@@ -20,7 +20,7 @@ Use the documentation-guidelines skill when:
 - Writing or reviewing `README.md`, `AGENTS.md`, `CLAUDE.md`
 - Creating specs, ADRs, design notes
 - Authoring SSOT content under `.ai/skills/`
-- Writing bootstrap materials under `init/`
+- Writing initialization archives or bootstrap materials
 
 ## Inputs
 

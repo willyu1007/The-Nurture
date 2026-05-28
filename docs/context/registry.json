@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-28T13:26:12.219Z",
+  "artifacts": [
+    {
+      "id": "api-openapi",
+      "type": "openapi",
+      "path": "docs/context/api/openapi.yaml",
+      "mode": "contract",
+      "format": "openapi-3.1",
+      "tags": [
+        "api"
+      ],
+      "checksumSha256": "ed8b0640efd49b9a12d81bc01a2d4fed4d8fa3d2235fc8be20b5c05080322c68",
+      "lastUpdated": "2026-05-28T09:16:20.633Z",
+      "source": {
+        "kind": "manual",
+        "notes": "Edit the contract file; then run ctl-context touch."
+      }
+    },
+    {
+      "id": "api-index",
+      "type": "json",
+      "path": "docs/context/api/api-index.json",
+      "mode": "generated",
+      "format": "api-index-v1",
+      "tags": [
+        "api",
+        "index",
+        "llm"
+      ],
+      "checksumSha256": "223b4a9e9c4f84b0f0ad0ddb227aada5ecfbbabf0ac9dc6838eeb0a24e5120c2",
+      "lastUpdated": "2026-05-28T09:16:20.635Z",
+      "source": {
+        "kind": "command",
+        "command": "node .ai/scripts/ctl-api-index.mjs generate --touch",
+        "notes": "Generated from openapi.yaml. Do NOT hand-edit."
+      }
+    },
+    {
+      "id": "glossary",
+      "type": "json",
+      "path": "docs/context/glossary.json",
+      "mode": "contract",
+      "format": "glossary-v1",
+      "tags": [
+        "glossary",
+        "llm"
+      ],
+      "checksumSha256": "9458ae377bdcc652618258440d671969f72ca05423f8f78124c114e21d8358f5",
+      "lastUpdated": "2026-05-28T13:26:12.217Z",
+      "source": {
+        "kind": "manual",
+        "notes": "Edit via ctl-context add-term/remove-term; then run ctl-context touch."
+      }
+    },
+    {
+      "id": "architecture-principles",
+      "type": "markdown",
+      "path": "docs/context/architecture-principles.md",
+      "mode": "contract",
+      "format": "architecture-principles-v1",
+      "tags": [
+        "architecture",
+        "llm"
+      ],
+      "checksumSha256": "6cc617057c651f0bfbd1eb8e4b8e224c38d5b1bc1a302266bc5d0b0d3f120f9e",
+      "lastUpdated": "2026-05-28T09:16:20.635Z",
+      "source": {
+        "kind": "manual",
+        "notes": "Edit the Markdown file directly; then run ctl-context touch."
+      }
+    },
+    {
+      "id": "db-schema",
+      "type": "db-schema",
+      "path": "docs/context/db/schema.json",
+      "mode": "generated",
+      "format": "normalized-db-schema-v2",
+      "tags": [
+        "db"
+      ],
+      "checksumSha256": "e4901d8e37d8f0934dca8ed9a16b2c734f2562b13bbe6b5fde3de66d5f4d0a09",
+      "lastUpdated": "2026-05-28T09:17:19.162Z",
+      "source": {
+        "kind": "command",
+        "command": "node .ai/scripts/ctl-db-ssot.mjs sync-to-context",
+        "notes": "Generated via ctl-db-ssot sync-to-context (then ctl-context touch). Do NOT hand-edit."
+      }
+    },
+    {
+      "id": "bpmn-example",
+      "type": "bpmn",
+      "path": "docs/context/process/example.bpmn",
+      "mode": "contract",
+      "format": "bpmn-2.0",
+      "tags": [
+        "bpmn",
+        "process"
+      ],
+      "checksumSha256": "1276230573853c3e20487671a11679169426ecd61bff59cb8f73e44b130d6f82",
+      "lastUpdated": "2026-05-28T09:16:20.635Z",
+      "source": {
+        "kind": "manual",
+        "notes": "Replace with real processes or add more .bpmn files; then run ctl-context touch."
+      }
+    },
+    {
+      "id": "workflow-nurture-scenario-contract",
+      "type": "markdown",
+      "path": "docs/context/workflow/nurture-scenario-contract.md",
+      "mode": "contract",
+      "format": "workflow-scenario-contract-v1",
+      "tags": [
+        "workflow",
+        "contract",
+        "my-chat",
+        "nurture"
+      ],
+      "checksumSha256": "96977432379b4c6ce7cdf925980c34537fa1d4d7fed23a23031a46910c21ec7a",
+      "lastUpdated": "2026-05-28T13:22:22.014Z",
+      "source": {
+        "kind": "command",
+        "command": "ctl-context add-artifact",
+        "cwd": "."
+      }
+    }
+  ]
+}

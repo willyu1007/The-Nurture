@@ -1,0 +1,386 @@
+{
+  "version": 1,
+  "project": {
+    "name": "the-nurture",
+    "description": "My-Chat framework scenario module for pregnancy, motherhood, childcare, family strategy, activity comparison, and review-driven parenting workflows.",
+    "domain": "Pregnancy, motherhood, childcare, and family decision workflow scenario for My-Chat",
+    "primaryUsers": [
+      "mothers and expectant mothers",
+      "co-parenting families and guardians",
+      "My-Chat operators and admins"
+    ],
+    "moduleBoundary": "Standard My-Chat scenario module, not a standalone product.",
+    "hostProject": "my-chat",
+    "contractSource": "my-workflow-base"
+  },
+  "repo": {
+    "layout": "monorepo",
+    "language": "typescript",
+    "packageManager": "pnpm",
+    "moduleShape": "scenario-module-with-independent-web-api-workers-packages"
+  },
+  "capabilities": {
+    "frontend": {
+      "enabled": true,
+      "framework": "nextjs",
+      "surfaces": [
+        "nurture-web-console",
+        "workflow-web-run-workbench-integration"
+      ]
+    },
+    "backend": {
+      "enabled": true,
+      "framework": "nestjs",
+      "services": [
+        "scenario-api",
+        "workflow-command-query-api",
+        "manifest-declared-internal-api"
+      ]
+    },
+    "api": {
+      "style": "rest",
+      "auth": "oauth2",
+      "hostAuth": "my-chat-logto-oidc-workspace-actor-permissions"
+    },
+    "database": {
+      "enabled": true,
+      "kind": "postgres",
+      "orm": "prisma",
+      "migrationStrategy": "repo-prisma",
+      "schemaSsot": "repo-prisma",
+      "schemaSsotPath": "prisma/schema.prisma",
+      "physicalLayoutPreference": "local-independent-db-cloud-my-chat-same-db-schema-or-table-group",
+      "canonicalObjectBoundary": "scenario data stores canonical object refs and attachments; My-Chat owns object identity"
+    },
+    "bpmn": {
+      "enabled": true,
+      "storage": "docs"
+    },
+    "workers": {
+      "enabled": true,
+      "runtime": "bullmq-redis-compatible-with-my-chat-workflow-workers"
+    },
+    "dashboard": {
+      "enabled": true,
+      "surfaces": [
+        "chat-dashboard-summary",
+        "mobile-dashboard-cards",
+        "web-run-workbench",
+        "nurture-web-console"
+      ],
+      "contract": "my-chat-workflow-dashboard-contract"
+    }
+  },
+  "quality": {
+    "testing": {
+      "unit": true,
+      "integration": true,
+      "e2e": true,
+      "deterministicJourneyHarness": true
+    },
+    "ci": {
+      "enabled": true
+    },
+    "devops": {
+      "enabled": true,
+      "containerize": true,
+      "packaging": true,
+      "deployment": true
+    }
+  },
+  "skills": {
+    "decision": "retain-all-packs-for-stage-b",
+    "packs": [
+      "workflows",
+      "backend",
+      "frontend",
+      "standards",
+      "testing",
+      "context-core"
+    ]
+  },
+  "context": {
+    "enabled": true,
+    "mode": "contract",
+    "environments": [
+      "dev",
+      "staging",
+      "prod"
+    ]
+  },
+  "db": {
+    "enabled": true,
+    "kind": "postgres",
+    "environments": [
+      "dev",
+      "staging",
+      "prod"
+    ],
+    "migrationTool": "prisma",
+    "ssot": "repo-prisma",
+    "schemaSsotPath": "prisma/schema.prisma",
+    "ssotPolicy": {
+      "sourceOfTruth": "repository-prisma-schema-and-migrations",
+      "cloudDatabaseRole": "apply-target-not-schema-authority",
+      "schemaChangeRule": "all schema changes start in repository Prisma schema and reviewed migrations",
+      "driftHandling": "cloud drift must be reconciled back through repository migrations before deployment"
+    },
+    "physicalLayout": "local-independent-db-cloud-my-chat-same-db-schema-or-table-group",
+    "layoutDecision": {
+      "localTesting": "independent-postgres-database-allowed",
+      "cloudPreferred": "merge-into-my-chat-postgres-using-dedicated-schema-or-nurture-table-group",
+      "driver": "my-chat-dashboard-chat-summary-web-console-query-efficiency",
+      "migrationGate": [
+        "my-chat-database-url-or-cloud-instance-exists",
+        "schema-name-or-table-prefix-is-reserved",
+        "prisma-migration-plan-is-reviewed-against-my-chat-schema",
+        "canonical-object-ref-foreign-key-or-reference-contract-is-defined",
+        "dashboard-read-path-and-index-plan-is-validated",
+        "rollback-and-data-export-plan-exists"
+      ],
+      "preconditionChecklist": [
+        {
+          "id": "my-chat-postgres-ready",
+          "check": "My-Chat cloud Postgres instance and DATABASE_URL secret reference are available for the target environment.",
+          "evidence": "env contract/secret ref plus deployment inventory entry"
+        },
+        {
+          "id": "namespace-reserved",
+          "check": "The Nurture has a reserved database namespace, either a dedicated schema or a nurture_* table group.",
+          "evidence": "schema/table naming decision recorded before migration"
+        },
+        {
+          "id": "canonical-object-contract",
+          "check": "Canonical object refs for mother, expectant mother, child, family, parent, activity, pregnancy episode, and postpartum episode are defined.",
+          "evidence": "context contract or schema note mapping each ref type to its My-Chat owner"
+        },
+        {
+          "id": "prisma-migration-reviewed",
+          "check": "Prisma migration is reviewed against the current My-Chat prisma/schema.prisma and migration history.",
+          "evidence": "migration diff and review note"
+        },
+        {
+          "id": "hot-path-index-plan",
+          "check": "Dashboard, chat summary, web console, handoff, and profile attachment read paths have indexes or projection strategy.",
+          "evidence": "query/index checklist attached to the migration plan"
+        },
+        {
+          "id": "local-to-cloud-data-boundary",
+          "check": "Local test data is not migrated into cloud production; only schema/migrations and approved seed/reference data move forward.",
+          "evidence": "migration runbook states data boundary"
+        },
+        {
+          "id": "rollback-export-plan",
+          "check": "Rollback, export, and recovery plan exists for The Nurture schema/table group before cloud apply.",
+          "evidence": "rollback section in migration runbook"
+        }
+      ],
+      "nonGoals": [
+        "copy-my-chat-object-identity-ownership-into-nurture",
+        "perform-cross-database-joins-on-hot-dashboard-paths",
+        "merge-local-test-data-into-production"
+      ]
+    },
+    "canonicalAttachment": {
+      "required": true,
+      "refTypes": [
+        "mother",
+        "expectant_mother",
+        "child",
+        "family",
+        "parent",
+        "activity",
+        "pregnancy_episode",
+        "postpartum_episode"
+      ]
+    }
+  },
+  "scenario": {
+    "key": "nurture",
+    "displayName": "The Nurture",
+    "status": "draft",
+    "ownerTeam": "my-chat-scenarios",
+    "allowedUserClasses": [
+      "mother",
+      "expectant_mother",
+      "parent",
+      "guardian",
+      "operator"
+    ],
+    "p0Workflows": [
+      "pregnancy-stage-management",
+      "long-term-goal-family-strategy",
+      "short-term-care-and-parenting-plan",
+      "activity-comparison-and-modeling",
+      "execution-review-and-learning"
+    ],
+    "crossCuttingCapabilities": [
+      "health-state-recording",
+      "basic-medical-guidance-boundary",
+      "scenario-profile-attachment",
+      "public-ready-draft-handoff"
+    ],
+    "firstDeterministicJourney": "long-term-goal-family-strategy-to-short-term-care-plan-to-activity-comparison-to-execution-review",
+    "medicalSafetyBoundary": {
+      "allowed": [
+        "health information organization",
+        "observation suggestions",
+        "questions for care provider",
+        "doctor visit or follow-up reminders",
+        "high-risk escalation prompts"
+      ],
+      "forbidden": [
+        "diagnosis",
+        "prescription",
+        "dosage",
+        "emergency replacement",
+        "doctor replacement",
+        "definitive no-care-needed claims"
+      ]
+    }
+  },
+  "workflow": {
+    "contract": "my-workflow-base-v0",
+    "moduleContract": true,
+    "manifestOrTsContract": "yaml-manifest-with-typescript-handler-registry",
+    "requiredRegistries": [
+      "handler_registry",
+      "action_registry",
+      "presenters",
+      "policies",
+      "repositories",
+      "surface_adapters"
+    ],
+    "standardSurfaces": [
+      "chat_workflow_control",
+      "chat_dashboard_summary",
+      "chat_citation",
+      "web_domain_workbench",
+      "web_run_workbench",
+      "mobile_dashboard",
+      "forum_publication",
+      "rag_knowledge",
+      "notification_push",
+      "admin_operator",
+      "worker_runtime"
+    ],
+    "events": {
+      "standardWorkflowEventsOnlyForSharedConsumers": true,
+      "signalPayloadPolicy": "refs-only-no-private-body-no-pii"
+    },
+    "handoff": {
+      "enabled": true,
+      "targets": [
+        "public_draft",
+        "forum",
+        "knowledge_candidate",
+        "notification"
+      ],
+      "policy": "request-receipt-refs-only-downstream-owner-reread",
+      "mvpDepth": "public-ready-draft-and-handoff-request-first; downstream forum-knowledge owners complete ingestion"
+    }
+  },
+  "ui": {
+    "enabled": true,
+    "framework": "nextjs-tailwind",
+    "surfaces": [
+      "nurture-web-console",
+      "workflow-dashboard-cards",
+      "web-run-workbench"
+    ]
+  },
+  "ci": {
+    "enabled": true,
+    "provider": "github",
+    "platform": "github-actions",
+    "features": [
+      "lint",
+      "test",
+      "typecheck",
+      "build",
+      "security"
+    ]
+  },
+  "packaging": {
+    "enabled": true,
+    "containerize": true,
+    "targets": [
+      "apps",
+      "services",
+      "workers"
+    ],
+    "registry": "ghcr.io/${GITHUB_REPOSITORY}"
+  },
+  "deploy": {
+    "enabled": true,
+    "model": "paas",
+    "environments": [
+      "dev",
+      "staging",
+      "prod"
+    ]
+  },
+  "release": {
+    "enabled": true,
+    "strategy": "semantic",
+    "changelog": true,
+    "branches": {
+      "main": "main",
+      "develop": "develop"
+    }
+  },
+  "observability": {
+    "enabled": true,
+    "metrics": true,
+    "logs": true,
+    "traces": true,
+    "platform": "other",
+    "keySignals": [
+      "workflow_run_started",
+      "workflow_step_latency",
+      "dashboard_card_generation_latency",
+      "health_safety_escalation",
+      "handoff_requested",
+      "review_completed"
+    ]
+  },
+  "stageBDecisions": {
+    "skillPacks": "retain workflows, backend, frontend, standards, testing, context-core",
+    "techStack": "confirmed TypeScript, pnpm, Next.js App Router, NestJS, Postgres, Prisma repo-prisma SSOT, BullMQ/Redis-compatible workers, My-Chat Logto/OIDC auth, My-Chat workflow dashboard contract",
+    "repoScaffold": "monorepo with independent web console, scenario api, workers, and packages",
+    "database": "repo-prisma is schema SSOT; local independent database is allowed; cloud should prefer My-Chat same Postgres with dedicated schema/table group when query efficiency requires it",
+    "databasePreconditions": [
+      "My-Chat cloud Postgres and DATABASE_URL secret ref exist for target environment",
+      "The Nurture database namespace is reserved",
+      "canonical object ref contract is defined",
+      "Prisma migration is reviewed against My-Chat schema and migration history",
+      "dashboard/chat/web-console/handoff read-path indexes or projections are planned",
+      "local test data is not migrated into cloud production",
+      "rollback/export/recovery plan exists before cloud apply"
+    ],
+    "firstJourney": "long-term goal/family strategy -> short-term care plan -> activity comparison -> execution review",
+    "dashboard": "include chat dashboard summary, mobile cards, web run workbench, and The Nurture web console",
+    "canonicalObjects": [
+      "mother_or_expectant_mother",
+      "child",
+      "family",
+      "parent_or_guardian",
+      "activity",
+      "pregnancy_episode",
+      "postpartum_episode"
+    ],
+    "handoffDepth": "model complete handoff targets; MVP implementation may stop at public-ready draft plus handoff request",
+    "medicalSafety": "safety policy/config must be explicit and testable"
+  },
+  "features": {
+    "contextAwareness": true,
+    "database": true,
+    "ui": true,
+    "environment": true,
+    "packaging": true,
+    "deployment": true,
+    "release": true,
+    "ci": true,
+    "observability": true
+  }
+}

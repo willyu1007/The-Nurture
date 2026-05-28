@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "updatedAt": "2026-05-28T00:00:00Z",
+  "terms": [
+    {
+      "term": "The Nurture",
+      "definition": "My-Chat 框架下的孕育/育儿决策标准场景模块，用于将 The-Parents 的目标规范化为可接入 My-Chat 的 workflow、web console、服务端、数据库和画像能力。",
+      "scope": "global",
+      "aliases": ["nurture scenario", "parenting workflow scenario"],
+      "see_also": ["My-Chat", "Workflow scenario"]
+    },
+    {
+      "term": "My-Chat",
+      "definition": "The Nurture 的宿主产品，拥有 chat、forum、knowledge、workflow runtime、domain registry、mobile dashboard、notification 和 admin 等共享消费面。",
+      "scope": "global",
+      "aliases": ["host product", "宿主平台"],
+      "see_also": ["Canonical object", "Workflow dashboard"]
+    },
+    {
+      "term": "Workflow scenario",
+      "definition": "My-Workflow-Base 中的一等场景对象，包含 scenario identity、capabilities、entrypoints、manifest、handlers、actions、presenters 和 policies。",
+      "scope": "workflow",
+      "aliases": ["scenario module", "场景模块"],
+      "see_also": ["Capability", "Entrypoint"]
+    },
+    {
+      "term": "Capability",
+      "definition": "Scenario 暴露的可启动能力，例如孕期阶段管理、短期育儿安排、长期目标校准或活动比较。",
+      "scope": "workflow",
+      "aliases": ["workflow capability", "场景能力"],
+      "see_also": ["Entrypoint"]
+    },
+    {
+      "term": "Entrypoint",
+      "definition": "Capability 下的具体启动入口，定义输入要求、步骤顺序、允许 surface 和版本。",
+      "scope": "workflow",
+      "aliases": ["workflow entrypoint"],
+      "see_also": ["Capability"]
+    },
+    {
+      "term": "ChatWorkflowAdapter",
+      "definition": "My-Chat chat surface 调用 workflow 的标准 adapter，负责推荐、启动、确认动作、dashboard summary 和 citation package。",
+      "scope": "workflow",
+      "aliases": ["chat workflow control adapter"],
+      "see_also": ["Workflow dashboard"]
+    },
+    {
+      "term": "Workflow dashboard",
+      "definition": "My-Chat 共享 workflow 消费面，用 cards、run summary、artifact preview 和 action availability 展示 run 状态并承载轻量动作。",
+      "scope": "workflow",
+      "aliases": ["mobile dashboard", "chat dashboard summary", "dashboard cards"],
+      "see_also": ["Web run workbench", "Artifact"]
+    },
+    {
+      "term": "Web run workbench",
+      "definition": "面向 web 的 workflow run 详情和操作面，可查看 timeline、artifact preview、actions 和 handoffs，但必须遵守 Workflow API 和权限边界。",
+      "scope": "workflow",
+      "aliases": ["web workflow workbench"],
+      "see_also": ["Workflow dashboard", "Handoff"]
+    },
+    {
+      "term": "The Nurture web console",
+      "definition": "The Nurture 的场景操作台，用于长期目标 workflow、画像查看、活动建模、复盘、人工确认和场景管理。",
+      "scope": "nurture",
+      "aliases": ["nurture console", "场景操作台"],
+      "see_also": ["Web run workbench"]
+    },
+    {
+      "term": "Domain Context Ref",
+      "definition": "Workflow 面向 canonical domain object 的稳定引用，包含 namespace、object_type、object_id、version 和 owner_scope。",
+      "scope": "workflow",
+      "aliases": ["context ref", "canonical ref"],
+      "see_also": ["Canonical object", "Context Snapshot", "Context Binding"]
+    },
+    {
+      "term": "Context Snapshot",
+      "definition": "Workflow 在 run 或 step 中使用的冻结安全视图，用于保证执行时上下文可追踪。",
+      "scope": "workflow",
+      "aliases": ["snapshot ref"],
+      "see_also": ["Domain Context Ref"]
+    },
+    {
+      "term": "Context Binding",
+      "definition": "记录某个 run、step 或 artifact 依赖哪些 context refs、snapshots 和 versions 的 ledger 记录。",
+      "scope": "workflow",
+      "aliases": ["binding record"],
+      "see_also": ["Domain Context Ref", "Context Snapshot"]
+    },
+    {
+      "term": "Handoff",
+      "definition": "Workflow 向 forum、knowledge、notification 或 RAG 等下游 owner 提交的 refs-only 请求/回执契约。",
+      "scope": "workflow",
+      "aliases": ["handoff request", "handoff receipt"],
+      "see_also": ["Public-ready draft", "Artifact"]
+    },
+    {
+      "term": "Public-ready draft",
+      "definition": "从私域记录、建议或复盘中生成的可公开草稿，必须经过脱敏、风险标记和用户确认后才可进入论坛或知识链路。",
+      "scope": "workflow",
+      "aliases": ["公开化草稿"],
+      "see_also": ["Handoff"]
+    },
+    {
+      "term": "Artifact",
+      "definition": "Workflow run 产生的结构化输出或可展示预览，带 exposure level、safe title/summary、source refs 和 storage refs。",
+      "scope": "workflow",
+      "aliases": ["workflow artifact"],
+      "see_also": ["Evidence record"]
+    },
+    {
+      "term": "Evidence record",
+      "definition": "对权威写入或高风险操作的最小解释性记录，用于合规、调试和重放解释。",
+      "scope": "workflow",
+      "aliases": ["evidence log"],
+      "see_also": ["Artifact"]
+    },
+    {
+      "term": "Long-term goal",
+      "definition": "家庭对孩子成长方向的长期目标或价值导向，在 The Nurture 中既是短期决策评价标准，也可以是独立 workflow 的输入和产出。",
+      "scope": "nurture",
+      "aliases": ["长期目标"],
+      "see_also": ["Family constraint", "Review result"]
+    },
+    {
+      "term": "Mother / expectant mother",
+      "definition": "The Nurture 的优先用户和 canonical object 之一，覆盖备孕、孕期、产后恢复、婴幼儿照护和家庭育儿决策中的主要照护者。",
+      "scope": "nurture",
+      "aliases": ["宝妈", "准妈妈", "孕产妇用户"],
+      "see_also": ["Pregnancy stage", "Health state"]
+    },
+    {
+      "term": "Pregnancy stage",
+      "definition": "与孕周、产检节点、身体状态和家庭准备事项相关的阶段上下文。",
+      "scope": "nurture",
+      "aliases": ["孕期阶段", "孕周阶段"],
+      "see_also": ["Mother / expectant mother", "Health state"]
+    },
+    {
+      "term": "Health state",
+      "definition": "用户记录的孕期、产后、孩子身体状态、症状观察、儿保/产检结论 refs 和相关证据。",
+      "scope": "nurture",
+      "aliases": ["健康状态", "身体状态"],
+      "see_also": ["Basic medical guidance"]
+    },
+    {
+      "term": "Basic medical guidance",
+      "definition": "非诊断性的健康信息整理、观察建议、问题清单、就医/复诊提示和急症升级提醒。",
+      "scope": "nurture",
+      "aliases": ["基础医疗建议", "健康提醒"],
+      "see_also": ["Health state"]
+    },
+    {
+      "term": "Scenario profile",
+      "definition": "The Nurture 维护的孕育/养育场景画像，必须通过 canonical object ref 贴附到 My-Chat 对象。",
+      "scope": "nurture",
+      "aliases": ["nurture profile", "场景画像"],
+      "see_also": ["Canonical object"]
+    },
+    {
+      "term": "Canonical object",
+      "definition": "My-Chat 数据库中的平台对象身份，例如宝妈/准妈妈、孩子、家庭、父母或活动对象。",
+      "scope": "global",
+      "aliases": ["My-Chat object", "platform object"],
+      "see_also": ["Scenario profile", "Domain Context Ref"]
+    },
+    {
+      "term": "Development constraint",
+      "definition": "与孩子年龄阶段和通用发展规律相关的适配性约束。",
+      "scope": "nurture",
+      "aliases": ["阶段约束", "通用发展约束"],
+      "see_also": ["Activity candidate"]
+    },
+    {
+      "term": "Family constraint",
+      "definition": "家庭本地的预算、时间、节律、父母精力、交通和协作边界。",
+      "scope": "nurture",
+      "aliases": ["家庭约束"],
+      "see_also": ["Long-term goal", "Activity candidate"]
+    },
+    {
+      "term": "Activity candidate",
+      "definition": "可被评估和安排的活动对象，例如课程、旅行、运动、娱乐、学习任务或家庭活动。",
+      "scope": "nurture",
+      "aliases": ["活动候选", "活动对象"],
+      "see_also": ["Development constraint", "Family constraint", "Review result"]
+    },
+    {
+      "term": "Review result",
+      "definition": "用户执行计划后的结果记录、观察和复盘结论，用于后续证据和 context 更新。",
+      "scope": "nurture",
+      "aliases": ["复盘结果"],
+      "see_also": ["Evidence record", "Long-term goal"]
+    }
+  ]
+}

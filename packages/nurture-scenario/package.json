@@ -1,0 +1,13 @@
+{
+  "name": "@the-nurture/scenario",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The Nurture scenario module scaffold compatible with My-Workflow-Base contracts.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

@@ -30,7 +30,7 @@ Do not use `.ai/tests/` as a replacement for project unit/integration/E2E tests 
 |-------|-------------------|--------------|
 | `ui` | `ui_gate.py`, `image_style_probe.py` | governance gate, style intake |
 | `environment` | `env_contractctl.py`, `env_localctl.py` | contract -> local |
-| `database` | `ctl-db-ssot.mjs`, `ctl-convex.mjs`, `ctl-db-doc.mjs` | sqlite smoke + Convex init/verify + DB doc surface |
+| `database` | `ctl-db-ssot.mjs`, `ctl-convex.mjs`, `ctl-db-doc.mjs` | sqlite smoke + Convex initialization/verification + DB doc surface |
 | `context-awareness` | `ctl-context.mjs` | init -> add-artifact -> touch -> verify + glossary contract regressions |
 | `api-index` | `ctl-api-index.mjs`, `ctl-openapi-quality.mjs` | generate -> verify -> diff + quality gate |
 | `deployment` | `ctl-deploy.mjs` | init -> add-service -> plan -> verify |

@@ -92,7 +92,6 @@ Notes:
 
 - `docs/project/`: project-specific documentation (requirements, blueprints)
 - `scripts/`: script entrypoints (cross-platform can share the same base name with different suffixes)
-- `init/`: bootstrap materials (if present)
 
 ### Temporary Directory (MUST)
 

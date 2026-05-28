@@ -1,0 +1,310 @@
+{
+  "version": 1,
+  "language": "zh",
+  "stage": "complete",
+  "createdAt": "2026-05-27T13:17:30.630Z",
+  "stage-a": {
+    "mustAsk": {
+      "terminologyAlignment": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/domain-glossary.md"
+      },
+      "onePurpose": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/requirements.md"
+      },
+      "userRoles": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/requirements.md"
+      },
+      "mustRequirements": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/requirements.md"
+      },
+      "outOfScope": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/requirements.md"
+      },
+      "userJourneys": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/requirements.md"
+      },
+      "constraints": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/non-functional-requirements.md"
+      },
+      "successMetrics": {
+        "asked": true,
+        "answered": true,
+        "writtenTo": "init/_work/stage-a-docs/non-functional-requirements.md"
+      }
+    },
+    "docsWritten": {
+      "requirements": true,
+      "nfr": true,
+      "glossary": true,
+      "riskQuestions": true
+    },
+    "validated": true,
+    "userApproved": true,
+    "docsFingerprint": "53a1259716ef1434783ea6e0091e28b8c038ebc718374fe7056e697f4cb25d71"
+  },
+  "stage-b": {
+    "drafted": true,
+    "validated": true,
+    "packsReviewed": true,
+    "userApproved": true,
+    "blueprintFingerprint": "44350d1e223aba4c3fd4573784c2196bc6d9c9b487739d6638b425740a8be806",
+    "packsReviewedFingerprint": "44350d1e223aba4c3fd4573784c2196bc6d9c9b487739d6638b425740a8be806",
+    "approvedBlueprintFingerprint": "44350d1e223aba4c3fd4573784c2196bc6d9c9b487739d6638b425740a8be806"
+  },
+  "stage-c": {
+    "scaffoldApplied": true,
+    "configsGenerated": true,
+    "manifestUpdated": true,
+    "wrappersSynced": true,
+    "skillRetentionReviewed": true,
+    "userApproved": true,
+    "appliedBlueprintFingerprint": "44350d1e223aba4c3fd4573784c2196bc6d9c9b487739d6638b425740a8be806",
+    "appliedProviders": "both",
+    "skillRetentionTablePath": "init/_work/skill-retention-table.template.md",
+    "skillRetentionTableFingerprint": "d17298a1b0d3215f295656ee0bced694b00e260027cf31b40a586d4d6ed90701"
+  },
+  "history": [
+    {
+      "timestamp": "2026-05-27T13:17:30.631Z",
+      "event": "init_started",
+      "details": "Initialization started"
+    },
+    {
+      "timestamp": "2026-05-27T13:17:30.684Z",
+      "event": "llm_language_set",
+      "details": "llm.language set to \"中文\""
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.431Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.terminologyAlignment updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.485Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.onePurpose updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.537Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.userRoles updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.591Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.mustRequirements updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.644Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.outOfScope updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.695Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.userJourneys updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.747Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.constraints updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:09.799Z",
+      "event": "must_ask_updated",
+      "details": "mustAsk.successMetrics updated"
+    },
+    {
+      "timestamp": "2026-05-27T13:23:18.893Z",
+      "event": "stage_a_validated",
+      "details": "Stage A docs validated"
+    },
+    {
+      "timestamp": "2026-05-27T13:41:18.857Z",
+      "event": "stage_a_validated",
+      "details": "Stage A docs validated"
+    },
+    {
+      "timestamp": "2026-05-27T22:33:23.321Z",
+      "event": "stage_a_validated",
+      "details": "Stage A docs validated"
+    },
+    {
+      "timestamp": "2026-05-27T22:50:51.841Z",
+      "event": "stage_a_validated",
+      "details": "Stage A docs validated"
+    },
+    {
+      "timestamp": "2026-05-27T23:28:59.626Z",
+      "event": "stage_a_validated",
+      "details": "Stage A docs validated"
+    },
+    {
+      "timestamp": "2026-05-27T23:42:50.082Z",
+      "event": "stage_a_approved",
+      "details": "Stage A approved by user"
+    },
+    {
+      "timestamp": "2026-05-27T23:44:24.729Z",
+      "event": "stage_b_validated",
+      "details": "Stage B blueprint validated"
+    },
+    {
+      "timestamp": "2026-05-28T07:48:59.960Z",
+      "event": "stage_b_validated",
+      "details": "Stage B blueprint validated"
+    },
+    {
+      "timestamp": "2026-05-28T07:49:00.012Z",
+      "event": "packs_reviewed",
+      "details": "Packs reviewed"
+    },
+    {
+      "timestamp": "2026-05-28T08:39:01.373Z",
+      "event": "stage_b_validated",
+      "details": "Stage B blueprint validated"
+    },
+    {
+      "timestamp": "2026-05-28T08:39:01.429Z",
+      "event": "packs_reviewed",
+      "details": "Packs reviewed"
+    },
+    {
+      "timestamp": "2026-05-28T09:08:31.353Z",
+      "event": "stage_b_validated",
+      "details": "Stage B blueprint validated"
+    },
+    {
+      "timestamp": "2026-05-28T09:08:31.406Z",
+      "event": "packs_reviewed",
+      "details": "Packs reviewed"
+    },
+    {
+      "timestamp": "2026-05-28T09:15:53.574Z",
+      "event": "stage_b_approved",
+      "details": "Stage B approved by user"
+    },
+    {
+      "timestamp": "2026-05-28T09:16:22.273Z",
+      "event": "stage_c_applied",
+      "details": "Stage C apply completed"
+    },
+    {
+      "timestamp": "2026-05-28T09:18:05.939Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (no deletions)"
+    },
+    {
+      "timestamp": "2026-05-28T09:56:38.676Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:14:25.135Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (apply)"
+    },
+    {
+      "timestamp": "2026-05-28T10:23:28.320Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:23:31.952Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (apply)"
+    },
+    {
+      "timestamp": "2026-05-28T10:24:06.409Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:24:06.410Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (no deletions)"
+    },
+    {
+      "timestamp": "2026-05-28T10:40:23.415Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:40:27.158Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (apply)"
+    },
+    {
+      "timestamp": "2026-05-28T10:40:45.634Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:40:45.635Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (no deletions)"
+    },
+    {
+      "timestamp": "2026-05-28T10:52:24.385Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:52:29.198Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (apply)"
+    },
+    {
+      "timestamp": "2026-05-28T10:52:45.128Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T10:52:45.130Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (no deletions)"
+    },
+    {
+      "timestamp": "2026-05-28T11:00:02.973Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T11:00:06.915Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (apply)"
+    },
+    {
+      "timestamp": "2026-05-28T11:00:25.560Z",
+      "event": "skill_retention_invalidated",
+      "details": "Skill retention confirmation invalidated (table changed)"
+    },
+    {
+      "timestamp": "2026-05-28T11:00:25.561Z",
+      "event": "skill_retention_reviewed",
+      "details": "Skill retention confirmed (no deletions)"
+    },
+    {
+      "timestamp": "2026-05-28T13:19:08.121Z",
+      "event": "init_completed",
+      "details": "Initialization completed"
+    }
+  ],
+  "llm": {
+    "language": "中文"
+  }
+}

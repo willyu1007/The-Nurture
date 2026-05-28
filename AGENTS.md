@@ -1,52 +1,56 @@
 # AI Assistant Instructions
 
-**AI-Friendly Repository Template**: a starter kit for creating LLM-optimized codebases with optional features.
+The Nurture is a My-Chat scenario module. Preserve My-Chat ownership boundaries and My-Workflow-Base contracts.
 
-## Project Type
+## Global Strategy
 
-Template repository. Users clone the repository to start new AI-friendly projects.
+- Do not treat The Nurture as an independent product shell.
+- Do not copy or fork My-Chat host runtime code into this repo unless explicitly requested.
+- Scenario-local data may exist, but identity belongs to My-Chat canonical objects.
+- Health guidance must be non-diagnostic, non-prescriptive, and non-emergency-replacement.
+- Prefer `docs/context/` contracts before source scanning for API, DB, workflow, glossary, or architecture context.
+- Initialization history belongs under `docs/project/overview/`; do not add new planning there.
 
-## Routing
+## Task Routing
 
-| Task Type | Entry Point |
-|-----------|-------------|
-| **First time / Project setup** | `init/AGENTS.md` |
-| **Skill authoring / maintenance** | `.ai/AGENTS.md` |
-| **LLM engineering** | `.ai/llm-config/AGENTS.md` |
-| **Project progress governance** | `.ai/project/AGENTS.md` |
-| **Complex task documentation** | `dev-docs/AGENTS.md` |
+- Project governance: `.ai/project/AGENTS.md`
+- Complex task docs: `dev-docs/AGENTS.md`
+- Context contracts: `docs/context/AGENTS.md`
+- Skill maintenance: `.ai/AGENTS.md`
+- Historical initialization decisions: `docs/project/overview/START-HERE.md`
 
-## Global Rules
+## Workflow Contract Rules
 
-- Follow progressive disclosure: read only the file you are routed to
-- On context reset for ongoing work, read `dev-docs/active/<task-name>/00-overview.md` first
+Before changing workflow integration, read:
 
-## Coding Standards (RECOMMEND)
+- `docs/context/workflow/nurture-scenario-contract.md`
+- `packages/nurture-scenario/scenario.manifest.yaml`
+- `packages/nurture-scenario/src/module.ts`
 
-- **ESM (.mjs)**: All scripts in the repository use ES Modules with `.mjs` extension. Use `import`/`export` syntax, not `require()`.
+The Nurture owns scenario manifest, handlers, actions, presenters, adapters, policies, repository ports, local projections, and scenario artifacts.
 
-## Coding Workflow (MUST)
+My-Chat owns canonical object identity, auth, shared workflow runtime, routes, workers, outbox, ledgers, dashboard/chat/mobile/forum/knowledge/notification/admin consumers.
 
-- Before modifying code/config for a non-trivial task, apply the Decision Gate in `dev-docs/AGENTS.md` and create/update the dev-docs task bundle as required.
-- If the user asks for planning artifacts (plan/roadmap/milestones/implementation plan) before coding:
-  - If the task meets the Decision Gate, use `plan-maker` first, then ask for confirmation to proceed with implementation.
-  - If the task is trivial (<30 min), provide an in-chat plan (do NOT write under `dev-docs/`).
-  - If the task needs context preservation (multi-session, handoff) or qualifies as complex, follow `dev-docs/AGENTS.md` and use dev-docs workflows.
+## Work Rules
 
-## Workspace Safety (MUST)
-
-- NEVER create/copy/clone this repository into any subdirectory of itself (no nested repo copies).
-- Create throwaway test repos **outside** the repo root (OS temp or a sibling directory) and delete them after verification.
-- Keep temporary workspaces shallow: if a path is getting deeply nested or has exceeded **12 path segments** total;, stop and clean up instead of continuing.
+- For non-trivial post-initialization work, apply `dev-docs/AGENTS.md` Decision Gate.
+- Keep host-runtime concerns out of scenario packages.
+- Use ESM for scripts (`.mjs`, `import`/`export`).
+- Do not edit `.codex/skills/` or `.claude/skills/` directly; edit `.ai/skills/` and regenerate wrappers.
+- Never create/copy/clone this repository into a subdirectory of itself.
 
 <!-- DB-SSOT:START -->
 ## Database SSOT and schema synchronization
 
-The section is **managed by the init pipeline**. After project initialization it will contain:
+**Mode: repo-prisma** (SSOT = `prisma/schema.prisma`)
 
-- The selected DB schema SSOT mode (`none` / `repo-prisma` / `database` / `convex`)
-- The correct routing for DB schema change requests
-- The canonical LLM-readable DB schema contract location
+- SSOT selection file: `docs/project/db-ssot.json`
+- DB context contract (generated, LLM-first): `docs/context/db/schema.json`
+- If you need to change persisted fields / tables: use skill `sync-db-schema-from-code`.
+- If you need to mirror an external DB: do NOT; this mode assumes migrations originate in the repo.
 
-If the block is still in its placeholder form, run the init Stage C apply step.
+Rules:
+- Business layer MUST NOT import Prisma (repositories return domain entities).
+- Database workflows in this repo require `features.contextAwareness=true`.
+- Refresh generated DB context via `node .ai/scripts/ctl-db-ssot.mjs sync-to-context`.
 <!-- DB-SSOT:END -->
