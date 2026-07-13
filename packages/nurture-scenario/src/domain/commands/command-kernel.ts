@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
 import type { NurtureWorkflowProject } from "../../repositories.js";
+import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
 
 export const NURTURE_COMMAND_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const HASH_HEX_PATTERN = /^[0-9a-f]{64}$/;
@@ -35,6 +36,8 @@ export type NurtureCommandExecutionRecord = {
 export type NurtureCommandExecutionDraft = Omit<NurtureCommandExecutionRecord, "id" | "committed_at">;
 
 export type NurtureCommandTransaction = {
+  /** Present when the N1 institution command adapter is wired. */
+  familyCare?: NurtureFamilyCareCommandTransaction;
   findCommitted(input: {
     workspace_id: string;
     command_request_id_hash: string;
@@ -76,6 +79,12 @@ export type NurtureCommandPreconditionDecision =
   | { status: "already_satisfied"; output_refs: DomainContextRef[] }
   | { status: "invalid" | "blocked" | "conflict"; reason_code: string };
 
+export type NurtureCommandExecutionContext = {
+  workspace_id: string;
+  business_actor_ref: string;
+  child_care_process_id?: string;
+};
+
 export type NurtureCommandSpec<Input> = {
   command_key: string;
   command_scope: string;
@@ -84,10 +93,12 @@ export type NurtureCommandSpec<Input> = {
   checkPreconditions(
     transaction: NurtureCommandTransaction,
     input: Input,
+    context: NurtureCommandExecutionContext,
   ): Promise<NurtureCommandPreconditionDecision>;
   apply(
     transaction: NurtureCommandTransaction,
     input: Input,
+    context: NurtureCommandExecutionContext,
   ): Promise<{ output_refs: DomainContextRef[] }>;
 };
 
@@ -231,6 +242,32 @@ export class NurtureCommandRunner {
     if (!input.workspace_id || !input.business_actor_ref || input.spec.contract_version < 1) {
       return { status: "not_committed", decision: "invalid", reason_code: "invalid_command_envelope" };
     }
+    if (
+      input.payload &&
+      typeof input.payload === "object" &&
+      "workspace_id" in input.payload &&
+      (input.payload as { workspace_id?: unknown }).workspace_id !== input.workspace_id
+    ) {
+      return {
+        status: "not_committed",
+        decision: "invalid",
+        reason_code: "invalid_command_workspace",
+      };
+    }
+    if (
+      input.payload &&
+      typeof input.payload === "object" &&
+      "child_care_process_id" in input.payload &&
+      input.child_care_process_id !== undefined &&
+      (input.payload as { child_care_process_id?: unknown }).child_care_process_id !==
+        input.child_care_process_id
+    ) {
+      return {
+        status: "not_committed",
+        decision: "invalid",
+        reason_code: "invalid_command_scope",
+      };
+    }
 
     const commandRequestIdHash = hashCommandRequestId(input.workspace_id, input.command_request_id);
     const originInvocationRequestIdHash = hashInvocationRequestId(
@@ -297,7 +334,18 @@ export class NurtureCommandRunner {
         });
         if (winner) return compareReplay({ existing: winner, ...replayInput });
 
-        const decision = await input.spec.checkPreconditions(transaction, input.payload);
+        const executionContext: NurtureCommandExecutionContext = {
+          workspace_id: input.workspace_id,
+          business_actor_ref: input.business_actor_ref,
+          ...(input.child_care_process_id
+            ? { child_care_process_id: input.child_care_process_id }
+            : {}),
+        };
+        const decision = await input.spec.checkPreconditions(
+          transaction,
+          input.payload,
+          executionContext,
+        );
         if (decision.status === "invalid" || decision.status === "blocked" || decision.status === "conflict") {
           return {
             status: "not_committed" as const,
@@ -311,7 +359,7 @@ export class NurtureCommandRunner {
             ? { business_outcome: "already_satisfied" as const, output_refs: decision.output_refs }
             : {
                 business_outcome: "applied" as const,
-                ...(await input.spec.apply(transaction, input.payload)),
+                ...(await input.spec.apply(transaction, input.payload, executionContext)),
               };
         validateRefs(applied.output_refs, "output_refs");
         const record = await transaction.createExecution({

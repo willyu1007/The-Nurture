@@ -2,6 +2,7 @@ import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts
 import type { NurtureCommandRepository } from "./domain/commands/command-kernel.js";
 import type { NurtureInteractionContextRepository } from "./domain/interactions/interaction-context.js";
 import type { NurtureInstitutionContextRepository } from "./domain/institution/institution-context.js";
+import type { NurtureFamilyCareQueryRepository } from "./domain/institution/family-care-query.js";
 
 export type NurtureProfileProjection = {
   profile_id: string;
@@ -119,6 +120,8 @@ export type NurtureRepositories = {
   interactions: NurtureInteractionContextRepository;
   /** N1 institution resolver/policy port; optional for legacy P0 test fixtures. */
   institution?: NurtureInstitutionContextRepository;
+  /** N1 safe collection reads; optional for legacy P0 fixtures. */
+  familyCareQuery?: NurtureFamilyCareQueryRepository;
   profiles: NurtureProfileRepository;
   activityComparisons: ActivityComparisonRepository;
   evidence: NurtureEvidenceRepository;
@@ -129,6 +132,7 @@ export const repositoryTokens = {
   commands: "nurture.repositories.commands",
   interactions: "nurture.repositories.interactions",
   institution: "nurture.repositories.institution",
+  familyCareQuery: "nurture.repositories.family_care_query",
   profiles: "nurture.repositories.profiles",
   activityComparisons: "nurture.repositories.activity_comparisons",
   evidence: "nurture.repositories.evidence",

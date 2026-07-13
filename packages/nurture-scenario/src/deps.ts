@@ -7,6 +7,7 @@ import type {
 import {
   createInMemoryInteractionContextRepository,
   createInMemoryInstitutionContextRepository,
+  createInMemoryFamilyCareQueryRepository,
   createInMemoryNurtureCommandRepository,
 } from "./domain/testing/in-memory-institution-ports.js";
 
@@ -112,6 +113,7 @@ export const defaultNurtureDeps: NurtureHandlerDeps = {
     commands: createInMemoryNurtureCommandRepository(),
     interactions: createInMemoryInteractionContextRepository(),
     institution: createInMemoryInstitutionContextRepository(),
+    familyCareQuery: createInMemoryFamilyCareQueryRepository(),
     profiles: {
       getByCanonicalObjectRef: async () => null,
       upsertProjection: async (input) => input,

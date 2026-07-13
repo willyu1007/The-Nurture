@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-13
 - **Owner:** willyu1007
-- **Next step:** Implement N1 on `feat/nurture-institution-n1` in quality-gated increments: additive schema, shared command kernel/interaction context, fail-closed resolver-policy core, then `class_family_inbox` + `teacher_attention_board`. Every committed Execution persists `handoffRequestSnapshotsPayload=[]`; non-empty activation remains gated until My-Chat X3 and joint crash tests pass.
+- **Next step:** Enter N1-F: prepare DB-backed family-care journey tests, obtain target-specific approval, apply the additive production migration to the approved database, and verify capture/replay/revoke/redaction/cancel/query behavior against Postgres. N1-E domain/repository code is static-gate complete; manifest handlers/presenters remain unadvertised until the DB-backed owner-read path is verified. Every committed Execution persists `handoffRequestSnapshotsPayload=[]`; non-empty activation remains gated until My-Chat X3 and joint crash tests pass.
 
 ## N1 Adopted Contract Baseline
 

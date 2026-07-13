@@ -13,13 +13,15 @@ import type {
   NurtureInstitutionContextRepository,
   NurturePolicyFacts,
 } from "../institution/institution-context.js";
+import type { NurtureFamilyCareQueryRepository } from "../institution/family-care-query.js";
+import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
 
 type CommandTransactionOverrides = Partial<
   Pick<
     NurtureCommandTransaction,
     "getWorkflowProjectById" | "updateWorkflowProjectStrategy" | "appendEvidenceRef"
   >
->;
+> & { familyCare?: NurtureFamilyCareCommandTransaction };
 
 export const createInMemoryNurtureCommandRepository = (
   overrides: CommandTransactionOverrides = {},
@@ -52,6 +54,7 @@ export const createInMemoryNurtureCommandRepository = (
       locks.add(lockKey);
       try {
         const transaction: NurtureCommandTransaction = {
+          ...(overrides.familyCare ? { familyCare: overrides.familyCare } : {}),
           findCommitted,
           createExecution,
           getWorkflowProjectById:
@@ -186,4 +189,11 @@ export const createInMemoryInstitutionContextRepository = (
     overrides.revalidateResolutionCandidate ??
     (async () => ({ current: false, reason_code: "participant_missing" })),
   loadPolicyFacts: overrides.loadPolicyFacts ?? (async () => unavailablePolicyFacts()),
+});
+
+export const createInMemoryFamilyCareQueryRepository = (
+  overrides: Partial<NurtureFamilyCareQueryRepository> = {},
+): NurtureFamilyCareQueryRepository => ({
+  listClassFamilyInbox: overrides.listClassFamilyInbox ?? (async () => []),
+  listTeacherAttentionBoard: overrides.listTeacherAttentionBoard ?? (async () => []),
 });

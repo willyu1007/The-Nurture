@@ -161,6 +161,17 @@
 2. `caregiver_daily_care` second.
 3. `child_media_attribution` third.
 
+**N1 implementation checkpoints（2026-07-13）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| N1-A | Complete | Cross-repo revision/hash pin and explicit-empty activation boundary. |
+| N1-B | Static preview complete | Additive production schema/migration/context; no target database has been migrated yet. |
+| N1-C | Complete | Shared CommandExecution runner, InteractionContext, Prisma transaction adapter, and one family-core command migration. |
+| N1-D | Complete | Fail-closed resolver, candidate kernel, structured policy, and current-state source adapters. |
+| N1-E | Complete | Family input → receipt/item/attention, caregiver acknowledge/reply, grant revoke, source redaction, pre-delivery cancel, class inbox/attention owner reads; explicit `[]` only. |
+| N1-F | Pending | Approved production-DB migration apply, DB-backed fault/privacy journey, scenario handler/presenter/manifest conformance, and final N1 review. |
+
 **Cross-repo task ownership：**
 
 - My-Workflow-Base：复用 `dev-docs/active/workflow-base`，因为 X0 是既有模板合同收敛。

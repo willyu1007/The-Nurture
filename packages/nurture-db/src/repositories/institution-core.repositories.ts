@@ -15,6 +15,7 @@ import type {
   NurtureInteractionContextRepository,
   NurtureWorkflowProject,
 } from "@the-nurture/scenario";
+import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -101,7 +102,11 @@ const toInteraction = (row: PrismaInteractionContext): NurtureInteractionContext
 });
 
 class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
-  constructor(private readonly transaction: Prisma.TransactionClient) {}
+  readonly familyCare: PrismaFamilyCareCommandTransaction;
+
+  constructor(private readonly transaction: Prisma.TransactionClient) {
+    this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
+  }
 
   async findCommitted(input: {
     workspace_id: string;
@@ -228,17 +233,20 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
     command_request_id_hash: string;
     operation: (transaction: NurtureCommandTransaction) => Promise<T>;
   }): Promise<{ acquired: true; value: T } | { acquired: false }> {
-    return this.prisma.$transaction(async (transaction) => {
-      const rows = await transaction.$queryRaw<Array<{ acquired: boolean }>>(
-        Prisma.sql`SELECT pg_try_advisory_xact_lock(${advisoryKey(
-          input.workspace_id,
-          input.command_request_id_hash,
-        )}) AS acquired`,
-      );
-      if (rows[0]?.acquired !== true) return { acquired: false };
-      const value = await input.operation(new PrismaNurtureCommandTransaction(transaction));
-      return { acquired: true, value };
-    });
+    return this.prisma.$transaction(
+      async (transaction) => {
+        const rows = await transaction.$queryRaw<Array<{ acquired: boolean }>>(
+          Prisma.sql`SELECT pg_try_advisory_xact_lock(${advisoryKey(
+            input.workspace_id,
+            input.command_request_id_hash,
+          )}) AS acquired`,
+        );
+        if (rows[0]?.acquired !== true) return { acquired: false };
+        const value = await input.operation(new PrismaNurtureCommandTransaction(transaction));
+        return { acquired: true, value };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
   }
 }
 

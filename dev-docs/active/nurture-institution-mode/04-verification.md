@@ -55,6 +55,19 @@
 | Unit gate | PASS | 15 files / 125 tests; exact population and routing gates pass. |
 | Static DB/boundary gates | PASS | Both Prisma schemas validate (dev-host with a non-connecting placeholder URL), production/dev-host boundaries pass, N1 schema contract passes, and cross-repo contract pin passes. No database was mutated. |
 
+## N1-E Inbox / Attention Domain Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Command closure | PASS | Family input, grant revoke, acknowledge, caregiver-confirmed reply, source redaction, and pre-delivery cancel all run through the shared CommandExecution transaction and return refs plus explicit empty snapshots. |
+| Identity/scope fence | PASS | Payload workspace, business actor, child process, participant/role, item-linked source grant, enrollment, thread, target scope, direction, and data class are current-state checked. Claim material and bodyful/foreign protected refs are rejected. |
+| Revoke/redaction semantics | PASS | Revoke updates Grant and bounded dependent Receipt/Item/attention rows without redacting the source; redaction removes protected body/attachment refs, sanitizes derived item/attention display, and blocks/revokes receipts. New grants do not reactivate old-grant items. |
+| Owner-read privacy | PASS | Class inbox and attention queries are bounded, group-authorized, source-message/grant/enrollment/thread revalidated, semantically ordered, and return display-safe fields without message body, thread id, grant policy, or host runtime state. |
+| Architecture review | PASS AFTER REPAIR | Removed premature manifest/context-ref declarations that produced 16 host-resolver fatals; repaired grant target selection, actor/child binding, stale convergence authorization, receipt versioning, linked-grant reactivation, redaction sanitization/bounds, and current participant/enrollment/thread/group/institution fences. |
+| Targeted tests | PASS | `packages/nurture-scenario/tests/institution/class-family-inbox.test.ts`: 22/22. |
+| Full unit/static gate | PASS | 16 unit files / 147 tests; full typecheck, test routing/population, production Prisma validate, dev-host Prisma validate with a non-connecting placeholder URL, persistence boundary, N1 schema contract, workflow contract pin, module validator/registry test, and diff whitespace pass. |
+| Production DB catalog | PENDING N1-F | The configured local production DB is still at G0, so `pnpm db:assert-boundary` correctly reports the 21 N1 tables as missing. No migration was applied in N1-E. |
+
 ## Automated Checks
 
 Run after task-doc or governance edits:
@@ -298,3 +311,8 @@ For IA/IA.1 discussion work:
 | 2026-07-13 | N1-D resolver/policy targeted verification | PASS | 30 targeted interaction/resolver/policy tests cover opaque tokens, binding/replay/revoke, candidate ranking/ties/limits, host-scope rejection, role-agnostic and workspace-optional ingress, current-state/lifecycle revalidation, and structured policy reasons. |
 | 2026-07-13 | N1-D architecture review and repair | PASS AFTER REPAIR | Closed inactive-scope, cross-workspace reachability, grant-target/revoke, same-conversation purpose, unbounded-query, sequential-query, safe-label-size, and repository-failure gaps before acceptance. |
 | 2026-07-13 | N1-D full static/unit gate | PASS | Full typecheck; 15 unit files / 125 tests; test routing; both Prisma validations; persistence boundary; N1 schema contract; cross-repo contract pin; and diff whitespace pass. No DB apply occurred. |
+| 2026-07-13 | N1-E targeted command/query verification | PASS | 22 tests cover explicit-empty capture/replay, actor/workspace/child binding, durable driver ref shape, grant revoke, ack/reply, redaction/cancel, class-of-10 inbox, attention board, invalid dates, and authorization/outage separation. |
+| 2026-07-13 | N1-E architecture review and repair | PASS AFTER REPAIR | Removed premature manifest activation and closed linked-grant reactivation, target-scope, current participant/enrollment/thread, receipt-version, bounded redaction, semantic ordering, and protected-ref validation gaps. |
+| 2026-07-13 | `pnpm test:unit:ci && pnpm verify:unit-population && pnpm verify:test-routing` | PASS | 16 unit files; 147/147 tests pass; routing census remains 16 unit / 2 production DB / 7 dev-host files. |
+| 2026-07-13 | N1-E static contract gates | PASS | Full typecheck, production Prisma validate, placeholder dev-host Prisma validate, persistence/N1 schema contracts, workflow contract pin tests, module validator/registry, and `git diff --check` pass. |
+| 2026-07-13 | `pnpm db:assert-boundary` | EXPECTED FAIL / N1-F GATE | Configured production DB still contains the G0 catalog and is missing the 21 additive N1 tables. No database was mutated; target-specific approval is required before apply. |

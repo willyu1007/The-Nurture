@@ -160,6 +160,14 @@ R8-B3-C2e keeps host technical exhaustion separate from Nurture business failure
 
 The intended reusable shape is a thin command runner plus Nurture command specifications, not a generic rules DSL. AI/attachments/remote calls stay outside the DB transaction; class/batch writes preserve child-scope isolation.
 
+### N1 explicit-empty implementation boundary（2026-07-13）
+
+N1 implements institution writes through a scenario-owned `NurtureFamilyCareCommandTransaction` attached to the shared command transaction. The Prisma adapter executes precondition reads, optimistic transitions, business events, bounded projection convergence, and immutable `NurtureCommandExecution` creation inside one serializable transaction. Command actor/workspace/child scope come from the trusted command envelope and must match the scenario payload and current owner facts.
+
+Owner reads use a separate bounded `NurtureFamilyCareQueryRepository`: every inbox/attention read rechecks active participant, role, group/institution, enrollment, the item-linked source grant, source-message lifecycle, and current grant target/direction/data class. A newly created grant cannot reactivate an item bound to a revoked grant. Grant revoke is distinct from source redaction: revoke fences access and suppresses active work without redacting the source message; redaction removes protected content/attachment access and sanitizes derived display fields.
+
+N1-E deliberately does not declare the new institution resolver keys or live workflow handlers in `scenario.manifest.yaml`. Doing so before My-Chat registers the owner resolvers makes legacy module validation fatal and would advertise a surface before its DB-backed owner-read path is accepted. N1-F closes the DB-backed direct surface; non-empty `handoff_key` and context-source declarations remain an X4/N2 change behind `workflow_handoff_materialization_v1`.
+
 ## 2. 业务对象模型
 
 Detailed IB schema contract: see `06-ib-nurture-schema-spec.md`. IB implementation defaults for the schema decisions are in `07-ib-decision-convergence.md`. IIA implementation sequencing for schema, policy, and tests is in `08-iia-schema-policy-test-design.md`. This section remains the architecture-level model and ownership baseline.

@@ -15,6 +15,7 @@ import {
   PrismaNurtureCommandRepository,
 } from "./institution-core.repositories.js";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import { PrismaFamilyCareQueryRepository } from "./family-care-query.repository.js";
 
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
 
@@ -331,6 +332,7 @@ export const createNurtureRepositories = (prisma: PrismaClient): NurtureReposito
   commands: new PrismaNurtureCommandRepository(prisma),
   interactions: new PrismaInteractionContextRepository(prisma),
   institution: new PrismaInstitutionContextRepository(prisma),
+  familyCareQuery: new PrismaFamilyCareQueryRepository(prisma),
   profiles: new PrismaProfileRepository(prisma),
   activityComparisons: new PrismaActivityComparisonRepository(prisma),
   evidence: new PrismaEvidenceRepository(prisma),

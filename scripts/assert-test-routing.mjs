@@ -27,9 +27,9 @@ for (const file of files.sort()) {
 }
 
 if (routes.unclassified.length > 0) throw new Error(`Unclassified tests: ${routes.unclassified.join(', ')}`);
-if (routes.unit.length !== 15 || routes.productionDb.length !== 2 || routes.devHost.length !== 7) {
+if (routes.unit.length !== 16 || routes.productionDb.length !== 2 || routes.devHost.length !== 7) {
   throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/15 productionDb=${routes.productionDb.length}/2 devHost=${routes.devHost.length}/7`,
+    `Test file census changed: unit=${routes.unit.length}/16 productionDb=${routes.productionDb.length}/2 devHost=${routes.devHost.length}/7`,
   );
 }
 process.stdout.write(
