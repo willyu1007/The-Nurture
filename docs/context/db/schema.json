@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-05-28T09:17:19.117Z",
+  "updatedAt": "2026-07-13T00:22:33.602Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -14,7 +14,6367 @@
     "name": "",
     "schemas": []
   },
-  "enums": [],
-  "tables": [],
+  "enums": [
+    {
+      "name": "NurtureCaptureExtractionStatus",
+      "values": [
+        "pending",
+        "extracted",
+        "user_confirmed",
+        "rejected",
+        "superseded"
+      ]
+    },
+    {
+      "name": "NurtureCaptureInputModality",
+      "values": [
+        "text",
+        "voice_transcript",
+        "form",
+        "checklist",
+        "media_ref",
+        "system_generated"
+      ]
+    },
+    {
+      "name": "NurtureCaptureSourceSurface",
+      "values": [
+        "web_workbench",
+        "mobile_llm",
+        "system_prompt",
+        "manual"
+      ]
+    },
+    {
+      "name": "NurtureCaptureStatus",
+      "values": [
+        "active",
+        "superseded",
+        "dismissed",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureCaptureType",
+      "values": [
+        "checkin",
+        "observation",
+        "conflict_event",
+        "rule_execution",
+        "burden_report",
+        "child_response",
+        "adjustment_request",
+        "free_note",
+        "media_ref"
+      ]
+    },
+    {
+      "name": "NurtureContextLayer",
+      "values": [
+        "L0_safety",
+        "L1_family_charter",
+        "L2_current_focus",
+        "L3_child_profile",
+        "L4_family_state",
+        "L5_scenario_constraints",
+        "L6_historical_feedback",
+        "L7_community_evidence"
+      ]
+    },
+    {
+      "name": "NurtureFreshnessLevel",
+      "values": [
+        "current",
+        "recent",
+        "stale",
+        "historical"
+      ]
+    },
+    {
+      "name": "NurtureIssueType",
+      "values": [
+        "screen",
+        "bedtime",
+        "homework",
+        "snack",
+        "custom"
+      ]
+    },
+    {
+      "name": "NurtureMaterialAudience",
+      "values": [
+        "mobile_llm",
+        "workflow_orchestrator",
+        "web_workbench",
+        "review_generator",
+        "recommendation_ranker"
+      ]
+    },
+    {
+      "name": "NurtureMaterialSourceType",
+      "values": [
+        "family_profile_snapshot",
+        "child_profile_snapshot",
+        "family_charter",
+        "focus_cycle",
+        "workflow_project",
+        "workflow_capture",
+        "quantification_snapshot",
+        "workflow_review",
+        "metric_observation",
+        "evidence"
+      ]
+    },
+    {
+      "name": "NurtureMaterialStatus",
+      "values": [
+        "active",
+        "stale",
+        "superseded",
+        "restricted",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureMaterialSubjectType",
+      "values": [
+        "family",
+        "child",
+        "parent",
+        "caregiver",
+        "workflow",
+        "rule_topic",
+        "scenario"
+      ]
+    },
+    {
+      "name": "NurtureMaterialType",
+      "values": [
+        "profile_fact",
+        "family_constraint",
+        "charter_principle",
+        "current_focus",
+        "development_vector_digest",
+        "metric_rollup",
+        "observation_summary",
+        "workflow_commitment",
+        "plan_rationale",
+        "checkpoint_signal",
+        "review_learning",
+        "safety_boundary",
+        "missing_context_question",
+        "family_preference"
+      ]
+    },
+    {
+      "name": "NurtureMetricObservationStatus",
+      "values": [
+        "active",
+        "corrected",
+        "dismissed",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureMetricSourceType",
+      "values": [
+        "capture",
+        "checkpoint",
+        "review",
+        "system_inferred",
+        "manual"
+      ]
+    },
+    {
+      "name": "NurtureMetricSubjectType",
+      "values": [
+        "family",
+        "child",
+        "parent",
+        "workflow",
+        "caregiver"
+      ]
+    },
+    {
+      "name": "NurtureMetricValueKind",
+      "values": [
+        "number",
+        "boolean",
+        "enum",
+        "duration",
+        "count",
+        "scale",
+        "text_summary"
+      ]
+    },
+    {
+      "name": "NurturePackAudience",
+      "values": [
+        "workflow_orchestrator",
+        "mobile_llm",
+        "web_workbench",
+        "review_generator"
+      ]
+    },
+    {
+      "name": "NurturePackPurpose",
+      "values": [
+        "create_plan",
+        "select_next_action",
+        "build_checkpoint",
+        "propose_adjustment",
+        "build_review_summary",
+        "preview_context",
+        "prepare_mobile_handoff"
+      ]
+    },
+    {
+      "name": "NurturePackStatus",
+      "values": [
+        "built",
+        "used",
+        "superseded",
+        "discarded",
+        "failed"
+      ]
+    },
+    {
+      "name": "NurturePackTriggerType",
+      "values": [
+        "project_created",
+        "project_updated",
+        "capture_added",
+        "checkpoint_requested",
+        "adjustment_requested",
+        "review_requested",
+        "manual_preview",
+        "mobile_turn_requested"
+      ]
+    },
+    {
+      "name": "NurturePackType",
+      "values": [
+        "planning",
+        "checkpoint",
+        "adjustment",
+        "review",
+        "workbench_preview",
+        "mobile_handoff"
+      ]
+    },
+    {
+      "name": "NurtureProjectStatus",
+      "values": [
+        "draft",
+        "confirmed",
+        "active",
+        "checkpoint",
+        "adjusted",
+        "completed",
+        "archived",
+        "escalated",
+        "cancelled"
+      ]
+    },
+    {
+      "name": "NurtureSensitivityLevel",
+      "values": [
+        "low",
+        "medium",
+        "high",
+        "restricted"
+      ]
+    },
+    {
+      "name": "NurtureSnapshotSourceType",
+      "values": [
+        "metric_rollup",
+        "workflow_review",
+        "user_update",
+        "llm_summary",
+        "mixed"
+      ]
+    },
+    {
+      "name": "NurtureSnapshotStatus",
+      "values": [
+        "active",
+        "superseded",
+        "disputed",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureSnapshotType",
+      "values": [
+        "planning",
+        "checkpoint",
+        "review",
+        "periodic",
+        "manual"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "name": "NurtureActivityComparisonDraft",
+      "dbName": "nurture_activity_comparison_draft",
+      "schema": null,
+      "columns": [
+        {
+          "name": "comparisonId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "comparison_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "computedResultPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "computed_result_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "optionRefs",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "option_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safeSummary",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "safe_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetRefs",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "weightOverridePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "weight_override_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId"
+          ],
+          "name": null,
+          "map": "ix_47"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "comparisonId"
+          ],
+          "name": null,
+          "map": "uq_5"
+        }
+      ]
+    },
+    {
+      "name": "NurtureActivityOption",
+      "dbName": "nurture_activity_option",
+      "schema": null,
+      "columns": [
+        {
+          "name": "binding",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "canonicalObjectRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "canonical_object_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "version",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId"
+          ],
+          "name": null,
+          "map": "ix_49"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildProfileSnapshot",
+      "dbName": "nurture_child_profile_snapshot",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "developmentStageKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "development_stage_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "developmentVectorDigestPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "development_vector_digest_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "profilePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "profile_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "childRefKey"
+          ],
+          "name": null,
+          "map": "ix_2"
+        }
+      ]
+    },
+    {
+      "name": "NurtureContextMaterial",
+      "dbName": "nurture_context_material",
+      "schema": null,
+      "columns": [
+        {
+          "name": "audience",
+          "type": "NurtureMaterialAudience",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confidence",
+          "type": "Float",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextLayer",
+          "type": "NurtureContextLayer",
+          "nullable": false,
+          "list": false,
+          "dbName": "context_layer",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdByPipeline",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "created_by_pipeline",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "developmentStageKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "development_stage_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "embeddingText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "embedding_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "freshnessLevel",
+          "type": "NurtureFreshnessLevel",
+          "nullable": false,
+          "list": false,
+          "dbName": "freshness_level",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "issueType",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "issue_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "language",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materialHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "material_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materializerVersion",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "materializer_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materialKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "material_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materialType",
+          "type": "NurtureMaterialType",
+          "nullable": false,
+          "list": false,
+          "dbName": "material_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "orchestrationHintPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "orchestration_hint_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "redactionLevel",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "redaction_level",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "retrievalKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "retrieval_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyScopes",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "safety_scopes",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "selectionWeightPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "selection_weight_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticDomains",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_domains",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticTags",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_tags",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "semantic_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sensitivityLevel",
+          "type": "NurtureSensitivityLevel",
+          "nullable": false,
+          "list": false,
+          "dbName": "sensitivity_level",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceCapturedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_captured_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceRefId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_ref_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceRefPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_ref_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceType",
+          "type": "NurtureMaterialSourceType",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceUpdatedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "stalenessPolicy",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "staleness_policy",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureMaterialStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "structuredPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "structured_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "subject_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectType",
+          "type": "NurtureMaterialSubjectType",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesMaterialId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_material_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "templateKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "template_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tokenEstimate",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "token_estimate",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "urgencyHorizon",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "urgency_horizon",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "userConfirmed",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "user_confirmed",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "validFrom",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "valid_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "validUntil",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "valid_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowStepId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_step_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "contextLayer",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_21"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "retrievalKey"
+          ],
+          "name": null,
+          "map": "ix_23"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "sourceType",
+            "sourceRefId"
+          ],
+          "name": null,
+          "map": "ix_22"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "audience",
+            "templateKey",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_20"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "contextLayer",
+            "status",
+            "validUntil"
+          ],
+          "name": null,
+          "map": "ix_18"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "materialType",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_19"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "materialKey",
+            "sourceVersion",
+            "semanticVersion"
+          ],
+          "name": null,
+          "map": "uq_2"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEvidence",
+      "dbName": "nurture_evidence",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidencePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "evidence_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "evidence_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonCode",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "reason_code",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "target_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "projectId"
+          ],
+          "name": null,
+          "map": "ix_45"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey"
+          ],
+          "name": null,
+          "map": "ix_44"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEvidenceRef",
+      "dbName": "nurture_evidence_ref",
+      "schema": null,
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "reasonCode",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reason_code",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId"
+          ],
+          "name": null,
+          "map": "ix_48"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCharter",
+      "dbName": "nurture_family_charter",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "charterPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "charter_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesCharterId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_charter_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "items",
+          "to": "NurtureFamilyCharterItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_3"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCharterItem",
+      "dbName": "nurture_family_charter_item",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "charterId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "charter_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "itemKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "item_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "itemPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "item_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "charter",
+          "to": "NurtureFamilyCharter",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "charterId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "charterId"
+          ],
+          "name": null,
+          "map": "ix_4"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyPolicy",
+      "dbName": "nurture_family_policy",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "policyPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "policy_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceProjectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_43"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyProfileSnapshot",
+      "dbName": "nurture_family_profile_snapshot",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "profilePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "profile_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey"
+          ],
+          "name": null,
+          "map": "ix_1"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyQuantificationSnapshot",
+      "dbName": "nurture_family_quantification_snapshot",
+      "schema": null,
+      "columns": [
+        {
+          "name": "capturedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "captured_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "captureRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "capture_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "checkpointId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "checkpoint_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confidence",
+          "type": "Float",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "developmentVectorDigestPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "development_vector_digest_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "evidence_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyConsistencyPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_consistency_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyResourcesPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_resources_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "generatedContextMaterialIds",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "generated_context_material_ids",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "lifeStructurePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "life_structure_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materializationStatus",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "materialization_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "metricObservationRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "metric_observation_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "metricRollupPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "metric_rollup_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "metricSchemaVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "metric_schema_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "overloadRiskPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "overload_risk_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "parentBandwidthPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "parent_bandwidth_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "parentChildConnectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "parent_child_connection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "periodEnd",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "period_end",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "periodStart",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "period_start",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "review_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticContextDigest",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_context_digest",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticDomains",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_domains",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticEmbeddingText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_embedding_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticTags",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_tags",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "snapshotType",
+          "type": "NurtureSnapshotType",
+          "nullable": false,
+          "list": false,
+          "dbName": "snapshot_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceType",
+          "type": "NurtureSnapshotSourceType",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureSnapshotStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "structureVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "structure_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "summaryPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "summary_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesSnapshotId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_snapshot_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "userConfirmed",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "user_confirmed",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "valueAlignmentPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "value_alignment_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowEffectPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_effect_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "project",
+          "to": "NurtureWorkflowProject",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "projectId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "checkpointId"
+          ],
+          "name": null,
+          "map": "ix_15"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_14"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "reviewId"
+          ],
+          "name": null,
+          "map": "ix_16"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childRefKey",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_17"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_12"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "snapshotType",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_13"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFocusCycle",
+      "dbName": "nurture_focus_cycle",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "cycleEnd",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "cycle_end",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "cycleStart",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "cycle_start",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "focusPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "focus_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "goals",
+          "to": "NurtureFocusGoal",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_5"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFocusGoal",
+      "dbName": "nurture_focus_goal",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "focusCycleId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "focus_cycle_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "goalKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "goal_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "goalPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "goal_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "priority",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "focusCycle",
+          "to": "NurtureFocusCycle",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "focusCycleId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "focusCycleId"
+          ],
+          "name": null,
+          "map": "ix_6"
+        }
+      ]
+    },
+    {
+      "name": "NurtureHealthStateSummary",
+      "dbName": "nurture_health_state_summary",
+      "schema": null,
+      "columns": [
+        {
+          "name": "binding",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "canonicalObjectRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "canonical_object_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "version",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId"
+          ],
+          "name": null,
+          "map": "ix_50"
+        }
+      ]
+    },
+    {
+      "name": "NurtureMetricDefinition",
+      "dbName": "nurture_metric_definition",
+      "schema": null,
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "definitionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "definition_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "displayName",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "display_name",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "metricCode",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "metric_code",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectType",
+          "type": "NurtureMetricSubjectType",
+          "nullable": true,
+          "list": false,
+          "dbName": "subject_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "unit",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "valueKind",
+          "type": "NurtureMetricValueKind",
+          "nullable": true,
+          "list": false,
+          "dbName": "value_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "metricCode"
+          ],
+          "name": null,
+          "map": "uq_1"
+        }
+      ]
+    },
+    {
+      "name": "NurtureMetricObservation",
+      "dbName": "nurture_metric_observation",
+      "schema": null,
+      "columns": [
+        {
+          "name": "booleanValue",
+          "type": "Boolean",
+          "nullable": true,
+          "list": false,
+          "dbName": "boolean_value",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "captureId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "capture_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "checkpointId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "checkpoint_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confidence",
+          "type": "Float",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enumValue",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "enum_value",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "generatedContextMaterialIds",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "generated_context_material_ids",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "materializationStatus",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "materialization_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "metricCode",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "metric_code",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "numericValue",
+          "type": "Decimal",
+          "nullable": true,
+          "list": false,
+          "dbName": "numeric_value",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "observedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "observed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "parentActorId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "parent_actor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "periodEnd",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "period_end",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "periodStart",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "period_start",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scaleMax",
+          "type": "Decimal",
+          "nullable": true,
+          "list": false,
+          "dbName": "scale_max",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scaleMin",
+          "type": "Decimal",
+          "nullable": true,
+          "list": false,
+          "dbName": "scale_min",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticTags",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_tags",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceType",
+          "type": "NurtureMetricSourceType",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureMetricObservationStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "subject_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectType",
+          "type": "NurtureMetricSubjectType",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesObservationId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_observation_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "textValue",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "text_value",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "unit",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "userConfirmed",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "user_confirmed",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "valueKind",
+          "type": "NurtureMetricValueKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "value_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "valuePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "value_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "checkpoint",
+          "to": "NurtureWorkflowCheckpoint",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "checkpointId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "project",
+          "to": "NurtureWorkflowProject",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "projectId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "captureId"
+          ],
+          "name": null,
+          "map": "ix_9"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "checkpointId"
+          ],
+          "name": null,
+          "map": "ix_10"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "metricCode",
+            "observedAt"
+          ],
+          "name": null,
+          "map": "ix_8"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childRefKey",
+            "metricCode",
+            "observedAt"
+          ],
+          "name": null,
+          "map": "ix_11"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "metricCode",
+            "observedAt"
+          ],
+          "name": null,
+          "map": "ix_7"
+        }
+      ]
+    },
+    {
+      "name": "NurtureProfileProjection",
+      "dbName": "nurture_profile_projection",
+      "schema": null,
+      "columns": [
+        {
+          "name": "canonicalObjectRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "canonical_object_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "profileId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "profile_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectionVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "projection_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "refNamespace",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "ref_namespace",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "refObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "ref_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "refObjectType",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "ref_object_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safeSummary",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "safe_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_key",
+          "dbType": null,
+          "default": "\"nurture\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "profileId"
+          ],
+          "name": null,
+          "map": "ix_profile_id"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId"
+          ],
+          "name": null,
+          "map": "ix_46"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "refNamespace",
+            "refObjectType",
+            "refObjectId"
+          ],
+          "name": null,
+          "map": "uq_3"
+        }
+      ]
+    },
+    {
+      "name": "NurtureRuntimeContextPack",
+      "dbName": "nurture_runtime_context_pack",
+      "schema": null,
+      "columns": [
+        {
+          "name": "assumptionsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "assumptions_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "audience",
+          "type": "NurturePackAudience",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "builderVersion",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "builder_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "candidateFilterPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "candidate_filter_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextLayerCoveragePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "context_layer_coverage_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "context_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextTextHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "context_text_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdByPipeline",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "created_by_pipeline",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "developmentStageKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "development_stage_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "excludedMaterialRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "excluded_material_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "issueType",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "issue_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "knownContextPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "known_context_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materialSetHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "material_set_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "missingContextPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "missing_context_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "modelProfileKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "model_profile_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "modelRuntimeHintsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "model_runtime_hints_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "orchestrationInputPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "orchestration_input_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "outputContractPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "output_contract_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "packHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "pack_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "packKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "pack_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "packStatsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "pack_stats_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "packType",
+          "type": "NurturePackType",
+          "nullable": false,
+          "list": false,
+          "dbName": "pack_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "packVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "pack_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "providerInvocationRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "provider_invocation_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purpose",
+          "type": "NurturePackPurpose",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "resultArtifactRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "result_artifact_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyBoundaryPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "safety_boundary_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "selectedMaterialRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "selected_material_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "selectionPolicyKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "selection_policy_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "selectionPolicyVersion",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "selection_policy_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurturePackStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesPackId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_pack_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "templateKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "template_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tokenBudgetPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "token_budget_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "triggerRefId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "trigger_ref_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "triggerType",
+          "type": "NurturePackTriggerType",
+          "nullable": false,
+          "list": false,
+          "dbName": "trigger_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "urgencyHorizon",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "urgency_horizon",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowStepId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_step_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "project",
+          "to": "NurtureWorkflowProject",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "projectId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "packKey"
+          ],
+          "name": null,
+          "map": "ix_28"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_24"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "providerInvocationRef"
+          ],
+          "name": null,
+          "map": "ix_29"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workflowRunId",
+            "workflowStepId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_25"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "audience",
+            "packType",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_27"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "packType",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_26"
+        }
+      ]
+    },
+    {
+      "name": "NurtureWorkflowCapture",
+      "dbName": "nurture_workflow_capture",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorRole",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_role",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "capturedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "captured_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "captureType",
+          "type": "NurtureCaptureType",
+          "nullable": false,
+          "list": false,
+          "dbName": "capture_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "checkpointId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "checkpoint_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "extractedBy",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "extracted_by",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "extractionConfidence",
+          "type": "Float",
+          "nullable": true,
+          "list": false,
+          "dbName": "extraction_confidence",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "extractionModelInfo",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "extraction_model_info",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "extractionStatus",
+          "type": "NurtureCaptureExtractionStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": "extraction_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "generatedContextMaterialIds",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "generated_context_material_ids",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "generatedEvidenceId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "generated_evidence_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "generatedMetricObservationIds",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "generated_metric_observation_ids",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "inputLanguage",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "input_language",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "inputModality",
+          "type": "NurtureCaptureInputModality",
+          "nullable": false,
+          "list": false,
+          "dbName": "input_modality",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "materializationStatus",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "materialization_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "normalizedInputPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "normalized_input_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "promptKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "prompt_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "promptPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "prompt_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "rawInputPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "raw_input_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "rawInputText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "raw_input_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetySignalLevel",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "safety_signal_level",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticContextRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_context_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticDomains",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_domains",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticEmbeddingText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_embedding_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticExtractionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_extraction_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticIntentPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_intent_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticTags",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_tags",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceSurface",
+          "type": "NurtureCaptureSourceSurface",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_surface",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureCaptureStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "structuredPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "structured_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesCaptureId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_capture_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "userConfirmed",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "user_confirmed",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowStepId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_step_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "project",
+          "to": "NurtureWorkflowProject",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "projectId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "checkpointId"
+          ],
+          "name": null,
+          "map": "ix_39"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_35"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "captureType",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_38"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childRefKey",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_37"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "capturedAt"
+          ],
+          "name": null,
+          "map": "ix_36"
+        }
+      ]
+    },
+    {
+      "name": "NurtureWorkflowCheckpoint",
+      "dbName": "nurture_workflow_checkpoint",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "checkpointPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "checkpoint_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "completedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "completed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scheduledAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "scheduled_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowStepId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_step_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "metricObservations",
+          "to": "NurtureMetricObservation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "project",
+          "to": "NurtureWorkflowProject",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "projectId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "projectId",
+            "scheduledAt"
+          ],
+          "name": null,
+          "map": "ix_41"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "projectId"
+          ],
+          "name": null,
+          "map": "ix_40"
+        }
+      ]
+    },
+    {
+      "name": "NurtureWorkflowProject",
+      "dbName": "nurture_workflow_project",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "baselinePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "baseline_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "cancelledAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "cancelled_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "capturePromptPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "capture_prompt_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "charterUpdateProposalPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "charter_update_proposal_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childProfileSnapshotId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_profile_snapshot_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "completedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "completed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "constraintPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "constraint_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextMaterialRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "context_material_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextSnapshotPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "context_snapshot_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdByActorId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "created_by_actor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "description",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "escalatedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "escalated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyCharterId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_charter_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyProfileSnapshotId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_profile_snapshot_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "focusCycleId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "focus_cycle_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "goalPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "goal_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "intentPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "intent_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "issueType",
+          "type": "NurtureIssueType",
+          "nullable": false,
+          "list": false,
+          "dbName": "issue_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "latestCheckpointAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "latest_checkpoint_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "latestRuntimeContextPackId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "latest_runtime_context_pack_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "learningOutputPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "learning_output_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "measurementPlanPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "measurement_plan_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "missingContextPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "missing_context_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextCheckpointAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "next_checkpoint_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "orchestrationStatePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "orchestration_state_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "planPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "plan_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "primaryChildRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "primary_child_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "primaryChildRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "primary_child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "profileUpdateProposalPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "profile_update_proposal_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "quantificationSnapshotId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "quantification_snapshot_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "resultingFamilyPolicyId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "resulting_family_policy_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewDueAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "review_due_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewSummaryPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "review_summary_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "riskLevel",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "risk_level",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticContextDigest",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_context_digest",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticDomains",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_domains",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticEmbeddingText",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_embedding_text",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticIntentPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_intent_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticStageKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_stage_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticTags",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "semantic_tags",
+          "dbType": null,
+          "default": "[]",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "semanticVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "semantic_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "slotsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "slots_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureProjectStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "suggestedActionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "suggested_action_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "templateKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "template_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "title",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedByActorId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "updated_by_actor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "urgencyHorizon",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "urgency_horizon",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "captures",
+          "to": "NurtureWorkflowCapture",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "checkpoints",
+          "to": "NurtureWorkflowCheckpoint",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "metricObservations",
+          "to": "NurtureMetricObservation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "quantificationSnapshots",
+          "to": "NurtureFamilyQuantificationSnapshot",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "reviews",
+          "to": "NurtureWorkflowReview",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "runtimeContextPacks",
+          "to": "NurtureRuntimeContextPack",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "issueType",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_32"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "semanticStageKey"
+          ],
+          "name": null,
+          "map": "ix_34"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_30"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "familyRefKey",
+            "templateKey",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_31"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "primaryChildRefKey",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_33"
+        }
+      ]
+    },
+    {
+      "name": "NurtureWorkflowReview",
+      "dbName": "nurture_workflow_review",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childRefKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "completedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "completed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "learningOutputPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "learning_output_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "projectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "project_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewSummaryPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "review_summary_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "userConfirmed",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "user_confirmed",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "workflow_run_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "project",
+          "to": "NurtureWorkflowProject",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "projectId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "projectId"
+          ],
+          "name": null,
+          "map": "ix_42"
+        }
+      ]
+    }
+  ],
   "notes": "Generated from Prisma schema.prisma (SSOT: repo-prisma)."
 }

@@ -382,7 +382,7 @@ handoffs:
       - notification_push
     downstream_owner: my_chat.notification
     policy_key: nurture.can_create_notification_handoff
-    receipt_required: false
+    receipt_required: true
 
 surface_mapping:
   chat_workflow_control:
@@ -517,6 +517,8 @@ event_registry:
       allowed_events:
         - workflow.handoff.requested
         - workflow.step.manual_review_required
+      forbidden_events:
+        - nurture.health_state.safety_escalated
 
 governance:
   admin_actions:

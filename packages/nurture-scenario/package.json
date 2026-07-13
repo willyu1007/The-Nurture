@@ -8,6 +8,13 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@my-chat/workflow-contracts": "file:../../../My-Chat/packages/workflow-contracts"
+  },
+  "devDependencies": {
+    "@my-chat/workflow-runtime": "file:../../../My-Chat/packages/workflow-runtime"
   }
 }

@@ -1,0 +1,18 @@
+{
+  "name": "@the-nurture/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The Nurture data layer: Prisma client + repository implementations of the scenario repository ports. The only package allowed to import Prisma (business layer stays Prisma-free).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@my-chat/workflow-contracts": "file:../../../My-Chat/packages/workflow-contracts",
+    "@prisma/client": "^5.22.0",
+    "@the-nurture/scenario": "workspace:*"
+  }
+}

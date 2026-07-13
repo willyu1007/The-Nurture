@@ -1,0 +1,79 @@
+{
+  "envs": [
+    "dev",
+    "prod",
+    "staging"
+  ],
+  "generated_at_utc": "2026-07-13T00:21:14Z",
+  "ssot_mode": "repo-env-contract",
+  "variables": {
+    "APP_ENV": {
+      "default": "dev",
+      "deprecate_after": null,
+      "description": "Deployment environment profile.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": true,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "enum"
+    },
+    "DATABASE_URL": {
+      "default": null,
+      "deprecate_after": null,
+      "description": "PostgreSQL connection URL for Nurture-owned production schema and migrations.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": true,
+      "scopes": null,
+      "secret": true,
+      "secret_ref": "database_url",
+      "state": "active",
+      "type": "url"
+    },
+    "PORT": {
+      "default": 8000,
+      "deprecate_after": null,
+      "description": "Service listen port.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": true,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "int"
+    },
+    "SERVICE_NAME": {
+      "default": "your-service",
+      "deprecate_after": null,
+      "description": "Service name (logical).",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": true,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "string"
+    }
+  }
+}

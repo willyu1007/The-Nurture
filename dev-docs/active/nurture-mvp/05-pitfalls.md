@@ -27,3 +27,33 @@
 - Fix / workaround: pin an explicit `contractRoot` per repository and hash paths relative to that root; keep repository revision as a separate field.
 - Prevention: contract content hashes must normalize package-root layout while still including paths below the contract root.
 - References: `sha256-path-content-v1`; `docs/project/integrations/my-chat-workflow-contract.json`.
+
+### 2026-07-13 — file-linked My-Chat runtime could not resolve workspace contracts
+
+- Symptom: `pnpm install` failed with `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND` for `@my-chat/workflow-contracts@workspace:*`.
+- Context: Nurture consumes `@my-chat/workflow-runtime` from the adjacent My-Chat repository for conformance tests.
+- What we tried: the package-level `file:` dependency alone.
+- Why it failed: the linked runtime retains a My-Chat-internal `workspace:*` dependency that is not a member of the Nurture workspace.
+- Fix / workaround: root pnpm override maps `@my-chat/workflow-contracts` to the adjacent pinned My-Chat contract package.
+- Prevention: keep the cross-repository revision/hash verifier mandatory whenever local path overrides are used.
+- References: `package.json#pnpm.overrides`; `docs/project/integrations/my-chat-workflow-contract.json`.
+
+### 2026-07-13 — Prisma validate and psql used different URL query support
+
+- Symptom: Prisma accepted `?schema=public`, but a diagnostic `psql` invocation rejected the same URI with `invalid URI query parameter: schema` after all migration/tests had passed.
+- Context: the PostgreSQL catalog was being printed as additional evidence after the Node catalog assertion.
+- What we tried: reuse the Prisma `DATABASE_URL` directly with `psql`.
+- Why it failed: Prisma-specific `schema` is not a libpq connection URI parameter.
+- Fix / workaround: pass host, port, user, and database explicitly to `psql`; keep the Prisma URL for Prisma commands.
+- Prevention: do not assume ORM URL extensions are accepted by native database clients.
+- References: `pnpm db:assert-boundary`; `psql -h 127.0.0.1 -p 5433 -U nurture -d nurture_g0_verify`.
+
+### 2026-07-13 — ordinary diff check missed untracked-file whitespace
+
+- Symptom: `git diff --check` passed before staging, then `git diff --cached --check` reported EOF blank lines in newly added source and test files.
+- Context: the reconstruction helper imported preserved files as new, untracked paths.
+- What we tried: the normal working-tree diff gate before staging.
+- Why it failed: `git diff` does not include untracked files.
+- Fix / workaround: normalize the imported files, stage the explicit scope, then run the cached diff gate.
+- Prevention: every increment with new files must treat `git diff --cached --check` as mandatory evidence; the pre-stage check is not sufficient.
+- References: `git diff --cached --check`; `git status --untracked-files=all`.

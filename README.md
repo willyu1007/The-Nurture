@@ -16,20 +16,28 @@ The Nurture is a My-Chat scenario module for pregnancy, motherhood, childcare, f
 - Workflow boundary: `docs/context/workflow/nurture-scenario-contract.md`
 - Scenario module: `packages/nurture-scenario/scenario.manifest.yaml`
 - DB contract: `docs/context/db/schema.json`
+- Cross-repo contract pin: `docs/project/integrations/my-chat-workflow-contract.json`
 - Initialization archive: `docs/project/overview/START-HERE.md`
 
 ## Baseline
 
-- Stack: TypeScript, pnpm, Next.js, NestJS, Postgres, Prisma, BullMQ/Redis-compatible workers.
+- Implemented production baseline: TypeScript scenario module, Nurture repository package, Postgres/Prisma schema, migration, and deterministic unit/DB tests.
 - P0 workflows: pregnancy stage management, family strategy, short-term care planning, activity comparison, execution review.
-- Local DB MAY be independent Postgres.
-- Cloud DB SHOULD merge into My-Chat Postgres through a dedicated schema or `nurture_*` table group after the recorded migration gates pass.
+- Root Prisma assets are Nurture production-only; they never create My-Chat workflow runtime tables.
+- Workflow run/step IDs in Nurture rows are opaque external references.
+- The backend workflow dev host is a separate G0 increment and must use an independent database/migration stream.
 
 ## Verify
 
 ```bash
+pnpm install
+pnpm db:generate
 pnpm typecheck
-pnpm --filter @the-nurture/scenario typecheck
+pnpm test:unit
+DATABASE_URL=<nurture-postgres-url> pnpm db:deploy
+DATABASE_URL=<nurture-postgres-url> pnpm db:assert-boundary
+DATABASE_URL=<nurture-postgres-url> pnpm test:db
+pnpm verify:workflow-contract-pin
 node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
 node .ai/scripts/lint-skills.mjs --strict
 ```

@@ -1,7 +1,974 @@
+// The Nurture — P1 data layer (repo-prisma SSOT)
+// After changing this file run: node .ai/scripts/ctl-db-ssot.mjs sync-to-context
+// Business layer MUST NOT import Prisma; repositories return domain entities.
+//
+// Naming: Prisma models PascalCase, fields camelCase, DB columns/tables snake_case via @map/@@map.
+// Scenario-local tables carry workspace_id + canonical ref binding (Json) + version + created_at/updated_at.
+// My-Chat workflow identifiers are stored only as opaque external references.
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum NurtureIssueType {
+  screen
+  bedtime
+  homework
+  snack
+  custom
+}
+
+enum NurtureProjectStatus {
+  draft
+  confirmed
+  active
+  checkpoint
+  adjusted
+  completed
+  archived
+  escalated
+  cancelled
+}
+
+enum NurtureCaptureType {
+  checkin
+  observation
+  conflict_event
+  rule_execution
+  burden_report
+  child_response
+  adjustment_request
+  free_note
+  media_ref
+}
+
+enum NurtureCaptureSourceSurface {
+  web_workbench
+  mobile_llm
+  system_prompt
+  manual
+}
+
+enum NurtureCaptureInputModality {
+  text
+  voice_transcript
+  form
+  checklist
+  media_ref
+  system_generated
+}
+
+enum NurtureCaptureExtractionStatus {
+  pending
+  extracted
+  user_confirmed
+  rejected
+  superseded
+}
+
+enum NurtureCaptureStatus {
+  active
+  superseded
+  dismissed
+  deleted
+}
+
+enum NurtureMetricValueKind {
+  number
+  boolean
+  enum
+  duration
+  count
+  scale
+  text_summary
+}
+
+enum NurtureMetricSubjectType {
+  family
+  child
+  parent
+  workflow
+  caregiver
+}
+
+enum NurtureMetricSourceType {
+  capture
+  checkpoint
+  review
+  system_inferred
+  manual
+}
+
+enum NurtureMetricObservationStatus {
+  active
+  corrected
+  dismissed
+  deleted
+}
+
+enum NurtureSnapshotType {
+  planning
+  checkpoint
+  review
+  periodic
+  manual
+}
+
+enum NurtureSnapshotSourceType {
+  metric_rollup
+  workflow_review
+  user_update
+  llm_summary
+  mixed
+}
+
+enum NurtureSnapshotStatus {
+  active
+  superseded
+  disputed
+  deleted
+}
+
+enum NurtureContextLayer {
+  L0_safety
+  L1_family_charter
+  L2_current_focus
+  L3_child_profile
+  L4_family_state
+  L5_scenario_constraints
+  L6_historical_feedback
+  L7_community_evidence
+}
+
+enum NurtureMaterialAudience {
+  mobile_llm
+  workflow_orchestrator
+  web_workbench
+  review_generator
+  recommendation_ranker
+}
+
+enum NurtureMaterialSubjectType {
+  family
+  child
+  parent
+  caregiver
+  workflow
+  rule_topic
+  scenario
+}
+
+enum NurtureFreshnessLevel {
+  current
+  recent
+  stale
+  historical
+}
+
+enum NurtureSensitivityLevel {
+  low
+  medium
+  high
+  restricted
+}
+
+enum NurtureMaterialStatus {
+  active
+  stale
+  superseded
+  restricted
+  deleted
+}
+
+enum NurtureMaterialSourceType {
+  family_profile_snapshot
+  child_profile_snapshot
+  family_charter
+  focus_cycle
+  workflow_project
+  workflow_capture
+  quantification_snapshot
+  workflow_review
+  metric_observation
+  evidence
+}
+
+enum NurtureMaterialType {
+  profile_fact
+  family_constraint
+  charter_principle
+  current_focus
+  development_vector_digest
+  metric_rollup
+  observation_summary
+  workflow_commitment
+  plan_rationale
+  checkpoint_signal
+  review_learning
+  safety_boundary
+  missing_context_question
+  family_preference
+}
+
+enum NurturePackType {
+  planning
+  checkpoint
+  adjustment
+  review
+  workbench_preview
+  mobile_handoff
+}
+
+enum NurturePackAudience {
+  workflow_orchestrator
+  mobile_llm
+  web_workbench
+  review_generator
+}
+
+enum NurturePackPurpose {
+  create_plan
+  select_next_action
+  build_checkpoint
+  propose_adjustment
+  build_review_summary
+  preview_context
+  prepare_mobile_handoff
+}
+
+enum NurturePackTriggerType {
+  project_created
+  project_updated
+  capture_added
+  checkpoint_requested
+  adjustment_requested
+  review_requested
+  manual_preview
+  mobile_turn_requested
+}
+
+enum NurturePackStatus {
+  built
+  used
+  superseded
+  discarded
+  failed
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — PROFILE PROJECTIONS (5b decision 1)
+// ============================================================================
+
+model NurtureFamilyProfileSnapshot {
+  id               String    @id @default(uuid())
+  workspaceId      String    @map("workspace_id")
+  familyRefKey     String    @map("family_ref_key")
+  familyRef        Json      @map("family_ref")
+  profilePayload   Json?     @map("profile_payload")
+  semanticSummary  String?   @map("semantic_summary") @db.Text
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  @@index([workspaceId, familyRefKey], map: "ix_1")
+  @@map("nurture_family_profile_snapshot")
+}
+
+model NurtureChildProfileSnapshot {
+  id                             String    @id @default(uuid())
+  workspaceId                    String    @map("workspace_id")
+  familyRefKey                   String    @map("family_ref_key")
+  childRefKey                    String    @map("child_ref_key")
+  childRef                       Json      @map("child_ref")
+  developmentStageKey            String?   @map("development_stage_key")
+  profilePayload                 Json?     @map("profile_payload")
+  developmentVectorDigestPayload Json?     @map("development_vector_digest_payload")
+  semanticSummary                String?   @map("semantic_summary") @db.Text
+  aggregateVersion               Int       @default(0) @map("aggregate_version")
+  createdAt                      DateTime  @default(now()) @map("created_at")
+  updatedAt                      DateTime  @updatedAt @map("updated_at")
+  deletedAt                      DateTime? @map("deleted_at")
+
+  @@index([workspaceId, familyRefKey, childRefKey], map: "ix_2")
+  @@map("nurture_child_profile_snapshot")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — STABLE STRATEGY (charter + focus)
+// ============================================================================
+
+model NurtureFamilyCharter {
+  id                  String    @id @default(uuid())
+  workspaceId         String    @map("workspace_id")
+  familyRefKey        String    @map("family_ref_key")
+  familyRef           Json      @map("family_ref")
+  charterPayload      Json?     @map("charter_payload")
+  status              String?
+  supersedesCharterId String?   @map("supersedes_charter_id")
+  aggregateVersion    Int       @default(0) @map("aggregate_version")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
+
+  items NurtureFamilyCharterItem[]
+
+  @@index([workspaceId, familyRefKey, status], map: "ix_3")
+  @@map("nurture_family_charter")
+}
+
+model NurtureFamilyCharterItem {
+  id               String   @id @default(uuid())
+  workspaceId      String   @map("workspace_id")
+  charterId        String   @map("charter_id")
+  familyRefKey     String   @map("family_ref_key")
+  itemKey          String?  @map("item_key")
+  itemPayload      Json?    @map("item_payload")
+  aggregateVersion Int      @default(0) @map("aggregate_version")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  charter NurtureFamilyCharter @relation(fields: [charterId], references: [id])
+
+  @@index([workspaceId, charterId], map: "ix_4")
+  @@map("nurture_family_charter_item")
+}
+
+model NurtureFocusCycle {
+  id               String    @id @default(uuid())
+  workspaceId      String    @map("workspace_id")
+  familyRefKey     String    @map("family_ref_key")
+  familyRef        Json      @map("family_ref")
+  cycleStart       DateTime? @map("cycle_start")
+  cycleEnd         DateTime? @map("cycle_end")
+  focusPayload     Json?     @map("focus_payload")
+  status           String?
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  goals NurtureFocusGoal[]
+
+  @@index([workspaceId, familyRefKey, status], map: "ix_5")
+  @@map("nurture_focus_cycle")
+}
+
+model NurtureFocusGoal {
+  id               String   @id @default(uuid())
+  workspaceId      String   @map("workspace_id")
+  focusCycleId     String   @map("focus_cycle_id")
+  familyRefKey     String   @map("family_ref_key")
+  goalKey          String?  @map("goal_key")
+  goalPayload      Json?    @map("goal_payload")
+  priority         Int?
+  aggregateVersion Int      @default(0) @map("aggregate_version")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  focusCycle NurtureFocusCycle @relation(fields: [focusCycleId], references: [id])
+
+  @@index([workspaceId, focusCycleId], map: "ix_6")
+  @@map("nurture_focus_goal")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — METRIC DEFINITION + OBSERVATION (5e)
+// ============================================================================
+
+model NurtureMetricDefinition {
+  id                String                    @id @default(uuid())
+  workspaceId       String                    @map("workspace_id")
+  metricCode        String                    @map("metric_code")
+  displayName       String?                   @map("display_name")
+  valueKind         NurtureMetricValueKind?   @map("value_kind")
+  subjectType       NurtureMetricSubjectType? @map("subject_type")
+  unit              String?
+  definitionPayload Json?                     @map("definition_payload")
+  createdAt         DateTime                  @default(now()) @map("created_at")
+  updatedAt         DateTime                  @updatedAt @map("updated_at")
+
+  @@unique([workspaceId, metricCode], map: "uq_1")
+  @@map("nurture_metric_definition")
+}
+
+model NurtureMetricObservation {
+  id                          String                         @id @default(uuid())
+  workspaceId                 String                         @map("workspace_id")
+  familyRefKey                String                         @map("family_ref_key")
+  childRefKey                 String?                        @map("child_ref_key")
+  parentActorId               String?                        @map("parent_actor_id")
+  projectId                   String?                        @map("project_id")
+  captureId                   String?                        @map("capture_id")
+  checkpointId                String?                        @map("checkpoint_id")
+  workflowRunId               String?                        @map("workflow_run_id")
+  metricCode                  String                         @map("metric_code")
+  subjectType                 NurtureMetricSubjectType       @map("subject_type")
+  subjectRefKey               String                         @map("subject_ref_key")
+  subjectRef                  Json?                          @map("subject_ref")
+  valueKind                   NurtureMetricValueKind         @map("value_kind")
+  numericValue                Decimal?                       @map("numeric_value")
+  booleanValue                Boolean?                       @map("boolean_value")
+  enumValue                   String?                        @map("enum_value")
+  textValue                   String?                        @map("text_value") @db.Text
+  valuePayload                Json?                          @map("value_payload")
+  unit                        String?
+  scaleMin                    Decimal?                       @map("scale_min")
+  scaleMax                    Decimal?                       @map("scale_max")
+  observedAt                  DateTime                       @map("observed_at")
+  periodStart                 DateTime?                      @map("period_start")
+  periodEnd                   DateTime?                      @map("period_end")
+  sourceType                  NurtureMetricSourceType        @map("source_type")
+  confidence                  Float?
+  userConfirmed               Boolean                        @default(false) @map("user_confirmed")
+  semanticSummary             String?                        @map("semantic_summary") @db.Text
+  semanticTags                String[]                       @default([]) @map("semantic_tags")
+  semanticPayload             Json?                          @map("semantic_payload")
+  materializationStatus       String?                        @map("materialization_status")
+  generatedContextMaterialIds String[]                       @default([]) @map("generated_context_material_ids")
+  status                      NurtureMetricObservationStatus
+  supersedesObservationId     String?                        @map("supersedes_observation_id")
+  createdAt                   DateTime                       @default(now()) @map("created_at")
+  updatedAt                   DateTime                       @updatedAt @map("updated_at")
+  deletedAt                   DateTime?                      @map("deleted_at")
+
+  project    NurtureWorkflowProject?    @relation(fields: [projectId], references: [id])
+  checkpoint NurtureWorkflowCheckpoint? @relation(fields: [checkpointId], references: [id])
+
+  @@index([workspaceId, familyRefKey, metricCode, observedAt], map: "ix_7")
+  @@index([projectId, metricCode, observedAt], map: "ix_8")
+  @@index([captureId], map: "ix_9")
+  @@index([checkpointId], map: "ix_10")
+  @@index([workspaceId, childRefKey, metricCode, observedAt], map: "ix_11")
+  @@map("nurture_metric_observation")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — FAMILY QUANTIFICATION SNAPSHOT (5f)
+// ============================================================================
+
+model NurtureFamilyQuantificationSnapshot {
+  id                             String                    @id @default(uuid())
+  workspaceId                    String                    @map("workspace_id")
+  familyRefKey                   String                    @map("family_ref_key")
+  familyRef                      Json                      @map("family_ref")
+  childRefKey                    String?                   @map("child_ref_key")
+  childRef                       Json?                     @map("child_ref")
+  projectId                      String?                   @map("project_id")
+  checkpointId                   String?                   @map("checkpoint_id")
+  reviewId                       String?                   @map("review_id")
+  workflowRunId                  String?                   @map("workflow_run_id")
+  snapshotType                   NurtureSnapshotType       @map("snapshot_type")
+  sourceType                     NurtureSnapshotSourceType @map("source_type")
+  periodStart                    DateTime?                 @map("period_start")
+  periodEnd                      DateTime?                 @map("period_end")
+  capturedAt                     DateTime                  @default(now()) @map("captured_at")
+  structureVersion               Int?                      @map("structure_version")
+  metricSchemaVersion            Int?                      @map("metric_schema_version")
+  familyResourcesPayload         Json?                     @map("family_resources_payload")
+  parentBandwidthPayload         Json?                     @map("parent_bandwidth_payload")
+  familyConsistencyPayload       Json?                     @map("family_consistency_payload")
+  parentChildConnectionPayload   Json?                     @map("parent_child_connection_payload")
+  lifeStructurePayload           Json?                     @map("life_structure_payload")
+  valueAlignmentPayload          Json?                     @map("value_alignment_payload")
+  overloadRiskPayload            Json?                     @map("overload_risk_payload")
+  metricRollupPayload            Json?                     @map("metric_rollup_payload")
+  developmentVectorDigestPayload Json?                     @map("development_vector_digest_payload")
+  workflowEffectPayload          Json?                     @map("workflow_effect_payload")
+  metricObservationRefs          Json?                     @map("metric_observation_refs")
+  captureRefs                    Json?                     @map("capture_refs")
+  evidenceRefs                   Json?                     @map("evidence_refs")
+  summaryPayload                 Json?                     @map("summary_payload")
+  semanticSummary                String?                   @map("semantic_summary") @db.Text
+  semanticTags                   String[]                  @default([]) @map("semantic_tags")
+  semanticDomains                String[]                  @default([]) @map("semantic_domains")
+  semanticContextDigest          String?                   @map("semantic_context_digest") @db.Text
+  semanticEmbeddingText          String?                   @map("semantic_embedding_text") @db.Text
+  semanticPayload                Json?                     @map("semantic_payload")
+  semanticVersion                Int?                      @map("semantic_version")
+  materializationStatus          String?                   @map("materialization_status")
+  generatedContextMaterialIds    String[]                  @default([]) @map("generated_context_material_ids")
+  confidence                     Float?
+  userConfirmed                  Boolean                   @default(false) @map("user_confirmed")
+  status                         NurtureSnapshotStatus
+  supersedesSnapshotId           String?                   @map("supersedes_snapshot_id")
+  createdAt                      DateTime                  @default(now()) @map("created_at")
+  updatedAt                      DateTime                  @updatedAt @map("updated_at")
+  deletedAt                      DateTime?                 @map("deleted_at")
+
+  project NurtureWorkflowProject? @relation(fields: [projectId], references: [id])
+
+  @@index([workspaceId, familyRefKey, capturedAt], map: "ix_12")
+  @@index([workspaceId, familyRefKey, snapshotType, capturedAt], map: "ix_13")
+  @@index([projectId, capturedAt], map: "ix_14")
+  @@index([checkpointId], map: "ix_15")
+  @@index([reviewId], map: "ix_16")
+  @@index([workspaceId, childRefKey, capturedAt], map: "ix_17")
+  @@map("nurture_family_quantification_snapshot")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — CONTEXT MATERIAL (5h corpus supply layer)
+// ============================================================================
+
+model NurtureContextMaterial {
+  id                       String                     @id @default(uuid())
+  workspaceId              String                     @map("workspace_id")
+  familyRefKey             String                     @map("family_ref_key")
+  childRefKey              String?                    @map("child_ref_key")
+  subjectType              NurtureMaterialSubjectType @map("subject_type")
+  subjectRefKey            String?                    @map("subject_ref_key")
+  projectId                String?                    @map("project_id")
+  workflowRunId            String?                    @map("workflow_run_id")
+  workflowStepId           String?                    @map("workflow_step_id")
+  materialKey              String                     @map("material_key")
+  sourceType               NurtureMaterialSourceType  @map("source_type")
+  sourceRefId              String                     @map("source_ref_id")
+  sourceRefPayload         Json?                      @map("source_ref_payload")
+  sourceVersion            Int                        @map("source_version")
+  sourceCapturedAt         DateTime?                  @map("source_captured_at")
+  sourceUpdatedAt          DateTime?                  @map("source_updated_at")
+  materialHash             String                     @map("material_hash")
+  materialType             NurtureMaterialType        @map("material_type")
+  contextLayer             NurtureContextLayer        @map("context_layer")
+  audience                 NurtureMaterialAudience
+  templateKey              String?                    @map("template_key")
+  issueType                String?                    @map("issue_type")
+  urgencyHorizon           String?                    @map("urgency_horizon")
+  developmentStageKey      String?                    @map("development_stage_key")
+  structuredPayload        Json?                      @map("structured_payload")
+  semanticText             String?                    @map("semantic_text") @db.Text
+  semanticSummary          String?                    @map("semantic_summary") @db.Text
+  semanticTags             String[]                   @default([]) @map("semantic_tags")
+  semanticDomains          String[]                   @default([]) @map("semantic_domains")
+  retrievalKey             String?                    @map("retrieval_key")
+  embeddingText            String?                    @map("embedding_text") @db.Text
+  language                 String?
+  tokenEstimate            Int                        @map("token_estimate")
+  orchestrationHintPayload Json?                      @map("orchestration_hint_payload")
+  selectionWeightPayload   Json?                      @map("selection_weight_payload")
+  freshnessLevel           NurtureFreshnessLevel      @map("freshness_level")
+  confidence               Float?
+  userConfirmed            Boolean                    @default(false) @map("user_confirmed")
+  sensitivityLevel         NurtureSensitivityLevel    @map("sensitivity_level")
+  redactionLevel           String?                    @map("redaction_level")
+  safetyScopes             String[]                   @default([]) @map("safety_scopes")
+  validFrom                DateTime?                  @map("valid_from")
+  validUntil               DateTime?                  @map("valid_until")
+  stalenessPolicy          String?                    @map("staleness_policy")
+  status                   NurtureMaterialStatus
+  supersedesMaterialId     String?                    @map("supersedes_material_id")
+  semanticVersion          Int                        @map("semantic_version")
+  materializerVersion      String?                    @map("materializer_version")
+  createdByPipeline        String?                    @map("created_by_pipeline")
+  createdAt                DateTime                   @default(now()) @map("created_at")
+  updatedAt                DateTime                   @updatedAt @map("updated_at")
+  deletedAt                DateTime?                  @map("deleted_at")
+
+  @@unique([workspaceId, materialKey, sourceVersion, semanticVersion], map: "uq_2")
+  @@index([workspaceId, familyRefKey, contextLayer, status, validUntil], map: "ix_18")
+  @@index([workspaceId, familyRefKey, materialType, status], map: "ix_19")
+  @@index([workspaceId, familyRefKey, audience, templateKey, status], map: "ix_20")
+  @@index([projectId, contextLayer, status], map: "ix_21")
+  @@index([sourceType, sourceRefId], map: "ix_22")
+  @@index([retrievalKey], map: "ix_23")
+  @@map("nurture_context_material")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — RUNTIME CONTEXT PACK (5i)
+// ============================================================================
+
+model NurtureRuntimeContextPack {
+  id                          String                 @id @default(uuid())
+  workspaceId                 String                 @map("workspace_id")
+  familyRefKey                String                 @map("family_ref_key")
+  childRefKey                 String?                @map("child_ref_key")
+  projectId                   String?                @map("project_id")
+  workflowRunId               String?                @map("workflow_run_id")
+  workflowStepId              String?                @map("workflow_step_id")
+  packKey                     String                 @map("pack_key")
+  packType                    NurturePackType        @map("pack_type")
+  purpose                     NurturePackPurpose
+  audience                    NurturePackAudience
+  templateKey                 String?                @map("template_key")
+  issueType                   String?                @map("issue_type")
+  urgencyHorizon              String?                @map("urgency_horizon")
+  developmentStageKey         String?                @map("development_stage_key")
+  triggerType                 NurturePackTriggerType @map("trigger_type")
+  triggerRefId                String?                @map("trigger_ref_id")
+  selectionPolicyKey          String?                @map("selection_policy_key")
+  selectionPolicyVersion      String?                @map("selection_policy_version")
+  candidateFilterPayload      Json?                  @map("candidate_filter_payload")
+  selectedMaterialRefs        Json?                  @map("selected_material_refs")
+  excludedMaterialRefs        Json?                  @map("excluded_material_refs")
+  contextLayerCoveragePayload Json?                  @map("context_layer_coverage_payload")
+  knownContextPayload         Json?                  @map("known_context_payload")
+  missingContextPayload       Json?                  @map("missing_context_payload")
+  assumptionsPayload          Json?                  @map("assumptions_payload")
+  safetyBoundaryPayload       Json?                  @map("safety_boundary_payload")
+  orchestrationInputPayload   Json?                  @map("orchestration_input_payload")
+  outputContractPayload       Json?                  @map("output_contract_payload")
+  contextText                 String?                @map("context_text") @db.Text
+  contextTextHash             String?                @map("context_text_hash")
+  tokenBudgetPayload          Json?                  @map("token_budget_payload")
+  packStatsPayload            Json?                  @map("pack_stats_payload")
+  modelProfileKey             String?                @map("model_profile_key")
+  modelRuntimeHintsPayload    Json?                  @map("model_runtime_hints_payload")
+  providerInvocationRef       String?                @map("provider_invocation_ref")
+  resultArtifactRef           Json?                  @map("result_artifact_ref")
+  materialSetHash             String?                @map("material_set_hash")
+  packHash                    String?                @map("pack_hash")
+  packVersion                 Int?                   @map("pack_version")
+  builderVersion              String?                @map("builder_version")
+  createdByPipeline           String?                @map("created_by_pipeline")
+  status                      NurturePackStatus
+  supersedesPackId            String?                @map("supersedes_pack_id")
+  createdAt                   DateTime               @default(now()) @map("created_at")
+  updatedAt                   DateTime               @updatedAt @map("updated_at")
+
+  project NurtureWorkflowProject? @relation(fields: [projectId], references: [id])
+
+  @@index([projectId, createdAt], map: "ix_24")
+  @@index([workflowRunId, workflowStepId, createdAt], map: "ix_25")
+  @@index([workspaceId, familyRefKey, packType, createdAt], map: "ix_26")
+  @@index([workspaceId, familyRefKey, audience, packType, status, createdAt], map: "ix_27")
+  @@index([packKey], map: "ix_28")
+  @@index([providerInvocationRef], map: "ix_29")
+  @@map("nurture_runtime_context_pack")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — WORKFLOW PROJECT + CAPTURE + CHECKPOINT + REVIEW (5a/5c/5d)
+// ============================================================================
+
+model NurtureWorkflowProject {
+  id                           String               @id @default(uuid())
+  workspaceId                  String               @map("workspace_id")
+  familyRefKey                 String               @map("family_ref_key")
+  familyRef                    Json                 @map("family_ref")
+  primaryChildRefKey           String?              @map("primary_child_ref_key")
+  primaryChildRef              Json?                @map("primary_child_ref")
+  templateKey                  String               @map("template_key")
+  issueType                    NurtureIssueType     @map("issue_type")
+  title                        String?
+  description                  String?              @db.Text
+  status                       NurtureProjectStatus
+  riskLevel                    String?              @map("risk_level")
+  urgencyHorizon               String?              @map("urgency_horizon")
+  workflowRunId                String?              @map("workflow_run_id")
+  workflowRunRef               Json?                @map("workflow_run_ref")
+  workflowVersion              Int?                 @map("workflow_version")
+  contextSnapshotPayload       Json?                @map("context_snapshot_payload")
+  familyProfileSnapshotId      String?              @map("family_profile_snapshot_id")
+  childProfileSnapshotId       String?              @map("child_profile_snapshot_id")
+  familyCharterId              String?              @map("family_charter_id")
+  focusCycleId                 String?              @map("focus_cycle_id")
+  quantificationSnapshotId     String?              @map("quantification_snapshot_id")
+  goalPayload                  Json?                @map("goal_payload")
+  constraintPayload            Json?                @map("constraint_payload")
+  measurementPlanPayload       Json?                @map("measurement_plan_payload")
+  baselinePayload              Json?                @map("baseline_payload")
+  planPayload                  Json?                @map("plan_payload")
+  intentPayload                Json?                @map("intent_payload")
+  slotsPayload                 Json?                @map("slots_payload")
+  missingContextPayload        Json?                @map("missing_context_payload")
+  suggestedActionPayload       Json?                @map("suggested_action_payload")
+  capturePromptPayload         Json?                @map("capture_prompt_payload")
+  semanticSummary              String?              @map("semantic_summary") @db.Text
+  semanticTags                 String[]             @default([]) @map("semantic_tags")
+  semanticDomains              String[]             @default([]) @map("semantic_domains")
+  semanticStageKey             String?              @map("semantic_stage_key")
+  semanticIntentPayload        Json?                @map("semantic_intent_payload")
+  semanticContextDigest        String?              @map("semantic_context_digest") @db.Text
+  semanticEmbeddingText        String?              @map("semantic_embedding_text") @db.Text
+  semanticPayload              Json?                @map("semantic_payload")
+  semanticVersion              Int?                 @map("semantic_version")
+  contextMaterialRefs          Json?                @map("context_material_refs")
+  latestRuntimeContextPackId   String?              @map("latest_runtime_context_pack_id")
+  orchestrationStatePayload    Json?                @map("orchestration_state_payload")
+  latestCheckpointAt           DateTime?            @map("latest_checkpoint_at")
+  nextCheckpointAt             DateTime?            @map("next_checkpoint_at")
+  reviewDueAt                  DateTime?            @map("review_due_at")
+  completedAt                  DateTime?            @map("completed_at")
+  cancelledAt                  DateTime?            @map("cancelled_at")
+  escalatedAt                  DateTime?            @map("escalated_at")
+  resultingFamilyPolicyId      String?              @map("resulting_family_policy_id")
+  reviewSummaryPayload         Json?                @map("review_summary_payload")
+  learningOutputPayload        Json?                @map("learning_output_payload")
+  profileUpdateProposalPayload Json?                @map("profile_update_proposal_payload")
+  charterUpdateProposalPayload Json?                @map("charter_update_proposal_payload")
+  aggregateVersion             Int                  @default(0) @map("aggregate_version")
+  createdByActorId             String?              @map("created_by_actor_id")
+  updatedByActorId             String?              @map("updated_by_actor_id")
+  createdAt                    DateTime             @default(now()) @map("created_at")
+  updatedAt                    DateTime             @updatedAt @map("updated_at")
+  deletedAt                    DateTime?            @map("deleted_at")
+
+  captures                NurtureWorkflowCapture[]
+  checkpoints             NurtureWorkflowCheckpoint[]
+  reviews                 NurtureWorkflowReview[]
+  metricObservations      NurtureMetricObservation[]
+  quantificationSnapshots NurtureFamilyQuantificationSnapshot[]
+  runtimeContextPacks     NurtureRuntimeContextPack[]
+
+  @@index([workspaceId, familyRefKey, status, updatedAt], map: "ix_30")
+  @@index([workspaceId, familyRefKey, templateKey, status], map: "ix_31")
+  @@index([workspaceId, familyRefKey, issueType, status], map: "ix_32")
+  @@index([workspaceId, primaryChildRefKey, status, updatedAt], map: "ix_33")
+  @@index([workspaceId, familyRefKey, semanticStageKey], map: "ix_34")
+  // Partial unique on workflowRunId WHERE workflow_run_id IS NOT NULL
+  // must be created via raw SQL migration (Prisma cannot express the predicate).
+  @@map("nurture_workflow_project")
+}
+
+model NurtureWorkflowCapture {
+  id                            String                         @id @default(uuid())
+  workspaceId                   String                         @map("workspace_id")
+  projectId                     String?                        @map("project_id")
+  familyRefKey                  String                         @map("family_ref_key")
+  childRefKey                   String?                        @map("child_ref_key")
+  workflowRunId                 String?                        @map("workflow_run_id")
+  workflowStepId                String?                        @map("workflow_step_id")
+  checkpointId                  String?                        @map("checkpoint_id")
+  captureType                   NurtureCaptureType             @map("capture_type")
+  sourceSurface                 NurtureCaptureSourceSurface    @map("source_surface")
+  inputModality                 NurtureCaptureInputModality    @map("input_modality")
+  occurredAt                    DateTime?                      @map("occurred_at")
+  capturedAt                    DateTime                       @default(now()) @map("captured_at")
+  actorId                       String?                        @map("actor_id")
+  actorRole                     String?                        @map("actor_role")
+  promptKey                     String?                        @map("prompt_key")
+  promptPayload                 Json?                          @map("prompt_payload")
+  rawInputText                  String?                        @map("raw_input_text") @db.Text
+  rawInputPayload               Json?                          @map("raw_input_payload")
+  inputLanguage                 String?                        @map("input_language")
+  normalizedInputPayload        Json?                          @map("normalized_input_payload")
+  structuredPayload             Json?                          @map("structured_payload")
+  semanticSummary               String?                        @map("semantic_summary") @db.Text
+  semanticTags                  String[]                       @default([]) @map("semantic_tags")
+  semanticDomains               String[]                       @default([]) @map("semantic_domains")
+  semanticIntentPayload         Json?                          @map("semantic_intent_payload")
+  semanticExtractionPayload     Json?                          @map("semantic_extraction_payload")
+  semanticContextRefs           Json?                          @map("semantic_context_refs")
+  semanticEmbeddingText         String?                        @map("semantic_embedding_text") @db.Text
+  semanticPayload               Json?                          @map("semantic_payload")
+  semanticVersion               Int?                           @map("semantic_version")
+  materializationStatus         String?                        @map("materialization_status")
+  generatedContextMaterialIds   String[]                       @default([]) @map("generated_context_material_ids")
+  extractionStatus              NurtureCaptureExtractionStatus @map("extraction_status")
+  extractionConfidence          Float?                         @map("extraction_confidence")
+  extractedBy                   String?                        @map("extracted_by")
+  extractionModelInfo           Json?                          @map("extraction_model_info")
+  userConfirmed                 Boolean                        @default(false) @map("user_confirmed")
+  safetySignalLevel             String?                        @map("safety_signal_level")
+  generatedMetricObservationIds String[]                       @default([]) @map("generated_metric_observation_ids")
+  generatedEvidenceId           String?                        @map("generated_evidence_id")
+  status                        NurtureCaptureStatus           @default(active)
+  supersedesCaptureId           String?                        @map("supersedes_capture_id")
+  aggregateVersion              Int                            @default(0) @map("aggregate_version")
+  createdAt                     DateTime                       @default(now()) @map("created_at")
+  updatedAt                     DateTime                       @updatedAt @map("updated_at")
+  deletedAt                     DateTime?                      @map("deleted_at")
+
+  project NurtureWorkflowProject? @relation(fields: [projectId], references: [id])
+
+  @@index([projectId, capturedAt], map: "ix_35")
+  @@index([workspaceId, familyRefKey, capturedAt], map: "ix_36")
+  @@index([workspaceId, childRefKey, capturedAt], map: "ix_37")
+  @@index([projectId, captureType, capturedAt], map: "ix_38")
+  @@index([checkpointId], map: "ix_39")
+  @@map("nurture_workflow_capture")
+}
+
+model NurtureWorkflowCheckpoint {
+  id                String    @id @default(uuid())
+  workspaceId       String    @map("workspace_id")
+  projectId         String    @map("project_id")
+  familyRefKey      String    @map("family_ref_key")
+  childRefKey       String?   @map("child_ref_key")
+  workflowRunId     String?   @map("workflow_run_id")
+  workflowStepId    String?   @map("workflow_step_id")
+  checkpointPayload Json?     @map("checkpoint_payload")
+  scheduledAt       DateTime? @map("scheduled_at")
+  completedAt       DateTime? @map("completed_at")
+  status            String?
+  aggregateVersion  Int       @default(0) @map("aggregate_version")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  project            NurtureWorkflowProject     @relation(fields: [projectId], references: [id])
+  metricObservations NurtureMetricObservation[]
+
+  @@index([workspaceId, projectId], map: "ix_40")
+  @@index([projectId, scheduledAt], map: "ix_41")
+  @@map("nurture_workflow_checkpoint")
+}
+
+model NurtureWorkflowReview {
+  id                    String    @id @default(uuid())
+  workspaceId           String    @map("workspace_id")
+  projectId             String    @map("project_id")
+  familyRefKey          String    @map("family_ref_key")
+  childRefKey           String?   @map("child_ref_key")
+  workflowRunId         String?   @map("workflow_run_id")
+  reviewSummaryPayload  Json?     @map("review_summary_payload")
+  learningOutputPayload Json?     @map("learning_output_payload")
+  status                String?
+  completedAt           DateTime? @map("completed_at")
+  userConfirmed         Boolean   @default(false) @map("user_confirmed")
+  aggregateVersion      Int       @default(0) @map("aggregate_version")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  deletedAt             DateTime? @map("deleted_at")
+
+  project NurtureWorkflowProject @relation(fields: [projectId], references: [id])
+
+  @@index([workspaceId, projectId], map: "ix_42")
+  @@map("nurture_workflow_review")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — FAMILY POLICY + EVIDENCE
+// ============================================================================
+
+model NurtureFamilyPolicy {
+  id               String    @id @default(uuid())
+  workspaceId      String    @map("workspace_id")
+  familyRefKey     String    @map("family_ref_key")
+  familyRef        Json      @map("family_ref")
+  childRefKey      String?   @map("child_ref_key")
+  sourceProjectId  String?   @map("source_project_id")
+  policyPayload    Json?     @map("policy_payload")
+  status           String?
+  effectiveFrom    DateTime? @map("effective_from")
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  @@index([workspaceId, familyRefKey, status], map: "ix_43")
+  @@map("nurture_family_policy")
+}
+
+model NurtureEvidence {
+  id               String    @id @default(uuid())
+  workspaceId      String    @map("workspace_id")
+  familyRefKey     String?   @map("family_ref_key")
+  childRefKey      String?   @map("child_ref_key")
+  projectId        String?   @map("project_id")
+  targetRef        Json?     @map("target_ref")
+  evidenceRef      Json?     @map("evidence_ref")
+  reasonCode       String?   @map("reason_code")
+  evidencePayload  Json?     @map("evidence_payload")
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  @@index([workspaceId, familyRefKey], map: "ix_44")
+  @@index([projectId], map: "ix_45")
+  @@map("nurture_evidence")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — REPOSITORY-PORT BACKING TABLES (repositories.ts)
+// ============================================================================
+
+// Backs NurtureProfileRepository (getByCanonicalObjectRef / upsertProjection).
+// The canonical ref is denormalized into scalar columns so getByCanonicalObjectRef
+// is an indexed lookup (Postgres cannot cheaply equality-match a Json object).
+model NurtureProfileProjection {
+  id                 String   @id @default(uuid())
+  profileId          String   @map("profile_id")
+  workspaceId        String   @map("workspace_id")
+  refNamespace       String   @map("ref_namespace")
+  refObjectType      String   @map("ref_object_type")
+  refObjectId        String   @map("ref_object_id")
+  canonicalObjectRef Json     @map("canonical_object_ref")
+  scenarioKey        String   @default("nurture") @map("scenario_key")
+  projectionVersion  Int      @map("projection_version")
+  safeSummary        String   @map("safe_summary") @db.Text
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // The canonical object ref is the natural key (the port upserts/reads by it).
+  // profile_id is a free-form label, intentionally NOT independently unique —
+  // a second unique on it would make the ref-keyed upsert throw P2002 on a
+  // legitimate re-bind of an existing profile_id to a new ref.
+  @@unique([workspaceId, refNamespace, refObjectType, refObjectId], map: "uq_3")
+  @@index([workspaceId], map: "ix_46")
+  @@index([workspaceId, profileId], map: "ix_profile_id")
+  @@map("nurture_profile_projection")
+}
+
+// Backs ActivityComparisonRepository (createDraft / getDraft).
+model NurtureActivityComparisonDraft {
+  id                    String   @id @default(uuid())
+  comparisonId          String   @map("comparison_id")
+  workspaceId           String   @map("workspace_id")
+  targetRefs            Json     @map("target_refs")
+  optionRefs            Json     @map("option_refs")
+  safeSummary           String   @map("safe_summary") @db.Text
+  weightOverridePayload Json?    @map("weight_override_payload")
+  computedResultPayload Json?    @map("computed_result_payload")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@unique([workspaceId, comparisonId], map: "uq_5")
+  @@index([workspaceId], map: "ix_47")
+  @@map("nurture_activity_comparison_draft")
+}
+
+// Backs NurtureEvidenceRepository.appendEvidenceRef (append-only link log).
+model NurtureEvidenceRef {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  targetRef   Json     @map("target_ref")
+  evidenceRef Json     @map("evidence_ref")
+  reasonCode  String   @map("reason_code")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([workspaceId], map: "ix_48")
+  @@map("nurture_evidence_ref")
+}
+
+// ============================================================================
+// SCENARIO-LOCAL — FUTURE EXTENSION TABLES (section 5: 后续扩展)
+// ============================================================================
+
+model NurtureActivityOption {
+  id                 String   @id @default(uuid())
+  workspaceId        String   @map("workspace_id")
+  canonicalObjectRef String?  @map("canonical_object_ref")
+  binding            Json?
+  version            Int      @default(0)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([workspaceId], map: "ix_49")
+  @@map("nurture_activity_option")
+}
+
+model NurtureHealthStateSummary {
+  id                 String   @id @default(uuid())
+  workspaceId        String   @map("workspace_id")
+  canonicalObjectRef String?  @map("canonical_object_ref")
+  binding            Json?
+  version            Int      @default(0)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([workspaceId], map: "ix_50")
+  @@map("nurture_health_state_summary")
 }

@@ -10,6 +10,7 @@ The preserved MVP implemented Nurture business persistence and a My-Chat-like wo
 
 - Root `prisma/schema.prisma`, root migrations, the default `@prisma/client`, and `packages/nurture-db` contain only Nurture-owned business facts and projections.
 - Workflow identifiers stored in Nurture business rows are opaque external references, not relational links to dev-host tables.
+- The production catalog assertion compares the deployed PostgreSQL tables/enums with generated `docs/context/db/schema.json` and rejects any non-`nurture_*` table or `Workflow*` runtime enum.
 
 ### Backend-private dev-host boundary
 

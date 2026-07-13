@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- Next step: reconstruct and verify the Nurture production persistence baseline without workflow dev-host models.
+- Next step: reconstruct the backend-private workflow dev host with its own Prisma schema, migration stream, database, and E2E population.
 - Updated: 2026-07-13
 
 ## Goal
@@ -27,6 +27,6 @@ The pre-G0 implementation was preserved on local branch `codex/g0-preservation` 
 - [x] The formal branch starts exactly from `origin/main`.
 - [ ] Obsolete UI governance tooling is retired without breaking remaining governance suites.
 - [x] My-Chat/Base contract revisions and hashes are machine-verifiable.
-- [ ] Nurture production persistence contains no My-Chat-owned workflow runtime tables.
+- [x] Nurture production persistence contains no My-Chat-owned workflow runtime tables.
 - [ ] Dev-host workflow persistence is private to `apps/backend` and uses a separate database.
 - [ ] Unit tests remain at or above 86, production DB tests at or above 15, and dev-host E2E tests at or above 14.

@@ -39,6 +39,21 @@
 - project governance lint and strict context verification: PASS.
 - `git diff --check`: PASS.
 
+### 2026-07-13 — Nurture production baseline
+
+- `pnpm install --frozen-lockfile`: PASS; 3 workspace importers, relative cross-repo paths, no backend/frontend dependency set.
+- `pnpm db:generate` and `pnpm db:validate`: PASS.
+- `pnpm typecheck`: PASS.
+- `pnpm test:unit:ci && pnpm verify:unit-population`: PASS; 86/86, floor 86.
+- migration preview audit: PASS; 22 tables, every table `nurture_*`, zero `Workflow*` runtime enum/table/FK statements.
+- `pnpm db:deploy`: PASS against isolated `nurture_g0_verify` database.
+- `pnpm db:assert-boundary`: PASS; deployed catalog exactly matches generated DB context with 22 tables and 27 enums.
+- `pnpm test:db:ci && pnpm verify:db-population`: PASS; 15/15, floor 15.
+- Prisma schema-to-deployed-database diff with `--exit-code`: PASS; no difference detected.
+- PostgreSQL catalog query: PASS; 22 `nurture_*` tables and 0 `workflow_*` tables, excluding Prisma migration metadata.
+- workflow contract pin verifier/tests: PASS; scenario contract hash updated to `2dfbe1b0b0dace8fd645c4c7f41517ad19b0aed5371725d23c70b241a6743c3c`.
+- env contract validation, strict context verification, strict skill lint, project governance lint, CI YAML parse, and `git diff --check`: PASS.
+
 ## Required gates for every formal increment
 
 - `git diff --check`

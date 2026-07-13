@@ -13,6 +13,9 @@
 - Removed UI from both test runners while preserving every remaining suite entry.
 - Added `docs/project/integrations/my-chat-workflow-contract.json` with independent Base, My-Chat, and Nurture scenario contract pins.
 - Added a dependency-free verifier with path traversal/symlink rejection, Git revision checks, deterministic path/content hashes, and CI cross-repository checkouts sourced from the pin.
+- Reconstructed the scenario implementation and Nurture repository package from the preservation snapshot while keeping Prisma imports out of the business layer.
+- Replaced the mixed schema history with a clean production migration containing 22 Nurture tables and 27 Nurture enums; removed all six host runtime models and two runtime enums from root Prisma/export/context surfaces.
+- Added `DATABASE_URL` to the env contract, generated env/context artifacts, production catalog assertions, Vitest population assertions, and production-only CI jobs.
 
 ## Decisions and tradeoffs
 
@@ -23,5 +26,5 @@
 
 ## Known issues and follow-ups
 
-- Production baseline is the next increment.
-- Dev-host split and T-002 design closure remain pending.
+- Backend-private dev-host reconstruction is the next increment.
+- T-002 design closure remains pending.

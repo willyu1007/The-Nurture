@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { compareActivities, collectContext } from "../src/handlers/p0-handlers.js";
 import { nurtureScenarioManifest } from "../src/registry.js";
 import { activityComparisonStepInput, familyContextRef } from "./fixtures/nurture-run.fixture.js";
@@ -19,3 +20,9 @@ export const runNurtureP0JourneyFixture = async (): Promise<boolean> => {
     comparisonResult.artifact_drafts?.[0]?.artifact_type === nurtureP0Journey.expected_artifact_type
   );
 };
+
+describe("nurture p0 journey fixture", () => {
+  it("binds family context and produces an activity comparison artifact", async () => {
+    await expect(runNurtureP0JourneyFixture()).resolves.toBe(true);
+  });
+});

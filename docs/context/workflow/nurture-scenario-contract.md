@@ -66,7 +66,9 @@ Escalate or block requests for emergency triage, diagnosis, medication decisions
 
 `prisma/schema.prisma` is the schema SSOT.
 
-Local testing MAY use independent Postgres. Cloud integration SHOULD use My-Chat Postgres with a dedicated schema or `nurture_*` table group after migration gates pass.
+The root `prisma/schema.prisma`, root migrations, default Prisma client, and `packages/nurture-db` contain only Nurture-owned production facts and projections. My-Chat workflow run/step identifiers are stored only as opaque references; they do not create a cross-database relation or transfer runtime ownership.
+
+Local workflow dev-host persistence MUST use a separate backend-private schema and database. It MUST NOT be deployed through the root Nurture migration stream.
 
 ## Integration Gates
 
