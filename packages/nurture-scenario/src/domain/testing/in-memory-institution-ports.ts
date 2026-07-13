@@ -9,6 +9,10 @@ import type {
   NurtureInteractionContextRecord,
   NurtureInteractionContextRepository,
 } from "../interactions/interaction-context.js";
+import type {
+  NurtureInstitutionContextRepository,
+  NurturePolicyFacts,
+} from "../institution/institution-context.js";
 
 type CommandTransactionOverrides = Partial<
   Pick<
@@ -94,6 +98,22 @@ export const createInMemoryInteractionContextRepository = (): NurtureInteraction
         ) ?? null
       );
     },
+    async findLatestActiveByConversationHash(input) {
+      return (
+        [...records.values()]
+          .filter(
+            (row) =>
+              row.workspace_id === input.workspace_id &&
+              row.participant_id === input.participant_id &&
+              row.purpose === input.purpose &&
+              row.surface === input.surface &&
+              row.host_conversation_ref_hash === input.host_conversation_ref_hash &&
+              row.status === "active" &&
+              new Date(row.expires_at).getTime() > new Date(input.at).getTime(),
+          )
+          .sort((left, right) => right.created_at.localeCompare(left.created_at))[0] ?? null
+      );
+    },
     async consume(input) {
       const record = records.get(input.context_id);
       if (
@@ -136,3 +156,34 @@ export const createInMemoryInteractionContextRepository = (): NurtureInteraction
     },
   };
 };
+
+const unavailablePolicyFacts = (): NurturePolicyFacts => ({
+  participant_state: "missing",
+  role_state: "missing",
+  scope_reaches_child: false,
+  care_group_matches: false,
+  child_visible: false,
+  thread_state: "missing",
+  thread_membership_active: false,
+  message_state: "missing",
+  enrollment_state: "missing",
+  grant_state: "missing",
+  grant_directions: [],
+  grant_data_classes: [],
+  family_thread_visible: false,
+  asset_scope_matches: false,
+  child_enrolled: false,
+  exposure_policy_present: false,
+});
+
+export const createInMemoryInstitutionContextRepository = (
+  overrides: Partial<NurtureInstitutionContextRepository> = {},
+): NurtureInstitutionContextRepository => ({
+  listActiveParticipants: overrides.listActiveParticipants ?? (async () => []),
+  listActiveActorBindings: overrides.listActiveActorBindings ?? (async () => []),
+  listResolutionCandidates: overrides.listResolutionCandidates ?? (async () => []),
+  revalidateResolutionCandidate:
+    overrides.revalidateResolutionCandidate ??
+    (async () => ({ current: false, reason_code: "participant_missing" })),
+  loadPolicyFacts: overrides.loadPolicyFacts ?? (async () => unavailablePolicyFacts()),
+});

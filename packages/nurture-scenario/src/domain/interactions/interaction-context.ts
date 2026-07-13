@@ -26,6 +26,14 @@ export type NurtureInteractionContextRecord = {
 export type NurtureInteractionContextRepository = {
   create(input: Omit<NurtureInteractionContextRecord, "id" | "created_at" | "updated_at">): Promise<NurtureInteractionContextRecord>;
   findByTokenHash(input: { workspace_id: string; token_hash: string }): Promise<NurtureInteractionContextRecord | null>;
+  findLatestActiveByConversationHash(input: {
+    workspace_id: string;
+    participant_id: string;
+    purpose: NurtureInteractionPurpose;
+    surface: string;
+    host_conversation_ref_hash: string;
+    at: string;
+  }): Promise<NurtureInteractionContextRecord | null>;
   consume(input: {
     workspace_id: string;
     context_id: string;
@@ -223,6 +231,30 @@ export class NurtureInteractionContextService {
     return consumed
       ? { status: "consumed", context: consumed }
       : { status: "blocked", reason_code: "token_replayed" };
+  }
+
+  async recoverCurrentConversation(input: {
+    workspace_id: string;
+    participant_id: string;
+    purpose: NurtureInteractionPurpose;
+    surface: string;
+    host_conversation_ref: string;
+  }): Promise<NurtureInteractionContextRecord | null> {
+    const row = await this.repository.findLatestActiveByConversationHash({
+      workspace_id: input.workspace_id,
+      participant_id: input.participant_id,
+      purpose: input.purpose,
+      surface: input.surface,
+      host_conversation_ref_hash: hashHostConversationRef(
+        input.workspace_id,
+        input.host_conversation_ref,
+      ),
+      at: this.now().toISOString(),
+    });
+    if (!row || row.status !== "active" || new Date(row.expires_at).getTime() <= this.now().getTime()) {
+      return null;
+    }
+    return row;
   }
 
   async revoke(input: {

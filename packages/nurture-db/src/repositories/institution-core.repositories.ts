@@ -282,6 +282,29 @@ export class PrismaInteractionContextRepository implements NurtureInteractionCon
     return row ? toInteraction(row) : null;
   }
 
+  async findLatestActiveByConversationHash(input: {
+    workspace_id: string;
+    participant_id: string;
+    purpose: NurtureInteractionContextRecord["purpose"];
+    surface: string;
+    host_conversation_ref_hash: string;
+    at: string;
+  }): Promise<NurtureInteractionContextRecord | null> {
+    const row = await this.prisma.nurtureInteractionContext.findFirst({
+      where: {
+        workspaceId: input.workspace_id,
+        participantId: input.participant_id,
+        purpose: input.purpose,
+        surface: input.surface,
+        hostConversationRefHash: input.host_conversation_ref_hash,
+        status: "active",
+        expiresAt: { gt: new Date(input.at) },
+      },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+    });
+    return row ? toInteraction(row) : null;
+  }
+
   async consume(input: {
     workspace_id: string;
     context_id: string;

@@ -105,6 +105,28 @@ describe("NurtureInteractionContextService", () => {
     expect(row?.status).toBe("active");
   });
 
+  it("recovers only the current purpose-bound context for the same conversation", async () => {
+    const { service } = createHarness();
+    const issued = await issue(service);
+    const current = await service.recoverCurrentConversation({
+      workspace_id: workspaceId,
+      participant_id: participantId,
+      purpose: "clarify",
+      surface: "mobile_chat",
+      host_conversation_ref: "conversation-1",
+    });
+    expect(current?.id).toBe(issued.context_id);
+    await expect(
+      service.recoverCurrentConversation({
+        workspace_id: workspaceId,
+        participant_id: participantId,
+        purpose: "submit_action",
+        surface: "mobile_chat",
+        host_conversation_ref: "conversation-1",
+      }),
+    ).resolves.toBeNull();
+  });
+
   it("consumes clarify exactly once and keeps open-notification reads reusable", async () => {
     const { service } = createHarness();
     await issue(service);

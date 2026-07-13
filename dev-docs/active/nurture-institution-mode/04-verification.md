@@ -41,6 +41,20 @@
 | `pnpm typecheck` | PASS | Scenario ports and Prisma adapters compile without Prisma leaking into the scenario package. |
 | Unit gate | PASS | 14 files / 100 tests; exact population and routing gates pass. |
 
+## N1-D Resolver / Policy Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Host-envelope boundary | PASS | Resolver rejects host-authored role, target, child, family, group, institution, grant, direction, data-class, and policy fields before any business resolution. Missing host workspace is accepted only when current Nurture participation resolves exactly one workspace. |
+| Candidate kernel | PASS | Complete actor-to-scope-to-target paths are merged and deduplicated deterministically; semantic ties and weak-recency matches require clarification; recency and stable ids never manufacture an auto-resolution. Aggregate and rendered-option limits fail into narrowing instead of silent truncation. |
+| Structured clarification | PASS | Nurture-issued scenario and option tokens are opaque/hash-only, safe labels are bounded, candidate refs remain Nurture-local, same-conversation recovery is purpose-bound, selection is one-time, and current participant/role/scope/grant/lifecycle are revalidated after selection. |
+| Business-memory adapters | PASS | Bounded adapters cover nonterminal family-care items, active attention items, and active private threads; attention rows deduplicate to actionable backing items; revoked/missing grant and inactive enrollment are filtered or returned as specific blocked reasons. No model, cache, vector, Redis, or new memory table was added. |
+| Structured policy | PASS | Six locked Nurture policy predicates return allow/deny, stable reason, refs-only audit evidence, and safe user state; repository failures deny as `policy_unavailable`. Grant direction/data class, enrollment, caregiver scope, redaction, thread membership, media scope, and exposure gates are current-state checks. |
+| Architecture review | PASS AFTER REPAIR | Fixed inactive role-scope resolution, tenant-qualified child reachability, grant-target binding, revoked backing-item/deep-link revalidation, unbounded grant history reads, sequential per-role source queries, and oversized clarification labels before acceptance. Scenario remains Prisma-free; My-Chat runtime ownership is unchanged. |
+| `pnpm typecheck` | PASS | Full workspace, scenario, and Prisma repository adapters compile. |
+| Unit gate | PASS | 15 files / 125 tests; exact population and routing gates pass. |
+| Static DB/boundary gates | PASS | Both Prisma schemas validate (dev-host with a non-connecting placeholder URL), production/dev-host boundaries pass, N1 schema contract passes, and cross-repo contract pin passes. No database was mutated. |
+
 ## Automated Checks
 
 Run after task-doc or governance edits:
@@ -281,3 +295,6 @@ For IA/IA.1 discussion work:
 | 2026-07-13 | G0 formal baseline isolation | PASS | Reconstructed from `origin/main` as five independent increments; production Prisma has only Nurture tables and backend-private Prisma has only workflow dev-host tables. No institution schema/live manifest was added. |
 | 2026-07-13 | G0 test and ownership matrix | PASS | 86 unit, 15 production DB, 14 dev-host E2E, both catalog boundaries, frontend lint/build, contract pin, context, and governance passed. N1 dirty-worktree blocker is resolved; X1 remains its contract dependency. |
 | 2026-07-13 | G0 merge/closure hardening audit | PASS | PR/main CI, fresh-worktree verification, cleanup, loopback-only dev host/Postgres, env-loader tests, Base web-workbench source pin, 86 unit + 15 production DB + 16 dev-host E2E, and governance completion passed. T-002 remains planned; X0 is the next implementation gate. |
+| 2026-07-13 | N1-D resolver/policy targeted verification | PASS | 30 targeted interaction/resolver/policy tests cover opaque tokens, binding/replay/revoke, candidate ranking/ties/limits, host-scope rejection, role-agnostic and workspace-optional ingress, current-state/lifecycle revalidation, and structured policy reasons. |
+| 2026-07-13 | N1-D architecture review and repair | PASS AFTER REPAIR | Closed inactive-scope, cross-workspace reachability, grant-target/revoke, same-conversation purpose, unbounded-query, sequential-query, safe-label-size, and repository-failure gaps before acceptance. |
+| 2026-07-13 | N1-D full static/unit gate | PASS | Full typecheck; 15 unit files / 125 tests; test routing; both Prisma validations; persistence boundary; N1 schema contract; cross-repo contract pin; and diff whitespace pass. No DB apply occurred. |
