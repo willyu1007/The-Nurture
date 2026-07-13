@@ -16,6 +16,9 @@
 - Reconstructed the scenario implementation and Nurture repository package from the preservation snapshot while keeping Prisma imports out of the business layer.
 - Replaced the mixed schema history with a clean production migration containing 22 Nurture tables and 27 Nurture enums; removed all six host runtime models and two runtime enums from root Prisma/export/context surfaces.
 - Added `DATABASE_URL` to the env contract, generated env/context artifacts, production catalog assertions, Vitest population assertions, and production-only CI jobs.
+- Added the backend-private Prisma schema/client/migration with exactly six Workflow tables and two runtime enums under `apps/backend`.
+- Rewired the dev host to two explicit clients, restored 14 backend E2E tests and the Next.js workbench, and split unit/production DB/dev-host test configs and CI jobs.
+- Backed up the old mixed local database, proved a same-version restore, then rebuilt `nurture` and `nurture_dev_host` from their independent migration streams.
 
 ## Decisions and tradeoffs
 
@@ -26,5 +29,4 @@
 
 ## Known issues and follow-ups
 
-- Backend-private dev-host reconstruction is the next increment.
-- T-002 design closure remains pending.
+- T-002 design closure and the full G0 WIP-coverage/merge audit remain pending.

@@ -25,18 +25,37 @@ The Nurture is a My-Chat scenario module for pregnancy, motherhood, childcare, f
 - P0 workflows: pregnancy stage management, family strategy, short-term care planning, activity comparison, execution review.
 - Root Prisma assets are Nurture production-only; they never create My-Chat workflow runtime tables.
 - Workflow run/step IDs in Nurture rows are opaque external references.
-- The backend workflow dev host is a separate G0 increment and must use an independent database/migration stream.
+- The backend workflow dev host uses `apps/backend/prisma`, a generated private client, and the separate `nurture_dev_host` database.
+- The Next.js workbench is a scenario development console; it does not own account/auth or shared My-Chat surfaces.
+
+## Local setup
+
+The `@willyu1007/web-workbench` dependency is served by GitHub Packages. Put a `read:packages` token in the user-level npm config; never commit it to this repository.
+
+```bash
+pnpm install
+pnpm db:up
+export DATABASE_URL='postgresql://nurture:nurture@127.0.0.1:5433/nurture?schema=public'
+export DEV_HOST_DATABASE_URL='postgresql://nurture:nurture@127.0.0.1:5433/nurture_dev_host?schema=public'
+pnpm db:generate:all
+pnpm db:deploy
+pnpm dev-host:db:deploy
+```
 
 ## Verify
 
 ```bash
 pnpm install
-pnpm db:generate
+pnpm db:generate:all
 pnpm typecheck
+pnpm verify:test-routing
 pnpm test:unit
-DATABASE_URL=<nurture-postgres-url> pnpm db:deploy
-DATABASE_URL=<nurture-postgres-url> pnpm db:assert-boundary
-DATABASE_URL=<nurture-postgres-url> pnpm test:db
+pnpm test:db
+pnpm test:dev-host
+pnpm db:assert-boundary
+pnpm dev-host:db:assert-boundary
+pnpm --filter @the-nurture/frontend lint
+pnpm --filter @the-nurture/frontend build
 pnpm verify:workflow-contract-pin
 node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
 node .ai/scripts/lint-skills.mjs --strict

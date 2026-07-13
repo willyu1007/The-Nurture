@@ -54,6 +54,23 @@
 - workflow contract pin verifier/tests: PASS; scenario contract hash updated to `2dfbe1b0b0dace8fd645c4c7f41517ad19b0aed5371725d23c70b241a6743c3c`.
 - env contract validation, strict context verification, strict skill lint, project governance lint, CI YAML parse, and `git diff --check`: PASS.
 
+### 2026-07-13 — backend-private workflow dev host
+
+- dev-host migration preview audit: PASS; exactly 6 `workflow_*` tables, 2 `Workflow*` enums, and zero Nurture table/FK statements.
+- pre-rebuild backup: PASS using PostgreSQL 16 tools inside `nurture-postgres`.
+  - custom-format backup SHA-256: `dfc369f4ded1364eb54f9a8ace391ef1e3b16443762ad3aad94b8a2ba310a5f4`.
+  - restore smoke census matched original: 29 tables, 150 projects, 186 runs, 744 steps, 225 artifacts.
+- local rebuild: PASS; `nurture` and `nurture_dev_host` were recreated and independently migrated.
+- `pnpm db:assert-boundary`: PASS; production catalog 22 `nurture_*`, 0 `workflow_*`.
+- `pnpm dev-host:db:assert-boundary`: PASS; dev-host catalog 6 `workflow_*`, 0 `nurture_*`.
+- `pnpm verify:persistence-boundaries`: PASS; source schemas, migrations, exports, adapters, and app API are isolated.
+- `pnpm verify:test-routing`: PASS; 21 files classified as 12 unit, 2 production DB, and 7 dev-host E2E files.
+- unit/production DB/dev-host populations: PASS; 86/86, 15/15, and 14/14.
+- `pnpm --filter @the-nurture/frontend lint`: PASS.
+- `pnpm --filter @the-nurture/frontend build`: PASS; five routes compiled/typechecked.
+- backend process smoke: PASS; dual-DB process listened on `:3001`, `GET /health` returned `{"ok":true}`, and no listener remained after shutdown.
+- `docker compose config`, CI YAML parse, generated-client ignore check, relative-lockfile check, and `git diff --check`: PASS.
+
 ## Required gates for every formal increment
 
 - `git diff --check`

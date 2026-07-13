@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-07-13T00:21:14Z",
+  "generated_at_utc": "2026-07-13T00:34:31Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -38,6 +38,25 @@
       "scopes": null,
       "secret": true,
       "secret_ref": "database_url",
+      "state": "active",
+      "type": "url"
+    },
+    "DEV_HOST_DATABASE_URL": {
+      "default": null,
+      "deprecate_after": null,
+      "description": "PostgreSQL connection URL for backend-private workflow dev-host schema and migrations.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": true,
+      "scopes": [
+        "dev"
+      ],
+      "secret": true,
+      "secret_ref": "dev_host_database_url",
       "state": "active",
       "type": "url"
     },

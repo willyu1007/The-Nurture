@@ -24,6 +24,22 @@ init/.init-state.json
 
 # Node
 node_modules/
+apps/backend/src/generated/dev-host-prisma/
+
+# Framework build output
+.next/
+dist/
+*.tsbuildinfo
+coverage/
+
+# Environment values
+.env
+.env.local
+.env.*.local
+
+# Prisma generated state
+prisma/generated/
+.prisma/
 
 # Python
 __pycache__/

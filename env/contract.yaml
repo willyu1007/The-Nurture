@@ -22,3 +22,10 @@ variables:
     secret: true
     secret_ref: database_url
     description: PostgreSQL connection URL for Nurture-owned production schema and migrations.
+  DEV_HOST_DATABASE_URL:
+    type: url
+    required: true
+    scopes: [dev]
+    secret: true
+    secret_ref: dev_host_database_url
+    description: PostgreSQL connection URL for backend-private workflow dev-host schema and migrations.

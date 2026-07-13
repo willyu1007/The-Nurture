@@ -1,0 +1,29 @@
+{
+  "name": "@the-nurture/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The Nurture web run workbench console. Consumes the @willyu1007/web-workbench UI kit as the UI/UX source of truth; renders run/artifact/action views via scenario adapters. UI implementation lands in P4.",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm lint:es && pnpm lint:css",
+    "lint:es": "eslint src",
+    "lint:css": "stylelint \"src/**/*.css\""
+  },
+  "dependencies": {
+    "@willyu1007/web-workbench": "link:../../../My-Workflow-Base/templates/web-workbench",
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^9",
+    "stylelint": "^16"
+  }
+}

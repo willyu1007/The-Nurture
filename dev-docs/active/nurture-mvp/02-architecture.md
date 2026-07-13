@@ -17,6 +17,8 @@ The preserved MVP implemented Nurture business persistence and a My-Chat-like wo
 - `apps/backend/prisma/` owns the workflow dev-host schema and migrations.
 - Its generated Prisma client lives under `apps/backend/src/generated/dev-host-prisma/` and is not published as a shared package.
 - `apps/backend` receives separate Nurture and dev-host database URLs and injects the correct client into each repository or runtime port.
+- `createNurtureApp` exposes `nurturePrisma` and `devHostPrisma` explicitly; the former feeds Nurture repositories/internal APIs and the latter feeds ledger/runtime/action/dispatcher/artifact ports.
+- `DEV_HOST_DATABASE_URL` is scoped to the `dev` environment contract and is absent from staging/production secret refs.
 
 ### Contracts
 

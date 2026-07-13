@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -99,18 +100,25 @@ jobs:
         with:
           path: The-Nurture
 
-      - name: Read pinned My-Chat dependency
+      - name: Read pinned source dependencies
         id: pin
         working-directory: The-Nurture
         run: |
-          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'repository='+pin.myChat.repository+'\\nrevision='+pin.myChat.revision+'\\n')"
+          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat source dependency
         uses: actions/checkout@v4
         with:
-          repository: ${{ steps.pin.outputs.repository }}
-          ref: ${{ steps.pin.outputs.revision }}
+          repository: ${{ steps.pin.outputs.my_chat_repository }}
+          ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
+
+      - name: Checkout My-Workflow-Base source dependency
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.workflow_base_repository }}
+          ref: ${{ steps.pin.outputs.workflow_base_revision }}
+          path: My-Workflow-Base
 
       - uses: pnpm/action-setup@v4
         with:
@@ -122,6 +130,11 @@ jobs:
           cache: pnpm
           cache-dependency-path: The-Nurture/pnpm-lock.yaml
 
+      - name: Build pinned web-workbench dependency
+        run: |
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench build
+
       - name: Install
         working-directory: The-Nurture
         run: pnpm install --frozen-lockfile
@@ -130,13 +143,18 @@ jobs:
         working-directory: The-Nurture
         env:
           DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture?schema=public
+          DEV_HOST_DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture_dev_host?schema=public
         run: |
-          pnpm db:generate
+          pnpm db:generate:all
           pnpm db:validate
+          pnpm dev-host:db:validate
 
       - name: Typecheck
         working-directory: The-Nurture
-        run: pnpm typecheck
+        run: |
+          pnpm typecheck
+          pnpm verify:test-routing
+          pnpm verify:persistence-boundaries
 
       - name: Run unit population
         working-directory: The-Nurture
@@ -170,18 +188,25 @@ jobs:
         with:
           path: The-Nurture
 
-      - name: Read pinned My-Chat dependency
+      - name: Read pinned source dependencies
         id: pin
         working-directory: The-Nurture
         run: |
-          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'repository='+pin.myChat.repository+'\\nrevision='+pin.myChat.revision+'\\n')"
+          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat source dependency
         uses: actions/checkout@v4
         with:
-          repository: ${{ steps.pin.outputs.repository }}
-          ref: ${{ steps.pin.outputs.revision }}
+          repository: ${{ steps.pin.outputs.my_chat_repository }}
+          ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
+
+      - name: Checkout My-Workflow-Base source dependency
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.workflow_base_repository }}
+          ref: ${{ steps.pin.outputs.workflow_base_revision }}
+          path: My-Workflow-Base
 
       - uses: pnpm/action-setup@v4
         with:
@@ -192,6 +217,11 @@ jobs:
           node-version: "20"
           cache: pnpm
           cache-dependency-path: The-Nurture/pnpm-lock.yaml
+
+      - name: Build pinned web-workbench dependency
+        run: |
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
         working-directory: The-Nurture
@@ -213,3 +243,147 @@ jobs:
         run: |
           pnpm test:db:ci
           pnpm verify:db-population
+
+  dev-host-db:
+    name: Backend Dev-Host DB and E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: nurture
+          POSTGRES_PASSWORD: nurture
+          POSTGRES_DB: nurture
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nurture -d nurture"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture?schema=public
+      DEV_HOST_DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture_dev_host?schema=public
+      PGPASSWORD: nurture
+    steps:
+      - name: Checkout The-Nurture
+        uses: actions/checkout@v4
+        with:
+          path: The-Nurture
+
+      - name: Read pinned source dependencies
+        id: pin
+        working-directory: The-Nurture
+        run: |
+          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
+
+      - name: Checkout My-Chat source dependency
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.my_chat_repository }}
+          ref: ${{ steps.pin.outputs.my_chat_revision }}
+          path: My-Chat
+
+      - name: Checkout My-Workflow-Base source dependency
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.workflow_base_repository }}
+          ref: ${{ steps.pin.outputs.workflow_base_revision }}
+          path: My-Workflow-Base
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: The-Nurture/pnpm-lock.yaml
+
+      - name: Build pinned web-workbench dependency
+        run: |
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench build
+
+      - name: Install
+        working-directory: The-Nurture
+        run: pnpm install --frozen-lockfile
+
+      - name: Create separate dev-host database
+        run: psql -h 127.0.0.1 -p 5432 -U nurture -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE nurture_dev_host'
+
+      - name: Generate and deploy both schemas
+        working-directory: The-Nurture
+        run: |
+          pnpm db:generate:all
+          pnpm db:deploy
+          pnpm dev-host:db:deploy
+
+      - name: Assert both ownership boundaries
+        working-directory: The-Nurture
+        run: |
+          pnpm db:assert-boundary
+          pnpm dev-host:db:assert-boundary
+
+      - name: Run dev-host E2E population
+        working-directory: The-Nurture
+        run: |
+          pnpm test:dev-host:ci
+          pnpm verify:dev-host-population
+
+  frontend:
+    name: Frontend Lint and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout The-Nurture
+        uses: actions/checkout@v4
+        with:
+          path: The-Nurture
+
+      - name: Read pinned source dependencies
+        id: pin
+        working-directory: The-Nurture
+        run: |
+          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
+
+      - name: Checkout My-Chat source dependency
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.my_chat_repository }}
+          ref: ${{ steps.pin.outputs.my_chat_revision }}
+          path: My-Chat
+
+      - name: Checkout My-Workflow-Base source dependency
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.workflow_base_repository }}
+          ref: ${{ steps.pin.outputs.workflow_base_revision }}
+          path: My-Workflow-Base
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: The-Nurture/pnpm-lock.yaml
+
+      - name: Build pinned web-workbench dependency
+        run: |
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench build
+
+      - name: Install
+        working-directory: The-Nurture
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint and build
+        working-directory: The-Nurture
+        run: |
+          pnpm --filter @the-nurture/frontend lint
+          pnpm --filter @the-nurture/frontend build

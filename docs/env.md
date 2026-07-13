@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-07-13T00:21:14Z`
+Generated at (UTC): `2026-07-13T00:34:31Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -13,6 +13,7 @@ Generated at (UTC): `2026-07-13T00:21:14Z`
 |---|---:|---:|:---:|:---:|---|---|---|---|---|---|---|
 | `APP_ENV` | `active` | `enum` | yes | no | `dev` | `` | `*` | `` | `` | `` | Deployment environment profile. |
 | `DATABASE_URL` | `active` | `url` | yes | yes | `` | `database_url` | `*` | `` | `` | `` | PostgreSQL connection URL for Nurture-owned production schema and migrations. |
+| `DEV_HOST_DATABASE_URL` | `active` | `url` | yes | yes | `` | `dev_host_database_url` | `dev` | `` | `` | `` | PostgreSQL connection URL for backend-private workflow dev-host schema and migrations. |
 | `PORT` | `active` | `int` | yes | no | `8000` | `` | `*` | `` | `` | `` | Service listen port. |
 | `SERVICE_NAME` | `active` | `string` | yes | no | `your-service` | `` | `*` | `` | `` | `` | Service name (logical). |
 

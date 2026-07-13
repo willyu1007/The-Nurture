@@ -57,3 +57,23 @@
 - Fix / workaround: normalize the imported files, stage the explicit scope, then run the cached diff gate.
 - Prevention: every increment with new files must treat `git diff --cached --check` as mandatory evidence; the pre-stage check is not sufficient.
 - References: `git diff --cached --check`; `git status --untracked-files=all`.
+
+### 2026-07-13 — host pg_dump was older than the container server
+
+- Symptom: backup aborted with `server version: 16.13; pg_dump version: 14.19` before any database mutation.
+- Context: the local database runs in `postgres:16-alpine`, while Homebrew exposed PostgreSQL 14 client tools first.
+- What we tried: invoke the host `pg_dump` against container PostgreSQL.
+- Why it failed: `pg_dump` refuses to dump a newer major server.
+- Fix / workaround: run `pg_dump` and `pg_restore` inside `nurture-postgres`, streaming the custom-format backup to/from the host file.
+- Prevention: compare server/client major versions before backup; prefer tools shipped with the database container.
+- References: `docker exec nurture-postgres pg_dump`; backup hash in `04-verification.md`.
+
+### 2026-07-13 — dev-host URL was initially required outside dev
+
+- Symptom: the first env contract required `DEV_HOST_DATABASE_URL` in staging and production despite the deployment boundary forbidding the dev host there.
+- Context: secret-ref coverage passed mechanically, masking the semantic contradiction.
+- What we tried: define the new URL as globally required.
+- Why it failed: coverage correctness is not deployment-scope correctness.
+- Fix / workaround: set `scopes: [dev]` and remove staging/production secret refs.
+- Prevention: every new config key must encode the environments where the owning component is actually deployable.
+- References: `env/contract.yaml`; `env/secrets/dev.ref.yaml`.
