@@ -77,3 +77,23 @@
 - Fix / workaround: set `scopes: [dev]` and remove staging/production secret refs.
 - Prevention: every new config key must encode the environments where the owning component is actually deployable.
 - References: `env/contract.yaml`; `env/secrets/dev.ref.yaml`.
+
+### 2026-07-13 — combined audit output polluted a restored document
+
+- Symptom: an extra-path list was appended to `safety-lexicon-signoff.md` during restoration.
+- Context: one shell command emitted both `git show` content and a later coverage list, and the orchestration code treated the combined stdout as one file.
+- What we tried: reuse a multi-purpose command result as restoration input.
+- Why it failed: stdout lacked a trustworthy boundary between file content and audit output.
+- Fix / workaround: restore the file again from a command that performs only `git show`; inspect the tail before audit continuation.
+- Prevention: file restoration commands must emit exactly one file and no diagnostic/list output.
+- References: `dev-docs/active/nurture-mvp/safety-lexicon-signoff.md`; preservation commit `9c54ef27...`.
+
+### 2026-07-13 — zsh path variable broke the blob audit
+
+- Symptom: the first blob census ended with `command not found: wc`.
+- Context: the loop used `path` as its variable name.
+- What we tried: iterate over preserved paths in zsh.
+- Why it failed: zsh treats lowercase `path` as a special array tied to `PATH`, so assigning a file path corrupted command lookup.
+- Fix / workaround: rename the loop variable to `file_path` and rerun the census from empty result files.
+- Prevention: never use `path` as a zsh local/loop variable in repository scripts or ad-hoc audits.
+- References: blob census recorded in `g0-wip-coverage-audit.md`.

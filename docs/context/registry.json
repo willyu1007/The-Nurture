@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-13T00:34:31.100Z",
+  "updatedAt": "2026-07-13T00:44:26.666Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "f1068678342d5310ce73f86e6673e843876474d2debd5b7e24bb95e3946ff34c",
-      "lastUpdated": "2026-07-13T00:27:07.194Z",
+      "checksumSha256": "123833a2aa3ab1a2505846989998f97fa3f2c71d65182fd4cfb278db9704b38f",
+      "lastUpdated": "2026-07-13T00:44:26.665Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -138,6 +138,27 @@
       ],
       "checksumSha256": "91191967df6b5278d9efa836568168bfe99d509b0b93743a0d7145060d1bbf56",
       "lastUpdated": "2026-07-13T00:34:31.099Z",
+      "source": {
+        "kind": "command",
+        "command": "ctl-context add-artifact",
+        "cwd": "."
+      }
+    },
+    {
+      "id": "product-workflow-design-contract",
+      "type": "markdown",
+      "path": "docs/context/product/workflow-product-design-contract.md",
+      "mode": "contract",
+      "format": "product-workflow-contract-v1",
+      "tags": [
+        "product",
+        "workflow",
+        "llm",
+        "nurture",
+        "my-chat"
+      ],
+      "checksumSha256": "0712a69011ab12378da13ef169d63870cdeb6fb30224c2a77908d6e2c07b8e86",
+      "lastUpdated": "2026-07-13T00:44:26.635Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

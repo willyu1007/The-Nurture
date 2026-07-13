@@ -71,6 +71,13 @@
 - backend process smoke: PASS; dual-DB process listened on `:3001`, `GET /health` returned `{"ok":true}`, and no listener remained after shutdown.
 - `docker compose config`, CI YAML parse, generated-client ignore check, relative-lockfile check, and `git diff --check`: PASS.
 
+### 2026-07-13 — preservation coverage audit
+
+- unpublished T-002 base commit: PASS; 11/11 paths represented in the formal branch.
+- 201-path WIP population: PASS; 71 exact file blobs, 78 exact deletions, 46 intentional same-path transformations, and 6 explicit SSOT/migration replacements.
+- lost/unexplained paths: 0.
+- detailed evidence: `g0-wip-coverage-audit.md`.
+
 ## Required gates for every formal increment
 
 - `git diff --check`

@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- Next step: fold the locked T-002 institution ecology design into the final documentation increment and run the full G0 closure audit.
+- Next step: complete the WIP coverage audit, merge the five-commit G0 branch, and rerun the full matrix from a fresh worktree.
 - Updated: 2026-07-13
 
 ## Goal
@@ -25,8 +25,8 @@ The pre-G0 implementation was preserved on local branch `codex/g0-preservation` 
 
 - [x] The original 201-path worktree is preserved in a dedicated local commit.
 - [x] The formal branch starts exactly from `origin/main`.
-- [ ] Obsolete UI governance tooling is retired without breaking remaining governance suites.
+- [x] Obsolete UI governance tooling is retired without breaking remaining governance suites.
 - [x] My-Chat/Base contract revisions and hashes are machine-verifiable.
 - [x] Nurture production persistence contains no My-Chat-owned workflow runtime tables.
 - [x] Dev-host workflow persistence is private to `apps/backend` and uses a separate database.
-- [ ] Unit tests remain at or above 86, production DB tests at or above 15, and dev-host E2E tests at or above 14.
+- [x] Unit tests remain at or above 86, production DB tests at or above 15, and dev-host E2E tests at or above 14.

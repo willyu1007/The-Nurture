@@ -25,11 +25,12 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 1 (planned: 0, in-progress: 1, blocked: 0, done: 0, archived: 0)
+- Tasks: 2 (planned: 1, in-progress: 1, blocked: 0, done: 0, archived: 0)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
 | T-001 nurture-mvp | in-progress | F-001 | dev-docs/active/nurture-mvp |
+| T-002 nurture-institution-mode | planned | F-002 | dev-docs/active/nurture-institution-mode |
 <!-- AUTO-GENERATED:END dashboard -->

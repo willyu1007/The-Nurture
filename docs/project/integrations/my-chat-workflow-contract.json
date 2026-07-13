@@ -29,6 +29,6 @@
       "packages/nurture-scenario/scenario.manifest.yaml",
       "packages/nurture-scenario/src/module.ts"
     ],
-    "contractSha256": "2dfbe1b0b0dace8fd645c4c7f41517ad19b0aed5371725d23c70b241a6743c3c"
+    "contractSha256": "d298af4b1c947af6fc220affa182e14f70815240f411d543974d8a7b590e2e88"
   }
 }

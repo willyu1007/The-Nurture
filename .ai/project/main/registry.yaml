@@ -16,6 +16,10 @@ milestones:
     title: "The Nurture MVP"
     status: in-progress
     description: "Reconstruct the Nurture MVP from a clean baseline with explicit production and backend-private dev-host persistence boundaries."
+  - id: M-002
+    title: "Institution ecology"
+    status: planned
+    description: "Child-centered institution ecology with My-Chat account/shell ownership and Nurture-owned care process, participant, role, institution, group, enrollment, grant, communication, care, and media facts."
 
 features:
   - id: F-000
@@ -28,6 +32,11 @@ features:
     status: in-progress
     description: "Deliver the scenario implementation, Nurture production persistence, and an isolated workflow dev-host harness through independently verified increments."
     milestone_id: M-001
+  - id: F-002
+    title: "Institution ecology"
+    status: planned
+    description: "Deliver class family inbox, teacher attention, daily care, and child media attribution through grant-gated child scopes and owner-reread surfaces."
+    milestone_id: M-002
 
 requirements: []
 
@@ -38,4 +47,11 @@ tasks:
     milestone_id: M-001
     feature_id: F-001
     dev_docs_path: dev-docs/active/nurture-mvp
+    updated: 2026-07-13
+  - id: T-002
+    slug: nurture-institution-mode
+    status: planned
+    milestone_id: M-002
+    feature_id: F-002
+    dev_docs_path: dev-docs/active/nurture-institution-mode
     updated: 2026-07-13

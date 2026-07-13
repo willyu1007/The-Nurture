@@ -34,4 +34,10 @@ Project: `main`
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-001 nurture-mvp | in-progress | dev-docs/active/nurture-mvp |
+
+### F-002 Institution ecology
+
+| Task | Status | Dev Docs |
+| --- | --- | --- |
+| T-002 nurture-institution-mode | planned | dev-docs/active/nurture-institution-mode |
 <!-- AUTO-GENERATED:END feature-map -->
