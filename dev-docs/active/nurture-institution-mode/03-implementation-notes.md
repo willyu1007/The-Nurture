@@ -2,11 +2,12 @@
 
 ## Status
 
-- Current status: `planned`
+- Current status: `in-progress`
 - Last updated: 2026-07-13
 
 ## What changed
 
+- 2026-07-13: Started N1 on `feat/nurture-institution-n1` after X1 adoption. Pinned the implementation baseline to Base `acba4e792c85131c19e63e08a5f671133c481c57`, My-Chat X1 `2c783675de896b93cf1157b7d1c7ae9e3051150e`, current local My-Chat X2 dependency `bda1542d6e6989a348254917a5e49f30de68083d`, and logical contract hash `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`. Diff verification confirmed X2 did not change `packages/workflow-contracts` from X1. N1 is limited to explicit-empty handoff snapshots and does not enable non-empty activation.
 - 2026-07-13: G0 formal baseline reconstructed the Nurture MVP into independently verified commits, split production and backend-private workflow databases, pinned Base/My-Chat contract revisions and hashes, and preserved institution implementation as design-only. The former dirty-worktree blocker is resolved on the formal branch; X0/X1 remain the next cross-repo gates.
 - 2026-06-29: 机构模式作为 `M-002 / F-002 / T-002` 登记到项目治理；创建 `dev-docs/active/nurture-institution-mode/` 设计包。
 - 2026-07-03: 补齐标准 dev-docs 任务包骨架，并把当前工作切到 roadmap 决策对齐。

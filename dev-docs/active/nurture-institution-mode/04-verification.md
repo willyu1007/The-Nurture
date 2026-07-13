@@ -2,9 +2,19 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-06
-- Current phase: IB Nurture schema SPEC + decision convergence
-- Code/config/schema impact: task docs/governance only; no live manifest, source code, registered context artifact, or DB schema changes intended
+- Last updated: 2026-07-13
+- Current phase: N1 explicit-empty implementation
+- Code/config/schema impact: additive Nurture production schema, shared command/resolver/policy code, first inbox/attention capabilities, and tests; no My-Chat runtime tables and no non-empty activation
+
+## N1 Entry Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Nurture baseline | PASS | `main` clean at `4040466`; G0 production/dev-host persistence streams remain isolated. |
+| Base revision | PASS | Merged `acba4e792c85131c19e63e08a5f671133c481c57`. |
+| My-Chat X1 adoption | PASS | X1 revision `2c783675de896b93cf1157b7d1c7ae9e3051150e`; logical contract hash `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`. |
+| Current My-Chat dependency | PASS | X2 revision `bda1542d6e6989a348254917a5e49f30de68083d`; no `packages/workflow-contracts` diff from X1. |
+| N1 activation gate | PASS | Explicit-empty snapshots only; manifest non-empty activation remains disabled. |
 
 ## Automated Checks
 

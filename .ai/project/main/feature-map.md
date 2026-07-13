@@ -50,5 +50,5 @@ Project: `main`
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-002 nurture-institution-mode | planned | dev-docs/active/nurture-institution-mode |
+| T-002 nurture-institution-mode | in-progress | dev-docs/active/nurture-institution-mode |
 <!-- AUTO-GENERATED:END feature-map -->

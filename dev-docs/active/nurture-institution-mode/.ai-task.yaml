@@ -2,7 +2,7 @@ version: 1
 task_id: T-002
 project: main
 slug: nurture-institution-mode
-status: planned
+status: in-progress
 updated: "2026-07-13"
 keywords:
   - institution-ecology

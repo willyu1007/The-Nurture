@@ -2,12 +2,20 @@
 
 ## Status
 
-- State: planned
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ cross-repo implementation entry（ready, not started）
+- State: in-progress
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（in progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-13
 - **Owner:** willyu1007
-- **Next step:** Start X0 in My-Workflow-Base, then X1 contract adoption in My-Chat. Nurture N1 may start after X1 with explicit empty snapshots only; non-empty activation remains gated until My-Chat X2/X3 and joint crash tests pass.
+- **Next step:** Implement N1 on `feat/nurture-institution-n1` in quality-gated increments: additive schema, shared command kernel/interaction context, fail-closed resolver-policy core, then `class_family_inbox` + `teacher_attention_board`. Every committed Execution persists `handoffRequestSnapshotsPayload=[]`; non-empty activation remains gated until My-Chat X3 and joint crash tests pass.
+
+## N1 Adopted Contract Baseline
+
+- My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
+- My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
+- My-Chat current local dependency revision: `bda1542d6e6989a348254917a5e49f30de68083d` (X2; `packages/workflow-contracts` is byte-identical to the X1 revision).
+- Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
+- N1 activation posture: capability activation disabled; all command handoff snapshots are explicit empty arrays.
 
 ## Goal
 

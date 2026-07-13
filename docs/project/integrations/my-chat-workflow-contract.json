@@ -6,12 +6,12 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "095f7a163461c5bbb11fa6f2d8cbda42fe64ca1e",
+    "revision": "acba4e792c85131c19e63e08a5f671133c481c57",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d",
+    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa",
     "sourcePins": [
       {
         "key": "web_workbench",
@@ -30,12 +30,12 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "e53aa6100578bab62cad110c6020e87e19b17c80",
+    "revision": "bda1542d6e6989a348254917a5e49f30de68083d",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d"
+    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa"
   },
   "nurtureScenario": {
     "contractRoot": ".",

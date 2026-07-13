@@ -50,7 +50,7 @@ tasks:
     updated: 2026-07-13
   - id: T-002
     slug: nurture-institution-mode
-    status: planned
+    status: in-progress
     milestone_id: M-002
     feature_id: F-002
     dev_docs_path: dev-docs/active/nurture-institution-mode
