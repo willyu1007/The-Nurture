@@ -4,6 +4,10 @@ import type {
   NurtureRepositories,
   NurtureWorkflowProject,
 } from "./repositories.js";
+import {
+  createInMemoryInteractionContextRepository,
+  createInMemoryNurtureCommandRepository,
+} from "./domain/testing/in-memory-institution-ports.js";
 
 // ---------------------------------------------------------------------------
 // Injected ports. Handlers/policies/presenters are pure functions that close
@@ -104,6 +108,8 @@ const synthProject = (
 
 export const defaultNurtureDeps: NurtureHandlerDeps = {
   repositories: {
+    commands: createInMemoryNurtureCommandRepository(),
+    interactions: createInMemoryInteractionContextRepository(),
     profiles: {
       getByCanonicalObjectRef: async () => null,
       upsertProjection: async (input) => input,

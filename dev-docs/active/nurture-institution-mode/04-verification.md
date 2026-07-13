@@ -29,6 +29,18 @@
 | `pnpm test:unit` | PASS | Existing 12 files / 86 tests pass; no P0 behavior regression. |
 | Migration apply | PENDING APPROVAL | Preview only; no target database was mutated. See `artifacts/db/n1-schema-preview.md`. |
 
+## N1-C Command / Interaction Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Command canonicalization/hash | PASS | Object-key stability, ordered arrays, null/omission difference, workspace/namespace separation, and family-strategy set normalization covered. |
+| Command replay/outcomes | PASS | executed/applied, replayed/applied, executed/replayed already-satisfied, same-key/different-hash conflict, blocked identity reuse, lock busy, lookup/transaction failure covered. |
+| Explicit-empty persistence | PASS | Runner always commits version 1 `[]`; Prisma mapper rejects corrupt non-empty/driver replay state; DB CHECK remains the final fence. |
+| Family-core adoption | PASS | `family_strategy.calibrate` uses the shared runner; update + evidence + Execution execute once and exact replay performs no second effect. |
+| Interaction context | PASS | Hash-only token/conversation storage, binding mismatch, derived expiry, one-time consume, reusable notification open, revoke, and forbidden body/policy/grant state covered. |
+| `pnpm typecheck` | PASS | Scenario ports and Prisma adapters compile without Prisma leaking into the scenario package. |
+| Unit gate | PASS | 14 files / 100 tests; exact population and routing gates pass. |
+
 ## Automated Checks
 
 Run after task-doc or governance edits:

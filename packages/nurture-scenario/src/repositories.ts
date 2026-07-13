@@ -1,4 +1,6 @@
 import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type { NurtureCommandRepository } from "./domain/commands/command-kernel.js";
+import type { NurtureInteractionContextRepository } from "./domain/interactions/interaction-context.js";
 
 export type NurtureProfileProjection = {
   profile_id: string;
@@ -112,6 +114,8 @@ export type NurtureWorkflowProjectRepository = {
 };
 
 export type NurtureRepositories = {
+  commands: NurtureCommandRepository;
+  interactions: NurtureInteractionContextRepository;
   profiles: NurtureProfileRepository;
   activityComparisons: ActivityComparisonRepository;
   evidence: NurtureEvidenceRepository;
@@ -119,6 +123,8 @@ export type NurtureRepositories = {
 };
 
 export const repositoryTokens = {
+  commands: "nurture.repositories.commands",
+  interactions: "nurture.repositories.interactions",
   profiles: "nurture.repositories.profiles",
   activityComparisons: "nurture.repositories.activity_comparisons",
   evidence: "nurture.repositories.evidence",

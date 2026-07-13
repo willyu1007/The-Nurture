@@ -15,6 +15,11 @@ import { classifySafetyIntent } from "../domain/safety-classifier.js";
 import { type ActivityOption, type ComparisonCriterion, rankActivities } from "../domain/comparison-scoring.js";
 import { deriveCarePlan, type IssueType } from "../domain/plan-derivation.js";
 import { evaluatePregnancyStage as derivePregnancyStage } from "../domain/pregnancy-stage.js";
+import { NurtureCommandRunner } from "../domain/commands/command-kernel.js";
+import {
+  calibrateFamilyStrategyCommand,
+  workflowProjectRef,
+} from "../domain/commands/family-strategy.command.js";
 
 // ---------------------------------------------------------------------------
 // input-only ref/event/artifact builders (no deps)
@@ -177,31 +182,55 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
     safety_floor: "non-diagnostic, non-punitive",
   };
 
-  try {
-    await deps.repositories.projects.updateStrategyPayloads({
+  const command = await new NurtureCommandRunner(deps.repositories.commands).execute({
+    workspace_id: ws,
+    invocation_request_id: input.meta.idempotency_key,
+    command_request_id: input.meta.idempotency_key,
+    business_actor_ref: input.meta.actor_id
+      ? `my_chat:user:${input.meta.actor_id}`
+      : "nurture:system:family_strategy",
+    primary_scope_ref: familyRef,
+    target_refs: [workflowProjectRef(project.project_id, project.aggregate_version)],
+    expected_versions: { [project.project_id]: project.aggregate_version },
+    payload: {
       workspace_id: ws,
       project_id: project.project_id,
       expected_version: project.aggregate_version,
       goal_payload: goalPayload,
       constraint_payload: constraintPayload,
-    });
-  } catch {
-    return manualReview(input, "version_conflict", [eventDraft(input, "workflow.step.retry_requested")]);
-  }
-
-  await deps.repositories.evidence.appendEvidenceRef({
-    workspace_id: ws,
-    target_ref: workflowRunRef(input),
-    evidence_ref: { kind: "context_snapshot", id: `${input.run_id}:family_strategy_basis`, version: project.aggregate_version },
-    reason_code: "family_strategy_decision_basis",
+      evidence_target_ref: workflowRunRef(input),
+      evidence_ref: {
+        kind: "context_snapshot",
+        id: `${input.run_id}:family_strategy_basis`,
+        version: project.aggregate_version,
+      },
+    },
+    spec: calibrateFamilyStrategyCommand,
   });
+  if (command.status === "not_committed") {
+    if (command.decision === "command_busy" || command.decision === "technical_error") {
+      return {
+        status: "retry_requested",
+        output_refs: [workflowRunRef(input)],
+        reason_code: command.reason_code,
+        event_drafts: [eventDraft(input, "workflow.step.retry_requested")],
+      };
+    }
+    return manualReview(input, command.reason_code, [eventDraft(input, "workflow.step.retry_requested")]);
+  }
 
   return {
     status: "completed", // approval is the separate request_approval step (D-P2-3)
-    output_refs: [workflowRunRef(input), artifactRef(input, "family_strategy_summary"), familyRefToCanonical(familyRef)],
+    output_refs: [
+      workflowRunRef(input),
+      artifactRef(input, "family_strategy_summary"),
+      familyRefToCanonical(familyRef),
+      familyRefToCanonical(command.execution_ref),
+    ],
     artifact_drafts: [
       artifactDraft(input, "family_strategy_summary", "Family strategy", "Reviewable strategy from charter boundaries and family calibration."),
     ],
+    handoff_drafts: [],
     event_drafts: [eventDraft(input, "workflow.step.completed"), eventDraft(input, "workflow.artifact.created")],
   };
 };

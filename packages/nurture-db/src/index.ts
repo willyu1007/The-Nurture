@@ -3,6 +3,7 @@ export { createPrismaClient, type NurturePrismaClient } from "./client.js";
 // inputs without importing @prisma/client directly (db stays the sole importer).
 export { Prisma } from "@prisma/client";
 export * from "./repositories/port-repositories.js";
+export * from "./repositories/institution-core.repositories.js";
 export * from "./repositories/scenario-repositories.js";
 
 // Re-export Prisma-generated model TYPES as the data layer's domain entities,

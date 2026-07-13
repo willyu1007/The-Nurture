@@ -7,4 +7,8 @@ export { nurturePolicies, createNurturePolicies } from "./policies.js";
 export { nurturePresenters, createNurturePresenters } from "./presenters.js";
 export * from "./repositories.js";
 export * from "./deps.js";
+export * from "./domain/commands/command-kernel.js";
+export * from "./domain/commands/family-strategy.command.js";
+export * from "./domain/interactions/interaction-context.js";
+export * from "./domain/testing/in-memory-institution-ports.js";
 export type * from "@my-chat/workflow-contracts";

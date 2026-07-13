@@ -39,7 +39,7 @@
     "dev-host:db:assert-boundary": "node scripts/run-with-local-env.mjs node scripts/assert-dev-host-db-boundary.mjs",
     "db:generate:all": "pnpm db:generate && pnpm dev-host:db:generate",
     "db:migrate:all": "pnpm db:migrate && pnpm dev-host:db:migrate",
-    "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 86",
+    "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 100",
     "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 15",
     "verify:dev-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/dev-host.json dev-host 16",
     "verify:test-routing": "node scripts/assert-test-routing.mjs",
