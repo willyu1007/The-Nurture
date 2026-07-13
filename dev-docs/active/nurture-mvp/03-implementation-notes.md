@@ -11,6 +11,8 @@
 - Created formal branch `codex/g0-nurture-baseline` from `origin/main` at `e76dbb72ad68fbd0bae29a350b66b230890c9dbb` in a separate worktree.
 - Retired the unused repo-local UI SSOT, four UI skills and provider wrappers, and their general/maintainer test suites.
 - Removed UI from both test runners while preserving every remaining suite entry.
+- Added `docs/project/integrations/my-chat-workflow-contract.json` with independent Base, My-Chat, and Nurture scenario contract pins.
+- Added a dependency-free verifier with path traversal/symlink rejection, Git revision checks, deterministic path/content hashes, and CI cross-repository checkouts sourced from the pin.
 
 ## Decisions and tradeoffs
 
@@ -21,5 +23,5 @@
 
 ## Known issues and follow-ups
 
-- Revision pin is the next increment.
-- Production baseline, dev-host split, and T-002 design closure remain pending.
+- Production baseline is the next increment.
+- Dev-host split and T-002 design closure remain pending.

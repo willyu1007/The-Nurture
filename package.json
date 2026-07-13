@@ -13,10 +13,11 @@
     "dev": "echo \"Add dev script\"",
     "lint": "echo \"Add lint script\"",
     "test": "echo \"Add test script\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:workflow-contract-pin": "node --test scripts/verify-workflow-contract-pin.test.mjs",
+    "verify:workflow-contract-pin": "node scripts/verify-workflow-contract-pin.mjs"
   },
   "devDependencies": {
     "typescript": "^5.4.0"
   }
 }
-

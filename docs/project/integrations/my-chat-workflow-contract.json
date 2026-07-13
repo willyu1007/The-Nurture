@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "hashAlgorithm": "sha256-path-content-v1",
+  "compatibility": {
+    "baseAndMyChatContractParityRequired": true
+  },
+  "myWorkflowBase": {
+    "repository": "willyu1007/My-Workflow-Base",
+    "revision": "095f7a163461c5bbb11fa6f2d8cbda42fe64ca1e",
+    "contractRoot": "templates/host-runtime/packages/workflow-contracts",
+    "contractPaths": [
+      "src"
+    ],
+    "contractSha256": "7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d"
+  },
+  "myChat": {
+    "repository": "willyu1007/My-Chat",
+    "revision": "e53aa6100578bab62cad110c6020e87e19b17c80",
+    "contractRoot": "packages/workflow-contracts",
+    "contractPaths": [
+      "src"
+    ],
+    "contractSha256": "7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d"
+  },
+  "nurtureScenario": {
+    "contractRoot": ".",
+    "contractPaths": [
+      "docs/context/workflow/nurture-scenario-contract.md",
+      "packages/nurture-scenario/scenario.manifest.yaml",
+      "packages/nurture-scenario/src/module.ts"
+    ],
+    "contractSha256": "2d294a8450c4a4020f90b544f936142a6b437fdce8cbab023ab23ab6732feda3"
+  }
+}

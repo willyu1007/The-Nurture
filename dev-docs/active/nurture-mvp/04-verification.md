@@ -26,6 +26,19 @@
 - retired-path/reference assertions: PASS after removing empty directories left by file deletion.
 - `git diff --check`: PASS.
 
+### 2026-07-13 — cross-repository workflow contract pin
+
+- live repository status: PASS; My-Chat and My-Workflow-Base are clean at the pinned revisions.
+- `node --test scripts/verify-workflow-contract-pin.test.mjs`: PASS; 4/4 tests, including path sensitivity, traversal rejection, and injected content drift rejection.
+- `node scripts/verify-workflow-contract-pin.mjs`: PASS.
+  - My-Workflow-Base: revision `095f7a163461c5bbb11fa6f2d8cbda42fe64ca1e`, 8 files, hash `7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d`.
+  - My-Chat: revision `e53aa6100578bab62cad110c6020e87e19b17c80`, 8 files, matching hash `7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d`.
+  - The-Nurture scenario contract: 3 files, independent hash `2d294a8450c4a4020f90b544f936142a6b437fdce8cbab023ab23ab6732feda3`.
+- JSON parse for the pin and `package.json`: PASS.
+- CI workflow YAML parse: PASS.
+- project governance lint and strict context verification: PASS.
+- `git diff --check`: PASS.
+
 ## Required gates for every formal increment
 
 - `git diff --check`

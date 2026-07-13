@@ -15,6 +15,47 @@ on:
   workflow_dispatch:
 
 jobs:
+  workflow-contract-pin:
+    name: Workflow Contract Pin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout The-Nurture
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Read pinned dependencies
+        id: pin
+        run: |
+          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
+
+      - name: Checkout My-Chat contract source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.my_chat_repository }}
+          ref: ${{ steps.pin.outputs.my_chat_revision }}
+          path: .ci-deps/my-chat
+
+      - name: Checkout My-Workflow-Base contract source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pin.outputs.workflow_base_repository }}
+          ref: ${{ steps.pin.outputs.workflow_base_revision }}
+          path: .ci-deps/my-workflow-base
+
+      - name: Verify revisions and contract hashes
+        run: >-
+          node scripts/verify-workflow-contract-pin.mjs
+          --my-chat-repo .ci-deps/my-chat
+          --workflow-base-repo .ci-deps/my-workflow-base
+
+      - name: Test contract hash verifier
+        run: node --test scripts/verify-workflow-contract-pin.test.mjs
+
   governance-lint:
     name: Governance Lint
     runs-on: ubuntu-latest
