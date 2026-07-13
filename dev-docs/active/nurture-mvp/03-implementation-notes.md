@@ -2,7 +2,7 @@
 
 ## Status
 
-- Current status: `in-progress`
+- Current status: `done`
 - Last updated: 2026-07-13
 
 ## What changed
@@ -19,6 +19,10 @@
 - Added the backend-private Prisma schema/client/migration with exactly six Workflow tables and two runtime enums under `apps/backend`.
 - Rewired the dev host to two explicit clients, restored 14 backend E2E tests and the Next.js workbench, and split unit/production DB/dev-host test configs and CI jobs.
 - Backed up the old mixed local database, proved a same-version restore, then rebuilt `nurture` and `nurture_dev_host` from their independent migration streams.
+- Merged PR #1 as `9e79d5eb89993b7ab9bec115fa1180faa549e21f`, passed all seven PR and main CI jobs, reran the full matrix from a fresh post-merge worktree, and removed the temporary backup, restore database, branches, and worktrees.
+- Hardened the local harness to loopback-only startup with an `APP_ENV` guard and loopback-only Postgres publishing.
+- Added a repository env runner so Prisma/Vitest/dev commands consistently honor process env, `.env.local`, then `.env` without weakening CI injection precedence.
+- Replaced the stale GitHub Packages setup path with a content-pinned Base `web-workbench` sibling source and made root `build`/`lint` real verification commands.
 
 ## Decisions and tradeoffs
 
@@ -26,7 +30,11 @@
   - Rationale: every ownership change must be independently reviewable, green, and revertible.
 - Decision: use two databases in the same local Postgres instance.
   - Rationale: this preserves realistic persistence tests while making the production boundary structural.
+- Decision: keep T-001 `done` under `dev-docs/active` until archival is explicitly approved.
+  - Rationale: the task is verified and complete, but the documentation workflow forbids moving it to archive without approval.
 
 ## Known issues and follow-ups
 
-- T-002 design closure and the full G0 WIP-coverage/merge audit remain pending.
+- T-002 remains `planned`; its next dependency is X0/X1, not additional G0 work.
+- The backend runtime is a local harness only. X2 claim-token, lease-reclaim, crash/replay, and atomic materialization semantics must be implemented in My-Chat before non-empty activation.
+- Archive `dev-docs/active/nurture-mvp/` only after explicit approval.

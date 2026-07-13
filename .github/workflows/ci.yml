@@ -152,6 +152,7 @@ jobs:
       - name: Typecheck
         working-directory: The-Nurture
         run: |
+          pnpm test:local-env-runner
           pnpm typecheck
           pnpm verify:test-routing
           pnpm verify:persistence-boundaries
@@ -384,6 +385,9 @@ jobs:
 
       - name: Lint and build
         working-directory: The-Nurture
+        env:
+          DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture?schema=public
+          DEV_HOST_DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture_dev_host?schema=public
         run: |
-          pnpm --filter @the-nurture/frontend lint
-          pnpm --filter @the-nurture/frontend build
+          pnpm lint
+          pnpm build

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "hashAlgorithm": "sha256-path-content-v1",
   "compatibility": {
     "baseAndMyChatContractParityRequired": true
@@ -11,7 +11,22 @@
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d"
+    "contractSha256": "7232ded12b035395d37c3a9970f4e0c2c4fa624dbba5f4fedd7bce2a6eefeb8d",
+    "sourcePins": [
+      {
+        "key": "web_workbench",
+        "root": ".",
+        "paths": [
+          "templates/web-workbench/package.json",
+          "templates/web-workbench/pnpm-lock.yaml",
+          "templates/web-workbench/tsconfig.json",
+          "templates/web-workbench/tsconfig.build.json",
+          "templates/web-workbench/src",
+          "templates/web-workbench/lint"
+        ],
+        "sha256": "9af31018673aae06ef8d440b69d93196a9bf160aa1557c4f8b370299647e888b"
+      }
+    ]
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",

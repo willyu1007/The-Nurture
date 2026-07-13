@@ -86,11 +86,33 @@
 - architecture review of the complete increment diff
 - staged path audit before commit and residue audit after commit
 
+### 2026-07-13 — merge and post-merge closure
+
+- PR #1: MERGED as `9e79d5eb89993b7ab9bec115fa1180faa549e21f`; all seven required PR checks passed.
+- main push CI run `29216655767`: PASS; all seven jobs passed from the merge commit.
+- fresh detached worktree from `origin/main`: PASS for frozen install, dual Prisma generation/validation, typecheck, 86 unit, 15 production DB, 14 dev-host E2E, both catalog boundaries, both schema diffs, frontend lint/build, workflow pins/tests, environment/context/skill/governance checks, compose/YAML parsing, and clean residue assertion.
+- cleanup: PASS; restore-smoke database, backup file, preservation/formal branches, remote feature branch, and temporary worktrees removed; `nurture` and `nurture_dev_host` retained.
+
+### 2026-07-13 — closure hardening
+
+- `pnpm test:local-env-runner`: PASS; 2/2 precedence/error tests.
+- `pnpm verify:workflow-contract-pin`: PASS; Base/My-Chat contract parity plus 58-file Base `web_workbench` source pin.
+- `pnpm test:workflow-contract-pin`: PASS; 4/4 including source drift rejection.
+- `pnpm typecheck`, `pnpm lint`, and `pnpm build`: PASS.
+- clean-client root build simulation: PASS; removed the ignored dev-host generated client, then `pnpm build` regenerated both clients and completed full typecheck/frontend build without relying on prior workspace residue.
+- clean-Base source preparation: PASS; removed the ignored Base `dist/`, then root `pnpm lint` verified the revision/source pin, rebuilt `web-workbench`, and completed frontend lint without prior Base artifacts.
+- `pnpm test:dev-host:ci && pnpm verify:dev-host-population`: PASS; 16/16, floor raised to 16.
+- `docker compose config`: PASS; PostgreSQL publish address is `127.0.0.1`.
+- complete closure matrix: PASS; frozen install, dual Prisma generation/validation, typecheck, 86/86 unit, 15/15 production DB, 16/16 dev-host, both catalog boundaries, both schema diffs, root lint/build, contract/source pins, env/context/skill/governance gates, compose/YAML parsing, and whitespace check.
+- positive startup smoke: PASS; `/health` returned `{"ok":true}` and `lsof` showed only `TCP 127.0.0.1:3101`.
+- negative startup smoke: PASS; `APP_ENV=production` exited non-zero with the dev-host guard before opening a listener.
+- governance sync: PASS; T-001/M-001/F-001 are `done`, T-002 remains `planned`, derived views/changelog regenerated, and the task remains active pending explicit archive approval.
+
 ## G0 closure populations
 
 - Unit: at least 86 tests.
 - Nurture production DB: at least 15 tests.
-- Backend dev-host E2E: at least 14 tests.
+- Backend dev-host E2E: at least 16 tests after closure hardening.
 - Existing tests must not be silently excluded.
 
 ## Rollout and backout

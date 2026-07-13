@@ -30,33 +30,40 @@ The Nurture is a My-Chat scenario module for pregnancy, motherhood, childcare, f
 
 ## Local setup
 
-The `@willyu1007/web-workbench` dependency is served by GitHub Packages. Put a `read:packages` token in the user-level npm config; never commit it to this repository.
+Local development consumes My-Chat and My-Workflow-Base from sibling checkouts. Their exact revisions, workflow contract hashes, and the Base `web-workbench` source hash are pinned in `docs/project/integrations/my-chat-workflow-contract.json`; no GitHub Packages token is required.
 
 ```bash
+pnpm verify:workflow-contract-pin
 pnpm install
+test -f .env.local || cp env/.env.example .env.local
+# Replace both <secret:...> placeholders with the local database URLs.
 pnpm db:up
-export DATABASE_URL='postgresql://nurture:nurture@127.0.0.1:5433/nurture?schema=public'
-export DEV_HOST_DATABASE_URL='postgresql://nurture:nurture@127.0.0.1:5433/nurture_dev_host?schema=public'
 pnpm db:generate:all
 pnpm db:deploy
 pnpm dev-host:db:deploy
 ```
 
+`pnpm lint` and `pnpm build` re-verify the sibling revisions/source hashes and build the pinned `web-workbench` automatically; they do not depend on a pre-existing Base `dist/` directory.
+
 ## Verify
 
 ```bash
 pnpm install
+pnpm test:local-env-runner
 pnpm db:generate:all
-pnpm typecheck
+pnpm db:validate
+pnpm dev-host:db:validate
+pnpm build
+pnpm lint
 pnpm verify:test-routing
 pnpm test:unit
 pnpm test:db
 pnpm test:dev-host
 pnpm db:assert-boundary
 pnpm dev-host:db:assert-boundary
-pnpm --filter @the-nurture/frontend lint
-pnpm --filter @the-nurture/frontend build
 pnpm verify:workflow-contract-pin
 node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
 node .ai/scripts/lint-skills.mjs --strict
 ```
+
+Repository commands load configuration in this order: the existing process environment, `.env.local`, then `.env`. Runtime/CI injection therefore remains authoritative while Prisma and Vitest also follow the generated local-env convention.

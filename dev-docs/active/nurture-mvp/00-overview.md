@@ -2,8 +2,8 @@
 
 ## Status
 
-- State: in-progress
-- Next step: complete the WIP coverage audit, merge the five-commit G0 branch, and rerun the full matrix from a fresh worktree.
+- State: done
+- Next step: archive this task bundle only after explicit approval; the product implementation ladder continues with X0 in My-Workflow-Base and X1 in My-Chat.
 - Updated: 2026-07-13
 
 ## Goal
@@ -19,7 +19,7 @@ Rebuild the existing Nurture MVP from a clean `origin/main` baseline while separ
 
 ## Context
 
-The pre-G0 implementation was preserved on local branch `codex/g0-preservation` at commit `9c54ef27a7685d4d0f6cfea9c6f310704c4133f7`. Formal work starts from `origin/main` on `codex/g0-nurture-baseline` and reconstructs that implementation as independently green, revertible commits.
+The pre-G0 implementation was preserved on local branch `codex/g0-preservation` at commit `9c54ef27a7685d4d0f6cfea9c6f310704c4133f7`. The formal five-commit reconstruction was merged through PR #1 as merge commit `9e79d5eb89993b7ab9bec115fa1180faa549e21f`; the preservation/formal branches and temporary worktrees were deleted only after fresh-worktree verification.
 
 ## Acceptance criteria
 
@@ -29,4 +29,7 @@ The pre-G0 implementation was preserved on local branch `codex/g0-preservation` 
 - [x] My-Chat/Base contract revisions and hashes are machine-verifiable.
 - [x] Nurture production persistence contains no My-Chat-owned workflow runtime tables.
 - [x] Dev-host workflow persistence is private to `apps/backend` and uses a separate database.
-- [x] Unit tests remain at or above 86, production DB tests at or above 15, and dev-host E2E tests at or above 14.
+- [x] Unit tests remain at or above 86, production DB tests at or above 15, and dev-host E2E tests at or above 16 after closure hardening.
+- [x] PR and main CI pass, a fresh post-merge worktree passes the complete matrix, and temporary backup/database/worktree/branch artifacts are removed.
+- [x] The local-only dev host binds to loopback, refuses non-dev/test startup, and loads `.env.local` consistently for repository commands.
+- [x] The pinned Base `web-workbench` source is content-verified in addition to the workflow contract.

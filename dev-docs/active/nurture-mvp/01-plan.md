@@ -2,12 +2,13 @@
 
 ## Phases
 
-1. Preserve the pre-G0 worktree and establish a clean formal branch.
-2. Retire obsolete UI governance tooling.
-3. Add the cross-repository workflow contract revision/hash pin and verifier.
-4. Reconstruct the Nurture production baseline and verify its database boundary.
-5. Move workflow dev-host persistence under `apps/backend` with its own database and CI job.
-6. Fold the locked institution ecology design into the final documentation increment and run the G0 closure matrix.
+1. [x] Preserve the pre-G0 worktree and establish a clean formal branch.
+2. [x] Retire obsolete UI governance tooling.
+3. [x] Add the cross-repository workflow contract revision/hash pin and verifier.
+4. [x] Reconstruct the Nurture production baseline and verify its database boundary.
+5. [x] Move workflow dev-host persistence under `apps/backend` with its own database and CI job.
+6. [x] Fold the locked institution ecology design into the final documentation increment and run the G0 closure matrix.
+7. [x] Merge, fresh-verify, clean temporary artifacts, and harden local setup/security before marking the task done.
 
 ## Detailed steps
 
