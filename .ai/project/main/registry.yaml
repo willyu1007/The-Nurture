@@ -14,7 +14,7 @@ milestones:
     description: "Triage queue for new or unplanned work."
   - id: M-001
     title: "The Nurture MVP"
-    status: in-progress
+    status: done
     description: "Reconstruct the Nurture MVP from a clean baseline with explicit production and backend-private dev-host persistence boundaries."
   - id: M-002
     title: "Institution ecology"
@@ -29,7 +29,7 @@ features:
     milestone_id: M-000
   - id: F-001
     title: "MVP baseline delivery"
-    status: in-progress
+    status: done
     description: "Deliver the scenario implementation, Nurture production persistence, and an isolated workflow dev-host harness through independently verified increments."
     milestone_id: M-001
   - id: F-002
@@ -43,7 +43,7 @@ requirements: []
 tasks:
   - id: T-001
     slug: nurture-mvp
-    status: in-progress
+    status: done
     milestone_id: M-001
     feature_id: F-001
     dev_docs_path: dev-docs/active/nurture-mvp

@@ -89,7 +89,7 @@ function readHead(repoRoot) {
 }
 
 function assertPinShape(pin) {
-  if (pin?.schemaVersion !== 1) throw new Error('Unsupported pin schemaVersion');
+  if (pin?.schemaVersion !== 2) throw new Error('Unsupported pin schemaVersion');
   if (pin?.hashAlgorithm !== HASH_ALGORITHM) throw new Error(`Unsupported hashAlgorithm: ${pin?.hashAlgorithm}`);
   if (pin?.compatibility?.baseAndMyChatContractParityRequired !== true) {
     throw new Error('Base/My-Chat contract parity must be explicitly required');
@@ -106,6 +106,20 @@ function assertPinShape(pin) {
     ) {
       throw new Error(`Invalid ${key} contract pin`);
     }
+    for (const sourcePin of dependency.sourcePins ?? []) {
+      if (
+        !/^[a-z0-9_]+$/.test(sourcePin?.key ?? '') ||
+        typeof sourcePin.root !== 'string' ||
+        !Array.isArray(sourcePin.paths) ||
+        sourcePin.paths.length === 0 ||
+        !/^[0-9a-f]{64}$/.test(sourcePin.sha256 ?? '')
+      ) {
+        throw new Error(`Invalid ${key} source pin`);
+      }
+    }
+  }
+  if (!pin.myWorkflowBase.sourcePins?.some((entry) => entry.key === 'web_workbench')) {
+    throw new Error('My-Workflow-Base web_workbench source pin is required');
   }
   if (
     typeof pin?.nurtureScenario?.contractRoot !== 'string' ||
@@ -123,7 +137,17 @@ async function verifyDependency(label, repoRoot, pin) {
   if (content.sha256 !== pin.contractSha256) {
     throw new Error(`${label} contract hash mismatch: expected ${pin.contractSha256}, got ${content.sha256}`);
   }
-  return { label, revision, ...content };
+  const sourceResults = [];
+  for (const sourcePin of pin.sourcePins ?? []) {
+    const sourceContent = await computeContractHash(resolveInside(repoRoot, sourcePin.root), sourcePin.paths);
+    if (sourceContent.sha256 !== sourcePin.sha256) {
+      throw new Error(
+        `${label} source pin ${sourcePin.key} hash mismatch: expected ${sourcePin.sha256}, got ${sourceContent.sha256}`,
+      );
+    }
+    sourceResults.push({ label: `${label} source:${sourcePin.key}`, revision, ...sourceContent });
+  }
+  return { contract: { label, revision, ...content }, sourceResults };
 }
 
 export async function verifyWorkflowContractPin(options) {
@@ -132,10 +156,12 @@ export async function verifyWorkflowContractPin(options) {
   const results = [];
   const workflowBase = await verifyDependency('My-Workflow-Base', options.workflowBaseRepo, pin.myWorkflowBase);
   const myChat = await verifyDependency('My-Chat', options.myChatRepo, pin.myChat);
-  if (workflowBase.sha256 !== myChat.sha256) {
-    throw new Error(`Base/My-Chat contract parity mismatch: Base ${workflowBase.sha256}, My-Chat ${myChat.sha256}`);
+  if (workflowBase.contract.sha256 !== myChat.contract.sha256) {
+    throw new Error(
+      `Base/My-Chat contract parity mismatch: Base ${workflowBase.contract.sha256}, My-Chat ${myChat.contract.sha256}`,
+    );
   }
-  results.push(workflowBase, myChat);
+  results.push(workflowBase.contract, ...workflowBase.sourceResults, myChat.contract, ...myChat.sourceResults);
 
   const nurtureScenario = await computeContractHash(
     resolveInside(options.nurtureRepo, pin.nurtureScenario.contractRoot),

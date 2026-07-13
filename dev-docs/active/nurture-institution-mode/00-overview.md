@@ -3,11 +3,11 @@
 ## Status
 
 - State: planned
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（formal branch complete, merge pending）/ cross-repo implementation entry（ready, not started）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ cross-repo implementation entry（ready, not started）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-13
 - **Owner:** willyu1007
-- **Next step:** Merge and fresh-verify G0, then start X0 in My-Workflow-Base and X1 contract adoption in My-Chat. Nurture N1 may start after X1 with explicit empty snapshots only; non-empty activation remains gated until My-Chat X2/X3 and joint crash tests pass.
+- **Next step:** Start X0 in My-Workflow-Base, then X1 contract adoption in My-Chat. Nurture N1 may start after X1 with explicit empty snapshots only; non-empty activation remains gated until My-Chat X2/X3 and joint crash tests pass.
 
 ## Goal
 

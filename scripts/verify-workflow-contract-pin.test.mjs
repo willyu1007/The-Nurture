@@ -47,11 +47,13 @@ test('contract inputs cannot escape the repository root', async (context) => {
 
 async function createGitContractRepo(root, content) {
   await mkdir(path.join(root, 'contract'), { recursive: true });
+  await mkdir(path.join(root, 'source'), { recursive: true });
   await writeFile(path.join(root, 'contract', 'value.ts'), content);
+  await writeFile(path.join(root, 'source', 'value.txt'), 'source content\n');
   execFileSync('git', ['init', '--quiet', root]);
   execFileSync('git', ['-C', root, 'config', 'user.name', 'Contract Pin Test']);
   execFileSync('git', ['-C', root, 'config', 'user.email', 'contract-pin@example.invalid']);
-  execFileSync('git', ['-C', root, 'add', 'contract/value.ts']);
+  execFileSync('git', ['-C', root, 'add', 'contract/value.ts', 'source/value.txt']);
   execFileSync('git', ['-C', root, 'commit', '--quiet', '-m', 'test contract']);
   return execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 }
@@ -68,12 +70,13 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
   await writeFile(path.join(nurtureRepo, 'scenario', 'contract.md'), '# Scenario\n');
 
   const dependencyHash = await computeContractHash(path.join(workflowBaseRepo, 'contract'), ['value.ts']);
+  const sourceHash = await computeContractHash(workflowBaseRepo, ['source/value.txt']);
   const scenarioHash = await computeContractHash(nurtureRepo, ['scenario/contract.md']);
   const pinPath = path.join(root, 'pin.json');
   await writeFile(
     pinPath,
     JSON.stringify({
-      schemaVersion: 1,
+      schemaVersion: 2,
       hashAlgorithm: 'sha256-path-content-v1',
       compatibility: { baseAndMyChatContractParityRequired: true },
       myWorkflowBase: {
@@ -82,6 +85,14 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
         contractRoot: 'contract',
         contractPaths: ['value.ts'],
         contractSha256: dependencyHash.sha256,
+        sourcePins: [
+          {
+            key: 'web_workbench',
+            root: '.',
+            paths: ['source/value.txt'],
+            sha256: sourceHash.sha256,
+          },
+        ],
       },
       myChat: {
         repository: 'example/my-chat',
@@ -99,6 +110,12 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
   );
 
   await verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath });
+  await writeFile(path.join(workflowBaseRepo, 'source', 'value.txt'), 'changed source\n');
+  await assert.rejects(
+    () => verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath }),
+    /source pin web_workbench hash mismatch/,
+  );
+  await writeFile(path.join(workflowBaseRepo, 'source', 'value.txt'), 'source content\n');
   await writeFile(path.join(myChatRepo, 'contract', 'value.ts'), 'export const value = 2;\n');
   await assert.rejects(
     () => verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath }),

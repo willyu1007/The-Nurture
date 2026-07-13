@@ -1,7 +1,22 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { createNurtureApp } from "../src/app.js";
+import { assertDevHostEnvironment, DEV_HOST_BIND_ADDRESS } from "../src/dev-host-guard.js";
 import { buildServer } from "../src/server.js";
+
+describe("dev-host startup guard", () => {
+  it("binds only to the loopback interface", () => {
+    expect(DEV_HOST_BIND_ADDRESS).toBe("127.0.0.1");
+  });
+
+  it("allows only dev and test environments", () => {
+    expect(assertDevHostEnvironment(undefined)).toBe("dev");
+    expect(assertDevHostEnvironment("DEV")).toBe("dev");
+    expect(assertDevHostEnvironment("test")).toBe("test");
+    expect(() => assertDevHostEnvironment("staging")).toThrow(/cannot run/);
+    expect(() => assertDevHostEnvironment("production")).toThrow(/cannot run/);
+  });
+});
 
 // P4 closeout audit fix (SEC-1): GET /internal/nurture/projects/:id must be
 // workspace-isolated — a project's UUID must not leak its detail/timeline to

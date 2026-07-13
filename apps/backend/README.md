@@ -8,3 +8,5 @@ Persistence is deliberately split:
 - `DEV_HOST_DATABASE_URL` and `apps/backend/prisma` access only six `workflow_*` dev-host tables.
 
 The dev-host schema is never a production deployment target and must not be copied into the root Prisma schema. Real host runtime ownership remains in My-Chat.
+
+The executable is intentionally local-only: it binds to `127.0.0.1` and refuses to start unless `APP_ENV` is `dev` or `test`. It has no production authentication boundary and must never be exposed through a shared ingress or deployed as a service.

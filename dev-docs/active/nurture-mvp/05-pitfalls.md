@@ -5,6 +5,8 @@
 - Never merge or cherry-pick `codex/g0-preservation`; reconstruct explicit formal scopes from `origin/main`.
 - Never deploy backend dev-host Workflow models through the root Nurture Prisma migration stream.
 - Never advance after a failed node gate; record and fix the failure first.
+- Never expose the unauthenticated dev host or local PostgreSQL outside loopback.
+- Never rely on a sibling source dependency without hashing the exact build inputs.
 
 ## Pitfall log
 
@@ -97,3 +99,23 @@
 - Fix / workaround: rename the loop variable to `file_path` and rerun the census from empty result files.
 - Prevention: never use `path` as a zsh local/loop variable in repository scripts or ad-hoc audits.
 - References: blob census recorded in `g0-wip-coverage-audit.md`.
+
+### 2026-07-13 — GitHub Package permissions blocked clean CI
+
+- Symptom: all four install-bearing CI jobs failed with `ERR_PNPM_FETCH_403` for the private `web-workbench` package while local checks passed from cache/authenticated state.
+- Context: the repository `GITHUB_TOKEN` had `packages: read` but the package belonged to another repository and did not grant this repository Actions access.
+- What we tried: package repository-access API and an authenticated browser fallback; neither yielded a safe, automated repository-level grant.
+- Why it failed: user-scoped package Actions access was not available through the attempted REST route, and storing the local broad PAT as a repository secret would violate least privilege.
+- Fix / workaround: check out the pinned My-Workflow-Base revision, build `templates/web-workbench`, link that sibling source, and hash its exact 58 build inputs.
+- Prevention: cross-repository CI must prove a clean, unauthenticated runner install; never treat local package cache/auth as portability evidence.
+- References: `.github/workflows/ci.yml`; `docs/project/integrations/my-chat-workflow-contract.json`.
+
+### 2026-07-13 — local env guidance and Prisma loading diverged
+
+- Symptom: `pnpm dev-host:db:validate` failed without an exported `DEV_HOST_DATABASE_URL` even though generated guidance recommends `.env.local`.
+- Context: Prisma CLI automatically loaded `.env`, while the repo environment contract and local tooling generate `.env.local`.
+- What we tried: validation from the existing post-merge workspace without re-exporting the URL.
+- Why it failed: the package scripts invoked Prisma/Vitest directly, so `.env.local` was not loaded.
+- Fix / workaround: route environment-dependent repository commands through `scripts/run-with-local-env.mjs` with process env > `.env.local` > `.env` precedence; add deterministic node tests.
+- Prevention: any documented local environment source must be exercised by the actual CLI entrypoints, not only by the application framework.
+- References: `scripts/run-with-local-env.mjs`; `scripts/run-with-local-env.test.mjs`; `README.md`.
