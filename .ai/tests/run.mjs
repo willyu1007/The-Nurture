@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 
 import { createEvidenceDir, createLogger, generateRunId, rmEvidenceDir, writeRunJson } from './lib/evidence.mjs';
 
-import * as uiSuite from './suites/ui/index.mjs';
 import * as envSuite from './suites/environment/index.mjs';
 import * as dbSuite from './suites/database/index.mjs';
 import * as contextSuite from './suites/context-awareness/index.mjs';
@@ -22,7 +21,6 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 
 const SUITES = {
-  ui: uiSuite,
   environment: envSuite,
   database: dbSuite,
   'context-awareness': contextSuite,
@@ -35,7 +33,7 @@ function usage(exitCode) {
   const msg = [
     'Usage:',
     '  node .ai/tests/run.mjs --list',
-    '  node .ai/tests/run.mjs --suite <ui|environment|database|context-awareness|deployment|iac|api-index>',
+    '  node .ai/tests/run.mjs --suite <environment|database|context-awareness|deployment|iac|api-index>',
     '',
     'Options:',
     '  --keep-artifacts     Keep evidence even on PASS (default: false)',
