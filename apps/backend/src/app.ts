@@ -63,7 +63,7 @@ export const createNurtureApp = (
   const command = new WorkflowCommandService(ledger);
   const query = new WorkflowQueryService(ledger);
   const actions = new WorkflowActionService(devHostPrisma);
-  const worker = new WorkflowWorker(registry);
+  const worker = new WorkflowWorker(registry, workerRuntime);
   const dispatcher = new StepDispatcher(devHostPrisma, registry, worker);
 
   return {

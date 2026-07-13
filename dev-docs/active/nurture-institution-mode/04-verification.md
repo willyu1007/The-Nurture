@@ -16,6 +16,19 @@
 | Current My-Chat dependency | PASS | X2 revision `bda1542d6e6989a348254917a5e49f30de68083d`; no `packages/workflow-contracts` diff from X1. |
 | N1 activation gate | PASS | Explicit-empty snapshots only; manifest non-empty activation remains disabled. |
 
+## N1-B Schema Preview Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `pnpm db:generate` | PASS | Prisma Client generated from the additive production SSOT. |
+| `pnpm db:validate` | PASS | N1 schema is structurally valid. |
+| `pnpm verify:n1-schema-contract` | PASS | 21 tables, 7 partial unique indexes, and 7 lifecycle CHECK constraints are present; explicit-empty command gate enforced. |
+| `pnpm verify:persistence-boundaries` | PASS | Production migration stream remains Nurture-only; dev-host stream remains Workflow-only. |
+| DB context sync + strict verify | PASS | Context refreshed to 43 total tables / 71 total enums and registry checksum updated. |
+| `pnpm typecheck` | PASS AFTER REPAIR | Refreshed the local `file:` dependency snapshot and updated the backend-private dev-host to the X2 worker constructor/materialization-v1 empty-draft contract. |
+| `pnpm test:unit` | PASS | Existing 12 files / 86 tests pass; no P0 behavior regression. |
+| Migration apply | PENDING APPROVAL | Preview only; no target database was mutated. See `artifacts/db/n1-schema-preview.md`. |
+
 ## Automated Checks
 
 Run after task-doc or governance edits:

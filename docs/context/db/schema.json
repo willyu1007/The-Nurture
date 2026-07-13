@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-07-13T00:22:33.602Z",
+  "updatedAt": "2026-07-13T15:20:55.933Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -69,6 +69,138 @@
       ]
     },
     {
+      "name": "NurtureCareGroupStatus",
+      "values": [
+        "active",
+        "paused",
+        "archived",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureCareInstitutionStatus",
+      "values": [
+        "active",
+        "paused",
+        "archived",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureCareRole",
+      "values": [
+        "guardian",
+        "caregiver",
+        "lead_caregiver",
+        "institution_admin",
+        "system_operator"
+      ]
+    },
+    {
+      "name": "NurtureCareRoleAssignmentStatus",
+      "values": [
+        "active",
+        "suspended",
+        "revoked",
+        "expired",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureCareScopeType",
+      "values": [
+        "child_care_process",
+        "family",
+        "institution",
+        "care_group",
+        "enrollment"
+      ]
+    },
+    {
+      "name": "NurtureChildCareProcessStatus",
+      "values": [
+        "active",
+        "paused",
+        "archived",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureChildLinkGrantStatus",
+      "values": [
+        "pending",
+        "active",
+        "revoked",
+        "expired",
+        "replaced",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureChildLinkReceiptDriverType",
+      "values": [
+        "workflow_step",
+        "item_action",
+        "scheduled_step"
+      ]
+    },
+    {
+      "name": "NurtureChildLinkReceiptPendingReason",
+      "values": [
+        "workflow_processing",
+        "awaiting_confirmation",
+        "scheduled_release"
+      ]
+    },
+    {
+      "name": "NurtureChildLinkReceiptSourceType",
+      "values": [
+        "family_care_message",
+        "family_care_item",
+        "daily_care_log",
+        "media_attribution",
+        "system_summary"
+      ]
+    },
+    {
+      "name": "NurtureChildLinkReceiptStatus",
+      "values": [
+        "pending",
+        "delivered",
+        "read",
+        "acknowledged",
+        "failed",
+        "blocked",
+        "revoked_after_delivery"
+      ]
+    },
+    {
+      "name": "NurtureChildLinkReceiptTargetScopeType",
+      "values": [
+        "family",
+        "participant",
+        "care_group",
+        "enrollment",
+        "institution"
+      ]
+    },
+    {
+      "name": "NurtureChildStatus",
+      "values": [
+        "active",
+        "archived",
+        "merged",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureCommandBusinessOutcome",
+      "values": [
+        "applied",
+        "already_satisfied"
+      ]
+    },
+    {
       "name": "NurtureContextLayer",
       "values": [
         "L0_safety",
@@ -82,12 +214,227 @@
       ]
     },
     {
+      "name": "NurtureDailyCareLogStatus",
+      "values": [
+        "draft",
+        "recorded",
+        "shared",
+        "suppressed",
+        "corrected",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentStatus",
+      "values": [
+        "pending",
+        "active",
+        "paused",
+        "ended",
+        "withdrawn",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItemCategory",
+      "values": [
+        "today_attention",
+        "constraint",
+        "question",
+        "follow_up",
+        "schedule",
+        "admin",
+        "other"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItemClassificationSource",
+      "values": [
+        "manual",
+        "rule",
+        "ai",
+        "system"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItemEventType",
+      "values": [
+        "created",
+        "classified",
+        "assigned",
+        "acknowledged",
+        "clarification_requested",
+        "clarification_received",
+        "clarification_expired",
+        "clarification_cancelled",
+        "corrected",
+        "replied",
+        "followed_up",
+        "closed",
+        "expired",
+        "suppressed",
+        "reopened"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItemStatus",
+      "values": [
+        "open",
+        "acknowledged",
+        "waiting_for_family",
+        "replied",
+        "followed_up",
+        "closed",
+        "expired",
+        "suppressed"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItemUrgency",
+      "values": [
+        "normal",
+        "today_attention",
+        "time_sensitive",
+        "urgent_non_emergency"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageAuthorshipKind",
+      "values": [
+        "family_authored",
+        "caregiver_confirmed",
+        "institution_generated",
+        "system_generated"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageBodyFormat",
+      "values": [
+        "plain_text",
+        "rich_text"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageBodyStorageMode",
+      "values": [
+        "plain_text_dev",
+        "protected",
+        "encrypted",
+        "redacted"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageKind",
+      "values": [
+        "family_message",
+        "caregiver_reply",
+        "system_notice",
+        "care_summary",
+        "redaction_notice"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageSourceSurface",
+      "values": [
+        "mobile",
+        "web",
+        "system_import",
+        "workflow"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageStatus",
+      "values": [
+        "sent",
+        "redacted",
+        "failed"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareParticipantKind",
+      "values": [
+        "guardian",
+        "caregiver",
+        "lead_caregiver",
+        "institution_admin",
+        "system"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareThreadParticipantVisibilityStatus",
+      "values": [
+        "active",
+        "muted",
+        "left",
+        "removed",
+        "blocked"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareThreadStatus",
+      "values": [
+        "active",
+        "closed",
+        "archived",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareThreadVisibilityScope",
+      "values": [
+        "family_private",
+        "enrollment_private",
+        "institution_case"
+      ]
+    },
+    {
+      "name": "NurtureFamilyStatus",
+      "values": [
+        "active",
+        "archived",
+        "deleted"
+      ]
+    },
+    {
       "name": "NurtureFreshnessLevel",
       "values": [
         "current",
         "recent",
         "stale",
         "historical"
+      ]
+    },
+    {
+      "name": "NurtureGrantDataClass",
+      "values": [
+        "daily_care_log",
+        "care_day_note",
+        "care_constraint_update",
+        "family_care_question",
+        "family_follow_up_request"
+      ]
+    },
+    {
+      "name": "NurtureGrantDirection",
+      "values": [
+        "family_to_org",
+        "org_to_family"
+      ]
+    },
+    {
+      "name": "NurtureInteractionContextStatus",
+      "values": [
+        "active",
+        "consumed",
+        "revoked"
+      ]
+    },
+    {
+      "name": "NurtureInteractionPurpose",
+      "values": [
+        "clarify",
+        "submit_action",
+        "open_notification"
       ]
     },
     {
@@ -164,6 +511,43 @@
         "safety_boundary",
         "missing_context_question",
         "family_preference"
+      ]
+    },
+    {
+      "name": "NurtureMediaAssetSourceKind",
+      "values": [
+        "class_album",
+        "class_group_message",
+        "activity_album",
+        "admin_upload"
+      ]
+    },
+    {
+      "name": "NurtureMediaAssetStatus",
+      "values": [
+        "active",
+        "hidden",
+        "deleted"
+      ]
+    },
+    {
+      "name": "NurtureMediaAttributionSource",
+      "values": [
+        "face_reference",
+        "manual",
+        "history_match",
+        "system"
+      ]
+    },
+    {
+      "name": "NurtureMediaAttributionStatus",
+      "values": [
+        "candidate",
+        "confirmed",
+        "rejected",
+        "corrected",
+        "hidden",
+        "deleted"
       ]
     },
     {
@@ -263,6 +647,16 @@
       ]
     },
     {
+      "name": "NurtureParticipantStatus",
+      "values": [
+        "active",
+        "inactive",
+        "suspended",
+        "merged",
+        "deleted"
+      ]
+    },
+    {
       "name": "NurtureProjectStatus",
       "values": [
         "draft",
@@ -312,6 +706,33 @@
         "review",
         "periodic",
         "manual"
+      ]
+    },
+    {
+      "name": "NurtureTeacherAttentionItemPriority",
+      "values": [
+        "normal",
+        "attention",
+        "time_sensitive"
+      ]
+    },
+    {
+      "name": "NurtureTeacherAttentionItemSourceType",
+      "values": [
+        "family_care_item",
+        "care_constraint",
+        "daily_care_log",
+        "child_applied_institution_policy",
+        "manual_child_note"
+      ]
+    },
+    {
+      "name": "NurtureTeacherAttentionItemStatus",
+      "values": [
+        "active",
+        "resolved",
+        "expired",
+        "suppressed"
       ]
     }
   ],
@@ -549,6 +970,2092 @@
       ]
     },
     {
+      "name": "NurtureCareGroup",
+      "dbName": "nurture_care_group",
+      "schema": null,
+      "columns": [
+        {
+          "name": "ageBandKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "age_band_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "capacity",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "rhythmConfigPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "rhythm_config_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureCareGroupStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "attentionItems",
+          "to": "NurtureTeacherAttentionItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "dailyCareLogs",
+          "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollments",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "items",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "mediaAssets",
+          "to": "NurtureMediaAssetRef",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "threads",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_care_group_institution"
+        }
+      ]
+    },
+    {
+      "name": "NurtureCareInstitution",
+      "dbName": "nurture_care_institution",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdByParticipantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "created_by_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "displayName",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "display_name",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "legalName",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "legal_name",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "philosophyPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "philosophy_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyConfigPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "policy_config_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "profilePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "profile_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureCareInstitutionStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroups",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollments",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "mediaAssets",
+          "to": "NurtureMediaAssetRef",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_institution_status"
+        }
+      ]
+    },
+    {
+      "name": "NurtureCareRoleAssignment",
+      "dbName": "nurture_care_role_assignment",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "displayLabel",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "display_label",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "endsAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "ends_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantedByParticipantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "granted_by_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "permissionsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "permissions_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "role",
+          "type": "NurtureCareRole",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scopeId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scope_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scopeType",
+          "type": "NurtureCareScopeType",
+          "nullable": false,
+          "list": false,
+          "dbName": "scope_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "startsAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "starts_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureCareRoleAssignmentStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "assignedItems",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "confirmedAttributions",
+          "to": "NurtureChildMediaAttribution",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "dailyCareLogs",
+          "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "threadMemberships",
+          "to": "NurtureFamilyCareThreadParticipant",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "uploadedAssets",
+          "to": "NurtureMediaAssetRef",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "participantId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_role_participant"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "role",
+            "scopeType",
+            "scopeId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_role_scope"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChild",
+      "dbName": "nurture_child",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "birthDate",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "birth_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "displayName",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "display_name",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "profileBasicsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "profile_basics_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureChildStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careProcesses",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_child_status"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildCareProcess",
+      "dbName": "nurture_child_care_process",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careContextPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_context_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careContextSummary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_context_summary",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentStageKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_stage_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "primaryFamilyId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "primary_family_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureChildCareProcessStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "attentionItems",
+          "to": "NurtureTeacherAttentionItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "child",
+          "to": "NurtureChild",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecutions",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "dailyCareLogs",
+          "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollments",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "families",
+          "to": "NurtureFamily",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "grants",
+          "to": "NurtureChildLinkGrant",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "items",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "mediaAttributions",
+          "to": "NurtureChildMediaAttribution",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "receipts",
+          "to": "NurtureChildLinkReceipt",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "threads",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_child_process_child"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_child_process_status"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildLinkGrant",
+      "dbName": "nurture_child_link_grant",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dataClasses",
+          "type": "NurtureGrantDataClass",
+          "nullable": false,
+          "list": true,
+          "dbName": "data_classes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "directions",
+          "type": "NurtureGrantDirection",
+          "nullable": false,
+          "list": true,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantedByParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "granted_by_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantedToScopeId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "granted_to_scope_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantedToScopeType",
+          "type": "NurtureCareScopeType",
+          "nullable": false,
+          "list": false,
+          "dbName": "granted_to_scope_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "policySnapshotPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "policy_snapshot_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purposes",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "retentionPolicyPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "retention_policy_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedByParticipantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_by_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokeReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoke_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureChildLinkGrantStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "dailyCareLogs",
+          "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "items",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "receipts",
+          "to": "NurtureChildLinkReceipt",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_grant_process"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "enrollmentId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_grant_enrollment"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "grantedToScopeType",
+            "grantedToScopeId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_grant_target"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildLinkReceipt",
+      "dbName": "nurture_child_link_receipt",
+      "schema": null,
+      "columns": [
+        {
+          "name": "acknowledgedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "acknowledged_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dataClass",
+          "type": "NurtureGrantDataClass",
+          "nullable": true,
+          "list": false,
+          "dbName": "data_class",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deliveredAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "delivered_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "direction",
+          "type": "NurtureGrantDirection",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "driverRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "driver_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "driverType",
+          "type": "NurtureChildLinkReceiptDriverType",
+          "nullable": true,
+          "list": false,
+          "dbName": "driver_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "grant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "metadataPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "metadata_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextActionAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "next_action_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pendingReason",
+          "type": "NurtureChildLinkReceiptPendingReason",
+          "nullable": true,
+          "list": false,
+          "dbName": "pending_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "readAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "read_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonCode",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "reason_code",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "retryOfReceiptId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "retry_of_receipt_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "routingAttemptKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "routing_attempt_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceType",
+          "type": "NurtureChildLinkReceiptSourceType",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureChildLinkReceiptStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetScopeId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "target_scope_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetScopeType",
+          "type": "NurtureChildLinkReceiptTargetScopeType",
+          "nullable": true,
+          "list": false,
+          "dbName": "target_scope_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "version",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "grant",
+          "to": "NurtureChildLinkGrant",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "grantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "retryOfReceipt",
+          "to": "NurtureChildLinkReceipt",
+          "optional": true,
+          "list": false,
+          "relationName": "ReceiptRetry",
+          "fields": [
+            "retryOfReceiptId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "retryReceipts",
+          "to": "NurtureChildLinkReceipt",
+          "optional": false,
+          "list": true,
+          "relationName": "ReceiptRetry",
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "direction",
+            "dataClass",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_receipt_process"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "grantId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_receipt_grant"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "retryOfReceiptId"
+          ],
+          "name": null,
+          "map": "ix_nurture_receipt_retry"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "targetScopeType",
+            "targetScopeId",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_receipt_target"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "direction",
+            "sourceType",
+            "sourceId",
+            "routingAttemptKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_receipt_route"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildMediaAttribution",
+      "dbName": "nurture_child_media_attribution",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confidence",
+          "type": "Decimal",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": "Decimal",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confirmedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "confirmed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confirmedByRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "confirmed_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "exposurePolicyPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "exposure_policy_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "mediaAssetRefId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "media_asset_ref_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "source",
+          "type": "NurtureMediaAttributionSource",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureMediaAttributionStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "confirmedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "confirmedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "mediaAssetRef",
+          "to": "NurtureMediaAssetRef",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "mediaAssetRefId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_media_attribution_process"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "mediaAssetRefId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_media_attribution_asset"
+        }
+      ]
+    },
+    {
       "name": "NurtureChildProfileSnapshot",
       "dbName": "nurture_child_profile_snapshot",
       "schema": null,
@@ -708,6 +3215,290 @@
           ],
           "name": null,
           "map": "ix_2"
+        }
+      ]
+    },
+    {
+      "name": "NurtureCommandExecution",
+      "dbName": "nurture_command_execution",
+      "schema": null,
+      "columns": [
+        {
+          "name": "businessActorRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "business_actor_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "businessOutcome",
+          "type": "NurtureCommandBusinessOutcome",
+          "nullable": false,
+          "list": false,
+          "dbName": "business_outcome",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandContractVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_contract_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandScope",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_scope",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "handoffDriverRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "handoff_driver_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "handoffRequestSnapshotsPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "handoff_request_snapshots_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "handoffSnapshotSchemaVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "handoff_snapshot_schema_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "originInvocationRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "origin_invocation_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "outputRefs",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "output_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "parentCommandRequestIdHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "parent_command_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "payloadCanonicalizationVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "payload_canonicalization_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "payloadHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "payload_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "primaryScopeRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "primary_scope_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestIdentityHashVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_identity_hash_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "target_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "committedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_command_execution_process"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "commandKey",
+            "committedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_command_execution_key"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "commandRequestIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_command_execution_identity"
         }
       ]
     },
@@ -1367,6 +4158,595 @@
       ]
     },
     {
+      "name": "NurtureDailyCareLog",
+      "dbName": "nurture_daily_care_log",
+      "schema": null,
+      "columns": [
+        {
+          "name": "activityPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "activity_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "grant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "healthObservationPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "health_observation_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "logDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "log_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "mealPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "meal_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "moodPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "mood_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "napPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "nap_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "recordedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "recorded_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceItemId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_item_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureDailyCareLogStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "summary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "grant",
+          "to": "NurtureChildLinkGrant",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "grantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "recordedByRole",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "recordedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "sourceItem",
+          "to": "NurtureFamilyCareItem",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "sourceItemId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "logDate",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_daily_log_group"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "logDate",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_daily_log_process"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollment",
+      "dbName": "nurture_enrollment",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentRefPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "enrollment_ref_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "joinedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "joined_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "leftAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "left_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureEnrollmentStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "dailyCareLogs",
+          "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "grants",
+          "to": "NurtureChildLinkGrant",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "items",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "receipts",
+          "to": "NurtureChildLinkReceipt",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "threads",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_enrollment_group"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_enrollment_process"
+        }
+      ]
+    },
+    {
       "name": "NurtureEvidence",
       "dbName": "nurture_evidence",
       "schema": null,
@@ -1617,6 +4997,1820 @@
           ],
           "name": null,
           "map": "ix_48"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamily",
+      "dbName": "nurture_family",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "displayName",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "display_name",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyProfilePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_profile_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilyStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "items",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "threads",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_process"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItem",
+      "dbName": "nurture_family_care_item",
+      "schema": null,
+      "columns": [
+        {
+          "name": "ackedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "acked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ackedByParticipantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "acked_by_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "activeClarificationRequestEventId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "active_clarification_request_event_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "assignedToRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "assigned_to_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "category",
+          "type": "NurtureFamilyCareItemCategory",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "clarificationExpiryDriverRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "clarification_expiry_driver_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "classificationConfidence",
+          "type": "Decimal",
+          "nullable": true,
+          "list": false,
+          "dbName": "classification_confidence",
+          "dbType": "Decimal",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "classificationSource",
+          "type": "NurtureFamilyCareItemClassificationSource",
+          "nullable": false,
+          "list": false,
+          "dbName": "classification_source",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "closedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "closed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dataClass",
+          "type": "NurtureGrantDataClass",
+          "nullable": false,
+          "list": false,
+          "dbName": "data_class",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "detail",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dueAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "due_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "grant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "linkedReplyMessageId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "linked_reply_message_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requiresAck",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "requires_ack",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requiresReply",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "requires_reply",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyFlagsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "safety_flags_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceMessageId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_message_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilyCareItemStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "summary",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "suppressedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "suppressed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "suppressionReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "suppression_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "threadId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "thread_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "urgency",
+          "type": "NurtureFamilyCareItemUrgency",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "version",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "waitingForFamilySince",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "waiting_for_family_since",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "waitingForFamilyUntil",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "waiting_for_family_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "assignedToRole",
+          "to": "NurtureCareRoleAssignment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "assignedToRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "dailyCareLogs",
+          "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "events",
+          "to": "NurtureFamilyCareItemEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "family",
+          "to": "NurtureFamily",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "grant",
+          "to": "NurtureChildLinkGrant",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "grantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "thread",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "threadId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "assignedToRoleAssignmentId",
+            "status",
+            "dueAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_item_assignee"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "status",
+            "urgency",
+            "dueAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_item_group"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_item_process"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "threadId",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_item_thread"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareItemEvent",
+      "dbName": "nurture_family_care_item_event",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorParticipantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correlationEventId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "correlation_event_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "event_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventType",
+          "type": "NurtureFamilyCareItemEventType",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "fromStatus",
+          "type": "NurtureFamilyCareItemStatus",
+          "nullable": true,
+          "list": false,
+          "dbName": "from_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "itemId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "item_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "relatedMessageId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "related_message_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "toStatus",
+          "type": "NurtureFamilyCareItemStatus",
+          "nullable": true,
+          "list": false,
+          "dbName": "to_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actorParticipant",
+          "to": "NurtureParticipant",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "item",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "itemId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "actorParticipantId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_item_event_actor"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "itemId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_item_event_item"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessage",
+      "dbName": "nurture_family_care_message",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "attachmentsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "attachments_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorshipKind",
+          "type": "NurtureFamilyCareMessageAuthorshipKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorship_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "body",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyFormat",
+          "type": "NurtureFamilyCareMessageBodyFormat",
+          "nullable": false,
+          "list": false,
+          "dbName": "body_format",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "body_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyStorageMode",
+          "type": "NurtureFamilyCareMessageBodyStorageMode",
+          "nullable": false,
+          "list": false,
+          "dbName": "body_storage_mode",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "grant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "messageKind",
+          "type": "NurtureFamilyCareMessageKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "message_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "redactedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "redacted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "redactedByParticipantId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "redacted_by_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "redactionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "redaction_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "redactionReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "redaction_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyFlagsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "safety_flags_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "senderParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "sender_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "senderRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "sender_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceDailyCareLogId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_daily_care_log_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceItemEventId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_item_event_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceItemId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_item_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceSurface",
+          "type": "NurtureFamilyCareMessageSourceSurface",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_surface",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilyCareMessageStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "threadId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "thread_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "grant",
+          "to": "NurtureChildLinkGrant",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "grantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "senderParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "senderParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "senderRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "senderRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "thread",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "threadId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_message_process"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "senderParticipantId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_message_sender"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "sourceItemId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_message_source_item"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "threadId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_message_thread"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareThread",
+      "dbName": "nurture_family_care_thread",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "latestMessageAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "latest_message_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilyCareThreadStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "summaryPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "summary_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "visibilityScope",
+          "type": "NurtureFamilyCareThreadVisibilityScope",
+          "nullable": false,
+          "list": false,
+          "dbName": "visibility_scope",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "family",
+          "to": "NurtureFamily",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "items",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "participants",
+          "to": "NurtureFamilyCareThreadParticipant",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "status",
+            "latestMessageAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_thread_group"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_thread_process"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareThreadParticipant",
+      "dbName": "nurture_family_care_thread_participant",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "lastReadAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "last_read_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastReadMessageId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "last_read_message_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantKind",
+          "type": "NurtureFamilyCareParticipantKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "roleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "threadId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "thread_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "visibilityStatus",
+          "type": "NurtureFamilyCareThreadParticipantVisibilityStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": "visibility_status",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "roleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "roleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "thread",
+          "to": "NurtureFamilyCareThread",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "threadId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "participantId",
+            "visibilityStatus"
+          ],
+          "name": null,
+          "map": "ix_nurture_thread_participant_actor"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "threadId",
+            "visibilityStatus"
+          ],
+          "name": null,
+          "map": "ix_nurture_thread_participant_thread"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "threadId",
+            "participantId",
+            "roleAssignmentId"
+          ],
+          "name": null,
+          "map": "uq_nurture_thread_participant"
         }
       ]
     },
@@ -3193,6 +8387,483 @@
       ]
     },
     {
+      "name": "NurtureInteractionContext",
+      "dbName": "nurture_interaction_context",
+      "schema": null,
+      "columns": [
+        {
+          "name": "consumedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "consumed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "hostConversationRefHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "host_conversation_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "payloadSchemaVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "payload_schema_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purpose",
+          "type": "NurtureInteractionPurpose",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "statePayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "state_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureInteractionContextStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "surface",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tokenHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "token_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tokenHashVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "token_hash_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "version",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "hostConversationRefHash",
+            "status",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_interaction_conversation"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "participantId",
+            "status",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_interaction_participant"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "tokenHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_interaction_token"
+        }
+      ]
+    },
+    {
+      "name": "NurtureMediaAssetRef",
+      "dbName": "nurture_media_asset_ref",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "capturedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "captured_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safeTitle",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "safe_title",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceKind",
+          "type": "NurtureMediaAssetSourceKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureMediaAssetStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "storageRefPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "storage_ref_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "uploadedByRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "uploaded_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "attributions",
+          "to": "NurtureChildMediaAttribution",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "uploadedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "uploadedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_media_asset_group"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "status",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_media_asset_institution"
+        }
+      ]
+    },
+    {
       "name": "NurtureMetricDefinition",
       "dbName": "nurture_metric_definition",
       "schema": null,
@@ -3821,6 +9492,193 @@
           ],
           "name": null,
           "map": "ix_7"
+        }
+      ]
+    },
+    {
+      "name": "NurtureParticipant",
+      "dbName": "nurture_participant",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "avatarRefPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "avatar_ref_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "displayName",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "display_name",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "myChatUserId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "my_chat_user_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "profilePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "profile_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureParticipantStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "interactionContexts",
+          "to": "NurtureInteractionContext",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "itemEvents",
+          "to": "NurtureFamilyCareItemEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "roleAssignments",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "threadMemberships",
+          "to": "NurtureFamilyCareThreadParticipant",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "myChatUserId",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_participant_auth"
         }
       ]
     },
@@ -4580,6 +10438,231 @@
           ],
           "name": null,
           "map": "ix_26"
+        }
+      ]
+    },
+    {
+      "name": "NurtureTeacherAttentionItem",
+      "dbName": "nurture_teacher_attention_item",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveDate",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "effective_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "priority",
+          "type": "NurtureTeacherAttentionItemPriority",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceType",
+          "type": "NurtureTeacherAttentionItemSourceType",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureTeacherAttentionItemStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "summary",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "title",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "effectiveDate",
+            "status",
+            "priority"
+          ],
+          "name": null,
+          "map": "ix_nurture_attention_group"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "status",
+            "effectiveDate"
+          ],
+          "name": null,
+          "map": "ix_nurture_attention_process"
         }
       ]
     },
