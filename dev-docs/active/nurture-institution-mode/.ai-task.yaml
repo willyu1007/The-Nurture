@@ -1,0 +1,39 @@
+version: 1
+task_id: T-002
+project: main
+slug: nurture-institution-mode
+status: planned
+updated: "2026-07-13"
+keywords:
+  - institution-ecology
+  - multi-family
+  - child-care-process
+  - caregiver
+  - class-family-inbox
+  - child-link-grant
+  - family-to-org
+  - nurture-owned-care-graph
+  - ib-schema-spec
+  - decision-convergence
+  - child-scope-first
+  - teacher-attention-projection
+  - runtime-supervised-revoke
+  - data-class-contract
+  - message-redaction-lifecycle
+  - my-chat-opaque-delivery
+  - mobile-chat-role-agnostic
+  - single-active-family
+  - iia-schema-policy-test-design
+  - class-of-10-journey
+  - iia-test-contract
+  - iia-capability-slice
+  - iia-surface-contract
+  - iia-resolver-contract
+  - resolver-output-consumers
+  - resolver-context-shape
+  - resolver-input-envelope
+  - scenario-token
+  - resolver-ambiguity
+  - structured-clarification
+  - scenario-token-mvp
+  - token-ttl-staleness

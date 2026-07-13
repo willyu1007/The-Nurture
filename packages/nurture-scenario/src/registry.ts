@@ -1,4 +1,4 @@
-import type { ScenarioManifest, WorkflowInternalApiRegistry } from "./types.js";
+import type { ScenarioManifest, WorkflowInternalApiRegistry } from "@my-chat/workflow-contracts";
 
 export const nurtureScenarioManifest = {
   manifest_version: 1,
@@ -166,6 +166,15 @@ export const nurtureScenarioManifest = {
         snapshot_required: true,
       },
       {
+        namespace: "my_chat",
+        object_type: "parent",
+        resolver_key: "my_chat.object.parent",
+        owner_scope: "workspace",
+        canonical_required: true,
+        scenario_local_allowed: false,
+        snapshot_required: true,
+      },
+      {
         namespace: "nurture",
         object_type: "nurture_profile",
         resolver_key: "nurture.profile",
@@ -289,7 +298,7 @@ export const nurtureScenarioManifest = {
       requested_purposes: ["notification_push"],
       downstream_owner: "my_chat.notification",
       policy_key: "nurture.can_create_notification_handoff",
-      receipt_required: false,
+      receipt_required: true,
     },
   ],
   surface_mapping: {
@@ -392,6 +401,7 @@ export const nurtureScenarioManifest = {
       },
       "my_chat.notification": {
         allowed_events: ["workflow.handoff.requested", "workflow.step.manual_review_required"],
+        forbidden_events: ["nurture.health_state.safety_escalated"],
       },
     },
   },

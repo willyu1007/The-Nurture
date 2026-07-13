@@ -1,4 +1,4 @@
-import type { DomainContextRef, WorkflowCommandMeta, WorkflowStepHandlerInput } from "../../src/types.js";
+import type { DomainContextRef, WorkflowCommandMeta, WorkflowStepHandlerInput } from "@my-chat/workflow-contracts";
 
 export const familyContextRef: DomainContextRef = {
   namespace: "my_chat",

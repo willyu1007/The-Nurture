@@ -1,0 +1,23 @@
+# Local Postgres instance with physically separate Nurture and workflow dev-host databases.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nurture-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nurture
+      POSTGRES_PASSWORD: nurture
+      POSTGRES_DB: nurture
+    ports:
+      - "5433:5432"
+    volumes:
+      - nurture-pgdata:/var/lib/postgresql/data
+      - ./ops/local-postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nurture -d nurture && pg_isready -U nurture -d nurture_dev_host"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  nurture-pgdata:

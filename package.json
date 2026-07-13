@@ -10,13 +10,58 @@
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "build": "echo \"Add build script\"",
-    "dev": "echo \"Add dev script\"",
+    "dev": "pnpm --filter @the-nurture/backend dev",
+    "dev:frontend": "pnpm --filter @the-nurture/frontend dev",
     "lint": "echo \"Add lint script\"",
-    "test": "echo \"Add test script\"",
-    "typecheck": "tsc --noEmit"
+    "test": "vitest run -c vitest.config.ts",
+    "test:unit": "vitest run -c vitest.config.ts",
+    "test:unit:ci": "vitest run -c vitest.config.ts --reporter=json --outputFile=.ai/.tmp/test-results/unit.json",
+    "test:db": "vitest run -c vitest.db.config.ts",
+    "test:db:ci": "vitest run -c vitest.db.config.ts --reporter=json --outputFile=.ai/.tmp/test-results/production-db.json",
+    "test:dev-host": "vitest run -c vitest.dev-host.config.ts",
+    "test:dev-host:ci": "vitest run -c vitest.dev-host.config.ts --reporter=json --outputFile=.ai/.tmp/test-results/dev-host.json",
+    "test:all": "pnpm test:unit && pnpm test:db && pnpm test:dev-host",
+    "typecheck": "tsc --noEmit",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:generate": "prisma generate --schema prisma/schema.prisma",
+    "db:validate": "prisma validate --schema prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema prisma/schema.prisma",
+    "db:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
+    "db:context": "node .ai/scripts/ctl-db-ssot.mjs sync-to-context",
+    "db:assert-boundary": "node scripts/assert-production-db-boundary.mjs",
+    "dev-host:db:generate": "prisma generate --schema apps/backend/prisma/schema.prisma",
+    "dev-host:db:validate": "prisma validate --schema apps/backend/prisma/schema.prisma",
+    "dev-host:db:migrate": "prisma migrate dev --schema apps/backend/prisma/schema.prisma",
+    "dev-host:db:deploy": "prisma migrate deploy --schema apps/backend/prisma/schema.prisma",
+    "dev-host:db:assert-boundary": "node scripts/assert-dev-host-db-boundary.mjs",
+    "db:generate:all": "pnpm db:generate && pnpm dev-host:db:generate",
+    "db:migrate:all": "pnpm db:migrate && pnpm dev-host:db:migrate",
+    "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 86",
+    "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 15",
+    "verify:dev-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/dev-host.json dev-host 14",
+    "verify:test-routing": "node scripts/assert-test-routing.mjs",
+    "verify:persistence-boundaries": "node scripts/assert-persistence-boundaries.mjs",
+    "test:workflow-contract-pin": "node --test scripts/verify-workflow-contract-pin.test.mjs",
+    "verify:workflow-contract-pin": "node scripts/verify-workflow-contract-pin.mjs"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.0"
+    "@types/node": "^20.12.0",
+    "dotenv": "^16.4.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@my-chat/workflow-contracts": "link:../My-Chat/packages/workflow-contracts"
+    }
   }
 }
-

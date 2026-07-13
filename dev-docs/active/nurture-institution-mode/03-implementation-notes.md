@@ -1,0 +1,657 @@
+# Implementation Notes — Institution Ecology
+
+## Status
+
+- Current status: `planned`
+- Last updated: 2026-07-13
+
+## What changed
+
+- 2026-07-13: G0 formal baseline reconstructed the Nurture MVP into independently verified commits, split production and backend-private workflow databases, pinned Base/My-Chat contract revisions and hashes, and preserved institution implementation as design-only. The former dirty-worktree blocker is resolved on the formal branch; X0/X1 remain the next cross-repo gates.
+- 2026-06-29: 机构模式作为 `M-002 / F-002 / T-002` 登记到项目治理；创建 `dev-docs/active/nurture-institution-mode/` 设计包。
+- 2026-07-03: 补齐标准 dev-docs 任务包骨架，并把当前工作切到 roadmap 决策对齐。
+- 2026-07-03: 根据讨论将产品语义从"机构模式/授权桥"校正为"机构生态/小孩成长外部环境"；`ChildLinkGrant` 降级为跨生态连接机制。
+- 2026-07-04: 明确儿童照片归属能力：基于点名卡、头像、入园登记照等 reference images，对班级群/班级相册照片生成候选孩子归属，老师确认后形成孩子相册视图；老师端以 mobile-first 为主要交互形态。
+- 2026-07-05: 重新对齐 My-Chat/Nurture ownership：My-Chat 拥有 account identity 和 scenario shell；Nurture 拥有 care ecology graph，包括 family、child、institution、care group、role assignment、enrollment、grant、家园沟通和照护事实。
+- 2026-07-05: 将 Nurture 的中心对象定义为 `NurtureChildCareProcess`；家长加入某个小孩的养育过程，老师把该过程并入班级日常工作流，机构管理者治理这些过程。
+- 2026-07-05: 将 `family_to_org` 第一版收敛为 `class_family_inbox`：一个班多个孩子的私密家庭线程聚合为老师侧班级 inbox，原文和事项状态归 Nurture canonical。
+- 2026-07-05: 新增 `06-ib-nurture-schema-spec.md`，把 IB 的 Nurture-owned core ecology、grant/receipt、family-care communication、first-slice care facts、resolver/policy 和 class-of-10 验收场景写成 design-only schema SPEC。
+- 2026-07-05: 新增 `07-ib-decision-convergence.md`，把 7 个 IB schema open decisions 收敛为 implementation defaults：participant 唯一性、family cardinality、teacher attention projection、grant revoke retention、data class vocabulary、message protection、My-Chat shell envelope。
+- 2026-07-06: 将 `NurtureChildCareProcess` 明确为独立 child scope：所有作用于具体孩子的动作、数据、查询和写入必须落到 `childCareProcessId`；老师/家长/机构/班级视角只是对 child scopes 的再组织。
+- 2026-07-06: 经讨论确认 IB-D0 锁定：`NurtureChildCareProcess` 是 child-specific care facts 的唯一独立作用域；`careGroupId`、`familyId`、`participantId`、`enrollmentId` 等只是再组织维度。
+- 2026-07-06: 经讨论确认 IB-D3 锁定：`NurtureTeacherAttentionItem` 物化为可重建 child-scoped projection；`careGroupId` 只是老师看板组织/查询维度，group-level operational notice 后续单独建模。
+- 2026-07-06: 经讨论确认 IB-D4 锁定：`NurtureChildLinkGrant` revoke 是 runtime fence，不抹掉历史动作，但必须立即停止未来投递、退出当前 active work surface/context，并阻断 in-flight workflow、pending outbox、retry/replay、cached context pack 对 revoked-grant context 的继续使用。
+- 2026-07-07: 经讨论确认 IB-D5 锁定：`dataClass` 是系统授权/policy/runtime 合约，`category` 是工作流/展示分类，机构词汇只能作为 label/template/routing 映射层，不能创建新的跨角色数据边界。
+- 2026-07-07: 经讨论确认 IB-D6 锁定：`NurtureFamilyCareMessage` canonical status 只保留 `sent` / `redacted` / `failed`；不设 message-level `hidden` / `deleted`；展示隐藏交给 projection，物理删除交给 retention/legal job。
+- 2026-07-07: 经讨论确认 IB-D7 锁定：My-Chat 默认即时调用 Nurture render/action API，不持久化 Nurture render envelope；只有 host delivery 需要时保存 minimal opaque bookkeeping，visible copy 只能作为 ephemeral/TTL delivery payload。
+- 2026-07-08: 经讨论确认 IB-D1/IB-D2 锁定：mobile chat 只做 Nurture 场景入口，不在 My-Chat 侧区分角色；Nurture 自行解析 role/scope/output。看板可切换 validated role assignment。一个 `NurtureChildCareProcess` 只有一个 active `NurtureFamily`。
+- 2026-07-08: 进入 IIA schema/policy/test design，新增 `08-iia-schema-policy-test-design.md`：把 schema model groups、resolver/policy predicates、capability slices 和 Test Contract 明确为后续实现入口；本轮不改 Prisma、manifest 或 runtime。
+- 2026-07-08: 定稿 IIA-0 Test Contract：按 required semantics、test layers、fixture shape、structured decision reason codes、non-pass conditions 组织测试门禁。
+- 2026-07-08: 经讨论确认 IIA-0-C1 Capability Slice 锁定：teacher mobile 是 surface composition，不是 canonical business capability；首批 capability key 分别为 `class_family_inbox`、`teacher_attention_board`、`caregiver_daily_care`、`child_media_attribution`，实现先跑 `class_family_inbox` + `teacher_attention_board` 闭环。
+- 2026-07-08: 经讨论确认 IIA-0-C2 Surface Contract 锁定：My-Chat owns chat conversation continuity；Nurture owns short-lived interaction context and business memory/facts；conversation refs 只能恢复意图，不能跳过 resolver/policy/grant/current-state 校验。
+- 2026-07-08: 经讨论确认 IIA-0-R1 Resolver Output Consumers 锁定：resolver output 是 Nurture internal context contract，消费方是 capability/orchestrator、policy、query/projection、command/workflow、presenter 和 interaction context manager；My-Chat 只消费最终 scenario response。
+- 2026-07-09: 经讨论确认 IIA-0-R2 Resolver Context Shape 锁定：resolver output 分为 `actor`、`workScope`、`target` 三层；`childCareProcessId` 对 child-specific action/write 必须存在，但对老师/机构集合工作面不是所有 `resolved` 输出的必填字段。
+- 2026-07-09: 经讨论确认 IIA-0-R3 Resolver Input Envelope 锁定：My-Chat 只传 authenticated user、surface、conversation refs、current payload、generic display state、Nurture-issued opaque scenario token 和 idempotency；target、workScope、roleAssignment、grant、dataClass、direction 和 policy facts 都由 Nurture resolver 解析。
+- 2026-07-09: 经讨论确认 IIA-0-R4 Ambiguity Handling 锁定：resolver 使用 typed candidates 和固定优先级；只有唯一、当前有效、可达且安全的候选才 auto-resolve；多候选进入 `needs_clarification`，禁用/撤销/脱敏/越权/不安全 stale 进入 `blocked`。
+- 2026-07-09: 经讨论确认 IIA-0-R5 Structured Clarification Interaction 锁定：`needs_clarification` 返回 My-Chat 可渲染的结构化交互请求，不返回长文本；Nurture 生成 prompt、options、fields、validation、scenarioToken 和 opaque option tokens，My-Chat 只渲染并回传选择/表单值。
+- 2026-07-09: 经讨论确认 IIA-0-R6 Scenario Token MVP TTL/Staleness 锁定：MVP token 是 Nurture opaque DB handle，只支持 `clarify`、`submit_action`、`open_notification`；分类为 `current`、`expired`、`recoverable`、`blocked`，每次使用都重新 resolver/policy/grant/lifecycle/preconditions。
+- 2026-07-10: 经讨论锁定 IIA-0-R7 Business Memory Retrieval：采用 thin reusable resolver kernel + Nurture-owned adapters；MVP 只启用 family-care item、teacher-attention item、family-care thread 三类 source，使用完整路径候选、分类式确定性排序和结构化歧义处理，不新增 memory/vector/cache/额外模型调用。
+- 2026-07-10: 经讨论锁定 IIA-0-C3 Workflow-Mediated Family Conversation：不同角色不直接聊天；家长侧保留 child-private conversation timeline，老师侧只操作 class workflow，Nurture 将家庭输入和老师动作转成 audience-specific canonical messages；老师身份内容必须人工确认，My-Chat 只渲染/通知。
+- 2026-07-10: 完成 IIA-0-R8 Command Write Preconditions 鲁棒性审查：保留 internal fact / cross-role distribution / composite action、Prepare/Execute 和 transaction-time recheck 方向，但识别 B1 跨库 durable handoff、B2 全 command 幂等并发、B3 durable routing/clarification 三个 lock blocker。
+
+## Files/modules touched (high level)
+
+- `dev-docs/active/nurture-institution-mode/`
+- `docs/context/workflow/nurture-scenario-contract.md`
+- `.ai/project/main/registry.yaml`（治理登记已存在，后续由 sync 维护派生视图）
+
+## Decisions & tradeoffs
+
+### D-001 — 机构生态是小孩成长外部环境，不是授权能力
+
+- Decision: 机构不是授权，也不只是一个模式；机构是小孩成长过程中的外部环境和组织化照护生态。家庭生态更聚焦单个小孩，机构生态是老师/看护者面向多个小孩的操作体系。
+- Rationale: 产品必须先解释机构和老师如何从中得到价值，否则机构生态无法运行；`organization` workspace 是技术承载，不是产品定义本身。
+- Alternatives considered: 独立 B 端 SaaS / marketplace；拒绝，因为会引入独立身份、交易、排名和双边市场冷启动。
+
+### D-002 — SUPERSEDED: 宿主拥有 care canonical 和 `ChildLinkGrant`
+
+- Superseded by: D-007 and D-010 on 2026-07-05.
+- Prior decision: `CareOrganization/CareGroup/CareGroupCaregiver/EnrolledChild/ChildLinkGrant` 归 My-Chat；The Nurture 只保存 scenario-side 投影。
+- Why superseded: 当前产品边界已明确为 My-Chat 统一用户账号，场景下多用户关系由各场景维护。Nurture 是独立托育生态，业务逻辑和业务数据处理归 Nurture。
+- Current rule: My-Chat owns account identity and scenario shell; Nurture owns the care ecology graph.
+
+### D-003 — 当前不改 live manifest
+
+- Decision: IA/IA.1 只保存设计与 manifest 增量 SPEC；`scenario.manifest.yaml` 等 IIA 再改。
+- Rationale: Nurture care ecology canonical schema、resolver、policy、handler 未就绪前，添加 live capability 会破坏 conformance。
+- Alternatives considered: 先接 manifest 再补 handler；拒绝，因为会制造已知红灯。
+
+### D-004 — 机构生态必须同时帮助机构和老师
+
+- Decision: 机构生态的机构侧收益主线是理念传达、资产沉淀与再组织、运营质量管线；老师 mobile 高频现场工作是这些主线进入执行层的入口。
+- Rationale: 机构如果只为家庭侧提供数据，没有足够直接收益，生态无法启动；机构需要把理念落到老师执行、把数字资产沉淀为品牌和分析材料、用工作流提升运营质量。
+- Alternatives considered: 先做家庭侧照护数据回流；暂不作为第一优先级，因为会把机构降格为数据源。
+
+### D-005 — 班级群照片归属基于孩子 reference image，但原始资产仍属机构
+
+- Decision: 使用系统中孩子点名卡、头像、入园登记照等 reference images，对班级群/班级相册照片生成候选孩子归属；老师确认后生成孩子相册视图。班级相册仍是机构/班级资产，孩子相册是派生视图。
+- Rationale: 老师现实中已经在班级群和大相册里积累大量照片，自动候选归属能减少整理成本，也能让家庭看到自己孩子相关素材。
+- Alternatives considered: 直接把识别结果发布到孩子家庭相册；拒绝，因为误识别和儿童隐私风险高，必须经过老师确认与曝光策略。
+
+### D-006 — 机构侧收益不是泛化运营减负，而是理念/资产/质量三条主线
+
+- Decision: 机构管理层价值应围绕三条线组织：理念传达到实际执行老师；数字化资产沉淀、时间序列追踪、再组织和品牌表达；运营质量工作流支持聚焦、复盘和 AI 精确帮助。
+- Rationale: 这三条更能解释机构为什么投入，而不只是老师为什么愿意使用。
+- Alternatives considered: 只描述"运营效率/家长信任/风险控制"；保留为下层收益，但不足以定义机构生态的战略价值。
+
+### D-007 — My-Chat 拥有账号和外壳，Nurture 拥有托育生态图谱
+
+- Decision: My-Chat owns account identity and scenario shell; Nurture owns the care ecology graph.
+- Details: 家长、老师、机构管理者都是 My-Chat 独立用户；小孩不是 My-Chat 用户。Nurture 通过 `NurtureParticipant.my_chat_user_id` 将 My-Chat 用户映射为场景参与者，再用 Nurture-owned role assignment 判断其是 guardian、caregiver、lead caregiver 还是 institution admin。
+- Rationale: My-Chat 是生态框架，不应承载 Nurture 的家庭、机构、班级、老师分配、入托、授权和家园沟通业务语义。Nurture 需要独立数据库和业务事实，才能处理托育场景的逻辑和数据。
+- Alternatives considered: 继续把 care canonical 放到 My-Chat；拒绝，因为会把场景关系挤进通用身份层，且阻塞 Nurture 自己的业务建模。
+
+### D-008 — Nurture 的中心对象是小孩养育过程
+
+- Decision: Nurture 的基本单位是 `NurtureChildCareProcess`，不是 family 或 class。
+- Details: 家长（可多个）加入某个小孩的养育过程；老师把某个小孩的养育过程并入班级日常工作流；机构管理者治理这些养育过程如何被组织化执行。
+- Rationale: 该模型能同时解释家庭视角和机构视角，避免把机构设计成家庭授权附属，也避免把老师工作流拆成大量孤立家庭群。
+- Alternatives considered: 以家庭为中心；不足以表达一个老师对多个孩子的班级工作流。以机构/班级为中心；不足以表达家长围绕单个孩子加入的私密关系。
+
+### D-009 — `family_to_org` MVP 是班级家庭沟通中枢
+
+- Decision: `family_to_org` 第一版定义为 `class_family_inbox`：每个孩子保留私密家庭线程，老师侧聚合成一个班级 inbox。
+- Details: `NurtureFamilyCareMessage` 保存家园沟通原文；`NurtureFamilyCareItem` 保存结构化事项，包括 category、summary、urgency、requires_ack、requires_reply、status、assigned_caregiver_ref、expires_at。My-Chat 可渲染线程、通知和 deep link，但不拥有原文或状态。
+- Rationale: 一个班 10 个孩子会产生 10 个沟通群，对老师而言负担很高。班级 inbox 把沟通从群聊切换变成任务化处理，同时保持家庭私密边界。
+- Alternatives considered: 只做 `care_day_note`/`care_constraint` 字段提交；不足以覆盖真实沟通负担。直接把所有消息留在 My-Chat chat；不足以让 Nurture 进行业务分类、授权、receipt 和工作流处理。
+
+### D-010 — `ChildLinkGrant` 归 Nurture，并绑定养育过程/入托关系
+
+- Decision: `ChildLinkGrant` 是 Nurture-owned consent object，绑定 `child_care_process_id` 和 `enrollment_id`，按 data class × direction 控制信息流动。
+- Details: MVP data classes 包括 `daily_care_log`（org_to_family）、`care_day_note`、`care_constraint_update`、`family_care_question`、`family_follow_up_request`（family_to_org）。撤销后停止未来投递；历史记录按保留策略标记来源 grant 已失效。
+- Rationale: 授权对象控制的是 Nurture 场景内同一小孩养育过程如何在家庭角色和机构角色之间流动，不是 My-Chat account-to-account 授权。
+- Alternatives considered: 将 grant 继续放在 My-Chat；拒绝，因为 My-Chat 不拥有 Nurture 的 child care process、enrollment 和家园沟通事实。
+
+### D-011 — IB schema SPEC 先锁 domain contract，不直接改 Prisma
+
+- Decision: Phase IB 以 `06-ib-nurture-schema-spec.md` 固化 domain/schema contract；本轮不修改 `prisma/schema.prisma`、不创建 migration、不接 live manifest。
+- Details: SPEC 覆盖 core ecology objects、`NurtureChildLinkGrant` / receipt、family-care thread/message/item、daily care、teacher attention、media attribution、resolver/policy contracts、class-of-10 验收场景和 My-Chat shell projection boundary。
+- Rationale: 当前仍是产品/架构对齐阶段。先把对象、生命周期、索引、授权解析和真实班级场景写清楚，可避免把未对齐的语义过早固化进 DB schema。
+- Alternatives considered: 直接进入 Prisma schema；暂不做，因为 revoke/retention、attention board 是否物化、message 加密/脱敏和 My-Chat shell metadata 仍需 review。
+
+### D-012 — IB schema open decisions 收敛为 implementation defaults
+
+- Decision: 将 `06-ib-nurture-schema-spec.md` 的 7 个 open decisions 收敛到 `07-ib-decision-convergence.md`，作为 IIA schema/policy 的默认实现输入。
+- Defaults:
+  - `NurtureParticipant` 按 `(workspaceId, myChatUserId)` 唯一；mobile chat 只做 Nurture 场景入口，Nurture 自行解析 role/scope/output；看板可切换 validated role assignment。
+  - MVP 中一个 `NurtureChildCareProcess` 只有一个 active `NurtureFamily`；多个家长通过 guardian role assignments 表达。
+  - `NurtureTeacherAttentionItem` 物化为可重建 child-scoped projection，source of truth 仍是 family-care item、daily care log、care constraint、child-applied institution policy 等来源对象。
+  - `NurtureChildLinkGrant` revoke 后作为 runtime fence：立即停止未来投递、退出 active work surface/context、阻断 runtime 继续使用 revoked-grant context；历史记录 limited/auditable。
+  - Grant-controlled `dataClass` 使用系统稳定 key；`category` 是 workflow/display taxonomy；机构本地词汇只能映射到系统 data classes/category。
+  - 家园消息原文归 Nurture；canonical status 只用 `sent` / `redacted` / `failed`；My-Chat 只拿 safe projection；redaction 必须从第一版具备。
+  - My-Chat shell 默认即时处理；只在 host delivery 需要时保存 opaque routing/dedupe/status/expiry bookkeeping，不保存 Nurture render envelope 或 business facts。
+- Rationale: 这些默认值足以让 IIA 进入 schema/policy/test 设计，同时把真正需要产品/法务/安全签核的事项限制在生产 rollout gate。
+- Remaining gates: `ChildLinkGrant` revoke 的数字化保留窗口/法律文案；生产 encryption/KMS/attachment security posture；My-Chat host payload version review。
+
+### D-013 — `NurtureChildCareProcess` 是独立 child scope
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-06.
+- Decision: 单个 `NurtureChildCareProcess` 是 Nurture 的独立 child scope。所有作用于具体孩子的动作、数据、查询、写入、消息、事项、日志、授权、receipt 和媒体归属，都必须解析到一个 `childCareProcessId`。
+- Details: 老师视角和家长视角都是 child care process 数据的再组织。老师通过 `careGroupId -> enrollment[] -> childCareProcessId[]` 操作多个 child scopes；家长通过 guardian assignments 操作一个或多个 child scopes。`CareGroup` / `Institution` 可以拥有组织配置，但不能成为 child-specific care facts 的替代作用域。
+- Rationale: 该规则保留 child-centered 产品语义，同时不把老师/班级工作流误建成第二套事实所有权。班级 inbox、今日看板、家长视图和机构视图都是聚合/过滤/工作流入口，事实仍落在 child scope。
+- Implementation implication: IIA schema review 应拒绝只有 `careGroupId`、`familyId`、`participantId` 或 `parentId`、但缺少 `childCareProcessId` 的 child-specific care fact。
+
+### D-014 — `NurtureTeacherAttentionItem` 是 child-scoped teacher projection
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-06.
+- Decision: `NurtureTeacherAttentionItem` 应物化为可重建 projection，但每条记录必须是 child-scoped，包含 `childCareProcessId`。`careGroupId` 只作为老师按班级查看/排序/筛选的组织维度。
+- Details: 它可以来源于 `NurtureFamilyCareItem`、care constraint、`NurtureDailyCareLog`、child-applied institution policy 或手工 child-specific note。它不拥有家园消息、照护约束、每日记录或机构策略的事实。
+- Rationale: 老师 mobile 看板需要稳定排序、快速读取和可操作状态，但 IB-D0 要求 child-specific care facts 都落到 child scope。班级看板是多个 child-scoped attention items 的聚合，而不是班级级事实源。
+- Boundary: "15:00 全班活动" 这类 group-level operational notice 不放在 `NurtureTeacherAttentionItem`；后续可单独建模为 `CareGroupOperationItem` / `CareGroupNotice`。
+- Implementation implication: IIA schema review 应拒绝 `NurtureTeacherAttentionItem.childCareProcessId` 为空；projection reconciliation tests 必须覆盖来源变更后的刷新/隐藏。
+
+### D-015 — `NurtureChildLinkGrant` revoke 是 runtime fence
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-06.
+- Decision: `NurtureChildLinkGrant` revoke 不是抹掉动作，而是 runtime fence。它必须立即停止新的 `family_to_org` / `org_to_family` 投递，使老师 inbox、今日看板、AI context、未来摘要、通知/deep link 等 active surface 退出 revoked-grant 依赖，并保留 already-delivered history 作为 limited/auditable records。
+- Runtime requirement: Revoke 应发出 Nurture domain event，例如 `NurtureChildLinkGrantRevoked`，携带 `grantId`、`childCareProcessId`、`enrollmentId`、`revokedAt`、grant aggregate version。workflow claim、retry、replay、delivery、notification、context-pack build、UI submit 都必须重新校验当前 grant 状态。
+- In-flight behavior: Pending cross-role delivery 标记为 `blocked` / `grant_revoked`；依赖 revoked-grant context 的 AI summary、model runtime hint、context pack 必须 stale/invalid 并重建；opened-before-revoke 的 reply/share/draft 在 submit 时必须 fail closed 或重新规划。
+- Historical behavior: 已经发生的 message、item、daily log、receipt、workflow run、media attribution 不因 revoke 自动物理删除；它们保留审计状态，并在展示时标记 grant 已失效。具体保留窗口、删除任务和法律文案仍是 production gate。
+- Implementation implication: IIA tests 必须覆盖 in-flight workflow suppression、pending outbox blocking、context-pack invalidation、retry/replay grant re-check、UI draft submit fail-closed。
+
+### D-016 — `dataClass` 是系统合约，机构词汇是映射层
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-07.
+- Decision: `dataClass` 是 grant/policy/runtime 使用的系统稳定 key；`category` 是老师 inbox、今日看板、排序、模板、路由等工作流/展示分类；机构自定义词汇只能作为 label/template/routing 映射层。
+- Details: MVP 系统 data classes 包括 `daily_care_log`、`care_day_note`、`care_constraint_update`、`family_care_question`、`family_follow_up_request`。机构可以把"午睡提醒"、"接送变化"、"过敏更新"等本地词汇映射到系统 `dataClass` 和 workflow `category`，但不能把本地词汇直接写入 grant/policy/revoke runtime 作为授权 key。
+- Rationale: 授权、撤销、receipt、AI context filtering 和 workflow runtime 需要稳定合约；机构需要表达灵活性，但不能通过本地命名改变跨家庭/机构边界。
+- Implementation implication: IIA tests 必须覆盖 institution vocabulary -> system `dataClass` + `category` 映射；grant/receipt/runtime policy 应拒绝把 institution-local key 当作 system `dataClass` 使用。
+
+### D-017 — 家园消息 lifecycle 只保留 sent/redacted/failed
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-07.
+- Decision: `NurtureFamilyCareMessage` canonical status 只保留 `sent`、`redacted`、`failed`。不设置 message-level `hidden` 或 `deleted`。
+- Details: `hidden` 语义归 projection/presenter/workflow surface，例如 `NurtureFamilyCareItem.status=suppressed`、`NurtureTeacherAttentionItem.status=suppressed`、notification policy 或查询过滤。用户删除、策略删除、安全删除、管理员处理、保留策略执行都进入 `redacted`，并记录 `redactionReason`、`redactedAt`、`redactedByParticipantId`、`redactionPayload`。
+- Boundary: Redaction 不是 summary/classification。`NurtureFamilyCareItem.summary`、`safeSummary`、AI extraction 是派生 projection，不改变 message status。物理删除属于 retention/legal job，不是业务 lifecycle 状态。
+- Implementation implication: IIA schema 应增加 redaction fields 和 body protection metadata，例如 `bodyStorageMode` / `bodyProtectionPayload`；测试应覆盖 projection suppression 不修改 message status、redacted 后 raw body/direct attachment 不可读、audit shell 保留。
+
+### D-018 — My-Chat 默认即时处理，只保存 opaque delivery bookkeeping
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-07.
+- Decision: My-Chat 不持久化 Nurture render envelope。默认路径是 My-Chat shell 调用 Nurture render/action API 并即时展示；只有通知、push、badge、retry、通知中心 delivery 需要时，My-Chat 才保存 minimal opaque host delivery bookkeeping。
+- Allowed host bookkeeping: `deliveryId`、`targetMyChatUserId`、`scenarioKey`、`scenarioObjectType`、`scenarioObjectId`、`deepLinkTarget`、`dedupeKey`、`deliveryStatus`、`generatedAt`、`expiresAt`、`notificationPolicyKey`、`deliveryChannel`、`attemptCount`、`lastAttemptAt`。字段名可在 My-Chat host contract review 时调整，但字段族只能是 routing/dedupe/status/expiry。
+- Boundary: `scenarioObjectType` / `scenarioObjectId` 是 opaque refs；My-Chat 不解释 `childCareProcessId`、`dataClass`、`category`、grant、role scope、message redaction、item status 或 media attribution。`safeTitle` / `safeBody` 只能作为 ephemeral provider payload 或 TTL delivery copy，不能作为 Nurture state。
+- Runtime rule: 每次 deep-link open 或 action submit 必须回 Nurture 重新解析 participant、role assignment、child scope、grant/runtime fence、message lifecycle、item status 和当前对象状态。
+- Implementation implication: IIA tests 应覆盖旧通知在 grant revoke、message redaction、role revoke、item closure 后回 Nurture fail-closed 或显示 unavailable/updated state。
+
+### D-019 — IB-D1：chat 入口不选角色，看板可切换 role assignment
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-08.
+- Decision: `NurtureParticipant` 仍按 `(workspaceId, myChatUserId)` 唯一。My-Chat mobile chat 不区分当前是家长、老师还是机构管理员，只判断是否进入 Nurture 场景，并把会话上下文传给 Nurture。Nurture 负责解析 participant、候选 role assignments、目标 child/thread/item/group、grant/runtime fence、policy，并决定返回内容或下一步动作。
+- Surface split: mobile chat 是 role-agnostic scenario ingress；mobile dashboard / teacher board / admin board 是 explicit work surface，可以切换 validated `NurtureCareRoleAssignment` / scope。看板切换的是工作角色和作用域，不是第二个 participant identity。
+- Write rule: 纯 chat 澄清轮可以停留在 participant-level context；一旦要写入 child-specific message、item、log、receipt、workflow event，必须先解析出具体 `roleAssignmentId` 和 `childCareProcessId`。
+- Implementation implication: IIA resolver tests 应覆盖同一 My-Chat 用户同时拥有 guardian/caregiver/admin roles 时，chat 入口不信任 host role selection；看板 role switch 必须校验 role assignment 属于该 participant 且 scope 有效。
+
+### D-020 — IB-D2：每个 child care process 一个 active family
+
+- Status: LOCKED for IB/IIA schema defaults as of 2026-07-08.
+- Decision: MVP 中一个 `NurtureChildCareProcess` 只有一个 active `NurtureFamily`。多个家长/监护人通过 guardian role assignments 进入同一个 child-scoped family-side care unit。
+- Boundary: `NurtureFamily` 不是全局家庭户口簿、不是 My-Chat 群、也不是跨孩子共享的 household identity。兄弟姐妹可以各自有 child care process 和 active family；同一批 guardian participants 可以分别挂到多个 child scopes。
+- Escalation: 如果未来需要两个监护人群体互相不可见，才引入同一 child care process 下多个 active families、family-specific threads、grants 和 policies；这不是 IB/MVP 默认。
+- Implementation implication: IIA schema/policy tests 应覆盖 active family uniqueness per child care process、多 guardian assignments、siblings with separate child scopes、以及 future multiple-family privacy model 不在 MVP 中被隐式启用。
+
+### D-021 — IIA 先做 schema/policy/test design，不直接改 Prisma
+
+- Status: ACTIVE for IIA as of 2026-07-08.
+- Decision: IIA 先落 `08-iia-schema-policy-test-design.md`，将 IB-D0 through IB-D7 转成 implementation slices、schema model groups、policy predicate contracts 和 Test Contract。Prisma schema、manifest、handlers、policies、presenters 和 tests 在 contract preflight 后再改。
+- Details: IIA implementation sequence is IIA-0 contract preflight, IIA-1 Prisma schema, IIA-2 repositories/resolvers/policies, IIA-3 capabilities/handlers/presenters, IIA-4 journey tests.
+- Boundary: Existing P0 family workflow tables continue to coexist. Institution ecology models should be added alongside them; do not rewrite P0 tables without an approved migration plan.
+- Implementation implication: Future schema work must use repo DB SSOT (`prisma/schema.prisma` -> migration preview -> `docs/context/db/schema.json` refresh) and must add tests for role-agnostic chat ingress, dashboard role switch, one active family, class-of-10 inbox, grant runtime fence, message redaction, and media attribution exposure.
+
+### D-022 — IIA-0 Test Contract 是实现前测试门禁
+
+- Status: LOCKED for IIA-0 as of 2026-07-08.
+- Decision: IIA-0 Test Contract 不是测试代码清单，而是实现前定义代码必须证明什么。它按 required semantics、test layers、fixture shape、structured decision reason codes、non-pass conditions 五类组织。
+- Details: Test Contract 要求后续实现覆盖 mobile chat role-agnostic ingress、dashboard role switch validation、single active family、child-scoped fact writes、class-of-10 teacher inbox、grant revoke runtime fence、message redaction/projection suppression、My-Chat opaque delivery、media candidate attribution。
+- Fixture rule: IIA canonical fixture 必须包含一个机构、一个班、十个 child care processes、十个 active families、十条 private threads、多名老师/家长、一个同时有 guardian/caregiver roles 的 My-Chat user、active/revoked grants、redacted message、suppressed projection、stale deep link 和 candidate media attribution。
+- Policy rule: Resolver/policy tests must assert structured decisions with `allowed`, `reasonCode`, `resolvedRefs`, `auditPayload`, and `safeUserState`; boolean-only tests are insufficient for IIA.
+- Implementation implication: IIA-1/2/3 每做一个 schema/policy/handler slice，都必须对照 Test Contract 补齐对应测试；happy path 通过但违反 non-pass conditions 时不得视为通过。
+
+### D-023 — IIA-0-C1 Capability Slice 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-08.
+- Decision: 首批 manifest contract 保留四个独立 capability keys：`class_family_inbox`、`teacher_attention_board`、`caregiver_daily_care`、`child_media_attribution`。Teacher mobile 是 surface composition，不是 canonical business capability。
+- Implementation sequence: IIA implementation 先做 `class_family_inbox` + `teacher_attention_board`，用它们验证 `family_to_org` 老师负担闭环；再接 `caregiver_daily_care`；最后接 `child_media_attribution`。
+- Boundary: mobile 工作面可以把四个能力组织成一个老师日常入口，但不能拥有业务事实、policy、lifecycle 或 source-of-truth。每个 capability 的 repository ports、policy predicates、presenters 和 tests 必须保持可分离。
+- Rationale: `class_family_inbox` 和 `teacher_attention_board` 共同验证一个班多个私密家庭线程如何进入老师班级工作流；`caregiver_daily_care` 写入新的照护事实；`child_media_attribution` 是机构资产价值，但不阻塞最小家园沟通闭环。
+- Implementation implication: IIA-0 下一步应收敛 Surface Contract，明确 `mobile_chat`、`mobile_dashboard`、`teacher_board`、`notification_deeplink` 能传什么、不能传什么。
+
+### D-024 — IIA-0-C2 Surface Contract 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-08.
+- Decision: My-Chat surfaces 只能传 entry context、conversation continuity refs、current payload、generic display state 和 Nurture-issued opaque scenario token。Nurture 是 participant、role assignment、work scope、child scope、grant state、policy decision、current object state 和输出的唯一 resolver。
+- Ownership split: My-Chat owns chat conversation continuity（`hostConversationRef`、`hostTurnId`、host transcript、UI 连续性）；Nurture owns short-lived scenario interaction context（pending intent、candidate refs、clarification state、pending draft/action、TTL/staleness）；Nurture owns business memory/facts（threads/messages/items、daily logs、constraints、grants、role assignments、attention items、media attribution）。
+- Same conversation rule: 同一轮多轮交互可以通过 `hostConversationRef` 关联短期 `NurtureInteractionContext`，用于恢复意图和减少重复澄清；它不是授权事实，不能绕过当前轮 resolver/policy/grant/object status。
+- Recovery rule: 如果用户隔天打开旧 My-Chat conversation，My-Chat 可传 `hostConversationRef` 和 Nurture-issued continuation token；如果用户新开对话，My-Chat 不需要旧聊天上下文，Nurture 通过 D-031 锁定的 source adapters 检索非终态事项、当前 attention 或活跃线程，并在多目标时结构化澄清。
+- Surface rule: `mobile_chat` 不传 trusted role/roleAssignment/child scope/target；`mobile_dashboard` / `teacher_board` 只传 generic display state 或 Nurture-issued scenario token；`notification_deeplink` 只传 host delivery bookkeeping 和 Nurture-issued scenario token；`web_workbench` / `admin_board` 不传 host-authored institution/careGroup target，机构管理员仍不拥有 ambient child-facts access。
+- R3 refinement: Earlier wording that mentioned `selectedRoleAssignmentId`, `targetRef`, `careGroupId`, or `institutionId` as surface inputs is narrowed by D-027. My-Chat does not know or author those Nurture business refs; only Nurture-issued opaque tokens may carry them back for re-resolution.
+- Implementation implication: Ambiguity、interaction-context/token staleness 和 business-memory retrieval 已由 D-028 through D-031 锁定；剩余 Resolver Contract 工作是 command write preconditions。
+
+### D-025 — IIA-0-R1 Resolver Output Consumers 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-08.
+- Decision: Resolver output 是 Nurture-internal context contract。My-Chat 不消费 `participantId`、`roleAssignmentId`、`childCareProcessId`、`policySeed` 等 Nurture 内部解析结果做业务判断；My-Chat 只消费 Nurture presenter 生成的最终 scenario response。
+- Consumer chain: Resolver output 的直接消费方是 capability handler / scenario orchestrator、policy engine、query/projection services、command / workflow action services、presenter 和 interaction context manager。
+- Write boundary: Resolver output 不是写授权。Command/workflow 只能把它作为 write candidate context，仍必须经过 policy、grant/runtime fence、object current-state 和 command-specific preconditions。
+- Clarification boundary: `needs_clarification` 和 `blocked` 是正常输出，不是异常；它们由 presenter 和 interaction context manager 消费，用于安全澄清、退出或显示 unavailable/updated state。
+- Implementation implication: Output shape、input envelope、ambiguity、structured clarification、token TTL/staleness 和 business-memory retrieval 已由 D-026 through D-031 锁定；剩余 IIA-0 resolver 工作是 command write preconditions。
+
+### D-026 — IIA-0-R2 Resolver Context Shape 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-09.
+- Decision: Resolver output 分为 `actor`、`workScope`、`target` 三层。`actor` 解析当前 My-Chat 用户对应的 Nurture participant 和 role assignment；`workScope` 解析当前工作面作用域；`target` 只在当前操作指向具体对象时出现。
+- Scope rule: `resolved` 表示 actor 和 work scope 可被 Nurture 内部使用，不等于一定选中了具体孩子。`teacher_attention_board`、`class_family_inbox` 等集合工作面可以先解析到 `care_group`；机构视图可以先解析到 `institution` 或 `care_group`。
+- Child-specific rule: child-specific write/action 必须在 command 执行前解析出具体 `childCareProcessId`，包括回复、分享、日报、receipt、workflow event、媒体归属确认等。该字段可来自 `workScope` 或 `target`。
+- Target lifecycle rule: 如果存在 `target`，resolver 必须解析目标对象当前生命周期，例如 `active`、`closed`、`redacted`、`stale`、`unavailable`，供 policy、presenter 和 command preconditions 使用。
+- Result states: `resolved`、`needs_clarification`、`blocked` 是 resolver 的一等输出；`needs_clarification` 用于多角色、多孩子、多目标或多 memory 命中；`blocked` 用于 participant/role/scope/object/grant/runtime fence/lifecycle fail-closed。
+- Implementation implication: Resolver input envelope、ambiguity candidate ranking、structured clarification、token TTL/staleness 和 business-memory retrieval 已由 D-027 through D-031 锁定；剩余 IIA-0 resolver 工作是 command write preconditions。
+
+### D-027 — IIA-0-R3 Resolver Input Envelope 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-09.
+- Decision: Resolver input 是 host invocation envelope，不是 Nurture business-context envelope。My-Chat 只传 authenticated caller、surface、conversation refs、current payload、generic display state、Nurture-issued opaque scenario token 和 idempotency。
+- Trusted facts: Resolver 只把 `myChatUserId` 视为 authenticated caller fact；`workspaceId` 如果存在应由 host adapter 注入；`scenarioKey`、`surface`、`hostRequestId`、`submittedAt`、`locale`、`timeZone` 是请求/壳层事实，不授予 Nurture scope。
+- Forbidden host inputs: My-Chat 不传 host-authored `targetRef`、`workScopeHint`、`selectedRoleAssignmentId`、`childCareProcessId`、`familyId`、`careGroupId`、`institutionId`、`grantId`、`dataClass`、`direction`、`policyDecision`、`canView` 或 `canWrite`。
+- Scenario token rule: 如果 Nurture UI 需要恢复 scope/target/action/draft/notification，Nurture 必须签发 opaque `scenarioToken`。My-Chat 只能保存和回传 token，不能解释或分支。Token 解开后仍必须重新校验 participant、role、scope、grant/runtime fence、policy 和 object lifecycle。
+- Flow check: 新 chat 只靠 user + text 解析；老师打开 dashboard 只靠 user + surface 让 Nurture 返回可选工作面；按钮提交只回传 Nurture token + form data；通知打开只回传 delivery bookkeeping/token；附件上传只回传 host attachment refs。
+- Implementation implication: Ambiguity candidate ranking、structured clarification、token TTL/staleness 和 business-memory retrieval 已由 D-028 through D-031 锁定；剩余 IIA-0 resolver 工作是 command write preconditions。
+
+### D-028 — IIA-0-R4 Ambiguity Handling 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-09.
+- Decision: Resolver ambiguity 使用 typed candidates 和 deterministic precedence。候选优先级是 valid `scenarioToken`、active `NurtureInteractionContext`、explicit payload semantics、surface defaults、Nurture business memory。
+- Auto-resolve rule: 只有候选唯一、当前有效、可达、适配 surface/action，并且 grant/runtime fence/policy precheck 没有已知阻断时，才能返回 `resolved`。
+- Clarification rule: 多角色、多 work scope、多 target、多 intent 或多 memory match 且候选都安全时，返回 `needs_clarification`。澄清不暴露内部 id，候选 refs 只存在 Nurture interaction context 或 Nurture-issued token 中。
+- Blocked rule: participant 缺失、token owner/purpose/surface 不匹配、role revoked、scope 不可达、target redacted/unavailable、enrollment/grant/runtime fence 阻断、继续执行需要扩大权限时，返回 `blocked`；这些情况不能降级成追问。
+- Implementation implication: Resolver/policy tests 必须覆盖多角色、多孩子、多班级、多 item、多 intent 和 stale token 的分流：唯一安全候选 resolved；多安全候选 structured clarification；禁用/撤销/脱敏/越权 blocked。
+
+### D-029 — IIA-0-R5 Structured Clarification Interaction 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-09.
+- Decision: `needs_clarification` 是 Nurture 请求 My-Chat 询问用户的标准输出，但它必须是结构化 interaction request，不是长文本。My-Chat 只渲染通用 primitives，不生成业务候选，不解释 option token。
+- Supported primitives: `single_choice`、`multi_choice`、`confirm_cancel`、`form`、`text_input`、`date_time`、`attachment_picker`。
+- Token rule: Clarification response 必须包含 `scenarioToken(purpose=clarify)`；choice option 必须用 `optionToken`，不能把 `childCareProcessId`、`roleAssignmentId`、`itemId` 等 Nurture business ids 暴露给 My-Chat。
+- Copy rule: `title` / `description` / option labels 必须短且 display-safe，避免让用户读大段解释；长业务推理留在 Nurture 内部，不交给 My-Chat 或用户。
+- Continuation rule: 用户选择/填写后，My-Chat 回传 `scenarioToken` + `optionToken` / form values / attachments / free text；Nurture 重新 resolver、policy、current-state 和 command preconditions。
+- Implementation implication: Presenter tests 必须证明 clarification response 可由 My-Chat generic UI 渲染，且不包含 Nurture business ids 或需要 My-Chat 理解业务语义的字段。
+
+### D-030 — IIA-0-R6 Scenario Token MVP TTL/Staleness 锁定
+
+- Status: LOCKED for IIA-0 as of 2026-07-09.
+- Decision: Scenario token MVP 是 Nurture opaque DB handle，不是授权凭证、不是 signed business payload、也不是通用 token 平台。
+- Purpose scope: MVP 只支持 `clarify`、`submit_action`、`open_notification`。`select_scope` 并入 `clarify`；`continue` 先靠 `hostConversationRef` + `NurtureInteractionContext`；`resume_draft` 后置。
+- Record shape: token record 至少保存 `tokenId`、`purpose`、`myChatUserId`、`participantId?`、`surface`、`hostConversationRef?`、`expiresAt`、`consumedAt?`、`state(active|consumed|expired|revoked)`、`payloadJson`、`createdAt`。
+- Classification: MVP 只分 `current`、`expired`、`recoverable`、`blocked`。`current` 仅表示 token 可作为恢复线索进入 resolver；`expired` 可尝试 business memory/clarification；`recoverable` 仅用于安全重新确认；`blocked` 用于 consumed/revoked/mismatch/replay 或当前状态禁止继续。
+- Purpose behavior: `clarify` short TTL，可重新生成结构化 clarification；`submit_action` short TTL，one-time 或 idempotency-bound，过期/消费/状态变化通常 fail closed；`open_notification` 较长 TTL，但只作为定位线索，打开时永远重新查当前对象。
+- Complexity boundary: MVP 不做完整 object version vectors、不做 signed payload token、不做 long-lived draft recovery、不做 cross-device continuation。实时查询 current state 是 MVP staleness 的主要兜底。
+- Implementation implication: Resolver tests 必须覆盖 token expired/replayed/mismatch/revoked、submit_action fail-closed、open_notification stale/unavailable、clarify recoverable，以及 token 不能跳过 resolver/policy/grant/lifecycle/preconditions。
+
+### D-031 — IIA-0-R7 Business Memory Retrieval 锁定
+
+- Status: LOCKED on 2026-07-10。
+- Decision: 采用 thin reusable scenario-resolver kernel + Nurture-owned source/policy adapters。Kernel 只做 merge/dedupe、categorical deterministic ordering 和 ambiguity result；Nurture adapters 查询 canonical facts 并完成 actor/scope/enrollment/grant/lifecycle/policy/intent 过滤。
+- Ownership: My-Chat 只提供 host invocation envelope 并渲染 scenario response，不运行 source adapter、不解释 candidate refs。Generic contract 先在 Nurture 内实现，第二个场景验证后才考虑提取到 My-Workflow-Base/shared scenario SDK。
+- MVP sources: `NurtureFamilyCareItem` nonterminal items、current `NurtureTeacherAttentionItem`、active `NurtureFamilyCareThread`。Message 默认只是 evidence；attention 有 actionable backing source 时必须归并；daily-care/media adapters 随对应 capability 后续注册。
+- Candidate contract: 每个 transient candidate 是完整 actor binding -> scope -> optional child/target -> intent 路径，包含通用 ref、`stateClass`、`matchClass`、evidence、occurredAt 和 dedupe key；禁止把不同候选的 role/scope/target 自由拼接。
+- Ranking: 先 hard-filter，再按 `exact_entities` -> `exact_topic_or_date` -> `explicit_continuation` -> `weak_recent_context`，同级按 `actionable` -> `active_context` -> `recent_context`。Recency/stable id 只能稳定展示顺序，不能消除业务歧义；`weak_recent_context` 永不 auto-resolve。
+- Limits: Source/aggregate/render limits 是可配置 runtime 参数。超过安全展示数量时询问 child/date/topic 进行缩小，不能静默截断并选择 top candidate。
+- Cost boundary: MVP 不新增 memory table、vector DB、embedding、generic rule DSL、Redis/candidate cache、candidate persistence 或 retrieval-only model call；复用现有 canonical tables/indexes 和已有 typed intent output。
+- Implementation implication: Kernel 使用 table-driven tests；adapter tests 覆盖资格过滤、dedupe、message-as-evidence、revoked/redacted exclusion 和 no-extra-storage/model dependency。下一项进入 command write preconditions。
+
+### D-032 — IIA-0-C3 Workflow-Mediated Family Conversation 锁定
+
+- Status: LOCKED on 2026-07-10。
+- Product decision: 不同角色之间没有 direct role-to-role chat。家长侧展示单个 child scope 的连续会话时间线；老师侧处理班级 inbox/attention/work detail；Nurture workflow 把输入、回执、澄清、老师确认答复、处理结果和 daily-care summary 分发到对应 audience。
+- Source-of-truth split: `NurtureFamilyCareMessage` 保存实际家庭输入和实际家庭可见沟通记录；item/event/log 保存老师工作状态与照护事实；family timeline 是二者的 presenter projection，不能反向成为 item/log 状态源。
+- Authorship: Named caregiver content 必须来自 caregiver-confirmed action；AI 只能辅助草拟；机构/系统自动消息必须明确标记，不能 impersonate caregiver。Routine item 使用 structured action + optional short note，`family_care_question` 可允许 fuller confirmed response。
+- Teacher UX: Teacher command 操作 item/event/log，不直接向 thread 追加任意文本。老师默认无需维护十个 family chat rooms，但在 child-scoped work detail 中可以查看 policy-allowed source context。
+- Persistence/delivery: Nurture transaction 原子保存业务状态、item/log event、family-facing canonical message/visibility 和 Nurture receipt/idempotency facts；scenario response 与 dashboard presenter 是正常结果面。My-Chat notification/outbox 仅是 commit 后的 optional activation handoff，失败不能抹掉或降级 Nurture communication/work history/visibility/receipt。
+- Runtime fence: Cross-role distribution、retry/replay、notification/deep-link render 必须重查 grant/role/scope/message lifecycle/exposure policy；被阻断的未来分发保留 auditable receipt/event。
+- Implementation implication: R8 command preconditions 必须以 workflow action -> state/event -> family message/distribution 为写路径，不以 direct chat send 为核心 command。
+
+### D-033 — IIA-0-R8 Command Write Preconditions 鲁棒性审查
+
+- Status: SUPERSEDED/CLOSED by D-054 on 2026-07-12；本节保留 2026-07-10 robustness review 的问题发现与原始排序。
+- Retained direction: Command 分 `internal_fact`、`cross_role_distribution`、`composite_workflow_action`；Prepare 只生成 immutable action payload/hash 和 submit token，Execute 在 Nurture transaction 内重查 actor/scope/enrollment/grant/target/version 并提交 mutation/event/message/receipt/distribution intent。
+- Contract correction: `writeKind` 不推导授权；每个 command 声明 `grantDependencies[]`。本条原始三值 `CommandOutcome` 已由 D-045 进一步拆为 persisted `applied|already_satisfied` + response `executed|replayed`；`ready` 不能缓存或离开 transaction。
+- B1: Nurture commit 与 My-Chat outbox acceptance 之间存在 crash window；本条原始 review 中的 `distribution intent/ledger` 泛称由 D-035 收窄为 pending `NurtureChildLinkReceipt` logical lifecycle + My-Chat Handoff Ledger，不追求 cross-DB exactly-once。
+- B1 host evidence: My-Chat 已有 `HandoffRequestInput` / `HandoffReceiptInput`、`WorkflowHandoffService` / `HandoffLedgerRepository` ports、handoff/receipt route metadata 和 workflow `event_drafts` transaction entry；但尚未发现 concrete handoff-ledger persistence，`@my-chat/outbox` 也未注册 `workflow.handoff.*`。当前 Nurture `create_handoff` 是 synthetic result，module production factory 只注入 `WorkflowRuntimePort`。
+- B2: Receipt idempotency 只覆盖 distribution；internal item/log/media commands 还需要 durable command execution uniqueness、payload hash、result replay 和 aggregate-version/conditional transition。
+- B3: Family input routing 和跨天 clarification 不能塞进 message lifecycle 或 `NurtureInteractionContext`；需要 durable pending/routed/blocked 及 clarification pending/answered/expired/cancelled correlation。
+- Scenario review: daily-care record/share 和 media confirm/publish 拆分兼容；offline duplicate、concurrent teacher action、post-commit crash 和 long-running clarification 在 blocker 关闭前不鲁棒。
+- Complexity boundary: 不做 generic rule DSL；AI、attachment、remote delivery 在 transaction 外；batch 按 child 或 bounded chunk 提交。
+- Next decision: this original sequencing is superseded by D-035/D-036；当前先收敛 B1-C typed activation draft，再处理 activation reconciliation、B2、B3。
+
+### D-034 — 模型执行成本是架构维度，不是当前产品门控
+
+- Status: LOCKED on 2026-07-11.
+- Product priority: 当前先保证 Nurture 场景可用性与可靠性，不设固定的每轮调用次数、token 或金额上限，也不因成本额度拒绝正常请求或降低结果正确性。
+- Reliability boundary: 仍保留 deadline、cancel、overload protection 和 loop/recursion guard；这些是防失控机制，不是成本配额。
+- Ownership: My-Chat 维护通用 conversation continuity/transport refs；Nurture 维护 purpose-specific context pack、child-scoped business memory、derived summary、pending interaction 和模型执行语义；My-Workflow-Base 不保存会话记忆或场景上下文。
+- Reuse invariant: infrastructure retry、command replay、handoff retry 和 recipient/device fan-out 不能意外重复已完成的模型工作。只有 semantic work unit 或相关 input/context/model/prompt version 改变时，重复调用才合理。
+- Observability: 每次调用应可关联 turn、command/run、purpose、context refs/version、model/prompt version、latency 和 token usage，后续基于真实数据优化模型路由、上下文压缩和缓存策略。
+- Scope boundary: 不因此扩大 R7；resolver 仍无 dedicated model call、Redis/vector/cache/generic memory dependency。IIA 暂不实现通用模型成本平台或硬预算系统。
+
+### D-035 — R8-B1-A Nurture logical delivery ownership
+
+- Status: LOCKED on 2026-07-11；“所有 receipt 初始 `pending`”已由 D-036 supersede。
+- Nurture durable fact: `NurtureChildLinkReceipt` 是 logical cross-role delivery lifecycle；source business fact/message/visibility 与 receipt(s) 在同一个 Nurture transaction 提交。目标 Nurture surface 已可读时可直接 `delivered`。
+- MVP complexity: 不新增 `NurtureDistributionIntent`，也不在 Nurture 内复制 generic outbox、handoff ledger 或 worker runtime。
+- Target granularity: Receipt 按 family、care group 等 logical target scope 创建，不按 My-Chat account、device 或 notification channel 创建；一个 source 面向多个独立目标时创建多个独立 receipts。
+- State ownership: Nurture 只保留 `pending/delivered/read/acknowledged/blocked/failed/revoked_after_delivery` 等业务状态，不镜像 My-Chat handoff accepted、queue、retry 或 channel-delivery 状态。
+- Host ownership: My-Chat Handoff Ledger/Notification 通过 canonical receipt ref 关联，负责 transport orchestration 和 physical fan-out，但不能决定 Nurture distribution 是否应该存在。
+- Next decision: superseded by D-036；handoff 已收窄为 optional host activation。
+
+### D-036 — R8-B1-B unified main-chat ingress and activation-only handoff
+
+- Status: LOCKED on 2026-07-11.
+- Unified ingress: 家长、老师、机构管理者都从 My-Chat main mobile chat 进入；My-Chat 处理当前 turn 并决定是否交给 Nurture，但只选择 scenario，不决定 Nurture role/work scope/target/intent/grant/business direction。
+- Direction split: `My-Chat -> Nurture -> My-Chat scenario response` 是系统调用方向；`family_to_org` / `org_to_family` / `internal_fact` 是 Nurture 业务效果，二者互不推导。
+- Result surfaces: main chat 使用 structured scenario response；明确绑定 Nurture 的 dashboard/board 使用 generic presenter/render contract；两者都不需要 handoff 才能展示 committed content。
+- Receipt correction: Nurture surface 在 transaction commit 后可读时，Receipt 可直接 `delivered`；`pending` 只表示 Nurture-owned confirmation/review/schedule/redaction/target-resolution 尚未完成，不表示 My-Chat queue/push 状态。
+- Handoff scope: 仅 notification、push、unread/badge、notification center、deep link 等 My-Chat-owned activation capability 使用 opaque/idempotent handoff；activation failure 不改变 Nurture visibility 或 receipt。
+- Next decision: 收敛 B1-C typed activation draft + host transaction materialization；现有 scenario handler 直接生成 `workflow.handoff.requested` 仍是待替换 scaffold。
+
+### D-037 — R8-B1-C1 activation source authority
+
+- Status: LOCKED on 2026-07-11.
+- Canonical-source rule: 普通 `NurtureFamilyCareMessage`、`NurtureFamilyCareItem`、care log、notice、`NurtureChildLinkReceipt` 已是 Nurture canonical object，activation handoff 直接引用 Nurture `DomainContextRef`，不为适配 handoff 强制创建内容重复的 Workflow Artifact。
+- Artifact rule: 只有具备独立 preview/approval/exposure/publication/knowledge lifecycle 的真实工作流产物（例如生成的阶段报告/周总结）才使用 Workflow Artifact。
+- Mixed-source rule: 一个 handoff 可同时引用真实 Workflow Artifact 与 Nurture Receipt/message context refs；前者说明用户查看的产物，后者提供逻辑目标、release 与授权回读入口。
+- Host rule: My-Chat 只保存 handoff ledger + opaque refs；activation consumer 回读 Nurture 获取当前 lifecycle、grant/runtime fence、目标 My-Chat users、display-safe activation payload 和 deep-link presenter result。
+- Base-contract gap: My-Workflow-Base `HandoffManifest` 只有 `source_artifact_types`，需要补 optional `source_context_ref_types(namespace, object_type)`，并在 host validator 校验 draft source refs。
+- Next decision: B1-C2 已由 D-038 完成；当前进入 B1-C3 host `complete_step` transaction materialization。
+
+### D-038 — R8-B1-C2 generic handoff snapshot and replay contract
+
+- Status: LOCKED on 2026-07-12.
+- Generic contract: 共享类型使用 `ScenarioHandoffRequestSnapshot(requestId, handoffKey, requestedPurpose, sourceContextRefs?, sourceArtifactRefs?, expiresAt?)`；各 scenario 在自己的 command-result transaction 中持久化，My-Workflow-Base 不拥有 central snapshot table。
+- Superseded by D-057: `NurtureCommandExecution` 使用 required versioned refs-only JSON array 保存 snapshots，不建 normalized child rows；没有 activation 时持久化 explicit `[]`，retry 不重新判断是否需要 activation。
+- Manifest routing: `HandoffManifest` 增加 stable `handoff_key`；My-Chat 通过 pinned `contractHash + handoffKey` 补齐 `handoff_type/downstream_owner/policy_key/allowed sources/receipt requirement`，场景 DB 不复制宿主路由配置。
+- Identity: `WorkflowHandoffDraft.draft_key=requestId`，host uniqueness scope 是 `(workspaceId, scenarioKey, draftKey)`；canonical hash 包含 resolved declaration、purpose、source refs/versions、expiry，不包含 trace/correlation/attempt。
+- Replay/resend: infrastructure/command retry 复用同一 request ID；same key/same hash 返回 existing，same key/different hash conflict；用户显式再次提醒是新 command + 新 request ID。
+- Runtime gate: 当前 source lifecycle、grant/policy、target membership、expiry 可阻止历史 request，但不能创建原 command 不存在的 request。
+- Multi-target: 每个独立 logical target/receipt 一个 snapshot/request ID，identity 不依赖数组顺序。
+- Cross-scenario: 同一 pipeline 可路由到 host capability 或另一个 registered scenario；consumer 回读 canonical owner、执行自己的 policy、写自己的 canonical result 并返回 receipt，不直连对方 DB、不通过 outbox 传正文。
+- Boundary: Nurture child/family/grant/direction 语义不进入共享 contract；共享层不是 generic Saga/business compensation/memory/context/auth platform。
+- Next decision: B1-C3 已由 D-039 完成；当前进入 B1-D failure/dead-letter/reconciliation/cancellation semantics。
+
+### D-039 — R8-B1-C3 My-Chat host transaction materialization
+
+- Status: LOCKED on 2026-07-12.
+- Input contract: `WorkflowStepHandlerResult` / `complete_step` 增加 optional `handoff_drafts`；`complete_step` 首次提交需要 `claim_token + expected_version`，durable result 返回 deterministic `materialized_handoffs(draft_key, handoff_ref, created|existing)`。
+- Preflight: host 通过 pinned `contractHash` 校验 handoff key/purpose/source types/refs/versions/expiry/bounded count 并计算 hash；transaction 内不远程读取 Nurture。Scenario 不得自行返回 `workflow_handoff` output ref。
+- Atomic write: 同一个 My-Chat Postgres transaction 内提交 context/artifact materialization、Handoff Ledger、new-only `workflow.handoff.requested` outbox、Step output/handoff refs、Step completion、`workflow.step.completed` outbox 和 completion replay result；queue/provider 只在 commit 后执行。
+- Event ownership: `workflow.handoff.*` 只由 Handoff Ledger Service 产生，`workflow.step.*` 只由 Step Ledger/Runtime 产生；scenario `event_drafts` 仅允许 registered scenario-internal events。当前 Nurture handler 直接生成标准事件是 scaffold，implementation 时必须移除。
+- Completion replay: 先查 committed completion key/hash，再做 first-time lease check；事务已提交但 response 丢失时，即使 lease 已过期也返回原 Step/result/handoff mapping/outbox IDs。未命中 replay 时必须验证 current claim/lease/version。
+- Mixed batch: same draft key/hash 返回 existing 且不发新事件，新 draft 创建；一个 hash conflict 回滚当前 transaction 的所有 new rows 与 step completion，旧 transaction 已存在 handoff 不受影响。Mapping 按 draft key 稳定排序。
+- Bounded batch: oversized/invalid drafts 在 host transaction 前拒绝；workflow Prepare/plan 必须在 Nurture commit 前拆成 child/bounded-chunk steps。
+- Boundary: 只保证 My-Chat 内部原子性，跨 Nurture DB 的窗口仍依赖 B2 command replay；host transaction 不调用 Nurture API、queue、provider 或其他 remote service。
+- Host gaps: concrete transaction-aware Handoff Ledger repository/service、`workflow.handoff.*` outbox registration、completion replay persistence、worker wiring 仍需后续跨仓实现。
+- Next decision: B1-D 收敛 failure classes、dead-letter/reconciliation、post-commit cancellation、stale/expired activation 和 manual replay boundary。
+
+### D-040 — R8-B1-D1 minimal Handoff failure taxonomy
+
+- Status: LOCKED on 2026-07-12.
+- Canonical lifecycle: 通用 Handoff 只保留 `requested/completed/stopped/failed`。等待、in-flight、自动重试仍是 `requested`；业务/授权/生命周期终止是 `stopped`；技术重试耗尽是 `failed`。
+- Non-status outcomes: `created/existing` 是 materialization disposition；`duplicate` 不再作为 Handoff status。Downstream `accepted` 可保留为 receipt/event，但不要求成为 canonical lifecycle state。
+- Attempt boundary: network/provider/queue/worker/invalid-token/attempt-count/backoff/dead-letter 等细节只进入 outbox/downstream attempt/evidence，不扩充 Handoff enum。
+- Stop convergence: 现有 `rejected/invalidated` 的运行行为统一为 `stopped + reasonCode`；历史 evidence 可继续区分 downstream rejection 与 later invalidation。
+- Defect boundary: manifest/hash/ref/idempotency contract defect 在 Handoff 创建前让 Workflow Step 进入 `manual_review_required`，不创建 Handoff `failed`。
+- Minimal reason groups: `workflow_cancelled/activation_expired/source_redacted/grant_revoked/policy_blocked/target_unavailable` 属于 stopped；`dispatch_exhausted/owner_unavailable_exhausted/downstream_timeout_exhausted/provider_exhausted` 属于 failed。
+- Logical completion: notification center/unread 已完成时，单个 optional push/device channel 失败不阻止 Handoff `completed`；渠道结果只做 attempt telemetry。
+- Race boundary: cancel/in-flight 最终只落 `stopped`（effect 未发生）或 `completed`（effect 已发生），不增加 cancel-pending 类状态。Nurture receipt 的 `revoked_after_delivery` 等业务状态不复制到共享 Handoff。
+- Next decision: B1-D2/D3/D4 已由 D-041/D-042/D-043 完成；B1 contract closed，进入 B2 command idempotency/concurrency。
+
+### D-041 — R8-B1-D2 recovery command boundaries
+
+- Status: LOCKED on 2026-07-12.
+- Step reconciliation: Nurture 可能已 commit 但 host completion 缺失时，使用原 scenario command idempotency identity 读取/重放同一 CommandExecution/snapshots，再 complete Step；retry exhausted 进入 `manual_review_required`，Admin 不手工构造替代 Draft。
+- Handoff technical replay: 仅 replayable technical `failed` reason 可使用 existing Handoff/request ID，在 current source/expiry/policy recheck 后以 expected version 执行 `failed -> requested`；不修改 source/purpose/target/policy/expiry。
+- Business resend: 用户再次提醒或修正内容后重新提醒是新 scenario command + 新 snapshot request ID + 新 Handoff；不能伪装成 Admin replay。
+- Ambiguous receipt: downstream 可能成功但 receipt 丢失时，先按 Handoff idempotency identity 查询/reconcile downstream，再决定是否重发。
+- Terminal boundary: `stopped/completed` 不允许 technical replay；改变业务意图必须新 command。
+
+### D-042 — R8-B1-D3 cancellation, expiry, and in-flight races
+
+- Status: LOCKED on 2026-07-12.
+- Pre-commit: Nurture commit 前取消则无业务写入/snapshot/Handoff。
+- Post-commit: Nurture commit 后取消不能抹掉业务结果；Step 必须 reconcile committed result。Handoff declaration 声明 `cancel_behavior`，institution `user_attention` 使用 `invalidate_if_pending`。
+- Pending: dispatch 前观察到 cancel/expiry 时保留 auditable `stopped` Handoff，不产生 requested effect dispatch；requested handoff 可用 expected version stop，consumer 在 irreversible effect 前最后重查 Handoff + Nurture gate。
+- In-flight: cancel 是 best effort，effect 未发生则 stopped、已发生则 completed；不增加中间 cancel 状态，也不承诺撤回已发 push。
+- Content boundary: generic workflow cancel 不 redaction/revoke Nurture content；撤回必须走 Nurture command，deep link 每次打开重新解析。
+- Expiry/version: expired 不允许 Admin 延期 replay；新提醒走新 command。Source version drift 由 canonical owner 分类 current/safely-superseded/redacted/revoked/unavailable，再由 declared policy 决定。
+
+### D-043 — R8-B1-D4 dead-letter, Admin, and observability
+
+- Status: LOCKED on 2026-07-12.
+- Ownership: My-Chat Outbox 拥有 dispatch retry/DLQ，downstream owner 拥有 provider/task attempt retry/DLQ，Handoff Ledger 汇总四态 + safe reason；Nurture 没有 transport DLQ，也不 poll My-Chat queue。
+- Exhaustion: retry exhausted 在 owner transaction 中写 `failed` + dead-letter/evidence ref，停止自动重试。
+- Admin allowed: 查看 safe refs/reasons、触发 Step reconciliation、replay replayable failed Handoff、invalidate pending、标记不再 retry。
+- Admin forbidden: 修改 source/purpose/target/policy/expiry/payload、绕过 grant、恢复 redacted/revoked/expired source、把旧 Handoff 改造成新 reminder、默认查看 Nurture 正文。
+- Observability: status age、completion latency、attempts/downstream、dead-letter、stopped/failed reasons、reconciliation/replay、receipt timeout；只记录 IDs/reason codes，不记录 Nurture body。
+- Correlation: run -> step -> completion key -> draft/request key -> Handoff -> outbox/attempt/receipt -> canonical source refs；跨库通过 owner API，不 direct join。
+- Closure: B1-A/B/C1/C2/C3/D1/D2/D3/D4 contractually closed；下一决策进入 B2 durable command idempotency/concurrency。
+
+### D-044 — R8-B2-A1 Nurture-wide command-kernel scope
+
+- Status: LOCKED on 2026-07-12.
+- Domain scope: `NurtureCommandExecution` 覆盖全部 Nurture authoritative writes，不只家校/机构：长期目标/家庭策略、短期 care plan、family rule trial/checkpoint/review、activity comparison/evidence、execution review/profile 更新和机构消息/item/log/media/grant/redaction/resend 都在范围内。
+- Inclusion rule: retry 可能导致 Nurture canonical 数据重复、重复推进、并发覆盖或不一致时必须进入 command kernel。
+- Exclusions: resolver/query/presenter/dashboard read、未确认 Prepare/clarification、LLM-only draft、纯 My-Chat Workflow Artifact/Step/Handoff/Outbox 写入不创建 Nurture execution。
+- Scope-neutral model: 不全局要求 careGroup/enrollment/institution/child process；使用 stable `commandScope`、actor refs、optional primary scope/child process 和 typed target refs。Child-specific command 自己仍强制 `childCareProcessId`。
+- Ownership: My-Chat Step idempotency 不替代独立 Nurture DB replay；B2 是 scenario-owned kernel，不创建 central cross-scenario execution table。
+- Rollout: IIA 建一个 shared schema/repository/runner，先接机构命令，并在同一验证增量接至少一个既有家庭核心写命令（`family_strategy.calibrate` 或 `family_rule_trial.record_checkpoint`）证明复用；其余 capability 渐进迁移，但 GA 前所有 authoritative writes 必须统一，禁止永久两套机制。
+- Next decision: B2-A2 已由 D-045 完成；当前进入 B2-B idempotency scope/key/hash。
+
+### D-045 — R8-B2-A2 committed execution and response semantics
+
+- Status: LOCKED on 2026-07-12.
+- Execution meaning: 可见 `NurtureCommandExecution` 表示 logical command 与全部 Nurture effects 已同 transaction commit；它是 immutable result/receipt，不是 attempt/queue state。Rollback 时 execution/effects 都不可见。
+- Stored outcome: 只保存 `applied` 或 command-spec-authorized `already_satisfied`。Shared runner 不根据相似 payload 猜 already-satisfied；append command 的不同 identity 不因内容相同去重。
+- Non-consuming failures: invalid/blocked/conflict/internal error 不 commit Execution、不消费 identity；security evidence/rate limit 另行记录。
+- Response split: API 使用 `disposition=executed|replayed` + `businessOutcome=applied|already_satisfied`；旧 `already_applied` 被 supersede。Replay 不改原 execution outcome/result。
+- Immutability: host handoff/provider 状态、内容修正、revoke/redaction、再次提醒都不能改写旧 Execution；后续变化创建新 command。
+- Replay auth: exact replay 阻止重复写，但 user-facing output 仍按当前可见性过滤；权限撤销时只返回 safe processed/unavailable。Trusted Step reconciliation 可按 service policy 读取原 refs/snapshots，但不能扩展效果。
+- Next decision: B2-B1 已由 D-046 完成；当前进入 B2-B2，收敛 commandRequestId issuer/lifecycle、Nurture unique/hash storage、canonical payload hash field inclusion/exclusion/versioning。
+
+### D-046 — R8-B2-B1 generic Scenario Command Pipeline boundary
+
+- Status: LOCKED on 2026-07-12.
+- Base responsibility: My-Workflow-Base 可定义 generic `ScenarioCommandEnvelope/Response`、logical key/hash semantics、conformance repository/service shape 和 tests；不拥有 central command-execution table 或 scenario business transaction。
+- My-Chat responsibility: 只负责 scenario selection、authenticated host identity、opaque stable idempotency-key transport、retry/correlation 和 Workflow Step orchestration；不解析 scenario role/scope/target/payload、不决定 state transition/`already_satisfied`、不保存 scenario execution truth。
+- Scenario responsibility: 每个 scenario 在自己的 DB transaction 保存 `<Scenario>CommandExecution` + canonical mutation；Nurture 使用 `NurtureCommandExecution`。Central persistence 会重建跨库 atomicity gap，因此禁止。
+- Identity namespace: generic scope 是 `(scenarioKey, workspaceId, commandRequestId)`；scenario-local table 可隐含 scenario key。`WorkflowCommandMeta.idempotency_key` 是 host transport field，一对一时透传 scenario request ID。
+- Fan-out: 一个 host command 拆成多个独立 scenario commands 时必须确定性派生 child request IDs；retry 保持不变，新业务 action/resend 使用新 ID。
+- Hash split: shared 层提供 versioned canonicalization/hash interface 和 key/hash conflict behavior；scenario command 定义 canonical DTO、effect-bearing fields、target/version、set/order 和 convergence。共享层不是 router/rule DSL/auth/LLM/audit product。
+- Cross-scenario: A -> B handoff 不共享 A execution；B 以稳定 downstream request identity 在自己的 transaction 创建 local execution/mutation 并返回 receipt。
+- Next decision: B2-B2a 已由 D-047 完成；当前进入 B2-B2b，收敛 Nurture unique/hash storage、canonical payload hash field inclusion/exclusion/versioning。
+
+### D-047 — R8-B2-B2a invocation/command identity lifecycle
+
+- Status: LOCKED on 2026-07-12.
+- Generic invocation: 共享入口使用 `invocationRequestId`，而不是把 chat-specific interaction 当通用语义；My-Chat message/form/action identity、API idempotency key、Workflow Step key、stable job/event ID 都可映射到它。
+- Four layers: `invocationRequestId` 表示一次稳定入口调用，`commandRequestId` 表示一次可独立 atomic commit/replay 的 scenario state change，process/aggregate ref 表示长期业务对象，effect key/ref 表示同命令产生的 child row/receipt/task/artifact。
+- Value reuse: 常见 one-invocation/one-command 直接令 `commandRequestId = invocationRequestId`；语义保持区分，但不强制两套随机 ID 或映射表。
+- Split rule: 只有独立 transaction/retry boundary 才派生 child command IDs。一个 transaction 中的多行、多 recipient、多 receipt/task/artifact 只是 effects，不按数量机械拆 command。
+- Multi-turn: Prepare/clarification 可先绑定 command ID 并通过 Nurture `scenarioToken` 跨多个 invocation 保持；第一次 Execution commit 后 identity 生命周期结束，后续 approve/correct/redact/resend/remind/repeat 都是新 command。
+- Cross-scenario validation: Education assignment publication 证明多 recipient 可仍是一个 atomic command，per-image upload 可独立；ERP `PaymentDoc` submit/approve/confirm 证明同 process 的多次状态转换必须是多个 command，voucher-post downstream work items 可只是同 transaction effects。
+- Nurture application: one-child direct write 复用 invocation ID；按 child/chunk 独立提交时确定性派生；family-care message + receipt/event/handoff snapshot 同 transaction 保持一个 command；explicit resend 是新 command。
+- Persistence direction: execution 保存 normalized/hash command identity 和 origin lineage；exact columns/hash namespace/canonical payload fields 留给 B2-B2b。
+- Next decision: B2-B2b 已由 D-048 完成；当前进入 B2-C concurrency/result-storage/replay mechanics。
+
+### D-048 — R8-B2-B2b command identity and payload fingerprint storage
+
+- Status: LOCKED on 2026-07-12.
+- Unique scope: Nurture-local `UNIQUE(workspaceId, commandRequestIdHash)`；不加入 command/target/process/actor，使错误复用同一 request ID 必然 conflict。
+- Input contract: production ID 是 bounded opaque ASCII (`^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$`)；禁止 prose/PII request key。Common one-to-one path 可继续复用 invocation value。
+- Storage: Execution 只保存 versioned namespaced SHA-256 lowercase hex：command、origin invocation、optional parent command；不保存 raw IDs。v1 分别使用 Nurture command/invocation + workspace namespaces。
+- Security/complexity: opaque/high-entropy contract 下不引入 HMAC secret/rotation；未来若必须接受 arbitrary/low-entropy external keys，则新增 keyed-HMAC hash version，不修改 v1 语义。
+- Payload fingerprint: command spec 先 schema-validate/normalize null/decimal/date/set/order/ref/version/checksum，shared layer 再做 versioned canonical JSON + namespaced SHA-256。
+- Included: command/version、actor/effective role/scope、target/process + expected versions、effect-bearing payload、immutable content/attachment refs、finalized AI business content、effect-changing distribution/activation intent、business-effective time。
+- Excluded: IDs/trace/conversation、retry/lease/transport、surface/render、generated IDs/timestamps/provider results、non-semantic model telemetry、current dynamic auth/grant/object state。Dynamic state 仍在 Execute 和 replay visibility 时重检。
+- Behavior: same key/same hash replay；same key/different hash conflict；same payload/new key 是新 command；未 commit 的 invalid/blocked/conflict/error 不消费 ID；并发 first commit wins，loser reload 后 exact replay 或 conflict。
+- Versioning: Execution 保存 identity-hash/payload-canonicalization/command-contract versions；仍在 replay retention 内的旧 canonicalizer 不能删除。
+- Next decision: B2-C 已由 D-049 完成并关闭 B2；当前进入 B3 durable family-input routing/clarification state。
+
+### D-049 — R8-B2-C simplified MVP command runner and concurrency
+
+- Status: LOCKED on 2026-07-12; B2 contractually closed.
+- MVP shape: one immutable `NurtureCommandExecution` table, one repository/runner, one v1 identity hash, one v1 payload canonicalizer, and per-command specifications. No independent idempotency platform.
+- Actor: persist/hash only `businessActorRef`; My-Chat worker/service principal stays in authenticated technical context/audit and may retry/reconcile without changing business command identity.
+- Result storage: Execution stores outcome + bounded bodyless `outputRefs`, not business body/full response/provider/model snapshot. Canonical objects and B1 handoff-request snapshots remain owner truth.
+- Fast path: authenticated/workspace-bounded lookup returns exact replay/conflict before lock. Missing key enters a short transaction and uses `pg_try_advisory_xact_lock`; busy is an unpersisted retryable technical result with bounded same-ID backoff.
+- Transaction: recheck Execution after lock; re-read current actor/scope/grant/target/version; apply conditional command mutation; persist effects/receipts/events/handoff snapshots/final Execution atomically; remote work runs post-commit only.
+- Concurrency split: same ID uses command serialization; different IDs on one target use expected version/state. `already_satisfied` is command-spec convergence only. Multi-object locks use stable order; class/batch work remains child/chunk bounded.
+- Replay: user result resolves refs through current visibility/redaction/grant/presenter; trusted reconciliation is purpose-gated refs-only and cannot replace actor or effects.
+- Retention: no Execution deletion/partition/archive in IIA. Future cleanup requires preserved duplicate-prevention semantics and separate product/legal evidence.
+- Deferred: HMAC v2, partition/archive/tombstone jobs, multi-DB adapters, Redis, reservation/attempt/processing tables, generic lock/rules DSL, universal transaction retry engine.
+- Closure: B2-A1/A2、B2-B1、B2-B2a/B2-B2b、B2-C closed; next blocker B3 durable family-input routing/clarification state.
+
+### D-050 — R8-B3-A reuse Receipt + Item/Event for durable routing and clarification
+
+- Status: LOCKED on 2026-07-12.
+- No new aggregate: reject `NurtureFamilyCareRouting` and `NurtureFamilyCareClarification`; they duplicate B1 Receipt and existing Item/Event authority.
+- Ownership: Message = canonical family content；`ChildLinkReceipt(family_to_org)` = durable logical route；Item = teacher work；ItemEvent = long clarification/action history；InteractionContext/token = short resolver ambiguity only。
+- Receipt correction: pending may temporarily omit grant/dataClass/target；delivered/read/acknowledged require all route fields + current grant/enrollment/scope；blocked/failed preserve safe partial resolution and reason without target disclosure。
+- Identity: add stable `routingAttemptKey`; unique `(workspaceId, direction, sourceType, sourceId, routingAttemptKey)`，不使用 nullable route fields。Retry reuses key，independent target route derives a new key。
+- Clarification: add Item `waiting_for_family` + optimistic `version`; request command atomically writes transition/event/family message/org-to-family receipt；family response writes message/family-to-org receipt and returns item to open with correlated event。
+- Multi-round: `relatedMessageId` + `correlationEventId` form append-only request/response/expired/cancel cycles；no dedicated clarification table until simultaneous/partial/per-guardian/SLA/reporting needs are proven。
+- Next decision: B3-B 已由 D-051 完成；当前进入 B3-C revoke/expiry/cancel/failure/manual-recovery transitions 和 R8 closure。
+
+### D-051 — R8-B3-B host-first durable driver; no pending-work scanner
+
+- Status: LOCKED on 2026-07-12.
+- Rejected: no `listPendingScenarioWork` global polling contract, Nurture transport outbox/worker, or Handoff misuse for internal routing. Current host Run/Step runtime is the durable technical driver.
+- Direct path: fully resolved/bounded family input may atomically commit Message + Item + delivered Receipt in one B2 command; no forced Run/pending state。
+- Async path: My-Chat creates pinned Run/Steps before Nurture capture may create pending Receipt. Resolver returns only registered capability/entrypoint + opaque refs；My-Chat does not infer role/child/dataClass/grant/target/topology。
+- Ingress: My-Chat ChatMessage is durable generic conversation input and queue carries refs only；capture owner adapter reads it and writes child-scoped Nurture Message，which becomes scenario business truth。
+- Pending invariant: pending Receipt requires `pendingReason` + typed already-existing `driverRef` (`workflow_step`/`item_action`/`scheduled_step`)；scheduled requires nextActionAt；no orphan pending receipts。
+- Boundary: Step owns lease/retry/attempt/DLQ；Receipt owns pending/delivered/blocked/failed；driver refs are provenance only and never authorize or mirror queue state。
+- Recovery: host-first Run closes pre-capture gap，B2 replay closes post-Nurture-commit/pre-Step-complete gaps，B1 handles optional activation only。
+- Human wait: waiting-for-family resumes by later family action and holds no worker；manual review may already be delivered/visible。
+- Superseded next step: B3-C1 已由 D-052 完成；B3-C2a-d 已由 D-053 锁定，仅剩 C2e technical exhaustion/manual-recovery 后关闭 R8。
+
+### D-052 — R8-B3-C1 scenario-owned business lifecycle statuses
+
+- Status: LOCKED on 2026-07-12.
+- Technical owners: My-Chat owns Run/Step and Handoff states；shared command contract owns executed/replayed + applied/already_satisfied only。
+- Business owner: Nurture exclusively defines Receipt/Item/ItemEvent/token statuses, reason codes, and transition policy. Education/ERP or future scenarios do not inherit those enums merely because they reuse the reliability pattern。
+- Base invariants only: durable driver/user continuation, refs-only transport, owner current-state recheck, idempotent recovery, and no host direct scenario mutation。No generic business delivery/wait/revoke state machine or universal DriverType。
+- Consumption: My-Chat cannot branch on Nurture status values；Nurture presenter/action maps them to generic UI primitives and recovery commands。Host Admin sees opaque refs/technical state but cannot edit business status。
+- Deferred: no normalized cross-scenario lifecycle class for analytics in IIA；future mapping must remain a scenario-declared projection, not authority。
+- Superseded next step: B3-C2a-d 已由 D-053 锁定；仅剩 C2e technical exhaustion/manual-recovery 后关闭 R8。
+
+### D-053 — R8-B3-C2a-d Nurture revoke/redaction/cancel/clarification transitions
+
+- Status: LOCKED on 2026-07-12.
+- Grant revoke: pending Receipt -> blocked；delivered/read/ack -> revoked_after_delivery；active dependent Item -> suppressed；waiting clarification gets cancelled event first。Message remains sent；current grant fence is immediate；old grant never reactivates。
+- Source redaction: body/attachments and direct derived display become unavailable；Receipt blocks/revokes-after-delivery；active Items suppress and sanitize summary/detail；confirmed independent care facts keep separate lifecycle while unconfirmed source-derived candidates invalidate。
+- Cancel split: pre-delivery `cancel_route` blocks pending route；post-delivery `withdraw_item` closes future Item work but preserves Receipt；redaction removes readability；correction appends。User resend = new command/routing key，technical retry = original key。
+- Clarification current state: Item stores active request event、wait since/until、optional delayed-Step ref；events remain full history。Token TTL has no business effect。
+- Clarification end: response/expiry/cancel uses active event + Item version first-commit-wins；still-valid Item returns open，Item business expiry becomes expired；late family response is stored/routed safely and never inferred as consent。
+- Completed by D-054: B3-C2e technical exhaustion/Receipt failed/manual-review/Admin recovery and R8 closure。
+
+### D-054 — R8-B3-C2e technical exhaustion/Admin recovery and R8 closure
+
+- Status: LOCKED on 2026-07-12；IIA-0-R8 is contractually closed。
+- Ownership: Workflow Step retry、attempt、DLQ、exhaustion 和 `manual_review_required` 归 My-Chat；这些技术状态不能直接映射为 Nurture Receipt `failed`。自动重试期间 Receipt 保持 `pending(workflow_processing)`。
+- Adjudication: retry exhaustion 后，Nurture `reevaluate_route` 重查 current grant/source/scope/policy/Receipt/Item。业务阻断进入已有 `blocked(reason)`；已完成投递保持 delivered/read/acknowledged；仍可恢复则保持 pending；只有 owner-authorized `fail_route` 可提交 `failed(technical_recovery_exhausted)`。
+- Terminality: `failed` Receipt 不重开。失败前技术重试复用原 Step/command/routing key；失败后的明确恢复使用新 host Run/Step、新 command identity、新 `routingAttemptKey` 和新 Receipt，并用 nullable `retryOfReceiptId` 关联旧失败尝试。
+- Race/replay: `fail_route` 需要 exhausted/manual-review evidence ref、expected Receipt version、`pending` current state 和当前 owner policy；host evidence 只作证据不授权。若路由已经提交，B2 replay/current-state guard 返回 already-satisfied/conflict，不能倒写 failed。
+- Admin: 可看 safe host/Nurture refs、reconcile/retry pending Step、调用 `reevaluate_route`、通过 Nurture `reissue_route` 发起新尝试、或调用现有 `cancel_route`；不可直接改 Receipt、伪造 delivered、改 grant/target/dataClass 或绕过 revoke/redaction/policy。
+- Taxonomy: MVP Receipt failure reason 只增加 `technical_recovery_exhausted`；具体技术错误和 attempt evidence 留在 host Step，不复制到 Nurture。确定性业务终止继续使用 `blocked` reasons。
+- Closure: `grantDependencies[]` 已在 D-033/R8 主契约锁定；AI/model/attachment/remote work 已在 B2-C 明确位于事务外。因此 C2e 后无剩余 R8 blocker，下一步做 IIA-0 contract-closure scan 和 implementation mapping。
+
+### D-055 — IIA-0 scenarioToken generic protocol / scenario-local authority split
+
+- Status: LOCKED on 2026-07-12。
+- Purpose: `scenarioToken` 是 scenario-issued opaque continuation handle，用于跨请求恢复 `clarify`、`submit_action` 或 `open_notification`；它不是登录/session、角色、Grant、授权结果、长期记忆、业务 workflow 状态、技术 driver 或 CommandExecution receipt。
+- Generic contract: My-Workflow-Base 可定义 opaque token/structured-interaction envelope、workspace/actor/purpose/TTL/replay/revalidation 不变量和 conformance tests；不拥有 central token service、共享 token DB 或 scenario payload。
+- Host: My-Chat 只渲染 choice/form/confirm/input 等通用 primitives 并原样回传 token/option token；不得解释 purpose、candidate、target 或 policy，也不得从 token 派生 Nurture business refs。
+- Scenario authority: Nurture 拥有 `NurtureInteractionContext` persistence、candidate/action/notification refs、purpose-specific TTL/consume/recovery、participant/scope/target binding、current policy checks、command binding 和 safe presenter output。
+- Scope limit: 普通新聊天依靠 resolver/business memory；普通 Nurture dashboard 依靠 explicit scenario surface + presenter。只有需要跨请求恢复澄清、待确认动作或通知目标时签发 token，不能扩为通用 Nurture object access token。
+- Reuse timing: 现在先锁通用协议和 Nurture-owned database 实现边界；Education/ERP 等第二个场景验证相同需求后，才可把 hash/TTL/consume/revoke 等机械实现提取到 shared scenario SDK。即使提取，各场景仍保留 scenario-owned table/payload/authorization。
+- Completed by D-056: the minimal `NurtureInteractionContext` persistence model and persisted-versus-derived lifecycle split are locked；the remaining carrier gap is handoff replay-seed storage。
+
+### D-056 — IIA-0 `NurtureInteractionContext` minimal persistence model
+
+- Status: LOCKED on 2026-07-12。
+- Carrier: one Nurture-owned database `NurtureInteractionContext` row per issued `scenarioToken`; no separate token table、central token service、session/draft platform or shared persistence。
+- Stored lifecycle: only `active|consumed|revoked`。`expired` derives from required `expiresAt`；`current|expired|recoverable|blocked` are resolver-time classifications after binding/current-state checks，not DB states。
+- Identity/binding: store namespaced high-entropy `tokenHash` + hash version，never raw token；bind workspace、participant、purpose、surface and optional hashed host conversation ref。My-Chat user is resolved through participant rather than duplicated as token authority。
+- Payload: versioned purpose-specific JSON validated by Nurture。`clarify` stores pending intent + complete candidate refs + option-token-hash mapping；`submit_action` stores command/target/expected-version/action-hash/immutable refs；`open_notification` stores Nurture locator refs。No bodies、target account lists or cached authorization decisions。
+- Concurrency: use optimistic `version`。Valid clarify/submit consumption changes active -> consumed；a further clarification creates a new context/token；open-notification reads remain reusable until expiry/revoke。Every use still reruns resolver/policy/grant/lifecycle/preconditions。
+- Command binding: multi-turn `submit_action` derives stable `commandRequestId` from internal context id/purpose，so response-loss retry reaches the same B2 Execution without persisting the original My-Chat invocation id。Single-turn writes still reuse `invocationRequestId` where appropriate。
+- Constraints: unique `(workspaceId, tokenHash)`；indexes by participant/status/expiry and optional conversation-hash/status/expiry。Retention/purge numbers remain a production-policy decision；expiry blocks use without requiring a status-migration job。
+- Completed by D-057 and refined by D-058: B1 replay seeds use required versioned Execution JSON；non-empty arrays require a persisted+claimed My-Chat Workflow Step whose ref exclusively owns replay。
+
+### D-057 — B1 replay-seed JSON carrier and durable host-driver invariant
+
+- Status: LOCKED on 2026-07-12。
+- Storage: `ScenarioHandoffRequestSnapshot[]` is stored as required versioned JSON on the immutable Nurture-database `NurtureCommandExecution` row；explicit `[]` means no activation。MVP adds no normalized snapshot child table、central table or scenario-side activation ledger。
+- Validation: command spec bounds count；requestId is unique within the array；persist order is stable by requestId；payload is refs-only and manifest-declared；schema version is required。Generated requestId/driver ref are technical outputs/provenance and do not alter the semantic command payload hash。
+- Blocking invariant: non-empty snapshots require a My-Chat Workflow Step durably created before Nurture invocation。My-Chat supplies a service-authenticated `handoffDriverRef(workflow_step)`；Nurture persists it with Execution but never treats it as authorization。
+- Refined by D-058: missing driver returns `missing_durable_handoff_driver`；wrong service/ref/binding or wrong-Step replay returns `invalid_durable_handoff_driver`。Both fail before first Nurture commit；no silent downgrade to `[]`。
+- Direct path correction: no-Run direct business commands remain valid only with explicit `[]`。If a fully synchronous Nurture route also requests notification/unread/badge/deep-link activation，My-Chat must still create a lightweight durable Run/Step first。
+- Recovery: after Nurture commit/response loss，the existing Step replays the same command identity，reads the exact stored JSON，and retries atomic host `complete_step` materialization。No Nurture scanner/outbox/Redis/Saga is introduced。
+- Host readiness gate: current My-Chat contracts/runtime expose only the Handoff service/repository shell；`complete_step` lacks `handoff_drafts`/materialized results and no concrete Handoff Ledger persistence was found。Non-empty Nurture snapshots MUST remain disabled until My-Workflow-Base contract + My-Chat ledger/materializer/outbox are implemented and crash-tested。
+- Complexity: Nurture adds two required Execution fields plus optional driver provenance and bounded validation；My-Chat owns the medium-complexity ledger/materializer/reconciliation work。No model call is added and provider dispatch stays post-commit。
+- Next: remove remaining historical blocker wording and produce the cross-repo IIA implementation dependency map；do not edit live schema/manifest until the host prerequisite order is explicit。
+
+### D-058 — Claimed Workflow Step attestation and exclusive replay ownership
+
+- Status: LOCKED on 2026-07-12；refines D-057 driver proof/replay semantics。
+- First execution: My-Chat MUST persist and claim the Workflow Step before invoking any Nurture command that may emit non-empty snapshots。The trusted Workflow Runtime supplies `driverRef + contractHash + capabilityKey + entrypointKey + claimToken + expectedStepVersion` in an internal service-authenticated envelope。
+- Nurture boundary: validate service principal、workspace/scenario、workflow-step ref shape and capability/entrypoint compatibility。Nurture does not call My-Chat back for owner-read and does not interpret lease/retry status；the host service attests that the Step was claimed。
+- Persistence: Execution stores only `handoffDriverRef`。Claim token/version are lease-scoped secrets/technical values，excluded from semantic hash and forbidden in Nurture DB、snapshot、logs or presenter output。Contract/capability binding remains canonical on the My-Chat Step/Run。
+- Exclusive replay: trusted reconciliation may return non-empty snapshots only when the caller presents the exact persisted Step ref。The same Step may be reclaimed with a new token/version；another Step cannot take over、read or materialize the snapshots。One Step may own multiple bounded child commands emitted by its registered handler。
+- Recovery split: Admin reconciles the original Step；post-materialization technical replay uses the existing Handoff Ledger；business resend uses new command/Step/request IDs。MVP has no replacement-Step transfer protocol；missing/corrupt original Step is manual data repair，not permission to mint a substitute driver。
+- Race: claim expiry after Nurture commit is recovered by re-claiming the same Step and B2 replay。Cancellation never deletes the Step；if business commit won the race，original-Step reconciliation preserves the Nurture result and current cancellation/expiry/grant/source gates stop or complete host activation safely。
+- Complexity: no cyclic `My-Chat -> Nurture -> My-Chat` owner-read、no signed attestation platform、no cross-database lock。My-Chat `complete_step` remains the final claim/lease/version validator。
+- Failure surface: missing context uses `missing_durable_handoff_driver`；wrong service/ref/binding or different-Step replay uses `invalid_durable_handoff_driver` with detailed diagnostics retained only by the host/runtime evidence。
+- Next: complete historical drift cleanup and the cross-repo implementation dependency map before live schema/manifest/runtime work。
+
+### D-059 — Cross-repo implementation dependency and incremental rollout
+
+- Status: LOCKED on 2026-07-13；architecture is implementation-ready，no source/schema/runtime work started by this decision。
+- Dependency direction: My-Workflow-Base defines template contract -> My-Chat adopts and implements the actual host package/runtime -> Nurture consumes only the My-Chat contract package and owns scenario persistence/business logic。
+- X0 Base: additive vNext handoff/driver/host-capability contract + templates/conformance，no runtime。Reuse existing `workflow-base` task。
+- X1 My-Chat contract: adopt types/validator/worker pass-through with legacy compatibility and disabled `workflow_handoff_materialization_v1`。Nurture cannot compile against vNext until this lands because it file-links `@my-chat/workflow-contracts`。
+- X2 My-Chat Step kernel: concrete Postgres claim/complete/fail、completion replay、real `WorkflowRuntimePort` injection。Existing Run/Step/Outbox tables are inputs，not proof of a finished runtime。
+- X3 My-Chat Handoff kernel: Handoff Ledger persistence、atomic `complete_step` materializer、standard outbox events、Admin reconciliation。Create a new My-Chat `workflow-handoff-materialization` task because the existing `workflow-runtime` task explicitly excluded persistence/Prisma/transactions。
+- N1 Nurture parallel core: after X1, implement care ecology schema、CommandExecution、InteractionContext、runner、class inbox/attention and at least one family-core command migration while forcing snapshot JSON to explicit `[]`。N1 may run in parallel with X2/X3。
+- X4/N2 integration: claimed-driver bridge、non-empty snapshots、manifest handoff keys/context refs and first `user_attention` owner-reread consumer，all behind host capability。
+- X5 enablement: joint crash/race/privacy tests pass before non-empty activation。Rollback is capability/manifest disablement，not cross-database data rollback。
+- Worktree readiness: My-Workflow-Base and My-Chat were clean on 2026-07-13；The-Nurture was ahead one commit with a heavily dirty tree。Start X0/X1 in isolated branches/tasks；before N1, isolate or intentionally commit the current Nurture scope rather than mixing schema work into unrelated changes。
+- Remaining production-only gates: numeric TTL/retention/legal copy、per-command snapshot limits、archive/HMAC/shared SDK and second-increment capabilities do not block X0/X1/N1 empty paths。
+
+## Deviations from plan
+
+- 2026-07-05: 原计划将 Phase IB 设为 My-Chat 宿主 care canonical 域。该路线已被 D-007/D-010 supersede。新的 Phase IB 是 Nurture-owned care ecology canonical schema + My-Chat account/shell integration contract。
+
+## Known issues / follow-ups
+
+- Review Phase IB schema SPEC in `06-ib-nurture-schema-spec.md` and decision defaults in `07-ib-decision-convergence.md`; override only with explicit superseding decisions.
+- Confirm production rollout gates for `ChildLinkGrant` numeric retention windows, deletion jobs, legal copy, and message/attachment security posture.
+- Implement IIA Test Contract from `08-iia-schema-policy-test-design.md` as schema/repository, resolver/policy, capability, conformance, and journey tests.
+- R8 B1/B2/B3、InteractionContext persistence and replay-seed carrier/driver invariant are closed by D-054/D-056/D-057. Complete historical drift cleanup and the cross-repo host dependency map before Prisma/manifest implementation.
+- Review My-Chat realtime render/action API contract from `07-ib-decision-convergence.md` against host payload version requirements.
+- Review My-Chat host notification/delivery contract using the IB-D7 allowed bookkeeping field family; do not promote visible render payload into host canonical state.
+- Review IIA-0 contract preflight from `08-iia-schema-policy-test-design.md` before editing `prisma/schema.prisma` or `scenario.manifest.yaml`.
+- Confirm whether `cohort_care_plan` / `developmental_observation` belong in first implementation slice or should be second increment after `class_family_inbox` / `teacher_attention_board` / `caregiver_daily_care` / `child_media_attribution`.
+- Confirm legal/product ownership for revoke semantics and retention window.
+
+## Pitfalls / dead ends (do not repeat)
+
+- Keep the detailed log in `05-pitfalls.md` (append-only).

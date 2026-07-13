@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 
 import { createEvidenceDir, createLogger, generateRunId, rmEvidenceDir, writeRunJson } from './lib/evidence.mjs';
 
-import * as uiSuite from './maintainer/ui/index.mjs';
 import * as envSuite from './maintainer/environment/index.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +16,6 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 
 const SUITES = {
-  ui: uiSuite,
   environment: envSuite,
 };
 
@@ -25,7 +23,7 @@ function usage(exitCode) {
   const msg = [
     'Usage:',
     '  node .ai/tests/run-maintainer.mjs --list',
-    '  node .ai/tests/run-maintainer.mjs --suite <ui|environment>',
+    '  node .ai/tests/run-maintainer.mjs --suite <environment>',
     '',
     'Options:',
     '  --keep-artifacts     Keep evidence even on PASS (default: false)',

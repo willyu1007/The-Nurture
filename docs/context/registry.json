@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-28T13:26:12.219Z",
+  "updatedAt": "2026-07-13T00:44:26.666Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -80,8 +80,8 @@
       "tags": [
         "db"
       ],
-      "checksumSha256": "e4901d8e37d8f0934dca8ed9a16b2c734f2562b13bbe6b5fde3de66d5f4d0a09",
-      "lastUpdated": "2026-05-28T09:17:19.162Z",
+      "checksumSha256": "23be8cea776673014915dba898684af07a5e90935792fbcd9d3afb99565380a1",
+      "lastUpdated": "2026-07-13T00:22:33.630Z",
       "source": {
         "kind": "command",
         "command": "node .ai/scripts/ctl-db-ssot.mjs sync-to-context",
@@ -117,8 +117,48 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "96977432379b4c6ce7cdf925980c34537fa1d4d7fed23a23031a46910c21ec7a",
-      "lastUpdated": "2026-05-28T13:22:22.014Z",
+      "checksumSha256": "123833a2aa3ab1a2505846989998f97fa3f2c71d65182fd4cfb278db9704b38f",
+      "lastUpdated": "2026-07-13T00:44:26.665Z",
+      "source": {
+        "kind": "command",
+        "command": "ctl-context add-artifact",
+        "cwd": "."
+      }
+    },
+    {
+      "id": "env-contract",
+      "type": "json",
+      "path": "docs/context/env/contract.json",
+      "mode": "generated",
+      "format": "env-contract-v1",
+      "tags": [
+        "env",
+        "config",
+        "llm"
+      ],
+      "checksumSha256": "91191967df6b5278d9efa836568168bfe99d509b0b93743a0d7145060d1bbf56",
+      "lastUpdated": "2026-07-13T00:34:31.099Z",
+      "source": {
+        "kind": "command",
+        "command": "ctl-context add-artifact",
+        "cwd": "."
+      }
+    },
+    {
+      "id": "product-workflow-design-contract",
+      "type": "markdown",
+      "path": "docs/context/product/workflow-product-design-contract.md",
+      "mode": "contract",
+      "format": "product-workflow-contract-v1",
+      "tags": [
+        "product",
+        "workflow",
+        "llm",
+        "nurture",
+        "my-chat"
+      ],
+      "checksumSha256": "0712a69011ab12378da13ef169d63870cdeb6fb30224c2a77908d6e2c07b8e86",
+      "lastUpdated": "2026-07-13T00:44:26.635Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

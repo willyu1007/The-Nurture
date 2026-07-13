@@ -1,0 +1,12 @@
+version: 1
+task_id: T-001
+project: main
+slug: nurture-mvp
+status: in-progress
+updated: "2026-07-13"
+keywords:
+  - nurture
+  - mvp
+  - g0
+  - database-boundary
+  - dev-host

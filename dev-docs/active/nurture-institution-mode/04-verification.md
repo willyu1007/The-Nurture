@@ -1,0 +1,247 @@
+# Verification — Institution Mode
+
+## Current Verification Status
+
+- Last updated: 2026-07-06
+- Current phase: IB Nurture schema SPEC + decision convergence
+- Code/config/schema impact: task docs/governance only; no live manifest, source code, registered context artifact, or DB schema changes intended
+
+## Automated Checks
+
+Run after task-doc or governance edits:
+
+```bash
+node .ai/scripts/ctl-project-governance.mjs sync --apply --project main
+node .ai/scripts/ctl-project-governance.mjs lint --check --project main
+```
+
+Expected result:
+
+- Governance registry and derived views stay consistent.
+- `T-002 nurture-institution-mode` remains mapped to `M-002 / F-002`.
+
+Run if registered context artifacts are changed:
+
+```bash
+node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
+```
+
+Expected result:
+
+- Context registry verifies cleanly.
+
+## Manual Smoke Checks
+
+For IA/IA.1 discussion work:
+
+1. Confirm `dev-docs/active/nurture-institution-mode/` contains the standard task bundle files.
+2. Confirm `roadmap.md` carries the current decision queue.
+3. Confirm `00-overview.md` states the current phase and next discussion step.
+4. Confirm no live manifest, source, or Prisma schema changes were made for institution mode before IB exists.
+
+## Rollout / Backout
+
+- Rollout: task-doc and governance-only changes can be merged once governance lint is green.
+- Backout: revert the T-002 task-doc changes and governance registry entries; no runtime data migration is involved.
+
+## Verification Log
+
+| Date | Command / check | Result | Notes |
+| --- | --- | --- | --- |
+| 2026-07-03 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Derived governance views regenerated. |
+| 2026-07-03 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Registry/task bundle consistency verified. |
+| 2026-07-03 | Manual bundle layout check | PASS | Standard files exist: roadmap, 00-05, `.ai-task.yaml`; no code/manifest/schema edits intended. |
+| 2026-07-03 | Product semantics update review | PASS | Reframed from "institution mode / authorization bridge" to "institution ecology / external growth environment"; `ChildLinkGrant` documented as cross-ecology connection mechanism. |
+| 2026-07-03 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Regenerated feature map after M-002/F-002 title updates. |
+| 2026-07-03 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance consistency verified after semantics update. |
+| 2026-07-04 | Product capability review | PASS | Clarified `child_media_attribution`: use child reference images such as attendance cards to classify class group photos into teacher-confirmed child album views. |
+| 2026-07-04 | Institution value model review | PASS | Reframed institution-side value around philosophy transmission, digital asset sedimentation/re-organization, and operational quality workflows. |
+| 2026-07-05 | Context/architecture ownership review | PASS | Synced My-Chat account/shell vs Nurture-owned care ecology graph; added `NurtureChildCareProcess`, `class_family_inbox`, Nurture-owned family-care messages/items, and Nurture-owned `ChildLinkGrant`. |
+| 2026-07-05 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs touch` | PASS | Registered context checksum checked after `docs/context/workflow/nurture-scenario-contract.md` update. |
+| 2026-07-05 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS | Context layer verification passed. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Regenerated governance derived views from updated registry and task metadata. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after manual dashboard/feature-map semantic updates. |
+| 2026-07-05 | IB schema SPEC review | PASS | Added `06-ib-nurture-schema-spec.md` with core ecology, grant/receipt, family-care communication, first-slice care facts, resolver/policy contracts, and class-of-10 acceptance scenario. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after adding the IB schema SPEC task-doc references. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed. Context verify not rerun because no registered context artifacts changed in this edit. |
+| 2026-07-05 | IB decision convergence review | PASS | Added `07-ib-decision-convergence.md` and converted the 7 schema open decisions into IIA implementation defaults with explicit production rollout gates. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after decision convergence docs and task metadata updates. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed. Context verify not rerun because no registered context artifacts changed in this edit. |
+| 2026-07-05 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main && node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Final governance sync/lint passed after verification log updates. |
+| 2026-07-06 | Child-scope baseline review | PASS | Documented `NurtureChildCareProcess` as the independent child scope; parent/teacher/institution views are reorganizations over child scopes. |
+| 2026-07-06 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main && node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance sync/lint passed after child-scope baseline docs update. |
+| 2026-07-06 | IB-D0 lock sync | PASS | Marked `NurtureChildCareProcess` child-scope baseline as locked for IB/IIA schema defaults. |
+| 2026-07-06 | IB-D3 lock sync | PASS | Marked `NurtureTeacherAttentionItem` as a materialized child-scoped projection grouped by `careGroupId`; group-level notices deferred to a separate future object. |
+| 2026-07-06 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main && node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance sync/lint passed after IB-D3 lock docs update. |
+| 2026-07-06 | IB-D4 runtime fence sync | PASS | Marked `NurtureChildLinkGrant` revoke as a runtime fence covering future delivery, in-flight workflow, pending outbox, retry/replay, cached context pack, UI submit, active surface exit, and limited/auditable history. |
+| 2026-07-07 | IB-D5 data-class contract sync | PASS | Marked `dataClass` as the system grant/policy/runtime contract, `category` as workflow/display taxonomy, and institution vocabulary as a mapping layer. |
+| 2026-07-07 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main && node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance sync/lint passed after IB-D5 docs update. |
+| 2026-07-07 | IB-D6 message lifecycle sync | PASS | Marked `NurtureFamilyCareMessage` canonical status as `sent` / `redacted` / `failed`; removed message-level `hidden` / `deleted`; added redaction and body-protection metadata requirements. |
+| 2026-07-07 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main && node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance sync/lint passed after IB-D6 docs update. |
+| 2026-07-07 | IB-D7 My-Chat opaque delivery sync | PASS | Marked My-Chat shell integration as realtime by default; host persistence is limited to minimal opaque routing/dedupe/status/expiry delivery bookkeeping when delivery requires it. |
+| 2026-07-07 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IB-D7 docs update. |
+| 2026-07-07 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IB-D7 docs update. |
+| 2026-07-08 | IB-D1 / IB-D2 lock sync | PASS | Marked participant identity + surface role resolution as locked: mobile chat is role-agnostic Nurture ingress; dashboard/board surfaces may switch validated role assignments. Marked one active `NurtureFamily` per `NurtureChildCareProcess` as locked for MVP. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IB-D1/IB-D2 docs update. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IB-D1/IB-D2 docs update. |
+| 2026-07-08 | IIA schema/policy/test design sync | PASS | Added `08-iia-schema-policy-test-design.md` with implementation slices, schema model groups, resolver/policy contracts, capability design, and test matrix. Design-only; no Prisma, manifest, source, or runtime edits. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA design docs update. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA design docs update. |
+| 2026-07-08 | `markdownlint --version` | SKIP | `markdownlint` is not installed in this environment; not a repo gate. |
+| 2026-07-08 | IIA-0 Test Contract sync | PASS | Finalized Test Contract categories: required semantics, test layers, fixture shape, structured decision reason codes, and non-pass conditions. Design-only; no test/source/schema edits. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0 Test Contract docs update. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0 Test Contract docs update. |
+| 2026-07-08 | IIA-0-C1 capability slice sync | PASS | Locked teacher mobile as surface composition, kept four first-slice capability keys separate, and set implementation order to inbox + attention, then daily care, then media attribution. Design-only; no manifest/source/schema edits. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-C1 docs update. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-C1 docs update. |
+| 2026-07-08 | IIA-0-C2 Surface Contract sync | PASS | Locked My-Chat conversation continuity vs Nurture interaction context/business memory boundary; conversation refs are untrusted hints and every render/action/write re-resolves through Nurture. Design-only; no manifest/source/schema edits. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-C2 docs update. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-C2 docs update. |
+| 2026-07-08 | IIA-0-R1 Resolver output consumers sync | PASS | Locked resolver output as a Nurture-internal context contract consumed by capability/orchestrator, policy, query/projection, command/workflow, presenter, and interaction context manager. My-Chat only consumes final scenario response. Design-only; no manifest/source/schema edits. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-R1 docs update. |
+| 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-R1 docs update. |
+| 2026-07-09 | IIA-0-R2 Resolver context shape sync | PASS | Locked resolver output into `actor`, `workScope`, and optional `target`; `childCareProcessId` is required for child-specific writes/actions but not for every teacher/institution collection work surface. Design-only; no manifest/source/schema edits. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-R2 docs update. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-R2 docs update. |
+| 2026-07-09 | IIA-0-R3 Resolver input envelope sync | PASS | Locked resolver input as host facts, conversation refs, current payload, generic display state, Nurture-issued scenario token, and idempotency only. Removed host-authored target/workScope/role/grant/dataClass/direction/policy inputs. Design-only; no manifest/source/schema edits. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-R3 docs update. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-R3 docs update. |
+| 2026-07-09 | IIA-0-R4/R5 ambiguity and structured clarification sync | PASS | Locked ambiguity handling with typed candidates and precedence; locked `needs_clarification` as structured My-Chat interaction requests with Nurture-owned prompt/options/fields/tokens. Design-only; no manifest/source/schema edits. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-R4/R5 docs update. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-R4/R5 docs update. |
+| 2026-07-09 | IIA-0-R6 scenario token MVP TTL/staleness sync | PASS | Locked scenario token MVP as opaque Nurture DB handle with `clarify` / `submit_action` / `open_notification`, conservative `current` / `expired` / `recoverable` / `blocked` classification, and no token-as-authorization behavior. Design-only; no manifest/source/schema edits. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IIA-0-R6 docs update. |
+| 2026-07-09 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IIA-0-R6 docs update. |
+| 2026-07-10 | IIA-0-R7 business-memory semantic boundary sync | PASS | Locked business memory as bounded retrieval over current Nurture canonical facts, producing candidates rather than authorization or commands; retrieval sources, candidate shape, and deterministic ranking remain in convergence. Design-only; no manifest/source/schema edits. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after the R7 semantic-boundary docs update. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after the R7 semantic-boundary docs update. |
+| 2026-07-10 | IIA-0-R7 full resolver-recovery contract sync | PASS | Locked thin reusable kernel + Nurture adapters, three MVP sources, complete-path candidates, categorical deterministic ranking, dedupe/tie/limit behavior, reuse path, and no-extra-storage/vector/cache/model cost gates. Design-only; no manifest/source/schema edits. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --dry-run --project main --init-if-missing` | PASS | Preview confirmed only registry and generated governance views required regeneration; manual F-002 semantic brief remained in the non-AUTO section. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance derived views regenerated after the complete R7 contract update. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after the complete R7 contract update. |
+| 2026-07-10 | IIA-0-C3 workflow-mediated family conversation sync | PASS | Locked conversation-shaped family UX, workflow-shaped teacher UX, Nurture-mediated canonical messages, authentic authorship/source traceability, and the Nurture transaction vs My-Chat notification/outbox boundary. Design-only; no Prisma/manifest/runtime edits. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --dry-run --project main --init-if-missing` | PASS | Preview confirmed governance derived-view regeneration after C3 task/semantic brief updates. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views regenerated after C3 convergence. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after C3 convergence. |
+| 2026-07-10 | IIA-0-R8 robustness review sync | PASS | Recorded retained command direction, B1-B3 lock blockers, typical-scenario compatibility, and cross-repo My-Chat handoff/outbox implementation evidence. R8 remains in convergence; design-only with no Prisma/manifest/runtime edits. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --dry-run --project main --init-if-missing` | PASS | Preview confirmed registry/derived-view updates after the R8 review and F-002 risk/checkpoint refresh. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views regenerated after the R8 robustness review sync. |
+| 2026-07-10 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after the R8 robustness review sync. |
+| 2026-07-11 | IIA-0 model execution and cost posture sync | PASS | Locked cost as an observed architecture dimension rather than an MVP product gate: no fixed call/token/monetary quota, reliability circuit breakers retained, context/memory ownership clarified, retry/fan-out reuse required, and R7 scope unchanged. Design-only; no Prisma/manifest/runtime edits. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after the model execution and cost posture decision. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after the model execution and cost posture decision. |
+| 2026-07-11 | `git diff --check` | PASS | No whitespace errors after the documentation-only decision sync. |
+| 2026-07-11 | R8-B1-A logical delivery ownership sync | PASS | Locked `NurtureChildLinkReceipt` as the pending logical delivery lifecycle committed with the source fact, logical-target granularity, non-mirrored My-Chat transport ownership, and no separate Nurture distribution-intent/outbox runtime. Design-only; no Prisma/manifest/runtime edits. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-A convergence. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-A convergence. |
+| 2026-07-11 | `git diff --check` | PASS | No whitespace errors after the B1-A documentation sync. |
+| 2026-07-11 | R8-B1-B unified ingress/result/activation boundary sync | PASS | Locked all adult roles onto My-Chat main-chat scenario routing, kept role/scope/target/business direction inside Nurture, separated structured scenario response and explicit dashboard presenter paths from optional host activation handoff, and corrected Receipt so target-readable content may be immediately `delivered`. Design-only; no Prisma/manifest/runtime edits. |
+| 2026-07-11 | B1 terminology drift scan | PASS | No active contract still treats dashboard/main-chat display as handoff delivery or Nurture `pending` as My-Chat notification state; the only match is the intentional D-035 supersede history. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-B convergence. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-B convergence. |
+| 2026-07-11 | `git diff --check` | PASS | No whitespace errors after the B1-B documentation sync. |
+| 2026-07-11 | R8-B1-C1 activation source authority sync | PASS | Locked direct Nurture `DomainContextRef` sources for existing messages/items/receipts, retained Workflow Artifact only for genuine independent workflow products, allowed mixed sources, and recorded the shared-base `source_context_ref_types` contract gap. Design-only; no My-Workflow-Base/My-Chat/Nurture runtime edits. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-C1 convergence. |
+| 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-C1 convergence. |
+| 2026-07-11 | `git diff --check` | PASS | No whitespace errors after the B1-C1 documentation sync. |
+| 2026-07-12 | R8-B1-C2 generic handoff snapshot/replay sync | PASS | Locked the cross-scenario `ScenarioHandoffRequestSnapshot`/`WorkflowHandoffDraft` contract, scenario-local immutable persistence, stable manifest `handoffKey`, pinned-contract host enrichment, retry versus explicit resend identity, per-target snapshots, and thin non-Saga boundary. Design-only; no shared-base/host/runtime/schema edits. |
+| 2026-07-12 | B1-C2 terminology/next-step scan | PASS | Historical B1-C1 next-step text was advanced to B1-C3; no active document still treats the request snapshot as a Nurture-only replay-seed contract. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-C2 convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-C2 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B1-C2 documentation sync. |
+| 2026-07-12 | R8-B1-C3 host transaction materialization sync | PASS | Locked `complete_step` atomic Step/Handoff/outbox materialization, completion and per-Draft idempotency, claim/lease ordering, mixed existing/new behavior, deterministic handoff mapping, bounded preflight, post-commit-only dispatch, and host-ledger standard event ownership. Design-only; no shared-base/host/runtime/schema edits. |
+| 2026-07-12 | B1-C3 terminology/next-step scan | PASS | Historical B1-C2 next-step text was advanced to B1-D; current contracts consistently treat standard step/handoff events as host-ledger products and current Nurture direct drafts as scaffold. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-C3 convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-C3 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B1-C3 documentation sync. |
+| 2026-07-12 | R8-B1-D1 minimal Handoff failure taxonomy sync | PASS | Locked `requested/completed/stopped/failed` as the only generic Handoff lifecycle states, moved `created/existing` to disposition and transient details to attempt/outbox evidence, converged rejected/invalidated behavior into stopped reasons, and kept contract defects at Workflow Step manual review. Design-only; no shared-base/host/runtime/schema edits. |
+| 2026-07-12 | B1-D1 lifecycle drift scan | PASS | No active task contract retains accepted/rejected/invalidated/duplicate as required generic Handoff lifecycle states; the unrelated media-attribution `rejected` business status remains valid. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-D1 convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-D1 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B1-D1 documentation sync. |
+| 2026-07-12 | R8-B1-D2/D3/D4 recovery/cancellation/operations sync | PASS | Locked Step reconciliation versus same-Handoff technical replay versus new-business resend, post-commit cancellation/expiry/in-flight outcomes, source-version owner resolution, dead-letter ownership, Admin allow/deny boundaries, refs-only observability, and no Nurture transport polling. B1 activation handoff contract is closed; design-only with no runtime/schema edits. |
+| 2026-07-12 | B1 closure next-step scan | PASS | Historical D1 next-step text was advanced through D2-D4 to B2; overview and roadmap now identify durable Nurture command idempotency/concurrency as the next R8 decision. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-D2/D3/D4 convergence and B1 contract closure. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1 contract closure. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B1 closure documentation sync. |
+| 2026-07-12 | R8-B2-A1 Nurture-wide command-kernel scope sync | PASS | Locked one scope-neutral `NurtureCommandExecution` mechanism across family long-term/short-term and institution authoritative writes, excluded reads/Prepare/host-only writes, required institution plus one existing family-core adoption in IIA, and prohibited permanent dual idempotency mechanisms before GA. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B2-A1 scope drift scan | PASS | Architecture, IIA design, plan, overview, and roadmap consistently describe B2 as Nurture-wide rather than institution-only and keep child/institution scope optional at the shared model level. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B2-A1 scope convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B2-A1 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B2-A1 documentation sync. |
+| 2026-07-12 | R8-B2-A2 committed execution/response semantics sync | PASS | Locked visible Execution as immutable committed result, persisted only applied/already-satisfied, kept invalid/blocked/conflict/error non-consuming, split executed/replayed response disposition from business outcome, and required current-visibility filtering on user replay with trusted reconciliation access. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B2-A2 outcome terminology scan | PASS | The former `already_applied`/three-value CommandOutcome remains only in explicit supersede history; active contracts use separate disposition and business outcome dimensions. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B2-A2 convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B2-A2 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B2-A2 documentation sync. |
+| 2026-07-12 | R8-B2-B1 generic Scenario Command Pipeline boundary sync | PASS | Locked reusable envelope/key/hash semantics in My-Workflow-Base, restricted My-Chat to scenario selection, authenticated identity and opaque request transport/retry orchestration, and kept execution truth plus canonical mutation atomic in each scenario database. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B2-B1 ownership and scope drift scan | PASS | Active contracts consistently prohibit a central cross-scenario execution table and keep role/scope/target, business canonicalization, convergence, and transaction ownership inside Nurture. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B2-B1 convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B2-B1 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B2-B1 documentation sync. |
+| 2026-07-12 | R8-B2-B2a invocation/command identity lifecycle sync | PASS | Locked generic invocation versus scenario-command semantics, one-to-one value reuse, Prepare-only cross-invocation continuity, first-commit lifecycle termination, and transaction/replay boundary as the only child-command split rule. Design-only; no schema/runtime edits. |
+| 2026-07-12 | Education/ERP cross-scenario identity validation | PASS | Education assignment publication versus per-image intake and ERP PaymentDoc submit/approve/confirm versus voucher-post work-item effects confirmed that process identity, command identity, and effect dedupe keys must remain separate. |
+| 2026-07-12 | B2-B2a terminology and fan-out drift scan | PASS | Active task contracts use generic `invocationRequestId`, no longer infer command count from target/effect count, and keep My-Chat free of scenario command interpretation. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B2-B2a convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B2-B2a convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B2-B2a documentation sync. |
+| 2026-07-12 | R8-B2-B2b key/hash/storage contract sync | PASS | Locked workspace-scoped command-ID uniqueness, bounded opaque identifiers, raw-ID prohibition, versioned namespaced SHA-256 identity/payload hashes, semantic field inclusion/exclusion, and first-commit-wins replay/conflict behavior. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B2-B2b security and dynamic-state boundary scan | PASS | Active contracts keep PII/prose out of request IDs, reserve HMAC for future low-entropy integrations, include finalized business content but exclude model telemetry, and recheck dynamic auth/grant/object state without making it part of request identity. |
+| 2026-07-12 | B2-B2b replay/version drift scan | PASS | Execution versions retain canonicalizer compatibility; same-key/same-hash, same-key/different-hash, new-key/same-payload, failed-attempt correction, and concurrent winner semantics are explicit. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B2-B2b convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B2-B2b convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B2-B2b documentation sync. |
+| 2026-07-12 | R8-B2-C simplified MVP runner/concurrency/result sync | PASS | Locked one immutable Execution table and thin command runner, authenticated fast replay, bounded transaction advisory lock, aggregate optimistic concurrency, stable multi-object order, refs-only results, current-visibility replay, and no IIA deletion path. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B2 complexity/scope reduction scan | PASS | HMAC v2, partition/archive/tombstone jobs, multi-database adapters, Redis, reservation/attempt/processing states, generic lock/rules DSL, and universal transaction retry engine are explicitly deferred rather than implementation blockers. |
+| 2026-07-12 | B2 concurrency and actor compatibility scan | PASS | Same-ID versus same-target concurrency are separate, service-principal retry preserves the business actor, busy/rollback do not consume identity, and Education/ERP-compatible behavioral semantics remain implementation-agnostic outside the Nurture Postgres adapter. |
+| 2026-07-12 | B2 closure next-step scan | PASS | B2-A1/A2, B2-B1, B2-B2a/B2-B2b, and B2-C are closed; overview and roadmap now identify B3 durable family-input routing/clarification as the remaining R8 blocker. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after simplified B2-C convergence and B2 closure. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B2 closure. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B2-C documentation sync. |
+| 2026-07-12 | R8-B3-A Receipt/Item/Event ownership sync | PASS | Reused ChildLinkReceipt for durable family-to-org routing and FamilyCareItem/Event for long clarification, rejected duplicate Routing/Clarification aggregates, and retained InteractionContext/token only for short resolver ambiguity. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B3-A pending-receipt schema correction | PASS | Reconciled B1 unresolved-target pending semantics with nullable grant/data-class/target fields, added stable routingAttemptKey identity independent of nullable state, and required complete current grant/target fields before delivered/read/acknowledged. |
+| 2026-07-12 | B3-A long-clarification contract scan | PASS | Added waiting_for_family + optimistic version and correlated request/received/expired/cancelled ItemEvents; multi-round history is append-only and no dedicated clarification table is required for MVP. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B3-A convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B3-A convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B3-A documentation sync. |
+| 2026-07-12 | R8-B3-B host-first durable-driver sync | PASS | Locked direct atomic fast path versus host-first async Run/Step, required an already-durable typed driver before pending Receipt creation, and kept host Step technical state separate from Nurture business status. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B3-B current-runtime compatibility review | PASS | My-Workflow-Base/My-Chat already provide Run/Step claim/lease/worker execution but no cross-scenario pending scanner; the design reuses existing runtime and records the host ChatMessage owner-read/start-run wiring as implementation work. |
+| 2026-07-12 | B3-B crash-window and boundary scan | PASS | Host-first Run closes pre-capture orphan risk, B2 replay closes post-commit/pre-step-complete gaps, B1 remains activation-only, queue payloads are refs-only, and Receipt stores no lease/attempt/DLQ/provider state. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B3-B convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B3-B convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B3-B documentation sync. |
+| 2026-07-12 | R8-B3-C1 scenario-owned lifecycle-status sync | PASS | Locked My-Chat Run/Step/Handoff and shared Command states as technical/reusable only, while Receipt/Item/Event/token statuses and reasons remain exclusively Nurture business policy. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B3-C1 host-consumption boundary scan | PASS | My-Chat cannot branch on Nurture statuses or edit them through Admin; Nurture presenters/actions produce generic structured UI and business recovery availability from current owner state. |
+| 2026-07-12 | B3-C1 shared-base scope scan | PASS | Shared contracts retain durable-driver, refs-only, replay, and owner-revalidation invariants without adding a generic business lifecycle or universal DriverType/analytics class. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B3-C1 convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B3-C1 convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B3-C1 documentation sync. |
+| 2026-07-12 | R8-B3-C2a-d Nurture transition sync | PASS | Locked grant revoke, source redaction, pre-delivery cancel/post-delivery withdrawal, correction/resend, and clarification deadline/cancel/late-response transitions as Nurture-only lifecycle policy. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B3-C2a-d history/non-erasure scan | PASS | Delivery/read/ack timestamps and append-only events remain auditable; revoke differs from redaction, withdrawal differs from cancellation, and correction/resend never overwrite prior actions. |
+| 2026-07-12 | B3-C2a-d clarification-state scan | PASS | Current wait pointers live on Item, event history remains append-only, token TTL has no business effect, optional deadline is host-first, and late response is retained without inferred consent. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B3-C2a-d convergence. |
+| 2026-07-12 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B3-C2a-d convergence. |
+| 2026-07-12 | `git diff --check` | PASS | No whitespace errors after the B3-C2a-d documentation sync. |
+| 2026-07-12 | R8-B3-C2e technical-exhaustion/Admin-recovery sync | PASS | Locked host exhaustion as manual-review evidence rather than a Receipt transition; only Nurture owner commands may classify blocked, already delivered, recoverable pending, or terminal failed outcomes. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B3-C2e terminality/recovery scan | PASS | Pre-failure technical retry reuses Step/command/routing identity; post-failure recovery creates a new host-first Run/Step, command, routing key, and Receipt linked by `retryOfReceiptId`; failed rows never reopen. |
+| 2026-07-12 | B3-C2e Admin/race/taxonomy scan | PASS | Admin cannot directly mutate Nurture status or gates; delivery-versus-failure uses current-state/version/B2 convergence; MVP adds only `technical_recovery_exhausted` while host evidence retains technical details. |
+| 2026-07-12 | IIA-0-R8 closure scan | PASS | B1/B2/B3-A/B/C1/C2a-e are locked; `grantDependencies[]` and transaction-external remote work already satisfy the two prior refinements, leaving no R8 blocker. |
+| 2026-07-12 | IIA-0 scenarioToken responsibility-boundary sync | PASS | Locked My-Workflow-Base to opaque continuation/structured-interaction protocol and conformance, My-Chat to render/pass-through, and Nurture to local persistence/business recovery/authorization. Design-only; no schema/runtime edits. |
+| 2026-07-12 | scenarioToken scope/complexity scan | PASS | Token remains limited to clarify/submit-action/open-notification continuation, does not become session/authorization/workflow/object-access state, and no central token service/shared DB is introduced before a second scenario validates extraction. |
+| 2026-07-12 | IIA-0 `NurtureInteractionContext` schema-contract sync | PASS | Locked one local row per token, hash-only token storage, participant/purpose/surface binding, versioned purpose payload, optimistic version, and no separate token/session/draft platform. Design-only; no Prisma/runtime edits. |
+| 2026-07-12 | InteractionContext lifecycle/classification scan | PASS | Persisted state is only active/consumed/revoked; expiry derives from `expiresAt`, while current/expired/recoverable/blocked remain resolver outcomes after current-state revalidation. |
+| 2026-07-12 | InteractionContext command/replay scan | PASS | Multi-turn submit derives a stable B2 command identity from context id; direct commands retain invocation identity; consumed submit can recover an exact committed Execution without storing raw host request IDs. |
+| 2026-07-12 | IB resolver-input drift correction | PASS | Removed host-authored target/role-assignment input from the IB schema narrative and aligned it with the locked R3 host invocation envelope plus Nurture-owned resolution. |
+| 2026-07-12 | B1 replay-seed carrier architecture review | PASS WITH BLOCKER RESOLVED IN CONTRACT | Versioned Execution JSON is appropriate because seeds are bounded immutable command results, but persistence alone cannot wake My-Chat; non-empty seeds now require a pre-existing durable host Step. Design-only; no schema/runtime edits. |
+| 2026-07-12 | B1 orphan-seed crash-window scan | PASS | Direct no-Run commands are limited to explicit empty snapshots; requested activation without a service-authenticated durable Step fails before Nurture commit, while post-commit response loss is recovered by Step replay. |
+| 2026-07-12 | B1 responsibility/complexity review | PASS | Nurture owns business + Execution + replay seed; My-Chat owns Step + Handoff Ledger + outbox/attempts; My-Workflow-Base owns contracts only. No scanner, Nurture outbox, Redis state, Saga, or extra model call is introduced. |
+| 2026-07-12 | B1 current-host readiness review | BLOCKED FOR IMPLEMENTATION | My-Chat `complete_step` currently lacks handoff drafts/materialized results, Handoff Ledger has no discovered concrete Postgres repository/model, and the Nurture adapter is synthetic. Non-empty snapshots remain disabled until the cross-repo host prerequisite is implemented. |
+| 2026-07-12 | B1 claimed-Step driver-attestation sync | PASS | Locked persist+claim before Nurture invocation, trusted runtime driver context, transient non-persisted claim token/version, and host-side final claim validation without a cyclic owner-read. Design-only; no runtime edits. |
+| 2026-07-12 | B1 exclusive replay-owner scan | PASS | Only the persisted original Step ref may retrieve non-empty snapshots; reclaim may rotate token/version, another Step cannot take over, Admin uses the original Step, and post-materialization replay stays on Handoff Ledger. |
+| 2026-07-12 | B1 claim-expiry/cancel race scan | PASS | Claim expiry reclaims the same Step and B2-replays; cancellation never deletes recovery evidence and cannot erase a committed Nurture result; current gates determine stopped/completed host activation. |
+| 2026-07-12 | B1 driver-complexity/security scan | PASS | No Nurture owner-read callback, signed driver-token platform, cross-DB lock, or persisted/logged claim secret; service/ref/binding mismatch fails before first commit and wrong-Step replay exposes no snapshots. |
+| 2026-07-13 | Cross-repo dependency/source inspection | PASS | Confirmed My-Workflow-Base is template-only, Nurture directly consumes My-Chat workflow packages, My-Chat has Run/Step/Outbox schema but its current workflow-runtime task excludes concrete persistence, and Nurture supports host runtime injection with synthetic defaults. |
+| 2026-07-13 | X0-X5/N1-N2 sequencing review | PASS | Contract-first adoption, host Step then Handoff kernels, parallel Nurture explicit-empty core, gated activation integration, and joint enablement are independently mergeable and avoid a three-repo cutover. |
+| 2026-07-13 | Implementation-entry worktree scan | CONDITIONAL PASS | My-Workflow-Base and My-Chat were clean; The-Nurture was ahead one commit with extensive existing changes. X0/X1 may start; N1 requires scoped isolation/commit before schema work. |
+| 2026-07-13 | G0 formal baseline isolation | PASS | Reconstructed from `origin/main` as five independent increments; production Prisma has only Nurture tables and backend-private Prisma has only workflow dev-host tables. No institution schema/live manifest was added. |
+| 2026-07-13 | G0 test and ownership matrix | PASS | 86 unit, 15 production DB, 14 dev-host E2E, both catalog boundaries, frontend lint/build, contract pin, context, and governance passed. N1 dirty-worktree blocker is resolved; X1 remains its contract dependency. |

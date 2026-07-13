@@ -5,7 +5,7 @@ import type {
   WorkflowCommandResponse,
   WorkflowRunRef,
   WorkflowStepHandlerInput,
-} from "../types.js";
+} from "@my-chat/workflow-contracts";
 
 const runRef = (input: WorkflowStepHandlerInput, status: string): WorkflowRunRef => ({
   run_id: input.run_id,
@@ -44,16 +44,23 @@ const actionResponse = (
   outbox_event_ids: [`${input.meta.idempotency_key}:${input.action}`],
 });
 
-export const confirmAction: WorkflowActionHandler = async (input) => actionResponse(input, "confirmed");
-export const rejectAction: WorkflowActionHandler = async (input) => actionResponse(input, "rejected");
-export const retryAction: WorkflowActionHandler = async (input) => actionResponse(input, "retry_requested");
-export const cancelAction: WorkflowActionHandler = async (input) => actionResponse(input, "cancelled");
-export const createHandoffAction: WorkflowActionHandler = async (input) => actionResponse(input, "handoff_requested");
+// Scenario-specific action handlers. The host validator (WF-MAN-011) requires
+// every manifest `action_availability.scenario_actions` key to resolve to a
+// handler registered here under that exact key. Shared actions (approve,
+// reject, confirm, retry, cancel, ...) are handled generically by the host
+// runtime and are not part of this scenario action registry.
+export const adjustActivityWeightsAction: WorkflowActionHandler = async (input) =>
+  actionResponse(input, "intervention_recorded");
+export const updateCareConstraintsAction: WorkflowActionHandler = async (input) =>
+  actionResponse(input, "intervention_recorded");
+export const markHealthSafetyEscalatedAction: WorkflowActionHandler = async (input) =>
+  actionResponse(input, "safety_escalated");
+export const attachNurtureProfileSnapshotAction: WorkflowActionHandler = async (input) =>
+  actionResponse(input, "profile_attached");
 
 export const nurtureActions: WorkflowActionRegistry = {
-  "nurture.confirm": confirmAction,
-  "nurture.reject": rejectAction,
-  "nurture.retry": retryAction,
-  "nurture.cancel": cancelAction,
-  "nurture.create_handoff": createHandoffAction,
+  adjust_activity_weights: adjustActivityWeightsAction,
+  update_care_constraints: updateCareConstraintsAction,
+  mark_health_safety_escalated: markHealthSafetyEscalatedAction,
+  attach_nurture_profile_snapshot: attachNurtureProfileSnapshotAction,
 };

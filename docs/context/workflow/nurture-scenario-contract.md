@@ -2,24 +2,32 @@
 
 ## Decision
 
-The Nurture is a My-Chat scenario module. My-Chat owns host runtime; The Nurture owns only scenario-specific workflow logic and projections.
+The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
+
+My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, workflows, and data.
+
+The Nurture basic product unit is not family or classroom. The basic unit is a child's care process: parents join the child's care process, teachers incorporate the child's care process into their daily care workflow, and institution managers govern how these processes are organized and executed.
 
 ## Ownership
 
 The Nurture owns:
 
 - Scenario manifest, capabilities, handlers, actions, presenters, adapters, policies, repository ports.
-- Scenario-local profile projections attached to My-Chat canonical object refs.
+- Scenario-local canonical care ecology objects: child care process, participant, role assignment, family, guardian, care institution, care group, enrollment, caregiver assignment, consent/grant, care communication, daily care, attention board, and media attribution facts.
 - Pregnancy, care-plan, family-strategy, activity-comparison, execution-review, and health-safety artifacts.
+- Institution ecology artifacts: family-care messages, family-care items, daily care logs, teacher attention summaries, caregiver observations, cohort plans, child media attribution summaries, and child album views.
 - Scenario-specific web console and internal APIs.
 
 My-Chat owns:
 
-- Canonical object identity and resolvers.
-- Auth, shared workflow runtime, routes, workers, outbox, ledgers, handoffs, and evidence.
-- Dashboard, chat, mobile, forum, knowledge base, notification, and admin consumers.
+- Canonical account identity: user account, authentication, session, and global user id.
+- Scenario shell and host runtime: shared workflow runtime, routes, workers, outbox, ledgers, handoffs, and evidence.
+- Mobile/web shell, notification, deep link, forum, knowledge base, dashboard, and admin consumers.
+- User-facing entry and rendering surfaces that call back into Nurture-owned APIs for Nurture business facts.
 
 Do not copy My-Workflow-Base host runtime into this repo. Integration should register `nurtureScenarioModule` with the My-Chat host and replace local compatibility types with host `workflow-contracts`.
+
+Do not put My-Chat account auth, session, or global user semantics into Nurture. Do not put Nurture-specific family, child, institution, caregiver, enrollment, consent, or care communication semantics into My-Chat as canonical business facts.
 
 ## P0 Workflows
 
@@ -33,18 +41,36 @@ Do not copy My-Workflow-Base host runtime into this repo. Integration should reg
 
 Canonical refs required from My-Chat:
 
-- `my_chat.child`
-- `my_chat.expectant_mother`
-- `my_chat.parent`
-- `my_chat.family`
+- `my_chat.user`
+- `my_chat.workspace` or shell entry ref when needed for routing
+- `my_chat.thread_surface` or equivalent render/deep-link ref when a Nurture-owned thread is shown inside My-Chat mobile/web
+- `my_chat.notification_target` when Nurture needs host notification/deep-link delivery
 
-Scenario-local refs allowed:
+Scenario-local canonical refs owned by Nurture:
 
+- `nurture.participant`
+- `nurture.child`
+- `nurture.child_care_process`
+- `nurture.family`
+- `nurture.guardian_role`
+- `nurture.care_institution`
+- `nurture.care_group`
+- `nurture.caregiver_role`
+- `nurture.institution_admin_role`
+- `nurture.enrollment`
+- `nurture.child_link_grant`
+- `nurture.family_care_thread`
+- `nurture.family_care_message`
+- `nurture.family_care_item`
 - `nurture.nurture_profile`
 - `nurture.activity_option`
 - `nurture.health_state_summary`
 
-Nurture profile projections MUST point to a My-Chat canonical object. Do not create a separate child, parent, or family identity owned only by The Nurture.
+Nurture scenario participants that correspond to login users MUST reference `my_chat.user`. Nurture role and relationship semantics MUST be resolved from Nurture data, not inferred from My-Chat account state.
+
+Nurture children are not My-Chat users. A child care process is Nurture-owned and may have multiple guardian participants, caregiver participants, and institution-manager participants attached through Nurture role assignments.
+
+Nurture family-care communication is Nurture-owned when the conversation is created through a Nurture care workflow. My-Chat MAY render the thread, deliver notifications, and hold display-safe shell references, but the message body, care item extraction, status, acknowledgment, reply, and follow-up facts remain Nurture canonical.
 
 ## Handoffs
 
@@ -53,8 +79,12 @@ Handoff payloads are refs-only.
 - `public_draft` -> `my_chat.forum`
 - `knowledge_candidate` -> `my_chat.knowledge_base`
 - `notification` -> `my_chat.notification`
+- `family_care_item` -> `my_chat.notification` for teacher/guardian delivery surfaces only; Nurture remains canonical for the care item.
+- `family_care_reply` -> `my_chat.notification` for delivery receipt only; Nurture remains canonical for the message and thread.
 
-Downstream services reread artifacts through host-owned APIs and apply their own policies.
+Downstream services reread Nurture-owned artifacts through Nurture APIs exposed via the My-Chat scenario shell, then apply their own delivery/display policies.
+
+Cross-surface delivery does not transfer ownership. A My-Chat deep link points back to a Nurture-owned business object.
 
 ## Health Boundary
 
@@ -66,13 +96,15 @@ Escalate or block requests for emergency triage, diagnosis, medication decisions
 
 `prisma/schema.prisma` is the schema SSOT.
 
-Local testing MAY use independent Postgres. Cloud integration SHOULD use My-Chat Postgres with a dedicated schema or `nurture_*` table group after migration gates pass.
+Nurture MAY use an independent database or a dedicated `nurture_*` schema/table group behind the My-Chat scenario shell. Nurture-owned care ecology facts should be canonical in the Nurture persistence boundary. My-Chat should store only account/shell/runtime facts, delivery metadata, and display-safe projections required by shared surfaces.
 
 ## Integration Gates
 
 - Host `workflow-contracts` replaces local compatibility types.
 - Host module validator accepts `packages/nurture-scenario/scenario.manifest.yaml`.
-- My-Chat canonical object resolver keys exist.
+- My-Chat canonical account/user resolver keys exist.
+- Nurture resolver keys exist for child care process, participant, family, institution, care group, enrollment, child link grant, family-care thread, message, and item.
 - Shared surfaces consume only standard workflow refs and safe artifact previews.
+- Shared mobile/chat/dashboard surfaces do not become the canonical source for Nurture family-care messages or care items.
 - Health safety policies are tested before pregnancy or care-plan workflows are enabled.
 - DB namespace, migrations, indexes, rollback/export, and seed-data boundaries are reviewed before cloud apply.

@@ -1,0 +1,211 @@
+// Backend-private workflow dev-host persistence.
+// This schema is test/development infrastructure and is never deployed to the Nurture production database.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/dev-host-prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DEV_HOST_DATABASE_URL")
+}
+
+enum WorkflowStepResultStatus {
+  completed
+  failed
+  retry_requested
+  manual_review_required
+}
+
+enum WorkflowApprovalStatus {
+  pending
+  approved
+  rejected
+  confirmed
+}
+
+// @dev-host harness-only — never promoted to cloud
+model WorkflowRun {
+  id                       String   @id @default(uuid())
+  workspaceId              String   @map("workspace_id")
+  scenarioKey              String   @map("scenario_key")
+  capabilityKey            String   @map("capability_key")
+  entrypointKey            String   @map("entrypoint_key")
+  workflowVersionId        String   @map("workflow_version_id")
+  status                   String
+  aggregateVersion         Int      @default(0) @map("aggregate_version")
+  actorId                  String?  @map("actor_id")
+  requirementValuesPayload Json?    @map("requirement_values_payload")
+  contextRefsPayload       Json?    @map("context_refs_payload")
+  canonicalRefsPayload     Json?    @map("canonical_refs_payload")
+  aggregateVersionsPayload Json?    @map("aggregate_versions_payload")
+  idempotencyKey           String?  @map("idempotency_key")
+  correlationId            String?  @map("correlation_id")
+  traceId                  String?  @map("trace_id")
+  clientSurface            String?  @map("client_surface")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  steps           WorkflowStep[]
+  artifacts       WorkflowArtifact[]
+  approvals       WorkflowApproval[]
+  contextBindings WorkflowContextBinding[]
+  outboxEvents    WorkflowOutboxEvent[]
+
+  @@unique([workspaceId, idempotencyKey], map: "uq_6")
+  @@index([workspaceId, scenarioKey, status], map: "ix_51")
+  @@index([workspaceId, status, updatedAt], map: "ix_52")
+  @@map("workflow_run")
+}
+
+// @dev-host harness-only — never promoted to cloud
+model WorkflowStep {
+  id                String                    @id @default(uuid())
+  runId             String                    @map("run_id")
+  workspaceId       String                    @map("workspace_id")
+  stepKey           String                    @map("step_key")
+  stepOrder         Int                       @map("step_order")
+  status            String
+  resultStatus      WorkflowStepResultStatus? @map("result_status")
+  aggregateVersion  Int                       @default(0) @map("aggregate_version")
+  claimToken        String?                   @map("claim_token")
+  claimedByWorkerId String?                   @map("claimed_by_worker_id")
+  claimExpiresAt    DateTime?                 @map("claim_expires_at")
+  outputRefsPayload Json?                     @map("output_refs_payload")
+  reasonCode        String?                   @map("reason_code")
+  retryable         Boolean?
+  idempotencyKey    String?                   @map("idempotency_key")
+  correlationId     String?                   @map("correlation_id")
+  createdAt         DateTime                  @default(now()) @map("created_at")
+  updatedAt         DateTime                  @updatedAt @map("updated_at")
+
+  run WorkflowRun @relation(fields: [runId], references: [id])
+
+  @@unique([runId, stepKey], map: "uq_7")
+  @@unique([claimToken], map: "uq_8")
+  @@index([runId, stepOrder], map: "ix_53")
+  @@index([workspaceId, status], map: "ix_54")
+  @@map("workflow_step")
+}
+
+// @dev-host harness-only — never promoted to cloud
+model WorkflowArtifact {
+  id                String    @id @default(uuid())
+  runId             String    @map("run_id")
+  stepId            String?   @map("step_id")
+  workspaceId       String    @map("workspace_id")
+  artifactType      String    @map("artifact_type")
+  exposureLevel     String    @map("exposure_level")
+  sourceRefsPayload Json?     @map("source_refs_payload")
+  storageRefPayload Json?     @map("storage_ref_payload")
+  safeTitle         String?   @map("safe_title")
+  safeSummary       String?   @map("safe_summary") @db.Text
+  safePreview       String?   @map("safe_preview") @db.Text
+  unavailableReason String?   @map("unavailable_reason")
+  status            String?
+  aggregateVersion  Int       @default(0) @map("aggregate_version")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  expiredAt         DateTime? @map("expired_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  run WorkflowRun @relation(fields: [runId], references: [id])
+
+  @@index([runId, artifactType], map: "ix_55")
+  @@index([workspaceId, status], map: "ix_56")
+  @@index([stepId], map: "ix_57")
+  @@map("workflow_artifact")
+}
+
+// @dev-host harness-only — never promoted to cloud
+model WorkflowApproval {
+  id               String                 @id @default(uuid())
+  runId            String                 @map("run_id")
+  stepId           String?                @map("step_id")
+  workspaceId      String                 @map("workspace_id")
+  targetType       String                 @map("target_type")
+  targetId         String                 @map("target_id")
+  targetRefPayload Json?                  @map("target_ref_payload")
+  status           WorkflowApprovalStatus
+  action           String?
+  reasonCode       String?                @map("reason_code")
+  expectedVersion  Int?                   @map("expected_version")
+  aggregateVersion Int                    @default(0) @map("aggregate_version")
+  actorId          String?                @map("actor_id")
+  idempotencyKey   String?                @map("idempotency_key")
+  correlationId    String?                @map("correlation_id")
+  requestedAt      DateTime               @default(now()) @map("requested_at")
+  resolvedAt       DateTime?              @map("resolved_at")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  run WorkflowRun @relation(fields: [runId], references: [id])
+
+  @@index([runId, status], map: "ix_58")
+  @@index([workspaceId, status], map: "ix_59")
+  @@index([targetType, targetId], map: "ix_60")
+  @@map("workflow_approval")
+}
+
+// @dev-host harness-only — never promoted to cloud
+model WorkflowContextBinding {
+  id                      String   @id @default(uuid())
+  runId                   String?  @map("run_id")
+  stepId                  String?  @map("step_id")
+  workspaceId             String   @map("workspace_id")
+  targetType              String   @map("target_type")
+  targetId                String   @map("target_id")
+  targetRefPayload        Json?    @map("target_ref_payload")
+  contextRefsPayload      Json     @map("context_refs_payload")
+  snapshotRefsPayload     Json?    @map("snapshot_refs_payload")
+  expectedVersionsPayload Json?    @map("expected_versions_payload")
+  status                  String?
+  rebindReason            String?  @map("rebind_reason")
+  aggregateVersion        Int      @default(0) @map("aggregate_version")
+  idempotencyKey          String?  @map("idempotency_key")
+  correlationId           String?  @map("correlation_id")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  run WorkflowRun? @relation(fields: [runId], references: [id])
+
+  @@index([runId, status], map: "ix_61")
+  @@index([workspaceId, targetType, targetId], map: "ix_62")
+  @@map("workflow_context_binding")
+}
+
+// @dev-host harness-only — never promoted to cloud
+// P3 note: OutboxEventDraft (workflow-contracts) has no idempotency_key. The host
+// derives each row's idempotencyKey from WorkflowCommandMeta.idempotency_key; the
+// composite unique (workspaceId, idempotencyKey, eventType) lets one command emit
+// several distinct event types idempotently. Do not add a column for this.
+model WorkflowOutboxEvent {
+  id               String    @id @default(uuid())
+  workspaceId      String    @map("workspace_id")
+  runId            String?   @map("run_id")
+  stepId           String?   @map("step_id")
+  eventType        String    @map("event_type")
+  aggregateType    String    @map("aggregate_type")
+  aggregateId      String    @map("aggregate_id")
+  aggregateVersion Int       @map("aggregate_version")
+  payload          Json
+  idempotencyKey   String    @map("idempotency_key")
+  correlationId    String?   @map("correlation_id")
+  traceId          String?   @map("trace_id")
+  clientSurface    String?   @map("client_surface")
+  status           String    @default("pending")
+  dispatchedAt     DateTime? @map("dispatched_at")
+  dispatchAttempts Int       @default(0) @map("dispatch_attempts")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  run WorkflowRun? @relation(fields: [runId], references: [id])
+
+  @@unique([workspaceId, idempotencyKey, eventType], map: "uq_9")
+  @@index([status, createdAt], map: "ix_63")
+  @@index([workspaceId, eventType], map: "ix_64")
+  @@index([aggregateType, aggregateId], map: "ix_65")
+  @@index([runId], map: "ix_66")
+  @@map("workflow_outbox_event")
+}

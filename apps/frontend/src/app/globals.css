@@ -1,0 +1,8 @@
+/* Host-authored layout CSS (linted by the kit stylelint preset — typography is
+ * owned by the kit's type scale, so no literal font-size/weight/family here). */
+
+.nurture-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1rem;
+}

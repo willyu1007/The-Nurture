@@ -15,7 +15,7 @@ import type {
   WorkflowRunWorkbench,
   WorkflowScenarioModule,
   WorkflowStepLease,
-} from "../types.js";
+} from "@my-chat/workflow-contracts";
 
 const runRef = (
   meta: WorkflowCommandMeta,
@@ -193,14 +193,14 @@ export const nurtureAdapters: WorkflowScenarioModule["adapters"] = {
       };
     },
     async create_handoff(input): Promise<WorkflowHandoffResult> {
+      const sourceRef = input.source_refs[0];
       return {
-        handoff_ref: {
-          kind: "workflow_handoff",
-          id: `${input.workspace_id}:${input.handoff_type}:${input.source_artifact_ref.id}:${input.requested_purpose}`,
-          version: 1,
-        },
-        receipt_required: input.handoff_type !== "notification",
-        downstream_owner: input.handoff_type === "public_draft" ? "my_chat.forum" : "my_chat.knowledge_base",
+        handoff_id: `${input.handoff_type}:${sourceRef?.id ?? "unknown"}:${input.requested_purpose}`,
+        handoff_type: input.handoff_type,
+        status: "requested",
+        source_refs: input.source_refs,
+        downstream_refs: [],
+        aggregate_version: 1,
       };
     },
   },
@@ -312,7 +312,7 @@ export const nurtureAdapters: WorkflowScenarioModule["adapters"] = {
         data: {
           run_id: input.run_id,
           step_id: input.step_id,
-          status: input.reason_code,
+          status: input.retryable ? "retry_requested" : "failed",
           aggregate_version: input.expected_version + 1,
           output_refs: [],
         },

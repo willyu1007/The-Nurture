@@ -6,7 +6,7 @@ Rules:
 
 - This package owns Nurture manifest, handlers, actions, presenters, policies, adapters, repository ports, and deterministic journey fixtures.
 - My-Chat owns host runtime, routes, workers, outbox, shared ledgers, handoffs, and downstream consumers.
-- Local TypeScript contract types are compatibility stubs. Replace them with My-Chat host `workflow-contracts` during integration.
+- Contract types come from the pinned My-Chat `workflow-contracts` package; local duplicate contract types are forbidden.
 - Health-state outputs must stay non-diagnostic and non-prescriptive.
 
 Primary entry:
