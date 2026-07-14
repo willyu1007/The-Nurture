@@ -2,9 +2,22 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-13
-- Current phase: N1 explicit-empty implementation
+- Last updated: 2026-07-15
+- Current phase: X4/N2 implementation entry; N1 remains explicit-empty
 - Code/config/schema impact: additive Nurture production schema, shared command/resolver/policy code, first inbox/attention capabilities, and tests; no My-Chat runtime tables and no non-empty activation
+
+## X4/N2 Entry Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| My-Chat X3 delivery | PASS | Final local delivery revision `4d40d81cceaa5eee84134729900cc3f5c2e15547`; X3 code hardening is `f73eba9`; post-commit typecheck, 323 non-DB tests, lint, context, environment, database, governance, and clean-tree gates pass. |
+| Exact dependency pin | PASS | `docs/project/integrations/my-chat-workflow-contract.json` now requires My-Chat `4d40d81`; live verification rejects any different checkout revision. |
+| Base/My-Chat contract parity | PASS | Both contract roots hash to `0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa`; the cross-layout logical source hash remains `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`. |
+| Nurture scenario pin | PASS | Context contract, YAML manifest, module, and registry remain pinned at `de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125`. |
+| Pin regression tests | PASS | 4/4 cover ordering/traversal stability, content/path drift, path escape, and exact-revision drift rejection. |
+| Nurture static/unit gate | PASS AFTER REPAIR | Typecheck; 152/152 unit tests; production and placeholder dev-host Prisma validation; persistence and N1 schema boundaries; test routing/population; context strict; governance; and whitespace checks pass. |
+| Local dependency snapshot | PASS AFTER REPAIR | The first run found the pnpm `file:` runtime snapshot missing three new X3 source files. `pnpm install --offline --frozen-lockfile --force` rebuilt `node_modules` without lockfile changes; typecheck and the two previously blocked conformance suites then passed. |
+| Activation posture | PASS | Capability remains unavailable; Nurture still persists explicit `[]` snapshots and no X4 code path is active. |
 
 ## N1 Entry Evidence
 

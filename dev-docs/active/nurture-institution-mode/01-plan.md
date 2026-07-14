@@ -172,6 +172,15 @@
 | N1-E | Complete | Family input → receipt/item/attention, caregiver acknowledge/reply, grant revoke, source redaction, pre-delivery cancel, class inbox/attention owner reads; explicit `[]` only. |
 | N1-F | Complete | Approved production-DB migration apply; 22/22 DB tests; DB-backed capture/replay/revoke/redaction/cancel and direct surface journey; YAML/registry/module conformance; final architecture repairs and N1 review. |
 
+**X4/N2 implementation-entry checkpoints（2026-07-15）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| X4-0A | Complete | My-Chat X3 hardening delivered and post-commit verified at final revision `4d40d81`. |
+| X4-0B | Complete | Nurture dependency pin updated to X3; Base/My-Chat parity, scenario pin, and negative drift tests pass. |
+| X4-0C | Complete | Nurture typecheck, 152 unit tests, Prisma/schema/boundary, routing/population, context, governance, and whitespace gates pass after refreshing the local `file:` dependency snapshot. |
+| X4-0D | In progress | Commit the pin/SSOT update, create independent X4 branches from immutable baselines, and lock the first vertical slice/test matrix before changing non-empty persistence, manifest activation, or host composition. |
+
 **Cross-repo task ownership：**
 
 - My-Workflow-Base：复用 `dev-docs/active/workflow-base`，因为 X0 是既有模板合同收敛。

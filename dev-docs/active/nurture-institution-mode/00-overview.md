@@ -3,17 +3,17 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）/ X4/N2 entry gate（in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-14
 - **Owner:** willyu1007
-- **Next step:** Hold Nurture non-empty activation. Proceed with the cross-repo X3 My-Chat Handoff kernel readiness/implementation gate; only after X3 passes may X4/N2 connect claimed drivers, non-empty snapshots, `handoff_key`, context sources, and `user_attention`. N1 is closed with DB-backed `class_family_inbox` / `teacher_attention_board` owner-read surfaces, while every committed Execution and institution workflow result remains explicit-empty.
+- **Next step:** My-Chat X3 is delivered at `4d40d81`; close the X4/N2 entry verification and create independent My-Chat/The-Nurture X4 branches. Keep Nurture non-empty activation disabled until claimed-driver provenance, non-empty replay seeds, manifest declarations, the real `user_attention` owner, and development capability composition pass their X4 gates. N1 remains DB-backed and explicit-empty.
 
 ## N1 Adopted Contract Baseline
 
 - My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
 - My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
-- My-Chat current local dependency revision: `bda1542d6e6989a348254917a5e49f30de68083d` (X2; `packages/workflow-contracts` is byte-identical to the X1 revision).
+- My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).
 - Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
 - N1 activation posture: capability activation disabled; all command handoff snapshots are explicit empty arrays.
 - N1 scenario source pin: `de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125` over the workflow context contract, YAML manifest, module, and live TypeScript registry.

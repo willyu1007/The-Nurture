@@ -17,8 +17,19 @@ This file exists to prevent repeating mistakes within this task.
 - Do not leave teachers with one UI thread per child family group; teacher-side family communication must aggregate into class inbox / attention board workflows.
 - Do not declare institution context resolvers or live manifest handlers before the host registry and DB-backed owner-read path exist; legacy validation will fail or the manifest will advertise a non-functional surface.
 - Do not authorize an item action from an arbitrary current grant; first revalidate the grant identity bound to that item so a replacement grant cannot reactivate old work.
+- Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 
 ## Pitfall log (append-only)
+
+### 2026-07-15 — Updating the My-Chat pin without refreshing the pnpm file snapshot
+
+- Symptom: The exact revision/hash verifier passed at My-Chat X3, but Nurture typecheck and two unit suites failed because the installed workflow-runtime package exported three files that were absent from its stale local snapshot.
+- Context: Nurture uses `file:../../../My-Chat/packages/workflow-runtime`; the lockfile directory key stayed valid while the adjacent package contents changed.
+- What we tried: Ran the full static gate immediately after changing only the revision pin.
+- Why it failed: Revision/hash verification reads the adjacent repository, while TypeScript and Vitest load pnpm's installed `file:` package snapshot. Those are separate freshness boundaries.
+- Fix / workaround: Run `pnpm install --offline --frozen-lockfile --force` to rebuild the local snapshot without changing dependency resolution, then rerun typecheck and unit tests. Use a non-connecting placeholder `DEV_HOST_DATABASE_URL` for schema-only dev-host Prisma validation.
+- Prevention: Every adopted My-Chat revision must pass both the exact pin verifier and an installed-package freshness gate before X4 code begins.
+- References: `docs/project/integrations/my-chat-workflow-contract.json`, `04-verification.md` X4/N2 entry evidence.
 
 ### 2026-07-03 — Treating institution mode as ordinary family-mode extension
 
