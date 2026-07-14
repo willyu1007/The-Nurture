@@ -85,7 +85,9 @@ Nurture family-care communication is Nurture-owned when the conversation is crea
 
 Handoff payloads are refs-only.
 
-N1 institution activation is deliberately disabled: every committed `NurtureCommandExecution` stores `handoffRequestSnapshotsPayload=[]`, and inbox/attention workflow handlers return `handoff_drafts=[]`. The family-care notification/deep-link routes below are ownership declarations for the later X4/N2 activation increment, not an enabled non-empty delivery path in N1.
+N1 institution activation remains disabled in the advertised runtime: direct commands store `handoffRequestSnapshotsPayload=[]`, and inbox/attention workflow handlers return `handoff_drafts=[]`. X4-A adds an unadvertised command-kernel foundation that can persist one `user_attention` replay seed only when an immediate family-input command receives trusted claimed-Step driver context. The manifest still declares no non-empty handoff key/source path, no live handler supplies that context, and the host capability remains disabled.
+
+The transient driver is validated before command identity lookup or mutation. Nurture persists only a canonical `host.workflow/workflow_step` ref bound to the `nurture` consumer; claim token and Step version are neither hashed nor stored. Same-Step reclaim may rotate that evidence, but another Step cannot replay the seed. Snapshot contents are bounded refs-only values over the Nurture-owned message, receipt, and item; downstream content still requires current owner reread.
 
 - `public_draft` -> `my_chat.forum`
 - `knowledge_candidate` -> `my_chat.knowledge_base`
@@ -118,7 +120,7 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
 - Shared surfaces consume only standard workflow refs and safe artifact previews.
 - Institution inbox/attention surfaces call Nurture owner-read handlers and receive only safe labels, generic badges, aggregate versions, and opaque item refs; My-Chat must not branch on Nurture business lifecycle values.
 - Institution owner reads re-resolve current participant/role/care-group scope and recheck enrollment, thread membership, the item-linked grant, source lifecycle, and redaction before every display.
-- N1 institution command executions and workflow handlers remain explicit-empty until X4/N2 is enabled behind the My-Chat host capability gate.
+- Advertised institution workflow handlers remain explicit-empty until the X4 manifest/bridge/consumer path is enabled behind the My-Chat host capability gate. The dormant X4-A command foundation is not evidence that activation is enabled.
 - Shared mobile/chat/dashboard surfaces do not become the canonical source for Nurture family-care messages or care items.
 - Health safety policies are tested before pregnancy or care-plan workflows are enabled.
 - DB namespace, migrations, indexes, rollback/export, and seed-data boundaries are reviewed before cloud apply.

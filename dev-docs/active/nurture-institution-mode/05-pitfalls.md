@@ -21,6 +21,15 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Pitfall log (append-only)
 
+### 2026-07-15 — Persisting the transient host driver shape verbatim
+
+- Symptom: Early X4-A code required `consumer_scenario_key=nurture` on the incoming driver even though the shared Base conformance fixture is owner-shaped and omits that field; the live My-Chat X3 helper also carried a transient Step version that must never be stored.
+- Context: `ScenarioCommandDriverContext.driverRef` is claim-time host evidence, while `NurtureCommandExecution.handoffDriverRef` is scenario-owned replay provenance. They identify the same Step but have different persistence constraints.
+- Root cause: Treating the transport shape and persisted shape as one DTO creates either Base incompatibility or a path for claim/version data to leak into Nurture.
+- Fix / workaround: Accept the Base owner-shaped ref (optionally already bound to Nurture), reject version/unknown keys, and construct a new exact five-field persisted ref with the Nurture consumer. Keep token/version only in the transient driver context.
+- Prevention: Test the real Base conformance fixture shape and assert both positive same-Step replay and negative secret/version persistence at unit, SQL-constraint, and DB-integration layers.
+- References: `packages/nurture-scenario/src/domain/commands/handoff-replay.ts`, `04-verification.md` X4-A evidence.
+
 ### 2026-07-15 — Updating the My-Chat pin without refreshing the pnpm file snapshot
 
 - Symptom: The exact revision/hash verifier passed at My-Chat X3, but Nurture typecheck and two unit suites failed because the installed workflow-runtime package exported three files that were absent from its stale local snapshot.

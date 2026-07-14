@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
+import type {
+  DomainContextRef,
+  ScenarioCommandDriverContext,
+} from "@my-chat/workflow-contracts";
 import {
   NurtureCommandRunner,
   canonicalJsonV1,
@@ -23,6 +26,24 @@ const outputRef = (version = 1): DomainContextRef => ({
   owner_scope: "workspace",
 });
 
+const driver = (
+  stepId = "step-1",
+  claimToken = "claim-token-1",
+  expectedStepVersion = 2,
+): ScenarioCommandDriverContext => ({
+  driverRef: {
+    namespace: "host.workflow",
+    object_type: "workflow_step",
+    object_id: stepId,
+    owner_scope: "workspace",
+  },
+  contractHash: "contract-hash-1",
+  capabilityKey: "test_capability",
+  entrypointKey: "execute_test",
+  claimToken,
+  expectedStepVersion,
+});
+
 const spec = (effect: () => void, decision: "ready" | "blocked" | "already_satisfied" = "ready"):
   NurtureCommandSpec<{ value: number }> => ({
   command_key: "test.apply",
@@ -38,6 +59,17 @@ const spec = (effect: () => void, decision: "ready" | "blocked" | "already_satis
   apply: async () => {
     effect();
     return { output_refs: [outputRef()] };
+  },
+});
+
+const activationSpec = (effect: () => void): NurtureCommandSpec<{ value: number }> => ({
+  ...spec(effect),
+  handoff: {
+    capability_key: "test_capability",
+    entrypoint_key: "execute_test",
+    handoff_key: "user_attention",
+    requested_purpose: "user_attention",
+    select_source_context_refs: (_input, outputRefs) => [...outputRefs],
   },
 });
 
@@ -104,6 +136,164 @@ describe("NurtureCommandRunner", () => {
       status: "not_committed",
       decision: "idempotency_conflict",
       reason_code: "command_request_payload_mismatch",
+    });
+  });
+
+  it("requires a valid claimed Step before activation without consuming command identity", async () => {
+    let effects = 0;
+    const repository = createInMemoryNurtureCommandRepository();
+    const commandSpec = activationSpec(() => {
+      effects += 1;
+    });
+    const missing = await command(repository, commandSpec, {
+      handoff_activation: { request_id: "attention-1" },
+    });
+    expect(missing).toEqual({
+      status: "not_committed",
+      decision: "invalid",
+      reason_code: "missing_durable_handoff_driver",
+    });
+    expect(effects).toBe(0);
+
+    const corrected = await command(repository, commandSpec, {
+      handoff_activation: { request_id: "attention-1", driver_context: driver() },
+    });
+    expect(corrected).toMatchObject({ status: "ok", disposition: "executed" });
+    expect(effects).toBe(1);
+  });
+
+  it("persists a refs-only replay seed and fences replay to the original Step", async () => {
+    let effects = 0;
+    const repository = createInMemoryNurtureCommandRepository();
+    const commandSpec = activationSpec(() => {
+      effects += 1;
+    });
+    const first = await command(repository, commandSpec, {
+      handoff_activation: { request_id: "attention-1", driver_context: driver() },
+    });
+    expect(first).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      handoff_request_snapshots: [
+        {
+          requestId: "attention-1",
+          handoffKey: "user_attention",
+          requestedPurpose: "user_attention",
+          sourceContextRefs: [{ object_type: "test_output", object_id: "output-1" }],
+        },
+      ],
+    });
+
+    const record = await repository.findCommitted({
+      workspace_id: workspaceId,
+      command_request_id_hash: hashCommandRequestId(workspaceId, "command-1"),
+    });
+    expect(record?.handoff_driver_ref).toEqual({
+      namespace: "host.workflow",
+      consumer_scenario_key: "nurture",
+      object_type: "workflow_step",
+      object_id: "step-1",
+      owner_scope: "workspace",
+    });
+    expect(JSON.stringify(record)).not.toContain("claim-token-1");
+    expect(JSON.stringify(record?.handoff_driver_ref)).not.toContain("version");
+
+    const reclaimed = await command(repository, commandSpec, {
+      handoff_activation: {
+        request_id: "attention-1",
+        driver_context: driver("step-1", "rotated-claim-token", 9),
+      },
+    });
+    expect(reclaimed).toMatchObject({ status: "ok", disposition: "replayed" });
+    expect(effects).toBe(1);
+
+    const wrongStep = await command(repository, commandSpec, {
+      handoff_activation: {
+        request_id: "attention-1",
+        driver_context: driver("step-other", "other-token", 1),
+      },
+    });
+    expect(wrongStep).toEqual({
+      status: "not_committed",
+      decision: "invalid",
+      reason_code: "invalid_durable_handoff_driver",
+    });
+  });
+
+  it("rejects driver versions, wrong bindings, and activation drift", async () => {
+    const repository = createInMemoryNurtureCommandRepository();
+    const commandSpec = activationSpec(() => undefined);
+    const versionedDriver = driver();
+    versionedDriver.driverRef = { ...versionedDriver.driverRef, version: 2 };
+    await expect(
+      command(repository, commandSpec, {
+        handoff_activation: { request_id: "attention-versioned", driver_context: versionedDriver },
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      reason_code: "invalid_durable_handoff_driver",
+    });
+
+    await expect(
+      command(repository, commandSpec, {
+        handoff_activation: {
+          request_id: "attention-consumer",
+          driver_context: {
+            ...driver(),
+            driverRef: { ...driver().driverRef, consumer_scenario_key: "another_scenario" },
+          },
+        },
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      reason_code: "invalid_durable_handoff_driver",
+    });
+
+    await expect(
+      command(repository, commandSpec, {
+        handoff_activation: {
+          request_id: "attention-binding",
+          driver_context: { ...driver(), entrypointKey: "wrong_entrypoint" },
+        },
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      reason_code: "invalid_durable_handoff_driver",
+    });
+
+    await command(repository, commandSpec);
+    const activationAfterEmpty = await command(repository, commandSpec, {
+      handoff_activation: { request_id: "attention-late", driver_context: driver() },
+    });
+    expect(activationAfterEmpty).toMatchObject({
+      status: "not_committed",
+      decision: "idempotency_conflict",
+    });
+  });
+
+  it("fails closed when stored replay routing metadata is corrupt", async () => {
+    const repository = createInMemoryNurtureCommandRepository();
+    const commandSpec = activationSpec(() => undefined);
+    await command(repository, commandSpec, {
+      handoff_activation: { request_id: "attention-1", driver_context: driver() },
+    });
+    const stored = await repository.findCommitted({
+      workspace_id: workspaceId,
+      command_request_id_hash: hashCommandRequestId(workspaceId, "command-1"),
+    });
+    expect(stored).not.toBeNull();
+    stored!.handoff_request_snapshots_payload[0] = {
+      ...stored!.handoff_request_snapshots_payload[0]!,
+      handoffKey: "tampered_attention",
+    };
+
+    const replay = await command(repository, commandSpec, {
+      handoff_activation: { request_id: "attention-1", driver_context: driver() },
+    });
+    expect(replay).toEqual({
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "invalid_stored_handoff_replay_seed",
     });
   });
 

@@ -6,6 +6,7 @@ import {
   type NurtureWorkflowProject as PrismaWorkflowProject,
   type PrismaClient,
 } from "@prisma/client";
+import { normalizeExecutionHandoffState } from "@the-nurture/scenario";
 import type {
   NurtureCommandExecutionDraft,
   NurtureCommandExecutionRecord,
@@ -51,32 +52,33 @@ const toProject = (row: PrismaWorkflowProject): NurtureWorkflowProject => ({
 });
 
 const toExecution = (row: PrismaCommandExecution): NurtureCommandExecutionRecord => {
-  const snapshots = row.handoffRequestSnapshotsPayload;
-  if (!Array.isArray(snapshots) || snapshots.length !== 0 || row.handoffDriverRef !== null) {
-    throw new Error("N1 command execution contains invalid handoff replay state");
-  }
+  const handoffState = normalizeExecutionHandoffState({
+    snapshots: row.handoffRequestSnapshotsPayload,
+    driver_ref: row.handoffDriverRef,
+  });
   return {
-  id: row.id,
-  workspace_id: row.workspaceId,
-  command_request_id_hash: row.commandRequestIdHash,
-  origin_invocation_request_id_hash: row.originInvocationRequestIdHash,
-  parent_command_request_id_hash: row.parentCommandRequestIdHash ?? undefined,
-  request_identity_hash_version: 1,
-  command_key: row.commandKey,
-  command_scope: row.commandScope,
-  command_contract_version: row.commandContractVersion,
-  payload_hash: row.payloadHash,
-  payload_canonicalization_version: 1,
-  business_actor_ref: row.businessActorRef,
-  primary_scope_ref: row.primaryScopeRef
-    ? (row.primaryScopeRef as NurtureCommandExecutionRecord["primary_scope_ref"])
-    : undefined,
-  child_care_process_id: row.childCareProcessId ?? undefined,
-  target_refs: (row.targetRefs ?? []) as unknown as NurtureCommandExecutionRecord["target_refs"],
-  business_outcome: row.businessOutcome,
-  output_refs: row.outputRefs as unknown as NurtureCommandExecutionRecord["output_refs"],
-  handoff_snapshot_schema_version: 1,
-  handoff_request_snapshots_payload: [],
+    id: row.id,
+    workspace_id: row.workspaceId,
+    command_request_id_hash: row.commandRequestIdHash,
+    origin_invocation_request_id_hash: row.originInvocationRequestIdHash,
+    parent_command_request_id_hash: row.parentCommandRequestIdHash ?? undefined,
+    request_identity_hash_version: 1,
+    command_key: row.commandKey,
+    command_scope: row.commandScope,
+    command_contract_version: row.commandContractVersion,
+    payload_hash: row.payloadHash,
+    payload_canonicalization_version: 1,
+    business_actor_ref: row.businessActorRef,
+    primary_scope_ref: row.primaryScopeRef
+      ? (row.primaryScopeRef as NurtureCommandExecutionRecord["primary_scope_ref"])
+      : undefined,
+    child_care_process_id: row.childCareProcessId ?? undefined,
+    target_refs: (row.targetRefs ?? []) as unknown as NurtureCommandExecutionRecord["target_refs"],
+    business_outcome: row.businessOutcome,
+    output_refs: row.outputRefs as unknown as NurtureCommandExecutionRecord["output_refs"],
+    handoff_snapshot_schema_version: 1,
+    handoff_request_snapshots_payload: handoffState.snapshots,
+    ...(handoffState.driver_ref ? { handoff_driver_ref: handoffState.driver_ref } : {}),
     committed_at: row.committedAt.toISOString(),
   };
 };
@@ -143,7 +145,10 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
         businessOutcome: input.business_outcome,
         outputRefs: asJson(input.output_refs),
         handoffSnapshotSchemaVersion: 1,
-        handoffRequestSnapshotsPayload: asJson([]),
+        handoffRequestSnapshotsPayload: asJson(input.handoff_request_snapshots_payload),
+        ...(input.handoff_driver_ref
+          ? { handoffDriverRef: asJson(input.handoff_driver_ref) }
+          : {}),
       },
     });
     return toExecution(row);

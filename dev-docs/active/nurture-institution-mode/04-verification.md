@@ -3,8 +3,22 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-15
-- Current phase: X4/N2 implementation entry; N1 remains explicit-empty
-- Code/config/schema impact: additive Nurture production schema, shared command/resolver/policy code, first inbox/attention capabilities, and tests; no My-Chat runtime tables and no non-empty activation
+- Current phase: X4-A claimed-Step replay-seed implementation; DB apply approval pending
+- Code/config/schema impact: guarded non-empty command replay seeds and a custom CHECK migration preview; no My-Chat runtime tables, manifest activation, live handoff materialization, or host capability enablement
+
+## X4-A Claimed-Step Replay-Seed Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Pre-transaction driver gate | PASS | Missing driver, wrong namespace/type/scenario/binding, unexpected ref keys, or Step version returns stable invalid state before command lookup/transaction and does not consume command identity. |
+| Secret and hash boundary | PASS | Claim token and expected Step version are validated transiently, omitted from semantic payload hash, snapshots, persisted driver, results, and error content; SQL also forbids secret/binding field names in snapshot JSON. |
+| Persistence shape | PASS | Non-empty state requires bounded, sorted, unique, refs-only snapshots plus an exact canonical five-field original-Step ref. Empty state requires null driver. Unknown keys and invalid stored JSON fail closed. |
+| Replay ownership | PASS | Same Step may replay after token/version rotation; another Step is rejected. Stored request/handoff/purpose/expiry drift returns `invalid_stored_handoff_replay_seed` instead of being materialized. |
+| First business slice | PASS | Immediate family input emits exactly one `user_attention` seed referencing the Nurture message, child-link receipt, and care item. Pending-workflow and direct no-activation paths remain explicit-empty. |
+| Unit/type/static gate | PASS | Typecheck, 41 focused tests, all 157 unit tests, X4 migration contract assertion, test routing, both Prisma schema validations, persistence/N1 boundaries, workflow pin plus 4 negative tests, refreshed context checksum/strict verification, project state, governance lint, and whitespace checks pass. |
+| DB migration preview | PASS / NOT APPLIED | Evidence in `artifacts/db/00-connection-check.md` through `02-migration-plan.md`; configured `localhost:5433/nurture` was not connected or mutated. |
+| DB/E2E journey | PENDING APPROVAL | A production-DB test covers canonical seed persistence, claim-secret absence, same-Step reclaim, wrong-Step denial, and single business effect; it must run only after the disposable target migration is approved/applied. |
+| Activation posture | PASS | Manifest handoff key/source declarations, live claimed-driver bridge, My-Chat owner consumer, and capability enablement remain absent. |
 
 ## X4/N2 Entry Evidence
 
@@ -13,7 +27,7 @@
 | My-Chat X3 delivery | PASS | Final local delivery revision `4d40d81cceaa5eee84134729900cc3f5c2e15547`; X3 code hardening is `f73eba9`; post-commit typecheck, 323 non-DB tests, lint, context, environment, database, governance, and clean-tree gates pass. |
 | Exact dependency pin | PASS | `docs/project/integrations/my-chat-workflow-contract.json` now requires My-Chat `4d40d81`; live verification rejects any different checkout revision. |
 | Base/My-Chat contract parity | PASS | Both contract roots hash to `0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa`; the cross-layout logical source hash remains `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`. |
-| Nurture scenario pin | PASS | Context contract, YAML manifest, module, and registry remain pinned at `de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125`. |
+| Nurture scenario pin | PASS | X4-A context contract plus unchanged YAML manifest/module/registry are pinned at `b56ce4d5f0758ecad037cc2ce2c2c4aaa0e67cc08c59f1173b6adcab31567e21`. |
 | Pin regression tests | PASS | 4/4 cover ordering/traversal stability, content/path drift, path escape, and exact-revision drift rejection. |
 | Nurture static/unit gate | PASS AFTER REPAIR | Typecheck; 152/152 unit tests; production and placeholder dev-host Prisma validation; persistence and N1 schema boundaries; test routing/population; context strict; governance; and whitespace checks pass. |
 | Local dependency snapshot | PASS AFTER REPAIR | The first run found the pnpm `file:` runtime snapshot missing three new X3 source files. `pnpm install --offline --frozen-lockfile --force` rebuilt `node_modules` without lockfile changes; typecheck and the two previously blocked conformance suites then passed. |

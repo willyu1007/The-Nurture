@@ -101,10 +101,11 @@ const validAttachmentRef = (value: DomainContextRef | undefined): value is Domai
 
 const validWorkflowDriverRef = (value: DomainContextRef | undefined): value is DomainContextRef =>
   validRef(value) &&
-  value.namespace === "my_chat" &&
+  value.namespace === "host.workflow" &&
+  value.consumer_scenario_key === "nurture" &&
   value.object_type === "workflow_step" &&
   value.owner_scope === "workspace" &&
-  value.version !== undefined;
+  value.version === undefined;
 
 const requireFamilyCare = (
   transaction: NurtureCommandTransaction,
@@ -294,6 +295,31 @@ export const familyInputRouteSpec: NurtureCommandSpec<FamilyInputRoutePayload> =
         }),
       ),
     };
+  },
+  handoff: {
+    capability_key: "class_family_inbox",
+    entrypoint_key: "capture_family_input",
+    handoff_key: "user_attention",
+    requested_purpose: "user_attention",
+    validate_input: (input) =>
+      input.route_mode === "immediate" ? null : "invalid_handoff_activation_route",
+    select_source_context_refs: (_input, refs) => {
+      const sourceTypes = [
+        "family_care_message",
+        "child_link_receipt",
+        "family_care_item",
+      ];
+      return sourceTypes.map((objectType) => {
+        const matches = refs.filter(
+          (candidate) =>
+            candidate.namespace === "nurture" && candidate.object_type === objectType,
+        );
+        if (matches.length !== 1) {
+          throw new Error(`user_attention requires exactly one ${objectType} ref`);
+        }
+        return matches[0]!;
+      });
+    },
   },
 };
 

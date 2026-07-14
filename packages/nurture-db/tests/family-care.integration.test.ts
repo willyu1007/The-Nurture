@@ -13,6 +13,7 @@ import {
   replyFamilyCareItemSpec,
   revokeFamilyCareGrantSpec,
   type NurtureCommandSpec,
+  type NurtureCommandHandoffActivation,
   type NurtureResolvedContext,
 } from "@the-nurture/scenario";
 import { createPrismaClient } from "../src/client.js";
@@ -199,6 +200,7 @@ const execute = <T>(input: {
   payload: T;
   command_request_id: string;
   actor_id: string;
+  handoff_activation?: NurtureCommandHandoffActivation;
 }) =>
   new NurtureCommandRunner(repositories.commands).execute({
     workspace_id: input.fixture.workspaceId,
@@ -206,6 +208,9 @@ const execute = <T>(input: {
     command_request_id: input.command_request_id,
     business_actor_ref: input.actor_id,
     child_care_process_id: input.fixture.process.id,
+    ...(input.handoff_activation
+      ? { handoff_activation: input.handoff_activation }
+      : {}),
     payload: input.payload,
     spec: input.spec,
   });
@@ -284,6 +289,99 @@ describe("N1 family-care Postgres journey", () => {
       where: { workspaceId: fixture.workspaceId },
     });
     expect(execution.handoffRequestSnapshotsPayload).toEqual([]);
+  });
+
+  it("persists one refs-only user-attention seed and fences DB replay to the original Step", async () => {
+    const fixture = await seedFixture();
+    const suffix = randomUUID();
+    const payload = routePayload(fixture, suffix);
+    const commandRequestId = `capture-activated:${suffix}`;
+    const activation = (
+      stepId: string,
+      claimToken: string,
+      expectedStepVersion: number,
+    ): NurtureCommandHandoffActivation => ({
+      request_id: `attention:${suffix}`,
+      driver_context: {
+        driverRef: {
+          namespace: "host.workflow",
+          object_type: "workflow_step",
+          object_id: stepId,
+          owner_scope: "workspace",
+        },
+        contractHash: "contract-hash-for-db-test",
+        capabilityKey: "class_family_inbox",
+        entrypointKey: "capture_family_input",
+        claimToken,
+        expectedStepVersion,
+      },
+    });
+
+    const first = await execute({
+      fixture,
+      spec: familyInputRouteSpec,
+      payload,
+      command_request_id: commandRequestId,
+      actor_id: fixture.guardian.id,
+      handoff_activation: activation(`step:${suffix}`, "claim-token-initial", 2),
+    });
+    expect(first).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      handoff_request_snapshots: [
+        {
+          requestId: `attention:${suffix}`,
+          handoffKey: "user_attention",
+          requestedPurpose: "user_attention",
+          sourceContextRefs: [
+            { object_type: "family_care_message" },
+            { object_type: "child_link_receipt" },
+            { object_type: "family_care_item" },
+          ],
+        },
+      ],
+    });
+    const execution = await prisma.nurtureCommandExecution.findFirstOrThrow({
+      where: { workspaceId: fixture.workspaceId, commandKey: familyInputRouteSpec.command_key },
+    });
+    expect(execution.handoffDriverRef).toEqual({
+      namespace: "host.workflow",
+      consumer_scenario_key: "nurture",
+      object_type: "workflow_step",
+      object_id: `step:${suffix}`,
+      owner_scope: "workspace",
+    });
+    expect(JSON.stringify(execution)).not.toContain("claim-token-initial");
+    expect(JSON.stringify(execution.handoffDriverRef)).not.toContain("version");
+
+    const reclaimed = await execute({
+      fixture,
+      spec: familyInputRouteSpec,
+      payload,
+      command_request_id: commandRequestId,
+      actor_id: fixture.guardian.id,
+      handoff_activation: activation(`step:${suffix}`, "claim-token-rotated", 9),
+    });
+    expect(reclaimed).toMatchObject({ status: "ok", disposition: "replayed" });
+
+    const wrongStep = await execute({
+      fixture,
+      spec: familyInputRouteSpec,
+      payload,
+      command_request_id: commandRequestId,
+      actor_id: fixture.guardian.id,
+      handoff_activation: activation(`step:other:${suffix}`, "claim-token-other", 1),
+    });
+    expect(wrongStep).toMatchObject({
+      status: "not_committed",
+      reason_code: "invalid_durable_handoff_driver",
+    });
+    await expect(
+      prisma.nurtureCommandExecution.count({ where: { workspaceId: fixture.workspaceId } }),
+    ).resolves.toBe(1);
+    await expect(
+      prisma.nurtureFamilyCareMessage.count({ where: { workspaceId: fixture.workspaceId } }),
+    ).resolves.toBe(1);
   });
 
   it("serves class inbox and attention through current owner reads without private bodies", async () => {
@@ -599,11 +697,10 @@ describe("N1 family-care Postgres journey", () => {
       ...routePayload(fixture, suffix),
       route_mode: "pending_workflow" as const,
       pending_driver_ref: {
-        namespace: "my_chat",
+        namespace: "host.workflow",
         consumer_scenario_key: "nurture",
         object_type: "workflow_step",
         object_id: `step:${suffix}`,
-        version: 1,
         owner_scope: "workspace" as const,
       },
     };

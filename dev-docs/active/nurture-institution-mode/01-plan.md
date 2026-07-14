@@ -179,7 +179,11 @@
 | X4-0A | Complete | My-Chat X3 hardening delivered and post-commit verified at final revision `4d40d81`. |
 | X4-0B | Complete | Nurture dependency pin updated to X3; Base/My-Chat parity, scenario pin, and negative drift tests pass. |
 | X4-0C | Complete | Nurture typecheck, 152 unit tests, Prisma/schema/boundary, routing/population, context, governance, and whitespace gates pass after refreshing the local `file:` dependency snapshot. |
-| X4-0D | In progress | Commit the pin/SSOT update, create independent X4 branches from immutable baselines, and lock the first vertical slice/test matrix before changing non-empty persistence, manifest activation, or host composition. |
+| X4-0D | Complete | Pin/SSOT update committed at `6f2c836`; independent X4 branches created from immutable Nurture/My-Chat baselines; first slice locked to claimed-Step `user_attention` replay seeds without manifest/host activation. |
+| X4-A1 | Complete | Command runner validates trusted driver binding before lookup/transaction, persists bounded refs-only snapshots plus canonical original-Step provenance, preserves direct explicit-empty, and fences replay to the same Step. |
+| X4-A2 | Complete | Custom CHECK migration preview, strict persisted JSON parser, static contract assertion, unit/privacy/replay tests, and DB-backed test case implemented. No database was connected or mutated. |
+| X4-A3 | Pending approval | Apply migration to a separate disposable PostgreSQL target and pass DB/E2E, catalog, secret-exclusion, same-Step reclaim, and wrong-Step denial evidence before X4-B. |
+| X4-B | Not started | My-Chat worker/handler bridge converts the claimed Step into the shared driver context and converts returned snapshots into handoff drafts; capability and manifest activation remain off until its tests pass. |
 
 **Cross-repo task ownership：**
 

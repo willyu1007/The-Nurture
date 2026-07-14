@@ -1,7 +1,21 @@
 import { createHash } from "node:crypto";
-import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type {
+  CanonicalRef,
+  DomainContextRef,
+  ScenarioHandoffRequestSnapshot,
+} from "@my-chat/workflow-contracts";
 import type { NurtureWorkflowProject } from "../../repositories.js";
 import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
+import {
+  buildNurtureHandoffRequestSnapshots,
+  normalizeExecutionHandoffState,
+  prepareNurtureHandoffActivation,
+  sameHandoffActivationSnapshot,
+  sameHandoffDriverRef,
+  type NurtureCommandHandoffActivation,
+  type NurtureCommandHandoffPolicy,
+  type PreparedNurtureHandoffActivation,
+} from "./handoff-replay.js";
 
 export const NURTURE_COMMAND_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const HASH_HEX_PATTERN = /^[0-9a-f]{64}$/;
@@ -29,7 +43,8 @@ export type NurtureCommandExecutionRecord = {
   business_outcome: NurtureCommandBusinessOutcome;
   output_refs: DomainContextRef[];
   handoff_snapshot_schema_version: 1;
-  handoff_request_snapshots_payload: [];
+  handoff_request_snapshots_payload: ScenarioHandoffRequestSnapshot[];
+  handoff_driver_ref?: DomainContextRef;
   committed_at: string;
 };
 
@@ -100,6 +115,7 @@ export type NurtureCommandSpec<Input> = {
     input: Input,
     context: NurtureCommandExecutionContext,
   ): Promise<{ output_refs: DomainContextRef[] }>;
+  handoff?: NurtureCommandHandoffPolicy<Input>;
 };
 
 export type NurtureCommandInput<Input> = {
@@ -113,6 +129,7 @@ export type NurtureCommandInput<Input> = {
   child_care_process_id?: string;
   target_refs?: DomainContextRef[];
   expected_versions?: Record<string, number>;
+  handoff_activation?: NurtureCommandHandoffActivation;
   payload: Input;
   spec: NurtureCommandSpec<Input>;
 };
@@ -123,7 +140,7 @@ export type NurtureCommandSuccess = {
   business_outcome: NurtureCommandBusinessOutcome;
   execution_ref: DomainContextRef;
   output_refs: DomainContextRef[];
-  handoff_request_snapshots: [];
+  handoff_request_snapshots: ScenarioHandoffRequestSnapshot[];
 };
 
 export type NurtureCommandNotCommitted = {
@@ -200,7 +217,37 @@ const compareReplay = (input: {
   command_scope: string;
   command_contract_version: number;
   payload_hash: string;
+  activation?: PreparedNurtureHandoffActivation<unknown>;
 }): NurtureCommandSuccess | NurtureCommandNotCommitted => {
+  let handoffState: ReturnType<typeof normalizeExecutionHandoffState>;
+  try {
+    handoffState = normalizeExecutionHandoffState({
+      snapshots: input.existing.handoff_request_snapshots_payload,
+      driver_ref: input.existing.handoff_driver_ref,
+    });
+  } catch {
+    return {
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "invalid_stored_handoff_replay_seed",
+    };
+  }
+  if (handoffState.snapshots.length > 0) {
+    if (!input.activation) {
+      return {
+        status: "not_committed",
+        decision: "invalid",
+        reason_code: "missing_durable_handoff_driver",
+      };
+    }
+    if (!sameHandoffDriverRef(handoffState.driver_ref, input.activation.driver_ref)) {
+      return {
+        status: "not_committed",
+        decision: "invalid",
+        reason_code: "invalid_durable_handoff_driver",
+      };
+    }
+  }
   const exact =
     input.existing.command_key === input.command_key &&
     input.existing.command_scope === input.command_scope &&
@@ -213,13 +260,24 @@ const compareReplay = (input: {
       reason_code: "command_request_payload_mismatch",
     };
   }
+  if (
+    input.activation &&
+    handoffState.snapshots.length > 0 &&
+    !sameHandoffActivationSnapshot(handoffState.snapshots, input.activation)
+  ) {
+    return {
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "invalid_stored_handoff_replay_seed",
+    };
+  }
   return {
     status: "ok",
     disposition: "replayed",
     business_outcome: input.existing.business_outcome,
     execution_ref: executionRef(input.existing),
     output_refs: input.existing.output_refs,
-    handoff_request_snapshots: [],
+    handoff_request_snapshots: handoffState.snapshots,
   };
 };
 
@@ -254,6 +312,21 @@ export class NurtureCommandRunner {
         reason_code: "invalid_command_workspace",
       };
     }
+
+    const activationDecision = prepareNurtureHandoffActivation({
+      activation: input.handoff_activation,
+      policy: input.spec.handoff,
+      command_input: input.payload,
+    });
+    if (activationDecision.status === "invalid") {
+      return {
+        status: "not_committed",
+        decision: "invalid",
+        reason_code: activationDecision.reason_code,
+      };
+    }
+    const activation =
+      activationDecision.status === "ready" ? activationDecision.activation : undefined;
     if (
       input.payload &&
       typeof input.payload === "object" &&
@@ -295,6 +368,14 @@ export class NurtureCommandRunner {
         child_care_process_id: input.child_care_process_id ?? null,
         target_refs: targetRefs,
         expected_versions: input.expected_versions ?? {},
+        handoff_activation: activation
+          ? {
+              request_id: activation.request_id,
+              handoff_key: activation.policy.handoff_key,
+              requested_purpose: activation.policy.requested_purpose,
+              expires_at: activation.expires_at ?? null,
+            }
+          : null,
         payload: input.spec.canonicalize(input.payload),
       });
     } catch {
@@ -306,6 +387,7 @@ export class NurtureCommandRunner {
       command_scope: input.spec.command_scope,
       command_contract_version: input.spec.contract_version,
       payload_hash: payloadHash,
+      ...(activation ? { activation: activation as PreparedNurtureHandoffActivation<unknown> } : {}),
     };
     let existing: NurtureCommandExecutionRecord | null;
     try {
@@ -328,72 +410,84 @@ export class NurtureCommandRunner {
         workspace_id: input.workspace_id,
         command_request_id_hash: commandRequestIdHash,
         operation: async (transaction) => {
-        const winner = await transaction.findCommitted({
-          workspace_id: input.workspace_id,
-          command_request_id_hash: commandRequestIdHash,
-        });
-        if (winner) return compareReplay({ existing: winner, ...replayInput });
+          const winner = await transaction.findCommitted({
+            workspace_id: input.workspace_id,
+            command_request_id_hash: commandRequestIdHash,
+          });
+          if (winner) return compareReplay({ existing: winner, ...replayInput });
 
-        const executionContext: NurtureCommandExecutionContext = {
-          workspace_id: input.workspace_id,
-          business_actor_ref: input.business_actor_ref,
-          ...(input.child_care_process_id
-            ? { child_care_process_id: input.child_care_process_id }
-            : {}),
-        };
-        const decision = await input.spec.checkPreconditions(
-          transaction,
-          input.payload,
-          executionContext,
-        );
-        if (decision.status === "invalid" || decision.status === "blocked" || decision.status === "conflict") {
-          return {
-            status: "not_committed" as const,
-            decision: decision.status,
-            reason_code: decision.reason_code,
+          const executionContext: NurtureCommandExecutionContext = {
+            workspace_id: input.workspace_id,
+            business_actor_ref: input.business_actor_ref,
+            ...(input.child_care_process_id
+              ? { child_care_process_id: input.child_care_process_id }
+              : {}),
           };
-        }
+          const decision = await input.spec.checkPreconditions(
+            transaction,
+            input.payload,
+            executionContext,
+          );
+          if (
+            decision.status === "invalid" ||
+            decision.status === "blocked" ||
+            decision.status === "conflict"
+          ) {
+            return {
+              status: "not_committed" as const,
+              decision: decision.status,
+              reason_code: decision.reason_code,
+            };
+          }
 
-        const applied =
-          decision.status === "already_satisfied"
-            ? { business_outcome: "already_satisfied" as const, output_refs: decision.output_refs }
-            : {
-                business_outcome: "applied" as const,
-                ...(await input.spec.apply(transaction, input.payload, executionContext)),
-              };
-        validateRefs(applied.output_refs, "output_refs");
-        const record = await transaction.createExecution({
-          workspace_id: input.workspace_id,
-          command_request_id_hash: commandRequestIdHash,
-          origin_invocation_request_id_hash: originInvocationRequestIdHash,
-          ...(parentCommandRequestIdHash
-            ? { parent_command_request_id_hash: parentCommandRequestIdHash }
-            : {}),
-          request_identity_hash_version: 1,
-          command_key: input.spec.command_key,
-          command_scope: input.spec.command_scope,
-          command_contract_version: input.spec.contract_version,
-          payload_hash: payloadHash,
-          payload_canonicalization_version: 1,
-          business_actor_ref: input.business_actor_ref,
-          ...(input.primary_scope_ref ? { primary_scope_ref: input.primary_scope_ref } : {}),
-          ...(input.child_care_process_id
-            ? { child_care_process_id: input.child_care_process_id }
-            : {}),
-          target_refs: targetRefs,
-          business_outcome: applied.business_outcome,
-          output_refs: applied.output_refs,
-          handoff_snapshot_schema_version: 1,
-          handoff_request_snapshots_payload: [],
-        });
-        return {
-          status: "ok" as const,
-          disposition: "executed" as const,
-          business_outcome: record.business_outcome,
-          execution_ref: executionRef(record),
-          output_refs: record.output_refs,
-          handoff_request_snapshots: [] as [],
-        };
+          const applied =
+            decision.status === "already_satisfied"
+              ? { business_outcome: "already_satisfied" as const, output_refs: decision.output_refs }
+              : {
+                  business_outcome: "applied" as const,
+                  ...(await input.spec.apply(transaction, input.payload, executionContext)),
+                };
+          validateRefs(applied.output_refs, "output_refs");
+          const handoffRequestSnapshots = activation
+            ? buildNurtureHandoffRequestSnapshots({
+                activation,
+                command_input: input.payload,
+                output_refs: applied.output_refs,
+              })
+            : [];
+          const record = await transaction.createExecution({
+            workspace_id: input.workspace_id,
+            command_request_id_hash: commandRequestIdHash,
+            origin_invocation_request_id_hash: originInvocationRequestIdHash,
+            ...(parentCommandRequestIdHash
+              ? { parent_command_request_id_hash: parentCommandRequestIdHash }
+              : {}),
+            request_identity_hash_version: 1,
+            command_key: input.spec.command_key,
+            command_scope: input.spec.command_scope,
+            command_contract_version: input.spec.contract_version,
+            payload_hash: payloadHash,
+            payload_canonicalization_version: 1,
+            business_actor_ref: input.business_actor_ref,
+            ...(input.primary_scope_ref ? { primary_scope_ref: input.primary_scope_ref } : {}),
+            ...(input.child_care_process_id
+              ? { child_care_process_id: input.child_care_process_id }
+              : {}),
+            target_refs: targetRefs,
+            business_outcome: applied.business_outcome,
+            output_refs: applied.output_refs,
+            handoff_snapshot_schema_version: 1,
+            handoff_request_snapshots_payload: handoffRequestSnapshots,
+            ...(activation ? { handoff_driver_ref: activation.driver_ref } : {}),
+          });
+          return {
+            status: "ok" as const,
+            disposition: "executed" as const,
+            business_outcome: record.business_outcome,
+            execution_ref: executionRef(record),
+            output_refs: record.output_refs,
+            handoff_request_snapshots: record.handoff_request_snapshots_payload,
+          };
         },
       });
     } catch {
@@ -419,8 +513,9 @@ export const assertCommandExecutionRecord = (record: NurtureCommandExecutionReco
   ]) {
     if (hash !== undefined && !HASH_HEX_PATTERN.test(hash)) throw new Error("invalid execution hash");
   }
-  if (record.handoff_request_snapshots_payload.length !== 0) {
-    throw new Error("N1 command execution must persist explicit empty snapshots");
-  }
+  normalizeExecutionHandoffState({
+    snapshots: record.handoff_request_snapshots_payload,
+    driver_ref: record.handoff_driver_ref,
+  });
   validateRefs(record.output_refs, "output_refs");
 };

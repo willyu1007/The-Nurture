@@ -45,6 +45,7 @@
     "verify:test-routing": "node scripts/assert-test-routing.mjs",
     "verify:persistence-boundaries": "node scripts/assert-persistence-boundaries.mjs",
     "verify:n1-schema-contract": "node scripts/assert-n1-schema-contract.mjs",
+    "verify:x4-handoff-replay-contract": "node scripts/assert-x4-handoff-replay-contract.mjs",
     "test:workflow-contract-pin": "node --test scripts/verify-workflow-contract-pin.test.mjs",
     "verify:workflow-contract-pin": "node scripts/verify-workflow-contract-pin.mjs"
   },

@@ -13,6 +13,7 @@ import {
   defaultNurtureDeps,
   familyCareRef,
   familyInputRouteSpec,
+  hashCommandRequestId,
   redactFamilyCareMessageSpec,
   replyFamilyCareItemSpec,
   revokeFamilyCareGrantSpec,
@@ -24,6 +25,7 @@ import {
   type FamilyCareRedactionFacts,
   type FamilyInputRouteFacts,
   type NurtureCommandSpec,
+  type NurtureCommandHandoffActivation,
   type NurtureFamilyCareCommandTransaction,
   type NurtureResolvedContext,
   type NurtureActorBinding,
@@ -126,6 +128,27 @@ const routePayload = {
   requires_reply: true,
 };
 
+const handoffActivation = (
+  stepId = "step-family-input-1",
+  claimToken = "claim-family-input-1",
+  expectedStepVersion = 2,
+): NurtureCommandHandoffActivation => ({
+  request_id: "attention-family-input-1",
+  driver_context: {
+    driverRef: {
+      namespace: "host.workflow",
+      object_type: "workflow_step",
+      object_id: stepId,
+      owner_scope: "workspace",
+    },
+    contractHash: "nurture-contract-hash-1",
+    capabilityKey: "class_family_inbox",
+    entrypointKey: "capture_family_input",
+    claimToken,
+    expectedStepVersion,
+  },
+});
+
 const makeHarness = (overrides: {
   revoke?: FamilyCareGrantRevokeFacts;
   route?: FamilyInputRouteFacts;
@@ -187,9 +210,11 @@ const makeHarness = (overrides: {
       return { receipt_ref: familyCareRef("child_link_receipt", "receipt-1", 1) };
     },
   };
+  const repository = createInMemoryNurtureCommandRepository({ familyCare });
   return {
     calls,
-    runner: new NurtureCommandRunner(createInMemoryNurtureCommandRepository({ familyCare })),
+    repository,
+    runner: new NurtureCommandRunner(repository),
   };
 };
 
@@ -205,6 +230,7 @@ const execute = <T>(
     typeof payload.participant_id === "string"
       ? payload.participant_id
       : "participant-1",
+  activation?: NurtureCommandHandoffActivation,
 ) =>
   runner.execute({
     workspace_id: "workspace-1",
@@ -214,6 +240,7 @@ const execute = <T>(
     child_care_process_id: "process-1",
     payload,
     spec,
+    ...(activation ? { handoff_activation: activation } : {}),
   });
 
 describe("family input to class inbox command closure", () => {
@@ -280,6 +307,63 @@ describe("family input to class inbox command closure", () => {
     expect(calls.route).toBe(1);
   });
 
+  it("commits one user-attention replay seed only for the claimed original Step", async () => {
+    const { runner, repository, calls } = makeHarness();
+    const first = await execute(
+      runner,
+      familyInputRouteSpec,
+      routePayload,
+      "capture-activation",
+      undefined,
+      handoffActivation(),
+    );
+    expect(first).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      handoff_request_snapshots: [
+        {
+          requestId: "attention-family-input-1",
+          handoffKey: "user_attention",
+          requestedPurpose: "user_attention",
+          sourceContextRefs: [
+            { object_type: "family_care_message", object_id: "message-1" },
+            { object_type: "child_link_receipt", object_id: "receipt-1" },
+            { object_type: "family_care_item", object_id: "item-1" },
+          ],
+        },
+      ],
+    });
+    const stored = await repository.findCommitted({
+      workspace_id: "workspace-1",
+      command_request_id_hash: hashCommandRequestId("workspace-1", "capture-activation"),
+    });
+    expect(JSON.stringify(stored)).not.toContain("claim-family-input-1");
+
+    const replay = await execute(
+      runner,
+      familyInputRouteSpec,
+      routePayload,
+      "capture-activation",
+      undefined,
+      handoffActivation("step-family-input-1", "rotated-token", 8),
+    );
+    expect(replay).toMatchObject({ status: "ok", disposition: "replayed" });
+    expect(calls.route).toBe(1);
+
+    const wrongStep = await execute(
+      runner,
+      familyInputRouteSpec,
+      routePayload,
+      "capture-activation",
+      undefined,
+      handoffActivation("step-other", "other-token", 1),
+    );
+    expect(wrongStep).toMatchObject({
+      status: "not_committed",
+      reason_code: "invalid_durable_handoff_driver",
+    });
+  });
+
   it("replays the exact command without a second business effect", async () => {
     const { runner, calls } = makeHarness();
     await execute(runner, familyInputRouteSpec, routePayload, "capture-replay");
@@ -319,11 +403,10 @@ describe("family input to class inbox command closure", () => {
         ...routePayload,
         route_mode: "pending_workflow" as const,
         pending_driver_ref: {
-          namespace: "my_chat",
+          namespace: "host.workflow",
           consumer_scenario_key: "nurture",
           object_type: "workflow_step",
           object_id: "step-1",
-          version: 3,
           owner_scope: "workspace" as const,
         },
       },

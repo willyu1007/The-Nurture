@@ -45,6 +45,6 @@
       "packages/nurture-scenario/src/module.ts",
       "packages/nurture-scenario/src/registry.ts"
     ],
-    "contractSha256": "de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125"
+    "contractSha256": "b56ce4d5f0758ecad037cc2ce2c2c4aaa0e67cc08c59f1173b6adcab31567e21"
   }
 }
