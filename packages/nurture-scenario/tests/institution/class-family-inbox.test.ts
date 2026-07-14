@@ -5,13 +5,18 @@ import {
   NurtureInstitutionWorkQueryService,
   acknowledgeFamilyCareItemSpec,
   cancelFamilyCareRouteSpec,
+  createInMemoryInstitutionContextRepository,
+  createInMemoryInteractionContextRepository,
   createInMemoryFamilyCareQueryRepository,
   createInMemoryNurtureCommandRepository,
+  createNurtureHandlers,
+  defaultNurtureDeps,
   familyCareRef,
   familyInputRouteSpec,
   redactFamilyCareMessageSpec,
   replyFamilyCareItemSpec,
   revokeFamilyCareGrantSpec,
+  readInstitutionSurface,
   type FamilyCareCancelRouteFacts,
   type FamilyCareCurrentGrant,
   type FamilyCareGrantRevokeFacts,
@@ -21,6 +26,10 @@ import {
   type NurtureCommandSpec,
   type NurtureFamilyCareCommandTransaction,
   type NurtureResolvedContext,
+  type NurtureActorBinding,
+  type NurtureFamilyCareQueryRepository,
+  type NurtureHandlerDeps,
+  type WorkflowStepHandlerInput,
 } from "../../src/index.js";
 
 const activeGrant: FamilyCareCurrentGrant = {
@@ -65,6 +74,7 @@ const itemFacts = (overrides: Partial<FamilyCareItemActionFacts> = {}): FamilyCa
   caregiver_scope_matches: true,
   enrollment_active: true,
   thread_active: true,
+  thread_membership_active: true,
   grant: { ...activeGrant, directions: [...activeGrant.directions], data_classes: [...activeGrant.data_classes] },
   item_status: "open",
   item_version: 0,
@@ -470,6 +480,39 @@ describe("teacher item action closure", () => {
     });
     expect(calls.reply).toBe(1);
   });
+
+  it("requires current caregiver membership before acknowledging or replying", async () => {
+    const acknowledgeHarness = makeHarness({
+      item: itemFacts({ thread_membership_active: false }),
+    });
+    await expect(
+      execute(
+        acknowledgeHarness.runner,
+        acknowledgeFamilyCareItemSpec,
+        acknowledgePayload,
+        "ack-no-thread-membership",
+      ),
+    ).resolves.toMatchObject({ status: "not_committed", reason_code: "thread_inactive" });
+    expect(acknowledgeHarness.calls.acknowledge).toBe(0);
+
+    const replyHarness = makeHarness({
+      item: itemFacts({ thread_membership_active: false }),
+    });
+    const result = await execute(
+      replyHarness.runner,
+      replyFamilyCareItemSpec,
+      {
+        ...acknowledgePayload,
+        required_direction: "org_to_family",
+        protected_content_ref: familyCareRef("protected_message_content", "content-3", 1),
+        safe_summary: "Pickup plan confirmed",
+        routing_attempt_key: "reply-route-without-membership",
+      },
+      "reply-no-thread-membership",
+    );
+    expect(result).toMatchObject({ status: "not_committed", reason_code: "thread_inactive" });
+    expect(replyHarness.calls.reply).toBe(0);
+  });
 });
 
 describe("redaction and pre-delivery cancel", () => {
@@ -642,5 +685,198 @@ describe("class-of-10 safe collection queries", () => {
     await expect(
       unavailable.openClassFamilyInbox({ workspace_id: "workspace-1", context: caregiverContext }),
     ).resolves.toEqual({ status: "blocked", reason_code: "query_unavailable" });
+  });
+});
+
+const surfaceParticipant = {
+  workspace_id: "workspace-1",
+  participant_id: "teacher-1",
+  my_chat_user_id: "user-teacher",
+  display_name: "Caregiver",
+};
+
+const surfaceBinding = (
+  id = "caregiver-role-1",
+  groupId = "group-1",
+  safeLabel = "Current care group",
+): NurtureActorBinding => ({
+  actor_binding_ref: id,
+  participant_id: surfaceParticipant.participant_id,
+  role_assignment_id: id,
+  role_kind: "caregiver",
+  scope_type: "care_group",
+  scope_id: groupId,
+  work_scope: { kind: "care_group", care_group_id: groupId },
+  safe_scope_label: safeLabel,
+});
+
+const surfaceDeps = (
+  query: NurtureFamilyCareQueryRepository,
+  bindings: NurtureActorBinding[] = [surfaceBinding()],
+): NurtureHandlerDeps => ({
+  ...defaultNurtureDeps,
+  repositories: {
+    ...defaultNurtureDeps.repositories,
+    interactions: createInMemoryInteractionContextRepository(),
+    institution: createInMemoryInstitutionContextRepository({
+      listActiveParticipants: async () => [surfaceParticipant],
+      listActiveActorBindings: async () => bindings,
+      listResolutionCandidates: async () => [],
+      revalidateResolutionCandidate: async ({ candidate }) => {
+        const actorBinding = bindings.find(
+          (binding) => binding.actor_binding_ref === candidate.actor_binding_ref,
+        );
+        return actorBinding
+          ? {
+              current: true as const,
+              participant: surfaceParticipant,
+              actor_binding: actorBinding,
+              candidate,
+            }
+          : { current: false as const, reason_code: "role_missing" as const };
+      },
+    }),
+    familyCareQuery: query,
+  },
+});
+
+const institutionStepInput: WorkflowStepHandlerInput = {
+  run_id: "run-inbox-1",
+  step_id: "step-inbox-1",
+  step_key: "open_class_family_inbox",
+  scenario_key: "nurture",
+  capability_key: "class_family_inbox",
+  entrypoint_key: "open_class_family_inbox",
+  workflow_version_id: "nurture-class-family-inbox-v1",
+  contract_hash: "contract-hash",
+  meta: {
+    workspace_id: "workspace-1",
+    actor_id: "user-teacher",
+    idempotency_key: "open-inbox-1",
+    correlation_id: "correlation-1",
+    client_surface: "mobile_dashboard",
+  },
+};
+
+describe("institution scenario surfaces", () => {
+  const inboxRepository = () =>
+    createInMemoryFamilyCareQueryRepository({
+      listClassFamilyInbox: async () => [
+        {
+          item_id: "item-private-1",
+          child_care_process_id: "process-private-1",
+          child_display_name: "Child 1",
+          category: "question",
+          urgency: "today_attention",
+          status: "open",
+          safe_summary: "Pickup plan needs confirmation",
+          requires_ack: true,
+          requires_reply: true,
+          version: 3,
+          updated_at: "2026-07-14T08:00:00.000Z",
+        },
+      ],
+    });
+
+  it("resolves current Nurture scope and returns display-safe opaque items", async () => {
+    const result = await readInstitutionSurface(surfaceDeps(inboxRepository()), {
+      view_key: "class_family_inbox",
+      workspace_id: "workspace-1",
+      my_chat_user_id: "user-teacher",
+      host_request_id: "read-1",
+      surface: "mobile_dashboard",
+    });
+    expect(result).toMatchObject({
+      status: "ready",
+      items: [
+        {
+          opaque_ref: "nurture:item:item-private-1",
+          safe_summary: "Pickup plan needs confirmation",
+          requires_attention: true,
+          aggregate_version: 3,
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toContain("process-private-1");
+    expect(JSON.stringify(result)).not.toContain("thread_id");
+    expect(JSON.stringify(result)).not.toContain("grant_id");
+  });
+
+  it("returns structured clarification rather than accepting a host-selected care group", async () => {
+    const result = await readInstitutionSurface(
+      surfaceDeps(inboxRepository(), [
+        surfaceBinding("role-1", "group-1", "Blue room"),
+        surfaceBinding("role-2", "group-2", "Green room"),
+      ]),
+      {
+        view_key: "class_family_inbox",
+        workspace_id: "workspace-1",
+        my_chat_user_id: "user-teacher",
+        host_request_id: "read-ambiguous",
+        surface: "mobile_dashboard",
+      },
+    );
+    expect(result).toMatchObject({
+      status: "needs_clarification",
+      interaction: { kind: "single_choice" },
+    });
+    expect(JSON.stringify(result)).not.toContain("group-1");
+    expect(JSON.stringify(result)).not.toContain("group-2");
+  });
+
+  it("fails closed when the owner query rejects current access", async () => {
+    const result = await readInstitutionSurface(
+      surfaceDeps(
+        createInMemoryFamilyCareQueryRepository({
+          listClassFamilyInbox: async () => {
+            throw new NurtureFamilyCareQueryAccessError();
+          },
+        }),
+      ),
+      {
+        view_key: "class_family_inbox",
+        workspace_id: "workspace-1",
+        my_chat_user_id: "user-teacher",
+        host_request_id: "read-revoked",
+        surface: "mobile_dashboard",
+      },
+    );
+    expect(result).toEqual({
+      status: "unavailable",
+      view_key: "class_family_inbox",
+      safe_title: "Class family inbox",
+      safe_summary: "This care-group view is not currently available.",
+      safe_reason_code: "access_changed",
+    });
+  });
+
+  it("keeps workflow completion explicit-empty while the direct surface owner-read is available", async () => {
+    const handler = createNurtureHandlers(surfaceDeps(inboxRepository()))[
+      "nurture.open_class_family_inbox"
+    ];
+    expect(handler).toBeDefined();
+    const result = await handler!(institutionStepInput);
+    expect(result).toMatchObject({
+      status: "completed",
+      handoff_drafts: [],
+      artifact_drafts: [
+        {
+          artifact_type: "family_care_inbox_summary",
+          safe_summary: "1 current family-care item(s).",
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toContain("Pickup plan needs confirmation");
+
+    const ambiguousHandler = createNurtureHandlers(
+      surfaceDeps(inboxRepository(), [
+        surfaceBinding("role-1", "group-1", "Blue room"),
+        surfaceBinding("role-2", "group-2", "Green room"),
+      ]),
+    )["nurture.open_class_family_inbox"];
+    await expect(ambiguousHandler!(institutionStepInput)).resolves.toMatchObject({
+      status: "manual_review_required",
+      reason_code: "unavailable",
+    });
   });
 });

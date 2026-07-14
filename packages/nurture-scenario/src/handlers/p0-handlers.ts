@@ -20,6 +20,7 @@ import {
   calibrateFamilyStrategyCommand,
   workflowProjectRef,
 } from "../domain/commands/family-strategy.command.js";
+import { readInstitutionSurface, type InstitutionSurfaceKey } from "../institution-surfaces.js";
 
 // ---------------------------------------------------------------------------
 // input-only ref/event/artifact builders (no deps)
@@ -456,6 +457,51 @@ export const makeRequestHandoff = (_deps: NurtureHandlerDeps): WorkflowStepHandl
   event_drafts: [eventDraft(input, "workflow.handoff.requested")],
 });
 
+const makeOpenInstitutionSurface = (
+  deps: NurtureHandlerDeps,
+  viewKey: InstitutionSurfaceKey,
+  artifactType: "family_care_inbox_summary" | "teacher_attention_board_summary",
+  safeTitle: string,
+): WorkflowStepHandler => async (input) => {
+  const surface = await readInstitutionSurface(deps, {
+    view_key: viewKey,
+    workspace_id: input.meta.workspace_id,
+    my_chat_user_id: input.meta.actor_id,
+    host_request_id: input.meta.idempotency_key,
+    surface: input.meta.client_surface,
+    structured_clarification: false,
+  });
+  if (surface.status !== "ready") {
+    return manualReview(input, surface.safe_reason_code);
+  }
+  return {
+    status: "completed",
+    output_refs: [workflowRunRef(input), artifactRef(input, artifactType)],
+    artifact_drafts: [artifactDraft(input, artifactType, safeTitle, surface.safe_summary)],
+    handoff_drafts: [],
+    event_drafts: [
+      eventDraft(input, "workflow.step.completed"),
+      eventDraft(input, "workflow.artifact.created"),
+    ],
+  };
+};
+
+export const makeOpenClassFamilyInbox = (deps: NurtureHandlerDeps): WorkflowStepHandler =>
+  makeOpenInstitutionSurface(
+    deps,
+    "class_family_inbox",
+    "family_care_inbox_summary",
+    "Class family inbox",
+  );
+
+export const makeOpenTodayAttentionBoard = (deps: NurtureHandlerDeps): WorkflowStepHandler =>
+  makeOpenInstitutionSurface(
+    deps,
+    "teacher_attention_board",
+    "teacher_attention_board_summary",
+    "Teacher attention board",
+  );
+
 const familyRefToCanonical = (ref: DomainContextRef): CanonicalRef => ({
   kind: "domain_context_ref",
   id: `${ref.namespace}.${ref.object_type}.${ref.object_id}`,
@@ -479,6 +525,8 @@ export const createNurtureHandlers = (deps: NurtureHandlerDeps): WorkflowHandler
   "nurture.request_approval": makeRequestApproval(deps),
   "nurture.request_handoff": makeRequestHandoff(deps),
   "nurture.apply_medical_safety_gate": makeApplyMedicalSafetyGate(deps),
+  "nurture.open_class_family_inbox": makeOpenClassFamilyInbox(deps),
+  "nurture.open_today_attention_board": makeOpenTodayAttentionBoard(deps),
 });
 
 // Bare exports bound to default (synthetic) deps — used by the journey fixture
@@ -493,5 +541,7 @@ export const writeArtifact = makeWriteArtifact(defaultNurtureDeps);
 export const requestApproval = makeRequestApproval(defaultNurtureDeps);
 export const requestHandoff = makeRequestHandoff(defaultNurtureDeps);
 export const applyMedicalSafetyGate = makeApplyMedicalSafetyGate(defaultNurtureDeps);
+export const openClassFamilyInbox = makeOpenClassFamilyInbox(defaultNurtureDeps);
+export const openTodayAttentionBoard = makeOpenTodayAttentionBoard(defaultNurtureDeps);
 
 export const nurtureHandlers: WorkflowHandlerRegistry = createNurtureHandlers(defaultNurtureDeps);

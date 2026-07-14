@@ -86,3 +86,33 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: Query/presenter paths validate the item-linked grant itself. Action paths require that source grant to remain current before checking the requested action direction; revoke also performs bounded immediate Receipt/Item convergence.
 - Prevention: Every grant-dependent aggregate must carry and revalidate its own `grantId`; never substitute a different current grant merely because its scope and data class match.
 - References: `02-architecture.md` R8-B3-C2a-d, `08-iia-schema-policy-test-design.md` grant revoke matrix.
+
+### 2026-07-14 — Pinning YAML while leaving the live registry outside the contract population
+
+- Symptom: A full YAML/runtime comparison found the `parent` and `family` context-ref declarations in different orders even though the Nurture scenario source pin was green.
+- Context: The source pin covered the YAML manifest and module, but the runtime validator consumes the TypeScript `nurtureScenarioManifest` from `registry.ts`.
+- What we tried: Verified the new capability keys and routes independently; those checks could not prove complete object parity.
+- Root cause: The live registry was outside the pinned source population, so semantically equivalent or divergent registry changes could escape the self-contract hash.
+- Fix / workaround: Aligned the full parsed objects and added `packages/nurture-scenario/src/registry.ts` to `nurtureScenario.contractPaths`; recomputed and verified the four-file hash.
+- Prevention: After any manifest edit, compare the full YAML and TypeScript objects and keep every runtime contract authority inside the pin population.
+- References: `docs/project/integrations/my-chat-workflow-contract.json`, `packages/nurture-scenario/scenario.manifest.yaml`, `packages/nurture-scenario/src/registry.ts`.
+
+### 2026-07-14 — Returning scenario enums as host-facing badge values
+
+- Symptom: The first direct-surface presenter returned raw item category, urgency, status, and attention priority enums as badge labels, and could return owner-specific denial reason codes.
+- Context: My-Chat must render generic UI and must not learn or branch on Nurture business lifecycle vocabulary.
+- What we tried: Relied on the contract statement that host consumers must not branch on those fields.
+- Root cause: A raw enum value still creates an avoidable coupling even when the host is instructed not to interpret it.
+- Fix / workaround: Nurture maps current enum values to human-readable display labels before returning generic badges and collapses denial output to `access_changed` / `unavailable`; business authorization and transitions remain owner-side.
+- Prevention: Presenter output should contain display semantics and opaque refs, not owner lifecycle codes that invite downstream branching.
+- References: `packages/nurture-scenario/src/institution-surfaces.ts`, `02-architecture.md` N1-F direct surface boundary.
+
+### 2026-07-14 — Issuing a clarification token from a workflow result that cannot return it
+
+- Symptom: The first shared surface reader could create a clarification InteractionContext when a workflow handler encountered multiple care-group scopes, but `WorkflowStepHandlerResult` has no structured-interaction/token field.
+- Context: Direct scenario responses can return the opaque token and interaction request; durable workflow Steps can only return refs, drafts, status, and a reason code.
+- What we tried: Reused the same default resolver behavior for direct reads and workflow reads.
+- Root cause: Resolver ambiguity handling was correct for realtime surfaces but incompatible with the narrower workflow result contract, leaving an unreachable continuation row.
+- Fix / workaround: Added an explicit no-issuance resolver mode for workflow handlers. Ambiguous workflow scope becomes generic manual review without creating a token; direct internal handlers keep structured clarification.
+- Prevention: A continuation token may be issued only when the current caller contract can deliver it to the user and accept the opaque response.
+- References: `packages/nurture-scenario/src/domain/institution/institution-resolver.ts`, `packages/nurture-scenario/src/institution-surfaces.ts`, `packages/nurture-scenario/src/handlers/p0-handlers.ts`.

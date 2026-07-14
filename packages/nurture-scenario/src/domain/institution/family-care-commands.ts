@@ -306,7 +306,9 @@ const itemActionDecision = (
   if (!facts.caregiver_role_active) return { status: "blocked", reason_code: "role_missing" };
   if (!facts.caregiver_scope_matches) return { status: "blocked", reason_code: "care_group_mismatch" };
   if (!facts.enrollment_active) return { status: "blocked", reason_code: "enrollment_inactive" };
-  if (!facts.thread_active) return { status: "blocked", reason_code: "thread_inactive" };
+  if (!facts.thread_active || !facts.thread_membership_active) {
+    return { status: "blocked", reason_code: "thread_inactive" };
+  }
   if (facts.item_status === "missing") return { status: "blocked", reason_code: "item_missing" };
   if (
     !commandIdentityValid({

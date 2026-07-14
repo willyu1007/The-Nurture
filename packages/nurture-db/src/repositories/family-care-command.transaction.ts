@@ -550,7 +550,23 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       }),
       this.transaction.nurtureFamilyCareItem.findFirst({
         where: { id: input.item_id, workspaceId: input.workspace_id },
-        include: { enrollment: true, thread: true, grant: true },
+        include: {
+          enrollment: true,
+          grant: true,
+          thread: {
+            include: {
+              participants: {
+                where: {
+                  participantId: input.participant_id,
+                  roleAssignmentId: input.role_assignment_id,
+                  visibilityStatus: "active",
+                  deletedAt: null,
+                },
+                take: 1,
+              },
+            },
+          },
+        },
       }),
     ]);
     const roleActive =
@@ -650,6 +666,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
           (!item.enrollment.leftAt || item.enrollment.leftAt > new Date()),
       ),
       thread_active: Boolean(item?.thread.status === "active" && item.thread.deletedAt === null),
+      thread_membership_active: Boolean(item?.thread.participants.length),
       grant,
       item_status: item?.status ?? "missing",
       item_version: item?.version ?? -1,

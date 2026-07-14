@@ -662,3 +662,14 @@
 ## Pitfalls / dead ends (do not repeat)
 
 - Keep the detailed log in `05-pitfalls.md` (append-only).
+## 2026-07-14 — N1-F DB and direct-surface closure
+
+- Received target-specific approval and applied `20260713150000_nurture_institution_n1_core` only to local PostgreSQL `localhost:5433/nurture`; migration status is current and the production catalog remains Nurture-only (`43` tables, `71` enums).
+- Added a real Postgres family-care journey covering atomic capture/Execution replay, owner reads, caregiver acknowledge/reply, current private-thread membership, grant revoke and replacement-grant fencing, source redaction, pending cancel, and explicit `handoffRequestSnapshotsPayload=[]`.
+- Added `readInstitutionSurface` as the shared resolver → owner query → safe presenter path for `class_family_inbox` and `teacher_attention_board`. It accepts no host-authored Nurture role/scope/target ids and returns only display-safe fields plus opaque refs.
+- Added the two capability/entrypoint declarations, workflow handlers, safe summary artifact types, and scenario-internal owner-read routes. Workflow handlers explicitly return `handoff_drafts=[]`; X4/N2 fields remain absent.
+- Added current caregiver thread-membership enforcement for acknowledge and reply writes and verified both paths in unit and DB tests.
+- Repaired presenter coupling by mapping Nurture enums to display labels before returning generic badges and collapsing owner denial reasons to generic `access_changed` / `unavailable` host states.
+- Prevented orphan clarification contexts: direct surfaces retain structured token delivery, while durable workflow handlers suppress token issuance and fail closed to manual review when scope is ambiguous.
+- Repaired governance drift: aligned YAML/TypeScript manifest ordering and expanded the Nurture scenario source pin to include the live `registry.ts`; final self hash is `de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125`.
+- Final locked populations: `152` unit tests, `22` production DB tests, `16` dev-host DB/E2E tests; routing census `16 / 3 / 7` files.

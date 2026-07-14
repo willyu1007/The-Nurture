@@ -161,16 +161,16 @@
 2. `caregiver_daily_care` second.
 3. `child_media_attribution` third.
 
-**N1 implementation checkpoints（2026-07-13）：**
+**N1 implementation checkpoints（2026-07-14）：**
 
 | Checkpoint | Status | Scope / exit evidence |
 | --- | --- | --- |
 | N1-A | Complete | Cross-repo revision/hash pin and explicit-empty activation boundary. |
-| N1-B | Static preview complete | Additive production schema/migration/context; no target database has been migrated yet. |
+| N1-B | Complete | Additive production schema/migration/context; migration applied only to the approved local `localhost:5433/nurture` target and catalog boundary verified. |
 | N1-C | Complete | Shared CommandExecution runner, InteractionContext, Prisma transaction adapter, and one family-core command migration. |
 | N1-D | Complete | Fail-closed resolver, candidate kernel, structured policy, and current-state source adapters. |
 | N1-E | Complete | Family input → receipt/item/attention, caregiver acknowledge/reply, grant revoke, source redaction, pre-delivery cancel, class inbox/attention owner reads; explicit `[]` only. |
-| N1-F | Pending | Approved production-DB migration apply, DB-backed fault/privacy journey, scenario handler/presenter/manifest conformance, and final N1 review. |
+| N1-F | Complete | Approved production-DB migration apply; 22/22 DB tests; DB-backed capture/replay/revoke/redaction/cancel and direct surface journey; YAML/registry/module conformance; final architecture repairs and N1 review. |
 
 **Cross-repo task ownership：**
 

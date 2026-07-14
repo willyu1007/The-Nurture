@@ -3,11 +3,11 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（in progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-13
+- **Updated:** 2026-07-14
 - **Owner:** willyu1007
-- **Next step:** Enter N1-F: prepare DB-backed family-care journey tests, obtain target-specific approval, apply the additive production migration to the approved database, and verify capture/replay/revoke/redaction/cancel/query behavior against Postgres. N1-E domain/repository code is static-gate complete; manifest handlers/presenters remain unadvertised until the DB-backed owner-read path is verified. Every committed Execution persists `handoffRequestSnapshotsPayload=[]`; non-empty activation remains gated until My-Chat X3 and joint crash tests pass.
+- **Next step:** Hold Nurture non-empty activation. Proceed with the cross-repo X3 My-Chat Handoff kernel readiness/implementation gate; only after X3 passes may X4/N2 connect claimed drivers, non-empty snapshots, `handoff_key`, context sources, and `user_attention`. N1 is closed with DB-backed `class_family_inbox` / `teacher_attention_board` owner-read surfaces, while every committed Execution and institution workflow result remains explicit-empty.
 
 ## N1 Adopted Contract Baseline
 
@@ -16,6 +16,7 @@
 - My-Chat current local dependency revision: `bda1542d6e6989a348254917a5e49f30de68083d` (X2; `packages/workflow-contracts` is byte-identical to the X1 revision).
 - Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
 - N1 activation posture: capability activation disabled; all command handoff snapshots are explicit empty arrays.
+- N1 scenario source pin: `de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125` over the workflow context contract, YAML manifest, module, and live TypeScript registry.
 
 ## Goal
 

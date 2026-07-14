@@ -66,7 +66,8 @@
 | Architecture review | PASS AFTER REPAIR | Removed premature manifest/context-ref declarations that produced 16 host-resolver fatals; repaired grant target selection, actor/child binding, stale convergence authorization, receipt versioning, linked-grant reactivation, redaction sanitization/bounds, and current participant/enrollment/thread/group/institution fences. |
 | Targeted tests | PASS | `packages/nurture-scenario/tests/institution/class-family-inbox.test.ts`: 22/22. |
 | Full unit/static gate | PASS | 16 unit files / 147 tests; full typecheck, test routing/population, production Prisma validate, dev-host Prisma validate with a non-connecting placeholder URL, persistence boundary, N1 schema contract, workflow contract pin, module validator/registry test, and diff whitespace pass. |
-| Production DB catalog | PENDING N1-F | The configured local production DB is still at G0, so `pnpm db:assert-boundary` correctly reports the 21 N1 tables as missing. No migration was applied in N1-E. |
+| Production DB catalog | PASS | Approved local target `localhost:5433/nurture` is migration-current; production boundary reports 43 Nurture tables and 71 enums with no dev-host Workflow tables. |
+| N1 direct surfaces | PASS | `class_family_inbox` and `teacher_attention_board` resolve current Nurture scope, owner-reread current DB facts, emit safe/opaque presenter output, and keep workflow handoff drafts explicit-empty. |
 
 ## Automated Checks
 
@@ -316,3 +317,14 @@ For IA/IA.1 discussion work:
 | 2026-07-13 | `pnpm test:unit:ci && pnpm verify:unit-population && pnpm verify:test-routing` | PASS | 16 unit files; 147/147 tests pass; routing census remains 16 unit / 2 production DB / 7 dev-host files. |
 | 2026-07-13 | N1-E static contract gates | PASS | Full typecheck, production Prisma validate, placeholder dev-host Prisma validate, persistence/N1 schema contracts, workflow contract pin tests, module validator/registry, and `git diff --check` pass. |
 | 2026-07-13 | `pnpm db:assert-boundary` | EXPECTED FAIL / N1-F GATE | Configured production DB still contains the G0 catalog and is missing the 21 additive N1 tables. No database was mutated; target-specific approval is required before apply. |
+| 2026-07-14 | Destructive SQL preflight + `pnpm db:deploy` | PASS | No `DROP`, `TRUNCATE`, `DELETE FROM`, or ALTER rename/drop statement; applied `20260713150000_nurture_institution_n1_core` only to approved `localhost:5433/nurture`. |
+| 2026-07-14 | Prisma migration status + production catalog boundary | PASS | Both migrations applied; schema up to date; production catalog is 43 Nurture tables / 71 enums. |
+| 2026-07-14 | `pnpm test:unit:ci` + population | PASS | 53 suites; 152/152 unit tests pass. |
+| 2026-07-14 | `pnpm test:db:ci` + population | PASS | 16 suites; 22/22 production DB tests pass, including full resolver → query → presenter reread before/after grant revoke and thread-membership denial for acknowledge/reply. |
+| 2026-07-14 | `pnpm test:dev-host:ci` + population | PASS | 15 suites; 16/16 isolated dev-host tests pass. |
+| 2026-07-14 | Production/dev-host Prisma and catalog boundaries | PASS | Both Prisma schemas validate; production remains 43/71 Nurture-only and dev-host remains 6/2 Workflow-only. |
+| 2026-07-14 | My-Chat validator/registry targeted conformance | PASS | 32/32 targeted surface + module tests pass; both new manifest handler keys resolve and module registration has no fatal finding. |
+| 2026-07-14 | YAML/TypeScript manifest parity | PASS AFTER REPAIR | Full parsed objects match after correcting the pre-existing parent/family declaration-order drift. |
+| 2026-07-14 | Workflow contract pin verification | PASS AFTER REPAIR | Base and My-Chat remain byte-identical at shared hash `0bd892...`; Nurture source pin now covers four files and verifies at `de32f2...`. |
+| 2026-07-14 | Context strict verification | PASS | Workflow context checksum refreshed; context layer strict verification passed. |
+| 2026-07-14 | Persistence/schema/test-routing gates | PASS | Persistence boundaries, N1 schema contract, routing census 16 unit / 3 production DB / 7 dev-host files, and population locks all pass. |

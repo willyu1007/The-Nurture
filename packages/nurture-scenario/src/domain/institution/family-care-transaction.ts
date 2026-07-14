@@ -87,6 +87,7 @@ export type FamilyCareItemActionFacts = {
   caregiver_scope_matches: boolean;
   enrollment_active: boolean;
   thread_active: boolean;
+  thread_membership_active: boolean;
   grant: FamilyCareCurrentGrant;
   item_status:
     | "open"

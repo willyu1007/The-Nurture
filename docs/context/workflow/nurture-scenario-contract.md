@@ -29,13 +29,22 @@ Do not copy My-Workflow-Base host runtime into this repo. Integration should reg
 
 Do not put My-Chat account auth, session, or global user semantics into Nurture. Do not put Nurture-specific family, child, institution, caregiver, enrollment, consent, or care communication semantics into My-Chat as canonical business facts.
 
-## P0 Workflows
+## Declared Workflows
+
+P0 workflows:
 
 - `pregnancy_stage_management`
 - `family_strategy`
 - `care_plan`
 - `activity_comparison`
 - `execution_review`
+
+N1 institution owner-read workflows:
+
+- `class_family_inbox` / `open_class_family_inbox`
+- `teacher_attention_board` / `open_today_attention_board`
+
+The N1 institution workflows resolve the current Nurture participant, role, and care-group scope on every read. Their direct surface handlers return display-safe items and opaque refs only. Their durable workflow handlers emit safe summary artifacts and an explicit empty `handoff_drafts` list.
 
 ## Object And Profile Rules
 
@@ -76,6 +85,8 @@ Nurture family-care communication is Nurture-owned when the conversation is crea
 
 Handoff payloads are refs-only.
 
+N1 institution activation is deliberately disabled: every committed `NurtureCommandExecution` stores `handoffRequestSnapshotsPayload=[]`, and inbox/attention workflow handlers return `handoff_drafts=[]`. The family-care notification/deep-link routes below are ownership declarations for the later X4/N2 activation increment, not an enabled non-empty delivery path in N1.
+
 - `public_draft` -> `my_chat.forum`
 - `knowledge_candidate` -> `my_chat.knowledge_base`
 - `notification` -> `my_chat.notification`
@@ -105,6 +116,9 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
 - My-Chat canonical account/user resolver keys exist.
 - Nurture resolver keys exist for child care process, participant, family, institution, care group, enrollment, child link grant, family-care thread, message, and item.
 - Shared surfaces consume only standard workflow refs and safe artifact previews.
+- Institution inbox/attention surfaces call Nurture owner-read handlers and receive only safe labels, generic badges, aggregate versions, and opaque item refs; My-Chat must not branch on Nurture business lifecycle values.
+- Institution owner reads re-resolve current participant/role/care-group scope and recheck enrollment, thread membership, the item-linked grant, source lifecycle, and redaction before every display.
+- N1 institution command executions and workflow handlers remain explicit-empty until X4/N2 is enabled behind the My-Chat host capability gate.
 - Shared mobile/chat/dashboard surfaces do not become the canonical source for Nurture family-care messages or care items.
 - Health safety policies are tested before pregnancy or care-plan workflows are enabled.
 - DB namespace, migrations, indexes, rollback/export, and seed-data boundaries are reviewed before cloud apply.

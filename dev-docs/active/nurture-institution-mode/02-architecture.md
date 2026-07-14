@@ -168,6 +168,16 @@ Owner reads use a separate bounded `NurtureFamilyCareQueryRepository`: every inb
 
 N1-E deliberately does not declare the new institution resolver keys or live workflow handlers in `scenario.manifest.yaml`. Doing so before My-Chat registers the owner resolvers makes legacy module validation fatal and would advertise a surface before its DB-backed owner-read path is accepted. N1-F closes the DB-backed direct surface; non-empty `handoff_key` and context-source declarations remain an X4/N2 change behind `workflow_handoff_materialization_v1`.
 
+### N1-F direct surface boundary（2026-07-14）
+
+N1-F advertises only `class_family_inbox` and `teacher_attention_board`, after their Postgres owner-read journey passed. Each capability handler resolves the current participant and care-group role from `meta.actor_id`, runs the bounded owner query, emits a display-safe summary artifact, and explicitly returns `handoff_drafts=[]`. The paired scenario-internal read handlers return generic safe titles, labels, badges, aggregate versions, and opaque refs; they do not return child-process, thread, grant, protected-content, attachment, or policy-seed fields.
+
+The host cannot author a Nurture care-group id or role assignment. Multiple reachable scopes return Nurture-owned structured clarification; missing/revoked access returns one generic unavailable state. Every read revalidates the current participant, role, group/institution scope, enrollment, thread membership, item-linked grant, source message, and redaction state. Grant revoke or source redaction therefore removes the old item on the next owner read without requiring My-Chat to interpret a Nurture lifecycle value.
+
+Structured clarification is issued only on the direct scenario response path, whose contract can return the opaque scenario token and interaction request. The durable workflow Step result cannot carry that continuation envelope, so its handler disables token issuance and enters generic manual review on ambiguous scope. It must not persist an unreachable InteractionContext.
+
+The manifest deliberately adds no institution context-ref type, `handoff_key`, context-source declaration, host capability requirement, or non-empty draft. Those remain X4/N2 work after My-Chat X3. The scenario source pin now includes the live TypeScript registry as well as the context contract, YAML manifest, and module so YAML/runtime drift is detectable.
+
 ## 2. 业务对象模型
 
 Detailed IB schema contract: see `06-ib-nurture-schema-spec.md`. IB implementation defaults for the schema decisions are in `07-ib-decision-convergence.md`. IIA implementation sequencing for schema, policy, and tests is in `08-iia-schema-policy-test-design.md`. This section remains the architecture-level model and ownership baseline.

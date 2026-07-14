@@ -42,8 +42,9 @@
     "contractPaths": [
       "docs/context/workflow/nurture-scenario-contract.md",
       "packages/nurture-scenario/scenario.manifest.yaml",
-      "packages/nurture-scenario/src/module.ts"
+      "packages/nurture-scenario/src/module.ts",
+      "packages/nurture-scenario/src/registry.ts"
     ],
-    "contractSha256": "d298af4b1c947af6fc220affa182e14f70815240f411d543974d8a7b590e2e88"
+    "contractSha256": "de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125"
   }
 }

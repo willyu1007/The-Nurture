@@ -295,6 +295,7 @@ export class NurtureInstitutionResolver {
       aggregate_candidate_limit?: number;
       rendered_option_limit?: number;
       clarification_ttl_ms?: number;
+      issue_clarification?: boolean;
     } = {},
   ) {
     this.sources = sources ?? createNurtureResolutionSourceAdapters(repository);
@@ -563,6 +564,9 @@ export class NurtureInstitutionResolver {
     });
     if (kernel.status === "blocked") return this.toBlocked(kernel.reason_code);
     if (kernel.status === "needs_clarification") {
+      if (this.options.issue_clarification === false) {
+        return this.toBlocked("no_reachable_context");
+      }
       return this.issueClarification({ envelope, participant, kernel, intent_key: intentKey });
     }
     const current = await this.repository.revalidateResolutionCandidate({

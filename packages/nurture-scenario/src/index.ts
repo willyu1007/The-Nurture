@@ -17,5 +17,6 @@ export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/family-care-commands.js";
 export * from "./domain/institution/family-care-query.js";
+export * from "./institution-surfaces.js";
 export * from "./domain/testing/in-memory-institution-ports.js";
 export type * from "@my-chat/workflow-contracts";

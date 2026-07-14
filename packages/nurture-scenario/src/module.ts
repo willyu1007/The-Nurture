@@ -2,10 +2,11 @@ import type { WorkflowRuntimePort, WorkflowScenarioModule } from "@my-chat/workf
 import { nurtureActions } from "./actions/shared-actions.js";
 import { nurtureAdapters } from "./adapters/chat-workflow.adapter.js";
 import { createNurtureHandlers, nurtureHandlers } from "./handlers/p0-handlers.js";
-import { type NurtureHandlerDeps, type NurturePresenterDeps } from "./deps.js";
+import { defaultNurtureDeps, type NurtureHandlerDeps, type NurturePresenterDeps } from "./deps.js";
 import { createNurturePolicies, nurturePolicies } from "./policies.js";
 import { createNurturePresenters, nurturePresenters } from "./presenters.js";
 import { nurtureInternalApiHandlers, nurtureScenarioManifest } from "./registry.js";
+import { createInstitutionInternalApiHandlers } from "./institution-surfaces.js";
 
 // Static module bound to synthetic default deps — used by conformance/journey
 // tests and any importer that does not wire a host.
@@ -16,7 +17,10 @@ export const nurtureScenarioModule: WorkflowScenarioModule = {
   adapters: nurtureAdapters,
   presenters: nurturePresenters,
   policies: nurturePolicies,
-  internal_api_handlers: nurtureInternalApiHandlers,
+  internal_api_handlers: {
+    ...nurtureInternalApiHandlers,
+    ...createInstitutionInternalApiHandlers(defaultNurtureDeps),
+  },
 };
 
 export type NurtureScenarioModuleDeps = {
@@ -41,5 +45,8 @@ export const createNurtureScenarioModule = (deps: NurtureScenarioModuleDeps): Wo
   adapters: { ...nurtureAdapters, worker_runtime: deps.workerRuntime },
   presenters: createNurturePresenters(nurtureScenarioManifest, deps.presenterDeps),
   policies: createNurturePolicies(deps.handlerDeps),
-  internal_api_handlers: nurtureInternalApiHandlers,
+  internal_api_handlers: {
+    ...nurtureInternalApiHandlers,
+    ...createInstitutionInternalApiHandlers(deps.handlerDeps),
+  },
 });
