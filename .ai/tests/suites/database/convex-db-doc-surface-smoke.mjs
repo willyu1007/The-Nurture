@@ -10,6 +10,7 @@ import {
   expectOk,
   materializeConvexFixture,
   runNodeScript,
+  skipIfScriptsUnavailable,
 } from './convex-fixture.mjs';
 
 export const name = 'database-convex-db-doc-surface-smoke';
@@ -27,6 +28,13 @@ function readGeneratedDoc(rootDir, relPath) {
 }
 
 export function run(ctx) {
+  const unavailable = skipIfScriptsUnavailable(ctx, name, [
+    'contextCtl',
+    'dbSsotCtl',
+    'convexCtl',
+    'dbDocCtl',
+  ]);
+  if (unavailable) return unavailable;
   const fixture = materializeConvexFixture(ctx, name);
 
   const status = runNodeScript({

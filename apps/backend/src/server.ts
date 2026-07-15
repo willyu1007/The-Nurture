@@ -1,6 +1,6 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import Fastify, { type FastifyInstance } from "fastify";
-import type { WorkflowCommandMeta } from "@my-chat/workflow-contracts";
+import type { DomainContextRef, WorkflowCommandMeta } from "@my-chat/workflow-contracts";
 import {
   NurtureCaptureExtractionStatus,
   NurtureCaptureInputModality,
@@ -13,10 +13,48 @@ import type { NurtureApp } from "./app.js";
 const DEFAULT_WORKSPACE = "ws-dev";
 
 /** Fastify HTTP surface mirroring the runtime's route checklist (subset for the first slice). */
-export const buildServer = (app: NurtureApp): FastifyInstance => {
+const authorized = (header: string | undefined, token: string | undefined): boolean => {
+  if (!header || !token || !header.startsWith("Bearer ")) return false;
+  const supplied = Buffer.from(header.slice("Bearer ".length), "utf8");
+  const expected = Buffer.from(token, "utf8");
+  return supplied.length === expected.length && timingSafeEqual(supplied, expected);
+};
+
+export const buildServer = (
+  app: NurtureApp,
+  options: { internalServiceToken?: string } = {},
+): FastifyInstance => {
   const fastify = Fastify({ logger: false });
 
   fastify.get("/health", async () => ({ ok: true }));
+
+  fastify.post<{
+    Body: {
+      workspace_id?: string;
+      source_context_refs?: DomainContextRef[];
+      actor_user_id?: string;
+    };
+  }>("/internal/nurture/activation/user-attention/resolve", async (req, reply) => {
+    if (!options.internalServiceToken) {
+      return reply.code(503).send({ error: "activation_owner_disabled" });
+    }
+    if (!authorized(req.headers.authorization, options.internalServiceToken)) {
+      return reply.code(401).send({ error: "service_auth_required" });
+    }
+    if (
+      !req.body?.workspace_id ||
+      !Array.isArray(req.body.source_context_refs)
+    ) {
+      return reply.code(400).send({ error: "invalid_owner_read_request" });
+    }
+    return reply.send(
+      await app.resolveUserAttention({
+        workspace_id: req.body.workspace_id,
+        source_context_refs: req.body.source_context_refs,
+        ...(req.body.actor_user_id ? { actor_user_id: req.body.actor_user_id } : {}),
+      }),
+    );
+  });
 
   // POST /api/workflow/runs — start a run (persists run + seeds steps).
   fastify.post<{

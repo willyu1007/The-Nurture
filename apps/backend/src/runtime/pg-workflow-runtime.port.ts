@@ -1,8 +1,12 @@
 import { randomUUID } from "node:crypto";
 import type {
+  WorkflowCompleteStepInput,
+  WorkflowCompleteStepLegacyInput,
+  WorkflowCompleteStepMaterializationInputV1,
   WorkflowCommandResponse,
-  WorkflowRuntimePort,
+  WorkflowRuntimePortMaterializationV1,
   WorkflowStepLease,
+  WorkflowStepMaterializationResultV1,
   WorkflowStepResult,
 } from "@my-chat/workflow-contracts";
 import {
@@ -31,7 +35,7 @@ const toResultStatus = (s?: string): WorkflowStepResultStatus =>
  * handler's artifact_drafts / context_bindings / event_drafts into the ledger
  * tables in ONE transaction so outbox ids + versions stay consistent.
  */
-export class PgWorkflowRuntimePort implements WorkflowRuntimePort {
+export class PgWorkflowRuntimePort implements WorkflowRuntimePortMaterializationV1 {
   constructor(private readonly prisma: DevHostPrismaClient) {}
 
   async claim_step(input: {
@@ -61,11 +65,28 @@ export class PgWorkflowRuntimePort implements WorkflowRuntimePort {
     };
   }
 
-  async complete_step(input: Parameters<WorkflowRuntimePort["complete_step"]>[0]): Promise<WorkflowCommandResponse<WorkflowStepResult>> {
+  async complete_step(input: WorkflowCompleteStepLegacyInput): Promise<WorkflowCommandResponse<WorkflowStepResult>>;
+  async complete_step(
+    input: WorkflowCompleteStepMaterializationInputV1,
+  ): Promise<WorkflowCommandResponse<WorkflowStepMaterializationResultV1>>;
+  async complete_step(
+    input: WorkflowCompleteStepInput,
+  ): Promise<WorkflowCommandResponse<WorkflowStepResult | WorkflowStepMaterializationResultV1>> {
     const ws = input.meta.workspace_id;
+    const materializationV1 = input.completion_contract_version === 1;
+    if (materializationV1 && (input.handoff_drafts?.length ?? 0) > 0) {
+      throw new Error("N1 dev host does not materialize non-empty handoff drafts");
+    }
     return this.prisma.$transaction(async (tx) => {
       const res = await tx.workflowStep.updateMany({
-        where: { id: input.step_id, runId: input.run_id, aggregateVersion: input.expected_version },
+        where: {
+          id: input.step_id,
+          runId: input.run_id,
+          aggregateVersion: input.expected_version,
+          ...(materializationV1
+            ? { claimToken: input.claim_token, claimExpiresAt: { gt: new Date() } }
+            : {}),
+        },
         data: {
           status: input.status ?? "completed",
           resultStatus: toResultStatus(input.status),
@@ -158,15 +179,22 @@ export class PgWorkflowRuntimePort implements WorkflowRuntimePort {
         }
       }
 
+      const stepResult: WorkflowStepResult = {
+        run_id: input.run_id,
+        step_id: input.step_id,
+        status: input.status ?? "completed",
+        aggregate_version: step.aggregateVersion,
+        output_refs: input.output_refs,
+      };
       return {
         ok: true as const,
-        data: {
-          run_id: input.run_id,
-          step_id: input.step_id,
-          status: input.status ?? "completed",
-          aggregate_version: step.aggregateVersion,
-          output_refs: input.output_refs,
-        },
+        data: materializationV1
+          ? {
+              ...stepResult,
+              completion_contract_version: 1 as const,
+              materialized_handoffs: [],
+            }
+          : stepResult,
         canonical_refs: input.output_refs,
         aggregate_versions: { [input.step_id]: step.aggregateVersion },
         action_availability: [],
@@ -175,7 +203,7 @@ export class PgWorkflowRuntimePort implements WorkflowRuntimePort {
     });
   }
 
-  async fail_step(input: Parameters<WorkflowRuntimePort["fail_step"]>[0]): Promise<WorkflowCommandResponse<WorkflowStepResult>> {
+  async fail_step(input: Parameters<WorkflowRuntimePortMaterializationV1["fail_step"]>[0]): Promise<WorkflowCommandResponse<WorkflowStepResult>> {
     const status = input.retryable ? "retry_requested" : "failed";
     const res = await this.prisma.workflowStep.updateMany({
       where: { id: input.step_id, runId: input.run_id, aggregateVersion: input.expected_version },

@@ -1,4 +1,9 @@
 import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type { NurtureCommandRepository } from "./domain/commands/command-kernel.js";
+import type { NurtureInteractionContextRepository } from "./domain/interactions/interaction-context.js";
+import type { NurtureInstitutionContextRepository } from "./domain/institution/institution-context.js";
+import type { NurtureFamilyCareQueryRepository } from "./domain/institution/family-care-query.js";
+import type { NurtureUserAttentionRepository } from "./domain/institution/user-attention-activation.js";
 
 export type NurtureProfileProjection = {
   profile_id: string;
@@ -112,6 +117,14 @@ export type NurtureWorkflowProjectRepository = {
 };
 
 export type NurtureRepositories = {
+  commands: NurtureCommandRepository;
+  interactions: NurtureInteractionContextRepository;
+  /** N1 institution resolver/policy port; optional for legacy P0 test fixtures. */
+  institution?: NurtureInstitutionContextRepository;
+  /** N1 safe collection reads; optional for legacy P0 fixtures. */
+  familyCareQuery?: NurtureFamilyCareQueryRepository;
+  /** Current owner facts for host activation delivery and deep-link reopen. */
+  userAttention?: NurtureUserAttentionRepository;
   profiles: NurtureProfileRepository;
   activityComparisons: ActivityComparisonRepository;
   evidence: NurtureEvidenceRepository;
@@ -119,6 +132,11 @@ export type NurtureRepositories = {
 };
 
 export const repositoryTokens = {
+  commands: "nurture.repositories.commands",
+  interactions: "nurture.repositories.interactions",
+  institution: "nurture.repositories.institution",
+  familyCareQuery: "nurture.repositories.family_care_query",
+  userAttention: "nurture.repositories.user_attention",
   profiles: "nurture.repositories.profiles",
   activityComparisons: "nurture.repositories.activity_comparisons",
   evidence: "nurture.repositories.evidence",

@@ -132,8 +132,16 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
+
+      - name: Prepare pinned My-Chat source dependency
+        working-directory: My-Chat
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/my_chat?schema=public
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm prisma generate
 
       - name: Install
         working-directory: The-Nurture
@@ -221,7 +229,7 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
@@ -305,7 +313,7 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
@@ -376,8 +384,16 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
+
+      - name: Prepare pinned My-Chat source dependency
+        working-directory: My-Chat
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/my_chat?schema=public
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm prisma generate
 
       - name: Install
         working-directory: The-Nurture

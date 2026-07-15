@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { WorkflowExposureLevel } from "@my-chat/workflow-contracts";
 import type { NurtureHandlerDeps, NurtureWorkflowProject } from "../src/index.js";
+import {
+  createInMemoryInteractionContextRepository,
+  createInMemoryNurtureCommandRepository,
+} from "../src/domain/testing/in-memory-institution-ports.js";
 import { createNurturePolicies } from "../src/index.js";
 
 const WS = "ws-1";
@@ -36,6 +40,8 @@ const buildDeps = (cfg: Cfg): NurtureHandlerDeps => {
   };
   return {
     repositories: {
+      commands: createInMemoryNurtureCommandRepository(),
+      interactions: createInMemoryInteractionContextRepository(),
       profiles: { getByCanonicalObjectRef: async () => null, upsertProjection: stub as never },
       activityComparisons: { createDraft: stub as never, getDraft: async () => null, saveWeightOverride: stub as never, saveComputedResult: stub as never },
       evidence: { appendEvidenceRef: stub as never },

@@ -130,6 +130,14 @@ An immutable replay seed is durable but cannot wake My-Chat by itself. Therefore
 
 The persisted Step ref is the exclusive recovery owner. A later retry may reclaim the same Step with a new claim token/version, but a different Step cannot read or materialize that Execution's non-empty snapshots. Admin reconciliation operates the original Step; MVP has no replacement/transfer protocol. Once a Handoff exists, technical replay operates the My-Chat Handoff Ledger instead; a new business resend creates a new command, Step, and snapshot identity. Nurture does not synchronously call back into My-Chat to owner-read the Step and does not interpret host lease/retry state. My-Chat validates claim/lease/version during atomic `complete_step`, preserving the boundary without a cyclic service call, polling scanner, Nurture transport outbox, Redis recovery state, or signed-driver-token platform.
 
+X4-A implements this boundary inside the shared Nurture command kernel without advertising it through the scenario manifest. The transient shared driver ref is owner-shaped (`host.workflow/workflow_step`) and may omit a consumer; Nurture canonicalizes the persisted provenance to an exact five-field object with `consumer_scenario_key=nurture`, while dropping claim token and Step version. Stored snapshots are parsed as bounded refs-only contract values and replay additionally verifies request id, handoff key, purpose, expiry, and the exact original Step. The first allowed policy is `familyInputRouteSpec` in `immediate` mode and emits one `user_attention` snapshot over message, receipt, and item refs. Direct calls without activation continue to commit `[]`; pending-workflow routing cannot request this handoff.
+
+This is a persistence foundation, not activation. No X4-A change adds `handoff_key` or source declarations to the manifest, passes driver context from a live workflow handler, creates a My-Chat Handoff, sends an event, or enables `workflow_handoff_materialization_v1`. Those remain ordered X4-B/X4-C work after the database-backed foundation passes.
+
+X4-B/X4-C1 add the bridge without moving authority across repositories. My-Chat owns the concrete bridge implementation and injects only a two-operation port: claimed-Step input becomes a transient `ScenarioCommandDriverContext`, and returned scenario snapshots become whitelisted `WorkflowHandoffDraft` values. Nurture does not take a production dependency on My-Chat runtime code. A separate scenario-owned source port resolves the stable invocation, command, and handoff request identities plus the current family-input payload; those identities are independent of claim token, Step version, and reclaim attempt. The handler derives child scope from the Nurture payload and lets the command kernel re-resolve policy/current state, so the source port is not a second scope or authorization authority.
+
+The handler emits no `workflow.step.*` or `workflow.handoff.*` scenario event draft because those are host-ledger products. Its Step output contains only an opaque CommandExecution evidence ref; message, receipt, and item refs remain in the handoff's owner-readable `source_context_refs` and are not encoded a second time into host Step output. The handler is present in the TypeScript registry for conformance testing but absent from `scenario.manifest.yaml`, and the default backend composition intentionally omits the business-source port. Therefore X4-C1 is fail-closed and unreachable from advertised runtime surfaces; manifest declarations, the real source adapter, owner-reread consumer wiring, and development capability enablement remain a separately reviewed X4-C2 activation change.
+
 R8-B1-C3 locks the My-Chat atomic boundary. `complete_step` performs exact completion replay lookup, validates the current claim/lease/version for first-time completion, materializes context/artifact/handoff drafts, writes Handoff Ledger + standard handoff/step outbox events, persists canonical handoff refs and the `draft_key -> handoff_ref` mapping, and completes the step in one host Postgres transaction. Mixed existing/new drafts are supported; same-key/different-hash conflict rolls back the current transaction. Remote Nurture/policy/provider/queue calls are forbidden inside the transaction. Standard `workflow.step.*` and `workflow.handoff.*` events are host-ledger products, not scenario event drafts.
 
 R8-B1-D1 deliberately keeps the generic Handoff lifecycle small: `requested`, `completed`, `stopped`, and `failed`. Automatic waiting/retry remains `requested` and lives in attempt/outbox state; cancellation/expiry/policy/source/target terminal stops use `stopped` plus a reason code; exhausted technical recovery uses `failed`. `created/existing` is materialization disposition, downstream acceptance is an optional receipt/event, and contract/hash defects remain Workflow Step manual-review failures rather than Handoff states.
@@ -159,6 +167,24 @@ R8-B3-C2a-d lock the first Nurture transition groups. Grant revoke immediately f
 R8-B3-C2e keeps host technical exhaustion separate from Nurture business failure. Workflow Step retry/manual-review state never directly mutates a Receipt. Automatic retry leaves a route `pending(workflow_processing)`; after retry exhaustion the host enters manual review while Nurture re-evaluates current grant/source/scope and route state. Current business blockers produce `blocked`, an already-completed route stays delivered, and only an owner-authorized `fail_route` may commit terminal `failed(technical_recovery_exhausted)`. A failed Receipt never reopens. A deliberate recovery creates a new host Run/Step, command identity, routing attempt, and Receipt linked by optional `retryOfReceiptId`; My-Chat Admin can reconcile or invoke Nurture recovery actions but cannot edit business state or bypass current gates.
 
 The intended reusable shape is a thin command runner plus Nurture command specifications, not a generic rules DSL. AI/attachments/remote calls stay outside the DB transaction; class/batch writes preserve child-scope isolation.
+
+### N1 explicit-empty implementation boundary（2026-07-13）
+
+N1 implements institution writes through a scenario-owned `NurtureFamilyCareCommandTransaction` attached to the shared command transaction. The Prisma adapter executes precondition reads, optimistic transitions, business events, bounded projection convergence, and immutable `NurtureCommandExecution` creation inside one serializable transaction. Command actor/workspace/child scope come from the trusted command envelope and must match the scenario payload and current owner facts.
+
+Owner reads use a separate bounded `NurtureFamilyCareQueryRepository`: every inbox/attention read rechecks active participant, role, group/institution, enrollment, the item-linked source grant, source-message lifecycle, and current grant target/direction/data class. A newly created grant cannot reactivate an item bound to a revoked grant. Grant revoke is distinct from source redaction: revoke fences access and suppresses active work without redacting the source message; redaction removes protected content/attachment access and sanitizes derived display fields.
+
+N1-E deliberately does not declare the new institution resolver keys or live workflow handlers in `scenario.manifest.yaml`. Doing so before My-Chat registers the owner resolvers makes legacy module validation fatal and would advertise a surface before its DB-backed owner-read path is accepted. N1-F closes the DB-backed direct surface; non-empty `handoff_key` and context-source declarations remain an X4/N2 change behind `workflow_handoff_materialization_v1`.
+
+### N1-F direct surface boundary（2026-07-14）
+
+N1-F advertises only `class_family_inbox` and `teacher_attention_board`, after their Postgres owner-read journey passed. Each capability handler resolves the current participant and care-group role from `meta.actor_id`, runs the bounded owner query, emits a display-safe summary artifact, and explicitly returns `handoff_drafts=[]`. The paired scenario-internal read handlers return generic safe titles, labels, badges, aggregate versions, and opaque refs; they do not return child-process, thread, grant, protected-content, attachment, or policy-seed fields.
+
+The host cannot author a Nurture care-group id or role assignment. Multiple reachable scopes return Nurture-owned structured clarification; missing/revoked access returns one generic unavailable state. Every read revalidates the current participant, role, group/institution scope, enrollment, thread membership, item-linked grant, source message, and redaction state. Grant revoke or source redaction therefore removes the old item on the next owner read without requiring My-Chat to interpret a Nurture lifecycle value.
+
+Structured clarification is issued only on the direct scenario response path, whose contract can return the opaque scenario token and interaction request. The durable workflow Step result cannot carry that continuation envelope, so its handler disables token issuance and enters generic manual review on ambiguous scope. It must not persist an unreachable InteractionContext.
+
+The manifest deliberately adds no institution context-ref type, `handoff_key`, context-source declaration, host capability requirement, or non-empty draft. Those remain X4/N2 work after My-Chat X3. The scenario source pin now includes the live TypeScript registry as well as the context contract, YAML manifest, and module so YAML/runtime drift is detectable.
 
 ## 2. 业务对象模型
 
@@ -427,3 +453,39 @@ IIA-0-C1 locks the first-slice capability contract. The four capability keys bel
 | 儿童数据曝光半径过大 | 高 | 授权按 child process / enrollment / care group；所有跨角色流动留 receipt。 |
 | 价值观漂移到排名/市场 | 中 | 硬反指标；运营质量复盘不等于公开排名或绩效竞争。 |
 | 同意撤销与保留语义不清 | 中 | 上线前定 revoke 语义和保留窗口；fail-closed。 |
+
+## 13. X4/N2 Development Activation Boundary
+
+The canonical Nurture manifest now declares one activation-only entrypoint,
+`class_family_inbox/capture_family_input`, and one `user_attention` Handoff.
+The source contract is exact: one `family_care_message`, one
+`child_link_receipt`, and one `family_care_item`, with no Workflow Artifact or
+business body in the draft.
+
+Activation is not the default module behavior. `nurturePreActivationScenarioModule`,
+the compatibility `nurtureScenarioModule`, `createNurtureScenarioModule`, and
+the local dev host all use the derived pre-activation manifest. Only
+`createNurtureActivationScenarioModule` advertises vNext, and its type requires
+the My-Chat materializing runtime, claimed-Step bridge, and Nurture production
+family-input source.
+
+The source adapter accepts one opaque claimed-Step requirement from My-Chat,
+parses an exact version-1 schema, resolves the durable Run Actor through current
+My-Chat membership, maps the resulting user to exactly one active Nurture
+participant, and then invokes the existing Nurture command runner. The command
+runner remains the authority for role, child scope, care group, enrollment,
+grant, target, versions, and business effects.
+
+The post-commit owner endpoint is service-authenticated and refs-only. It selects
+no message body, attachment, child display name, or item detail. Every delivery
+and deep-link open rereads message/receipt/item links plus current grant,
+enrollment, thread, care group, institution, and recipient role assignments.
+Unauthorized actors are rejected before redaction/revoke classification to
+avoid lifecycle reason disclosure.
+
+My-Chat owns Step/Handoff/Outbox/notification/delivery and mobile routing;
+Nurture owns every business fact and policy result. There is no distributed
+transaction. Response loss is recovered by the original Step's B2 replay seed;
+same-Step reclaim may rotate claim evidence, while another Step cannot acquire
+the seed. X5 remains responsible for the full combined failure matrix and pilot
+decision.

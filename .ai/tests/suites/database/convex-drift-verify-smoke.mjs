@@ -10,6 +10,7 @@ import {
   expectOk,
   materializeConvexFixture,
   runNodeScript,
+  skipIfScriptsUnavailable,
 } from './convex-fixture.mjs';
 
 export const name = 'database-convex-drift-verify-smoke';
@@ -19,6 +20,12 @@ function writeJson(filePath, value) {
 }
 
 export function run(ctx) {
+  const unavailable = skipIfScriptsUnavailable(ctx, name, [
+    'contextCtl',
+    'dbSsotCtl',
+    'convexCtl',
+  ]);
+  if (unavailable) return unavailable;
   const fixture = materializeConvexFixture(ctx, name);
 
   fs.writeFileSync(

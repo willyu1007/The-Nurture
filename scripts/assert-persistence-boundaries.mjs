@@ -1,18 +1,26 @@
 #!/usr/bin/env node
 
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relativePath) => readFile(path.join(repoRoot, relativePath), 'utf8');
+const readMigrationStream = async (relativeRoot) => {
+  const entries = await readdir(path.join(repoRoot, relativeRoot), { recursive: true });
+  const migrationPaths = entries
+    .filter((entry) => entry.endsWith('migration.sql'))
+    .sort()
+    .map((entry) => path.join(relativeRoot, entry));
+  return (await Promise.all(migrationPaths.map((migrationPath) => read(migrationPath)))).join('\n');
+};
 const failures = [];
 const reject = (label, content, pattern) => {
   if (pattern.test(content)) failures.push(`${label} matched ${pattern}`);
 };
 
 const productionSchema = await read('prisma/schema.prisma');
-const productionMigration = await read('prisma/migrations/20260713082500_nurture_production_baseline/migration.sql');
+const productionMigration = await readMigrationStream('prisma/migrations');
 const nurtureDbExports = await read('packages/nurture-db/src/index.ts');
 reject('production schema', productionSchema, /^(?:model|enum) Workflow/m);
 reject('production schema', productionSchema, /@@map\("workflow_/);
@@ -21,9 +29,7 @@ reject('production migration', productionMigration, /CREATE TYPE "Workflow/);
 reject('Nurture DB exports', nurtureDbExports, /Workflow(?:Run|Step|Artifact|Approval|ContextBinding|OutboxEvent|StepResultStatus|ApprovalStatus)/);
 
 const devHostSchema = await read('apps/backend/prisma/schema.prisma');
-const devHostMigration = await read(
-  'apps/backend/prisma/migrations/20260713084000_workflow_dev_host_baseline/migration.sql',
-);
+const devHostMigration = await readMigrationStream('apps/backend/prisma/migrations');
 reject('dev-host schema', devHostSchema, /^(?:model|enum) Nurture/m);
 reject('dev-host schema', devHostSchema, /@@map\("nurture_/);
 reject('dev-host migration', devHostMigration, /(?:CREATE TABLE|ALTER TABLE|REFERENCES) "nurture_/);

@@ -265,6 +265,343 @@ enum NurturePackStatus {
 }
 
 // ============================================================================
+// INSTITUTION ECOLOGY — LOCKED ENUM CONTRACTS (T-002 / N1)
+// ============================================================================
+
+enum NurtureParticipantStatus {
+  active
+  inactive
+  suspended
+  merged
+  deleted
+}
+
+enum NurtureChildStatus {
+  active
+  archived
+  merged
+  deleted
+}
+
+enum NurtureChildCareProcessStatus {
+  active
+  paused
+  archived
+  deleted
+}
+
+enum NurtureFamilyStatus {
+  active
+  archived
+  deleted
+}
+
+enum NurtureCareInstitutionStatus {
+  active
+  paused
+  archived
+  deleted
+}
+
+enum NurtureCareGroupStatus {
+  active
+  paused
+  archived
+  deleted
+}
+
+enum NurtureEnrollmentStatus {
+  pending
+  active
+  paused
+  ended
+  withdrawn
+  deleted
+}
+
+enum NurtureCareRole {
+  guardian
+  caregiver
+  lead_caregiver
+  institution_admin
+  system_operator
+}
+
+enum NurtureCareScopeType {
+  child_care_process
+  family
+  institution
+  care_group
+  enrollment
+}
+
+enum NurtureCareRoleAssignmentStatus {
+  active
+  suspended
+  revoked
+  expired
+  deleted
+}
+
+enum NurtureChildLinkGrantStatus {
+  pending
+  active
+  revoked
+  expired
+  replaced
+  deleted
+}
+
+enum NurtureGrantDirection {
+  family_to_org
+  org_to_family
+}
+
+enum NurtureGrantDataClass {
+  daily_care_log
+  care_day_note
+  care_constraint_update
+  family_care_question
+  family_follow_up_request
+}
+
+enum NurtureChildLinkReceiptStatus {
+  pending
+  delivered
+  read
+  acknowledged
+  failed
+  blocked
+  revoked_after_delivery
+}
+
+enum NurtureChildLinkReceiptSourceType {
+  family_care_message
+  family_care_item
+  daily_care_log
+  media_attribution
+  system_summary
+}
+
+enum NurtureChildLinkReceiptTargetScopeType {
+  family
+  participant
+  care_group
+  enrollment
+  institution
+}
+
+enum NurtureChildLinkReceiptPendingReason {
+  workflow_processing
+  awaiting_confirmation
+  scheduled_release
+}
+
+enum NurtureChildLinkReceiptDriverType {
+  workflow_step
+  item_action
+  scheduled_step
+}
+
+enum NurtureFamilyCareThreadVisibilityScope {
+  family_private
+  enrollment_private
+  institution_case
+}
+
+enum NurtureFamilyCareThreadStatus {
+  active
+  closed
+  archived
+  deleted
+}
+
+enum NurtureFamilyCareParticipantKind {
+  guardian
+  caregiver
+  lead_caregiver
+  institution_admin
+  system
+}
+
+enum NurtureFamilyCareThreadParticipantVisibilityStatus {
+  active
+  muted
+  left
+  removed
+  blocked
+}
+
+enum NurtureFamilyCareMessageKind {
+  family_message
+  caregiver_reply
+  system_notice
+  care_summary
+  redaction_notice
+}
+
+enum NurtureFamilyCareMessageAuthorshipKind {
+  family_authored
+  caregiver_confirmed
+  institution_generated
+  system_generated
+}
+
+enum NurtureFamilyCareMessageBodyFormat {
+  plain_text
+  rich_text
+}
+
+enum NurtureFamilyCareMessageBodyStorageMode {
+  plain_text_dev
+  protected
+  encrypted
+  redacted
+}
+
+enum NurtureFamilyCareMessageSourceSurface {
+  mobile
+  web
+  system_import
+  workflow
+}
+
+enum NurtureFamilyCareMessageStatus {
+  sent
+  redacted
+  failed
+}
+
+enum NurtureFamilyCareItemCategory {
+  today_attention
+  constraint
+  question
+  follow_up
+  schedule
+  admin
+  other
+}
+
+enum NurtureFamilyCareItemUrgency {
+  normal
+  today_attention
+  time_sensitive
+  urgent_non_emergency
+}
+
+enum NurtureFamilyCareItemStatus {
+  open
+  acknowledged
+  waiting_for_family
+  replied
+  followed_up
+  closed
+  expired
+  suppressed
+}
+
+enum NurtureFamilyCareItemClassificationSource {
+  manual
+  rule
+  ai
+  system
+}
+
+enum NurtureFamilyCareItemEventType {
+  created
+  classified
+  assigned
+  acknowledged
+  clarification_requested
+  clarification_received
+  clarification_expired
+  clarification_cancelled
+  corrected
+  replied
+  followed_up
+  closed
+  expired
+  suppressed
+  reopened
+}
+
+enum NurtureDailyCareLogStatus {
+  draft
+  recorded
+  shared
+  suppressed
+  corrected
+  deleted
+}
+
+enum NurtureTeacherAttentionItemSourceType {
+  family_care_item
+  care_constraint
+  daily_care_log
+  child_applied_institution_policy
+  manual_child_note
+}
+
+enum NurtureTeacherAttentionItemPriority {
+  normal
+  attention
+  time_sensitive
+}
+
+enum NurtureTeacherAttentionItemStatus {
+  active
+  resolved
+  expired
+  suppressed
+}
+
+enum NurtureMediaAssetSourceKind {
+  class_album
+  class_group_message
+  activity_album
+  admin_upload
+}
+
+enum NurtureMediaAssetStatus {
+  active
+  hidden
+  deleted
+}
+
+enum NurtureMediaAttributionSource {
+  face_reference
+  manual
+  history_match
+  system
+}
+
+enum NurtureMediaAttributionStatus {
+  candidate
+  confirmed
+  rejected
+  corrected
+  hidden
+  deleted
+}
+
+enum NurtureInteractionPurpose {
+  clarify
+  submit_action
+  open_notification
+}
+
+enum NurtureInteractionContextStatus {
+  active
+  consumed
+  revoked
+}
+
+enum NurtureCommandBusinessOutcome {
+  applied
+  already_satisfied
+}
+
+// ============================================================================
 // SCENARIO-LOCAL — PROFILE PROJECTIONS (5b decision 1)
 // ============================================================================
 
@@ -971,4 +1308,630 @@ model NurtureHealthStateSummary {
 
   @@index([workspaceId], map: "ix_50")
   @@map("nurture_health_state_summary")
+}
+
+// ============================================================================
+// INSTITUTION ECOLOGY — N1 EXPLICIT-EMPTY CORE (T-002)
+// ============================================================================
+
+model NurtureParticipant {
+  id               String                   @id @default(uuid())
+  workspaceId      String                   @map("workspace_id")
+  myChatUserId     String                   @map("my_chat_user_id")
+  displayName      String?                  @map("display_name")
+  avatarRefPayload Json?                    @map("avatar_ref_payload")
+  status           NurtureParticipantStatus
+  profilePayload   Json?                    @map("profile_payload")
+  aggregateVersion Int                      @default(0) @map("aggregate_version")
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  deletedAt        DateTime?                @map("deleted_at")
+
+  roleAssignments     NurtureCareRoleAssignment[]
+  threadMemberships   NurtureFamilyCareThreadParticipant[]
+  messages            NurtureFamilyCareMessage[]
+  itemEvents          NurtureFamilyCareItemEvent[]
+  interactionContexts NurtureInteractionContext[]
+
+  @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
+  @@map("nurture_participant")
+}
+
+model NurtureChild {
+  id                   String             @id @default(uuid())
+  workspaceId          String             @map("workspace_id")
+  displayName          String             @map("display_name")
+  birthDate            DateTime?          @map("birth_date") @db.Date
+  profileBasicsPayload Json?              @map("profile_basics_payload")
+  status               NurtureChildStatus
+  aggregateVersion     Int                @default(0) @map("aggregate_version")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  deletedAt            DateTime?          @map("deleted_at")
+
+  careProcesses NurtureChildCareProcess[]
+
+  @@index([workspaceId, status, updatedAt], map: "ix_nurture_child_status")
+  @@map("nurture_child")
+}
+
+model NurtureChildCareProcess {
+  id                 String                        @id @default(uuid())
+  workspaceId        String                        @map("workspace_id")
+  childId            String                        @map("child_id")
+  primaryFamilyId    String?                       @map("primary_family_id")
+  status             NurtureChildCareProcessStatus
+  currentStageKey    String?                       @map("current_stage_key")
+  careContextSummary String?                       @map("care_context_summary") @db.Text
+  careContextPayload Json?                         @map("care_context_payload")
+  aggregateVersion   Int                           @default(0) @map("aggregate_version")
+  createdAt          DateTime                      @default(now()) @map("created_at")
+  updatedAt          DateTime                      @updatedAt @map("updated_at")
+  deletedAt          DateTime?                     @map("deleted_at")
+
+  child             NurtureChild                   @relation(fields: [childId], references: [id], onDelete: Restrict)
+  families          NurtureFamily[]
+  enrollments       NurtureEnrollment[]
+  grants            NurtureChildLinkGrant[]
+  receipts          NurtureChildLinkReceipt[]
+  threads           NurtureFamilyCareThread[]
+  messages          NurtureFamilyCareMessage[]
+  items             NurtureFamilyCareItem[]
+  dailyCareLogs     NurtureDailyCareLog[]
+  attentionItems    NurtureTeacherAttentionItem[]
+  mediaAttributions NurtureChildMediaAttribution[]
+  commandExecutions NurtureCommandExecution[]
+
+  @@index([workspaceId, childId, status], map: "ix_nurture_child_process_child")
+  @@index([workspaceId, status, updatedAt], map: "ix_nurture_child_process_status")
+  @@map("nurture_child_care_process")
+}
+
+model NurtureFamily {
+  id                   String              @id @default(uuid())
+  workspaceId          String              @map("workspace_id")
+  childCareProcessId   String              @map("child_care_process_id")
+  displayName          String?             @map("display_name")
+  status               NurtureFamilyStatus
+  familyProfilePayload Json?               @map("family_profile_payload")
+  aggregateVersion     Int                 @default(0) @map("aggregate_version")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+  deletedAt            DateTime?           @map("deleted_at")
+
+  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  threads          NurtureFamilyCareThread[]
+  items            NurtureFamilyCareItem[]
+
+  @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_family_process")
+  @@map("nurture_family")
+}
+
+model NurtureCareInstitution {
+  id                     String                       @id @default(uuid())
+  workspaceId            String                       @map("workspace_id")
+  displayName            String                       @map("display_name")
+  legalName              String?                      @map("legal_name")
+  profilePayload         Json?                        @map("profile_payload")
+  policyConfigPayload    Json?                        @map("policy_config_payload")
+  philosophyPayload      Json?                        @map("philosophy_payload")
+  status                 NurtureCareInstitutionStatus
+  createdByParticipantId String?                      @map("created_by_participant_id")
+  aggregateVersion       Int                          @default(0) @map("aggregate_version")
+  createdAt              DateTime                     @default(now()) @map("created_at")
+  updatedAt              DateTime                     @updatedAt @map("updated_at")
+  deletedAt              DateTime?                    @map("deleted_at")
+
+  careGroups  NurtureCareGroup[]
+  enrollments NurtureEnrollment[]
+  mediaAssets NurtureMediaAssetRef[]
+
+  @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
+  @@map("nurture_care_institution")
+}
+
+model NurtureCareGroup {
+  id                  String                 @id @default(uuid())
+  workspaceId         String                 @map("workspace_id")
+  institutionId       String                 @map("institution_id")
+  name                String
+  ageBandKey          String?                @map("age_band_key")
+  capacity            Int?
+  rhythmConfigPayload Json?                  @map("rhythm_config_payload")
+  status              NurtureCareGroupStatus
+  aggregateVersion    Int                    @default(0) @map("aggregate_version")
+  createdAt           DateTime               @default(now()) @map("created_at")
+  updatedAt           DateTime               @updatedAt @map("updated_at")
+  deletedAt           DateTime?              @map("deleted_at")
+
+  institution    NurtureCareInstitution        @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  enrollments    NurtureEnrollment[]
+  threads        NurtureFamilyCareThread[]
+  items          NurtureFamilyCareItem[]
+  dailyCareLogs  NurtureDailyCareLog[]
+  attentionItems NurtureTeacherAttentionItem[]
+  mediaAssets    NurtureMediaAssetRef[]
+
+  @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
+  @@map("nurture_care_group")
+}
+
+model NurtureEnrollment {
+  id                   String                  @id @default(uuid())
+  workspaceId          String                  @map("workspace_id")
+  childCareProcessId   String                  @map("child_care_process_id")
+  institutionId        String                  @map("institution_id")
+  careGroupId          String                  @map("care_group_id")
+  status               NurtureEnrollmentStatus
+  joinedAt             DateTime?               @map("joined_at")
+  leftAt               DateTime?               @map("left_at")
+  enrollmentRefPayload Json?                   @map("enrollment_ref_payload")
+  aggregateVersion     Int                     @default(0) @map("aggregate_version")
+  createdAt            DateTime                @default(now()) @map("created_at")
+  updatedAt            DateTime                @updatedAt @map("updated_at")
+  deletedAt            DateTime?               @map("deleted_at")
+
+  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  institution      NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup        NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  grants           NurtureChildLinkGrant[]
+  receipts         NurtureChildLinkReceipt[]
+  threads          NurtureFamilyCareThread[]
+  items            NurtureFamilyCareItem[]
+  dailyCareLogs    NurtureDailyCareLog[]
+
+  @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
+  @@index([workspaceId, careGroupId, status], map: "ix_nurture_enrollment_group")
+  @@map("nurture_enrollment")
+}
+
+model NurtureCareRoleAssignment {
+  id                     String                          @id @default(uuid())
+  workspaceId            String                          @map("workspace_id")
+  participantId          String                          @map("participant_id")
+  role                   NurtureCareRole
+  scopeType              NurtureCareScopeType            @map("scope_type")
+  scopeId                String                          @map("scope_id")
+  displayLabel           String?                         @map("display_label")
+  permissionsPayload     Json?                           @map("permissions_payload")
+  status                 NurtureCareRoleAssignmentStatus
+  startsAt               DateTime?                       @map("starts_at")
+  endsAt                 DateTime?                       @map("ends_at")
+  grantedByParticipantId String?                         @map("granted_by_participant_id")
+  aggregateVersion       Int                             @default(0) @map("aggregate_version")
+  createdAt              DateTime                        @default(now()) @map("created_at")
+  updatedAt              DateTime                        @updatedAt @map("updated_at")
+  deletedAt              DateTime?                       @map("deleted_at")
+
+  participant           NurtureParticipant                   @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  threadMemberships     NurtureFamilyCareThreadParticipant[]
+  messages              NurtureFamilyCareMessage[]
+  assignedItems         NurtureFamilyCareItem[]
+  dailyCareLogs         NurtureDailyCareLog[]
+  uploadedAssets        NurtureMediaAssetRef[]
+  confirmedAttributions NurtureChildMediaAttribution[]
+
+  @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
+  @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
+  @@map("nurture_care_role_assignment")
+}
+
+model NurtureChildLinkGrant {
+  id                     String                      @id @default(uuid())
+  workspaceId            String                      @map("workspace_id")
+  childCareProcessId     String                      @map("child_care_process_id")
+  enrollmentId           String                      @map("enrollment_id")
+  grantedByParticipantId String                      @map("granted_by_participant_id")
+  grantedToScopeType     NurtureCareScopeType        @map("granted_to_scope_type")
+  grantedToScopeId       String                      @map("granted_to_scope_id")
+  directions             NurtureGrantDirection[]
+  dataClasses            NurtureGrantDataClass[]     @map("data_classes")
+  purposes               String[]
+  status                 NurtureChildLinkGrantStatus
+  effectiveFrom          DateTime?                   @map("effective_from")
+  expiresAt              DateTime?                   @map("expires_at")
+  revokedAt              DateTime?                   @map("revoked_at")
+  revokedByParticipantId String?                     @map("revoked_by_participant_id")
+  revokeReason           String?                     @map("revoke_reason")
+  retentionPolicyPayload Json?                       @map("retention_policy_payload")
+  policySnapshotPayload  Json?                       @map("policy_snapshot_payload")
+  aggregateVersion       Int                         @default(0) @map("aggregate_version")
+  createdAt              DateTime                    @default(now()) @map("created_at")
+  updatedAt              DateTime                    @updatedAt @map("updated_at")
+  deletedAt              DateTime?                   @map("deleted_at")
+
+  childCareProcess NurtureChildCareProcess    @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment          @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  receipts         NurtureChildLinkReceipt[]
+  messages         NurtureFamilyCareMessage[]
+  items            NurtureFamilyCareItem[]
+  dailyCareLogs    NurtureDailyCareLog[]
+
+  @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_grant_process")
+  @@index([workspaceId, enrollmentId, status], map: "ix_nurture_grant_enrollment")
+  @@index([workspaceId, grantedToScopeType, grantedToScopeId, status], map: "ix_nurture_grant_target")
+  @@map("nurture_child_link_grant")
+}
+
+model NurtureChildLinkReceipt {
+  id                 String                                  @id @default(uuid())
+  workspaceId        String                                  @map("workspace_id")
+  grantId            String?                                 @map("grant_id")
+  childCareProcessId String                                  @map("child_care_process_id")
+  enrollmentId       String?                                 @map("enrollment_id")
+  direction          NurtureGrantDirection
+  dataClass          NurtureGrantDataClass?                  @map("data_class")
+  sourceType         NurtureChildLinkReceiptSourceType       @map("source_type")
+  sourceId           String                                  @map("source_id")
+  routingAttemptKey  String                                  @map("routing_attempt_key")
+  retryOfReceiptId   String?                                 @map("retry_of_receipt_id")
+  targetScopeType    NurtureChildLinkReceiptTargetScopeType? @map("target_scope_type")
+  targetScopeId      String?                                 @map("target_scope_id")
+  status             NurtureChildLinkReceiptStatus
+  reasonCode         String?                                 @map("reason_code")
+  pendingReason      NurtureChildLinkReceiptPendingReason?   @map("pending_reason")
+  driverType         NurtureChildLinkReceiptDriverType?      @map("driver_type")
+  driverRef          Json?                                   @map("driver_ref")
+  nextActionAt       DateTime?                               @map("next_action_at")
+  version            Int                                     @default(0)
+  deliveredAt        DateTime?                               @map("delivered_at")
+  readAt             DateTime?                               @map("read_at")
+  acknowledgedAt     DateTime?                               @map("acknowledged_at")
+  metadataPayload    Json?                                   @map("metadata_payload")
+  createdAt          DateTime                                @default(now()) @map("created_at")
+  updatedAt          DateTime                                @updatedAt @map("updated_at")
+
+  grant            NurtureChildLinkGrant?    @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment?        @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  retryOfReceipt   NurtureChildLinkReceipt?  @relation("ReceiptRetry", fields: [retryOfReceiptId], references: [id], onDelete: Restrict)
+  retryReceipts    NurtureChildLinkReceipt[] @relation("ReceiptRetry")
+
+  @@unique([workspaceId, direction, sourceType, sourceId, routingAttemptKey], map: "uq_nurture_receipt_route")
+  @@index([workspaceId, grantId, status], map: "ix_nurture_receipt_grant")
+  @@index([workspaceId, retryOfReceiptId], map: "ix_nurture_receipt_retry")
+  @@index([workspaceId, childCareProcessId, direction, dataClass, createdAt], map: "ix_nurture_receipt_process")
+  @@index([workspaceId, targetScopeType, targetScopeId, status, createdAt], map: "ix_nurture_receipt_target")
+  @@map("nurture_child_link_receipt")
+}
+
+model NurtureFamilyCareThread {
+  id                 String                                 @id @default(uuid())
+  workspaceId        String                                 @map("workspace_id")
+  childCareProcessId String                                 @map("child_care_process_id")
+  familyId           String                                 @map("family_id")
+  enrollmentId       String?                                @map("enrollment_id")
+  careGroupId        String?                                @map("care_group_id")
+  visibilityScope    NurtureFamilyCareThreadVisibilityScope @map("visibility_scope")
+  status             NurtureFamilyCareThreadStatus
+  latestMessageAt    DateTime?                              @map("latest_message_at")
+  summaryPayload     Json?                                  @map("summary_payload")
+  aggregateVersion   Int                                    @default(0) @map("aggregate_version")
+  createdAt          DateTime                               @default(now()) @map("created_at")
+  updatedAt          DateTime                               @updatedAt @map("updated_at")
+  deletedAt          DateTime?                              @map("deleted_at")
+
+  childCareProcess NurtureChildCareProcess              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  family           NurtureFamily                        @relation(fields: [familyId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment?                   @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  careGroup        NurtureCareGroup?                    @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  participants     NurtureFamilyCareThreadParticipant[]
+  messages         NurtureFamilyCareMessage[]
+  items            NurtureFamilyCareItem[]
+
+  @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_thread_process")
+  @@index([workspaceId, careGroupId, status, latestMessageAt], map: "ix_nurture_thread_group")
+  @@map("nurture_family_care_thread")
+}
+
+model NurtureFamilyCareThreadParticipant {
+  id                String                                             @id @default(uuid())
+  workspaceId       String                                             @map("workspace_id")
+  threadId          String                                             @map("thread_id")
+  participantId     String                                             @map("participant_id")
+  roleAssignmentId  String                                             @map("role_assignment_id")
+  participantKind   NurtureFamilyCareParticipantKind                   @map("participant_kind")
+  visibilityStatus  NurtureFamilyCareThreadParticipantVisibilityStatus @map("visibility_status")
+  lastReadMessageId String?                                            @map("last_read_message_id")
+  lastReadAt        DateTime?                                          @map("last_read_at")
+  aggregateVersion  Int                                                @default(0) @map("aggregate_version")
+  createdAt         DateTime                                           @default(now()) @map("created_at")
+  updatedAt         DateTime                                           @updatedAt @map("updated_at")
+  deletedAt         DateTime?                                          @map("deleted_at")
+
+  thread         NurtureFamilyCareThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  participant    NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  roleAssignment NurtureCareRoleAssignment @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, threadId, participantId, roleAssignmentId], map: "uq_nurture_thread_participant")
+  @@index([workspaceId, participantId, visibilityStatus], map: "ix_nurture_thread_participant_actor")
+  @@index([workspaceId, threadId, visibilityStatus], map: "ix_nurture_thread_participant_thread")
+  @@map("nurture_family_care_thread_participant")
+}
+
+model NurtureFamilyCareMessage {
+  id                      String                                  @id @default(uuid())
+  workspaceId             String                                  @map("workspace_id")
+  threadId                String                                  @map("thread_id")
+  childCareProcessId      String                                  @map("child_care_process_id")
+  senderParticipantId     String                                  @map("sender_participant_id")
+  senderRoleAssignmentId  String                                  @map("sender_role_assignment_id")
+  messageKind             NurtureFamilyCareMessageKind            @map("message_kind")
+  authorshipKind          NurtureFamilyCareMessageAuthorshipKind  @map("authorship_kind")
+  sourceItemId            String?                                 @map("source_item_id")
+  sourceItemEventId       String?                                 @map("source_item_event_id")
+  sourceDailyCareLogId    String?                                 @map("source_daily_care_log_id")
+  body                    String?                                 @db.Text
+  bodyFormat              NurtureFamilyCareMessageBodyFormat      @map("body_format")
+  bodyStorageMode         NurtureFamilyCareMessageBodyStorageMode @map("body_storage_mode")
+  bodyProtectionPayload   Json?                                   @map("body_protection_payload")
+  attachmentsPayload      Json?                                   @map("attachments_payload")
+  sourceSurface           NurtureFamilyCareMessageSourceSurface   @map("source_surface")
+  grantId                 String?                                 @map("grant_id")
+  status                  NurtureFamilyCareMessageStatus
+  redactedAt              DateTime?                               @map("redacted_at")
+  redactedByParticipantId String?                                 @map("redacted_by_participant_id")
+  redactionReason         String?                                 @map("redaction_reason")
+  redactionPayload        Json?                                   @map("redaction_payload")
+  safetyFlagsPayload      Json?                                   @map("safety_flags_payload")
+  aggregateVersion        Int                                     @default(0) @map("aggregate_version")
+  createdAt               DateTime                                @default(now()) @map("created_at")
+  updatedAt               DateTime                                @updatedAt @map("updated_at")
+
+  thread               NurtureFamilyCareThread   @relation(fields: [threadId], references: [id], onDelete: Restrict)
+  childCareProcess     NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  senderParticipant    NurtureParticipant        @relation(fields: [senderParticipantId], references: [id], onDelete: Restrict)
+  senderRoleAssignment NurtureCareRoleAssignment @relation(fields: [senderRoleAssignmentId], references: [id], onDelete: Restrict)
+  grant                NurtureChildLinkGrant?    @relation(fields: [grantId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, threadId, createdAt], map: "ix_nurture_message_thread")
+  @@index([workspaceId, childCareProcessId, createdAt], map: "ix_nurture_message_process")
+  @@index([workspaceId, senderParticipantId, createdAt], map: "ix_nurture_message_sender")
+  @@index([workspaceId, sourceItemId, createdAt], map: "ix_nurture_message_source_item")
+  @@map("nurture_family_care_message")
+}
+
+model NurtureFamilyCareItem {
+  id                                String                                    @id @default(uuid())
+  workspaceId                       String                                    @map("workspace_id")
+  sourceMessageId                   String?                                   @map("source_message_id")
+  threadId                          String                                    @map("thread_id")
+  childCareProcessId                String                                    @map("child_care_process_id")
+  familyId                          String                                    @map("family_id")
+  enrollmentId                      String?                                   @map("enrollment_id")
+  careGroupId                       String                                    @map("care_group_id")
+  dataClass                         NurtureGrantDataClass                     @map("data_class")
+  category                          NurtureFamilyCareItemCategory
+  summary                           String
+  detail                            String?                                   @db.Text
+  urgency                           NurtureFamilyCareItemUrgency
+  requiresAck                       Boolean                                   @default(false) @map("requires_ack")
+  requiresReply                     Boolean                                   @default(false) @map("requires_reply")
+  status                            NurtureFamilyCareItemStatus
+  version                           Int                                       @default(0)
+  activeClarificationRequestEventId String?                                   @map("active_clarification_request_event_id")
+  waitingForFamilySince             DateTime?                                 @map("waiting_for_family_since")
+  waitingForFamilyUntil             DateTime?                                 @map("waiting_for_family_until")
+  clarificationExpiryDriverRef      Json?                                     @map("clarification_expiry_driver_ref")
+  assignedToRoleAssignmentId        String?                                   @map("assigned_to_role_assignment_id")
+  dueAt                             DateTime?                                 @map("due_at")
+  expiresAt                         DateTime?                                 @map("expires_at")
+  ackedByParticipantId              String?                                   @map("acked_by_participant_id")
+  ackedAt                           DateTime?                                 @map("acked_at")
+  closedAt                          DateTime?                                 @map("closed_at")
+  suppressedAt                      DateTime?                                 @map("suppressed_at")
+  suppressionReason                 String?                                   @map("suppression_reason")
+  linkedReplyMessageId              String?                                   @map("linked_reply_message_id")
+  classificationSource              NurtureFamilyCareItemClassificationSource @map("classification_source")
+  classificationConfidence          Decimal?                                  @map("classification_confidence") @db.Decimal(5, 4)
+  grantId                           String?                                   @map("grant_id")
+  safetyFlagsPayload                Json?                                     @map("safety_flags_payload")
+  createdAt                         DateTime                                  @default(now()) @map("created_at")
+  updatedAt                         DateTime                                  @updatedAt @map("updated_at")
+
+  thread           NurtureFamilyCareThread      @relation(fields: [threadId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess      @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  family           NurtureFamily                @relation(fields: [familyId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment?           @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  careGroup        NurtureCareGroup             @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  assignedToRole   NurtureCareRoleAssignment?   @relation(fields: [assignedToRoleAssignmentId], references: [id], onDelete: Restrict)
+  grant            NurtureChildLinkGrant?       @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  events           NurtureFamilyCareItemEvent[]
+  dailyCareLogs    NurtureDailyCareLog[]
+
+  @@index([workspaceId, careGroupId, status, urgency, dueAt], map: "ix_nurture_item_group")
+  @@index([workspaceId, childCareProcessId, status, createdAt], map: "ix_nurture_item_process")
+  @@index([workspaceId, threadId, status, createdAt], map: "ix_nurture_item_thread")
+  @@index([workspaceId, assignedToRoleAssignmentId, status, dueAt], map: "ix_nurture_item_assignee")
+  @@map("nurture_family_care_item")
+}
+
+model NurtureFamilyCareItemEvent {
+  id                    String                         @id @default(uuid())
+  workspaceId           String                         @map("workspace_id")
+  itemId                String                         @map("item_id")
+  actorParticipantId    String?                        @map("actor_participant_id")
+  actorRoleAssignmentId String?                        @map("actor_role_assignment_id")
+  eventType             NurtureFamilyCareItemEventType @map("event_type")
+  fromStatus            NurtureFamilyCareItemStatus?   @map("from_status")
+  toStatus              NurtureFamilyCareItemStatus?   @map("to_status")
+  relatedMessageId      String?                        @map("related_message_id")
+  correlationEventId    String?                        @map("correlation_event_id")
+  eventPayload          Json?                          @map("event_payload")
+  createdAt             DateTime                       @default(now()) @map("created_at")
+
+  item             NurtureFamilyCareItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  actorParticipant NurtureParticipant?   @relation(fields: [actorParticipantId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, itemId, createdAt], map: "ix_nurture_item_event_item")
+  @@index([workspaceId, actorParticipantId, createdAt], map: "ix_nurture_item_event_actor")
+  @@map("nurture_family_care_item_event")
+}
+
+model NurtureDailyCareLog {
+  id                         String                    @id @default(uuid())
+  workspaceId                String                    @map("workspace_id")
+  childCareProcessId         String                    @map("child_care_process_id")
+  enrollmentId               String                    @map("enrollment_id")
+  careGroupId                String                    @map("care_group_id")
+  recordedByRoleAssignmentId String                    @map("recorded_by_role_assignment_id")
+  logDate                    DateTime                  @map("log_date") @db.Date
+  mealPayload                Json?                     @map("meal_payload")
+  napPayload                 Json?                     @map("nap_payload")
+  activityPayload            Json?                     @map("activity_payload")
+  moodPayload                Json?                     @map("mood_payload")
+  healthObservationPayload   Json?                     @map("health_observation_payload")
+  summary                    String?                   @db.Text
+  status                     NurtureDailyCareLogStatus
+  sourceItemId               String?                   @map("source_item_id")
+  grantId                    String?                   @map("grant_id")
+  aggregateVersion           Int                       @default(0) @map("aggregate_version")
+  createdAt                  DateTime                  @default(now()) @map("created_at")
+  updatedAt                  DateTime                  @updatedAt @map("updated_at")
+  deletedAt                  DateTime?                 @map("deleted_at")
+
+  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment         @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  careGroup        NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  recordedByRole   NurtureCareRoleAssignment @relation(fields: [recordedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  sourceItem       NurtureFamilyCareItem?    @relation(fields: [sourceItemId], references: [id], onDelete: Restrict)
+  grant            NurtureChildLinkGrant?    @relation(fields: [grantId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, careGroupId, logDate, status], map: "ix_nurture_daily_log_group")
+  @@index([workspaceId, childCareProcessId, logDate, status], map: "ix_nurture_daily_log_process")
+  @@map("nurture_daily_care_log")
+}
+
+model NurtureTeacherAttentionItem {
+  id                 String                                @id @default(uuid())
+  workspaceId        String                                @map("workspace_id")
+  careGroupId        String                                @map("care_group_id")
+  childCareProcessId String                                @map("child_care_process_id")
+  sourceType         NurtureTeacherAttentionItemSourceType @map("source_type")
+  sourceId           String?                               @map("source_id")
+  title              String
+  summary            String?
+  priority           NurtureTeacherAttentionItemPriority
+  status             NurtureTeacherAttentionItemStatus
+  effectiveDate      DateTime?                             @map("effective_date") @db.Date
+  expiresAt          DateTime?                             @map("expires_at")
+  aggregateVersion   Int                                   @default(0) @map("aggregate_version")
+  createdAt          DateTime                              @default(now()) @map("created_at")
+  updatedAt          DateTime                              @updatedAt @map("updated_at")
+
+  careGroup        NurtureCareGroup        @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, careGroupId, effectiveDate, status, priority], map: "ix_nurture_attention_group")
+  @@index([workspaceId, childCareProcessId, status, effectiveDate], map: "ix_nurture_attention_process")
+  @@map("nurture_teacher_attention_item")
+}
+
+model NurtureMediaAssetRef {
+  id                         String                      @id @default(uuid())
+  workspaceId                String                      @map("workspace_id")
+  institutionId              String                      @map("institution_id")
+  careGroupId                String?                     @map("care_group_id")
+  uploadedByRoleAssignmentId String?                     @map("uploaded_by_role_assignment_id")
+  sourceKind                 NurtureMediaAssetSourceKind @map("source_kind")
+  storageRefPayload          Json                        @map("storage_ref_payload")
+  safeTitle                  String?                     @map("safe_title")
+  capturedAt                 DateTime?                   @map("captured_at")
+  status                     NurtureMediaAssetStatus
+  aggregateVersion           Int                         @default(0) @map("aggregate_version")
+  createdAt                  DateTime                    @default(now()) @map("created_at")
+  updatedAt                  DateTime                    @updatedAt @map("updated_at")
+  deletedAt                  DateTime?                   @map("deleted_at")
+
+  institution  NurtureCareInstitution         @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup    NurtureCareGroup?              @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  uploadedBy   NurtureCareRoleAssignment?     @relation(fields: [uploadedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  attributions NurtureChildMediaAttribution[]
+
+  @@index([workspaceId, institutionId, status, createdAt], map: "ix_nurture_media_asset_institution")
+  @@index([workspaceId, careGroupId, status, createdAt], map: "ix_nurture_media_asset_group")
+  @@map("nurture_media_asset_ref")
+}
+
+model NurtureChildMediaAttribution {
+  id                          String                        @id @default(uuid())
+  workspaceId                 String                        @map("workspace_id")
+  mediaAssetRefId             String                        @map("media_asset_ref_id")
+  childCareProcessId          String                        @map("child_care_process_id")
+  source                      NurtureMediaAttributionSource
+  confidence                  Decimal?                      @db.Decimal(5, 4)
+  status                      NurtureMediaAttributionStatus
+  confirmedByRoleAssignmentId String?                       @map("confirmed_by_role_assignment_id")
+  confirmedAt                 DateTime?                     @map("confirmed_at")
+  exposurePolicyPayload       Json?                         @map("exposure_policy_payload")
+  aggregateVersion            Int                           @default(0) @map("aggregate_version")
+  createdAt                   DateTime                      @default(now()) @map("created_at")
+  updatedAt                   DateTime                      @updatedAt @map("updated_at")
+  deletedAt                   DateTime?                     @map("deleted_at")
+
+  mediaAssetRef    NurtureMediaAssetRef       @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess    @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  confirmedBy      NurtureCareRoleAssignment? @relation(fields: [confirmedByRoleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, mediaAssetRefId, status], map: "ix_nurture_media_attribution_asset")
+  @@index([workspaceId, childCareProcessId, status, createdAt], map: "ix_nurture_media_attribution_process")
+  @@map("nurture_child_media_attribution")
+}
+
+model NurtureInteractionContext {
+  id                      String                          @id @default(uuid())
+  workspaceId             String                          @map("workspace_id")
+  participantId           String                          @map("participant_id")
+  purpose                 NurtureInteractionPurpose
+  surface                 String
+  tokenHash               String                          @map("token_hash") @db.Char(64)
+  tokenHashVersion        Int                             @default(1) @map("token_hash_version")
+  hostConversationRefHash String?                         @map("host_conversation_ref_hash") @db.Char(64)
+  payloadSchemaVersion    Int                             @map("payload_schema_version")
+  statePayload            Json                            @map("state_payload")
+  status                  NurtureInteractionContextStatus
+  expiresAt               DateTime                        @map("expires_at")
+  consumedAt              DateTime?                       @map("consumed_at")
+  revokedAt               DateTime?                       @map("revoked_at")
+  version                 Int                             @default(0)
+  createdAt               DateTime                        @default(now()) @map("created_at")
+  updatedAt               DateTime                        @updatedAt @map("updated_at")
+
+  participant NurtureParticipant @relation(fields: [participantId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, tokenHash], map: "uq_nurture_interaction_token")
+  @@index([workspaceId, participantId, status, expiresAt], map: "ix_nurture_interaction_participant")
+  @@index([workspaceId, hostConversationRefHash, status, expiresAt], map: "ix_nurture_interaction_conversation")
+  @@map("nurture_interaction_context")
+}
+
+model NurtureCommandExecution {
+  id                             String                        @id @default(uuid())
+  workspaceId                    String                        @map("workspace_id")
+  commandRequestIdHash           String                        @map("command_request_id_hash") @db.Char(64)
+  originInvocationRequestIdHash  String                        @map("origin_invocation_request_id_hash") @db.Char(64)
+  parentCommandRequestIdHash     String?                       @map("parent_command_request_id_hash") @db.Char(64)
+  requestIdentityHashVersion     Int                           @default(1) @map("request_identity_hash_version")
+  commandKey                     String                        @map("command_key")
+  commandScope                   String                        @map("command_scope")
+  commandContractVersion         Int                           @map("command_contract_version")
+  payloadHash                    String                        @map("payload_hash") @db.Char(64)
+  payloadCanonicalizationVersion Int                           @default(1) @map("payload_canonicalization_version")
+  businessActorRef               String                        @map("business_actor_ref")
+  primaryScopeRef                Json?                         @map("primary_scope_ref")
+  childCareProcessId             String?                       @map("child_care_process_id")
+  targetRefs                     Json?                         @map("target_refs")
+  businessOutcome                NurtureCommandBusinessOutcome @map("business_outcome")
+  outputRefs                     Json                          @map("output_refs")
+  handoffSnapshotSchemaVersion   Int                           @default(1) @map("handoff_snapshot_schema_version")
+  handoffRequestSnapshotsPayload Json                          @map("handoff_request_snapshots_payload")
+  handoffDriverRef               Json?                         @map("handoff_driver_ref")
+  committedAt                    DateTime                      @default(now()) @map("committed_at")
+
+  childCareProcess NurtureChildCareProcess? @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
+  @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
+  @@index([workspaceId, childCareProcessId, committedAt], map: "ix_nurture_command_execution_process")
+  @@map("nurture_command_execution")
 }

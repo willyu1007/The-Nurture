@@ -1,5 +1,7 @@
 import {
   loadWorkflowRegistry,
+  createScenarioCommandDriverContext,
+  createWorkflowHandoffDraftsFromScenarioSnapshots,
   WorkflowCommandService,
   WorkflowQueryService,
   WorkflowWorker,
@@ -7,6 +9,11 @@ import {
 } from "@my-chat/workflow-runtime";
 import type { WorkflowPresenters } from "@my-chat/workflow-contracts";
 import { createNurtureScenarioModule } from "@the-nurture/scenario";
+import {
+  resolveNurtureUserAttention,
+  type NurtureUserAttentionResolution,
+} from "@the-nurture/scenario";
+import type { DomainContextRef } from "@my-chat/workflow-contracts";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
 import { createDevHostPrismaClient, type DevHostPrismaClient } from "./db/dev-host-client.js";
 import { MockCanonicalObjectResolver, PgArtifactPreviewPort, PgRunContextPort } from "./deps/mock-deps.js";
@@ -29,6 +36,11 @@ export type NurtureApp = {
   presenters: WorkflowPresenters;
   /** Scenario-table repos (projects/captures/...) for the internal API (B3). */
   scenarioRepositories: ReturnType<typeof createScenarioRepositories>;
+  resolveUserAttention(input: {
+    workspace_id: string;
+    source_context_refs: readonly DomainContextRef[];
+    actor_user_id?: string;
+  }): Promise<NurtureUserAttentionResolution>;
   disconnect(): Promise<void>;
 };
 
@@ -48,9 +60,18 @@ export const createNurtureApp = (
   const runContext = new PgRunContextPort(devHostPrisma);
   const artifacts = new PgArtifactPreviewPort(devHostPrisma);
   const repositories = createNurtureRepositories(nurturePrisma);
+  const handlerDeps = {
+    repositories,
+    canonicalResolver,
+    runContext,
+    scenarioCommandBridge: {
+      createDriverContext: createScenarioCommandDriverContext,
+      createHandoffDrafts: createWorkflowHandoffDraftsFromScenarioSnapshots,
+    },
+  };
 
   const module = createNurtureScenarioModule({
-    handlerDeps: { repositories, canonicalResolver, runContext },
+    handlerDeps,
     presenterDeps: { artifacts },
     workerRuntime,
   });
@@ -63,7 +84,7 @@ export const createNurtureApp = (
   const command = new WorkflowCommandService(ledger);
   const query = new WorkflowQueryService(ledger);
   const actions = new WorkflowActionService(devHostPrisma);
-  const worker = new WorkflowWorker(registry);
+  const worker = new WorkflowWorker(registry, workerRuntime);
   const dispatcher = new StepDispatcher(devHostPrisma, registry, worker);
 
   return {
@@ -77,6 +98,7 @@ export const createNurtureApp = (
     artifacts,
     presenters,
     scenarioRepositories: createScenarioRepositories(nurturePrisma),
+    resolveUserAttention: (input) => resolveNurtureUserAttention(handlerDeps, input),
     async disconnect() {
       await Promise.all([nurturePrisma.$disconnect(), devHostPrisma.$disconnect()]);
     },

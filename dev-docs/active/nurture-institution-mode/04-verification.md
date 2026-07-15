@@ -2,9 +2,163 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-06
-- Current phase: IB Nurture schema SPEC + decision convergence
-- Code/config/schema impact: task docs/governance only; no live manifest, source code, registered context artifact, or DB schema changes intended
+- Last updated: 2026-07-15
+- Current phase: X5 joint acceptance complete; pilot enablement remains a separate authorization gate
+- Code/config/schema impact: additive joint acceptance tests, My-Chat technical recovery APIs/repository, and backend-neutral refs-only telemetry. No Nurture or My-Chat schema/migration and no activation flag changed.
+
+## X5 Final Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Delivery CI bootstrap | PASS AFTER REPAIR | PR #3 run `29419715925` failed before Nurture install because the excluded standalone web-workbench resolved the parent workspace; run `29420192609` proved that fix and passed both DB gates, then exposed missing My-Chat workspace/Prisma preparation only in the two cross-repo typecheck jobs. The final workflow uses `--ignore-workspace` for the template and prepares exact-revision My-Chat only where required. A fresh three-repository `/tmp` checkout passes the full preparation/typecheck chain; run `29420657909` passes all seven PR checks, including `175/175` unit, frontend lint/build, production DB, dev-host DB/E2E, contract pin, context/env, and governance. |
+| Exact revisions and pins | PASS | My-Chat X5 implementation `0ad5b575...` is merged through PR #3 and the exact pin is main revision `62d9809e82b7821226bfefb6f9dd17e9a0427878`; Base/My-Chat shared contract stays `0bd8925e...01aa`; the 25-file Nurture source pin is `e976c235...d193`. Live verification plus all four drift/traversal negative tests pass. |
+| Fresh migrations and drift | PASS | Approved `pgvector/pgvector:pg16` container on `127.0.0.1:55436`; My-Chat `17`, Nurture production `3`, dev-host `1` migrations current; all datasource-to-schema diffs empty. Existing/shared `localhost:5433/nurture` was not connected or changed. |
+| My-Chat full gate | PASS | Full workspace typecheck, ESLint, observability, governance, whitespace, and `79` files / `385` tests with all X2-X5 DB routes enabled. |
+| Nurture full gate | PASS | Typecheck; `175/175` unit; `24/24` production DB; `19/19` dev-host; routing `19/3/8/1`; schema/persistence/X4 replay/observability/pin/whitespace gates pass. |
+| Joint boundary | PASS x3 | Three consecutive two-database runs each prove business commit plus lost response, wrong-Step denial, one authorized same-Step recovery, exact Nurture replay, atomic materialization/completion replay, one owner delivery, and revoke-time fail-closed open. |
+| Catalog ownership | PASS | Nurture production is exactly `43` tables / `71` enums; dev-host is `6/2`; My-Chat contains zero `nurture_*` tables. |
+| Persisted privacy and uniqueness | PASS | Three joint workspaces contain 3 messages, 3 capture Executions with non-empty snapshots, 3 completed Handoffs, and 3 notifications. Duplicate-delivery defects, private body/protected type/claim evidence, forbidden driver fields, and zero-version refs are all `0`. |
+| Architecture/debt review | PASS AFTER REPAIR | Repaired unknown-outcome terminal drift, 0-based-to-positive ref normalization, activation telemetry no-op, source-pin gaps, Admin actor/causation propagation, and shared-Outbox test races. No remaining blocker or important finding. |
+| Cleanup and decision | PASS | Disposable container/data removed and port `55436` free. Capability remains development-only/default-off elsewhere. X5 recommends a separate pilot gate; it does not authorize pilot/staging/production/GA. |
+
+## X5 Pre-Database Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Baseline and routing | PASS AFTER REPAIR | Independent X5 branches start from immutable X4 revisions. The joint suite is an explicit fourth test route (`19` unit files, `3` production DB files, `8` dev-host files, `1` X5 joint file), not an invisible exclusion. |
+| Response-loss recovery | PASS STATIC / DB PENDING | Unknown Nurture handler outcome at exhausted retry budget enters `manual_review_required`; only an authorized workspace-scoped Admin action can grant one additional same-Step attempt. Known terminal failures remain `failed`. |
+| Admin boundary | PASS STATIC / DB PENDING | Admin may reread safe Handoff counts/status, replay an allowlisted failed technical Handoff, stop a requested Handoff, or reconcile the exact outcome-unknown Step. It cannot edit Nurture facts or Handoff payload/refs. Actions use expected versions, idempotency, actor/correlation evidence, and refs-only Outbox signals. |
+| Joint journey | IMPLEMENTED / DB PENDING | One real Nurture DB plus one real My-Chat DB journey covers business commit + response loss, wrong-Step denial, Admin same-Step recovery, exact Nurture replay, atomic materialization/completion replay, idempotent owner delivery, stale open after revoke, and cross-database secret/body probes. |
+| Telemetry/privacy | PASS | Nurture command and My-Chat owner instrumentation records duration, context refs, attempt/replay outcome, LLM-call count, and cache hits through injected sinks. Labels are fixed command/owner/outcome dimensions; tests exclude workspace/run/step/handoff/user IDs, bodies, protected refs, and claim material. Both observability registries verify. |
+| Nurture static gate | PASS | Full typecheck; `175/175` unit tests; production and placeholder dev-host Prisma validation; routing/population, persistence/N1/X4 replay boundaries, exact pin plus 4 negative tests, root lint, context strict, governance, observability, and whitespace checks. |
+| My-Chat static gate | PASS | 17-workspace typecheck, full ESLint, `73` passed files / `359` passed tests with `6` DB files / `26` DB tests skipped, Prisma validation, context strict, governance, observability, and whitespace checks. |
+| Exact pins | PASS IN-PROGRESS | Base/My-Chat contract hash remains `0bd8925e...01aa`; the in-progress Nurture source pin expands from 19 to 25 activation-critical files and is `3f506a17...800b29`. Final My-Chat X5 commit revision remains to be locked after DB closure. |
+| Database mutation | NOT RUN | Existing/shared `localhost:5433/nurture` was not connected or changed. Disposable container, databases, migrations, and X5 DB suites await explicit approval. |
+
+## X4-C2/N2 Final Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact cross-repo pin | PASS | My-Chat revision `d47929d12e1a3368a99fa24757732988e5072e1e`; Base/My-Chat contract hash remains `0bd8925e...01aa`; logical source remains `a97a5b14...e981`; 19-file Nurture source hash is `1b124cb4...d72`. |
+| Manifest/module gate | PASS | Canonical vNext manifest declares one exact Handoff and activation entrypoint. Default/static/factory dev-host paths remain pre-activation. Only the activation factory can advertise vNext and it requires materialization + bridge + source ports. |
+| Source/identity gate | PASS AFTER REPAIR | Exact versioned seed parser rejects bodies, unknown keys, pending routes, invalid refs, and claim fields. Durable Run Actor maps through active My-Chat membership to exactly one active Nurture participant; command preconditions recheck role/scope/grant. |
+| Owner/current-state gate | PASS AFTER REPAIR | Owner rereads message/receipt/item/grant/enrollment/thread/group/institution/recipient roles and selects no business body. Unauthorized actor is classified before revoke/redaction; delivered/read/acknowledged receipt states support current opens. |
+| Service boundary | PASS | Missing token returns disabled; wrong token returns unauthorized; valid service token reaches refs-only owner read. 3/3 endpoint auth E2E tests pass. |
+| Static/unit | PASS | Typecheck and 173/173 unit tests; routing/population, X4 replay, persistence, N1 schema, both Prisma validations, environment contract, context strict, governance, pin, negative pin, and whitespace gates pass. |
+| Production DB | PASS | Three migrations current, drift empty, Prisma valid, 24/24 DB/E2E, exact 43 tables/71 enums, no My-Chat runtime tables. |
+| Dev-host DB | PASS | One private migration current, drift empty, Prisma valid, 19/19 DB/E2E, exact 6 tables/2 enums. |
+| Privacy probe | PASS | Final DB population: 46 Executions, 2 non-empty snapshot rows, 0 persisted `claimToken`, `claim_token`, or `expectedStepVersion` fields in snapshots/driver refs. |
+| My-Chat host journey | PASS | 23/23 X2/X3/X4 DB/worker tests: Step claim/complete atomically materializes one Handoff/Outbox, owner creates one idempotent notification/delivery, current open resolves ready, simulated revoke resolves unavailable. |
+| Cleanup | PASS | `institution-x4-validation-postgres` and anonymous data removed; loopback port 55435 free. No existing/shared DB used. |
+| Architecture review | PASS AFTER REPAIR | No remaining blocker/important finding in X4 scope. X5 owns combined failure/privacy/telemetry and pilot decision. |
+
+## X4-B/X4-C1 Handler-Bridge Pre-Activation Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Nurture implementation | PASS | X4-C1 code and pre-activation evidence committed at `2398d98d8860e5f90e6c365e652f40043ce8d82d`. |
+| Cross-repo baseline | PASS | My-Chat runtime implementation `a9685d538ddc320df2dd4ee68a0a65e004f446a0`; final delivery/exact checkout pin `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; no `packages/` diff between them. Base/My-Chat contract hashes remain `0bd8925e...01aa` path-content and `a97a5b14...e981` logical-source. |
+| Scenario pin | PASS | Expanded eight-file source population hashes to `c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0`; exact pin verifier and all 4 drift/traversal/revision negative tests pass. |
+| Ownership boundary | PASS AFTER REPAIR | My-Chat runtime implementation is host-injected behind a two-operation port; the scenario package has no production runtime dependency. Nurture owns command-source resolution and business execution. Redundant source-port scope/ref/version fields were removed so they cannot become a second provenance or authorization authority. |
+| Stable identity/replay | PASS | Stable invocation/command/handoff IDs come from the scenario source rather than claim/version/current Step. Targeted tests prove same-Step reclaim with rotated token/version returns the same draft and one business effect; a different Step is denied before a second effect. |
+| Output/event boundary | PASS AFTER REPAIR | Step output contains one opaque CommandExecution ref only. Message/receipt/item refs remain owner-readable handoff context refs. Scenario emits no host-standard step/handoff event draft. |
+| Fail-closed activation | PASS | Handler is registered in TypeScript but absent from the manifest; YAML has no `user_attention` handoff declaration; default backend composition injects the technical bridge but no family-input business-source adapter. The path is unadvertised and cannot activate. |
+| Static/unit gate | PASS | Nurture typecheck; 4 focused handler tests; 161/161 unit tests; 27-file routing census; persistence/N1/X4 contract assertions; both Prisma validations; pin, context strict, governance, root lint, public database suite run `20260715-013854-807272`, and whitespace gates pass. |
+| Database regression | PASS | Existing approved production validation DB `nurture_x4_validation_e7d4590` passes 23/23 DB/E2E tests. Disposable dev-host DB `nurture_x4_handler_final_c208e684` received only its existing baseline migration, passed 16/16 tests, and was force-dropped afterward. No schema change was introduced and shared `localhost:5433/nurture` was not targeted. |
+| Architecture review | PASS AFTER REPAIR | Overall activation-foundation risk is medium. No remaining must-fix or should-fix finding after source-authority and duplicate-ref repairs. Manifest/capability/owner-consumer activation remains a separate approval gate. |
+
+## X4-A Claimed-Step Replay-Seed Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Pre-transaction driver gate | PASS | Missing driver, wrong namespace/type/scenario/binding, unexpected ref keys, or Step version returns stable invalid state before command lookup/transaction and does not consume command identity. |
+| Secret and hash boundary | PASS | Claim token and expected Step version are validated transiently, omitted from semantic payload hash, snapshots, persisted driver, results, and error content; SQL also forbids secret/binding field names in snapshot JSON. |
+| Persistence shape | PASS | Non-empty state requires bounded, sorted, unique, refs-only snapshots plus an exact canonical five-field original-Step ref. Empty state requires null driver. Unknown keys and invalid stored JSON fail closed. |
+| Replay ownership | PASS | Same Step may replay after token/version rotation; another Step is rejected. Stored request/handoff/purpose/expiry drift returns `invalid_stored_handoff_replay_seed` instead of being materialized. |
+| First business slice | PASS | Immediate family input emits exactly one `user_attention` seed referencing the Nurture message, child-link receipt, and care item. Pending-workflow and direct no-activation paths remain explicit-empty. |
+| Unit/type/static gate | PASS | Typecheck, 41 focused tests, all 157 unit tests, X4 migration contract assertion, test routing, both Prisma schema validations, persistence/N1 boundaries, workflow pin plus 4 negative tests, refreshed context checksum/strict verification, project state, governance lint, and whitespace checks pass. |
+| DB migration | PASS | All three migrations applied to approved disposable database `nurture_x4_validation_e7d4590`; `prisma migrate status` is current. Existing `localhost:5433/nurture` was not targeted. |
+| DB/E2E journey | PASS | 23/23 tests cover explicit-empty compatibility, canonical non-empty seed persistence, claim-secret absence, same-Step reclaim, wrong-Step denial, and single business effect. |
+| PostgreSQL constraint | PASS | `ck_nurture_command_execution_handoff_v1` is validated; direct negative updates containing driver `version` or snapshot `claimToken` are rejected. Final probe after repeated suites: 45 Executions, 3 non-empty, 0 forbidden snapshot fields, 0 forbidden driver fields. |
+| Production catalog boundary | PASS | Exact 43 Nurture tables and 71 enums; no My-Chat Workflow runtime table or enum. |
+| DB context/public suite | PASS | `ctl-db-ssot sync-to-context`, strict context verify, and public database suite pass. Optional Convex/init smokes explicitly SKIP because those feature packs are not installed in this repo; applicable repo-prisma smoke remains green. |
+| Activation posture | PASS | Manifest handoff key/source declarations, live claimed-driver bridge, My-Chat owner consumer, and capability enablement remain absent. |
+
+## X4/N2 Entry Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| My-Chat X3 delivery | PASS | Final local delivery revision `4d40d81cceaa5eee84134729900cc3f5c2e15547`; X3 code hardening is `f73eba9`; post-commit typecheck, 323 non-DB tests, lint, context, environment, database, governance, and clean-tree gates pass. |
+| Exact dependency pin | PASS | `docs/project/integrations/my-chat-workflow-contract.json` now requires My-Chat `4d40d81`; live verification rejects any different checkout revision. |
+| Base/My-Chat contract parity | PASS | Both contract roots hash to `0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa`; the cross-layout logical source hash remains `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`. |
+| Nurture scenario pin | PASS | X4-A context contract plus unchanged YAML manifest/module/registry are pinned at `b56ce4d5f0758ecad037cc2ce2c2c4aaa0e67cc08c59f1173b6adcab31567e21`. |
+| Pin regression tests | PASS | 4/4 cover ordering/traversal stability, content/path drift, path escape, and exact-revision drift rejection. |
+| Nurture static/unit gate | PASS AFTER REPAIR | Typecheck; 152/152 unit tests; production and placeholder dev-host Prisma validation; persistence and N1 schema boundaries; test routing/population; context strict; governance; and whitespace checks pass. |
+| Local dependency snapshot | PASS AFTER REPAIR | The first run found the pnpm `file:` runtime snapshot missing three new X3 source files. `pnpm install --offline --frozen-lockfile --force` rebuilt `node_modules` without lockfile changes; typecheck and the two previously blocked conformance suites then passed. |
+| Activation posture | PASS | Capability remains unavailable and all advertised handlers stay explicit-empty. The guarded X4-A command foundation exists but no manifest or live handler can activate it. |
+
+## N1 Entry Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Nurture baseline | PASS | `main` clean at `4040466`; G0 production/dev-host persistence streams remain isolated. |
+| Base revision | PASS | Merged `acba4e792c85131c19e63e08a5f671133c481c57`. |
+| My-Chat X1 adoption | PASS | X1 revision `2c783675de896b93cf1157b7d1c7ae9e3051150e`; logical contract hash `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`. |
+| Current My-Chat dependency | PASS | X2 revision `bda1542d6e6989a348254917a5e49f30de68083d`; no `packages/workflow-contracts` diff from X1. |
+| N1 activation gate | PASS | Explicit-empty snapshots only; manifest non-empty activation remains disabled. |
+
+## N1-B Schema Preview Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `pnpm db:generate` | PASS | Prisma Client generated from the additive production SSOT. |
+| `pnpm db:validate` | PASS | N1 schema is structurally valid. |
+| `pnpm verify:n1-schema-contract` | PASS | 21 tables, 7 partial unique indexes, and 7 lifecycle CHECK constraints are present; explicit-empty command gate enforced. |
+| `pnpm verify:persistence-boundaries` | PASS | Production migration stream remains Nurture-only; dev-host stream remains Workflow-only. |
+| DB context sync + strict verify | PASS | Context refreshed to 43 total tables / 71 total enums and registry checksum updated. |
+| `pnpm typecheck` | PASS AFTER REPAIR | Refreshed the local `file:` dependency snapshot and updated the backend-private dev-host to the X2 worker constructor/materialization-v1 empty-draft contract. |
+| `pnpm test:unit` | PASS | Existing 12 files / 86 tests pass; no P0 behavior regression. |
+| Migration apply | PENDING APPROVAL | Preview only; no target database was mutated. See `artifacts/db/n1-schema-preview.md`. |
+
+## N1-C Command / Interaction Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Command canonicalization/hash | PASS | Object-key stability, ordered arrays, null/omission difference, workspace/namespace separation, and family-strategy set normalization covered. |
+| Command replay/outcomes | PASS | executed/applied, replayed/applied, executed/replayed already-satisfied, same-key/different-hash conflict, blocked identity reuse, lock busy, lookup/transaction failure covered. |
+| Explicit-empty persistence | PASS | Runner always commits version 1 `[]`; Prisma mapper rejects corrupt non-empty/driver replay state; DB CHECK remains the final fence. |
+| Family-core adoption | PASS | `family_strategy.calibrate` uses the shared runner; update + evidence + Execution execute once and exact replay performs no second effect. |
+| Interaction context | PASS | Hash-only token/conversation storage, binding mismatch, derived expiry, one-time consume, reusable notification open, revoke, and forbidden body/policy/grant state covered. |
+| `pnpm typecheck` | PASS | Scenario ports and Prisma adapters compile without Prisma leaking into the scenario package. |
+| Unit gate | PASS | 14 files / 100 tests; exact population and routing gates pass. |
+
+## N1-D Resolver / Policy Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Host-envelope boundary | PASS | Resolver rejects host-authored role, target, child, family, group, institution, grant, direction, data-class, and policy fields before any business resolution. Missing host workspace is accepted only when current Nurture participation resolves exactly one workspace. |
+| Candidate kernel | PASS | Complete actor-to-scope-to-target paths are merged and deduplicated deterministically; semantic ties and weak-recency matches require clarification; recency and stable ids never manufacture an auto-resolution. Aggregate and rendered-option limits fail into narrowing instead of silent truncation. |
+| Structured clarification | PASS | Nurture-issued scenario and option tokens are opaque/hash-only, safe labels are bounded, candidate refs remain Nurture-local, same-conversation recovery is purpose-bound, selection is one-time, and current participant/role/scope/grant/lifecycle are revalidated after selection. |
+| Business-memory adapters | PASS | Bounded adapters cover nonterminal family-care items, active attention items, and active private threads; attention rows deduplicate to actionable backing items; revoked/missing grant and inactive enrollment are filtered or returned as specific blocked reasons. No model, cache, vector, Redis, or new memory table was added. |
+| Structured policy | PASS | Six locked Nurture policy predicates return allow/deny, stable reason, refs-only audit evidence, and safe user state; repository failures deny as `policy_unavailable`. Grant direction/data class, enrollment, caregiver scope, redaction, thread membership, media scope, and exposure gates are current-state checks. |
+| Architecture review | PASS AFTER REPAIR | Fixed inactive role-scope resolution, tenant-qualified child reachability, grant-target binding, revoked backing-item/deep-link revalidation, unbounded grant history reads, sequential per-role source queries, and oversized clarification labels before acceptance. Scenario remains Prisma-free; My-Chat runtime ownership is unchanged. |
+| `pnpm typecheck` | PASS | Full workspace, scenario, and Prisma repository adapters compile. |
+| Unit gate | PASS | 15 files / 125 tests; exact population and routing gates pass. |
+| Static DB/boundary gates | PASS | Both Prisma schemas validate (dev-host with a non-connecting placeholder URL), production/dev-host boundaries pass, N1 schema contract passes, and cross-repo contract pin passes. No database was mutated. |
+
+## N1-E Inbox / Attention Domain Evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Command closure | PASS | Family input, grant revoke, acknowledge, caregiver-confirmed reply, source redaction, and pre-delivery cancel all run through the shared CommandExecution transaction and return refs plus explicit empty snapshots. |
+| Identity/scope fence | PASS | Payload workspace, business actor, child process, participant/role, item-linked source grant, enrollment, thread, target scope, direction, and data class are current-state checked. Claim material and bodyful/foreign protected refs are rejected. |
+| Revoke/redaction semantics | PASS | Revoke updates Grant and bounded dependent Receipt/Item/attention rows without redacting the source; redaction removes protected body/attachment refs, sanitizes derived item/attention display, and blocks/revokes receipts. New grants do not reactivate old-grant items. |
+| Owner-read privacy | PASS | Class inbox and attention queries are bounded, group-authorized, source-message/grant/enrollment/thread revalidated, semantically ordered, and return display-safe fields without message body, thread id, grant policy, or host runtime state. |
+| Architecture review | PASS AFTER REPAIR | Removed premature manifest/context-ref declarations that produced 16 host-resolver fatals; repaired grant target selection, actor/child binding, stale convergence authorization, receipt versioning, linked-grant reactivation, redaction sanitization/bounds, and current participant/enrollment/thread/group/institution fences. |
+| Targeted tests | PASS | `packages/nurture-scenario/tests/institution/class-family-inbox.test.ts`: 22/22. |
+| Full unit/static gate | PASS | 16 unit files / 147 tests; full typecheck, test routing/population, production Prisma validate, dev-host Prisma validate with a non-connecting placeholder URL, persistence boundary, N1 schema contract, workflow contract pin, module validator/registry test, and diff whitespace pass. |
+| Production DB catalog | PASS | Approved local target `localhost:5433/nurture` is migration-current; production boundary reports 43 Nurture tables and 71 enums with no dev-host Workflow tables. |
+| N1 direct surfaces | PASS | `class_family_inbox` and `teacher_attention_board` resolve current Nurture scope, owner-reread current DB facts, emit safe/opaque presenter output, and keep workflow handoff drafts explicit-empty. |
 
 ## Automated Checks
 
@@ -246,3 +400,22 @@ For IA/IA.1 discussion work:
 | 2026-07-13 | G0 formal baseline isolation | PASS | Reconstructed from `origin/main` as five independent increments; production Prisma has only Nurture tables and backend-private Prisma has only workflow dev-host tables. No institution schema/live manifest was added. |
 | 2026-07-13 | G0 test and ownership matrix | PASS | 86 unit, 15 production DB, 14 dev-host E2E, both catalog boundaries, frontend lint/build, contract pin, context, and governance passed. N1 dirty-worktree blocker is resolved; X1 remains its contract dependency. |
 | 2026-07-13 | G0 merge/closure hardening audit | PASS | PR/main CI, fresh-worktree verification, cleanup, loopback-only dev host/Postgres, env-loader tests, Base web-workbench source pin, 86 unit + 15 production DB + 16 dev-host E2E, and governance completion passed. T-002 remains planned; X0 is the next implementation gate. |
+| 2026-07-13 | N1-D resolver/policy targeted verification | PASS | 30 targeted interaction/resolver/policy tests cover opaque tokens, binding/replay/revoke, candidate ranking/ties/limits, host-scope rejection, role-agnostic and workspace-optional ingress, current-state/lifecycle revalidation, and structured policy reasons. |
+| 2026-07-13 | N1-D architecture review and repair | PASS AFTER REPAIR | Closed inactive-scope, cross-workspace reachability, grant-target/revoke, same-conversation purpose, unbounded-query, sequential-query, safe-label-size, and repository-failure gaps before acceptance. |
+| 2026-07-13 | N1-D full static/unit gate | PASS | Full typecheck; 15 unit files / 125 tests; test routing; both Prisma validations; persistence boundary; N1 schema contract; cross-repo contract pin; and diff whitespace pass. No DB apply occurred. |
+| 2026-07-13 | N1-E targeted command/query verification | PASS | 22 tests cover explicit-empty capture/replay, actor/workspace/child binding, durable driver ref shape, grant revoke, ack/reply, redaction/cancel, class-of-10 inbox, attention board, invalid dates, and authorization/outage separation. |
+| 2026-07-13 | N1-E architecture review and repair | PASS AFTER REPAIR | Removed premature manifest activation and closed linked-grant reactivation, target-scope, current participant/enrollment/thread, receipt-version, bounded redaction, semantic ordering, and protected-ref validation gaps. |
+| 2026-07-13 | `pnpm test:unit:ci && pnpm verify:unit-population && pnpm verify:test-routing` | PASS | 16 unit files; 147/147 tests pass; routing census remains 16 unit / 2 production DB / 7 dev-host files. |
+| 2026-07-13 | N1-E static contract gates | PASS | Full typecheck, production Prisma validate, placeholder dev-host Prisma validate, persistence/N1 schema contracts, workflow contract pin tests, module validator/registry, and `git diff --check` pass. |
+| 2026-07-13 | `pnpm db:assert-boundary` | EXPECTED FAIL / N1-F GATE | Configured production DB still contains the G0 catalog and is missing the 21 additive N1 tables. No database was mutated; target-specific approval is required before apply. |
+| 2026-07-14 | Destructive SQL preflight + `pnpm db:deploy` | PASS | No `DROP`, `TRUNCATE`, `DELETE FROM`, or ALTER rename/drop statement; applied `20260713150000_nurture_institution_n1_core` only to approved `localhost:5433/nurture`. |
+| 2026-07-14 | Prisma migration status + production catalog boundary | PASS | Both migrations applied; schema up to date; production catalog is 43 Nurture tables / 71 enums. |
+| 2026-07-14 | `pnpm test:unit:ci` + population | PASS | 53 suites; 152/152 unit tests pass. |
+| 2026-07-14 | `pnpm test:db:ci` + population | PASS | 16 suites; 22/22 production DB tests pass, including full resolver → query → presenter reread before/after grant revoke and thread-membership denial for acknowledge/reply. |
+| 2026-07-14 | `pnpm test:dev-host:ci` + population | PASS | 15 suites; 16/16 isolated dev-host tests pass. |
+| 2026-07-14 | Production/dev-host Prisma and catalog boundaries | PASS | Both Prisma schemas validate; production remains 43/71 Nurture-only and dev-host remains 6/2 Workflow-only. |
+| 2026-07-14 | My-Chat validator/registry targeted conformance | PASS | 32/32 targeted surface + module tests pass; both new manifest handler keys resolve and module registration has no fatal finding. |
+| 2026-07-14 | YAML/TypeScript manifest parity | PASS AFTER REPAIR | Full parsed objects match after correcting the pre-existing parent/family declaration-order drift. |
+| 2026-07-14 | Workflow contract pin verification | PASS AFTER REPAIR | Base and My-Chat remain byte-identical at shared hash `0bd892...`; Nurture source pin now covers four files and verifies at `de32f2...`. |
+| 2026-07-14 | Context strict verification | PASS | Workflow context checksum refreshed; context layer strict verification passed. |
+| 2026-07-14 | Persistence/schema/test-routing gates | PASS | Persistence boundaries, N1 schema contract, routing census 16 unit / 3 production DB / 7 dev-host files, and population locks all pass. |

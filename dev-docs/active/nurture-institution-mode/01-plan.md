@@ -161,6 +161,57 @@
 2. `caregiver_daily_care` second.
 3. `child_media_attribution` third.
 
+**N1 implementation checkpoints（2026-07-14）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| N1-A | Complete | Cross-repo revision/hash pin and explicit-empty activation boundary. |
+| N1-B | Complete | Additive production schema/migration/context; migration applied only to the approved local `localhost:5433/nurture` target and catalog boundary verified. |
+| N1-C | Complete | Shared CommandExecution runner, InteractionContext, Prisma transaction adapter, and one family-core command migration. |
+| N1-D | Complete | Fail-closed resolver, candidate kernel, structured policy, and current-state source adapters. |
+| N1-E | Complete | Family input → receipt/item/attention, caregiver acknowledge/reply, grant revoke, source redaction, pre-delivery cancel, class inbox/attention owner reads; explicit `[]` only. |
+| N1-F | Complete | Approved production-DB migration apply; 22/22 DB tests; DB-backed capture/replay/revoke/redaction/cancel and direct surface journey; YAML/registry/module conformance; final architecture repairs and N1 review. |
+
+**X4/N2 implementation-entry checkpoints（2026-07-15）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| X4-0A | Complete | My-Chat X3 hardening delivered and post-commit verified at final revision `4d40d81`. |
+| X4-0B | Complete | Nurture dependency pin updated to X3; Base/My-Chat parity, scenario pin, and negative drift tests pass. |
+| X4-0C | Complete | Nurture typecheck, 152 unit tests, Prisma/schema/boundary, routing/population, context, governance, and whitespace gates pass after refreshing the local `file:` dependency snapshot. |
+| X4-0D | Complete | Pin/SSOT update committed at `6f2c836`; independent X4 branches created from immutable Nurture/My-Chat baselines; first slice locked to claimed-Step `user_attention` replay seeds without manifest/host activation. |
+| X4-A1 | Complete | Command runner validates trusted driver binding before lookup/transaction, persists bounded refs-only snapshots plus canonical original-Step provenance, preserves direct explicit-empty, and fences replay to the same Step. |
+| X4-A2 | Complete | Custom CHECK migration preview, strict persisted JSON parser, static contract assertion, unit/privacy/replay tests, and DB-backed test case implemented. No database was connected or mutated. |
+| X4-A3 | Complete | Approved disposable database `nurture_x4_validation_e7d4590` is migration-current; 23/23 DB/E2E, 43-table/71-enum boundary, validated CHECK, negative JSON probes, DB context, and public database suite pass. Existing `nurture` was not touched. |
+| X4-B | Complete | My-Chat worker bridge converts a claimed Step into the Base-shaped transient driver and converts returned snapshots into whitelisted handoff drafts. Runtime implementation `a9685d5`, final delivery/exact pin `26f57be`; 327 non-DB tests and all delivery gates pass with capability disabled. |
+| X4-C1 | Complete | Delivered at `2398d98`. Nurture receives the bridge only through a host-injected port, resolves stable scenario command/request IDs through a scenario-owned source port, replays only on the original Step, returns one opaque CommandExecution output ref, and emits no host-standard event. The handler is registered but absent from the manifest and the default composition has no business-source adapter. |
+| X4-C2 | Complete | Added the versioned manifest handoff/context-source declarations, strict production business-source adapter, explicit activation-only module factory, current owner reread, service-auth boundary, My-Chat dev-only owner/capability, idempotent notification/deep-link shell, and isolated PostgreSQL verification. Default Nurture composition plus My-Chat staging/prod remain disabled. |
+| X4-C3 | Complete | Final architecture/privacy review repaired Actor/user binding, receipt-open state, unauthorized lifecycle reason leak, notification channel convergence, generic fallback coupling, owner-outage open behavior, and global mobile deep-link routing. Cross-repo pins and full static/DB gates pass. |
+| X5 | Complete | Combined fault/privacy/recovery/telemetry matrix passes; pilot enablement remains a separate authorization node. |
+
+**X5 joint-acceptance checkpoints（2026-07-15）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| X5-A | Complete | X4 revisions/hashes, existing-vs-missing evidence, and the fresh two-production-DB plus private dev-host DB validation topology are locked without changing activation posture. |
+| X5-B | Complete | The real two-database response-loss/reclaim/wrong-Step/revoke/privacy journey and My-Chat Admin technical recovery pass. Existing deterministic tests remain the authority for mixed/rollback, redaction/cancel/withdrawal/policy, provider/dead-letter, and owner-outage rows. |
+| X5-C | Complete | Added backend-neutral, refs-only command/owner telemetry for duration, context-ref count, attempts, LLM calls, cache hits, and replay; static privacy tests and both observability registries pass. |
+| X5-D | Complete | Three clean isolated databases received the 17/3/1 migration streams with no drift; full suites and three consecutive joint runs pass; the disposable container was removed and port `55436` released. |
+| X5-E | Complete | Dual-repo review repaired outcome-unknown handling, version normalization, telemetry composition, Outbox test isolation, source-pin coverage, and Admin actor/causation evidence. Exact revisions/hashes are locked; pilot is recommended but not enabled. |
+
+X5 acceptance matrix (each row must have deterministic evidence; adjacent single-repo tests may support but cannot replace the joint boundary where noted):
+
+- business commit success and worker response loss;
+- same-Step lease reclaim and wrong-Step replay denial;
+- exact duplicate, mixed existing/new partial duplicate, and crash rollback/retry;
+- grant revoke, source redaction, pre-delivery cancel, post-delivery withdrawal, and current policy change;
+- owner/provider failure, Outbox retry/dead-letter, and authorized Admin technical reconciliation;
+- stale notification/deep-link owner reread and owner outage fail-closed behavior;
+- contract/source-pin drift and refs-only privacy boundary;
+- latency, context size, retry attempts, LLM calls, and cache-hit telemetry.
+
+X5 remains a validation and hardening gate. It does not authorize schema ownership changes, staging/production activation, pilot enablement, or rollback of committed Nurture business facts. Rollback remains capability/manifest deactivation only.
+
 **Cross-repo task ownership：**
 
 - My-Workflow-Base：复用 `dev-docs/active/workflow-base`，因为 X0 是既有模板合同收敛。

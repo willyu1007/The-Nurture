@@ -10,6 +10,13 @@ import type {
   NurtureWorkflowProject,
   NurtureWorkflowProjectRepository,
 } from "@the-nurture/scenario";
+import {
+  PrismaInteractionContextRepository,
+  PrismaNurtureCommandRepository,
+} from "./institution-core.repositories.js";
+import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import { PrismaFamilyCareQueryRepository } from "./family-care-query.repository.js";
+import { PrismaUserAttentionRepository } from "./user-attention.repository.js";
 
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
 
@@ -323,6 +330,11 @@ export class PrismaEvidenceRepository implements NurtureEvidenceRepository {
 
 /** Wire the Prisma-backed implementations into the scenario repository ports. */
 export const createNurtureRepositories = (prisma: PrismaClient): NurtureRepositories => ({
+  commands: new PrismaNurtureCommandRepository(prisma),
+  interactions: new PrismaInteractionContextRepository(prisma),
+  institution: new PrismaInstitutionContextRepository(prisma),
+  familyCareQuery: new PrismaFamilyCareQueryRepository(prisma),
+  userAttention: new PrismaUserAttentionRepository(prisma),
   profiles: new PrismaProfileRepository(prisma),
   activityComparisons: new PrismaActivityComparisonRepository(prisma),
   evidence: new PrismaEvidenceRepository(prisma),

@@ -2,8 +2,8 @@ version: 1
 task_id: T-002
 project: main
 slug: nurture-institution-mode
-status: planned
-updated: "2026-07-13"
+status: in-progress
+updated: "2026-07-15"
 keywords:
   - institution-ecology
   - multi-family

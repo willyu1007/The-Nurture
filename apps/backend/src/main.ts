@@ -8,7 +8,9 @@ const PORT = Number(process.env.PORT ?? 3001);
 async function main(): Promise<void> {
   assertDevHostEnvironment(process.env.APP_ENV);
   const app = createNurtureApp();
-  const server = buildServer(app);
+  const server = buildServer(app, {
+    internalServiceToken: process.env.NURTURE_INTERNAL_SERVICE_TOKEN,
+  });
   app.dispatcher.start();
   await server.listen({ port: PORT, host: DEV_HOST_BIND_ADDRESS });
   // eslint-disable-next-line no-console

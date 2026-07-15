@@ -135,6 +135,76 @@ export const nurtureScenarioManifest = {
         },
       ],
     },
+    {
+      capability_key: "class_family_inbox",
+      label: "Class family inbox",
+      description: "Resolve the current caregiver scope and open the current class-level family-care work collection.",
+      enablement_policy: "workspace_enabled",
+      entrypoints: [
+        {
+          entrypoint_key: "open_class_family_inbox",
+          label: "Open class family inbox",
+          workflow_version: 1,
+          workflow_version_id: "nurture-class-family-inbox-v1",
+          input_schema_version: 1,
+          output_schema_version: 1,
+          allowed_step_types: ["domain_action"],
+          steps: [
+            {
+              step_key: "open_class_family_inbox",
+              step_type: "domain_action",
+              order: 10,
+              handler_key: "nurture.open_class_family_inbox",
+              retry_policy: "bounded_exponential",
+            },
+          ],
+        },
+        {
+          entrypoint_key: "capture_family_input",
+          label: "Capture family input",
+          workflow_version: 1,
+          workflow_version_id: "nurture-capture-family-input-v1",
+          input_schema_version: 1,
+          output_schema_version: 1,
+          allowed_step_types: ["domain_action"],
+          steps: [
+            {
+              step_key: "capture_family_input",
+              step_type: "domain_action",
+              order: 10,
+              handler_key: "nurture.capture_family_input",
+              retry_policy: "bounded_exponential",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      capability_key: "teacher_attention_board",
+      label: "Teacher attention board",
+      description: "Resolve the current caregiver scope and open the current teacher attention collection.",
+      enablement_policy: "workspace_enabled",
+      entrypoints: [
+        {
+          entrypoint_key: "open_today_attention_board",
+          label: "Open today's attention board",
+          workflow_version: 1,
+          workflow_version_id: "nurture-teacher-attention-board-v1",
+          input_schema_version: 1,
+          output_schema_version: 1,
+          allowed_step_types: ["domain_action"],
+          steps: [
+            {
+              step_key: "open_today_attention_board",
+              step_type: "domain_action",
+              order: 10,
+              handler_key: "nurture.open_today_attention_board",
+              retry_policy: "bounded_exponential",
+            },
+          ],
+        },
+      ],
+    },
   ],
   scenario_data: {
     context_ref_types: [
@@ -158,8 +228,8 @@ export const nurtureScenarioManifest = {
       },
       {
         namespace: "my_chat",
-        object_type: "family",
-        resolver_key: "my_chat.object.family",
+        object_type: "parent",
+        resolver_key: "my_chat.object.parent",
         owner_scope: "workspace",
         canonical_required: true,
         scenario_local_allowed: false,
@@ -167,8 +237,8 @@ export const nurtureScenarioManifest = {
       },
       {
         namespace: "my_chat",
-        object_type: "parent",
-        resolver_key: "my_chat.object.parent",
+        object_type: "family",
+        resolver_key: "my_chat.object.family",
         owner_scope: "workspace",
         canonical_required: true,
         scenario_local_allowed: false,
@@ -223,6 +293,13 @@ export const nurtureScenarioManifest = {
         surfaces: ["chat_workflow_control", "web_run_workbench"],
         required: true,
       },
+      {
+        requirement_key: "nurture_family_input_command_v1",
+        schema_version: 1,
+        entrypoints: ["capture_family_input"],
+        surfaces: ["chat_workflow_control", "mobile_dashboard"],
+        required: true,
+      },
     ],
     step_interventions: [
       {
@@ -249,6 +326,8 @@ export const nurtureScenarioManifest = {
       "activity_comparison_summary",
       "execution_review_summary",
       "health_state_summary",
+      "family_care_inbox_summary",
+      "teacher_attention_board_summary",
     ],
     exposure_levels: {
       L0: [],
@@ -259,6 +338,8 @@ export const nurtureScenarioManifest = {
         "activity_comparison_summary",
         "execution_review_summary",
         "health_state_summary",
+        "family_care_inbox_summary",
+        "teacher_attention_board_summary",
       ],
       L2: ["family_strategy_summary", "activity_comparison_summary", "execution_review_summary"],
       L3: ["pregnancy_stage_summary", "care_plan_summary", "health_state_summary"],
@@ -300,6 +381,21 @@ export const nurtureScenarioManifest = {
       policy_key: "nurture.can_create_notification_handoff",
       receipt_required: true,
     },
+    {
+      handoff_key: "user_attention",
+      handoff_type: "notification",
+      source_artifact_types: [],
+      source_context_ref_types: [
+        { namespace: "nurture", object_type: "family_care_message" },
+        { namespace: "nurture", object_type: "child_link_receipt" },
+        { namespace: "nurture", object_type: "family_care_item" },
+      ],
+      requested_purposes: ["user_attention"],
+      downstream_owner: "user_attention",
+      policy_key: "nurture.can_request_user_attention",
+      receipt_required: true,
+      materialization_mode: "workflow_step_complete_v1",
+    },
   ],
   surface_mapping: {
     chat_workflow_control: { adapter_key: "nurture.chat_workflow", recommendation_policy: "user_message_intent_and_context_refs" },
@@ -339,6 +435,30 @@ export const nurtureScenarioManifest = {
         command_class: "scenario_internal",
         writes_workflow_facts: false,
         handler_key: "nurture.internal.preview_activity_comparison",
+      },
+      {
+        method: "GET",
+        path: "/internal/nurture/institution/class-family-inbox",
+        owner_surface: "web_domain_workbench",
+        command_class: "scenario_internal",
+        writes_workflow_facts: false,
+        handler_key: "nurture.internal.open_class_family_inbox",
+      },
+      {
+        method: "GET",
+        path: "/internal/nurture/institution/teacher-attention-board",
+        owner_surface: "web_domain_workbench",
+        command_class: "scenario_internal",
+        writes_workflow_facts: false,
+        handler_key: "nurture.internal.open_today_attention_board",
+      },
+      {
+        method: "POST",
+        path: "/internal/nurture/activation/user-attention/resolve",
+        owner_surface: "admin_operator",
+        command_class: "scenario_internal",
+        writes_workflow_facts: false,
+        handler_key: "nurture.internal.resolve_user_attention",
       },
     ],
   },
@@ -423,6 +543,43 @@ export const nurtureScenarioManifest = {
     journey_harness: "nurture-p0-first-journey",
   },
 } satisfies ScenarioManifest;
+
+/**
+ * Explicit pre-activation projection used by the local compatibility host.
+ * The canonical manifest above remains the vNext source of truth, while this
+ * projection removes the single capability path that requires the My-Chat X3
+ * materializer. Keeping it named/versioned prevents an accidental silent
+ * fallback from being mistaken for the activation contract.
+ */
+export const nurturePreActivationScenarioManifest: ScenarioManifest = {
+  ...nurtureScenarioManifest,
+  capabilities: nurtureScenarioManifest.capabilities.map((capability) =>
+    capability.capability_key === "class_family_inbox"
+      ? {
+          ...capability,
+          entrypoints: capability.entrypoints.filter(
+            (entrypoint) => entrypoint.entrypoint_key !== "capture_family_input",
+          ),
+        }
+      : capability,
+  ),
+  scenario_data: {
+    ...nurtureScenarioManifest.scenario_data,
+    run_start_requirements:
+      nurtureScenarioManifest.scenario_data.run_start_requirements.filter(
+        (requirement) =>
+          requirement.requirement_key !== "nurture_family_input_command_v1",
+      ),
+  },
+  handoffs: nurtureScenarioManifest.handoffs.filter(
+    (handoff) => handoff.handoff_key !== "user_attention",
+  ),
+  internal_api: {
+    routes: nurtureScenarioManifest.internal_api.routes.filter(
+      (route) => route.handler_key !== "nurture.internal.resolve_user_attention",
+    ),
+  },
+};
 
 export const nurtureInternalApiHandlers: WorkflowInternalApiRegistry = {
   async "nurture.internal.get_profile"(input) {

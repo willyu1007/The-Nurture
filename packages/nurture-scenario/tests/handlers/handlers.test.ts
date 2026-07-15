@@ -3,6 +3,10 @@ import type { DomainContextRef, WorkflowStepHandlerInput } from "@my-chat/workfl
 import type { ActivityComparisonDraft, NurtureProfileProjection, NurtureWorkflowProject } from "../../src/repositories.js";
 import type { CanonicalSnapshot, NurtureHandlerDeps, RunMaterial } from "../../src/deps.js";
 import {
+  createInMemoryInteractionContextRepository,
+  createInMemoryNurtureCommandRepository,
+} from "../../src/domain/testing/in-memory-institution-ports.js";
+import {
   makeApplyMedicalSafetyGate,
   makeCalibrateFamilyStrategy,
   makeCollectContext,
@@ -82,6 +86,20 @@ const buildDeps = (cfg: Cfg = {}) => {
   });
   const deps: NurtureHandlerDeps = {
     repositories: {
+      commands: createInMemoryNurtureCommandRepository({
+        getWorkflowProjectById: async () =>
+          cfg.rejectUpdates && cfg.project
+            ? { ...cfg.project, aggregate_version: cfg.project.aggregate_version + 1 }
+            : (cfg.project ?? null),
+        updateWorkflowProjectStrategy: async (i) => {
+          calls.updateStrategy.push(i);
+          return { ...(cfg.project as NurtureWorkflowProject), aggregate_version: i.expected_version + 1 };
+        },
+        appendEvidenceRef: async (i) => {
+          calls.evidence.push(i.reason_code);
+        },
+      }),
+      interactions: createInMemoryInteractionContextRepository(),
       profiles: {
         getByCanonicalObjectRef: async () => cfg.profile ?? null,
         upsertProjection: async (i) => {
