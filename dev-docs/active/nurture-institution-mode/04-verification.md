@@ -2,9 +2,22 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-15
-- Current phase: X5 joint acceptance complete; pilot enablement remains a separate authorization gate
-- Code/config/schema impact: additive joint acceptance tests, My-Chat technical recovery APIs/repository, and backend-neutral refs-only telemetry. No Nurture or My-Chat schema/migration and no activation flag changed.
+- Last updated: 2026-07-16
+- Current phase: X5 joint acceptance complete; Pilot-0 readiness authorized and in progress
+- Code/config/schema impact: the Pilot-0 change is governance/documentation only. No product code, Nurture or My-Chat schema/migration, contract pin, environment, secret, artifact publication, traffic, or activation flag changed.
+
+## Pilot-0 Governance Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Task routing | PASS | Reuse `T-002 nurture-institution-mode` under `M-002 > F-002`; no duplicate Nurture task bundle is created. |
+| Authorization boundary | PASS | Only Pilot-0 scope/readiness is open. Pilot-1..4, DB apply, ACR publication, secret configuration, capability/manifest composition, external traffic, staging, production, and GA require separate approval. |
+| Rollback boundary | PASS | Readiness work has no runtime state to roll back. Any later pilot rollback remains capability/activation deactivation and never rewrites committed Nurture business facts. |
+| Product/runtime impact | PASS | Documentation and project governance only; exact revisions, hashes, schemas, migrations, source pins, default-off activation, and CI behavior remain unchanged. |
+| Project governance | PASS | `sync --apply --changelog`, governance lint, and T-002 query pass; M-002, F-002, and T-002 now consistently report `in-progress`, with T-002 updated on `2026-07-16`. |
+| Task/project document lint | PASS WITH PRE-EXISTING REPO EXCEPTION | Scoped anchor/document lint passes for all 26 institution-task Markdown files with 15 existing vague-reference warnings and for all 4 project-hub Markdown files with no warnings. The repo-wide probe still reports the pre-existing naming false positive for the valid Next.js dynamic route `apps/frontend/src/app/nurture/projects/[id]`; no changed path has a lint error. |
+| Structure and whitespace | PASS | Both changed YAML files parse successfully with Ruby Psych and `git diff --check` passes. The repository does not install a Prettier CLI, so no Prettier result is claimed. |
+| Context and contract baseline | PASS | Strict context verification and live workflow contract pin verification pass at unchanged Base/My-Chat hash `0bd8925e...01aa` and Nurture source pin `e976c235...d193`. |
 
 ## X5 Final Gate
 
