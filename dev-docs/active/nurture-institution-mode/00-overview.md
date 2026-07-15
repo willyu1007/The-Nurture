@@ -17,7 +17,7 @@
 - My-Chat X4-B runtime implementation revision: `a9685d538ddc320df2dd4ee68a0a65e004f446a0`.
 - My-Chat X4-B final delivery and exact dependency revision: `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; its `packages/` tree is byte-identical to the implementation revision.
 - My-Chat X4-C2/N2 development-activation revision: `d47929d12e1a3368a99fa24757732988e5072e1e`.
-- My-Chat X5 joint-acceptance revision: `0ad5b5753332d5f547968e98735c02bd55476121`.
+- My-Chat X5 implementation revision: `0ad5b5753332d5f547968e98735c02bd55476121`; merged and pinned main revision: `62d9809e82b7821226bfefb6f9dd17e9a0427878`.
 - Nurture X4-C1 live-handler implementation revision: `2398d98d8860e5f90e6c365e652f40043ce8d82d`.
 - Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
 - Current activation posture: the canonical vNext manifest and explicit activation factory are available only to the reviewed development composition. The default/static module and Nurture dev host remain pre-activation; My-Chat staging and production gates remain false.

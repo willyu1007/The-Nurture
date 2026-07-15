@@ -10,7 +10,7 @@
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Exact revisions and pins | PASS | My-Chat X5 is `0ad5b5753332d5f547968e98735c02bd55476121`; Base/My-Chat shared contract stays `0bd8925e...01aa`; the 25-file Nurture source pin is `e976c235...d193`. Live verification plus all four drift/traversal negative tests pass. |
+| Exact revisions and pins | PASS | My-Chat X5 implementation `0ad5b575...` is merged through PR #3 and the exact pin is main revision `62d9809e82b7821226bfefb6f9dd17e9a0427878`; Base/My-Chat shared contract stays `0bd8925e...01aa`; the 25-file Nurture source pin is `e976c235...d193`. Live verification plus all four drift/traversal negative tests pass. |
 | Fresh migrations and drift | PASS | Approved `pgvector/pgvector:pg16` container on `127.0.0.1:55436`; My-Chat `17`, Nurture production `3`, dev-host `1` migrations current; all datasource-to-schema diffs empty. Existing/shared `localhost:5433/nurture` was not connected or changed. |
 | My-Chat full gate | PASS | Full workspace typecheck, ESLint, observability, governance, whitespace, and `79` files / `385` tests with all X2-X5 DB routes enabled. |
 | Nurture full gate | PASS | Typecheck; `175/175` unit; `24/24` production DB; `19/19` dev-host; routing `19/3/8/1`; schema/persistence/X4 replay/observability/pin/whitespace gates pass. |
