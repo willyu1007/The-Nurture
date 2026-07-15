@@ -31,6 +31,7 @@
 | Delivery/operations | NO-GO FOR TRAFFIC | My-Chat images build but publication remains gated. Nurture has no packaging service, registered deploy service, or implemented deploy command; metric contracts exist without deployed sinks, dashboards, alerts, named incident owners, or backup/restore evidence. |
 | Recommended decision | PASS | `09-pilot-readiness.md` records GO for Pilot-0 readiness continuation and NO-GO for external traffic, with proposed cohort, IIB, topology, success/stop, and rollback contracts. No runtime/environment mutation was performed. |
 | Pilot-0-B1/B2-1 internal cohort and guardian lock | PASS / PREVIOUS B1 SUPERSEDED | Owner replaced the earlier real-cohort shape with one internal synthetic workspace containing three child scopes and three independent families. Guardian accounts are `2 + 1 + 1` across those families; all four identities are distinct, and real Pilot-4 sizing remains open. |
+| Pilot-0-B2-2 staff/operator lock | PASS | Owner accepted one separate institution admin, one lead caregiver, no backup caregiver, and one non-business technical operator. With four guardians, the experiment has seven logical accounts; administrator, caregiver, and operator authority remain non-overlapping. |
 
 ## X5 Final Gate
 
@@ -235,6 +236,7 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-16 | Pilot-0-B2-2 accepted-decision sync | PASS | Current SSOT locks seven logical accounts and separates institution configuration, caregiver business actions, guardian authority, and My-Chat technical recovery. B3 business/data class is the next decision. |
 | 2026-07-16 | Revised Pilot-0-B1 and B2-1 accepted-decision sync | PASS | Current SSOT locks three synthetic child scopes, three independent families, and four distinct guardian accounts as `2 + 1 + 1`; real Pilot-4 sizing remains open and the prior B1 shape is explicitly superseded. |
 | 2026-07-16 | Pilot-0-B1 accepted-decision sync | SUPERSEDED | The initial 2 then 5–8 real-cohort shape was validly recorded and then explicitly replaced by the revised B1/B2-1 record. |
 | 2026-07-16 | Pilot-0-B1 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and no new warning; governance lint, strict context verification, exact workflow pin, and `git diff --check` pass. |
