@@ -16,6 +16,7 @@
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).
 - My-Chat X4-B runtime implementation revision: `a9685d538ddc320df2dd4ee68a0a65e004f446a0`.
 - My-Chat X4-B final delivery and exact dependency revision: `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; its `packages/` tree is byte-identical to the implementation revision.
+- Nurture X4-C1 live-handler implementation revision: `2398d98d8860e5f90e6c365e652f40043ce8d82d`.
 - Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
 - Current activation posture: capability activation and manifest non-empty declarations are disabled. The live-handler foundation is registered in TypeScript but has no manifest entry and no default business-source adapter, so existing advertised paths remain explicit-empty and the new path fails closed.
 - Current scenario source pin: `c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0` over the host composition, workflow context contract, unchanged YAML manifest, handler dependency/implementation/registry surfaces, and module.

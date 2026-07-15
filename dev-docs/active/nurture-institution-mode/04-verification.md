@@ -10,6 +10,7 @@
 
 | Check | Result | Evidence |
 | --- | --- | --- |
+| Nurture implementation | PASS | X4-C1 code and pre-activation evidence committed at `2398d98d8860e5f90e6c365e652f40043ce8d82d`. |
 | Cross-repo baseline | PASS | My-Chat runtime implementation `a9685d538ddc320df2dd4ee68a0a65e004f446a0`; final delivery/exact checkout pin `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; no `packages/` diff between them. Base/My-Chat contract hashes remain `0bd8925e...01aa` path-content and `a97a5b14...e981` logical-source. |
 | Scenario pin | PASS | Expanded eight-file source population hashes to `c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0`; exact pin verifier and all 4 drift/traversal/revision negative tests pass. |
 | Ownership boundary | PASS AFTER REPAIR | My-Chat runtime implementation is host-injected behind a two-operation port; the scenario package has no production runtime dependency. Nurture owns command-source resolution and business execution. Redundant source-port scope/ref/version fields were removed so they cannot become a second provenance or authorization authority. |
