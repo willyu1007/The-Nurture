@@ -30,6 +30,7 @@
 | Security and cohort isolation | NO-GO FOR TRAFFIC | The owner endpoint is service-authenticated and fails closed, but current dev-host workflow/project routes are not production-authenticated. My-Chat activation is environment-global and has no exact workspace allowlist. |
 | Delivery/operations | NO-GO FOR TRAFFIC | My-Chat images build but publication remains gated. Nurture has no packaging service, registered deploy service, or implemented deploy command; metric contracts exist without deployed sinks, dashboards, alerts, named incident owners, or backup/restore evidence. |
 | Recommended decision | PASS | `09-pilot-readiness.md` records GO for Pilot-0 readiness continuation and NO-GO for external traffic, with proposed cohort, IIB, topology, success/stop, and rollback contracts. No runtime/environment mutation was performed. |
+| Pilot-0-B1 cohort lock | PASS | Owner accepted one allowlisted workspace and a progressive single-institution cohort: Pilot-3 synthetic only; Pilot-4A two consenting family child scopes in one care group; Pilot-4B may expand to five through eight scopes only after zero immediate-stop events. No second institution, whole-group default enrollment, or self-service enrollment. |
 
 ## X5 Final Gate
 
@@ -234,6 +235,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-16 | Pilot-0-B1 accepted-decision sync | PASS | `09-pilot-readiness.md`, overview, plan, roadmap, implementation notes, and this verification record agree on one allowlisted workspace and the progressive 2 then 5–8 child-scope single-institution cohort; later Pilot phases and traffic remain closed. |
+| 2026-07-16 | Pilot-0-B1 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and no new warning; governance lint, strict context verification, exact workflow pin, and `git diff --check` pass. |
 | 2026-07-16 | Cross-repository Pilot-0-A source/runtime/UX/delivery audit | PASS / EXTERNAL TRAFFIC NO-GO | Exact baselines inspected; six P0 and three P1 readiness findings plus the reduced first-pilot capability/data-class scope are recorded in `09-pilot-readiness.md`. |
 | 2026-07-16 | `pnpm verify:workflow-contract-pin` | PASS | Base/My-Chat contract hash remains `0bd8925e...01aa`; Nurture source pin remains `e976c235...d193`. |
 | 2026-07-16 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors` | PASS | 27 files, zero errors; 15 pre-existing vague-reference warnings remain in older documents, and `09-pilot-readiness.md` introduces none. |

@@ -70,12 +70,22 @@ The first pilot must therefore not claim all four roadmap capabilities. Its only
 
 ## Recommended first-pilot slice
 
-The following slice is the recommended Pilot-0 default and remains subject to owner acceptance before Pilot-0 can close.
+### Pilot-0-B1 — cohort nature and staged size (LOCKED)
+
+The first real observation cohort MUST use one allowlisted My-Chat workspace, one invited institution, and a progressive single-care-group expansion:
+
+1. Pilot-3 uses internal operators, test accounts, and synthetic data only.
+2. Pilot-4A starts with two explicitly participating families and two corresponding child care processes in one care group. This stage validates consent, child/workspace isolation, owner reread, revoke, and operational safety.
+3. Pilot-4B may expand to five through eight participating child care processes in the same care group only after Pilot-4A completes with no immediate-stop event. This stage validates inbox aggregation and caregiver workflow value.
+4. The pilot MUST NOT add a second institution, default-enroll the whole care group, open self-service enrollment, or include a child scope without the participating guardian's explicit consent.
+5. Child-facing display identity and collected attributes MUST be minimized. The pilot does not require broad child profiles to validate the approved question workflow.
+
+The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
 | --- | --- |
 | Environment | A new isolated `pilot` environment, separate from current dev, staging, and production. No shared database. |
-| Cohort | One My-Chat workspace, one Nurture institution, one care group, 2–5 child care processes from at least two families, one institution administrator, one lead caregiver/caregiver, and one guardian per participating child. At least two child scopes are required to exercise aggregation and cross-child isolation. |
+| Cohort | **LOCKED by Pilot-0-B1:** one allowlisted workspace; Pilot-3 synthetic rehearsal; Pilot-4A one invited institution/care group with two participating family child scopes; Pilot-4B gated expansion to five through eight scopes in the same group. No second institution, whole-group default enrollment, or self-service enrollment. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -145,7 +155,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort and data-class lock | **Proposed** | Owner accepts or revises the one-workspace/one-group/2–5-child, `family_care_question`-only slice. |
+| Pilot-0-B — cohort and data-class lock | **In progress — B1 locked** | B1 locks the progressive one-institution cohort at 2 then 5–8 child scopes. B2 role/personnel configuration and later business/data-class decisions remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
