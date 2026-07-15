@@ -9,7 +9,7 @@
   },
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm --dir ../My-Workflow-Base/templates/web-workbench install --frozen-lockfile && pnpm --dir ../My-Workflow-Base/templates/web-workbench build",
+    "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm --dir ../My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile && pnpm --dir ../My-Workflow-Base/templates/web-workbench build",
     "build": "pnpm prepare:pinned-source && pnpm db:generate:all && pnpm typecheck && pnpm --filter @the-nurture/frontend build",
     "dev": "node scripts/run-with-local-env.mjs pnpm --filter @the-nurture/backend dev",
     "dev:frontend": "pnpm --filter @the-nurture/frontend dev",

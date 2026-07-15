@@ -24,8 +24,25 @@ This file exists to prevent repeating mistakes within this task.
 - Do not encode the same Nurture business refs into both handoff context and host Step output; keep owner-readable refs in the handoff and expose only opaque execution evidence from the Step.
 - Do not return revoke/redaction classification before checking whether the current My-Chat actor is an authorized recipient; lifecycle reason is itself sensitive.
 - Do not treat a delivered receipt as permanently delivered for deep-link reads; current recipient opens must also allow the converged read/acknowledged states while rechecking every other gate.
+- Do not install an intentionally standalone package with a parent-workspace-aware pnpm command; use its own lockfile with `--ignore-workspace` and prove the path in a clean checkout.
 
 ## Pitfall log (append-only)
+
+### 2026-07-15 — Parent workspace discovery skipped the standalone web-workbench
+
+- Symptom: all four Nurture PR execution jobs failed while building the pinned
+  web-workbench with missing React modules and a missing local `node_modules`.
+- Context: `templates/web-workbench` has its own package and lockfile but is
+  intentionally absent from the My-Workflow-Base `pnpm-workspace.yaml`.
+- Root cause: `pnpm --dir ... install` discovered the parent workspace, installed
+  its five declared projects, and never installed the requested excluded package.
+- What we tried: inspected the failed job log and reproduced both workspace
+  discovery and standalone installation in a fresh temporary checkout.
+- Fix / workaround: add `--ignore-workspace` to the Nurture preparation script
+  and each CI bootstrap command so the template installs from its own lockfile.
+- Prevention: clean-checkout validation must assert the requested package's
+  dependencies and build output, not accept a successful parent install alone.
+- References: `.github/workflows/ci.yml`, `package.json`, PR #3 run `29419715925`.
 
 ### 2026-07-15 — Leaking lifecycle classification to an unauthorized opener
 

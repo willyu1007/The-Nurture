@@ -132,7 +132,7 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
@@ -221,7 +221,7 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
@@ -305,7 +305,7 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
@@ -376,7 +376,7 @@ jobs:
 
       - name: Build pinned web-workbench dependency
         run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --frozen-lockfile
+          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
           pnpm --dir My-Workflow-Base/templates/web-workbench build
 
       - name: Install
