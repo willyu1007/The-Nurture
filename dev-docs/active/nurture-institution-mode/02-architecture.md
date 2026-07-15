@@ -489,3 +489,9 @@ transaction. Response loss is recovered by the original Step's B2 replay seed;
 same-Step reclaim may rotate claim evidence, while another Step cannot acquire
 the seed. X5 remains responsible for the full combined failure matrix and pilot
 decision.
+
+Pilot-0 does not alter this runtime boundary. The cross-repository readiness
+audit, proposed isolated delivery topology, two-key workspace gate, minimum IIB
+closure, and success/stop/rollback contract live in `09-pilot-readiness.md`.
+Those recommendations are not an activation authorization; the current dev
+host remains pre-activation and is not a deployable pilot service.

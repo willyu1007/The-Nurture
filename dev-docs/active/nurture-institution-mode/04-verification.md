@@ -19,6 +19,18 @@
 | Structure and whitespace | PASS | Both changed YAML files parse successfully with Ruby Psych and `git diff --check` passes. The repository does not install a Prettier CLI, so no Prettier result is claimed. |
 | Context and contract baseline | PASS | Strict context verification and live workflow contract pin verification pass at unchanged Base/My-Chat hash `0bd8925e...01aa` and Nurture source pin `e976c235...d193`. |
 
+## Pilot-0-A Readiness Audit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact baseline | PASS | Clean Base `acba4e7`, My-Chat `a1b5e64`, and Nurture `058c792` baselines were inspected; `pnpm verify:workflow-contract-pin` passes with unchanged contract/source hashes. |
+| Actual capability inventory | PASS / SCOPE REDUCED | Only `class_family_inbox`, `teacher_attention_board`, and the activation-only `capture_family_input`/`user_attention` path have executable handler/kernel evidence. The exact joint journey uses `family_care_question`; `caregiver_daily_care` and `child_media_attribution` do not have equivalent advertised handler/UX/joint closure. |
+| Runtime composition | NO-GO FOR TRAFFIC | The activation factory is not loaded by a runnable My-Chat host composition. The Nurture Fastify backend is a pre-activation dev host with a private Workflow DB and cannot be promoted to pilot runtime. |
+| IIB/user journey | NO-GO FOR TRAFFIC | No institution frontend exists; declared institution routes are not mounted by the current server; My-Chat mobile only renders a generic current-availability card; caregiver acknowledge/reply, guardian receipt/reply, consent/revoke, and institution onboarding are not live product actions. |
+| Security and cohort isolation | NO-GO FOR TRAFFIC | The owner endpoint is service-authenticated and fails closed, but current dev-host workflow/project routes are not production-authenticated. My-Chat activation is environment-global and has no exact workspace allowlist. |
+| Delivery/operations | NO-GO FOR TRAFFIC | My-Chat images build but publication remains gated. Nurture has no packaging service, registered deploy service, or implemented deploy command; metric contracts exist without deployed sinks, dashboards, alerts, named incident owners, or backup/restore evidence. |
+| Recommended decision | PASS | `09-pilot-readiness.md` records GO for Pilot-0 readiness continuation and NO-GO for external traffic, with proposed cohort, IIB, topology, success/stop, and rollback contracts. No runtime/environment mutation was performed. |
+
 ## X5 Final Gate
 
 | Check | Result | Evidence |
@@ -179,14 +191,19 @@
 Run after task-doc or governance edits:
 
 ```bash
+node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors
 node .ai/scripts/ctl-project-governance.mjs sync --apply --project main
 node .ai/scripts/ctl-project-governance.mjs lint --check --project main
+pnpm verify:workflow-contract-pin
+git diff --check
 ```
 
 Expected result:
 
 - Governance registry and derived views stay consistent.
 - `T-002 nurture-institution-mode` remains mapped to `M-002 / F-002`.
+- Task docs have no link/anchor/encoding error and changed content has no whitespace error.
+- Cross-repository revisions and contract/source hashes remain exact.
 
 Run if registered context artifacts are changed:
 
@@ -200,22 +217,28 @@ Expected result:
 
 ## Manual Smoke Checks
 
-For IA/IA.1 discussion work:
+For Pilot-0 readiness work:
 
-1. Confirm `dev-docs/active/nurture-institution-mode/` contains the standard task bundle files.
-2. Confirm `roadmap.md` carries the current decision queue.
-3. Confirm `00-overview.md` states the current phase and next discussion step.
-4. Confirm no live manifest, source, or Prisma schema changes were made for institution mode before IB exists.
+1. Confirm `00-overview.md`, `01-plan.md`, `roadmap.md`, and `09-pilot-readiness.md` agree on the current checkpoint and authorization boundary.
+2. Confirm the capability inventory distinguishes schema/domain availability, advertised handlers, user surfaces/actions, and joint X5 evidence.
+3. Confirm proposed cohort/data-class, IIB, topology, success/stop, and rollback decisions remain visibly proposed until accepted.
+4. Confirm Pilot-1 through Pilot-4, external traffic, database apply, artifact publication, secrets, capability activation, staging, production, and GA remain closed.
+5. Confirm the Pilot-0 diff contains no product source, schema, migration, environment, secret, artifact, or activation change.
 
 ## Rollout / Backout
 
-- Rollout: task-doc and governance-only changes can be merged once governance lint is green.
-- Backout: revert the T-002 task-doc changes and governance registry entries; no runtime data migration is involved.
+- Rollout: merge the Pilot-0-A task-doc/governance evidence after all documentation, governance, context, pin, and whitespace gates pass.
+- Backout: revert the Pilot-0-A task-doc/governance changes. No runtime state, database migration, artifact, secret, capability, or traffic change is involved.
 
 ## Verification Log
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-16 | Cross-repository Pilot-0-A source/runtime/UX/delivery audit | PASS / EXTERNAL TRAFFIC NO-GO | Exact baselines inspected; six P0 and three P1 readiness findings plus the reduced first-pilot capability/data-class scope are recorded in `09-pilot-readiness.md`. |
+| 2026-07-16 | `pnpm verify:workflow-contract-pin` | PASS | Base/My-Chat contract hash remains `0bd8925e...01aa`; Nurture source pin remains `e976c235...d193`. |
+| 2026-07-16 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors` | PASS | 27 files, zero errors; 15 pre-existing vague-reference warnings remain in older documents, and `09-pilot-readiness.md` introduces none. |
+| 2026-07-16 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main --changelog` + governance lint/query | PASS | T-002 remains `in-progress` under M-002/F-002; generated governance views are consistent. |
+| 2026-07-16 | Strict context verification + `git diff --check` | PASS | Registered context remains valid; the readiness-only diff has no whitespace error. |
 | 2026-07-03 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Derived governance views regenerated. |
 | 2026-07-03 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Registry/task bundle consistency verified. |
 | 2026-07-03 | Manual bundle layout check | PASS | Standard files exist: roadmap, 00-05, `.ai-task.yaml`; no code/manifest/schema edits intended. |
