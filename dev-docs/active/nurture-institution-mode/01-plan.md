@@ -187,7 +187,30 @@
 | X4-C1 | Complete | Delivered at `2398d98`. Nurture receives the bridge only through a host-injected port, resolves stable scenario command/request IDs through a scenario-owned source port, replays only on the original Step, returns one opaque CommandExecution output ref, and emits no host-standard event. The handler is registered but absent from the manifest and the default composition has no business-source adapter. |
 | X4-C2 | Complete | Added the versioned manifest handoff/context-source declarations, strict production business-source adapter, explicit activation-only module factory, current owner reread, service-auth boundary, My-Chat dev-only owner/capability, idempotent notification/deep-link shell, and isolated PostgreSQL verification. Default Nurture composition plus My-Chat staging/prod remain disabled. |
 | X4-C3 | Complete | Final architecture/privacy review repaired Actor/user binding, receipt-open state, unauthorized lifecycle reason leak, notification channel convergence, generic fallback coupling, owner-outage open behavior, and global mobile deep-link routing. Cross-repo pins and full static/DB gates pass. |
-| X5 | Pending | Run the combined crash/race/revoke/redaction/cancel/provider/dead-letter/Admin/stale-link/contract-drift/privacy/telemetry matrix before pilot. |
+| X5 | Complete | Combined fault/privacy/recovery/telemetry matrix passes; pilot enablement remains a separate authorization node. |
+
+**X5 joint-acceptance checkpoints（2026-07-15）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| X5-A | Complete | X4 revisions/hashes, existing-vs-missing evidence, and the fresh two-production-DB plus private dev-host DB validation topology are locked without changing activation posture. |
+| X5-B | Complete | The real two-database response-loss/reclaim/wrong-Step/revoke/privacy journey and My-Chat Admin technical recovery pass. Existing deterministic tests remain the authority for mixed/rollback, redaction/cancel/withdrawal/policy, provider/dead-letter, and owner-outage rows. |
+| X5-C | Complete | Added backend-neutral, refs-only command/owner telemetry for duration, context-ref count, attempts, LLM calls, cache hits, and replay; static privacy tests and both observability registries pass. |
+| X5-D | Complete | Three clean isolated databases received the 17/3/1 migration streams with no drift; full suites and three consecutive joint runs pass; the disposable container was removed and port `55436` released. |
+| X5-E | Complete | Dual-repo review repaired outcome-unknown handling, version normalization, telemetry composition, Outbox test isolation, source-pin coverage, and Admin actor/causation evidence. Exact revisions/hashes are locked; pilot is recommended but not enabled. |
+
+X5 acceptance matrix (each row must have deterministic evidence; adjacent single-repo tests may support but cannot replace the joint boundary where noted):
+
+- business commit success and worker response loss;
+- same-Step lease reclaim and wrong-Step replay denial;
+- exact duplicate, mixed existing/new partial duplicate, and crash rollback/retry;
+- grant revoke, source redaction, pre-delivery cancel, post-delivery withdrawal, and current policy change;
+- owner/provider failure, Outbox retry/dead-letter, and authorized Admin technical reconciliation;
+- stale notification/deep-link owner reread and owner outage fail-closed behavior;
+- contract/source-pin drift and refs-only privacy boundary;
+- latency, context size, retry attempts, LLM calls, and cache-hit telemetry.
+
+X5 remains a validation and hardening gate. It does not authorize schema ownership changes, staging/production activation, pilot enablement, or rollback of committed Nurture business facts. Rollback remains capability/manifest deactivation only.
 
 **Cross-repo task ownership：**
 

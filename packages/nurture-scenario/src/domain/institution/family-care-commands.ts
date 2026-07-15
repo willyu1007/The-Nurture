@@ -248,8 +248,11 @@ const outputRefs = (value: {
     (entry): entry is DomainContextRef => entry !== undefined,
   );
 
+export const familyInputRouteCommandKey =
+  "nurture.family_care.capture_and_route" as const;
+
 export const familyInputRouteSpec: NurtureCommandSpec<FamilyInputRoutePayload> = {
-  command_key: "nurture.family_care.capture_and_route",
+  command_key: familyInputRouteCommandKey,
   command_scope: "family_care",
   contract_version: 1,
   canonicalize: (input) => input,

@@ -7,13 +7,12 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["packages/nurture-db/**/*.test.ts"],
-    exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/x5-joint-acceptance.integration.test.ts",
+    include: [
+      "packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts",
     ],
-    testTimeout: 20000,
+    exclude: ["**/node_modules/**", "**/dist/**"],
+    testTimeout: 60_000,
+    hookTimeout: 60_000,
     setupFiles: ["dotenv/config"],
   },
 });

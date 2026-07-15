@@ -19,6 +19,7 @@ import {
   createInMemoryFamilyCareQueryRepository,
   createInMemoryNurtureCommandRepository,
 } from "./domain/testing/in-memory-institution-ports.js";
+import type { NurtureInstitutionWorkflowTelemetry } from "./observability/institution-workflow-telemetry.js";
 
 // ---------------------------------------------------------------------------
 // Injected ports. Handlers/policies/presenters are pure functions that close
@@ -123,6 +124,8 @@ export type NurtureHandlerDeps = {
   scenarioCommandBridge?: NurtureScenarioCommandBridgePort;
   /** Scenario-owned resolver for the refs-only workflow command seed. */
   familyInputWorkflow?: NurtureFamilyInputWorkflowPort;
+  /** Backend-neutral numeric telemetry; never receives bodies, ids, or claim evidence. */
+  institutionWorkflowTelemetry?: NurtureInstitutionWorkflowTelemetry;
 };
 
 // ---------------------------------------------------------------------------

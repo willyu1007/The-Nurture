@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "d47929d12e1a3368a99fa24757732988e5072e1e",
+    "revision": "0ad5b5753332d5f547968e98735c02bd55476121",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -45,10 +45,16 @@
       "apps/backend/src/server.ts",
       "docs/context/workflow/nurture-scenario-contract.md",
       "packages/nurture-db/src/index.ts",
+      "packages/nurture-db/src/repositories/family-care-command.transaction.ts",
+      "packages/nurture-db/src/repositories/institution-core.repositories.ts",
       "packages/nurture-db/src/repositories/port-repositories.ts",
       "packages/nurture-db/src/repositories/user-attention.repository.ts",
       "packages/nurture-scenario/scenario.manifest.yaml",
       "packages/nurture-scenario/src/deps.ts",
+      "packages/nurture-scenario/src/domain/commands/command-kernel.ts",
+      "packages/nurture-scenario/src/domain/commands/handoff-replay.ts",
+      "packages/nurture-scenario/src/domain/institution/family-care-commands.ts",
+      "packages/nurture-scenario/src/domain/institution/family-care-transaction.ts",
       "packages/nurture-scenario/src/domain/institution/user-attention-activation.ts",
       "packages/nurture-scenario/src/family-input-workflow-source.ts",
       "packages/nurture-scenario/src/handlers/family-input-workflow.handler.ts",
@@ -60,6 +66,6 @@
       "packages/nurture-scenario/src/registry.ts",
       "packages/nurture-scenario/src/repositories.ts"
     ],
-    "contractSha256": "1b124cb400e0bb56941308352d8699a6f3768d2e2a2e14edff627eb95ce94d72"
+    "contractSha256": "e976c235962c827367d1c13dcc603a0d315fdac118daf03f00a3df85e153d193"
   }
 }

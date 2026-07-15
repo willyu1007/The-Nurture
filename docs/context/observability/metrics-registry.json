@@ -1,21 +1,107 @@
 {
   "version": 1,
-  "updatedAt": "2025-12-25T00:00:00Z",
+  "updatedAt": "2026-07-15T04:19:59.977Z",
   "metrics": [
     {
       "name": "http_requests_total",
       "type": "counter",
       "description": "Total HTTP requests",
-      "labels": ["method", "path", "status"],
+      "labels": [
+        "method",
+        "path",
+        "status"
+      ],
       "unit": "requests"
     },
     {
       "name": "http_request_duration_seconds",
       "type": "histogram",
       "description": "HTTP request duration in seconds",
-      "labels": ["method", "path"],
+      "labels": [
+        "method",
+        "path"
+      ],
       "unit": "seconds",
-      "buckets": [0.01, 0.05, 0.1, 0.5, 1, 5]
+      "buckets": [
+        0.01,
+        0.05,
+        0.1,
+        0.5,
+        1,
+        5
+      ]
+    },
+    {
+      "name": "nurture_command_duration_ms",
+      "type": "histogram",
+      "description": "Nurture command execution or exact replay duration.",
+      "labels": [
+        "command_key",
+        "outcome"
+      ],
+      "unit": "milliseconds",
+      "buckets": [
+        1,
+        5,
+        10,
+        25,
+        50,
+        100,
+        250,
+        500,
+        1000,
+        5000
+      ]
+    },
+    {
+      "name": "nurture_command_context_ref_count",
+      "type": "histogram",
+      "description": "Bounded Handoff context reference count emitted by a Nurture command.",
+      "labels": [
+        "command_key",
+        "outcome"
+      ],
+      "unit": "refs",
+      "buckets": [
+        0,
+        1,
+        3,
+        5,
+        10,
+        25,
+        50,
+        100
+      ]
+    },
+    {
+      "name": "nurture_command_llm_calls_total",
+      "type": "counter",
+      "description": "Model calls attributable to a Nurture command execution.",
+      "labels": [
+        "command_key",
+        "outcome"
+      ],
+      "unit": "calls"
+    },
+    {
+      "name": "nurture_command_cache_hits_total",
+      "type": "counter",
+      "description": "Reusable semantic-work cache hits attributable to a Nurture command execution.",
+      "labels": [
+        "command_key",
+        "outcome"
+      ],
+      "unit": "hits"
+    },
+    {
+      "name": "nurture_command_replay_total",
+      "type": "counter",
+      "description": "Exact committed Nurture command replays that avoid duplicate business effects.",
+      "labels": [
+        "command_key",
+        "outcome"
+      ],
+      "unit": "replays"
     }
   ]
 }

@@ -109,11 +109,15 @@ const normalizeContextRef = (value: unknown): DomainContextRef => {
     !validId(value.object_id) ||
     !["workspace", "organization", "platform", "external"].includes(String(value.owner_scope)) ||
     (value.consumer_scenario_key !== undefined && !validId(value.consumer_scenario_key)) ||
-    !validVersion(value.version)
+    (value.version !== undefined && !validVersion(value.version))
   ) {
     throw new Error("invalid handoff context ref");
   }
   const canonicalRef = normalizeCanonicalIdentity(value.canonical_ref);
+  // Nurture aggregates are 0-based, while the shared Handoff context-ref
+  // contract represents an initial/unversioned owner reread by omitting the
+  // optional version and accepts only positive versions when one is present.
+  const version = Number(value.version);
   const normalized: DomainContextRef = {
     namespace: value.namespace,
     ...(value.consumer_scenario_key
@@ -121,7 +125,7 @@ const normalizeContextRef = (value: unknown): DomainContextRef => {
       : {}),
     object_type: value.object_type,
     object_id: value.object_id,
-    version: value.version,
+    ...(version > 0 ? { version } : {}),
     owner_scope: value.owner_scope as DomainContextRef["owner_scope"],
     ...(canonicalRef ? { canonical_ref: canonicalRef } : {}),
   };

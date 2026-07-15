@@ -49,7 +49,12 @@ export type NurtureActivationScenarioModuleDeps = Omit<
 > & {
   handlerDeps: NurtureHandlerDeps &
     Required<
-      Pick<NurtureHandlerDeps, "scenarioCommandBridge" | "familyInputWorkflow">
+      Pick<
+        NurtureHandlerDeps,
+        | "scenarioCommandBridge"
+        | "familyInputWorkflow"
+        | "institutionWorkflowTelemetry"
+      >
     >;
   workerRuntime: WorkflowRuntimePortMaterializationV1;
 };

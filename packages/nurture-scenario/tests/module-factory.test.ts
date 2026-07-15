@@ -70,6 +70,12 @@ const fakeRuntimePort: WorkflowRuntimePort = {
   }),
 };
 
+const telemetryLogger = {
+  info: () => undefined,
+  warn: () => undefined,
+  error: () => undefined,
+};
+
 describe("createNurtureScenarioModule(deps)", () => {
   const module = createNurtureScenarioModule({
     handlerDeps: defaultNurtureDeps,
@@ -114,6 +120,7 @@ describe("createNurtureActivationScenarioModule(deps)", () => {
           createHandoffDrafts: () => [],
         },
         familyInputWorkflow: { resolveCommand: async () => null },
+        institutionWorkflowTelemetry: { logger: telemetryLogger },
       },
       presenterDeps: defaultPresenterDeps,
       workerRuntime: activationRuntime,
@@ -153,6 +160,7 @@ describe("createNurtureActivationScenarioModule(deps)", () => {
           createHandoffDrafts: () => [],
         },
         familyInputWorkflow: { resolveCommand: async () => null },
+        institutionWorkflowTelemetry: { logger: telemetryLogger },
       },
       presenterDeps: defaultPresenterDeps,
       workerRuntime: fakeRuntimePort as WorkflowRuntimePortMaterializationV1,

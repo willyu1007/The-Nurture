@@ -244,6 +244,70 @@ describe("claimed-Step family input workflow handler", () => {
     expect(harness.routeEffects).toBe(0);
   });
 
+  it("records deterministic zero-LLM command telemetry without ids or protected refs", async () => {
+    const harness = makeHarness();
+    const logs: Array<Record<string, unknown>> = [];
+    const metrics: Array<{
+      name: string;
+      labels: Record<string, string>;
+      value?: number;
+    }> = [];
+    let clock = 100;
+    const handler = makeCaptureFamilyInput({
+      ...harness.deps,
+      institutionWorkflowTelemetry: {
+        nowMs: () => (clock += 5),
+        logger: {
+          info: (_message, context) => logs.push(context ?? {}),
+          warn: () => undefined,
+          error: () => undefined,
+        },
+        metrics: {
+          increment: (name, labels, value) => metrics.push({ name, labels, value }),
+          observe: (name, value, labels) => metrics.push({ name, labels, value }),
+        },
+      },
+    });
+
+    await handler(handlerInput());
+    await handler(
+      handlerInput({ claim_token: "claim-token-2", expected_step_version: 8 }),
+    );
+
+    expect(logs).toEqual([
+      expect.objectContaining({
+        command_key: "nurture.family_care.capture_and_route",
+        outcome: "completed",
+        context_ref_count: 3,
+        llm_call_count: 0,
+        cache_hit_count: 0,
+      }),
+      expect.objectContaining({
+        command_key: "nurture.family_care.capture_and_route",
+        outcome: "replayed",
+        context_ref_count: 3,
+        llm_call_count: 0,
+        cache_hit_count: 0,
+      }),
+    ]);
+    expect(metrics.map((entry) => entry.name)).toContain(
+      "nurture_command_replay_total",
+    );
+    const serialized = JSON.stringify({ logs, metrics });
+    for (const forbidden of [
+      "workspace-1",
+      "run-1",
+      "step-1",
+      "claim-token",
+      "message-1",
+      "receipt-1",
+      "item-1",
+      routePayload.safe_summary,
+    ]) {
+      expect(serialized).not.toContain(forbidden);
+    }
+  });
+
   it("rejects malformed claimed-Step evidence before resolving business input", async () => {
     const harness = makeHarness();
     const handler = makeCaptureFamilyInput(harness.deps);

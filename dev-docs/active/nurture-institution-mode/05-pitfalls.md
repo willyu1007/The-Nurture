@@ -191,3 +191,38 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: Added an explicit no-issuance resolver mode for workflow handlers. Ambiguous workflow scope becomes generic manual review without creating a token; direct internal handlers keep structured clarification.
 - Prevention: A continuation token may be issued only when the current caller contract can deliver it to the user and accept the opaque response.
 - References: `packages/nurture-scenario/src/domain/institution/institution-resolver.ts`, `packages/nurture-scenario/src/institution-surfaces.ts`, `packages/nurture-scenario/src/handlers/p0-handlers.ts`.
+
+### 2026-07-15 — Nurture Version Zero Crossed a Positive-Version Host Contract
+
+- Symptom: the first joint run committed the Nurture command but My-Chat sent
+  Step completion to manual review before creating a Handoff.
+- Root cause: Nurture aggregates start at version `0`; the shared optional
+  context-ref version, when present, must be positive.
+- Fix / workaround: preserve Nurture's internal version semantics, omit only an
+  initial `0` at the shared Handoff boundary, and retain positive versions.
+- Prevention: include every normalization seam in the scenario source pin and
+  run a real cross-repository codec journey before activation promotion.
+- References: `domain/commands/handoff-replay.ts` and the X5 joint suite.
+
+### 2026-07-15 — Parallel DB Suites Contended on Shared Validation State
+
+- Symptom: one production DB test failed only while My-Chat, production, and
+  dev-host suites ran concurrently; isolated and three sequential runs passed.
+- Root cause: the suites shared one PostgreSQL container and Prisma/Outbox test
+  populations despite targeting separate logical gates.
+- Fix / workaround: final database gates run sequentially, and My-Chat DB files
+  serialize whenever the shared Outbox-backed integration routes are enabled.
+- Prevention: parallelize unit/static work, but serialize stateful acceptance
+  gates unless each queue and database population is fully isolated.
+- References: X5 final gate in `04-verification.md`.
+
+### 2026-07-15 — Generic PostgreSQL Image Could Not Apply Host Migrations
+
+- Symptom: the first disposable `postgres:16-alpine` container failed at the
+  unchanged My-Chat migration that creates the vector extension.
+- Root cause: the image lacked the migration stream's pgvector prerequisite.
+- Fix / workaround: recreate only the approved temporary container with
+  `pgvector/pgvector:pg16`; no shared database or migration was changed.
+- Prevention: inventory extension requirements before selecting a clean
+  validation image.
+- References: X5 final gate in `04-verification.md`.

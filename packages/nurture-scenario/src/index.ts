@@ -32,5 +32,6 @@ export * from "./domain/institution/family-care-commands.js";
 export * from "./domain/institution/family-care-query.js";
 export * from "./domain/institution/user-attention-activation.js";
 export * from "./institution-surfaces.js";
+export * from "./observability/institution-workflow-telemetry.js";
 export * from "./domain/testing/in-memory-institution-ports.js";
 export type * from "@my-chat/workflow-contracts";

@@ -3,8 +3,36 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-15
-- Current phase: X4/N2 development activation implementation and verification complete; X5 pending
-- Code/config/schema impact: additive vNext manifest/activation factory, strict business-source adapter, refs-only current owner read, service-auth endpoint, and environment secret reference. No Nurture schema/migration or My-Chat runtime table was added.
+- Current phase: X5 joint acceptance complete; pilot enablement remains a separate authorization gate
+- Code/config/schema impact: additive joint acceptance tests, My-Chat technical recovery APIs/repository, and backend-neutral refs-only telemetry. No Nurture or My-Chat schema/migration and no activation flag changed.
+
+## X5 Final Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact revisions and pins | PASS | My-Chat X5 is `0ad5b5753332d5f547968e98735c02bd55476121`; Base/My-Chat shared contract stays `0bd8925e...01aa`; the 25-file Nurture source pin is `e976c235...d193`. Live verification plus all four drift/traversal negative tests pass. |
+| Fresh migrations and drift | PASS | Approved `pgvector/pgvector:pg16` container on `127.0.0.1:55436`; My-Chat `17`, Nurture production `3`, dev-host `1` migrations current; all datasource-to-schema diffs empty. Existing/shared `localhost:5433/nurture` was not connected or changed. |
+| My-Chat full gate | PASS | Full workspace typecheck, ESLint, observability, governance, whitespace, and `79` files / `385` tests with all X2-X5 DB routes enabled. |
+| Nurture full gate | PASS | Typecheck; `175/175` unit; `24/24` production DB; `19/19` dev-host; routing `19/3/8/1`; schema/persistence/X4 replay/observability/pin/whitespace gates pass. |
+| Joint boundary | PASS x3 | Three consecutive two-database runs each prove business commit plus lost response, wrong-Step denial, one authorized same-Step recovery, exact Nurture replay, atomic materialization/completion replay, one owner delivery, and revoke-time fail-closed open. |
+| Catalog ownership | PASS | Nurture production is exactly `43` tables / `71` enums; dev-host is `6/2`; My-Chat contains zero `nurture_*` tables. |
+| Persisted privacy and uniqueness | PASS | Three joint workspaces contain 3 messages, 3 capture Executions with non-empty snapshots, 3 completed Handoffs, and 3 notifications. Duplicate-delivery defects, private body/protected type/claim evidence, forbidden driver fields, and zero-version refs are all `0`. |
+| Architecture/debt review | PASS AFTER REPAIR | Repaired unknown-outcome terminal drift, 0-based-to-positive ref normalization, activation telemetry no-op, source-pin gaps, Admin actor/causation propagation, and shared-Outbox test races. No remaining blocker or important finding. |
+| Cleanup and decision | PASS | Disposable container/data removed and port `55436` free. Capability remains development-only/default-off elsewhere. X5 recommends a separate pilot gate; it does not authorize pilot/staging/production/GA. |
+
+## X5 Pre-Database Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Baseline and routing | PASS AFTER REPAIR | Independent X5 branches start from immutable X4 revisions. The joint suite is an explicit fourth test route (`19` unit files, `3` production DB files, `8` dev-host files, `1` X5 joint file), not an invisible exclusion. |
+| Response-loss recovery | PASS STATIC / DB PENDING | Unknown Nurture handler outcome at exhausted retry budget enters `manual_review_required`; only an authorized workspace-scoped Admin action can grant one additional same-Step attempt. Known terminal failures remain `failed`. |
+| Admin boundary | PASS STATIC / DB PENDING | Admin may reread safe Handoff counts/status, replay an allowlisted failed technical Handoff, stop a requested Handoff, or reconcile the exact outcome-unknown Step. It cannot edit Nurture facts or Handoff payload/refs. Actions use expected versions, idempotency, actor/correlation evidence, and refs-only Outbox signals. |
+| Joint journey | IMPLEMENTED / DB PENDING | One real Nurture DB plus one real My-Chat DB journey covers business commit + response loss, wrong-Step denial, Admin same-Step recovery, exact Nurture replay, atomic materialization/completion replay, idempotent owner delivery, stale open after revoke, and cross-database secret/body probes. |
+| Telemetry/privacy | PASS | Nurture command and My-Chat owner instrumentation records duration, context refs, attempt/replay outcome, LLM-call count, and cache hits through injected sinks. Labels are fixed command/owner/outcome dimensions; tests exclude workspace/run/step/handoff/user IDs, bodies, protected refs, and claim material. Both observability registries verify. |
+| Nurture static gate | PASS | Full typecheck; `175/175` unit tests; production and placeholder dev-host Prisma validation; routing/population, persistence/N1/X4 replay boundaries, exact pin plus 4 negative tests, root lint, context strict, governance, observability, and whitespace checks. |
+| My-Chat static gate | PASS | 17-workspace typecheck, full ESLint, `73` passed files / `359` passed tests with `6` DB files / `26` DB tests skipped, Prisma validation, context strict, governance, observability, and whitespace checks. |
+| Exact pins | PASS IN-PROGRESS | Base/My-Chat contract hash remains `0bd8925e...01aa`; the in-progress Nurture source pin expands from 19 to 25 activation-critical files and is `3f506a17...800b29`. Final My-Chat X5 commit revision remains to be locked after DB closure. |
+| Database mutation | NOT RUN | Existing/shared `localhost:5433/nurture` was not connected or changed. Disposable container, databases, migrations, and X5 DB suites await explicit approval. |
 
 ## X4-C2/N2 Final Gate
 

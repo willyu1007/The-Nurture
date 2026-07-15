@@ -220,6 +220,39 @@ describe("NurtureCommandRunner", () => {
     });
   });
 
+  it("omits a zero-based Nurture aggregate version at the shared Handoff boundary", async () => {
+    const repository = createInMemoryNurtureCommandRepository();
+    const zeroVersionSpec: NurtureCommandSpec<{ value: number }> = {
+      ...spec(() => undefined),
+      apply: async () => ({ output_refs: [outputRef(0)] }),
+      handoff: {
+        capability_key: "test_capability",
+        entrypoint_key: "execute_test",
+        handoff_key: "user_attention",
+        requested_purpose: "user_attention",
+        select_source_context_refs: (_input, outputRefs) => [...outputRefs],
+      },
+    };
+
+    const result = await command(repository, zeroVersionSpec, {
+      handoff_activation: {
+        request_id: "attention-zero-version",
+        driver_context: driver(),
+      },
+    });
+
+    expect(result).toMatchObject({ status: "ok", disposition: "executed" });
+    if (result.status !== "ok") throw new Error("zero-version command did not commit");
+    expect(result.handoff_request_snapshots[0]?.sourceContextRefs).toEqual([
+      {
+        namespace: "nurture",
+        object_type: "test_output",
+        object_id: "output-1",
+        owner_scope: "workspace",
+      },
+    ]);
+  });
+
   it("rejects driver versions, wrong bindings, and activation drift", async () => {
     const repository = createInMemoryNurtureCommandRepository();
     const commandSpec = activationSpec(() => undefined);
