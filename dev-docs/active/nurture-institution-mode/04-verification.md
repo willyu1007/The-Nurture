@@ -30,7 +30,7 @@
 | Security and cohort isolation | NO-GO FOR TRAFFIC | The owner endpoint is service-authenticated and fails closed, but current dev-host workflow/project routes are not production-authenticated. My-Chat activation is environment-global and has no exact workspace allowlist. |
 | Delivery/operations | NO-GO FOR TRAFFIC | My-Chat images build but publication remains gated. Nurture has no packaging service, registered deploy service, or implemented deploy command; metric contracts exist without deployed sinks, dashboards, alerts, named incident owners, or backup/restore evidence. |
 | Recommended decision | PASS | `09-pilot-readiness.md` records GO for Pilot-0 readiness continuation and NO-GO for external traffic, with proposed cohort, IIB, topology, success/stop, and rollback contracts. No runtime/environment mutation was performed. |
-| Pilot-0-B1 cohort lock | PASS | Owner accepted one allowlisted workspace and a progressive single-institution cohort: Pilot-3 synthetic only; Pilot-4A two consenting family child scopes in one care group; Pilot-4B may expand to five through eight scopes only after zero immediate-stop events. No second institution, whole-group default enrollment, or self-service enrollment. |
+| Pilot-0-B1/B2-1 internal cohort and guardian lock | PASS / PREVIOUS B1 SUPERSEDED | Owner replaced the earlier real-cohort shape with one internal synthetic workspace containing three child scopes and three independent families. Guardian accounts are `2 + 1 + 1` across those families; all four identities are distinct, and real Pilot-4 sizing remains open. |
 
 ## X5 Final Gate
 
@@ -235,7 +235,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
-| 2026-07-16 | Pilot-0-B1 accepted-decision sync | PASS | `09-pilot-readiness.md`, overview, plan, roadmap, implementation notes, and this verification record agree on one allowlisted workspace and the progressive 2 then 5–8 child-scope single-institution cohort; later Pilot phases and traffic remain closed. |
+| 2026-07-16 | Revised Pilot-0-B1 and B2-1 accepted-decision sync | PASS | Current SSOT locks three synthetic child scopes, three independent families, and four distinct guardian accounts as `2 + 1 + 1`; real Pilot-4 sizing remains open and the prior B1 shape is explicitly superseded. |
+| 2026-07-16 | Pilot-0-B1 accepted-decision sync | SUPERSEDED | The initial 2 then 5–8 real-cohort shape was validly recorded and then explicitly replaced by the revised B1/B2-1 record. |
 | 2026-07-16 | Pilot-0-B1 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and no new warning; governance lint, strict context verification, exact workflow pin, and `git diff --check` pass. |
 | 2026-07-16 | Cross-repository Pilot-0-A source/runtime/UX/delivery audit | PASS / EXTERNAL TRAFFIC NO-GO | Exact baselines inspected; six P0 and three P1 readiness findings plus the reduced first-pilot capability/data-class scope are recorded in `09-pilot-readiness.md`. |
 | 2026-07-16 | `pnpm verify:workflow-contract-pin` | PASS | Base/My-Chat contract hash remains `0bd8925e...01aa`; Nurture source pin remains `e976c235...d193`. |

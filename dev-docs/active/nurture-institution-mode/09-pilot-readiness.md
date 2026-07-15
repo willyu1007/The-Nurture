@@ -70,22 +70,30 @@ The first pilot must therefore not claim all four roadmap capabilities. Its only
 
 ## Recommended first-pilot slice
 
-### Pilot-0-B1 — cohort nature and staged size (LOCKED)
+### Pilot-0-B1 — internal experiment cohort (LOCKED, REVISED)
 
-The first real observation cohort MUST use one allowlisted My-Chat workspace, one invited institution, and a progressive single-care-group expansion:
+The owner refinement supersedes the earlier proposed 2 then 5–8 real-cohort shape. The first experiment MUST remain internal and use one allowlisted test workspace:
 
-1. Pilot-3 uses internal operators, test accounts, and synthetic data only.
-2. Pilot-4A starts with two explicitly participating families and two corresponding child care processes in one care group. This stage validates consent, child/workspace isolation, owner reread, revoke, and operational safety.
-3. Pilot-4B may expand to five through eight participating child care processes in the same care group only after Pilot-4A completes with no immediate-stop event. This stage validates inbox aggregation and caregiver workflow value.
-4. The pilot MUST NOT add a second institution, default-enroll the whole care group, open self-service enrollment, or include a child scope without the participating guardian's explicit consent.
-5. Child-facing display identity and collected attributes MUST be minimized. The pilot does not require broad child profiles to validate the approved question workflow.
+1. Create one synthetic institution, one synthetic care group, three synthetic child care processes, and three distinct synthetic families. Each child care process has exactly one independent family in this experiment.
+2. One family has two guardian participants; the other two families have one guardian participant each. The experiment therefore uses four distinct guardian identities and four distinct My-Chat test accounts.
+3. The two-guardian family MAY label its internal personas “father” and “mother”, but the domain contract remains two `guardian` role assignments and MUST NOT hard-code one family structure as a product requirement.
+4. One designated primary guardian in each family creates the grant and submits the question. The second guardian in the two-guardian family validates same-family receipt/reply visibility. Every guardian MUST be denied access to the other two families.
+5. All child, family, institution, and message data are synthetic. One internal tester MAY operate multiple personas, but every account, session, command actor, and audit record remains distinct.
+6. This cohort validates structure, isolation, multi-guardian visibility, correct reply routing, per-family revoke, notification, deep link, and owner reread. It does not claim real caregiver-efficiency or institution-value evidence.
+7. The real Pilot-4 cohort size and expansion policy remain uncommitted until the internal experiment passes its stop gates and Pilot-4 receives separate authorization.
+
+### Pilot-0-B2 — role/personnel matrix
+
+- **B2-1 guardian matrix: LOCKED.** Four guardian accounts across three families: `2 + 1 + 1`.
+- **B2-2 institution/caregiver/operator matrix: OPEN.** Administrator, lead caregiver, backup caregiver, and internal technical operator counts and boundaries remain the next decision.
 
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
 | --- | --- |
 | Environment | A new isolated `pilot` environment, separate from current dev, staging, and production. No shared database. |
-| Cohort | **LOCKED by Pilot-0-B1:** one allowlisted workspace; Pilot-3 synthetic rehearsal; Pilot-4A one invited institution/care group with two participating family child scopes; Pilot-4B gated expansion to five through eight scopes in the same group. No second institution, whole-group default enrollment, or self-service enrollment. |
+| Cohort | **LOCKED by revised Pilot-0-B1:** one allowlisted internal test workspace; one synthetic institution/group; three synthetic child scopes and three independent families. Real Pilot-4 cohort sizing remains open. |
+| Guardian matrix | **LOCKED by Pilot-0-B2-1:** one family has two guardians, the other two have one guardian each; four distinct My-Chat test accounts. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -155,7 +163,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort and data-class lock | **In progress — B1 locked** | B1 locks the progressive one-institution cohort at 2 then 5–8 child scopes. B2 role/personnel configuration and later business/data-class decisions remain open. |
+| Pilot-0-B — cohort and data-class lock | **In progress — B1 and B2-1 locked** | B1 locks the three-child/three-family synthetic internal cohort. B2-1 locks the `2 + 1 + 1` guardian matrix. B2-2 staff/operator roles and later business/data-class decisions remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

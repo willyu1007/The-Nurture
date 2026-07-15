@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-16
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-B2 role/personnel configuration after B1 locked the progressive one-institution cohort. Business/data-class, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-B2-2 institution/caregiver/operator configuration after revised B1 locked the three-child/three-family internal cohort and B2-1 locked four guardian accounts in a `2 + 1 + 1` matrix. Real cohort sizing, business/data-class, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 
