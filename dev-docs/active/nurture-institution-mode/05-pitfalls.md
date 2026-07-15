@@ -25,6 +25,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not return revoke/redaction classification before checking whether the current My-Chat actor is an authorized recipient; lifecycle reason is itself sensitive.
 - Do not treat a delivered receipt as permanently delivered for deep-link reads; current recipient opens must also allow the converged read/acknowledged states while rechecking every other gate.
 - Do not install an intentionally standalone package with a parent-workspace-aware pnpm command; use its own lockfile with `--ignore-workspace` and prove the path in a clean checkout.
+- Do not assume a checked-out adjacent repository is typecheck-ready; direct source imports require its workspace install and generated clients in the same clean job.
 
 ## Pitfall log (append-only)
 
@@ -43,6 +44,23 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: clean-checkout validation must assert the requested package's
   dependencies and build output, not accept a successful parent install alone.
 - References: `.github/workflows/ci.yml`, `package.json`, PR #3 run `29419715925`.
+
+### 2026-07-15 — Checked-out My-Chat source lacked its build-time environment
+
+- Symptom: after the standalone template fix, Nurture typecheck and frontend
+  build reported missing My-Chat workspace aliases and `@prisma/client`.
+- Context: the X5 joint acceptance test directly imports pinned My-Chat DB,
+  workflow runtime, and worker source so TypeScript follows that source graph.
+- Root cause: the CI jobs checked out My-Chat but did not install its workspace
+  dependencies or generate its Prisma Client; the local adjacent repo already
+  had both and masked the clean-job requirement.
+- What we tried: reproduced all three repositories in a fresh temporary root,
+  then ran My-Chat frozen install and Prisma generation before Nurture setup.
+- Fix / workaround: prepare exact-revision My-Chat in the two jobs that compile
+  cross-repository source; DB-only jobs remain unchanged and already pass.
+- Prevention: every direct-source cross-repo test must declare checkout,
+  dependency install, generated-code preparation, and typecheck as one gate.
+- References: `.github/workflows/ci.yml`, `packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts`, PR #3 run `29420192609`.
 
 ### 2026-07-15 — Leaking lifecycle classification to an unauthorized opener
 
