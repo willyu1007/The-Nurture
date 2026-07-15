@@ -11,12 +11,19 @@ import {
   expectOk,
   materializeConvexFixture,
   runNodeScript,
+  skipIfScriptsUnavailable,
   scriptPaths,
 } from './convex-fixture.mjs';
 
 export const name = 'database-convex-init-contract-smoke';
 
 export function run(ctx) {
+  const unavailable = skipIfScriptsUnavailable(ctx, name, [
+    'initPipeline',
+    'exampleBlueprint',
+    'convexCtl',
+  ]);
+  if (unavailable) return unavailable;
   const testDir = createTestDir(ctx, name);
   const scripts = scriptPaths(ctx.repoRoot);
   const blueprintRepoRoot = path.join(testDir, 'blueprint-root');

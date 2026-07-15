@@ -353,6 +353,31 @@ describe("N1 family-care Postgres journey", () => {
     });
     expect(JSON.stringify(execution)).not.toContain("claim-token-initial");
     expect(JSON.stringify(execution.handoffDriverRef)).not.toContain("version");
+    await expect(
+      prisma.nurtureCommandExecution.update({
+        where: { id: execution.id },
+        data: {
+          handoffDriverRef: {
+            ...(execution.handoffDriverRef as Record<string, unknown>),
+            version: 2,
+          },
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      prisma.nurtureCommandExecution.update({
+        where: { id: execution.id },
+        data: {
+          handoffRequestSnapshotsPayload: [
+            {
+              ...((execution.handoffRequestSnapshotsPayload as Array<Record<string, unknown>>)[0] ??
+                {}),
+              claimToken: "must-never-persist",
+            },
+          ],
+        },
+      }),
+    ).rejects.toThrow();
 
     const reclaimed = await execute({
       fixture,

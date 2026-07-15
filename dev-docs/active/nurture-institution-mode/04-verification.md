@@ -3,8 +3,8 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-15
-- Current phase: X4-A claimed-Step replay-seed implementation; DB apply approval pending
-- Code/config/schema impact: guarded non-empty command replay seeds and a custom CHECK migration preview; no My-Chat runtime tables, manifest activation, live handoff materialization, or host capability enablement
+- Current phase: X4-A claimed-Step replay-seed complete; X4-B My-Chat bridge ready
+- Code/config/schema impact: guarded non-empty command replay seeds and a custom CHECK migration validated on a disposable DB; no My-Chat runtime tables, manifest activation, live handoff materialization, or host capability enablement
 
 ## X4-A Claimed-Step Replay-Seed Evidence
 
@@ -16,8 +16,11 @@
 | Replay ownership | PASS | Same Step may replay after token/version rotation; another Step is rejected. Stored request/handoff/purpose/expiry drift returns `invalid_stored_handoff_replay_seed` instead of being materialized. |
 | First business slice | PASS | Immediate family input emits exactly one `user_attention` seed referencing the Nurture message, child-link receipt, and care item. Pending-workflow and direct no-activation paths remain explicit-empty. |
 | Unit/type/static gate | PASS | Typecheck, 41 focused tests, all 157 unit tests, X4 migration contract assertion, test routing, both Prisma schema validations, persistence/N1 boundaries, workflow pin plus 4 negative tests, refreshed context checksum/strict verification, project state, governance lint, and whitespace checks pass. |
-| DB migration preview | PASS / NOT APPLIED | Evidence in `artifacts/db/00-connection-check.md` through `02-migration-plan.md`; configured `localhost:5433/nurture` was not connected or mutated. |
-| DB/E2E journey | PENDING APPROVAL | A production-DB test covers canonical seed persistence, claim-secret absence, same-Step reclaim, wrong-Step denial, and single business effect; it must run only after the disposable target migration is approved/applied. |
+| DB migration | PASS | All three migrations applied to approved disposable database `nurture_x4_validation_e7d4590`; `prisma migrate status` is current. Existing `localhost:5433/nurture` was not targeted. |
+| DB/E2E journey | PASS | 23/23 tests cover explicit-empty compatibility, canonical non-empty seed persistence, claim-secret absence, same-Step reclaim, wrong-Step denial, and single business effect. |
+| PostgreSQL constraint | PASS | `ck_nurture_command_execution_handoff_v1` is validated; direct negative updates containing driver `version` or snapshot `claimToken` are rejected. Final probe after repeated suites: 45 Executions, 3 non-empty, 0 forbidden snapshot fields, 0 forbidden driver fields. |
+| Production catalog boundary | PASS | Exact 43 Nurture tables and 71 enums; no My-Chat Workflow runtime table or enum. |
+| DB context/public suite | PASS | `ctl-db-ssot sync-to-context`, strict context verify, and public database suite pass. Optional Convex/init smokes explicitly SKIP because those feature packs are not installed in this repo; applicable repo-prisma smoke remains green. |
 | Activation posture | PASS | Manifest handoff key/source declarations, live claimed-driver bridge, My-Chat owner consumer, and capability enablement remain absent. |
 
 ## X4/N2 Entry Evidence
@@ -31,7 +34,7 @@
 | Pin regression tests | PASS | 4/4 cover ordering/traversal stability, content/path drift, path escape, and exact-revision drift rejection. |
 | Nurture static/unit gate | PASS AFTER REPAIR | Typecheck; 152/152 unit tests; production and placeholder dev-host Prisma validation; persistence and N1 schema boundaries; test routing/population; context strict; governance; and whitespace checks pass. |
 | Local dependency snapshot | PASS AFTER REPAIR | The first run found the pnpm `file:` runtime snapshot missing three new X3 source files. `pnpm install --offline --frozen-lockfile --force` rebuilt `node_modules` without lockfile changes; typecheck and the two previously blocked conformance suites then passed. |
-| Activation posture | PASS | Capability remains unavailable; Nurture still persists explicit `[]` snapshots and no X4 code path is active. |
+| Activation posture | PASS | Capability remains unavailable and all advertised handlers stay explicit-empty. The guarded X4-A command foundation exists but no manifest or live handler can activate it. |
 
 ## N1 Entry Evidence
 

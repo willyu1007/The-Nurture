@@ -18,8 +18,18 @@ This file exists to prevent repeating mistakes within this task.
 - Do not declare institution context resolvers or live manifest handlers before the host registry and DB-backed owner-read path exist; legacy validation will fail or the manifest will advertise a non-functional surface.
 - Do not authorize an item action from an arbitrary current grant; first revalidate the grant identity bound to that item so a replacement grant cannot reactivate old work.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
+- Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 
 ## Pitfall log (append-only)
+
+### 2026-07-15 — Treating absent optional database packs as product-test failures
+
+- Symptom: The required public database suite failed after the X4 PostgreSQL path was fully green because Convex tests tried to copy an absent initializer blueprint and execute an absent `ctl-convex.mjs`.
+- Context: The-Nurture is `repo-prisma`; its checked-in `.ai` assets do not include the optional initialization or Convex-as-SSOT packs, but the public suite enumerated every database smoke unconditionally.
+- Root cause: Test preconditions were implicit, so a missing optional tool surfaced as an unhandled filesystem/module exception instead of a declared unavailable capability.
+- Fix / workaround: Centralize optional script detection and return a named `SKIP` with the exact missing repo-relative assets. Continue running SQLite/repo-prisma checks and fail normally when an installed pack is broken.
+- Prevention: Every public cross-feature smoke must distinguish unavailable optional packs from installed-but-failing packs; only the former may SKIP.
+- References: `.ai/tests/suites/database/convex-fixture.mjs`, public database suite run `20260715-005737-a801ce`.
 
 ### 2026-07-15 — Persisting the transient host driver shape verbatim
 

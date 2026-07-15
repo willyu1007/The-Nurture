@@ -31,4 +31,4 @@ Applying to the existing `localhost:5433/nurture` database requires a separate e
 
 ## Pending execution evidence
 
-`03-execution-log.md` and `04-post-verify.md` will be created only after approval and actual execution. Until then, the database node remains preview-only.
+Approval was granted and this plan was executed against the disposable target. See `03-execution-log.md` and `04-post-verify.md`; the plan remains the historical pre-apply contract.

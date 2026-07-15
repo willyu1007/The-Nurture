@@ -3,11 +3,11 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）/ X4-A claimed-Step replay seed（implementation complete, DB apply pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）/ X4-A claimed-Step replay seed（complete）/ X4-B My-Chat bridge（next）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-15
 - **Owner:** willyu1007
-- **Next step:** Apply the reviewed X4-A constraint migration to a separate disposable PostgreSQL target after explicit approval, run the DB-backed non-empty replay journey, and repair any defects before starting My-Chat X4-B. Manifest activation, notification/deep-link consumption, and the host capability remain disabled.
+- **Next step:** Start My-Chat X4-B from its isolated branch: normalize the live claimed-Step driver to the Base contract, pass it only through the trusted handler bridge, convert returned Nurture snapshots to host handoff drafts, and keep manifest activation plus the development capability disabled until bridge tests pass.
 
 ## N1 Adopted Contract Baseline
 

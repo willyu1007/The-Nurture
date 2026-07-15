@@ -155,6 +155,19 @@ export function scriptPaths(repoRoot) {
   };
 }
 
+export function skipIfScriptsUnavailable(ctx, testName, scriptKeys) {
+  const scripts = scriptPaths(ctx.repoRoot);
+  const missingScripts = scriptKeys
+    .map((key) => scripts[key])
+    .filter((filePath) => !filePath || !fs.existsSync(filePath));
+  if (missingScripts.length === 0) return null;
+  const reason = `optional database feature pack unavailable: ${missingScripts
+    .map((filePath) => path.relative(ctx.repoRoot, filePath))
+    .join(', ')}`;
+  ctx.log(`[${testName}] SKIP (${reason})`);
+  return { name: testName, status: 'SKIP', reason };
+}
+
 export function runNodeScript({ script, args, cwd, evidenceDir, label }) {
   return runCommand({
     cmd: 'node',
