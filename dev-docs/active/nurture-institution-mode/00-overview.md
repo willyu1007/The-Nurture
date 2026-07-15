@@ -3,20 +3,22 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）/ X4-A claimed-Step replay seed（complete）/ X4-B My-Chat bridge（next）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）/ X4-A claimed-Step replay seed（complete）/ X4-B My-Chat bridge（complete）/ X4-C1 Nurture live-handler foundation（complete, unadvertised）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-15
 - **Owner:** willyu1007
-- **Next step:** Start My-Chat X4-B from its isolated branch: normalize the live claimed-Step driver to the Base contract, pass it only through the trusted handler bridge, convert returned Nurture snapshots to host handoff drafts, and keep manifest activation plus the development capability disabled until bridge tests pass.
+- **Next step:** Perform the separate X4-C2 activation-readiness review for the manifest `handoff_key`/context-source declarations and My-Chat development capability. Do not advertise `nurture.capture_family_input` or enable non-empty activation until that review is explicitly approved.
 
-## N1 Adopted Contract Baseline
+## Current Cross-Repo Contract Baseline
 
 - My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
 - My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).
+- My-Chat X4-B runtime implementation revision: `a9685d538ddc320df2dd4ee68a0a65e004f446a0`.
+- My-Chat X4-B final delivery and exact dependency revision: `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; its `packages/` tree is byte-identical to the implementation revision.
 - Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
-- Current activation posture: capability activation and manifest non-empty declarations are disabled. Existing direct/advertised paths remain explicit-empty; X4-A adds only a guarded command-kernel replay-seed path that requires trusted claimed-Step context.
-- Current scenario source pin: `b56ce4d5f0758ecad037cc2ce2c2c4aaa0e67cc08c59f1173b6adcab31567e21` over the X4-A workflow context contract, unchanged YAML manifest/module, and live TypeScript registry.
+- Current activation posture: capability activation and manifest non-empty declarations are disabled. The live-handler foundation is registered in TypeScript but has no manifest entry and no default business-source adapter, so existing advertised paths remain explicit-empty and the new path fails closed.
+- Current scenario source pin: `c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0` over the host composition, workflow context contract, unchanged YAML manifest, handler dependency/implementation/registry surfaces, and module.
 
 ## Goal
 

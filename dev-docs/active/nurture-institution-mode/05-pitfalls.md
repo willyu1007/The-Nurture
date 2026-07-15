@@ -19,8 +19,20 @@ This file exists to prevent repeating mistakes within this task.
 - Do not authorize an item action from an arbitrary current grant; first revalidate the grant identity bound to that item so a replacement grant cannot reactivate old work.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
+- Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
+- Do not let a scenario command-source port supply scope, target refs, or expected versions that Nurture can derive and owner-reread; that creates a second authorization authority.
+- Do not encode the same Nurture business refs into both handoff context and host Step output; keep owner-readable refs in the handoff and expose only opaque execution evidence from the Step.
 
 ## Pitfall log (append-only)
+
+### 2026-07-15 — Letting the handler bridge become a second business authority
+
+- Symptom: The first X4-C1 port draft included primary scope, target refs, expected versions, and ref provenance alongside a command payload, and the handler copied message/receipt/item identities into both the handoff and Step output.
+- Context: My-Chat may prove the claimed Step and materialize drafts, but Nurture alone must resolve business identity, child scope, current target state, and authorization. Host Step output is evidence, not a second business projection.
+- Root cause: The transport bridge was designed from the handler's immediate data needs instead of the repository ownership boundary, allowing technically convenient fields to become competing semantic inputs.
+- Fix / workaround: Shrink the host bridge to transient driver creation and snapshot mapping. Let the scenario-owned source supply only stable request identities plus the current Nurture payload, derive scope inside Nurture, re-run command policy/preconditions, and return only an opaque CommandExecution ref from the Step.
+- Prevention: Review each bridge field by authority: host claim evidence belongs to My-Chat; stable command intent and business payload belong to Nurture; current scope/policy comes from Nurture owner reads; message/receipt/item refs travel once as handoff context.
+- References: `packages/nurture-scenario/src/deps.ts`, `packages/nurture-scenario/src/handlers/family-input-workflow.handler.ts`, `04-verification.md` X4-B/X4-C1 gate.
 
 ### 2026-07-15 — Treating absent optional database packs as product-test failures
 

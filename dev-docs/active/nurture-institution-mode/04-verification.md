@@ -3,8 +3,22 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-15
-- Current phase: X4-A claimed-Step replay-seed complete; X4-B My-Chat bridge ready
-- Code/config/schema impact: guarded non-empty command replay seeds and a custom CHECK migration validated on a disposable DB; no My-Chat runtime tables, manifest activation, live handoff materialization, or host capability enablement
+- Current phase: X4-A claimed-Step replay-seed, X4-B My-Chat bridge, and X4-C1 Nurture live-handler foundation complete; X4-C2 activation review pending
+- Code/config/schema impact: guarded non-empty replay seeds plus a host-injected, manifest-unadvertised handler bridge; no new schema/migration, My-Chat runtime table in Nurture, manifest activation, owner consumer, or host capability enablement
+
+## X4-B/X4-C1 Handler-Bridge Pre-Activation Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Cross-repo baseline | PASS | My-Chat runtime implementation `a9685d538ddc320df2dd4ee68a0a65e004f446a0`; final delivery/exact checkout pin `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; no `packages/` diff between them. Base/My-Chat contract hashes remain `0bd8925e...01aa` path-content and `a97a5b14...e981` logical-source. |
+| Scenario pin | PASS | Expanded eight-file source population hashes to `c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0`; exact pin verifier and all 4 drift/traversal/revision negative tests pass. |
+| Ownership boundary | PASS AFTER REPAIR | My-Chat runtime implementation is host-injected behind a two-operation port; the scenario package has no production runtime dependency. Nurture owns command-source resolution and business execution. Redundant source-port scope/ref/version fields were removed so they cannot become a second provenance or authorization authority. |
+| Stable identity/replay | PASS | Stable invocation/command/handoff IDs come from the scenario source rather than claim/version/current Step. Targeted tests prove same-Step reclaim with rotated token/version returns the same draft and one business effect; a different Step is denied before a second effect. |
+| Output/event boundary | PASS AFTER REPAIR | Step output contains one opaque CommandExecution ref only. Message/receipt/item refs remain owner-readable handoff context refs. Scenario emits no host-standard step/handoff event draft. |
+| Fail-closed activation | PASS | Handler is registered in TypeScript but absent from the manifest; YAML has no `user_attention` handoff declaration; default backend composition injects the technical bridge but no family-input business-source adapter. The path is unadvertised and cannot activate. |
+| Static/unit gate | PASS | Nurture typecheck; 4 focused handler tests; 161/161 unit tests; 27-file routing census; persistence/N1/X4 contract assertions; both Prisma validations; pin, context strict, governance, root lint, public database suite run `20260715-013854-807272`, and whitespace gates pass. |
+| Database regression | PASS | Existing approved production validation DB `nurture_x4_validation_e7d4590` passes 23/23 DB/E2E tests. Disposable dev-host DB `nurture_x4_handler_final_c208e684` received only its existing baseline migration, passed 16/16 tests, and was force-dropped afterward. No schema change was introduced and shared `localhost:5433/nurture` was not targeted. |
+| Architecture review | PASS AFTER REPAIR | Overall activation-foundation risk is medium. No remaining must-fix or should-fix finding after source-authority and duplicate-ref repairs. Manifest/capability/owner-consumer activation remains a separate approval gate. |
 
 ## X4-A Claimed-Step Replay-Seed Evidence
 

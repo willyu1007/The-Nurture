@@ -183,7 +183,9 @@
 | X4-A1 | Complete | Command runner validates trusted driver binding before lookup/transaction, persists bounded refs-only snapshots plus canonical original-Step provenance, preserves direct explicit-empty, and fences replay to the same Step. |
 | X4-A2 | Complete | Custom CHECK migration preview, strict persisted JSON parser, static contract assertion, unit/privacy/replay tests, and DB-backed test case implemented. No database was connected or mutated. |
 | X4-A3 | Complete | Approved disposable database `nurture_x4_validation_e7d4590` is migration-current; 23/23 DB/E2E, 43-table/71-enum boundary, validated CHECK, negative JSON probes, DB context, and public database suite pass. Existing `nurture` was not touched. |
-| X4-B | Ready | My-Chat worker/handler bridge converts the claimed Step into the shared driver context and converts returned snapshots into handoff drafts; capability and manifest activation remain off until its tests pass. |
+| X4-B | Complete | My-Chat worker bridge converts a claimed Step into the Base-shaped transient driver and converts returned snapshots into whitelisted handoff drafts. Runtime implementation `a9685d5`, final delivery/exact pin `26f57be`; 327 non-DB tests and all delivery gates pass with capability disabled. |
+| X4-C1 | Complete | Nurture receives the bridge only through a host-injected port, resolves stable scenario command/request IDs through a scenario-owned source port, replays only on the original Step, returns one opaque CommandExecution output ref, and emits no host-standard event. The handler is registered but absent from the manifest and the default composition has no business-source adapter. |
+| X4-C2 | Pending approval | Add the versioned manifest handoff/context-source declarations, wire the production business-source adapter, and enable `workflow_handoff_materialization_v1` only in the approved development composition. This is a separate activation node, not part of X4-C1. |
 
 **Cross-repo task ownership：**
 

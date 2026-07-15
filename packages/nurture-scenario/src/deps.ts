@@ -1,9 +1,18 @@
-import type { CanonicalRef, DomainContextRef, WorkflowExposureLevel } from "@my-chat/workflow-contracts";
+import type {
+  CanonicalRef,
+  DomainContextRef,
+  ScenarioCommandDriverContext,
+  ScenarioHandoffRequestSnapshot,
+  WorkflowExposureLevel,
+  WorkflowHandoffDraft,
+  WorkflowStepHandlerInput,
+} from "@my-chat/workflow-contracts";
 import type {
   ActivityComparisonDraft,
   NurtureRepositories,
   NurtureWorkflowProject,
 } from "./repositories.js";
+import type { FamilyInputRoutePayload } from "./domain/institution/family-care-transaction.js";
 import {
   createInMemoryInteractionContextRepository,
   createInMemoryInstitutionContextRepository,
@@ -61,10 +70,39 @@ export type NurtureRunContextPort = {
   getStartRequirements(input: { workspace_id: string; run_id: string }): Promise<NurtureRunStartContext | null>;
 };
 
+export type NurtureScenarioCommandBridgePort = {
+  createDriverContext(input: WorkflowStepHandlerInput): ScenarioCommandDriverContext;
+  createHandoffDrafts(
+    snapshots: readonly ScenarioHandoffRequestSnapshot[],
+  ): WorkflowHandoffDraft[];
+};
+
+export type NurtureFamilyInputWorkflowCommand = {
+  invocation_request_id: string;
+  command_request_id: string;
+  handoff_request_id: string;
+  handoff_expires_at?: string;
+  payload: FamilyInputRoutePayload;
+};
+
+export type NurtureFamilyInputWorkflowPort = {
+  resolveCommand(input: {
+    workspace_id: string;
+    run_id: string;
+    step_id: string;
+    actor_id?: string;
+    correlation_id: string;
+  }): Promise<NurtureFamilyInputWorkflowCommand | null>;
+};
+
 export type NurtureHandlerDeps = {
   repositories: NurtureRepositories;
   canonicalResolver: CanonicalObjectResolver;
   runContext: NurtureRunContextPort;
+  /** Host-owned transient bridge; never implemented by scenario business code. */
+  scenarioCommandBridge?: NurtureScenarioCommandBridgePort;
+  /** Scenario-owned resolver for the refs-only workflow command seed. */
+  familyInputWorkflow?: NurtureFamilyInputWorkflowPort;
 };
 
 // ---------------------------------------------------------------------------

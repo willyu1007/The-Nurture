@@ -1,5 +1,7 @@
 import {
   loadWorkflowRegistry,
+  createScenarioCommandDriverContext,
+  createWorkflowHandoffDraftsFromScenarioSnapshots,
   WorkflowCommandService,
   WorkflowQueryService,
   WorkflowWorker,
@@ -50,7 +52,15 @@ export const createNurtureApp = (
   const repositories = createNurtureRepositories(nurturePrisma);
 
   const module = createNurtureScenarioModule({
-    handlerDeps: { repositories, canonicalResolver, runContext },
+    handlerDeps: {
+      repositories,
+      canonicalResolver,
+      runContext,
+      scenarioCommandBridge: {
+        createDriverContext: createScenarioCommandDriverContext,
+        createHandoffDrafts: createWorkflowHandoffDraftsFromScenarioSnapshots,
+      },
+    },
     presenterDeps: { artifacts },
     workerRuntime,
   });

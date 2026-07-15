@@ -3,6 +3,7 @@ export { nurtureScenarioManifest } from "./registry.js";
 export { nurtureActions } from "./actions/shared-actions.js";
 export { nurtureAdapters } from "./adapters/chat-workflow.adapter.js";
 export { nurtureHandlers, createNurtureHandlers } from "./handlers/p0-handlers.js";
+export { makeCaptureFamilyInput } from "./handlers/family-input-workflow.handler.js";
 export { nurturePolicies, createNurturePolicies } from "./policies.js";
 export { nurturePresenters, createNurturePresenters } from "./presenters.js";
 export * from "./repositories.js";

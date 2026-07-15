@@ -21,6 +21,7 @@ import {
   workflowProjectRef,
 } from "../domain/commands/family-strategy.command.js";
 import { readInstitutionSurface, type InstitutionSurfaceKey } from "../institution-surfaces.js";
+import { makeCaptureFamilyInput } from "./family-input-workflow.handler.js";
 
 // ---------------------------------------------------------------------------
 // input-only ref/event/artifact builders (no deps)
@@ -525,6 +526,7 @@ export const createNurtureHandlers = (deps: NurtureHandlerDeps): WorkflowHandler
   "nurture.request_approval": makeRequestApproval(deps),
   "nurture.request_handoff": makeRequestHandoff(deps),
   "nurture.apply_medical_safety_gate": makeApplyMedicalSafetyGate(deps),
+  "nurture.capture_family_input": makeCaptureFamilyInput(deps),
   "nurture.open_class_family_inbox": makeOpenClassFamilyInbox(deps),
   "nurture.open_today_attention_board": makeOpenTodayAttentionBoard(deps),
 });
@@ -541,6 +543,7 @@ export const writeArtifact = makeWriteArtifact(defaultNurtureDeps);
 export const requestApproval = makeRequestApproval(defaultNurtureDeps);
 export const requestHandoff = makeRequestHandoff(defaultNurtureDeps);
 export const applyMedicalSafetyGate = makeApplyMedicalSafetyGate(defaultNurtureDeps);
+export const captureFamilyInput = makeCaptureFamilyInput(defaultNurtureDeps);
 export const openClassFamilyInbox = makeOpenClassFamilyInbox(defaultNurtureDeps);
 export const openTodayAttentionBoard = makeOpenTodayAttentionBoard(defaultNurtureDeps);
 
