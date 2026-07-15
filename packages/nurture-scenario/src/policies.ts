@@ -1,6 +1,7 @@
-import type { WorkflowPolicies } from "@my-chat/workflow-contracts";
+import type { DomainContextRef, WorkflowPolicies } from "@my-chat/workflow-contracts";
 import { defaultNurtureDeps, type NurtureHandlerDeps } from "./deps.js";
 import { nurtureScenarioManifest } from "./registry.js";
+import { NurtureUserAttentionService } from "./domain/institution/user-attention-activation.js";
 
 // Port-derived, FAIL-CLOSED handoff/exposure gates. Caller-supplied bag values
 // (exposure_level, guardian_approval, ...) are UNTRUSTED hints; authoritative
@@ -8,7 +9,11 @@ import { nurtureScenarioManifest } from "./registry.js";
 // resolver miss, or error => false.
 
 const ap = nurtureScenarioManifest.artifact_policy;
-const handoffsByType = new Map(nurtureScenarioManifest.handoffs.map((h) => [h.handoff_type, h]));
+const handoffsByType = new Map(
+  nurtureScenarioManifest.handoffs
+    .filter((handoff) => handoff.materialization_mode === undefined)
+    .map((handoff) => [handoff.handoff_type, handoff]),
+);
 const HANDOFF_BUCKET: Record<string, string> = { public_draft: "public_draft", knowledge_candidate: "indexing", notification: "notification" };
 const EXTERNALIZING = new Set(["public_draft", "knowledge_candidate"]);
 
@@ -93,6 +98,24 @@ export const createNurturePolicies = (deps: NurtureHandlerDeps): WorkflowPolicie
     "nurture.can_create_public_draft_handoff": handoffGate("public_draft", true),
     "nurture.can_create_knowledge_candidate_handoff": handoffGate("knowledge_candidate", true),
     "nurture.can_create_notification_handoff": handoffGate("notification", false),
+    "nurture.can_request_user_attention": async (input) => {
+      if (!deps.repositories.userAttention) return false;
+      const workspaceId = str(input.workspace_id);
+      const sourceRefs = input.source_context_refs;
+      if (!workspaceId || !Array.isArray(sourceRefs)) return false;
+      try {
+        const resolution = await new NurtureUserAttentionService(
+          deps.repositories.userAttention,
+        ).resolve({
+          workspace_id: workspaceId,
+          source_context_refs: sourceRefs as DomainContextRef[],
+          ...(str(input.actor_user_id) ? { actor_user_id: str(input.actor_user_id)! } : {}),
+        });
+        return resolution.status === "ready";
+      } catch {
+        return false;
+      }
+    },
     "nurture.can_expose_artifact": async (input) => {
       const bag = parseBag(input);
       const ws = bag.workspace_id;

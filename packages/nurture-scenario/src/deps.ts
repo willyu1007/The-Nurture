@@ -95,6 +95,26 @@ export type NurtureFamilyInputWorkflowPort = {
   }): Promise<NurtureFamilyInputWorkflowCommand | null>;
 };
 
+/**
+ * Host-owned read of one persisted Run input. The host treats the value as an
+ * opaque scenario payload; parsing and actor binding stay inside Nurture.
+ */
+export type NurtureFamilyInputWorkflowSeedReader = {
+  readSeed(input: {
+    workspace_id: string;
+    run_id: string;
+    step_id: string;
+  }): Promise<unknown | null>;
+};
+
+/** Host-owned conversion from canonical Actor identity to current My-Chat user identity. */
+export type NurtureMyChatActorIdentityReader = {
+  resolveMyChatUserId(input: {
+    workspace_id: string;
+    actor_id: string;
+  }): Promise<string | null>;
+};
+
 export type NurtureHandlerDeps = {
   repositories: NurtureRepositories;
   canonicalResolver: CanonicalObjectResolver;

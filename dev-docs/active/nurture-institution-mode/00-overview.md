@@ -3,11 +3,11 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0 Nurture baseline（merged, fresh-verified, hardened）/ N1 explicit-empty core（complete）/ X4-A claimed-Step replay seed（complete）/ X4-B My-Chat bridge（complete）/ X4-C1 Nurture live-handler foundation（complete, unadvertised）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（implementation and verification complete）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-15
 - **Owner:** willyu1007
-- **Next step:** Perform the separate X4-C2 activation-readiness review for the manifest `handoff_key`/context-source declarations and My-Chat development capability. Do not advertise `nurture.capture_family_input` or enable non-empty activation until that review is explicitly approved.
+- **Next step:** Start X5 joint fault/privacy/telemetry acceptance. Pilot, staging, production, and GA activation remain unauthorized.
 
 ## Current Cross-Repo Contract Baseline
 
@@ -16,10 +16,11 @@
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).
 - My-Chat X4-B runtime implementation revision: `a9685d538ddc320df2dd4ee68a0a65e004f446a0`.
 - My-Chat X4-B final delivery and exact dependency revision: `26f57be9aaee9d20be1a6d83db28f37b8e7fe466`; its `packages/` tree is byte-identical to the implementation revision.
+- My-Chat X4-C2/N2 development-activation revision: `d47929d12e1a3368a99fa24757732988e5072e1e`.
 - Nurture X4-C1 live-handler implementation revision: `2398d98d8860e5f90e6c365e652f40043ce8d82d`.
 - Base/My-Chat logical workflow-contract source hash: `a97a5b149b222e70b5cfb7592414108fa0684887a08b08b3819ce2037577e981`.
-- Current activation posture: capability activation and manifest non-empty declarations are disabled. The live-handler foundation is registered in TypeScript but has no manifest entry and no default business-source adapter, so existing advertised paths remain explicit-empty and the new path fails closed.
-- Current scenario source pin: `c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0` over the host composition, workflow context contract, unchanged YAML manifest, handler dependency/implementation/registry surfaces, and module.
+- Current activation posture: the canonical vNext manifest and explicit activation factory are available only to the reviewed development composition. The default/static module and Nurture dev host remain pre-activation; My-Chat staging and production gates remain false.
+- Current scenario source pin: `1b124cb400e0bb56941308352d8699a6f3768d2e2a2e14edff627eb95ce94d72` over 19 host, manifest, handler/source/policy/module, owner-read, and Nurture repository files.
 
 ## Goal
 

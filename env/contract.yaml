@@ -29,3 +29,9 @@ variables:
     secret: true
     secret_ref: dev_host_database_url
     description: PostgreSQL connection URL for backend-private workflow dev-host schema and migrations.
+  NURTURE_INTERNAL_SERVICE_TOKEN:
+    type: string
+    required: false
+    secret: true
+    secret_ref: nurture_internal_service_token
+    description: Shared service-auth token for refs-only activation owner reads; never persisted or logged.

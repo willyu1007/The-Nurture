@@ -3,6 +3,7 @@ import type { NurtureCommandRepository } from "./domain/commands/command-kernel.
 import type { NurtureInteractionContextRepository } from "./domain/interactions/interaction-context.js";
 import type { NurtureInstitutionContextRepository } from "./domain/institution/institution-context.js";
 import type { NurtureFamilyCareQueryRepository } from "./domain/institution/family-care-query.js";
+import type { NurtureUserAttentionRepository } from "./domain/institution/user-attention-activation.js";
 
 export type NurtureProfileProjection = {
   profile_id: string;
@@ -122,6 +123,8 @@ export type NurtureRepositories = {
   institution?: NurtureInstitutionContextRepository;
   /** N1 safe collection reads; optional for legacy P0 fixtures. */
   familyCareQuery?: NurtureFamilyCareQueryRepository;
+  /** Current owner facts for host activation delivery and deep-link reopen. */
+  userAttention?: NurtureUserAttentionRepository;
   profiles: NurtureProfileRepository;
   activityComparisons: ActivityComparisonRepository;
   evidence: NurtureEvidenceRepository;
@@ -133,6 +136,7 @@ export const repositoryTokens = {
   interactions: "nurture.repositories.interactions",
   institution: "nurture.repositories.institution",
   familyCareQuery: "nurture.repositories.family_care_query",
+  userAttention: "nurture.repositories.user_attention",
   profiles: "nurture.repositories.profiles",
   activityComparisons: "nurture.repositories.activity_comparisons",
   evidence: "nurture.repositories.evidence",

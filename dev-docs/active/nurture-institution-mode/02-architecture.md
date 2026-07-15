@@ -453,3 +453,39 @@ IIA-0-C1 locks the first-slice capability contract. The four capability keys bel
 | 儿童数据曝光半径过大 | 高 | 授权按 child process / enrollment / care group；所有跨角色流动留 receipt。 |
 | 价值观漂移到排名/市场 | 中 | 硬反指标；运营质量复盘不等于公开排名或绩效竞争。 |
 | 同意撤销与保留语义不清 | 中 | 上线前定 revoke 语义和保留窗口；fail-closed。 |
+
+## 13. X4/N2 Development Activation Boundary
+
+The canonical Nurture manifest now declares one activation-only entrypoint,
+`class_family_inbox/capture_family_input`, and one `user_attention` Handoff.
+The source contract is exact: one `family_care_message`, one
+`child_link_receipt`, and one `family_care_item`, with no Workflow Artifact or
+business body in the draft.
+
+Activation is not the default module behavior. `nurturePreActivationScenarioModule`,
+the compatibility `nurtureScenarioModule`, `createNurtureScenarioModule`, and
+the local dev host all use the derived pre-activation manifest. Only
+`createNurtureActivationScenarioModule` advertises vNext, and its type requires
+the My-Chat materializing runtime, claimed-Step bridge, and Nurture production
+family-input source.
+
+The source adapter accepts one opaque claimed-Step requirement from My-Chat,
+parses an exact version-1 schema, resolves the durable Run Actor through current
+My-Chat membership, maps the resulting user to exactly one active Nurture
+participant, and then invokes the existing Nurture command runner. The command
+runner remains the authority for role, child scope, care group, enrollment,
+grant, target, versions, and business effects.
+
+The post-commit owner endpoint is service-authenticated and refs-only. It selects
+no message body, attachment, child display name, or item detail. Every delivery
+and deep-link open rereads message/receipt/item links plus current grant,
+enrollment, thread, care group, institution, and recipient role assignments.
+Unauthorized actors are rejected before redaction/revoke classification to
+avoid lifecycle reason disclosure.
+
+My-Chat owns Step/Handoff/Outbox/notification/delivery and mobile routing;
+Nurture owns every business fact and policy result. There is no distributed
+transaction. Response loss is recovered by the original Step's B2 replay seed;
+same-Step reclaim may rotate claim evidence, while another Step cannot acquire
+the seed. X5 remains responsible for the full combined failure matrix and pilot
+decision.

@@ -3,8 +3,25 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-15
-- Current phase: X4-A claimed-Step replay-seed, X4-B My-Chat bridge, and X4-C1 Nurture live-handler foundation complete; X4-C2 activation review pending
-- Code/config/schema impact: guarded non-empty replay seeds plus a host-injected, manifest-unadvertised handler bridge; no new schema/migration, My-Chat runtime table in Nurture, manifest activation, owner consumer, or host capability enablement
+- Current phase: X4/N2 development activation implementation and verification complete; X5 pending
+- Code/config/schema impact: additive vNext manifest/activation factory, strict business-source adapter, refs-only current owner read, service-auth endpoint, and environment secret reference. No Nurture schema/migration or My-Chat runtime table was added.
+
+## X4-C2/N2 Final Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact cross-repo pin | PASS | My-Chat revision `d47929d12e1a3368a99fa24757732988e5072e1e`; Base/My-Chat contract hash remains `0bd8925e...01aa`; logical source remains `a97a5b14...e981`; 19-file Nurture source hash is `1b124cb4...d72`. |
+| Manifest/module gate | PASS | Canonical vNext manifest declares one exact Handoff and activation entrypoint. Default/static/factory dev-host paths remain pre-activation. Only the activation factory can advertise vNext and it requires materialization + bridge + source ports. |
+| Source/identity gate | PASS AFTER REPAIR | Exact versioned seed parser rejects bodies, unknown keys, pending routes, invalid refs, and claim fields. Durable Run Actor maps through active My-Chat membership to exactly one active Nurture participant; command preconditions recheck role/scope/grant. |
+| Owner/current-state gate | PASS AFTER REPAIR | Owner rereads message/receipt/item/grant/enrollment/thread/group/institution/recipient roles and selects no business body. Unauthorized actor is classified before revoke/redaction; delivered/read/acknowledged receipt states support current opens. |
+| Service boundary | PASS | Missing token returns disabled; wrong token returns unauthorized; valid service token reaches refs-only owner read. 3/3 endpoint auth E2E tests pass. |
+| Static/unit | PASS | Typecheck and 173/173 unit tests; routing/population, X4 replay, persistence, N1 schema, both Prisma validations, environment contract, context strict, governance, pin, negative pin, and whitespace gates pass. |
+| Production DB | PASS | Three migrations current, drift empty, Prisma valid, 24/24 DB/E2E, exact 43 tables/71 enums, no My-Chat runtime tables. |
+| Dev-host DB | PASS | One private migration current, drift empty, Prisma valid, 19/19 DB/E2E, exact 6 tables/2 enums. |
+| Privacy probe | PASS | Final DB population: 46 Executions, 2 non-empty snapshot rows, 0 persisted `claimToken`, `claim_token`, or `expectedStepVersion` fields in snapshots/driver refs. |
+| My-Chat host journey | PASS | 23/23 X2/X3/X4 DB/worker tests: Step claim/complete atomically materializes one Handoff/Outbox, owner creates one idempotent notification/delivery, current open resolves ready, simulated revoke resolves unavailable. |
+| Cleanup | PASS | `institution-x4-validation-postgres` and anonymous data removed; loopback port 55435 free. No existing/shared DB used. |
+| Architecture review | PASS AFTER REPAIR | No remaining blocker/important finding in X4 scope. X5 owns combined failure/privacy/telemetry and pilot decision. |
 
 ## X4-B/X4-C1 Handler-Bridge Pre-Activation Gate
 

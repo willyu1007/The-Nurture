@@ -11,6 +11,7 @@ import {
   familyCareRef,
   hashCommandRequestId,
   makeCaptureFamilyInput,
+  nurturePreActivationScenarioManifest,
   nurtureScenarioManifest,
   type FamilyCareCurrentGrant,
   type FamilyInputRouteFacts,
@@ -82,7 +83,7 @@ const handlerInput = (
   contract_hash: "a".repeat(64),
   meta: {
     workspace_id: "workspace-1",
-    actor_id: "my-chat-user-1",
+    actor_id: "actor-1",
     idempotency_key: "run-1:step-1",
     correlation_id: "correlation-1",
     client_surface: "worker_runtime",
@@ -257,18 +258,27 @@ describe("claimed-Step family input workflow handler", () => {
     expect(harness.routeEffects).toBe(0);
   });
 
-  it("keeps the registered handler unreachable while manifest activation is absent", () => {
+  it("keeps pre-activation unreachable while the canonical activation manifest declares it", () => {
     const harness = makeHarness();
     const handlers = createNurtureHandlers(harness.deps);
-    const declaredHandlerKeys = nurtureScenarioManifest.capabilities.flatMap((capability) =>
+    const preActivationHandlerKeys = nurturePreActivationScenarioManifest.capabilities.flatMap((capability) =>
+      capability.entrypoints.flatMap((entrypoint) =>
+        entrypoint.steps.map((step) => step.handler_key),
+      ),
+    );
+    const activationHandlerKeys = nurtureScenarioManifest.capabilities.flatMap((capability) =>
       capability.entrypoints.flatMap((entrypoint) =>
         entrypoint.steps.map((step) => step.handler_key),
       ),
     );
 
     expect(handlers["nurture.capture_family_input"]).toBeTypeOf("function");
-    expect(declaredHandlerKeys).not.toContain("nurture.capture_family_input");
-    expect(nurtureScenarioManifest.handoffs).not.toEqual(
+    expect(preActivationHandlerKeys).not.toContain("nurture.capture_family_input");
+    expect(nurturePreActivationScenarioManifest.handoffs).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ handoff_key: "user_attention" })]),
+    );
+    expect(activationHandlerKeys).toContain("nurture.capture_family_input");
+    expect(nurtureScenarioManifest.handoffs).toEqual(
       expect.arrayContaining([expect.objectContaining({ handoff_key: "user_attention" })]),
     );
   });

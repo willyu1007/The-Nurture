@@ -1,4 +1,4 @@
-import type { WorkflowInternalApiRegistry } from "@my-chat/workflow-contracts";
+import type { DomainContextRef, WorkflowInternalApiRegistry } from "@my-chat/workflow-contracts";
 import type { NurtureHandlerDeps } from "./deps.js";
 import { NurtureInteractionContextService } from "./domain/interactions/interaction-context.js";
 import {
@@ -10,6 +10,10 @@ import {
   NurtureInstitutionResolver,
   type NurtureStructuredInteraction,
 } from "./domain/institution/institution-resolver.js";
+import {
+  NurtureUserAttentionService,
+  type NurtureUserAttentionResolution,
+} from "./domain/institution/user-attention-activation.js";
 
 export type InstitutionSurfaceKey = "class_family_inbox" | "teacher_attention_board";
 
@@ -227,6 +231,26 @@ const readString = (payload: unknown, key: string): string | undefined => {
   return typeof value === "string" ? value : undefined;
 };
 
+const readArray = (payload: unknown, key: string): unknown[] | undefined => {
+  if (!payload || typeof payload !== "object") return undefined;
+  const value = (payload as Record<string, unknown>)[key];
+  return Array.isArray(value) ? value : undefined;
+};
+
+export const resolveNurtureUserAttention = async (
+  deps: NurtureHandlerDeps,
+  input: {
+    workspace_id: string;
+    source_context_refs: readonly DomainContextRef[];
+    actor_user_id?: string;
+  },
+): Promise<NurtureUserAttentionResolution> => {
+  if (!deps.repositories.userAttention) {
+    return { status: "stopped", reason_code: "target_unavailable" };
+  }
+  return new NurtureUserAttentionService(deps.repositories.userAttention).resolve(input);
+};
+
 export const createInstitutionInternalApiHandlers = (
   deps: NurtureHandlerDeps,
 ): WorkflowInternalApiRegistry => ({
@@ -249,4 +273,17 @@ export const createInstitutionInternalApiHandlers = (
       on_date: readString(input.payload, "on_date"),
       limit: readNumber(input.payload, "limit"),
     }),
+  "nurture.internal.resolve_user_attention": (input) => {
+    const sourceRefs = readArray(input.payload, "source_context_refs");
+    if (!sourceRefs) {
+      return Promise.resolve({ status: "stopped", reason_code: "policy_blocked" });
+    }
+    return resolveNurtureUserAttention(deps, {
+      workspace_id: input.meta.workspace_id,
+      source_context_refs: sourceRefs as DomainContextRef[],
+      ...(readString(input.payload, "actor_user_id")
+        ? { actor_user_id: readString(input.payload, "actor_user_id")! }
+        : {}),
+    });
+  },
 });

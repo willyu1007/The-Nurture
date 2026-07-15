@@ -22,8 +22,41 @@ This file exists to prevent repeating mistakes within this task.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
 - Do not let a scenario command-source port supply scope, target refs, or expected versions that Nurture can derive and owner-reread; that creates a second authorization authority.
 - Do not encode the same Nurture business refs into both handoff context and host Step output; keep owner-readable refs in the handoff and expose only opaque execution evidence from the Step.
+- Do not return revoke/redaction classification before checking whether the current My-Chat actor is an authorized recipient; lifecycle reason is itself sensitive.
+- Do not treat a delivered receipt as permanently delivered for deep-link reads; current recipient opens must also allow the converged read/acknowledged states while rechecking every other gate.
 
 ## Pitfall log (append-only)
+
+### 2026-07-15 — Leaking lifecycle classification to an unauthorized opener
+
+- Symptom: the first owner-read ordering could return `source_redacted` or
+  `grant_revoked` before proving that `actor_user_id` was a current recipient.
+- Context: My-Chat deep links are authenticated, but a guessed Handoff ID must
+  not reveal whether a private family item was redacted or its grant revoked.
+- Root cause: business lifecycle checks were ordered before target
+  authorization because the asynchronous delivery path has no actor.
+- Fix / workaround: compute current recipients first and return generic target
+  unavailable for a non-recipient; only an authorized actor may reach current
+  redaction/revoke/policy classification. My-Chat renders all stopped results as
+  one generic unavailable message.
+- Prevention: reason-code reviews must treat classification as data exposure,
+  not only the referenced content body.
+- References: `packages/nurture-scenario/src/domain/institution/user-attention-activation.ts`.
+
+### 2026-07-15 — Requiring exactly delivered broke legitimate later opens
+
+- Symptom: the owner could create the notification while the receipt was
+  `delivered`, but a later deep-link open failed after the same receipt became
+  `read` or `acknowledged`.
+- Context: the first delivery decision and a current actor open have different
+  lifecycle predicates but share all grant/source/scope gates.
+- Root cause: one receipt-status predicate was reused for both operations.
+- Fix / workaround: owner delivery still requires exactly `delivered`; an
+  authenticated current recipient open allows `delivered`, `read`, or
+  `acknowledged` and reruns every other owner gate.
+- Prevention: include post-delivery state transitions in current-open contract
+  tests, not only delivery-time tests.
+- References: `packages/nurture-scenario/src/domain/institution/user-attention-activation.ts`.
 
 ### 2026-07-15 — Letting the handler bridge become a second business authority
 

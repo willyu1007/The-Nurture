@@ -41,10 +41,10 @@ P0 workflows:
 
 N1 institution owner-read workflows:
 
-- `class_family_inbox` / `open_class_family_inbox`
+- `class_family_inbox` / `open_class_family_inbox` / `capture_family_input`
 - `teacher_attention_board` / `open_today_attention_board`
 
-The N1 institution workflows resolve the current Nurture participant, role, and care-group scope on every read. Their direct surface handlers return display-safe items and opaque refs only. Their durable workflow handlers emit safe summary artifacts and an explicit empty `handoff_drafts` list.
+The N1 institution workflows resolve the current Nurture participant, role, and care-group scope on every read. Their direct surface handlers return display-safe items and opaque refs only. Existing owner-read workflow handlers remain explicit-empty. The activation-only `capture_family_input` Step may emit one refs-only `user_attention` draft only when the host loads the vNext manifest with `workflow_handoff_materialization_v1` enabled.
 
 ## Object And Profile Rules
 
@@ -85,11 +85,13 @@ Nurture family-care communication is Nurture-owned when the conversation is crea
 
 Handoff payloads are refs-only.
 
-N1 institution activation remains disabled in the advertised runtime: direct commands store `handoffRequestSnapshotsPayload=[]`, and inbox/attention workflow handlers return `handoff_drafts=[]`. X4-A adds the guarded command-kernel replay seed. My-Chat X4-B supplies one host-owned transient driver/snapshot bridge. The Nurture X4 handler foundation registers `nurture.capture_family_input` in code and the dev host injects that bridge, but the manifest still declares no capture Step, non-empty handoff key/source path, or required host capability. The scenario command-source port is also intentionally absent from default/dev composition. Therefore the handler remains unreachable and fails closed if called directly.
+The canonical vNext manifest declares `capture_family_input` and one `user_attention` handoff with `workflow_step_complete_v1` materialization. Its source contract is exactly one `family_care_message`, `child_link_receipt`, and `family_care_item`, with no artifact refs. This declaration is not a global enablement: `nurtureScenarioModule`, `createNurtureScenarioModule`, and the local dev host use the derived pre-activation manifest. Only `createNurtureActivationScenarioModule` exposes vNext and its constructor requires a materializing host runtime, the claimed-Step bridge, and the production family-input source port.
 
 The transient driver is validated before command identity lookup or mutation. Nurture persists only a canonical `host.workflow/workflow_step` ref bound to the `nurture` consumer; claim token and Step version are neither hashed nor stored. Same-Step reclaim may rotate that evidence, but another Step cannot replay the seed. Snapshot contents are bounded refs-only values over the Nurture-owned message, receipt, and item; downstream content still requires current owner reread.
 
-The live handler receives two explicit ports. A host-injected bridge derives `ScenarioCommandDriverContext` from the already claimed Step and maps the returned immutable snapshots to host drafts. A scenario-owned command-source port resolves the current family-input payload plus stable invocation, command, and handoff request IDs. The IDs do not come from claim/version evidence: same-Step reclaim reuses the Execution, while another Step presenting the same command ID is rejected by the persisted original-Step provenance before a second business effect. The handler emits no host-standard event and exposes only an opaque Nurture CommandExecution ref as Step output; message, receipt, and item remain owner-readable context refs inside the handoff draft.
+The live handler receives two explicit ports. A host-injected bridge derives `ScenarioCommandDriverContext` from the already claimed Step and maps returned immutable snapshots to host drafts. A scenario-owned command-source adapter parses one opaque persisted Run requirement and resolves stable invocation, command, and handoff request IDs. Before participant lookup, the host must map the Run's canonical Actor to an active My-Chat user through current workspace membership; the queue cannot supply this identity. The IDs do not come from claim/version evidence: same-Step reclaim reuses the Execution, while another Step presenting the same command ID is rejected by persisted original-Step provenance before a second business effect. The handler emits no host-standard event and exposes only an opaque Nurture CommandExecution ref as Step output; message, receipt, and item remain owner-readable context refs inside the handoff draft.
+
+The `user_attention` owner endpoint is service-authenticated and returns only current My-Chat recipient IDs plus fixed generic display text. It rereads message, receipt, item, grant, enrollment, thread membership, care group, institution, and recipient role state. My-Chat owns the Handoff Ledger, notification idempotency, Outbox, and deep-link shell. Opening a deep link repeats the Ledger and Nurture owner reads for the authenticated user; stale notification content is never treated as authorization.
 
 - `public_draft` -> `my_chat.forum`
 - `knowledge_candidate` -> `my_chat.knowledge_base`
@@ -122,7 +124,8 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
 - Shared surfaces consume only standard workflow refs and safe artifact previews.
 - Institution inbox/attention surfaces call Nurture owner-read handlers and receive only safe labels, generic badges, aggregate versions, and opaque item refs; My-Chat must not branch on Nurture business lifecycle values.
 - Institution owner reads re-resolve current participant/role/care-group scope and recheck enrollment, thread membership, the item-linked grant, source lifecycle, and redaction before every display.
-- Advertised institution workflow handlers remain explicit-empty until the X4 manifest/bridge/consumer path is enabled behind the My-Chat host capability gate. The dormant X4-A command foundation is not evidence that activation is enabled.
+- The default/dev scenario module remains pre-activation. The canonical vNext manifest may be loaded only through `createNurtureActivationScenarioModule` and only when the My-Chat development composition advertises `workflow_handoff_materialization_v1` and provides the claimed requirement, Actor-to-user, bridge, and materializing runtime ports.
+- `NURTURE_INTERNAL_SERVICE_TOKEN` is configured on both sides of the owner-read boundary; absence disables activation owner reads and never falls back to an unauthenticated route.
 - Shared mobile/chat/dashboard surfaces do not become the canonical source for Nurture family-care messages or care items.
 - Health safety policies are tested before pregnancy or care-plan workflows are enabled.
 - DB namespace, migrations, indexes, rollback/export, and seed-data boundaries are reviewed before cloud apply.

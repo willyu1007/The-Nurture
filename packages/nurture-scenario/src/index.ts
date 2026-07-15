@@ -1,9 +1,20 @@
-export { nurtureScenarioModule, createNurtureScenarioModule, type NurtureScenarioModuleDeps } from "./module.js";
-export { nurtureScenarioManifest } from "./registry.js";
+export {
+  nurtureScenarioModule,
+  nurturePreActivationScenarioModule,
+  createNurtureScenarioModule,
+  createNurtureActivationScenarioModule,
+  type NurtureScenarioModuleDeps,
+  type NurtureActivationScenarioModuleDeps,
+} from "./module.js";
+export {
+  nurtureScenarioManifest,
+  nurturePreActivationScenarioManifest,
+} from "./registry.js";
 export { nurtureActions } from "./actions/shared-actions.js";
 export { nurtureAdapters } from "./adapters/chat-workflow.adapter.js";
 export { nurtureHandlers, createNurtureHandlers } from "./handlers/p0-handlers.js";
 export { makeCaptureFamilyInput } from "./handlers/family-input-workflow.handler.js";
+export * from "./family-input-workflow-source.js";
 export { nurturePolicies, createNurturePolicies } from "./policies.js";
 export { nurturePresenters, createNurturePresenters } from "./presenters.js";
 export * from "./repositories.js";
@@ -19,6 +30,7 @@ export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/family-care-commands.js";
 export * from "./domain/institution/family-care-query.js";
+export * from "./domain/institution/user-attention-activation.js";
 export * from "./institution-surfaces.js";
 export * from "./domain/testing/in-memory-institution-ports.js";
 export type * from "@my-chat/workflow-contracts";

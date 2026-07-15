@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "26f57be9aaee9d20be1a6d83db28f37b8e7fe466",
+    "revision": "d47929d12e1a3368a99fa24757732988e5072e1e",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -41,14 +41,25 @@
     "contractRoot": ".",
     "contractPaths": [
       "apps/backend/src/app.ts",
+      "apps/backend/src/main.ts",
+      "apps/backend/src/server.ts",
       "docs/context/workflow/nurture-scenario-contract.md",
+      "packages/nurture-db/src/index.ts",
+      "packages/nurture-db/src/repositories/port-repositories.ts",
+      "packages/nurture-db/src/repositories/user-attention.repository.ts",
       "packages/nurture-scenario/scenario.manifest.yaml",
       "packages/nurture-scenario/src/deps.ts",
+      "packages/nurture-scenario/src/domain/institution/user-attention-activation.ts",
+      "packages/nurture-scenario/src/family-input-workflow-source.ts",
       "packages/nurture-scenario/src/handlers/family-input-workflow.handler.ts",
       "packages/nurture-scenario/src/handlers/p0-handlers.ts",
+      "packages/nurture-scenario/src/index.ts",
+      "packages/nurture-scenario/src/institution-surfaces.ts",
       "packages/nurture-scenario/src/module.ts",
-      "packages/nurture-scenario/src/registry.ts"
+      "packages/nurture-scenario/src/policies.ts",
+      "packages/nurture-scenario/src/registry.ts",
+      "packages/nurture-scenario/src/repositories.ts"
     ],
-    "contractSha256": "c208e684a2d314f0b1332e6bdc7c261836b8aeaef00fdc39487e7b6d202aa2d0"
+    "contractSha256": "1b124cb400e0bb56941308352d8699a6f3768d2e2a2e14edff627eb95ce94d72"
   }
 }

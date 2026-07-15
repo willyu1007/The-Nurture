@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   NurtureCommandRunner,
   NurtureInstitutionWorkQueryService,
+  NurtureUserAttentionService,
   acknowledgeFamilyCareItemSpec,
   cancelFamilyCareRouteSpec,
   familyCareRef,
@@ -497,6 +498,44 @@ describe("N1 family-care Postgres journey", () => {
       surface: "mobile_dashboard",
     });
     expect(afterRevoke).toMatchObject({ status: "ready", items: [] });
+  });
+
+  it("rereads current user-attention recipients and closes access after grant revoke", async () => {
+    const fixture = await seedFixture();
+    const captured = await capture(fixture, randomUUID());
+    const repository = repositories.userAttention;
+    expect(repository).toBeDefined();
+    const owner = new NurtureUserAttentionService(repository!);
+    const source_context_refs = [
+      familyCareRef("family_care_message", captured.message.id, 1),
+      familyCareRef("child_link_receipt", captured.receipt.id, 1),
+      familyCareRef("family_care_item", captured.item.id, 1),
+    ];
+
+    await expect(
+      owner.resolve({ workspace_id: fixture.workspaceId, source_context_refs }),
+    ).resolves.toMatchObject({
+      status: "ready",
+      recipient_user_ids: [fixture.caregiver.myChatUserId],
+    });
+
+    await execute({
+      fixture,
+      spec: revokeFamilyCareGrantSpec,
+      payload: {
+        participant_id: fixture.guardian.id,
+        role_assignment_id: fixture.guardianRole.id,
+        grant_id: fixture.grant.id,
+        expected_version: 0,
+        reason_code: "user_revoked",
+      },
+      command_request_id: `owner-revoke:${fixture.grant.id}`,
+      actor_id: fixture.guardian.id,
+    });
+
+    await expect(
+      owner.resolve({ workspace_id: fixture.workspaceId, source_context_refs }),
+    ).resolves.toEqual({ status: "stopped", reason_code: "grant_revoked" });
   });
 
   it("acknowledges and writes a caregiver-confirmed family reply in the same private thread", async () => {

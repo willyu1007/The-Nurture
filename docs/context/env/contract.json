@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-07-13T00:34:31Z",
+  "generated_at_utc": "2026-07-15T02:56:21Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -59,6 +59,23 @@
       "secret_ref": "dev_host_database_url",
       "state": "active",
       "type": "url"
+    },
+    "NURTURE_INTERNAL_SERVICE_TOKEN": {
+      "default": null,
+      "deprecate_after": null,
+      "description": "Shared service-auth token for refs-only activation owner reads; never persisted or logged.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": true,
+      "secret_ref": "nurture_internal_service_token",
+      "state": "active",
+      "type": "string"
     },
     "PORT": {
       "default": 8000,
