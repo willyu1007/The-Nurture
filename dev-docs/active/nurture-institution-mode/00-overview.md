@@ -3,11 +3,11 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 joint acceptance（complete）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 joint acceptance（complete）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-15
+- **Updated:** 2026-07-16
 - **Owner:** willyu1007
-- **Next step:** Decide whether to authorize a separate pilot-enablement node. X5 recommends pilot readiness, but pilot, staging, production, and GA remain disabled until an explicit enablement decision and rollout gate.
+- **Next step:** Complete Pilot-0 by locking the pilot cohort, IIB UX gaps, delivery/environment prerequisites, success/stop criteria, and rollback evidence. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

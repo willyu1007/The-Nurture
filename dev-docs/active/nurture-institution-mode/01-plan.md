@@ -199,6 +199,18 @@
 | X5-D | Complete | Three clean isolated databases received the 17/3/1 migration streams with no drift; full suites and three consecutive joint runs pass; the disposable container was removed and port `55436` released. |
 | X5-E | Complete | Dual-repo review repaired outcome-unknown handling, version normalization, telemetry composition, Outbox test isolation, source-pin coverage, and Admin actor/causation evidence. Exact revisions/hashes are locked; pilot is recommended but not enabled. |
 
+**Pilot Enablement checkpoints（2026-07-16）：**
+
+| Checkpoint | Status | Scope / exit evidence |
+| --- | --- | --- |
+| Pilot-0 | Authorized / In progress | Readiness and scope lock only: identify the pilot institution/workspace/cohort, roles and data classes; audit IIB teacher/guardian UX gaps; choose the delivery/environment shape; define observation duration, success/stop criteria, privacy ownership, and rollback evidence. No runtime or environment enablement is authorized. |
+| Pilot-1 | Not authorized | Prepare an isolated pilot environment only after Pilot-0 acceptance: exact revisions/hashes, database and backup/restore plan, service-token scope, artifact provenance, and secret handling. ACR becomes a prerequisite here only if the approved pilot deployment uses the current container publication path. |
+| Pilot-2 | Not authorized | Enable the activation composition and `workflow_handoff_materialization_v1` only for an explicit workspace allowlist; all other workspaces and staging/production remain default-off. |
+| Pilot-3 | Not authorized | Rehearse response loss, same-Step reclaim, wrong-Step denial, revoke/redaction/cancel, dead-letter/Admin recovery, stale deep links, owner outage, capability kill-switch, credential rotation, and database recovery in the approved pilot topology. |
+| Pilot-4 | Not authorized | Run the bounded observation window, review latency/errors/retries/LLM/cache/manual-work/privacy evidence, rehearse rollback, and make an explicit continue/expand/stop decision. It cannot authorize staging, production, or GA. |
+
+The 2026-07-16 approval opens only Pilot-0 inside the existing T-002 task bundle. Any database apply, ACR publication, repository/environment secret configuration, capability or manifest-composition change, external pilot traffic, or Pilot-1 through Pilot-4 entry requires a new explicit approval. Pilot rollback remains capability/activation deactivation and must not rewrite committed Nurture business facts.
+
 X5 acceptance matrix (each row must have deterministic evidence; adjacent single-repo tests may support but cannot replace the joint boundary where noted):
 
 - business commit success and worker response loss;
