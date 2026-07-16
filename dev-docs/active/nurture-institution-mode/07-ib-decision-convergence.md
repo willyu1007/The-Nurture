@@ -48,7 +48,7 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08; surface/action entitlement, key layering, operator separation, and exact domain mappings refined through Pilot-0-B3-1d-2 on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-08; B3-1 surface/action/key/operator/reason/adoption refinements complete on 2026-07-16.
 
 **Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
@@ -74,6 +74,9 @@ Rules:
 - Guardian enrollment confirmation, initial grant confirmation, grant replacement, and revoke remain separate actions/commands. Institution initiation alone never binds a family or creates consent; grant replacement creates new identity and never revives a revoked grant.
 - Institution topology uses explicit create/update/suspend/resume/close actions rather than generic upsert/change-state. Adult invitation remains My-Chat identity-owned until accepted, after which an owner callback binds the canonical user into Nurture before separate role assignment.
 - Pilot business disable/recovery reuses care-group suspend/resume and does not create a second Nurture enablement aggregate; My-Chat capability/workspace allowlist remain separate technical gates.
+- Domain-action availability exposes only the locked safe reason vocabulary plus scenario-owned `safe_label`/`safe_help`; internal command/database/provider errors are not client reason codes. Confirmation is a separate `explicit` or `strong_authorization` class and never cached authorization.
+- Cross-surface entity actions require optional additive Base `domain_action_contracts` and a separate handler registry. Missing handlers or invalid target/surface/confirmation declarations are fatal; current Run-level `scenario_actions` and legacy manifests retain their existing semantics.
+- Contract adoption remains Base -> My-Chat -> Nurture with capability disabled. Nurture advertises an action only after authenticated handler, current owner presenter, command path, and negative tests exist.
 - `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.
 - Notification and deep link are transitions into an entitled surface, not independent role surfaces or authorization sources.
 - If multiple roles/scopes are possible and the target does not disambiguate them, Nurture should ask for clarification or return safe scenario-level output rather than defaulting to the broadest role.

@@ -158,6 +158,17 @@ Pilot-0-B3-1d-2 exact domain-action refinement:
 - Scoped Pilot business disable/recovery uses `suspend_care_group` / `resume_care_group`; no scenario-local Pilot enablement aggregate is added. Environment capability and workspace allowlist remain My-Chat technical gates.
 - The new keys are reserved design contracts, not implemented claims. Direct fixture provisioning MAY prepare the internal synthetic institution/group before traffic but MUST NOT substitute for authenticated owner commands once user-operable onboarding begins.
 
+Pilot-0-B3-1d-3 availability and adoption refinement:
+
+- Domain-action `safe_reason_code` is limited to `available`, `not_implemented`, `capability_disabled`, `surface_not_entitled`, `actor_not_entitled`, `scope_unavailable`, `target_unavailable`, `state_not_actionable`, `target_changed`, `enrollment_inactive`, `grant_missing`, `grant_revoked`, `policy_blocked`, `operator_not_authorized`, `technical_state_not_recoverable`, `owner_unavailable`, and `temporarily_unavailable`.
+- Nurture owns `safe_label` and optional `safe_help`; My-Chat renders the generic availability/confirmation state without interpreting scenario semantics. Availability is not authorization and every command reruns current resolution/preconditions.
+- `confirmation_class` is independent and limited to `explicit` or `strong_authorization`. Confirmation requirements MUST NOT be encoded as reason codes or inferred from surface/action labels.
+- Internal participant/role failures map to `actor_not_entitled`; family/child/group/thread reachability maps to `scope_unavailable`; missing/redacted targets map to `target_unavailable`; lifecycle conflicts map to `state_not_actionable`; version conflicts map to `target_changed`; data-class/direction mismatch maps to `policy_blocked`; contention maps to `temporarily_unavailable`.
+- `not_implemented` is readiness/dev-only for known actions absent from the active registry. A `domain_action_contracts` declaration without a valid handler is fatal and MUST NOT fall back to runtime `not_implemented`.
+- Base adds optional additive `domain_action_contracts` plus separate availability/command/handler contracts. Validators reject duplicate/reserved keys, missing handlers, invalid target/surface/confirmation declarations, and Run-action handler reuse while preserving legacy fixtures.
+- My-Chat adopts the exact Base revision and generic routing/renderer/registry with capability off. Nurture adopts only after authenticated handlers, current owner presenters, commands, and wrong-surface/role/scope/version/grant/admin/raw-id/owner-outage/privacy negative tests pass.
+- Adoption order is Base -> My-Chat -> Nurture. No simultaneous switch, legacy reinterpretation, or traffic/capability enablement is allowed during contract adoption.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
