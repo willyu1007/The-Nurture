@@ -236,6 +236,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-16 | Pilot-0-B3-1b documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |
+| 2026-07-16 | Pilot-0-B3-1b Caregiver action matrix accepted-decision sync | PASS | SSOT locks generic AI Chat plus teacher-board acknowledge/reply closure, transient protected owner-read detail, no implicit acknowledge, caregiver-confirmed authorship, complete board history, and explicit exclusions. B3-1c-d remain open; no source/schema/manifest/environment change. |
 | 2026-07-16 | Pilot-0-B3-1a documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |
 | 2026-07-16 | Pilot-0-B3-1a Guardian action matrix accepted-decision sync | PASS | SSOT locks generic AI Chat plus family board/workbench action availability, three-surface reachability for core Guardian rights, immutable submitted questions, conditional pending cancellation, no `primary_guardian` role, and current implementation gaps. B3-1b-d remain open; no source/schema/manifest/environment change. |
 | 2026-07-16 | Pilot-0-B3-0 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |

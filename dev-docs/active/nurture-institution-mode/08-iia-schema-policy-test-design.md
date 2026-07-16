@@ -105,6 +105,17 @@ Pilot-0-B3-1a Guardian action refinement:
 - `cancel_route` is action-available only for a current cancellable pending Receipt. An immediate-only Pilot route may expose no cancellation affordance.
 - The Pilot's designated primary/secondary guardian script does not create a `primary_guardian` role or client-side permission rule; action availability always comes from current Nurture facts and policy.
 
+Pilot-0-B3-1b Caregiver action refinement:
+
+- Caregiver Chat remains the generic My-Chat AI/interaction harness, while the teacher board is the complete Nurture work surface. Both MUST close acknowledge/reply without a caregiver domain-workbench fallback.
+- Chat timeline and activation payloads remain display-safe. Protected family-question bodies are loaded by opaque ref from Nurture into a transient detail surface after current owner reread and MUST NOT be persisted as My-Chat Chat messages, interaction history, projections, or logs.
+- Item open is read-only and does not imply Nurture acknowledgment. Host notification read/unread remains separate. `nurture.family_care.acknowledge_item` requires an explicit current caregiver confirmation and command precondition recheck.
+- AI MAY produce an explicitly unconfirmed, non-diagnostic, non-prescriptive response draft from currently authorized Nurture context. Only a caregiver-confirmed `nurture.family_care.reply_item` action may create a named caregiver-authored family-facing message.
+- Teacher board MUST include complete authorized open/acknowledged/replied/blocked-or-revoked/redacted-or-suppressed history with child, care-group, status, and time filters because no Caregiver domain workbench exists. Redacted/suppressed rows expose only display-safe state or tombstone metadata, never protected bodies.
+- Caregiver-authored replies are immutable after commit. Redaction follows current author/policy checks; in-place edit, automatic reopen, second reply, and correction remain outside Pilot-0 and require a later explicit command contract.
+- Direct family Chat, bulk actions, clarification loops, daily-care outcomes, grant/enrollment/topology administration, cross-care-group work, reassignment, and duty handoff are unavailable in the first internal experiment.
+- Final acknowledge/reply/redaction commands MUST fail closed after revoke, source redaction, enrollment/role change, item-version conflict, or policy change. A draft or alternate surface is not authorization.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
