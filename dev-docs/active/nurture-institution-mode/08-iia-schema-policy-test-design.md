@@ -126,6 +126,16 @@ Pilot-0-B3-1c Institution action refinement:
 - Suspend/close/disable transitions preserve canonical and audit facts; recovery is a separate revalidated command, not a blind toggle. No Institution surface hard-deletes topology or controls My-Chat capability, allowlist, Workflow Run/Step/Handoff/Outbox, notification, or technical recovery.
 - Operational aggregates MUST NOT become child ranking, cross-group comparison, public caregiver scoring, or competitive institution ranking. The synthetic direct-Prisma fixture remains test preparation and cannot substitute for authenticated owner commands.
 
+Pilot-0-B3-1d-0 action-key layering refinement:
+
+- The canonical cross-surface product identity is `(scenario_key, action_key)`. Nurture action keys use stable `snake_case`; the same business intent keeps one key across Chat, role boards, and domain workbenches.
+- Nurture `command_key` is the immutable dotted `CommandExecution` contract. Existing keys `nurture.family_care.capture_and_route`, `nurture.family_care.revoke_grant`, `nurture.family_care.acknowledge_item`, `nurture.family_care.reply_item`, `nurture.family_care.redact_message`, and `nurture.family_care.cancel_route` keep their persisted names and MUST NOT be renamed or duplicated to match UI labels.
+- Workflow `entrypoint_key` starts a workflow definition; `handler_key` binds implementation. Neither value is the product action identity, and direct entity actions MUST NOT create synthetic Runs solely to fit an entrypoint API.
+- Product action key, surface, opaque target ref, expected version, and confirmation state remain untrusted until Nurture re-resolves actor, entitlement, role/scope, grant, policy, lifecycle, and current version.
+- Read/search/navigation/selection/AI-draft/preview/detail-open interactions are non-durable and MUST NOT create a `CommandExecution` or fake durable action.
+- The existing manifest `action_availability.scenario_actions` contract is Workflow Run/Step-shaped. Message/Grant/Item/Enrollment actions MUST NOT be added there or reinterpret the four legacy scenario-action handlers. Cross-surface domain actions require an additive contract/registry.
+- My-Chat Admin recovery actions remain Host-owned and MUST NOT become Nurture action or command keys. B3-1d-1 separately decides their operator entitlement and safe exposure.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

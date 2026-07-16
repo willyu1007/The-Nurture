@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; decisions through B3-1c locked
+- **Current checkpoint:** Pilot-0-B in progress; decisions through B3-1d-0 locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -103,7 +103,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
-| B3-1 action availability by surface | **IN PROGRESS — B3-1a/B3-1b/B3-1c LOCKED** | Guardian, Caregiver, and Institution matrices are locked; technical-operator and exact action-key mappings remain open. |
+| B3-1 action availability by surface | **IN PROGRESS — THROUGH B3-1d-0 LOCKED** | Guardian, Caregiver, and Institution matrices plus action-key layering are locked; operator permissions, remaining exact mappings, and unavailable reasons remain open. |
 | B3-2 cross-surface continuity | OPEN | Transition, opaque token, notification/deep-link, and owner-reread rules. |
 | B3-3 business path and data envelope | OPEN | Exact `family_care_question` fields, exclusions, grant directions, and lifecycle. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
@@ -140,7 +140,7 @@ The B3-0 readiness decision changes no manifest or runtime. B3-1 and later imple
 | B3-1a Guardian action matrix | **LOCKED** | Guardian Chat, family board, and family workbench action availability. |
 | B3-1b Caregiver action matrix | **LOCKED** | Caregiver Chat and teacher-board reads, acknowledge, reply, redaction, history, and prohibited actions. |
 | B3-1c Institution action matrix | **LOCKED** | Institution-board/workbench topology, enrollment, disablement, and content-exposure boundaries. |
-| B3-1d Technical/operator and action-key mapping | OPEN | Host recovery actions plus exact manifest/API/command keys and unavailable reasons. |
+| B3-1d Technical/operator and action-key mapping | **IN PROGRESS — B3-1d-0 LOCKED** | Key layering and six existing family-care mappings are locked; operator permissions, remaining domain actions, and unavailable reasons remain open. |
 
 #### Pilot-0-B3-1a — Guardian action matrix (LOCKED)
 
@@ -257,6 +257,43 @@ The first internal Institution path is deliberately small: inspect the one synth
 
 The B3-1c product contract is ahead of current implementation. Current topology and account setup are produced by direct Prisma fixtures in tests; there is no complete authenticated Institution board/workbench or user-operable onboarding/control plane that closes these actions through Nurture commands and the coordinated My-Chat identity flow. Those gaps must close before Pilot traffic; B3-1c authorizes no source, schema, manifest, environment, capability, or activation change.
 
+#### Pilot-0-B3-1d — technical operator and exact action-key mapping
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| B3-1d-0 key layers and compatibility boundary | **LOCKED** | Stable product `action_key`, Nurture `command_key`, implementation `handler_key`, Workflow `entrypoint_key`, and legacy Run-action separation. |
+| B3-1d-1 technical-operator permission matrix | OPEN | Exact evidence, recovery, owner-reevaluation, kill-switch, and prohibited actions. |
+| B3-1d-2 remaining exact domain-action mapping | OPEN | Guardian grant creation/replacement and Institution topology/onboarding command mappings. |
+| B3-1d-3 unavailable reasons and implementation gate | OPEN | Stable safe reason vocabulary, additive contract adoption, and negative coverage. |
+
+**Pilot-0-B3-1d-0 — key layers and compatibility boundary (LOCKED)**
+
+The canonical product action identity is `(scenario_key, action_key)`. For Nurture, `scenario_key` is `nurture` and `action_key` uses stable `snake_case`. The same business intent uses the same action key across every entitled surface; UI labels, layout, and confirmation components are presentation, not separate action identities.
+
+| Locked `action_key` | Workflow entrypoint/handler when applicable | Existing authoritative `command_key` | Current implementation fact |
+| --- | --- | --- | --- |
+| `submit_family_care_question` | `capture_family_input` / `nurture.capture_family_input` | `nurture.family_care.capture_and_route` | Activation-only handler and command exist; generic surface-action wiring does not. |
+| `revoke_child_link_grant` | Direct domain action; handler not implemented | `nurture.family_care.revoke_grant` | Command spec/transaction exist; authenticated surface action does not. |
+| `acknowledge_family_care_item` | Direct domain action; handler not implemented | `nurture.family_care.acknowledge_item` | Command spec/transaction exist; authenticated surface action does not. |
+| `reply_family_care_item` | Direct domain action; handler not implemented | `nurture.family_care.reply_item` | Command spec/transaction exist; authenticated surface action does not. |
+| `redact_family_care_message` | Direct domain action; handler not implemented | `nurture.family_care.redact_message` | Command spec/transaction exist; authenticated surface action does not. |
+| `cancel_family_care_route` | Direct domain action; handler not implemented | `nurture.family_care.cancel_route` | Command spec/transaction exist; authenticated surface action does not. |
+
+The key-layer boundary is exact:
+
+1. `action_key` names a scenario product intent and MAY be returned by Chat/board/workbench presenters with an opaque target ref, expected version, confirmation class, and safe availability reason. The action key is not a command receipt or authorization result.
+2. Every render and execution MUST re-resolve current actor, surface entitlement, role, work/child scope, target, grant, policy, lifecycle, and expected version. Client-supplied action keys, surfaces, refs, or confirmation state cannot bypass owner checks.
+3. `command_key` identifies one immutable Nurture `CommandExecution` contract and uses a versioned dotted namespace. Existing committed/replayable command keys MUST NOT be renamed or aliased to a second implementation merely to match product labels.
+4. One durable product action normally maps to one independently atomic command. An explicit orchestrator MAY derive stable child command identities only when one invocation intentionally commits multiple independent commands; multiple rows written by one transaction remain one command.
+5. `entrypoint_key` starts a Workflow definition and `handler_key` binds an implementation. Neither is a user-facing action identity. A direct domain action does not require a synthetic Workflow Run solely to fit an entrypoint-shaped API.
+6. Read, search, navigation, target selection, AI drafting, preview, and opening a detail are non-durable interactions and MUST NOT create `CommandExecution` rows or fake durable action keys.
+7. The current manifest `action_availability.scenario_actions` is a legacy Workflow Run action registry: its handler contract requires Run/Step context and returns Run state. B3 domain-object actions MUST NOT be appended there or reinterpret its four existing keys as Message/Grant/Item/Enrollment actions.
+8. Cross-surface domain-action advertisement requires an additive contract/registry that carries scenario/action identity, target-ref class, confirmation requirement, allowed surface class, and handler binding without transferring Nurture authorization to My-Chat. The exact additive schema is an implementation design task, not permission to mutate Base/My-Chat/Nurture contracts in Pilot-0.
+9. My-Chat technical Admin recovery actions are Host-owned operations and MUST NOT appear in the Nurture scenario action registry or become Nurture `command_key` values. B3-1d-1 decides their exact operator exposure.
+10. Unavailable reason codes describe current safe presentation only. They never become cached authorization, command identity, or permission for an alternate surface to execute the action.
+
+The current contract gap is explicit: My-Chat and Base have Run-level action contracts, while My-Chat does not yet provide a general scenario-produced domain-action delivery/execution registry for generic Chat and role boards. Nurture has no authenticated direct action handlers for the five direct mappings above and no manifest/API shape for the accepted cross-surface domain actions. B3-1d-0 locks naming and compatibility only; the lock changes no manifest, runtime, schema, environment, capability, or activation.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -269,6 +306,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Guardian action availability | **LOCKED by Pilot-0-B3-1a:** core rights are reachable from all three Guardian surfaces through generic Chat interactions or dedicated board/workbench UX, while all writes converge on Nurture commands. |
 | Caregiver action availability | **LOCKED by Pilot-0-B3-1b:** generic Chat and teacher board both close acknowledge/reply; protected bodies use transient owner-read detail; teacher board owns complete authorized work history; direct family Chat and bulk/multi-caregiver actions are excluded. |
 | Institution action availability | **LOCKED by Pilot-0-B3-1c:** the institution board is read-only safe aggregate/navigation; the institution workbench owns strongly confirmed Nurture topology/configuration commands; Guardian authority, protected family content, caregiver actions, technical runtime controls, destructive deletion, and ranking remain unavailable. |
+| Action-key layering | **LOCKED by Pilot-0-B3-1d-0:** product action, Nurture command, Workflow entrypoint, implementation handler, and Host Admin recovery remain separate; six existing family-care mappings are stable, and current Run-level `scenario_actions` is not repurposed for domain objects. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -338,7 +376,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-1c locked** | B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a/B3-1b/B3-1c lock Guardian/Caregiver/Institution actions. B3-1d, B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-1d-0 locked** | B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a/B3-1b/B3-1c lock role action matrices; B3-1d-0 locks key layering. B3-1d-1 through B3-1d-3, B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

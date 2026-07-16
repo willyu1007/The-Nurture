@@ -236,6 +236,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-16 | Pilot-0-B3-1d-0 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |
+| 2026-07-16 | Pilot-0-B3-1d-0 key-layering accepted-decision sync | PASS | SSOT separates product action, Nurture command, Workflow entrypoint, implementation handler, and Host Admin recovery; preserves six existing family-care command mappings; and forbids repurposing Run-level `scenario_actions`. B3-1d-1 through B3-1d-3 remain open; no source/schema/manifest/environment change. |
 | 2026-07-16 | Pilot-0-B3-1c documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |
 | 2026-07-16 | Pilot-0-B3-1c Institution action matrix accepted-decision sync | PASS | SSOT locks a read-only safe-aggregate Institution board and a strongly confirmed Nurture-command workbench; identity invitation, Guardian/grant authority, protected content, caregiver actions, technical controls, destructive deletion, and ranking boundaries remain separated. B3-1d remains open; no source/schema/manifest/environment change. |
 | 2026-07-16 | Pilot-0-B3-1b documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |

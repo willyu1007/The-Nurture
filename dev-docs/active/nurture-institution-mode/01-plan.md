@@ -216,7 +216,7 @@ Pilot-0 detailed evidence and recommendations are canonical in `09-pilot-readine
 | Pilot-0 checkpoint | Status | Exit |
 | --- | --- | --- |
 | Pilot-0-A baseline/actual-capability audit | Complete | Exact cross-repo baseline and contract/source hashes pass; actual runtime, UX, provisioning, delivery, security, and observability gaps are classified. |
-| Pilot-0-B cohort/role/surface/data lock | In progress — through B3-1c locked | Revised B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a/B3-1b/B3-1c lock Guardian/Caregiver/Institution actions across their entitled surfaces. B3-1d and B3-2 through B3-4 remain open. |
+| Pilot-0-B cohort/role/surface/data lock | In progress — through B3-1d-0 locked | Revised B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a/B3-1b/B3-1c lock role action matrices; B3-1d-0 locks key layering and six existing family-care mappings. B3-1d-1 through B3-1d-3 and B3-2 through B3-4 remain open. |
 | Pilot-0-C IIB/onboarding contract | Proposed | Accept the minimum authenticated guardian, caregiver, institution-admin, grant/revoke, acknowledge/reply, and receipt UX closure. |
 | Pilot-0-D topology/operations contract | Proposed | Accept the isolated environment, exact scenario artifact, two-key workspace gate, observation, stop, recovery, and rollback terms. |
 | Pilot-0-E Go/No-Go review | Pending | Assign implementation owners and review all evidence. Pilot-1 remains separately authorized. |
