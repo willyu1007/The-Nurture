@@ -257,6 +257,15 @@ Key constraints:
 - Index: `(workspaceId, grantedToScopeType, grantedToScopeId, status)`.
 - Grant resolution must check direction, data class, enrollment, scope, status, and time window.
 
+Pilot-0-B3-3b profile refinement:
+
+- The first Pilot uses one Grant identity for the complete question round trip: exact child process and current enrollment; target `care_group` with the enrollment's current group; directions `family_to_org` and `org_to_family`; only `family_care_question`; purpose `family_care_workflow`; expiry at the earlier of 30 days after effectiveness or the workspace allowlist expiry.
+- The `org_to_family` direction is valid only for a caregiver-confirmed reply causally linked to the original Grant-bound question item. The profile grants no proactive institution message, broadcast, daily-care share, or other data class.
+- At most one active Grant may exist for the exact workspace/child/enrollment/care-group/purpose binding. Exact re-confirmation is idempotent; a changed definition creates a replacement identity and atomically moves the old Grant to `replaced`.
+- Capture, acknowledge, and reply use the exact original `grantId`. A replacement cannot satisfy an old item's direction check or revive its lifecycle.
+- The granting participant must be a current same-family Guardian. Pilot institution, caregiver, and technical roles cannot grant. Only the granting participant may replace/revoke; another current same-family Guardian may author a new question and read committed family-visible facts but cannot administer the Grant or redact another author's message.
+- Pilot Grant expiry is mandatory, with no auto-renew or reactivation. Loss of the granting participant's current Guardian eligibility blocks new cross-role use and does not transfer ownership.
+
 Runtime revoke requirements:
 
 - Revoke must emit a Nurture domain event, for example `NurtureChildLinkGrantRevoked`, with `grantId`, `childCareProcessId`, `enrollmentId`, `revokedAt`, and grant aggregate version.

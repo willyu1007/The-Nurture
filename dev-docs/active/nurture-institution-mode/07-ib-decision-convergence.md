@@ -152,7 +152,7 @@ Implementation implication:
 
 ## IB-D4 — `NurtureChildLinkGrant` Revoke and Retention
 
-**Convergence status:** LOCKED on 2026-07-06.
+**Convergence status:** LOCKED on 2026-07-06; first Pilot identity/authority profile refined by Pilot-0-B3-3b on 2026-07-16.
 
 **Default:** Revoke is a runtime fence, not a historical eraser.
 
@@ -171,6 +171,7 @@ Rules:
 - Pending cross-role deliveries become `blocked` with reason `grant_revoked`.
 - Running steps that are internal institution care records may continue only if they no longer require cross-role delivery or revoked family context. Running steps that deliver, summarize, or reuse revoked-grant context must stop or be re-planned without that context.
 - Opened-but-not-submitted UI actions must re-resolve the grant at submit time. Draft replies, shares, and AI summaries created before revoke cannot be sent after revoke unless another active grant permits it.
+- Pilot-0 is stricter for `family_care_question`: capture, acknowledge, and reply remain bound to the exact original `grantId`. A replacement/new Grant never permits an old question to continue or revive.
 
 ### 3. Active surface and context exit
 
@@ -198,6 +199,13 @@ Production gate:
 - Numeric retention windows, deletion jobs, and legal copy remain rollout gates.
 - The schema must store `retentionPolicyPayload` and enough timestamps/statuses to apply those rules later.
 - IIA implementation must add tests for in-flight workflow cancellation/suppression, pending outbox blocking, context-pack invalidation, and retry/replay grant re-checks.
+
+Pilot-0 grant identity and authority refinement:
+
+- One active bidirectional Grant covers one exact child/current-enrollment/current-care-group `family_care_question` round trip with purpose `family_care_workflow` and mandatory expiry bounded by 30 days and the allowlist.
+- One exact binding has at most one active Grant. Exact confirmation is `already_satisfied`; changed definition atomically creates a replacement identity; revoked/expired/replaced identities never reactivate.
+- The scripted primary Guardian is the Grant owner, not a separate role. Same-family current Guardians may author questions and read committed family-visible facts under the Grant; only the granting participant may replace/revoke. Message redaction remains author-only.
+- Institution admin, caregiver, and technical operator cannot administer a family Grant. Grant-owner role loss fails closed for new cross-role use and never transfers authority implicitly.
 
 ## IB-D5 — Data Class and Category Vocabulary
 

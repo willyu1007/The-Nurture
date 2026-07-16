@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; B3-3a first business input/data envelope locked
+- **Current checkpoint:** Pilot-0-B in progress; B3-3a/b input envelope and Grant/family authority locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -105,7 +105,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
 | B3-2 cross-surface continuity | **LOCKED / COMPLETE** | B3-2a-d lock transition/destination, opaque tokens, notification/deep-link stale handling, and draft/result/history continuity. |
-| B3-3 business path and data envelope | **IN PROGRESS — B3-3a LOCKED** | First input/data envelope is locked; grant/family authority, target scope, lifecycle, and failure/privacy behavior remain B3-3b-d. |
+| B3-3 business path and data envelope | **IN PROGRESS — B3-3a/B3-3b LOCKED** | First input/data envelope plus Grant/family authority/target scope are locked; lifecycle and failure/privacy behavior remain B3-3c/d. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
 
 #### Pilot-0-B3-0 — role and surface entitlement (LOCKED)
@@ -614,7 +614,7 @@ Current foundations support the direction: Nurture CommandExecution already stor
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | B3-3a first input and data envelope | **LOCKED** | Exact first data class, fixed routing/classification fields, body envelope, exclusions, trusted derivation, and additive Pilot profile gate. |
-| B3-3b grant, family authority, and target scope | OPEN | Directions, grant identity/owner, second-guardian rights, exact enrollment/care-group target, expiry, and revoke authority. |
+| B3-3b grant, family authority, and target scope | **LOCKED** | One exact bidirectional Grant, active uniqueness, original-Grant lifecycle binding, owner/second-Guardian rights, care-group target, expiry, and revoke authority. |
 | B3-3c Message/Receipt/Item lifecycle | OPEN | Atomic capture, acknowledgment, reply, terminal-for-Pilot state, and family-visible outcomes. |
 | B3-3d replay, revoke, redaction, and failure/privacy behavior | OPEN | Command identities, response loss, stale actions, withdrawal/tombstones, notification independence, and fail-closed negative matrix. |
 
@@ -654,6 +654,61 @@ The Pilot profile is additive over the reusable domain kernel:
 
 Current implementation already proves the wider `family_care_question` immediate path with `today_attention`, acknowledgment/reply flags, protected refs, Message/Receipt/Item/attention creation, and exact command replay. The authenticated user-facing adapter and narrow Pilot body/profile contract remain absent: generic payload validation still accepts broader classes/categories/urgencies, up to ten attachments, multiple source values, and `pending_workflow`, while body length is outside the refs-only command. B3-3a therefore closes planning only and records an implementation gate without changing source, schema, manifest, route, runtime, environment, capability, provider, or traffic.
 
+**Pilot-0-B3-3b — Grant, family authority, and target scope (LOCKED)**
+
+The complete first-Pilot question round trip uses one Nurture-owned active Grant. Separate `family_to_org` and `org_to_family` Grant identities are forbidden because partial replacement/revoke and repository selection would create two authorization tracks for one business conversation.
+
+The exact Grant profile is:
+
+| Grant field | Pilot value / rule |
+| --- | --- |
+| `workspaceId` | Exact allowlisted Pilot workspace. |
+| `childCareProcessId` | Exact selected child process. |
+| `enrollmentId` | Exact current active enrollment. |
+| `grantedToScopeType` | Fixed `care_group`. |
+| `grantedToScopeId` | Current care group referenced by the enrollment. |
+| `directions` | Exactly `[family_to_org, org_to_family]`. |
+| `dataClasses` | Exactly `[family_care_question]`. |
+| `purposes` | Exactly `[family_care_workflow]`. |
+| `grantedByParticipantId` | Current same-family Guardian who explicitly confirms the Grant. |
+| `effectiveFrom` | Confirmation commit time. |
+| `expiresAt` | Required: earlier of `effectiveFrom + 30 days` or exact Pilot workspace allowlist expiry. |
+| `status` | `active` after first successful confirmation; no automatic renewal/reactivation. |
+
+The `care_group` target does not broaden the child scope. Every grant remains bound to the exact child and enrollment; the target only identifies the caregiver work scope allowed to receive that child's question. Institution-wide and enrollment-target Pilot variants are rejected. The `org_to_family` direction authorizes only one caregiver-confirmed reply causally linked to a source Item created under the same Grant. The direction does not authorize institution-initiated messages, broadcast, daily-care sharing, clarification loops, media, or another data class.
+
+Active identity is deterministic:
+
+1. At most one active Grant may exist for `(workspace, child process, enrollment, care group, family_care_workflow)`.
+2. Reconfirming the exact same definition returns `already_satisfied` and creates no new row/effect.
+3. Changing target, direction, data class, purpose, or expiry requires `replace_child_link_grant` with the current expected version. One transaction marks the old identity `replaced` and creates the new active Grant.
+4. `revoked`, `expired`, and `replaced` identities never return to active. Expiry has no implicit renewal; a later authorization uses a new identity.
+5. Overlapping active creation/replacement races fail deterministically. Repository resolution MUST NOT depend on `findFirst` ordering among multiple matching active rows.
+
+One question is permanently bound to its original Grant:
+
+```text
+capture question -> acknowledge item -> caregiver reply
+                     same original grantId
+```
+
+Capture stores the original `grantId`. Acknowledge and reply reload that exact row and recheck status, version, time window, enrollment, care-group target, both required directions, data class, purpose, Grant-owner eligibility, actor role/scope, and current policy. Revoke, expiry, replacement, owner-role loss, target/enrollment drift, or mismatch blocks the old item. A replacement Grant applies only to newly submitted questions and cannot take ownership of, resume, or deliver an old question.
+
+Guardian authority is separate from family-visible business facts:
+
+| Action | Grant owner | Another current same-family Guardian |
+| --- | --- | --- |
+| View current Grant scope/state | Allowed | Allowed. |
+| View currently authorized committed question/Receipt/ack/reply | Allowed | Allowed. |
+| Author a new question under the active family Grant | Allowed | Allowed; not required by the first scripted evidence. |
+| Replace or revoke the Grant | Allowed with current expected version and confirmation | Not allowed. |
+| Redact a submitted question | Own messages only | Own messages only. |
+| Read or act on another family | Never | Never. |
+
+The designated primary Guardian remains a Pilot script assignment, not a `primary_guardian` role. The second Guardian validates same-family committed visibility while retaining a distinct My-Chat identity, Nurture participant, session, authorship, and audit trail. Institution administrator, caregiver, and technical operator cannot confirm, replace, revoke, transfer, or directly edit a family Grant. If the granting participant loses current Guardian eligibility, new cross-role use fails closed; no role or operator inherits ownership, and a future current Guardian must complete a separately authorized new-Grant flow.
+
+Current schema supports a bidirectional Grant and the revoke transaction already verifies that the actor owns the Grant. Product implementation remains incomplete: confirm/replace handlers and authenticated surfaces are absent; there is no enforced active-binding uniqueness; general `currentGrant` lookup can select among overlaps by `findFirst`; and caregiver reply currently may resolve another matching `org_to_family` Grant instead of the Item's original Grant. These gaps must be repaired with transactional concurrency/negative tests before Pilot traffic. B3-3b changes no source, schema, migration, manifest, runtime, environment, capability, provider, or traffic.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -676,6 +731,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Draft/result/history continuity | **LOCKED by Pilot-0-B3-2d:** drafts stay actor/surface-local with explicit stay/discard; committed results use Execution replay/current owner reread; history is queried at role-correct surfaces; only route class + current/recent/history follows navigation. B3-2 is complete. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Input/data envelope | **LOCKED by Pilot-0-B3-3a:** 1–2000-character protected plain-text question/reply only; fixed question/today-attention/immediate/ack/reply/empty-attachment profile; generic summary; owner-derived refs; no health/emergency/media/daily-care/constraint/follow-up/rich-text/batch input. |
+| Grant/family authority/target | **LOCKED by Pilot-0-B3-3b:** one active exact child/enrollment/care-group Grant with both directions, question-only data class, bounded expiry, owner-only administration, same-family visibility, and original-`grantId` capture/ack/reply binding; replacement never revives an old item. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
 | Observation window | Five consecutive operating days after Pilot-3 rehearsal passes. Extend only by explicit Pilot-4 decision. |
 
@@ -743,7 +799,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3a locked** | B1/B2/B3-0/B3-1, B3-2a-d, and the first B3-3 input/data envelope are locked. B3-3b-d grant/lifecycle/failure-privacy and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3a/b locked** | B1/B2/B3-0/B3-1, B3-2a-d, and B3-3a/b input/Grant-family authority are locked. B3-3c lifecycle, B3-3d failure/privacy, and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

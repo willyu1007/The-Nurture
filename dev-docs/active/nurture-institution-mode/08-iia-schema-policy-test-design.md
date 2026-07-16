@@ -226,6 +226,18 @@ Pilot-0-B3-3a first business input/data-envelope refinement:
 - The generic schema/command kernel remains broader. Implementation MUST add one strict additive Pilot profile validator at the Nurture boundary and reject every value outside the profile before persistence; the validator MUST NOT fork the canonical Message/Receipt/Item/Execution lifecycle.
 - Tests MUST cover exact allowed values, both 1/2000 boundaries, empty/overlong/control-only input, every fixed-field override, non-empty attachment, unsupported data class/category/urgency/route mode/source surface, raw-id/ref injection, unsafe content category, AI-draft-without-confirmation, and exact command replay.
 
+Pilot-0-B3-3b Grant/family-authority/target-scope refinement:
+
+- The complete Pilot question round trip uses one active Grant, not separate directional Grants. The exact fields are current workspace/child process/enrollment, `grantedToScopeType=care_group`, the enrollment's current care-group id, `directions=[family_to_org,org_to_family]`, `dataClasses=[family_care_question]`, and `purposes=[family_care_workflow]`.
+- Effective time begins at confirmation. `expiresAt` is required and equals the earlier of 30 days after effectiveness or the exact Pilot workspace allowlist expiry. Expiry never auto-renews or reactivates a row.
+- `org_to_family` authorizes only `nurture.family_care.reply_item` for an item created under the same Grant. The direction cannot authorize proactive institution messages, broadcast, daily-care sharing, clarification loops, or another data class.
+- Capture persists the original `grantId`; acknowledge and reply must reload and validate that exact Grant. Revoke, expiry, replacement, target/enrollment drift, owner-role loss, or data-class/direction mismatch blocks the old item. A current replacement Grant applies only to new questions.
+- At most one active Grant exists for `(workspace, child process, enrollment, care group, family_care_workflow)`. Identical confirmation returns `already_satisfied`. Any scope/direction/data-class/purpose/expiry change uses expected version and one transaction to mark the old Grant `replaced` and create a new active identity. No terminal identity returns to active.
+- One designated Guardian performs first confirmation in the test script, but `primary_guardian` is not a role. Any current Guardian in the same active family may author a new question and owner-read committed family-visible question/Receipt/reply facts under the Grant. Only `grantedByParticipantId` may replace/revoke; message redaction remains exact-author only.
+- Institution administrator, caregiver, and technical operator cannot create, confirm, replace, revoke, transfer, or directly edit a family Grant. Loss of the Grant owner's current Guardian eligibility blocks new cross-role use and requires a separately confirmed new Grant rather than implicit ownership transfer.
+- Implementation MUST remove ambiguous active matching: overlapping active rows are rejected transactionally, repository resolution never relies on `findFirst` ordering among overlaps, and reply cannot switch from the item's original Grant to another current matching row.
+- Tests MUST cover exact duplicate, overlapping create race, expected-version replacement race, all changed-definition dimensions, wrong direction/class/purpose/scope/enrollment, expiry/allowlist bound, original-Grant revoke/replace before acknowledge/reply, replacement non-revival, owner versus second-Guardian administration, same-family view, cross-family denial, owner-role loss, and non-family-role denial.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
