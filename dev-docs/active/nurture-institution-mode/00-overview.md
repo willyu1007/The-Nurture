@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-16
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-B3-2d draft/result/history continuity after B3-2a transition/destination, B3-2b opaque-token protocol, and B3-2c notification/deep-link stale handling locked. B3-3 business/data envelope, B3-4 journey coverage, real cohort sizing, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-B3-3 business path/data envelope after B3-2 cross-surface continuity closed through B3-2d. B3-4 journey coverage, real cohort sizing, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

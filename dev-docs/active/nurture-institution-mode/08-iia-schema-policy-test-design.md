@@ -180,7 +180,7 @@ Pilot-0-B3-2a cross-surface transition refinement:
 
 Pilot-0-B3-2b opaque-token refinement:
 
-- The Pilot purpose set remains exactly `clarify|submit_action|open_notification`. Generic navigation without one of these purposes carries route class only; `open_notification` MUST NOT become a general object-browser token.
+- The Pilot purpose set remains exactly `clarify|submit_action|open_notification`. Generic navigation without one of these purposes carries only route class plus the B3-2d allowlisted `current|recent|history` display mode; `open_notification` MUST NOT become a general object-browser token or business target/filter/cursor carrier.
 - Every token binds workspace, current participant, purpose, and the surface where it is consumed/opened. Chat clarification also binds the hashed host conversation. A token issued for one surface MUST NOT be accepted as a cross-surface credential; an intended destination token is issued for that destination.
 - Pilot TTL is fixed at five minutes for `clarify`, five minutes for `submit_action`, and seven days for `open_notification`. TTL expiry affects continuation only and MUST NOT transition Message, Receipt, Item, clarification deadline, Grant, Enrollment, or any other business fact.
 - A structurally valid clarify answer consumes its context once. Invalid/mismatched input does not consume it; stale current facts return safe blocked/recovery and any further clarification uses a new context/token rather than extending the old row.
@@ -202,6 +202,18 @@ Pilot-0-B3-2c notification/deep-link refinement:
 - Current visible lifecycle change returns current detail/history and current actions, never stale controls. Source redaction/withdrawal/suppression may expose only an owner-approved tombstone. Grant/role/enrollment/scope removal, stopped/failed Handoff, or disabled capability returns no protected token/detail.
 - The generic Host response classes are exactly `ready|unavailable|retryable`. Nurture supplies safe label/help/retry; My-Chat MUST NOT interpret grant, redaction, lifecycle, or policy reason semantics. Internal `handoff_unavailable` does not become client domain state.
 - Notification list copy may be rendered from the generic durable Host record without a per-row owner call. Opening, retrying, destination rendering, or executing an action always uses current owner state. Repeat/multi-device opens are read-only and may issue separate TTL-bound tokens after current checks.
+
+Pilot-0-B3-2d draft/result/history continuity refinement:
+
+- Pilot continuity guarantees committed Nurture facts/results and current authorized history across surfaces; unfinished bodyful drafts do not cross surface, device, account, participant, or guardian boundaries.
+- Unsubmitted text/form/AI draft belongs to the creating actor and surface. Same-surface `clarify|submit_action` may use the existing 5-minute context, but a non-empty draft leaving the surface requires explicit stay/discard. Refresh/process loss/cross-device recovery is not guaranteed.
+- My-Chat Chat transcript is Host conversation history and MUST NOT reconstruct, resubmit, or authorize a Nurture draft. User-authored Chat text may remain under Host policy; caregiver AI drafts derived from protected family content remain ephemeral and MUST NOT persist in Chat history.
+- Existing My-Chat `PublicDraft`, Workflow artifact draft, and Nurture forum-publication Handoff remain external-publication mechanisms. They MUST NOT store family-care question/reply, grant/enrollment, or Institution-command interaction drafts.
+- Committed continuity is Nurture business facts plus refs-only `CommandExecution`. Source result summaries are display-only; response loss returns exact Execution replay; destination surfaces owner-query current facts and MUST NOT rerun the command or introduce `open_result`/generic object tokens.
+- Non-notification transition carries only generic `route_class` and optional `view_mode=current|recent|history`. Business target ids, output refs, rows, filters, search text, pagination cursors, bodies, expected versions, action availability, and scroll state remain owner/surface-local.
+- Guardian family board owns current/recent and family workbench owns complete authorized family/grant/enrollment history. Teacher board owns complete authorized caregiver history. Institution board owns safe current aggregates and institution workbench owns authorized topology/configuration command history. Chat, Notification inbox, and Technical Admin are not Nurture business-history stores.
+- Unsubmitted drafts are never visible to another guardian/device. Committed Message/Receipt/reply/outcome visibility follows current family relationship/grant/policy. Every page/filter/detail/action rereads current owner state; redacted/suppressed history exposes only permitted tombstones.
+- Round-trip tests MUST cover Guardian Chat -> board/workbench, second guardian visibility, Caregiver Chat -> teacher board, Institution board -> workbench -> board, response loss, concurrent/current-state change, revoke/redaction between surfaces, wrong actor/workspace/surface, reload, and cross-device access without duplicate effects or draft leakage.
 
 Multi-turn behavior:
 
