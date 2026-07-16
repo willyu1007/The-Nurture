@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; B3-1 action availability fully locked
+- **Current checkpoint:** Pilot-0-B in progress; B3-2a surface transition locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -104,7 +104,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | --- | --- | --- |
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
-| B3-2 cross-surface continuity | OPEN | Transition, opaque token, notification/deep-link, and owner-reread rules. |
+| B3-2 cross-surface continuity | **IN PROGRESS — B3-2a LOCKED** | Surface transition/destination is locked; token protocol, notification/deep-link stale handling, and draft/result/history continuity remain open. |
 | B3-3 business path and data envelope | OPEN | Exact `family_care_question` fields, exclusions, grant directions, and lifecycle. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
 
@@ -420,6 +420,45 @@ The additive implementation gate is ordered and fail-closed:
 
 B3-1d-3 is ahead of implementation. Base/My-Chat do not yet define the additive domain-action contract, and Nurture does not yet advertise or implement the accepted action surface. The decision closes B3-1 planning only; the decision authorizes no contract/source/schema/manifest/environment/capability/traffic change.
 
+#### Pilot-0-B3-2 — cross-surface continuity
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| B3-2a surface transition and destination selection | **LOCKED** | What a transition carries, when navigation occurs, destination precedence, and no implicit action. |
+| B3-2b opaque token protocol | OPEN | `clarify`, `submit_action`, and `open_notification` purpose, binding, TTL, consume, replay, and refresh. |
+| B3-2c notification/deep-link stale handling | OPEN | Delivery envelope, target-surface open, owner reread, stale/withdrawn/revoked behavior. |
+| B3-2d draft/result/history continuity | OPEN | What may follow a user between surfaces and the minimum negative/round-trip matrix. |
+
+**Pilot-0-B3-2a — surface transition and destination selection (LOCKED)**
+
+A cross-surface transition restores user intent and an eligible navigation destination only. The transition never transfers business authorization, command/lifecycle ownership, a cached availability decision, or a Nurture business fact.
+
+Destination precedence is role-specific:
+
+| Source intent | Preferred destination rule |
+| --- | --- |
+| Guardian action executable in current Chat/family board/family workbench | Complete in the current surface; do not force navigation. |
+| Guardian complete history or complex enrollment/grant review | Navigate to `family_workbench`. |
+| Caregiver action executable in Chat | Complete in Chat when the protected detail/action flow is available. |
+| Caregiver current/detail/history work requiring the full role surface | Navigate to `teacher_board`; never route to a caregiver workbench. |
+| Institution board write intent | Navigate to `institution_workbench`; the board remains read-only. |
+| Institution read/aggregate navigation | Stay on `institution_board` unless authorized configuration detail is explicitly requested. |
+| Technical recovery | Stay in `technical_admin`; never enter a Nurture role surface. |
+
+The transition boundary is exact:
+
+1. If the current entitled surface can complete an accepted action, the product SHOULD close the action there. Navigation is for a richer authorized view, not a mandatory detour or a substitute for missing action wiring.
+2. My-Chat MAY carry only a generic destination `route_class`, a Nurture-issued opaque continuation token, and necessary display expiry/bookkeeping. URLs, notification payloads, client route state, analytics, and logs MUST NOT contain raw child, family, grant, message, receipt, item, enrollment, role-assignment, institution, or care-group ids.
+3. A surface transition MUST NOT implicitly acknowledge, confirm, submit, cancel, revoke, redact, reissue, retry, or execute any durable action. Opening a target view is read-only until the user performs a separately presented/confirmed action.
+4. The destination surface MUST perform a current Nurture owner read and re-resolve participant, surface entitlement, eligible role, work/child scope, target, grant, policy, lifecycle, expected version, and action availability before rendering protected detail or an executable control.
+5. My-Chat does not decode the opaque token or synthesize a Nurture target from route params. A route class selects only a generic shell destination; Nurture decides the current target and whether the actor may see or act on the current target.
+6. If a command completed in the source surface, the destination rereads the committed `CommandExecution`-referenced/current business result. Navigation MUST NOT create a second command identity or rerun the effect merely to populate another surface.
+7. If token binding, entitlement, target, grant, policy, or lifecycle changed before open, Nurture returns the current safe unavailable/result view and newly available actions. The host MUST NOT restore an old button state, stale preview, or cached protected detail.
+8. Transition and navigation telemetry MAY record route class, source surface, destination surface, outcome, latency, and opaque correlation id. The telemetry MUST NOT contain Nurture bodies, raw target ids, token material, or become a canonical Nurture fact.
+9. Surface transition is absent from Nurture command identity and does not create a Message, Receipt, Item, Enrollment, Grant, role assignment, or `CommandExecution`. Any later durable action uses its own locked action/command contract.
+
+B3-2a is ahead of implementation. My-Chat does not yet have the general scenario-produced domain-action/navigation registry locked by B3-1d-3, and the accepted family/teacher/institution target surfaces are not fully implemented. The decision locks navigation semantics only and authorizes no source, schema, manifest, route, environment, capability, or traffic change.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -436,6 +475,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Technical-operator permissions | **LOCKED by Pilot-0-B3-1d-1:** a named, exact-workspace internal operator may inspect safe technical evidence, reconcile the original outcome-unknown Step, replay/stop eligible Handoffs, request owner reevaluation, and perform disable-only emergency shutdown; no Nurture business action or direct-state edit is permitted. |
 | Remaining domain-action mapping | **LOCKED by Pilot-0-B3-1d-2:** Guardian enrollment/grant actions and Institution topology/configuration transitions use explicit stable keys; invitation is split across My-Chat identity acceptance and Nurture participant binding; care-group suspend/resume is the only Pilot business-disable lifecycle. |
 | Unavailable reasons and adoption gate | **LOCKED by Pilot-0-B3-1d-3:** domain actions use the closed safe reason vocabulary and separate confirmation classes; missing handlers/declaration drift fail validation; Base, My-Chat, and Nurture adopt additively in order with legacy compatibility and capability off. |
+| Surface transition | **LOCKED by Pilot-0-B3-2a:** complete an action in the current entitled surface when possible; otherwise carry only generic route class plus opaque Nurture continuation to the role-correct destination, perform current owner reread, and never execute an implicit command. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -505,7 +545,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-1 complete** | B1 locks the cohort; B2 locks accounts; B3-0/B3-1 lock role/surface/action/key/reason/adoption boundaries. B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-2a locked** | B1/B2/B3-0/B3-1 are locked; B3-2a locks transition/destination semantics. B3-2b-d, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

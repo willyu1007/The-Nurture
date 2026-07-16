@@ -169,6 +169,15 @@ Pilot-0-B3-1d-3 availability and adoption refinement:
 - My-Chat adopts the exact Base revision and generic routing/renderer/registry with capability off. Nurture adopts only after authenticated handlers, current owner presenters, commands, and wrong-surface/role/scope/version/grant/admin/raw-id/owner-outage/privacy negative tests pass.
 - Adoption order is Base -> My-Chat -> Nurture. No simultaneous switch, legacy reinterpretation, or traffic/capability enablement is allowed during contract adoption.
 
+Pilot-0-B3-2a cross-surface transition refinement:
+
+- A transition carries intent/navigation only: generic destination `route_class`, Nurture-issued opaque continuation, and necessary display expiry/bookkeeping. URLs, notification payloads, logs, analytics, and client route state MUST NOT carry raw Nurture object/role/scope ids or token material.
+- If the current entitled surface can close the action, navigation SHOULD NOT be required. Guardian complex history/enrollment/grant work targets `family_workbench`; Caregiver full detail/history targets `teacher_board`; Institution writes target `institution_workbench`; technical recovery remains `technical_admin`.
+- Transition open is read-only and MUST NOT acknowledge, confirm, submit, cancel, revoke, redact, reissue, retry, or execute a command. The destination owner-rereads current participant, surface entitlement, role, scope, target, grant, policy, lifecycle, expected version, and action availability.
+- My-Chat treats route class as generic shell navigation and MUST NOT decode the opaque continuation or synthesize Nurture targets. Changed token binding/entitlement/target/policy returns current safe unavailable/result state and actions, never cached controls or protected detail.
+- A command already completed on the source surface is reread at the destination through current Execution/business facts. Navigation neither reruns the command nor enters command identity.
+- Transition telemetry is limited to route classes, source/destination surface, safe outcome, latency, and opaque correlation. Transition creates no Nurture business fact and carries no bodies, raw ids, or token values.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

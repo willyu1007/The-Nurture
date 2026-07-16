@@ -48,7 +48,7 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08; B3-1 surface/action/key/operator/reason/adoption refinements complete on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-08; B3-1 refinements complete and B3-2a transition semantics added on 2026-07-16.
 
 **Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
@@ -77,6 +77,9 @@ Rules:
 - Domain-action availability exposes only the locked safe reason vocabulary plus scenario-owned `safe_label`/`safe_help`; internal command/database/provider errors are not client reason codes. Confirmation is a separate `explicit` or `strong_authorization` class and never cached authorization.
 - Cross-surface entity actions require optional additive Base `domain_action_contracts` and a separate handler registry. Missing handlers or invalid target/surface/confirmation declarations are fatal; current Run-level `scenario_actions` and legacy manifests retain their existing semantics.
 - Contract adoption remains Base -> My-Chat -> Nurture with capability disabled. Nurture advertises an action only after authenticated handler, current owner presenter, command path, and negative tests exist.
+- Cross-surface transitions carry only generic route class plus Nurture-issued opaque continuation/display bookkeeping. They transfer no role/scope/authorization, business lifecycle, action availability, command identity, or raw Nurture ids.
+- An action closes in the current entitled surface when possible. Guardian complex history/grant work targets family workbench; Caregiver full work targets teacher board; Institution writes target institution workbench; technical recovery never leaves Technical Admin.
+- Target open is read-only and reruns current owner resolution before protected detail or actions. Navigation cannot implicitly acknowledge/confirm/submit/cancel/retry or create another Nurture command/fact.
 - `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.
 - Notification and deep link are transitions into an entitled surface, not independent role surfaces or authorization sources.
 - If multiple roles/scopes are possible and the target does not disambiguate them, Nurture should ask for clarification or return safe scenario-level output rather than defaulting to the broadest role.
