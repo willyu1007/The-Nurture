@@ -48,7 +48,7 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08; surface entitlement refined by Pilot-0-B3-0 on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-08; surface/action entitlement refined through Pilot-0-B3-1c on 2026-07-16.
 
 **Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
@@ -64,6 +64,9 @@ Rules:
 - A pure mobile chat clarification turn may be handled with participant-level context only. Any persisted child-specific action, message, item, log, receipt, or workflow event must resolve to a concrete `roleAssignmentId` and `childCareProcessId` before write.
 - Family, teacher, and institution boards are explicit role work surfaces and may expose only validated Nurture role/scope selections compatible with that surface. A switch does not create a second participant identity or broaden authorization.
 - The family domain web workbench is guardian-entitled; the institution domain web workbench is institution-admin-entitled. The first internal experiment has no caregiver domain web workbench fallback.
+- The institution board is read-only for safe aggregates and navigation in the first internal experiment. Institution-owned topology/configuration writes occur only in the institution domain web workbench through the Nurture `CommandExecution` kernel.
+- Institution administrators may initiate adult invitations and enrollment setup but cannot bind raw My-Chat user ids, accept an invitation for another user, establish/revoke Guardian relationships, or create/replace/revoke family grants. My-Chat owns account acceptance; family authority owns Guardian/grant confirmation.
+- Institution administrators have no ambient access to family question/reply bodies or child-specific care facts and cannot perform caregiver actions, technical-runtime recovery, hard deletion, or ranking/scoring actions.
 - `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.
 - Notification and deep link are transitions into an entitled surface, not independent role surfaces or authorization sources.
 - If multiple roles/scopes are possible and the target does not disambiguate them, Nurture should ask for clarification or return safe scenario-level output rather than defaulting to the broadest role.

@@ -116,6 +116,16 @@ Pilot-0-B3-1b Caregiver action refinement:
 - Direct family Chat, bulk actions, clarification loops, daily-care outcomes, grant/enrollment/topology administration, cross-care-group work, reassignment, and duty handoff are unavailable in the first internal experiment.
 - Final acknowledge/reply/redaction commands MUST fail closed after revoke, source redaction, enrollment/role change, item-version conflict, or policy change. A draft or alternate surface is not authorization.
 
+Pilot-0-B3-1c Institution action refinement:
+
+- The institution board MUST remain read-only in the first internal experiment. It exposes only safe topology/readiness/backlog aggregates, unavailable-state categories, and navigation; projection cards do not execute durable Nurture writes.
+- The institution domain web workbench is the only Institution surface for authoritative institution/care-group lifecycle, invitation initiation, staff-role, enrollment, lead-caregiver, policy, and scoped business-disablement commands. Every write uses the shared `CommandExecution` kernel with idempotency, expected version, current institution-admin role/scope, target lifecycle, and policy revalidation.
+- Adult invitation is coordinated across ownership boundaries: Institution may initiate; My-Chat owns canonical account invitation/authentication/acceptance; Nurture maps the accepted user into participant/role facts. Institution MUST NOT bind raw `myChatUserId` values or accept for another user.
+- Institution may initiate enrollment topology but MUST NOT establish/revoke Guardian relationships or create/replace/revoke grants. Family authority confirms the child/family linkage and applicable grant.
+- Institution coverage views MAY expose safe enrollment/grant metadata such as scope, direction, system `dataClass`, version, and status. They MUST NOT expose family question/reply bodies, consent/revoke narrative, child-specific care facts, or named caregiver-authored content.
+- Suspend/close/disable transitions preserve canonical and audit facts; recovery is a separate revalidated command, not a blind toggle. No Institution surface hard-deletes topology or controls My-Chat capability, allowlist, Workflow Run/Step/Handoff/Outbox, notification, or technical recovery.
+- Operational aggregates MUST NOT become child ranking, cross-group comparison, public caregiver scoring, or competitive institution ranking. The synthetic direct-Prisma fixture remains test preparation and cannot substitute for authenticated owner commands.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
