@@ -153,7 +153,7 @@ Implementation implication:
 
 ## IB-D4 — `NurtureChildLinkGrant` Revoke and Retention
 
-**Convergence status:** LOCKED on 2026-07-06; first Pilot identity/authority profile refined by Pilot-0-B3-3b on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-06; first Pilot identity/authority and runtime-fence profile refined by Pilot-0-B3-3b/B3-3d on 2026-07-16 and 2026-07-17.
 
 **Default:** Revoke is a runtime fence, not a historical eraser.
 
@@ -207,6 +207,9 @@ Pilot-0 grant identity and authority refinement:
 - One exact binding has at most one active Grant. Exact confirmation is `already_satisfied`; changed definition atomically creates a replacement identity; revoked/expired/replaced identities never reactivate.
 - The scripted primary Guardian is the Grant owner, not a separate role. Same-family current Guardians may author questions and read committed family-visible facts under the Grant; only the granting participant may replace/revoke. Message redaction remains author-only.
 - Institution admin, caregiver, and technical operator cannot administer a family Grant. Grant-owner role loss fails closed for new cross-role use and never transfers authority implicitly.
+- Every read, action, retry, notification eligibility check, and stale open revalidates the exact original Grant plus current role/family/enrollment/care-group/policy. Revoke, expiry, replacement, owner-role loss, and scope/policy drift share the same fail-closed fence; reconciliation is not the enforcement boundary.
+- Grant invalidation terminalizes linked Receipt distribution state, suppresses the dependent Item and active Attention, and retains immutable Message/Execution/Event audit facts. A resolved Attention remains an actionless shell. A new Grant never restores the old Item.
+- Audit retention and protected-body visibility are independent. A still-authorized same-side author may reread their own unredacted Message, while a former cross-role receiver receives only an allowed tombstone. The author also loses access when their current same-side role/family relationship no longer resolves.
 
 ## IB-D5 — Data Class and Category Vocabulary
 
@@ -244,7 +247,7 @@ Implementation implication:
 
 ## IB-D6 — Message Encryption, Redaction, and Attachment Handling
 
-**Convergence status:** LOCKED on 2026-07-07; first Pilot protected-text and command lifecycle profiles refined by Pilot-0-B3-3a/B3-3c on 2026-07-16 and 2026-07-17.
+**Convergence status:** LOCKED on 2026-07-07; first Pilot protected-text, command lifecycle, and redaction-cascade profiles refined by Pilot-0-B3-3a/B3-3c/B3-3d on 2026-07-16 and 2026-07-17.
 
 **Default:** Nurture owns canonical message body; message lifecycle is `sent` / `redacted` / `failed`; My-Chat only receives safe projections.
 
@@ -264,6 +267,8 @@ Rules:
 - Pilot-0 question and caregiver-confirmed reply bodies are trimmed 1–2000-character plain text behind protected content refs. Rich text, attachments, media, direct object URLs, and body-derived safe summaries are not accepted by the first Pilot profile.
 - Pilot list summaries are deterministic generic copy. AI may help a user draft body text but cannot publish, select the data class, or expand the envelope.
 - Pilot capture writes one family-authored sent Message. Acknowledge changes Item/source-Receipt state but creates no Message. Reply writes exactly one caregiver-confirmed sent Message linked to the source Item and reply event; `replied` is terminal-for-Pilot and correction requires a new question rather than message mutation.
+- Pilot redaction is author-only, expected-version, and irreversible. Source-question redaction suppresses the dependent Item/active Attention and removes receiver access; an existing caregiver reply remains a separate author fact. Caregiver-reply redaction terminalizes only the reply distribution and does not suppress/reopen the already-replied source Item.
+- Tombstones retain only permitted audit metadata. They contain no body, body-derived summary, protected ref, attachment ref, or internal denial/redaction reason. Redaction cannot be reversed through replay, a stale token, a replacement Grant, or technical operator recovery.
 
 Rationale:
 

@@ -2,7 +2,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-16
+- Last updated: 2026-07-17
 - Current phase: X5 joint acceptance complete; Pilot-0 readiness authorized and in progress
 - Code/config/schema impact: the Pilot-0 change is governance/documentation only. No product code, Nurture or My-Chat schema/migration, contract pin, environment, secret, artifact publication, traffic, or activation flag changed.
 
@@ -18,6 +18,17 @@
 | Task/project document lint | PASS WITH PRE-EXISTING REPO EXCEPTION | Scoped anchor/document lint passes for all 27 institution-task Markdown files with 15 existing vague-reference warnings and for all 4 project-hub Markdown files with no warnings. The repo-wide probe still reports the pre-existing naming false positive for the valid Next.js dynamic route `apps/frontend/src/app/nurture/projects/[id]`; no changed path has a lint error. |
 | Structure and whitespace | PASS | Both changed YAML files parse successfully with Ruby Psych and `git diff --check` passes. The repository does not install a Prettier CLI, so no Prettier result is claimed. |
 | Context and contract baseline | PASS | Strict context verification and live workflow contract pin verification pass at unchanged Base/My-Chat hash `0bd8925e...01aa` and Nurture source pin `e976c235...d193`. |
+
+## Pilot-0-B3-3 Business/Data Contract Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| B3-3d owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IB schema/convergence, IIA policy/test design, and Pilot readiness consistently lock exact replay, same-Step seed ownership, original-Grant runtime fencing, role-aware author/receiver protected-body visibility, distinct source/reply redaction cascades, immediate-route no-cancel, and independent technical-failure ownership. B3-3 is complete; B3-4 remains next. |
+| Privacy and lifecycle semantics | PASS | Audit retention is explicitly separated from body authorization; Grant invalidation cannot be bypassed by replacement Grant, retry, notification, or stale open; source redaction suppresses dependent work, while caregiver-reply redaction leaves the replied source Item closed to further action. Technical Admin cannot restore Grant authority or edit Nurture lifecycle. |
+| Implementation debt capture | PASS | Pre-Pilot gates record acknowledge-only reply, original-Grant binding, author/receiver visibility coverage, reply-redaction non-suppression, removal of Pilot cancel, provider/owner/kill-switch joint coverage, and the current revoke/redaction `take: 100` defect. Cascades must loop atomically to closure or roll back on overflow. |
+| Documentation lint | PASS WITH PRE-EXISTING WARNINGS | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors` checks 27 files with 0 errors and the unchanged 15 vague-reference warnings. |
+| Governance and context | PASS | `sync --apply --changelog`, governance lint, and `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` pass. The previously recorded obsolete `ctl-context-forge.mjs` path was not used. |
+| Contract pin and whitespace | PASS | `pnpm verify:workflow-contract-pin` passes at unchanged Base/My-Chat contract hash `0bd8925e...01aa` and Nurture activation-source hash `e976c235...d193`; `git diff --check` passes. |
 
 ## Pilot-0-A Readiness Audit
 

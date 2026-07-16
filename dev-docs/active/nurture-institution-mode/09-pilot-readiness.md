@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-B in progress; B3-3a-c input, Grant authority, and business lifecycle locked
+- **Current checkpoint:** Pilot-0-B in progress; B3-3 business/data contract complete, B3-4 representative journey coverage next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -105,7 +105,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
 | B3-2 cross-surface continuity | **LOCKED / COMPLETE** | B3-2a-d lock transition/destination, opaque tokens, notification/deep-link stale handling, and draft/result/history continuity. |
-| B3-3 business path and data envelope | **IN PROGRESS — B3-3a/B3-3b/B3-3c LOCKED** | Input envelope, Grant/family authority/target scope, and atomic business lifecycle are locked; replay/revoke/redaction/failure/privacy remains B3-3d. |
+| B3-3 business path and data envelope | **LOCKED / COMPLETE** | B3-3a-d lock the input envelope, Grant/family authority/target scope, atomic business lifecycle, exact replay, revoke/redaction, and failure/privacy behavior. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
 
 #### Pilot-0-B3-0 — role and surface entitlement (LOCKED)
@@ -616,7 +616,7 @@ Current foundations support the direction: Nurture CommandExecution already stor
 | B3-3a first input and data envelope | **LOCKED** | Exact first data class, fixed routing/classification fields, body envelope, exclusions, trusted derivation, and additive Pilot profile gate. |
 | B3-3b grant, family authority, and target scope | **LOCKED** | One exact bidirectional Grant, active uniqueness, original-Grant lifecycle binding, owner/second-Guardian rights, care-group target, expiry, and revoke authority. |
 | B3-3c Message/Receipt/Item lifecycle | **LOCKED** | Atomic capture, explicit acknowledgment, caregiver-confirmed reply, Receipt semantics, Attention projection, terminal-for-Pilot state, and family-visible outcomes. |
-| B3-3d replay, revoke, redaction, and failure/privacy behavior | OPEN | Command identities, response loss, stale actions, withdrawal/tombstones, notification independence, and fail-closed negative matrix. |
+| B3-3d replay, revoke, redaction, and failure/privacy behavior | **LOCKED** | Exact replay, response loss, original-Grant fence, role-aware protected-body visibility, withdrawal/tombstones, notification independence, and fail-closed failure matrix. |
 
 **Pilot-0-B3-3a — first input and data envelope (LOCKED)**
 
@@ -763,6 +763,80 @@ Receipt semantics are exact:
 
 Current capture and acknowledge transactions largely match the decision. Current reply accepts `open|acknowledged|waiting_for_family`; the Pilot implementation must narrow both command preconditions and database update predicates to `acknowledged` only, apply the B3-3b original-Grant rule, and prevent clarification/second-reply/extra-close surface actions. Notification coverage remains B3-4 and cannot change the business transaction outcome. B3-3c changes no source, schema, migration, manifest, runtime, environment, capability, provider, or traffic.
 
+**Pilot-0-B3-3d — replay, revoke, redaction, and failure/privacy behavior (LOCKED)**
+
+Command replay is exact and immutable:
+
+1. Every capture, acknowledge, and reply uses a stable `commandRequestId` plus canonical payload hash. The same identity and payload return the original `CommandExecution` and output refs; the same identity with different payload is rejected before a business write.
+2. Capture/acknowledge/reply response loss never creates a second Message, Receipt, ItemEvent, Item/Attention version, or result set. A new question requires a new command identity, body ref, and routing attempt.
+3. If Nurture committed but My-Chat lost the response, only the original durable claimed Step may reclaim and replay the stored seed. Another Step cannot take ownership. Exact replay materializes at most one Handoff.
+
+The original Grant remains the runtime fence at every boundary:
+
+| Invalidated point | Required Nurture result |
+| --- | --- |
+| Before capture commit | Reject with no Message, Receipt, Item, Attention, Execution effect, or replay seed. |
+| After capture, before acknowledge | Source audit facts remain; Item and active Attention become suppressed; acknowledge/reply and cross-role body read are blocked. |
+| After acknowledge, before reply | Acknowledgment audit remains; Item/active Attention are suppressed; reply is blocked. |
+| After reply | Item becomes a suppressed audit state; completed reply history is not reopened and no new business action becomes available. |
+
+Every execute, retry, presenter read, notification eligibility check, provider retry, and open revalidates the Item's exact original `grantId` plus current participant role, family, enrollment, care group, and policy. Grant `revoked`, `expired`, or `replaced`, Grant-owner role loss, enrollment/care-group drift, and policy disable all fail closed immediately; reconciliation is not the authorization boundary, and a new Grant never revives an old Item.
+
+Linked Receipt and Attention behavior is exact:
+
+- A `pending` Receipt becomes `blocked(grant_revoked)`. A `delivered`, `read`, or `acknowledged` Receipt becomes `revoked_after_delivery(grant_revoked)`.
+- Active Attention becomes suppressed. Resolved Attention remains a resolved audit shell, but protected content and actions are unavailable.
+- Messages, `CommandExecution`, ItemEvents, authorship, timestamps, and allowed audit metadata remain retained rather than rewritten.
+
+Audit retention and protected-body authorization are separate:
+
+| Actor after Grant invalidation | Protected-body result |
+| --- | --- |
+| Original Guardian author with current same-family Guardian eligibility | May owner-read their own unredacted family Message. |
+| Other current Guardian in the same family | May owner-read the family-side family submission under current family policy. |
+| Caregiver receiver of the family Message | Loses the cross-role body and sees only an allowed content-free tombstone. |
+| Caregiver author of an existing reply with current same-side role | May retain author-side audit access to their own unredacted reply. |
+| Guardian receiver of the caregiver reply | Loses the cross-role reply body and sees only an allowed tombstone. |
+| Author whose role/family relationship is no longer current | Loses author-side protected-body access as well. |
+
+Message redaction is exact-author-only, expected-version, and irreversible:
+
+| Redacted Message | Required cascade |
+| --- | --- |
+| Guardian source question | Clear body/protected ref; source Receipt becomes `revoked_after_delivery(source_redacted)`; dependent Item and active Attention are suppressed; caregiver read/acknowledge/reply are blocked. A previously committed caregiver reply is not automatically redacted because the reply has another author, but the source question renders as a tombstone. |
+| Caregiver reply | Clear reply body/protected ref; reply Receipt becomes `revoked_after_delivery(source_redacted)`; family sees a reply tombstone. Source question/source Receipt, terminal replied Item, resolved Attention, Execution, and events retain audit state. The Item is not suppressed or reopened, and no second reply becomes available. |
+
+An allowed tombstone contains no body, body-derived summary, protected ref, attachment ref, hidden target selector, or internal redaction/denial reason. No replay, stale token/button/cache, replacement Grant, or technical recovery can unredact a Message.
+
+Pilot immediate routing exposes no `cancel_route` action. Calling cancel after logical delivery returns `route_already_visible` without mutation. Post-submit withdrawal is represented only by exact-author redaction or Grant-owner revoke; cancel, redaction, and revoke remain separate commands and audit meanings.
+
+Failure ownership remains independent:
+
+| Failure | Required result |
+| --- | --- |
+| Nurture precommit failure | No business facts; retry the same command identity. |
+| Nurture postcommit response loss | Replay the original Execution/output refs. |
+| My-Chat Step/Handoff/Outbox failure | Nurture facts remain committed; original same-Step recovery continues. |
+| Notification provider failure | Nurture Receipt remains unchanged; My-Chat Outbox retries or dead-letters. |
+| Nurture owner API outage | No notification send and no cached protected body; return generic retryable state. |
+| Stale version/action | No write; refresh current state. |
+| Wrong actor/workspace/family/child | Generic unavailable; no existence or content disclosure. |
+| Capability or workspace allowlist disabled | Block new writes/activation while retaining committed facts. |
+
+Technical Admin may inspect refs/counts/status/version/reason evidence, reconcile the original outcome-unknown Step, replay/stop eligible Handoffs, request Nurture owner reevaluation, and disable the gate. The operator cannot edit Message/Receipt/Item, undo redaction, restore/replace a Grant, synthesize provenance, or mark acknowledge/reply.
+
+Notification delivery rechecks owner eligibility before creation and every provider send/retry. A not-yet-sent notification after revoke/redaction is skipped. An OS notification already displayed cannot be retracted, but every open authenticates, owner-rereads, and returns only current content, an allowed tombstone, or generic unavailable/retryable state. Host read/unread never changes Nurture lifecycle.
+
+Current core tests already cover exact replay, wrong-Step ownership, Grant revoke, redaction, and owner reread. Pre-Pilot implementation must still:
+
+1. Replace the current revoke/redaction `take: 100` behavior with an atomic loop-to-closure or whole-transaction overflow failure; a partially fenced dependent fact set must never commit.
+2. Enforce the B3-3b original-Grant and B3-3c acknowledge-only reply requirements.
+3. Add separate author-side and receiver-side post-revoke body-visibility tests.
+4. Assert caregiver-reply redaction does not suppress/reopen the source Item and remove `cancel_route` from the Pilot action registry.
+5. Jointly validate provider retry/dead-letter, owner outage, stale notification, and two-key kill-switch behavior.
+
+B3-3 is complete as a planning contract. B3-3d changes no source, schema, migration, manifest, route, runtime, environment, capability, provider, database, or traffic. B3-4 now decides the minimum representative cross-surface journey matrix that must prove this contract end to end.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -787,6 +861,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Input/data envelope | **LOCKED by Pilot-0-B3-3a:** 1–2000-character protected plain-text question/reply only; fixed question/today-attention/immediate/ack/reply/empty-attachment profile; generic summary; owner-derived refs; no health/emergency/media/daily-care/constraint/follow-up/rich-text/batch input. |
 | Grant/family authority/target | **LOCKED by Pilot-0-B3-3b:** one active exact child/enrollment/care-group Grant with both directions, question-only data class, bounded expiry, owner-only administration, same-family visibility, and original-`grantId` capture/ack/reply binding; replacement never revives an old item. |
 | Business lifecycle | **LOCKED by Pilot-0-B3-3c:** atomic capture creates Message/Receipt/open Item/active Attention; explicit acknowledge updates Item/source Receipt while Attention stays active; caregiver-confirmed reply only from acknowledged creates reply Message/Receipt and resolves Attention; `replied` is terminal-for-Pilot and delivery/read/notification remain separate. |
+| Replay/revoke/redaction/failure privacy | **LOCKED by Pilot-0-B3-3d:** exact immutable command replay and same-Step seed ownership; original-Grant fence on every boundary; role-aware author/receiver body visibility; distinct irreversible redaction cascades; no Pilot cancel; owner/provider/runtime failures remain independent and fail closed. B3-3 is complete. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
 | Observation window | Five consecutive operating days after Pilot-3 rehearsal passes. Extend only by explicit Pilot-4 decision. |
 
@@ -854,7 +929,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3a-c locked** | B1/B2/B3-0/B3-1, B3-2a-d, and B3-3a-c input/Grant/lifecycle are locked. B3-3d failure/privacy and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3 complete** | B1/B2/B3-0/B3-1, B3-2a-d, and B3-3a-d are locked. B3-4 representative journey coverage remains open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

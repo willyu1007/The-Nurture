@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-B3-3d replay/revoke/redaction/failure-privacy convergence after B3-3c locked atomic capture/acknowledge/reply and `replied` as the Pilot terminal state. B3-4 journey coverage, real cohort sizing, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-B3-4 representative journey coverage after B3-3a-d closed the first business/data path, Grant authority, lifecycle, and replay/revoke/redaction/failure-privacy contract. Real cohort sizing, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 
