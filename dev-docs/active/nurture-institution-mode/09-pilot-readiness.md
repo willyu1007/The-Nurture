@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; B3-2a surface transition and B3-2b opaque-token protocol locked
+- **Current checkpoint:** Pilot-0-B in progress; B3-2a/b/c surface transition, token, and notification/deep-link stale handling locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -104,7 +104,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | --- | --- | --- |
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
-| B3-2 cross-surface continuity | **IN PROGRESS — B3-2a/B3-2b LOCKED** | Surface transition/destination and opaque-token protocol are locked; notification/deep-link stale handling and draft/result/history continuity remain open. |
+| B3-2 cross-surface continuity | **IN PROGRESS — B3-2a/B3-2b/B3-2c LOCKED** | Surface transition/destination, opaque-token protocol, and notification/deep-link stale handling are locked; draft/result/history continuity remains open. |
 | B3-3 business path and data envelope | OPEN | Exact `family_care_question` fields, exclusions, grant directions, and lifecycle. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
 
@@ -426,7 +426,7 @@ B3-1d-3 is ahead of implementation. Base/My-Chat do not yet define the additive 
 | --- | --- | --- |
 | B3-2a surface transition and destination selection | **LOCKED** | What a transition carries, when navigation occurs, destination precedence, and no implicit action. |
 | B3-2b opaque token protocol | **LOCKED** | `clarify`, `submit_action`, and `open_notification` purpose, binding, Pilot TTL, consume, replay, and refresh. |
-| B3-2c notification/deep-link stale handling | OPEN | Delivery envelope, target-surface open, owner reread, stale/withdrawn/revoked behavior. |
+| B3-2c notification/deep-link stale handling | **LOCKED** | Recipient-bound delivery envelope, authenticated target open, delivery/open owner reread, and stale/withdrawn/revoked behavior. |
 | B3-2d draft/result/history continuity | OPEN | What may follow a user between surfaces and the minimum negative/round-trip matrix. |
 
 **Pilot-0-B3-2a — surface transition and destination selection (LOCKED)**
@@ -474,7 +474,7 @@ The common binding is exact:
 1. Every token MUST bind `workspaceId`, the current authenticated identity's resolved Nurture `participantId`, exact purpose, payload schema/version, expiry, and the surface where the token may be consumed or opened.
 2. `surface` means consumer/return surface. Chat `clarify` additionally binds the namespaced hash of the same host conversation. `submit_action` binds the surface that presents/confirms the prepared action. `open_notification` binds the B3-2a-selected destination surface.
 3. A token bound to a source surface MUST NOT become a cross-surface credential. When a purpose genuinely continues at a different destination, Nurture issues a destination-bound token; generic navigation without `clarify`, `submit_action`, or `open_notification` carries route class only.
-4. My-Chat treats the token as opaque and MUST NOT use token material to derive role, scope, target, grant, action availability, or Nurture ids. Raw-token carrier, provider/deep-link storage, and stale landing-page rules are left to B3-2c, but token values are already forbidden from logs, analytics, error text, and business facts.
+4. My-Chat treats the token as opaque and MUST NOT use token material to derive role, scope, target, grant, action availability, or Nurture ids. B3-2c fixes raw-token carrier and stale landing behavior: notification provider/deep-link storage never contains token material, and token values remain forbidden from logs, analytics, error text, and business facts.
 
 Purpose behavior is fail-closed:
 
@@ -489,6 +489,59 @@ Purpose behavior is fail-closed:
 9. A scenario token never satisfies `strong_authorization`. Internal `token_mismatch|token_replayed|token_revoked|token_expired` remains server-side and maps through current safe presenter reasons such as `target_unavailable`, `state_not_actionable`, or `target_changed` without leaking internals.
 
 The current interaction-context core already provides namespaced hash-only storage, participant/purpose/surface/conversation binding, optimistic consume/revoke, derived expiry, one-time clarification, and reusable notification reads. B3-2b remains ahead of full product implementation: purpose-level TTL enforcement, transactional submit consumption/Execution replay, consumer-surface contract tests, open-notification delivery wiring, safe reason mapping, and token leakage tests are still required. This readiness lock authorizes no source, schema, manifest, route, environment, capability, or traffic change.
+
+**Pilot-0-B3-2c — notification/deep-link stale handling (LOCKED)**
+
+Notification is a safe arrival signal and authenticated indirection, not a Nurture continuation, object reference, authorization source, business receipt, or extra role surface.
+
+The delivery envelope is minimal:
+
+| Carrier | Allowed | Forbidden |
+| --- | --- | --- |
+| My-Chat durable Notification | Exact workspace/recipient, Notification id/type/read state, internal Handoff target, generic safe copy/open route, delivery/correlation evidence | Raw scenario token, Nurture ref/id/body/status/action/policy cache |
+| Provider payload | Recipient-bound `notification_id`, generic notification-open route, provider-required technical fields, generic safe title/body | Handoff id, scenario token, child/family/group/item/message/receipt/grant/enrollment ids or content |
+| Deep link/client route | `morethan://notifications/{notification_id}/open` | Handoff id, scenario token, Nurture target, cached role/scope/action state |
+| Open response/navigation memory | Generic `route_class`, newly issued destination-bound `open_notification` token, expiry/display bookkeeping | Token persistence, URL/query logging, business body, authorization decision |
+
+For a Nurture Notification, the client list DTO exposes only Notification id/type/read state, generic safe copy, and generic deep link. Internal Handoff target id/type and metadata remain server-side; the generic workflow Notification DTO MUST NOT leak those fields into client navigation or analytics.
+
+The authenticated open sequence is exact:
+
+1. An unauthenticated tap enters generic My-Chat sign-in and preserves only the Notification id. My-Chat MUST NOT call Nurture before authentication.
+2. My-Chat validates that the Notification exists for the exact authenticated `userId + workspaceId`. Wrong user, workspace, missing id, and tampered id return indistinguishable generic unavailable output and do not call Nurture.
+3. After recipient validation, My-Chat marks only the Host Notification as read. Ready, stale/unavailable, and transient owner-outage landing all count as a Host open; manual unread remains available. Host read MUST NOT mark a Nurture Receipt read, acknowledge an Item, execute a reply, or create `CommandExecution`.
+4. My-Chat rereads the internal Handoff. `requested|completed` may continue because Notification creation may commit before a response-loss completion update; `stopped|failed` is unavailable and cannot be resurrected.
+5. My-Chat calls the Nurture open resolver with authenticated actor and refs from the server-side Handoff. The resolver reruns current participant, role, surface entitlement, work/child scope, enrollment, grant, policy, target lifecycle, and visibility.
+6. A ready result returns only generic target `route_class` plus a newly issued B3-2b `scenarioToken(purpose=open_notification)`. Raw token exists only in the response/client navigation channel and MUST NOT enter provider payload, deep link, durable My-Chat Notification/metadata, logs, analytics, traces, or metrics.
+7. The destination surface performs another owner read before protected detail, history, or actions. Client/process loss reopens the recipient-bound Notification and obtains a current token; no URL/local-history recovery of raw token is allowed.
+8. Repeat and multi-device opens remain read-only. Each authenticated open rechecks owner state; a newly issued token does not transfer Notification ownership or revive another expired/revoked token.
+
+Delivery eligibility and current open visibility MUST use separate owner operations:
+
+| Owner operation | Question answered | Current-state effect |
+| --- | --- | --- |
+| `resolve_delivery` | Should the current recipient receive or retry the Notification now? | Current revoke/redaction/cancel/terminal target stops provider work; transient owner failure sends nothing and retries within Host policy. |
+| `resolve_open` | What may the authenticated prior recipient see now? | May route acknowledged/replied/closed work to current authorized detail/history; never restores the earlier delivery predicate, preview, status, or action controls. |
+
+Owner reread occurs before Notification creation, before every provider send/retry, and on every authenticated open. A pre-send deterministic stop marks technical delivery `skipped` and never calls the provider. A post-send revoke/redaction/withdrawal cannot recall an OS notification, so open-time and destination owner reads are the privacy fence. Provider `sent|failed|skipped` remains My-Chat technical state and never changes Nurture business status.
+
+Stale-open behavior is closed:
+
+| Current condition | Safe result |
+| --- | --- |
+| Actor/role/scope/grant/target current | `ready`; return current destination route and a fresh open token. |
+| Item acknowledged/replied/closed but still historically visible | `ready`; show current authorized detail/history and current actions, never stale buttons. |
+| Source redacted/withdrawn/suppressed | Owner-approved tombstone or `unavailable`; no protected body/detail token. |
+| Grant revoked or role/enrollment/scope removed | `unavailable`; no target detail, token, or existence-bearing fallback. |
+| Pre-send cancel/revoke/redaction | Delivery `skipped`; no provider call. |
+| Post-send lifecycle/access change | Existing push remains generic; open resolves current safe result. |
+| Owner API/database unavailable | `retryable`; show generic safe shell, expose no cached detail/control, and allow bounded retry. |
+| Capability/workspace gate disabled | `unavailable`; no owner token or target navigation. |
+| Wrong user/workspace/id | Same generic `unavailable`; no Nurture call or existence oracle. |
+
+My-Chat understands only `ready|unavailable|retryable`, generic route, safe label/help, and retry availability. Nurture retains grant/redaction/lifecycle/policy meaning. Internal `handoff_unavailable` remains technical and MUST NOT become a client domain state or cached business reason.
+
+The current X4/X5 implementation is only a scaffold. It places Handoff id in `morethan://nurture/attention/{handoff_id}`, returns Handoff target fields through the generic Notification DTO, opens directly by Handoff without exact Notification-recipient lookup, does not mark Host read as part of the landing flow, reuses the delivery `item.status=open` predicate for open visibility, issues no `open_notification` token, performs no target-surface navigation, and does not revalidate before every provider send/retry. The implementation also returns a generic availability card rather than current detail/history. B3-2c requires notification-id indirection, recipient-safe DTO, separate delivery/open owner contracts, token issuance, route navigation, generic-safe copy, pre-send reread, safe outcome mapping, and leakage/negative tests before Pilot traffic. The readiness lock changes no source, schema, manifest, route, provider, environment, capability, or traffic.
 
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
@@ -508,6 +561,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Unavailable reasons and adoption gate | **LOCKED by Pilot-0-B3-1d-3:** domain actions use the closed safe reason vocabulary and separate confirmation classes; missing handlers/declaration drift fail validation; Base, My-Chat, and Nurture adopt additively in order with legacy compatibility and capability off. |
 | Surface transition | **LOCKED by Pilot-0-B3-2a:** complete an action in the current entitled surface when possible; otherwise carry only generic route class plus opaque Nurture continuation to the role-correct destination, perform current owner reread, and never execute an implicit command. |
 | Opaque token protocol | **LOCKED by Pilot-0-B3-2b:** only clarify/submit/open-notification are valid; bind exact workspace/participant/purpose/consumer surface, use Pilot TTL 5m/5m/7d, consume clarify once and submit transactionally, keep notification open read-only/reusable, and replace rather than extend tokens. |
+| Notification/deep-link stale handling | **LOCKED by Pilot-0-B3-2c:** provider/deep link use recipient-bound Notification id only; authenticate and validate ownership before owner reads; split delivery/open resolution; reread before create/send/open; issue destination token only after current open; Host read never acknowledges Nurture work. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -577,7 +631,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-2b locked** | B1/B2/B3-0/B3-1 are locked; B3-2a/b lock transition/destination and opaque-token semantics. B3-2c/d, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-2c locked** | B1/B2/B3-0/B3-1 are locked; B3-2a/b/c lock transition, token, and notification/deep-link stale semantics. B3-2d, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

@@ -187,7 +187,21 @@ Pilot-0-B3-2b opaque-token refinement:
 - `submit_action` binds action key, opaque target refs, expected versions, prepared schema/hash, immutable refs, and a stable command request id derived from context id + purpose. Token consumption, `CommandExecution`, and the business effect MUST commit atomically. Exact response-loss replay returns the committed Execution; deterministic stale/denied state revokes the context; retryable technical failure leaves the unchanged token active only within TTL.
 - `open_notification` stores locator refs only, is reusable/read-only until expiry/revoke, and every open owner-rereads current participant/role/scope/grant/policy/target lifecycle. Open MUST NOT mark a Nurture Receipt read/acknowledged or execute any command.
 - Refresh never mutates `expiresAt` or reactivates a consumed/revoked/expired context. Clarification regenerates current candidates, submit reopens/re-presents the action, and notification recovery returns through a current owner view before issuing any new token.
-- Scenario tokens never satisfy `strong_authorization`. Internal mismatch/replay/revoke/expiry codes remain server-side and map through the accepted safe availability vocabulary. Raw token transport/logging/deep-link details and stale notification landing behavior remain B3-2c work.
+- Scenario tokens never satisfy `strong_authorization`. Internal mismatch/replay/revoke/expiry codes remain server-side and map through the accepted safe availability vocabulary. Pilot-0-B3-2c fixes notification transport/open behavior below.
+
+Pilot-0-B3-2c notification/deep-link refinement:
+
+- Provider payload and deep link carry only a server-side recipient-bound My-Chat `notification_id`, generic notification-open route, and generic copy that remains safe after revoke/redaction. They MUST NOT carry scenario token, Handoff id, Nurture ref/id, protected body, target/action state, or cached authorization.
+- Nurture Notification list DTO exposes only Notification id/type/read state, generic safe copy, and generic deep link. Internal Handoff target id/type and metadata remain server-side and MUST NOT be returned as a client navigation target.
+- The generic route is `morethan://notifications/{notification_id}/open`. Authentication and exact Notification `userId + workspaceId` validation happen before Ledger/Nurture access. Wrong user/workspace/id returns the same generic unavailable result and MUST NOT call Nurture.
+- After recipient validation, My-Chat marks only the Host Notification read state. Owner-ready, stale, unavailable, or transient owner-outage landing all count as a Host open; none changes Nurture Receipt/Item/Message or creates `CommandExecution`.
+- My-Chat rereads an eligible `requested|completed` Handoff, then calls a dedicated Nurture open resolver with the authenticated actor. `stopped|failed` Handoff cannot open or be resurrected. The requested state remains eligible only for the crash window where Notification committed before Handoff completion was recorded.
+- Ready open issues a destination-bound `scenarioToken(purpose=open_notification)` after current owner checks. Raw token exists only in the response/client navigation channel; provider payload, URL, durable My-Chat Notification/metadata, logs, analytics, and telemetry MUST NOT store the value. The destination owner-rereads again before protected render/action availability.
+- Delivery eligibility and open visibility are different owner operations. Delivery requires current reason to notify; open may route an already acknowledged/replied/closed item to current authorized detail/history. Open MUST NOT reuse delivery's `item.status=open` predicate as a universal visibility rule.
+- Owner state is rechecked before Notification creation, before every provider send/retry, and on every open. Pre-send revoke/redaction/cancel or terminal target state yields delivery `skipped`; transient owner failure sends nothing and enters bounded retry; post-send state change cannot recall the OS notification but wins at open.
+- Current visible lifecycle change returns current detail/history and current actions, never stale controls. Source redaction/withdrawal/suppression may expose only an owner-approved tombstone. Grant/role/enrollment/scope removal, stopped/failed Handoff, or disabled capability returns no protected token/detail.
+- The generic Host response classes are exactly `ready|unavailable|retryable`. Nurture supplies safe label/help/retry; My-Chat MUST NOT interpret grant, redaction, lifecycle, or policy reason semantics. Internal `handoff_unavailable` does not become client domain state.
+- Notification list copy may be rendered from the generic durable Host record without a per-row owner call. Opening, retrying, destination rendering, or executing an action always uses current owner state. Repeat/multi-device opens are read-only and may issue separate TTL-bound tokens after current checks.
 
 Multi-turn behavior:
 
@@ -326,7 +340,7 @@ Forbidden host-provided business inputs:
 Scenario token rules:
 
 - Scenario tokens are issued by Nurture and are opaque to My-Chat.
-- My-Chat may store and return the token but must not inspect, modify, or branch on the token contents.
+- My-Chat may hold and return the token in bounded surface/client interaction state but must not inspect, modify, or branch on the token contents. Notification delivery never durably stores raw token material.
 - MVP tokens are opaque Nurture DB handles, not signed business payloads.
 - MVP supports `clarify`, `submit_action`, and `open_notification` only. `select_scope` is folded into `clarify`; `continue` uses `hostConversationRef` + `NurtureInteractionContext`; `resume_draft` is post-MVP.
 - The token record may reference candidate role, work scope, target, pending action, delivery, or clarification refs, but those refs become usable only after Nurture resolves and validates them.

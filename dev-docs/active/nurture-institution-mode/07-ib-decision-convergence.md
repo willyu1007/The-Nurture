@@ -48,7 +48,7 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08; B3-1 refinements plus B3-2a transition and B3-2b opaque-token semantics added on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-08; B3-1 refinements plus B3-2a transition, B3-2b opaque-token, and B3-2c notification/deep-link stale semantics added on 2026-07-16.
 
 **Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
@@ -79,6 +79,7 @@ Rules:
 - Contract adoption remains Base -> My-Chat -> Nurture with capability disabled. Nurture advertises an action only after authenticated handler, current owner presenter, command path, and negative tests exist.
 - Cross-surface transitions carry only generic route class plus Nurture-issued opaque continuation/display bookkeeping. They transfer no role/scope/authorization, business lifecycle, action availability, command identity, or raw Nurture ids.
 - Pilot tokens retain only `clarify`, `submit_action`, and `open_notification`; bind exact workspace, participant, purpose, and consumer surface; use five-minute clarify/submit TTL and seven-day notification-open TTL; never skip current owner gates; and never extend or reactivate an old context. Clarify consumes one valid answer, submit consumption/Execution/business effect are transactional with exact replay, and notification open remains reusable/read-only.
+- Provider notification and deep-link carriers contain only recipient-bound My-Chat notification identity plus generic safe copy/route. Authentication and exact recipient/workspace validation precede Handoff/Nurture reads; Nurture issues any destination token only after the open-time owner read. Delivery eligibility and current open visibility remain separate, every send/retry/open rereads owner state, Host notification read never acknowledges Nurture work, and stale/revoked/redacted/withdrawn targets never restore cached content or controls.
 - An action closes in the current entitled surface when possible. Guardian complex history/grant work targets family workbench; Caregiver full work targets teacher board; Institution writes target institution workbench; technical recovery never leaves Technical Admin.
 - Target open is read-only and reruns current owner resolution before protected detail or actions. Navigation cannot implicitly acknowledge/confirm/submit/cancel/retry or create another Nurture command/fact.
 - `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.
