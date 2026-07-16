@@ -236,6 +236,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-16 | Pilot-0-B3-2b documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
+| 2026-07-16 | Pilot-0-B3-2b opaque-token accepted-decision sync | PASS | SSOT fixes the three-purpose Pilot profile, consumer-surface/conversation bindings, 5-minute clarify/submit TTL, 7-day notification-open TTL, one-time/transactional consume, exact Execution replay, current owner reread, and new-token-only refresh. B3-2c/d remain open; no source/schema/manifest/route/environment change. |
 | 2026-07-16 | Pilot-0-B3-2a documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |
 | 2026-07-16 | Pilot-0-B3-2a transition/destination accepted-decision sync | PASS | SSOT makes transitions navigation-only, prefers current-surface closure, routes to role-correct destinations, carries no raw Nurture ids, requires target owner reread, and forbids implicit commands or lifecycle transfer. B3-2b-d remain open; no source/schema/manifest/route/environment change. |
 | 2026-07-16 | Pilot-0-B3-1d-3 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |

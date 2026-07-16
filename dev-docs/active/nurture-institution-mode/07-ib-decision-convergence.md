@@ -48,7 +48,7 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08; B3-1 refinements complete and B3-2a transition semantics added on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-08; B3-1 refinements plus B3-2a transition and B3-2b opaque-token semantics added on 2026-07-16.
 
 **Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
@@ -78,6 +78,7 @@ Rules:
 - Cross-surface entity actions require optional additive Base `domain_action_contracts` and a separate handler registry. Missing handlers or invalid target/surface/confirmation declarations are fatal; current Run-level `scenario_actions` and legacy manifests retain their existing semantics.
 - Contract adoption remains Base -> My-Chat -> Nurture with capability disabled. Nurture advertises an action only after authenticated handler, current owner presenter, command path, and negative tests exist.
 - Cross-surface transitions carry only generic route class plus Nurture-issued opaque continuation/display bookkeeping. They transfer no role/scope/authorization, business lifecycle, action availability, command identity, or raw Nurture ids.
+- Pilot tokens retain only `clarify`, `submit_action`, and `open_notification`; bind exact workspace, participant, purpose, and consumer surface; use five-minute clarify/submit TTL and seven-day notification-open TTL; never skip current owner gates; and never extend or reactivate an old context. Clarify consumes one valid answer, submit consumption/Execution/business effect are transactional with exact replay, and notification open remains reusable/read-only.
 - An action closes in the current entitled surface when possible. Guardian complex history/grant work targets family workbench; Caregiver full work targets teacher board; Institution writes target institution workbench; technical recovery never leaves Technical Admin.
 - Target open is read-only and reruns current owner resolution before protected detail or actions. Navigation cannot implicitly acknowledge/confirm/submit/cancel/retry or create another Nurture command/fact.
 - `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.

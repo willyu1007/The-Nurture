@@ -178,6 +178,17 @@ Pilot-0-B3-2a cross-surface transition refinement:
 - A command already completed on the source surface is reread at the destination through current Execution/business facts. Navigation neither reruns the command nor enters command identity.
 - Transition telemetry is limited to route classes, source/destination surface, safe outcome, latency, and opaque correlation. Transition creates no Nurture business fact and carries no bodies, raw ids, or token values.
 
+Pilot-0-B3-2b opaque-token refinement:
+
+- The Pilot purpose set remains exactly `clarify|submit_action|open_notification`. Generic navigation without one of these purposes carries route class only; `open_notification` MUST NOT become a general object-browser token.
+- Every token binds workspace, current participant, purpose, and the surface where it is consumed/opened. Chat clarification also binds the hashed host conversation. A token issued for one surface MUST NOT be accepted as a cross-surface credential; an intended destination token is issued for that destination.
+- Pilot TTL is fixed at five minutes for `clarify`, five minutes for `submit_action`, and seven days for `open_notification`. TTL expiry affects continuation only and MUST NOT transition Message, Receipt, Item, clarification deadline, Grant, Enrollment, or any other business fact.
+- A structurally valid clarify answer consumes its context once. Invalid/mismatched input does not consume it; stale current facts return safe blocked/recovery and any further clarification uses a new context/token rather than extending the old row.
+- `submit_action` binds action key, opaque target refs, expected versions, prepared schema/hash, immutable refs, and a stable command request id derived from context id + purpose. Token consumption, `CommandExecution`, and the business effect MUST commit atomically. Exact response-loss replay returns the committed Execution; deterministic stale/denied state revokes the context; retryable technical failure leaves the unchanged token active only within TTL.
+- `open_notification` stores locator refs only, is reusable/read-only until expiry/revoke, and every open owner-rereads current participant/role/scope/grant/policy/target lifecycle. Open MUST NOT mark a Nurture Receipt read/acknowledged or execute any command.
+- Refresh never mutates `expiresAt` or reactivates a consumed/revoked/expired context. Clarification regenerates current candidates, submit reopens/re-presents the action, and notification recovery returns through a current owner view before issuing any new token.
+- Scenario tokens never satisfy `strong_authorization`. Internal mismatch/replay/revoke/expiry codes remain server-side and map through the accepted safe availability vocabulary. Raw token transport/logging/deep-link details and stale notification landing behavior remain B3-2c work.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
