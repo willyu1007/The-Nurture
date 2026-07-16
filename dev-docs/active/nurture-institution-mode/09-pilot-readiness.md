@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-B in progress; B3-3 business/data contract complete, B3-4 representative journey coverage next
+- **Current checkpoint:** Pilot-0-B complete; Pilot-0-C IIB/onboarding closure next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -106,7 +106,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
 | B3-2 cross-surface continuity | **LOCKED / COMPLETE** | B3-2a-d lock transition/destination, opaque tokens, notification/deep-link stale handling, and draft/result/history continuity. |
 | B3-3 business path and data envelope | **LOCKED / COMPLETE** | B3-3a-d lock the input envelope, Grant/family authority/target scope, atomic business lifecycle, exact replay, revoke/redaction, and failure/privacy behavior. |
-| B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
+| B3-4 representative journey coverage | **LOCKED / COMPLETE** | Exhaustive action/surface conformance, four representative round trips across three child scopes, Institution/Operator strands, layered negative/fault/privacy evidence, and exit gates. |
 
 #### Pilot-0-B3-0 — role and surface entitlement (LOCKED)
 
@@ -761,7 +761,7 @@ Receipt semantics are exact:
 - Only explicit acknowledge changes the source Receipt. Guardian open leaves the reply Receipt delivered because Pilot exposes no explicit family-read command.
 - Family presenters compose the safe product states `sent -> caregiver acknowledged -> replied` from current Nurture Message/Receipt/Item facts rather than copying or exposing internal status tuples in My-Chat.
 
-Current capture and acknowledge transactions largely match the decision. Current reply accepts `open|acknowledged|waiting_for_family`; the Pilot implementation must narrow both command preconditions and database update predicates to `acknowledged` only, apply the B3-3b original-Grant rule, and prevent clarification/second-reply/extra-close surface actions. Notification coverage remains B3-4 and cannot change the business transaction outcome. B3-3c changes no source, schema, migration, manifest, runtime, environment, capability, provider, or traffic.
+Current capture and acknowledge transactions largely match the decision. Current reply accepts `open|acknowledged|waiting_for_family`; the Pilot implementation must narrow both command preconditions and database update predicates to `acknowledged` only, apply the B3-3b original-Grant rule, and prevent clarification/second-reply/extra-close surface actions. B3-4 specifies notification coverage without changing the business transaction outcome. B3-3c changes no source, schema, migration, manifest, runtime, environment, capability, provider, or traffic.
 
 **Pilot-0-B3-3d — replay, revoke, redaction, and failure/privacy behavior (LOCKED)**
 
@@ -835,9 +835,78 @@ Current core tests already cover exact replay, wrong-Step ownership, Grant revok
 4. Assert caregiver-reply redaction does not suppress/reopen the source Item and remove `cancel_route` from the Pilot action registry.
 5. Jointly validate provider retry/dead-letter, owner outage, stale notification, and two-key kill-switch behavior.
 
-B3-3 is complete as a planning contract. B3-3d changes no source, schema, migration, manifest, route, runtime, environment, capability, provider, database, or traffic. B3-4 now decides the minimum representative cross-surface journey matrix that must prove this contract end to end.
+B3-3 is complete as a planning contract. B3-3d changes no source, schema, migration, manifest, route, runtime, environment, capability, provider, database, or traffic.
 
-The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
+**Pilot-0-B3-4 — representative journey coverage (LOCKED / COMPLETE)**
+
+B3-4 proves the accepted action, continuity, and business contracts without requiring every action, surface, and failure to form a full Cartesian E2E product. Evidence is layered:
+
+| Evidence layer | Mandatory responsibility |
+| --- | --- |
+| Contract/conformance | Exercise every allowed and denied B3-1 action/surface cell; validate stable keys, confirmation class, target-ref class, handler presence, legacy compatibility, and fail-closed routing. |
+| Nurture domain/DB | Prove atomic command effects, versions, original Grant, Receipt/Item/Attention lifecycle, revoke/redaction cascades, author/receiver visibility, and no partial dependent state. |
+| Two-database joint E2E | Prove claimed-Step response-loss replay, same-Step ownership, wrong-Step denial, Handoff/Outbox recovery, notification owner reread, provider/owner failure, kill switch, and persistence privacy. |
+| Rendered surface E2E/manual | Prove generic Chat interaction UI, family/teacher/institution board and workbench behavior, Notification/deep link, Technical Admin limits, safe empty/error/permission states, and current-state refresh. |
+
+The complete action/surface matrix is exhaustive at the contract/adapter layer. Full business E2E uses four representative round trips across the existing three child/family scopes and seven logical accounts:
+
+| Journey | Guardian entry | Caregiver acknowledge | Caregiver reply | Family result and special evidence |
+| --- | --- | --- | --- | --- |
+| J1 — multi-Guardian cross-surface | Family-1 designated Grant owner submits through generic Chat. | Caregiver Chat | Teacher board | Second Guardian opens the recipient-bound Notification into Family board and then Family workbench history; both Guardians see current same-family facts and neither sees another family. |
+| J2 — board to Chat | Family-2 Guardian submits through Family board. | Teacher board | Caregiver Chat | Guardian owner-rereads the result in Family workbench; caregiver-reply redaction later leaves the source Item terminal/replied and actionless. |
+| J3 — workbench to board | Family-3 Guardian submits through Family workbench. | Teacher board | Teacher board | Guardian opens current result from Notification to Family board; the joint path injects response loss/provider recovery while preserving one effect. |
+| J4 — Chat same-surface | Family-1 second Guardian submits a separate question under the current family Grant. | Caregiver Chat | Caregiver Chat | Primary Guardian owner-rereads the committed result; the submitting second Guardian then performs exact-author source redaction to prove the distinct source/reply cascade and tombstone behavior. |
+
+The four journeys provide all four Caregiver `Chat|teacher_board` acknowledge/reply pairings, exercise Guardian Chat/board/workbench submission, and validate the second Guardian without adding a fourth child. Each question has a new command identity, body ref, and routing attempt. Every surface observes one canonical Nurture fact path; navigation/open is read-only, drafts do not cross surfaces, and authorized committed facts are recovered by owner reread rather than command replay from another surface.
+
+The Institution strand is separate from the family-care round trips:
+
+1. Institution board displays safe missing/readiness, invitation, role, enrollment, Grant-coverage, and backlog aggregates and never executes a durable write.
+2. Institution workbench initiates the My-Chat adult invitation; My-Chat owns acceptance, then Nurture binds the canonical user and separately assigns the current staff role.
+3. Workbench initiates enrollment, while a Guardian independently confirms the family link and creates the Grant. Institution administration never substitutes for Guardian authority.
+4. Board rereads current aggregates after setup and business activity without family question/reply bodies or protected consent narrative.
+5. Institution workbench business-cohort disable blocks new eligible Nurture work while retaining facts. Recovery is a separate revalidated command and cannot revive a revoked Grant, redacted Message, or terminal Item. My-Chat technical kill switch remains independent.
+
+Pilot-0-C owns the exact authenticated onboarding/UI/API closure. B3-4 locks the required eventual journey but does not treat direct fixture or Prisma setup as product evidence.
+
+The Technical Operator strand remains entirely in Technical Admin:
+
+- inspect refs/counts/status/version/reason evidence;
+- reconcile the original outcome-unknown Step and prove same-Step recovery;
+- replay/stop an eligible Handoff and observe Outbox/provider retry or dead-letter;
+- request Nurture owner reevaluation and execute disable-only emergency shutdown;
+- fail every attempt to read protected business content, edit Message/Receipt/Item, restore/replace a Grant, reverse redaction, synthesize provenance, or mark acknowledge/reply.
+
+The complete negative/failure coverage matrix is mandatory:
+
+| Category | Required cases |
+| --- | --- |
+| Identity/scope | Wrong workspace, family, child, role, care group, surface, and raw-id/ref injection; cross-family Guardian; Institution/Operator body denial. |
+| Command/concurrency | Exact replay, same id/different payload, response loss, wrong-Step, stale version, concurrent acknowledge/reply, reply-before-ack, and second reply. |
+| Grant fence | Invalidation before capture, after capture/before acknowledge, after acknowledge/before reply, and after reply; expiry, replacement, owner-role loss, enrollment/care-group drift, and policy disable. |
+| Redaction | Guardian source redaction before caregiver action and after committed reply; caregiver-reply redaction; no unredact, Item reopen, or second reply. |
+| Surface continuity | Draft stay/discard, reload/process loss, cross-device committed-only access, history navigation, stale button/token/cache, and concurrent change at destination. |
+| Notification | Owner reread before create/send/retry/open; wrong recipient; provider retry/dead-letter; revoke/redaction after send; stale deep link; owner API outage; Host read remains non-business. |
+| Runtime | Nurture precommit failure, postcommit response loss, Step/Handoff/Outbox crash, exact/partial duplicate, Admin reconciliation, and two-key kill switch. |
+| Privacy | Zero body, claim token, forbidden protected ref, raw target, internal denial reason, or secret material in My-Chat persistence, Handoff, Outbox, Notification, logs, analytics, and telemetry. |
+
+Equivalent failure semantics do not need repetition on every surface. Contract/adapter tests exhaust surface availability, domain tests exhaust business state points, and representative joint/surface paths cross the highest-risk boundaries.
+
+B3-4 exit evidence is exact:
+
+1. Every B3-1 allowed/denied action-surface cell maps to a deterministic test id and owner.
+2. J1-J4 pass with three independent families, three child scopes, four Guardian identities, one institution admin, one lead caregiver, and one Technical Operator.
+3. All four Caregiver acknowledge/reply surface pairings pass; second-Guardian same-family visibility and cross-family denial pass.
+4. Institution and Technical Admin surfaces expose no protected family body or unauthorized business control.
+5. High-risk joint replay/fault/privacy journeys pass three consecutive times with one business effect and at most one Handoff for each question.
+6. The revoke/redaction `take: 100` partial-cascade risk is removed through atomic loop-to-closure or whole-transaction overflow rollback.
+7. Automated contract, DB, joint, and surface evidence passes, followed by one recorded manual rendered journey on the exact candidate artifact/topology.
+8. CI may seed synthetic topology for kernel validation; final Pilot-2 product evidence must use authenticated owner actions after Pilot-0-C closure.
+9. Capability and workspace allowlist remain disabled; B3-4 closes readiness decisions only and authorizes no implementation, database, artifact, secret, provider, or traffic change.
+
+Pilot-0-B is complete. Pilot-0-C IIB/onboarding closure is the next decision checkpoint.
+
+The remaining delivery and operations rows are recommendations until their later Pilot checkpoint is explicitly accepted.
 
 | Dimension | Recommended lock |
 | --- | --- |
@@ -862,6 +931,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Grant/family authority/target | **LOCKED by Pilot-0-B3-3b:** one active exact child/enrollment/care-group Grant with both directions, question-only data class, bounded expiry, owner-only administration, same-family visibility, and original-`grantId` capture/ack/reply binding; replacement never revives an old item. |
 | Business lifecycle | **LOCKED by Pilot-0-B3-3c:** atomic capture creates Message/Receipt/open Item/active Attention; explicit acknowledge updates Item/source Receipt while Attention stays active; caregiver-confirmed reply only from acknowledged creates reply Message/Receipt and resolves Attention; `replied` is terminal-for-Pilot and delivery/read/notification remain separate. |
 | Replay/revoke/redaction/failure privacy | **LOCKED by Pilot-0-B3-3d:** exact immutable command replay and same-Step seed ownership; original-Grant fence on every boundary; role-aware author/receiver body visibility; distinct irreversible redaction cascades; no Pilot cancel; owner/provider/runtime failures remain independent and fail closed. B3-3 is complete. |
+| Representative journey coverage | **LOCKED by Pilot-0-B3-4:** exhaustive action/surface conformance plus four representative round trips across three child scopes cover all Guardian input surfaces and Caregiver acknowledge/reply pairings; Institution/Operator strands and layered identity/replay/Grant/redaction/continuity/notification/runtime/privacy evidence close Pilot-0-B. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
 | Observation window | Five consecutive operating days after Pilot-3 rehearsal passes. Extend only by explicit Pilot-4 decision. |
 
@@ -929,9 +999,9 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3 complete** | B1/B2/B3-0/B3-1, B3-2a-d, and B3-3a-d are locked. B3-4 representative journey coverage remains open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
-Pilot-0 is not complete while Pilot-0-B through Pilot-0-E remain unresolved. The current decision is deliberately **NO-GO for external traffic** and **GO for readiness decisions only**.
+Pilot-0 is not complete while Pilot-0-C through Pilot-0-E remain unresolved. The current decision is deliberately **NO-GO for external traffic** and **GO for readiness decisions only**.

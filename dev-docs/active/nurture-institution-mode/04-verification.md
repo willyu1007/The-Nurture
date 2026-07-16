@@ -19,16 +19,20 @@
 | Structure and whitespace | PASS | Both changed YAML files parse successfully with Ruby Psych and `git diff --check` passes. The repository does not install a Prettier CLI, so no Prettier result is claimed. |
 | Context and contract baseline | PASS | Strict context verification and live workflow contract pin verification pass at unchanged Base/My-Chat hash `0bd8925e...01aa` and Nurture source pin `e976c235...d193`. |
 
-## Pilot-0-B3-3 Business/Data Contract Gate
+## Pilot-0-B3 Business/Data and Coverage Contract Gate
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| B3-3d owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IB schema/convergence, IIA policy/test design, and Pilot readiness consistently lock exact replay, same-Step seed ownership, original-Grant runtime fencing, role-aware author/receiver protected-body visibility, distinct source/reply redaction cascades, immediate-route no-cancel, and independent technical-failure ownership. B3-3 is complete; B3-4 remains next. |
+| B3-3d owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IB schema/convergence, IIA policy/test design, and Pilot readiness consistently lock exact replay, same-Step seed ownership, original-Grant runtime fencing, role-aware author/receiver protected-body visibility, distinct source/reply redaction cascades, immediate-route no-cancel, and independent technical-failure ownership. B3-3 is complete; B3-4 coverage is verified below. |
 | Privacy and lifecycle semantics | PASS | Audit retention is explicitly separated from body authorization; Grant invalidation cannot be bypassed by replacement Grant, retry, notification, or stale open; source redaction suppresses dependent work, while caregiver-reply redaction leaves the replied source Item closed to further action. Technical Admin cannot restore Grant authority or edit Nurture lifecycle. |
 | Implementation debt capture | PASS | Pre-Pilot gates record acknowledge-only reply, original-Grant binding, author/receiver visibility coverage, reply-redaction non-suppression, removal of Pilot cancel, provider/owner/kill-switch joint coverage, and the current revoke/redaction `take: 100` defect. Cascades must loop atomically to closure or roll back on overflow. |
 | Documentation lint | PASS WITH PRE-EXISTING WARNINGS | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors` checks 27 files with 0 errors and the unchanged 15 vague-reference warnings. |
 | Governance and context | PASS | `sync --apply --changelog`, governance lint, and `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` pass. The previously recorded obsolete `ctl-context-forge.mjs` path was not used. |
 | Contract pin and whitespace | PASS | `pnpm verify:workflow-contract-pin` passes at unchanged Base/My-Chat contract hash `0bd8925e...01aa` and Nurture activation-source hash `e976c235...d193`; `git diff --check` passes. |
+| B3-4 owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IIA policy/test design, and Pilot readiness consistently lock four evidence layers, four question journeys across three child scopes, all four Caregiver Chat/teacher-board acknowledge/reply pairings, Institution/Operator strands, the full negative matrix, and exact exit evidence. Pilot-0-B is complete and Pilot-0-C is next. |
+| Coverage completeness | PASS / PLANNING CONTRACT ONLY | All accepted action/surface cells require exhaustive contract evidence, while J1-J4 provide representative joint/surface crossings without a Cartesian E2E explosion. The contract covers seven logical accounts, second-Guardian same-family visibility/cross-family denial, setup/disable/recovery boundaries, every Grant fence stage, source/reply redaction, notification/provider/owner/runtime failure, and persistence privacy. No implementation test result is claimed. |
+| Evidence and implementation gates | PASS | The contract requires contract, Nurture DB, two-database joint, rendered-surface, and manual evidence; three consecutive high-risk joint passes; atomic repair of the revoke/redaction `take: 100` risk; and authenticated Pilot-0-C onboarding before fixture-seeded CI can become product evidence. Capability and workspace allowlist remain disabled. |
+| B3-4 document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, live contract-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 vague-reference warnings. |
 
 ## Pilot-0-A Readiness Audit
 
@@ -240,13 +244,15 @@ For Pilot-0 readiness work:
 
 ## Rollout / Backout
 
-- Rollout: merge the Pilot-0-A task-doc/governance evidence after all documentation, governance, context, pin, and whitespace gates pass.
-- Backout: revert the Pilot-0-A task-doc/governance changes. No runtime state, database migration, artifact, secret, capability, or traffic change is involved.
+- Rollout: merge each accepted Pilot-0 readiness decision as a scoped task-doc commit after documentation, governance, context, pin, and whitespace gates pass.
+- Backout: revert the relevant Pilot-0 task-doc decision commit. No runtime state, database migration, artifact, secret, capability, or traffic change is involved.
 
 ## Verification Log
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-17 | Pilot-0-B3-4 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
+| 2026-07-17 | Pilot-0-B3-4 representative-coverage accepted-decision sync | PASS | SSOT fixes four evidence layers, J1-J4 across three child scopes, every Caregiver Chat/teacher-board acknowledge/reply pairing, Institution/Operator strands, complete negative/fault/privacy categories, three-run high-risk joint evidence, and authenticated-onboarding dependency. Pilot-0-B is complete; Pilot-0-C is next. No implementation/runtime/environment/traffic change. |
 | 2026-07-17 | Pilot-0-B3-3c documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
 | 2026-07-17 | Pilot-0-B3-3c lifecycle accepted-decision sync | PASS | SSOT fixes atomic capture, separate explicit acknowledge, caregiver-confirmed reply only from acknowledged, original-Grant use, source/reply Receipt behavior, Attention active-to-resolved projection, no implicit read, and `replied` terminal-for-Pilot. Current open/waiting reply acceptance remains an explicit implementation gate. B3-3d remains open; no source/schema/manifest/route/environment change. |
 | 2026-07-16 | Pilot-0-B3-3b documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
