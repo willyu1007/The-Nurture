@@ -70,9 +70,11 @@ My-Chat surface
   -> Scenario response back to My-Chat
 ```
 
-Parents, teachers, and institution administrators all use the My-Chat main mobile chat. My-Chat may process a turn to decide whether to invoke Nurture and may reuse an explicit scenario entry, conversation binding, or Nurture-issued token. That host route decision selects only the scenario. Nurture still resolves participant role, work scope, target, policy, and whether the business effect is internal, `family_to_org`, or `org_to_family`.
+Pilot-0-B3-0 refines surface entitlement without changing identity or resolver ownership. Guardian Nurture work may use Chat, the family board, or the family domain web workbench. Caregiver Nurture work may use Chat or the teacher board. Institution-admin Nurture work may use the institution board or institution domain web workbench and is not exposed through Chat. A technical operator uses only the host technical Admin surface and is not implicitly a Nurture participant. A general My-Chat account may still use My-Chat Chat; the restriction concerns which Nurture role capability is exposed there.
 
-The system invocation direction (`My-Chat -> Nurture -> My-Chat response`) is independent from the Nurture business distribution direction. A teacher message entering from My-Chat is not a special reverse path; it is the same role-agnostic scenario invocation as a guardian or institution-admin message.
+For Chat-entitled roles, My-Chat may process a turn to decide whether to invoke Nurture and may reuse an explicit scenario entry, conversation binding, or Nurture-issued token. That host route decision selects only the scenario. Nurture still resolves participant role, surface entitlement, work scope, target, policy, and whether the business effect is internal, `family_to_org`, or `org_to_family`.
+
+The system invocation direction (`My-Chat -> Nurture -> My-Chat response`) is independent from the Nurture business distribution direction. A caregiver message entering from Chat is not a direct role-to-role reply path; it remains a Nurture scenario invocation that must resolve a current workflow item and commit a caregiver-confirmed action. Institution actions enter through the institution board/workbench rather than Nurture Chat.
 
 `NurtureInteractionContext` may store short-lived pending intent, candidates, clarification state, and draft/action refs. It is consumed inside Nurture and is not a host authorization result.
 

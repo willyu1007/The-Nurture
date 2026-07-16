@@ -3,8 +3,8 @@
 ## Status
 
 - **Phase:** IB decision convergence
-- **Updated:** 2026-07-06
-- **Scope:** schema/defaults only; no Prisma migration, live manifest, or runtime code change
+- **Updated:** 2026-07-16
+- **Scope:** schema/defaults plus Pilot-0 surface-entitlement refinement; no Prisma migration, live manifest, or runtime code change
 - **Input:** child-scope alignment plus `06-ib-nurture-schema-spec.md` section 11 open decisions
 
 This document records the child-scope baseline and converts the seven IB schema open decisions into implementation defaults. These defaults are strong enough for IIA schema/policy design, while keeping production rollout gates explicit where legal/security input is still required.
@@ -14,7 +14,7 @@ This document records the child-scope baseline and converts the seven IB schema 
 | ID | Topic | IB default | Still gated before production |
 | --- | --- | --- | --- |
 | IB-D0 | Child care process scope | **LOCKED:** `NurtureChildCareProcess.id` is the independent child scope; parent/teacher views reorganize one or more child scopes. | Keep organization-level config distinct from child-specific care facts. |
-| IB-D1 | Participant identity and surface role resolution | **LOCKED:** One `NurtureParticipant` per `(workspaceId, myChatUserId)`; all adult roles share My-Chat main chat, My-Chat only selects the scenario, and Nurture resolves role/scope/target/business direction/output; dashboard surfaces may switch validated role assignments. | Revisit only if explicit legal/persona separation is required. |
+| IB-D1 | Participant identity and surface role resolution | **LOCKED, REFINED BY PILOT-0-B3-0:** One `NurtureParticipant` per `(workspaceId, myChatUserId)` remains canonical. Guardian uses Nurture Chat/family board/family workbench; caregiver uses Nurture Chat/teacher board; institution admin uses institution board/workbench and not Nurture Chat; technical operator stays outside Nurture business surfaces. Nurture resolves role/scope/target/business direction/output on every surface. | B3-1 action availability and exact manifest/adapter identifiers remain open. |
 | IB-D2 | Family cardinality | **LOCKED:** One active `NurtureFamily` per `NurtureChildCareProcess` for MVP; multiple parents use guardian role assignments. | Separate-family privacy model for complex custody/blended-family cases. |
 | IB-D3 | Teacher attention board | **LOCKED:** Materialize `NurtureTeacherAttentionItem` as a rebuildable child-scoped projection for teacher mobile UX. | Keep group-level operational notices in a separate future object. |
 | IB-D4 | Grant revoke retention/runtime | **LOCKED:** Revoke is a runtime fence: stop future delivery immediately, exit active work surfaces/context, and keep historical records limited/auditable. | Numeric retention windows, deletion jobs, and legal copy. |
@@ -48,20 +48,24 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08.
+**Convergence status:** LOCKED on 2026-07-08; surface entitlement refined by Pilot-0-B3-0 on 2026-07-16.
 
-**Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Parents, teachers, and institution administrators all use the My-Chat main mobile chat. My-Chat decides whether the current turn belongs to the Nurture scenario but does not choose a Nurture role; Nurture resolves the participant's role/scope/output.
+**Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
 Rules:
 
 - A My-Chat user has one Nurture participant identity inside a workspace.
 - The same participant may hold multiple `NurtureCareRoleAssignment` rows, such as `guardian` for one child and `caregiver` for a care group.
 - Role-specific labels, staff titles, classroom display names, and family-facing labels belong on `NurtureCareRoleAssignment`, not on separate participant identities.
-- My-Chat mobile chat ingress may use an explicit scenario entry, an existing conversation-to-scenario binding, a returned Nurture `scenarioToken`, or generic host routing to decide whether to invoke Nurture. A bound Nurture conversation does not require a new scenario-routing decision on every turn.
+- For Chat-entitled guardian/caregiver roles, My-Chat Chat ingress may use an explicit scenario entry, an existing conversation-to-scenario binding, a returned Nurture `scenarioToken`, or generic host routing to decide whether to invoke Nurture. A bound Nurture conversation does not require a new scenario-routing decision on every turn.
+- An institution administrator may use general My-Chat Chat, but Nurture institution-management capability is unavailable there and must enter through the institution board or institution domain web workbench.
 - After selecting Nurture, My-Chat passes authenticated user identity, surface, conversation/message refs, current payload, generic display state, and any Nurture-issued opaque token. It does not pass trusted role, work scope, child target, grant, or Nurture business intent.
 - Nurture chat handling resolves the active participant, candidate role assignments, target child/thread/item/group, grant/runtime fence, and policy before returning a response or creating any business object.
 - A pure mobile chat clarification turn may be handled with participant-level context only. Any persisted child-specific action, message, item, log, receipt, or workflow event must resolve to a concrete `roleAssignmentId` and `childCareProcessId` before write.
-- Mobile dashboard/board surfaces may expose a role/scope switcher because they are explicit work surfaces. That switch selects among validated Nurture role assignments/scopes; it does not create a second participant identity.
+- Family, teacher, and institution boards are explicit role work surfaces and may expose only validated Nurture role/scope selections compatible with that surface. A switch does not create a second participant identity or broaden authorization.
+- The family domain web workbench is guardian-entitled; the institution domain web workbench is institution-admin-entitled. The first internal experiment has no caregiver domain web workbench fallback.
+- `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.
+- Notification and deep link are transitions into an entitled surface, not independent role surfaces or authorization sources.
 - If multiple roles/scopes are possible and the target does not disambiguate them, Nurture should ask for clarification or return safe scenario-level output rather than defaulting to the broadest role.
 - Audit trails should reference both `participantId` and `roleAssignmentId` when the actor's role matters.
 
@@ -69,8 +73,9 @@ Rationale:
 
 - My-Chat already owns account identity. Duplicating participant identities would make auth resolution, audit, and revocation harder.
 - A single participant with multiple roles cleanly handles the case where one adult participates in more than one Nurture relationship.
-- Keeping mobile chat role-agnostic preserves My-Chat's scenario shell boundary. Nurture owns role semantics and decides output based on its own resolver.
-- Allowing dashboard role switching is still necessary for operational work: a teacher/admin work surface needs deliberate role/scope selection, but that selection belongs to Nurture role assignment, not My-Chat identity.
+- Keeping Chat role-agnostic among Chat-entitled roles preserves My-Chat's scenario shell boundary. Nurture owns entitlement and role semantics and decides output through its resolver.
+- Role boards and domain workbenches serve different work shapes without creating parallel business lifecycles: family views are child/family scoped, teacher views aggregate care-group work, and institution views govern topology/policy without ambient family-content access.
+- Excluding institution Nurture actions from Chat and caregiver actions from a domain web workbench keeps the first internal experiment aligned with the intended product modules instead of treating every host surface as universally available.
 
 Escalation path:
 

@@ -3,7 +3,7 @@
 ## Status
 
 - **Phase:** IB schema SPEC draft
-- **Updated:** 2026-07-11
+- **Updated:** 2026-07-16
 - **Scope:** design-only; no Prisma migration or live manifest change in this phase
 - **Owner boundary:** My-Chat owns account identity and scenario shell; Nurture owns the care ecology graph and care facts
 
@@ -16,7 +16,7 @@ This SPEC defines the Nurture-owned canonical schema needed before institution e
 3. **Child-centered:** `NurtureChildCareProcess` is the center. Families join it; teachers include one or more such scopes in class workflows; institution managers govern how these scopes are organized.
 4. **User boundary:** parents, teachers, and institution managers are My-Chat users; children are not My-Chat users.
 5. **Participant mapping:** Nurture references My-Chat users through `myChatUserId`, but Nurture role, scope, and relationship semantics come from Nurture tables.
-6. **Surface role boundary:** Parents, teachers, and institution administrators share the My-Chat main mobile-chat entry. My-Chat decides whether to route a turn to Nurture but does not choose a Nurture role; Nurture resolves role, scope, target, business direction, and output. Dashboard/board surfaces are explicitly Nurture-bound and may switch among validated Nurture role assignments/scopes, but that switch does not create a separate participant identity.
+6. **Surface role boundary:** Guardian Nurture work is entitled to Chat, the family board, and the family domain web workbench; caregiver Nurture work is entitled to Chat and the teacher board; institution-admin Nurture work is entitled to the institution board and institution domain web workbench, not Chat; technical operations remain in host Admin. My-Chat never selects a trusted Nurture role. Nurture resolves participant, surface entitlement, role, scope, target, business direction, and output. Surface changes do not create another participant identity or authorization source.
 7. **No ambient cross-family read:** caregivers can only access a child care process through active role assignment, enrollment, grant, and policy.
 8. **Nurture-owned communication facts:** family-care message body, classification, item status, acknowledgments, replies, follow-ups, and receipts are canonical in Nurture when created through Nurture care communication.
 9. **Grant-gated cross-role flow:** `family_to_org` and `org_to_family` require an active Nurture-owned `NurtureChildLinkGrant` with matching direction and data class.
@@ -837,7 +837,7 @@ Detailed rationale and implementation implications are in `07-ib-decision-conver
 | ID | Decision | IB default |
 | --- | --- | --- |
 | IB-D0 | Child care process scope | **LOCKED:** `NurtureChildCareProcess.id` is the independent child scope; parent/teacher views reorganize one or more child scopes. |
-| IB-D1 | `NurtureParticipant` identity and surface role resolution | **LOCKED:** One participant per `(workspaceId, myChatUserId)`; mobile chat is role-agnostic scenario ingress, and Nurture resolves role/scope/output; dashboard surfaces may switch validated role assignments. |
+| IB-D1 | `NurtureParticipant` identity and surface role resolution | **LOCKED, REFINED BY PILOT-0-B3-0:** One participant per `(workspaceId, myChatUserId)`; Chat is role-agnostic only among Chat-entitled guardian/caregiver roles; guardian also has family board/workbench, caregiver has teacher board, institution admin has institution board/workbench, and technical operator remains outside Nurture business surfaces. |
 | IB-D2 | `NurtureFamily` cardinality | **LOCKED:** One active family per child care process for MVP; multiple parents use guardian role assignments. |
 | IB-D3 | Teacher attention board | **LOCKED:** Materialize `NurtureTeacherAttentionItem` as a rebuildable child-scoped projection for teacher mobile UX. |
 | IB-D4 | Grant revoke retention/runtime | **LOCKED:** Revoke is a runtime fence: stop future flow immediately, exit active work surfaces/context, and keep historical records limited/auditable. |

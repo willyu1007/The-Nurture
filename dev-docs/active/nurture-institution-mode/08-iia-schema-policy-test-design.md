@@ -3,7 +3,7 @@
 ## Status
 
 - **Phase:** IIA design entry
-- **Updated:** 2026-07-12
+- **Updated:** 2026-07-16
 - **Scope:** design-only; do not edit `prisma/schema.prisma`, `scenario.manifest.yaml`, handlers, policies, presenters, or tests in this phase.
 - **Input:** `06-ib-nurture-schema-spec.md` and `07-ib-decision-convergence.md` are locked for IB-D0 through IB-D7.
 - **Next implementation gate:** schema implementation must use the repo DB SSOT workflow from `prisma/schema.prisma`, then refresh `docs/context/db/schema.json`.
@@ -21,7 +21,7 @@ IIA must preserve these locked rules:
 
 - `NurtureChildCareProcess.id` is the independent child scope.
 - `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`.
-- Parents, teachers, and institution administrators share role-agnostic My-Chat main-chat ingress; My-Chat selects Nurture while Nurture resolves role/scope/target/business direction/output.
+- Guardian and caregiver roles may use role-agnostic Nurture Chat; guardian also uses family board/workbench, caregiver uses teacher board, and institution admin uses institution board/workbench rather than Nurture Chat. My-Chat selects only Nurture and Nurture resolves surface entitlement, role/scope/target/business direction/output.
 - Dashboard/board surfaces may switch among validated `NurtureCareRoleAssignment` rows.
 - One active `NurtureFamily` exists per `NurtureChildCareProcess` in MVP.
 - Main-chat scenario responses and explicit Nurture dashboards use generic realtime render paths; host persistence is limited to opaque optional activation bookkeeping.
@@ -77,20 +77,22 @@ Ownership split:
 - Nurture owns scenario interaction context: `nurtureInteractionContextId`, pending intent, candidate role/scope refs, clarification state, pending draft/action refs, TTL, and staleness state.
 - Nurture owns business memory/facts: family-care threads/messages/items, daily care logs, care constraints, grants, role assignments, child care process state, attention items, and media attribution facts.
 
-Main-chat routing rules:
+Main-chat routing rules, refined by Pilot-0-B3-0:
 
-- Parents, teachers, and institution administrators all enter through the My-Chat main mobile chat. My-Chat MAY process the current turn to decide whether it belongs to Nurture, but the route decision only selects `scenario=nurture`; it does not resolve the Nurture actor role, work scope, child target, business intent, grant, or propagation direction.
+- Guardian and caregiver Nurture work MAY enter through My-Chat Chat. My-Chat MAY process the current turn to decide whether it belongs to Nurture, but the route decision only selects `scenario=nurture`; it does not resolve the Nurture actor role, work scope, child target, business intent, grant, or propagation direction.
+- Institution-admin Nurture work MUST enter through the institution board or institution domain web workbench. General My-Chat Chat remains available to the account but MUST NOT expose Nurture institution-management actions.
 - My-Chat SHOULD reuse an explicit Nurture entry, existing conversation-to-scenario binding, or returned Nurture `scenarioToken` before invoking generic intent routing again. Route reuse is a host conversation optimization, not Nurture authorization.
 - After Nurture is selected, the existing Surface Contract envelope applies. Nurture independently resolves whether the actor is currently acting as guardian, caregiver, or institution administrator and whether the requested effect is `internal_fact`, `family_to_org`, or `org_to_family`.
 - The system invocation direction (`My-Chat -> Nurture -> My-Chat scenario response`) and the Nurture business distribution direction (`family_to_org` / `org_to_family`) are independent concepts and MUST NOT be inferred from each other.
 
 Surface rules:
 
-- `mobile_chat` may pass `workspaceId` if injected by the host adapter, `myChatUserId`, `surface=mobile_chat`, current input payload, `hostConversationRef`, `hostTurnId`, `previousTurnRef`, and `clientLocalContext`.
+- `mobile_chat` may pass `workspaceId` if injected by the host adapter, `myChatUserId`, `surface=mobile_chat`, current input payload, `hostConversationRef`, `hostTurnId`, `previousTurnRef`, and `clientLocalContext`. Nurture MUST limit role candidates to current Chat-entitled guardian/caregiver assignments.
 - `mobile_chat` must not pass trusted role, trusted `selectedRoleAssignmentId`, trusted `childCareProcessId`, host-authored `targetRef`, host-authored `workScopeHint`, or host-side family/institution/class authorization decisions.
-- `mobile_dashboard` / `teacher_board` may pass generic display state such as filters, sort, pagination, selected tab, and a Nurture-issued `scenarioToken` from a previously rendered work surface. My-Chat must not synthesize `roleAssignmentId`, `careGroupId`, `childCareProcessId`, `targetRef`, `dataClass`, or `direction`.
+- Family, teacher, and institution boards may pass generic display state such as filters, sort, pagination, selected tab, and a Nurture-issued `scenarioToken` from a previously rendered work surface. Nurture MUST restrict role/scope candidates to the board's product entitlement; My-Chat must not synthesize `roleAssignmentId`, `careGroupId`, `childCareProcessId`, `targetRef`, `dataClass`, or `direction`.
 - `notification_deeplink` may pass host delivery bookkeeping such as `deliveryId`, `dedupeKey`, and provider delivery status, plus a Nurture-issued `scenarioToken` if one was embedded in the notification. My-Chat must not interpret or pass Nurture target ids as business refs.
-- `web_workbench` / `admin_board` may pass generic display state and Nurture-issued `scenarioToken`. Institution admin work scope is resolved by Nurture; institution admin is not ambient access to all child facts.
+- The family domain web workbench is guardian-entitled and the institution domain web workbench is institution-admin-entitled; neither accepts a host-authored Nurture role/scope. The first internal experiment exposes no caregiver domain web workbench. Institution admin is not ambient access to family content or all child facts.
+- Host `web_run_workbench` and technical Admin are not Nurture domain workbenches and MUST NOT gain business access through surface naming or routing.
 
 Multi-turn behavior:
 
@@ -581,9 +583,9 @@ R8-B1-A logical delivery ownership is locked, with the initial-pending rule corr
 - My-Chat Handoff Ledger and Notification may retain canonical receipt refs and transport correlation, but they do not decide whether the Nurture distribution should exist.
 - My-Chat activation failure does not change the Nurture receipt state.
 
-R8-B1-B unified ingress/result/activation boundary is locked:
+R8-B1-B ingress/result/activation ownership remains locked, with surface entitlement refined by Pilot-0-B3-0:
 
-- My-Chat main chat is the role-agnostic entry for all adult Nurture participants. My-Chat selects the scenario; Nurture resolves actor role, work scope, target, business intent, and propagation direction.
+- My-Chat Chat is a role-agnostic Nurture entry only for Chat-entitled guardian/caregiver roles. Institution-admin Nurture work enters through institution board/workbench. My-Chat selects the scenario; Nurture resolves surface entitlement, actor role, work scope, target, business intent, and propagation direction.
 - A read/clarification turn returns a structured Nurture scenario response. A confirmed write uses the durable Prepare/Execute command path, then returns command/result refs plus scenario response.
 - Nurture dashboard/board content is read through generic scenario presenter contracts and does not require `workflow.handoff.*`.
 - Handoff is reserved for optional host activation capabilities such as notification, push, unread/badge, notification center, and deep link. Business distribution direction and activation-handoff direction are independent.

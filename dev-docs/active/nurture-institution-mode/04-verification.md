@@ -236,7 +236,9 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
-| 2026-07-16 | Pilot-0-B2-2 accepted-decision sync | PASS | Current SSOT locks seven logical accounts and separates institution configuration, caregiver business actions, guardian authority, and My-Chat technical recovery. B3 business/data class is the next decision. |
+| 2026-07-16 | Pilot-0-B3-0 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings; governance sync/lint, strict context verification, exact workflow contract pin, and `git diff --check` pass. |
+| 2026-07-16 | Pilot-0-B3 resplit and B3-0 accepted-decision sync | PASS | B3 is now B3-0 role/surface, B3-1 action, B3-2 transition, B3-3 business/data, and B3-4 journey coverage. B3-0 locks guardian Chat/board/workbench, caregiver Chat/board, institution board/workbench, and technical Admin-only operator entitlement; earlier all-adult Nurture Chat wording is explicitly superseded in part. No manifest/runtime/environment change. |
+| 2026-07-16 | Pilot-0-B2-2 accepted-decision sync | PASS | Current SSOT locks seven logical accounts and separates institution configuration, caregiver business actions, guardian authority, and My-Chat technical recovery. This originally opened one B3 business/data decision; Pilot-0-B3-0 later resplit B3 into five ordered checkpoints. |
 | 2026-07-16 | Revised Pilot-0-B1 and B2-1 accepted-decision sync | PASS | Current SSOT locks three synthetic child scopes, three independent families, and four distinct guardian accounts as `2 + 1 + 1`; real Pilot-4 sizing remains open and the prior B1 shape is explicitly superseded. |
 | 2026-07-16 | Pilot-0-B1 accepted-decision sync | SUPERSEDED | The initial 2 then 5–8 real-cohort shape was validly recorded and then explicitly replaced by the revised B1/B2-1 record. |
 | 2026-07-16 | Pilot-0-B1 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and no new warning; governance lint, strict context verification, exact workflow pin, and `git diff --check` pass. |
@@ -278,7 +280,7 @@ For Pilot-0 readiness work:
 | 2026-07-07 | IB-D7 My-Chat opaque delivery sync | PASS | Marked My-Chat shell integration as realtime by default; host persistence is limited to minimal opaque routing/dedupe/status/expiry delivery bookkeeping when delivery requires it. |
 | 2026-07-07 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IB-D7 docs update. |
 | 2026-07-07 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IB-D7 docs update. |
-| 2026-07-08 | IB-D1 / IB-D2 lock sync | PASS | Marked participant identity + surface role resolution as locked: mobile chat is role-agnostic Nurture ingress; dashboard/board surfaces may switch validated role assignments. Marked one active `NurtureFamily` per `NurtureChildCareProcess` as locked for MVP. |
+| 2026-07-08 | IB-D1 / IB-D2 lock sync | SUPERSEDED IN PART | Participant identity, Nurture-owned role resolution, and one active family remain locked. Pilot-0-B3-0 later narrows Nurture Chat entitlement to guardian/caregiver and moves institution-admin Nurture work to institution board/workbench. |
 | 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance sync passed after IB-D1/IB-D2 docs update. |
 | 2026-07-08 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after IB-D1/IB-D2 docs update. |
 | 2026-07-08 | IIA schema/policy/test design sync | PASS | Added `08-iia-schema-policy-test-design.md` with implementation slices, schema model groups, resolver/policy contracts, capability design, and test matrix. Design-only; no Prisma, manifest, source, or runtime edits. |
@@ -332,7 +334,7 @@ For Pilot-0 readiness work:
 | 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-A convergence. |
 | 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-A convergence. |
 | 2026-07-11 | `git diff --check` | PASS | No whitespace errors after the B1-A documentation sync. |
-| 2026-07-11 | R8-B1-B unified ingress/result/activation boundary sync | PASS | Locked all adult roles onto My-Chat main-chat scenario routing, kept role/scope/target/business direction inside Nurture, separated structured scenario response and explicit dashboard presenter paths from optional host activation handoff, and corrected Receipt so target-readable content may be immediately `delivered`. Design-only; no Prisma/manifest/runtime edits. |
+| 2026-07-11 | R8-B1-B unified ingress/result/activation boundary sync | SUPERSEDED IN PART | Role/scope/target/business direction ownership, result paths, activation separation, and Receipt semantics remain valid. Pilot-0-B3-0 later replaces only the all-adult Nurture main-chat entitlement with the role/surface matrix. |
 | 2026-07-11 | B1 terminology drift scan | PASS | No active contract still treats dashboard/main-chat display as handoff delivery or Nurture `pending` as My-Chat notification state; the only match is the intentional D-035 supersede history. |
 | 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Governance views synchronized after B1-B convergence. |
 | 2026-07-11 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance lint passed after B1-B convergence. |
