@@ -94,6 +94,17 @@ Surface rules:
 - The family domain web workbench is guardian-entitled and the institution domain web workbench is institution-admin-entitled; neither accepts a host-authored Nurture role/scope. The first internal experiment exposes no caregiver domain web workbench. Institution admin is not ambient access to family content or all child facts.
 - Host `web_run_workbench` and technical Admin are not Nurture domain workbenches and MUST NOT gain business access through surface naming or routing.
 
+Pilot-0-B3-1a Guardian action refinement:
+
+- Guardian Chat MUST remain the generic My-Chat AI/interaction harness. Nurture returns generic interaction envelopes and MUST NOT add a Guardian-specific Chat shell or second Chat business lifecycle.
+- Guardian Chat initially relies only on implemented core primitives: `timeline_inline`, `action_option_deck`, `editable_preview`, `authorization_gate`, `bottom_sheet`, `full_screen_flow`, and envelope `resultSummary`. Incomplete generic primitives are not Pilot prerequisites.
+- Question submission, grant confirm/replacement, revoke, and author redaction are reachable from Chat, family board, and family workbench. Presentation differs, but every durable effect uses the same Nurture command specification, current resolver/policy checks, and CommandExecution kernel.
+- Natural language, selected surface, dashboard projection, and client state are not authorization. Every confirmation reloads current actor, role, child/family scope, grant, object lifecycle, and expected version before execution.
+- Family board is current/recent work scope; family workbench is complete authorized history and complex grant review. Neither owns a parallel message, receipt, grant, or action state.
+- Revoke cannot require web-workbench access. Submitted questions cannot be edited in place or hard-deleted; correction/resend uses a new command, while redaction changes current visibility under the existing retention/audit contract.
+- `cancel_route` is action-available only for a current cancellable pending Receipt. An immediate-only Pilot route may expose no cancellation affordance.
+- The Pilot's designated primary/secondary guardian script does not create a `primary_guardian` role or client-side permission rule; action availability always comes from current Nurture facts and policy.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; B1, B2, and B3-0 locked
+- **Current checkpoint:** Pilot-0-B in progress; decisions through B3-1a locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -103,7 +103,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
-| B3-1 action availability by surface | OPEN | Which read/write/authorization actions each entitled surface may expose. |
+| B3-1 action availability by surface | **IN PROGRESS — B3-1a LOCKED** | Guardian matrix is locked; caregiver, institution, technical-operator, and exact action-key mappings remain open. |
 | B3-2 cross-surface continuity | OPEN | Transition, opaque token, notification/deep-link, and owner-reread rules. |
 | B3-3 business path and data envelope | OPEN | Exact `family_care_question` fields, exclusions, grant directions, and lifecycle. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
@@ -133,6 +133,50 @@ B3-0 supersedes only the earlier statement that every adult Nurture role shares 
 
 The B3-0 readiness decision changes no manifest or runtime. B3-1 and later implementation must reconcile at least three known gaps: guardian family-input activation does not yet declare the family web workbench, teacher inbox/attention routes are currently labelled with `web_domain_workbench` even though the product entitlement is the teacher board, and generic Chat declarations do not yet encode the institution-role exclusion. These are implementation findings, not permission to edit or enable the manifest.
 
+**Pilot-0-B3-1 — action availability by surface**
+
+| Checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| B3-1a Guardian action matrix | **LOCKED** | Guardian Chat, family board, and family workbench action availability. |
+| B3-1b Caregiver action matrix | OPEN | Caregiver Chat and teacher-board reads, acknowledge, reply, and prohibited actions. |
+| B3-1c Institution action matrix | OPEN | Institution-board/workbench topology, enrollment, disablement, and content-exposure boundaries. |
+| B3-1d Technical/operator and action-key mapping | OPEN | Host recovery actions plus exact manifest/API/command keys and unavailable reasons. |
+
+#### Pilot-0-B3-1a — Guardian action matrix (LOCKED)
+
+| Guardian action | Generic AI Chat | Family board | Family domain web workbench |
+| --- | --- | --- | --- |
+| Ask for current state or explanation | AI response over current owner-reread | Display current state | Display current state |
+| View current question, receipt, or caregiver reply | Display safe summary and offer an entitled target surface | Current/recent list and detail | Complete authorized history and detail |
+| Select a child or item | Generic `action_option_deck` when ambiguous | Select within current board scope | Select within authorized workbench scope |
+| Create a question draft | AI-assisted draft | Short question input | Full question editor |
+| Submit `family_care_question` | `editable_preview` plus `authorization_gate` | Confirm child/destination, then execute | Full preview, then execute |
+| View grant state and scope | Safe summary plus navigation | Current grant summary | Complete grant/version/replacement record |
+| Create or confirm a grant | Generic strong authorization flow | Strong authorization flow | Complete authorization flow |
+| Revoke a grant | Generic `authorization_gate` | Strong confirmation | Strong confirmation with full consequence detail |
+| Redact the guardian's own submitted question | Generic `authorization_gate` for a resolved message | Confirm from question detail | Confirm from authorized history detail |
+| Cancel a pending route | Conditional on current cancellable `pending` state | Same | Same |
+| Search complete history | Navigate to the workbench | Not available beyond current/recent scope | Available |
+| Edit an already-submitted question | Not allowed | Not allowed | Not allowed |
+| Hard-delete Message/Receipt/Execution facts | Not allowed | Not allowed | Not allowed |
+| Continue chatting on an already-replied item | Out of Pilot-0 | Out of Pilot-0 | Out of Pilot-0 |
+| View another family | Not allowed | Not allowed | Not allowed |
+
+The Guardian matrix has the following mandatory semantics:
+
+1. Chat is the generic My-Chat AI panel, not a Guardian-specific Nurture page. Nurture MUST use generic interaction envelopes and MUST NOT register a second Chat business state machine or bespoke family-chat shell.
+2. The first Guardian Chat slice depends only on the currently implemented core primitives: `timeline_inline`, `action_option_deck`, `editable_preview`, `authorization_gate`, `bottom_sheet`, `full_screen_flow`, and envelope `resultSummary`. `form_collector`, `step_wizard`, `suggestion_chips`, and other incomplete primitives are not Pilot prerequisites.
+3. Natural-language input is intent and private draft material. Cross-role submission, grant creation/replacement, revoke, and redaction require an explicit current-state confirmation before a Nurture command executes.
+4. Chat returns a safe result summary after command completion. Family board/workbench views reread current Nurture-owned state; no surface copies the business lifecycle into My-Chat Chat or projection storage.
+5. Core Guardian rights are reachable from all three entitled surfaces: submit a question, create/confirm a grant, revoke a grant, and redact the actor's own question. Each surface may use a different presentation, but all three MUST converge on the same canonical Nurture command and policy.
+6. Revoke MUST NOT require access to the web workbench. The confirmation MUST disclose affected child scope, data class/direction, future-access consequence, retention behavior, and reversibility before commit.
+7. `cancel_route` is shown only when the current Receipt is both `pending` and cancellable. If B3-3 locks an immediate-only route with no user-visible pending window, Pilot UI MAY expose no cancel action.
+8. A submitted question is immutable. Correction, resend, or another question creates a new command identity; redaction affects visibility but does not rewrite or hard-delete audit facts.
+9. The dual-guardian experiment adds no `primary_guardian` role. The designated primary guardian performs scripted grant/submission actions, while actual action availability is derived from current role, family reachability, grant ownership, policy, and object state. The second guardian validates same-family owner-read.
+10. Surface identity is untrusted context for eligibility, audit, and presentation only. My-Chat MUST NOT treat `chat`, `family_board`, or `family_workbench` as business authorization or as part of the canonical command identity.
+
+The B3-1a product contract is ahead of current implementation. My-Chat has a typed mobile interaction envelope, core render hosts, and a public-draft vertical slice, but no complete server-produced generic interaction delivery/action registry for arbitrary scenario actions. Nurture does not yet expose the Guardian board/workbench actions or map the accepted action set into manifest/API command keys. Those gaps must close before Pilot traffic; B3-1a does not authorize runtime or manifest changes.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -142,6 +186,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Guardian matrix | **LOCKED by Pilot-0-B2-1:** one family has two guardians, the other two have one guardian each; four distinct My-Chat test accounts. |
 | Staff/operator matrix | **LOCKED by Pilot-0-B2-2:** one separate institution administrator, one lead caregiver, no backup caregiver, and one non-business technical operator; seven logical accounts in total. |
 | Surface entitlement | **LOCKED by Pilot-0-B3-0:** guardian uses Chat/family board/family web workbench; caregiver uses Chat/teacher board; institution admin uses institution board/institution web workbench; technical operator uses technical Admin only. |
+| Guardian action availability | **LOCKED by Pilot-0-B3-1a:** core rights are reachable from all three Guardian surfaces through generic Chat interactions or dedicated board/workbench UX, while all writes converge on Nurture commands. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -211,7 +256,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B1/B2/B3-0 locked** | B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement. B3-1 action availability, B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-1a locked** | B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a locks Guardian actions. B3-1b-d, B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
