@@ -48,7 +48,7 @@ Implementation implication:
 
 ## IB-D1 — `NurtureParticipant` Identity and Surface Role Resolution
 
-**Convergence status:** LOCKED on 2026-07-08; surface/action entitlement and key layering refined through Pilot-0-B3-1d-0 on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-08; surface/action entitlement, key layering, and technical-operator separation refined through Pilot-0-B3-1d-1 on 2026-07-16.
 
 **Default:** `NurtureParticipant` is unique per `(workspaceId, myChatUserId)`. Guardian Nurture work may use Chat, family board, and family domain web workbench. Caregiver Nurture work may use Chat and teacher board. Institution-admin Nurture work may use institution board and institution domain web workbench, not Chat. Technical operations use the host technical Admin surface. My-Chat never chooses a trusted Nurture role; Nurture resolves the participant's eligible role, scope, target, policy, and output.
 
@@ -69,6 +69,8 @@ Rules:
 - Institution administrators have no ambient access to family question/reply bodies or child-specific care facts and cannot perform caregiver actions, technical-runtime recovery, hard deletion, or ranking/scoring actions.
 - A Nurture product action is identified by `(scenario_key, action_key)` across entitled surfaces, while `command_key`, Workflow `entrypoint_key`, implementation `handler_key`, and Host Admin recovery remain separate identities. None of these caller-facing values replaces current role/scope/policy resolution.
 - Existing family-care `command_key` values remain immutable for replay. The current Run/Step-shaped manifest `scenario_actions` registry cannot be repurposed for Nurture entity actions; an additive domain-action contract is required before surface implementation.
+- The technical operator is a distinct internal My-Chat platform-operations account scoped to the exact Pilot workspace, not a Nurture participant. Generic workspace admin and Nurture institution-admin status do not imply the entitlement.
+- Technical Admin may expose safe evidence, exact original-Step reconciliation, eligible Handoff replay/stop, owner-reevaluation request, and disable-only emergency operations. It cannot expose Nurture bodies, execute Nurture business-role actions, edit canonical state, or re-enable/expand the Pilot.
 - `web_domain_workbench` is a Nurture business surface and must not be conflated with the host `web_run_workbench` or technical Admin surface.
 - Notification and deep link are transitions into an entitled surface, not independent role surfaces or authorization sources.
 - If multiple roles/scopes are possible and the target does not disambiguate them, Nurture should ask for clarification or return safe scenario-level output rather than defaulting to the broadest role.

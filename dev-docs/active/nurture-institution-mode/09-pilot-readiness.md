@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; decisions through B3-1d-0 locked
+- **Current checkpoint:** Pilot-0-B in progress; decisions through B3-1d-1 locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -103,7 +103,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
-| B3-1 action availability by surface | **IN PROGRESS — THROUGH B3-1d-0 LOCKED** | Guardian, Caregiver, and Institution matrices plus action-key layering are locked; operator permissions, remaining exact mappings, and unavailable reasons remain open. |
+| B3-1 action availability by surface | **IN PROGRESS — THROUGH B3-1d-1 LOCKED** | Role matrices, action-key layering, and technical-operator permissions are locked; remaining exact domain mappings and unavailable reasons remain open. |
 | B3-2 cross-surface continuity | OPEN | Transition, opaque token, notification/deep-link, and owner-reread rules. |
 | B3-3 business path and data envelope | OPEN | Exact `family_care_question` fields, exclusions, grant directions, and lifecycle. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
@@ -140,7 +140,7 @@ The B3-0 readiness decision changes no manifest or runtime. B3-1 and later imple
 | B3-1a Guardian action matrix | **LOCKED** | Guardian Chat, family board, and family workbench action availability. |
 | B3-1b Caregiver action matrix | **LOCKED** | Caregiver Chat and teacher-board reads, acknowledge, reply, redaction, history, and prohibited actions. |
 | B3-1c Institution action matrix | **LOCKED** | Institution-board/workbench topology, enrollment, disablement, and content-exposure boundaries. |
-| B3-1d Technical/operator and action-key mapping | **IN PROGRESS — B3-1d-0 LOCKED** | Key layering and six existing family-care mappings are locked; operator permissions, remaining domain actions, and unavailable reasons remain open. |
+| B3-1d Technical/operator and action-key mapping | **IN PROGRESS — THROUGH B3-1d-1 LOCKED** | Key layering, six existing family-care mappings, and operator permissions are locked; remaining domain actions and unavailable reasons remain open. |
 
 #### Pilot-0-B3-1a — Guardian action matrix (LOCKED)
 
@@ -262,7 +262,7 @@ The B3-1c product contract is ahead of current implementation. Current topology 
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | B3-1d-0 key layers and compatibility boundary | **LOCKED** | Stable product `action_key`, Nurture `command_key`, implementation `handler_key`, Workflow `entrypoint_key`, and legacy Run-action separation. |
-| B3-1d-1 technical-operator permission matrix | OPEN | Exact evidence, recovery, owner-reevaluation, kill-switch, and prohibited actions. |
+| B3-1d-1 technical-operator permission matrix | **LOCKED** | Exact evidence, recovery, owner-reevaluation, kill-switch, and prohibited actions. |
 | B3-1d-2 remaining exact domain-action mapping | OPEN | Guardian grant creation/replacement and Institution topology/onboarding command mappings. |
 | B3-1d-3 unavailable reasons and implementation gate | OPEN | Stable safe reason vocabulary, additive contract adoption, and negative coverage. |
 
@@ -294,6 +294,38 @@ The key-layer boundary is exact:
 
 The current contract gap is explicit: My-Chat and Base have Run-level action contracts, while My-Chat does not yet provide a general scenario-produced domain-action delivery/execution registry for generic Chat and role boards. Nurture has no authenticated direct action handlers for the five direct mappings above and no manifest/API shape for the accepted cross-surface domain actions. B3-1d-0 locks naming and compatibility only; the lock changes no manifest, runtime, schema, environment, capability, or activation.
 
+**Pilot-0-B3-1d-1 — technical-operator permission matrix (LOCKED)**
+
+| Technical-operator operation | Pilot permission | Exact boundary |
+| --- | --- | --- |
+| Read Run/Step/Handoff/Outbox/notification/audit evidence | Allowed | IDs, safe status/reason, versions, counts, timestamps, and correlation only; no Nurture body or claim material. |
+| `reconcile_outcome_unknown_step` | Allowed | Operator-facing Host key maps to the existing Step `/reconcile` operation; only the exact outcome-unknown original Step may replay its original command/snapshots. |
+| `replay_failed` | Allowed | Existing My-Chat Handoff action; only a replayable `failed` Handoff with expected version, idempotency, and current owner reread. |
+| `stop_pending` | Allowed | Existing My-Chat Handoff action; only a still-pending/requested technical activation before downstream logical effect. It does not cancel or redact Nurture facts. |
+| `request_owner_reevaluation` | Allowed as a request-only Host action | Planned operation invokes Nurture owner recovery with opaque refs/current host evidence; the operator cannot select or author the business result. |
+| Execute emergency Pilot disable | Allowed under the approved runbook | Disable-only responsibility: remove the exact workspace allowlist first, then disable the environment capability. Re-enable/expansion requires a new Go/No-Go decision. |
+| Direct `cancel_route`, `reissue_route`, or `fail_route` | Not allowed | Current business actor or Nurture owner recovery service decides under current policy; the operator never impersonates that authority. |
+| Grant/revoke/redaction/acknowledge/reply/topology actions | Not allowed | Operator is not a Guardian, Caregiver, Institution admin, or implicit Nurture participant. |
+| Edit source refs, payload, purpose, target, expiry, Handoff status, Step claim, Outbox, or notification facts | Not allowed | No mutation bypass around the canonical owner repository/service. |
+| Direct database/queue repair or mint replacement Step/Draft/Handoff | Not allowed | Missing/corrupt canonical evidence is an incident/data-repair escalation, not authority to create substitute provenance. |
+
+The operator boundary is exact:
+
+1. The internal technical operator MUST use a distinct My-Chat account with an internal platform-operations entitlement and exact Pilot-workspace scope. A generic workspace `admin` permission alone is insufficient, and Nurture `institution_admin` MUST NOT inherit technical Admin access.
+2. Technical operations are available only through My-Chat Technical Admin. Chat, role boards, and Nurture domain workbenches do not expose operator actions.
+3. Evidence views MUST remain refs/counts/status/reason/version-only. They MUST NOT expose protected Nurture content, grant narrative, message bodies, claim tokens, service tokens, Handoff payload bodies, or raw provider errors containing user data.
+4. Step reconciliation preserves the original Step, scenario command idempotency identity, driver ref, and snapshot request identity. Same-Step reclaim may rotate transient claim evidence; another Step cannot recover or materialize the result.
+5. `replay_failed` preserves Handoff identity, source refs, purpose, target, policy, and expiry, and reruns current owner gates. `stop_pending` can stop only a request without a completed downstream effect. Completed/stopped/expired Handoffs cannot be replayed or rewritten.
+6. `request_owner_reevaluation` carries only trusted host evidence and opaque refs to Nurture. Nurture rereads current source/grant/scope/policy/Receipt/Item state and either returns a safe classification or performs an owner-authorized deterministic transition. The operator cannot choose `blocked`, `failed`, delivered, cancelled, or reissued state.
+7. Emergency disable is intentionally asymmetric. The operator MAY stop new Pilot activation immediately under the two-key runbook, but MUST NOT re-enable a capability, add a workspace, broaden a cohort, or bypass a stopped gate without a new authorization decision.
+8. Every operator write records operator actor, workspace, target, operation, expected version, idempotency key, correlation/causation/trace evidence, safe reason, before/after version, and resulting Outbox IDs. Telemetry contains no Nurture body or secret material.
+9. The operator MUST NOT call Guardian/Caregiver/Institution commands through a service identity, reuse another participant's token, or convert technical recovery into a new business resend. A new business intent requires the currently entitled business actor or an explicitly owner-authorized service transition.
+10. Direct database, queue, Handoff, Outbox, notification, or Nurture lifecycle editing is outside normal Pilot recovery. Incident repair follows a separately authorized data-repair process and never manufactures claimed-Step provenance.
+
+B3-1d-1 narrows the earlier D-054 wording that allowed Admin to invoke Nurture `reissue_route` or `cancel_route`. Under the later B2/B3-0 separation, a technical operator may request owner reevaluation but cannot directly authorize business cancel, failure, or resend. If reevaluation determines an owner transition is valid, the Nurture owner recovery service executes under current policy with the technical operator retained only as initiating audit evidence.
+
+Current implementation is partial. My-Chat already implements safe Handoff evidence, `replay_failed`, `stop_pending`, and exact Step reconciliation with expected version/idempotency checks, but the API relies on generic Admin ACL rather than a named Pilot-operator entitlement and the Admin UI exposes no recovery controls. `request_owner_reevaluation`, the workspace allowlist, and the two-key emergency-disable composition are not implemented. B3-1d-1 authorizes no source, schema, manifest, environment, capability, or activation change.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -307,6 +339,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Caregiver action availability | **LOCKED by Pilot-0-B3-1b:** generic Chat and teacher board both close acknowledge/reply; protected bodies use transient owner-read detail; teacher board owns complete authorized work history; direct family Chat and bulk/multi-caregiver actions are excluded. |
 | Institution action availability | **LOCKED by Pilot-0-B3-1c:** the institution board is read-only safe aggregate/navigation; the institution workbench owns strongly confirmed Nurture topology/configuration commands; Guardian authority, protected family content, caregiver actions, technical runtime controls, destructive deletion, and ranking remain unavailable. |
 | Action-key layering | **LOCKED by Pilot-0-B3-1d-0:** product action, Nurture command, Workflow entrypoint, implementation handler, and Host Admin recovery remain separate; six existing family-care mappings are stable, and current Run-level `scenario_actions` is not repurposed for domain objects. |
+| Technical-operator permissions | **LOCKED by Pilot-0-B3-1d-1:** a named, exact-workspace internal operator may inspect safe technical evidence, reconcile the original outcome-unknown Step, replay/stop eligible Handoffs, request owner reevaluation, and perform disable-only emergency shutdown; no Nurture business action or direct-state edit is permitted. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
@@ -376,7 +409,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-1d-0 locked** | B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a/B3-1b/B3-1c lock role action matrices; B3-1d-0 locks key layering. B3-1d-1 through B3-1d-3, B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — through B3-1d-1 locked** | B1 locks the synthetic cohort; B2 locks seven logical accounts; B3-0 locks role/surface entitlement; B3-1a/B3-1b/B3-1c lock role action matrices; B3-1d-0/B3-1d-1 lock key layering and operator permissions. B3-1d-2/B3-1d-3, B3-2 transitions, B3-3 business/data envelope, and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |

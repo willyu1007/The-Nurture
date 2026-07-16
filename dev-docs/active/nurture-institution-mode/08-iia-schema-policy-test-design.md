@@ -136,6 +136,17 @@ Pilot-0-B3-1d-0 action-key layering refinement:
 - The existing manifest `action_availability.scenario_actions` contract is Workflow Run/Step-shaped. Message/Grant/Item/Enrollment actions MUST NOT be added there or reinterpret the four legacy scenario-action handlers. Cross-surface domain actions require an additive contract/registry.
 - My-Chat Admin recovery actions remain Host-owned and MUST NOT become Nurture action or command keys. B3-1d-1 separately decides their operator entitlement and safe exposure.
 
+Pilot-0-B3-1d-1 technical-operator refinement:
+
+- The technical operator MUST be a named internal My-Chat platform-operations account with exact Pilot-workspace scope. Generic workspace-admin or Nurture institution-admin status alone is insufficient and MUST NOT expose Technical Admin recovery.
+- Technical Admin MAY expose safe Run/Step/Handoff/Outbox/notification/audit IDs, states, versions, counts, timestamps, and reason/correlation evidence. It MUST NOT expose protected Nurture bodies, consent narrative, claim/service tokens, or user-bearing raw provider errors.
+- The Host operation `reconcile_outcome_unknown_step` maps to the existing Step reconciliation endpoint and preserves the original Step, command identity, driver ref, and snapshot request identities. It cannot construct a substitute Step, Draft, or Handoff.
+- Existing `replay_failed` is available only for a replayable failed Handoff; existing `stop_pending` is available only before downstream logical effect. Both require exact workspace, expected version, idempotency, current Handoff state, and owner reread.
+- Planned `request_owner_reevaluation` carries host evidence plus opaque refs to Nurture. The Nurture owner service rechecks source/grant/scope/policy/Receipt/Item and decides any deterministic transition; the operator cannot choose business blocked/failed/delivered/cancelled/reissued state.
+- The operator MAY execute disable-only emergency shutdown under the approved two-key runbook. Re-enable, workspace addition, or cohort expansion requires a new Go/No-Go and is never an operator convenience action.
+- The operator MUST NOT directly invoke Guardian/Caregiver/Institution commands, edit technical or business records, mint provenance, alter refs/payload/purpose/target/expiry, or repair databases/queues outside a separately authorized incident process.
+- Every operator write MUST persist actor, workspace, target, operation, expected version, idempotency, correlation/causation/trace, safe reason, before/after version, and Outbox evidence without Nurture bodies or secrets.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
@@ -1358,7 +1369,7 @@ Consumption boundary:
 
 - My-Chat MUST NOT branch on Nurture business values, for example `if receipt.status == blocked`. It may branch only on its own Run/Step/Handoff state or on generic structured UI/action payloads produced by Nurture.
 - Nurture presenter maps current Receipt/Item/Event state into safe scenario responses, options, forms, badges, or unavailable states. My-Chat renders those primitives without interpreting the underlying status.
-- My-Chat Admin may inspect host technical state and opaque Nurture refs. Nurture Admin presenter/actions decide which business recovery commands are available; host Admin cannot edit Nurture status directly.
+- My-Chat Technical Admin may inspect safe host evidence and opaque Nurture refs, then request owner reevaluation. Nurture owner recovery decides business convergence; the technical operator cannot directly execute business cancel/failure/reissue or edit Nurture status.
 
 Conformance tests:
 
@@ -1454,7 +1465,7 @@ Owner commands and guards:
 
 Admin and presentation boundary:
 
-- My-Chat Admin may inspect host attempts/evidence and opaque Nurture refs, reconcile or retry the current Step, and invoke Nurture-presented `reevaluate_route`, `reissue_route`, or existing `cancel_route` actions.
+- Pilot-0-B3-1d-1 refinement: My-Chat Technical Admin may inspect safe attempts/evidence and opaque refs, reconcile the original outcome-unknown Step, replay/stop an eligible Handoff, and request `reevaluate_route` through owner recovery. The earlier direct Admin permission for `reissue_route` or `cancel_route` is superseded; a currently entitled business actor or Nurture owner recovery service decides business cancel/failure/resend under current policy.
 - My-Chat Admin cannot directly set `failed/blocked/delivered`, edit grant/dataClass/target/source refs, bypass revoke/redaction/current policy, or claim a logical delivery occurred.
 - Nurture presenters map pending/manual-review/failed state into safe delayed, under-review, failed, or recovery-action UI without exposing inaccessible targets or raw host error details.
 - MVP adds only `technical_recovery_exhausted` as a Receipt failed reason. Detailed provider/worker/DB errors and attempt evidence remain under the host Step; deterministic business termination continues to use existing `blocked` reasons.
