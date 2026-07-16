@@ -99,6 +99,7 @@ Pilot-0-B3-1a Guardian action refinement:
 - Guardian Chat MUST remain the generic My-Chat AI/interaction harness. Nurture returns generic interaction envelopes and MUST NOT add a Guardian-specific Chat shell or second Chat business lifecycle.
 - Guardian Chat initially relies only on implemented core primitives: `timeline_inline`, `action_option_deck`, `editable_preview`, `authorization_gate`, `bottom_sheet`, `full_screen_flow`, and envelope `resultSummary`. Incomplete generic primitives are not Pilot prerequisites.
 - Question submission, grant confirm/replacement, revoke, and author redaction are reachable from Chat, family board, and family workbench. Presentation differs, but every durable effect uses the same Nurture command specification, current resolver/policy checks, and CommandExecution kernel.
+- `confirm_family_enrollment` is also reachable from all three Guardian surfaces with strong confirmation. It accepts the current proposed child/family enrollment under Guardian authority and does not implicitly create a grant.
 - Natural language, selected surface, dashboard projection, and client state are not authorization. Every confirmation reloads current actor, role, child/family scope, grant, object lifecycle, and expected version before execution.
 - Family board is current/recent work scope; family workbench is complete authorized history and complex grant review. Neither owns a parallel message, receipt, grant, or action state.
 - Revoke cannot require web-workbench access. Submitted questions cannot be edited in place or hard-deleted; correction/resend uses a new command, while redaction changes current visibility under the existing retention/audit contract.
@@ -146,6 +147,16 @@ Pilot-0-B3-1d-1 technical-operator refinement:
 - The operator MAY execute disable-only emergency shutdown under the approved two-key runbook. Re-enable, workspace addition, or cohort expansion requires a new Go/No-Go and is never an operator convenience action.
 - The operator MUST NOT directly invoke Guardian/Caregiver/Institution commands, edit technical or business records, mint provenance, alter refs/payload/purpose/target/expiry, or repair databases/queues outside a separately authorized incident process.
 - Every operator write MUST persist actor, workspace, target, operation, expected version, idempotency, correlation/causation/trace, safe reason, before/after version, and Outbox evidence without Nurture bodies or secrets.
+
+Pilot-0-B3-1d-2 exact domain-action refinement:
+
+- Guardian mappings are `confirm_family_enrollment -> nurture.family_care.confirm_enrollment`, `confirm_child_link_grant -> nurture.family_care.confirm_grant`, and `replace_child_link_grant -> nurture.family_care.replace_grant`; existing `revoke_child_link_grant -> nurture.family_care.revoke_grant` remains unchanged.
+- Enrollment confirmation, initial grant confirmation, replacement, and revoke MUST use separate command identities, expected versions, policy checks, and audit events. A changed grant contract requires replacement; a revoked grant is never reactivated.
+- Institution mappings use matching explicit action and `nurture.institution.*` command verbs: `create_care_institution`, `update_care_institution`, `create_care_group`, `update_care_group`, `suspend_care_group`, `resume_care_group`, `close_care_group`, `assign_staff_role`, `revoke_staff_role`, `designate_lead_caregiver`, `initiate_enrollment`, `suspend_enrollment`, `resume_enrollment`, `close_enrollment`, `update_institution_policy`, and `update_care_group_policy`.
+- Generic `upsert_*` and `change_*_state` actions are forbidden. Resume applies only to current suspended state after revalidation; close is terminal in Pilot-0.
+- `initiate_participant_invitation` maps to planned Host command `my_chat.workspace_invitation.create`. My-Chat owns delivery/authentication/acceptance; only after acceptance may an owner callback execute planned `nurture.institution.bind_accepted_participant` with a canonical user ref. The callback is not a surface action and grants no role implicitly.
+- Scoped Pilot business disable/recovery uses `suspend_care_group` / `resume_care_group`; no scenario-local Pilot enablement aggregate is added. Environment capability and workspace allowlist remain My-Chat technical gates.
+- The new keys are reserved design contracts, not implemented claims. Direct fixture provisioning MAY prepare the internal synthetic institution/group before traffic but MUST NOT substitute for authenticated owner commands once user-operable onboarding begins.
 
 Multi-turn behavior:
 
