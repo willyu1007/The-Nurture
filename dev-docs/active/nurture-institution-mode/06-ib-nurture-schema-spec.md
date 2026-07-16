@@ -495,6 +495,14 @@ State rules:
 - Time-sensitive items may become `expired`; expired items must remain auditable.
 - AI classification may create a draft item, but sending/replying/closing remains human-confirmed for MVP.
 
+Pilot-0-B3-3c lifecycle refinement:
+
+- One capture transaction writes the family-authored sent Message, family-to-org delivered Receipt, `open(v0)` Item, `created` ItemEvent, active TeacherAttention projection, thread update, and CommandExecution/result. Partial fact sets are forbidden.
+- A separate explicitly confirmed caregiver command is required for `open(v0) -> acknowledged(v1)`. The command appends `acknowledged`, records actor/time, and moves the source Receipt `delivered(v0) -> acknowledged(v1)` while Attention remains active. No caregiver Message or org-to-family Receipt is created by acknowledgment.
+- Caregiver-confirmed reply is allowed only for `acknowledged(v1) -> replied(v2)`. The same transaction writes one linked caregiver reply Message, `replied` ItemEvent, org-to-family delivered Receipt, thread update, and resolves Attention. Direct reply from `open` or `waiting_for_family` is invalid in the Pilot profile.
+- `replied` is terminal for the first Pilot. `waiting_for_family`, `followed_up`, `closed`, `expired`, and `reopened` remain reusable schema vocabulary but are excluded from the success path; `suppressed` remains available for B3-3d privacy/runtime fences. A second reply, in-place edit, clarification, follow-up, or close command is not available. Correction starts a new question/command identity.
+- For the Pilot, Receipt `delivered` means the currently authorized logical target Nurture surface can owner-read the content. Device/provider/Handoff/Outbox state and Host notification read do not change Receipt state. Item/detail/notification open performs no implicit Nurture `read`; only explicit acknowledge changes the source Receipt.
+
 Vocabulary rules:
 
 - `dataClass` is the grant/policy/runtime taxonomy. It must be a system key accepted by the Nurture data-class registry.

@@ -5,9 +5,9 @@
 - State: in-progress
 - **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 joint acceptance（complete）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-16
+- **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-B3-3c Message/Receipt/Item lifecycle convergence after B3-3b locked one exact bidirectional Grant, family authority, and care-group target scope. B3-3d replay/revoke/redaction/failure-privacy, B3-4 journey coverage, real cohort sizing, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-B3-3d replay/revoke/redaction/failure-privacy convergence after B3-3c locked atomic capture/acknowledge/reply and `replied` as the Pilot terminal state. B3-4 journey coverage, real cohort sizing, IIB/onboarding, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

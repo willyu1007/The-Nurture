@@ -126,7 +126,7 @@ Escalation path:
 
 ## IB-D3 — `NurtureTeacherAttentionItem` Materialization
 
-**Convergence status:** LOCKED on 2026-07-06.
+**Convergence status:** LOCKED on 2026-07-06; first Pilot work-state lifecycle refined by Pilot-0-B3-3c on 2026-07-17.
 
 **Default:** Materialize `NurtureTeacherAttentionItem` as a rebuildable child-scoped projection.
 
@@ -138,6 +138,7 @@ Rules:
 - The projection may store ordering, priority, snooze/resolution state, effective date, expiry, and mobile display summary.
 - If the projection becomes inconsistent, it should be rebuildable from source objects plus item events.
 - Group-level operational notices, such as whole-class activity reminders, do not belong in `NurtureTeacherAttentionItem`; model them separately later as `CareGroupOperationItem` / `CareGroupNotice` or equivalent.
+- Pilot question capture creates an active Attention projection. Explicit acknowledge leaves the projection active because reply is still required; caregiver-confirmed reply resolves it. Surface open/read and Host notification state never resolve or acknowledge the projection.
 
 Rationale:
 
@@ -243,7 +244,7 @@ Implementation implication:
 
 ## IB-D6 — Message Encryption, Redaction, and Attachment Handling
 
-**Convergence status:** LOCKED on 2026-07-07; first Pilot protected-text profile refined by Pilot-0-B3-3a on 2026-07-16.
+**Convergence status:** LOCKED on 2026-07-07; first Pilot protected-text and command lifecycle profiles refined by Pilot-0-B3-3a/B3-3c on 2026-07-16 and 2026-07-17.
 
 **Default:** Nurture owns canonical message body; message lifecycle is `sent` / `redacted` / `failed`; My-Chat only receives safe projections.
 
@@ -262,6 +263,7 @@ Rules:
 - Production must provide encryption at rest for the database and protected attachment storage. Application-level field encryption can be introduced when key management is ready, but production rollout should not proceed without a documented security posture.
 - Pilot-0 question and caregiver-confirmed reply bodies are trimmed 1–2000-character plain text behind protected content refs. Rich text, attachments, media, direct object URLs, and body-derived safe summaries are not accepted by the first Pilot profile.
 - Pilot list summaries are deterministic generic copy. AI may help a user draft body text but cannot publish, select the data class, or expand the envelope.
+- Pilot capture writes one family-authored sent Message. Acknowledge changes Item/source-Receipt state but creates no Message. Reply writes exactly one caregiver-confirmed sent Message linked to the source Item and reply event; `replied` is terminal-for-Pilot and correction requires a new question rather than message mutation.
 
 Rationale:
 

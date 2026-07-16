@@ -2,8 +2,8 @@
 
 ## Status and authorization
 
-- **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; B3-3a/b input envelope and Grant/family authority locked
+- **Review date:** 2026-07-17
+- **Current checkpoint:** Pilot-0-B in progress; B3-3a-c input, Grant authority, and business lifecycle locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -105,7 +105,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
 | B3-2 cross-surface continuity | **LOCKED / COMPLETE** | B3-2a-d lock transition/destination, opaque tokens, notification/deep-link stale handling, and draft/result/history continuity. |
-| B3-3 business path and data envelope | **IN PROGRESS — B3-3a/B3-3b LOCKED** | First input/data envelope plus Grant/family authority/target scope are locked; lifecycle and failure/privacy behavior remain B3-3c/d. |
+| B3-3 business path and data envelope | **IN PROGRESS — B3-3a/B3-3b/B3-3c LOCKED** | Input envelope, Grant/family authority/target scope, and atomic business lifecycle are locked; replay/revoke/redaction/failure/privacy remains B3-3d. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
 
 #### Pilot-0-B3-0 — role and surface entitlement (LOCKED)
@@ -615,7 +615,7 @@ Current foundations support the direction: Nurture CommandExecution already stor
 | --- | --- | --- |
 | B3-3a first input and data envelope | **LOCKED** | Exact first data class, fixed routing/classification fields, body envelope, exclusions, trusted derivation, and additive Pilot profile gate. |
 | B3-3b grant, family authority, and target scope | **LOCKED** | One exact bidirectional Grant, active uniqueness, original-Grant lifecycle binding, owner/second-Guardian rights, care-group target, expiry, and revoke authority. |
-| B3-3c Message/Receipt/Item lifecycle | OPEN | Atomic capture, acknowledgment, reply, terminal-for-Pilot state, and family-visible outcomes. |
+| B3-3c Message/Receipt/Item lifecycle | **LOCKED** | Atomic capture, explicit acknowledgment, caregiver-confirmed reply, Receipt semantics, Attention projection, terminal-for-Pilot state, and family-visible outcomes. |
 | B3-3d replay, revoke, redaction, and failure/privacy behavior | OPEN | Command identities, response loss, stale actions, withdrawal/tombstones, notification independence, and fail-closed negative matrix. |
 
 **Pilot-0-B3-3a — first input and data envelope (LOCKED)**
@@ -709,6 +709,60 @@ The designated primary Guardian remains a Pilot script assignment, not a `primar
 
 Current schema supports a bidirectional Grant and the revoke transaction already verifies that the actor owns the Grant. Product implementation remains incomplete: confirm/replace handlers and authenticated surfaces are absent; there is no enforced active-binding uniqueness; general `currentGrant` lookup can select among overlaps by `findFirst`; and caregiver reply currently may resolve another matching `org_to_family` Grant instead of the Item's original Grant. These gaps must be repaired with transactional concurrency/negative tests before Pilot traffic. B3-3b changes no source, schema, migration, manifest, runtime, environment, capability, provider, or traffic.
 
+**Pilot-0-B3-3c — Message/Receipt/Item lifecycle (LOCKED)**
+
+The first Pilot success path has exactly three Nurture command transactions:
+
+```text
+capture: open(v0)
+  -> explicit acknowledge: acknowledged(v1)
+  -> caregiver-confirmed reply: replied(v2, Pilot terminal)
+```
+
+Every transaction includes its `CommandExecution`, immutable output refs, business facts/events, and any permitted replay seed. A failed write, version conflict, policy/grant change, or transaction error rolls back the complete command effect.
+
+Capture is atomic:
+
+| Object | Committed state |
+| --- | --- |
+| Source Message | `family_authored`, `family_message`, `sent`, protected body, original Grant. |
+| Source Receipt | `family_to_org`, complete route, `delivered(v0)`, target current care group. |
+| FamilyCare Item | `open(v0)`, question/today-attention/ack-required/reply-required, original Grant. |
+| ItemEvent | `created`, links the source Message and Item. |
+| TeacherAttention | `active(v0)`, child-scoped and grouped by current care group. |
+| Thread | `latestMessageAt` and aggregate version advance. |
+| CommandExecution | One committed result plus activation seed only when permitted by the claimed-Step path. |
+
+Pilot capture has no intermediate `pending` Receipt and no cancellable route window. Partial Message/Receipt/Item/Attention fact sets are invalid.
+
+Acknowledge is a separate explicit business action:
+
+1. The only happy-path transition is `open(v0) -> acknowledged(v1)` with current expected version, original Grant, caregiver role, care-group reachability, enrollment, thread membership, and policy.
+2. The transaction stores `ackedByParticipantId/ackedAt`, appends `acknowledged`, and moves the source Receipt `delivered(v0) -> acknowledged(v1)`.
+3. TeacherAttention remains active because reply is still required.
+4. Acknowledge creates no caregiver Message, org-to-family Receipt, reply, or implicit notification.
+5. Family owner-read may present `caregiver acknowledged`, but acknowledgment is not a caregiver reply.
+
+Reply is also separate and caregiver-confirmed:
+
+1. The only happy-path transition is `acknowledged(v1) -> replied(v2)`. Reply from `open`, `waiting_for_family`, or any other state is blocked.
+2. The transaction writes exactly one protected `caregiver_confirmed/caregiver_reply/sent` Message, links the Message to the source Item and `replied` event, and uses the original Grant.
+3. The transaction creates one complete org-to-family `delivered(v0)` Receipt targeted to the current family, advances the thread, and moves TeacherAttention `active(v0) -> resolved(v1)`.
+4. The source family-to-org Receipt remains acknowledged. The reply never overwrites the Guardian Message or source Receipt.
+5. Both currently authorized same-family Guardians may owner-read the committed reply under B3-3b.
+
+`replied` is terminal-for-Pilot. The first profile provides no second formal reply, in-place question/reply edit, clarification, `waiting_for_family`, follow-up, close, reopen, or continue-chat command. A correction or supplement creates a new `family_care_question` with a new command identity and complete capture lifecycle. General schema states remain available for future reviewed capabilities; `suppressed` remains reserved for B3-3d revoke/redaction/privacy behavior.
+
+Receipt semantics are exact:
+
+- `delivered` means the currently authorized logical Nurture target surface can owner-read the content after the Nurture transaction commits.
+- `delivered` does not mean My-Chat Handoff/Outbox completion, provider/device delivery, notification display, user open, caregiver acknowledgment, or business reply.
+- Teacher/family Item/detail/notification open is read-only in the Pilot and creates no implicit Nurture `read` transition. Host Notification read/unread remains Host-only.
+- Only explicit acknowledge changes the source Receipt. Guardian open leaves the reply Receipt delivered because Pilot exposes no explicit family-read command.
+- Family presenters compose the safe product states `sent -> caregiver acknowledged -> replied` from current Nurture Message/Receipt/Item facts rather than copying or exposing internal status tuples in My-Chat.
+
+Current capture and acknowledge transactions largely match the decision. Current reply accepts `open|acknowledged|waiting_for_family`; the Pilot implementation must narrow both command preconditions and database update predicates to `acknowledged` only, apply the B3-3b original-Grant rule, and prevent clarification/second-reply/extra-close surface actions. Notification coverage remains B3-4 and cannot change the business transaction outcome. B3-3c changes no source, schema, migration, manifest, runtime, environment, capability, provider, or traffic.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -732,6 +786,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
 | Input/data envelope | **LOCKED by Pilot-0-B3-3a:** 1–2000-character protected plain-text question/reply only; fixed question/today-attention/immediate/ack/reply/empty-attachment profile; generic summary; owner-derived refs; no health/emergency/media/daily-care/constraint/follow-up/rich-text/batch input. |
 | Grant/family authority/target | **LOCKED by Pilot-0-B3-3b:** one active exact child/enrollment/care-group Grant with both directions, question-only data class, bounded expiry, owner-only administration, same-family visibility, and original-`grantId` capture/ack/reply binding; replacement never revives an old item. |
+| Business lifecycle | **LOCKED by Pilot-0-B3-3c:** atomic capture creates Message/Receipt/open Item/active Attention; explicit acknowledge updates Item/source Receipt while Attention stays active; caregiver-confirmed reply only from acknowledged creates reply Message/Receipt and resolves Attention; `replied` is terminal-for-Pilot and delivery/read/notification remain separate. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
 | Observation window | Five consecutive operating days after Pilot-3 rehearsal passes. Extend only by explicit Pilot-4 decision. |
 
@@ -799,7 +854,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3a/b locked** | B1/B2/B3-0/B3-1, B3-2a-d, and B3-3a/b input/Grant-family authority are locked. B3-3c lifecycle, B3-3d failure/privacy, and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3a-c locked** | B1/B2/B3-0/B3-1, B3-2a-d, and B3-3a-c input/Grant/lifecycle are locked. B3-3d failure/privacy and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
