@@ -201,7 +201,7 @@ Production gate:
 
 ## IB-D5 — Data Class and Category Vocabulary
 
-**Convergence status:** LOCKED on 2026-07-07.
+**Convergence status:** LOCKED on 2026-07-07; first Pilot input profile refined by Pilot-0-B3-3a on 2026-07-16.
 
 **Default:** `dataClass` is the system grant/policy contract, `category` is workflow/display taxonomy, and institution vocabulary is a mapping layer.
 
@@ -218,6 +218,8 @@ Rules:
 - `pickup_or_schedule` and `other` may exist as workflow categories, but they must not become grant-controlled data classes without explicit policy review.
 - Grants, receipts, runtime policy checks, revoke fences, AI context filters, and delivery decisions must use `dataClass`, not institution-local labels.
 - Institution vocabulary may change how an item is named, displayed, templated, or routed; it must not silently expand what crosses the family/institution boundary.
+- Pilot-0 accepts only `dataClass=family_care_question` with `category=question`, `urgency=today_attention`, immediate routing, acknowledgment/reply required, and no attachments. These values are derived by the trusted Nurture Pilot adapter rather than supplied by a client or inferred by an LLM.
+- The Pilot restriction is an additive profile gate. It does not remove the broader system vocabulary or create parallel Message/Receipt/Item types.
 
 Rationale:
 
@@ -233,7 +235,7 @@ Implementation implication:
 
 ## IB-D6 — Message Encryption, Redaction, and Attachment Handling
 
-**Convergence status:** LOCKED on 2026-07-07.
+**Convergence status:** LOCKED on 2026-07-07; first Pilot protected-text profile refined by Pilot-0-B3-3a on 2026-07-16.
 
 **Default:** Nurture owns canonical message body; message lifecycle is `sent` / `redacted` / `failed`; My-Chat only receives safe projections.
 
@@ -250,6 +252,8 @@ Rules:
 - Redaction is not summarization. Classification, `safeSummary`, and `NurtureFamilyCareItem.summary` are derived projections from a message; they do not change the message status.
 - Redaction must be represented from day one: message status can become `redacted`, and redaction metadata should identify when/why/by whom at audit level.
 - Production must provide encryption at rest for the database and protected attachment storage. Application-level field encryption can be introduced when key management is ready, but production rollout should not proceed without a documented security posture.
+- Pilot-0 question and caregiver-confirmed reply bodies are trimmed 1–2000-character plain text behind protected content refs. Rich text, attachments, media, direct object URLs, and body-derived safe summaries are not accepted by the first Pilot profile.
+- Pilot list summaries are deterministic generic copy. AI may help a user draft body text but cannot publish, select the data class, or expand the envelope.
 
 Rationale:
 

@@ -215,6 +215,17 @@ Pilot-0-B3-2d draft/result/history continuity refinement:
 - Unsubmitted drafts are never visible to another guardian/device. Committed Message/Receipt/reply/outcome visibility follows current family relationship/grant/policy. Every page/filter/detail/action rereads current owner state; redacted/suppressed history exposes only permitted tombstones.
 - Round-trip tests MUST cover Guardian Chat -> board/workbench, second guardian visibility, Caregiver Chat -> teacher board, Institution board -> workbench -> board, response loss, concurrent/current-state change, revoke/redaction between surfaces, wrong actor/workspace/surface, reload, and cross-device access without duplicate effects or draft leakage.
 
+Pilot-0-B3-3a first business input/data-envelope refinement:
+
+- The first Pilot accepts only `family_care_question`. The trusted Nurture Pilot adapter fixes `category=question`, `urgency=today_attention`, `route_mode=immediate`, `requires_ack=true`, `requires_reply=true`, and `attachment_refs=[]` before the existing command runner.
+- User-facing submission carries only trimmed plain-text question content plus a current Nurture-issued context/confirmation. Participant, role, child process, family, enrollment, care group, thread, grant, target, protected-content ref, source surface, data class, category, urgency, route mode, summary, and acknowledgment/reply flags are owner-derived or trusted-adapter fields, never raw client authority.
+- Guardian question and caregiver-confirmed reply text are each 1–2000 Unicode characters after trim. Both remain behind protected content refs. Rich text, attachment, media, URL-bearing storage credential, and batch input are excluded.
+- List/attention copy uses deterministic generic safe summary such as `Family question requires caregiver reply`; the summary is not an extract, classification, or AI summary of the protected body. Authorized detail always owner-rereads the protected body.
+- Health observation, diagnosis, medication, emergency request, daily-care log, care-constraint change, follow-up workflow, and any other data class are unsupported in the Pilot profile. Recognized or uncertain out-of-profile input fails before the first business write with safe non-diagnostic/non-prescriptive routing; Nurture never silently remaps the input to `family_care_question`.
+- AI may help produce an editable user draft, but cannot select/override the fixed classification, create a caregiver-confirmed authorship, bypass confirmation, or expand the envelope. The authoritative command values are deterministic.
+- The generic schema/command kernel remains broader. Implementation MUST add one strict additive Pilot profile validator at the Nurture boundary and reject every value outside the profile before persistence; the validator MUST NOT fork the canonical Message/Receipt/Item/Execution lifecycle.
+- Tests MUST cover exact allowed values, both 1/2000 boundaries, empty/overlong/control-only input, every fixed-field override, non-empty attachment, unsupported data class/category/urgency/route mode/source surface, raw-id/ref injection, unsafe content category, AI-draft-without-confirmation, and exact command replay.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

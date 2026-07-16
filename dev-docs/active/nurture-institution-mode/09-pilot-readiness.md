@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-16
-- **Current checkpoint:** Pilot-0-B in progress; B3-2 cross-surface continuity complete through B3-2d
+- **Current checkpoint:** Pilot-0-B in progress; B3-3a first business input/data envelope locked
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -105,7 +105,7 @@ The earlier single B3 business/data decision is replaced by the following ordere
 | B3-0 role and surface entitlement | **LOCKED** | Which Nurture product surfaces each Pilot role may use. |
 | B3-1 action availability by surface | **LOCKED** | Role matrices, key layering, operator permissions, exact mappings, safe unavailable reasons, and additive implementation gates are locked. |
 | B3-2 cross-surface continuity | **LOCKED / COMPLETE** | B3-2a-d lock transition/destination, opaque tokens, notification/deep-link stale handling, and draft/result/history continuity. |
-| B3-3 business path and data envelope | OPEN | Exact `family_care_question` fields, exclusions, grant directions, and lifecycle. |
+| B3-3 business path and data envelope | **IN PROGRESS — B3-3a LOCKED** | First input/data envelope is locked; grant/family authority, target scope, lifecycle, and failure/privacy behavior remain B3-3b-d. |
 | B3-4 representative journey coverage | OPEN | Adapter coverage and the minimum cross-surface E2E matrix. |
 
 #### Pilot-0-B3-0 — role and surface entitlement (LOCKED)
@@ -609,6 +609,51 @@ The minimum round-trip matrix is mandatory:
 
 Current foundations support the direction: Nurture CommandExecution already stores refs-only results and exact replay; InteractionContext forbids bodies and has no `resume_draft`. Product implementation remains incomplete: family/teacher/institution target surfaces, generic route/view-mode contract, destination history/result presenters, unsaved-draft UX, and the round-trip/negative matrix are absent. My-Chat PublicDraft exists for another lifecycle and must remain separate. B3-2d closes planning only and authorizes no source, schema, manifest, route, runtime, environment, capability, provider, or traffic change.
 
+**Pilot-0-B3-3 — business path and data envelope**
+
+| Checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| B3-3a first input and data envelope | **LOCKED** | Exact first data class, fixed routing/classification fields, body envelope, exclusions, trusted derivation, and additive Pilot profile gate. |
+| B3-3b grant, family authority, and target scope | OPEN | Directions, grant identity/owner, second-guardian rights, exact enrollment/care-group target, expiry, and revoke authority. |
+| B3-3c Message/Receipt/Item lifecycle | OPEN | Atomic capture, acknowledgment, reply, terminal-for-Pilot state, and family-visible outcomes. |
+| B3-3d replay, revoke, redaction, and failure/privacy behavior | OPEN | Command identities, response loss, stale actions, withdrawal/tombstones, notification independence, and fail-closed negative matrix. |
+
+**Pilot-0-B3-3a — first input and data envelope (LOCKED)**
+
+The first internal experiment accepts one business input only: a Guardian-authored protected plain-text `family_care_question` about the selected child's current care relationship. The reviewed workflow input requires caregiver acknowledgment and one caregiver-confirmed reply and is not a direct family-to-caregiver Chat message.
+
+The authoritative Pilot profile is exact:
+
+| Internal field | Pilot value / derivation |
+| --- | --- |
+| `data_class` | Fixed `family_care_question`. |
+| `category` | Fixed `question`. |
+| `urgency` | Fixed `today_attention`; no urgency selector or AI override. |
+| `route_mode` | Fixed `immediate`; Pilot exposes no pending-route/cancel window. |
+| `requires_ack` | Fixed `true`. |
+| `requires_reply` | Fixed `true`. |
+| `attachment_refs` | Fixed `[]`. |
+| `safe_summary` | Deterministic generic copy, initially `Family question requires caregiver reply`; never derived from the protected body. |
+| `source_surface` | Trusted Host/Nurture origin mapped from the actual entitled mobile/web surface; never client-authored authority. |
+| participant/role/child/family/enrollment/care-group/thread/target/grant refs | Resolved from current Nurture context and policy; raw client ids are rejected. |
+| `protected_content_ref` | Created only after protected owner storage; never accepted as a user-authored object selector. |
+
+The user-facing Guardian submission carries only the current Nurture-issued context/confirmation plus question text. The text is trimmed plain text containing 1–2000 Unicode characters. Line breaks may be preserved; empty/control-only and overlong input is rejected. The source surface shows the resolved child and destination as safe display labels before explicit submission, but neither label nor prior selection bypasses current owner resolution.
+
+The first profile excludes attachments, image/video/media, rich text, batch import, `daily_care_log`, `care_day_note`, `care_constraint_update`, `family_follow_up_request`, health observations, diagnosis, medication, and emergency requests. Recognized or uncertain out-of-profile input fails before the first business write and receives safe non-diagnostic/non-prescriptive routing; Nurture does not silently coerce the input into `family_care_question`, and My-Chat does not decide another Nurture business class.
+
+Caregiver reply uses the symmetric content boundary: trimmed 1–2000-character protected plain text, no attachment, and deterministic generic display copy. AI may produce an editable draft, but a named reply is persisted only through a current caregiver-confirmed command with `authorship_kind=caregiver_confirmed`. AI cannot publish, set business classification, change routing flags, select a grant/target, or expand the envelope.
+
+The Pilot profile is additive over the reusable domain kernel:
+
+1. Existing general enums, schema, and command support for other data classes, categories, urgencies, attachments, sources, and pending workflow mode remain intact for future separately reviewed capabilities.
+2. Before Pilot traffic, one strict Nurture-owned Pilot profile validator MUST run before the existing command runner and before protected/business persistence. The validator rejects every non-profile field or attempted client override and does not create parallel Message, Receipt, Item, or Execution types.
+3. Protected body ingestion enforces the 1–2000-character boundary because the current domain command receives an opaque protected-content ref rather than inline text. The command boundary independently enforces all fixed refs-only/profile fields.
+4. List/attention/notification copy remains generic. Authorized detail obtains the current protected body through owner reread after role, scope, grant, lifecycle, and policy checks.
+5. Required negative evidence includes empty/overlong/control-only text, fixed-field override, non-empty attachment, unsupported class/category/urgency/route/source, raw-id/ref injection, health/emergency input, AI draft without confirmation, wrong actor/workspace/child/family, and exact replay without a second effect.
+
+Current implementation already proves the wider `family_care_question` immediate path with `today_attention`, acknowledgment/reply flags, protected refs, Message/Receipt/Item/attention creation, and exact command replay. The authenticated user-facing adapter and narrow Pilot body/profile contract remain absent: generic payload validation still accepts broader classes/categories/urgencies, up to ten attachments, multiple source values, and `pending_workflow`, while body length is outside the refs-only command. B3-3a therefore closes planning only and records an implementation gate without changing source, schema, manifest, route, runtime, environment, capability, provider, or traffic.
+
 The remaining rows are recommendations until their Pilot-0-B decision is explicitly accepted.
 
 | Dimension | Recommended lock |
@@ -630,7 +675,7 @@ The remaining rows are recommendations until their Pilot-0-B decision is explici
 | Notification/deep-link stale handling | **LOCKED by Pilot-0-B3-2c:** provider/deep link use recipient-bound Notification id only; authenticate and validate ownership before owner reads; split delivery/open resolution; reread before create/send/open; issue destination token only after current open; Host read never acknowledges Nurture work. |
 | Draft/result/history continuity | **LOCKED by Pilot-0-B3-2d:** drafts stay actor/surface-local with explicit stay/discard; committed results use Execution replay/current owner reread; history is queried at role-correct surfaces; only route class + current/recent/history follows navigation. B3-2 is complete. |
 | Business path | Guardian private input → `family_care_question` → class inbox/teacher attention → caregiver acknowledge + reply → family receipt/reply → grant revoke/stale-open check. |
-| Data | Text question only, no attachment, no health observation, no media, no daily-care log, no batch import. `requires_ack=true`, `requires_reply=true`, immediate route. |
+| Input/data envelope | **LOCKED by Pilot-0-B3-3a:** 1–2000-character protected plain-text question/reply only; fixed question/today-attention/immediate/ack/reply/empty-attachment profile; generic summary; owner-derived refs; no health/emergency/media/daily-care/constraint/follow-up/rich-text/batch input. |
 | Operation model | Operator-assisted and allowlisted. No self-service institution signup and no traffic outside the named workspace. |
 | Observation window | Five consecutive operating days after Pilot-3 rehearsal passes. Extend only by explicit Pilot-4 decision. |
 
@@ -698,7 +743,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | Checkpoint | State | Exit evidence |
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
-| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-2 complete** | B1/B2/B3-0/B3-1 and B3-2a-d are locked. B3-3 business/data envelope and B3-4 journey coverage remain open. |
+| Pilot-0-B — cohort, role, surface, and data lock | **In progress — B3-3a locked** | B1/B2/B3-0/B3-1, B3-2a-d, and the first B3-3 input/data envelope are locked. B3-3b-d grant/lifecycle/failure-privacy and B3-4 journey coverage remain open. |
 | Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
