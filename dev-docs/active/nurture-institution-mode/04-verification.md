@@ -34,6 +34,15 @@
 | Evidence and implementation gates | PASS | The contract requires contract, Nurture DB, two-database joint, rendered-surface, and manual evidence; three consecutive high-risk joint passes; atomic repair of the revoke/redaction `take: 100` risk; and authenticated Pilot-0-C onboarding before fixture-seeded CI can become product evidence. Capability and workspace allowlist remain disabled. |
 | B3-4 document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, live contract-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 vague-reference warnings. |
 
+## Pilot-0-C IIB and Onboarding Contract Gate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| C-0 owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IIA policy/test design, and Pilot readiness consistently lock authenticated My-Chat public ingress, private Nurture owner/action authority, one-time first-Institution bootstrap, exact replay/permanent closure, and Pilot-0-D custody dependency. Pilot-0-C is in progress; C-1 is next. |
+| Ownership and token boundary | PASS | Client/raw Nurture routes, trusted Host role/scope/target/Grant/state, public dev-host fallback, ambient workspace-admin privilege, and Technical Admin business provisioning are forbidden. The versioned provisioning specification is control-plane input rather than a fourth B3-2 scenario token, URL/deep-link/client credential, or reusable role result. |
+| Bootstrap safety contract | PASS / PLANNING CONTRACT ONLY | The exact user must authenticate and accept the matching My-Chat invitation before one idempotent Nurture transaction establishes Institution/Participant/first-admin/audit facts. Exact replay is stable; user/workspace/scenario/institution/payload/expiry drift, reuse, self-claim, and operator mutation/reopen fail closed. No implementation result is claimed. |
+| C-0 document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, live workflow contract/source-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 vague-reference warnings. |
+
 ## Pilot-0-A Readiness Audit
 
 | Check | Result | Evidence |
@@ -251,6 +260,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-17 | Pilot-0-C0 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
+| 2026-07-17 | Pilot-0-C0 authenticated-ingress/bootstrap accepted-decision sync | PASS | SSOT fixes My-Chat-only public ingress, Nurture-private business authority, an exact expiring one-time provisioning specification, authenticated first-admin acceptance, atomic/idempotent bootstrap, permanent closure, operator denial, and the Pilot-0-D custody boundary. C-1 is next; no implementation/runtime/environment/traffic change. |
 | 2026-07-17 | Pilot-0-B3-4 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
 | 2026-07-17 | Pilot-0-B3-4 representative-coverage accepted-decision sync | PASS | SSOT fixes four evidence layers, J1-J4 across three child scopes, every Caregiver Chat/teacher-board acknowledge/reply pairing, Institution/Operator strands, complete negative/fault/privacy categories, three-run high-risk joint evidence, and authenticated-onboarding dependency. Pilot-0-B is complete; Pilot-0-C is next. No implementation/runtime/environment/traffic change. |
 | 2026-07-17 | Pilot-0-B3-3c documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |

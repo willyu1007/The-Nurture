@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-B complete; Pilot-0-C IIB/onboarding closure next
+- **Current checkpoint:** Pilot-0-C in progress; C-0 authenticated ingress/first-Institution bootstrap locked, C-1 adult identity/role onboarding next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -904,7 +904,7 @@ B3-4 exit evidence is exact:
 8. CI may seed synthetic topology for kernel validation; final Pilot-2 product evidence must use authenticated owner actions after Pilot-0-C closure.
 9. Capability and workspace allowlist remain disabled; B3-4 closes readiness decisions only and authorizes no implementation, database, artifact, secret, provider, or traffic change.
 
-Pilot-0-B is complete. Pilot-0-C IIB/onboarding closure is the next decision checkpoint.
+Pilot-0-B is complete. Pilot-0-C IIB/onboarding closure is governed below and has started with C-0.
 
 The remaining delivery and operations rows are recommendations until their later Pilot checkpoint is explicitly accepted.
 
@@ -947,6 +947,46 @@ The pilot topology should preserve runtime and data ownership rather than promot
 6. My-Chat and Nurture databases, migrations, backup/restore evidence, secrets, artifact provenance, and service-to-service token scope remain separate Pilot-1 deliverables.
 
 If the approved topology uses the current My-Chat container publication path, ACR credentials/publication become a Pilot-1 prerequisite. ACR is not required for Pilot-0 documentation and is not configured here. Nurture still needs its own real artifact definition regardless of registry provider.
+
+## Pilot-0-C — IIB and onboarding closure contract
+
+| Checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
+| C-1 adult invitation, participant binding, and staff-role lifecycle | OPEN | Ordinary invitation/acceptance, canonical-user binding, role assignment/revoke, expiry/retry, and offboarding behavior. |
+| C-2 child/family/enrollment/Grant onboarding | OPEN | Child/family identity boundary, enrollment proposal/Guardian confirmation, thread, Grant, replace/revoke, and readiness progression. |
+| C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
+| C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
+
+### Pilot-0-C0 — authenticated ingress and first-Institution bootstrap (LOCKED)
+
+The Pilot exposes one public application boundary:
+
+1. Guardian/Caregiver generic Chat, family/teacher/institution boards, family/institution workbenches, Notification, and deep links enter through authenticated My-Chat shell routes.
+2. Clients never call raw Nurture owner, presenter, resolver, or command routes. My-Chat authenticates the canonical user/workspace, validates generic route/surface context, carries idempotency and Nurture-issued opaque context, and renders typed generic presenter/action envelopes.
+3. Nurture private owner/action services alone resolve participant, eligible role, work/child scope, target, Grant, policy, lifecycle, expected version, display state, and action availability on every read and action. My-Chat never supplies a trusted role, scope, target, Grant, availability decision, or business lifecycle value.
+4. The current Nurture dev-host workflow/project routes are not part of the Pilot artifact, are not exposed through My-Chat, and cannot serve as an operational fallback.
+
+The first synthetic Institution cannot use the ordinary Institution-admin flow because no Institution Admin exists yet. The Pilot therefore uses one explicit bootstrap exception rather than ambient privilege:
+
+1. A versioned Pilot provisioning specification binds the exact allowlisted workspace, Nurture scenario, synthetic Institution definition, initial Institution Admin My-Chat identity, and expiry.
+2. The provisioning specification is control-plane input. The specification is not a B3-2 scenario interaction token, client credential, URL/deep-link value, user-selected role, or reusable authorization result. Pilot-0-D will lock issuance, custody, deployment, revocation, and rollback.
+3. The initial Admin must authenticate as the exact My-Chat user and accept the matching My-Chat invitation before Nurture bootstrap may execute.
+4. One idempotent Nurture transaction creates the exact Institution, Participant, first Institution Admin role assignment, and auditable `CommandExecution`/result refs. Exact response-loss replay returns the original result; a second business effect is forbidden.
+5. Wrong/changed user, workspace, scenario, Institution definition, canonical payload hash, or expiry fails before a business write. Reuse after success or concurrent non-identical consumption also fails closed.
+6. Successful bootstrap closes permanently. Later adult onboarding uses ordinary C-1 invitation, accepted-user binding, and separate staff-role commands. Neither an Institution Admin nor a Technical Operator can reopen bootstrap.
+7. Technical Admin may observe refs/counts/status/version/reason evidence for the technical outcome. The operator cannot author or change the provisioning specification, choose another initial Admin, invoke bootstrap with a business payload, alter created facts, or turn the exception into general provisioning authority.
+
+The following alternatives are forbidden:
+
+- ordinary My-Chat workspace admin automatically becoming a Nurture Institution Admin;
+- Technical Admin directly creating Nurture participants or role assignments;
+- the initial user self-declaring an Institution, role, scope, or target;
+- a client, URL, invitation code, or raw id selecting Nurture authority;
+- direct Prisma/SQL fixture writes counting as final Pilot onboarding evidence;
+- public/raw Nurture business endpoints or deployment of the current dev host.
+
+C-0 evidence must cover one exact successful bootstrap fact/audit set, exact replay, concurrent consumption, wrong/expired/drifted/reused specification, unauthenticated/wrong-user/workspace/scenario attempts, ordinary workspace admin, self-claim, Technical Operator mutation/reopen, raw-client authority injection, direct-route/dev-host exposure, and absence of protected body/secret material from Host persistence and telemetry. This is a readiness contract, not an authorization to create the provisioning artifact or apply a database change.
 
 ## Minimum IIB closure before real traffic
 
@@ -1000,7 +1040,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **Proposed** | Minimum guardian/teacher/admin journeys and authenticated action boundaries accepted. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-0 locked** | C-0 fixes authenticated My-Chat public ingress, private Nurture owner/action authority, one-time first-Institution bootstrap, exact replay/closure, and forbidden ambient-admin/dev-host/direct-DB alternatives. C-1 adult invitation/participant/role lifecycle is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
