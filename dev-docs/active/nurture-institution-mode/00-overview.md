@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-C2c-4 acceptance result and handoff to Enrollment confirmation after C-2c-3 locked a 7×24-hour TTL, stored `pending|consumed|cancelled|superseded` lifecycle with derived expiry, Admin cancel versus recipient decline reasons, immutable reissue identities, technical provider retry separation, readiness-time blocking, context invalidation, and expected-version first-commit-wins races. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-C2d atomic Enrollment confirmation after C-2c-4 closed the Enrollment Invitation flow with a typed `ready_for_enrollment_confirmation` result, a five-minute invitation-bound `submit_action` InteractionContext, current-state revalidation on every render/submit, and zero pre-confirmation Enrollment/roster-link/Grant/thread/Handoff effects. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. The authorization remains readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

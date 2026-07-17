@@ -332,6 +332,17 @@ Pilot-0-C2c-3 invitation lifecycle refinement:
 - Terminal intents, opaque Host refs, CommandExecutions, actor/reason/time, and supersede lineage are retained for audit. No old intent is deleted or changed back to pending.
 - Pilot runs three normal invitation paths plus one cancel/reissue race and one expiry/stale-open probe without adding a child/family.
 
+Pilot-0-C2c-4 confirmation-ready result refinement:
+
+- A successful child branch returns typed presenter result `ready_for_enrollment_confirmation`; the result is not an Enrollment or authorization result. Allowlisted display is Institution, CareGroup, Guardian-confirmed child display, invitation expiry, privacy consequence, and an explicit statement that Enrollment does not create a Grant.
+- Nurture issues a `submit_action` `NurtureInteractionContext` bound to exact invitation, participant, selected or newly created ChildCareProcess, Institution/CareGroup/RosterEntry, `confirm_family_enrollment`, source surface, expected versions, and canonical action hash. The client supplies only the opaque scenario token and confirmation input, never raw target ids.
+- Effective context expiry is `min(contextCreatedAt + 5 minutes, invitation.expiresAt)`. The context cannot extend the invitation. Expired/consumed/revoked context or invitation/binding/version drift requires fresh owner resolution through C-2c-2.
+- The context is short-lived continuation state, not a persisted RosterEntry-child link or proposed Enrollment. Existing-child selection stays inside the context; a new family profile remains its own durable family fact without Institution association.
+- Guardian Chat, family board, and family workbench may render the result and invoke the same `confirm_family_enrollment` action. No cross-surface/device/account unfinished draft or context transfer is supported.
+- Every render and submit rechecks pending/not-expired invitation, exact recipient/current Guardian, unlinked RosterEntry, Institution/CareGroup/Lead/policy/Pilot readiness, absence of conflicting Enrollment, and expected versions.
+- C-2c-4 writes no Enrollment, RosterEntry-child link, Grant, family thread, teacher-visible child fact, notification, or Workflow Handoff. Only C-2d strong confirmation may commit those permitted Enrollment-bound facts and consume the invitation.
+- Replay of the same read/result is deterministic and side-effect free. Terminal invitation or readiness loss returns only a safe unavailable/refresh result; stale cached confirmation cannot continue.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`

@@ -217,7 +217,7 @@ Pilot-0 detailed evidence and recommendations are canonical in `09-pilot-readine
 | --- | --- | --- |
 | Pilot-0-A baseline/actual-capability audit | Complete | Exact cross-repo baseline and contract/source hashes pass; actual runtime, UX, provisioning, delivery, security, and observability gaps are classified. |
 | Pilot-0-B cohort/role/surface/data lock | Complete | Revised B1/B2, B3-0/B3-1, B3-2a-d, B3-3a-d, and B3-4 are locked. The coverage contract requires complete action/surface conformance, four representative business journeys across three child scopes, Institution/Operator strands, layered fault/privacy evidence, and explicit exit gates. |
-| Pilot-0-C IIB/onboarding contract | In progress — C-2c-1/2/3 locked | C-2c-3 fixes 7×24-hour expiry, stored pending/consumed/cancelled/superseded states, derived expired classification, Admin cancel/recipient decline reasons, immutable reissue, provider retry separation, readiness blocking, context invalidation, and first-commit-wins concurrency. Only C-2d may consume. C-2c-4 handoff result is next. |
+| Pilot-0-C IIB/onboarding contract | In progress — C-2c complete | C-2c-4 fixes the confirmation-ready presenter, five-minute invitation-bound submit context, exact surface convergence, render/submit revalidation, and no pre-C-2d business or Workflow Handoff effect. C-2d atomic Enrollment confirmation is next. |
 | Pilot-0-D topology/operations contract | Proposed | Accept the isolated environment, exact scenario artifact, two-key workspace gate, observation, stop, recovery, and rollback terms. |
 | Pilot-0-E Go/No-Go review | Pending | Assign implementation owners and review all evidence. Pilot-1 remains separately authorized. |
 

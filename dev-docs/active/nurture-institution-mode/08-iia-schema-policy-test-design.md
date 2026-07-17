@@ -378,6 +378,15 @@ Pilot-0-C2c-3 invitation lifecycle refinement:
 - Expected-version first-commit-wins tests MUST cover cancel versus C-2d consume, decline versus consume, supersede versus accept/context use, concurrent reissue, and duplicate issue. Only C-2d may write consumed; exact replay returns original outcome.
 - Tests MUST cover 168-hour boundaries, no-sweeper expiry, actor-specific cancel/decline, exact replay/payload drift, immutable reissue lineage, provider retry separation, readiness block/recovery, context invalidation, retained audit/no deletion, three ordinary paths, one cancel/reissue race, and one expiry/stale-open probe without cohort growth.
 
+Pilot-0-C2c-4 confirmation-ready result refinement:
+
+- The accepted child branch MUST return `ready_for_enrollment_confirmation`, not enrolled/success wording. Presenter tests MUST allow only Institution/CareGroup, Guardian-confirmed child display, invitation expiry, privacy consequence, and explicit no-implicit-Grant text; raw ids, Host bindings, policy internals, and unverified profile fields are forbidden.
+- Nurture MUST issue a five-minute `submit_action` context bounded earlier by invitation expiry and bound to exact invitation/participant/ChildCareProcess/Institution/CareGroup/RosterEntry/surface/action/expected versions/canonical hash. Raw-id replacement, cross-workspace/participant/surface/action reuse, payload drift, and context extension MUST fail.
+- Chat, family board, and family workbench MUST converge on `confirm_family_enrollment`; all three rerun pending/not-expired invitation, exact recipient/current Guardian, roster, readiness/policy, conflicting Enrollment, and expected-version checks on render and submit.
+- Existing-child selection MUST remain context-only; independent new-profile facts MAY remain durable but MUST have no Institution link. Context expiry/consume/revoke, terminal invitation, readiness loss, or version/binding drift returns safe unavailable/refresh and requires fresh owner resolution.
+- C-2c-4 owner/DB/outbox tests MUST prove zero Enrollment, RosterEntry-child link, Grant, thread, teacher-visible child fact, notification, Workflow Handoff, and invitation consumption. C-2d is the only strong-confirmation commit boundary.
+- Tests MUST cover same-result replay, stale cached confirmation, all terminal invitation states, readiness loss/recovery, the five-minute/invitation-expiry minimum boundary, wrong surface/device/account reuse, no cross-surface draft transfer, and all three Guardian entry surfaces without cohort growth.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
