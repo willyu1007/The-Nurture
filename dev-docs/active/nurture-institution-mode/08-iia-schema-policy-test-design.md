@@ -338,6 +338,16 @@ Pilot-0-C2b-3 Guardian rights/history refinement:
 - Drafts and active interaction contexts remain actor/surface-bound. The second Guardian MUST NOT read the first Guardian's unsubmitted Chat/form/AI draft, scenario token, or `NurtureInteractionContext`.
 - Tests MUST cover pre-accept denial/post-accept current access, pre-join committed family history, original-Grant caregiver reply visibility, Grant revoke/replacement after join, family-source and caregiver-reply redaction, own-versus-other author redaction, Grant-owner versus Co-Guardian administration, equal label/order permission, cross-family denial, no draft/context sharing, no row duplication/backfill notification, and no arbitrary profile-edit authority.
 
+Pilot-0-C2b-4 Guardian self-exit refinement:
+
+- Only the exact current Guardian may request their own exit. Strong confirmation binds actor, Family/ChildCareProcess, exact RoleAssignment, expected version, consequence summary, and stable command identity. Peer Guardian, original inviter, Institution, Caregiver, Operator, raw-id, and service-principal removal attempts MUST fail closed.
+- Policy MUST deny exit when the actor is the last current Guardian. The command cannot create an authority-free child/family aggregate and cannot infer transfer to another account.
+- Role revoke, cancellation of pending invitation intents issued by the actor, revocation of active Grants owned by the actor, dependent Receipt/Item/Attention/body cascades, and `CommandExecution` result/audit MUST commit atomically. Grants owned by another current Guardian remain unchanged.
+- After commit, every owner read/action and stale Notification/deep-link open MUST deny the exiting actor. Author/audit refs and business facts remain, but current-role loss removes body access; remaining Guardians receive no reassigned authorship or Grant ownership.
+- Host account/workspace loss MUST deny access without mutating Nurture role/Grant state. Host restoration cannot reactivate a terminal role. Rejoin requires a new invitation/RoleAssignment; old Grant/role identities stay terminal.
+- Pilot runs the Family-1 second-Guardian self-exit probe after J1-J4 or other required dual-Guardian evidence, preserving the main `2 + 1 + 1` topology during representative journeys.
+- Tests MUST cover exact replay/payload drift, last-Guardian denial, self versus peer/inviter/Institution/Caregiver/Operator, stale role version, concurrent self-exit/action, actor-owned versus other-owned Grant, cascade completeness beyond current batch limits, atomic rollback, post-exit own/history/draft/action denial, stale notification, Host loss/restore, new-invitation rejoin with terminal old identities, retained audit/no reassignment, and absence of forced-dispute/admin DB paths.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

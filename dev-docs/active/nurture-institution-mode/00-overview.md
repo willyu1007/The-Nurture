@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-C2b-4 accepted-relationship exit/revoke after C-2b-3 locked equal current-Guardian base rights, current-state owner reread of eligible family history, separate authorship/Grant ownership/cross-role authorization, no draft sharing or historical duplication/backfill notification, and fail-closed revoke/redaction behavior. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-C2c Institution Enrollment Invitation after C-2b closed with self-exit-only accepted-relationship offboarding, last-Guardian protection, atomic own-role/pending-invitation/owned-Grant termination, immediate owner-read denial, retained authorship/audit, no peer/Institution/Operator removal, and new-invitation-only rejoin. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

@@ -283,6 +283,18 @@ Pilot-0-C2b-3 Guardian rights/history refinement:
 - General child-profile mutation remains outside this checkpoint; C-2b-3 grants safe profile/history read plus already locked family-care actions, not arbitrary shared profile editing.
 - Relationship exit/revoke and post-exit visibility remain C-2b-4.
 
+Pilot-0-C2b-4 accepted-relationship exit/revoke refinement:
+
+- A current Guardian may strongly confirm exit of their own relationship. One Guardian cannot revoke another accepted Guardian role, including a role established from their invitation. Institution Admin, Caregiver, and Technical Operator have no direct removal authority.
+- Self-exit requires current My-Chat identity/workspace, current Participant/Guardian role, exact Family/ChildCareProcess, expected role version, current policy, and at least one other current Guardian. Last-Guardian exit fails before any write; family closure or authority transfer belongs to a later dedicated contract.
+- One Nurture `CommandExecution` transaction changes the exiting RoleAssignment to terminal `revoked`, terminalizes pending Co-Guardian invitation intents issued by that actor, revokes active `NurtureChildLinkGrant` rows whose `grantedByParticipantId` is that actor, and applies existing dependent Receipt/Item/Attention/body fences. Failure rolls back all mutations.
+- Active Grants owned by another eligible current Guardian are not revoked by the actor's self-exit. Grant ownership is neither transferred nor inherited.
+- Post-commit owner reads/actions deny the exiting actor immediately, including author-side body access that requires a current same-family role. Participant, relationship history, authorship refs, Message/Receipt/Execution facts, and audit shells remain; no fact or author is reassigned to the remaining Guardian.
+- My-Chat account disablement or workspace-membership loss blocks authenticated use but does not silently rewrite Nurture RoleAssignment/Grant state. Restoring Host membership does not revive a terminal Nurture role.
+- Rejoin requires a new Co-Guardian invitation, a new active RoleAssignment, and any later independently confirmed Grant. Old role and Grant identities remain terminal.
+- Pilot performs one second-Guardian self-exit only after the main two-Guardian journeys. The main journey topology remains `2 + 1 + 1`; the later offboarding probe verifies stale notification/history denial and is not a reusable cardinality rule.
+- Forced removal, custody/legal dispute, evidence capture, or safety adjudication is outside Pilot. Such work requires a separate high-sensitivity authority/privacy/retention contract and cannot become an Operator, Institution, or direct-database action.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
