@@ -2,7 +2,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-17
+- Last updated: 2026-07-18
 - Current phase: X5 joint acceptance complete; Pilot-0 readiness authorized and in progress
 - Code/config/schema impact: the Pilot-0 change is governance/documentation only. No product code, Nurture or My-Chat schema/migration, contract pin, environment, secret, artifact publication, traffic, or activation flag changed.
 
@@ -87,6 +87,9 @@
 | C-2e-0 owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IB schema spec, IIA policy/test design, and Pilot readiness consistently lock current owner-reread authority and optional non-authorizing ThreadParticipant projection. C-2e-1 is next. |
 | Thread projection and authority separation | PASS / PLANNING CONTRACT ONLY | Exact Thread existence/scope/lifecycle remains required, but a missing ThreadParticipant row cannot deny otherwise current authority and a stale/forged/cross-scope row cannot grant or preserve it. Implementation must remove the stored membership hard gate and add positive/negative projection evidence; no implementation result is claimed. |
 | C-2e-0 document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, live workflow contract/source-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 vague-reference warnings after repairing an initial 17-warning draft. |
+| C-2e-1 owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, IB schema spec, IIA policy/test design, and Pilot readiness consistently lock any-current-Guardian first confirmation, first-committer sole ownership, common strong-confirmation disclosure, exact submit context, and no pre-submit effect. C-2e-2 is next. |
+| Grant review and confirming-Guardian boundary | PASS / PLANNING CONTRACT ONLY | Enrollment recipient/join order creates no hidden primary role; natural language/LLM/navigation cannot confirm; another Guardian cannot acquire management authority through `already_satisfied`; terminal Grant requires fresh review. Atomic creation/time/expiry/concurrency remains C-2e-2, and no implementation result is claimed. |
+| C-2e-1 document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, live workflow contract/source-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 vague-reference warnings. |
 
 ## Pilot-0-A Readiness Audit
 
@@ -305,6 +308,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-18 | Pilot-0-C2e-1 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
+| 2026-07-18 | Pilot-0-C2e-1 Grant review/confirming-Guardian accepted-decision sync | PASS | SSOT fixes equal first-confirm eligibility, first-commit owner-only administration, mandatory review disclosure, explicit generic confirmation, exact five-minute submit context, existing/current-state behavior, and no pre-submit effects. C-2e-2 is next; no implementation/runtime/environment/traffic change. |
 | 2026-07-17 | Pilot-0-C2e-0 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files after repairing an initial 17-warning draft; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
 | 2026-07-17 | Pilot-0-C2e-0 ThreadParticipant authority accepted-decision sync | PASS | SSOT fixes one current owner-reread authority path, exact Thread lifecycle as a business precondition, optional participant projection, no-row authorization success, and stale/forged-row non-authority. C-2e-1 is next; no implementation/runtime/environment/traffic change. |
 | 2026-07-17 | Pilot-0-C2d-4 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files after repairing an initial 16-warning draft; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |

@@ -27,8 +27,24 @@ This file exists to prevent repeating mistakes within this task.
 - Do not install an intentionally standalone package with a parent-workspace-aware pnpm command; use its own lockfile with `--ignore-workspace` and prove the path in a clean checkout.
 - Do not assume a checked-out adjacent repository is typecheck-ready; direct source imports require its workspace install and generated clients in the same clean job.
 - Do not use `NurtureFamilyCareThreadParticipant` as a second authorization ledger; current role, scope, Enrollment, Grant, Thread/source lifecycle, policy, and redaction are the owner-reread authority, while participant rows are optional projection only.
+- Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Enrollment confirmation risked becoming hidden Grant hierarchy
+
+- Symptom: restricting first-Grant confirmation to the Enrollment invitation
+  recipient would make one otherwise equal Guardian a hidden primary authority.
+- Context: Pilot-0-C2e-1 review and confirming-Guardian convergence.
+- Root cause: Enrollment acceptance and Grant authorization are adjacent in the UX,
+  but the commands establish different facts and already have separate action keys.
+- What we tried: compared the proposed actor boundary with equal Guardian rights,
+  owner-only Grant administration, and the no-primary-Guardian Pilot contract.
+- Fix / workaround: allow any current exact-family Guardian to review and first-
+  confirm. First committed confirmation alone establishes `grantedByParticipantId`;
+  `already_satisfied`, join order, or Enrollment confirmation never transfers owner.
+- Prevention: presenter and concurrency tests must cover both Guardians, first-
+  committer ownership, loser `already_satisfied`, and zero implicit owner transfer.
 
 ### 2026-07-17 — Stored thread membership contradicted owner-reread authority
 

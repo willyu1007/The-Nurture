@@ -392,6 +392,15 @@ Pilot-0-C2e-0 ThreadParticipant authority refinement:
 - The first active-Grant transaction need not create ThreadParticipant rows. Projection creation/update may run only after current owner authorization and cannot become an authorization cache or mandatory fan-out dependency.
 - C-2e implementation MUST remove `thread_membership_active` as a Guardian/Caregiver hard gate while retaining exact Thread existence/scope/lifecycle checks. Schema fields may remain additive, but no stored participant status may become a second permission source.
 
+Pilot-0-C2e-1 Grant review and confirming-Guardian refinement:
+
+- Any current My-Chat-authenticated, exact-Family Guardian whose role reaches the selected ChildCareProcess may review and first-confirm the fixed Pilot Grant. Enrollment invitation recipient, Enrollment confirmer, join order, and relationship label do not create primary authority.
+- The first committed confirmer becomes exact `grantedByParticipantId` and sole replace/revoke owner. Other current same-family Guardians may use and inspect the active Grant but cannot co-own, replace, revoke, or receive ownership through replay, `already_satisfied`, or membership changes.
+- Product-level strong confirmation requires current owner resolution and an explicit generic `authorization_gate`. Natural-language agreement, LLM intent, navigation, preview, page open, or Enrollment confirmation is not a Grant confirmation; Pilot adds no password/OTP/biometric requirement beyond applicable Host session policy.
+- Every confirming surface MUST display safe child label, Institution/CareGroup, the exact bidirectional family-question workflow, eligible family/caregiver use, bounded duration, confirming-owner/non-transfer consequence, revoke/retention effect, and excluded direct-chat/broadcast/media/daily-care/health/emergency/other-data uses. Raw ids, internal enums/policy/hash, client-defined target/profile/expiry, and unverified Institution child data are forbidden.
+- Nurture issues a five-minute `submit_action` InteractionContext bound to exact workspace, Participant/Guardian role, Family/ChildCareProcess, active Enrollment/Institution/CareGroup, `confirm_child_link_grant`, fixed canonical profile/hash, expected versions, and presenting surface. The client returns only opaque context plus explicit confirmation; context cannot cross actor/account/surface/device or survive expiry/revoke/drift.
+- Review and context issue create no Grant, Thread, CommandExecution, protected-content, Handoff, notification, or cross-role visibility fact. Existing exact active Grant renders current state; a new/racing command may resolve `already_satisfied` without changing owner. C-2e-2 owns transaction, identity, time, expiry, and concurrency enforcement.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`

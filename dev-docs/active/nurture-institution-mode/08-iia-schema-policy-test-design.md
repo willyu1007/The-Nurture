@@ -431,6 +431,15 @@ Pilot-0-C2e-0 ThreadParticipant authority refinement:
 - Forged participant/role/scope rows, raw ids, another Institution's row, and cached active projection MUST NOT reveal existence or create authority. Hidden/inactive projection may alter list presentation but cannot change business eligibility.
 - First-Grant fault and concurrency tests MUST NOT require participant fan-out. Optional read/subscription/display projection may be written only after owner authorization, and projection write failure cannot leave Grant/Thread business authorization partially represented.
 
+Pilot-0-C2e-1 Grant review and confirming-Guardian refinement:
+
+- Actor tests MUST allow either current exact-family Guardian to review and first-confirm while rejecting Enrollment-recipient-only or join-order hierarchy. Institution Admin, Caregiver, Operator, service identity, non-Guardian family member, wrong Family/Child/workspace actor, and stale/revoked/suspended role MUST fail without existence leakage or effects.
+- The first committed confirmation MUST establish the exact confirmer as sole owner. Another Guardian may use/inspect current scope but cannot replace/revoke; exact replay and a new `already_satisfied` command MUST preserve the first owner. C-2e-2 supplies database first-commit evidence.
+- Presenter tests across Chat, family board, and family workbench MUST expose the same mandatory safe facts: child label, Institution/CareGroup, bidirectional question-workflow scope, current eligible users, bounded duration, owner/non-transfer consequence, revoke/retention behavior, and exclusions. Tests MUST reject missing mandatory consequence copy and raw ids/internal enum/policy/hash/unverified child data.
+- Confirmation tests MUST require an authenticated current session, fresh Nurture owner resolution, and explicit `authorization_gate`. Natural-language/LLM agreement, page open, navigation, preview, Enrollment confirmation, default-selected control, and client-authored confirmation state MUST NOT execute the command. No extra Pilot password/OTP/biometric flow is inferred.
+- `submit_action` tests MUST prove five-minute exact workspace/participant/role/family/process/Enrollment/Institution/CareGroup/action/profile-hash/version/surface binding; opaque-context-plus-explicit-confirmation-only input; and denial for account/Guardian/surface/device copy, expiry, consume/revoke, payload/target/profile/expiry injection, or any binding/policy/allowlist drift.
+- Pre-submit tests MUST prove zero Grant/Thread/Execution/protected-content/Handoff/notification/cross-role effect. Existing exact active state suppresses a create affordance; a racing confirmation returns safe current/`already_satisfied` semantics without owner transfer. Atomic write/time/expiry/uniqueness assertions remain C-2e-2.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

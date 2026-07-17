@@ -2,8 +2,8 @@
 
 ## Status and authorization
 
-- **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-2e-0 locks ThreadParticipant as optional non-authorizing projection, C-2e-1 Grant review/confirming-Guardian authority next
+- **Review date:** 2026-07-18
+- **Current checkpoint:** Pilot-0-C in progress; C-2e-1 locks Grant review, any-current-Guardian first confirmation, first-committer ownership, and exact submit context, C-2e-2 atomic Grant/Thread semantics next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-0 LOCKED** | C-2e-0 closes the ThreadParticipant authority split: owner-reread business predicates are authoritative, exact Thread lifecycle remains required, and participant rows are optional projection only. C-2e-1 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-1 LOCKED** | C-2e-1 closes Grant review/confirming-Guardian authority, first-committer owner, mandatory cross-surface disclosure, five-minute exact submit context, and no pre-submit business effect. C-2e-2 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | **IN PROGRESS — C-2e-0 LOCKED** | ThreadParticipant is optional non-authorizing projection; C-2e-1 will lock review/confirming-Guardian authority before atomic Grant creation/lifecycle/recovery/withdrawal decisions. |
+| C-2e separate Grant authorization | **IN PROGRESS — C-2e-1 LOCKED** | ThreadParticipant remains optional projection; any current Guardian may first-confirm, first commit owns, and one exact strong-confirmation/context contract spans all family surfaces. C-2e-2 will lock atomic Grant/Thread identity/time/expiry/concurrency. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1267,9 +1267,44 @@ Grant-gated communication has one current owner-reread authorization path; store
 5. The first active-Grant transaction need not create Guardian or Caregiver participant rows. Projection creation/update may occur only after the current owner path authorizes the actor and cannot become an authorization cache, mandatory fan-out, or retry prerequisite.
 6. Guardian/Co-Guardian acceptance, Caregiver assignment/change, role suspension/revoke/expiry, Grant revoke/expiry/replacement, Enrollment/CareGroup change, and policy/redaction changes do not depend on participant-row synchronization for safety. The next owner reread enforces the authoritative facts immediately.
 7. Current Guardian and Caregiver command preconditions that require `thread_membership_active` conflict with the C-2e-0 authority boundary and must be repaired before Pilot traffic. The implementation may retain projection fields additively but must remove stored membership as a hard allow/deny predicate.
-8. C-2e-0 changes no first-Grant actor, confirmation copy/context, Grant ownership, atomic Grant/Thread identity, expiry/replacement/revoke, result/Handoff, or C-2f lifecycle decision. C-2e-1 owns Grant review and confirming-Guardian authority next.
+8. C-2e-0 changes no first-Grant actor, confirmation copy/context, Grant ownership, atomic Grant/Thread identity, expiry/replacement/revoke, result/Handoff, or C-2f lifecycle decision. The C-2e-1 contract owns Grant review and confirming-Guardian authority.
 
 C-2e-0 evidence must cover valid Guardian and Caregiver access with an exact active Thread and no participant row; stale active row after every role/Grant/Enrollment/CareGroup/policy/redaction denial; forged/wrong-scope/cross-Institution row; hidden/inactive projection without business-permission drift; missing/mismatched/terminal Thread denial; no participant fan-out dependency in first-Grant fault/replay tests; and removal of `thread_membership_active` as a hard command predicate without weakening current owner reread.
+
+#### C-2e-1 — Grant review and confirming-Guardian authority (LOCKED)
+
+Grant confirmation is a separate family authorization, not an extension of Enrollment confirmation or a hidden primary-Guardian role:
+
+1. Any current My-Chat-authenticated Guardian whose Nurture role reaches the exact Family/ChildCareProcess may review and first-confirm. Enrollment invitation recipient, Enrollment confirmer, Guardian join order, and `father|mother|other_guardian` display metadata do not change eligibility.
+2. The first committed confirmer becomes exact `grantedByParticipantId` and the sole replace/revoke owner. Another current same-family Guardian may inspect/use the active Grant and currently authorized family facts but cannot co-own, replace, revoke, transfer, inherit, or restore owner authority.
+3. The authorization is a Pilot product data-flow confirmation, not legal-guardian verification, legal consent adjudication, or joint-custody resolution. Forced dispute/joint-consent policy remains outside Pilot and cannot become Institution/Operator authority.
+4. Product-level strong confirmation requires the current authenticated Host session, a fresh Nurture owner resolution, and an explicit generic `authorization_gate` action such as “确认授权并开启家园问题沟通”. Natural-language agreement, LLM intent classification, navigation, preview, detail open, default-selected control, or prior Enrollment confirmation cannot execute `confirm_child_link_grant`. Pilot adds no password, OTP, biometric, or signature requirement beyond separately applicable Host session policy.
+5. Guardian Chat, family board, and family workbench converge on the same `confirm_child_link_grant -> nurture.family_care.confirm_grant` action/command. Layout may differ, but each final confirmation discloses the same mandatory consequence set.
+
+The mandatory review contract is:
+
+| Review field | Safe required meaning |
+| --- | --- |
+| Child | Guardian-confirmed safe child label. |
+| Destination | Current Institution and exact CareGroup. |
+| Purpose/scope | Current child only; family-care question workflow only. |
+| `family_to_org` | Current same-family Guardians may submit a question into the exact care-group workflow. |
+| `org_to_family` | One current exact-group Caregiver may provide one caregiver-confirmed reply causally linked to that question; no institution-initiated conversation. |
+| Current users | Current same-family Guardians may use current authorization; Caregivers act only through current item workflow and exact scope/policy. |
+| Duration | Starts only after successful commit; expires no later than 30 days or the exact Pilot allowlist expiry. |
+| Owner | The confirming Guardian becomes sole replace/revoke owner; other Guardians receive no management authority. |
+| Owner loss | Guardian-eligibility loss stops the Grant and never transfers owner automatically. |
+| Revoke/retention | Revoke stops eligible new/cross-role use, does not hard-delete audit facts, and a later Grant cannot revive old Item/content authority. |
+| Exclusions | No direct family-caregiver Chat, broadcast, institution-wide access, media, daily care, health/emergency use, clarification loop, attachment, or another data class. |
+
+6. Safe user-facing terms may replace internal enum labels, but no surface may omit owner, scope, directions, duration, revoke/retention, or exclusion consequences. Raw participant/child/enrollment/care-group/grant ids, internal enum/policy/hash, client-defined target/profile/expiry, and Institution-unverified child data are forbidden.
+7. After a complete review, Nurture issues one five-minute `submit_action` `NurtureInteractionContext` bound to exact workspace, Participant/Guardian RoleAssignment, Family/ChildCareProcess, current active Enrollment/Institution/CareGroup, `confirm_child_link_grant`, fixed Pilot profile/canonical hash, expected versions, and presenting surface. The client returns only opaque context plus explicit confirmation.
+8. Context is continuation, not authority. Account/Guardian/surface/device copying, expiry, consume/revoke, role/Enrollment/CareGroup/policy/allowlist/version drift, changed prepared profile, or client field injection requires fresh owner resolution and review; no old context may move across surfaces.
+9. Review and context issue create no Grant, Thread, CommandExecution, protected content, teacher visibility, Handoff, Outbox, notification, or deep link. Cancel/abandon/expiry leaves no Grant authorization or cross-role business effect.
+10. If an exact active Grant exists at render, the surface displays current state instead of a new-create affordance. The owner receives current management navigation; another Guardian receives safe “可使用但不可替换/撤销” guidance. Exact replay returns the original result; a new or racing same-definition command may return `already_satisfied` but cannot change the first committed owner.
+11. A revoked, expired, or replaced Grant never reactivates. With no current active Grant, a future eligible Guardian requires a fresh review/context/confirmation and new identity; no new Grant revives old Item/content. C-2e-2 owns atomic creation, database identity, transaction time, expiry terminalization, and first-commit-wins enforcement.
+
+C-2e-1 evidence must cover both current Guardians as eligible first confirmer; Enrollment-recipient/join-order/relationship-label equality; every wrong actor/family/child/workspace and stale role; first-owner versus other-Guardian use/manage presentation; all three surfaces and every mandatory/forbidden field; explicit gate versus natural-language/LLM/navigation/default-control denial; five-minute exact context binding and every copy/expiry/revoke/drift/injection path; zero pre-submit business/technical effects; existing active owner/non-owner rendering; exact replay versus new/racing `already_satisfied` without owner transfer; terminal Grant fresh-review-only behavior; and no legal-consent, password/OTP, or premature C-2e-2 atomicity claim.
 
 ## Minimum IIB closure before real traffic
 
@@ -1323,7 +1358,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-0 locked** | C-2e-0 locks one current owner-reread authorization path, exact Thread lifecycle, and optional non-authorizing ThreadParticipant projection. C-2e-1 Grant review/confirming-Guardian authority is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-1 locked** | C-2e-1 locks any-current-Guardian review/first confirmation, first-committer sole ownership, mandatory cross-surface disclosure, five-minute exact submit context, current/already-satisfied presentation, and no pre-submit effects. C-2e-2 atomic Grant/Thread semantics is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
