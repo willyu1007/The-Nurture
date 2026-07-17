@@ -348,6 +348,15 @@ Pilot-0-C2b-4 Guardian self-exit refinement:
 - Pilot runs the Family-1 second-Guardian self-exit probe after J1-J4 or other required dual-Guardian evidence, preserving the main `2 + 1 + 1` topology during representative journeys.
 - Tests MUST cover exact replay/payload drift, last-Guardian denial, self versus peer/inviter/Institution/Caregiver/Operator, stale role version, concurrent self-exit/action, actor-owned versus other-owned Grant, cascade completeness beyond current batch limits, atomic rollback, post-exit own/history/draft/action denial, stale notification, Host loss/restore, new-invitation rejoin with terminal old identities, retained audit/no reassignment, and absence of forced-dispute/admin DB paths.
 
+Pilot-0-C2c-1 Enrollment Invitation issue refinement:
+
+- Issue MUST resolve a current Institution Admin from authenticated My-Chat identity and rerun C-1 invitation readiness plus exact current unlinked RosterEntry policy. Client role/scope/ids, Institution board writes, Caregiver/Guardian/Operator, missing Lead/policy, inactive topology, and disabled Pilot gates fail before first business write.
+- Nurture invitation intent MUST bind exact workspace/Institution/CareGroup/RosterEntry/issuer/opaque Host recipient binding/expiry/version/payload hash and enforce at most one effective pending intent per RosterEntry. Exact replay returns original refs; changed dimensions conflict.
+- My-Chat raw contact/provider/auth/membership/Host acceptance state MUST remain outside Nurture. Host accepted/delivered state is identity/delivery evidence only and MUST NOT override current Nurture intent denial.
+- Issue MUST have zero Participant/Guardian/Child/Process/Family/Enrollment/Grant/roster-link/thread/Message/Receipt/teacher-child effects. Presenter output MUST expose only allowlisted safe invitation display and mark Institution prefill unverified.
+- Three Pilot RosterEntries MUST receive three distinct Enrollment Invitation intents. The Family-1 Co-Guardian Invitation MUST use a distinct type/identity/policy path and cannot consume or mutate the Enrollment Invitation intent.
+- Tests MUST cover exact replay/payload drift, concurrent duplicate issue, one-effective-pending uniqueness, wrong Institution/Admin/Group/RosterEntry/workspace/recipient binding, linked/stale RosterEntry, readiness and gate loss, raw-contact/persistence/log probes, stale Host accepted state, display allowlist/unverified provenance, zero business side effects, three-intent topology, and cross-kind Co-Guardian confusion denial.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

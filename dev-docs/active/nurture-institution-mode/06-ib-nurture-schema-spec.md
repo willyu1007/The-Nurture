@@ -295,6 +295,18 @@ Pilot-0-C2b-4 accepted-relationship exit/revoke refinement:
 - Pilot performs one second-Guardian self-exit only after the main two-Guardian journeys. The main journey topology remains `2 + 1 + 1`; the later offboarding probe verifies stale notification/history denial and is not a reusable cardinality rule.
 - Forced removal, custody/legal dispute, evidence capture, or safety adjudication is outside Pilot. Such work requires a separate high-sensitivity authority/privacy/retention contract and cannot become an Operator, Institution, or direct-database action.
 
+Pilot-0-C2c-1 Institution Enrollment Invitation issue refinement:
+
+- Only a current Institution Admin for the exact Institution may issue from the Institution workbench. Caregiver, Guardian, Technical Operator, service identity, board card, and raw client role/scope claims cannot initiate.
+- Issue rechecks active Institution/CareGroup, current exact-group Lead Caregiver, completed required policy, workspace/capability/Pilot gates, current unlinked `NurtureInstitutionRosterEntry`, and absence of an effective pending Enrollment Invitation for that entry.
+- A future Nurture Enrollment Invitation intent binds workspace, Institution, CareGroup, RosterEntry, issuing Admin, opaque exact-recipient Host invitation binding, required `expiresAt`, version, canonical payload hash, lifecycle/audit, and opaque Host invitation ref. The current Prisma schema does not yet implement this intent or its effective-pending uniqueness.
+- My-Chat owns raw recipient contact, provider delivery, recipient authentication, workspace membership, and Host acceptance. Nurture intent state remains the sole business onboarding fence; stale Host delivered/accepted/provider state cannot override Nurture cancel, expiry, readiness, lifecycle, or policy denial.
+- Issue creates no recipient Participant/Guardian RoleAssignment, Child/ChildCareProcess/Family, Enrollment, Grant, roster link, family thread, Message/Receipt, or teacher-visible child fact.
+- Display output is limited to safe Institution name, CareGroup name, institution-local child label, invitation purpose, expiry, and privacy/confirmation explanation. Institution-provided child name/age/birth prefill remains visibly unverified and cannot become canonical profile data on issue.
+- Exact replay returns the original intent/ref. Changed Institution, CareGroup, RosterEntry, recipient binding, expiry, or canonical payload conflicts. A replacement/reissue must terminalize the prior pending intent under C-2c-3 rather than overlap.
+- Pilot creates exactly three distinct Enrollment Invitation intents, one per synthetic RosterEntry. Family-1 second-Guardian onboarding uses the separate Co-Guardian invitation intent and cannot reuse or reinterpret Enrollment Invitation state.
+- C-2c-1 requires an explicit expiry but defers the numeric Pilot duration, cancel, reissue, and concurrent lifecycle to C-2c-3.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
