@@ -308,6 +308,16 @@ Pilot-0-C2a no-existing-profile and roster-entry refinement:
 - Pilot journey admission requires every participating Guardian to finish authenticated signup plus minimum child/process/profile confirmation before J1-J4. Institution-only full child operations for non-participating families are excluded and require a separate future contract.
 - Tests MUST cover create/correct replay and version conflict, wrong Institution/Admin/Group, send-before-readiness, raw-contact leakage, unverified-prefill display, Guardian edit, same-workspace authorized selection, atomic new profile/initial-Guardian creation and rollback, candidate-selection-without-roster-link, fuzzy/global/cross-workspace denial, ignored/declined/expired/wrong-recipient invitation, no authority-bearing side effects before confirmation, separate Enrollment/Grant confirmation, and retained local audit without protected child facts.
 
+Pilot-0-C2b-1 first-Guardian refinement:
+
+- My-Chat MUST authenticate the exact current Enrollment Invitation recipient. Nurture MUST reject unauthenticated, wrong-recipient, wrong-workspace, expired/revoked invitation, and raw identity/role/scope claims before first business write. Invitation acceptance remains evidence for entry, not relationship authority.
+- The prospective Guardian MUST strongly confirm a relationship declaration, the edited minimum child profile, longitudinal-profile/privacy meaning, and the fact that later current Guardians may see family-visible facts. The confirmation is a product assertion, not legal verification.
+- Participant binding/reuse, new Child/ChildCareProcess/Family, first Guardian RoleAssignment, and CommandExecution/result refs MUST commit in one Nurture transaction. Exact command replay returns original refs; payload drift conflicts; partial or authority-free creation is forbidden.
+- Existing-profile selection MUST owner-resolve through a current same-workspace Guardian role. Institution prefill, name/birth/contact match, raw object id, Enrollment Invitation recipient status, and a claimed relationship label cannot grant selection.
+- `primary_guardian` MUST NOT be added. `father|mother|other_guardian` relationship/display metadata MUST NOT alter Guardian policy, Grant ownership, author rights, or Co-Guardian rights.
+- Pilot topology uses Family-1 first-Guardian establishment followed by one later Co-Guardian Invitation; Family-2 and Family-3 retain one Guardian each. Production legal/evidence verification remains a separately approved sensitive-data capability.
+- Tests MUST cover exact replay/payload drift, transaction rollback at every row boundary, participant reuse, duplicate active Guardian uniqueness, wrong/expired/revoked invitation, wrong actor/workspace, confirmation omission, Institution assertion denial, existing-child non-Guardian denial, current-Guardian selection, no-primary equality, relationship-label permission equality, no implicit Enrollment/Grant, and presenter copy that does not claim legal verification.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

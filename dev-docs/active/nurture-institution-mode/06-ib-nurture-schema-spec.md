@@ -252,6 +252,15 @@ Pilot-0-C1 staff-onboarding refinement:
 - Teacher-board/Chat caregiver access requires current Host membership plus current Participant and active RoleAssignment for the exact care group. Wrong group, expired/suspended/revoked role, group/institution pause/archive, or policy change fails closed on every read/action.
 - Revoking or expiring a staff role does not delete the Participant, accepted invitation history, authored Message/Event/Execution facts, or other separately authorized role scopes. Re-invitation reuses the canonical Participant and requires a new/current RoleAssignment; no prior role silently reactivates.
 
+Pilot-0-C2b-1 first-Guardian refinement:
+
+- An active Institution Enrollment Invitation and exact My-Chat recipient authentication are prerequisites for the Pilot entry path, but neither fact is a Guardian RoleAssignment or proof of a family relationship.
+- The prospective Guardian must strongly confirm the relationship declaration, minimum child profile, longitudinal-profile/privacy meaning, and visibility consequence. Institution prefill stays unverified and editable.
+- One Nurture `CommandExecution` transaction binds or reuses `NurtureParticipant` and creates the new `NurtureChild`, `NurtureChildCareProcess`, `NurtureFamily`, and first active Guardian RoleAssignment. Unique/version/idempotency failures roll back all rows; an authority-free child/family aggregate is forbidden.
+- Existing child processes are selectable only through current owner resolution for an already active Guardian in the same workspace. A non-Guardian Enrollment Invitation recipient cannot claim an existing child and must first complete the separate current-Guardian-initiated Co-Guardian flow.
+- No `primary_guardian` role or implicit higher authority is introduced. Family-confirmed `father`, `mother`, or `other_guardian` relationship/display metadata may be retained on the role/profile contract but must not change policy permissions.
+- The Pilot records a product assertion and audit result, not legal guardian verification. Identity documents, civil-status evidence, institution attestation, and offline review are outside this command and require a separate sensitive-data contract before real use.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
@@ -807,11 +816,12 @@ Rules:
 
 ### 8.1 Parent joins a child care process
 
-1. My-Chat user enters Nurture shell.
-2. Nurture creates or finds `NurtureParticipant`.
-3. Nurture creates `NurtureChild`, `NurtureChildCareProcess`, and `NurtureFamily` if missing.
-4. Nurture creates `NurtureCareRoleAssignment(role=guardian, scopeType=child_care_process|family)`.
-5. Family-side workflow can now create private family-care threads.
+1. The exact invited adult authenticates through My-Chat; invitation identity and Institution intent grant no Guardian authority.
+2. The prospective Guardian strongly confirms relationship, minimum profile, longitudinal-profile/privacy meaning, and family visibility.
+3. One idempotent Nurture transaction binds/reuses `NurtureParticipant` and creates `NurtureChild`, `NurtureChildCareProcess`, `NurtureFamily`, the first active Guardian RoleAssignment, and `CommandExecution` audit evidence.
+4. Any failure rolls back the complete transaction. Exact replay returns the same refs; changed relationship/profile payload conflicts rather than creating a second child/family/role.
+5. An existing process may be selected only by a current same-workspace Guardian. A non-Guardian follows Co-Guardian Invitation first and cannot use Institution prefill or matching as authority.
+6. Family-side workflow becomes reachable only after current policy rechecks; Enrollment and Grant remain later separate confirmations.
 
 ### 8.2 Institution enrolls child
 
