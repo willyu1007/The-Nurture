@@ -470,6 +470,16 @@ Pilot-0-C2e-4a Grant replacement test refinement:
 - Old-object tests prove every Message/Receipt/Item/Attention retains old `grantId`, fails current cross-role access/action immediately, and cannot be revived by successor Grant or reused Thread. C-2e-4d supplies complete cascade-to-closure assertions.
 - Execution tests require exactly terminal-old/new-active/Thread output refs, explicit empty snapshots, null driver, no Step/Handoff/Outbox/notification/deep link/protected object, and no remote call in the transaction.
 
+Pilot-0-C2e-4b owner-initiated revoke test refinement:
+
+- Actor/surface tests allow only the exact active Grant owner who remains a current exact-Family Guardian and deny another Guardian, Institution Admin, Caregiver, Operator, service actor, raw-id caller, wrong family/process/workspace, stale role, and owner-ineligible actor. Chat may present confirmation but natural language, LLM intent, navigation, and default controls cannot execute.
+- All three Guardian surfaces show the same immediate-stop, retained-audit, already-seen-information, irreversible, and fresh-authorization consequences. Five-minute context tests enforce exact actor/role/process/Enrollment/current CareGroup/Grant version/action/surface binding, explicit confirmation, and denial of copied/expired/consumed/drifted context or client actor/reason/time/version injection.
+- Persistence tests require database transaction time, exact resolved revoke actor, fixed `user_revoked` Grant reason, downstream `grant_revoked`, and one version increment. Arbitrary reason text or client audit fields are rejected and internal codes/raw refs do not reach presenter, route, transcript, notification, or analytics payloads.
+- Transaction fault injection covers context consume, Grant transition/audit/version, every dependent-fence stage, and Execution. Every fault rolls back the whole unit; C-2e-4d adds loop-to-closure/overflow and bounded-summary coverage. Tests explicitly reject the current `take: 100` partial commit and incomplete dependent-ref output pattern.
+- Outcome tests cover exact applied replay; new eligible same-Grant revoke as `already_satisfied` without audit rewrite; replaced/expired/deleted/missing/scope-drift states; current-owner loss; revoke/revoke, revoke/replace, and question/revoke races; known serialization retry; response loss; and unknown integrity failure.
+- Fresh-authorization tests prove the revoked row is never edited/reactivated/replaced, any current equal Guardian may later complete a full new confirmation and become the new Grant owner, and the new Grant/reused Thread applies only to future work and never revives revoked-Grant Message/Receipt/Item/Attention.
+- Execution tests require exactly terminal Grant/Thread refs, explicit empty snapshots, null driver, no per-dependent output refs, and no Step/Handoff/Outbox/notification/deep link/protected object or remote call. Owner-reread tests skip unsent delivery after revoke and render only a permitted tombstone/unavailable state when an already displayed notification is opened.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

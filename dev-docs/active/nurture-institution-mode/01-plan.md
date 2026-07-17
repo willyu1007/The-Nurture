@@ -217,7 +217,7 @@ Pilot-0 detailed evidence and recommendations are canonical in `09-pilot-readine
 | --- | --- | --- |
 | Pilot-0-A baseline/actual-capability audit | Complete | Exact cross-repo baseline and contract/source hashes pass; actual runtime, UX, provisioning, delivery, security, and observability gaps are classified. |
 | Pilot-0-B cohort/role/surface/data lock | Complete | Revised B1/B2, B3-0/B3-1, B3-2a-d, B3-3a-d, and B3-4 are locked. The coverage contract requires complete action/surface conformance, four representative business journeys across three child scopes, Institution/Operator strands, layered fault/privacy evidence, and explicit exit gates. |
-| Pilot-0-C IIB/onboarding contract | In progress — C-2e-4a locked | C-2e-4a makes replacement owner-only strong authorization, adds single-direction self-lineage, atomically replaces old/new Grant without overlap or gap, preserves owner/Thread while fencing old work, rejects terminal/topology-transfer paths, and keeps replacement explicit-empty. C-2e-4b owner-initiated revoke is next. |
+| Pilot-0-C IIB/onboarding contract | In progress — C-2e-4b locked | C-2e-4b makes voluntary revoke exact-owner strong authorization, fixes server-owned reason/database time, keeps transition/fence/Execution atomic, defines replay/races and exact Grant/Thread refs, preserves equal-Guardian fresh reauthorization without old-work revival, and remains explicit-empty. C-2e-4c owner loss is next. |
 | Pilot-0-D topology/operations contract | Proposed | Accept the isolated environment, exact scenario artifact, two-key workspace gate, observation, stop, recovery, and rollback terms. |
 | Pilot-0-E Go/No-Go review | Pending | Assign implementation owners and review all evidence. Pilot-1 remains separately authorized. |
 

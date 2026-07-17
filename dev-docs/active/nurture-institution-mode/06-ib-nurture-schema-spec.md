@@ -439,6 +439,17 @@ Pilot-0-C2e-4a Grant replacement refinement:
 - Every existing Message/Receipt/Item/Attention keeps its original `grantId`. Old-Grant work fails current authorization immediately and converges under C-2e-4d; successor Grant applies only to future questions. Thread reuse retains one Enrollment container but grants no old-body/action authority.
 - Replacement Execution outputs exactly terminal old Grant ref, active successor Grant ref, and reused Thread ref. It stores `handoffRequestSnapshotsPayload=[]` and null driver and creates no Step/Handoff/Outbox/notification/deep link/protected business object.
 
+Pilot-0-C2e-4b owner-initiated revoke refinement:
+
+- Voluntary revoke remains the separate `revoke_child_link_grant -> nurture.family_care.revoke_grant` command. Only the exact active Grant `grantedByParticipantId` may prepare/submit while remaining a current exact-Family Guardian. Another Guardian, Institution, Caregiver, Operator, service identity, raw-id caller, or owner-ineligible actor cannot revoke.
+- Chat, family board, and family workbench use one five-minute strong-authorization `submit_action` context bound to exact actor/role/process/Enrollment/current CareGroup/Grant id+version/action/surface. Review states immediate authorization and old-work stop, retained audit, inability to recall already seen information, irreversibility, and the need for a fresh future authorization. Client input is opaque context plus explicit confirmation only.
+- Pilot does not accept a client reason string. The transaction persists server-owned `revokeReason=user_revoked`, database `revokedAt`, and the resolved exact `revokedByParticipantId`; downstream fences use `grant_revoked`. User presentation does not expose internal reason codes or raw refs.
+- One Serializable transaction performs exact replay; locks/reloads context/current owner facts/Grant/exact Thread and the dependent boundary; obtains database time; validates expected version; consumes context; writes `active -> revoked`, revoke audit fields, and version increment; invokes the same-transaction dependent fence; and persists Execution. C-2e-4d owns the exhaustive dependent set, loop-to-closure mechanics, and bounded cascade evidence, but partial or asynchronous cascade commit is forbidden.
+- Exact replay returns the immutable original Execution. A new command from the still-eligible exact owner against the same already revoked Grant resolves `already_satisfied` and cannot rewrite `revokedAt`, actor, reason, or version. Replaced, expired, deleted, missing, or scope-mismatched Grant is not revoke success; owner ineligibility defers to C-2e-4c.
+- Revoke/revoke and revoke/replace races use expected Grant version and first-commit-wins. A question/revoke race is serialized: a question committed first is fenced by the revoke transaction, while a revoke committed first blocks the question before business writes. Response loss uses exact replay and never repeats the transition or fence.
+- Revoked Grant is irreversible and cannot be edited, replaced, reactivated, or reused. Revocation creates no permanent family-wide veto: any current exact-Family Guardian may later run the full first-Grant review/confirmation and own a new active future-only Grant. The new Grant and reused Thread cannot revive any object bound to the revoked `grantId`.
+- Revoke Execution outputs exactly terminal Grant ref and exact Enrollment-private Thread ref, never an incomplete list of dependent refs. It stores `handoffRequestSnapshotsPayload=[]` and null driver and creates no Step/Handoff/Outbox/notification/deep link/Message/Receipt/Item/Attention/protected body. Existing downstream delivery is stopped by current owner reread plus the atomic local fence; an already displayed OS notification cannot be physically recalled and every open rechecks current authorization.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
@@ -463,9 +474,9 @@ Controls explicit information flow for a child care process between family and i
 | `supersedesGrantId` | string | no | Unique Restrict self-FK from a replacement Grant to its immediate predecessor; the inverse relation finds the successor. |
 | `replacedAt` | datetime | no | Database transaction time at which this Grant became `replaced`; required for replaced rows. |
 | `replacedByParticipantId` | string | no | Restrict Participant FK for the replacement actor; required for replaced rows. |
-| `revokedAt` | datetime | no | Revoke timestamp. |
-| `revokedByParticipantId` | string | no | Audit reference for revoke actor. |
-| `revokeReason` | string | no | Display-safe reason. |
+| `revokedAt` | datetime | no | Database revoke timestamp; required for revoked rows. |
+| `revokedByParticipantId` | string | no | Restrict Participant FK for the resolved revoke actor; required for voluntary-revoke rows. |
+| `revokeReason` | string | no | Server-owned lifecycle code; Pilot voluntary revoke uses `user_revoked`, never client free text. |
 | `retentionPolicyPayload` | json | no | What happens to historical messages/items/receipts after revoke. |
 | `policySnapshotPayload` | json | no | Snapshot of consent copy/policy version. |
 

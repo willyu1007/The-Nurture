@@ -23,6 +23,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not treat CommandExecution output refs as durable user visibility or a client result locator. Exact replay must owner-reread current state, while routes and clients receive no Grant/Thread/Execution raw refs or `open_result` token.
 - Do not store both `supersedesGrantId` and a mirrored `replacementGrantId`; one unique new-to-old self-reference plus inverse query prevents lineage divergence.
 - Do not treat replacement Thread reuse as Grant or content continuity. Every old Message/Receipt/Item/Attention retains the old `grantId`, and replacement cannot restore its cross-role authority.
+- Do not let Grant-owner revoke become a permanent family veto. The exact Grant stays terminal, but any current equal Guardian may later complete a fresh authorization for future work only.
+- Do not accept revoke reason, timestamp, actor, or dependent refs as client-authored audit. Pilot uses server-owned `user_revoked`, database time, resolved actor, exact Grant/Thread refs, and a separately bounded cascade summary.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -36,6 +38,22 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Owner revoke risked creating hidden primary-Guardian veto
+
+- Symptom: treating revoke as a family-wide permanent prohibition would let the
+  first Grant owner prevent another otherwise equal current Guardian from ever
+  creating a fresh authorization.
+- Context: Pilot-0-C2e-4b voluntary revoke convergence.
+- Root cause: administration of one exact Grant identity was conflated with global
+  authority over future Family consent decisions.
+- What we tried: compared C-2e-1 equal first-confirm eligibility, owner-only current
+  Grant administration, irreversible terminal history, and old-work isolation.
+- Fix / workaround: revoke only the exact Grant; never reactivate that row or old
+  work; require a complete fresh confirmation for any future authorization; allow
+  any then-current Guardian to become the owner of that new future-only Grant.
+- Prevention: tests must separate same-Grant owner-only revoke from fresh-Grant
+  equal-Guardian eligibility and prove no successor revives old content or actions.
 
 ### 2026-07-18 — Replacement lineage risked reauthorizing old work
 
