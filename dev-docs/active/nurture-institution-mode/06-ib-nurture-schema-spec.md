@@ -318,6 +318,20 @@ Pilot-0-C2c-2 acceptance and child branch refinement:
 - A newly created family-owned profile survives later invitation expiry/cancel because it is an independently confirmed longitudinal fact. Institution linkage remains absent, and a later attempt must re-resolve current owner/profile state.
 - Pilot first onboarding for all three families uses the new-profile branch. Existing-profile selection is a required boundary test using an already authorized synthetic process; it does not add a fourth child/family or count as final Enrollment evidence.
 
+Pilot-0-C2c-3 invitation lifecycle refinement:
+
+- Stored lifecycle is `pending`, `consumed`, `cancelled`, or `superseded`. `expired` is a current derived classification whenever `now >= expiresAt`; no sweep/status migration is required for authority loss.
+- Pilot `expiresAt` is exactly `issuedAt + 7×24 hours`. Expiry never extends in place. A reissue receives a new identity and new seven-day window.
+- Any current Institution Admin for the exact Institution may cancel a pending intent; the exact recipient may decline. Both store a terminal `cancelled` state with distinct allowlisted audit reason, actor, version, and time. Caregiver/Operator/other recipient cannot cancel or decline.
+- Reissue/correction never edits an existing binding. One Nurture command terminalizes the old pending intent as `superseded` and creates a new intent with new invitation/request/Host ref/expiry/hash plus immutable `supersedesInvitationId` lineage; the effective-pending uniqueness remains true.
+- My-Chat provider retry/resend of the same Host invitation is technical delivery and retains the original Nurture intent. A business reissue never reuses old Host acceptance, request, replay key, or intent identity.
+- Readiness/lifecycle/policy loss derives a current blocked result without another invitation state. An unexpired pending intent may resume after readiness recovery; current checks still run on every attempt.
+- Cancel/decline/expiry/supersede invalidates or blocks related `NurtureInteractionContext` use. Independently committed Participant/Child/Process/Family/Guardian facts remain and receive no Institution link.
+- Every lifecycle transition requires expected version and stable command identity. Cancel versus C-2d consume, supersede versus acceptance, and duplicate issue use first-commit-wins; exact replay returns the terminal/current result and losing stale writes cannot reopen.
+- `consumed` may be written only in the C-2d transaction that commits Enrollment and consumes the exact current pending intent. Host acceptance, child selection, profile creation, provider delivery, or context use cannot write consumed.
+- Terminal intents, opaque Host refs, CommandExecutions, actor/reason/time, and supersede lineage are retained for audit. No old intent is deleted or changed back to pending.
+- Pilot runs three normal invitation paths plus one cancel/reissue race and one expiry/stale-open probe without adding a child/family.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`

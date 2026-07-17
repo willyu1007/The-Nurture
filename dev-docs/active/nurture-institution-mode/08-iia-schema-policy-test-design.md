@@ -367,6 +367,17 @@ Pilot-0-C2c-2 acceptance/child-branch refinement:
 - Before C-2d, owner and DB tests MUST prove no Roster link/Enrollment/Grant/thread/teacher fact/invitation consumption. A separately committed new family profile remains after invite cancel/expiry but exposes no Institution data.
 - Tests MUST cover wrong recipient/workspace, stale/revoked invitation/readiness, zero/one/multiple candidate branches, mandatory single-candidate confirmation, opaque option replay/drift, existing non-Guardian denial, Co-Guardian redirect, independent new-profile replay/response loss, abandonment after profile creation, InteractionContext expiry, no pre-Enrollment linkage, all three Pilot new-profile journeys, and an existing-profile boundary without a fourth child.
 
+Pilot-0-C2c-3 invitation lifecycle refinement:
+
+- Tests and policies MUST treat `pending|consumed|cancelled|superseded` as stored states and expiry as `now >= expiresAt`; an expired pending row MUST fail without a sweeper. Pilot TTL is exactly 168 hours with boundary tests immediately before/at/after expiry.
+- Current exact-Institution Admin cancellation and exact-recipient decline MUST use separate actor/reason evidence but the same terminal no-continuation guarantee. Wrong Institution/Admin, Caregiver, Operator, other recipient, stale version, and terminal intent attempts fail closed.
+- Reissue MUST atomically supersede the old pending intent and create one new intent with new identities/expiry/hash/Host binding and immutable lineage. Correction cannot mutate recipient/CareGroup/RosterEntry or extend expiry in place.
+- Provider retry of the same Host invitation MUST retain the same business intent; business reissue MUST not reuse Host acceptance or replay identity. Stale provider/client state against cancel/decline/expire/supersede/consume MUST fail.
+- Readiness loss MUST derive blocked while keeping the stored lifecycle unchanged; recovery before expiry MAY resume after full current revalidation. Expiry or another terminal lifecycle still wins.
+- Invitation-bound InteractionContext MUST become unusable after cancel/decline/expire/supersede or binding drift. Independently committed family profiles remain with no Institution linkage.
+- Expected-version first-commit-wins tests MUST cover cancel versus C-2d consume, decline versus consume, supersede versus accept/context use, concurrent reissue, and duplicate issue. Only C-2d may write consumed; exact replay returns original outcome.
+- Tests MUST cover 168-hour boundaries, no-sweeper expiry, actor-specific cancel/decline, exact replay/payload drift, immutable reissue lineage, provider retry separation, readiness block/recovery, context invalidation, retained audit/no deletion, three ordinary paths, one cancel/reissue race, and one expiry/stale-open probe without cohort growth.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
