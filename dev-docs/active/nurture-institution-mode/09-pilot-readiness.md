@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2e-1 locks Grant review, any-current-Guardian first confirmation, first-committer ownership, and exact submit context, C-2e-2 atomic Grant/Thread semantics next
+- **Current checkpoint:** Pilot-0-C in progress; C-2e-2 locks active Grant identity, atomic Grant/Thread creation, database-time expiry, replay/concurrency convergence, and bounded retry, C-2e-3 result/recovery/explicit-empty Handoff next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -671,7 +671,7 @@ The exact Grant profile is:
 | `dataClasses` | Exactly `[family_care_question]`. |
 | `purposes` | Exactly `[family_care_workflow]`. |
 | `grantedByParticipantId` | Current same-family Guardian who explicitly confirms the Grant. |
-| `effectiveFrom` | Confirmation commit time. |
+| `effectiveFrom` | Database `transaction_timestamp()` captured inside the successful confirmation transaction. |
 | `expiresAt` | Required: earlier of `effectiveFrom + 30 days` or exact Pilot workspace allowlist expiry. |
 | `status` | `active` after first successful confirmation; no automatic renewal/reactivation. |
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-1 LOCKED** | C-2e-1 closes Grant review/confirming-Guardian authority, first-committer owner, mandatory cross-surface disclosure, five-minute exact submit context, and no pre-submit business effect. C-2e-2 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-2 LOCKED** | C-2e-2 closes active Grant identity/partial uniqueness, one serializable Grant/Thread/context/Execution transaction, database-time expiry, exact replay, cross-command race convergence, bounded retry, and integrity-conflict handling. C-2e-3 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | **IN PROGRESS — C-2e-1 LOCKED** | ThreadParticipant remains optional projection; any current Guardian may first-confirm, first commit owns, and one exact strong-confirmation/context contract spans all family surfaces. C-2e-2 will lock atomic Grant/Thread identity/time/expiry/concurrency. |
+| C-2e separate Grant authorization | **IN PROGRESS — C-2e-2 LOCKED** | ThreadParticipant remains optional projection; any current Guardian may first-confirm, first commit owns, and one serializable transaction enforces active identity, exact Thread, database time/expiry, replay, race, and failure semantics. C-2e-3 will lock result/recovery/explicit-empty Handoff. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1306,6 +1306,40 @@ The mandatory review contract is:
 
 C-2e-1 evidence must cover both current Guardians as eligible first confirmer; Enrollment-recipient/join-order/relationship-label equality; every wrong actor/family/child/workspace and stale role; first-owner versus other-Guardian use/manage presentation; all three surfaces and every mandatory/forbidden field; explicit gate versus natural-language/LLM/navigation/default-control denial; five-minute exact context binding and every copy/expiry/revoke/drift/injection path; zero pre-submit business/technical effects; existing active owner/non-owner rendering; exact replay versus new/racing `already_satisfied` without owner transfer; terminal Grant fresh-review-only behavior; and no legal-consent, password/OTP, or premature C-2e-2 atomicity claim.
 
+#### C-2e-2 — Atomic Grant/Thread creation, time, and concurrency (LOCKED)
+
+Grant confirmation has one authoritative database transaction and one active business identity:
+
+1. Active Grant identity is `(workspaceId, childCareProcessId, enrollmentId, grantedToScopeType, grantedToScopeId, canonical purposes)`. Pilot requires `care_group`, the exact current Enrollment CareGroup, and canonical singleton purposes `[family_care_workflow]`.
+2. A raw PostgreSQL partial unique index enforces one row for the identity where `status='active' AND deleted_at IS NULL`. Server code canonicalizes array order, rejects duplicate/unknown values, and never relies on Prisma to express the partial predicate.
+3. `directions=[family_to_org,org_to_family]`, the fixed question data class, and purposes form the stable business profile. Same-definition comparison excludes newly recomputed lifecycle timestamps. Changed directions/data classes/purposes or a deliberate expiry-policy change requires C-2e-4 replacement and returns `grant_replacement_required`; a derived per-attempt timestamp cannot manufacture a difference, overwrite an active row, or create an overlapping definition.
+4. `grantedByParticipantId` gains a Restrict foreign key to the exact Nurture Participant. Migration preflight reports duplicate active identities and orphan owners and stops. Migration cannot auto-pick an owner, merge rows, delete history, or silently repair ambiguous state.
+5. One Serializable Nurture transaction performs exact CommandExecution replay lookup; locks/reloads the submit context, actor/role/Family/process/Enrollment/Institution/CareGroup/allowlist/policy facts and expected versions; obtains database `transaction_timestamp()`; classifies all related Grant/Thread rows without `findFirst`; conditionally consumes context; creates the Grant; creates or reuses the Thread; and persists CommandExecution plus audit/result refs. No external provider or service call occurs inside the transaction.
+6. An applied command atomically commits the consumed context, one new active Grant, one new or existing exact active Enrollment-private Thread, and `CommandExecution(applied)`. Any fault before transaction completion commits none of those facts.
+7. Exact command replay returns the original Execution/result and never consumes another context or reruns business writes. A new or racing same-definition command consumes its own valid context and records `CommandExecution(already_satisfied)` referencing the winning Grant/Thread; owner and expiry remain unchanged.
+8. `effectiveFrom` is database transaction time. `expiresAt=min(effectiveFrom + 30 days, exact Pilot allowlist expiry)`. Effective authorization checks `status=active`, `effectiveFrom <= dbNow`, `expiresAt > dbNow`, `revokedAt IS NULL`, and `deletedAt IS NULL`; the interval is `[effectiveFrom, expiresAt)` and never depends on an expiry worker.
+9. An allowlist closed at transaction time or computed `expiresAt <= effectiveFrom` produces no success writes. Same-definition never rolls expiry forward. A fresh eligible confirmation may mark an elapsed active row `expired` with version increment and create a new Grant identity in the same transaction, reusing the exact Enrollment Thread; the old Grant and old protected content never reactivate.
+10. An active Grant whose owner is no longer eligible blocks first-confirm handling and defers to C-2e-4. C-2e-2 cannot auto-revoke, transfer, inherit, or replace owner authority.
+11. Thread state is exhaustive: no historical Thread creates the exact Enrollment-private Thread atomically; one exact active Thread is reused across Grant expiry/replacement history; first Message never creates a Thread. A terminal, mismatched, duplicate, or cross-Institution Thread while the Enrollment is active returns an integrity conflict for manual reconciliation. C-2e-2 creates no ThreadParticipant row.
+12. Known serialization failure, deadlock, and exact Grant/Thread partial-unique collision receive bounded whole-transaction retry with fresh authoritative reads. A loser converges to `already_satisfied`; rollback leaves the submit context active until a retry commits or the context TTL ends. Exhausted known contention returns retryable `command_busy`. Unknown unique or integrity failures remain technical and cannot be relabeled as success.
+
+The deterministic state matrix is:
+
+| Observed state | Required result |
+| --- | --- |
+| Same command already committed | Return original CommandExecution/result. |
+| New command, exact active same-definition | Consume valid context; record `already_satisfied`; preserve owner/expiry. |
+| Two valid commands race | First commit is `applied`; loser retries and becomes `already_satisfied`. |
+| Terminal Grant history only | Fresh review may create a new Grant identity and reuse the exact Thread. |
+| Stored `active` row elapsed by database time | Mark old row `expired`, then create a fresh Grant if every current gate passes. |
+| Active identity with profile mismatch | `grant_replacement_required`; no confirmation-side mutation. |
+| Enrollment/target drift or multiple matching active rows | `grant_integrity_conflict`; no success effect. |
+| Pending/deleted/future-active/missing lifecycle data | `grant_state_conflict` or manual reconciliation; no guessing. |
+| Role/policy/Enrollment/allowlist invalid | Specific blocked result; no success effect. |
+| Active owner ineligible | Blocked pending C-2e-4 owner-loss rules. |
+
+C-2e-2 evidence must cover the partial unique index and owner FK/preflight; array canonicalization; fault injection after every planned write; exact replay and response loss; two Guardians racing with distinct command ids; every known and unknown constraint outcome; all database-time/allowlist boundaries; expired-row terminalization; Thread create/reuse/mismatch; the complete state matrix; unchanged winner owner/expiry on `already_satisfied`; and zero ThreadParticipant/Message/Receipt/Item/Attention/Handoff/Outbox/notification/deep-link effects. C-2e-3 owns result presentation, recovery, and explicit-empty Handoff. C-2e-4 owns replace, revoke, owner loss, and dependent cascade.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1358,7 +1392,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-1 locked** | C-2e-1 locks any-current-Guardian review/first confirmation, first-committer sole ownership, mandatory cross-surface disclosure, five-minute exact submit context, current/already-satisfied presentation, and no pre-submit effects. C-2e-2 atomic Grant/Thread semantics is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-2 locked** | C-2e-2 locks active identity/partial uniqueness, one serializable Grant/Thread transaction, database-time bounded expiry, exact replay, cross-command race convergence, exhaustive state classification, and bounded known-race retry. C-2e-3 result/recovery/explicit-empty Handoff is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
