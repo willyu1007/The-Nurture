@@ -413,6 +413,16 @@ Pilot-0-C2d-3 private Thread timing refinement:
 - Revoke/expiry/replacement MUST retain the Thread/audit identity while current owner reads/actions fail closed as required. A replacement or later Grant MUST NOT revive content invalidated by the original Grant.
 - Ended/withdrawn Enrollment and re-entry tests MUST prove the old Thread is not migrated or reused and the new Thread appears only with the new Enrollment's first active Grant. C-2f still owns close/archive transitions; C-2d-4 owns result/Handoff.
 
+Pilot-0-C2d-4 Enrollment result, recovery, and Handoff refinement:
+
+- Success MUST return `enrollment_confirmed` backed by stable CommandExecution refs. Presenter tests MUST allow only safe child label, Institution, CareGroup, current status, joinedAt, and no-Grant/no-private-communication copy; raw/internal/Host/family/contact/profile fields, Thread/Grant refs or internal lifecycle fields, and protected content MUST be absent.
+- `review_family_care_grant` MUST remain a route affordance with no command/token authority. Tests MUST prove fresh owner resolution before the existing `confirm_child_link_grant` action and reject route/action aliasing, old context reuse, raw ids, and client-authored availability.
+- Exact replay and response loss MUST return one Execution/business effect while owner-rereading current Enrollment. Later lifecycle/role/workspace changes MUST produce current result or safe unavailable/tombstone rather than cached active confirmation.
+- Consumed-invitation recovery before/at/after the former expiry MUST preserve the committed Enrollment result for the exact currently authorized owner and MUST deny wrong recipient/Guardian/workspace without existence leakage. Expiry remains authoritative only for unconsumed continuation.
+- Faults after business commit in presenter/client/network/provider MUST leave Enrollment/roster/invitation/context unchanged and MUST NOT compensate, delete, reopen, or duplicate. Pre-commit fault injection retains C-2d-1 atomic rollback behavior.
+- CommandExecution MUST contain schema-valid explicit `handoffRequestSnapshotsPayload=[]`. DB/outbox/worker tests MUST prove zero activation seed, Handoff, Outbox event, notification, and deep link for Enrollment confirmation; Institution surfaces discover the update only through owner reread.
+- Contract tests MUST reject a future Enrollment notification added implicitly to the same Pilot command. Any later versioned action/Handoff requires durable claimed-Step provenance and separate acceptance, and delivery cannot affect Enrollment success.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

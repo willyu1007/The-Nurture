@@ -373,6 +373,17 @@ Pilot-0-C2d-3 private Thread timing refinement:
 - Grant revoke/expiry/replacement retains Thread identity and audit. Replacement reuses the container, but no new/later Grant revives protected bodies or effects invalidated under a terminal original Grant. Ineligible reads/actions fail immediately regardless of Thread status.
 - Ended/withdrawn Enrollment cannot migrate or reuse the Thread for a later Enrollment. Re-entry creates a new Enrollment-scoped Thread only with its new first active Grant. Thread close/archive actors and exact transition timing remain C-2f.
 
+Pilot-0-C2d-4 Enrollment result, recovery, and Handoff refinement:
+
+- Successful confirmation stores stable Enrollment/RosterEntry/invitation refs in CommandExecution and returns presenter type `enrollment_confirmed`. Stored result refs are replay/recovery locators, not cached authorization or lifecycle values.
+- Current presenter allowlist is Guardian-confirmed safe child label, Institution, CareGroup, current Enrollment status, and `joinedAt`, plus explicit statements that no Grant exists and private family-care communication remains unavailable. Raw ids, invitation/Host refs, family/contact/profile fields, Thread/Grant refs or internal lifecycle details, and protected content are forbidden.
+- `review_family_care_grant` is a non-authorizing presenter route affordance only. Opening Grant review reruns owner resolution and may later expose the existing `confirm_child_link_grant` durable action; no route payload, result, or old submit context grants authority or aliases that action key.
+- Exact stable-command replay and response-loss recovery return the original CommandExecution/Enrollment refs and one business effect. Every render owner-rereads current recipient/Guardian/workspace/Enrollment state, so later pause/end/withdraw or authority loss cannot be masked by cached confirmation output.
+- After the exact invitation is consumed, passing its former `expiresAt` does not undo Enrollment or turn the committed result into an expired failure. The invitation-to-Enrollment correlation supports safe recovery only for the exact currently authorized owner; wrong/stale actors receive unavailable/tombstone without existence leakage.
+- Presenter, client, provider, or network failure after commit never deletes, compensates, or reopens Enrollment, roster linkage, invitation, or context. An uncommitted transactional failure retains the C-2d-1 all-or-nothing outcome.
+- Pilot `confirm_family_enrollment` always stores `handoffRequestSnapshotsPayload=[]`; no durable driver is required, and no activation seed, Workflow Handoff, My-Chat Outbox event, notification, or deep link is created. Institution board/workbench discovers roster changes through current owner reread.
+- A future Enrollment-success notification requires a separate versioned refs-only action/Handoff, durable claimed-Step provenance, and independent acceptance. Delivery success can never become an Enrollment commit condition.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
