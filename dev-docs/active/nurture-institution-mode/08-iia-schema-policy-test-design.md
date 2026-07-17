@@ -460,6 +460,16 @@ Pilot-0-C2e-3 Grant result/recovery test refinement:
 - Schema/command tests require `handoffRequestSnapshotsPayload=[]` and null driver for applied, already-satisfied, and exact replay. Grant confirmation creates no Step/Handoff/Outbox/notification/deep link/teacher-visible state/Message/Receipt/Item/Attention/ThreadParticipant and makes no remote provider call.
 - Surface tests prove owner versus family-user action availability and require question creation to start a separate draft/preview/context/confirmation/command. Grant result rendering cannot create protected content or auto-navigate into a hidden action.
 
+Pilot-0-C2e-4a Grant replacement test refinement:
+
+- Actor/presenter tests allow only the exact current owner Guardian and deny another Guardian, inviter/Enrollment confirmer, Institution Admin, Caregiver, Operator, service actor, wrong family/process/workspace, stale role, and owner-ineligible actor. All three Guardian surfaces show the same old/new delta, expiry, old-work-stop, retention, unchanged-owner, and no-revival consequences.
+- Context tests enforce five-minute exact actor/role/process/Enrollment/current CareGroup/old Grant version/new canonical profile/surface binding, opaque-context-plus-explicit-confirmation input, and rejection of copied context, raw ids, client expiry/profile/owner injection, or any policy/allowlist/version drift.
+- Schema/migration tests cover nullable unique Restrict `supersedesGrantId`, old `replacedAt`/`replacedByParticipantId`, no mirrored old-row replacement id, same workspace/process/Enrollment/owner lineage, one direct successor, and preflight rejection of duplicate/broken/cyclic/cross-scope history without auto-repair.
+- Transaction fault injection covers context consume, old status/audit/version update, successor insert, Thread reuse, every old-work fence, and Execution. Every fault rolls back old/new/lineage/fence/Execution; committed success has one database time for old `replacedAt` and new `effectiveFrom` and no active overlap/gap.
+- Outcome tests cover exact replay; exact same-definition `already_satisfied` without renewal; valid replacement; terminal/deleted/missing old Grant; owner ineligibility; topology drift; replace-versus-revoke; two different replacement commands; known unique/serialization retry; unknown lineage/integrity failure; and response loss.
+- Old-object tests prove every Message/Receipt/Item/Attention retains old `grantId`, fails current cross-role access/action immediately, and cannot be revived by successor Grant or reused Thread. C-2e-4d supplies complete cascade-to-closure assertions.
+- Execution tests require exactly terminal-old/new-active/Thread output refs, explicit empty snapshots, null driver, no Step/Handoff/Outbox/notification/deep link/protected object, and no remote call in the transaction.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

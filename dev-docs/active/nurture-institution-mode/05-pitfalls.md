@@ -21,6 +21,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not compare a newly derived `expiresAt` when deciding same-definition. Directions, data classes, and purposes form the canonical business profile; lifecycle timestamps are committed facts, and recomputing them would create a rolling-renewal path.
 - Do not label every successful Grant command `grant_confirmed`. A second Guardian's `already_satisfied` result means an authorization is already active, not that the actor confirmed, owns, or jointly consents to the Grant.
 - Do not treat CommandExecution output refs as durable user visibility or a client result locator. Exact replay must owner-reread current state, while routes and clients receive no Grant/Thread/Execution raw refs or `open_result` token.
+- Do not store both `supersedesGrantId` and a mirrored `replacementGrantId`; one unique new-to-old self-reference plus inverse query prevents lineage divergence.
+- Do not treat replacement Thread reuse as Grant or content continuity. Every old Message/Receipt/Item/Attention retains the old `grantId`, and replacement cannot restore its cross-role authority.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -34,6 +36,23 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Replacement lineage risked reauthorizing old work
+
+- Symptom: storing both old-to-new and new-to-old Grant ids could diverge, while
+  reusing the Enrollment Thread could be misread as restoring old Message,
+  Receipt, Item, or Attention authority under the successor Grant.
+- Context: Pilot-0-C2e-4a Grant replacement convergence.
+- Root cause: authorization lineage and conversation-container continuity were
+  represented as if they were the same lifecycle relationship.
+- What we tried: traced replacement identity, Thread ownership, original-object
+  foreign keys, current owner-read predicates, and transaction rollback together.
+- Fix / workaround: persist only unique successor `supersedesGrantId` and query its
+  inverse; keep every existing object on its original `grantId`; treat Thread reuse
+  as container continuity only; fence old work in the atomic replacement command.
+- Prevention: migration and transaction tests must reject broken or ambiguous
+  lineage and prove that neither the successor Grant nor the reused Thread revives
+  any old cross-role read, action, activation, or delivery permission.
 
 ### 2026-07-18 — Immutable Grant receipt risked becoming a second permission view
 

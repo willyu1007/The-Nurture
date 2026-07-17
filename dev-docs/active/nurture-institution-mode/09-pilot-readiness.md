@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2e-3 locks immutable Grant result/current presentation separation, response-loss recovery, safe actor/result vocabulary, and explicit-empty Handoff, C-2e-4 replace/revoke/owner-loss/cascade next
+- **Current checkpoint:** Pilot-0-C in progress; C-2e-4a locks owner-only Grant replacement, single self-lineage, atomic no-gap/no-overlap successor creation, old-work isolation, and explicit-empty result, C-2e-4b owner-initiated revoke next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-3 LOCKED** | C-2e-3 closes immutable Execution versus current presentation, exact Grant/Thread refs, safe result/actor relation, response-loss replay before consumed context, no result token, explicit empty snapshots, and zero implicit activation/content effect. C-2e-4 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-4a LOCKED** | C-2e-4a closes exact-owner replacement, strong old/new-delta review, single self-lineage, atomic old-to-new transition, same owner/Thread with old-work fence, race/terminal/topology boundaries, and explicit-empty output. C-2e-4b is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | **IN PROGRESS — C-2e-3 LOCKED** | ThreadParticipant remains optional projection; CommandExecution is immutable while `family_care_grant_current` owner-rereads current state; response loss uses exact replay; Grant confirmation is always explicit-empty and creates no content/delivery effect. C-2e-4 will lock replace/revoke/owner-loss/cascade. |
+| C-2e separate Grant authorization | **IN PROGRESS — C-2e-4a LOCKED** | Replacement is owner-only new authorization with one-way lineage and atomic old/new transition; old objects keep old Grant and reused Thread grants no revival. C-2e-4b revoke, C-2e-4c owner loss, and C-2e-4d cascade remain open. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1372,6 +1372,48 @@ The result/recovery matrix is:
 
 C-2e-3 evidence must cover all four disposition/outcome combinations; exact two-ref Execution output; owner/family-user/none presentation; mandatory and forbidden fields; response loss after context consume and after later context expiry; current Grant/authority change after commit; wrong-caller non-disclosure; lost-command fallback without probe/result token; deterministic versus retryable context behavior; presenter failure without compensation; explicit-empty/null-driver schema state; and absence of Step/Handoff/Outbox/Notification/deep-link/teacher visibility/protected business objects. C-2e-4 owns replace, revoke, owner loss, and dependent cascade.
 
+#### C-2e-4 — Grant terminal transitions and dependent fences (IN PROGRESS)
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-2e-4a replacement | **LOCKED** | Exact owner/strong delta confirmation, single self-lineage, atomic old/new transition, same owner/Thread, no old-work revival, and explicit-empty output. |
+| C-2e-4b owner-initiated revoke | OPEN / NEXT | Voluntary revoke authority, confirmation, timestamp/reason/result, concurrency, and no reactivation. |
+| C-2e-4c owner loss | OPEN | Host loss versus temporary/terminal Nurture role loss, self-exit composition, no transfer, and recovery. |
+| C-2e-4d cascade closure | OPEN | Receipt/Item/Attention/context/activation/body fences, loop-to-closure atomicity, bounded evidence, and stale delivery/open handling. |
+
+#### C-2e-4a — Owner-confirmed Grant replacement (LOCKED)
+
+Replacement is a new authorization identity and never an in-place edit, rolling renewal, reactivation, ownership transfer, or topology move:
+
+1. Only the exact active Grant `grantedByParticipantId` may prepare and execute `replace_child_link_grant -> nurture.family_care.replace_grant` while remaining a current exact-Family Guardian. Another Guardian, Institution Admin, Caregiver, Operator, service identity, raw-id caller, or owner-ineligible actor cannot substitute.
+2. Prepare and submit recheck current Host/Nurture identity, Participant/Guardian RoleAssignment, Family/ChildCareProcess, exact active old Grant, expected old version, current active Enrollment/CareGroup, policy, allowlist, and fixed Pilot profile rules. Enrollment/CareGroup transfer is C-2f, not replacement.
+3. Every Guardian surface uses the same five-minute strong-authorization `submit_action` contract. Review shows safe old/new profile and actual expiry, exact delta, unchanged owner, immediate termination of old authorization, stop of old-Grant work, retention/audit effect, and no old-content revival. The client returns only opaque context plus explicit confirmation.
+4. Schema adds nullable unique `supersedesGrantId` on the new Grant as a Restrict self-FK and nullable old-Grant `replacedAt`/`replacedByParticipantId`, with replacement actor as a Restrict Participant FK. A replaced old row requires replacement audit fields.
+5. `supersedesGrantId` is the only stored lineage direction. The inverse relation locates the successor; no old-row `replacementGrantId` is stored. One old Grant has at most one direct successor, and migration preflight rejects broken, duplicate, cyclic, or cross-scope lineage without auto-linking history.
+6. The new successor shares workspace, ChildCareProcess, Enrollment, and owner with the old Grant. The new canonical target must equal the current Enrollment CareGroup. Replacement may change the reviewed Grant profile/expiry policy but cannot migrate the care relationship.
+7. One Serializable transaction performs exact replay, locks/reloads context/current owner facts/old Grant/exact Thread, obtains database transaction time, validates new profile, consumes context, changes old `active -> replaced` with version/audit, creates the same-owner active successor, reuses the exact Enrollment-private Thread, fences old-Grant dependent work, and commits CommandExecution.
+8. `old.replacedAt == new.effectiveFrom == transaction_timestamp()`. Old-first/new-second writes plus the active partial unique index create no committed overlap or gap. Any fault rolls back context, old/new Grant, lineage, fences, and Execution.
+9. Exact same-definition returns `already_satisfied` with no new row, lineage, expiry extension, or owner change. Revoked/expired/replaced/deleted/missing old Grant cannot replace. Owner ineligibility is C-2e-4c. Unknown lineage/active-identity defects are integrity conflicts, never inferred success.
+10. Replace versus revoke and competing replacement commands use expected old version and first-commit-wins. The loser reloads current state and requires a fresh review; no command silently retargets to the winner's successor.
+11. Every old Message/Receipt/Item/Attention remains permanently linked to the old `grantId`. Old work fails current cross-role read/action immediately and converges under C-2e-4d. The successor applies only to future questions; reused Thread is container continuity and grants no old-content authority.
+12. Replacement Execution outputs exactly terminal old Grant ref, active successor Grant ref, and reused Thread ref. `handoffRequestSnapshotsPayload=[]` and `handoffDriverRef=NULL`; no Step, Handoff, Outbox, Notification, deep link, Message, Receipt, Item, Attention, or protected body is created by replacement.
+
+The replacement state matrix is:
+
+| Observed state | Required result |
+| --- | --- |
+| Exact replacement command committed | Replay original old/new/Thread result. |
+| New command, requested definition equals current Grant | `already_satisfied`; no replacement or renewal. |
+| Current owner + active expected-version old Grant + valid changed profile | Atomic replacement. |
+| Another Guardian or non-family actor | Generic unavailable/actor denial; no existence leak. |
+| Owner no longer eligible | Block pending C-2e-4c; no owner transfer. |
+| Old Grant terminal/deleted/missing | Current/fresh-confirm guidance; no replacement. |
+| Enrollment/CareGroup topology drift | Conflict and C-2f path; no implicit transfer. |
+| Replace/revoke or two replacements race | First valid commit wins; loser refreshes and re-reviews. |
+| Broken/duplicate/cyclic lineage or active overlap | Integrity conflict/manual reconciliation; no auto-repair. |
+
+C-2e-4a evidence must cover exact owner versus every denied actor; all three surfaces and complete delta/consequence review; exact context binding/copy/drift/injection; lineage schema/preflight and no mirrored field; one database timestamp; transaction fault injection; no overlap/gap; exact replay/same-definition; every terminal/owner/topology state; replace/revoke and replace/replace races; original-Grant permanent binding; Thread non-authority; exact three refs; explicit-empty/null driver; and zero host activation/content/delivery effects. C-2e-4b owns voluntary revoke.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1424,7 +1466,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-3 locked** | C-2e-3 locks immutable receipt/current presenter separation, exact server-side Grant/Thread refs, safe result/actor semantics, response-loss replay without second confirmation, no result token, and explicit-empty/no-activation behavior. C-2e-4 replace/revoke/owner-loss/cascade is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-4a locked** | C-2e-4a locks exact-owner replacement, strong delta review, one-way lineage, atomic same-owner successor creation with no overlap/gap, old-work non-revival, race/terminal/topology boundaries, and explicit-empty output. C-2e-4b revoke is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

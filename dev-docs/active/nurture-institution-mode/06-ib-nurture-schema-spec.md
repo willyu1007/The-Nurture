@@ -425,6 +425,20 @@ Pilot-0-C2e-3 Grant result, recovery, and explicit-empty refinement:
 - `confirm_child_link_grant` stores `handoffRequestSnapshotsPayload=[]` and `handoffDriverRef=NULL` for both `applied` and `already_satisfied`. The command requires no durable Workflow Step and creates no Workflow Handoff, My-Chat Outbox, notification, deep link, teacher visibility, Message, Receipt, Item, Attention, or ThreadParticipant. Nurture-local audit/event rows remain local facts and cannot be interpreted as host activation.
 - Active owner presentation may offer separate submit-question/replace/revoke actions; active `family_user` presentation may offer separate submit-question/current-state actions only. Starting a question requires a new draft, preview, context, confirmation, and command and cannot be folded into Grant confirmation.
 
+Pilot-0-C2e-4a Grant replacement refinement:
+
+- Replacement is a new authorization identity and separate `replace_child_link_grant -> nurture.family_care.replace_grant` command, never in-place profile/expiry mutation, renewal, reactivation, ownership transfer, or Enrollment/CareGroup topology change.
+- Only the exact old Grant `grantedByParticipantId` may prepare/submit while remaining a current exact-Family Guardian and while old Grant, Family/ChildCareProcess, Enrollment/current CareGroup, policy, allowlist, and expected old Grant version are current. Another Guardian and every Institution/Caregiver/Operator/service actor fail closed.
+- A five-minute `submit_action` strong-authorization context binds exact actor/role/process/Enrollment/current CareGroup/old Grant id+version/new canonical profile/surface. Review shows old/new safe definitions and expiries, exact delta, unchanged owner, immediate old-Grant termination, old-work stop, retention, and no revival. Client returns only opaque context plus explicit confirmation.
+- Add nullable unique `supersedesGrantId` on the new Grant as a Restrict self-FK, plus nullable `replacedAt` and `replacedByParticipantId` on the old Grant; replacement actor is a Restrict FK to Participant. For `status=replaced`, old-row replacement audit fields are required. A new Grant with `supersedesGrantId` must share workspace/process/Enrollment/owner with its active predecessor and the predecessor must transition to `replaced` in the same command transaction.
+- Do not add a stored `replacementGrantId` on the old row. The unique new-to-old relation provides the inverse successor query and avoids two persisted lineage directions. Migration preflight reports broken/duplicate/cyclic/cross-scope lineage and cannot auto-link history.
+- One Serializable transaction performs exact replay; locks/reloads context/current owner facts/old Grant/exact Thread; obtains database transaction time; validates the canonical new definition; consumes context; writes old `active -> replaced`, `replacedAt`, replacement actor, and version increment; creates one same-owner active successor with `effectiveFrom=old.replacedAt`; reuses the exact Enrollment-private Thread; applies old-Grant fences; and persists Execution.
+- The active partial unique index plus old-first/new-second writes inside one transaction yield no committed overlap or gap. Old/new mutation, dependent fence, and Execution are all-or-nothing. No remote service runs inside the transaction.
+- Exact same-definition resolves `already_satisfied` without new row, lineage, owner change, or expiry extension. Revoked/expired/replaced/deleted/missing old Grant cannot replace. Owner ineligibility defers to C-2e-4c; Enrollment/CareGroup movement defers to C-2f.
+- Replace/revoke or two-replacement races use expected old version and first-commit-wins. Losers return current conflict/review guidance; unknown lineage/active-identity defects remain integrity conflicts and cannot become `already_satisfied`.
+- Every existing Message/Receipt/Item/Attention keeps its original `grantId`. Old-Grant work fails current authorization immediately and converges under C-2e-4d; successor Grant applies only to future questions. Thread reuse retains one Enrollment container but grants no old-body/action authority.
+- Replacement Execution outputs exactly terminal old Grant ref, active successor Grant ref, and reused Thread ref. It stores `handoffRequestSnapshotsPayload=[]` and null driver and creates no Step/Handoff/Outbox/notification/deep link/protected business object.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
@@ -446,6 +460,9 @@ Controls explicit information flow for a child care process between family and i
 | `status` | enum | yes | `pending`, `active`, `revoked`, `expired`, `replaced`, `deleted`. |
 | `effectiveFrom` | datetime | no | Start. |
 | `expiresAt` | datetime | no | Optional expiry. |
+| `supersedesGrantId` | string | no | Unique Restrict self-FK from a replacement Grant to its immediate predecessor; the inverse relation finds the successor. |
+| `replacedAt` | datetime | no | Database transaction time at which this Grant became `replaced`; required for replaced rows. |
+| `replacedByParticipantId` | string | no | Restrict Participant FK for the replacement actor; required for replaced rows. |
 | `revokedAt` | datetime | no | Revoke timestamp. |
 | `revokedByParticipantId` | string | no | Audit reference for revoke actor. |
 | `revokeReason` | string | no | Display-safe reason. |
