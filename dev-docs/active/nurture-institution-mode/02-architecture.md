@@ -108,6 +108,8 @@ Pilot-0-C0 makes My-Chat's authenticated shell the only public IIB ingress. Clie
 
 Pilot-0-C1 uses `NurtureCareGroup` as the only class/group aggregate. Institution Admin creates/updates and non-destructively pauses/resumes/archives a CareGroup from the Institution workbench; the board remains read-only. Enrollment-invitation eligibility is a current derived readiness decision over active Institution/Group, current Lead Caregiver assignment, completed required policy, and Pilot gates rather than a second class lifecycle or cached boolean. Staff onboarding is three separate owner transitions: Institution Admin initiates a My-Chat Staff Invitation, accepted canonical identity binds or reuses one `NurtureParticipant` with no business role, and a later strongly confirmed Nurture command creates a care-group-scoped `caregiver` RoleAssignment before a distinct Lead designation. Invitation intent is not role authority, and neither Participant existence nor Host membership grants Teacher-board access. Role suspension/revoke, Host membership loss, group pause/archive, expiry, or scope drift blocks access immediately without deleting Participant, authorship, or audit facts. The Pilot activates exactly one Lead Caregiver and no backup/multi-caregiver concurrency, while the reusable model may support multiple separately scoped assignments later.
 
+Pilot-0-C2a separates institution-local intake from the family-authorized longitudinal child record. An Institution Admin may create a minimal `NurtureInstitutionRosterEntry` for an expected child in one Institution/CareGroup and use the entry to initiate an Enrollment Invitation after C-1 readiness passes. The entry is a Nurture-owned, institution-local intake/audit object, not a `NurtureChild`, `NurtureChildCareProcess`, Guardian relationship, Enrollment, Grant, global child identity, or cross-institution matching key. Institution-provided display name and optional age/birth prefill retain institution provenance and remain unverified until the invited adult authenticates as a prospective Guardian and explicitly confirms or edits them. A prospective Guardian without an existing product profile creates the minimum child/process/family record and initial Guardian relationship in one family-authorized transaction; a current Guardian with an eligible same-workspace record selects it from owner-resolved candidates. Global/fuzzy name-and-birth matching is forbidden. Roster-to-child linkage, Enrollment, and Grant remain separate strongly confirmed transitions; the roster link is written only with confirmed Enrollment. An ignored/expired/declined invitation creates none of those authority-bearing facts. Cross-workspace longitudinal portability remains a later C-2f contract rather than an implied property of the roster entry.
+
 For Chat-entitled roles, My-Chat may process a turn to decide whether to invoke Nurture and may reuse an explicit scenario entry, conversation binding, or Nurture-issued token. That host route decision selects only the scenario. Nurture still resolves participant role, surface entitlement, work scope, target, policy, and whether the business effect is internal, `family_to_org`, or `org_to_family`.
 
 The system invocation direction (`My-Chat -> Nurture -> My-Chat response`) is independent from the Nurture business distribution direction. A caregiver message entering from Chat is not a direct role-to-role reply path; it remains a Nurture scenario invocation that must resolve a current workflow item and commit a caregiver-confirmed action. Institution actions enter through the institution board/workbench rather than Nurture Chat.
@@ -270,6 +272,14 @@ NurtureCareGroup
   age_band?
   capacity?
   rhythm_config?
+
+NurtureInstitutionRosterEntry
+  institution_id
+  care_group_id
+  institution_local_display_name
+  institution_prefill_with_provenance?
+  linked_child_care_process_id?
+  status
 
 NurtureEnrollment
   child_care_process_id

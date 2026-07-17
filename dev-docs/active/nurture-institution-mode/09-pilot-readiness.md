@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-0/C-1 ingress/bootstrap and CareGroup/staff onboarding locked, C-2 family/child/enrollment/Grant onboarding next
+- **Current checkpoint:** Pilot-0-C in progress; C-0/C-1 and C-2a no-existing-profile/RosterEntry boundary locked, C-2b Family/Co-Guardian Invitation next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | OPEN | Child/family identity boundary, enrollment proposal/Guardian confirmation, thread, Grant, replace/revoke, and readiness progression. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2a LOCKED** | C-2a separates the institution-local roster entry from the Guardian-confirmed longitudinal child profile. Family/Co-Guardian Invitation, Enrollment confirmation/thread timing, Grant, and later portability remain open. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1026,6 +1026,34 @@ The internal experiment activates exactly one Lead Caregiver, no backup caregive
 
 C-1 evidence must cover workbench command/board-write boundaries, CareGroup version conflicts and lifecycle, missing/stale readiness, Staff Invitation exact replay/drift/expiry/revoke, acceptance-before-assignment, Participant uniqueness, assignment-before-acceptance denial, wrong-group scope, distinct Lead designation, Host membership loss, role suspend/revoke/reinvite, preservation of another valid scope, overlap denial, group pause/archive, and Enrollment Invitation unavailable-to-ready transition without family content leakage. The C-1 decision changes no source, schema, route, environment, capability, invitation provider, database, or traffic.
 
+### Pilot-0-C2 — child/family/enrollment/Grant onboarding (IN PROGRESS)
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-2a no-existing-profile entry and longitudinal child boundary | **LOCKED** | Minimal institution-local RosterEntry; Guardian-authenticated child-process creation/selection; no implicit Enrollment, Grant, matching, or institution-only full profile. |
+| C-2b Family and Co-Guardian Invitation | OPEN | Family authority, initial/current Guardian, second-Guardian invitation, acceptance, revoke, and no institution-asserted family relation. |
+| C-2c Institution Enrollment Invitation | OPEN | Initiator, exact recipient/context, issue/accept/revoke/expiry, and identity-to-roster correlation. |
+| C-2d child-process selection/creation, Enrollment, and thread timing | OPEN | Strong confirmation, idempotent transaction boundaries, lifecycle, and when private communication becomes reachable. |
+| C-2e separate Grant authorization | OPEN | Review/confirm/replace/revoke and current family authority without Enrollment-implied consent. |
+| C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
+
+#### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
+
+The common acquisition path assumes the invited family may have no My-Chat account and no existing child profile. The Institution may prepare onboarding without claiming ownership of the longitudinal child record:
+
+1. An Institution Admin creates a minimal `NurtureInstitutionRosterEntry` inside one exact Institution/CareGroup. The workbench may prepare/correct the entry before readiness; sending an Enrollment Invitation still requires the C-1 active-topology, Lead, policy, and Pilot gates.
+2. The RosterEntry contains only an institution-local display label, optional age-band/birth prefill with institution provenance, local lifecycle/version/audit, and an optional opaque My-Chat invitation correlation. Raw contact/auth data remains My-Chat-owned.
+3. The RosterEntry is not a canonical child, child care process, family, Guardian relation, Enrollment, Grant, thread, Message, Receipt, care fact, global identity, or cross-institution matching key. The entry grants no protected read/write authority and cannot feed teacher operational work by itself.
+4. My-Chat invitation acceptance authenticates the exact invited adult as a prospective Guardian. If no profile exists, the adult explicitly confirms or edits the minimum profile and one family-authorized transaction atomically creates `NurtureChild`, `NurtureChildCareProcess`, `NurtureFamily`, and the first confirmed Guardian relationship. If a profile exists, only a current Guardian may select a Nurture owner-resolved same-workspace candidate. C-2b will lock the exact initial/Co-Guardian invitation and authority mechanics.
+5. Institution prefill is never verified identity. Global/fuzzy matching by name, birth date, contact, or institution input; raw-id child selection; automatic cross-workspace linking; and Institution auto-creation of a longitudinal profile are forbidden.
+6. New-profile creation cannot leave an authority-free child/family aggregate, but the initial Guardian relationship still does not imply Enrollment or data sharing. Existing-profile selection creates no new Guardian authority. Roster-to-child linkage is written only with Guardian-confirmed Enrollment or exact replay, and Enrollment never implies Grant.
+7. If the invitation is ignored, declined, expired, revoked, addressed to another actor/workspace, or never completed, only the institution-local roster/invitation audit may remain. No invitation-derived Participant/Guardian role, child process, Family, Enrollment, Grant, family-care thread, Message, Receipt, or care fact becomes active.
+8. All three Pilot families must complete authenticated signup and minimum child/process confirmation before J1-J4. Institution-only full child operations for non-participating families are outside Pilot-0 and require a separate authority/privacy/retention design; a RosterEntry cannot be silently promoted into that feature.
+
+C-2a locks a design contract only. `NurtureInstitutionRosterEntry` does not yet exist in Prisma, migrations, repositories, routes, presenters, or My-Chat invitation IIB. Exact fields, commands, transaction ordering, and cross-workspace portability remain implementation/C-2b-f work and require later approval.
+
+C-2a evidence must cover RosterEntry create/correct idempotency and versioning; wrong Admin/Institution/Group; send-before-readiness; no raw contact leakage; unverified prefill display and Guardian edit; same-workspace authorized selection; atomic new profile/initial-Guardian creation and rollback; candidate-selection-without-roster-link; global/fuzzy/raw-id/cross-workspace denial; ignored/declined/expired/revoked/wrong-recipient invitation; zero protected-work side effects before explicit confirmation; separate Enrollment and Grant transitions; and retained institution-local audit without a canonical child claim.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1078,7 +1106,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-0/C-1 locked** | C-0 fixes ingress/bootstrap; C-1 fixes the sole CareGroup aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. C-2 family/child/enrollment/Grant onboarding is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-0/C-1/C-2a locked** | C-2a adds the minimal institution-local RosterEntry for families with no product profile while reserving child-process creation/selection, Enrollment, and Grant to explicit authenticated Guardian transitions. C-2b Family/Co-Guardian Invitation is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

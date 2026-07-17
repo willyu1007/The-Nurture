@@ -168,6 +168,29 @@ Pilot-0-C1 class/readiness refinement:
 - Paused/archived CareGroup, missing current Lead, expired/revoked staff scope, or institution/policy disable blocks new family invitations and current protected work according to owner policy while retaining historical group, enrollment, role, message, and audit facts.
 - Pilot activates exactly one Lead Caregiver for the synthetic group and excludes backup/multi-caregiver concurrency. The reusable schema may hold multiple caregiver assignments later, but every assignment remains separately scoped and revalidated.
 
+### 3.6.1 `NurtureInstitutionRosterEntry` (Pilot-0-C2a design target)
+
+Represents the minimum institution-local intake record used when an invited family has no existing Nurture child profile. This design is locked for later implementation but is not present in the current Prisma schema or migration stream.
+
+| Field family | Required | Notes |
+| --- | --- | --- |
+| Workspace/Institution/CareGroup scope | yes | The entry is usable only inside one exact institution/group boundary. |
+| Institution-local display label | yes | An operational invitation label, not a verified or global child identity. |
+| Optional age band or birth prefill | no | Must retain institution provenance and remain visibly unverified until Guardian confirmation/edit. |
+| Lifecycle/version/audit | yes | Supports institution-local correction, invitation correlation, closure, and idempotent command evidence without deleting history. |
+| Opaque Host invitation reference | no | Correlates the My-Chat-owned Enrollment Invitation; raw contact/auth data remains in My-Chat. |
+| Linked child-care-process reference | no | May be written only as part of, or as an idempotent replay of, Guardian-confirmed Enrollment. |
+
+Key constraints:
+
+- A RosterEntry is not `NurtureChild`, `NurtureChildCareProcess`, `NurtureFamily`, a Guardian RoleAssignment, `NurtureEnrollment`, or `NurtureChildLinkGrant`; it grants no family, teacher, message, care-fact, or protected-body access.
+- Institution Admin may create/correct the entry from the Institution workbench before the group is invitation-ready, but Enrollment Invitation send still requires the full current C-1 readiness predicate.
+- Institution-provided name/age/birth data is prefill only. Guardian must explicitly confirm or edit the minimum profile; Nurture must not globally or fuzzily match children by name, birth date, institution input, or raw contact data.
+- When no profile exists, minimum `NurtureChild` / `NurtureChildCareProcess` / `NurtureFamily` creation and the first confirmed Guardian RoleAssignment must commit atomically; the flow cannot leave an authority-free child profile. C-2b still owns the exact invitation, confirmation, and later Co-Guardian authority rules.
+- Pilot existing-profile selection is restricted to child processes currently owner-resolved for the authenticated Guardian in the same workspace. Cross-workspace/cross-stage portability requires the separate C-2f contract.
+- If the invitation is never accepted, expires, or is declined, the institution-local entry/audit may remain, but no invitation-derived Participant/Guardian role, child process, Family, Enrollment, Grant, thread, Message, Receipt, or care fact may be created.
+- Pilot-0 excludes institution-only full child operations for non-participating families. Any future service for such families requires its own authority, privacy, retention, and migration design and cannot silently upgrade a RosterEntry into a longitudinal child profile.
+
 ### 3.7 `NurtureEnrollment`
 
 Connects one child care process to an institution/group.
@@ -792,11 +815,12 @@ Rules:
 
 ### 8.2 Institution enrolls child
 
-1. Institution admin/caregiver has active institution/care group role.
-2. Nurture creates `NurtureEnrollment` linking child care process to institution/group.
-3. Nurture creates or updates `NurtureFamilyCareThread` for enrollment-private communication.
-4. Family and institution negotiate/confirm `NurtureChildLinkGrant`.
-5. Teacher board/class inbox can now show grant-allowed items.
+1. Institution Admin creates a minimal institution-local `NurtureInstitutionRosterEntry`; sending its Enrollment Invitation remains blocked until C-1 readiness passes.
+2. My-Chat delivers the invitation and authenticates the invited Guardian without exposing raw contact/auth data to Nurture.
+3. The prospective Guardian explicitly selects a currently authorized same-workspace child process or atomically creates/confirms the minimum `NurtureChild` / `NurtureChildCareProcess` / `NurtureFamily` profile plus initial Guardian relationship. Institution prefill never establishes canonical identity.
+4. Guardian separately confirms `NurtureEnrollment` linking the child care process to the exact institution/group; the detailed C-2c/C-2d transaction and thread timing remain open.
+5. Guardian separately reviews and confirms `NurtureChildLinkGrant`; Enrollment never implies Grant.
+6. Only then may grant-allowed items appear in teacher board/class inbox. An unaccepted/expired/declined invitation leaves only the institution-local roster/audit state.
 
 ### 8.3 `family_to_org` message to class inbox
 
