@@ -395,6 +395,15 @@ Pilot-0-C2d-1 atomic Enrollment refinement:
 - Exact committed replay and response loss MUST return the same Execution/Enrollment/roster/invitation result. Payload/context/hash drift and concurrent stale confirmation MUST conflict without a second Enrollment or overwrite.
 - Tests MUST prove zero implicit Grant, family-content teacher access, or client/provider authority. Initial status/time/lifecycle/uniqueness assertions wait for C-2d-2; thread assertions wait for C-2d-3; presenter/Handoff assertions wait for C-2d-4.
 
+Pilot-0-C2d-2 Enrollment lifecycle and concurrency refinement:
+
+- Confirmation MUST create `active` with a database-issued transaction `joinedAt`. Tests MUST reject pending/client status, client/Host/Institution timestamp, backdated/future time, in-place time edit, and any scheduled-start implication.
+- Effective uniqueness MUST treat pending/active/paused as current-conflicting for one workspace/ChildCareProcess/Institution across CareGroups. Tests MUST allow separately scoped current Enrollments at different Institutions and prove no access or Grant sharing.
+- Same-Institution same-group new command MUST return safe `already_enrolled`; exact stable replay MUST return the original Execution/result. Same-Institution different-group, occupied RosterEntry, changed invitation/context, and stale version MUST return deterministic conflict without mutation.
+- Concurrent same/different invitation and roster-link tests MUST prove first-commit-wins through database uniqueness and expected versions. Losing invitation remains pending/unconsumed, losing RosterEntry remains unlinked, and no context/Execution success or partial effect survives.
+- Paused MUST still block another same-Institution Enrollment. Ended/withdrawn MUST reject reactivation; re-entry MUST use new roster/invitation/Enrollment identities. Deleted MUST be unavailable as a Pilot transition or uniqueness/audit bypass.
+- C-2d-2 tests MUST NOT infer pause/resume/end/withdraw/transfer actor authority; C-2f owns those commands. Thread creation remains C-2d-3 and result/Handoff remains C-2d-4.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

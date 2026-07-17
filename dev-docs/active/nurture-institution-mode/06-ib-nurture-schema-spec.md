@@ -352,6 +352,17 @@ Pilot-0-C2d-1 atomic Enrollment refinement:
 - The Enrollment initial status/`joinedAt` semantics, effective uniqueness and later transitions remain C-2d-2. Private thread creation timing remains C-2d-3. Presenter/recovery/Handoff policy remains C-2d-4; no effect may be inferred before those decisions.
 - Enrollment confirmation neither creates a `NurtureChildLinkGrant` nor authorizes teacher access to family content. Grant remains a separate C-2e strong-confirmation command.
 
+Pilot-0-C2d-2 Enrollment lifecycle and concurrency refinement:
+
+- Pilot `confirm_family_enrollment` creates `status=active` and sets `joinedAt` from the authoritative database transaction timestamp generated inside the same atomic transaction. Client/Host/Institution-provided status or time, backdating, future scheduling, and in-place `joinedAt` changes are forbidden. A future scheduled-start feature requires a separate contract.
+- Pilot creates no `pending` Enrollment. For fail-closed uniqueness, any pre-existing `pending`, `active`, or `paused` Enrollment is current-conflicting for the same `(workspaceId, childCareProcessId, institutionId)` across all CareGroups.
+- A ChildCareProcess may hold independent current Enrollments at different Institutions. Each Enrollment, CareGroup, roster association, policy scope, and later Grant remains separate; cross-Institution presence grants no shared access.
+- Same-Institution current Enrollment in another CareGroup returns `enrollment_conflict`; confirmation cannot silently end, move, replace, or relink the prior Enrollment. Transfer remains C-2f.
+- Exact stable-command replay returns the original Enrollment and consumed invitation result. A new command for an already-current same Institution/CareGroup returns safe `already_enrolled` without a new business effect; a different CareGroup, already-linked RosterEntry, or competing invitation returns a deterministic conflict.
+- One RosterEntry links successfully once. Concurrent confirmations, invitations, and roster-link writes use database uniqueness plus expected versions and first-commit-wins. A losing invitation remains unconsumed, its RosterEntry remains unlinked, and no context/Execution success or partial business effect commits.
+- `paused` remains current-conflicting. `ended` and `withdrawn` are terminal and never return to active. Re-entry after a terminal Enrollment requires a new RosterEntry, Enrollment Invitation, and Enrollment identity.
+- Pilot does not transition to or from `deleted`; the status cannot bypass terminal history, uniqueness, audit, or C-2f transition policy. C-2f owns pause/resume/exit/withdraw/transfer and cross-stage actors and commands.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
