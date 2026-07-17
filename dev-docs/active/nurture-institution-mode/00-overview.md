@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-C2c-2 Enrollment Invitation acceptance and new/existing child branch after C-2c-1 locked Institution-Admin-only issue, current readiness, exact CareGroup/RosterEntry/Host-recipient binding, one effective pending intent per RosterEntry, Nurture business-state authority, refs-only Host correlation, required expiry, and zero child/family/Guardian/Enrollment/Grant/thread side effects at issue. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-C2c-3 Enrollment Invitation expiry/cancel/reissue/concurrency after C-2c-2 locked exact-recipient Host acceptance as identity evidence, owner-resolved explicit existing-child selection, atomic first-profile creation for no-Guardian recipients, InteractionContext-only pending selection, no pre-Enrollment roster link or institution facts, distinct command identities, and invitation consumption only with C-2d Enrollment commit. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

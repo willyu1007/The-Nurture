@@ -357,6 +357,16 @@ Pilot-0-C2c-1 Enrollment Invitation issue refinement:
 - Three Pilot RosterEntries MUST receive three distinct Enrollment Invitation intents. The Family-1 Co-Guardian Invitation MUST use a distinct type/identity/policy path and cannot consume or mutate the Enrollment Invitation intent.
 - Tests MUST cover exact replay/payload drift, concurrent duplicate issue, one-effective-pending uniqueness, wrong Institution/Admin/Group/RosterEntry/workspace/recipient binding, linked/stale RosterEntry, readiness and gate loss, raw-contact/persistence/log probes, stale Host accepted state, display allowlist/unverified provenance, zero business side effects, three-intent topology, and cross-kind Co-Guardian confusion denial.
 
+Pilot-0-C2c-2 acceptance/child-branch refinement:
+
+- Host acceptance MUST bind the exact recipient but MUST NOT consume the Nurture intent or authorize a child. Nurture reruns current intent, recipient/workspace, Institution/CareGroup readiness, RosterEntry, Pilot gate, and policy before returning any branch.
+- Current same-workspace Guardians MUST receive owner-resolved safe candidates and explicitly choose a Nurture opaque option even when exactly one candidate exists. Raw id, Host-selected child, Institution prefill, name/birth/contact fuzzy/global match, wrong-family candidate, and stale option MUST fail without existence leakage.
+- A recipient with no eligible Guardian role MUST use the independent C-2b-1 atomic profile/first-Guardian command. Exact replay returns the same profile refs; Enrollment invitation/intent remains pending and unchanged.
+- A non-Guardian cannot select another Guardian's existing process. The flow MUST direct to Co-Guardian Invitation without merging, copying, or auto-linking profiles.
+- Pending existing-child selection MUST live only in bounded `NurtureInteractionContext`; context expiry/revoke/participant or invitation drift requires fresh owner resolution. No RosterEntry/invitation long-lived child ref may appear before C-2d.
+- Before C-2d, owner and DB tests MUST prove no Roster link/Enrollment/Grant/thread/teacher fact/invitation consumption. A separately committed new family profile remains after invite cancel/expiry but exposes no Institution data.
+- Tests MUST cover wrong recipient/workspace, stale/revoked invitation/readiness, zero/one/multiple candidate branches, mandatory single-candidate confirmation, opaque option replay/drift, existing non-Guardian denial, Co-Guardian redirect, independent new-profile replay/response loss, abandonment after profile creation, InteractionContext expiry, no pre-Enrollment linkage, all three Pilot new-profile journeys, and an existing-profile boundary without a fourth child.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

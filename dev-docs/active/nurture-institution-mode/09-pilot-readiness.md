@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-2c-1 Enrollment Invitation issue/binding locked, C-2c-2 recipient acceptance and new/existing child branch next
+- **Current checkpoint:** Pilot-0-C in progress; C-2c-1/2 issue and recipient child-branch locked, C-2c-3 expiry/cancel/reissue/concurrency next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2c-1 LOCKED** | C-2c-1 locks Institution-Admin-only issue, readiness, exact RosterEntry/Host-recipient binding, one pending business intent, required expiry, refs-only Host split, and zero downstream business effects. Acceptance branching is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2c-1/2 LOCKED** | C-2c-2 locks exact-recipient identity evidence, explicit owner-resolved existing-child choice, separate first-profile creation, InteractionContext-only pending selection, no pre-Enrollment linkage, and C-2d-only invitation consumption. Lifecycle is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1032,7 +1032,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | --- | --- | --- |
 | C-2a no-existing-profile entry and longitudinal child boundary | **LOCKED** | Minimal institution-local RosterEntry; Guardian-authenticated child-process creation/selection; no implicit Enrollment, Grant, matching, or institution-only full profile. |
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
-| C-2c Institution Enrollment Invitation | **IN PROGRESS — C-2c-1 LOCKED** | Issue and exact binding are locked; recipient acceptance/new-existing-child branch plus cancel/expiry/reissue/concurrency and handoff to Enrollment confirmation remain open. |
+| C-2c Institution Enrollment Invitation | **IN PROGRESS — C-2c-1/2 LOCKED** | Issue/binding and recipient new/existing child branch are locked; cancel/expiry/reissue/concurrency and handoff to Enrollment confirmation remain open. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | OPEN | Strong confirmation, idempotent transaction boundaries, lifecycle, and when private communication becomes reachable. |
 | C-2e separate Grant authorization | OPEN | Review/confirm/replace/revoke and current family authority without Enrollment-implied consent. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
@@ -1137,6 +1137,24 @@ Institution Enrollment Invitation prepares one family onboarding opportunity wit
 
 C-2c-1 evidence must cover exact replay and every payload-drift dimension; concurrent duplicate issue and one-pending uniqueness; wrong Institution/Admin/Group/workspace/recipient/RosterEntry; linked/stale RosterEntry; missing Lead/policy/readiness/gate; raw-contact/provider/auth persistence and log probes; stale Host accepted state against Nurture denial; safe display/unverified provenance; zero Participant/role/child/family/Enrollment/Grant/link/thread/message/teacher effects; three exact Pilot intents; and cross-kind Co-Guardian confusion denial.
 
+#### C-2c-2 — recipient acceptance and new/existing child branch (LOCKED)
+
+Host acceptance establishes exact recipient identity but leaves child authority and Enrollment under Nurture control:
+
+1. The exact recipient authenticates and accepts through My-Chat. Nurture then rechecks current invitation intent, recipient/workspace, Institution/CareGroup readiness, RosterEntry unlinked state, Pilot gates, and policy. Host acceptance alone neither consumes the Nurture intent nor selects/creates a child.
+2. When the participant has current same-workspace Guardian authority for one or more ChildCareProcesses, Nurture owner resolution returns safe candidates. The Guardian must explicitly select a Nurture-issued opaque option even when only one candidate exists; raw ids and Host/Institution-selected child values are forbidden.
+3. Multiple eligible candidates require explicit clarification. Zero eligible candidates enters the new-profile path; no candidate count or forbidden object is leaked beyond safe branch output.
+4. A recipient without an eligible Guardian relationship uses the locked C-2b-1 command to bind/reuse Participant and atomically create Child, ChildCareProcess, Family, first Guardian role, and audit refs. New-profile command identity/replay is separate from Enrollment confirmation.
+5. A non-Guardian who knows another current profile exists cannot claim that profile through the Enrollment Invitation. A current Guardian must first issue Co-Guardian Invitation; Nurture performs no global/fuzzy name/birth/contact matching, automatic merge, or raw-id link.
+6. Institution prefill remains unverified and may assist display/editing only; prefill cannot auto-select, auto-create canonical values without Guardian confirmation, or establish a RosterEntry link.
+7. Existing-child choice is stored only in a short-lived `NurtureInteractionContext` bound to invitation/participant/purpose/surface/expiry and opaque candidate refs. Context expiry/revoke/state drift requires fresh owner resolution and selection.
+8. Before C-2d Enrollment commit, neither branch writes RosterEntry-to-child link, Enrollment, Grant, family thread, teacher-visible child fact, or invitation consumption. Selection is not durable Institution linkage.
+9. If a newly created family profile is followed by abandonment, invitation cancel, or expiry, the independently confirmed family profile and first Guardian relationship remain. No Institution relationship exists, and a later attempt re-resolves current facts.
+10. The Nurture Enrollment Invitation intent stays pending and resumable by the same exact recipient until C-2d consumes the intent or C-2c-3 terminalizes the intent. Host acceptance never substitutes for that lifecycle.
+11. All three Pilot first Guardians use the new-profile branch. Existing-profile choice is mandatory boundary evidence using an already authorized synthetic process and does not add a fourth child/family or satisfy final Enrollment evidence.
+
+C-2c-2 evidence must cover wrong recipient/workspace and stale intent/readiness; Host acceptance without business consumption; zero/one/multiple owner-resolved candidate branches; mandatory single-candidate confirmation; opaque option exact use/replay/drift; raw-id/Host/Institution/fuzzy/global selection denial; existing-profile non-Guardian denial and Co-Guardian redirect; independent new-profile replay/response loss; abandonment/cancel/expiry after profile creation; InteractionContext expiry/revoke/drift; no pre-C-2d link/Enrollment/Grant/thread/teacher effect; three new-profile Pilot paths; and existing-profile coverage without cohort growth.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1189,7 +1207,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2c-1 locked** | C-2c-1 locks exact Institution/Admin/CareGroup/RosterEntry/Host-recipient issue under current readiness, one pending Nurture business intent, required expiry, refs-only Host ownership, safe display, replay/drift rules, and zero downstream business effects. C-2c-2 acceptance branching is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2c-1/2 locked** | C-2c-2 locks exact-recipient Host identity evidence, explicit owner-resolved opaque child selection, independent atomic first-profile creation, InteractionContext-only pending choice, no pre-Enrollment linkage, and invitation consumption only in C-2d. C-2c-3 lifecycle is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

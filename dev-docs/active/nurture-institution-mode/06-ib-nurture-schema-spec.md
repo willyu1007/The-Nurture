@@ -307,6 +307,17 @@ Pilot-0-C2c-1 Institution Enrollment Invitation issue refinement:
 - Pilot creates exactly three distinct Enrollment Invitation intents, one per synthetic RosterEntry. Family-1 second-Guardian onboarding uses the separate Co-Guardian invitation intent and cannot reuse or reinterpret Enrollment Invitation state.
 - C-2c-1 requires an explicit expiry but defers the numeric Pilot duration, cancel, reissue, and concurrent lifecycle to C-2c-3.
 
+Pilot-0-C2c-2 acceptance and child branch refinement:
+
+- Exact-recipient My-Chat Host acceptance is required identity/membership evidence but does not consume the Nurture Enrollment Invitation intent, select a child, create business authority, or bypass current intent/readiness/policy checks.
+- If the authenticated participant already has one or more current same-workspace Guardian scopes, Nurture owner resolution returns only safe eligible ChildCareProcess candidates. The Guardian must explicitly select through a Nurture-issued opaque option even for a single candidate; raw child ids, Institution prefill, name/birth/contact match, and Host payload cannot select.
+- If no eligible Guardian scope exists, the recipient uses the C-2b-1 command to atomically bind/reuse Participant and create Child/ChildCareProcess/Family/first Guardian RoleAssignment. That command has its own stable identity/replay result and does not consume or complete the Enrollment Invitation.
+- A non-Guardian who knows an existing profile exists must obtain Co-Guardian Invitation from a current Guardian. Enrollment Invitation cannot claim, merge, or duplicate-link an existing profile through fuzzy/global matching. Automatic duplicate detection/merge is outside Pilot.
+- Existing-child selection remains only in a bounded `NurtureInteractionContext` tied to invitation/participant/purpose/surface/expiry and opaque candidate refs. No selected child id is persisted on the RosterEntry or Enrollment Invitation intent before C-2d confirmation; expired context requires fresh owner resolution.
+- Before C-2d commit there is no RosterEntry-to-child link, Enrollment, Grant, family thread, teacher-visible child fact, invitation consumption, or cross-role access.
+- A newly created family-owned profile survives later invitation expiry/cancel because it is an independently confirmed longitudinal fact. Institution linkage remains absent, and a later attempt must re-resolve current owner/profile state.
+- Pilot first onboarding for all three families uses the new-profile branch. Existing-profile selection is a required boundary test using an already authorized synthetic process; it does not add a fourth child/family or count as final Enrollment evidence.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
