@@ -343,6 +343,15 @@ Pilot-0-C2c-4 confirmation-ready result refinement:
 - C-2c-4 writes no Enrollment, RosterEntry-child link, Grant, family thread, teacher-visible child fact, notification, or Workflow Handoff. Only C-2d strong confirmation may commit those permitted Enrollment-bound facts and consume the invitation.
 - Replay of the same read/result is deterministic and side-effect free. Terminal invitation or readiness loss returns only a safe unavailable/refresh result; stale cached confirmation cannot continue.
 
+Pilot-0-C2d-1 atomic Enrollment refinement:
+
+- `confirm_family_enrollment` requires the exact current invitation recipient to remain a current Guardian and strongly confirm the resolved ChildCareProcess, Institution, CareGroup, and roster association plus the explicit no-implicit-Grant consequence. Client input is limited to the opaque current submit context and confirmation response.
+- Before writing, Nurture reloads the pending/not-expired invitation, exact recipient/Participant/Guardian, ChildCareProcess/Family, unlinked RosterEntry, Institution/CareGroup/Lead/policy/Pilot readiness, absence of conflicting Enrollment, context status/expiry/bindings, and all expected versions.
+- One Nurture database transaction consumes the submit InteractionContext, creates or resolves the stable CommandExecution, creates the exact `NurtureEnrollment`, sets the RosterEntry's canonical `linkedChildCareProcessId`, moves the exact invitation from pending to consumed with `consumedAt` and Enrollment correlation, and records immutable audit/result refs.
+- The transaction is all-or-nothing. Constraint, lifecycle, version, readiness, binding, or authority failure leaves no partial Enrollment, roster link, invitation/context consumption, Execution result, or audit success. Exact committed replay returns the original refs; changed command/context payload conflicts.
+- The Enrollment initial status/`joinedAt` semantics, effective uniqueness and later transitions remain C-2d-2. Private thread creation timing remains C-2d-3. Presenter/recovery/Handoff policy remains C-2d-4; no effect may be inferred before those decisions.
+- Enrollment confirmation neither creates a `NurtureChildLinkGrant` nor authorizes teacher access to family content. Grant remains a separate C-2e strong-confirmation command.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`

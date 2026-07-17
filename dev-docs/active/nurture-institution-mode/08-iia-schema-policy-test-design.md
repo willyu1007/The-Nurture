@@ -387,6 +387,14 @@ Pilot-0-C2c-4 confirmation-ready result refinement:
 - C-2c-4 owner/DB/outbox tests MUST prove zero Enrollment, RosterEntry-child link, Grant, thread, teacher-visible child fact, notification, Workflow Handoff, and invitation consumption. C-2d is the only strong-confirmation commit boundary.
 - Tests MUST cover same-result replay, stale cached confirmation, all terminal invitation states, readiness loss/recovery, the five-minute/invitation-expiry minimum boundary, wrong surface/device/account reuse, no cross-surface draft transfer, and all three Guardian entry surfaces without cohort growth.
 
+Pilot-0-C2d-1 atomic Enrollment refinement:
+
+- `confirm_family_enrollment` MUST require strong confirmation by the exact invitation recipient who remains a current Guardian. Tests MUST reject another Guardian, inviter/Admin/Caregiver/Operator/service identity, client-authored ids/scope/role, wrong surface/account/workspace, and a copied or altered context.
+- The command MUST reload every invitation/context/recipient/Guardian/ChildCareProcess/Family/RosterEntry/Institution/CareGroup/Lead/policy/Pilot/conflicting-Enrollment/version precondition before the first write. A stale cached authorization result cannot substitute.
+- Context consumption, stable CommandExecution, exact Enrollment creation, canonical roster link, exact invitation consumption with Enrollment correlation, and audit/result refs MUST commit in one Nurture transaction. Fault injection after every write boundary MUST roll back all effects.
+- Exact committed replay and response loss MUST return the same Execution/Enrollment/roster/invitation result. Payload/context/hash drift and concurrent stale confirmation MUST conflict without a second Enrollment or overwrite.
+- Tests MUST prove zero implicit Grant, family-content teacher access, or client/provider authority. Initial status/time/lifecycle/uniqueness assertions wait for C-2d-2; thread assertions wait for C-2d-3; presenter/Handoff assertions wait for C-2d-4.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.
