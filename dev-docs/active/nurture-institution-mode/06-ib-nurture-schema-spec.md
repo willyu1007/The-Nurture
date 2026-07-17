@@ -160,6 +160,14 @@ Key constraints:
 - Index: `(workspaceId, institutionId, status)`.
 - Name uniqueness is institution-local when active: `(workspaceId, institutionId, name)` for active groups.
 
+Pilot-0-C1 class/readiness refinement:
+
+- `NurtureCareGroup` is the only class/group aggregate; no parallel `Class`, onboarding-class state machine, or Host-owned class projection may become authoritative.
+- Institution workbench creates/updates and non-destructively pauses/resumes/archives the CareGroup through explicit versioned `CommandExecution` transitions. Institution board remains a read-only safe aggregate/navigation surface. `deleted` is not a Pilot user action.
+- CareGroup lifecycle and readiness are separate. Family Enrollment Invitation requires current `active` Institution and CareGroup, at least one active care-group-scoped Lead Caregiver, complete required policy, and enabled Pilot gates. Missing staff/policy/gate produces a current unavailable/readiness result rather than another persisted group status or cached authorization boolean.
+- Paused/archived CareGroup, missing current Lead, expired/revoked staff scope, or institution/policy disable blocks new family invitations and current protected work according to owner policy while retaining historical group, enrollment, role, message, and audit facts.
+- Pilot activates exactly one Lead Caregiver for the synthetic group and excludes backup/multi-caregiver concurrency. The reusable schema may hold multiple caregiver assignments later, but every assignment remains separately scoped and revalidated.
+
 ### 3.7 `NurtureEnrollment`
 
 Connects one child care process to an institution/group.
@@ -212,6 +220,14 @@ Policy derivation:
 - Guardian access requires an active `guardian` assignment scoped to `child_care_process` or `family`.
 - Teacher access requires active `caregiver` or `lead_caregiver` assignment scoped to the relevant `care_group` or `enrollment`.
 - Institution admin access requires active `institution_admin` assignment scoped to the institution and must still respect child data exposure policies.
+
+Pilot-0-C1 staff-onboarding refinement:
+
+- Staff Invitation is My-Chat identity delivery/acceptance plus Nurture-owned invitation intent; the intent may describe the expected Institution/CareGroup safely but is never a RoleAssignment or access credential.
+- Accepted canonical My-Chat identity binds or reuses exactly one workspace `NurtureParticipant`. Participant existence and Host membership grant no Nurture business role.
+- Institution Admin separately and strongly confirms a care-group-scoped `caregiver` RoleAssignment. Lead Caregiver designation is a distinct versioned transition and cannot be inferred from invitation copy, the first accepted teacher, or general Institution membership.
+- Teacher-board/Chat caregiver access requires current Host membership plus current Participant and active RoleAssignment for the exact care group. Wrong group, expired/suspended/revoked role, group/institution pause/archive, or policy change fails closed on every read/action.
+- Revoking or expiring a staff role does not delete the Participant, accepted invitation history, authored Message/Event/Execution facts, or other separately authorized role scopes. Re-invitation reuses the canonical Participant and requires a new/current RoleAssignment; no prior role silently reactivates.
 
 ## 4. Grant and Receipt Objects
 

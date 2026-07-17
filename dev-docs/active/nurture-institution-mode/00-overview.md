@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-C1 adult invitation, participant binding, and staff-role lifecycle after C-0 locked the authenticated My-Chat public ingress, private Nurture owner/action boundary, and one-time allowlisted Institution bootstrap. Guardian/Caregiver/Institution IIB closure, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-C2 family-owned longitudinal child profile, Co-Guardian Invitation, Institution-initiated Enrollment Invitation, Guardian enrollment confirmation, and separate Grant authorization after C-1 locked CareGroup management/readiness plus staff invitation/Participant/RoleAssignment/Lead Caregiver lifecycle. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. This authorization is readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

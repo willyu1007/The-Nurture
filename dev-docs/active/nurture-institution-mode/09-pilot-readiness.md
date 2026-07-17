@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-0 authenticated ingress/first-Institution bootstrap locked, C-1 adult identity/role onboarding next
+- **Current checkpoint:** Pilot-0-C in progress; C-0/C-1 ingress/bootstrap and CareGroup/staff onboarding locked, C-2 family/child/enrollment/Grant onboarding next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -953,7 +953,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
-| C-1 adult invitation, participant binding, and staff-role lifecycle | OPEN | Ordinary invitation/acceptance, canonical-user binding, role assignment/revoke, expiry/retry, and offboarding behavior. |
+| C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
 | C-2 child/family/enrollment/Grant onboarding | OPEN | Child/family identity boundary, enrollment proposal/Guardian confirmation, thread, Grant, replace/revoke, and readiness progression. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
@@ -987,6 +987,44 @@ The following alternatives are forbidden:
 - public/raw Nurture business endpoints or deployment of the current dev host.
 
 C-0 evidence must cover one exact successful bootstrap fact/audit set, exact replay, concurrent consumption, wrong/expired/drifted/reused specification, unauthenticated/wrong-user/workspace/scenario attempts, ordinary workspace admin, self-claim, Technical Operator mutation/reopen, raw-client authority injection, direct-route/dev-host exposure, and absence of protected body/secret material from Host persistence and telemetry. This is a readiness contract, not an authorization to create the provisioning artifact or apply a database change.
+
+### Pilot-0-C1 — CareGroup and institution-staff onboarding lifecycle (LOCKED / COMPLETE)
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-1a CareGroup lifecycle and readiness | **LOCKED** | One class aggregate, workbench-only writes, read-only board, lifecycle/readiness separation, and no hard delete. |
+| C-1b Staff Invitation and My-Chat acceptance | **LOCKED** | Institution initiation, Host-owned contact/auth/acceptance/membership, opaque Nurture correlation, and no role grant. |
+| C-1c Participant, Caregiver role, and Lead designation | **LOCKED** | Accepted-user binding, separate strong role assignment, exact group scope, distinct Lead transition, and idempotent audit. |
+| C-1d revoke/offboarding/reinvite | **LOCKED** | Immediate fail-closed access, retained identity/authorship/audit, other-scope preservation, and no silent role reactivation. |
+| C-1e family-invitation readiness gate | **LOCKED** | Active topology, Lead coverage, required policy, Pilot gates, and no enrollment invitation before readiness. |
+
+`NurtureCareGroup` is the only class/group business aggregate. Institution Admin uses the Institution workbench to create/update and non-destructively pause/resume/archive the CareGroup with expected-version `CommandExecution`; Institution board displays only safe status, readiness, and navigation. Pilot exposes no `Class` duplicate, generic state-upsert, card-triggered write, or hard-delete action.
+
+CareGroup lifecycle and onboarding readiness remain separate:
+
+| Dimension | Source of truth |
+| --- | --- |
+| CareGroup lifecycle | Existing `active`, `paused`, and `archived` Nurture state; `deleted` is not a Pilot user operation. |
+| Family-invitation readiness | Current derived result requiring active Institution/CareGroup, active exact-group Lead Caregiver, complete required policy, and enabled environment/workspace/business gates. |
+
+Missing teacher coverage or policy produces a current unavailable/readiness reason rather than a second persisted class status, Host-owned readiness flag, or cached authorization result. A group may exist before staffing, but family Enrollment Invitation send and protected family-care work remain blocked until readiness passes. Group pause/archive blocks new invitations and cannot delete historical roles, enrollments, messages, or audits.
+
+Institution staff onboarding is a sequence of independent owner transitions:
+
+1. Institution Admin initiates Staff Invitation from the workbench for a safe intended Institution/CareGroup context.
+2. My-Chat owns recipient contact data, delivery, authentication, acceptance, and workspace membership. Nurture receives only accepted canonical identity plus an opaque Host invitation ref and allowlisted display context.
+3. Acceptance binds or reuses exactly one workspace `NurtureParticipant`; no Nurture business role exists yet.
+4. Institution Admin separately and strongly confirms an exact care-group-scoped `caregiver` RoleAssignment with current version/scope/policy.
+5. Lead Caregiver designation is another explicit transition and is never inferred from first acceptance, invitation wording, Participant existence, or general membership.
+6. Only current Host membership plus current Participant, exact active RoleAssignment, active Institution/CareGroup, and policy permits Caregiver Chat/teacher-board access.
+
+Invitation intent is not authorization. Host invitation acceptance, Host membership, Participant binding, Caregiver assignment, and Lead designation have distinct identities, versions, audit outcomes, and retry semantics. Another group's role, general workspace admin, Institution Admin status, or a raw client role/scope value grants no caregiver reachability.
+
+Role suspend/revoke/expiry, Host membership loss, CareGroup/Institution pause/archive, policy change, or scope drift blocks access immediately on every read/action. Offboarding retains Participant, invitation/acceptance history, authorship, Message/Event/Execution facts, and other independently active role scopes. Reinviting the same canonical user reuses the Participant but requires a new/current RoleAssignment; no terminal assignment silently reactivates.
+
+The internal experiment activates exactly one Lead Caregiver, no backup caregiver, no Institution Admin/Caregiver overlap, and no multi-caregiver concurrency. The reusable schema may later support several separately scoped Caregiver assignments or a teacher serving several groups, but each scope remains independently granted and revoked.
+
+C-1 evidence must cover workbench command/board-write boundaries, CareGroup version conflicts and lifecycle, missing/stale readiness, Staff Invitation exact replay/drift/expiry/revoke, acceptance-before-assignment, Participant uniqueness, assignment-before-acceptance denial, wrong-group scope, distinct Lead designation, Host membership loss, role suspend/revoke/reinvite, preservation of another valid scope, overlap denial, group pause/archive, and Enrollment Invitation unavailable-to-ready transition without family content leakage. The C-1 decision changes no source, schema, route, environment, capability, invitation provider, database, or traffic.
 
 ## Minimum IIB closure before real traffic
 
@@ -1040,7 +1078,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-0 locked** | C-0 fixes authenticated My-Chat public ingress, private Nurture owner/action authority, one-time first-Institution bootstrap, exact replay/closure, and forbidden ambient-admin/dev-host/direct-DB alternatives. C-1 adult invitation/participant/role lifecycle is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-0/C-1 locked** | C-0 fixes ingress/bootstrap; C-1 fixes the sole CareGroup aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. C-2 family/child/enrollment/Grant onboarding is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
