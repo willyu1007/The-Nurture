@@ -7,7 +7,7 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-17
 - **Owner:** willyu1007
-- **Next step:** Continue Pilot-0-C2d-3 private-thread creation timing after C-2d-2 locked immediate `active` Enrollment with database-issued transaction `joinedAt`, same-child/same-Institution current uniqueness across groups, cross-Institution coexistence, exact replay/new-command duplicate classification, first-commit-wins races, and non-reactivating terminal identities. C-2d-4 result/Handoff remains open; transfer/exit stays C-2f. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. The authorization remains readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
+- **Next step:** Continue Pilot-0-C2d-4 Enrollment result, recovery, and Handoff rules after C-2d-3 locked no Thread at Enrollment, safe roster-only institution visibility, and one enrollment-private Thread created atomically with the first C-2e active Grant. Thread identity never authorizes access, replacement reuses the Thread, revoke/expiry fails closed without deletion or old-content revival, and re-enrollment receives a new Thread. Transfer/exit stays C-2f. Guardian/Caregiver operational IIB, topology/operations, and final Go/No-Go remain open. The authorization remains readiness-only: Pilot-1 through Pilot-4, database apply, ACR publication, secret configuration, capability activation, external traffic, staging, production, and GA remain closed until separate approval.
 
 ## Current Cross-Repo Contract Baseline
 

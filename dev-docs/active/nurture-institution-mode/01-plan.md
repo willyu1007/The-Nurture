@@ -217,7 +217,7 @@ Pilot-0 detailed evidence and recommendations are canonical in `09-pilot-readine
 | --- | --- | --- |
 | Pilot-0-A baseline/actual-capability audit | Complete | Exact cross-repo baseline and contract/source hashes pass; actual runtime, UX, provisioning, delivery, security, and observability gaps are classified. |
 | Pilot-0-B cohort/role/surface/data lock | Complete | Revised B1/B2, B3-0/B3-1, B3-2a-d, B3-3a-d, and B3-4 are locked. The coverage contract requires complete action/surface conformance, four representative business journeys across three child scopes, Institution/Operator strands, layered fault/privacy evidence, and explicit exit gates. |
-| Pilot-0-C IIB/onboarding contract | In progress — C-2d-1/2 locked | C-2d-2 fixes immediate active/server-time Enrollment, same-Institution current uniqueness with cross-Institution coexistence, duplicate/race classification, and non-reactivating terminal identities. C-2d-3 thread timing is next; C-2d-4 result/Handoff remains open. |
+| Pilot-0-C IIB/onboarding contract | In progress — C-2d-1/2/3 locked | C-2d-3 fixes no Enrollment-time/lazy Thread, safe roster-only visibility, first-Grant atomic Thread creation, per-Enrollment uniqueness, current owner reread, replacement reuse, and revoke/terminal retention boundaries. C-2d-4 result/recovery/Handoff is next. |
 | Pilot-0-D topology/operations contract | Proposed | Accept the isolated environment, exact scenario artifact, two-key workspace gate, observation, stop, recovery, and rollback terms. |
 | Pilot-0-E Go/No-Go review | Pending | Assign implementation owners and review all evidence. Pilot-1 remains separately authorized. |
 

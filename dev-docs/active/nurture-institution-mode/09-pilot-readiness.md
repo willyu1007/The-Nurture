@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-2d-1/2 atomic confirmation and Enrollment lifecycle/concurrency locked, C-2d-3 private-thread timing next
+- **Current checkpoint:** Pilot-0-C in progress; C-2d-1/2/3 atomic Enrollment, lifecycle/concurrency, and private-thread timing locked, C-2d-4 result/recovery/Handoff next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2d-1/2 LOCKED** | C-2d-2 locks active/server-time Enrollment, same-Institution current uniqueness, cross-Institution coexistence, and duplicate/race/terminal rules. C-2d-3 thread timing is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2d-1/2/3 LOCKED** | C-2d-3 locks safe roster-only visibility and first-Grant atomic per-Enrollment Thread without a second authority or lazy-creation path. C-2d-4 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1033,7 +1033,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2a no-existing-profile entry and longitudinal child boundary | **LOCKED** | Minimal institution-local RosterEntry; Guardian-authenticated child-process creation/selection; no implicit Enrollment, Grant, matching, or institution-only full profile. |
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
-| C-2d child-process selection/creation, Enrollment, and thread timing | **IN PROGRESS — C-2d-1/2 LOCKED** | Atomic confirmation and Enrollment lifecycle/duplicate/concurrency are locked. Private-thread timing and result/Handoff remain open. |
+| C-2d child-process selection/creation, Enrollment, and thread timing | **IN PROGRESS — C-2d-1/2/3 LOCKED** | Atomic confirmation, Enrollment lifecycle/concurrency, and first-Grant private-thread timing are locked. Result/recovery/Handoff remains open. |
 | C-2e separate Grant authorization | OPEN | Review/confirm/replace/revoke and current family authority without Enrollment-implied consent. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
@@ -1222,6 +1222,23 @@ Pilot Enrollment has one immediate, deterministic creation shape and no implicit
 
 C-2d-2 evidence must cover database-time active creation; every status/time injection; pending/active/paused uniqueness; same-group new command versus exact replay; same-Institution different-group conflict; cross-Institution coexistence with strict access/Grant separation; occupied-roster and competing-invitation races; first-commit-wins and no partial loser effects; terminal non-reactivation/new identities; deleted-state denial; and no premature C-2f/thread/Handoff authority.
 
+#### C-2d-3 — private Thread creation timing and authority (LOCKED)
+
+Enrollment establishes a care relationship, while Grant separately activates protected family-care communication:
+
+1. C-2d Enrollment confirmation creates no `NurtureFamilyCareThread` or ThreadParticipant. No empty/pending Thread shell exists between Enrollment and Grant.
+2. After Enrollment, current exact-scope Institution Admin/Caregiver roster views may expose only care-group membership, a Guardian-confirmed safe child label, Enrollment status, and `joinedAt`. Family/Guardian/contact/profile details, Grant/thread/message existence, protected bodies, and facts from another Institution remain hidden.
+3. The first C-2e transaction that creates the exact active Grant also creates the one `active`, `enrollment_private` Thread bound to the exact workspace, ChildCareProcess, Family, Enrollment, and CareGroup. Grant/Thread/Execution/audit/result refs commit or roll back together.
+4. One active enrollment-private Thread exists per workspace/ChildCareProcess/Family/Enrollment. Different Institution Enrollment creates a distinct Thread only after that Enrollment's own first Grant.
+5. Exact Grant replay and Grant replacement reuse the existing Thread id. No history is copied, split, or merged, and a first Message cannot lazily create a missing Thread.
+6. Thread and ThreadParticipant rows are routing/projection facts, not permission. Every read/write rechecks current participant/role, exact Enrollment/CareGroup, original/current Grant, thread/source lifecycle, policy, and redaction.
+7. Grant revoke or expiry retains the Thread/audit identity but immediately blocks now-ineligible bodies/actions. Replacement or a later Grant cannot revive content invalidated under the terminal original Grant.
+8. Ended/withdrawn Enrollment does not migrate or reuse its Thread. Re-entry creates a new Enrollment-scoped Thread only with the new first active Grant; C-2f owns close/archive actors and transition timing.
+9. Notification, My-Chat conversation state, cached Thread membership, provider state, and raw Thread/participant ids cannot create or preserve communication authority.
+10. Pilot rejects a Grant-only row, Thread-only row, duplicate Thread, missing-Thread first Message, cross-Institution Thread reuse, and all stale owner-projection paths.
+
+C-2d-3 evidence must cover zero Thread at Enrollment; safe roster allowlist and negative fields before Grant; first-Grant atomic Grant/Thread/Execution/audit creation with fault injection; active uniqueness; cross-Institution separation; replay/replacement reuse; no lazy first-Message creation; Thread/participant non-authority; revoke/expiry and original-Grant fences; terminal Enrollment/re-entry separation; stale/raw/provider/notification denial; and no premature C-2d-4 Handoff behavior.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1274,7 +1291,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2d-1/2 locked** | C-2d-2 locks immediate active/server-time Enrollment, same-Institution current uniqueness, cross-Institution coexistence, exact replay/new-command duplicate classification, first-commit-wins, and terminal non-reactivation. C-2d-3 thread timing is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2d-1/2/3 locked** | C-2d-3 locks no Enrollment-time/lazy Thread, safe roster-only visibility, first-Grant atomic per-Enrollment Thread, current owner reread, replacement reuse, and revoke/terminal retention boundaries. C-2d-4 result/recovery/Handoff is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

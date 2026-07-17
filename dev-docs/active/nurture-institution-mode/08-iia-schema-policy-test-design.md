@@ -404,6 +404,15 @@ Pilot-0-C2d-2 Enrollment lifecycle and concurrency refinement:
 - Paused MUST still block another same-Institution Enrollment. Ended/withdrawn MUST reject reactivation; re-entry MUST use new roster/invitation/Enrollment identities. Deleted MUST be unavailable as a Pilot transition or uniqueness/audit bypass.
 - C-2d-2 tests MUST NOT infer pause/resume/end/withdraw/transfer actor authority; C-2f owns those commands. Thread creation remains C-2d-3 and result/Handoff remains C-2d-4.
 
+Pilot-0-C2d-3 private Thread timing refinement:
+
+- Enrollment commit tests MUST prove zero Thread/ThreadParticipant. Institution/Caregiver owner presenters before Grant MUST expose only allowlisted roster membership, Guardian-confirmed safe child label, Enrollment status, and joinedAt; family/profile/contact/Grant/thread/message/body existence MUST remain absent.
+- First active-Grant confirmation MUST atomically create the exact active enrollment-private Thread plus Grant/Execution/audit refs. Fault injection and races MUST leave neither Grant-only nor Thread-only state, and uniqueness MUST prevent a second active Thread for the same workspace/process/family/Enrollment.
+- Different Institution Enrollment MUST resolve a different Thread. Exact Grant replay and replacement MUST reuse the same Thread id with no history copy; first Message MUST reject missing Thread rather than lazily create one.
+- Thread and participant rows MUST fail as authorization when role, Enrollment/CareGroup, original/current Grant, policy, source lifecycle, or redaction denies. Raw thread/participant ids, stale projections, and another Institution's Thread MUST not leak existence or content.
+- Revoke/expiry/replacement MUST retain the Thread/audit identity while current owner reads/actions fail closed as required. A replacement or later Grant MUST NOT revive content invalidated by the original Grant.
+- Ended/withdrawn Enrollment and re-entry tests MUST prove the old Thread is not migrated or reused and the new Thread appears only with the new Enrollment's first active Grant. C-2f still owns close/archive transitions; C-2d-4 owns result/Handoff.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

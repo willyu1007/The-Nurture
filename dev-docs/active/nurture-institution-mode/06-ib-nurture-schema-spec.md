@@ -363,6 +363,16 @@ Pilot-0-C2d-2 Enrollment lifecycle and concurrency refinement:
 - `paused` remains current-conflicting. `ended` and `withdrawn` are terminal and never return to active. Re-entry after a terminal Enrollment requires a new RosterEntry, Enrollment Invitation, and Enrollment identity.
 - Pilot does not transition to or from `deleted`; the status cannot bypass terminal history, uniqueness, audit, or C-2f transition policy. C-2f owns pause/resume/exit/withdraw/transfer and cross-stage actors and commands.
 
+Pilot-0-C2d-3 private Thread timing refinement:
+
+- Enrollment confirmation creates no `NurtureFamilyCareThread` or ThreadParticipant. Exact-scope Institution Admin/Caregiver roster presenters may show only current care-group membership, a Guardian-confirmed safe child label, Enrollment status, and `joinedAt`; family/Guardian/contact/profile details, Grant/thread/message existence, protected bodies, and other Institution facts are forbidden.
+- The first C-2e command that commits the exact active `NurtureChildLinkGrant` also creates `status=active`, `visibilityScope=enrollment_private` Thread bound to exact `(workspaceId, childCareProcessId, familyId, enrollmentId, careGroupId)`. Grant, Thread, CommandExecution, and required audit/result refs are all-or-nothing.
+- One active enrollment-private Thread identity exists per `(workspaceId, childCareProcessId, familyId, enrollmentId)`. A different Institution Enrollment has a different Enrollment and Thread. Exact Grant replay and Grant replacement return/reuse the existing Thread rather than copying history or creating a second container.
+- Thread creation cannot be deferred to first Message/Item. First protected input requires an already current Enrollment, active original Grant, and existing resolved Thread, avoiding a second thread-creation/retry path.
+- Thread and ThreadParticipant rows are routing/projection state, never authority snapshots. Every presenter/action resolves current participant/role, exact Enrollment/CareGroup, original/current Grant, thread lifecycle, policy, source lifecycle, and redaction before exposing content or accepting a write.
+- Grant revoke/expiry/replacement retains Thread identity and audit. Replacement reuses the container, but no new/later Grant revives protected bodies or effects invalidated under a terminal original Grant. Ineligible reads/actions fail immediately regardless of Thread status.
+- Ended/withdrawn Enrollment cannot migrate or reuse the Thread for a later Enrollment. Re-entry creates a new Enrollment-scoped Thread only with its new first active Grant. Thread close/archive actors and exact transition timing remain C-2f.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
