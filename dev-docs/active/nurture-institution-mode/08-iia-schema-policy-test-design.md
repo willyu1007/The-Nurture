@@ -329,6 +329,15 @@ Pilot-0-C2b-2 Co-Guardian Invitation refinement:
 - Pilot configuration permits exactly one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3. Tests MUST prove this exact topology without adding a global two-Guardian constraint or implying a reusable product maximum.
 - Tests MUST cover any-current-Guardian issue, no-primary behavior, wrong-family/process/scope, Institution/Caregiver/Operator denial, raw-contact persistence probe, exact/different-payload issue replay, wrong/expired/revoked/consumed recipient acceptance, stale Host accepted/provider state against Nurture denial, inviter revoke, cancel/accept race, Participant reuse, duplicate role, atomic rollback, no pre-accept history/Grant access, no implicit Enrollment/new child, exact `2 + 1 + 1` Pilot gate, and absence of a Schema cardinality cap.
 
+Pilot-0-C2b-3 Guardian rights/history refinement:
+
+- Before second-role commit, every family profile/history/action query MUST deny without leaking existence. After commit, both current Guardians resolve the same base family action set; join order and relationship label MUST NOT affect policy.
+- Current owner queries MAY return eligible committed facts created before Co-Guardian acceptance, but MUST recheck current role/Family, Enrollment, original Grant for cross-role bodies, redaction, retention, and policy. Queries MUST NOT clone rows, create a per-Guardian history projection, or emit historical notifications.
+- Both current Guardians MAY author new eligible questions under the active Grant and read currently allowed same-family committed facts. Exact author alone may redact a Message. Grant replace/revoke remains limited to the persisted `grantedByParticipantId`; acceptance cannot transfer ownership.
+- Family-originated body access and cross-role reply access MUST use their distinct B3-3d fences. Grant revoke/replacement/expiry removes receiver-side caregiver/institution bodies even for a current Co-Guardian; same-family membership cannot revive a redacted source or reply.
+- Drafts and active interaction contexts remain actor/surface-bound. The second Guardian MUST NOT read the first Guardian's unsubmitted Chat/form/AI draft, scenario token, or `NurtureInteractionContext`.
+- Tests MUST cover pre-accept denial/post-accept current access, pre-join committed family history, original-Grant caregiver reply visibility, Grant revoke/replacement after join, family-source and caregiver-reply redaction, own-versus-other author redaction, Grant-owner versus Co-Guardian administration, equal label/order permission, cross-family denial, no draft/context sharing, no row duplication/backfill notification, and no arbitrary profile-edit authority.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

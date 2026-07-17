@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; locked through C-2b-2 Co-Guardian Invitation issue/acceptance, C-2b-3 Guardian rights/history next
+- **Current checkpoint:** Pilot-0-C in progress; locked through C-2b-3 Guardian rights/history, C-2b-4 accepted-relationship exit/revoke next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — through C-2b-2 LOCKED** | C-2b-2 locks current-Guardian initiation, exact-recipient Host acceptance, acceptance-time authority/topology rechecks, atomic second-Guardian role, pending cancellation, and cohort-only `2 + 1 + 1`; rights/history is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — through C-2b-3 LOCKED** | C-2b-3 locks equal current-Guardian base rights and eligible historical owner reread while preserving authorship, Grant ownership, cross-role fences, draft isolation, and no history/notification backfill. Relationship exit/revoke is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1031,7 +1031,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | C-2a no-existing-profile entry and longitudinal child boundary | **LOCKED** | Minimal institution-local RosterEntry; Guardian-authenticated child-process creation/selection; no implicit Enrollment, Grant, matching, or institution-only full profile. |
-| C-2b Family and Co-Guardian Invitation | **IN PROGRESS — C-2b-1/2 LOCKED** | First-Guardian establishment and Co-Guardian issue/acceptance are locked; resulting rights/history and accepted-relationship exit/revoke remain open. |
+| C-2b Family and Co-Guardian Invitation | **IN PROGRESS — C-2b-1/2/3 LOCKED** | Establishment, invitation/acceptance, and current rights/history are locked; accepted-relationship exit/revoke remains open. |
 | C-2c Institution Enrollment Invitation | OPEN | Initiator, exact recipient/context, issue/accept/revoke/expiry, and identity-to-roster correlation. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | OPEN | Strong confirmation, idempotent transaction boundaries, lifecycle, and when private communication becomes reachable. |
 | C-2e separate Grant authorization | OPEN | Review/confirm/replace/revoke and current family authority without Enrollment-implied consent. |
@@ -1083,6 +1083,23 @@ Co-Guardian Invitation extends an existing family relationship without introduci
 8. Pilot policy allows exactly one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3, yielding the accepted `2 + 1 + 1` topology. The cohort gate is not a unique constraint, Schema cardinality, or product limit; the reusable model may support more Guardians after a separate product-policy decision.
 
 C-2b-2 evidence must cover any-current-Guardian issue and no-primary behavior; exact/different-payload issue replay; wrong family/process/workspace/recipient; Institution/Caregiver/Operator denial; zero raw contact in Nurture; no pre-accept Participant/role/history/Grant effects; inviter revoke; expiry/revoke/consume; stale Host accepted/provider state against Nurture denial; cancel/accept race; exact-recipient acceptance; Participant reuse; duplicate-role and transaction rollback; response-loss replay; no implicit Enrollment/Grant/new child; exact Family-1 two-Guardian and Family-2/3 one-Guardian topology; and proof that no global two-Guardian constraint was added.
+
+#### C-2b-3 — current Guardian rights and historical visibility (LOCKED)
+
+Co-Guardian acceptance establishes equal current family membership without collapsing actor-specific or consent-specific ownership:
+
+1. The first and second current Guardians receive the same base family role permissions. Join order and `father|mother|other_guardian` relationship/display metadata create no hierarchy.
+2. Before the second RoleAssignment transaction commits, the recipient has no family profile, history, action, or existence access. After commit, current owner queries may return eligible committed family facts created before or after acceptance.
+3. Historical access is current-state authorization, not a snapshot grant. Every query rechecks current Family/Guardian role, applicable Enrollment, original Grant for cross-role bodies, redaction, retention, and policy. No per-Guardian Message/Receipt/history copies are created.
+4. Both current Guardians may read safe child/family profile context, read currently authorized family timeline/Message/Receipt/caregiver-reply facts, and submit a new eligible family-care question under the active Grant.
+5. Authorship remains exact. A Guardian may redact only their own Message and cannot edit, redact, or assume authorship of another Guardian's content.
+6. Grant administration remains exact-owner authority. Co-Guardian acceptance does not change `grantedByParticipantId`; the second Guardian cannot replace/revoke the existing Grant or inherit/restore that Grant merely through family membership. C-2e will govern creation of any later separately confirmed Grant.
+7. Family-originated committed facts may remain family-side readable under current same-family policy. Caregiver/institution-originated protected bodies remain cross-role facts and require the original current Grant; revoke/replacement/expiry yields the allowed unavailable/tombstone result even while both Guardian roles remain active.
+8. Unsubmitted Chat/form/AI drafts, scenario tokens, and `NurtureInteractionContext` remain actor/surface-local. Acceptance does not copy drafts, restore expired context, create historical notifications, or replay old delivery.
+9. Acceptance cannot revive redacted/revoked/expired facts, transfer authorship, expose another family/child or institution-internal content, or create general child-profile edit authority.
+10. C-2b-4 owns current access loss and any retained author/audit visibility after a Guardian relationship exits or is revoked.
+
+C-2b-3 evidence must cover no pre-accept existence/history leak; post-accept equal role resolution; eligible pre-join history; original-Grant caregiver reply visibility; Grant revoke/replacement/expiry after join; family-source and caregiver-reply redaction; exact-author redaction denial for the other Guardian; Grant-owner versus Co-Guardian administration; equal join-order/relationship-label permission; cross-family/child/institution denial; no draft/token/context sharing; no Message/Receipt/history duplication; no historical notification backfill; and no arbitrary profile editing.
 
 ## Minimum IIB closure before real traffic
 
@@ -1136,7 +1153,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — through C-2b-2 locked** | C-2b-2 locks current-Guardian initiation, exact-recipient Host acceptance, revalidated atomic second-Guardian creation, pending-invitation cancellation, no implicit Grant/Enrollment, and the cohort-only `2 + 1 + 1` shape. C-2b-3 Guardian rights/history is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — through C-2b-3 locked** | C-2b-3 locks equal current-Guardian family rights and eligible pre-join history owner reread while keeping authorship, Grant administration, cross-role bodies, drafts, notifications, and other-family scope separate. C-2b-4 relationship exit/revoke is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

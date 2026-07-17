@@ -272,6 +272,17 @@ Pilot-0-C2b-2 Co-Guardian Invitation refinement:
 - The exact inviter may cancel a pending invitation. Pending cancellation cannot remove an accepted Guardian relationship; accepted relationship exit/revoke remains C-2b-4.
 - Pilot policy permits one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3, producing the exact `2 + 1 + 1` topology. This is a cohort gate, not a unique constraint, Schema cardinality, or product maximum; later multi-Guardian policy remains separate.
 
+Pilot-0-C2b-3 Guardian rights/history refinement:
+
+- All current Guardian RoleAssignments in the same Family/ChildCareProcess have equal base family role authority; first/second order and relationship/display labels do not change permission.
+- After atomic role commit, a current Guardian may owner-reread eligible committed family history, including facts created before that Guardian joined. Every query still checks current Family/role, applicable Enrollment, original Grant where cross-role content is involved, redaction, retention, and policy. No pre-commit access or copied per-Guardian history projection exists.
+- Either current same-family Guardian may author a new eligible family-care question under the current active Grant and read currently allowed family-visible Message/Receipt/reply facts. Exact authorship remains immutable, and each Guardian may redact only their own Message.
+- Co-Guardian acceptance does not change `grantedByParticipantId`. Only the existing Grant owner may replace/revoke that Grant; a second Guardian cannot inherit, transfer, or revive ownership through role membership.
+- Family-originated committed facts use current family-side authorization. Caregiver/institution-originated protected bodies remain cross-role data and require the original Grant/current fences; role membership cannot bypass revoke/replacement/expiry or turn an allowed tombstone into a body.
+- Unsubmitted drafts, Chat drafts, action forms, and `NurtureInteractionContext` are actor/surface-local and never become Co-Guardian history. Acceptance creates no Message/Receipt copy, history backfill row, old notification, or duplicate owner projection.
+- General child-profile mutation remains outside this checkpoint; C-2b-3 grants safe profile/history read plus already locked family-care actions, not arbitrary shared profile editing.
+- Relationship exit/revoke and post-exit visibility remain C-2b-4.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
