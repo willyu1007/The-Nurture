@@ -19,6 +19,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not authorize an item action from an arbitrary current grant; first revalidate the grant identity bound to that item so a replacement grant cannot reactivate old work.
 - Do not assume a command-request lock serializes two Guardians using different command ids against the same Grant business identity. Enforce the active partial unique index, retry only known whole-transaction races, and reread the winner as `already_satisfied` without transferring owner or extending expiry.
 - Do not compare a newly derived `expiresAt` when deciding same-definition. Directions, data classes, and purposes form the canonical business profile; lifecycle timestamps are committed facts, and recomputing them would create a rolling-renewal path.
+- Do not label every successful Grant command `grant_confirmed`. A second Guardian's `already_satisfied` result means an authorization is already active, not that the actor confirmed, owns, or jointly consents to the Grant.
+- Do not treat CommandExecution output refs as durable user visibility or a client result locator. Exact replay must owner-reread current state, while routes and clients receive no Grant/Thread/Execution raw refs or `open_result` token.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -32,6 +34,25 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Immutable Grant receipt risked becoming a second permission view
+
+- Symptom: a single `grant_confirmed` result could describe a second Guardian's
+  `already_satisfied` command as confirmation/ownership and could keep showing
+  active state from immutable Execution refs after current authorization changed.
+- Context: Pilot-0-C2e-3 result, response-loss, and Handoff convergence.
+- Root cause: command idempotency evidence, current business visibility, and user
+  presentation were treated as one result layer even though they have different
+  lifecycle and authorization rules.
+- What we tried: compared C-2e-2's immutable Execution semantics with B3-2d current
+  presenter continuity and the equal-Guardian/first-committer ownership contract.
+- Fix / workaround: keep exact Grant/Thread refs server-side on CommandExecution,
+  owner-reread `family_care_grant_current` for every user result, and distinguish
+  `activated` from `already_active` without transferring owner. Confirmation stays
+  explicit-empty and creates no result token, notification, or protected work.
+- Prevention: test all disposition/outcome combinations, current-state change after
+  commit, second-Guardian presentation, raw-ref absence, and exact response-loss
+  replay before consumed-context classification.
 
 ### 2026-07-18 — Enrollment confirmation risked becoming hidden Grant hierarchy
 

@@ -450,6 +450,16 @@ Pilot-0-C2e-2 atomic Grant/Thread test refinement:
 - State-matrix tests cover exact replay; exact active same-definition; terminal history only; active definition mismatch; target/Enrollment drift; multiple matching active rows; pending/deleted/future-active/missing lifecycle timestamps; role/policy/Enrollment/allowlist invalidation; active owner ineligibility; no historical Thread; exact active Thread reuse; and terminal/mismatched/cross-Institution Thread reconciliation.
 - Applied and `already_satisfied` results reference the exact Grant/Thread. C-2e-2 creates no ThreadParticipant, Message, Receipt, Item, Attention, Handoff, Outbox, notification, or deep link. Result presentation/recovery and explicit-empty Handoff remain C-2e-3; replace/revoke/owner loss remain C-2e-4.
 
+Pilot-0-C2e-3 Grant result/recovery test refinement:
+
+- Command tests cover all four response combinations: `executed/applied`, `replayed/applied`, `executed/already_satisfied`, and `replayed/already_satisfied`. Each Execution stores exactly the versioned Grant/Thread refs, and a second Guardian's convergent Execution preserves that actor for audit without changing or impersonating the Grant owner.
+- Presenter tests use `family_care_grant_current` and cover `activated|already_active|processed_but_unavailable` crossed with `owner|family_user|none`. Active safe output includes only child label, Institution/CareGroup, scope, effective/expiry times, and current actions. Raw account/Participant/role/Grant/Thread/Execution ids, policy/hash, and internal reasons are rejected from client/route/transcript/notification/analytics output.
+- Response-loss tests prove Execution lookup precedes consumed/expired context classification, exact retry needs no second confirmation, and replay returns one business effect. Exact replay after Grant expiry/revoke/replacement or caller authority loss retains immutable Execution but renders only the currently entitled state or generic unavailable.
+- Missing-command-identity tests route to ordinary current-state presentation and prove no probe command, `open_result` token, raw output ref, automatic resubmission, or second confirmation is created. Wrong caller/workspace/surface cannot distinguish missing Execution from inaccessible Execution.
+- Context/failure tests prove deterministic drift invalidates the context without Execution/business success; retryable contention/transaction/transport/owner-read failure leaves the original context usable only within TTL; presenter failure after commit never compensates Grant/Thread/Execution.
+- Schema/command tests require `handoffRequestSnapshotsPayload=[]` and null driver for applied, already-satisfied, and exact replay. Grant confirmation creates no Step/Handoff/Outbox/notification/deep link/teacher-visible state/Message/Receipt/Item/Attention/ThreadParticipant and makes no remote provider call.
+- Surface tests prove owner versus family-user action availability and require question creation to start a separate draft/preview/context/confirmation/command. Grant result rendering cannot create protected content or auto-navigate into a hidden action.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

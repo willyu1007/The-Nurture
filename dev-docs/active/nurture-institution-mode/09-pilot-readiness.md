@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2e-2 locks active Grant identity, atomic Grant/Thread creation, database-time expiry, replay/concurrency convergence, and bounded retry, C-2e-3 result/recovery/explicit-empty Handoff next
+- **Current checkpoint:** Pilot-0-C in progress; C-2e-3 locks immutable Grant result/current presentation separation, response-loss recovery, safe actor/result vocabulary, and explicit-empty Handoff, C-2e-4 replace/revoke/owner-loss/cascade next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-2 LOCKED** | C-2e-2 closes active Grant identity/partial uniqueness, one serializable Grant/Thread/context/Execution transaction, database-time expiry, exact replay, cross-command race convergence, bounded retry, and integrity-conflict handling. C-2e-3 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-3 LOCKED** | C-2e-3 closes immutable Execution versus current presentation, exact Grant/Thread refs, safe result/actor relation, response-loss replay before consumed context, no result token, explicit empty snapshots, and zero implicit activation/content effect. C-2e-4 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | **IN PROGRESS — C-2e-2 LOCKED** | ThreadParticipant remains optional projection; any current Guardian may first-confirm, first commit owns, and one serializable transaction enforces active identity, exact Thread, database time/expiry, replay, race, and failure semantics. C-2e-3 will lock result/recovery/explicit-empty Handoff. |
+| C-2e separate Grant authorization | **IN PROGRESS — C-2e-3 LOCKED** | ThreadParticipant remains optional projection; CommandExecution is immutable while `family_care_grant_current` owner-rereads current state; response loss uses exact replay; Grant confirmation is always explicit-empty and creates no content/delivery effect. C-2e-4 will lock replace/revoke/owner-loss/cascade. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1340,6 +1340,38 @@ The deterministic state matrix is:
 
 C-2e-2 evidence must cover the partial unique index and owner FK/preflight; array canonicalization; fault injection after every planned write; exact replay and response loss; two Guardians racing with distinct command ids; every known and unknown constraint outcome; all database-time/allowlist boundaries; expired-row terminalization; Thread create/reuse/mismatch; the complete state matrix; unchanged winner owner/expiry on `already_satisfied`; and zero ThreadParticipant/Message/Receipt/Item/Attention/Handoff/Outbox/notification/deep-link effects. C-2e-3 owns result presentation, recovery, and explicit-empty Handoff. C-2e-4 owns replace, revoke, owner loss, and dependent cascade.
 
+#### C-2e-3 — Grant result, recovery, and explicit-empty Handoff (LOCKED)
+
+Grant completion has separate immutable receipt and current user-presentation layers:
+
+1. CommandExecution persists `businessOutcome=applied|already_satisfied`; response `disposition=executed|replayed` remains orthogonal and does not mutate the stored outcome. `outputRefs` contain exactly the versioned Grant ref and exact versioned Enrollment-private Thread ref.
+2. Execution/output refs are server-side recovery locators, not authorization, navigation, history, or client state. Raw Grant/Thread/Execution refs cannot enter URLs, route state, Chat transcript, Notification, analytics, traces, metrics, or My-Chat query dimensions.
+3. User-facing presentation type is `family_care_grant_current`. Safe source-result values are `activated`, `already_active`, and `processed_but_unavailable`; current actor relation is `owner`, `family_user`, or `none`.
+4. An active entitled view may show Guardian-confirmed child label, current Institution/CareGroup, fixed question-workflow scope, actual `effectiveFrom`/`expiresAt`, and current action availability. Owner is described only as “you” or “another current Guardian”; raw identity and internal policy/lifecycle/hash details are forbidden.
+5. A second Guardian's `already_satisfied` Execution records that Guardian as the requesting business actor and references the winner's Grant/Thread. Presentation may say the authorization already exists and is usable, but cannot say that the second actor confirmed, jointly approved, owns, inherited, or may administer the Grant.
+6. Exact response-loss retry performs authenticated compatible Execution lookup and payload comparison before consumed/expired submit-context checks. A committed command needs no new context, review, or confirmation. The response still owner-rereads current identity, role, Family, Enrollment/CareGroup, Grant, policy, and lifecycle before exposing details/actions.
+7. Exact replay preserves the original Execution/outcome while current presentation may become `processed_but_unavailable` after expiry/revoke/replacement/authority change. A wrong/stale actor receives generic unavailable without learning whether an Execution or Grant exists.
+8. If the source loses the original command identity, recovery uses the ordinary current Grant presenter. The client/Host cannot mint another command identity to probe completion, create an `open_result` token, or transport raw output refs across surfaces.
+9. Deterministic token/binding/role/scope/Enrollment/CareGroup/policy/allowlist/version drift makes the old context unusable and commits no Execution or business success. Retryable contention, transaction, owner-service, or transport failure leaves the context active only within the original TTL. Presenter failure after commit never compensates or deletes Grant/Thread/Execution.
+10. For both positive outcomes, `handoffRequestSnapshotsPayload=[]` and `handoffDriverRef=NULL`. Grant confirmation requires no durable Workflow Step and creates no Workflow Handoff, My-Chat Outbox, Notification, deep link, teacher visibility, Message, Receipt, Item, Attention, or ThreadParticipant.
+11. A Nurture-local activation audit/event may record the applied Grant inside the business transaction but is not host activation and emits no teacher/family push. Pilot does not notify another Guardian when a Grant becomes active; family surfaces discover current state through owner reread.
+12. An active owner result may expose separately authorized submit-question, replace, and revoke affordances. An active `family_user` result may expose submit-question/current-state affordances but no management action. Question creation starts a separate actor/surface-local draft, preview, context, confirmation, and command; Grant confirmation cannot create protected content implicitly.
+
+The result/recovery matrix is:
+
+| Command result | Current presentation |
+| --- | --- |
+| `executed/applied`, Grant still active, actor owner | `activated` + `owner`; current manage/use actions. |
+| `replayed/applied`, Grant still active, actor owner | Original receipt + current active owner view; no second confirmation/effect. |
+| `executed/already_satisfied`, actor another Guardian | `already_active` + `family_user`; no owner/expiry change or management action. |
+| `replayed/already_satisfied`, actor another Guardian | Original convergent receipt + current family-user view. |
+| Original result committed, Grant or access later changed | Compatible original actor receives `processed_but_unavailable` or currently entitled safe state; immutable Execution remains. |
+| Wrong actor/workspace/surface | Generic unavailable; no Execution/Grant existence signal. |
+| Retryable failure before commit | No Execution/business effect; retry same identity/context within TTL. |
+| Deterministic stale/blocked/conflict before commit | No Execution/business success; old context unusable and fresh owner resolution required. |
+
+C-2e-3 evidence must cover all four disposition/outcome combinations; exact two-ref Execution output; owner/family-user/none presentation; mandatory and forbidden fields; response loss after context consume and after later context expiry; current Grant/authority change after commit; wrong-caller non-disclosure; lost-command fallback without probe/result token; deterministic versus retryable context behavior; presenter failure without compensation; explicit-empty/null-driver schema state; and absence of Step/Handoff/Outbox/Notification/deep-link/teacher visibility/protected business objects. C-2e-4 owns replace, revoke, owner loss, and dependent cascade.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1392,7 +1424,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-2 locked** | C-2e-2 locks active identity/partial uniqueness, one serializable Grant/Thread transaction, database-time bounded expiry, exact replay, cross-command race convergence, exhaustive state classification, and bounded known-race retry. C-2e-3 result/recovery/explicit-empty Handoff is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-3 locked** | C-2e-3 locks immutable receipt/current presenter separation, exact server-side Grant/Thread refs, safe result/actor semantics, response-loss replay without second confirmation, no result token, and explicit-empty/no-activation behavior. C-2e-4 replace/revoke/owner-loss/cascade is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
