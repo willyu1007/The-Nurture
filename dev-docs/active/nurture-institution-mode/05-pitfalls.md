@@ -5,7 +5,7 @@ This file exists to prevent repeating mistakes within this task.
 ## Do-not-repeat summary
 
 - Do not reduce institution ecology to an authorization feature; institution is the child's external growth environment.
-- Do not treat institution ecology as an independent product shell; it remains inside the My-Chat scenario boundary.
+- Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
 - Do not put Nurture care ecology semantics inside My-Chat as canonical facts; family, child, institution, care group, role assignment, enrollment, grant, family-care messages, and care items belong to Nurture.
 - Do not wire live manifest capabilities before Nurture care ecology schema, resolvers, policies, and handlers exist.
@@ -26,8 +26,27 @@ This file exists to prevent repeating mistakes within this task.
 - Do not treat a delivered receipt as permanently delivered for deep-link reads; current recipient opens must also allow the converged read/acknowledged states while rechecking every other gate.
 - Do not install an intentionally standalone package with a parent-workspace-aware pnpm command; use its own lockfile with `--ignore-workspace` and prove the path in a clean checkout.
 - Do not assume a checked-out adjacent repository is typecheck-ready; direct source imports require its workspace install and generated clients in the same clean job.
+- Do not use `NurtureFamilyCareThreadParticipant` as a second authorization ledger; current role, scope, Enrollment, Grant, Thread/source lifecycle, policy, and redaction are the owner-reread authority, while participant rows are optional projection only.
 
 ## Pitfall log (append-only)
+
+### 2026-07-17 — Stored thread membership contradicted owner-reread authority
+
+- Symptom: C-2d-3 defined ThreadParticipant as non-authorizing projection, but the
+  current family and caregiver command preconditions still require a stored
+  `thread_membership_active` row. A first-Grant transaction without participant
+  fan-out would therefore create an unusable Thread.
+- Context: Pilot-0-C2e-0 Grant authorization convergence before implementation.
+- Root cause: an earlier repository convenience check became an independent
+  permission fence even though role, Enrollment, CareGroup, Grant, Thread
+  lifecycle, policy, and redaction are already re-resolved by the owner path.
+- What we tried: compared the locked C-2d-3 authority boundary with both Guardian
+  and Caregiver command preconditions and the stored participant lookup.
+- Fix / workaround: lock ThreadParticipant as optional routing/read/subscription/UI
+  projection. Missing projection cannot deny current authority; stale, forged, or
+  cross-scope projection cannot grant business authority. Exact Thread lifecycle remains required.
+- Prevention: C-2e implementation must remove the stored membership hard gate and
+  test no-row success, stale-row denial, forged-row denial, and exact-Thread failure.
 
 ### 2026-07-15 — Parent workspace discovery skipped the standalone web-workbench
 
@@ -144,7 +163,7 @@ This file exists to prevent repeating mistakes within this task.
 ### 2026-07-03 — Reducing institution ecology to a consent bridge
 
 - Symptom: The design over-centers `ChildLinkGrant`, making the institution look like an authorization extension of family mode.
-- Context: The institution is a real external environment in the child's growth process. It has its own organization, teachers, group rhythms, workflows, and operational incentives.
+- Context: The institution is a real external environment in the child's growth process, with its own organization, teachers, group rhythms, workflows, and operational incentives.
 - What we tried: Reframed `ChildLinkGrant` as the cross-ecology data-flow mechanism only.
 - Why it failed (or current hypothesis): If the product does not help institutions and teachers directly, they have no reason to adopt it.
 - Fix / workaround: Add an explicit institution/teacher value model before capabilities: record reduction, group care operations, parent need intake, handoff, and quality review.

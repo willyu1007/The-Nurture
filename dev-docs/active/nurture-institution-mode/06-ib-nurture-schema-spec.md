@@ -384,6 +384,14 @@ Pilot-0-C2d-4 Enrollment result, recovery, and Handoff refinement:
 - Pilot `confirm_family_enrollment` always stores `handoffRequestSnapshotsPayload=[]`; no durable driver is required, and no activation seed, Workflow Handoff, My-Chat Outbox event, notification, or deep link is created. Institution board/workbench discovers roster changes through current owner reread.
 - A future Enrollment-success notification requires a separate versioned refs-only action/Handoff, durable claimed-Step provenance, and independent acceptance. Delivery success can never become an Enrollment commit condition.
 
+Pilot-0-C2e-0 ThreadParticipant authority refinement:
+
+- Business permission is derived on every presenter/action from current My-Chat identity/workspace membership plus Nurture Participant/RoleAssignment, exact Enrollment/CareGroup, exact current or original Grant, Thread/source lifecycle, policy, and redaction.
+- `NurtureFamilyCareThread` is the required exact business aggregate. A missing, mismatched, inactive, or terminal Thread fails the operation through domain lifecycle validation rather than actor-membership projection.
+- `NurtureFamilyCareThreadParticipant` is optional routing, read-cursor, subscription, and display-preference projection. Its absence cannot deny an otherwise current Guardian/Caregiver; an active, stale, forged, or cross-scope row cannot grant or preserve access; hidden/inactive projection may affect listing only.
+- The first active-Grant transaction need not create ThreadParticipant rows. Projection creation/update may run only after current owner authorization and cannot become an authorization cache or mandatory fan-out dependency.
+- C-2e implementation MUST remove `thread_membership_active` as a Guardian/Caregiver hard gate while retaining exact Thread existence/scope/lifecycle checks. Schema fields may remain additive, but no stored participant status may become a second permission source.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`

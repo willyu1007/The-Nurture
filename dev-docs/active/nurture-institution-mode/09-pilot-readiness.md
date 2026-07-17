@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-2d Enrollment confirmation complete through result/recovery/explicit-empty Handoff boundary, C-2e separate Grant authorization next
+- **Current checkpoint:** Pilot-0-C in progress; C-2e-0 locks ThreadParticipant as optional non-authorizing projection, C-2e-1 Grant review/confirming-Guardian authority next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -208,7 +208,7 @@ The Caregiver matrix has the following mandatory semantics:
 2. Chat timeline content is display-safe. Protected family-question bodies are loaded from Nurture by opaque ref through a current owner read into a transient detail surface and MUST NOT be copied into persisted My-Chat Chat messages, interaction history, projections, logs, or activation payloads.
 3. Opening an item is read-only. My-Chat notification read/unread is host display state. Nurture `acknowledge_item` is a separate explicit caregiver-confirmed business command and MUST NOT occur implicitly when Chat or board detail opens.
 4. AI MAY help draft a caregiver response using the currently authorized Nurture context, but the draft MUST be labelled unconfirmed, remain outside the canonical family-facing message lifecycle, and never publish under a caregiver identity without the caregiver's explicit confirmation. Drafting remains non-diagnostic, non-prescriptive, and not an emergency-care replacement.
-5. Caregiver reply submission from Chat and teacher board MUST converge on `nurture.family_care.reply_item`. The command rechecks caregiver role, care-group reachability, enrollment, thread membership, grant `org_to_family`, source/item lifecycle, expected version, and current policy.
+5. Caregiver reply submission from Chat and teacher board MUST converge on `nurture.family_care.reply_item`. The command rechecks caregiver role, care-group reachability, enrollment, exact Thread lifecycle, grant `org_to_family`, source/item lifecycle, expected version, and current policy; optional ThreadParticipant projection is not authority.
 6. The teacher board MUST cover both current work and complete authorized history because the Caregiver role has no domain workbench. History includes open, acknowledged, replied, blocked/revoked, and redacted/suppressed items with child, care-group, status, and time filters; redacted/suppressed entries expose only current display-safe state or tombstone metadata, never the protected body.
 7. A caregiver reply is immutable after commit. The caregiver may redact the caregiver-authored reply through current policy, but Pilot-0 provides no in-place edit, automatic reopen, second reply, or correction command. A future correction flow requires an explicit new command contract.
 8. Direct family Chat is forbidden. Family input creates a workflow item; caregiver actions commit a Nurture business transition and a traceable family-facing message. Chat presentation MUST NOT bypass the workflow-mediated communication contract.
@@ -737,7 +737,7 @@ Pilot capture has no intermediate `pending` Receipt and no cancellable route win
 
 Acknowledge is a separate explicit business action:
 
-1. The only happy-path transition is `open(v0) -> acknowledged(v1)` with current expected version, original Grant, caregiver role, care-group reachability, enrollment, thread membership, and policy.
+1. The only happy-path transition is `open(v0) -> acknowledged(v1)` with current expected version, original Grant, caregiver role, care-group reachability, enrollment, exact Thread lifecycle, and policy; optional ThreadParticipant projection is not authority.
 2. The transaction stores `ackedByParticipantId/ackedAt`, appends `acknowledged`, and moves the source Receipt `delivered(v0) -> acknowledged(v1)`.
 3. TeacherAttention remains active because reply is still required.
 4. Acknowledge creates no caregiver Message, org-to-family Receipt, reply, or implicit notification.
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2d COMPLETE** | C-2d-4 closes typed safe result, response-loss/current-reread recovery, route-only Grant review, explicit empty snapshots, and no Enrollment activation/Handoff. C-2e is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-0 LOCKED** | C-2e-0 closes the ThreadParticipant authority split: owner-reread business predicates are authoritative, exact Thread lifecycle remains required, and participant rows are optional projection only. C-2e-1 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | OPEN | Review/confirm/replace/revoke and current family authority without Enrollment-implied consent. |
+| C-2e separate Grant authorization | **IN PROGRESS — C-2e-0 LOCKED** | ThreadParticipant is optional non-authorizing projection; C-2e-1 will lock review/confirming-Guardian authority before atomic Grant creation/lifecycle/recovery/withdrawal decisions. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1256,12 +1256,27 @@ Enrollment success is a committed Nurture fact whose recovery never depends on p
 
 C-2d-4 evidence must cover presenter allowlist and negative fields; route-versus-command separation; exact replay/response loss with current owner reread; later lifecycle/authority drift; consumed invitation before/at/after old expiry; wrong actor/workspace no-leak denial; post-commit presentation/provider faults without compensation; pre-commit rollback; exact empty snapshot schema; zero activation/Handoff/Outbox/notification/deep-link rows; Institution owner-reread visibility; and rejection of implicit future notification behavior.
 
+#### C-2e-0 — ThreadParticipant authority boundary (LOCKED)
+
+Grant-gated communication has one current owner-reread authorization path; stored thread membership cannot become a second permission ledger:
+
+1. Every presenter/read/write revalidates current My-Chat identity/workspace membership, Nurture Participant/RoleAssignment and exact family/child/work scope, current Enrollment/CareGroup, exact current or original Grant, exact Thread and source lifecycle, current policy, and redaction.
+2. `NurtureFamilyCareThread` is the required business aggregate and routing container. A missing, mismatched, inactive, terminal, or cross-Institution Thread blocks the operation through object lifecycle/scope validation; Thread status is not actor membership authority.
+3. `NurtureFamilyCareThreadParticipant` is optional routing, read-cursor, subscription, and display-preference projection only. Its absence cannot deny an otherwise current Guardian or Caregiver.
+4. An active, stale, forged, raw-id-selected, cached, wrong-role, wrong-scope, or cross-Institution ThreadParticipant row cannot grant or preserve authority. Hidden/inactive projection may affect list presentation but cannot change business eligibility.
+5. The first active-Grant transaction need not create Guardian or Caregiver participant rows. Projection creation/update may occur only after the current owner path authorizes the actor and cannot become an authorization cache, mandatory fan-out, or retry prerequisite.
+6. Guardian/Co-Guardian acceptance, Caregiver assignment/change, role suspension/revoke/expiry, Grant revoke/expiry/replacement, Enrollment/CareGroup change, and policy/redaction changes do not depend on participant-row synchronization for safety. The next owner reread enforces the authoritative facts immediately.
+7. Current Guardian and Caregiver command preconditions that require `thread_membership_active` conflict with the C-2e-0 authority boundary and must be repaired before Pilot traffic. The implementation may retain projection fields additively but must remove stored membership as a hard allow/deny predicate.
+8. C-2e-0 changes no first-Grant actor, confirmation copy/context, Grant ownership, atomic Grant/Thread identity, expiry/replacement/revoke, result/Handoff, or C-2f lifecycle decision. C-2e-1 owns Grant review and confirming-Guardian authority next.
+
+C-2e-0 evidence must cover valid Guardian and Caregiver access with an exact active Thread and no participant row; stale active row after every role/Grant/Enrollment/CareGroup/policy/redaction denial; forged/wrong-scope/cross-Institution row; hidden/inactive projection without business-permission drift; missing/mismatched/terminal Thread denial; no participant fan-out dependency in first-Grant fault/replay tests; and removal of `thread_membership_active` as a hard command predicate without weakening current owner reread.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
 2. Guardian UX for explicit grant review, question submission, sent/blocked/replied receipt state, reply display, and revoke with clear consequence/retention text.
 3. Teacher mobile/web UX for class inbox, attention board, item detail, acknowledge, reply, current-scope re-resolution, empty/error/permission states, and no direct cross-family chat.
-4. Owner-reread on every open and action; workspace, role, care group, enrollment, grant, thread membership, receipt, redaction, and current policy remain fail-closed.
+4. Owner-reread on every open and action; workspace, role, care group, enrollment, grant, exact Thread/receipt lifecycle, redaction, and current policy remain fail-closed, while optional ThreadParticipant projection neither grants nor denies business permission.
 5. Authenticated My-Chat shell routing and negative tests for cross-workspace, cross-child, stale notification, revoked grant, and disabled cohort.
 6. Manual journey evidence for onboarding → question → attention → acknowledge/reply → family receipt → revoke, on the exact pilot artifact and topology.
 
@@ -1308,7 +1323,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2d complete** | C-2d-4 closes typed safe result, current owner-reread recovery, route-only Grant review, consumed-invitation correlation, no compensation, explicit empty snapshots, and no Enrollment activation/Handoff. C-2e Grant is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-0 locked** | C-2e-0 locks one current owner-reread authorization path, exact Thread lifecycle, and optional non-authorizing ThreadParticipant projection. C-2e-1 Grant review/confirming-Guardian authority is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

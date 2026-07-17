@@ -409,7 +409,7 @@ Pilot-0-C2d-3 private Thread timing refinement:
 - Enrollment commit tests MUST prove zero Thread/ThreadParticipant. Institution/Caregiver owner presenters before Grant MUST expose only allowlisted roster membership, Guardian-confirmed safe child label, Enrollment status, and joinedAt; family/profile/contact/Grant/thread/message/body existence MUST remain absent.
 - First active-Grant confirmation MUST atomically create the exact active enrollment-private Thread plus Grant/Execution/audit refs. Fault injection and races MUST leave neither Grant-only nor Thread-only state, and uniqueness MUST prevent a second active Thread for the same workspace/process/family/Enrollment.
 - Different Institution Enrollment MUST resolve a different Thread. Exact Grant replay and replacement MUST reuse the same Thread id with no history copy; first Message MUST reject missing Thread rather than lazily create one.
-- Thread and participant rows MUST fail as authorization when role, Enrollment/CareGroup, original/current Grant, policy, source lifecycle, or redaction denies. Raw thread/participant ids, stale projections, and another Institution's Thread MUST not leak existence or content.
+- Exact Thread existence/scope/lifecycle MUST fail closed when unavailable. ThreadParticipant rows are not authorization: missing projection MUST allow an otherwise fully current actor, while active/stale/forged/cross-scope projection MUST fail to grant or preserve access when role, Enrollment/CareGroup, original/current Grant, policy, source lifecycle, or redaction denies. Raw thread/participant ids and another Institution's Thread MUST not leak existence or content.
 - Revoke/expiry/replacement MUST retain the Thread/audit identity while current owner reads/actions fail closed as required. A replacement or later Grant MUST NOT revive content invalidated by the original Grant.
 - Ended/withdrawn Enrollment and re-entry tests MUST prove the old Thread is not migrated or reused and the new Thread appears only with the new Enrollment's first active Grant. C-2f still owns close/archive transitions; C-2d-4 owns result/Handoff.
 
@@ -422,6 +422,14 @@ Pilot-0-C2d-4 Enrollment result, recovery, and Handoff refinement:
 - Faults after business commit in presenter/client/network/provider MUST leave Enrollment/roster/invitation/context unchanged and MUST NOT compensate, delete, reopen, or duplicate. Pre-commit fault injection retains C-2d-1 atomic rollback behavior.
 - CommandExecution MUST contain schema-valid explicit `handoffRequestSnapshotsPayload=[]`. DB/outbox/worker tests MUST prove zero activation seed, Handoff, Outbox event, notification, and deep link for Enrollment confirmation; Institution surfaces discover the update only through owner reread.
 - Contract tests MUST reject a future Enrollment notification added implicitly to the same Pilot command. Any later versioned action/Handoff requires durable claimed-Step provenance and separate acceptance, and delivery cannot affect Enrollment success.
+
+Pilot-0-C2e-0 ThreadParticipant authority refinement:
+
+- Guardian and Caregiver tests MUST derive permission from current Host/Nurture identity, Participant/RoleAssignment, exact Enrollment/CareGroup, exact current or original Grant, exact Thread/source lifecycle, policy, and redaction. Stored participant projection MUST NOT be an independent allow or deny predicate.
+- Positive evidence MUST cover a valid actor with an exact active Thread and no ThreadParticipant row. Both family input and caregiver Item action remain eligible when every authoritative predicate passes.
+- Negative evidence MUST cover an active participant row after role revoke/suspend, Grant revoke/expiry/replacement, Enrollment/CareGroup drift, policy disablement, source redaction, and Thread terminalization; every case fails closed through the authoritative predicate.
+- Forged participant/role/scope rows, raw ids, another Institution's row, and cached active projection MUST NOT reveal existence or create authority. Hidden/inactive projection may alter list presentation but cannot change business eligibility.
+- First-Grant fault and concurrency tests MUST NOT require participant fan-out. Optional read/subscription/display projection may be written only after owner authorization, and projection write failure cannot leave Grant/Thread business authorization partially represented.
 
 Multi-turn behavior:
 
