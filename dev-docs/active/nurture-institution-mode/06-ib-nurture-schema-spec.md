@@ -261,6 +261,17 @@ Pilot-0-C2b-1 first-Guardian refinement:
 - No `primary_guardian` role or implicit higher authority is introduced. Family-confirmed `father`, `mother`, or `other_guardian` relationship/display metadata may be retained on the role/profile contract but must not change policy permissions.
 - The Pilot records a product assertion and audit result, not legal guardian verification. Identity documents, civil-status evidence, institution attestation, and offline review are outside this command and require a separate sensitive-data contract before real use.
 
+Pilot-0-C2b-2 Co-Guardian Invitation refinement:
+
+- Any current Guardian in the exact Family/ChildCareProcess may initiate a Co-Guardian invitation under current family policy. The role model adds no primary/family-admin hierarchy. Institution Admin, Caregiver, and Technical Operator cannot initiate, accept, or substitute a recipient.
+- My-Chat owns raw contact, provider delivery, recipient authentication, invitation acceptance, and workspace membership. A future Nurture invitation-intent record owns only opaque Host invitation ref, inviter/family/process binding, suggested relationship metadata, expiry/version/canonical payload hash, lifecycle/audit, and current-policy evidence; the current Prisma schema does not yet implement this intent.
+- My-Chat Host acceptance proves exact recipient identity/membership but is not the business invitation lifecycle. The current Nurture intent is the sole Guardian-creation eligibility fence; Host/provider accepted or delivered state cannot override Nurture expiry/revoke/cancel/policy denial.
+- Invitation issue creates no recipient `NurtureParticipant`, Guardian RoleAssignment, historical visibility, Grant ownership, Enrollment, roster link, or new Child/Process/Family. Suggested `father|mother|other_guardian` metadata is untrusted until the recipient confirms/edits it and never changes permission.
+- Acceptance requires exact My-Chat recipient identity and rechecks current inviter Guardian authority, Family/ChildCareProcess lifecycle, invitation state/expiry/version, workspace, recipient uniqueness, and the Pilot cohort gate. One Nurture `CommandExecution` transaction binds/reuses recipient Participant and creates one active Guardian RoleAssignment plus result/audit refs.
+- Exact issue/accept replay returns original refs; changed family/process/recipient/relationship payload conflicts. Inviter role loss, family/process disablement, wrong recipient/workspace, revoked/expired/consumed invitation, or topology drift fails before role creation.
+- The exact inviter may cancel a pending invitation. Pending cancellation cannot remove an accepted Guardian relationship; accepted relationship exit/revoke remains C-2b-4.
+- Pilot policy permits one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3, producing the exact `2 + 1 + 1` topology. This is a cohort gate, not a unique constraint, Schema cardinality, or product maximum; later multi-Guardian policy remains separate.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`

@@ -318,6 +318,17 @@ Pilot-0-C2b-1 first-Guardian refinement:
 - Pilot topology uses Family-1 first-Guardian establishment followed by one later Co-Guardian Invitation; Family-2 and Family-3 retain one Guardian each. Production legal/evidence verification remains a separately approved sensitive-data capability.
 - Tests MUST cover exact replay/payload drift, transaction rollback at every row boundary, participant reuse, duplicate active Guardian uniqueness, wrong/expired/revoked invitation, wrong actor/workspace, confirmation omission, Institution assertion denial, existing-child non-Guardian denial, current-Guardian selection, no-primary equality, relationship-label permission equality, no implicit Enrollment/Grant, and presenter copy that does not claim legal verification.
 
+Pilot-0-C2b-2 Co-Guardian Invitation refinement:
+
+- Issue MUST require a currently authorized Guardian for the exact Family/ChildCareProcess. Nurture owns invitation intent/scope/policy; My-Chat owns raw contact/delivery/auth/acceptance. Institution/Caregiver/Operator issue or proxy acceptance fails closed.
+- Host acceptance is exact-recipient identity/membership evidence only. Nurture intent state is the sole business-acceptance fence; stale Host delivered/accepted/provider state MUST NOT override Nurture cancel/revoke/expiry/current-policy denial.
+- Issue persists no recipient Participant/role/history/Grant authority or new child/family facts. The Nurture intent carries only bounded safe metadata and opaque Host correlation; relationship label remains recipient-confirmed display metadata, not authorization.
+- Acceptance MUST authenticate the exact recipient and rerun inviter-role, family/process lifecycle, invitation state/expiry/version, workspace, recipient uniqueness, and Pilot topology predicates. Inviter revoke after issue, concurrent cancellation/acceptance, duplicate recipient role, and cohort drift use first-commit-wins/current-state denial.
+- Participant bind/reuse, second Guardian RoleAssignment, invitation consumption, and `CommandExecution` result/audit MUST commit atomically. Exact response-loss replay returns original refs; changed payload conflicts and cannot create a second role.
+- Exact inviter MAY cancel a pending invitation. Cancellation after committed acceptance cannot revoke the role; C-2b-4 owns relationship exit/revoke.
+- Pilot configuration permits exactly one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3. Tests MUST prove this exact topology without adding a global two-Guardian constraint or implying a reusable product maximum.
+- Tests MUST cover any-current-Guardian issue, no-primary behavior, wrong-family/process/scope, Institution/Caregiver/Operator denial, raw-contact persistence probe, exact/different-payload issue replay, wrong/expired/revoked/consumed recipient acceptance, stale Host accepted/provider state against Nurture denial, inviter revoke, cancel/accept race, Participant reuse, duplicate role, atomic rollback, no pre-accept history/Grant access, no implicit Enrollment/new child, exact `2 + 1 + 1` Pilot gate, and absence of a Schema cardinality cap.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

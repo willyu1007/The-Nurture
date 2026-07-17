@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-17
-- **Current checkpoint:** Pilot-0-C in progress; C-0/C-1/C-2a and C-2b-1 first-Guardian establishment locked, C-2b-2 Co-Guardian Invitation issue/acceptance next
+- **Current checkpoint:** Pilot-0-C in progress; locked through C-2b-2 Co-Guardian Invitation issue/acceptance, C-2b-3 Guardian rights/history next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — through C-2b-1 LOCKED** | C-2a separates roster intake from the longitudinal profile; C-2b-1 locks exact-recipient authentication, strong first-Guardian confirmation, atomic aggregate/role creation, no primary hierarchy, and no legal-verification claim. Co-Guardian Invitation is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — through C-2b-2 LOCKED** | C-2b-2 locks current-Guardian initiation, exact-recipient Host acceptance, acceptance-time authority/topology rechecks, atomic second-Guardian role, pending cancellation, and cohort-only `2 + 1 + 1`; rights/history is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1031,7 +1031,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | C-2a no-existing-profile entry and longitudinal child boundary | **LOCKED** | Minimal institution-local RosterEntry; Guardian-authenticated child-process creation/selection; no implicit Enrollment, Grant, matching, or institution-only full profile. |
-| C-2b Family and Co-Guardian Invitation | **IN PROGRESS — C-2b-1 LOCKED** | First-Guardian establishment is locked; Co-Guardian issue/acceptance, resulting rights/history, and cancellation/relationship exit remain open. |
+| C-2b Family and Co-Guardian Invitation | **IN PROGRESS — C-2b-1/2 LOCKED** | First-Guardian establishment and Co-Guardian issue/acceptance are locked; resulting rights/history and accepted-relationship exit/revoke remain open. |
 | C-2c Institution Enrollment Invitation | OPEN | Initiator, exact recipient/context, issue/accept/revoke/expiry, and identity-to-roster correlation. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | OPEN | Strong confirmation, idempotent transaction boundaries, lifecycle, and when private communication becomes reachable. |
 | C-2e separate Grant authorization | OPEN | Review/confirm/replace/revoke and current family authority without Enrollment-implied consent. |
@@ -1068,6 +1068,21 @@ Institution onboarding identifies an intended enrollment recipient but does not 
 8. Strong confirmation produces product assertion and audit evidence only. Pilot-0 does not claim legal Guardian verification. Identity-document capture, civil-status evidence, Institution attestation, or offline adjudication requires a separately authorized sensitive-data feature before any production reliance.
 
 C-2b-1 evidence must cover exact response-loss replay and payload drift; rollback at every Participant/Child/Process/Family/Role/Execution boundary; Participant reuse and duplicate-role uniqueness; unauthenticated/wrong-recipient/workspace/expired/revoked invitation; omitted or stale confirmation; Institution direct assertion and uninvited self-claim denial; existing-child non-Guardian denial; current-Guardian selection; relationship-label permission equality; absence of `primary_guardian`; no implicit Roster link/Enrollment/Grant/content access; and UI/audit wording that never claims legal verification.
+
+#### C-2b-2 — Co-Guardian Invitation issue and acceptance (LOCKED)
+
+Co-Guardian Invitation extends an existing family relationship without introducing a primary-Guardian hierarchy:
+
+1. Any current Guardian for the exact Family/ChildCareProcess may initiate under current policy. Institution Admin, Caregiver, and Technical Operator cannot initiate, choose a substitute recipient, accept on another adult's behalf, or gain family authority from the workflow.
+2. My-Chat owns raw recipient contact, delivery provider state, authentication, exact-recipient Host acceptance, and workspace membership. Nurture owns the sole business invitation intent bound to inviter, Family, ChildCareProcess, suggested relationship metadata, expiry/version/canonical payload hash, lifecycle/audit, and an opaque Host invitation ref. Host acceptance proves recipient identity/membership only and cannot override Nurture cancel/revoke/expiry/policy denial. The intent is design-only and not yet in Prisma.
+3. Issue creates no recipient Participant, Guardian role, family-history access, Grant ownership, Enrollment, roster link, or child/family aggregate. The recipient must confirm or edit the suggested relationship label; label choice never changes Guardian permission.
+4. Acceptance rechecks the inviter's current Guardian authority, Family/ChildCareProcess lifecycle, invitation state/expiry/version, exact recipient/workspace, existing active role, current policy, and the Pilot cohort gate. Stale authority or topology fails before a role write.
+5. One Nurture `CommandExecution` transaction binds or reuses the recipient Participant, creates the second active Guardian RoleAssignment, consumes the invitation, and stores result/audit refs. Exact response-loss replay returns original refs; family/process/recipient/label/payload drift conflicts.
+6. The exact inviter may cancel a pending Nurture intent. Inviter role loss or family/process disablement makes later acceptance unusable. Host/provider cancellation is delivery bookkeeping rather than family authority. Cancellation after committed acceptance cannot revoke the Guardian role; C-2b-4 owns relationship exit/revoke.
+7. Invitation acceptance does not transfer Grant ownership, create Enrollment/Grant, create another child profile, or decide retrospective history rights. C-2b-3 owns the accepted Guardian's action and history matrix.
+8. Pilot policy allows exactly one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3, yielding the accepted `2 + 1 + 1` topology. The cohort gate is not a unique constraint, Schema cardinality, or product limit; the reusable model may support more Guardians after a separate product-policy decision.
+
+C-2b-2 evidence must cover any-current-Guardian issue and no-primary behavior; exact/different-payload issue replay; wrong family/process/workspace/recipient; Institution/Caregiver/Operator denial; zero raw contact in Nurture; no pre-accept Participant/role/history/Grant effects; inviter revoke; expiry/revoke/consume; stale Host accepted/provider state against Nurture denial; cancel/accept race; exact-recipient acceptance; Participant reuse; duplicate-role and transaction rollback; response-loss replay; no implicit Enrollment/Grant/new child; exact Family-1 two-Guardian and Family-2/3 one-Guardian topology; and proof that no global two-Guardian constraint was added.
 
 ## Minimum IIB closure before real traffic
 
@@ -1121,7 +1136,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — through C-2b-1 locked** | C-2b-1 locks exact-recipient authentication, strong first-Guardian confirmation, atomic Participant/Child/Process/Family/Role creation, existing-profile current-Guardian selection, no primary hierarchy, and no legal-verification claim. C-2b-2 Co-Guardian Invitation is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — through C-2b-2 locked** | C-2b-2 locks current-Guardian initiation, exact-recipient Host acceptance, revalidated atomic second-Guardian creation, pending-invitation cancellation, no implicit Grant/Enrollment, and the cohort-only `2 + 1 + 1` shape. C-2b-3 Guardian rights/history is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
