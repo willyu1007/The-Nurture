@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2f-5 completes C-2f planning with exact outcome/replay/presenter separation, server-side output refs, original-Execution/original-Step response-loss recovery, route-only continuity, unchanged legacy `user_attention`, and a minimal future Guardian relationship-attention boundary; C-3 Guardian/Caregiver operational IIB next
+- **Current checkpoint:** Pilot-0-C in progress; C-3-0a locks Account–Subject reachability for the education/nurture product catalog, scenario-owned relationship resolution, generic subject scope, opaque non-authoritative Host discovery, prospective-minimum access, and no implicit global/cross-workspace/cross-scenario identity; C-3-0b authenticated ingress/trusted principal next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -978,7 +978,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
 | C-2 child/family/enrollment/Grant onboarding | **LOCKED / COMPLETE** | C-2f-5 closes C-2 with immutable business outcome versus replay disposition, exact server-only output refs, current owner presenters, same-Execution/same-Step response-loss recovery, route-only continuity, preserved explicit-empty paths, and minimal future Guardian relationship attention without widening `user_attention`. |
-| C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
+| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0a LOCKED** | C-3-0a binds every activated education/nurture business surface to an authenticated account and scenario-owned subject-reachability path without making My-Chat a Child/relationship SSOT. C-3-0b authenticated ingress/trusted principal is next. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
 ### Pilot-0-C0 — authenticated ingress and first-Institution bootstrap (LOCKED)
@@ -1956,7 +1956,61 @@ The recovery matrix is:
 | Presenter/Handoff/provider fails | Business fact remains committed; technical path retries/stops independently. |
 | Recipient role lost before open | Generic unavailable after current owner reread. |
 
-C-2f-5 evidence must cover every result vocabulary combination, exact output-ref codec, ref non-disclosure, four presenters on every entitled surface, route-only navigation, stable Execution lookup ordering, response loss at each post-commit seam, same-Step/wrong-Step behavior, lost-command-id fallback, precommit denial, pinned legacy `user_attention`, absent/default-off future additive contract, exact Host-effect/recipient/expiry matrix, original-Step provenance, notification privacy/open ordering, current owner reread, and planning-only scope. C-2f is complete as a decision contract; no manifest, registry, contract package, source, schema, migration, route, runtime, capability, database, environment, provider, or traffic changed. C-3 Guardian/Caregiver operational IIB is next, and C-4 Institution IIB/closure evidence remains open.
+C-2f-5 evidence must cover every result vocabulary combination, exact output-ref codec, ref non-disclosure, four presenters on every entitled surface, route-only navigation, stable Execution lookup ordering, response loss at each post-commit seam, same-Step/wrong-Step behavior, lost-command-id fallback, precommit denial, pinned legacy `user_attention`, absent/default-off future additive contract, exact Host-effect/recipient/expiry matrix, original-Step provenance, notification privacy/open ordering, current owner reread, and planning-only scope. C-2f is complete as a decision contract; no manifest, registry, contract package, source, schema, migration, route, runtime, capability, database, environment, provider, or traffic changed. C-3 begins below with C-3-0a locked, while C-4 Institution IIB/closure evidence remains open.
+
+### Pilot-0-C3 — Guardian/Caregiver operational IIB (IN PROGRESS)
+
+| Checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0a LOCKED** | Account–Subject reachability is locked; authenticated ingress, presentation, action/driver, privacy/offline, and adoption contracts remain C-3-0b-e. |
+| C-3-1 Guardian family-communication IIB | OPEN | Question draft/submit, Receipt/reply current state, authorized history, and Guardian-source redaction across Chat, Family board, and Family workbench. |
+| C-3-2 Guardian relationship/authority IIB | OPEN | Enrollment, transfer, withdrawal, Grant, and stage review/strong-confirmation actions across all entitled Guardian surfaces. |
+| C-3-3 Caregiver operational IIB | OPEN | Chat/Teacher-board inbox, Attention, transient protected detail, acknowledge, reply, history, and Caregiver-reply redaction. |
+| C-3-4 cross-surface/result/notification continuity | OPEN | Draft stay/discard, route/view continuation, response-loss result recovery, Notification/deep-link owner reread, and privacy/offline behavior. |
+| C-3-5 Guardian/Caregiver evidence and exit | OPEN | Action/surface conformance plus B3 J1-J4 rendered, fault, privacy, and three-child-scope evidence without claiming Institution C-4 closure. |
+
+#### Pilot-0-C3-0 — shared subject-aware IIB baseline
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-3-0a Account–Subject reachability | **LOCKED** | Product-scope versus platform-capability separation, account-to-owner relationship path, generic subject scope, opaque Host discovery, prospective boundary, and identity-isolation rules. |
+| C-3-0b authenticated ingress and trusted principal | OPEN | Public My-Chat route, session/workspace derivation, internal service identity, client field allowlist, and direct-Nurture denial. |
+| C-3-0c subject-aware presentation contract | OPEN | Additive subject provider/domain surface types, blocks/actions, persistence classes, renderer mapping, and Base conformance. |
+| C-3-0d action execution and recovery | OPEN | Domain action dispatch, confirmation, idempotency, direct-empty versus claimed-Step driver selection, and result reconciliation. |
+| C-3-0e protected data, offline, adoption, and evidence | OPEN | Transient/private rendering, draft/cache/offline policy, Base -> My-Chat -> Nurture adoption, negative coverage, and planning exit. |
+
+**C-3-0a — Account–Subject reachability (LOCKED)**
+
+1. My-Chat's activated user-facing business scenario catalog converges on education and nurture. Reusable Chat, Workflow, Notification, Forum/Knowledge, delivery, and Technical Admin remain subject-neutral infrastructure and do not acquire synthetic child references. Product-scope convergence does not collapse repositories, scenario ownership, or canonical stores.
+2. Product experience remains child-centered, while reusable Base/My-Chat contracts use generic `subject`. A Nurture adapter may map `subject` to `NurtureChildCareProcess`; Base/My-Chat cannot import, persist, rename, or reinterpret that domain type. The authenticated adult account is an actor, not the child subject, and C-3-0a creates no child login.
+3. Every activated business presenter/action begins with an authenticated My-Chat account/workspace and must let the scenario owner prove a current Account–Subject relationship path before returning a subject presentation or action context. A client-supplied account, Participant, role, subject, Family, ChildCareProcess, CareGroup, Enrollment, Institution, or relationship type is not proof.
+4. Nurture owns the complete relationship graph. Guardian path is Participant -> current exact Guardian RoleAssignment -> exact Family -> ChildCareProcess. Caregiver path is Participant -> current Caregiver/Lead RoleAssignment -> exact CareGroup -> current eligible Enrollment -> ChildCareProcess collection. Institution Admin path is Participant -> current Institution Admin RoleAssignment -> exact Institution -> scoped CareGroups/current eligible Enrollments -> collection. Technical Operator has no business subject relationship.
+5. Shared subject scope is exactly `unresolved|single_subject|subject_collection`. `unresolved` permits only bounded owner-returned safe candidates and clarification; `single_subject` binds one exact owner-resolved process; `subject_collection` is a current role-scoped aggregation, not batch mutation, shared Grant, cross-subject consent, or another collection's discovery authority.
+6. A prospective invitation is not an established Account–Subject relationship. The prospective context exposes only the invitation's separately locked minimum allowlist. Invitation acceptance, same adult, institution roster prefill, display name, birth fact, contact, or opaque Host binding cannot reveal other subjects or authorize current subject actions before the owning onboarding transaction commits.
+7. Every future activated education/nurture scenario must expose a versioned scenario-owner subject provider that can list current reachable contexts and resolve/recheck one opaque context. Exact manifest field names, wire DTOs, provider methods, and persistence classes remain C-3-0c/Base work and cannot be inferred by implementation before that lock.
+8. My-Chat may aggregate only workspace/scenario-bound opaque entries, scope kind, display-safe owner copy, generic route class, and freshness/version evidence for discovery/navigation. Pilot uses live owner resolution and creates no canonical Host Subject table, account-subject authority ledger, or stable cross-scenario correlation. A future refs-only index would be a revocable non-authoritative projection requiring separate privacy and lifecycle review.
+9. Every render, selection, detail/history read, action preparation, submit, result, Notification open, retry, and recovery rereads the relationship path and current subject/scope lifecycle/policy. A cached Host entry cannot authorize, fill an owner outage, preserve lost membership, reveal a removed subject, or bypass a current denial.
+10. Subject context is not global child identity, custody proof, raw business reference, workspace bridge, cross-scenario link, portability token, role delegation, authority transfer, or account impersonation. Cross-workspace/cross-scenario same-child inference, search, matching, merging, and automatic migration remain forbidden until a separately versioned consent protocol exists.
+
+The authoritative reachability examples are:
+
+| Actor context | Required owner path | Returned scope | Explicit denial |
+| --- | --- | --- | --- |
+| Current Guardian | Account -> Participant -> Guardian RoleAssignment -> Family -> Process | One or more `single_subject` options or a Family-scoped collection for navigation. | Another Family, stale/exited Guardian, guessed Child, account-history inference. |
+| Current Caregiver/Lead | Account -> Participant -> exact CareGroup role -> current eligible Enrollments | CareGroup `subject_collection`. | Outside-group child, roster-only protected access, direct family relationship, bulk authority. |
+| Current Institution Admin | Account -> Participant -> exact Institution role -> scoped Groups/Enrollments | Institution/Group `subject_collection` with separately locked safe fields. | Family body, stage, another Institution, Guardian/Caregiver action, global child discovery. |
+| Prospective invited adult | Account -> exact current invitation only | Minimum prospective invitation context plus the exact separately authorized onboarding action, not an established subject. | Existing subject directory, protected profile/history, or any ordinary subject action before onboarding commit. |
+| Technical Operator | Exact Host operator entitlement only | No business subject context. | Subject listing, relationship search, protected content, or business command. |
+
+The scope behavior is:
+
+| Scope kind | Allowed behavior | Forbidden behavior |
+| --- | --- | --- |
+| `unresolved` | Show bounded display-safe owner candidates and ask clarification. | Business action, raw id entry, candidate persistence, cross-scope search. |
+| `single_subject` | Render/action against one exact owner-reread subject path. | Treat opaque context as stable identity or skip relationship/policy reread. |
+| `subject_collection` | Render current role-scoped aggregates and select one owner-returned member. | Batch write, shared consent/Grant, membership caching as authority, inference of excluded members. |
+
+C-3-0a evidence must cover product-catalog versus infrastructure classification, generic-contract non-leakage, every account/role reachability path, zero/one/multiple Guardian subjects, two-Guardian same-Family access, the three-child Caregiver collection, Institution safe collections, prospective invitation minimums, Technical Operator absence, every scope kind, client raw-id/relationship injection, stale owner paths at every read/action seam, Host live-resolution/no-SSOT behavior, cross-workspace/scenario identity isolation, and planning-only scope. No contract package, manifest, schema, provider, route, handler, UI, runtime, database, environment, capability, or traffic changed. C-3-0b authenticated ingress/trusted principal is next.
 
 ## Minimum IIB closure before real traffic
 
@@ -2010,7 +2064,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2 complete** | C-2f-5 completes child/family/enrollment/Grant planning with exact result/recovery/presenter/Host-effect semantics and preserves all prior explicit-empty and ownership boundaries. C-3 Guardian/Caregiver operational IIB is next; C-4 Institution IIB/closure evidence remains open. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0a locked** | C-3-0a connects the authenticated account to scenario-owned `unresolved|single_subject|subject_collection` contexts through current role/scope relationships, keeps Host entries opaque/non-authoritative, and forbids prospective/global/cross-scope identity shortcuts. C-3-0b is next; C-4 Institution IIB/closure evidence remains open. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

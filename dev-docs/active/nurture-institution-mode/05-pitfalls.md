@@ -59,6 +59,11 @@ This file exists to prevent repeating mistakes within this task.
 - Do not create completion spam for pause/resume, transfer cancel/decline/confirm, re-entry confirmation, stage changes, or portability. Existing proposal/invitation/current presenters cover those paths without another lifecycle Handoff.
 - Do not resolve relationship-notification recipients at delivery time. Snapshot exact current Guardian RoleAssignments at business commit, exclude the withdrawal actor, never backfill later-added Guardians, and stop lost-role recipients through current owner reread.
 - Do not compensate, delete, reopen, or rewrite a committed Nurture fact because presenter, Step, Handoff, Outbox, provider, or notification delivery failed. Recover the original Execution/Step and keep technical delivery independent.
+- Do not equate an authenticated My-Chat account with the scenario subject. An adult actor must reach a child/learner subject through the current scenario-owned relationship graph.
+- Do not solve account-to-subject discovery by creating a second canonical Child or relationship table in My-Chat. Host subject entries are opaque discovery/navigation context and never authorization.
+- Do not hardcode `NurtureChildCareProcess` into reusable Base/My-Chat contracts. Product copy can be child-centered while shared technical contracts use generic `subject`.
+- Do not let a `subject_collection` grant bulk write, shared Grant/consent, outside-scope discovery, or membership-cache authority. Every member action resolves one exact current owner path.
+- Do not treat a prospective invitation, roster prefill, same adult, name, birth fact, contact, or old cache as an established Account–Subject relationship.
 - Do not build Institution presenters by loading every Enrollment for a ChildCareProcess and filtering afterward. Begin with current Institution/CareGroup authority and enforce the scope in repository predicates.
 - Do not expose a stable Child/Process id, count, conflict reason, route token, stage, or empty/error distinction that lets one Institution infer another Institution relationship.
 - Do not merge family longitudinal summaries into a shared cross-Institution Thread, Grant, content projection, or lifecycle. Aggregate safe navigation only and owner-reread every episode independently.
@@ -75,6 +80,33 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Subject-centric UX could create a second identity and authorization graph
+
+- Symptom: narrowing My-Chat to education/nurture could lead to a Host-global
+  Child table, account-equals-child assumptions, cached account-subject
+  membership, automatic same-child matching across workspaces/scenarios, or a
+  collection selector that silently grants batch authority.
+- Context: Pilot-0-C3-0a Account–Subject reachability convergence.
+- Root cause: product subject, authenticated actor, scenario-owned relationship,
+  discovery projection, operational target, and canonical identity were treated
+  as one platform object because the existing account-to-scenario mapping alone
+  did not explain subject access.
+- What we tried: traced Guardian, Caregiver, Institution Admin, prospective
+  invitation, and Technical Operator paths; zero/one/multiple subjects; one
+  Family with two Guardians; one CareGroup with three child scopes; stale role,
+  Enrollment, Family, Process, and policy; Host aggregation; and cross-workspace
+  or cross-scenario same-child claims.
+- Fix / workaround: require every activated education/nurture business scenario
+  to resolve a current account-to-subject path through its owner graph; use
+  generic `unresolved|single_subject|subject_collection`; keep Host entries
+  opaque and non-authoritative; expose prospective context minimally; and
+  preserve explicit identity/link/portability protocols for any future
+  cross-boundary relationship.
+- Prevention: catalog classification, contract non-leakage, actor-path,
+  scope-kind, prospective, live-provider, stale-reread, raw-injection,
+  collection-non-authority, cross-boundary isolation, and planning-only tests
+  must pass before subject-aware IIB implementation.
 
 ### 2026-07-18 — Lifecycle delivery could become a second business authority
 
