@@ -492,7 +492,7 @@ Pilot-0-C2f-0 Enrollment lifecycle and actor-boundary refinement:
 - Transfer cannot update `careGroupId`, reuse the old Enrollment identity, or move old RosterEntry, Grant, Thread, Message, Receipt, Item, Attention, InteractionContext, or Handoff authority into the target CareGroup. A completed transfer ends the old Enrollment and creates a new Enrollment identity; any new Grant and Thread follow the normal fresh authorization path.
 - Independent current Enrollments at different Institutions remain separately scoped. Pause, withdraw, end, transfer, Grant closure, or policy change in one Institution cannot mutate or authorize another Institution's Enrollment or content.
 - Same-workspace Child/ChildCareProcess/Family continuity remains family-owned and current-owner-resolved. Cross-workspace fuzzy/global matching, raw database linking, global child identity claims, and automatic profile, Enrollment, Grant, Thread, content, or audit migration are forbidden. C-2f-4 may define a future explicit protocol but cannot infer portability from My-Chat adult identity or institution roster data.
-- C-2f-0 defines no persistence migration, action key, result vocabulary, Handoff, notification, or provider effect. C-2f-1 separately locks pause/resume planning below; C-2f-2 through C-2f-5 must still lock their mechanics before implementation or traffic.
+- C-2f-0 defines no persistence migration, action key, result vocabulary, Handoff, notification, or provider effect. C-2f-1 through C-2f-5 below now lock their planning mechanics; implementation and traffic remain separately gated.
 
 Pilot-0-C2f-1 Enrollment pause/resume refinement:
 
@@ -633,6 +633,53 @@ Pilot-0-C2f-4-3 future cross-workspace protocol boundary refinement:
 - After target commit, the copied facts are target-local Guardian-owned facts with independent lifecycle. Source revoke, redaction, role loss, workspace closure, or deletion cannot distributed-delete, mutate, or make the target aggregate unavailable. Target Guardian separately manages correction/deletion under target policy. Both confirmation surfaces must clearly disclose the no-recall boundary before commit.
 - My-Chat owns raw adult account/session authentication, source/target workspace access, opaque exact-recipient binding, and refs-only transport. Nurture owns source business authorization, minimum snapshot, lifecycle, consume/replay decision, target business creation, and safe audit. My-Chat cannot interpret or store portability bodies, choose fields, assert child identity, or force consumption; existing Workflow Handoff/Outbox cannot be the payload or commit authority.
 - C-2f-4-3 remains planning-only. It adds no schema model, dataClass, action key, handler, route, protocol token, Host capability, Handoff declaration, runtime, database, notification, or traffic effect. C-2f-5 owns exact current-Pilot result/recovery/presenter/Handoff/delivery semantics and does not activate this future protocol.
+
+Pilot-0-C2f-5 lifecycle result, recovery, presenter, and Host-effect refinement:
+
+- `NurtureCommandExecution.businessOutcome` is the immutable persisted business classification and is exactly `applied|already_satisfied`. Response-only `disposition=executed|replayed` reports whether this invocation committed or recovered the Execution. Current owner presenters independently return `changed|already_current|processed_but_unavailable`; the last class means the historical effect may be proven but the current actor can no longer see the business object. A replay or later duplicate cannot claim that its caller performed, owned, approved, or jointly consented to the original effect.
+- Every command uses a versioned exact `outputRefs` codec. Refs are immutable server-side recovery evidence, not presentation authority or client navigation. They never enter a client response payload, URL, route state, Host Chat transcript, Notification, Workflow Handoff, analytics event, metric/tag/query dimension, or search/filter parameter. No `open_result` token or equivalent ref-to-result locator exists.
+- Exact output refs are fixed as follows:
+
+| Command outcome | Exact versioned `outputRefs` |
+| --- | --- |
+| Pause applied | Enrollment plus new active Hold. |
+| Resume applied | Enrollment plus released Hold. |
+| Duplicate pause | Enrollment plus existing active Hold. |
+| Duplicate resume with no referencable Hold | Enrollment only. |
+| Transfer propose/cancel/decline | Source Enrollment plus TransferIntent. |
+| Transfer confirm | Consumed TransferIntent, source and target Enrollments, and source and target RosterEntries. |
+| Family withdrawal / Institution service end | Terminal Enrollment plus exact historical RosterEntry. |
+| Fresh re-entry confirmation | New Enrollment, new RosterEntry, and consumed Enrollment Invitation, reusing C-2d-4. |
+| Stage set/change/correct | ChildCareProcess plus resulting current StageEpisode. |
+| Stage clear | ChildCareProcess plus closed StageEpisode. |
+| Stage already unset | ChildCareProcess only. |
+| Cross-workspace portability | No current Pilot command or result. |
+
+- `outputRefs` cannot fan out Grant, Thread, Hold lists, Message, Receipt, Item, Attention, cascade-dependent refs, or LifecycleCascadeAudit. Consequence evidence remains reachable only from the owning Execution/audit under technical authorization.
+- Four owner presenters are canonical. `enrollment_lifecycle_current` renders pause/resume/withdraw/end current state and safe episode history; `enrollment_transfer_current` renders proposal/review/cancel/decline/completed state; `enrollment_confirmed` renders initial and fresh re-entry confirmation under C-2d-4; `child_care_stage_current` renders current stage and family-authorized history. Chat renders a generic action-result card, Family board current/recent facts, Family workbench complete authorized history and complex actions, Institution board read-only current aggregates, Institution workbench Institution-topology commands/history, Notification generic safe copy only, and Technical Admin refs/counts/status evidence only.
+- Cross-surface continuation carries only `route_class` and `view_mode=current|recent|history`. It carries no business id, output ref, raw filter, prior action state, context body, or cached result. Every destination authenticates and owner-rereads current state.
+- Stable `commandRequestId` lookup occurs before a consumed/expired-context rejection. Compatible replay validates immutable Execution identity, canonical input hash, caller binding, and original durable-Step provenance, returns the original `businessOutcome` and `outputRefs` with `disposition=replayed`, then invokes the current owner presenter. Wrong input/caller/Step conflicts. Same-Step reclaim may finish once. If the caller lost the command id, the only recovery is the ordinary current presenter; it cannot create a probe command, infer the old outcome, or mint an `open_result` token.
+- A deterministic denial before business commit writes no Execution. A retryable local transaction/owner outage may retry only while the original five-minute context remains valid. Presenter/network/worker/Step/Handoff/Outbox/provider failure after the Nurture transaction commits cannot compensate, delete, reopen, rewrite, or hide the business fact. Response-loss recovery completes the original Step; wrong-Step replay remains denied.
+- Existing manifest `handoff_key=user_attention`, purpose `user_attention`, and sources `family_care_message|child_link_receipt|family_care_item` remain exact and unchanged. Enrollment lifecycle cannot widen, reinterpret, or reuse that contract.
+- A separately versioned future additive planning contract may declare `handoff_key=guardian_relationship_attention`, purposes `review_enrollment_transfer|enrollment_relationship_changed`, and source context types `enrollment|enrollment_transfer_intent|guardian_role_assignment`. It is not part of the current manifest or capability and cannot be advertised before its Base/My-Chat/Nurture additive implementation and conformance review.
+- The exact future Host-effect matrix is:
+
+| Business effect | `handoffRequestSnapshotsPayload` policy |
+| --- | --- |
+| Family/Institution pause or resume | `[]`. |
+| Transfer proposal | One stable draft per current exact-Family Guardian RoleAssignment for `review_enrollment_transfer`. |
+| Transfer cancel, decline, or confirm | `[]`; any prior proposal open renders current state. |
+| Family withdrawal | One stable draft for each other current exact-Family Guardian RoleAssignment, excluding the actor. |
+| Institution service end | One stable draft for every current exact-Family Guardian RoleAssignment. |
+| Initial or fresh re-entry invitation | Existing Host Enrollment Invitation path, not this Handoff. |
+| Fresh re-entry confirmation | `[]`, preserving C-2d-4. |
+| Stage set/change/correct/clear | `[]`, preserving C-2f-4-1. |
+| Cross-workspace portability | No current command or Handoff. |
+
+- Recipients are exact RoleAssignments resolved and snapshotted in the business commit. Later-added Guardians never receive an old notification; a target that loses current role is stopped by owner reread. No eligible target produces explicit `[]`. One versioned stable request/draft key exists per target RoleAssignment, and exact replay returns the same snapshots. Transfer-review Handoff expiry cannot outlive its TransferIntent. Relationship-termination attention uses a fixed seven-day expiry capped by the Pilot allowlist expiry.
+- Any command path capable of a non-empty snapshot is Host-first: the original My-Chat Step must be durably persisted and currently claimed before the first Nurture commit. Missing trusted original-Step provenance fails before the business commit; Nurture cannot invent a replay seed afterward. Same-Step replay preserves exact snapshots; wrong-Step, recipient/source/expiry mutation, Admin-created drafts, and raw claim-token persistence/logging are forbidden. My-Chat later atomically materializes Handoff/Outbox; a materialization or provider failure cannot roll back Nurture facts.
+- Provider payload is limited to generic durable copy such as `有一项托育关系更新待查看` plus My-Chat `notification_id`; it contains no child/Institution name, body, target, action state, business ref, or Nurture context. An open first validates exact My-Chat user/workspace/Notification before any Nurture call, then eligible Handoff state, current Nurture owner resolver, a destination-bound `open_notification` token, and destination owner reread. Wrong user/workspace/id returns generic unavailable without a Nurture call. Host read/unread and provider delivery remain technical state, not Nurture lifecycle.
+- C-2f-5 completes C-2f planning only. The four presenter names and additive Handoff key/purposes/source types are design contracts, not implemented declarations. No manifest, registry, contract package, source, Prisma schema, migration, route, capability, database, environment, provider, or traffic changes in this checkpoint. C-3 owns Guardian/Caregiver operational IIB implementation readiness and C-4 owns Institution IIB/closure evidence.
 
 ## 4. Grant and Receipt Objects
 

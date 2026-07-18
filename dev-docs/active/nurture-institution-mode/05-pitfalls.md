@@ -53,6 +53,12 @@ This file exists to prevent repeating mistakes within this task.
 - Do not search, suggest, attach to, overwrite, or merge an existing target child during future v1 import. Existing-profile reconciliation is a separate target-local protocol and never a Technical Operator edit.
 - Do not place portability bodies or child-identity claims in My-Chat Workflow Step, Handoff, Outbox, notification, provider payload, logs, or Admin controls; My-Chat remains authentication plus refs-only transport.
 - Do not promise that source revoke/redaction/deletion recalls an already consumed import. Before consume these gates fail closed; after consume the copied fields are target-local facts under target Guardian policy.
+- Do not collapse persisted business outcome, replay disposition, and current presenter result. A replay or already-satisfied caller cannot claim it performed, owned, approved, or jointly consented to the original effect.
+- Do not treat CommandExecution `outputRefs` as client navigation, presentation authority, analytics dimensions, notification data, or Handoff content. They remain exact server-side recovery evidence and there is no `open_result` token.
+- Do not widen or reinterpret existing `user_attention` for Enrollment lifecycle. A future Guardian relationship-attention contract is additive, separately versioned, capability-gated, and limited to transfer review and irreversible relationship termination.
+- Do not create completion spam for pause/resume, transfer cancel/decline/confirm, re-entry confirmation, stage changes, or portability. Existing proposal/invitation/current presenters cover those paths without another lifecycle Handoff.
+- Do not resolve relationship-notification recipients at delivery time. Snapshot exact current Guardian RoleAssignments at business commit, exclude the withdrawal actor, never backfill later-added Guardians, and stop lost-role recipients through current owner reread.
+- Do not compensate, delete, reopen, or rewrite a committed Nurture fact because presenter, Step, Handoff, Outbox, provider, or notification delivery failed. Recover the original Execution/Step and keep technical delivery independent.
 - Do not build Institution presenters by loading every Enrollment for a ChildCareProcess and filtering afterward. Begin with current Institution/CareGroup authority and enforce the scope in repository predicates.
 - Do not expose a stable Child/Process id, count, conflict reason, route token, stage, or empty/error distinction that lets one Institution infer another Institution relationship.
 - Do not merge family longitudinal summaries into a shared cross-Institution Thread, Grant, content projection, or lifecycle. Aggregate safe navigation only and owner-reread every episode independently.
@@ -69,6 +75,35 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Lifecycle delivery could become a second business authority
+
+- Symptom: a convenient result/deep-link design could expose raw output refs,
+  claim that a retrying Guardian performed an earlier action, reuse
+  `user_attention` for unrelated Enrollment events, notify every state change,
+  select recipients at delivery time, or compensate the Nurture transaction
+  after a provider failure.
+- Context: Pilot-0-C2f-5 result, recovery, presenter, and Handoff convergence.
+- Root cause: immutable business outcome, invocation replay, current user
+  presentation, technical delivery, and relationship attention were treated as
+  one success result despite having different owners, clocks, and failure
+  semantics.
+- What we tried: traced first commit, already-satisfied duplicate, response loss,
+  same-Step reclaim, wrong-Step replay, lost command id, owner loss after commit,
+  every lifecycle event, zero/one/two Guardian recipient sets, recipient role
+  changes, provider failure, stale notification, and existing family-care
+  `user_attention` compatibility.
+- Fix / workaround: separate `businessOutcome`, response `disposition`, and
+  current presenter result; keep exact output refs server-side; recover only the
+  original Execution/Step; pin legacy `user_attention`; reserve a separately
+  versioned relationship-attention contract for transfer review and irreversible
+  relationship termination; snapshot exact RoleAssignment recipients; use
+  generic refs-only delivery plus owner reread; and never compensate committed
+  business facts for technical delivery failure.
+- Prevention: vocabulary/codec/privacy/presenter/route, replay/fault,
+  legacy-contract pin, Host-effect matrix, recipient snapshot/expiry,
+  original-Step provenance, notification-open ordering, and planning-boundary
+  tests must pass before C-2f-5 implementation or activation.
 
 ### 2026-07-18 — Portability could become global identity or remote-control infrastructure
 
