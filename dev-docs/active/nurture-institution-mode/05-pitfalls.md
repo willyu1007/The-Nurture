@@ -37,6 +37,9 @@ This file exists to prevent repeating mistakes within this task.
 - Do not create the target RosterEntry before transfer confirmation or copy old Grant/Thread/content/work into the target Group. Target roster/new Enrollment and complete old closure commit together.
 - Do not make permanent Enrollment withdrawal depend on Grant ownership, invitation receipt, first/primary Guardian status, or unanimous Guardians. Any current exact-Family Guardian has equal independent family-side terminal authority after strong confirmation.
 - Do not model terminal exit as resume, cross-side release, a generic `end_enrollment`, or a client-authored reason. Keep family withdrawal, Institution service end, and transfer status/reason semantics distinct, and close remaining holds only as system consequences.
+- Do not lock TransferIntent before Enrollment or let different topology commands invent different root orders. Enrollment is the common serialized root before Hold, TransferIntent, roster, Grant, Thread, and dependents.
+- Do not record a Guardian or Institution terminal actor as `revokedByParticipantId` on a Grant they do not own. Topology invalidation uses a server cause, null revoke actor, and Enrollment Execution/CascadeAudit evidence.
+- Do not commit terminal Enrollment status before closing every hold, intent, active Grant/dependent, Thread, and roster projection. Preflight the aggregate cap, assert zero survivors, and roll back the entire transaction on any defect.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -50,6 +53,25 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Terminal exit could deadlock or leave live old work
+
+- Symptom: transfer prose locked TransferIntent before Enrollment while pause used
+  Enrollment first; a terminal status write could then deadlock against transfer or
+  commit before old Grant work, holds, retries, and projections were fully closed.
+- Context: Pilot-0-C2f-3b permanent Enrollment terminal closure convergence.
+- Root cause: topology commands lacked one global root order, and Enrollment actor
+  audit was conflated with Grant-owner revoke fields and eventual projection repair.
+- What we tried: traced pause/transfer/end/withdraw and every dependent writer,
+  multi-Grant expiry, context discovery, pending intents, cascade hard-cap behavior,
+  response loss, duplicate/different causes, stale delivery, and failure injection.
+- Fix / workaround: make Enrollment the shared topology root, preflight all closure
+  work, use server topology Grant causes with null revoke actor, and commit terminal
+  facts, holds, intents, Grants/dependents, Thread/roster, audit, and zero-survivor
+  assertions in one Serializable transaction.
+- Prevention: lock-order conformance, aggregate cardinality, fault-at-every-stage,
+  replay/race, actor-field, expiry, survivor, stale-open, and no-remote-call tests
+  must reject lock inversion, prefix commit, actor impersonation, and async repair.
 
 ### 2026-07-18 — Permanent exit could create hidden Guardian hierarchy
 
