@@ -25,6 +25,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not treat replacement Thread reuse as Grant or content continuity. Every old Message/Receipt/Item/Attention retains the old `grantId`, and replacement cannot restore its cross-role authority.
 - Do not let Grant-owner revoke become a permanent family veto. The exact Grant stays terminal, but any current equal Guardian may later complete a fresh authorization for future work only.
 - Do not accept revoke reason, timestamp, actor, or dependent refs as client-authored audit. Pilot uses server-owned `user_revoked`, database time, resolved actor, exact Grant/Thread refs, and a separately bounded cascade summary.
+- Do not bind Grant ownership only to Participant identity. Persist the exact confirming Guardian RoleAssignment so rejoin or a new role row cannot revive an old Grant.
+- Do not translate Host account/workspace loss into a Nurture role or Grant mutation. Host blocks that user's access; Nurture suspension/terminal role facts independently govern the Grant lifecycle.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -38,6 +40,22 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Participant-only ownership could revive a terminal Grant
+
+- Symptom: an old Grant keyed only by `grantedByParticipantId` could become usable
+  again when the same canonical Participant rejoined through a new Guardian
+  RoleAssignment after the original role had terminated.
+- Context: Pilot-0-C2e-4c Grant-owner loss convergence.
+- Root cause: stable person identity and versioned authority identity were treated
+  as interchangeable even though rejoin must create a new authority row.
+- What we tried: traced self-exit, Host loss/restore, role suspend/resume, terminal
+  role states, fresh Grant confirmation, and original-Grant runtime checks.
+- Fix / workaround: add exact `grantedByRoleAssignmentId`, require current checks
+  against that row, quarantine ambiguous legacy bindings, and let only a complete
+  fresh confirmation create a new Grant bound to a new role.
+- Prevention: migration, resolver, race, rejoin, and stale-open tests must prove a
+  new RoleAssignment never restores the old Grant or old protected work.
 
 ### 2026-07-18 — Owner revoke risked creating hidden primary-Guardian veto
 

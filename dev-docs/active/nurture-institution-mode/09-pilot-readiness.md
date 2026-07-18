@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2e-4b locks exact-owner voluntary revoke, common strong confirmation, atomic database-time revoke/fence, deterministic replay/races, equal-Guardian fresh authorization, and explicit-empty result, C-2e-4c owner loss next
+- **Current checkpoint:** Pilot-0-C in progress; C-2e-4c locks exact owner-role binding, Host/suspension/terminal classification, atomic self-exit and local convergence, no ownership transfer, fresh future-only authorization, and explicit-empty result, C-2e-4d cascade closure next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-4b LOCKED** | C-2e-4b closes exact-owner voluntary revoke, common strong confirmation, server reason/database time, atomic revoke/fence/Execution, replay/race classification, fresh equal-Guardian authorization without old revival, and explicit-empty output. C-2e-4c is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-4c LOCKED** | C-2e-4c closes exact owner-role identity, Host/suspension/terminal owner-loss semantics, atomic self-exit and local convergence, no transfer/new-role revival, fresh equal-Guardian future authorization, races, and explicit-empty output. C-2e-4d is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | **IN PROGRESS — C-2e-4b LOCKED** | Voluntary revoke is exact-owner strong authorization with one atomic transition/fence/Execution, exact two refs, no permanent family veto, and no old-work revival. C-2e-4c owner loss and C-2e-4d cascade remain open. |
+| C-2e separate Grant authorization | **IN PROGRESS — C-2e-4c LOCKED** | Grant binds exact owner Participant and RoleAssignment; Host loss does not rewrite Nurture, same-role suspension is resumable, terminal role loss permanently fences without transfer, and fresh confirmation creates an independent future-only Grant. C-2e-4d cascade remains open. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1378,8 +1378,8 @@ C-2e-3 evidence must cover all four disposition/outcome combinations; exact two-
 | --- | --- | --- |
 | C-2e-4a replacement | **LOCKED** | Exact owner/strong delta confirmation, single self-lineage, atomic old/new transition, same owner/Thread, no old-work revival, and explicit-empty output. |
 | C-2e-4b owner-initiated revoke | **LOCKED** | Exact owner/common strong confirmation, server audit/database time, atomic transition/fence, replay/races, equal-Guardian fresh authorization, and explicit-empty output. |
-| C-2e-4c owner loss | OPEN / NEXT | Host loss versus temporary/terminal Nurture role loss, self-exit composition, no transfer, and recovery. |
-| C-2e-4d cascade closure | OPEN | Receipt/Item/Attention/context/activation/body fences, loop-to-closure atomicity, bounded evidence, and stale delivery/open handling. |
+| C-2e-4c owner loss | **LOCKED** | Exact role binding, Host/suspension/terminal classification, self-exit/local convergence, no transfer or new-role revival, fresh future authorization, and explicit-empty output. |
+| C-2e-4d cascade closure | OPEN / NEXT | Receipt/Item/Attention/context/activation/body fences, loop-to-closure atomicity, bounded evidence, and stale delivery/open handling. |
 
 #### C-2e-4a — Owner-confirmed Grant replacement (LOCKED)
 
@@ -1448,6 +1448,41 @@ The voluntary-revoke state matrix is:
 
 C-2e-4b evidence must cover the exact owner and every denied actor; all three surfaces and AI non-authority; complete consequence copy; exact context binding/copy/drift/injection; server reason/actor/database time; transaction fault injection; no partial cascade; exact replay/new-command already-satisfied; all terminal and owner-loss states; revoke/revoke, revoke/replace, and question/revoke races; equal-Guardian fresh authorization without permanent veto; original-Grant permanent binding; exact two refs; explicit-empty/null driver; skipped unsent delivery; stale notification open; and zero new host activation/content/delivery effects. C-2e-4c owns owner-loss classification and C-2e-4d owns complete cascade mechanics/evidence.
 
+#### C-2e-4c — Grant-owner loss and recovery (LOCKED)
+
+Grant owner identity consists of the canonical Participant and the exact versioned Guardian RoleAssignment that supplied authority. Stable person identity never substitutes for the original authority row:
+
+1. Add nullable `grantedByRoleAssignmentId` as a Restrict Grant FK. The rollout stays additive for legacy compatibility, but every new Grant and every Pilot-active non-deleted Grant must have the exact field before activation. The bound role's participant equals `grantedByParticipantId`, and the role must be Guardian scope reaching the exact Family/ChildCareProcess.
+2. Backfill uses only exact CommandExecution/audit evidence proving one compatible role, actor, participant, scope, and effective time. Missing, conflicting, or multiple candidates enter preflight/manual reconciliation; current-role, created-time, relationship-label, invitation-recipient, or join-order heuristics cannot choose a role.
+3. Every Grant read/action/delivery validates the exact stored role id, matching participant, `role=guardian`, Family/process reach, `status=active`, effective window, policy, and non-deletion. Rejoining as the same Participant with a new RoleAssignment cannot revive the old Grant, Thread work, or protected body.
+4. My-Chat account disablement, workspace-membership loss, or Host owner-service failure denies the affected canonical user's Host ingress, presenter, action, and stale open. Host owns and retains that state; Nurture does not rewrite RoleAssignment/Grant, transfer ownership, or infer a family-wide revoke. Host restoration still performs full current Host/Nurture reread and cannot reactivate terminal Nurture facts.
+5. Exact Nurture RoleAssignment `suspended` or otherwise temporarily ineffective blocks the Grant and all original-Grant work but leaves the Grant row nonterminal. C-2e-4c authorizes no suspend/resume actor. Only an independently authorized transition of that same exact role row back to active may restore eligibility; another Guardian cannot bypass temporary loss by creating a new Grant.
+6. Exact role `revoked`, `expired`, `deleted`, or effective-end elapsed is terminal owner loss. The authoritative predicate blocks the Grant immediately before any reconciliation write. No peer Guardian, Institution, Operator, service, or Host state inherits or receives owner identity.
+7. C-2b-4 self-exit is the primary Pilot terminal path. One Nurture transaction locks role before Grant/dependents, changes the exact RoleAssignment to terminal `revoked`, cancels pending Co-Guardian intents issued by that actor, revokes actor-owned active Grants with server reason `owner_self_exit` and the exiting actor, performs the complete fence, and stores one CommandExecution. Any fault rolls back the whole effect; other-owner Grants remain unchanged.
+8. A terminal exact role observed outside self-exit fails closed immediately and later converges through idempotent Nurture-local owner action with server reason `owner_role_ended`, database time, no inferred actor, complete same-transaction fence, and immutable Execution/audit evidence. My-Chat Step/Handoff/Outbox, cached eligibility, or eventual status rewrite is not the authorization boundary.
+9. If another current exact-Family Guardian exists, full first-Grant review/confirmation may recover future cooperation. One Serializable transaction locks context, terminal old role, old Grant, new Guardian role, exact Thread, and dependents; terminalizes/fences an unreconciled old active row if needed; creates an independent active Grant bound to the new participant and role; reuses Thread only as container; and commits Execution.
+10. Recovery is not replacement or transfer. The new Grant has no `supersedesGrantId`, does not copy old owner/audit/profile state, applies only to future work, and cannot revive old Message/Receipt/Item/Attention. Confirmation Execution outputs exactly new active Grant/Thread refs; old terminalization remains Nurture-local audit evidence. Temporary Host loss or exact-role suspension cannot enter recovery.
+11. Self-exit versus question/revoke/replace, terminal role versus action, reconciler versus fresh confirmation, and Host restore versus action use exact role/Grant versions, deterministic role-before-Grant-before-Thread/dependent lock order where local, and current reread at every boundary. Exact replay remains immutable while presentation follows current authorization.
+12. Last-Guardian terminal recovery, peer/Institution/Operator forced removal, legal/custody dispute, authority reassignment, Host-driven role deletion, and cross-database atomic offboarding remain outside Pilot. Every owner-loss/recovery Execution stores `handoffRequestSnapshotsPayload=[]` and `handoffDriverRef=NULL` and creates no Step, Handoff, Outbox, Notification, deep link, or protected body.
+
+The Grant-owner-loss matrix is:
+
+| Observed state | Grant and recovery result |
+| --- | --- |
+| Host account/workspace unavailable | Deny that user's Host access; no Nurture mutation or global Grant revoke. |
+| Host restored, exact role and Grant still current | Full reread may allow that user again; no terminal fact is revived. |
+| Exact role suspended/temporarily ineffective | Grant remains nonterminal but unusable; no peer fresh-confirm bypass. |
+| Same exact role independently resumed | Full reread may restore eligibility if every other Grant fence remains current. |
+| Exact role revoked/expired/deleted/time-ended | Immediate permanent Grant fence; local terminal convergence; no transfer. |
+| Same Participant receives a new role row | Old Grant remains unusable; new role grants no old authority. |
+| Self-exit with another Guardian remaining | Atomic role/invitation/owned-Grant/fence/Execution transition. |
+| Self-exit as last current Guardian | Denied before write; later authority recovery remains outside Pilot. |
+| Another Guardian fully confirms after terminal loss | Independent future-only Grant; no replacement lineage or old-work revival. |
+| Another Guardian attempts during Host loss/suspension | Denied; temporary state cannot be converted into ownership takeover. |
+| Reconciler and fresh confirmation race | One serialized terminalization; new Grant only after exact terminal proof. |
+
+C-2e-4c evidence must cover exact role schema/FK/backfill/preflight; Participant-versus-role identity; every Host loss/restore state; suspension and same-row resume; every terminal role cause; new-role non-revival; self-exit atomicity and last-Guardian denial; immediate pre-reconcile fence; idempotent local convergence; fresh equal-Guardian confirmation and no `supersedesGrantId`; exact new Grant/Thread refs; complete race/lock matrix; current replay/presentation; explicit-empty/null driver; and zero Host technical-state persistence or activation/delivery effects. C-2e-4d owns complete dependent closure and evidence.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1500,7 +1535,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-4b locked** | C-2e-4b locks exact-owner voluntary revoke, common strong confirmation, server audit/database time, atomic transition/fence/Execution, deterministic replay/races, equal-Guardian fresh authorization, old-work non-revival, and explicit-empty output. C-2e-4c owner loss is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-4c locked** | C-2e-4c locks exact owner-role binding, Host/suspension/terminal classification, atomic self-exit and local convergence, no transfer or new-role revival, fresh equal-Guardian future authorization, race/replay boundaries, and explicit-empty output. C-2e-4d cascade closure is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
