@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2e-4c locks exact owner-role binding, Host/suspension/terminal classification, atomic self-exit and local convergence, no ownership transfer, fresh future-only authorization, and explicit-empty result, C-2e-4d cascade closure next
+- **Current checkpoint:** Pilot-0-C in progress; C-2e is complete after C-2e-4d locked permanent/temporary classification, typed dependencies, atomic loop-to-closure, exact Grant/redaction matrices, bounded audit, and stale Host delivery fences; C-2f leave/transfer/next-stage next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e-4c LOCKED** | C-2e-4c closes exact owner-role identity, Host/suspension/terminal owner-loss semantics, atomic self-exit and local convergence, no transfer/new-role revival, fresh equal-Guardian future authorization, races, and explicit-empty output. C-2e-4d is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e COMPLETE** | C-2e-4d closes permanent/temporary invalidation, typed context dependencies, exact dependent/redaction matrices, one root-first loop-to-closure transaction, bounded audit/overflow, immutable-seed owner reread, and explicit-empty output. C-2f is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1034,7 +1034,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2b Family and Co-Guardian Invitation | **LOCKED / COMPLETE** | C-2b-1 through C-2b-4 lock establishment, invitation/acceptance, current rights/history, and self-exit-only offboarding without peer/admin removal. |
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
-| C-2e separate Grant authorization | **IN PROGRESS — C-2e-4c LOCKED** | Grant binds exact owner Participant and RoleAssignment; Host loss does not rewrite Nurture, same-role suspension is resumable, terminal role loss permanently fences without transfer, and fresh confirmation creates an independent future-only Grant. C-2e-4d cascade remains open. |
+| C-2e separate Grant authorization | **LOCKED / COMPLETE** | C-2e-0 through C-2e-4d lock one owner-read authority path, exact Grant/role identity, strong create/replace/revoke, immutable recovery, owner-loss handling, typed complete cascades, bounded evidence, and zero implicit Host activation. |
 | C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
@@ -1372,14 +1372,14 @@ The result/recovery matrix is:
 
 C-2e-3 evidence must cover all four disposition/outcome combinations; exact two-ref Execution output; owner/family-user/none presentation; mandatory and forbidden fields; response loss after context consume and after later context expiry; current Grant/authority change after commit; wrong-caller non-disclosure; lost-command fallback without probe/result token; deterministic versus retryable context behavior; presenter failure without compensation; explicit-empty/null-driver schema state; and absence of Step/Handoff/Outbox/Notification/deep-link/teacher visibility/protected business objects. C-2e-4 owns replace, revoke, owner loss, and dependent cascade.
 
-#### C-2e-4 — Grant terminal transitions and dependent fences (IN PROGRESS)
+#### C-2e-4 — Grant terminal transitions and dependent fences (LOCKED / COMPLETE)
 
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | C-2e-4a replacement | **LOCKED** | Exact owner/strong delta confirmation, single self-lineage, atomic old/new transition, same owner/Thread, no old-work revival, and explicit-empty output. |
 | C-2e-4b owner-initiated revoke | **LOCKED** | Exact owner/common strong confirmation, server audit/database time, atomic transition/fence, replay/races, equal-Guardian fresh authorization, and explicit-empty output. |
 | C-2e-4c owner loss | **LOCKED** | Exact role binding, Host/suspension/terminal classification, self-exit/local convergence, no transfer or new-role revival, fresh future authorization, and explicit-empty output. |
-| C-2e-4d cascade closure | OPEN / NEXT | Receipt/Item/Attention/context/activation/body fences, loop-to-closure atomicity, bounded evidence, and stale delivery/open handling. |
+| C-2e-4d cascade closure | **LOCKED** | Permanent/temporary classification, typed context dependencies, exact Grant/redaction matrices, root-first loop-to-closure/overflow, bounded audit, and stale Host delivery/open fences. |
 
 #### C-2e-4a — Owner-confirmed Grant replacement (LOCKED)
 
@@ -1483,6 +1483,41 @@ The Grant-owner-loss matrix is:
 
 C-2e-4c evidence must cover exact role schema/FK/backfill/preflight; Participant-versus-role identity; every Host loss/restore state; suspension and same-row resume; every terminal role cause; new-role non-revival; self-exit atomicity and last-Guardian denial; immediate pre-reconcile fence; idempotent local convergence; fresh equal-Guardian confirmation and no `supersedesGrantId`; exact new Grant/Thread refs; complete race/lock matrix; current replay/presentation; explicit-empty/null driver; and zero Host technical-state persistence or activation/delivery effects. C-2e-4d owns complete dependent closure and evidence.
 
+#### C-2e-4d — Dependent cascade closure and stale delivery (LOCKED)
+
+Cascade is irreversible business convergence, not a synonym for every temporary owner-read denial:
+
+1. Permanent Grant revoke/replacement/expiry/terminal-owner-loss and exact Guardian-source/Caregiver-reply redaction invoke the versioned cascade kernel. Host account/workspace loss, exact-role suspension, owner-service outage, and temporary policy/Institution/CareGroup unavailability fail closed on current read/action/delivery without persistent suppression. C-2f decides when Enrollment/topology change is terminal before invoking the kernel.
+2. Add `NurtureInteractionContextDependency`. Each row binds one context to exactly one nullable typed Restrict FK among Grant, Message, Item, or Receipt; a raw CHECK enforces one non-null ref. Multiple rows support multi-candidate clarification. Protected context creation and all dependency rows commit together; incomplete typed dependencies block Pilot activation/use. JSON state is never dependency authority.
+3. Grant invalidation revokes every active Grant-dependent context and removes executable state; terminalizes all Grant Receipts and retry controls; suppresses every actionable Item and active clarification; scrubs body-derived Item/Attention/Thread projections; and retains protected Message, immutable Execution/events, authorship, timestamps, and approved body-free audit under current author/receiver rules.
+4. Receipt transitions are exact: `pending -> blocked(reason)` and clears pending/driver/retry controls; `delivered|read|acknowledged -> revoked_after_delivery(reason)` and retains occurred-at timestamps; `failed|blocked|revoked_after_delivery` remains terminal. Retry descendants cannot retain schedulable delivery.
+5. Item `open|acknowledged|waiting_for_family|replied|followed_up -> suppressed`. An active clarification writes one `clarification_cancelled` and one suppression event, then clears active ids/times/driver refs and executable assignment. Item summary becomes a generic tombstone; detail and body-derived/safety projections clear. Root/audit refs remain internal.
+6. Every affected Attention loses body-derived title/summary. `active -> suppressed`; resolved/expired/suppressed status remains terminal with scrubbed projection and a versioned update. Enrollment Thread remains reusable, but invalid summary payload is cleared or safely owner-recomputed; chronology may remain.
+7. Guardian-source redaction clears the source body/attachment/protection, terminalizes source Receipt, revokes contexts bound to that source Message, suppresses dependent Item/active Attention, and scrubs Thread projection. An independently authored Caregiver reply is not automatically redacted, while source presentation becomes a tombstone.
+8. Caregiver-reply redaction clears only reply body/Receipt/context/projection. Source question/source Receipt and the replied Item/resolved Attention are not suppressed, reopened, or made replyable again. Redaction branches have distinct server causes and state matrices.
+9. The kernel locks Grant before Message and roots before dependents, validates root/version/cause, pre-counts a versioned Pilot hard cap, and keyset-processes deterministic primary-key batches inside one Serializable transaction. `SKIP LOCKED`, async repair, and intermediate commit are forbidden. Every dependent writer locks/revalidates the root, preventing post-count escape.
+10. Final root-specific `NOT EXISTS` assertions cover context, Receipt, Item, clarification, Attention projection, and Thread projection. Root, all dependents, one bounded audit, and owning Execution commit together. Any fault, conflict, phantom, cap overflow, or failed closure assertion rolls back before root mutation; no first-100 prefix may commit.
+11. Add `NurtureLifecycleCascadeAudit` with unique root type/id/version/cause, cascade schema version, canonical per-transition counts, closure hash, database completion time, and owning Execution locator. The row is evidence only and stores no body, token, dependent-ref list, account/device target, or Host technical state. Existing exact CommandExecution output refs do not expand.
+12. Invalidation Commands remain explicit-empty and create no new Handoff/Outbox/Notification. Old immutable same-Step replay seeds may materialize refs-only technical work, but materializer consumers, provider retries, opens, and presenters owner-reread current Nurture state and stop/skip/tombstone. Admin sees bounded evidence and can request owner reconciliation but cannot edit or mark business closure.
+
+The closure matrix is:
+
+| Root/case | Persistent closure result |
+| --- | --- |
+| Permanent Grant invalidation before capture | No new business effect; all bound active contexts revoke. |
+| After capture/before acknowledge | Receipt terminal; Item/Attention suppress; secondary projections scrub. |
+| After acknowledge/before reply | Ack audit retained; Item/Attention suppress; reply and receiver body blocked. |
+| After reply | Item becomes suppressed audit state; reply history is not reopened; bodies follow author/receiver rules. |
+| Guardian source redaction | Source body/Receipt/context/workflow close; independent reply retained; source tombstone. |
+| Caregiver reply redaction | Reply side closes; source workflow stays terminal and cannot gain another reply. |
+| Host loss/role suspension/temporary outage | Current fence only; zero irreversible cascade mutation. |
+| Zero through exact hard-cap dependents | Full one-transaction closure plus bounded audit. |
+| Above hard cap | Whole transaction fails before root mutation; manual owner reconciliation. |
+| Concurrent dependent writer | Writer precedes and is included, or observes terminal root and fails before write. |
+| Old seed/provider retry/stale open | Refs-only technical state may exist; no send/body/action after owner reread. |
+
+C-2e-4d evidence must cover classification of every permanent and temporary cause; typed dependency schema/backfill/activation; every context/Receipt/Item/clarification/Attention/Thread/Message state; both redaction branches; zero/one/batch-boundary/more-than-100/hard-cap/overflow cardinality; root/dependent lock ordering; concurrent inserts/actions; fault injection at every batch and audit/Execution boundary; final zero-row assertions; exact replay; bounded audit hash/privacy; author/receiver body rules; immutable seed/materialization/provider/open behavior; Admin non-authority; explicit-empty/null driver; and removal of prefix-limited/sliced-ref implementation. C-2e-0 through C-2e-4d are now complete as the C-2e planning contract; C-2f is next.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1535,7 +1570,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e-4c locked** | C-2e-4c locks exact owner-role binding, Host/suspension/terminal classification, atomic self-exit and local convergence, no transfer or new-role revival, fresh equal-Guardian future authorization, race/replay boundaries, and explicit-empty output. C-2e-4d cascade closure is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e complete** | C-2e-4d completes typed permanent cascades, reversible current fences, exact Grant/redaction matrices, one root-first loop-to-closure transaction, bounded audit/overflow, immutable-seed owner reread, and explicit-empty output. C-2f is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

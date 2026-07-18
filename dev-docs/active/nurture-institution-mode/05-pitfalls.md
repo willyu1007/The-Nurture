@@ -27,6 +27,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not accept revoke reason, timestamp, actor, or dependent refs as client-authored audit. Pilot uses server-owned `user_revoked`, database time, resolved actor, exact Grant/Thread refs, and a separately bounded cascade summary.
 - Do not bind Grant ownership only to Participant identity. Persist the exact confirming Guardian RoleAssignment so rejoin or a new role row cannot revive an old Grant.
 - Do not translate Host account/workspace loss into a Nurture role or Grant mutation. Host blocks that user's access; Nurture suspension/terminal role facts independently govern the Grant lifecycle.
+- Do not run permanent cascade for Host loss, role suspension, owner outage, or temporary policy/topology denial; current fail-closed and irreversible lifecycle convergence are different operations.
+- Do not use JSON scanning, `take: 100`, `SKIP LOCKED`, intermediate commits, or truncated dependent refs as cascade closure. Typed dependencies, root locking, keyset loops, zero-row postconditions, and bounded count/hash audit are required.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -40,6 +42,23 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Bounded cascade could commit a privacy-unsafe prefix
+
+- Symptom: revoke and redaction selected only the first 100 dependents and returned
+  sliced refs, allowing the root to become terminal while later Receipt, Item,
+  Attention, context, or derived projection rows remained actionable or readable.
+- Context: Pilot-0-C2e-4d dependent cascade closure convergence.
+- Root cause: API result bounding, transaction workload control, dependency
+  discovery, and authorization closure were treated as the same limit.
+- What we tried: traced Grant and redaction roots through contexts, Receipts, Items,
+  clarification events, Attention, Thread summaries, immutable replay seeds, and
+  Host delivery retries, including more-than-100 and concurrent-insert cases.
+- Fix / workaround: use typed dependencies, root-first locks, a preflight hard cap,
+  in-transaction keyset loops, final zero-row assertions, and bounded count/hash
+  audit; overflow rolls back before root mutation and output refs stay exact.
+- Prevention: fault, overflow, phantom-insert, redaction-branch, stale-delivery, and
+  persistence-privacy tests must reject every partial or body-derived survivor.
 
 ### 2026-07-18 — Participant-only ownership could revive a terminal Grant
 

@@ -465,6 +465,21 @@ Pilot-0-C2e-4c Grant-owner loss refinement:
 - Self-exit/action, role-end/action, reconciler/fresh-confirm, and Host restore/action races use exact role and Grant versions plus a deterministic role-before-Grant-before-Thread/dependent lock order. Exact replay is immutable; every presenter still owner-rereads current facts. Last-Guardian terminal recovery, forced removal, custody dispute, authority reassignment, and Host-driven deletion remain outside Pilot.
 - Every owner-loss, reconciliation, and recovery Execution stores `handoffRequestSnapshotsPayload=[]` and null driver and creates no Step/Handoff/Outbox/notification/deep link/protected body. C-2e-4d owns the exhaustive dependent closure and bounded evidence.
 
+Pilot-0-C2e-4d dependent cascade closure refinement:
+
+- Irreversible cascade applies only to permanent Grant revoke/replacement/expiry/terminal-owner-loss and exact Guardian-source or Caregiver-reply redaction. Host account/workspace loss, exact-role suspension, owner-service outage, and temporary policy/Institution/CareGroup unavailability remain current fail-closed predicates and cannot write permanent suppression. C-2f classifies Enrollment/topology terminality before invoking the kernel.
+- Add typed `NurtureInteractionContextDependency` rows for every Grant/Message/Item/Receipt ref used by protected `submit_action`, `open_notification`, or clarification candidates. JSON `statePayload` is not dependency authority. A protected context without complete dependency rows fails activation/preflight and cannot execute.
+- Permanent Grant invalidation revokes every active Grant-dependent context and replaces executable state with a non-body tombstone; terminalizes linked Receipts; suppresses actionable Items plus active clarification; scrubs body-derived Item/Attention/Thread projections; and retains protected Message, CommandExecution, authorship, times, and body-free audit under current author/receiver policy.
+- Receipt transitions are exact: `pending -> blocked(reason)` and clear pending/driver/retry controls; `delivered|read|acknowledged -> revoked_after_delivery(reason)` while retaining occurred-at times; existing `failed|blocked|revoked_after_delivery` stays terminal. Retry descendants are included through their direct Grant dependency and no delivery retry remains schedulable.
+- Item `open|acknowledged|waiting_for_family|replied|followed_up -> suppressed`. Active clarification receives exactly one `clarification_cancelled` before one suppression event; active clarification ids/times/driver refs and executable assignment state clear. Summary becomes a generic tombstone, detail and body-derived/safety projection payloads clear, and old Grant/Message/event refs remain audit-only.
+- Every Attention sourced from an affected Item loses title/summary-derived content. `active -> suppressed`; resolved/expired/suppressed status remains terminal while projection content is scrubbed and versioned. Thread stays available for the Enrollment, but `summaryPayload` is cleared or owner-recomputed without invalid content; `latestMessageAt` may remain chronological audit.
+- Guardian-source redaction clears source body/attachment/protection, terminalizes source Receipt, revokes contexts bound to that source Message, suppresses dependent Item/active Attention, and scrubs Thread projection. An independently authored Caregiver reply is not redacted, but source presentation is a tombstone. Caregiver-reply redaction clears only reply body/Receipt/context/projection; source question/Receipt and replied Item/resolved Attention are neither suppressed nor reopened, and no second reply becomes available.
+- The kernel locks Grant before Message and every root before dependents, validates root/version/cause, pre-counts against a versioned Pilot hard cap, and processes deterministic primary-key keyset batches inside one Serializable transaction. `SKIP LOCKED`, intermediate commit, async repair, and root-first-then-eventual-dependent commit are forbidden. Every dependent writer locks/revalidates the root so no post-count insert can escape.
+- After every batch, root-specific `NOT EXISTS` checks prove no eligible context, Receipt, Item, clarification, Attention projection, or Thread projection remains. The transaction then writes one bounded `NurtureLifecycleCascadeAudit` and the owning Execution. Any row conflict, phantom, fault, cap overflow, or failed postcondition rolls back before root mutation; Pilot overflow enters manual reconciliation and never commits a prefix.
+- `NurtureLifecycleCascadeAudit` is evidence, not authorization. It stores root type/id/version, cause, cascade schema version, per-type transition counts, canonical closure hash, completed database time, and CommandExecution ref under a unique root/version/cause identity. It stores no bodies, tokens, dependent-ref list, account/device targets, or Host technical state and is not added to prior exact business output refs.
+- Invalidation Commands remain explicit-empty and never create a new Handoff/Outbox/Notification. Existing immutable replay seeds are retained and may materialize refs-only Host work only under original same-Step rules; every materializer consumer, provider send/retry, notification open, and presenter owner-rereads Nurture and returns stopped/skipped/tombstone. Technical Admin may inspect bounded cascade evidence and request owner reconciliation but cannot edit lifecycle or mark closure.
+- C-2e is complete only when zero/one/exact-cap/over-cap, more-than-100, concurrent insert/action, every fault point, replay, both redaction branches, author/receiver body visibility, stale delivery/open, audit privacy, and no-output-expansion evidence pass. Current prefix-limited implementation is not compliant.
+
 ## 4. Grant and Receipt Objects
 
 ### 4.1 `NurtureChildLinkGrant`
@@ -999,6 +1014,53 @@ Key constraints:
 - Index: `(workspaceId, participantId, status, expiresAt)`.
 - Index: `(workspaceId, hostConversationRefHash, status, expiresAt)`.
 - Numeric TTL and physical purge windows are purpose/product policy, not schema enums. Expired rows cannot be used even before purge.
+
+#### 7.3.1 `NurtureInteractionContextDependency`
+
+Typed lifecycle dependencies make revocation/redaction discovery complete without parsing JSON.
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `id` | string | yes | Dependency row id. |
+| `workspaceId` | string | yes | Must match context and referenced object workspace. |
+| `contextId` | string | yes | Restrict FK to `NurtureInteractionContext`. |
+| `grantId` | string | no | Restrict FK to one Grant dependency. |
+| `messageId` | string | no | Restrict FK to one Message dependency. |
+| `itemId` | string | no | Restrict FK to one Item dependency. |
+| `receiptId` | string | no | Restrict FK to one Receipt dependency. |
+| `createdAt` | datetime | yes | Database creation time. |
+
+Constraints:
+
+- Raw CHECK requires exactly one of `grantId|messageId|itemId|receiptId` to be non-null.
+- Unique indexes prevent duplicate `(contextId, typedRef)` rows; indexes on `(workspaceId, eachTypedRef, contextId)` support root cascade.
+- Context issuance and all dependency rows commit together. Multi-candidate clarification writes multiple rows; any missing typed dependency invalidates the context for protected use.
+- Dependency rows contain refs only and never bodies, tokens, authorization decisions, or Host retry state.
+
+#### 7.3.2 `NurtureLifecycleCascadeAudit`
+
+Bounded local evidence proves closure without expanding CommandExecution output refs.
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `id` | string | yes | Audit id. |
+| `workspaceId` | string | yes | Scenario partition. |
+| `rootType` | enum | yes | Versioned `child_link_grant|family_care_message`. |
+| `rootId` | string | yes | Internal root ref; never a client route. |
+| `rootVersion` | integer | yes | Version whose cascade was closed. |
+| `cause` | enum/string | yes | Server-owned terminal/redaction reason. |
+| `cascadeSchemaVersion` | integer | yes | Determines dependency registry and transition matrix. |
+| `affectedCountsPayload` | json | yes | Canonical bounded counts by object/transition; no ref lists. |
+| `closureHash` | string | yes | Canonical hash of root/version/cause/schema/counts/postconditions. |
+| `commandExecutionId` | string | yes | Restrict FK to the immutable owning `NurtureCommandExecution`. |
+| `completedAt` | datetime | yes | Database transaction time. |
+
+Constraints:
+
+- Unique: `(workspaceId, rootType, rootId, rootVersion, cause)`.
+- Index: `(workspaceId, commandExecutionId)`; one composite command may own multiple root cascade audits.
+- Audit, root mutation, dependent closure, and owning Execution commit in one transaction.
+- Audit never grants access and stores no body, attachment, token, per-dependent ref, target-account/device list, or Host technical lifecycle.
 
 ### 7.4 IIA Command handoff replay-seed extension
 
