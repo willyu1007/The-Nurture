@@ -40,6 +40,10 @@ This file exists to prevent repeating mistakes within this task.
 - Do not lock TransferIntent before Enrollment or let different topology commands invent different root orders. Enrollment is the common serialized root before Hold, TransferIntent, roster, Grant, Thread, and dependents.
 - Do not record a Guardian or Institution terminal actor as `revokedByParticipantId` on a Grant they do not own. Topology invalidation uses a server cause, null revoke actor, and Enrollment Execution/CascadeAudit evidence.
 - Do not commit terminal Enrollment status before closing every hold, intent, active Grant/dependent, Thread, and roster projection. Preflight the aggregate cap, assert zero survivors, and roll back the entire transaction on any defect.
+- Do not reactivate a terminal Enrollment or reuse its roster, invitation, Grant, Thread, context, or work for re-entry. Reuse only the longitudinal Child/Process/Family/current Guardian identities and create a new care episode.
+- Do not add separate transfer and re-entry lineage fields. Use one unique `predecessorEnrollmentId + continuityKind` pair and remove the unimplemented `supersedesEnrollmentId` proposal before schema work.
+- Do not let a generic first-enrollment invitation bypass a known same-Institution terminal predecessor. Re-entry requires an exact terminal-leaf/version binding and exact current-Guardian confirmation.
+- Do not merge old and new Enrollment histories or let a new Grant/Thread restore old cross-role bodies. Render separate episodes and apply original authorship/Grant/redaction/retention/policy on every old read.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -53,6 +57,28 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Re-entry could reactivate old authority or split lineage
+
+- Symptom: returning to the same Institution could reuse a terminal Enrollment,
+  old invitation/roster/Thread, or introduce `reenteredFromEnrollmentId` beside
+  the planned transfer-only `supersedesEnrollmentId`, creating two successor
+  sources and making old protected work appear current again.
+- Context: Pilot-0-C2f-3c fresh re-entry and retained-history convergence.
+- Root cause: longitudinal child identity, care-episode identity, Enrollment
+  lineage, onboarding consent, and historical-body authorization were not yet
+  separated after permanent closure.
+- What we tried: traced family withdrawal and Institution end back through the
+  existing roster/invitation confirmation flow, same/different target Groups,
+  transfer lineage, dual Guardians, legacy ambiguity, old/new Threads, side-local
+  history, stale notifications, replay, and concurrent successor creation.
+- Fix / workaround: reuse existing initiate/confirm actions but require fresh
+  relationship identities, exact terminal-leaf/current-Guardian resolution, one
+  generalized predecessor/continuity pair, atomic new-episode confirmation, and
+  separate history views with no old cross-role authority revival.
+- Prevention: identity, lineage, invitation, owner-resolution, transaction/fault,
+  successor-race, history-allowlist, original-Grant, stale-open, no-alias, and
+  planning-boundary tests must pass before re-entry implementation.
 
 ### 2026-07-18 — Terminal exit could deadlock or leave live old work
 
