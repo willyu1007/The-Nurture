@@ -507,6 +507,17 @@ Pilot-0-C2e-4d dependent cascade closure test refinement:
 - Joint Host tests prove immutable old seeds remain same-Step-only and refs-only; post-invalidation materialization/consumer/provider retry stops on owner reread; unsent Notification is skipped; already shown OS Notification opens to current tombstone/unavailable; owner outage sends nothing; Admin only sees bounded evidence and cannot edit/close business facts.
 - C-2e completion requires all prior C-2e-0 through C-2e-4d matrices plus removal of `take: 100`, sliced dependent refs, JSON-only discovery, and incomplete projection handling. No product implementation result is claimed until schema, kernel, repositories, surfaces, joint tests, and migration evidence exist.
 
+Pilot-0-C2f-0 Enrollment lifecycle and actor-boundary test refinement:
+
+- Status tests MUST classify `active|paused` as current and uniqueness-conflicting, legacy `pending` as conflict-bearing but not Pilot-creatable, `ended|withdrawn` as terminal/non-reactivatable, and `deleted` as unavailable for Pilot commands, uniqueness bypass, retention erasure, or re-entry.
+- Actor tests MUST separate current exact-Family Guardian family-side restriction/withdrawal eligibility from exact-scope active Institution Admin institution-side restriction/end/transfer-proposal eligibility. Caregiver, Lead Caregiver, Technical Operator, service identity, natural-language/AI inference, raw ids, Host membership, and ambient administration MUST have zero topology authority.
+- Pause classification tests MUST deny Enrollment-dependent cross-role reads/actions/delivery/new Grant while preserving nonterminal Enrollment/Grant/Thread/content/audit facts and producing no permanent C-2e cascade mutation. Recovery tests wait for C-2f-1 but MUST preserve the invariant that one side cannot release the other side's restriction.
+- Multi-side tests MUST prove aggregate `paused` is not resume authority and that independently attributable family/institution restrictions can coexist. C-2f-1 MUST cover cross-side release denial, stale versions, concurrent pause/resume, and terminal-transition races before any action is implemented.
+- Terminal classification tests MUST require old-Enrollment Grant/dependent closure for withdrawal, Institution end, and completed transfer while rejecting terminal reactivation. Exact status/reason/transaction behavior remains C-2f-2/C-2f-3 and cannot be inferred from C-2f-0 alone.
+- Transfer boundary tests MUST reject in-place `careGroupId` edit, old Enrollment reuse, and movement/revival of RosterEntry, Grant, Thread, Message, Receipt, Item, Attention, context, or Handoff authority. The target relationship requires a new Enrollment and later fresh Grant/Thread authorization.
+- Cross-Institution tests MUST prove pause/end/withdraw/transfer/policy/Grant effects in one Institution neither mutate nor grant access in another current Institution relationship. Cross-workspace tests MUST reject fuzzy/global/raw-link matching and every automatic profile/Enrollment/Grant/Thread/content/audit migration despite a shared My-Chat adult identity.
+- C-2f-0 documentation evidence MUST NOT claim a schema migration, action key, transaction, result, Handoff, notification, provider, or runtime implementation. C-2f-1 through C-2f-5 own those executable details.
+
 Multi-turn behavior:
 
 - Same-conversation turns may reuse a short-lived `NurtureInteractionContext` to recover pending intent, candidate targets, and clarification state.

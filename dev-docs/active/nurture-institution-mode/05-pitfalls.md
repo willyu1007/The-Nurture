@@ -29,6 +29,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not translate Host account/workspace loss into a Nurture role or Grant mutation. Host blocks that user's access; Nurture suspension/terminal role facts independently govern the Grant lifecycle.
 - Do not run permanent cascade for Host loss, role suspension, owner outage, or temporary policy/topology denial; current fail-closed and irreversible lifecycle convergence are different operations.
 - Do not use JSON scanning, `take: 100`, `SKIP LOCKED`, intermediate commits, or truncated dependent refs as cascade closure. Typed dependencies, root locking, keyset loops, zero-row postconditions, and bounded count/hash audit are required.
+- Do not model Enrollment pause as one unowned boolean/status that either family or institution can clear. Preserve independently attributable restrictions, deny cross-side release, and reserve permanent cascade for terminal Enrollment transitions.
+- Do not transfer an Enrollment by editing `careGroupId` or carrying its Grant, Thread, or content authority. Terminate the old identity and create a new separately authorized Enrollment.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -42,6 +44,24 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — One shared paused flag could erase the other side's restriction
+
+- Symptom: if Guardian and Institution Admin both write the same Enrollment status,
+  either side could resume service and reopen cross-role access while the other
+  side's safety or service restriction was still intended to remain active.
+- Context: Pilot-0-C2f-0 Enrollment lifecycle and actor-boundary convergence.
+- Root cause: the aggregate display state, the actor who imposed a restriction,
+  the authority to release it, and permanent lifecycle closure were conflated.
+- What we tried: separated family and institution authority, current versus
+  terminal states, same-Institution transfer, and cross-Institution/workspace
+  continuity before choosing command or persistence mechanics.
+- Fix / workaround: treat pause as reversible current denial with independently
+  attributable family/institution restrictions; neither side clears the other's
+  restriction, and terminal transitions alone may invoke permanent closure.
+- Prevention: C-2f-1 tests must cover both sides paused concurrently, every
+  cross-side release denial, stale resume, terminal races, and zero cascade on
+  pause; C-2f-2/3 must reject in-place transfer and terminal reactivation.
 
 ### 2026-07-18 — Bounded cascade could commit a privacy-unsafe prefix
 

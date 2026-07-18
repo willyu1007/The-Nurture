@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2e is complete after C-2e-4d locked permanent/temporary classification, typed dependencies, atomic loop-to-closure, exact Grant/redaction matrices, bounded audit, and stale Host delivery fences; C-2f leave/transfer/next-stage next
+- **Current checkpoint:** Pilot-0-C in progress; C-2f-0 locks Enrollment lifecycle/actor classes, reversible independently attributed pause, permanent old-Enrollment closure, new-identity transfer, independent Institutions, and no automatic cross-workspace migration; C-2f-1 pause/resume next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -954,7 +954,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2e COMPLETE** | C-2e-4d closes permanent/temporary invalidation, typed context dependencies, exact dependent/redaction matrices, one root-first loop-to-closure transaction, bounded audit/overflow, immutable-seed owner reread, and explicit-empty output. C-2f is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-0 LOCKED** | C-2f-0 closes current/terminal state classes, family/institution actor classes, reversible independently attributed pause, permanent old-Enrollment closure, new-identity transfer, independent Institutions, and no automatic cross-workspace migration. C-2f-1 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1035,7 +1035,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
 | C-2e separate Grant authorization | **LOCKED / COMPLETE** | C-2e-0 through C-2e-4d lock one owner-read authority path, exact Grant/role identity, strong create/replace/revoke, immutable recovery, owner-loss handling, typed complete cascades, bounded evidence, and zero implicit Host activation. |
-| C-2f leave/transfer/next-stage and cross-workspace boundary | OPEN | Longitudinal semantics without automatic old-Grant/content transfer or unsupported global identity claims. |
+| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-0 LOCKED** | Lifecycle/actor classes are fixed without automatic old-Grant/content transfer or unsupported global identity claims; pause/resume mechanics are next. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
 
@@ -1518,6 +1518,50 @@ The closure matrix is:
 
 C-2e-4d evidence must cover classification of every permanent and temporary cause; typed dependency schema/backfill/activation; every context/Receipt/Item/clarification/Attention/Thread/Message state; both redaction branches; zero/one/batch-boundary/more-than-100/hard-cap/overflow cardinality; root/dependent lock ordering; concurrent inserts/actions; fault injection at every batch and audit/Execution boundary; final zero-row assertions; exact replay; bounded audit hash/privacy; author/receiver body rules; immutable seed/materialization/provider/open behavior; Admin non-authority; explicit-empty/null driver; and removal of prefix-limited/sliced-ref implementation. C-2e-0 through C-2e-4d are now complete as the C-2e planning contract; C-2f is next.
 
+#### C-2f — Enrollment topology lifecycle and longitudinal boundary (IN PROGRESS)
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-2f-0 lifecycle vocabulary and actor authority | **LOCKED** | Current/terminal/deleted classes, family/institution actor separation, reversible versus permanent closure, new-identity transfer, independent Institutions, and forbidden automatic migration. |
+| C-2f-1 temporary Enrollment pause/resume | OPEN / NEXT | Independently attributable family/institution holds, exact action keys, release authority, current fences, replay, and races. |
+| C-2f-2 same-Institution CareGroup transfer | OPEN | Proposal/confirmation, old/new Enrollment lineage, roster handling, atomic Grant/work closure, and no authority carryover. |
+| C-2f-3 permanent leave/end and re-entry | OPEN | Guardian withdrawal, Institution end, reason/status mapping, terminal closure, presentation, and fresh re-entry identities. |
+| C-2f-4 next-stage and cross-scope portability | OPEN | Same-workspace longitudinal continuity, independent Institutions, cross-workspace denial/future protocol, and zero global identity inference. |
+| C-2f-5 result, recovery, surfaces, and Handoff | OPEN | Exact result refs/copy, response loss/current reread, route affordances, explicit effects, and cross-surface evidence. |
+
+#### C-2f-0 — Lifecycle vocabulary and actor authority (LOCKED)
+
+C-2f-0 classifies authority and irreversibility before any transition-specific command is designed:
+
+1. `active` and `paused` are current, uniqueness-conflicting Enrollment states. Legacy `pending` remains conflict-bearing but Pilot creates none. `ended` and `withdrawn` are terminal and never reactivate. `deleted` is unavailable as a Pilot action, retention shortcut, uniqueness bypass, or audit erasure.
+2. A current exact-Family Guardian is the only family-side actor class for a family restriction or withdrawal. An exact-scope active Institution Admin is the only institution-side actor class for an institution restriction, service end, or same-Institution transfer proposal. Later C-2f checkpoints own exact confirmation, multi-Guardian, action-key, and concurrency rules.
+3. Caregiver, Lead Caregiver, Technical Operator, service identity, AI/natural-language interpretation, raw ids, Host membership, and ambient workspace administration have no Enrollment topology authority. Technical Admin remains evidence/reconciliation-only.
+4. Pause is reversible current denial. Enrollment-dependent cross-role reads, actions, delivery, stale notification open, and new Grant use fail closed, but the pause itself cannot terminalize Enrollment, Grant, Thread, Message, Receipt, Item, or Attention and cannot invoke the permanent C-2e cascade.
+5. Family and institution restrictions must be independently attributable. `status=paused` may be an aggregate presentation, never resume authority; neither side may clear the other side's restriction. C-2f-1 will lock the additive hold representation and exact release rules.
+6. Guardian withdrawal, Institution end, and completed transfer are permanent outcomes for the old Enrollment and must close old active Grants/dependent work under C-2e. C-2f-2/C-2f-3 own exact reason/status mapping, transaction boundaries, and retained presentation.
+7. Transfer cannot edit `careGroupId`, reuse the old Enrollment, or carry old RosterEntry, Grant, Thread, Message, Receipt, Item, Attention, context, or Handoff authority. Completion ends the old Enrollment and creates a new Enrollment identity; any target Grant/Thread requires its normal fresh path.
+8. Current Enrollments at different Institutions remain independent. A lifecycle, policy, or Grant change in one Institution cannot mutate or authorize another Institution relationship.
+9. Same-workspace longitudinal Child/ChildCareProcess/Family continuity remains family-owned and current-owner-resolved. Cross-workspace fuzzy/global matching, raw linking, global child identity claims, or automatic profile/Enrollment/Grant/Thread/content/audit migration is forbidden even when the adult My-Chat identity is the same.
+10. C-2f-0 authorizes no schema migration, action, transaction, notification, Handoff, runtime, environment, capability, or traffic change. C-2f-1 through C-2f-5 must lock executable details separately.
+
+The classification matrix is:
+
+| Case | Classification and authority boundary |
+| --- | --- |
+| Active Enrollment | Current; normal owner reread still required. |
+| Family restriction | Guardian-side current pause candidate; Institution cannot release the family restriction. |
+| Institution restriction | Institution-Admin-side current pause candidate; Guardian cannot release the institution restriction. |
+| Both restrictions | Remains paused until each independently authorized restriction is released. |
+| Guardian withdrawal | Permanent old-Enrollment outcome; exact mechanics wait for C-2f-3. |
+| Institution service end | Permanent old-Enrollment outcome; exact mechanics wait for C-2f-3. |
+| Same-Institution transfer proposal | Institution Admin may propose; no topology mutation until C-2f-2 authorization completes. |
+| Completed transfer | Old Enrollment terminal plus new Enrollment identity; no authority carryover. |
+| Another Institution Enrollment | Independent lifecycle and authority scope. |
+| Cross-workspace candidate | No automatic match, link, migration, or global identity conclusion. |
+| Caregiver/Operator/AI/Host-only caller | No topology authority. |
+
+C-2f-0 evidence must cover every state classification, both actor sides and every denied actor, concurrent dual restrictions, cross-side release denial, zero permanent cascade on pause, permanent old-Enrollment classification, terminal non-reactivation, in-place transfer denial, new-identity/no-carryover invariant, cross-Institution isolation, cross-workspace/global-match denial, and absence of any premature executable effect. C-2f-1 is next.
+
 ## Minimum IIB closure before real traffic
 
 1. Authenticated institution onboarding/control plane for institution, care group, participant mapping, role assignment, child process, enrollment, thread, grant, revoke, and cohort disablement; all authoritative writes use the Nurture CommandExecution kernel.
@@ -1570,7 +1614,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2e complete** | C-2e-4d completes typed permanent cascades, reversible current fences, exact Grant/redaction matrices, one root-first loop-to-closure transaction, bounded audit/overflow, immutable-seed owner reread, and explicit-empty output. C-2f is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-0 locked** | C-2f-0 locks current/terminal/deleted classes, family/institution actor separation, independently attributed reversible pause, permanent old-Enrollment closure, new-identity transfer, independent Institutions, and no automatic cross-workspace migration. C-2f-1 is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
