@@ -49,6 +49,10 @@ This file exists to prevent repeating mistakes within this task.
 - Do not treat `currentStageKey`, pregnancy-stage output, profile snapshot, age band, or roster attribute as the canonical stage ledger. Only a current versioned StageEpisode created by an exact Guardian command is authoritative.
 - Do not overwrite, backdate, branch, or delete stage history to represent change or correction. Close the current leaf with fixed evidence, create at most one successor, or explicitly clear the current state.
 - Do not infer or merge a child across workspaces from the same adult account, name, birth fact, contact, media, roster, or raw id. Cross-workspace portability remains Pilot `NO-GO` until a separate consented versioned protocol exists.
+- Do not treat future portability as identity migration or let the same My-Chat adult prove the same child. Future v1 may only copy explicitly confirmed minimum fields into a fresh target-local aggregate after independent source and target checks.
+- Do not search, suggest, attach to, overwrite, or merge an existing target child during future v1 import. Existing-profile reconciliation is a separate target-local protocol and never a Technical Operator edit.
+- Do not place portability bodies or child-identity claims in My-Chat Workflow Step, Handoff, Outbox, notification, provider payload, logs, or Admin controls; My-Chat remains authentication plus refs-only transport.
+- Do not promise that source revoke/redaction/deletion recalls an already consumed import. Before consume these gates fail closed; after consume the copied fields are target-local facts under target Guardian policy.
 - Do not build Institution presenters by loading every Enrollment for a ChildCareProcess and filtering afterward. Begin with current Institution/CareGroup authority and enforce the scope in repository predicates.
 - Do not expose a stable Child/Process id, count, conflict reason, route token, stage, or empty/error distinction that lets one Institution infer another Institution relationship.
 - Do not merge family longitudinal summaries into a shared cross-Institution Thread, Grant, content projection, or lifecycle. Aggregate safe navigation only and owner-reread every episode independently.
@@ -65,6 +69,34 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Portability could become global identity or remote-control infrastructure
+
+- Symptom: a convenient export/import flow could infer one global child from the
+  same adult or birth facts, merge an existing target profile, move roles and
+  Institution history, put profile bodies in Host Handoff, or promise that a
+  later source revoke deletes independently committed target facts.
+- Context: Pilot-0-C2f-4-3 future cross-workspace protocol-boundary
+  convergence.
+- Root cause: data copying, identity proof, authority transfer, target
+  reconciliation, transport delivery, and post-import lifecycle were described
+  as one portability operation despite having different owners and irreversible
+  privacy consequences.
+- What we tried: traced same versus different adult, source issue/revoke,
+  target reauthentication, new versus existing profile, field-level export,
+  stage and protected-history exclusion, expiry, token forwarding,
+  revoke/consume races, response loss, and source deletion before and after
+  target commit.
+- Fix / workaround: keep Pilot executable portability disabled; constrain a
+  future v1 to the same authenticated adult, independent dual-scope checks,
+  fresh target-local identities, `displayName` plus opt-in `birthDate`, a
+  seven-day target-bound Intent and five-minute confirmation, Nurture-owned
+  consumption/idempotency, refs-only Host delivery, no match/merge, and clear
+  post-consume no-recall semantics.
+- Prevention: absence, actor, allowlist, forbidden-payload, fresh-target,
+  no-match, lifecycle/token, owner-reread, revoke/race, replay/fault,
+  post-import independence, Host/Nurture ownership, privacy-noninterference,
+  and planning-boundary tests must pass before any portability implementation.
 
 ### 2026-07-18 — Family aggregation could become an Institution discovery channel
 
