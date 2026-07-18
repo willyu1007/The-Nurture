@@ -45,7 +45,9 @@ This file exists to prevent repeating mistakes within this task.
 - Do not let a generic first-enrollment invitation bypass a known same-Institution terminal predecessor. Re-entry requires an exact terminal-leaf/version binding and exact current-Guardian confirmation.
 - Do not merge old and new Enrollment histories or let a new Grant/Thread restore old cross-role bodies. Render separate episodes and apply original authorship/Grant/redaction/retention/policy on every old read.
 - Do not model entry to another Institution as Enrollment transfer or extend `predecessorEnrollmentId` across Institutions. Use independent fresh onboarding against the family-selected ChildCareProcess, preserve concurrent Institution relationships, and carry no authority or content.
-- Do not let stage change mutate Enrollment or let age, birthday, Institution data, or AI inference silently rewrite `currentStageKey`. Stage authority/history remains a separate Guardian-owned C-2f-4-1 decision.
+- Do not let stage change mutate Enrollment or let age, birthday, Institution data, or AI inference silently rewrite `currentStageKey`. Use the locked Guardian-owned C-2f-4-1 StageEpisode authority/history path.
+- Do not treat `currentStageKey`, pregnancy-stage output, profile snapshot, age band, or roster attribute as the canonical stage ledger. Only a current versioned StageEpisode created by an exact Guardian command is authoritative.
+- Do not overwrite, backdate, branch, or delete stage history to represent change or correction. Close the current leaf with fixed evidence, create at most one successor, or explicitly clear the current state.
 - Do not infer or merge a child across workspaces from the same adult account, name, birth fact, contact, media, roster, or raw id. Cross-workspace portability remains Pilot `NO-GO` until a separate consented versioned protocol exists.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
@@ -60,6 +62,27 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — A mutable stage projection could erase longitudinal history
+
+- Symptom: `currentStageKey` or a derived pregnancy/age/roster value could be
+  updated in place, silently appear Guardian-confirmed, lose correction history,
+  or indirectly change Enrollment behavior.
+- Context: Pilot-0-C2f-4-1 stage fact, authority, and lifecycle convergence.
+- Root cause: the existing optional string was a useful projection but had no
+  versioned taxonomy, owner proof, lineage, transition audit, or concurrency
+  contract.
+- What we tried: traced initial unset/set, normal change, current correction,
+  explicit clear, set-after-clear, equal Guardians, replay, stale races, legacy
+  values, pregnancy guidance, downstream artifacts, and Institution reads.
+- Fix / workaround: make a linear versioned StageEpisode the only stage SSOT,
+  bind every write to an exact current Guardian and strong-confirmation context,
+  update the coarse projection atomically, preserve fixed terminal evidence, and
+  quarantine unproven legacy or mismatched projections.
+- Prevention: schema/lineage/catalog, actor/surface/action, confirmation,
+  transition/correction/clear, replay/race, projection/preflight, no-inference,
+  no-Enrollment-side-effect, and planning-boundary tests must pass before stage
+  implementation.
 
 ### 2026-07-18 — Portability could collapse stage, Institution, and workspace boundaries
 
