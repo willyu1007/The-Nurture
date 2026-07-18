@@ -33,6 +33,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not transfer an Enrollment by editing `careGroupId` or carrying its Grant, Thread, or content authority. Terminate the old identity and create a new separately authorized Enrollment.
 - Do not add `pause_institution_enrollment` beside the locked `suspend_enrollment` key or interpret `resume_enrollment` as global recovery. Reuse the Institution keys, release only that side's hold, and recompute current aggregate state.
 - Do not silently merge two side actions prepared from the same Enrollment version. The first commits; every stale confirmation refreshes and reviews the changed consequences before another hold transition.
+- Do not implement transfer through `careGroupId` mutation, initial `initiate_enrollment`, terminal `close_enrollment`, Enrollment Invitation reuse, or a direct Institution-only command. Use one family-confirmed TransferIntent and a new Enrollment identity.
+- Do not create the target RosterEntry before transfer confirmation or copy old Grant/Thread/content/work into the target Group. Target roster/new Enrollment and complete old closure commit together.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -46,6 +48,25 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Operational class move could silently transfer data authority
+
+- Symptom: an Institution-only `careGroupId` edit or reused enrollment command
+  would expose safe roster state to a new caregiver scope without family review,
+  while old Grant, Thread, Item, or delivery work could remain live or be copied.
+- Context: Pilot-0-C2f-2 same-Institution CareGroup transfer convergence.
+- Root cause: institution roster management, family-confirmed relationship scope,
+  Enrollment identity, authorization closure, and historical content retention were
+  treated as one mutable class-assignment field.
+- What we tried: traced initial invitation/roster semantics, dual Guardian rights,
+  pause holds, target readiness, Enrollment uniqueness/lineage, C-2e hard-cap
+  cascade, Thread timing, old caregiver reach, response loss, and transfer races.
+- Fix / workaround: use an Institution-proposed/family-confirmed TransferIntent,
+  require zero holds, create target roster at confirmation, end old/create new
+  Enrollment at one database time, and close old authorization without copying it.
+- Prevention: action-map, intent, target readiness, lineage, transaction/fault,
+  cascade overflow, persistence-privacy, stale-open, and no-carryover tests must
+  reject every direct, partial, early-target, mirrored, or Host-owned transfer.
 
 ### 2026-07-18 — Resume naming could bypass the other side's hold
 
