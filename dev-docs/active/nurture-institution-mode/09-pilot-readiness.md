@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2f-4-1 locks versioned linear StageEpisode, equal current-Guardian strong-confirmation authority, stable coarse/allowlisted fine vocabulary, change/correction/clear/replay/races, projection-only `currentStageKey`, and zero Institution/inference/Enrollment side effect; C-2f-4-2 multi-Institution visibility/concurrency next
+- **Current checkpoint:** Pilot-0-C in progress; C-2f-4-2 locks current-Guardian longitudinal aggregation, repository-scoped Institution/CareGroup isolation, no other-Institution existence/id/stage leakage, no stage dataClass, independent per-Institution lifecycle/concurrency, exact dependency rereads, and safe stale-episode degradation; C-2f-4-3 future cross-workspace protocol boundary next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -977,7 +977,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-4-1 LOCKED** | C-2f-4-1 makes linear versioned StageEpisode the Guardian-owned fact, locks exact equal-authority action/confirmation/lifecycle/replay, keeps `currentStageKey` projection-only, and forbids Institution/inference/Enrollment effects. C-2f-4-2 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-4-2 LOCKED** | C-2f-4-2 permits current-Guardian safe longitudinal aggregation while enforcing repository-level Institution isolation, zero other-Institution/id/stage leakage, no stage dataClass, per-Institution concurrency, exact dependency rereads, and safe stale-segment handling. C-2f-4-3 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1058,7 +1058,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
 | C-2e separate Grant authorization | **LOCKED / COMPLETE** | C-2e-0 through C-2e-4d lock one owner-read authority path, exact Grant/role identity, strong create/replace/revoke, immutable recovery, owner-loss handling, typed complete cascades, bounded evidence, and zero implicit Host activation. |
-| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-4-1 LOCKED** | Existing lifecycle/classification remains fixed; C-2f-4-1 adds versioned linear stage facts, equal Guardian authority, exact transition/correction/clear and projection/preflight rules, and zero Enrollment/Institution/inference side effect. C-2f-4-2 visibility/concurrency is next. |
+| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-4-2 LOCKED** | Existing lifecycle/stage rules remain fixed; C-2f-4-2 adds current-Guardian safe aggregation, exact Institution query partition, no cross-Institution/id/stage signal, no stage dataClass, independent concurrency, and owner-reread degradation. C-2f-4-3 future protocol boundary is next. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
 
@@ -1551,7 +1551,7 @@ C-2e-4d evidence must cover classification of every permanent and temporary caus
 | C-2f-3 permanent leave/end and re-entry | **LOCKED / COMPLETE** | C-2f-3a-c lock terminal actions/actors/statuses, atomic closure, fresh relationship identities, unified lineage, current-owner confirmation, retained-history separation, and no old authority revival. |
 | C-2f-4-0 portability boundary/classification | **LOCKED** | Same-workspace longitudinal process, family-owned stage, Institution-local Enrollment, independent different-Institution onboarding, no lineage/carryover, Enrollment-independent stage change, and cross-workspace `NO-GO`. |
 | C-2f-4-1 stage fact/authority/lifecycle | **LOCKED** | Versioned linear StageEpisode, exact equal-Guardian action/confirmation, stable vocabulary, transition/correction/clear/replay/races, projection-only `currentStageKey`, and no inferred or Enrollment effect. |
-| C-2f-4-2 same-workspace multi-Institution visibility/concurrency | OPEN | Family longitudinal view, each Institution's exact visibility, concurrent Enrollment isolation, and stale-read behavior. |
+| C-2f-4-2 same-workspace multi-Institution visibility/concurrency | **LOCKED** | Current-Guardian safe longitudinal view, repository-scoped Institution isolation, no cross-Institution/id/stage leakage, no stage dataClass, independent concurrency, exact dependencies, and stale-segment safety. |
 | C-2f-4-3 future cross-workspace protocol boundary | OPEN | Explicit future export/import constraints without Pilot identity matching, reuse, authority transfer, or protocol implementation. |
 | C-2f-5 result, recovery, surfaces, and Handoff | OPEN | Exact result refs/copy, response loss/current reread, route affordances, explicit effects, and cross-surface evidence. |
 
@@ -1586,7 +1586,7 @@ The classification matrix is:
 | Cross-workspace candidate | No automatic match, link, migration, or global identity conclusion. |
 | Caregiver/Operator/AI/Host-only caller | No topology authority. |
 
-C-2f-0 evidence must cover every state classification, both actor sides and every denied actor, concurrent dual restrictions, cross-side release denial, zero permanent cascade on pause, permanent old-Enrollment classification, terminal non-reactivation, in-place transfer denial, new-identity/no-carryover invariant, cross-Institution isolation, cross-workspace/global-match denial, and absence of any premature executable effect. C-2f-1 and C-2f-2 lock pause/resume and same-Institution transfer planning; C-2f-3a-c lock permanent exit, closure, and fresh re-entry; C-2f-4-0/1 now lock portability classification and stage lifecycle, and C-2f-4-2 is next.
+C-2f-0 evidence must cover every state classification, both actor sides and every denied actor, concurrent dual restrictions, cross-side release denial, zero permanent cascade on pause, permanent old-Enrollment classification, terminal non-reactivation, in-place transfer denial, new-identity/no-carryover invariant, cross-Institution isolation, cross-workspace/global-match denial, and absence of any premature executable effect. C-2f-1 and C-2f-2 lock pause/resume and same-Institution transfer planning; C-2f-3a-c lock permanent exit, closure, and fresh re-entry; C-2f-4-0/1/2 now lock portability classification, stage lifecycle, and same-workspace visibility/concurrency, and C-2f-4-3 is next.
 
 #### C-2f-1 — Temporary Enrollment pause/resume (LOCKED)
 
@@ -1622,7 +1622,7 @@ The pause/resume matrix is:
 | Terminal Enrollment race | Terminal state wins permanently; no pause/resume reactivation. |
 | CareGroup/Institution/Host/capability recovery | Does not release either Enrollment hold. |
 
-C-2f-1 evidence must cover additive schema/preflight, all actor/side/surface/action mappings, same-side shared release, cross-side/technical denial, exact consequence copy/context binding, status/hold mismatch, every hold combination, database time/transaction faults, exact replay/already-satisfied, stale same/cross-side races, terminal and dependent-writer races, Grant clock/non-revival, preserved business/technical facts, no cascade/bulk replay/alias, upper-scope separation, and the planning-only boundary. C-2f-2 locks transfer planning; C-2f-3a-c lock permanent exit, closure, and fresh re-entry; C-2f-4-0/1 now lock portability classification and stage lifecycle, and C-2f-4-2 is next.
+C-2f-1 evidence must cover additive schema/preflight, all actor/side/surface/action mappings, same-side shared release, cross-side/technical denial, exact consequence copy/context binding, status/hold mismatch, every hold combination, database time/transaction faults, exact replay/already-satisfied, stale same/cross-side races, terminal and dependent-writer races, Grant clock/non-revival, preserved business/technical facts, no cascade/bulk replay/alias, upper-scope separation, and the planning-only boundary. C-2f-2 locks transfer planning; C-2f-3a-c lock permanent exit, closure, and fresh re-entry; C-2f-4-0/1/2 now lock portability classification, stage lifecycle, and same-workspace visibility/concurrency, and C-2f-4-3 is next.
 
 #### C-2f-2 — Same-Institution CareGroup transfer (LOCKED)
 
@@ -1658,7 +1658,7 @@ The transfer matrix is:
 | Target after commit | Safe roster only; fresh Grant/Thread required. |
 | Old notification/open/work | Current owner reread yields historical/unavailable; no old action. |
 
-C-2f-2 evidence must cover intent schema/lifecycle/expiry/privacy, every actor/surface/action alias, zero-hold/version binding, source/target readiness and capacity, exact roster relation/timing, unified one-way lineage/preflight, confirmation copy/context, database-time transaction/fault/overflow, complete C-2e closure, old/new visibility and persisted privacy, every race/replay/response-loss case, no carryover, no Host commit authority, and planning-only status. The following C-2f-3a-c sections lock terminal authority, atomic closure, and fresh re-entry; C-2f-4-0/1 now lock portability classification and stage lifecycle, and C-2f-4-2 is next.
+C-2f-2 evidence must cover intent schema/lifecycle/expiry/privacy, every actor/surface/action alias, zero-hold/version binding, source/target readiness and capacity, exact roster relation/timing, unified one-way lineage/preflight, confirmation copy/context, database-time transaction/fault/overflow, complete C-2e closure, old/new visibility and persisted privacy, every race/replay/response-loss case, no carryover, no Host commit authority, and planning-only status. The following C-2f-3a-c sections lock terminal authority, atomic closure, and fresh re-entry; C-2f-4-0/1/2 now lock portability classification, stage lifecycle, and same-workspace visibility/concurrency, and C-2f-4-3 is next.
 
 #### C-2f-3 — Permanent leave/end and re-entry (LOCKED / COMPLETE)
 
@@ -1695,7 +1695,7 @@ The C-2f-3a classification matrix is:
 | Two terminal confirmations use one source version | First commit wins; loser owner-rereads the terminal result. |
 | Attempt to resume ended/withdrawn Enrollment | Permanently denied; fresh re-entry only. |
 
-C-2f-3a evidence must cover every surface/action mapping, equal current-Guardian permutations, forbidden hidden hierarchy/unanimity/countersignature, exact Institution scope, all denied actors, fixed status/reason mapping, client-field/privacy injection, five-minute consequence binding, active/paused source classes, hold non-veto/non-release, terminal races, terminal non-resume, and the planning-only boundary. C-2f-3b locks atomic terminal closure, C-2f-3c locks fresh re-entry, C-2f-4-0/1 lock portability classification and stage lifecycle, and C-2f-4-2 is next.
+C-2f-3a evidence must cover every surface/action mapping, equal current-Guardian permutations, forbidden hidden hierarchy/unanimity/countersignature, exact Institution scope, all denied actors, fixed status/reason mapping, client-field/privacy injection, five-minute consequence binding, active/paused source classes, hold non-veto/non-release, terminal races, terminal non-resume, and the planning-only boundary. C-2f-3b locks atomic terminal closure, C-2f-3c locks fresh re-entry, C-2f-4-0/1/2 lock portability classification, stage lifecycle, and same-workspace visibility/concurrency, and C-2f-4-3 is next.
 
 **C-2f-3b — Atomic terminal closure (LOCKED)**
 
@@ -1731,7 +1731,7 @@ The atomic-closure matrix is:
 | Historical business facts | Retained and still bound to original Enrollment; current cross-role use is denied. |
 | Host/provider/Handoff failure | No effect on the already atomic Nurture business decision. |
 
-C-2f-3b evidence must cover schema constraints and migration preflight, every root/dependent cardinality, elapsed/effective Grant classification, typed Enrollment context dependencies, Enrollment-first lock conformance, terminal and writer races, exact replay and fresh duplicate classification, injected faults at every boundary, final zero-survivor assertions, privacy/retention boundaries, no remote commit dependency, and planning-only status. C-2f-3c following locks fresh re-entry, C-2f-4-0/1 lock portability classification and stage lifecycle, and C-2f-4-2 is next.
+C-2f-3b evidence must cover schema constraints and migration preflight, every root/dependent cardinality, elapsed/effective Grant classification, typed Enrollment context dependencies, Enrollment-first lock conformance, terminal and writer races, exact replay and fresh duplicate classification, injected faults at every boundary, final zero-survivor assertions, privacy/retention boundaries, no remote commit dependency, and planning-only status. C-2f-3c following locks fresh re-entry, C-2f-4-0/1/2 lock portability classification, stage lifecycle, and same-workspace visibility/concurrency, and C-2f-4-3 is next.
 
 **C-2f-3c — Fresh re-entry and retained history (LOCKED)**
 
@@ -1770,7 +1770,7 @@ The fresh re-entry matrix is:
 | Historical view | Separate safe episode summaries plus independently authorized side-local history. |
 | Stale old notification/deep link | Owner reread yields historical/tombstone/unavailable; no old action or resend. |
 
-C-2f-3c evidence must cover action/surface aliases, every fresh versus retained identity, unified lineage schema/migration preflight, invitation provenance and lifecycle, exact predecessor and Guardian resolution, same/different Group targets, generic-invitation bypass denial, transaction faults, replay/successor races, safe history allowlists, side-local protected-body rules, old notification/open/retry behavior, no old authority revival, no remote commit dependency, and planning-only status. C-2f-4-0/1 now lock next-stage/cross-scope classification and stage lifecycle; C-2f-4-2 is next, while C-2f-5 retains exact result/notification/Handoff/delivery ownership.
+C-2f-3c evidence must cover action/surface aliases, every fresh versus retained identity, unified lineage schema/migration preflight, invitation provenance and lifecycle, exact predecessor and Guardian resolution, same/different Group targets, generic-invitation bypass denial, transaction faults, replay/successor races, safe history allowlists, side-local protected-body rules, old notification/open/retry behavior, no old authority revival, no remote commit dependency, and planning-only status. C-2f-4-0/1/2 now lock next-stage/cross-scope classification, stage lifecycle, and same-workspace visibility/concurrency; C-2f-4-3 is next, while C-2f-5 retains exact result/notification/Handoff/delivery ownership.
 
 **C-2f-4-0 — Next-stage and cross-scope boundary/classification (LOCKED)**
 
@@ -1800,7 +1800,7 @@ The portability classification matrix is:
 | Same adult or similar child facts in another workspace | No match, reuse, merge, link, disclosure, or migration in Pilot. |
 | Future cross-workspace portability | Separate protocol and authorization; target-local identity and zero authority carryover. |
 
-C-2f-4-0 evidence must cover every classification row, same-Institution route preservation, fresh different-Institution onboarding, concurrent Enrollment isolation, no auto-exit, no cross-Institution lineage, zero authority/content/existence carryover, stage/Enrollment independence, both combined-operation orders and partial outcomes, every cross-workspace matching input, no possible-match disclosure, future-protocol absence, and planning-only status. C-2f-4-1 now locks stage lifecycle, C-2f-4-2 is next, and C-2f-5 retains exact result/notification/Handoff/delivery ownership.
+C-2f-4-0 evidence must cover every classification row, same-Institution route preservation, fresh different-Institution onboarding, concurrent Enrollment isolation, no auto-exit, no cross-Institution lineage, zero authority/content/existence carryover, stage/Enrollment independence, both combined-operation orders and partial outcomes, every cross-workspace matching input, no possible-match disclosure, future-protocol absence, and planning-only status. C-2f-4-1/2 now lock stage lifecycle and same-workspace visibility/concurrency, C-2f-4-3 is next, and C-2f-5 retains exact result/notification/Handoff/delivery ownership.
 
 **C-2f-4-1 — Stage fact, Guardian authority, and lifecycle (LOCKED)**
 
@@ -1817,7 +1817,7 @@ C-2f-4-0 evidence must cover every classification row, same-Institution route pr
 11. One Serializable transaction resolves exact replay; locks context/current Guardian/Family/Process/current Episode and predecessor uniqueness; rereads owner/process/catalog state; validates expected versions; obtains database `T`; consumes context; closes and creates at most one successor as required; updates Process projection/version; and persists audit/Execution. No Enrollment, Grant, Thread, artifact, Host call, Handoff, Outbox, notification, or deep link participates.
 12. Exact response-loss replay returns the original outcome. A fresh exact same-stage command is `already_satisfied` without new Episode/version/audit. Two Guardians and change/correct/clear combinations are first-commit-wins; stale losers reread and reconfirm. Pilot cannot backdate or edit old keys/start times, correct a noncurrent historical Episode, branch lineage, or synthesize elapsed stages.
 13. Existing artifacts/materials keep their original stage snapshot and provenance; current reasoning may mark them stale only through the owning policy. `evaluate_pregnancy_stage` remains a deterministic non-medical guidance handler and cannot write or confirm StageEpisode.
-14. Stage commit creates no Enrollment, transfer, withdrawal, Grant, Thread, Institution visibility, Host seed, or delivery. C-2f-4-2 owns family/Institution visibility and concurrent Enrollment reads; C-2f-4-3 owns the future cross-workspace protocol boundary; C-2f-5 owns exact result, presenter, notification, Handoff, and recovery. C-2f-4-1 remains planning-only.
+14. Stage commit creates no Enrollment, transfer, withdrawal, Grant, Thread, Institution visibility, Host seed, or delivery. C-2f-4-2 now locks family/Institution visibility and concurrent Enrollment reads; C-2f-4-3 owns the future cross-workspace protocol boundary, and C-2f-5 owns exact result, presenter, notification, Handoff, and recovery. C-2f-4-1 remains planning-only.
 
 The stage lifecycle matrix is:
 
@@ -1836,7 +1836,42 @@ The stage lifecycle matrix is:
 | Old artifact created under prior stage | Retains original provenance; no rewrite or retroactive relabel. |
 | Enrollment or Institution view | No mutation or implicit disclosure from stage commit. |
 
-C-2f-4-1 evidence must cover schema/catalog/lineage constraints, every coarse and fine-key class, equal Guardian and denied-actor permutations, exact surface/action/confirmation binding, unset/initial/change/correction/clear/set-after-clear, duplicate/replay/races, transaction faults, projection/preflight mismatch, no heuristic migration, no age/pregnancy/Institution inference, unchanged downstream artifacts, zero Enrollment/Host/visibility effect, and planning-only status. C-2f-4-2 multi-Institution visibility/concurrency is next; C-2f-5 retains exact result/notification/Handoff/delivery ownership.
+C-2f-4-1 evidence must cover schema/catalog/lineage constraints, every coarse and fine-key class, equal Guardian and denied-actor permutations, exact surface/action/confirmation binding, unset/initial/change/correction/clear/set-after-clear, duplicate/replay/races, transaction faults, projection/preflight mismatch, no heuristic migration, no age/pregnancy/Institution inference, unchanged downstream artifacts, zero Enrollment/Host/visibility effect, and planning-only status. C-2f-4-2 now locks multi-Institution visibility/concurrency, C-2f-4-3 is next, and C-2f-5 retains exact result/notification/Handoff/delivery ownership.
+
+**C-2f-4-2 — Same-workspace multi-Institution visibility and concurrency (LOCKED)**
+
+1. A current exact-Family Guardian may start from one owner-resolved ChildCareProcess and aggregate the family-owned StageEpisode timeline plus every current or historical Enrollment episode safe summary. The allowlist is Guardian-confirmed child label, Institution, CareGroup, joined/left database times, current/historical classification, Enrollment status, and terminal class. Raw ids, terminal actor, free text, internal audit, Grant/Thread refs, protected refs, and technical state remain absent.
+2. Family aggregation is navigation/presentation only. Every protected Message, Grant, Thread, Receipt, Item, care log, media fact, and historical body stays under its original Enrollment and current Family/role, original/current Grant, authorship, redaction, retention, and policy. The family view cannot merge Threads, move content, create shared Grants, or use one Institution episode to authorize another.
+3. Institution Admin and Caregiver queries start from a current exact Institution/CareGroup RoleAssignment and include workspace, Institution, and allowed CareGroup predicates in the repository query before row materialization. Querying every Enrollment by ChildCareProcess and filtering later in controller, service, presenter, or client code is forbidden.
+4. Exact Institution Admin may see only its Institution's safe current/historical roster and Enrollment summaries plus allowlisted Grant coverage metadata. Caregiver/Lead sees only currently assigned CareGroups, safe roster, and independently Grant-authorized work. Technical Operator sees bounded refs-only evidence and no stage, protected body, or cross-Institution relationship graph.
+5. Other-Institution existence is protected. Institution-local rows, counts, pagination totals, sort keys, duplicate/conflict classification, empty/error/unavailable copy, timing class, logs/metrics, raw Child/Process ids, routes, and opaque tokens cannot vary in a way that reveals another Institution Enrollment, Group, stage, Grant, or content. Institution-scoped scenario tokens cannot be compared or replayed across Institutions.
+6. Enrollment confirmation and roster membership expose no StageEpisode, `currentStageKey`, coarse/fine stage, history, or stage-derived label. Pilot registers no `child_development_stage` or equivalent dataClass, and the current `family_care_question` Grant grants no stage access. Future Institution stage use requires a separate explicit dataClass/Grant decision.
+7. Current Enrollment uniqueness remains per `(workspaceId, childCareProcessId, institutionId)` across current-conflicting statuses. No global per-process current uniqueness exists. Different Institutions may independently onboard, pause/resume, transfer inside themselves, withdraw/end, and change Grant or policy. An Institution effect cannot mutate, invalidate, authorize, or disclose another Institution relationship.
+8. Shared ChildCareProcess locks may serialize operations for current identity/family/process-lifecycle reread but cannot create a cross-Institution business conflict. Enrollment commands bind current Family ownership, Process lifecycle, target invitation/roster/Institution/Group/Enrollment, and consequence-relevant versions. An unrelated StageEpisode or `currentStageKey`-only version change cannot alter or invalidate Enrollment outcome. A real shared Family-owner or Process lifecycle change remains a valid fail-closed dependency.
+9. Stage update and different-Institution Enrollment may commit in either order or concurrently. Onboarding takes no stage snapshot and exposes no stage. Institution A lifecycle/Grant/policy races with Institution B remain independent; no distributed lock, compensation, combined CommandExecution, or all-or-nothing cross-Institution transaction is allowed.
+10. Every family and Institution list, detail, action, and deep-link open owner-rereads current role, scope, Process lifecycle, exact Enrollment, Grant/policy, and source lifecycle. Cached roster/process/stage/other-Institution data is never authority. A failed or stale family segment renders generic unavailable for that episode without cached substitution or preventing independently current episodes from rendering.
+11. Another Institution raw id/token, removed role, and target mismatch map to generic unavailable or permission-safe output before sensitive lifecycle classification. Error bodies, metrics, logs, traces, and pagination cannot disclose another Institution or a child match. Technical reconciliation requests owner action and cannot edit visibility or business facts.
+12. C-2f-4-2 creates no cross-Institution projection, dataClass, action, route, Handoff, notification, shared ledger, schema implementation, database, or traffic effect. C-2f-4-3 owns the future cross-workspace protocol boundary; C-2f-5 owns exact result, recovery, presenter route, notification, Handoff, and delivery.
+
+The visibility and concurrency matrix is:
+
+| Case | Required outcome |
+| --- | --- |
+| Current Guardian family timeline | Safe StageEpisode plus safe Enrollment episode aggregation across the exact process. |
+| Protected family history | Re-evaluated per original Enrollment/Grant/role; never merged. |
+| Institution Admin own Institution | Safe own roster/current/history plus allowlisted Grant coverage only. |
+| Caregiver own current CareGroups | Safe roster and independently granted work only. |
+| Technical Operator | Refs-only evidence; no business body, stage, or relationship graph. |
+| Another Institution exists or changes | Institution-local output and error surface remain noninterfering. |
+| Enrollment/roster without Grant | No stage or protected-content visibility. |
+| Two current different-Institution Enrollments | Allowed and independently lifecycle-managed. |
+| Stage update races with Enrollment | Independent outcomes; no stage snapshot, topology conflict, or distributed rollback. |
+| Institution A races with Institution B | Independent effects; shared lock may serialize but not couple outcomes. |
+| Shared Family owner or Process lifecycle becomes invalid | Every affected scope fails closed without another-Institution disclosure. |
+| One family timeline segment is stale/unavailable | Generic unavailable for that episode; no cache fill; other current episodes remain independent. |
+| Cross-Institution id/token/error probe | Generic denial before sensitive lookup; no existence signal. |
+
+C-2f-4-2 evidence must cover current-Guardian aggregation allowlists, protected-history per-episode authorization, repository query shape, every Institution/CareGroup/Operator actor scope, output/count/error/id/token noninterference, zero stage/dataClass visibility, per-Institution uniqueness, A/B onboarding/lifecycle/Grant/policy concurrency, exact semantic dependencies, stage/Enrollment composition, stale segment degradation, current owner reread, cross-scope denial, and planning-only status. C-2f-4-3 future cross-workspace protocol boundary is next; C-2f-5 retains exact result/notification/Handoff/delivery ownership.
 
 ## Minimum IIB closure before real traffic
 
@@ -1890,7 +1925,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-4-1 locked** | C-2f-4-1 locks versioned linear StageEpisode, equal current-Guardian strong-confirmation authority, stable vocabulary, exact transition/correction/clear/replay, projection-only `currentStageKey`, and zero inferred/Institution/Enrollment side effect. C-2f-4-2 is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-4-2 locked** | C-2f-4-2 locks current-Guardian safe longitudinal aggregation, repository-scoped Institution isolation, no other-Institution/id/stage leakage, no stage dataClass, independent concurrency, exact dependency rereads, and stale-segment safety. C-2f-4-3 is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

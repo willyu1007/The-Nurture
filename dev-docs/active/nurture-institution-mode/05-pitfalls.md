@@ -49,6 +49,9 @@ This file exists to prevent repeating mistakes within this task.
 - Do not treat `currentStageKey`, pregnancy-stage output, profile snapshot, age band, or roster attribute as the canonical stage ledger. Only a current versioned StageEpisode created by an exact Guardian command is authoritative.
 - Do not overwrite, backdate, branch, or delete stage history to represent change or correction. Close the current leaf with fixed evidence, create at most one successor, or explicitly clear the current state.
 - Do not infer or merge a child across workspaces from the same adult account, name, birth fact, contact, media, roster, or raw id. Cross-workspace portability remains Pilot `NO-GO` until a separate consented versioned protocol exists.
+- Do not build Institution presenters by loading every Enrollment for a ChildCareProcess and filtering afterward. Begin with current Institution/CareGroup authority and enforce the scope in repository predicates.
+- Do not expose a stable Child/Process id, count, conflict reason, route token, stage, or empty/error distinction that lets one Institution infer another Institution relationship.
+- Do not merge family longitudinal summaries into a shared cross-Institution Thread, Grant, content projection, or lifecycle. Aggregate safe navigation only and owner-reread every episode independently.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -62,6 +65,29 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Family aggregation could become an Institution discovery channel
+
+- Symptom: a useful Guardian timeline could be reused as an Institution query,
+  expose a stable process id or other-Institution conflict/count, copy stage into
+  roster, or merge separately authorized content and lifecycle.
+- Context: Pilot-0-C2f-4-2 same-workspace multi-Institution visibility and
+  concurrency convergence.
+- Root cause: one longitudinal ChildCareProcess legitimately anchors family
+  history, but that storage relation is not an Institution authorization or
+  presentation boundary.
+- What we tried: traced Guardian aggregation, Institution Admin and Caregiver
+  list/detail/history, roster before Grant, current stage, protected content,
+  raw ids/routes/errors, concurrent onboarding/lifecycle/stage changes, cached
+  reads, and partial owner-read failure.
+- Fix / workaround: allow only current-Guardian safe aggregation; require exact
+  Institution/CareGroup repository predicates for organization reads; withhold
+  stage and all other-Institution signals; preserve per-Enrollment authority;
+  and degrade stale segments without cached substitution.
+- Prevention: actor/scope query-shape, output allowlist, id/error noninterference,
+  stage/no-dataClass, per-Institution uniqueness/concurrency, exact dependency,
+  segmented stale-read, no-shared-projection, and planning-boundary tests must
+  pass before multi-Institution implementation.
 
 ### 2026-07-18 — A mutable stage projection could erase longitudinal history
 
