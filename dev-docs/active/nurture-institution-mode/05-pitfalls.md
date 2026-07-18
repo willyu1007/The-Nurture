@@ -44,6 +44,9 @@ This file exists to prevent repeating mistakes within this task.
 - Do not add separate transfer and re-entry lineage fields. Use one unique `predecessorEnrollmentId + continuityKind` pair and remove the unimplemented `supersedesEnrollmentId` proposal before schema work.
 - Do not let a generic first-enrollment invitation bypass a known same-Institution terminal predecessor. Re-entry requires an exact terminal-leaf/version binding and exact current-Guardian confirmation.
 - Do not merge old and new Enrollment histories or let a new Grant/Thread restore old cross-role bodies. Render separate episodes and apply original authorship/Grant/redaction/retention/policy on every old read.
+- Do not model entry to another Institution as Enrollment transfer or extend `predecessorEnrollmentId` across Institutions. Use independent fresh onboarding against the family-selected ChildCareProcess, preserve concurrent Institution relationships, and carry no authority or content.
+- Do not let stage change mutate Enrollment or let age, birthday, Institution data, or AI inference silently rewrite `currentStageKey`. Stage authority/history remains a separate Guardian-owned C-2f-4-1 decision.
+- Do not infer or merge a child across workspaces from the same adult account, name, birth fact, contact, media, roster, or raw id. Cross-workspace portability remains Pilot `NO-GO` until a separate consented versioned protocol exists.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -57,6 +60,26 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Portability could collapse stage, Institution, and workspace boundaries
+
+- Symptom: a next-stage or new-Institution journey could be implemented as one
+  Enrollment transfer, widen Enrollment lineage across Institutions, auto-end a
+  concurrent relationship, or infer the same child in another workspace.
+- Context: Pilot-0-C2f-4-0 portability boundary and classification convergence.
+- Root cause: longitudinal child facts, stage phase, Institution relationship,
+  and tenant identity were described together as "movement" despite having
+  different owners, privacy reach, consent, and transaction boundaries.
+- What we tried: classified same-Institution transfer/re-entry, independent
+  different-Institution onboarding, stage-only change, combined stage plus new
+  Institution, concurrent Enrollments, and cross-workspace identity reuse.
+- Fix / workaround: keep ChildCareProcess as the same-workspace longitudinal
+  spine, stage as a family-owned phase, Enrollment as Institution-local, and
+  workspace as the hard identity boundary; compose separate effects rather than
+  create cross-Institution lineage or a distributed move.
+- Prevention: classification, concurrency, no-carryover, no-auto-exit,
+  stage/Enrollment independence, cross-workspace denial, no-global-match, and
+  planning-boundary tests must pass before portability implementation.
 
 ### 2026-07-18 — Re-entry could reactivate old authority or split lineage
 
