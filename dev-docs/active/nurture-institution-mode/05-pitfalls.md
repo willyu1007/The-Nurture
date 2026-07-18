@@ -7,6 +7,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not reduce institution ecology to an authorization feature; institution is the child's external growth environment.
 - Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
+- Do not activate optional Host actor/workspace fields or let Nurture infer workspace from Participant history; subject-aware ingress requires one My-Chat-established adult principal and exact validated workspace.
 - Do not put Nurture care ecology semantics inside My-Chat as canonical facts; family, child, institution, care group, role assignment, enrollment, grant, family-care messages, and care items belong to Nurture.
 - Do not wire live manifest capabilities before Nurture care ecology schema, resolvers, policies, and handlers exist.
 - Do not let institution mode drift into ranking, marketplace, competitive caregiver scoring, or institution growth tooling.
@@ -694,3 +695,13 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: inventory extension requirements before selecting a clean
   validation image.
 - References: X5 final gate in `04-verification.md`.
+
+### 2026-07-19 — Treating a trusted service call as business identity
+
+- Symptom: A private My-Chat-to-Nurture request could appear authorized merely because the caller supplied a service credential, optional `actor_id`, surface string, or a workspace that Nurture could infer from Participant history.
+- Context: C-3 subject-aware routes need both trusted transport and an authenticated adult, while all Guardian/Caregiver/Institution roles and Subject relationships remain Nurture-owned current facts.
+- What we tried: Reusing the legacy workflow metadata and workspace-optional Nurture envelope as the future activated ingress contract.
+- Root cause: Transport caller, adult principal, workspace selection, surface context, and business authority are separate proofs. Collapsing them lets a machine identity or ambiguous Host field become an impersonation path.
+- Fix / workaround: C-3-0b-0 requires independent My-Chat service-caller and adult-principal proofs, one Host-established workspace, server-derived surface provenance, and fresh Nurture Participant/RoleAssignment/Subject resolution. Invitation acceptance stays a separate Host identity transition, and current optional fields remain non-activatable legacy scaffold.
+- Prevention: Every subject-aware route review must identify the public authenticator, private workload identity, represented adult, workspace establishment, surface source, and owner reread separately; no credential or context field may satisfy two layers implicitly.
+- References: `02-architecture.md` Pilot-0-C3-0b-0, `09-pilot-readiness.md` C-3-0b-0.

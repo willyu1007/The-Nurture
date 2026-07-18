@@ -2,7 +2,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-18
+- Last updated: 2026-07-19
 - Current phase: X5 joint acceptance complete; Pilot-0 readiness authorized and in progress
 - Code/config/schema impact: the Pilot-0 change is governance/documentation only. No product code, Nurture or My-Chat schema/migration, contract pin, environment, secret, artifact publication, traffic, or activation flag changed.
 
@@ -144,6 +144,9 @@
 | C-3-0a owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, pitfalls, IB schema spec, IIA policy/test design, and Pilot readiness consistently separate the education/nurture product catalog from subject-neutral platform capabilities; require authenticated account-to-owner relationship paths; use generic subject scope; keep Nurture relationship authority and opaque Host discovery separate; limit prospective context; and forbid global/cross-workspace/cross-scenario identity inference. C-3-0b is next. |
 | Account–Subject reachability integrity boundary | PASS / PLANNING CONTRACT ONLY | Account-equals-child, Host canonical Child/relationship SSOT, Nurture type leakage into Base, client-selected relationship, invitation-as-authority, collection-as-bulk-permission, cached membership authorization, Technical Operator subject access, raw subject correlation, and implicit cross-boundary matching/linking are forbidden. No implementation result is claimed. |
 | C-3-0a document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, exact workflow contract/source-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 vague-reference warnings after repairing two new draft warnings. |
+| C-3-0b-0 owner decision synchronization | PASS | Overview, plan, roadmap, architecture, implementation notes, pitfalls, IB schema spec, IIA policy/test design, and Pilot readiness consistently require the sole My-Chat public ingress, independent service-caller/adult-principal proofs, one Host-established workspace, server-derived surface provenance, Nurture-only business resolution, separate invitation acceptance, and additive retirement of optional identity/workspace inference. C-3-0b-1 is next. |
+| Trusted-principal authority boundary | PASS / PLANNING CONTRACT ONLY | Service-as-business-actor, workspace-membership-as-role, surface-as-permission, actor-ref-as-Participant selector, client workspace/role/subject claims, Nurture workspace inference, invitation circularity, worker impersonation, secret/token persistence, and direct public Nurture ingress are forbidden. No implementation result is claimed. |
+| C-3-0b-0 document/governance gate | PASS WITH PRE-EXISTING WARNINGS | `sync --apply --changelog`, governance lint, strict context verification, exact workflow contract/source-pin verification, and `git diff --check` pass. Scoped docs lint checks 27 files with 0 errors and the unchanged 15 pre-existing vague-reference warnings after repairing one new draft warning. |
 
 ## Pilot-0-A Readiness Audit
 
@@ -362,6 +365,8 @@ For Pilot-0 readiness work:
 
 | Date | Command / check | Result | Notes |
 | --- | --- | --- | --- |
+| 2026-07-19 | Pilot-0-C3-0b-0 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the unchanged 15 pre-existing warnings across 27 files after repairing one new draft warning; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
+| 2026-07-19 | Pilot-0-C3-0b-0 trusted-principal accepted-decision sync | PASS | SSOT separates service caller from adult principal, terminates Host trust before Nurture role/Subject authority, requires one validated workspace and server-derived surface context, keeps invitation acceptance separate, classifies legacy optional actor/workspace behavior as non-activatable, and leaves C-3-0b-1 next with no implementation/environment/traffic change. |
 | 2026-07-18 | Pilot-0-C3-0a documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files after repairing two new draft warnings; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
 | 2026-07-18 | Pilot-0-C3-0a Account–Subject reachability accepted-decision sync | PASS | SSOT narrows the user-facing product catalog to education/nurture, keeps shared contracts generic, binds every business subject to an authenticated account plus scenario-owner relationship path, fixes three scope kinds and prospective minimums, preserves live owner reread/opaque Host discovery, and denies Host Child SSOT or implicit identity federation. C-3-0b is next; no implementation/runtime/environment/traffic change. |
 | 2026-07-18 | Pilot-0-C2f-5 documentation/governance/context/pin/whitespace gates | PASS | Task-doc lint has zero errors and the same 15 pre-existing warnings across 27 files; governance sync/lint, strict context verification, exact workflow contract/source pin, and `git diff --check` pass. |
