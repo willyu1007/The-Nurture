@@ -35,6 +35,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not silently merge two side actions prepared from the same Enrollment version. The first commits; every stale confirmation refreshes and reviews the changed consequences before another hold transition.
 - Do not implement transfer through `careGroupId` mutation, initial `initiate_enrollment`, terminal `close_enrollment`, Enrollment Invitation reuse, or a direct Institution-only command. Use one family-confirmed TransferIntent and a new Enrollment identity.
 - Do not create the target RosterEntry before transfer confirmation or copy old Grant/Thread/content/work into the target Group. Target roster/new Enrollment and complete old closure commit together.
+- Do not make permanent Enrollment withdrawal depend on Grant ownership, invitation receipt, first/primary Guardian status, or unanimous Guardians. Any current exact-Family Guardian has equal independent family-side terminal authority after strong confirmation.
+- Do not model terminal exit as resume, cross-side release, a generic `end_enrollment`, or a client-authored reason. Keep family withdrawal, Institution service end, and transfer status/reason semantics distinct, and close remaining holds only as system consequences.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -48,6 +50,25 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Permanent exit could create hidden Guardian hierarchy
+
+- Symptom: family withdrawal could be limited to the Grant owner, invitation
+  recipient, earliest Guardian, invented primary Guardian, or all-Guardian vote;
+  a paused Enrollment could also become impossible to close without peer release.
+- Context: Pilot-0-C2f-3a permanent Enrollment action/authority convergence.
+- Root cause: Grant administration, enrollment onboarding, reversible side holds,
+  and permanent family relationship authority were treated as one owner concept.
+- What we tried: compared the accepted equal-Guardian model, two-Guardian Pilot
+  family, Institution-owned service end, strong confirmation, pause semantics,
+  terminal status vocabulary, stale notifications, and fresh re-entry boundary.
+- Fix / workaround: any current exact-Family Guardian may independently execute
+  the dedicated withdrawal command; an exact Institution Admin independently uses
+  terminal close. Fixed server status/reasons distinguish both from transfer, and
+  terminal closure closes holds without pretending either side released them.
+- Prevention: action/surface, actor hierarchy, strong-confirmation, status/reason,
+  active/paused, two-Guardian race, alias, client-injection, and no-countersign
+  tests must pass before terminal commands are implemented.
 
 ### 2026-07-18 — Operational class move could silently transfer data authority
 

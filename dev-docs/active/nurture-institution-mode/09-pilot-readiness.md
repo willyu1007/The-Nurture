@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2f-2 locks Institution-proposed/family-confirmed transfer intent, zero-hold/version binding, target-on-confirm roster, one-way Enrollment lineage, atomic old/new cutover, complete old-work closure, and no authority/content carryover; C-2f-3 permanent exit/re-entry next
+- **Current checkpoint:** Pilot-0-C in progress; C-2f-3a locks separate Guardian withdrawal and Institution service-end actions, equal independent current-Guardian authority, exact terminal status/reason mappings, five-minute strong confirmation, and active/paused terminal entry without false hold release; C-2f-3b atomic closure next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -156,6 +156,7 @@ The B3-0 readiness decision changes no manifest or runtime. B3-1 and later imple
 | Suspend the family side of an Enrollment | Generic `authorization_gate` | Strong confirmation from current Enrollment | Complete side/consequence review and confirmation |
 | Release the family-side suspension | Generic `authorization_gate` | Strong confirmation from current Enrollment | Complete current-hold/other-side review and confirmation |
 | Confirm or decline a CareGroup transfer | Generic `authorization_gate` | Strong confirmation from current transfer proposal | Complete old/new Group and closure review |
+| Permanently withdraw the family Enrollment | Generic `authorization_gate` | Strong confirmation from current Enrollment | Complete permanent-end/history/re-entry consequence review |
 | Create or confirm a grant | Generic strong authorization flow | Strong authorization flow | Complete authorization flow |
 | Revoke a grant | Generic `authorization_gate` | Strong confirmation | Strong confirmation with full consequence detail |
 | Redact the guardian's own submitted question | Generic `authorization_gate` for a resolved message | Confirm from question detail | Confirm from authorized history detail |
@@ -179,6 +180,7 @@ The Guardian matrix has the following mandatory semantics:
 9. The dual-guardian experiment adds no `primary_guardian` role. The designated primary guardian performs scripted grant/submission actions, while actual action availability is derived from current role, family reachability, grant ownership, policy, and object state. The second guardian validates same-family owner-read.
 10. Surface identity is untrusted context for eligibility, audit, and presentation only. My-Chat MUST NOT treat `chat`, `family_board`, or `family_workbench` as business authorization or as part of the canonical command identity.
 11. Institution initiation does not bind a family to an enrollment. `confirm_family_enrollment` is a distinct Guardian-authorized action reachable from all three Guardian surfaces; the command rechecks the current proposed enrollment and child/family scope and does not implicitly create a grant.
+12. `withdraw_family_enrollment` is reachable from all three Guardian surfaces and permanently ends the shared Enrollment after current strong confirmation. Any current exact-Family Guardian is independently eligible; Grant ownership, invitation receipt, join order, a primary label, or another Guardian's countersignature cannot add or remove that authority.
 
 The B3-1a product contract is ahead of current implementation. My-Chat has a typed mobile interaction envelope, core render hosts, and a public-draft vertical slice, but no complete server-produced generic interaction delivery/action registry for arbitrary scenario actions. Nurture does not yet expose the Guardian board/workbench actions or map the accepted action set into manifest/API command keys. Those gaps must close before Pilot traffic; B3-1a does not authorize runtime or manifest changes.
 
@@ -236,6 +238,7 @@ The B3-1b product contract is ahead of current implementation. Nurture has domai
 | Assign or revoke a staff role | Navigate to workbench; no durable command | Strong confirmation with current scope/version recheck |
 | Initiate or change enrollment lifecycle | Navigate to workbench; no durable command | Strong confirmation with current child/family linkage recheck |
 | Propose or cancel a CareGroup transfer | Navigate to workbench; no durable command | Strong confirmation over current source Enrollment and target readiness |
+| Permanently end Institution service for an Enrollment | Navigate to workbench; no durable command | `close_enrollment` strong confirmation; no family countersignature |
 | Designate the lead caregiver | Navigate to workbench; no durable command | Strong confirmation with current care-group role coverage recheck |
 | Configure institution/care-group policy | Navigate to workbench; no durable command | Strong confirmation with current policy/version recheck |
 | Disable the Pilot business cohort | Navigate to workbench; no durable command | Strong confirmation; stops eligible Nurture business use for the scoped cohort |
@@ -258,6 +261,7 @@ The Institution matrix has the following mandatory semantics:
 8. Nurture business disablement is separate from the My-Chat technical kill switch. Institution surfaces cannot change the environment capability, workspace allowlist, Workflow runtime state, Handoff Ledger, Outbox, notification delivery, or Admin reconciliation state.
 9. Institution analytics remain within the product Anti-Metrics boundary: no child ranking, cross-group comparison, public caregiver-performance score, or competitive institution ranking. Operational aggregates exist to find incomplete setup and blocked workflows, not to score people.
 10. The internal synthetic institution/group/account fixture is test preparation, not a production authority model. Pilot setup evidence MUST eventually use authenticated owner actions; direct Prisma fixture writes or operator edits cannot substitute for Institution/Guardian/My-Chat command boundaries.
+11. `close_enrollment` is the Institution's permanent service-end action and executes only from the workbench after current strong confirmation. The action does not require Guardian countersignature, cannot represent family withdrawal or transfer, and cannot be executed by a Caregiver, Operator, service identity, or board card.
 
 The first internal Institution path is deliberately small: inspect the one synthetic institution/group, initiate the required adult invitations, maintain the administrator/lead-caregiver assignments, inspect three enrollment-readiness and grant-coverage states, observe safe family-care backlog counts, disable the scoped cohort, and prove stale entries fail closed. Real institution registration, billing, organizational hierarchy, multiple care groups, substitute teachers, batch import, complex approvals, child/caregiver ranking, and self-service Pilot activation remain outside Pilot-0.
 
@@ -343,6 +347,7 @@ Guardian enrollment/grant action contracts are distinct:
 | `resume_family_enrollment` | `nurture.family_care.resume_enrollment` | Releases only the family-side hold; aggregate Enrollment may remain paused. |
 | `confirm_enrollment_transfer` | `nurture.family_care.confirm_enrollment_transfer` | Guardian confirms one current same-Institution transfer intent and atomic old/new cutover. |
 | `decline_enrollment_transfer` | `nurture.family_care.decline_enrollment_transfer` | Guardian terminalizes only the pending transfer intent; Enrollment remains unchanged. |
+| `withdraw_family_enrollment` | `nurture.family_care.withdraw_enrollment` | Any current exact-Family Guardian independently confirms permanent family withdrawal; no Grant-owner/primary/unanimous authority. |
 | `confirm_child_link_grant` | `nurture.family_care.confirm_grant` | Creates/confirms the first current grant from an explicit reviewed authorization under current enrollment. |
 | `replace_child_link_grant` | `nurture.family_care.replace_grant` | Creates a new grant identity/version under current policy; never reactivates a revoked grant. |
 
@@ -374,6 +379,8 @@ Institution topology/configuration mappings are explicit and non-polymorphic:
 For Enrollment lifecycle, Institution `suspend_enrollment` creates only the institution-side hold and `resume_enrollment` releases only that hold; neither action changes the family hold. The locked keys are retained, and `pause_institution_enrollment` is forbidden as a semantic alias. Aggregate active is a resolved outcome, not the promise of either resume key.
 
 CareGroup transfer uses only the new proposal/cancel and confirm/decline mappings. `initiate_enrollment` remains initial onboarding, `close_enrollment` remains C-2f-3 terminal Institution service end, and no direct `transfer_enrollment` or Enrollment Invitation alias may bypass Guardian confirmation.
+
+Permanent exit uses only `withdraw_family_enrollment` for family-owned withdrawal and `close_enrollment` for Institution-owned service end. Neither action requires opposite-side countersignature; no generic `end_enrollment`, Grant-owner substitute, invented primary-Guardian key, or cross-action alias may be registered.
 
 Invitation is the deliberate cross-owner exception:
 
@@ -968,7 +975,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-2 LOCKED** | C-2f-2 closes two-owner transfer intent/actions, zero-hold/version binding, target-on-confirm roster, one-way Enrollment lineage, atomic cutover/old-work closure, replay/races, and no authority/content carryover. C-2f-3 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-3a LOCKED** | C-2f-3a closes permanent-exit action/actor/status/reason semantics, equal independent Guardian authority, strong confirmation, and active/paused terminal entry. C-2f-3b atomic closure is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1049,7 +1056,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
 | C-2e separate Grant authorization | **LOCKED / COMPLETE** | C-2e-0 through C-2e-4d lock one owner-read authority path, exact Grant/role identity, strong create/replace/revoke, immutable recovery, owner-loss handling, typed complete cascades, bounded evidence, and zero implicit Host activation. |
-| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-2 LOCKED** | Lifecycle/actor classes, reversible pause, and same-Institution transfer are fixed without old-Grant/content transfer or unsupported global identity claims; permanent exit/re-entry is next. |
+| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-3a LOCKED** | Lifecycle/actor classes, reversible pause, same-Institution transfer, and separate family/Institution permanent-exit authority are fixed; atomic terminal closure is next. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
 
@@ -1539,7 +1546,7 @@ C-2e-4d evidence must cover classification of every permanent and temporary caus
 | C-2f-0 lifecycle vocabulary and actor authority | **LOCKED** | Current/terminal/deleted classes, family/institution actor separation, reversible versus permanent closure, new-identity transfer, independent Institutions, and forbidden automatic migration. |
 | C-2f-1 temporary Enrollment pause/resume | **LOCKED** | Side-owned family/institution holds, exact compatible keys, shared same-side authority, cross-side denial, strong confirmation, current fences, atomic aggregate, replay, and races. |
 | C-2f-2 same-Institution CareGroup transfer | **LOCKED** | Institution proposal/family confirmation, intent lifecycle, target-on-confirm roster, one-way old/new Enrollment lineage, atomic Grant/work closure, and no authority carryover. |
-| C-2f-3 permanent leave/end and re-entry | OPEN / NEXT | Guardian withdrawal, Institution end, reason/status mapping, terminal closure, presentation, and fresh re-entry identities. |
+| C-2f-3 permanent leave/end and re-entry | **IN PROGRESS — C-2f-3a LOCKED** | Separate actions/actors/statuses/reasons and equal Guardian authority are fixed; terminal closure and fresh re-entry remain. |
 | C-2f-4 next-stage and cross-scope portability | OPEN | Same-workspace longitudinal continuity, independent Institutions, cross-workspace denial/future protocol, and zero global identity inference. |
 | C-2f-5 result, recovery, surfaces, and Handoff | OPEN | Exact result refs/copy, response loss/current reread, route affordances, explicit effects, and cross-surface evidence. |
 
@@ -1646,7 +1653,44 @@ The transfer matrix is:
 | Target after commit | Safe roster only; fresh Grant/Thread required. |
 | Old notification/open/work | Current owner reread yields historical/unavailable; no old action. |
 
-C-2f-2 evidence must cover intent schema/lifecycle/expiry/privacy, every actor/surface/action alias, zero-hold/version binding, source/target readiness and capacity, exact roster relation/timing, one-way lineage/preflight, confirmation copy/context, database-time transaction/fault/overflow, complete C-2e closure, old/new visibility and persisted privacy, every race/replay/response-loss case, no carryover, no Host commit authority, and planning-only status. C-2f-3 is next.
+C-2f-2 evidence must cover intent schema/lifecycle/expiry/privacy, every actor/surface/action alias, zero-hold/version binding, source/target readiness and capacity, exact roster relation/timing, one-way lineage/preflight, confirmation copy/context, database-time transaction/fault/overflow, complete C-2e closure, old/new visibility and persisted privacy, every race/replay/response-loss case, no carryover, no Host commit authority, and planning-only status. The following C-2f-3a section locks terminal action/authority semantics; C-2f-3b is next.
+
+#### C-2f-3 — Permanent leave/end and re-entry (IN PROGRESS)
+
+| Sub-checkpoint | State | Decision boundary |
+| --- | --- | --- |
+| C-2f-3a terminal actions, actors, statuses, and reasons | **LOCKED** | Family withdrawal versus Institution service end, exact action/command mappings, equal independent Guardian authority, fixed terminal mapping, strong confirmation, and active/paused entry. |
+| C-2f-3b atomic terminal closure | OPEN / NEXT | Hold closed evidence, database-time Enrollment transition, complete Grant/Thread/work closure, lock order, replay, faults, and races. |
+| C-2f-3c fresh re-entry and retained history | OPEN | New roster/invitation/Enrollment identity, re-entry provenance, same-profile owner resolution, historical visibility, and no old authority revival. |
+
+**C-2f-3a — Terminal actions, actors, statuses, and reasons (LOCKED)**
+
+Permanent exit has two owner-specific actions rather than one generic terminal mutation:
+
+1. Guardian Chat, family board, and family workbench use `withdraw_family_enrollment -> nurture.family_care.withdraw_enrollment`. Institution workbench uses the already reserved `close_enrollment -> nurture.institution.close_enrollment`; Institution board stays read-only. No `end_enrollment`, alias, initial-enrollment, pause/resume, transfer, or raw lifecycle action may substitute.
+2. Any current exact-Family Guardian may independently withdraw the shared Enrollment. Grant owner, Enrollment Invitation recipient, first Guardian, join order, relationship label, a hidden primary role, or unanimous/current Co-Guardian approval has no special Enrollment authority. Another Guardian's notification or acknowledgment cannot gate commit.
+3. Any current exact-scope Institution Admin may independently end service. Guardian countersignature is not required. The opposite owner side, Caregiver, Lead, Technical Operator, service identity, Host/workspace admin, AI/natural-language inference, raw ids, or ambient membership cannot execute either action.
+4. Mapping is server-owned and closed: Guardian withdrawal produces terminal `withdrawn + family_withdrawn`; Institution end produces terminal `ended + institution_service_ended`; completed transfer remains terminal `ended + care_group_transfer`. The client cannot supply free text, sensitive dispute/health/fee narrative, status, reason, actor, time, or audit fields.
+5. Both actions require a five-minute `submit_action` strong-confirmation context bound to exact actor/RoleAssignment, owner scope, ChildCareProcess, Enrollment/version, action, surface, and consequence hash. Copy states immediate permanent end, mandatory old Grant/work closure, retained non-recallable history, notification non-recall/current stale open, no resume, and fresh re-entry.
+6. Both `active` and `paused` may enter a terminal path. An active family or Institution hold cannot veto permanent exit or force the opposite side to release first. Terminal processing closes holds as system consequences and never records `released`, peer consent, or a fabricated release actor.
+7. First terminal commit wins under Enrollment versioning. Concurrent Guardians, family withdrawal versus Institution end, and terminal versus other lifecycle actions cannot create a second terminal effect or overwrite the winner's status/reason/actor. C-2f-3b owns exact locking, replay, closure, and fault mechanics.
+8. Terminal Enrollment identities never resume or reactivate. C-2f-3c owns all fresh re-entry identities and retained-history rules. C-2f-5 owns exact result refs, presenter, peer notification, deep link, Handoff, and delivery; none is a terminal commit condition.
+
+The C-2f-3a classification matrix is:
+
+| Case | Required outcome |
+| --- | --- |
+| Current Guardian withdraws active Enrollment | Family terminal path: `withdrawn + family_withdrawn`. |
+| Either current Guardian in the dual-Guardian family withdraws | Independently eligible after strong confirmation; no peer vote. |
+| Grant owner or invitation recipient without current Guardian authority | Denied; historical role gives no topology authority. |
+| Current Institution Admin closes active Enrollment | Institution terminal path: `ended + institution_service_ended`. |
+| Opposite owner side asked to countersign | No countersign step; notification/ack is not commit authority. |
+| Active family/institution hold exists | Terminal path remains eligible; hold later becomes system `closed`, never released. |
+| Caregiver/Lead/Operator/Host/AI/raw-id caller | No terminal action or existence-bearing authority. |
+| Two terminal confirmations use one source version | First commit wins; loser owner-rereads the terminal result. |
+| Attempt to resume ended/withdrawn Enrollment | Permanently denied; fresh re-entry only. |
+
+C-2f-3a evidence must cover every surface/action mapping, equal current-Guardian permutations, forbidden hidden hierarchy/unanimity/countersignature, exact Institution scope, all denied actors, fixed status/reason mapping, client-field/privacy injection, five-minute consequence binding, active/paused source classes, hold non-veto/non-release, terminal races, terminal non-resume, and the planning-only boundary. C-2f-3b atomic terminal closure is next.
 
 ## Minimum IIB closure before real traffic
 
@@ -1700,7 +1744,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-2 locked** | C-2f-2 locks two-owner transfer intent/actions, zero-hold version binding, target-on-confirm roster, one-way Enrollment lineage, atomic old/new cutover, complete Grant/work closure, and no authority/content carryover. C-2f-3 is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-3a locked** | C-2f-3a locks separate family/Institution terminal actions, equal independent current-Guardian authority, exact statuses/reasons, strong confirmation, and active/paused terminal entry without false hold release. C-2f-3b is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
