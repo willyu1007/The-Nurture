@@ -31,6 +31,8 @@ This file exists to prevent repeating mistakes within this task.
 - Do not use JSON scanning, `take: 100`, `SKIP LOCKED`, intermediate commits, or truncated dependent refs as cascade closure. Typed dependencies, root locking, keyset loops, zero-row postconditions, and bounded count/hash audit are required.
 - Do not model Enrollment pause as one unowned boolean/status that either family or institution can clear. Preserve independently attributable restrictions, deny cross-side release, and reserve permanent cascade for terminal Enrollment transitions.
 - Do not transfer an Enrollment by editing `careGroupId` or carrying its Grant, Thread, or content authority. Terminate the old identity and create a new separately authorized Enrollment.
+- Do not add `pause_institution_enrollment` beside the locked `suspend_enrollment` key or interpret `resume_enrollment` as global recovery. Reuse the Institution keys, release only that side's hold, and recompute current aggregate state.
+- Do not silently merge two side actions prepared from the same Enrollment version. The first commits; every stale confirmation refreshes and reviews the changed consequences before another hold transition.
 - Do not treat an updated adjacent-repo revision pin as sufficient for a pnpm `file:` dependency; rebuild the local package snapshot and rerun typecheck/tests before accepting the pin.
 - Do not let public database smokes fail as missing-file exceptions when they target optional feature packs absent from the repo; mark unavailable packs as explicit SKIP and continue applicable SSOT-mode tests.
 - Do not derive a Nurture business command identity from claim token, Step version, or the currently executing Step; reclaim evidence rotates and a wrong Step must not become a new business command.
@@ -44,6 +46,24 @@ This file exists to prevent repeating mistakes within this task.
 - Do not make the Enrollment invitation recipient or earliest Guardian an implicit primary Grant authority; every current exact-family Guardian may first-confirm, and only the first committed Grant establishes owner-only administration.
 
 ## Pitfall log (append-only)
+
+### 2026-07-18 — Resume naming could bypass the other side's hold
+
+- Symptom: the already locked Institution `resume_enrollment` name could be read as
+  setting the whole Enrollment active, while a family hold remained authoritative;
+  adding a new institution pause alias would also create two command paths.
+- Context: Pilot-0-C2f-1 Enrollment pause/resume convergence.
+- Root cause: surface action naming, side-local restriction ownership, aggregate
+  status, and concurrent confirmation semantics had not been resolved together.
+- What we tried: compared personal versus side-owned holds, existing B3 action
+  keys, dual-Guardian equality, actor-role loss, upper-scope pauses, Grant clocks,
+  stale contexts, and two-side races.
+- Fix / workaround: retain the existing Institution keys, add distinct family
+  keys, define every resume as same-side release, keep holds authoritative and
+  status aggregate, and force stale cross-side actions to refresh/reconfirm.
+- Prevention: action-map, surface, transaction, concurrency, and presenter tests
+  must prove no alias, global-resume promise, personal veto, silent merge, cascade,
+  clock extension, or other-side release.
 
 ### 2026-07-18 — One shared paused flag could erase the other side's restriction
 

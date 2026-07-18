@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-18
-- **Current checkpoint:** Pilot-0-C in progress; C-2f-0 locks Enrollment lifecycle/actor classes, reversible independently attributed pause, permanent old-Enrollment closure, new-identity transfer, independent Institutions, and no automatic cross-workspace migration; C-2f-1 pause/resume next
+- **Current checkpoint:** Pilot-0-C in progress; C-2f-1 locks side-owned Enrollment holds, exact family/Institution actions, current confirmation, side-local resume, atomic aggregate/replay/concurrency, preserved facts/clocks, and zero permanent cascade; C-2f-2 transfer next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -153,6 +153,8 @@ The B3-0 readiness decision changes no manifest or runtime. B3-1 and later imple
 | Submit `family_care_question` | `editable_preview` plus `authorization_gate` | Confirm child/destination, then execute | Full preview, then execute |
 | View grant state and scope | Safe summary plus navigation | Current grant summary | Complete grant/version/replacement record |
 | Confirm family enrollment | Generic strong authorization flow | Strong confirmation | Complete enrollment/link review and confirmation |
+| Suspend the family side of an Enrollment | Generic `authorization_gate` | Strong confirmation from current Enrollment | Complete side/consequence review and confirmation |
+| Release the family-side suspension | Generic `authorization_gate` | Strong confirmation from current Enrollment | Complete current-hold/other-side review and confirmation |
 | Create or confirm a grant | Generic strong authorization flow | Strong authorization flow | Complete authorization flow |
 | Revoke a grant | Generic `authorization_gate` | Strong confirmation | Strong confirmation with full consequence detail |
 | Redact the guardian's own submitted question | Generic `authorization_gate` for a resolved message | Confirm from question detail | Confirm from authorized history detail |
@@ -335,6 +337,8 @@ Guardian enrollment/grant action contracts are distinct:
 | Locked `action_key` | Planned authoritative `command_key` | Mandatory effect boundary |
 | --- | --- | --- |
 | `confirm_family_enrollment` | `nurture.family_care.confirm_enrollment` | Guardian confirms the current proposed child/family enrollment; no grant is created implicitly. |
+| `suspend_family_enrollment` | `nurture.family_care.suspend_enrollment` | Creates only the family-side Enrollment hold after current strong confirmation. |
+| `resume_family_enrollment` | `nurture.family_care.resume_enrollment` | Releases only the family-side hold; aggregate Enrollment may remain paused. |
 | `confirm_child_link_grant` | `nurture.family_care.confirm_grant` | Creates/confirms the first current grant from an explicit reviewed authorization under current enrollment. |
 | `replace_child_link_grant` | `nurture.family_care.replace_grant` | Creates a new grant identity/version under current policy; never reactivates a revoked grant. |
 
@@ -361,6 +365,8 @@ Institution topology/configuration mappings are explicit and non-polymorphic:
 | `update_institution_policy` | `nurture.institution.update_institution_policy` |
 | `update_care_group_policy` | `nurture.institution.update_care_group_policy` |
 
+For Enrollment lifecycle, Institution `suspend_enrollment` creates only the institution-side hold and `resume_enrollment` releases only that hold; neither action changes the family hold. The locked keys are retained, and `pause_institution_enrollment` is forbidden as a semantic alias. Aggregate active is a resolved outcome, not the promise of either resume key.
+
 Invitation is the deliberate cross-owner exception:
 
 1. Institution-workbench `initiate_participant_invitation` maps to the planned Host identity command `my_chat.workspace_invitation.create`; the Host command is not a Nurture `CommandExecution` and cannot bind a raw My-Chat user id.
@@ -368,7 +374,7 @@ Invitation is the deliberate cross-owner exception:
 3. After My-Chat records acceptance, an authenticated owner callback invokes planned `nurture.institution.bind_accepted_participant` with a canonical accepted-user ref and invitation correlation. The callback is not advertised as a user `action_key` and cannot accept on the user's behalf.
 4. Staff-role assignment remains a separate institution-admin command after participant binding. Identity acceptance never grants a Nurture role implicitly.
 
-The lifecycle mapping has no generic `upsert_*` or `change_*_state` action. Create/update/suspend/resume/close remain separate keys with separate allowed-state, expected-version, authorization, and audit rules. `resume_*` applies only to a currently suspended object after revalidation; `close_*` is terminal in Pilot-0. The scoped Pilot business-disable action uses `suspend_care_group`, and recovery uses `resume_care_group`; no second Nurture Pilot-enablement aggregate or reversible client toggle is introduced. My-Chat environment capability/workspace allowlist remain separate technical gates.
+The lifecycle mapping has no generic `upsert_*` or `change_*_state` action. Create/update/suspend/resume/close remain separate keys with separate allowed-state, expected-version, authorization, and audit rules. `resume_*` applies only after current revalidation; an Enrollment resume releases only the caller's authorized side hold and may leave aggregate state paused. `close_*` is terminal in Pilot-0. The scoped Pilot business-disable action uses `suspend_care_group`, and recovery uses `resume_care_group`; no second Nurture Pilot-enablement aggregate or reversible client toggle is introduced. My-Chat environment capability/workspace allowlist remain separate technical gates.
 
 The synthetic institution/group MAY be pre-provisioned as internal test preparation, so `create_care_institution` and `create_care_group` need not be first-journey prerequisites. The accepted keys are still reserved contracts for the authenticated onboarding/control plane and MUST NOT be simulated by direct database edits once user-operable Pilot setup begins.
 
@@ -954,7 +960,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | --- | --- | --- |
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
-| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-0 LOCKED** | C-2f-0 closes current/terminal state classes, family/institution actor classes, reversible independently attributed pause, permanent old-Enrollment closure, new-identity transfer, independent Institutions, and no automatic cross-workspace migration. C-2f-1 is next. |
+| C-2 child/family/enrollment/Grant onboarding | **IN PROGRESS — C-2f-1 LOCKED** | C-2f-1 closes side-owned pause holds, action compatibility, same-side shared authority/cross-side denial, strong confirmation, atomic aggregation, replay/races, preserved facts/clocks, and no cascade/bulk replay. C-2f-2 is next. |
 | C-3 Guardian/Caregiver operational IIB | OPEN | Authenticated presenters/actions and complete user-visible question, receipt, attention, acknowledge, reply, history, redaction, and revoke flows. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
@@ -1035,7 +1041,7 @@ C-1 evidence must cover workbench command/board-write boundaries, CareGroup vers
 | C-2c Institution Enrollment Invitation | **LOCKED / COMPLETE** | C-2c-1 through C-2c-4 lock issue/binding, child branch, lifecycle/concurrency, and the confirmation-ready result/continuation boundary without a pre-confirmation business or Workflow Handoff effect. |
 | C-2d child-process selection/creation, Enrollment, and thread timing | **LOCKED / COMPLETE** | C-2d-1 through C-2d-4 lock atomic confirmation, lifecycle/concurrency, first-Grant Thread timing, typed result/current recovery, route-only Grant review, and explicit-empty Handoff. |
 | C-2e separate Grant authorization | **LOCKED / COMPLETE** | C-2e-0 through C-2e-4d lock one owner-read authority path, exact Grant/role identity, strong create/replace/revoke, immutable recovery, owner-loss handling, typed complete cascades, bounded evidence, and zero implicit Host activation. |
-| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-0 LOCKED** | Lifecycle/actor classes are fixed without automatic old-Grant/content transfer or unsupported global identity claims; pause/resume mechanics are next. |
+| C-2f leave/transfer/next-stage and cross-workspace boundary | **IN PROGRESS — C-2f-1 LOCKED** | Lifecycle/actor classes plus reversible side-owned pause/resume are fixed without old-Grant/content transfer or unsupported global identity claims; same-Institution transfer is next. |
 
 #### C-2a — no-existing-profile entry and longitudinal child boundary (LOCKED)
 
@@ -1523,8 +1529,8 @@ C-2e-4d evidence must cover classification of every permanent and temporary caus
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | C-2f-0 lifecycle vocabulary and actor authority | **LOCKED** | Current/terminal/deleted classes, family/institution actor separation, reversible versus permanent closure, new-identity transfer, independent Institutions, and forbidden automatic migration. |
-| C-2f-1 temporary Enrollment pause/resume | OPEN / NEXT | Independently attributable family/institution holds, exact action keys, release authority, current fences, replay, and races. |
-| C-2f-2 same-Institution CareGroup transfer | OPEN | Proposal/confirmation, old/new Enrollment lineage, roster handling, atomic Grant/work closure, and no authority carryover. |
+| C-2f-1 temporary Enrollment pause/resume | **LOCKED** | Side-owned family/institution holds, exact compatible keys, shared same-side authority, cross-side denial, strong confirmation, current fences, atomic aggregate, replay, and races. |
+| C-2f-2 same-Institution CareGroup transfer | OPEN / NEXT | Proposal/confirmation, old/new Enrollment lineage, roster handling, atomic Grant/work closure, and no authority carryover. |
 | C-2f-3 permanent leave/end and re-entry | OPEN | Guardian withdrawal, Institution end, reason/status mapping, terminal closure, presentation, and fresh re-entry identities. |
 | C-2f-4 next-stage and cross-scope portability | OPEN | Same-workspace longitudinal continuity, independent Institutions, cross-workspace denial/future protocol, and zero global identity inference. |
 | C-2f-5 result, recovery, surfaces, and Handoff | OPEN | Exact result refs/copy, response loss/current reread, route affordances, explicit effects, and cross-surface evidence. |
@@ -1537,12 +1543,12 @@ C-2f-0 classifies authority and irreversibility before any transition-specific c
 2. A current exact-Family Guardian is the only family-side actor class for a family restriction or withdrawal. An exact-scope active Institution Admin is the only institution-side actor class for an institution restriction, service end, or same-Institution transfer proposal. Later C-2f checkpoints own exact confirmation, multi-Guardian, action-key, and concurrency rules.
 3. Caregiver, Lead Caregiver, Technical Operator, service identity, AI/natural-language interpretation, raw ids, Host membership, and ambient workspace administration have no Enrollment topology authority. Technical Admin remains evidence/reconciliation-only.
 4. Pause is reversible current denial. Enrollment-dependent cross-role reads, actions, delivery, stale notification open, and new Grant use fail closed, but the pause itself cannot terminalize Enrollment, Grant, Thread, Message, Receipt, Item, or Attention and cannot invoke the permanent C-2e cascade.
-5. Family and institution restrictions must be independently attributable. `status=paused` may be an aggregate presentation, never resume authority; neither side may clear the other side's restriction. C-2f-1 will lock the additive hold representation and exact release rules.
+5. Family and institution restrictions must be independently attributable. `status=paused` may be an aggregate presentation, never resume authority; neither side may clear the other side's restriction. The `C-2f-1 — Temporary Enrollment pause/resume` section locks the additive hold representation and exact release rules.
 6. Guardian withdrawal, Institution end, and completed transfer are permanent outcomes for the old Enrollment and must close old active Grants/dependent work under C-2e. C-2f-2/C-2f-3 own exact reason/status mapping, transaction boundaries, and retained presentation.
 7. Transfer cannot edit `careGroupId`, reuse the old Enrollment, or carry old RosterEntry, Grant, Thread, Message, Receipt, Item, Attention, context, or Handoff authority. Completion ends the old Enrollment and creates a new Enrollment identity; any target Grant/Thread requires its normal fresh path.
 8. Current Enrollments at different Institutions remain independent. A lifecycle, policy, or Grant change in one Institution cannot mutate or authorize another Institution relationship.
 9. Same-workspace longitudinal Child/ChildCareProcess/Family continuity remains family-owned and current-owner-resolved. Cross-workspace fuzzy/global matching, raw linking, global child identity claims, or automatic profile/Enrollment/Grant/Thread/content/audit migration is forbidden even when the adult My-Chat identity is the same.
-10. C-2f-0 authorizes no schema migration, action, transaction, notification, Handoff, runtime, environment, capability, or traffic change. C-2f-1 through C-2f-5 must lock executable details separately.
+10. C-2f-0 authorizes no schema migration, action, transaction, notification, Handoff, runtime, environment, capability, or traffic change. The `C-2f-1 — Temporary Enrollment pause/resume` section separately locks pause/resume planning; C-2f-2 through C-2f-5 still own their executable details.
 
 The classification matrix is:
 
@@ -1560,7 +1566,43 @@ The classification matrix is:
 | Cross-workspace candidate | No automatic match, link, migration, or global identity conclusion. |
 | Caregiver/Operator/AI/Host-only caller | No topology authority. |
 
-C-2f-0 evidence must cover every state classification, both actor sides and every denied actor, concurrent dual restrictions, cross-side release denial, zero permanent cascade on pause, permanent old-Enrollment classification, terminal non-reactivation, in-place transfer denial, new-identity/no-carryover invariant, cross-Institution isolation, cross-workspace/global-match denial, and absence of any premature executable effect. C-2f-1 is next.
+C-2f-0 evidence must cover every state classification, both actor sides and every denied actor, concurrent dual restrictions, cross-side release denial, zero permanent cascade on pause, permanent old-Enrollment classification, terminal non-reactivation, in-place transfer denial, new-identity/no-carryover invariant, cross-Institution isolation, cross-workspace/global-match denial, and absence of any premature executable effect. C-2f-1 pause/resume planning follows; C-2f-2 remains next.
+
+#### C-2f-1 — Temporary Enrollment pause/resume (LOCKED)
+
+Pause is a reversible relationship fence backed by side-owned evidence, not a Grant revoke, terminal Enrollment transition, upper-scope pause, personal veto, or global status toggle:
+
+1. Additive `NurtureEnrollmentPauseHold` binds one exact Enrollment and side. Lifecycle is `active|released|closed`; `released` is authorized same-side resume and reserved `closed` is terminal closure for C-2f-2/C-2f-3. Released/closed rows never reactivate and Pilot has no auto-expiry.
+2. One active hold is allowed per Enrollment/side. Every hold stores fixed side-compatible reason, exact place/release Participant, RoleAssignment, CommandExecution and database time, version, and no free text, protected narrative, Host/provider state, or client audit values.
+3. Holds are restriction authority; Enrollment `status` is an atomic aggregate. Zero holds means active, either/both holds means paused, and every hold transition increments Enrollment version even if still paused. Any mismatch fails closed and requires owner reconciliation rather than status-only use or command-time auto-repair.
+4. Any current exact-Family Guardian may place/release the shared family hold; any current active exact-scope Institution Admin may place/release the shared institution hold. Place actor is audit, not personal ownership. Neither side may release the other; Caregiver, Lead, Operator, service, AI, Host, and raw-id actors have no action.
+5. Guardian surfaces use `suspend_family_enrollment -> nurture.family_care.suspend_enrollment` and `resume_family_enrollment -> nurture.family_care.resume_enrollment`. Institution reuses locked `suspend_enrollment -> nurture.institution.suspend_enrollment` and `resume_enrollment -> nurture.institution.resume_enrollment`; no institution pause alias exists. Resume releases only its own side and may leave aggregate paused.
+6. Both directions use a five-minute `submit_action` context. Review identifies side, immediate bidirectional cross-role fence, retained history, non-recall, continuing Grant expiry, other-side independence, and conditional recovery. AI language, navigation, raw ids, status/side/reason/time, or copied context cannot execute.
+7. One Serializable transaction resolves replay; locks context/role, Enrollment, then holds; rereads current scope/policy/upper fences; validates expected versions; uses database time; creates/releases the hold; recomputes status; increments Enrollment version; consumes context; and commits audit/Execution without remote call.
+8. Exact replay is stable. Fresh duplicate pause/resume is already satisfied without rewriting audit. Same- or different-side actions prepared at one Enrollment version serialize first-commit-wins; stale losers must refresh and reconfirm changed consequences. Both holds may coexist only after current review. Releasing one while the other is active stays paused.
+9. End/withdraw/transfer wins permanently under Enrollment-first locking. Every Grant/capture/ack/reply/delivery writer also locks/revalidates Enrollment and holds: work committed before pause is immediately fenced; work after pause rejects. Enrollment version makes old contexts permanently stale and resume never revives them.
+10. During pause, current cross-role bodies, capture, ack/reply, Grant create/replace, retry/delivery, notification open, and new protected effects are unavailable. Grant/Thread/Message/Receipt/Item/Attention/context lifecycle and immutable seeds remain unchanged; Grant expiry continues; no cascade, clock extension, bulk replay, new Handoff, or automatic notification occurs.
+11. After all holds clear, an object becomes usable only if current role, original/current Grant, policy, Institution/CareGroup, source lifecycle, time, redaction, and object state all pass. Resume is never authorization restoration by itself.
+12. Institution/CareGroup pause, Host loss, owner outage, and capability/allowlist disable remain separate upper-scope fences. They create no Enrollment holds, and recovery cannot release a hold. C-2f-5 owns exact result refs, presenter recovery, notification, and Handoff semantics.
+
+The pause/resume matrix is:
+
+| Case | Required outcome |
+| --- | --- |
+| Family pause, no Institution hold | Create family hold; aggregate paused. |
+| Institution pause, no family hold | Create institution hold; aggregate paused. |
+| Second side pauses after refresh | Create second hold; aggregate remains paused and version advances. |
+| Same-side duplicate pause | Already satisfied; no row/time/version/audit rewrite. |
+| Same-side resume with active hold | Release only that side; recompute aggregate. |
+| Same-side duplicate resume | Already satisfied; no mutation. |
+| Resume while other side remains | Command succeeds for own side; aggregate remains paused. |
+| Two confirmations from one version | First commits; stale loser refreshes and reconfirms. |
+| Pause during valid work | Earlier commit remains audit fact but current access/action/delivery stops. |
+| Resume after Grant/object expiry | No revival; current owner reread remains denied. |
+| Terminal Enrollment race | Terminal state wins permanently; no pause/resume reactivation. |
+| CareGroup/Institution/Host/capability recovery | Does not release either Enrollment hold. |
+
+C-2f-1 evidence must cover additive schema/preflight, all actor/side/surface/action mappings, same-side shared release, cross-side/technical denial, exact consequence copy/context binding, status/hold mismatch, every hold combination, database time/transaction faults, exact replay/already-satisfied, stale same/cross-side races, terminal and dependent-writer races, Grant clock/non-revival, preserved business/technical facts, no cascade/bulk replay/alias, upper-scope separation, and the planning-only boundary. C-2f-2 is next.
 
 ## Minimum IIB closure before real traffic
 
@@ -1614,7 +1656,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-0 locked** | C-2f-0 locks current/terminal/deleted classes, family/institution actor separation, independently attributed reversible pause, permanent old-Enrollment closure, new-identity transfer, independent Institutions, and no automatic cross-workspace migration. C-2f-1 is next. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-2f-1 locked** | C-2f-1 locks side-owned holds, compatible family/Institution actions, same-side shared authority, cross-side denial, current confirmation, atomic aggregate/replay/races, retained facts/clocks, and no cascade/bulk replay. C-2f-2 is next. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
