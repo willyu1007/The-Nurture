@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-19
-- **Current checkpoint:** Pilot-0-C in progress; C-3-0b-2 locks independent My-Chat workload authentication plus an ES256-signed/request-bound human-principal envelope, exact User/Actor/Workspace/origin semantics, 60-second freshness, single-use nonce versus CommandExecution replay, audience/caller/key rotation, strict private codec, and additive no-fallback activation; C-3-0b-3 ingress path variants next
+- **Current checkpoint:** Pilot-0-C in progress; C-3-0b-3 locks registered product/transition/runtime ingress, exact API/session and worker/Run-actor combinations, two-stage Notification open, Step-bound durable replay, the invitation-bound prospective Participant exception, and separate C-0/operator channels; C-3-0b-4 client echo, denial, audit, adoption, and negative closure evidence next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -978,7 +978,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
 | C-2 child/family/enrollment/Grant onboarding | **LOCKED / COMPLETE** | C-2f-5 closes C-2 with immutable business outcome versus replay disposition, exact server-only output refs, current owner presenters, same-Execution/same-Step response-loss recovery, route-only continuity, preserved explicit-empty paths, and minimal future Guardian relationship attention without widening `user_attention`. |
-| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0b-2 LOCKED** | C-3-0b-2 adds independent workload/principal proofs, exact signed Host identity and route context, bounded freshness/replay, key rotation, strict verification, and vNext no-fallback activation without claiming implementation. C-3-0b-3 is next. |
+| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0b-3 LOCKED** | C-3-0b-3 adds the closed product/transition/runtime ingress matrix, Notification and durable replay mechanics, the sole prospective onboarding exception, and separate provisioning/operator-recovery channels without claiming implementation. C-3-0b-4 is next. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
 ### Pilot-0-C0 — authenticated ingress and first-Institution bootstrap (LOCKED)
@@ -1962,7 +1962,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
-| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0b-2 LOCKED** | Account–Subject reachability, trusted-principal/public-context boundaries, and the private signed invocation envelope are locked; ingress variants, presentation, action/driver, privacy/offline, and adoption contracts remain open. |
+| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0b-3 LOCKED** | Account–Subject reachability, public/private trust boundaries, the signed invocation envelope, and exact ingress variants are locked; presentation, action/driver, privacy/offline, and adoption contracts remain open. |
 | C-3-1 Guardian family-communication IIB | OPEN | Question draft/submit, Receipt/reply current state, authorized history, and Guardian-source redaction across Chat, Family board, and Family workbench. |
 | C-3-2 Guardian relationship/authority IIB | OPEN | Enrollment, transfer, withdrawal, Grant, and stage review/strong-confirmation actions across all entitled Guardian surfaces. |
 | C-3-3 Caregiver operational IIB | OPEN | Chat/Teacher-board inbox, Attention, transient protected detail, acknowledge, reply, history, and Caregiver-reply redaction. |
@@ -1974,7 +1974,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
 | C-3-0a Account–Subject reachability | **LOCKED** | Product-scope versus platform-capability separation, account-to-owner relationship path, generic subject scope, opaque Host discovery, prospective boundary, and identity-isolation rules. |
-| C-3-0b authenticated ingress and trusted principal | **IN PROGRESS — C-3-0b-2 LOCKED** | Trust model, public context/session/workspace establishment, and private caller/principal envelope are locked; ingress variants plus client allowlist/denial/audit/adoption evidence remain C-3-0b-3/4. |
+| C-3-0b authenticated ingress and trusted principal | **IN PROGRESS — C-3-0b-3 LOCKED** | Trust model, public context/session/workspace establishment, private caller/principal envelope, and all ingress variants are locked; client allowlist/denial/audit/adoption evidence remains C-3-0b-4. |
 | C-3-0c subject-aware presentation contract | OPEN | Additive subject provider/domain surface types, blocks/actions, persistence classes, renderer mapping, and Base conformance. |
 | C-3-0d action execution and recovery | OPEN | Domain action dispatch, confirmation, idempotency, direct-empty versus claimed-Step driver selection, and result reconciliation. |
 | C-3-0e protected data, offline, adoption, and evidence | OPEN | Transient/private rendering, draft/cache/offline policy, Base -> My-Chat -> Nurture adoption, negative coverage, and planning exit. |
@@ -2019,7 +2019,7 @@ C-3-0a evidence must cover product-catalog versus infrastructure classification,
 | C-3-0b-0 trust model | **LOCKED** | Sole My-Chat public ingress, independent workload/adult proofs, Host trust terminus, Nurture business authority, invitation separation, and legacy compatibility. |
 | C-3-0b-1 public ingress, session, and workspace establishment | **LOCKED** | General/business/invitation context modes, explicit general-to-business transition, workspace source precedence, session/membership/gate order, separate acceptance/continuation, safe public states, and current gaps. |
 | C-3-0b-2 private service caller and principal envelope | **LOCKED** | Independent caller credential and signed request, exact human principal, request/contract binding, 60-second freshness, nonce-versus-command replay, audience/subject/key rotation, strict codec, normalized boundary, and additive no-fallback activation. |
-| C-3-0b-3 ingress path variants | OPEN | Interactive Chat/board/workbench, Notification open, durable worker/replay, prospective onboarding, C-0 provisioning, and Technical Operator classifications. |
+| C-3-0b-3 ingress path variants | **LOCKED** | Registered product/transition/runtime ingress; exact caller-origin matrix; two-stage Notification; Step-bound durable replay; invitation-bound prospective Participant exception; separate C-0 and owner-recovery channels. |
 | C-3-0b-4 client allowlist, denial, audit, and adoption evidence | OPEN | Echo versus Host-only fields, safe status mapping, secret/PII exclusions, Base -> My-Chat -> Nurture compatibility, negative tests, and planning exit. |
 
 **C-3-0b-0 — trust model (LOCKED)**
@@ -2027,7 +2027,7 @@ C-3-0a evidence must cover product-catalog versus infrastructure classification,
 1. My-Chat is the only public business ingress for Chat, role boards, domain workbenches, Notification/deep-link opens, and user-facing onboarding. Browser/mobile clients never call Nurture presenter, subject provider, resolver, policy, command, recovery, dev-host, or internal service routes directly.
 2. Every private business invocation requires two independent proofs: an allowed My-Chat workload authenticates the service-to-service caller, and a Host-established adult principal identifies the represented canonical account/human actor in one exact workspace. A valid service caller without a valid adult principal cannot resolve a Participant or invoke a business action.
 3. My-Chat trust terminates at contract version, opaque account ref, human actor ref, exact validated workspace ref, registered scenario/surface provenance, request/correlation evidence, and interactive-session or durable-Run-actor origin. Exact DTO/field names remain C-3-0b-2. The principal carries no Participant, RoleAssignment, business role, Subject, Family, ChildCareProcess, Institution, CareGroup, Enrollment, Grant, policy decision, target availability, or command authority.
-4. Nurture binds Participant from exact workspace plus canonical account ref and resolves current RoleAssignment, subject/work scope, target, lifecycle, Grant, policy, and action availability. Host actor ref is provenance only and cannot choose/create a Participant. Zero or duplicate/mismatched Participant fails closed without email/contact, history, alternate-workspace, or client-selection fallback.
+4. On ordinary subject-aware paths, Nurture binds Participant from exact workspace plus canonical account ref and resolves current RoleAssignment, subject/work scope, target, lifecycle, Grant, policy, and action availability. Host actor ref is provenance only and cannot choose/create a Participant. Zero or duplicate/mismatched Participant fails closed without email/contact, history, alternate-workspace, or client-selection fallback; C-3-0b-3 owns the sole exact-invitation prospective exception.
 5. A client may request a workspace, but selection is not proof. My-Chat must establish one exact current workspace before private invocation. Nurture cannot infer, default, or substitute workspace from Participant history, a cached Subject entry, conversation, Notification/Handoff, invitation, token, URL, or raw business object.
 6. Scenario and surface provenance are established by the registered server route/composition. A client cannot author or switch them through a body/header field. A valid surface proves entry context only; that surface neither grants a Nurture role nor overrides the B3 action/surface matrix or current owner policy.
 7. Action key, owner-issued opaque target/token, expected version, explicit confirmation, form/Chat input, and idempotency may cross as codec-validated but untrusted echoes. Structured client account/actor/role/scope/Subject/relationship/Grant/policy/availability fields are rejected; natural-language claims are ordinary intent text and never authority.
@@ -2117,7 +2117,7 @@ C-3-0b-1 evidence must cover all three context modes, storage-versus-business wo
 2. The signed `caller_binding.caller_subject` must equal the caller authenticator result. Initial subjects are `my-chat-api` paired only with `interactive_session`, and `my-chat-workflow-worker` paired only with `durable_run_actor`. Browser/mobile, provider, arbitrary worker, Technical Operator, C-0 provisioner, and Nurture itself are outside the ordinary matrix; C-3-0b-3 must classify exact special paths rather than widen the caller.
 3. Shared wire type `ScenarioHumanPrincipalV1` is version `1`, kind `human_user`, and contains exactly one `my_chat/user` account ref, one `my_chat/actor` human-actor ref, one `my_chat/workspace` workspace ref, and `interactive_session|durable_run_actor` origin. Nurture product language may call the represented principal an adult, but no age/role claim enters the reusable contract.
 4. My-Chat may sign only after current User, human Actor ownership, Workspace, membership, environment capability, scenario registration, workspace allowlist/Pilot cohort, and server-derived route/surface checks pass. Durable origin recovers Actor from the persisted Run and current membership, never the queue payload. Host Invitation acceptance creates no principal; a separately gated post-accept continuation constructs a fresh interactive principal.
-5. Nurture binds Participant only from Workspace plus User. Actor is provenance and cannot select/create Participant, role, Subject, scope, target, or action. Zero, duplicate, inactive, or mismatched Participant fails closed without Actor, `business_actor_ref`, email/contact, history, alternate workspace, cache, invitation, token, or client fallback.
+5. On ordinary subject-aware paths, Nurture binds Participant only from Workspace plus User. Actor is provenance and cannot select/create Participant, role, Subject, scope, target, or action. Zero, duplicate, inactive, or mismatched Participant fails closed without Actor, `business_actor_ref`, email/contact, history, alternate workspace, cache, invitation, token, or client fallback. C-3-0b-3 alone defines the exact-invitation prospective transaction that may bind/create a missing Participant without becoming an ordinary fallback.
 6. Principal fields never include PII, membership id/role, Participant/RoleAssignment, Nurture role, Subject/Family/Child/Process, Institution/CareGroup/Enrollment, Grant/policy/action/availability, target, surface, payload, session, invitation, scenario, service, or claim credential. Activated C3 domain commands use the resolved Participant as business actor and never Host Actor. Existing `NurtureCommandExecution.business_actor_ref` is already polymorphic: legacy family-core writes My-Chat/system refs while institution commands require Participant id. C-3-0b-2 does not reinterpret historical rows; C-3-0d must choose an additive typed/versioned actor representation or explicit migration, while Host provenance uses a separate name/hash.
 7. `ScenarioPrivateInvocationV1` has exact top-level contract version/hash, issuer, assertion audience, caller binding, human principal, route, request, and operation payload. Route binds `scenario_key=nurture`, `endpoint_key=scenario_private_invoke_v1`, `method=POST`, and a separately versioned registered ingress surface. Request binds logical request/correlation/optional trace ids, issue/expiry times, and nonce. Operation binds a registered operation key and its own untrusted input codec.
 8. The detached signature covers the final raw request body. Nurture compares the actual endpoint/method/scenario and rejects any altered body, payload, contract, caller, User/Actor/Workspace, surface, operation, request evidence, time, or nonce. Parse-and-reserialize verification, client-supplied route authority, repeated authority mismatch, and request-controlled key source are forbidden.
@@ -2151,6 +2151,83 @@ The normalized verification pipeline is:
 Current implementation is not C-3-0b-2 evidence. Base/My-Chat expose optional `WorkflowCommandMeta.actor_id` and broad `client_surface`; Nurture internal surfaces can derive `my_chat_user_id` from optional Host metadata; only one owner-read route uses the static internal token; there is no shared signed envelope, caller/origin mapping, strict principal codec, shared nonce store, key rotation/revocation path, verifier-only normalized type, or `trusted_scenario_invocation_v1` capability. `business_actor_ref` is also a real semantic dual-use: legacy family-core writes `my_chat:user:*` or system refs while institution family-care commands require Participant id. These are implementation blockers, not accepted Pilot behavior.
 
 C-3-0b-2 evidence must cover the full dual-proof cross-product, exact principal allowlist, Host construction gates, Workspace+User Participant binding, raw-body/request/contract binding, 60-second time boundaries, concurrent nonce consumption and outage, response-loss versus business replay, same/wrong-Step, algorithm/header/audience/key negatives, normal/emergency rotation, environment isolation, optional Pilot authenticator with no fallback, strict codec limits, verifier-only construction, persistence/log exclusions, legacy compatibility, vNext fatal gates, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, runtime, secret, environment, capability, provider, database, or traffic changed. C-3-0b-3 ingress path variants are next.
+
+**C-3-0b-3 — ingress path variants (LOCKED)**
+
+C-3-0b-3 uses one versioned discriminated ingress context for the signed human-principal boundary. `ScenarioIngressSurfaceV1` is a reusable Base structure with exact `ingress_version=1`, a closed category, and one scenario-registered key. The Nurture Pilot registry is:
+
+| Ingress category | Registered keys | Meaning |
+| --- | --- | --- |
+| `product_surface` | `nurture_chat`, `family_board`, `family_workbench`, `teacher_board`, `institution_board`, `institution_workbench` | Current Nurture product presentation/action context. |
+| `host_transition` | `notification_open`, `invitation_continuation` | A bounded My-Chat transition that is not a role surface or continuing authority. |
+| `workflow_runtime` | `workflow_worker` | Durable runtime entry with no user-interface entitlement. |
+
+Base owns the category structure and validator semantics, the Nurture manifest owns exact registered keys plus allowed operation combinations, and My-Chat owns the server route-to-ingress registry. Device labels such as `mobile|web|desktop`, generic `web_run_workbench`, broad/legacy `client_surface`, and `technical_admin` are not Nurture product surfaces. Chat has one `nurture_chat` key and remains role-agnostic among currently entitled roles; Institution capability is not exposed through Chat. Surface proves only registered entry context for eligibility, presentation, and safe audit. The surface cannot choose Participant/role/Subject/scope/target/policy and is not part of canonical business command identity.
+
+The signed caller/origin/ingress matrix is closed:
+
+| Path | Caller and principal | Ingress | Participant behavior |
+| --- | --- | --- | --- |
+| Chat/board/workbench | `my-chat-api + interactive_session` | Exact registered `product_surface` | Exactly one current Workspace+User Participant is required. |
+| Notification/deep-link open | `my-chat-api + interactive_session` after exact recipient/workspace/Notification validation | `host_transition/notification_open` | Current Participant/role/target is reread; open is read-only. |
+| Durable worker/replay | `my-chat-workflow-worker + durable_run_actor` reconstructed from persisted Run | `workflow_runtime/workflow_worker` | Exactly one current Participant plus the separately claimed original Step is required. |
+| Post-accept onboarding | `my-chat-api + interactive_session` after independent Host acceptance/membership commit | `host_transition/invitation_continuation` | Sole exact-invitation-bound exception that may atomically create/reuse a missing Participant. |
+| C-0 bootstrap | Separate provisioner caller/assertion/audience/endpoint | Outside `ScenarioPrivateInvocationV1` and `ScenarioIngressSurfaceV1` | Fixed one-time transaction may create the first Participant; no ordinary principal. |
+| Technical Operator | My-Chat Technical Admin; separate owner-recovery caller only when needed | Outside `ScenarioPrivateInvocationV1` and Nurture role surfaces | Operator never resolves as Participant or business actor. |
+
+Interactive product behavior is exact:
+
+1. `platform_general` produces no Nurture product-surface call. Explicit transition into one exact `workspace_business` context precedes `nurture_chat`, including when only one workspace is eligible.
+2. My-Chat authenticates the current session/User/human Actor, establishes the exact workspace/membership and all gates, and derives the product key from a registered server route before signing.
+3. Nurture still resolves Participant, eligible role, Subject/work scope, target, Grant, policy, lifecycle, and action availability. A valid product key cannot grant a role or convert Institution Admin into Chat authority.
+4. Chat/board/workbench adapters converge on the same registered owner presenter/command. They MUST NOT duplicate the domain state machine or alter command identity because presentation differs.
+5. Client device/tab/page labels remain untrusted echo and are deferred to C-3-0b-4. They cannot replace or select the signed ingress context.
+
+Notification open is a two-stage current-owner path:
+
+1. Provider payload and deep link carry only the recipient-bound Host Notification id and generic open route. They never authenticate a person, choose a workspace, or contain a Nurture token/ref/body.
+2. My-Chat authenticates the session, validates exact recipient + workspace + Notification, marks only the Host Notification read under the already locked B3-2c semantics, and then creates the fresh `notification_open` signed invocation from server-side Notification/Handoff evidence.
+3. The Nurture notification resolver rereads the current Participant, role, reachable scope, Grant, policy, source/target lifecycle, and visibility. The request does not author the destination product surface.
+4. A ready result returns a current generic destination route plus a newly issued destination-bound `open_notification` locator. The subsequent destination request is a new product-surface invocation and owner read.
+5. Repeat/multi-device opens, session loss, revoke, redaction, withdrawal, stale Handoff, owner outage, and target closure never restore old content or execute acknowledge/reply/submit implicitly.
+
+Durable workflow behavior is exact:
+
+1. The worker rereads the persisted Run actor, resolves the current canonical User/human Actor/workspace membership and Pilot gates, and signs immediately before each attempt. Queue payload identity cannot create the principal.
+2. `workflow_worker` is the only runtime ingress. A prior UI surface may remain safe initiating provenance but cannot be asserted as the current surface or authority.
+3. An operation must be explicitly registered for durable ingress. Product-surface-only domain actions cannot be made durable by relabeling the request, and a direct domain action does not gain a synthetic Workflow Run.
+4. The claimed original Step, Run, expected version, driver ref, and claim token remain a separate driver context. Claim token is signed transient input only and is absent from Principal, command identity, persistence, Handoff, Outbox, logs, traces, and metrics.
+5. Response loss uses the same original Step and stable `command_request_id` with a fresh claim/nonce/signature. Wrong Step/Run, cross-origin, cross-ingress, and cross-operation replay fails even when the business id and payload otherwise match.
+
+Post-accept onboarding behavior is exact:
+
+1. Host invitation preview/acceptance remains entirely in My-Chat. Acceptance commits/replays workspace membership independently and creates no Nurture role, Subject access, or automatic business effect.
+2. A user-confirmed continuation creates a fresh interactive principal plus exact server-bound Host invitation correlation and current operation-specific confirmation. Client contact, role, raw Participant/Subject ids, or invitation wording cannot select authority.
+3. `invitation_continuation` dispatches to a prospective-onboarding application service before ordinary Participant resolution. Only explicitly registered invitation transactions may bind/reuse the exact Workspace+User Participant and perform the previously locked staff/family onboarding effect.
+4. `invitation_continuation` is the sole signed-human exception to ordinary zero-Participant denial. The exception is transaction-specific, never a generic find-or-create fallback, and exposes only the already locked prospective invitation allowlist before commit.
+5. Exact replay returns the original CommandExecution/result; payload, recipient, workspace, invitation, lifecycle, or confirmation drift conflicts or fails closed. Host acceptance and Nurture transaction never share a distributed transaction.
+6. After commit, navigation creates a new ordinary product-surface invocation. Invitation correlation/continuation cannot authorize later reads or actions.
+
+C-0 and Technical Operator remain isolated:
+
+1. C-0 bootstrap uses a separately versioned provisioning assertion/spec, workload caller, audience, endpoint, verifier, gate, and fixed operation. The exact accepted initial Admin and Host membership are bound evidence rather than a caller credential or ordinary principal. The transaction is idempotent, closes permanently, and cannot be authored/reopened by Institution Admin or Technical Operator. Pilot-0-D retains spec issuance, custody, deployment, revocation, and rollback.
+2. Technical Run/Step/Handoff/Outbox/Notification operations remain My-Chat-owned. Only `request_owner_reevaluation` may cross to a separately versioned owner-recovery endpoint with opaque refs, current Host evidence, expected version/idempotency, and operator audit provenance.
+3. Provisioner and Technical Operator never construct `ScenarioHumanPrincipalV1`, register a Nurture role surface, resolve as Participant, or use the ordinary private endpoint. An owner-authorized deterministic recovery transition is attributed to the owner-recovery service; the operator remains initiating audit evidence only.
+4. Both special boundaries require independent capability/allowlist and no fallback. They cannot accept arbitrary business payloads, expose protected content, or reuse `NURTURE_INTERNAL_SERVICE_TOKEN` as new authority.
+
+Cross-path invariants are mandatory:
+
+1. Every operation declares exact allowed caller, principal origin, ingress category/key, and handler class. Any unregistered combination fails before Participant/business resolution.
+2. `my-chat-api` cannot assert `durable_run_actor`; `my-chat-workflow-worker` cannot assert `interactive_session` or a product/transition surface.
+3. Notification, invitation continuation, durable replay, provisioning, and owner recovery cannot fall back or upgrade into one another after validation, owner, policy, or availability failure.
+4. A business replay keeps the original ingress class and operation provenance. Surface remains outside canonical effect identity, but current surface/token/Step binding remains a replay precondition where declared.
+5. Every attempt rereads current Host and Nurture facts. No prior session, Notification, locator, UI presentation, workflow attempt, provisioning spec outcome, or operator request becomes continuing authorization.
+6. The implementation dependency direction is public route -> Host auth/controller -> ingress orchestration/signer -> Nurture verifier/controller -> variant application service -> domain resolver/policy/command -> repository. Routes/controllers contain no Nurture business resolution, and domain services receive no HTTP/JWS/credential object.
+7. Activated variants cannot fall back to optional `actor_id`, default/inferred workspace, broad `client_surface`, legacy event dispatch, dev-host route, owner-read token, legacy handler, or another authenticator.
+
+Current implementation is not C-3-0b-3 evidence. Base/My-Chat/Nurture have no discriminated ingress type/registry or variant validator; existing `WorkflowSurface`/`client_surface`, optional Host identity, `NurtureHostInvocationEnvelope.event.kind`, `worker_runtime`, generic workbench labels, and static owner-read token remain legacy/scaffold semantics. Notification does not implement the complete two-stage signed owner path, post-accept onboarding has no exact Host invitation route/contract, and separate provisioning/owner-recovery private boundaries do not exist. `NurtureCommandExecution.business_actor_ref` remains polymorphic and C-3-0d still owns typed/versioned persisted actor semantics.
+
+C-3-0b-3 evidence must cover exact ingress registry/type validation, every caller/origin/ingress/operation cross-product, all six product surfaces, general-to-Chat transition, Institution-through-Chat denial, two-stage Notification reread, provider/deep-link non-authority, worker no-UI-surface behavior, same/wrong-Step replay, invitation acceptance/continuation separation, zero-Participant ordinary denial versus the sole prospective exception, onboarding replay/drift/non-disclosure, C-0/operator endpoint isolation, owner-recovery audit-only operator semantics, cross-path replay denial, layering, legacy compatibility, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, runtime, secret, environment, capability, provider, database, or traffic changed. C-3-0b-4 is next.
 
 ## Minimum IIB closure before real traffic
 
@@ -2204,7 +2281,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0b-2 locked** | C-3-0b-2 requires independent caller/principal proofs, exact signed User/Actor/Workspace/origin context, bounded request/nonce replay, separate CommandExecution recovery, pinned audience/key rotation, strict private verification, and additive no-fallback activation. C-3-0b-3 is next; C-4 Institution IIB/closure evidence remains open. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0b-3 locked** | C-3-0b-3 fixes the complete product/transition/runtime ingress matrix, Notification/durable/onboarding mechanics, and isolated provisioning/operator-recovery channels. C-3-0b-4 is next; C-4 Institution IIB/closure evidence remains open. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
