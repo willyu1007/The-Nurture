@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-19
-- **Current checkpoint:** Pilot-0-C in progress; C-3-0c-0/1/2/3 presentation ownership, provider wire, semantic presentation, renderer mapping, persistence classes, accessibility, and stale behavior are locked after C-3-0b authenticated ingress completed; C-3-0c-4 conformance/adoption evidence next
+- **Current checkpoint:** Pilot-0-C in progress; C-3-0b authenticated ingress and C-3-0c subject-aware presentation planning are complete. C-3-0c-4 locks atomic capability, additive contracts, named source/module/renderer evidence, ordered three-repo adoption, legacy/no-fallback behavior, and conformance; C-3-0d action execution/recovery is next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -16,7 +16,7 @@ Pilot-0 answers whether the reviewed X5 implementation can be turned into a boun
 | My-Workflow-Base | `acba4e792c85131c19e63e08a5f671133c481c57` | vNext additive handoff/driver/capability contract and conformance harness. |
 | My-Chat | `a1b5e64c84c9865e34abb7068be10352cf42c949` | X2-X5 Step/Handoff/Outbox/owner delivery, CI and image-build gates; staging/prod capability false. |
 | The-Nurture | `058c792dc86c0f41797632ebabc6f9a04fec6c18` | N1/X4/X5 business kernel, pre-activation default, activation-only factory, owner reread, CI/governance baseline. |
-| Shared contract | `0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa` | Base/My-Chat path-content contract hash. |
+| Shared contract | `0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa` | Base/My-Chat path-content hash for the reviewed handoff baseline only; the hash is not C-3 presentation adoption evidence. |
 | Nurture activation source | `e976c235962c827367d1c13dcc603a0d315fdac118daf03f00a3df85e153d193` | Exact 25-file X5 activation-critical source population. |
 
 The live pin verifier passes at these revisions. All worktrees were clean before the review branch was created.
@@ -978,7 +978,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
 | C-2 child/family/enrollment/Grant onboarding | **LOCKED / COMPLETE** | C-2f-5 closes C-2 with immutable business outcome versus replay disposition, exact server-only output refs, current owner presenters, same-Execution/same-Step response-loss recovery, route-only continuity, preserved explicit-empty paths, and minimal future Guardian relationship attention without widening `user_attention`. |
-| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0c-3 LOCKED** | C-3-0c-0/1/2/3 lock presentation ownership, provider wire, semantic output, renderer mapping, persistence classes, stale handling, and accessibility without claiming implementation. C-3-0c-4 is next. |
+| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0c COMPLETE** | C-3-0c-0 through C-3-0c-4 lock presentation ownership/wire/render/persistence plus atomic capability, named adoption identities, exact three-repo order, legacy/no-fallback behavior, and conformance without claiming implementation. C-3-0d is next. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
 ### Pilot-0-C0 — authenticated ingress and first-Institution bootstrap (LOCKED)
@@ -1962,7 +1962,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
-| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0c-3 LOCKED** | Account–Subject reachability, authenticated ingress, presentation ownership, provider wire, semantic presentation, renderer mapping, and persistence/stale/accessibility classes are locked; conformance/adoption, action/driver, protected-data/offline, and complete-IIB evidence remain C-3-0c-4 through C-3-0e. |
+| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0c COMPLETE** | Account–Subject reachability, authenticated ingress, presentation ownership/wire/render/persistence, and presentation adoption/evidence gates are locked; action/driver, protected-data/offline, and actual complete-IIB adoption remain C-3-0d/e. |
 | C-3-1 Guardian family-communication IIB | OPEN | Question draft/submit, Receipt/reply current state, authorized history, and Guardian-source redaction across Chat, Family board, and Family workbench. |
 | C-3-2 Guardian relationship/authority IIB | OPEN | Enrollment, transfer, withdrawal, Grant, and stage review/strong-confirmation actions across all entitled Guardian surfaces. |
 | C-3-3 Caregiver operational IIB | OPEN | Chat/Teacher-board inbox, Attention, transient protected detail, acknowledge, reply, history, and Caregiver-reply redaction. |
@@ -1975,7 +1975,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 | --- | --- | --- |
 | C-3-0a Account–Subject reachability | **LOCKED** | Product-scope versus platform-capability separation, account-to-owner relationship path, generic subject scope, opaque Host discovery, prospective boundary, and identity-isolation rules. |
 | C-3-0b authenticated ingress and trusted principal | **LOCKED / COMPLETE** | C-3-0b-0 through C-3-0b-4 lock public/private trust, exact ingress, client/Host/owner fields, denial, audit retention/access, additive adoption, and negative planning closure. |
-| C-3-0c subject-aware presentation contract | **IN PROGRESS — C-3-0c-3 LOCKED** | Pipeline/ownership, provider wire, semantic blocks/offers, renderer mapping, persistence classes, freshness, and accessibility are locked; Base conformance and exact adoption remain C-3-0c-4. |
+| C-3-0c subject-aware presentation contract | **LOCKED / COMPLETE** | C-3-0c-0 through C-3-0c-4 lock pipeline/ownership, provider/presentation wire, renderer/persistence/freshness/accessibility, atomic capability, named adoption identities, three-repo order, legacy/no-fallback behavior, and four-layer conformance. Completion is planning-only; actual adoption remains C-3-0e. |
 | C-3-0d action execution and recovery | OPEN | Domain action dispatch, confirmation, idempotency, direct-empty versus claimed-Step driver selection, and result reconciliation. |
 | C-3-0e protected data, offline, complete-IIB adoption, and evidence | OPEN | Transient/private rendering, draft/cache/offline policy, complete Base -> My-Chat -> Nurture adoption building on the ingress-only C-3-0b-4 slice, negative coverage, and planning exit. |
 
@@ -2319,7 +2319,7 @@ Current implementation is not C-3-0b-4 evidence. Nurture still accepts optional 
 
 C-3-0b-4 evidence must cover every echo variant and bound, all forbidden/unknown/structured authority fields, signing-without-trust-upgrade, client-versus-Host field substitution, Host-versus-owner authority injection, command-id derivation, strong-auth separation, Notification/Invitation route conversion, every HTTP/public/owner mapping, existence noninterference, safe reason disclosure thresholds, support-ref opacity, owner-split audit fields, every retention cutoff, audit access/audit-of-audit, sink failure, zero protected-body duplication, Base -> My-Chat -> Nurture revision/hash/registry adoption, legacy/vNext compatibility, no fallback, rollback, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, runtime, audit sink, secret, environment, capability, provider, database, or traffic changed. C-3-0b is complete; C-3-0c is next.
 
-**C-3-0c — subject-aware presentation contract (IN PROGRESS)**
+**C-3-0c — subject-aware presentation contract (LOCKED / COMPLETE)**
 
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
@@ -2327,7 +2327,7 @@ C-3-0b-4 evidence must cover every echo variant and bound, all forbidden/unknown
 | C-3-0c-1 subject-provider wire contract | **LOCKED** | Separate list/resolve, a new opaque ref, collection-as-context, closed results/privacy fields, freshness/version semantics, and exact bounds. |
 | C-3-0c-2 semantic blocks and actions | **LOCKED** | Read-only result, owner-resolved plain text, six flat blocks, separate navigation/action offers, entitled unavailable disclosure, AI projection, exact bounds, and forbidden fields. |
 | C-3-0c-3 renderer and persistence classes | **LOCKED** | Exact product-surface renderer mapping, four persistence classes, no presentation cache, bounded foreground freshness, accessibility, stale behavior, and Pilot query-control scope. |
-| C-3-0c-4 conformance and adoption evidence | OPEN | Additive Base contracts, exact three-repo registry/revision adoption, legacy compatibility, negative fixtures, and presentation planning exit. |
+| C-3-0c-4 conformance and adoption evidence | **LOCKED / COMPLETE** | Atomic capability, additive Base contracts, exact named source/module/renderer identities, ordered three-repo adoption, legacy/no-fallback rules, negative fixtures, and presentation planning exit. |
 
 **C-3-0c-0 — presentation pipeline and ownership (LOCKED)**
 
@@ -2557,7 +2557,61 @@ Accessibility is part of generic renderer compatibility rather than owner semant
 
 Current implementation is not C-3-0c-3 evidence. My-Chat Chat interactions are transient React state, but the broad envelope contains `serverAction|params|extensions`; persisted Chat messages are not separated from Nurture rehydration placeholders; the Workflow dashboard branches on raw Run action/target/reason values; role boards and domain workbenches are absent; renderer accessibility is partial; and there is no surface compatibility registry, freshness lease, invalidation clearing, persistence allowlist, or leakage scanner. Nurture has no activated semantic presenter and its existing synthetic surfaces cannot satisfy the mapping. These are implementation gaps, not accepted fallback paths.
 
-C-3-0c-3 evidence must cover all six product-surface mappings, every block across compatible renderer families, institution-board action rejection, order/copy/tone preservation, complete-pagination behavior, arbitrary-filter/search deferral, all four persistence classes and destinations, Chat placeholder rehydration, ref expiry/storage, 60-second freshness boundaries, invalidation/background/focus/outage behavior, no stale/legacy/offline fallback, no optimistic business state, accessibility/device/locale/focus matrices, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. C-3-0c-4 conformance and adoption evidence is next.
+C-3-0c-3 evidence must cover all six product-surface mappings, every block across compatible renderer families, institution-board action rejection, order/copy/tone preservation, complete-pagination behavior, arbitrary-filter/search deferral, all four persistence classes and destinations, Chat placeholder rehydration, ref expiry/storage, 60-second freshness boundaries, invalidation/background/focus/outage behavior, no stale/legacy/offline fallback, no optimistic business state, accessibility/device/locale/focus matrices, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. The following C-3-0c-4 section locks conformance and adoption evidence.
+
+**C-3-0c-4 — conformance and adoption evidence (LOCKED / COMPLETE)**
+
+C-3-0c adoption is one atomic read-presentation capability rather than independently enableable provider, presenter, renderer, or persistence slices:
+
+1. The shared Host capability key is `scenario_subject_presentation_v1`.
+2. The capability requires `trusted_scenario_invocation_v1` and represents the complete C-3-0c-1 subject-provider wire, C-3-0c-2 semantic-presentation wire, and C-3-0c-3 renderer/freshness/persistence compatibility.
+3. The capability does not authorize a domain command. Before C-3-0d provides its separate active domain-action contract/capability, any activated presentation MUST emit `actions=[]`; a non-empty action offer is a fatal incompatibility.
+4. Provider-only, presentation-only, renderer-only, persistence-guard-only, or trusted-ingress-missing enablement is forbidden. Test-only direct invocation may exercise individual units but cannot become an activated product path.
+
+Base manifest adoption is additive and versioned:
+
+1. A new optional presentation area declares subject-context provider key/version plus exact `list_subject_contexts|resolve_subject_context` operations; presentation key/version and provider reference; registered product surfaces, `current|recent|history`, route classes, safe-reason codes, action-key references, and per-surface action-offer policy.
+2. Renderer family/component/layout, Nurture role/Subject/object identity, scenario copy, business schema, runtime, cache, database, and persistence implementation remain absent from the Base wire.
+3. A legacy manifest with no presentation declaration remains valid and behaviorally unchanged. Absence alone creates no global warning or false readiness claim.
+4. Once any vNext presentation declaration exists, missing, duplicate, unknown, malformed, or cross-mismatched provider/presentation/surface/operation/view/route/reason/action declarations are fatal. Missing Host surface support, `trusted_scenario_invocation_v1`, or `scenario_subject_presentation_v1` is fatal.
+5. `institution_board` action-offer support is always a fatal declaration. Other surface action references are valid only after the exact C-3-0d `domain_action_contracts` entry, handler, and capability exist.
+6. The same activated operation cannot appear in both vNext and legacy registries. Validation or runtime failure rejects the complete request/presentation and never falls back to `surface_mapping`, `internal_api`, broad `InteractionEnvelope`, Workflow dashboard presenter, synthetic Nurture surface, alternate provider, or more permissive renderer.
+
+Four independently named identities prevent semantic overloading:
+
+| Identity | Required proof |
+| --- | --- |
+| Historical workflow contract hash | The current `0bd8925e...01aa` path-content and `a97a5b14...e981` logical-source values prove only the reviewed X0-X5 handoff baseline. They cannot be relabeled as C-3 support. |
+| `scenario_interface_source_v1` | Normalized shared C-3 ingress/provider/presentation contract, codec, manifest, and validator source. Base and My-Chat MUST match exactly; Nurture pins the exact Base/My-Chat revisions and hash. |
+| Scenario module contract hash | Nurture canonical manifest plus the real provider, presenter, operation, safe-reason, route, and applicable action registries. My-Chat accepts the exact published module identity. |
+| Host renderer conformance revision | My-Chat product-surface compatibility registry, generic renderer, freshness/invalidation behavior, persistence allowlist/leakage scanner, accessibility, and negative suite. |
+
+The activation record pairs these identities and uses explicit names. A generic `contract_hash` field cannot substitute one identity for another. Historical Workflow Run/Step/module evidence remains immutable under its recorded revision/hash and is never recomputed or reinterpreted when new additive source lands.
+
+Adoption order and ownership are exact:
+
+1. **My-Workflow-Base:** add reusable provider/presentation types, strict input/output codecs, optional manifest structures, host-capability declarations, validator fatal rules, exact bounds, normalized source-set hashing, and legacy/vNext/negative conformance fixtures. Base contains no Nurture key, runtime, database, cache, renderer component, or scenario policy.
+2. **My-Chat:** explicitly adopt the exact Base revision/source set; implement manifest loading, server route/surface compatibility registry, generic renderer, ephemeral state clearing, persistence allowlist, leakage scanner, accessibility, and a default-off capability. Legacy scenarios remain unchanged.
+3. **The-Nurture:** pin the exact Base and My-Chat revision/source set; implement current owner provider/presenter/ref codecs, safe copy/reasons, AI projection, and manifest/implementation registries. Every declared key has one real implementation and no activated legacy twin.
+4. **Joint:** verify exact source, Scenario module, and Host renderer identities; mixed-revision/registry denial; end-to-end current owner reads; privacy/fault/stale/accessibility evidence; and default-off capability/empty workspace allowlist before any enablement request.
+5. A local pnpm `file:` link is development convenience only. The link is not immutable adoption evidence; CI MUST checkout or materialize the exact pinned revision and prove the installed dependency contents.
+
+Nurture maintains one canonical vNext manifest. A pre-activation module MAY use a mechanical projection driven by an explicit disabled-capability list. The projection MUST NOT be independently edited, change retained operation semantics/order/handler binding, add an alternate registry, or silently re-enable a legacy path. Conformance compares canonical and projected manifests and permits only the expected removal of gated declarations. Rollback removes the workspace allowlist first and disables the capability without invoking legacy behavior or rewriting Nurture facts, CommandExecution, audit, or history.
+
+Required evidence is four-layered:
+
+| Layer | Required evidence |
+| --- | --- |
+| Base | Legacy/vNext compile, strict provider/presentation codecs and all bounds, unknown-field/manifest fatal matrix, source-hash portability, and neutrality scan. |
+| My-Chat | Six surfaces x six blocks, renderer compatibility/order/copy/tone, Institution action rejection, content-free Chat rehydration, 60-second freshness/invalidation, accessibility, all persistence-destination leakage scans, capability-off, legacy unchanged, and no fallback. |
+| Nurture | Every list/resolve/present result, wrong principal/Workspace/scenario/provider/ref/version, expiry/revoke/redaction/policy/lifecycle/outage, collection non-expansion, privacy allowlist, safe copy/reasons, route/action disclosure, AI projection, and real registry backing. |
+| Joint | Exact revisions and named identities, mixed-version/registry/renderer drift, public -> signed private -> provider -> presenter -> renderer path, current reread across surfaces, stale/ref/revoke/outage behavior, zero cache/legacy/offline fallback, and rollback. |
+
+Current implementation is not C-3-0c-4 adoption evidence. Base and My-Chat expose only the existing X0-X5 handoff-era workflow contract and validator; no `scenario_interface_source_v1`, trusted-invocation type, subject-provider/presentation manifest area, or presentation capability exists. My-Chat has broad interaction/dashboard paths and no complete surface registry, role boards/workbenches, renderer conformance revision, freshness/persistence guard, or leakage scanner. Nurture still has legacy `surface_mapping`/`internal_api`, a manually coded compatibility projection, a local `file:` My-Chat dependency, synthetic `institution-surfaces`, and no activated provider/presenter. The equal current handoff hash does not alter the readiness finding.
+
+C-3-0c-4 evidence must cover atomic capability/dependency behavior, additive manifest and every fatal reference rule, all four named identity semantics, exact Base -> My-Chat -> Nurture order, immutable dependency materialization, canonical/projection equivalence, legacy compatibility, no fallback, four-layer negative/fault/privacy/accessibility coverage, current-gap detection, default-off rollback, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed.
+
+C-3-0c is therefore complete as a design and implementation-evidence specification only. C-3-0c completion does not claim implementation, adoption, enablement, or user-operable IIB. C-3-0d action execution/recovery is the next decision checkpoint. C-3-0e retains protected data/draft/cache/offline policy and actual complete-IIB adoption/evidence.
 
 ## Minimum IIB closure before real traffic
 
@@ -2611,7 +2665,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0c-3 locked** | C-3-0c-0/1/2/3 lock presentation ownership, provider wire, semantic blocks/offers, renderer mapping, four persistence classes, no-cache freshness, stale behavior, and accessibility. C-3-0c-4 is next; C-4 Institution IIB/closure evidence remains open. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0c complete** | C-3-0c-0 through C-3-0c-4 lock presentation ownership/wire/render/persistence plus atomic capability, named identities, ordered three-repo adoption, legacy/no-fallback behavior, and conformance. C-3-0d is next; C-4 Institution IIB/closure evidence remains open. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
