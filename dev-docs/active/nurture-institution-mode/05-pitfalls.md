@@ -8,6 +8,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
 - Do not activate optional Host actor/workspace fields or let Nurture infer workspace from Participant history; subject-aware ingress requires one My-Chat-established adult principal and exact validated workspace.
+- Do not treat a general Chat thread's personal-workspace storage partition as business context or silently promote daily Q&A into Nurture; business entry requires an explicit workspace transition and minimal confirmed intent carryover.
 - Do not put Nurture care ecology semantics inside My-Chat as canonical facts; family, child, institution, care group, role assignment, enrollment, grant, family-care messages, and care items belong to Nurture.
 - Do not wire live manifest capabilities before Nurture care ecology schema, resolvers, policies, and handlers exist.
 - Do not let institution mode drift into ranking, marketplace, competitive caregiver scoring, or institution growth tooling.
@@ -705,3 +706,13 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: C-3-0b-0 requires independent My-Chat service-caller and adult-principal proofs, one Host-established workspace, server-derived surface provenance, and fresh Nurture Participant/RoleAssignment/Subject resolution. Invitation acceptance stays a separate Host identity transition, and current optional fields remain non-activatable legacy scaffold.
 - Prevention: Every subject-aware route review must identify the public authenticator, private workload identity, represented adult, workspace establishment, surface source, and owner reread separately; no credential or context field may satisfy two layers implicitly.
 - References: `02-architecture.md` Pilot-0-C3-0b-0, `09-pilot-readiness.md` C-3-0b-0.
+
+### 2026-07-19 — Treating every signed-in Chat as workspace business ingress
+
+- Symptom: A daily generic My-Chat question could inherit the personal workspace used to store its thread, then silently invoke Nurture or query private workspace/Subject data when the text mentioned a child, teacher, or institution.
+- Context: My-Chat supports ordinary AI use outside any business workspace, while the current identity repository can default an omitted active workspace to the earliest personal workspace.
+- What we tried: Applying the same exact-workspace rule to every signed-in Chat and allowing a sole membership to become implicit business context.
+- Root cause: Storage partition, account-level conversation context, and established business workspace are separate meanings. A unique membership removes ambiguity but does not express consent to cross from generic Q&A into private scenario processing.
+- Fix / workaround: C-3-0b-1 defines `platform_general`, `workspace_business`, and `invitation_acceptance`. General Chat cannot call Nurture; transition remains explicit even with one eligible workspace, starts/enters a workspace-scoped conversation, and carries only the current confirmed intent by default.
+- Prevention: Every Chat entry must classify context mode before scenario routing. Tests must distinguish storage workspace from business workspace and prove that child-related text alone cannot activate a scenario or copy prior general history.
+- References: `02-architecture.md` Pilot-0-C3-0b-1, `09-pilot-readiness.md` C-3-0b-1.
