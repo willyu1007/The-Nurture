@@ -66,6 +66,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not solve account-to-subject discovery by creating a second canonical Child or relationship table in My-Chat. Host subject entries are opaque discovery/navigation context and never authorization.
 - Do not hardcode `NurtureChildCareProcess` into reusable Base/My-Chat contracts. Product copy can be child-centered while shared technical contracts use generic `subject`.
 - Do not let a `subject_collection` grant bulk write, shared Grant/consent, outside-scope discovery, or membership-cache authority. Every member action resolves one exact current owner path.
+- Do not reuse `DomainContextRef`, raw Subject identity, collection members/counts, or stable context-version correlation for subject discovery. Use the short-lived opaque subject locator, keep collection as one context, and resolve again at every surface/action seam.
 - Do not treat a prospective invitation, roster prefill, same adult, name, birth fact, contact, or old cache as an established Account–Subject relationship.
 - Do not build Institution presenters by loading every Enrollment for a ChildCareProcess and filtering afterward. Begin with current Institution/CareGroup authority and enforce the scope in repository predicates.
 - Do not expose a stable Child/Process id, count, conflict reason, route token, stage, or empty/error distinction that lets one Institution infer another Institution relationship.
@@ -767,3 +768,13 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: C-3-0c-0 fixes one Nurture semantic presenter/owner path followed by My-Chat generic renderers. Chat narration is limited to current display-safe semantic output; renderers cannot add actions/reasons/facts; every surface rereads; and unclassified presentation/domain/protected fields cannot enter Host persistence.
 - Prevention: Every renderer review must identify the owner-produced semantic input, prove zero domain queries/interpretation, compare all surfaces against one owner presenter, test LLM non-invention, and list every persisted field with a later C-3-0c-3/e persistence class.
 - References: `02-architecture.md` Pilot-0-C3-0c-0, `06-ib-nurture-schema-spec.md` C-3-0c-0 refinement, `09-pilot-readiness.md` C-3-0c-0.
+
+### 2026-07-19 — Reusing domain refs or treating subject options as authority
+
+- Symptom: A Host adapter could reuse `DomainContextRef` for subject discovery, expose stable Nurture object identity, expand a CareGroup/Institution collection into children, or treat a selected option as lasting authorization.
+- Context: C-3-0a requires account-to-Subject reachability without a Host Child/relationship SSOT, while existing workflow `DomainContextRef` intentionally contains `namespace`, `object_type`, `object_id`, and optional canonical identity for durable owner reread.
+- What we tried: Reusing the existing ref to avoid a new type, combining discovery and resolve in one generic method, and letting My-Chat rank or cache candidates for cross-surface convenience.
+- Root cause: Durable domain identity and short-lived privacy-preserving reachability prove different facts. Candidate discovery is not current authorization, and collection reachability does not authorize member enumeration.
+- Fix / workaround: C-3-0c-1 introduces separate `list_subject_contexts` and `resolve_subject_context`, a new principal/workspace/scenario-bound opaque `ScenarioSubjectContextRefV1`, one collection context without member expansion, closed results/privacy fields, and 30-minute ref/5-minute cursor/20-candidate bounds. Exact safe-copy encoding remains C-3-0c-2.
+- Prevention: Conformance must reject `DomainContextRef` identity fields, Host ranking/filtering/correlation, collection member/count output, and any use of a context ref as relationship, action, replay, cross-surface, or offline authority. Resolve again at every surface/action seam.
+- References: `02-architecture.md` Pilot-0-C3-0c-1, `06-ib-nurture-schema-spec.md` C-3-0c-1 refinement, `09-pilot-readiness.md` C-3-0c-1.
