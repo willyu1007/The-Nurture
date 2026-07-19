@@ -85,19 +85,18 @@ Main-chat routing rules, refined by Pilot-0-B3-0:
 - After Nurture is selected, the existing Surface Contract envelope applies. Nurture independently resolves whether the actor is currently acting as guardian, caregiver, or institution administrator and whether the requested effect is `internal_fact`, `family_to_org`, or `org_to_family`.
 - The system invocation direction (`My-Chat -> Nurture -> My-Chat scenario response`) and the Nurture business distribution direction (`family_to_org` / `org_to_family`) are independent concepts and MUST NOT be inferred from each other.
 
-Surface rules:
+Surface rules, superseded by the exact C-3-0b/c contracts:
 
-- `mobile_chat` may pass `workspaceId` if injected by the host adapter, `myChatUserId`, `surface=mobile_chat`, current input payload, `hostConversationRef`, `hostTurnId`, `previousTurnRef`, and `clientLocalContext`. Nurture MUST limit role candidates to current Chat-entitled guardian/caregiver assignments.
-- `mobile_chat` must not pass trusted role, trusted `selectedRoleAssignmentId`, trusted `childCareProcessId`, host-authored `targetRef`, host-authored `workScopeHint`, or host-side family/institution/class authorization decisions.
-- Family, teacher, and institution boards may pass generic display state such as filters, sort, pagination, selected tab, and a Nurture-issued `scenarioToken` from a previously rendered work surface. Nurture MUST restrict role/scope candidates to the board's product entitlement; My-Chat must not synthesize `roleAssignmentId`, `careGroupId`, `childCareProcessId`, `targetRef`, `dataClass`, or `direction`.
-- `notification_deeplink` may pass host delivery bookkeeping such as `deliveryId`, `dedupeKey`, and provider delivery status, plus a Nurture-issued `scenarioToken` if one was embedded in the notification. My-Chat must not interpret or pass Nurture target ids as business refs.
+- `nurture_chat` enters through the verified private invocation and exact registered product-surface key. Client broad `workspaceId|myChatUserId|surface|clientLocalContext`, trusted role/scope/target, and Host business authorization decisions are rejected; C-3-0c-1/2 provide the only subject/presentation input.
+- Family, teacher, and institution boards use their exact registered product-surface key and may request only the locked `current|recent|history`, owner cursor/page, item detail, and owner-issued navigation. Arbitrary filters, sort, selected-tab authority, persisted scenario token, raw role/scope/target/data-class/direction, and local business filtering are forbidden in Pilot-0.
+- Notification/deep-link entry carries only the recipient-bound Host Notification id through the generic open route. Delivery ids/dedupe/provider status, raw Handoff/Nurture targets, and scenario tokens do not enter provider payload, client route, or semantic presentation.
 - The family domain web workbench is guardian-entitled and the institution domain web workbench is institution-admin-entitled; neither accepts a host-authored Nurture role/scope. The first internal experiment exposes no caregiver domain web workbench. Institution admin is not ambient access to family content or all child facts.
 - Host `web_run_workbench` and technical Admin are not Nurture domain workbenches and MUST NOT gain business access through surface naming or routing.
 
 Pilot-0-B3-1a Guardian action refinement:
 
-- Guardian Chat MUST remain the generic My-Chat AI/interaction harness. Nurture returns generic interaction envelopes and MUST NOT add a Guardian-specific Chat shell or second Chat business lifecycle.
-- Guardian Chat initially relies only on implemented core primitives: `timeline_inline`, `action_option_deck`, `editable_preview`, `authorization_gate`, `bottom_sheet`, `full_screen_flow`, and envelope `resultSummary`. Incomplete generic primitives are not Pilot prerequisites.
+- Guardian Chat MUST remain the generic My-Chat AI/semantic-presentation harness. Nurture returns the C-3-0c semantic contract and MUST NOT add a Guardian-specific Chat shell or second Chat business lifecycle.
+- Existing `timeline_inline`, option, preview, authorization, bottom-sheet, and full-screen components are UI foundations only. The broad mobile `InteractionEnvelope` is not the activated Nurture wire and cannot satisfy C-3-0c renderer conformance without an additive compatible adapter/registry.
 - Question submission, grant confirm/replacement, revoke, and author redaction are reachable from Chat, family board, and family workbench. Presentation differs, but every durable effect uses the same Nurture command specification, current resolver/policy checks, and CommandExecution kernel.
 - `confirm_family_enrollment` is also reachable from all three Guardian surfaces with strong confirmation. It accepts the current proposed child/family enrollment under Guardian authority and does not implicitly create a grant.
 - Natural language, selected surface, dashboard projection, and client state are not authorization. Every confirmation reloads current actor, role, child/family scope, grant, object lifecycle, and expected version before execution.
@@ -112,7 +111,7 @@ Pilot-0-B3-1b Caregiver action refinement:
 - Chat timeline and activation payloads remain display-safe. Protected family-question bodies are loaded by opaque ref from Nurture into a transient detail surface after current owner reread and MUST NOT be persisted as My-Chat Chat messages, interaction history, projections, or logs.
 - Item open is read-only and does not imply Nurture acknowledgment. Host notification read/unread remains separate. `nurture.family_care.acknowledge_item` requires an explicit current caregiver confirmation and command precondition recheck.
 - AI MAY produce an explicitly unconfirmed, non-diagnostic, non-prescriptive response draft from currently authorized Nurture context. Only a caregiver-confirmed `nurture.family_care.reply_item` action may create a named caregiver-authored family-facing message.
-- Teacher board MUST include complete authorized open/acknowledged/replied/blocked-or-revoked/redacted-or-suppressed history with child, care-group, status, and time filters because no Caregiver domain workbench exists. Redacted/suppressed rows expose only display-safe state or tombstone metadata, never protected bodies.
+- Teacher board MUST include complete owner-paginated authorized open/acknowledged/replied/blocked-or-revoked/redacted-or-suppressed history because no Caregiver domain workbench exists. Pilot-0 uses current/recent/history, owner cursor/page, item detail, and owner-issued navigation. Arbitrary search/sort and compound child/care-group/status/time filters require a later owner query-control contract. Redacted/suppressed rows expose only display-safe state or tombstone metadata, never protected bodies.
 - Caregiver-authored replies are immutable after commit. Redaction follows current author/policy checks; in-place edit, automatic reopen, second reply, and correction remain outside Pilot-0 and require a later explicit command contract.
 - Direct family Chat, bulk actions, clarification loops, daily-care outcomes, grant/enrollment/topology administration, cross-care-group work, reassignment, and duty handoff are unavailable in the first internal experiment.
 - Final acknowledge/reply/redaction commands MUST fail closed after revoke, source redaction, enrollment/role change, item-version conflict, or policy change. A draft or alternate surface is not authorization.
@@ -187,7 +186,7 @@ Pilot-0-B3-2b opaque-token refinement:
 - `submit_action` binds action key, opaque target refs, expected versions, prepared schema/hash, immutable refs, and a stable command request id derived from context id + purpose. Token consumption, `CommandExecution`, and the business effect MUST commit atomically. Exact response-loss replay returns the committed Execution; deterministic stale/denied state revokes the context; retryable technical failure leaves the unchanged token active only within TTL.
 - `open_notification` stores locator refs only, is reusable/read-only until expiry/revoke, and every open owner-rereads current participant/role/scope/grant/policy/target lifecycle. Open MUST NOT mark a Nurture Receipt read/acknowledged or execute any command.
 - Refresh never mutates `expiresAt` or reactivates a consumed/revoked/expired context. Clarification regenerates current candidates, submit reopens/re-presents the action, and notification recovery returns through a current owner view before issuing any new token.
-- Scenario tokens never satisfy `strong_authorization`. Internal mismatch/replay/revoke/expiry codes remain server-side and map through the accepted safe availability vocabulary. Pilot-0-B3-2c fixes notification transport/open behavior below.
+- Scenario tokens never satisfy `strong_authorization`. Internal mismatch/replay/revoke/expiry codes remain server-side and map through the accepted safe availability vocabulary. The Pilot-0-B3-2c section fixes notification transport/open behavior.
 
 Pilot-0-B3-2c notification/deep-link refinement:
 
@@ -210,9 +209,9 @@ Pilot-0-B3-2d draft/result/history continuity refinement:
 - My-Chat Chat transcript is Host conversation history and MUST NOT reconstruct, resubmit, or authorize a Nurture draft. User-authored Chat text may remain under Host policy; caregiver AI drafts derived from protected family content remain ephemeral and MUST NOT persist in Chat history.
 - Existing My-Chat `PublicDraft`, Workflow artifact draft, and Nurture forum-publication Handoff remain external-publication mechanisms. They MUST NOT store family-care question/reply, grant/enrollment, or Institution-command interaction drafts.
 - Committed continuity is Nurture business facts plus refs-only `CommandExecution`. Source result summaries are display-only; response loss returns exact Execution replay; destination surfaces owner-query current facts and MUST NOT rerun the command or introduce `open_result`/generic object tokens.
-- Non-notification transition carries only generic `route_class` and optional `view_mode=current|recent|history`. Business target ids, output refs, rows, filters, search text, pagination cursors, bodies, expected versions, action availability, and scroll state remain owner/surface-local.
+- Non-notification transition carries only generic `route_class` and optional `view_mode=current|recent|history`. Business target ids, output refs, rows, owner pagination cursors, bodies, expected versions, action availability, and scroll state remain owner/surface-local. Pilot-0 has no arbitrary filter/search control; a future separately contracted query state would also remain owner/surface-local.
 - Guardian family board owns current/recent and family workbench owns complete authorized family/grant/enrollment history. Teacher board owns complete authorized caregiver history. Institution board owns safe current aggregates and institution workbench owns authorized topology/configuration command history. Chat, Notification inbox, and Technical Admin are not Nurture business-history stores.
-- Unsubmitted drafts are never visible to another guardian/device. Committed Message/Receipt/reply/outcome visibility follows current family relationship/grant/policy. Every page/filter/detail/action rereads current owner state; redacted/suppressed history exposes only permitted tombstones.
+- Unsubmitted drafts are never visible to another guardian/device. Committed Message/Receipt/reply/outcome visibility follows current family relationship/grant/policy. Every Pilot page/detail/action rereads current owner state; any future separately contracted filter also owner-rereads. Redacted/suppressed history exposes only permitted tombstones.
 - Round-trip tests MUST cover Guardian Chat -> board/workbench, second guardian visibility, Caregiver Chat -> teacher board, Institution board -> workbench -> board, response loss, concurrent/current-state change, revoke/redaction between surfaces, wrong actor/workspace/surface, reload, and cross-device access without duplicate effects or draft leakage.
 
 Pilot-0-B3-3a first business input/data-envelope refinement:
@@ -776,10 +775,10 @@ Pilot-0-C3-0c-0 presentation pipeline and ownership test refinement:
 - Chat-AI tests MUST constrain narration/tool context to current display-safe semantic output plus generic Host state. Hidden candidate/domain objects, protected content, internal reason/policy metadata, stale conversation summaries, and prior tool output MUST be absent. Prompt injection, natural-language role claims, and model-generated action proposals MUST NOT create a candidate, disclosure, confirmation, or action absent from the structured owner result.
 - Renderer tests MUST prove generic components perform structural compatibility, accessibility, layout, navigation, and device adaptation only. Unknown/incompatible structures fail safely; renderers cannot query owner state, widen copy, translate internal codes, fabricate actions, or fall back to another surface/legacy presenter.
 - Non-authority tests MUST rerun Host gates and Nurture relationship/policy/lifecycle checks at render, refresh, selection, navigation, prepare, submit, retry, result recovery, and Notification destination. A previous semantic or rendered response cannot satisfy any later authorization/command precondition.
-- Persistence-negative tests MUST inspect Chat history, dashboard/cache/search/analytics, Notification, Handoff/Outbox, artifact drafts, logs, traces, metrics, and offline storage for rendered trees, candidates, raw Subject/domain ids, relationship paths, role/Grant/policy results, protected bodies, owner tokens, action availability, and inferred state. Every unclassified field MUST be absent until C-3-0c-3/e explicitly permits it.
+- Persistence-negative tests MUST inspect Chat history, dashboard/cache/search/analytics, Notification, Handoff/Outbox, artifact drafts, logs, traces, metrics, and offline storage for rendered trees, candidates, raw Subject/domain ids, relationship paths, role/Grant/policy results, protected bodies, owner tokens, action availability, and inferred state. C-3-0c-3 permits only the exact content-free Host shell; every other unclassified field remains absent until C-3-0e explicitly permits a narrower protected/draft/offline channel.
 - Outage/staleness tests MUST cover provider failure, owner database failure, stale/revoked opaque context, relationship loss, Grant/policy/lifecycle drift, renderer-version mismatch, and cross-surface reopening. All cases fail closed or return the current safe state without cached presentation, hidden detail, or more permissive renderer fallback.
 - Current-gap tests MUST detect existing broad Workflow surfaces, synthetic presenters/artifact drafts, Nurture `institution-surfaces`, absent subject-provider/presentation types, absent renderer conformance, and absent persistence classification. Legacy scaffold output cannot satisfy activation.
-- Planning-boundary tests MUST prove C-3-0c-0 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists. C-3-0c-1 locks the subject-provider wire below.
+- Planning-boundary tests MUST prove C-3-0c-0 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists. The C-3-0c-1 section locks the subject-provider wire.
 
 Pilot-0-C3-0c-1 subject-provider wire test design:
 
@@ -792,8 +791,8 @@ Pilot-0-C3-0c-1 subject-provider wire test design:
 - Selection tests MUST prove My-Chat cannot sort, rank, merge, filter, search, infer, or auto-select candidates from labels, counts, raw refs, surfaces, history, or cache. Same-name disambiguation is minimal owner-produced safe copy; My-Chat cannot assemble the copy.
 - Authority tests MUST prove a valid ref grants no relationship, action, direct CommandExecution, replay, cross-surface, or offline authority. Every surface transition repeats Host gates and owner resolve; every action prepare/submit repeats owner resolution and requires the later C-3-0d action context.
 - Freshness tests MUST prove a subject ref expires by 30 minutes, a cursor expires by 5 minutes, a page never exceeds 20 options, and provider/database outage uses generic HTTP `503` without cached-context fallback.
-- Persistence-negative tests MUST inspect Chat history, board/workbench cache, search, analytics, Notification, Handoff/Outbox, logs, traces, metrics, and offline storage. No list result, candidate, raw ref, safe label, owner context, or inferred cross-ref correlation may persist before C-3-0c-3/e explicitly classifies the field.
-- Planning-boundary tests MUST prove C-3-0c-1 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists. C-3-0c-2 locks semantic presentation below.
+- Persistence-negative tests MUST inspect Chat history, board/workbench cache, search, analytics, Notification, Handoff/Outbox, logs, traces, metrics, and offline storage. C-3-0c-3 classifies list results, candidates, raw refs, safe labels, owner context, and inferred cross-ref correlation as ephemeral or forbidden Host copies; none may persist.
+- Planning-boundary tests MUST prove C-3-0c-1 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists. The C-3-0c-2 section locks semantic presentation.
 
 Pilot-0-C3-0c-2 semantic-presentation test design:
 
@@ -811,7 +810,26 @@ Pilot-0-C3-0c-2 semantic-presentation test design:
 - Bounds tests MUST enforce 64 KiB UTF-8 total, 20 blocks, 20 fact/metric/item/timeline entries per block/page, 8 navigation offers, 8 actions, label 80, title 120, summary/body 500, help 240, and five-minute cursor/item/continuation/action-target expiry at codec and owner-result construction.
 - AI-projection tests MUST include only `narration=allowed` safe text and strip every ref, version, reason/action code, cursor, target, hidden action, and display-only field. Prompt injection and model output cannot create new facts, blocks, reasons, actions, confirmation, or submit behavior.
 - Current-gap tests MUST detect Base Run-level/raw-target action availability, My-Chat broad `params|extensions|serverAction` interaction fields, Nurture id-shaped pseudo-opaque refs/ad-hoc safe strings, and absent shared semantic-presentation codecs. Existing scaffold cannot satisfy activation.
-- Planning-boundary tests MUST prove C-3-0c-2 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists. C-3-0c-3 is next.
+- Planning-boundary tests MUST prove C-3-0c-2 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists.
+
+Pilot-0-C3-0c-3 renderer/persistence test design:
+
+- Surface-registry tests MUST cover all six exact product surfaces and their Chat semantic panel, role-board, or domain-workbench family. Guardian/Caregiver Chat role resolution remains owner-side; Teacher board has complete owner-paginated history; Institution board rejects every action offer; family/institution workbenches remain domain-specific and cannot expose caregiver/institution-forbidden content.
+- Renderer-structure tests MUST cover all six block kinds across every compatible family, preserve block/row/entry/order/copy/locale/tone/badge/timestamp/offer priority, and permit layout reflow only. Sort, merge, omission, relabel, translation, summarization, semantic inference, synthetic actions, and timestamp-lifecycle inference MUST fail.
+- Compatibility tests MUST reject unknown schema/version/block/field, over-bound output, missing renderer capability, and wrong-surface actions as a whole-presentation failure. Partial rendering, silently dropping an offer, switching to another surface profile, and fallback to broad mobile `InteractionEnvelope`, Workflow dashboard, or legacy Nurture surfaces MUST fail.
+- History/query tests MUST prove `current|recent|history`, owner cursor/page, item detail, and owner-issued navigation can reach every current authorized row without copying history. Arbitrary text search, renderer-owned sort, compound business filters, local filtering, and encoding filters through route/presentation/continuation/analytics MUST be absent from Pilot-0. A future filter/search path requires a separate owner query-control contract.
+- Persistence-class tests MUST classify every field as `owner_canonical`, `ephemeral_presentation`, `durable_host_shell`, or `forbidden_host_copy`. Unknown/unclassified fields MUST fail conformance and activation rather than inherit a permissive default.
+- Owner-canonical tests MUST prove Nurture business facts/lifecycle/CommandExecution/history remain owner-durable and are never reconstructed from Host shell, Chat, renderer, cache, Notification, Handoff/Outbox, analytics, or AI output.
+- Ephemeral tests MUST inspect process/foreground memory lifecycle for every subject/presentation result, safe text/reason, block/offer, ref/version/cursor, AI projection, selection/scroll/expanded state, and render tree. Every value MUST disappear on background/lock, sign-out, Workspace/account/thread/surface/process/renderer change and MUST be absent from all durable Host destinations.
+- Durable-shell tests MUST allow only Host conversation/turn/page, canonical Workspace, scenario, registered product surface/presentation key/route/view mode, renderer-contract version, Host timestamps, and generic rehydration state. Raw owner facts/content/target/policy/authority and unregistered metadata MUST fail. Reopening a semantic Chat turn MUST owner-reread and never replay old copy/narration.
+- Forbidden-copy/leakage tests MUST scan Chat history, board/workbench cache, search, analytics, Notification, Handoff/Outbox, logs, traces, metrics, crash evidence, URLs/navigation history, client persistence, and offline storage for protected body/media/draft, raw id, relationship/role/Grant/policy result, tokens/credentials, action target/version, cursor, candidates, presentation copy, and inferred state.
+- Ref-storage tests MUST prove the subject ref can exist only in protected server transient state until its 30-minute TTL and five-minute item/cursor/continuation/action refs only in response/foreground memory. Expiry, background, process loss, and cross-surface navigation cannot recover or extend the values.
+- Freshness tests MUST cover the exact 60-second foreground lease, shorter-ref expiry, boundary timing, known invalidation before lease end, immediate content/control clearing, foreground resume/focus, refresh, navigation, pagination, detail, action prepare/result, retry, and Notification destination. Every seam repeats Host gates and owner read.
+- Stale/failure tests MUST cover revoke, redaction, policy/lifecycle drift, provider/owner/database outage, renderer drift, app background, process loss, and network retry. No stale-while-revalidate, content-behind-spinner, cached/legacy/more-permissive/offline fallback, or optimistic Nurture lifecycle/count/badge/action/reason mutation is allowed.
+- Accessibility tests MUST cover owner locale and text direction, semantic reading/order/roles, label-value announcements, non-color/icon-only meaning, accessible names/roles/states, focus/keyboard order, touch targets, font scaling, reduced motion, screen reader behavior, and generic polite transition announcements. `critical` cannot infer assertive/emergency semantics; omitted/display-only data cannot enter assistive output.
+- Observability tests MUST allow only body-free low-cardinality surface/schema/version/outcome/refresh/latency/count dimensions and reject safe copy, high-cardinality presentation keys, block/item keys, refs/versions/cursors, role/Grant/policy, target existence, or presentation content.
+- Current-gap tests MUST detect broad Chat envelope fields, durable semantic Chat-message ambiguity, raw Workflow dashboard action/target/reason branching, absent role boards/workbenches, partial accessibility, absent renderer registry/freshness/invalidation/persistence allowlist/leakage scanner, and absent activated Nurture semantic presenter.
+- Planning-boundary tests MUST prove C-3-0c-3 changes task/governance documentation only. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic change exists. C-3-0c-4 conformance/adoption evidence is next.
 
 Multi-turn behavior:
 
@@ -1232,7 +1250,7 @@ This decision does not expand R7. Resolver recovery remains deterministic and ha
 
 **Status:** LOCKED on 2026-07-12 after B1, B2, and B3 closure.
 
-Command write preconditions are the authoritative submit-time checks after resolver and policy prechecks. R8 separates internal business-fact writes from cross-role distribution, uses a prepare/execute flow, and requires current-state checks inside the Nurture transaction. B1-B3 below close the durable handoff, command execution, routing/clarification, lifecycle, and recovery blockers.
+Command write preconditions are the authoritative submit-time checks after resolver and policy prechecks. R8 separates internal business-fact writes from cross-role distribution, uses a prepare/execute flow, and requires current-state checks inside the Nurture transaction. The R8-B1 through R8-B3 sections close the durable handoff, command execution, routing/clarification, lifecycle, and recovery blockers.
 
 Command effect classes:
 
@@ -1279,7 +1297,7 @@ CommandResponseDisposition:
 - `conflict` means current object/version state requires refresh or a new prepare/confirmation flow.
 - `needs_clarification` is not a command outcome. Actor/scope/target ambiguity returns to resolver; a long-running family clarification is a separate durable business workflow.
 
-Original robustness blockers (contractually closed by B1-B3; implementation gates remain below):
+Original robustness blockers (contractually closed by B1-B3; implementation gates remain in the later R8 sections):
 
 1. **R8-B1 durable host activation handoff:** Committed Nurture content is returned through scenario response/presenter paths and does not depend on a handoff for visibility. When a command also requests a My-Chat-owned notification, unread/badge, or deep link, a crash after Nurture commit but before My-Chat outbox acceptance can still lose that activation request. B1 requires an at-least-once, idempotent host activation handoff; cross-database exactly-once is not an MVP goal.
 2. **R8-B2 durable command idempotency and concurrency:** Grant-receipt uniqueness covers only distribution. Internal item/log/media commands require a shared Nurture command-execution record or equivalent durable uniqueness, payload-hash mismatch rejection, result replay, and enforced `aggregateVersion`/conditional update behavior.
@@ -1404,7 +1422,7 @@ Generic-pipeline boundary:
 Verification implications:
 
 - Tests MUST cover same-command replay, explicit empty snapshots, bounded/versioned JSON validation, request-ID uniqueness/stable ordering, persist+claim ordering, missing/forged/wrong-service/wrong-type/binding-mismatch rejection before commit, claim-secret non-persistence/logging, exact original-Step replay, same-Step re-claim with changed token/version, wrong-Step denial, cancellation/claim-expiry races, direct-empty versus host-first-non-empty paths, same-key/hash duplicate, same-key/different-hash conflict, manifest drift under pinned contract hash, explicit resend with a new request ID, per-target stable IDs independent of array order, expiry, current-policy blocking, and refs-only payloads.
-- B1-C3 below locks My-Chat `complete_step` materialization, transaction atomicity, partial duplicate handling, bounded batch behavior, and returned canonical handoff refs.
+- The R8-B1-C3 section locks My-Chat `complete_step` materialization, transaction atomicity, partial duplicate handling, bounded batch behavior, and returned canonical handoff refs.
 
 R8-B1-C3 host transaction materialization is locked:
 
@@ -1698,7 +1716,7 @@ Cross-scenario behavior:
 
 - A handoff from Scenario A to Scenario B does not reuse Scenario A's execution row. Scenario B derives/receives a stable downstream command request identity and commits its own local CommandExecution with its own canonical mutation, then returns the handoff receipt.
 - Shared conformance tests MUST prove host pass-through/retry stability while scenario tests prove local transaction atomicity and command-specific hash/state semantics.
-- B2-B2a below locks invocation/command/process/effect identity and the concrete `commandRequestId` lifecycle. B2-B2b then locks Nurture uniqueness/hash storage and canonical payload-hash field inclusion/exclusion/versioning; B2-C is the next concurrency/result-storage decision.
+- The R8-B2-B2a section locks invocation/command/process/effect identity and the concrete `commandRequestId` lifecycle. B2-B2b then locks Nurture uniqueness/hash storage and canonical payload-hash field inclusion/exclusion/versioning; B2-C is the next concurrency/result-storage decision.
 
 R8-B2-B2a invocation/command identity lifecycle is locked:
 
@@ -1945,7 +1963,7 @@ Required B3-A tests:
 - request clarification atomic item/event/message/receipt transition, family response correlation from same/new conversation, repeated clarification rounds, expiry/cancel returning teacher attention, and concurrent stale item-version rejection;
 - no new Routing/Clarification model or duplicate lifecycle in schema/runtime contracts.
 
-B3-A leaves pending-receipt driving/recovery to B3-B below, which closes it through direct atomic delivery or host-first durable Run/Step and explicitly rejects a Nurture transport outbox/global pending scanner.
+B3-A leaves pending-receipt driving/recovery to the R8-B3-B section, which closes the boundary through direct atomic delivery or host-first durable Run/Step and explicitly rejects a Nurture transport outbox/global pending scanner.
 
 R8-B3-B host-first durable driver and recovery contract is locked:
 
@@ -2011,7 +2029,7 @@ Required B3-B tests:
 - waiting-for-family consumes no worker lease, manual-review item remains delivered/visible, and optional activation failure remains independent;
 - contract/schema scans prove no Nurture outbox/worker, Handoff misuse, `listPendingScenarioWork`, or generic polling platform.
 
-B3-C1 below locks status ownership inside Nurture. B3-C2a-d lock revoke/redaction/cancel/clarification transitions for pending receipts and waiting items; B3-C2e then closes technical exhaustion and Admin recovery.
+The R8-B3-C1 section locks status ownership inside Nurture. B3-C2a-d lock revoke/redaction/cancel/clarification transitions for pending receipts and waiting items; B3-C2e then closes technical exhaustion and Admin recovery.
 
 R8-B3-C1 lifecycle-status ownership boundary is locked:
 
@@ -2343,7 +2361,7 @@ Policies should return structured decisions, not booleans only, so handlers can 
 
 ## 5. Capability Design
 
-Teacher mobile is the primary execution surface for first-slice institution ecology. It composes the capabilities below, but each capability remains independently declared, authorized, tested, and evolved.
+Teacher mobile is the primary execution surface for first-slice institution ecology. Teacher mobile composes the capabilities in the following list, but each capability remains independently declared, authorized, tested, and evolved.
 
 Implementation order is not the same as capability membership. IIA includes all four first-slice capabilities in the manifest contract, while implementation starts with the `class_family_inbox` + `teacher_attention_board` closure.
 

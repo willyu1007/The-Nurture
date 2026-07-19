@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-19
-- **Current checkpoint:** Pilot-0-C in progress; C-3-0c-0/1/2 presentation ownership, subject-provider wire, and semantic blocks/actions are locked after C-3-0b authenticated ingress completed; C-3-0c-3 renderer/persistence classes next
+- **Current checkpoint:** Pilot-0-C in progress; C-3-0c-0/1/2/3 presentation ownership, provider wire, semantic presentation, renderer mapping, persistence classes, accessibility, and stale behavior are locked after C-3-0b authenticated ingress completed; C-3-0c-4 conformance/adoption evidence next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -161,7 +161,7 @@ The B3-0 readiness decision changes no manifest or runtime. B3-1 and later imple
 | Revoke a grant | Generic `authorization_gate` | Strong confirmation | Strong confirmation with full consequence detail |
 | Redact the guardian's own submitted question | Generic `authorization_gate` for a resolved message | Confirm from question detail | Confirm from authorized history detail |
 | Cancel a pending route | Conditional on current cancellable `pending` state | Same | Same |
-| Search complete history | Navigate to the workbench | Not available beyond current/recent scope | Available |
+| Search complete history | Navigate to the workbench | Not available beyond current/recent scope | Complete owner-paginated history; arbitrary text search and compound business filters are deferred from Pilot-0 |
 | Edit an already-submitted question | Not allowed | Not allowed | Not allowed |
 | Hard-delete Message/Receipt/Execution facts | Not allowed | Not allowed | Not allowed |
 | Continue chatting on an already-replied item | Out of Pilot-0 | Out of Pilot-0 | Out of Pilot-0 |
@@ -169,7 +169,7 @@ The B3-0 readiness decision changes no manifest or runtime. B3-1 and later imple
 
 The Guardian matrix has the following mandatory semantics:
 
-1. Chat is the generic My-Chat AI panel, not a Guardian-specific Nurture page. Nurture MUST use generic interaction envelopes and MUST NOT register a second Chat business state machine or bespoke family-chat shell.
+1. Chat is the generic My-Chat AI panel, not a Guardian-specific Nurture page. Nurture MUST use the C-3-0c semantic presentation through generic My-Chat interaction UI and MUST NOT register a second Chat business state machine or bespoke family-chat shell.
 2. The first Guardian Chat slice depends only on the currently implemented core primitives: `timeline_inline`, `action_option_deck`, `editable_preview`, `authorization_gate`, `bottom_sheet`, `full_screen_flow`, and envelope `resultSummary`. `form_collector`, `step_wizard`, `suggestion_chips`, and other incomplete primitives are not Pilot prerequisites.
 3. Natural-language input is intent and private draft material. Cross-role submission, grant creation/replacement, revoke, and redaction require an explicit current-state confirmation before a Nurture command executes.
 4. Chat returns a safe result summary after command completion. Family board/workbench views reread current Nurture-owned state; no surface copies the business lifecycle into My-Chat Chat or projection storage.
@@ -183,14 +183,14 @@ The Guardian matrix has the following mandatory semantics:
 12. `withdraw_family_enrollment` is reachable from all three Guardian surfaces and permanently ends the shared Enrollment after current strong confirmation. Any current exact-Family Guardian is independently eligible; Grant ownership, invitation receipt, join order, a primary label, or another Guardian's countersignature cannot add or remove that authority.
 13. `update_child_care_stage` is reachable from all three Guardian surfaces and converges on one StageEpisode command. The action requires current strong confirmation and cannot become an Institution action, automatic age transition, pregnancy-handler side effect, or Enrollment mutation.
 
-The B3-1a product contract is ahead of current implementation. My-Chat has a typed mobile interaction envelope, core render hosts, and a public-draft vertical slice, but no complete server-produced generic interaction delivery/action registry for arbitrary scenario actions. Nurture does not yet expose the Guardian board/workbench actions or map the accepted action set into manifest/API command keys. Those gaps must close before Pilot traffic; B3-1a does not authorize runtime or manifest changes.
+The B3-1a product contract is ahead of current implementation. My-Chat has a broad typed mobile interaction envelope, core render hosts, and a public-draft vertical slice, but no C-3-0c semantic-presentation delivery/renderer/action registry. Nurture does not yet expose the Guardian board/workbench actions or map the accepted action set into manifest/API command keys. Those gaps must close before Pilot traffic; B3-1a does not authorize runtime or manifest changes.
 
 #### Pilot-0-B3-1b — Caregiver action matrix (LOCKED)
 
 | Caregiver action | Generic AI Chat | Teacher board |
 | --- | --- | --- |
 | Query current attention state | AI response over current owner-reread safe summaries | Aggregated counts, state, and grouping |
-| View actionable-item candidates | Display a bounded candidate set | Complete authorized list with filter and sort |
+| View actionable-item candidates | Display a bounded candidate set | Complete owner-paginated authorized list; arbitrary compound filter/sort controls are deferred from Pilot-0 |
 | Select a child or item | Generic `action_option_deck` | Select within current authorized care-group scope |
 | View protected family-question body | Resolve an opaque ref, perform transient owner-reread detail, and do not persist the body in Chat history | Current item detail after owner reread |
 | View current grant/enrollment eligibility | Safe available/blocked summary | Item detail with current available/blocked reason |
@@ -215,7 +215,7 @@ The Caregiver matrix has the following mandatory semantics:
 3. Opening an item is read-only. My-Chat notification read/unread is host display state. Nurture `acknowledge_item` is a separate explicit caregiver-confirmed business command and MUST NOT occur implicitly when Chat or board detail opens.
 4. AI MAY help draft a caregiver response using the currently authorized Nurture context, but the draft MUST be labelled unconfirmed, remain outside the canonical family-facing message lifecycle, and never publish under a caregiver identity without the caregiver's explicit confirmation. Drafting remains non-diagnostic, non-prescriptive, and not an emergency-care replacement.
 5. Caregiver reply submission from Chat and teacher board MUST converge on `nurture.family_care.reply_item`. The command rechecks caregiver role, care-group reachability, enrollment, exact Thread lifecycle, grant `org_to_family`, source/item lifecycle, expected version, and current policy; optional ThreadParticipant projection is not authority.
-6. The teacher board MUST cover both current work and complete authorized history because the Caregiver role has no domain workbench. History includes open, acknowledged, replied, blocked/revoked, and redacted/suppressed items with child, care-group, status, and time filters; redacted/suppressed entries expose only current display-safe state or tombstone metadata, never the protected body.
+6. The teacher board MUST cover both current work and complete authorized owner-paginated history because the Caregiver role has no domain workbench. History includes open, acknowledged, replied, blocked/revoked, and redacted/suppressed items. Pilot-0 uses current/recent/history modes, owner pagination, item detail, and owner-issued navigation offers; arbitrary text search and compound child/care-group/status/time filters require a later additive owner query-control contract. Redacted/suppressed entries expose only current display-safe state or tombstone metadata, never the protected body.
 7. A caregiver reply is immutable after commit. The caregiver may redact the caregiver-authored reply through current policy, but Pilot-0 provides no in-place edit, automatic reopen, second reply, or correction command. A future correction flow requires an explicit new command contract.
 8. Direct family Chat is forbidden. Family input creates a workflow item; caregiver actions commit a Nurture business transition and a traceable family-facing message. Chat presentation MUST NOT bypass the workflow-mediated communication contract.
 9. Bulk actions, clarification loops, daily-care outcomes, multi-caregiver concurrency, caregiver reassignment, and duty handoff remain outside the first internal experiment.
@@ -613,7 +613,7 @@ History responsibility remains role-correct:
 | Institution workbench | Authorized topology/configuration command history, never ambient family body history. |
 | Technical Admin | Run/Step/Handoff/Outbox/Notification technical history only. |
 
-History rows, business target filters, search text, pagination cursor, scroll position, old expected versions, and action state are surface-local. Every target query/page/filter/detail/action rereads current Nurture access. Redacted/suppressed rows expose only owner-approved tombstone state. My-Chat Chat transcript, Notification inbox, and Technical Admin never become a parallel Nurture history projection.
+History rows, owner pagination cursors, scroll position, old expected versions, and action state are surface-local. Pilot-0 carries no arbitrary business filter/search control; any future separately contracted filter/search state would also remain surface-local and owner-validated. Every target query/page/detail/action rereads current Nurture access. Redacted/suppressed rows expose only owner-approved tombstone state. My-Chat Chat transcript, Notification inbox, and Technical Admin never become a parallel Nurture history projection.
 
 The minimum round-trip matrix is mandatory:
 
@@ -978,7 +978,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
 | C-2 child/family/enrollment/Grant onboarding | **LOCKED / COMPLETE** | C-2f-5 closes C-2 with immutable business outcome versus replay disposition, exact server-only output refs, current owner presenters, same-Execution/same-Step response-loss recovery, route-only continuity, preserved explicit-empty paths, and minimal future Guardian relationship attention without widening `user_attention`. |
-| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0c-2 LOCKED** | C-3-0c-0/1/2 lock presentation ownership, provider wire, safe copy, semantic blocks, navigation/action offers, AI projection, disclosure, privacy, and bounds without claiming implementation. C-3-0c-3 is next. |
+| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0c-3 LOCKED** | C-3-0c-0/1/2/3 lock presentation ownership, provider wire, semantic output, renderer mapping, persistence classes, stale handling, and accessibility without claiming implementation. C-3-0c-4 is next. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
 ### Pilot-0-C0 — authenticated ingress and first-Institution bootstrap (LOCKED)
@@ -1962,7 +1962,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
-| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0c-2 LOCKED** | Account–Subject reachability, authenticated ingress, presentation ownership, provider wire, and semantic presentation are locked; renderer/persistence, action/driver, protected-data/offline, and complete-IIB adoption/evidence remain C-3-0c-3 through C-3-0e. |
+| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0c-3 LOCKED** | Account–Subject reachability, authenticated ingress, presentation ownership, provider wire, semantic presentation, renderer mapping, and persistence/stale/accessibility classes are locked; conformance/adoption, action/driver, protected-data/offline, and complete-IIB evidence remain C-3-0c-4 through C-3-0e. |
 | C-3-1 Guardian family-communication IIB | OPEN | Question draft/submit, Receipt/reply current state, authorized history, and Guardian-source redaction across Chat, Family board, and Family workbench. |
 | C-3-2 Guardian relationship/authority IIB | OPEN | Enrollment, transfer, withdrawal, Grant, and stage review/strong-confirmation actions across all entitled Guardian surfaces. |
 | C-3-3 Caregiver operational IIB | OPEN | Chat/Teacher-board inbox, Attention, transient protected detail, acknowledge, reply, history, and Caregiver-reply redaction. |
@@ -1975,7 +1975,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 | --- | --- | --- |
 | C-3-0a Account–Subject reachability | **LOCKED** | Product-scope versus platform-capability separation, account-to-owner relationship path, generic subject scope, opaque Host discovery, prospective boundary, and identity-isolation rules. |
 | C-3-0b authenticated ingress and trusted principal | **LOCKED / COMPLETE** | C-3-0b-0 through C-3-0b-4 lock public/private trust, exact ingress, client/Host/owner fields, denial, audit retention/access, additive adoption, and negative planning closure. |
-| C-3-0c subject-aware presentation contract | **IN PROGRESS — C-3-0c-2 LOCKED** | Pipeline/ownership, additive subject-provider wire, safe copy, semantic blocks, navigation/action offers, and bounds are locked; renderer/persistence classes and Base conformance remain C-3-0c-3/4. |
+| C-3-0c subject-aware presentation contract | **IN PROGRESS — C-3-0c-3 LOCKED** | Pipeline/ownership, provider wire, semantic blocks/offers, renderer mapping, persistence classes, freshness, and accessibility are locked; Base conformance and exact adoption remain C-3-0c-4. |
 | C-3-0d action execution and recovery | OPEN | Domain action dispatch, confirmation, idempotency, direct-empty versus claimed-Step driver selection, and result reconciliation. |
 | C-3-0e protected data, offline, complete-IIB adoption, and evidence | OPEN | Transient/private rendering, draft/cache/offline policy, complete Base -> My-Chat -> Nurture adoption building on the ingress-only C-3-0b-4 slice, negative coverage, and planning exit. |
 
@@ -2326,7 +2326,7 @@ C-3-0b-4 evidence must cover every echo variant and bound, all forbidden/unknown
 | C-3-0c-0 presentation pipeline and ownership | **LOCKED** | Nurture semantic presentation, My-Chat generic rendering, Chat AI/structured-UI boundary, surface convergence, current reread, and no unclassified Host persistence. |
 | C-3-0c-1 subject-provider wire contract | **LOCKED** | Separate list/resolve, a new opaque ref, collection-as-context, closed results/privacy fields, freshness/version semantics, and exact bounds. |
 | C-3-0c-2 semantic blocks and actions | **LOCKED** | Read-only result, owner-resolved plain text, six flat blocks, separate navigation/action offers, entitled unavailable disclosure, AI projection, exact bounds, and forbidden fields. |
-| C-3-0c-3 renderer and persistence classes | OPEN | Chat/board/workbench mapping, ephemeral versus durable fields, draft/cache rules delegated to C-3-0e, accessibility, and stale behavior. |
+| C-3-0c-3 renderer and persistence classes | **LOCKED** | Exact product-surface renderer mapping, four persistence classes, no presentation cache, bounded foreground freshness, accessibility, stale behavior, and Pilot query-control scope. |
 | C-3-0c-4 conformance and adoption evidence | OPEN | Additive Base contracts, exact three-repo registry/revision adoption, legacy compatibility, negative fixtures, and presentation planning exit. |
 
 **C-3-0c-0 — presentation pipeline and ownership (LOCKED)**
@@ -2338,7 +2338,7 @@ C-3-0b-4 evidence must cover every echo variant and bound, all forbidden/unknown
 5. Nurture Chat is the common AI conversation surface already locked by B3. The AI may decide whether to invoke Nurture and may narrate only the current display-safe semantic presentation plus generic Host state. The AI cannot infer protected facts, synthesize candidates, invent action availability, treat natural-language agreement as confirmation, or convert hidden owner data into prose. Structured UI panels remain generic My-Chat components driven by the same semantic presentation used by entitled board/workbench views.
 6. Chat, board, and workbench adapters converge on one current Nurture semantic presenter/owner path. Surface eligibility may yield a permitted subset or different layout, but surface-specific code cannot duplicate facts, tokens, lifecycle, safe reasons, commands, or authorization. Moving between surfaces performs current owner reread and never copies a stale rendered tree as business truth.
 7. Presentation is not authorization, command input, relationship proof, durable replay evidence, or an offline entitlement. Every initial render, refresh, navigation, prepare, submit, retry, result recovery, and Notification destination rereads the applicable Host session/workspace gates and current Nurture subject/role/scope/policy/lifecycle facts.
-8. Before C-3-0c-3/e classifies a field, My-Chat cannot persist a presentation tree, owner candidate set, raw Subject/domain id, relationship path, role/Grant/policy result, protected body, owner token, action availability, or inferred business state. The only cross-request continuity already permitted is an opaque workspace/scenario-bound context/ref under its owner contract; no unclassified field enters Chat history, dashboard cache, search index, analytics, Notification, Handoff, or offline storage.
+8. C-3-0c-3 now classifies semantic presentation as ephemeral, permits only a content-free durable Host shell, and forbids protected/owner/action copies from generic Host persistence; C-3-0e still owns narrower protected/draft/offline handling. An opaque Workspace/scenario-bound context/ref may cross requests only under its owner contract. No unclassified field enters Chat history, dashboard cache, search index, analytics, Notification, Handoff, or offline storage.
 9. Nurture/provider outage, stale opaque context, revoked relationship, changed scope, or renderer incompatibility cannot fall back to a cached presentation or a more permissive surface. My-Chat returns the already locked generic Host/owner unavailable or changed state and preserves no hidden business detail.
 10. C-3-0c-0 does not lock provider DTO names/methods, context TTL, candidate fields, scope encoding, semantic block/action enums, copy localization format, renderer mapping, persistence/TTL, protected-detail transport, offline behavior, action driver, or implementation order. Those decisions remain C-3-0c-1 through C-3-0e.
 
@@ -2502,7 +2502,62 @@ C-3-0c-1 evidence must cover strict codecs/bounds, `DomainContextRef` non-reuse,
 13. AI receives a generated narration projection rather than the wire object. The projection includes only `narration=allowed` safe text and removes every ref, version, reason/action code, cursor, target, hidden action, and display-only field. AI may explain the current owner text but cannot add a block, fact, safe reason, action, confirmation, or submit behavior absent from the structured owner result.
 14. Existing implementation is not evidence. Base `WorkflowActionAvailability` remains Run-level and raw-target-shaped; My-Chat mobile `InteractionEnvelope` permits broad `serverAction|params|extensions`; Nurture `institution-surfaces` builds id-shaped pseudo-opaque refs and ad-hoc safe strings. No shared `present_subject_context`, semantic block codec, safe-copy codec, entitled action disclosure, or narration projector exists. Existing scaffolds cannot be relabeled or activated as C-3-0c-2.
 
-C-3-0c-2 evidence must cover operation/result codecs, every safe-copy/reason rule, all six block kinds, Anti-Metrics, navigation/action separation, active-handler requirements, unavailable disclosure versus omission, five-minute target expiry, every size/count/text bound, raw-id/URL/HTML/extension/Run-action rejection, code-to-copy non-interpretation, AI projection stripping/non-invention, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. C-3-0c-3 renderer/persistence classes is next.
+C-3-0c-2 evidence must cover operation/result codecs, every safe-copy/reason rule, all six block kinds, Anti-Metrics, navigation/action separation, active-handler requirements, unavailable disclosure versus omission, five-minute target expiry, every size/count/text bound, raw-id/URL/HTML/extension/Run-action rejection, code-to-copy non-interpretation, AI projection stripping/non-invention, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. The C-3-0c-3 section locks renderer and persistence behavior.
+
+**C-3-0c-3 — renderer and persistence classes (LOCKED)**
+
+The six registered Nurture product surfaces map to three My-Chat generic renderer families. A renderer family is Host layout capability rather than a Nurture wire field, business role, authorization result, or component name.
+
+| Nurture product surface | Generic renderer family | Pilot presentation responsibility |
+| --- | --- | --- |
+| `nurture_chat` | Chat semantic panel | Current explanation, bounded list/timeline, navigation, and action-prepare entry for currently entitled Guardian/Caregiver roles; never complete history. |
+| `family_board` | Role board | Current/recent family work, current detail, and owner-offered actions. |
+| `teacher_board` | Role board | Current work plus complete owner-paginated authorized history, detail, and owner-offered actions; no caregiver workbench fallback. |
+| `institution_board` | Read-only role board | Safe aggregates, readiness notices, and navigation only; an action offer is a fatal surface-contract mismatch. |
+| `family_workbench` | Domain workbench | Complete owner-paginated authorized family history plus complex Grant/Enrollment action-prepare entry. |
+| `institution_workbench` | Domain workbench | Authorized topology/configuration/history and action-prepare entry; never ambient family question/reply bodies. |
+
+Renderer behavior is exact:
+
+1. My-Chat owns the renderer registry, layout, navigation chrome, responsive adaptation, accessibility, focus, and generic loading/error shell. Nurture owns the registered product-surface eligibility, presentation key, block/order/copy/tone, navigation offers, action offers, and every disclosure decision. No renderer identifier, component prop, CSS/layout primitive, business filter, or device-specific component enters the semantic wire.
+2. A compatible renderer preserves the owner block order, entry/row order, safe copy, tone, badges, timestamps, navigation priority, action priority, and unavailable disclosure. The renderer may reflow the same structure for device size but cannot sort, merge, omit, relabel, translate, summarize, infer, or synthesize semantic fields/actions. Timestamp formatting uses the owner-disclosed value and locale without inferring lifecycle.
+3. Unknown schema/version/block/field, over-bound output, missing renderer capability, or a disallowed surface/action combination rejects the complete presentation. My-Chat shows a generic incompatible/unavailable shell and emits body-free evidence; My-Chat cannot partially render, silently drop an action, use another surface profile, or fall back to the broad legacy `InteractionEnvelope`, Workflow dashboard presenter, or synthetic Nurture surface.
+4. `nurture_chat` may render every C-3-0c-2 block kind in a bounded semantic panel, but remains current/recent rather than canonical history. Role boards and workbenches use the same block meanings with list/detail/workbench layout. `institution_board` accepts only read-safe blocks/navigation and rejects every action offer. Available action controls on other surfaces request C-3-0d preparation only; no C-3-0c renderer submits a command.
+5. Pilot-0 complete history means a current Nurture-owned, cursor-paginated result that can reach every currently authorized row. `current|recent|history`, item detail, owner cursor, and owner-issued navigation offers remain the only C-3-0c-2 query controls. Arbitrary text search, renderer-authored sort, and compound child/care-group/status/time filters are not Pilot-0 gates and require a later separately versioned owner query-control contract. My-Chat cannot encode business filters into route state, continuation refs, presentation keys, analytics, or local collection filtering.
+
+The presentation persistence model has four closed classes:
+
+| Persistence class | Allowed material | Storage rule |
+| --- | --- | --- |
+| `owner_canonical` | Nurture Message, Receipt, Item, Grant, Enrollment, topology, lifecycle, CommandExecution, and business history. | Durable only in the Nurture owner boundary under existing business retention. |
+| `ephemeral_presentation` | Subject/presentation results, safe copy, blocks, navigation/actions, opaque versions/refs/cursors, AI narration projection, selected item, scroll/expanded state, and render tree. | Current foreground/request memory only; never a Host durable projection. |
+| `durable_host_shell` | Host conversation/turn/page identity, canonical Workspace, scenario, registered product surface/presentation key, registered route class, `current|recent|history`, renderer-contract version, Host timestamps, and generic `rehydrate_required` state. | Strict My-Chat allowlist; carries no Nurture content, target, result, policy, or authority. |
+| `forbidden_host_copy` | Protected body/media, unsubmitted or AI business draft, owner/business raw id, relationship path, role/Grant/policy result, owner token/credential, action target/version, cursor, candidate set, and inferred business state. | Absent from Chat history, board/workbench cache, search, analytics, Notification, Handoff/Outbox, logs/traces/metrics, crash evidence, and offline storage. C-3-0d/e may later define narrower transient channels but cannot reinterpret `forbidden_host_copy` as generic Host persistence. |
+
+Persistence and Chat behavior are exact:
+
+1. Every C-3-0c-1/2 owner response defaults to `ephemeral_presentation`. Display-safe does not mean durable, searchable, offline-safe, or safe after revoke/redaction. My-Chat cannot persist the semantic response, AI narration projection, renderer tree, safe reason, action availability, item list, or owner labels as a Chat message or dashboard projection.
+2. General platform Chat remains governed by My-Chat conversation retention. For a Nurture semantic presentation, Pilot-0 may durably anchor only a Host-generated content-free placeholder such as a rehydration marker. Reopening the turn obtains a fresh subject/presentation result; the old owner copy or AI narration is never replayed. User-authored Nurture draft/body handling remains C-3-0e and cannot be inferred from ordinary transcript retention.
+3. `ScenarioSubjectContextRefV1` may cross requests only in a protected server-side transient context for at most its 30-minute owner TTL. Five-minute presentation item/cursor/continuation/action-target refs remain response/foreground memory only. Neither ref class enters permanent Chat history, route URL, navigation history, client persistence, analytics, logs, Notification, or offline storage.
+4. My-Chat may record body-free, low-cardinality renderer evidence such as product-surface key, schema/version, compatible/incompatible outcome, refresh reason class, latency, and counts already allowed by the common observability boundary. Evidence contains no presentation key when the key would create a high-cardinality business dimension, safe text, block/item key, ref/version/cursor, role/Grant/policy result, or target existence.
+
+Freshness and stale behavior are fail-closed:
+
+1. Pilot-0 uses a maximum 60-second foreground presentation freshness lease, bounded further by any shorter owner ref expiry. The lease is display freshness only and never authorization. Known revoke/redaction/policy/lifecycle invalidation clears the view immediately; the 60-second lease is the fallback bound when no invalidation signal arrives.
+2. App background/lock, sign-out, Workspace/account/thread/product-surface change, process loss, and renderer-version change clear every `ephemeral_presentation` value. Foreground resume, tab/page focus, manual refresh, navigation, pagination, item-detail open, action prepare, action result, retry, and Notification destination perform a fresh Host gate plus Nurture owner read.
+3. When freshness expires or invalidation arrives, My-Chat removes owner business content and disables navigation/action controls before fetching. Refresh cannot keep stale content visible behind a spinner. Owner/provider/database failure shows only the generic retry/unavailable shell; no stale-while-revalidate, cached presentation, legacy presenter, more permissive surface, or offline fallback is permitted.
+4. Optimistic UI is limited to Host-owned loading/submission progress. My-Chat cannot optimistically change a Nurture lifecycle, count, badge, action availability, safe reason, Receipt, Item, Grant, Enrollment, Attention, or topology value. C-3-0d command completion and owner reread determine the next semantic result.
+
+Accessibility is part of generic renderer compatibility rather than owner semantics:
+
+1. My-Chat applies the owner-provided normalized locale and text direction, preserves semantic reading order, exposes summary/notice/fact/metric/list/timeline structure, and announces label with value. Tone, color, icon, order, and position cannot be the sole meaning.
+2. Every interactive control has a safe accessible name, role, state, focus order, keyboard path, suitable touch target, font scaling, and reduced-motion behavior. An unavailable action exposes only the owner-approved safe reason; an omitted action leaves no visual or assistive-technology trace.
+3. Refresh, context-changed, unavailable, and completed Host transitions move focus to the generic status container and use a generic polite announcement. My-Chat cannot infer urgent/assertive announcement behavior from Nurture `critical` tone, invent emergency semantics, or read hidden/display-only text to assistive technology.
+4. Locale, accessibility, responsive-layout, focus-loss, screen-reader, keyboard, reduced-motion, and stale-refresh behavior are renderer conformance requirements. Accessibility failure rejects activation evidence; the failure cannot be waived because the semantic wire is valid.
+
+Current implementation is not C-3-0c-3 evidence. My-Chat Chat interactions are transient React state, but the broad envelope contains `serverAction|params|extensions`; persisted Chat messages are not separated from Nurture rehydration placeholders; the Workflow dashboard branches on raw Run action/target/reason values; role boards and domain workbenches are absent; renderer accessibility is partial; and there is no surface compatibility registry, freshness lease, invalidation clearing, persistence allowlist, or leakage scanner. Nurture has no activated semantic presenter and its existing synthetic surfaces cannot satisfy the mapping. These are implementation gaps, not accepted fallback paths.
+
+C-3-0c-3 evidence must cover all six product-surface mappings, every block across compatible renderer families, institution-board action rejection, order/copy/tone preservation, complete-pagination behavior, arbitrary-filter/search deferral, all four persistence classes and destinations, Chat placeholder rehydration, ref expiry/storage, 60-second freshness boundaries, invalidation/background/focus/outage behavior, no stale/legacy/offline fallback, no optimistic business state, accessibility/device/locale/focus matrices, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. C-3-0c-4 conformance and adoption evidence is next.
 
 ## Minimum IIB closure before real traffic
 
@@ -2556,7 +2611,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0c-2 locked** | C-3-0c-0/1/2 lock presentation ownership, provider wire, safe text/reasons, six semantic blocks, navigation/action offers, entitled unavailable disclosure, AI projection, privacy, and bounds. C-3-0c-3 is next; C-4 Institution IIB/closure evidence remains open. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0c-3 locked** | C-3-0c-0/1/2/3 lock presentation ownership, provider wire, semantic blocks/offers, renderer mapping, four persistence classes, no-cache freshness, stale behavior, and accessibility. C-3-0c-4 is next; C-4 Institution IIB/closure evidence remains open. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 
