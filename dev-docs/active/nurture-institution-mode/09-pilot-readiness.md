@@ -2012,7 +2012,7 @@ The scope behavior is:
 
 C-3-0a evidence must cover product-catalog versus infrastructure classification, generic-contract non-leakage, every account/role reachability path, zero/one/multiple Guardian subjects, two-Guardian same-Family access, the three-child Caregiver collection, Institution safe collections, prospective invitation minimums, Technical Operator absence, every scope kind, client raw-id/relationship injection, stale owner paths at every read/action seam, Host live-resolution/no-SSOT behavior, cross-workspace/scenario identity isolation, and planning-only scope. No contract package, manifest, schema, provider, route, handler, UI, runtime, database, environment, capability, or traffic changed. C-3-0b continues in the following section with C-3-0b-0 locked and C-3-0b-1 next.
 
-**C-3-0b — authenticated ingress and trusted principal (IN PROGRESS)**
+**C-3-0b — authenticated ingress and trusted principal (LOCKED / COMPLETE)**
 
 | Sub-checkpoint | State | Decision boundary |
 | --- | --- | --- |
@@ -2236,8 +2236,8 @@ C-3-0b-4 closes authenticated-ingress planning by separating three field classes
 | Field class | Allowed meaning | Examples |
 | --- | --- | --- |
 | Client echo | Strictly codec-validated intent/query/confirmation input that never proves authority. | Chat text, `client_message_id`, bounded view mode/cursor/page/query, scenario/option token, action key, owner-issued opaque target, expected version, operation input, confirmation, `client_mutation_id`, presentation hints. |
-| Host-established | Current My-Chat identity, route, request, or durable evidence built after Host checks and unavailable for client override. | User/Actor/Workspace, session/membership/gates, scenario/endpoint/ingress, caller/origin, contract/time/nonce/signature, request evidence, conversation/Notification/Handoff/Invitation/Run/Step/driver refs, claim token, command identity, strong-authorization assertion. |
-| Nurture-owner-only | Current domain facts resolved only by Nurture and forbidden as Host authority. | Participant/RoleAssignment/role, Subject/Family/Process, Institution/CareGroup/Enrollment, Grant/direction/data class, target availability, policy, lifecycle, action availability, owner candidates/relationship path. |
+| Host-established | Current My-Chat identity, route, request, durable, or authentication-assurance evidence built after Host checks and unavailable for client override. | User/Actor/Workspace, session/membership/gates, scenario/endpoint/ingress, caller/origin, contract/time/nonce/signature, request evidence, conversation/Notification/Handoff/Invitation/Run/Step/driver refs, claim token, server-established request/driver identity inputs, authentication-assurance evidence. |
+| Nurture-owner-only | Current domain facts and canonical business-effect semantics resolved or validated by Nurture and forbidden as Host authority. | Participant/RoleAssignment/role, Subject/Family/Process, Institution/CareGroup/Enrollment, Grant/direction/data class, target availability, policy, lifecycle, action availability, owner candidates/relationship path, canonical effect identity/hash/replay disposition under the registered operation/driver contract. |
 
 The additive `ScenarioClientEchoV1` contract is a strict discriminated union:
 
@@ -2245,12 +2245,12 @@ The additive `ScenarioClientEchoV1` contract is a strict discriminated union:
 2. `view_query` carries only `current|recent|history`, an owner-issued opaque cursor, bounded page size, and an operation-registered exact query schema.
 3. `clarification_answer` carries one scenario token and an operation-registered option/answer schema.
 4. `action_prepare` carries a registered action key, owner-issued opaque target, optional expected version, and an operation-registered exact input schema.
-5. `action_submit` carries the `submit_action` token, exact explicit confirmation, and bounded `client_mutation_id`. A client cannot author `command_request_id`; Host/Nurture derives the stable business identity from the current bound context.
+5. `action_submit` carries an owner-issued `submit_action` context/token, exact explicit confirmation, and bounded `client_mutation_id`. A client cannot author `command_request_id`. My-Chat may establish registered request/driver inputs, while Nurture validates the canonical effect identity/hash/replay under the operation/driver contract. C-3-0d must lock the distinct direct-empty and claimed-Step derivations before activation.
 6. Optional presentation hints are limited to `mobile|web`, normalized locale, and IANA time zone. They cannot affect database time, expiry, policy, role, destination, or business result.
 7. Unknown/duplicate/null authority fields, unregistered schema/version, unbounded object/array/string/depth, raw Nurture ids, structured role/scope/policy/availability fields, and forbidden attachments fail before private invocation. Pilot-0 has no attachment echo.
 8. A natural-language role/object claim remains intent text. A structured authority claim is rejected rather than ignored or copied into broad metadata.
 9. Notification/Invitation ids may be public My-Chat route inputs, but exact recipient/resource validation converts them to server-side Host evidence; the raw client value is not forwarded as Nurture echo.
-10. Client confirmation never satisfies strong authorization. A strong-authorization proof is a separately bound Host assertion and remains outside client echo.
+10. Client confirmation never satisfies Host authentication assurance or Nurture strong authorization. A separately bound Host assertion may prove only the required recent-authentication ceremony and remains outside client echo. Nurture strong authorization still requires current owner facts, policy, the owner-issued submit context, exact action, and explicit confirmation.
 
 Activated vNext MUST NOT expose free-form `structured_payload`, `form_data`, `display_state`, `details`, filters, sort, local context, or metadata. Reusable Base types may parameterize registered operation schemas, but every activated operation resolves one exact schema/version and rejects extra fields. Legacy broad objects remain pre-activation fixtures only.
 
