@@ -217,7 +217,7 @@ Pilot-0 detailed evidence and recommendations are canonical in `09-pilot-readine
 | --- | --- | --- |
 | Pilot-0-A baseline/actual-capability audit | Complete | Exact cross-repo baseline and contract/source hashes pass; actual runtime, UX, provisioning, delivery, security, and observability gaps are classified. |
 | Pilot-0-B cohort/role/surface/data lock | Complete | Revised B1/B2, B3-0/B3-1, B3-2a-d, B3-3a-d, and B3-4 are locked. The coverage contract requires complete action/surface conformance, four representative business journeys across three child scopes, Institution/Operator strands, layered fault/privacy evidence, and explicit exit gates. |
-| Pilot-0-C IIB/onboarding contract | In progress — C-3-0b complete | C-3-0b-4 closes exact client-echo/Host-only/owner-only fields, layered public denial, body-free owner-split audit with Pilot retention defaults, additive exact-revision three-repo adoption, and authenticated-ingress negative/planning exit. C-3-0c subject-aware presentation is next. |
+| Pilot-0-C IIB/onboarding contract | In progress — C-3-0c-0 locked | C-3-0c-0 locks the Nurture semantic-presentation/My-Chat generic-renderer pipeline, Chat AI plus structured-UI boundary, no renderer business interpretation, no presentation-as-authority, and no unclassified Host persistence. C-3-0c-1 subject-provider wire contract is next. |
 | Pilot-0-D topology/operations contract | Proposed | Accept the isolated environment, exact scenario artifact, two-key workspace gate, observation, stop, recovery, and rollback terms. |
 | Pilot-0-E Go/No-Go review | Pending | Assign implementation owners and review all evidence. Pilot-1 remains separately authorized. |
 
