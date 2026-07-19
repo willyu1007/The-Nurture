@@ -9,6 +9,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
 - Do not activate optional Host actor/workspace fields or let Nurture infer workspace from Participant history; subject-aware ingress requires one My-Chat-established adult principal and exact validated workspace.
 - Do not treat a general Chat thread's personal-workspace storage partition as business context or silently promote daily Q&A into Nurture; business entry requires an explicit workspace transition and minimal confirmed intent carryover.
+- Do not let one service token prove both workload and represented adult, map Host Actor to Nurture Participant, reuse nonce as command identity, or fall back to legacy metadata after vNext verification fails.
 - Do not put Nurture care ecology semantics inside My-Chat as canonical facts; family, child, institution, care group, role assignment, enrollment, grant, family-care messages, and care items belong to Nurture.
 - Do not wire live manifest capabilities before Nurture care ecology schema, resolvers, policies, and handlers exist.
 - Do not let institution mode drift into ranking, marketplace, competitive caregiver scoring, or institution growth tooling.
@@ -716,3 +717,13 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: C-3-0b-1 defines `platform_general`, `workspace_business`, and `invitation_acceptance`. General Chat cannot call Nurture; transition remains explicit even with one eligible workspace, starts/enters a workspace-scoped conversation, and carries only the current confirmed intent by default.
 - Prevention: Every Chat entry must classify context mode before scenario routing. Tests must distinguish storage workspace from business workspace and prove that child-related text alone cannot activate a scenario or copy prior general history.
 - References: `02-architecture.md` Pilot-0-C3-0b-1, `09-pilot-readiness.md` C-3-0b-1.
+
+### 2026-07-19 — Collapsing private transport proof, human identity, and replay
+
+- Symptom: One static service credential plus optional `actor_id/workspace_id` could appear sufficient for a private Nurture call, while a reused nonce, business idempotency key, or Step claim might be treated as interchangeable replay evidence.
+- Context: Current code has a static owner-read token, optional workflow actor metadata, a Nurture command replay kernel, and claimed-Step provenance, but no signed human-principal envelope or transport replay store.
+- What we tried: Reusing the owner-read token and legacy `WorkflowCommandMeta` for activated subject-aware routes, or putting caller, adult, workspace, route, freshness, and business replay into one broadly interpreted token/request id.
+- Root cause: Workload authentication, represented human identity, transport integrity/freshness, Nurture business idempotency, and original-Step handoff ownership prove different facts and have different retry lifecycles. Current `business_actor_ref` also carries My-Chat/system refs for legacy family-core but Participant ids for institution commands, so the name cannot safely bridge Host and domain identity.
+- Fix / workaround: C-3-0b-2 requires a separate caller credential plus ES256-signed exact-body envelope, exact Workspace+User Participant binding, 60-second single-use nonce, stable inner `command_request_id`, independent original-Step check, pinned audiences/keys, verifier-only normalized context, and additive vNext no-fallback activation. Activated C3 uses the resolved Participant in domain context; C-3-0d must add a typed/versioned persisted actor representation or explicitly migrate legacy rows rather than reinterpret them.
+- Prevention: Every private-ingress review must show the five evidence layers independently and run their cross-product negatives. Never reuse `NURTURE_INTERNAL_SERVICE_TOKEN`, Host Actor, nonce, command id, or claim token as another layer's authority.
+- References: `02-architecture.md` Pilot-0-C3-0b-2, `06-ib-nurture-schema-spec.md` C-3-0b-2 refinement, `09-pilot-readiness.md` C-3-0b-2.
