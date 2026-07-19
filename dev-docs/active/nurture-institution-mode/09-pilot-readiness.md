@@ -3,7 +3,7 @@
 ## Status and authorization
 
 - **Review date:** 2026-07-19
-- **Current checkpoint:** Pilot-0-C in progress; C-3-0c-0/1 presentation ownership and subject-provider wire are locked after C-3-0b authenticated ingress completed; C-3-0c-2 semantic blocks/actions next
+- **Current checkpoint:** Pilot-0-C in progress; C-3-0c-0/1/2 presentation ownership, subject-provider wire, and semantic blocks/actions are locked after C-3-0b authenticated ingress completed; C-3-0c-3 renderer/persistence classes next
 - **Decision:** **GO for Pilot-0 readiness continuation; NO-GO for external pilot traffic**
 - **Authorization boundary:** the review changes only task/governance evidence. The review does not authorize a database apply, artifact publication, secret configuration, capability or manifest-composition change, external traffic, Pilot-1 through Pilot-4, staging, production, or GA.
 
@@ -978,7 +978,7 @@ If the approved topology uses the current My-Chat container publication path, AC
 | C-0 authenticated ingress and first-Institution bootstrap | **LOCKED** | Public/private IIB ownership, first-admin bootstrap authority, provisioning identity/idempotency/closure, and forbidden ambient-admin/dev-host/DB-edit alternatives. |
 | C-1 CareGroup and institution-staff onboarding lifecycle | **LOCKED / COMPLETE** | C-1a-e lock the sole class aggregate, derived readiness, Staff Invitation/acceptance, Participant binding, separate Caregiver/Lead roles, offboarding, and family-invitation gate. |
 | C-2 child/family/enrollment/Grant onboarding | **LOCKED / COMPLETE** | C-2f-5 closes C-2 with immutable business outcome versus replay disposition, exact server-only output refs, current owner presenters, same-Execution/same-Step response-loss recovery, route-only continuity, preserved explicit-empty paths, and minimal future Guardian relationship attention without widening `user_attention`. |
-| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0c-1 LOCKED** | C-3-0c-0/1 lock presentation ownership and the provider list/resolve, opaque ref, collection, result, privacy, authority, and freshness contracts without claiming implementation. C-3-0c-2 is next. |
+| C-3 Guardian/Caregiver operational IIB | **IN PROGRESS — C-3-0c-2 LOCKED** | C-3-0c-0/1/2 lock presentation ownership, provider wire, safe copy, semantic blocks, navigation/action offers, AI projection, disclosure, privacy, and bounds without claiming implementation. C-3-0c-3 is next. |
 | C-4 Institution IIB, safe states, and closure evidence | OPEN | Board/workbench closure, empty/loading/error/permission behavior, accessibility, route/auth negatives, and Pilot-0-C exit evidence. |
 
 ### Pilot-0-C0 — authenticated ingress and first-Institution bootstrap (LOCKED)
@@ -1962,7 +1962,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
-| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0c-0 LOCKED** | Account–Subject reachability, authenticated ingress, and presentation-pipeline ownership are locked; subject-provider wire, blocks/actions, renderer/persistence, action/driver, protected-data/offline, and complete-IIB adoption/evidence remain C-3-0c-1 through C-3-0e. |
+| C-3-0 shared subject-aware IIB baseline | **IN PROGRESS — C-3-0c-2 LOCKED** | Account–Subject reachability, authenticated ingress, presentation ownership, provider wire, and semantic presentation are locked; renderer/persistence, action/driver, protected-data/offline, and complete-IIB adoption/evidence remain C-3-0c-3 through C-3-0e. |
 | C-3-1 Guardian family-communication IIB | OPEN | Question draft/submit, Receipt/reply current state, authorized history, and Guardian-source redaction across Chat, Family board, and Family workbench. |
 | C-3-2 Guardian relationship/authority IIB | OPEN | Enrollment, transfer, withdrawal, Grant, and stage review/strong-confirmation actions across all entitled Guardian surfaces. |
 | C-3-3 Caregiver operational IIB | OPEN | Chat/Teacher-board inbox, Attention, transient protected detail, acknowledge, reply, history, and Caregiver-reply redaction. |
@@ -1975,7 +1975,7 @@ C-2f-5 evidence must cover every result vocabulary combination, exact output-ref
 | --- | --- | --- |
 | C-3-0a Account–Subject reachability | **LOCKED** | Product-scope versus platform-capability separation, account-to-owner relationship path, generic subject scope, opaque Host discovery, prospective boundary, and identity-isolation rules. |
 | C-3-0b authenticated ingress and trusted principal | **LOCKED / COMPLETE** | C-3-0b-0 through C-3-0b-4 lock public/private trust, exact ingress, client/Host/owner fields, denial, audit retention/access, additive adoption, and negative planning closure. |
-| C-3-0c subject-aware presentation contract | **IN PROGRESS — C-3-0c-0 LOCKED** | Pipeline/ownership is locked; additive subject-provider wire, blocks/actions, renderer/persistence classes, and Base conformance remain C-3-0c-1 through C-3-0c-4. |
+| C-3-0c subject-aware presentation contract | **IN PROGRESS — C-3-0c-2 LOCKED** | Pipeline/ownership, additive subject-provider wire, safe copy, semantic blocks, navigation/action offers, and bounds are locked; renderer/persistence classes and Base conformance remain C-3-0c-3/4. |
 | C-3-0d action execution and recovery | OPEN | Domain action dispatch, confirmation, idempotency, direct-empty versus claimed-Step driver selection, and result reconciliation. |
 | C-3-0e protected data, offline, complete-IIB adoption, and evidence | OPEN | Transient/private rendering, draft/cache/offline policy, complete Base -> My-Chat -> Nurture adoption building on the ingress-only C-3-0b-4 slice, negative coverage, and planning exit. |
 
@@ -2325,7 +2325,7 @@ C-3-0b-4 evidence must cover every echo variant and bound, all forbidden/unknown
 | --- | --- | --- |
 | C-3-0c-0 presentation pipeline and ownership | **LOCKED** | Nurture semantic presentation, My-Chat generic rendering, Chat AI/structured-UI boundary, surface convergence, current reread, and no unclassified Host persistence. |
 | C-3-0c-1 subject-provider wire contract | **LOCKED** | Separate list/resolve, a new opaque ref, collection-as-context, closed results/privacy fields, freshness/version semantics, and exact bounds. |
-| C-3-0c-2 semantic blocks and actions | OPEN | Reusable block/action/result vocabulary, safe copy encoding, action-offer rules, bounds, and forbidden fields. |
+| C-3-0c-2 semantic blocks and actions | **LOCKED** | Read-only result, owner-resolved plain text, six flat blocks, separate navigation/action offers, entitled unavailable disclosure, AI projection, exact bounds, and forbidden fields. |
 | C-3-0c-3 renderer and persistence classes | OPEN | Chat/board/workbench mapping, ephemeral versus durable fields, draft/cache rules delegated to C-3-0e, accessibility, and stale behavior. |
 | C-3-0c-4 conformance and adoption evidence | OPEN | Additive Base contracts, exact three-repo registry/revision adoption, legacy compatibility, negative fixtures, and presentation planning exit. |
 
@@ -2344,7 +2344,7 @@ C-3-0b-4 evidence must cover every echo variant and bound, all forbidden/unknown
 
 Current implementation is not C-3-0c-0 evidence. Existing Workflow presenters/artifact drafts and Nurture `institution-surfaces` provide legacy/synthetic summaries around broad surfaces; no shared subject provider, semantic-presentation contract, generic renderer conformance, field persistence classification, or activated owner-to-renderer pipeline exists. These components remain pre-activation scaffolding and cannot be relabeled as the locked pipeline.
 
-C-3-0c-0 evidence must cover exact ownership/layering, one owner presenter across every entitled surface, Chat narration from display-safe output only, zero renderer business interpretation, action/candidate non-invention, current reread at every seam, cross-surface convergence, renderer mismatch/outage behavior, forbidden Host persistence destinations, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. C-3-0c-1 locks the provider wire below.
+C-3-0c-0 evidence must cover exact ownership/layering, one owner presenter across every entitled surface, Chat narration from display-safe output only, zero renderer business interpretation, action/candidate non-invention, current reread at every seam, cross-surface convergence, renderer mismatch/outage behavior, forbidden Host persistence destinations, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. The C-3-0c-1 section locks the provider wire.
 
 **C-3-0c-1 — subject-provider wire contract (LOCKED)**
 
@@ -2415,7 +2415,94 @@ C-3-0c-0 evidence must cover exact ownership/layering, one owner presenter acros
 11. A subject context ref is a locator only. The ref is not relationship proof, bearer authorization, action authority, direct CommandExecution authorization, durable replay evidence, cross-surface permission, or offline entitlement. Every action prepare/submit re-resolves current owner facts and obtains the separate C-3-0d owner action context.
 12. C-3-0c-1 is planning-only. Current code has no shared provider type, list/resolve implementation, opaque-ref codec/store, TTL enforcement, or joint conformance. Existing Workflow `DomainContextRef`, presenters, artifact drafts, and `institution-surfaces` cannot satisfy the new provider contract. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed.
 
-C-3-0c-1 evidence must cover strict codecs/bounds, `DomainContextRef` non-reuse, all result variants, collection non-expansion, same-name safe disambiguation, ref/cursor expiry, fresh issuance without extension, current-version drift, every principal/workspace/scenario/provider substitution, indistinguishable unavailable states, exact privacy allowlist, zero Host selection/correlation, no authority transfer, outage without cache, forbidden persistence destinations, current-gap detection, and planning-only scope. C-3-0c-2 semantic blocks/actions is next.
+C-3-0c-1 evidence must cover strict codecs/bounds, `DomainContextRef` non-reuse, all result variants, collection non-expansion, same-name safe disambiguation, ref/cursor expiry, fresh issuance without extension, current-version drift, every principal/workspace/scenario/provider substitution, indistinguishable unavailable states, exact privacy allowlist, zero Host selection/correlation, no authority transfer, outage without cache, forbidden persistence destinations, current-gap detection, and planning-only scope. The C-3-0c-2 section locks semantic presentation.
+
+**C-3-0c-2 — semantic blocks and actions (LOCKED)**
+
+1. `present_subject_context` is a read-only operation after C-3-0c-1 resolve. The exact input is a v1 presentation version, C-3-0c-1 subject ref, manifest-registered `presentation_key`, and optional already codec-validated `current|recent|history` query with owner cursor, bounded page size, and owner-issued `presentation_item_ref`. The client cannot add surface, role, raw target, action authority, business id, command id, or submit evidence. Registered route/operation or the Nurture intent registry selects the allowed presentation key; Nurture revalidates current owner scope. The item ref opens only a fresh owner-read detail and cannot become an action target.
+2. The presentation result is closed:
+
+   ```ts
+   type ScenarioPresentationResultV1 =
+     | { status: "ready"; presentation: ScenarioSemanticPresentationV1 }
+     | { status: "empty"; presentation: ScenarioSemanticPresentationV1 }
+     | { status: "context_changed"; safe_reason: ScenarioSafeReasonV1 }
+     | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };
+   ```
+
+   `partial|not_modified|error|needs_selection` aliases are forbidden. C-3-0c-1 owns selection. Provider/database outage remains generic HTTP `503`; no cached or partial presentation is returned. Presentation status cannot redefine C-2f-5/C-3-0d business outcome, replay disposition, command result, or recovery.
+3. Safe copy is owner-resolved plain text:
+
+   ```ts
+   type ScenarioSafeTextV1 = {
+     kind: "plain_text";
+     value: string;
+     locale: string;
+   };
+
+   type ScenarioSafeLabelV1 = ScenarioSafeTextV1;
+
+   type ScenarioSafeReasonV1 = {
+     reason_code: string;
+     message: ScenarioSafeTextV1;
+     help?: ScenarioSafeTextV1;
+     retry_class: "none" | "refresh" | "retry_later" | "contact_support";
+   };
+   ```
+
+   Nurture resolves normalized BCP-47 copy and fallback before returning the value. My-Chat renders the value verbatim and does not host a Nurture localization dictionary or translate reason/action codes. Markdown, HTML, URL, control characters, unresolved parameters, internal reason/exception text, and provider/database details are forbidden.
+4. `reason_code` belongs to the exact scenario registry. B3 meanings remain closed. `not_implemented` is readiness/dev-only and cannot reach Pilot users. Provider/database outage cannot be recoded as an HTTP-200 `owner_unavailable`; that reason may describe only an entitled owner-owned subresource after Nurture successfully evaluated disclosure. An available offer has no user-facing unavailable reason; the B3 `available` classification remains registry/telemetry evidence.
+5. A semantic presentation carries v1 schema/key, subject ref, opaque current context version, generation time, blocks, navigation offers, and action offers. My-Chat cannot interpret the presentation key or context version as business state/authority. `ready` may contain an empty collection only when the overall view remains meaningful; a true safe empty view uses `empty` with owner-produced empty-state blocks/actions.
+6. `ScenarioSemanticBlockV1` is exactly the flat closed union `summary|notice|fact_group|metric_group|item_collection|timeline`. Every block has a response-local key, generic `neutral|informational|positive|warning|critical` tone, safe text, and `narration: allowed|display_only`. Summary/notice carry optional title plus required body. Fact/metric groups carry optional title plus keyed safe label/value/tone rows. Item collections carry optional title plus keyed title/summary/badges/optional timestamp/optional `presentation_item_ref` items and optional next cursor. Timelines carry optional title plus keyed title/summary/badges/required timestamp/optional item-ref entries and optional next cursor. Blocks do not nest or carry arbitrary records/extensions.
+7. Block/fact/metric/item/entry keys are response-local renderer keys, not analytics, correlation, business identity, or cross-response stability. Metric output may show entitled operational aggregates but never ranking, score, comparative trend, or cross-scope Anti-Metrics. `presentation_item_ref` is bound to current principal, Workspace, scenario, subject, presentation, item, and version; the ref opens only current owner-read detail, expires within five minutes, and is not action/submit/cross-surface/offline authority. Raw/canonical ids, command/audit refs, protected bodies, forms/drafts, attachments/media bytes, and renderer-specific primitives are forbidden.
+8. Navigation is separate from durable action:
+
+   ```ts
+   type ScenarioNavigationOfferV1 = {
+     route_class: string;
+     label: ScenarioSafeTextV1;
+     view_mode?: "current" | "recent" | "history";
+     continuation_ref?: string;
+     priority: "primary" | "secondary" | "tertiary";
+     narration: "allowed" | "display_only";
+   };
+   ```
+
+   Route class is registered and the optional continuation ref is owner-issued/opaque. Navigation has no URL, raw target, action key, confirmation, command, or implicit durable effect; opening repeats current Host and owner gates.
+9. Domain action offers are a closed union:
+
+   ```ts
+   type ScenarioActionOfferV1 =
+     | {
+         availability: "available";
+         action_key: string;
+         label: ScenarioSafeTextV1;
+         help?: ScenarioSafeTextV1;
+         target_ref: string;
+         expected_version?: string;
+         confirmation_class: "explicit" | "strong_authorization";
+         priority: "primary" | "secondary" | "tertiary";
+         tone: "neutral" | "informational" | "positive" | "warning" | "critical";
+         narration: "allowed" | "display_only";
+       }
+     | {
+         availability: "unavailable";
+         action_key: string;
+         label: ScenarioSafeTextV1;
+         safe_reason: ScenarioSafeReasonV1;
+         priority: "primary" | "secondary" | "tertiary";
+         tone: "neutral" | "informational" | "positive" | "warning" | "critical";
+         narration: "allowed" | "display_only";
+       };
+   ```
+
+10. An available action requires an active `domain_action_contracts` entry and real authenticated handler. The target ref binds current principal, Workspace, scenario, subject, action, owner target, and version but is sufficient only to request C-3-0d preparation. Expected version is opaque to My-Chat. An unavailable action has no target/version and may appear only when current Nurture disclosure permits the adult to know the action and target exist; existence-sensitive or non-entitled actions are omitted.
+11. My-Chat cannot infer priority, tone, confirmation, availability, or disclosure from `action_key`. Presentation cannot contain Run-level raw `target_type|target_id`, `command_key`, `handler_key`, `serverAction`, client params, arbitrary extensions, raw target id, submit/claim token, or CommandExecution identity/result. An action offer is not relationship proof, policy result, command identity, submit authority, cross-surface permission, or offline entitlement. Every prepare/submit owner-rereads.
+12. Pilot bounds are 64 KiB UTF-8 serialized output, 20 blocks, 20 fact/metric/item/timeline entries per block/page, 8 navigation offers, 8 action offers, label 80 characters, title 120, summary/body 500, and help 240. Presentation cursors, item refs, continuation refs, and action target refs expire within five minutes. Unknown fields, recursive blocks, arbitrary extension payloads, and over-bound output are fatal codec/result-construction failures.
+13. AI receives a generated narration projection rather than the wire object. The projection includes only `narration=allowed` safe text and removes every ref, version, reason/action code, cursor, target, hidden action, and display-only field. AI may explain the current owner text but cannot add a block, fact, safe reason, action, confirmation, or submit behavior absent from the structured owner result.
+14. Existing implementation is not evidence. Base `WorkflowActionAvailability` remains Run-level and raw-target-shaped; My-Chat mobile `InteractionEnvelope` permits broad `serverAction|params|extensions`; Nurture `institution-surfaces` builds id-shaped pseudo-opaque refs and ad-hoc safe strings. No shared `present_subject_context`, semantic block codec, safe-copy codec, entitled action disclosure, or narration projector exists. Existing scaffolds cannot be relabeled or activated as C-3-0c-2.
+
+C-3-0c-2 evidence must cover operation/result codecs, every safe-copy/reason rule, all six block kinds, Anti-Metrics, navigation/action separation, active-handler requirements, unavailable disclosure versus omission, five-minute target expiry, every size/count/text bound, raw-id/URL/HTML/extension/Run-action rejection, code-to-copy non-interpretation, AI projection stripping/non-invention, current-gap detection, and planning-only scope. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed. C-3-0c-3 renderer/persistence classes is next.
 
 ## Minimum IIB closure before real traffic
 
@@ -2469,7 +2556,7 @@ Product friction, latency, or provider failure that does not create a privacy/in
 | --- | --- | --- |
 | Pilot-0-A — baseline and actual-capability audit | **Complete** | Exact revisions/hashes reverified; executable capability, runtime composition, IIB, provisioning, delivery, security, and observability gaps classified. |
 | Pilot-0-B — cohort, role, surface, and data lock | **Complete** | B1/B2 and B3-0 through B3-4 are locked: internal topology/accounts, surface/action/continuity/business semantics, four representative journeys, layered fault/privacy coverage, and explicit exit evidence. |
-| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0c-1 locked** | C-3-0c-0/1 lock presentation ownership and the subject-provider list/resolve, opaque ref, collection, result, privacy, authority, and freshness contracts. C-3-0c-2 is next; C-4 Institution IIB/closure evidence remains open. |
+| Pilot-0-C — IIB and onboarding closure contract | **In progress — C-3-0c-2 locked** | C-3-0c-0/1/2 lock presentation ownership, provider wire, safe text/reasons, six semantic blocks, navigation/action offers, entitled unavailable disclosure, AI projection, privacy, and bounds. C-3-0c-3 is next; C-4 Institution IIB/closure evidence remains open. |
 | Pilot-0-D — topology, operations, success/stop/rollback contract | **Proposed** | Isolated pilot topology, two-key allowlist, five-day window, ownership, recovery, stop, and rollback terms accepted. |
 | Pilot-0-E — final Go/No-Go | **Pending** | Blocker owners and implementation nodes assigned; Pilot-0 evidence reviewed. Only then may the user separately authorize Pilot-1. |
 

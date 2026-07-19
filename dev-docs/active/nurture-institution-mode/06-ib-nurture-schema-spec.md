@@ -773,9 +773,9 @@ Pilot-0-C3-0b-4 client, denial, audit, and adoption schema refinement:
 
 Pilot-0-C3-0c-0 presentation pipeline and ownership schema refinement:
 
-- The planning-only pipeline is verified My-Chat invocation -> current Nurture subject/owner resolution -> display-safe semantic presentation -> My-Chat generic surface adapter/renderer. Exact shared type and method names are deferred to C-3-0c-1/2.
+- The planning-only pipeline is verified My-Chat invocation -> current Nurture subject/owner resolution -> display-safe semantic presentation -> My-Chat generic surface adapter/renderer. The C-3-0c-1/2 refinements define the shared provider and semantic-presentation names.
 - Base may own reusable provider/presentation containers, closed generic result classes, structural bounds, capability declarations, and conformance fixtures. Base contains no Nurture domain name, ref type, role, lifecycle, safe reason, action key, persistence rule, renderer, runtime, or database behavior.
-- Nurture owns current subject-provider resolution, Account–Subject relationship checks, role/scope/target/lifecycle/Grant/policy reread, safe business disclosure, semantic presentation state, and action availability. Nurture may later emit safe text or localization key/parameters only after C-3-0c-2 chooses one exact representation.
+- Nurture owns current subject-provider resolution, Account–Subject relationship checks, role/scope/target/lifecycle/Grant/policy reread, safe business disclosure, semantic presentation state, and action availability. C-3-0c-2 chooses Nurture-resolved plain text rather than a Host-owned localization-key dictionary.
 - My-Chat owns authenticated shell and generic Chat/card/list/detail/workbench rendering, route/navigation chrome, accessibility, device adaptation, and renderer registration. My-Chat receives no authority to map internal owner codes, raw refs, or guessed roles into scenario presentation; renderer compatibility is structural only.
 - Nurture Chat combines AI conversation with the same generic structured UI system used elsewhere. AI input from Nurture is limited to the current display-safe semantic response; the model cannot receive hidden candidates, raw owner objects, protected facts, internal denial detail, or action-policy metadata and cannot synthesize a business block/action absent from the semantic response.
 - Surface adapters consume one current owner presentation path. Surface eligibility may select an owner-permitted subset, and the renderer may change layout, but no adapter creates a separate fact, lifecycle, token, action key, safe reason, command, or authorization result. Cross-surface navigation invokes a fresh owner read.
@@ -790,13 +790,185 @@ Pilot-0-C3-0c-1 subject-provider wire schema refinement:
 - The provider exposes exactly two operations. `list_subject_contexts` discovers the current reachable context set; `resolve_subject_context` revalidates one owner-issued ref. A generic `get_subject`, client-selected raw target, or Host-selected candidate is forbidden.
 - `ListScenarioSubjectContextsInputV1` contains only `provider_version: 1`, optional owner-issued `cursor`, and optional `page_size`. `ResolveScenarioSubjectContextInputV1` contains only `provider_version: 1`, `subject_context_ref`, and optional opaque `known_context_version`.
 - Client/provider input MUST NOT contain Workspace, account, Actor, Participant, role, raw Subject/Child/Family/CareGroup/Institution id, scope, relationship, Grant, policy, surface, route, caller, action, confirmation, or command id. Verified Host context supplies Host facts; Nurture resolves all owner facts.
-- `ScenarioSubjectContextOptionV1` contains only `subject_context_ref`, `scope_kind: single_subject|subject_collection`, `route_class: subject_detail|subject_collection`, `safe_label: ScenarioSafeLabelV1`, optional `safe_disambiguation: ScenarioSafeLabelV1`, opaque `context_version`, `issued_at`, and `expires_at`. C-3-0c-2 defines `ScenarioSafeLabelV1`; C-3-0c-1 locks only the display-safe semantic slots.
-- `ListScenarioSubjectContextsResultV1` is a closed union: `resolved` with one option; `needs_selection` with `scope_kind: unresolved`, a bounded candidate list, and optional `next_cursor`; or `unavailable` with an entitled safe-reason slot. `ResolveScenarioSubjectContextResultV1` is a closed union: `resolved` with one option and `resolved_at`; `context_changed` with an entitled safe-reason slot; or `unavailable` with an entitled safe-reason slot. C-3-0c-2 defines the exact safe-reason encoding/vocabulary.
+- `ScenarioSubjectContextOptionV1` contains only `subject_context_ref`, `scope_kind: single_subject|subject_collection`, `route_class: subject_detail|subject_collection`, `safe_label: ScenarioSafeLabelV1`, optional `safe_disambiguation: ScenarioSafeLabelV1`, opaque `context_version`, `issued_at`, and `expires_at`. The C-3-0c-2 refinement defines `ScenarioSafeLabelV1`; C-3-0c-1 locks only the display-safe semantic slots.
+- `ListScenarioSubjectContextsResultV1` is a closed union: `resolved` with one option; `needs_selection` with `scope_kind: unresolved`, a bounded candidate list, and optional `next_cursor`; or `unavailable` with an entitled safe-reason slot. `ResolveScenarioSubjectContextResultV1` is a closed union: `resolved` with one option and `resolved_at`; `context_changed` with an entitled safe-reason slot; or `unavailable` with an entitled safe-reason slot. The C-3-0c-2 refinement defines the exact safe-reason encoding/vocabulary.
 - One safely determinable context returns `resolved`; multiple contexts return Nurture-curated `needs_selection`; zero contexts return safe `unavailable`. A reachable collection returns one resolved `subject_collection` option and never expands members or exact counts. A known established context with changed owner meaning may return `context_changed`. Guessed, forged, cross-principal, cross-workspace, cross-scenario, revoked, or expired refs collapse to existence-indistinguishable `unavailable`.
 - Subject refs expire within 30 minutes. List cursors expire within 5 minutes. Page size defaults to 10 and MUST NOT exceed 20. A successful resolve may issue a fresh ref and MUST NOT extend the prior ref. `context_version` is opaque same-ref owner state for staleness detection, cannot be correlated across options/refs, and is not a mutation expected-version value.
 - The ref is a locator only and MUST NOT authorize a relationship, action, direct CommandExecution, durable replay, cross-surface access, or offline use. Action prepare/submit re-resolves current owner facts and obtains the separate C-3-0d owner action context.
 - Raw/canonical domain refs, profile/birth/stage/health/media/avatar data, Guardian/Caregiver lists, Enrollment/Grant/relationship paths, role/policy/action availability, collection members/counts, protected body, and stable cross-workspace/scenario correlation keys are forbidden. My-Chat MUST NOT compare opaque refs to infer a shared child.
-- C-3-0c-1 is planning-only. Exact safe labels/reasons and semantic block/action schemas remain C-3-0c-2; renderer/persistence classes remain C-3-0c-3; conformance/adoption remains C-3-0c-4. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed.
+- C-3-0c-1 is planning-only. The C-3-0c-2 refinement locks safe labels/reasons and semantic block/action schemas; renderer/persistence classes remain C-3-0c-3; conformance/adoption remains C-3-0c-4. No contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic changed.
+
+Pilot-0-C3-0c-2 semantic-presentation schema refinement:
+
+```ts
+type ScenarioSafeTextV1 = {
+  kind: "plain_text";
+  value: string;
+  locale: string;
+};
+
+type ScenarioSafeLabelV1 = ScenarioSafeTextV1;
+
+type ScenarioSafeReasonV1 = {
+  reason_code: string;
+  message: ScenarioSafeTextV1;
+  help?: ScenarioSafeTextV1;
+  retry_class: "none" | "refresh" | "retry_later" | "contact_support";
+};
+
+type ScenarioPresentationItemRefV1 = string;
+
+type PresentScenarioSubjectContextInputV1 = {
+  presentation_version: 1;
+  subject_context_ref: ScenarioSubjectContextRefV1;
+  presentation_key: string;
+  view_query?: {
+    view_mode: "current" | "recent" | "history";
+    presentation_item_ref?: ScenarioPresentationItemRefV1;
+    cursor?: string;
+    page_size?: number;
+  };
+};
+
+type ScenarioSemanticPresentationV1 = {
+  presentation_version: 1;
+  presentation_key: string;
+  subject_context_ref: ScenarioSubjectContextRefV1;
+  context_version: string;
+  generated_at: string;
+  blocks: ScenarioSemanticBlockV1[];
+  navigation: ScenarioNavigationOfferV1[];
+  actions: ScenarioActionOfferV1[];
+};
+
+type ScenarioPresentationResultV1 =
+  | { status: "ready"; presentation: ScenarioSemanticPresentationV1 }
+  | { status: "empty"; presentation: ScenarioSemanticPresentationV1 }
+  | { status: "context_changed"; safe_reason: ScenarioSafeReasonV1 }
+  | { status: "unavailable"; safe_reason: ScenarioSafeReasonV1 };
+```
+
+- `present_subject_context` is read-only and runs only after C-3-0c-1 resolution. `presentation_key` is manifest-registered and selected through the verified route/operation or Nurture intent registry; the client cannot create an unregistered key. Surface, role, raw target, action authority, business ids, command id, and submit evidence are forbidden input.
+- `ScenarioSafeTextV1` is owner-localized normalized BCP-47 plain text. The value contains no Markdown, HTML, URL, control character, unresolved localization parameter, internal reason, exception, or provider/database detail. My-Chat renders the value without translating a reason/action code or hosting a Nurture dictionary.
+- `ScenarioSafeReasonV1.reason_code` MUST be declared in the scenario safe-reason registry. B3 reason semantics remain; `not_implemented` is readiness/dev-only. Provider/database outage remains HTTP `503`; `owner_unavailable` may describe only an entitled owner-owned subresource after Nurture successfully evaluated disclosure. An available action uses `availability=available` and no user-facing reason; the B3 `available` code remains registry/telemetry evidence.
+- `ScenarioPresentationItemRefV1 = string` is an opaque read locator bound to current principal/Workspace/scenario/subject/presentation/item/version. The ref can enter only the exact registered `view_query.presentation_item_ref` slot, expires within five minutes, and triggers a fresh detail owner read. The item ref is not an action target, relationship proof, submit context, cross-surface permission, or offline locator.
+- `ScenarioSemanticBlockV1` is the closed flat union defined here:
+
+```ts
+type ScenarioToneV1 = "neutral" | "informational" | "positive" | "warning" | "critical";
+type ScenarioNarrationPolicyV1 = "allowed" | "display_only";
+
+type ScenarioSemanticBlockBaseV1 = {
+  block_key: string;
+  tone: ScenarioToneV1;
+  narration: ScenarioNarrationPolicyV1;
+};
+
+type ScenarioBadgeV1 = {
+  label: ScenarioSafeTextV1;
+  tone: ScenarioToneV1;
+};
+
+type ScenarioSemanticBlockV1 =
+  | (ScenarioSemanticBlockBaseV1 & {
+      kind: "summary" | "notice";
+      title?: ScenarioSafeTextV1;
+      body: ScenarioSafeTextV1;
+    })
+  | (ScenarioSemanticBlockBaseV1 & {
+      kind: "fact_group";
+      title?: ScenarioSafeTextV1;
+      facts: Array<{
+        fact_key: string;
+        label: ScenarioSafeTextV1;
+        value: ScenarioSafeTextV1;
+        tone: ScenarioToneV1;
+      }>;
+    })
+  | (ScenarioSemanticBlockBaseV1 & {
+      kind: "metric_group";
+      title?: ScenarioSafeTextV1;
+      metrics: Array<{
+        metric_key: string;
+        label: ScenarioSafeTextV1;
+        value: ScenarioSafeTextV1;
+        tone: ScenarioToneV1;
+      }>;
+    })
+  | (ScenarioSemanticBlockBaseV1 & {
+      kind: "item_collection";
+      title?: ScenarioSafeTextV1;
+      items: Array<{
+        item_key: string;
+        title: ScenarioSafeTextV1;
+        summary?: ScenarioSafeTextV1;
+        badges: ScenarioBadgeV1[];
+        occurred_at?: string;
+        presentation_item_ref?: ScenarioPresentationItemRefV1;
+      }>;
+      next_cursor?: string;
+    })
+  | (ScenarioSemanticBlockBaseV1 & {
+      kind: "timeline";
+      title?: ScenarioSafeTextV1;
+      entries: Array<{
+        entry_key: string;
+        title: ScenarioSafeTextV1;
+        summary?: ScenarioSafeTextV1;
+        badges: ScenarioBadgeV1[];
+        occurred_at: string;
+        presentation_item_ref?: ScenarioPresentationItemRefV1;
+      }>;
+      next_cursor?: string;
+    });
+```
+
+- Block/fact/metric/item/entry keys are response-local renderer keys, not analytics, correlation, business identity, or cross-response stability. `occurred_at` is an owner-disclosed timestamp that a generic renderer may format without inferring lifecycle. Cursors and item refs remain opaque and cannot be compared.
+- Summary/notice blocks carry only bounded safe text. Fact/metric blocks carry bounded safe label/value rows. Metrics cannot carry rank, score, comparative trend, cross-scope comparison, or another Anti-Metrics field. Item/timeline entries carry only response-local keys, safe text/badges/timestamps, and short-lived opaque owner locators. No block contains raw/canonical ids, command/audit refs, protected body, form/draft, attachment, media bytes, renderer primitive, or business authorization.
+
+```ts
+type ScenarioNavigationOfferV1 = {
+  route_class: string;
+  label: ScenarioSafeTextV1;
+  view_mode?: "current" | "recent" | "history";
+  continuation_ref?: string;
+  priority: "primary" | "secondary" | "tertiary";
+  narration: "allowed" | "display_only";
+};
+
+type ScenarioActionTargetRefV1 = string;
+
+type ScenarioActionOfferV1 =
+  | {
+      availability: "available";
+      action_key: string;
+      label: ScenarioSafeTextV1;
+      help?: ScenarioSafeTextV1;
+      target_ref: ScenarioActionTargetRefV1;
+      expected_version?: string;
+      confirmation_class: "explicit" | "strong_authorization";
+      priority: "primary" | "secondary" | "tertiary";
+      tone: "neutral" | "informational" | "positive" | "warning" | "critical";
+      narration: "allowed" | "display_only";
+    }
+  | {
+      availability: "unavailable";
+      action_key: string;
+      label: ScenarioSafeTextV1;
+      safe_reason: ScenarioSafeReasonV1;
+      priority: "primary" | "secondary" | "tertiary";
+      tone: "neutral" | "informational" | "positive" | "warning" | "critical";
+      narration: "allowed" | "display_only";
+    };
+```
+
+- Navigation is non-durable. `route_class` is registered; `continuation_ref` is owner-issued and opaque. Navigation contains no URL, raw target, action key, confirmation, command, or implicit durable effect.
+- An available action is declared by an active `domain_action_contracts` entry with a real authenticated handler. `target_ref` is bound to the current principal/Workspace/scenario/subject/action/owner target and is sufficient only to request C-3-0d preparation. `expected_version` is opaque to My-Chat. An unavailable action carries no target/version.
+- An unavailable action MAY appear only when current Nurture disclosure permits the adult to know both the action and target exist. Existence-sensitive or non-entitled actions are omitted rather than returned as disabled controls. My-Chat MUST NOT infer priority, tone, confirmation, availability, or disclosure from `action_key`.
+- Presentation forbids `command_key`, `handler_key`, `serverAction`, client params, arbitrary extensions, raw target id, submit token, claim token, and CommandExecution identity/result. Draft/edit/prepare/submit/confirmation stays C-3-0d; protected bodies/media/offline stays C-3-0e.
+- Pilot bounds are 64 KiB UTF-8 serialized response, 20 blocks, 20 fact/metric/item/timeline entries per block/page, 8 navigation offers, 8 action offers, label 80 characters, title 120, summary/body 500, and help 240. Presentation cursors, item refs, continuation refs, and action target refs expire within 5 minutes. Unknown fields and over-bound values are fatal codec failures.
+- AI receives a generated projection, never the wire object. The projection includes only `narration=allowed` safe text and removes refs, versions, reason/action codes, cursor values, target refs, hidden actions, and display-only text. AI cannot create a block, fact, reason, action, confirmation, or submit behavior absent from the owner result.
+- Current Base `WorkflowActionAvailability` remains Run-level and raw-target-shaped; current My-Chat mobile `InteractionEnvelope` contains broad `params|extensions|serverAction`; current Nurture surface refs encode database ids. None satisfies C-3-0c-2. The checkpoint is planning-only and changes no contract package, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, environment, capability, provider, database, or traffic. C-3-0c-3 is next.
 
 ## 4. Grant and Receipt Objects
 
