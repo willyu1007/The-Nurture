@@ -8,6 +8,9 @@ The Nurture is a My-Chat scenario module for pregnancy, motherhood, childcare, f
 - My-Chat owns canonical objects, auth, shared workflow runtime, dashboard/chat/mobile/forum/knowledge/notification/admin surfaces, ledgers, workers, and outbox.
 - The Nurture owns scenario workflows, local projections, policies, artifacts, and scenario-specific console/API surfaces.
 - Nurture profiles MUST attach to My-Chat canonical objects; do not create duplicate child/family/person identity ownership.
+- My-Chat `child_id` is the opaque shared subject key. Nurture binds it to a
+  local `NurtureChild`; the local `NurtureChild.id` and care-process `childId`
+  are not platform child IDs, and the binding never grants scenario access.
 - Health guidance MUST stay non-diagnostic, non-prescriptive, and non-emergency-replacement.
 - Persisted schema changes start in `prisma/schema.prisma`.
 

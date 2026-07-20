@@ -188,7 +188,9 @@ not serve any Current Focus, it SHOULD explain why it is still worth doing.
 ## Child Development Vector
 
 The Child Development Vector is the main consistency anchor for child-specific output.
-It SHOULD be stored as scenario-local projection attached to a My-Chat child canonical ref.
+It SHOULD be stored as a scenario-local projection attached to an opaque
+`my_chat.child` / `child_id` binding. The Nurture-local child ID remains
+distinct, and the shared ID MUST NOT substitute for Nurture authorization.
 
 Initial dimensions:
 
@@ -336,7 +338,7 @@ The first slice SHOULD establish durable data landing points:
 
 | Layer | Data landing |
 | --- | --- |
-| Canonical refs | My-Chat `family`, `child`, `parent`, and related actor refs |
+| Canonical refs | My-Chat `family_id`, `child_id`, parent User/Actor, and related actor refs; IDs are routing keys, not scenario grants |
 | Scenario profile projection | FamilyProfile and ChildProfile projections attached to canonical refs |
 | Stable strategy | FamilyCharter and CurrentFocus |
 | Calibration snapshot | FamilyQuantificationSnapshot using non-ranking metrics |
@@ -448,7 +450,10 @@ The first database implementation MUST follow these decisions:
 
 1. Family and child profile projections SHOULD be split into separate tables. The split
    keeps family-system semantics and child-development semantics explicit, while both remain
-   scenario-local projections attached to My-Chat canonical refs.
+   scenario-local projections attached to opaque My-Chat canonical refs. A
+   child projection SHOULD store nullable `my_chat_child_id`; it MUST NOT reuse
+   the local child primary key, auto-create a global child, or infer a binding
+   from PII.
 2. Workflow goals, constraints, and measurement plans SHOULD initially live inside
    `NurtureWorkflowProject` structured payloads. They MUST be shaped so they can later be
    extracted into dedicated tables without changing user-facing semantics.

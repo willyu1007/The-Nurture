@@ -21,6 +21,9 @@ The Nurture owns:
 My-Chat owns:
 
 - Canonical account identity: user account, authentication, session, and global user id.
+- Protected child/family identity: stable `my_chat.child` / `child_id` and
+  `my_chat.family` / `family_id`, stewardship, creation authorization, and
+  scenario-binding lifecycle.
 - Scenario shell and host runtime: shared workflow runtime, routes, workers, outbox, ledgers, handoffs, and evidence.
 - Mobile/web shell, notification, deep link, forum, knowledge base, dashboard, and admin consumers.
 - User-facing entry and rendering surfaces that call back into Nurture-owned APIs for Nurture business facts.
@@ -51,6 +54,8 @@ The N1 institution workflows resolve the current Nurture participant, role, and 
 Canonical refs required from My-Chat:
 
 - `my_chat.user`
+- `my_chat.child` (`child_id`) when a Nurture child is globally bound
+- `my_chat.family` (`family_id`) when a Nurture family is globally bound
 - `my_chat.workspace` or shell entry ref when needed for routing
 - `my_chat.thread_surface` or equivalent render/deep-link ref when a Nurture-owned thread is shown inside My-Chat mobile/web
 - `my_chat.notification_target` when Nurture needs host notification/deep-link delivery
@@ -78,6 +83,88 @@ Scenario-local canonical refs owned by Nurture:
 Nurture scenario participants that correspond to login users MUST reference `my_chat.user`. Nurture role and relationship semantics MUST be resolved from Nurture data, not inferred from My-Chat account state.
 
 Nurture children are not My-Chat users. A child care process is Nurture-owned and may have multiple guardian participants, caregiver participants, and institution-manager participants attached through Nurture role assignments.
+
+## My-Chat `child_id` Usage Contract
+
+### Meaning and local representation
+
+`child_id` identifies the protected child across My-Chat scenarios. It is an
+opaque identity key, not a Nurture profile, login principal, PII match key, or
+authorization grant.
+
+Nurture MUST keep two identities distinct:
+
+- `NurtureChild.id` is the Nurture-owned child/profile identifier.
+- `my_chat.child` / `child_id` is the My-Chat-owned shared subject identifier.
+
+The existing `NurtureChildCareProcess.childId` points to `NurtureChild.id`; it
+MUST NOT be interpreted, exposed, or copied as a My-Chat `child_id`.
+
+When persistence implementation follows this contract, `NurtureChild` SHOULD
+carry a nullable opaque domain property `myChatChildId`, mapped to
+`my_chat_child_id`, with at most one active local child per platform child. The
+field remains nullable so an authorized Nurture workflow can hold a provisional
+local child before a global binding exists. My-Chat remains canonical for the
+binding lifecycle.
+
+### Creation and binding happy path
+
+1. Authenticate the My-Chat user and resolve the current Actor plus any
+   represented organization through the pinned host contract.
+2. Resolve the Nurture participant and local roles independently.
+3. Obtain `child_id` from the My-Chat child owner API. A parent/steward creates
+   the child, or My-Chat verifies an explicit, current creation authorization
+   for the acting person and represented organization.
+4. Create or select the Nurture child under Nurture policy. Bind by sending the
+   canonical `nurture.child` ref to the My-Chat binding API and store only the
+   returned opaque `child_id`/version locally.
+5. On every protected read or command, resolve the local Nurture child/care
+   process and recheck current Nurture role assignment, enrollment,
+   child-link grant, purpose, consent/policy, and lifecycle. `child_id` alone
+   MUST fail closed.
+
+Nurture MUST consume My-Chat through pinned contracts, owner APIs, and refs-only
+handoffs. It MUST NOT import a sibling ORM, query the My-Chat database, or join
+databases directly.
+
+### Provisional, claim, and reconciliation rules
+
+- Without current parent/steward authority, a teacher, caregiver, institution,
+  or school MAY create only a Nurture-local provisional child/care record.
+- A provisional record MUST NOT contain an invented `child_id` or be visible as
+  a globally bound child.
+- Claim/bind requires a new, explicit parent/steward-authorized operation. It
+  MUST NOT auto-match on name, birth date, school identifier, family contact,
+  or other PII.
+- Existing Nurture rows MUST NOT be bulk backfilled into My-Chat children.
+- My-Chat merge, redirect, revocation, archive, or deletion signals require a
+  current owner reread and an auditable local reconciliation. Nurture MUST NOT
+  silently rewrite subject bindings from stale cache data.
+
+### Education interoperability
+
+The same My-Chat `child_id` MAY bind one Nurture child and one Education
+learner. That shared key permits routing and authorized correlation only:
+
+- Nurture MUST NOT query The-Education storage or import its ORM.
+- Education MUST NOT query Nurture storage or infer Nurture permissions.
+- Cross-scenario handoffs contain opaque canonical refs and minimal policy
+  metadata; the receiving owner rereads its own facts and current grants.
+- A valid Education association does not authorize Nurture access, and a valid
+  Nurture association does not authorize Education access.
+
+### Verification checklist
+
+- A parent-created or parent-authorized child binds to one local
+  `NurtureChild` and retains distinct local/global identifiers.
+- An unauthorized institution actor can create only a provisional local child;
+  My-Chat child creation/binding fails closed.
+- Binding-only, family-association-only, and `child_id`-only reads are denied.
+- Revoked grants and stale owner versions are denied after owner reread.
+- Logs, outbox payloads, handoffs, and projections contain opaque refs rather
+  than child PII or scenario dossier content.
+- One `child_id` can route separately to Nurture and Education without a
+  cross-database join or cross-scenario permission leak.
 
 Nurture family-care communication is Nurture-owned when the conversation is created through a Nurture care workflow. My-Chat MAY render the thread, deliver notifications, and hold display-safe shell references, but the message body, care item extraction, status, acknowledgment, reply, and follow-up facts remain Nurture canonical.
 

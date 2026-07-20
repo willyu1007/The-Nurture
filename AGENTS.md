@@ -7,6 +7,14 @@ The Nurture is a My-Chat scenario module. Preserve My-Chat ownership boundaries 
 - Do not treat The Nurture as an independent product shell.
 - Do not copy or fork My-Chat host runtime code into this repo unless explicitly requested.
 - Scenario-local data may exist, but identity belongs to My-Chat canonical objects.
+- My-Chat owns shared `child_id` and `family_id`. Nurture owns the local child
+  profile and care process that bind to those opaque IDs; an existing local
+  `NurtureChild.id` is not a platform `child_id`.
+- A parent/steward creates the My-Chat child or explicitly authorizes another
+  actor to create it. Without that authority, Nurture may keep only a local
+  provisional child and MUST NOT mint or infer a global child identity.
+- A `child_id`, family association, or My-Chat scenario binding is routing and
+  policy input, never sufficient permission to read Nurture facts.
 - Health guidance must be non-diagnostic, non-prescriptive, and non-emergency-replacement.
 - Prefer `docs/context/` contracts before source scanning for API, DB, workflow, glossary, or architecture context.
 - Initialization history belongs under `docs/project/overview/`; do not add new planning there.
@@ -30,6 +38,11 @@ Before changing workflow integration, read:
 The Nurture owns scenario manifest, handlers, actions, presenters, adapters, policies, repository ports, local projections, and scenario artifacts.
 
 My-Chat owns canonical object identity, auth, shared workflow runtime, routes, workers, outbox, ledgers, dashboard/chat/mobile/forum/knowledge/notification/admin consumers.
+
+Nurture consumes `my_chat.child` through pinned owner contracts/APIs and
+stores only an opaque binding to its local child. It MUST NOT import the
+My-Chat ORM, query the My-Chat database, derive `child_id` from PII, or use the
+same ID as an authorization grant.
 
 ## Work Rules
 
