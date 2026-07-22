@@ -66,6 +66,6 @@
       "packages/nurture-scenario/src/registry.ts",
       "packages/nurture-scenario/src/repositories.ts"
     ],
-    "contractSha256": "e976c235962c827367d1c13dcc603a0d315fdac118daf03f00a3df85e153d193"
+    "contractSha256": "e92582d9b710e62f087d92549e1e473a9a22d64b9ad0d058eb010c8c46a67d35"
   }
 }

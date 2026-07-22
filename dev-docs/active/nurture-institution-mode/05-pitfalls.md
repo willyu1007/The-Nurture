@@ -13,7 +13,62 @@ This file exists to prevent repeating mistakes within this task.
 - Do not relabel the existing handoff contract hash as C-3 presentation adoption, split provider/presentation/renderer into independently activatable paths, or maintain a second handwritten pre-activation manifest.
 - Do not use `Direct domain action` to mean both “not a legacy Run action” and “direct-empty effect driver.” Driver is a static action-contract property; caregiver reply and every non-empty-capable relationship action remain claimed-Step even when the current snapshot array is empty.
 - Do not persist submit token, owner target/version, Nurture body/context, or claim evidence in a Workflow Step. Persist a content-free non-claimable Step, bind it immutably in Nurture, then expose only that original Step to claim/replay.
-- Do not put Nurture care ecology semantics inside My-Chat as canonical facts; family, child, institution, care group, role assignment, enrollment, grant, family-care messages, and care items belong to Nurture.
+- Do not treat a synthetic protected ref, nullable Message body, encrypted flag, ordinary Chat turn, `PublicDraft`, local/browser cache, or AI provider policy as a complete protected-content boundary. Use the owner-encrypted aggregate, protected composer/read path, crypto-erasure, retention/restore fence, and exact cross-repo evidence together.
+- Do not seed the protected composer from sent or unsent ordinary Chat text. Pilot opens an empty manual composer and keeps protected AI absent/off.
+- Do not promise that private text mistakenly typed into ordinary Chat was never retained. The zero-copy guarantee begins at the protected composer; Chat remains under My-Chat policy and never auto-promotes content.
+- Do not register `institution_board|institution_workbench` in a C-3 Nurture candidate. Use neutral Host renderer fixtures for generic conformance and leave real Institution routes/presenters to C-4.
+- Do not add C-4 routes, handlers, models, or migrations directly to an artifact claimed to be the immutable C-3 component. Compose a separately identified Institution extension and migration ledger over the exact content-addressed C-3 input.
+- Do not let C-4 evidence depend on Pilot-0-E or reuse C-3 evidence authority. Use a separate pre-E C-4 candidate kind, evidence authorization, qualification chain, and final false/empty teardown.
+- Do not borrow Pilot-0-D provisioning authority to run pre-D C-4 JI1. Use the isolated single-use bootstrap-evidence authorization against the real handler in a disposable synthetic Workspace; D still owns real Pilot provisioning.
+- Do not admit a complete-Pilot row from current C-3 plus E alone. Independently resolve current C-3 qualification, current C-4 qualification, E decision, and exact Pilot-1 deployment every time.
+- Do not require a live Pilot-1 deployment before Pilot-0-E or hash E/evidence/deployment back into the candidate. E reviews an immutable undeployed artifact/topology/config/operations candidate; Pilot-1 later binds exact live resources and secrets.
+- Do not defer static behavior-affecting configuration until Pilot-1 or hash the current environment capability/activation row into the candidate. The candidate freezes ordinary behavior values plus gate schema/default/policy; governed gate values remain live authority state.
+- Do not let an informal test report satisfy E. Only a separately authorized disposable D evidence environment may produce the signed/current `pilot0_d_predeployment_evidence_seal_v1`, and it must finish false/empty, revoke credentials, prove zero external traffic, and be destroyed.
+- Do not reuse `c4_bootstrap_evidence_*`, ambient Workspace admin, Institution Admin, or Technical Operator to create the real Pilot Institution. Use the isolated real-Pilot provisioning spec/controller plus exact invitation acceptance, one-effect claim/status recovery, permanent close, and no replacement while outcome is unknown.
+- Do not make a remote My-Chat gate read from inside a Nurture transaction or claim cross-database disable/commit total ordering. Host admission rereads current authorities before the owner attempt; Nurture first verifies the fresh signed private invocation/nonce and then the persisted bounded admission locally, and an already admitted in-flight attempt may commit at most once.
+- Do not model an infrastructure hard stop as choosing one of ingress, private route, workers, send/open, or capability. When the application gate store is unavailable, close all ordinary effect-producing seams together and retain only the separately trusted frozen-recovery lane.
+- Do not treat a stage prerequisite, daily observation record, or terminal review as an unsigned document. Each uses its named schema, isolated signer/store/current resolver, exact candidate/deployment/stage heads, and append-only invalidation semantics.
+- Do not interpret one absent bootstrap lookup as `confirmed_no_effect`. The recovery lane must wait for all attempts/deadlines, acquire the C-0 writer fence, and prove exact Execution/effect absence; timeout, outage, possible in-flight work, or ambiguity remains `unknown`.
+- Do not open ordinary product routes merely because the first Pilot activation row is current or Nurture C-0 committed. The row stays bootstrap-only through response loss and every same-operation recovery state; exact Host `owner_committed + spec consumed + quarantine clear` alone derives `ordinary_ready`.
+- Do not make Pilot-2 readiness reject the same bootstrap operation's bounded `prepared -> claimed -> prepared` recovery loop. Keep that exact lineage verifiable while bootstrap-only; `closed_no_effect`, another operation/spec, or budget/identity drift invalidates the stage.
+- Do not restore an old activation row as current, clear restored rows with SQL, or call RDS availability an RTO PASS. Restored rows deny through environment/deployment mismatch and converge to `[]` through the owner command before privacy-ledger, KMS/trust, integrity, quarantine, route-closed, and restore-seal completion.
+- Do not equate Grant revoke with crypto erasure. Revoke removes cross-role authority; only redaction, source deletion, retention deletion, or explicit erase policy produces a privacy-ledger tombstone that suppresses the protected body on restore.
+- Do not run disabled-cohort/kill-switch or restore tests inside the Pilot-4 PASS clock. Seal them in Pilot-3, create a no-reset owner-path baseline and fresh row, then run exactly seven planned question paths across one uninterrupted 120-hour window.
+- Do not restore or extend Pilot-3's activation row after a kill-switch rehearsal. Pilot-4 requires a new signed stage authorization and a new exact row; Technical Operator remains disable-only.
+- Do not equate a revoked, expired, aborted, or partially executed Pilot-3 plan with successful consumption. Only the complete ordered matrix, false/empty kill-switch census, recovery closure, and final allowlisted binding transition may append `consumed_success`; every other terminal outcome blocks Pilot-4.
+- Do not make the legitimate Pilot-3 gate-close, row-removal, final binding, plan-consume, or stage-consume successors look like arbitrary bound-head drift. Resolve only the exact ordered terminal lineage; historical consumed heads verify but never execute.
+- Do not gate E with a count or the phrases “critical TR-P1” or “explicitly accepted.” Use the stable `pilot0_traffic_readiness_census_v1` ids and permit `accepted_scope_exclusion` only for `TR-P1-3a-native-external-delivery`.
+- Do not treat an admitted extra Pilot-4 question as harmless overflow. Any unplanned admitted Nurture question/business effect makes the window `no_pass`; only a denial before owner admission with zero effect may remain a negative probe.
+- Do not interpret “zero external traffic” as zero network packets or no public My-Chat ingress. Derive `externalProductTrafficCount=0` from trusted source session/account/service boundaries: an external authenticated account counts even if Host denies before owner call, while an allowlisted internal injected-target probe stays internal only when denied with zero owner effect. Audit every narrowly excluded edge/control/service event.
+- Do not omit `pilot4_terminal_stop_evidence_v1` from the evidence-only sealing grace. Every non-PASS window needs exactly one stop/boundary record, including failed full-segment and zero-length Tend cases, while the grace remains incapable of product effects.
+- Do not treat two technical gates as two-person approval or let an unavailable activation store defeat shutdown. Environment capability and the exact Workspace row each deny independently, with an infrastructure hard-stop for control-plane outage.
+- Do not reuse the Nurture dev host, empty Kubernetes scaffold, staging BWS/static service token, tag-based old ACR images, or one shared DB/credential as complete-Pilot topology.
+- Do not use “five days” as five partial workdays or preserve a clock across gate shutdown, restore, candidate/config/trust change, or evidence gap. Pilot-4 is one fresh-row uninterrupted 120-hour window.
+- Do not call legacy class-inbox/teacher-attention APIs an Institution board/workbench. C-4 requires exact Institution Admin reachability, repository-predicate-first reads, two real product surfaces, and no Institution Chat.
+- Do not model staff onboarding as one Admin role write or use Workflow Step/Handoff as invitation identity transport. Host owns a non-deliverable contact shell and acceptance; Nurture owns a replayable intent, Participant binding, later Caregiver role, and later exact Lead designation.
+- Do not treat Host `already_member` as staff-invitation acceptance or reuse a consumed Staff Invitation after role revoke. Existing members reauthenticate and explicitly acknowledge the new purpose; one unique source intent creates one role identity forever.
+- Do not let `lead_caregiver`, Group JSON, first-staff order, or Host role independently grant teacher access. Lead is a separate exact-group RoleAssignment bound to the exact current operational Caregiver role episode.
+- Do not add `withdrawn|ended|transferred` as a second Roster status enum. Roster stays `active|linked|closed`; terminal relationship class is a typed `terminalReason`.
+- Do not assume a reusable terminal DTO implies that C-3 already validates `closed + no reply + resolved Attention`. C-4 owns the exact extension graph/adapter, later privacy convergence, and create/send fences separately from open.
+- Do not make group pause cascade or group close silently clean dependents. Pause is a reversible current fence; terminal archive requires a locked zero-dependent census and explicit owner lifecycle closure first.
+- Do not let disabled execution-status recovery reuse ordinary API/worker ingress or an expired principal as authority. Use the dedicated recovery caller/endpoint/frozen provenance and prohibit every business/read/delivery side effect.
+- Do not return protocol `unknown` for an unauthenticated, malformed, replayed, or frozen-binding-mismatched recovery request. Deny generically before status/fence/application work and keep the Host row quarantined.
+- Do not treat a qualification envelope, CI result, cached status, or Technical Operator action as current qualification. Only the signed append-only qualification chain resolved fail-closed by its authoritative resolver may qualify a candidate.
+- Do not make disposable C-3 evidence depend on the qualification result being produced, or make I10 depend on its own exit. Use candidate-kind-specific authority and pre-seal -> controller-signed envelope/event -> resolver exit.
+- Do not use legacy `business_actor_ref`, ThreadParticipant, Institution Admin, or Lead designation as activated C-3 business authority. Require the typed Participant actor and exact operational RoleAssignment/claim/Grant predicates.
+- Do not implement the C30 shared baseline again in C31. C31 and every later node consume immutable predecessor evidence through the strict C30 -> C31 -> C32 -> C33 -> C34 -> C35 DAG.
+- Do not let legacy R7 return `replied|followed_up|waiting_for_family` as current family-care work. Pilot current is only `open|acknowledged`; terminal work is recent/history and has no continuation action.
+- Do not translate candidate `materialization_status=skipped` into provider `delivery_status=skipped`, or vice versa; identical literals belong to independent state machines.
+- Do not collapse Guardian communication progress, Item suppression, and question/reply body visibility into one status; project the independent axes from a complete Item-root fact graph.
+- Do not turn class inbox, TeacherAttention, legacy internal APIs, or Caregiver Chat cards into separate Caregiver work/action roots; one exact FamilyCare Item graph owns the lifecycle and Attention is only its queue projection.
+- Do not let another or newly issued Caregiver RoleAssignment reply after an exact claimant acknowledges an Item; Pilot has no reassignment/handoff, and temporary versus terminal claimant loss must not be converted into takeover or silent suppression.
+- Do not infer a `user_attention` producer or historical recipient cohort from direction/current membership alone; validate the Host-derived action origin and the typed commit-time RoleAssignment cohort before every current delivery plan.
+- Do not alias historical `capture_family_input`, `internal_api`, a hand-filtered registry, or a mutable local dependency into the C-3 Guardian action path. Keep the canonical manifest generated/parity-checked and require C-3-5 default-off qualification before any separately authorized Pilot-2 activation.
+- Do not call a persistent gate schema, disposable true/one-Workspace exercise, or qualified C-3 component “activated” or “Pilot ready.” C-3-5 must end environment activation bundle false and active Workspace rows empty.
+- Do not merge evidence from different commits, builds, schemas, KMS/signing revisions, registries, or test configurations into one candidate; every evidence row binds one immutable component-candidate id.
+- Do not let J1-J4 communication journeys stand in for C-3-2 Guardian relationship/authority evidence or C-4 Institution product evidence; those are separate mandatory strands.
+- Do not abandon a committed Nurture Execution when the kill switch races Step completion; the original Step must close only body-free technical work without re-executing business or sending after disablement.
+- Do not put Nurture care ecology semantics inside My-Chat as canonical facts. My-Chat owns protected platform Child/Family identity, stewardship/membership, and scenario bindings; Nurture owns workspace-local Child/Process/child-scoped Family, Institution, CareGroup, RoleAssignment, Enrollment, Grant, family-care messages/items, and every care policy/fact.
 - Do not wire live manifest capabilities before Nurture care ecology schema, resolvers, policies, and handlers exist.
 - Do not let institution mode drift into ranking, marketplace, competitive caregiver scoring, or institution growth tooling.
 - Do not allow cross-domain ambient reads; cross-ecology movement must be `ChildLinkGrant`-gated handoff.
@@ -54,11 +109,11 @@ This file exists to prevent repeating mistakes within this task.
 - Do not let stage change mutate Enrollment or let age, birthday, Institution data, or AI inference silently rewrite `currentStageKey`. Use the locked Guardian-owned C-2f-4-1 StageEpisode authority/history path.
 - Do not treat `currentStageKey`, pregnancy-stage output, profile snapshot, age band, or roster attribute as the canonical stage ledger. Only a current versioned StageEpisode created by an exact Guardian command is authoritative.
 - Do not overwrite, backdate, branch, or delete stage history to represent change or correction. Close the current leaf with fixed evidence, create at most one successor, or explicitly clear the current state.
-- Do not infer or merge a child across workspaces from the same adult account, name, birth fact, contact, media, roster, or raw id. Cross-workspace portability remains Pilot `NO-GO` until a separate consented versioned protocol exists.
-- Do not treat future portability as identity migration or let the same My-Chat adult prove the same child. Future v1 may only copy explicitly confirmed minimum fields into a fresh target-local aggregate after independent source and target checks.
-- Do not search, suggest, attach to, overwrite, or merge an existing target child during future v1 import. Existing-profile reconciliation is a separate target-local protocol and never a Technical Operator edit.
-- Do not place portability bodies or child-identity claims in My-Chat Workflow Step, Handoff, Outbox, notification, provider payload, logs, or Admin controls; My-Chat remains authentication plus refs-only transport.
-- Do not promise that source revoke/redaction/deletion recalls an already consumed import. Before consume these gates fail closed; after consume the copied fields are target-local facts under target Guardian policy.
+- Do not infer or merge a child across workspaces from the same adult account, name, birth fact, contact, media, roster, or client/raw id. Exact current typed My-Chat Child/Family binding reuse is allowed; automatic local-association reuse, dossier discovery, data movement, and authority carryover remain Pilot `NO-GO`.
+- Do not treat future scenario-data portability as identity migration. Any later protocol operates only after exact platform identity and target-local authorization are current, and moves only explicitly consented scenario data without roles, Enrollment, Grant, or authority.
+- Do not search, suggest, overwrite, auto-attach, or merge a target dossier through source values or anchor enumeration. Existing target association resolution uses the exact typed binding/workspace compound path; conflicting anchors quarantine and Technical Operator never edits identity.
+- Do not place scenario-data portability bodies, anchors, or Nurture authority claims in Workflow Step, Handoff, Outbox, Notification, provider payload, logs, or Admin controls. My-Chat may own platform identity and refs-only orchestration without owning Nurture dossier content.
+- Do not promise that source revoke/redaction/deletion recalls a future separately consented scenario-data commit. Before commit all gates fail closed; after commit any transferred target-local fact follows the future target policy without reviving source authority.
 - Do not collapse persisted business outcome, replay disposition, and current presenter result. A replay or already-satisfied caller cannot claim it performed, owned, approved, or jointly consented to the original effect.
 - Do not treat CommandExecution `outputRefs` as client navigation, presentation authority, analytics dimensions, notification data, or Handoff content. They remain exact server-side recovery evidence and there is no `open_result` token.
 - Do not widen or reinterpret existing `user_attention` for Enrollment lifecycle. A future Guardian relationship-attention contract is additive, separately versioned, capability-gated, and limited to transfer review and irreversible relationship termination.
@@ -66,7 +121,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not resolve relationship-notification recipients at delivery time. Snapshot exact current Guardian RoleAssignments at business commit, exclude the withdrawal actor, never backfill later-added Guardians, and stop lost-role recipients through current owner reread.
 - Do not compensate, delete, reopen, or rewrite a committed Nurture fact because presenter, Step, Handoff, Outbox, provider, or notification delivery failed. Recover the original Execution/Step and keep technical delivery independent.
 - Do not equate an authenticated My-Chat account with the scenario subject. An adult actor must reach a child/learner subject through the current scenario-owned relationship graph.
-- Do not solve account-to-subject discovery by creating a second canonical Child or relationship table in My-Chat. Host subject entries are opaque discovery/navigation context and never authorization.
+- Do not turn My-Chat's canonical platform Child/Family identity into a second Nurture subject or relationship-authority table. Host subject entries and bindings provide protected identity/routing context only; Nurture's workspace-local Process/roles/associations remain the care subject and authorization graph.
 - Do not hardcode `NurtureChildCareProcess` into reusable Base/My-Chat contracts. Product copy can be child-centered while shared technical contracts use generic `subject`.
 - Do not let a `subject_collection` grant bulk write, shared Grant/consent, outside-scope discovery, or membership-cache authority. Every member action resolves one exact current owner path.
 - Do not reuse `DomainContextRef`, raw Subject identity, collection members/counts, or stable context-version correlation for subject discovery. Use the short-lived opaque subject locator, keep collection as one context, and resolve again at every surface/action seam.
@@ -162,12 +217,12 @@ This file exists to prevent repeating mistakes within this task.
   stage and protected-history exclusion, expiry, token forwarding,
   revoke/consume races, response loss, and source deletion before and after
   target commit.
-- Fix / workaround: keep Pilot executable portability disabled; constrain a
-  future v1 to the same authenticated adult, independent dual-scope checks,
-  fresh target-local identities, `displayName` plus opt-in `birthDate`, a
-  seven-day target-bound Intent and five-minute confirmation, Nurture-owned
-  consumption/idempotency, refs-only Host delivery, no match/merge, and clear
-  post-consume no-recall semantics.
+- Fix / workaround (historical, superseded by the 2026-07-20 identity repair):
+  keep Pilot scenario-data portability disabled. The former fresh-identity and
+  `displayName|birthDate` copy protocol is withdrawn. A future protocol may
+  move only separately consented scenario data after current platform identity
+  reuse and independently authorized target-local association; it never moves
+  authority, performs PII matching, or uses Host delivery as commit authority.
 - Prevention: absence, actor, allowlist, forbidden-payload, fresh-target,
   no-match, lifecycle/token, owner-reread, revoke/race, replay/fault,
   post-import independence, Host/Nurture ownership, privacy-noninterference,
@@ -608,7 +663,7 @@ This file exists to prevent repeating mistakes within this task.
 - Context: My-Chat is the ecosystem frame and single account system. Each scenario currently maintains its own multi-user business relationships. In Nurture, parents, teachers, and institution managers are My-Chat users, but their Nurture roles and relationships are scenario-owned; children are not My-Chat users.
 - What we tried: Treat My-Chat education-domain organization/class/student tables as the direct ownership template for Nurture care canonical.
 - Why it failed (or current hypothesis): That pushes Nurture-specific family, child, institution, class, enrollment, consent, and care communication semantics into the generic account/shell layer.
-- Fix / workaround: Define `NurtureChildCareProcess` as the center; store Nurture participants, role assignments, enrollment, `NurtureChildLinkGrant`, family-care threads/messages/items, and care facts as Nurture canonical data. My-Chat only owns account identity, shell/runtime, notification, and deep-link surfaces.
+- Fix / workaround (current supersession applied): Define `NurtureChildCareProcess` as the local care subject; store Nurture participants, role assignments, Enrollment, `NurtureChildLinkGrant`, family-care threads/messages/items, and care facts as Nurture canonical data. My-Chat owns account plus protected platform Child/Family identity, stewardship/membership, scenario binding, shell/runtime, Notification, and deep-link surfaces, but none of those Host facts replaces Nurture authority.
 - Prevention: Before designing tables or handoffs, separate "who can log in" (`my_chat.user`) from "what role and relationship this user has in Nurture" (`NurtureParticipant` + role assignment).
 - References: `02-architecture.md` sections 1-4, `03-implementation-notes.md` D-007 through D-010.
 
@@ -799,8 +854,8 @@ This file exists to prevent repeating mistakes within this task.
 - Context: C-3-0c-2 provides display-safe semantic data but deliberately contains no renderer primitive or arbitrary business query. B3 required complete role-correct history while the first internal experiment has only three child scopes and no accepted owner query-control contract.
 - What we tried: Mapping `display-safe` to “safe to persist,” reusing ordinary Chat messages for semantic narration, using stale-while-revalidate for perceived speed, filtering loaded rows in My-Chat, or smuggling query criteria through route/presentation/continuation values.
 - Root cause: Safe current disclosure, durable retention, offline access, query semantics, and current authorization are independent decisions. A generic renderer cannot know whether an old label, action, row, or locally filtered absence remains safe or complete.
-- Fix / workaround: C-3-0c-3 maps six product surfaces to three Host renderer families, classifies all presentation fields as owner-canonical, ephemeral, allowlisted Host shell, or forbidden Host copy, uses a content-free Chat rehydration marker, clears stale content before refresh, and caps foreground freshness at 60 seconds. Complete Pilot history is owner-paginated; arbitrary search/sort/compound filters are deferred to an additive owner query-control contract.
-- Prevention: Renderer conformance must scan every Host destination, reject unclassified fields and partial/legacy fallback, prove background/focus/invalidation clearing, verify Institution-board read-only behavior, and test accessibility plus complete pagination without renderer business inference.
+- Fix / workaround: C-3-0c-3 maps the four registered C-3 Nurture surfaces to three Host renderer families and uses neutral Host fixtures for the remaining generic family/read-only checks; Institution routes remain C-4. It classifies all presentation fields as owner-canonical, ephemeral, allowlisted Host shell, or forbidden Host copy, uses a content-free Chat rehydration marker, clears stale content before refresh, and caps foreground freshness at 60 seconds. Complete Pilot history is owner-paginated; arbitrary search/sort/compound filters are deferred to an additive owner query-control contract.
+- Prevention: Renderer conformance must scan every Host destination, reject unclassified fields and partial/legacy fallback, prove background/focus/invalidation clearing, verify neutral read-only role-board behavior without registering C-4 keys, and test accessibility plus complete pagination without renderer business inference.
 - References: `02-architecture.md` Pilot-0-C3-0c-3, `06-ib-nurture-schema-spec.md` C-3-0c-3 refinement, `09-pilot-readiness.md` C-3-0c-3.
 
 ### 2026-07-19 — Treating one hash or partial capability as presentation adoption
@@ -810,7 +865,7 @@ This file exists to prevent repeating mistakes within this task.
 - What we tried: Extending the meaning of the old hash without a named C-3 source set, enabling provider/presentation/renderer separately, treating a sibling checkout as immutable adoption proof, or adding more hand-maintained filters to the pre-activation manifest.
 - Root cause: Shared source parity, scenario registry/implementation identity, Host renderer conformance, dependency materialization, and activation state prove different facts. A partial capability or independently edited projection creates a second semantic path and makes no-fallback claims unverifiable.
 - Fix / workaround: C-3-0c-4 requires atomic `scenario_subject_presentation_v1` dependent on trusted ingress, a separately named `scenario_interface_source_v1`, distinct Scenario module and Host renderer identities, exact Base -> My-Chat -> Nurture adoption, four-layer conformance, and one canonical manifest with a mechanical disabled-capability projection. Legacy manifests remain unchanged, but any vNext declaration is all-or-fatal and never falls back.
-- Prevention: Every adoption review must show exact revisions and named hashes, real provider/presenter/renderer registry backing, mixed-version denial, `file:` materialization provenance, projection equivalence, capability/allowlist default-off state, and negative evidence for all six surfaces before claiming implementation readiness.
+- Prevention: Every adoption review must show exact revisions and named hashes, real provider/presenter/renderer registry backing, mixed-version denial, `file:` materialization provenance, projection equivalence, capability/allowlist default-off state, positive evidence for the four registered C-3 surfaces, neutral Host fixture coverage for all three renderer families, and negative evidence for the two reserved C-4 keys before claiming implementation readiness.
 - References: `02-architecture.md` Pilot-0-C3-0c-4, `06-ib-nurture-schema-spec.md` C-3-0c-4 refinement, `08-iia-schema-policy-test-design.md` C-3-0c-4 test design, `09-pilot-readiness.md` C-3-0c-4.
 
 ### 2026-07-19 — Conflating domain-action shape with the effect driver
@@ -822,3 +877,491 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: C-3-0d defines static `nurture_direct_empty_v1|workflow_claimed_step_v1` per action, makes question/reply/transfer-proposal/withdrawal/service-end claimed, and uses content-free non-claimable Step -> immutable Nurture binding -> claim. Nurture derives effect identity, consumes context with effect/Execution/snapshots atomically, and permits only original-Step replay. A different `already_satisfied` Step stores `[]` and cannot resend. Typed Participant evidence is additive and legacy `business_actor_ref` remains unchanged.
 - Prevention: Contract/manifest tests must assert one driver per action/surface, reject recipient/outcome-based switching and reply-as-direct, scan every Step/persistence destination for token/target/body/claim leakage, fault every pre-bind/post-bind seam, and deny different-Step seed transfer. Invitation, provisioning, portability, and Technical Operator remain separate protocols rather than a third catch-all driver.
 - References: `02-architecture.md` Pilot-0-C3-0d, `06-ib-nurture-schema-spec.md` C-3-0d refinement, `08-iia-schema-policy-test-design.md` C-3-0d test design, `09-pilot-readiness.md` C-3-0d.
+
+### 2026-07-19 — Treating encryption or a protected ref as the whole privacy boundary
+
+- Symptom: A Message can carry `body=null` and a `protected_content_ref` while no real encrypted owner store exists, or the same text can survive in ordinary Chat, `PublicDraft`, Item detail, browser cache, logs, AI prompts, backups, or a stale protected view. The system then appears protected at the schema row while retaining several authoritative or readable copies.
+- Context: The current Nurture implementation uses synthetic protected refs and scaffold storage modes; My-Chat independently persists ordinary Chat revisions and durable public drafts. C-3-0c/d intentionally left protected body, draft, cache/offline, AI, and retention behavior to C-3-0e.
+- What we tried: Treating a nullable body/encrypted flag as sufficient, keeping ciphertext or summaries in multiple business rows, reusing Chat/draft infrastructure for convenience, enabling model drafting under the general AI contract, or declaring adoption when one repository had the new type.
+- Root cause: Encryption at rest, current authorization, draft lifecycle, decrypted-view lifetime, deletion, backup restore, provider handling, Host persistence, and cross-repo activation prove independent properties. Closing only one leaves a hidden second content store or an unreadable/unerasable canonical fact.
+- Fix / workaround: C-3-0e makes `scenario_protected_interaction_v1` atomic, adds one Nurture `NurtureProtectedContent` authority with per-content envelope encryption and crypto-erasure, separates protected composer/read from Chat and `PublicDraft`, forbids cache/offline/body-derived copies, gates protected AI separately and off, fixes Pilot retention/restore behavior, and names `scenario_protected_interaction_source_v1` plus storage/runtime evidence.
+- Prevention: Activation review must trace one body from keystroke through prepare/commit/read/redact/expiry/backup restore and inspect every My-Chat/Nurture/queue/cache/observability/AI destination. Partial capability, scaffold ref, `plain_text_dev`, body-derived metadata, mutable dependency, or planning-only documentation can never count as complete adoption.
+- References: `02-architecture.md` Pilot-0-C3-0e, `06-ib-nurture-schema-spec.md` C-3-0e refinement, `08-iia-schema-policy-test-design.md` C-3-0e test design, `09-pilot-readiness.md` C-3-0e.
+
+### 2026-07-19 — Collapsing communication progress, suppression, and body visibility into one status
+
+- Symptom: A revoked or redacted Item appears to lose its prior acknowledgment/reply, a reply redaction reopens the source task, or the UI exposes a body because the entry is still marked replied. Different surfaces then display incompatible histories from the same facts.
+- Context: B3 uses Message, Receipt, Item, Event, Attention, original Grant, and protected-body policy as separate authorities. Source redaction may suppress an Item after a reply, while caregiver reply redaction must leave the source Item terminal and actionless.
+- What we tried: Mapping `Item.status` directly to one product enum, treating `suppressed` as progress, or using one entry-level `visible|hidden` bit for both authors' bodies.
+- Root cause: Business progress, action lifecycle, question visibility, reply visibility, and owner availability answer different questions and change under different commands/retention clocks.
+- Fix / workaround: C-3-1 projects independent `progress`, `entry_lifecycle`, `question_visibility`, and `reply_visibility` axes from a complete Item-root fact graph. Missing or contradictory facts fail closed; redaction/revoke preserves the highest complete progress and applies author-specific tombstones.
+- Prevention: Presenter and DB tests must enumerate all legal axes, validate unique typed source/reply relations and original Grant, reject partial graphs, and prove source versus reply redaction never invents progress, reopens work, or grants body access.
+- References: `02-architecture.md` Pilot-0-C3-1, `06-ib-nurture-schema-spec.md` C-3-1 refinement, `08-iia-schema-policy-test-design.md` C-3-1 test design, `09-pilot-readiness.md` C-3-1a/d.
+
+### 2026-07-19 — Moving ordinary Chat text into the protected composer
+
+- Symptom: A user asks the AI a private family question and the product silently converts the Chat turn into a Nurture draft, or an `editable_preview`/`PublicDraft` path retains a second plaintext copy while appearing to use protected submission.
+- Context: Generic My-Chat Chat persists conversation content, while C-3-0e permits protected body only in process-local composer memory and Nurture encrypted prepared/committed storage. Pilot protected AI is disabled.
+- What we tried: One-click transfer of sent/unsent Chat text, seeding the composer from conversation history, or reusing legacy preview/draft components to avoid a new protected editor.
+- Root cause: The source Chat path already has a different retention, AI, cache, and recovery contract. Moving its text does not retroactively make the original copy protected and creates ambiguous user expectations about what entered history.
+- Fix / workaround: C-3-1 always opens an empty protected composer, labels the no-Chat-history boundary, and permits only normal manual typing/paste. AI receives display-safe presentation only; the protected body never enters Chat, legacy `InteractionEnvelope`, `ContentRevision`, `PublicDraft`, semantic output, or Host result state.
+- Prevention: Rendered and leakage tests must start from both sent and unsent ordinary Chat text, prove no automatic/one-click transfer exists, and inspect every Host/client/cache/telemetry destination before allowing protected submission.
+- References: `02-architecture.md` Pilot-0-C3-1, `06-ib-nurture-schema-spec.md` C-3-1 refinement, `08-iia-schema-policy-test-design.md` C-3-1 test design, `09-pilot-readiness.md` C-3-1-0/b.
+
+### 2026-07-19 — Aliasing the historical family-input Workflow into the C-3 action path
+
+- Symptom: `capture_family_input`, a hand-filtered preactivation registry, or an existing `internal_api` handler is renamed/wrapped as `submit_family_care_question`, and the system appears adopted while still accepting client-owned Nurture ids, broad profiles, synthetic protected refs, or ThreadParticipant authorization.
+- Context: The X4 compatibility path predates trusted ingress, owner-derived action input, typed actor, pre-bound claimed Step, protected content, semantic Guardian presenter, and the three separately named C-3 source identities.
+- What we tried: Reusing the old Run requirement as the new action DTO, keeping YAML and a handwritten runtime registry as two authorities, or enabling only the Guardian path in a shared dev environment before caregiver/continuity gates exist.
+- Root cause: Similar business intent does not imply compatible trust, persistence, recovery, manifest, or privacy contracts. Partial reuse creates an untested fallback that can bypass the atomic C-3 capability set.
+- Fix / workaround: C-3-1 keeps `scenario.manifest.yaml` canonical with generated typed projection and fatal bidirectional implementation parity, bans alias/fallback, orders Base -> My-Chat -> Nurture -> isolated joint evidence, and defers positive-only gate implementation plus default-off qualification to C-3-5; non-empty activation remains Pilot-2.
+- Prevention: Conformance must reject mixed revisions, alternate registries, manual key filters, legacy handler coexistence, mutable local dependency evidence, and any environment activation before C-3-2/3/4, C-3-5 qualification, and separate Pilot-2 authorization pass.
+- References: `02-architecture.md` Pilot-0-C3-1, `06-ib-nurture-schema-spec.md` C-3-1 refinement, `08-iia-schema-policy-test-design.md` C-3-1 test design, `09-pilot-readiness.md` C-3-1e.
+
+### 2026-07-19 — Collapsing Guardian relationship roots into one status or Host projection
+
+- Symptom: A subject has one apparent current Enrollment/Grant, an Institution episode failure hides every other relationship, or My-Chat reconstructs a combined relationship status from several owner calls.
+- Context: One ChildCareProcess may have several same-workspace Institution Enrollment episodes while Guardian Role, Hold, TransferIntent, Grant, and StageEpisode retain distinct owners, versions, and lifecycles.
+- What we tried: Adding a relationship aggregate/table, choosing one current Enrollment, flattening all episodes in Chat/board, or merging multiple presenter responses in the Host/client.
+- Root cause: A convenient summary cannot preserve independent authorization, concurrency, retention, and noninterference boundaries. It also exceeds the semantic action-offer bound and creates a second business SSOT.
+- Fix / workaround: C-3-2 defines one non-persisted Nurture owner composition, segments every Institution/Enrollment episode, and uses fresh owner-issued item detail before issuing one exact action target. The outer presenter never creates a combined business lifecycle.
+- Prevention: Presenter and joint tests must prove multi-Institution episode separation, one owner snapshot boundary, exact action target roots, unavailable-segment noninterference, and zero Host relationship persistence or client aggregation.
+- References: `02-architecture.md` Pilot-0-C3-2, `06-ib-nurture-schema-spec.md` C-3-2 refinement, `08-iia-schema-policy-test-design.md` C-3-2 test design, `09-pilot-readiness.md` C-3-2-0.
+
+### 2026-07-19 — Treating every Guardian relationship transition as a domain-action driver
+
+- Symptom: Raw recipient contact reaches Nurture/Chat, Host invitation acceptance creates a Guardian role, or Co-Guardian onboarding is implemented as direct-empty/claimed Workflow action with a generic Participant fallback.
+- Context: Invitation delivery/authentication and ordinary current-subject actions prove different facts. A prospective recipient may correctly have no Participant before the exact onboarding transaction.
+- What we tried: Reusing `ScenarioDomainActionContractV1` for invitation issue/accept, treating provider acceptance as authority, or inventing a third generic driver for Host-coordinated transitions.
+- Root cause: The ordinary action path requires an established current subject relationship, while invitation continuation is the sole bounded prospective zero-Participant exception and must coordinate raw-contact ownership with a Nurture intent.
+- Fix / workaround: C-3-2 keeps first/Co-Guardian invitation operations in the dedicated Host shell plus prospective application-service lane. Accepted self-exit is an ordinary strong/direct-empty action because it starts from an established current relationship; withdrawal remains the only Guardian relationship claimed action.
+- Prevention: Cross-path tests must deny invitation/action/Handoff substitution, generic Participant creation, raw-contact leakage, provider-state authority, self-exit attention invention, and any fallback after a current owner or verifier failure.
+- References: `02-architecture.md` Pilot-0-C3-2, `06-ib-nurture-schema-spec.md` C-3-2 refinement, `08-iia-schema-policy-test-design.md` C-3-2 test design, `09-pilot-readiness.md` C-3-2a/e.
+
+### 2026-07-19 — Extending communication retention or Enrollment fences to longitudinal family facts
+
+- Symptom: Stage/Enrollment history disappears after 365 days, a temporary Enrollment Hold hides the complete child/family view, or rejoining as the same Participant can never see retained family-authored history they remain authorized to read.
+- Context: C-3-1's 365-day window governs one communication entry shell. Relationship, Enrollment, Grant, and Stage are canonical longitudinal facts with their own retention; holds primarily fence cross-role episode work.
+- What we tried: Applying one global history cutoff/fence to every C-3 presenter or reading “new relationship does not recover old episode” as permanent denial of all family-side facts.
+- Root cause: Product visibility, retention, relationship reach, original-Grant receiver authority, and temporary topology availability are independent policies.
+- Fix / workaround: C-3-2 history uses owner-retained canonical facts. A new authorized Role may restore current family-side retained access and exact-author redaction, never the old Role/Grant/cross-role authority. Holds keep Stage and safe episode/family history visible while fencing exact dependent work.
+- Prevention: Tests must vary retention class, hold side, terminal versus temporary facts, rejoin identity, authorship, and original Grant, and must reject global cutoff, hidden Stage, or old receiver-authority revival.
+- References: `02-architecture.md` Pilot-0-C3-2, `06-ib-nurture-schema-spec.md` C-3-2 refinement, `08-iia-schema-policy-test-design.md` C-3-2 test design, `09-pilot-readiness.md` C-3-2-0/a.
+
+### 2026-07-20 — Treating inbox and Attention as two Caregiver business lifecycles
+
+- Symptom: `class_family_inbox`, `teacher_attention_board`, and a synthetic internal API each calculate state or expose action targets independently, so one surface shows open while another shows resolved, or an Attention ref bypasses the Item's original Grant/version.
+- Context: Pilot requires an aggregated Caregiver queue and an attention-oriented teacher-board layout, but B3 also fixes one Message/Receipt/Item/Event/Attention workflow graph and C-3-0c requires one owner presentation path.
+- What we tried: Registering each legacy Workflow entrypoint as a new presenter, treating `NurtureTeacherAttentionItem` as a second task aggregate, or merging several owner responses in My-Chat.
+- Root cause: Product views, queue indexes, and canonical work facts solve different problems. Giving a projection its own lifecycle/authorization creates dual-track state and makes complete graph integrity impossible to prove.
+- Fix / workaround: C-3-3 defines one `caregiver_family_care_work_v1` Item-root non-persisted projection. Current may render Attention summary plus inbox blocks, while recent/history/detail and every action still resolve the same complete Item graph. Attention is uniquely typed to its source Item and never becomes an action target.
+- Prevention: Presenter/schema/joint tests must reject duplicate/missing/cross-Grant Attention, legacy/internal-API aliases, Host multi-presenter joins, Attention action refs, partial responses, and any state derivation that does not validate the complete Item graph.
+- References: `02-architecture.md` Pilot-0-C3-3, `06-ib-nurture-schema-spec.md` C-3-3 refinement, `08-iia-schema-policy-test-design.md` C-3-3 test design, `09-pilot-readiness.md` C-3-3-0/a.
+
+### 2026-07-20 — Turning acknowledge into implicit multi-Caregiver handoff
+
+- Symptom: One Caregiver acknowledges an Item and another RoleAssignment submits the reply, or a terminal/new staff role silently acquires old work because the Item stores only a Participant or group.
+- Context: The internal Pilot has exactly one operational Caregiver plus separate Lead designation and explicitly excludes backup, reassignment, duty handoff, and multi-Caregiver concurrency. Future extensibility must not be obtained through accidental current-query behavior.
+- What we tried: Treating acknowledge as a group-wide flag, resolving any current Caregiver at reply time, adding a global one-Caregiver database constraint, or suppressing the Item automatically when the claimant role ends.
+- Root cause: Audit actor, exact work claim, staffing topology, and permanent business invalidation are separate. A group-level or Participant-only claim permits unreviewed takeover; global cardinality blocks future protocols; automatic suppression misclassifies staff loss as source/Grant termination.
+- Fix / workaround: C-3-3 makes acknowledge an exact Pilot Participant+RoleAssignment claim and binds the assigned role. Only that current role may reply. Temporary loss preserves acknowledged/active facts and permits fresh prepare after same-row recovery; terminal loss leaves body-free staffing-review work with no takeover. Multiple eligible roles fail the Pilot gate without a global schema constraint.
+- Prevention: Tests must cover zero/one/multiple roles, same Participant/new role, suspension/resume, terminal offboarding, open-before-replacement, acknowledged-after-loss, cross-surface same claimant, and Institution/Operator denial. A future handoff requires its own versioned command and review.
+- References: `02-architecture.md` Pilot-0-C3-3, `06-ib-nurture-schema-spec.md` C-3-3 refinement, `08-iia-schema-policy-test-design.md` C-3-3 test design, `09-pilot-readiness.md` C-3-3b/d.
+
+### 2026-07-20 — Guessing user-attention origin or recipients from current rows
+
+- Symptom: A caregiver reply is routed through the legacy capture entrypoint, a new Guardian receives an old reply notification, a departed user remains targeted, or one direction/source tuple is interpreted differently by two consumers.
+- Context: The existing Handoff key/purpose/source types serve family-to-organization attention and must also carry the locked organization-to-family reply without widening the public contract. Notification continuity remains C-3-4.
+- What we tried: Inferring producer from Receipt direction, faking `capture_family_input` capability/entrypoint fields, storing My-Chat user ids in Nurture, creating one Handoff per recipient, or resolving only the currently active role set at delayed delivery time.
+- Root cause: Producer provenance, business audience at commit, current delivery eligibility, and Host Notification state prove different facts. Current-only lookup causes historical backfill, while a fake entrypoint breaks replay/evidence identity.
+- Fix / workaround: C-3-3 adds a neutral versioned Host-derived domain-action producer origin, typed Nurture RoleAssignment cohort rows committed with the reply, one logical refs-only Handoff, and an origin/graph-aware resolver using commit cohort intersected with current eligibility. `complete_step` remains local/atomic; C-3-4 rereads before Notification/send/open.
+- Prevention: Conformance must reject client/fake origin, direction-only inference, legacy alias, new Handoff key/source types, per-recipient duplicate Handoffs, late-join backfill, new-role inheritance, departed delivery, remote owner calls inside `complete_step`, and live Notification behavior in the C-3-3 harness.
+- References: `02-architecture.md` Pilot-0-C3-3, `06-ib-nurture-schema-spec.md` C-3-3 refinement, `08-iia-schema-policy-test-design.md` C-3-3 test design, `09-pilot-readiness.md` C-3-3c/e.
+
+### 2026-07-20 — Exposing a Handoff as the Notification address
+
+- Symptom: Client DTO, provider payload, deep link, or mobile route contains a Handoff id, and an authenticated workspace member can call the owner resolver without proving ownership of one recipient Notification.
+- Context: Handoff is a My-Chat technical materialization fact shared by a recipient cohort. It is neither a public resource nor a recipient binding; one reply Handoff may legitimately fan out to two Guardian Notifications.
+- What we tried: Storing `targetType=workflow_handoff`, duplicating the id in metadata, generating `morethan://nurture/attention/{handoff}`, and opening through `/workflow-handoffs/:id/...`.
+- Root cause: A technical source reference was treated as both delivery address and authorization locator. This leaks topology, bypasses exact recipient lookup, and makes legacy generic target and vNext semantics compete.
+- Fix / workaround: C-3-4 requires Notification-id-only external carriage and an additive typed workspace/recipient/Handoff/continuity source link as the sole vNext send/open authority. Generic targets remain explicit legacy rows and are never dual-read or fallback.
+- Prevention: DTO/provider/deep-link/log scans reject Handoff/target/reason fields; wrong recipient/workspace/id proves zero Handoff/Nurture calls; mixed/missing typed-link rows fail generic unavailable.
+- References: `02-architecture.md` Pilot-0-C3-4, `06-ib-nurture-schema-spec.md` C-3-4 refinement, `08-iia-schema-policy-test-design.md` C-3-4 tests, `09-pilot-readiness.md` C-3-4c/e.
+
+### 2026-07-20 — Reusing one predicate for Notification delivery and open
+
+- Symptom: A replied/acknowledged Item can no longer open its current history because delivery required `open`, or a stale delivery predicate revives an old button/body during open.
+- Context: Delivery asks whether a new generic signal should be created/sent now; open asks what an exact prior recipient may currently see. The two questions share source evidence but not lifecycle meaning.
+- What we tried: One resolver with optional actor input, current Item status branching, and one fixed teacher route for create, send, and open.
+- Root cause: Candidate audience, current delivery desirability, historical shell visibility, protected-body visibility, and action availability were collapsed into one boolean.
+- Fix / workaround: C-3-4 separates delivery plan, exact create/send check, and authenticated open. Open first binds the historical recipient role episode, then resolves shell/body/action independently and issues only a destination locator; destination owner reread remains final.
+- Prevention: Tests cover acknowledged/replied/closed, tombstone, role loss/new role, temporary recovery, Grant/source change, and owner outage with distinct create/send/open results; resolver/handler alias is fatal.
+- References: `02-architecture.md` Pilot-0-C3-4, `08-iia-schema-policy-test-design.md` C-3-4 tests, `09-pilot-readiness.md` C-3-4c-e.
+
+### 2026-07-20 — Treating Notification/provider state as Nurture business progress
+
+- Symptom: Host read acknowledges an Item, provider success marks a Receipt delivered, provider failure makes a business command fail, or a completed Handoff is displayed as a caregiver reply.
+- Context: Nurture Message/Receipt/Item/Execution, Workflow Handoff, Host Notification read, and per-device provider delivery are different owners and failure domains.
+- What we tried: Deriving business result from Handoff/provider state or waiting for push success before completing the logical Notification materialization.
+- Root cause: User-arrival evidence and canonical domain effect were conflated, creating distributed-transaction expectations and incorrect recovery.
+- Fix / workaround: C-3-4 keeps original Execution/Step recovery authoritative, completes Handoff after idempotent logical Notification reconciliation, and gives provider work its own lease/retry/dead-letter lifecycle. Open marks only Host read and performs no Nurture write.
+- Prevention: Fault tests assert one business effect through provider outage/duplicate push, zero Receipt/Item/Message/Execution mutation on open/read/unread, and independent state vocabularies/telemetry.
+- References: `02-architecture.md` Pilot-0-C3-4, `06-ib-nurture-schema-spec.md` C-3-4 refinement, `08-iia-schema-policy-test-design.md` C-3-4 tests, `09-pilot-readiness.md` C-3-4b/d/e.
+
+### 2026-07-20 — Persisting drafts, result locators, or open tokens to simulate continuity
+
+- Symptom: Protected text crosses surfaces through Chat draft/history, a result/output ref is put in route state, or `open_notification` token survives in URL/local storage and reopens stale content offline.
+- Context: Pilot continuity intentionally preserves committed owner facts, not unfinished protected authoring or cached authorization. Route/view intent and current owner reread are sufficient for ordinary movement.
+- What we tried: Reusing `threadDrafts`, `PublicDraft`, continuation refs, `open_result`, persisted scenario tokens, and cached Notification detail cards.
+- Root cause: Product convenience carriers were mistaken for durable owner evidence and created hidden body/authorization stores.
+- Fix / workaround: C-3-4 requires `stay|discard_and_navigate`, ordinary route/view-only movement, original Execution/Step recovery, Notification-id reopen, foreground-only destination token, and a second current owner read. Offline is generic shell only.
+- Prevention: Storage/browser/PWA/log inventories must remain empty for protected draft/result/token; navigation/draft/reload/multi-device tests reject every alternate carrier and legacy Handoff card.
+- References: `02-architecture.md` Pilot-0-C3-4, `08-iia-schema-policy-test-design.md` C-3-4 tests, `09-pilot-readiness.md` C-3-4a/b/e.
+
+### 2026-07-20 — Replaying partial fanout without per-candidate outcomes
+
+- Symptom: A response-loss retry cannot distinguish a candidate that crashed before Notification creation from one already terminally skipped, so a restored role receives a late Notification or a Handoff completes while a temporary candidate is still unresolved.
+- Context: One non-empty Handoff can have two immutable commit-cohort recipients, and each recipient can independently materialize, become terminally ineligible, remain temporarily fenced, or hit owner outage.
+- What we tried: Inferring completion from the union of existing typed links, a current recipient query, or aggregate downstream counts.
+- Root cause: Absence of a Notification is not a state. Without an immutable candidate plan and terminal outcome, crash-missing, temporary pending, and permanent skipped are indistinguishable.
+- Fix / workaround: C-3-4 persists one body-free candidate row with canonical plan/intent hash and `pending|materialized|skipped`. Pending keeps Handoff requested; all skipped/none materialized stops; at least one materialized/all terminal completes; terminal skipped never backfills.
+- Prevention: Fault tests cover every candidate/link/receipt seam, temporary recovery/horizon, partial fanout, plan drift, and replay. A command-time empty cohort remains Nurture `[]` and never creates a Handoff.
+- References: `02-architecture.md` Pilot-0-C3-4, `06-ib-nurture-schema-spec.md` C-3-4 refinement, `08-iia-schema-policy-test-design.md` C-3-4 tests, `09-pilot-readiness.md` C-3-4c.
+
+### 2026-07-20 — Treating activation-control implementation as permission to activate
+
+- Symptom: Adding a Workspace gate table or briefly setting a synthetic gate during tests is reported as persistent activation, Pilot readiness, or authority to enable the internal Workspace.
+- Context: C-3-5 must prove that a positive-only environment-plus-Workspace gate and kill switch work, while Pilot-0 authorizes no persistent environment, secret, database mutation, capability enablement, or traffic.
+- What we tried: Deferring “persistent activation” to C-3-5 without distinguishing the gate mechanism, disposable evidence exercise, final stored state, and Pilot-2 release mutation.
+- Root cause: Implementation readiness and operational authorization used the same word and hid the separate Pilot-0-D/E, Pilot-1, and Pilot-2 decisions.
+- Fix / workaround: C-3-5 now owns activation-control implementation and qualification only. Its required final census is environment activation bundle false and active Workspace rows empty. A separately approved disposable proof uses a short-lived `evidence_release_controller` through the production command/path, scoped to one synthetic environment/C-3 component/disposable deployment/Workspace and destroyed afterward. Only Pilot-2's distinct controller may enable a Pilot row, and that row binds the E-reviewed complete candidate plus Pilot-1 deployment—not the C-3 component alone.
+- Prevention: Status and gate tests reject `activated|pilot_ready|go`, direct DB/test bypass, component-only Pilot binding, invalidated qualification/Go, deployment drift, evidence credentials with Pilot scope, or surviving evidence authority; candidate evidence records before/after false-empty state, release authority, and zero external traffic.
+- References: `02-architecture.md` Pilot-0-C3-5, `06-ib-nurture-schema-spec.md` C-3-5 refinement, `08-iia-schema-policy-test-design.md` C-3-5 tests, `09-pilot-readiness.md` C-3-5c/f.
+
+### 2026-07-20 — Mixing evidence from different candidate builds
+
+- Symptom: Contract tests from one Base revision, DB tests from another schema, screenshots from a rebuilt frontend, and rollback from a different configuration are combined because every individual job was green.
+- Context: Cross-repository safety depends on exact source, manifest, schema, runtime, renderer, provider, KMS/signing, gate, topology, and test-code compatibility.
+- What we tried: Using a branch name, release tag, one contract hash, or latest successful CI run as the umbrella identity.
+- Root cause: A mutable label cannot prove that every evidence layer executed the same bits and configuration or identify which downstream proof became stale after a change.
+- Fix / workaround: `c3_component_candidate_manifest_v1` derives `component_candidate_id` only from immutable build/configuration inputs. Every result records that id; a later evidence index binds it; and a separate signed `qualification_envelope_id` binds candidate id, evidence-index digest, final gate census, and result. Evidence never writes back into candidate-pinned source commits.
+- Prevention: Qualification rejects a self-referential evidence-index candidate tuple, mutable lifecycle in the candidate manifest, dirty trees, post-test rebuilds, mutable dependencies/URLs, missing SBOM/provenance, mixed candidate ids, or dependency-edge reruns that omit an affected layer. A discovered risk invalidates the same candidate's qualification; only a tuple-changing fix creates a new candidate.
+- References: `02-architecture.md` Pilot-0-C3-5, `08-iia-schema-policy-test-design.md` C-3-5 candidate tests, `09-pilot-readiness.md` C-3-5b.
+
+### 2026-07-20 — Using J1-J4 as complete Guardian or Institution evidence
+
+- Symptom: Four communication journeys pass and the release is described as covering Guardian authority, Institution onboarding, transfer/service closure, and the complete Pilot product.
+- Context: J1-J4 intentionally cover the family-care round trip and four Caregiver Chat/teacher-board pairings. Guardian relationship/Enrollment/Grant/Stage actions and C-4 Institution producers/surfaces have different owners and risks.
+- What we tried: Treating deterministic topology setup and one Institution account as product evidence for all prerequisite relationships.
+- Root cause: Representative business paths were confused with exhaustive action/surface conformance and with setup/product ownership.
+- Fix / workaround: C-3-5 requires a separate rendered C-3-2 authority strand plus J1-J4. Fixtures may seed only C-4-owned Institution/CareGroup/staff-role and pending invitation/transfer topology; qualifying Grant/Thread/accepted-Enrollment facts use real C-3 paths. C-4 routes/producers stay absent or contract-negative and must be proven later on a new complete candidate.
+- Prevention: The evidence index assigns every action/surface cell and journey to its owning strand and marks fixtures explicitly. C-3 exit remains `C4_PENDING`.
+- References: `08-iia-schema-policy-test-design.md` C-3-5 evidence tests, `09-pilot-readiness.md` C-3-5-0/d/f.
+
+### 2026-07-20 — Letting the kill switch strand a committed business effect
+
+- Symptom: A Workspace row is removed while a command is crossing the My-Chat/Nurture database boundary, leaving the Step outcome unknown, an explicit-empty replay misclassified, or a later operator tempted to run a new Step or edit the database.
+- Context: Emergency disablement must stop delivery/open immediately without rewriting the already committed owner fact or losing deterministic replay ownership.
+- What we tried: Comparing cross-database wall-clock delete/commit times as if they formed one transaction, applying the gate only before the command, cancelling every in-flight technical row, or disabling workers without classifying replay-seed and post-commit windows.
+- Root cause: “Stop new activation” lacked an implementable admission linearization point, conflated the C-3-0b transport nonce with business commit, and conflated explicit-empty execution with non-empty handoff recovery.
+- Fix / workaround: Base owns the exact admission/status contract. Host gate-read plus body-free admission persistence/issuance is admission. Each owner attempt still consumes a fresh transport nonce before owner calls; fenced `CommandExecution + business effect` is owner commit. Expiry prevents new uncommitted work but never blocks exact committed recovery. After deadline, the same command fence classifies `committed|confirmed_no_effect|unknown`: unknown stays quarantined; no-effect closes claimed/direct work without Handoff; committed direct returns the original result; committed claimed work alone enters the five settlement cases (`[]` no Handoff, non-empty/no Handoff stopped, Handoff/no plan stopped, zero-materialized skipped/stopped, partial skipped/completed). Provider/open/destination stay disabled and no business effect repeats.
+- Prevention: Fault injection covers source-hash/codec drift, transport replay before owner calls, fresh-nonce exact business replay, admission before/at/after expiry, issued-before-send, nonce-before-transaction, rollback, commit-response-loss, claimed/direct drivers, both disable-race outcomes, unknown/no-effect/committed classification, wrong-Step/new-admission denial, zero audience recomputation, no skipped backfill, final false/empty state, and no duplicate CommandExecution.
+- References: `02-architecture.md` Pilot-0-C3-5, `06-ib-nurture-schema-spec.md` C-3-5 refinement, `08-iia-schema-policy-test-design.md` C-3-5 kill-switch tests, `09-pilot-readiness.md` C-3-5e.
+
+### 2026-07-20 — Masking protected evidence only after capture
+
+- Symptom: The final screenshot or video is masked, but an unmasked source recording, editor autosave, thumbnail, clipboard, or tool cache remains on disk.
+- Context: Rendered/manual qualification must prove user-visible behavior without turning the evidence system into another protected-content store.
+- What we tried: Capturing the full screen and redacting the exported artifact afterward.
+- Root cause: Export-time masking protects only the final file, not the capture pipeline or its intermediate persistence.
+- Fix / workaround: Exclude or mask protected regions at capture time, prohibit any unmasked intermediate write, record observer attestation, and scan temporary recording/editor/tool caches before sealing evidence.
+- Prevention: Manual-evidence tests fail on any unmasked frame/cache, missing capture-control attestation, or evidence destination outside the body/secret-free inventory.
+- References: `08-iia-schema-policy-test-design.md` C-3-5 rendered/manual and privacy tests, `09-pilot-readiness.md` C-3-5d/e.
+
+### 2026-07-20 — Letting C-3 product scope, generic renderer coverage, and legacy resolver semantics overlap
+
+- Symptom: C-3 simultaneously required six Nurture product surfaces and required the two Institution surfaces to be absent; the older R7 resolver also returned replied/follow-up work as current after C-3 made reply terminal.
+- Context: Generic My-Chat renderer families must be reusable before the Institution product slice exists, while one Nurture capability must still have one current/recent/history lifecycle.
+- What we tried: Counting neutral renderer examples as Nurture routes and leaving the old resolver wording as a generic source-adapter option.
+- Root cause: Host conformance scope was conflated with scenario product registration, and a historical resolver design was not explicitly superseded by the later product lifecycle.
+- Fix / workaround: C-3 registers exactly four Guardian/Caregiver surfaces. Neutral Host fixtures exercise all three renderer families but provide no Nurture route/presenter/C-4 evidence. R7 current family-care candidates are exactly `open|acknowledged`; `replied|suppressed` are terminal recent/history, and follow-up/continue aliases are unregistered.
+- Prevention: Manifest/route/presenter tests assert Institution-key absence; conformance reports fixture versus product evidence separately; resolver tests compare every source adapter to the final C-3 lifecycle table.
+- References: `02-architecture.md` C-3-0c/C-3-3, `06-ib-nurture-schema-spec.md` C-3-0b/c, `08-iia-schema-policy-test-design.md` C-3-0c and R7, `09-pilot-readiness.md` C-3-0b/c/C-3-3.
+
+### 2026-07-20 — Making protected-Chat privacy promises broader than the controllable boundary
+
+- Symptom: Documentation promised protected text never enters Chat even though the ordinary generic Chat accepts and retains user-authored text before the protected composer is opened.
+- Context: The product can prevent copying a composer body into Chat and can avoid asking for detail in Chat, but it cannot truthfully make ordinary Chat input retroactively no-retention without a separately implemented pre-persistence guard.
+- What we tried: Calling ordinary natural-language intent “private draft material” and relying on UI direction to claim that users would never paste private content into Chat.
+- Root cause: A lifecycle guarantee was attached to user intent rather than to the first enforceable system boundary.
+- Fix / workaround: The zero-copy/no-Chat-persistence guarantee begins only when the registered protected composer accepts the business body. Nurture Chat warns and opens an empty composer before soliciting detail. Ordinary Chat remains under My-Chat transcript/provider/deletion policy, never auto-promotes its content, and receives no false zero-retention claim.
+- Prevention: Tests distinguish a composer-accepted body from a mistaken ordinary Chat turn and scan every Host destination for only the former; product copy must name the boundary precisely.
+- References: `02-architecture.md` C-3-0c/e, `06-ib-nurture-schema-spec.md` C-3-0c/e, `08-iia-schema-policy-test-design.md` C-3-0e/C-3-1, `09-pilot-readiness.md` C-3-0b/e/C-3-1.
+
+### 2026-07-20 — Leaving disabled recovery and qualification without authoritative trust paths
+
+- Symptom: Execution lookup had to work after activation disablement but ordinary invocation signing required an active row; qualification/invalidation had signed envelopes but no sole signer, append-only current-state authority, or fail-closed resolver.
+- Context: Post-commit response loss must remain recoverable without reopening business authority, and activation must know whether an immutable component is currently qualified after later invalidation.
+- What we tried: Reusing the ordinary API/worker principal for lookup and treating the qualification envelope or latest CI result as sufficient state.
+- Root cause: Recovery classification, business invocation, evidence sealing, qualification governance, activation mutation, and Technical Operator responsibilities were not separated into distinct trust domains.
+- Fix / workaround: `scenario_activation_admission_source_v1` defines a dedicated `my-chat-execution-recovery` caller/issuer/audience/endpoint/key/verifier lane bound to frozen provenance and prohibited from business/presenter/delivery effects. A separate `c3_qualification_controller` appends signed predecessor-linked events to the content-addressed store; the current-state resolver validates the unambiguous chain and fails closed. Technical Operator remains disable/request-only.
+- Prevention: Cross-product tests reject credential/endpoint substitution and every forbidden lookup side effect; activation tests require the current qualification/Go resolvers and deny on outage, revoked signer, divergent chain, cached status, or invalidation.
+- References: `02-architecture.md` C-3-5, `06-ib-nurture-schema-spec.md` C-3-5, `08-iia-schema-policy-test-design.md` C-3-0b-3/C-3-5, `09-pilot-readiness.md` C-3-0b-3/C-3-5b/c/f.
+
+### 2026-07-20 — Reimplementing shared C-3 baselines and conflating same-named technical states
+
+- Symptom: C30 and C31 both appeared to build the same contracts/Host runtime/owner baseline, while candidate and provider delivery both used an unqualified `skipped`; setup fixtures and J1 also left unclear whether accepted authority or a second business seed had been pre-created.
+- Context: Cross-repository adoption must remain a DAG with attributable evidence, and the two fanout state machines have different owners and transitions.
+- What we tried: Allowing “lands first or in one series” without explicit `requires` edges, using bare status literals, and describing pending invitation topology without its Host/Nurture/Roster correlation.
+- Root cause: Implementation nodes described outputs but not immutable predecessor consumption; evidence shorthand omitted the exact initial and duplicate-effect assertions.
+- Fix / workaround: The DAG is strict `C30 -> C31 -> C32 -> C33 -> C34 -> C35`, with C30 the sole baseline owner and C35-I1 additive convergence. Status fields are explicitly `materialization_status` versus `delivery_status` with no mapping. The fixture ends at a correlated pending Host invitation + Nurture intent + unlinked RosterEntry; real C-3 paths create accepted authority. J1 materializes G1/G2 rows from one Handoff and proves the second delivery creates no second seed/Handoff.
+- Prevention: Dependency tests require every predecessor evidence ref, state-machine tests assert independent transitions, and rendered setup/journey evidence inventories every pre-created versus user-created fact.
+- References: `01-plan.md`, `02-architecture.md` C-3-1/4/5, `08-iia-schema-policy-test-design.md` C-3-1/4/5, `09-pilot-readiness.md` C-3-1e/C-3-4/C-3-5a/d.
+
+### 2026-07-20 — Letting legacy roles, thread membership, and actor bytes remain executable
+
+- Symptom: Older policy tables allow ThreadParticipant, Institution Admin, or Lead designation to read/write family communication, while a legacy `businessActorRef` still appears to identify the actor for an activated C-3 command.
+- Context: C-3 requires an exact current operational Caregiver RoleAssignment, original Grant, and acknowledge claim; the ordinary business actor is one typed Nurture Participant. Thread membership is only a projection locator, and Admin/Lead labels are not operational Caregiver authority.
+- What we tried: Keeping pre-C3 predicate/type examples as broadly reusable defaults while adding narrower C-3 prose elsewhere.
+- Root cause: Historical schema and policy vocabulary remained syntactically implementable and therefore formed a second authority path.
+- Fix / workaround: Mark the legacy surface/policy/type material non-activatable. Activated C-3 requires versioned predicates, typed Participant actor fields with Restrict FK, separately named Host-principal provenance, and exact claimant/RoleAssignment/Grant checks. Services, recovery callers, provisioners, Notification workers, and Technical Operators never populate the Participant actor.
+- Prevention: Contract and DB tests reject legacy actor reads/writes, ThreadParticipant allow/deny decisions, Admin/Lead substitution, peer/new-role reply, and missing typed actor/provenance fields.
+- References: `06-ib-nurture-schema-spec.md` C-3 action and 7.2/7.4, `08-iia-schema-policy-test-design.md` R7/R8 and 4.2/4.3, `09-pilot-readiness.md` C-3-0d/C-3-3.
+
+### 2026-07-20 — Treating invalid recovery requests as a valid unknown outcome
+
+- Symptom: Unknown signer, replayed nonce, malformed codec, or wrong admission/request/command/Run/Step/principal binding enters the status resolver and returns `unknown`.
+- Context: `unknown` describes an authenticated exact-bound request whose compatible owner evidence cannot yet distinguish committed from no effect; the value is not an authentication or authorization error bucket.
+- What we tried: Failing closed by mapping every lookup failure to the same protocol state.
+- Root cause: Transport denial and owner-state uncertainty were conflated, allowing invalid callers to reach the writer fence and making telemetry/recovery semantics ambiguous.
+- Fix / workaround: The dedicated recovery verifier performs exact caller/credential/signature/issuer/audience/endpoint/codec/nonce/frozen-binding checks first. Failure returns a generic transport deny/unavailable response with zero status/fence/application call; My-Chat retains local `outcome_unknown/quarantined`. Only a valid request may return protocol `unknown` for lock timeout, possible in-flight work, store outage, or compatible-evidence ambiguity.
+- Prevention: Negative tests assert zero downstream calls for every transport/binding defect and separately exercise each authenticated `unknown` cause.
+- References: `02-architecture.md` C-3-5 recovery, `06-ib-nurture-schema-spec.md` C-3-5, `08-iia-schema-policy-test-design.md` admission-status tests, `09-pilot-readiness.md` C-3-5c/e.
+
+### 2026-07-20 — Creating circular evidence activation or qualification authority
+
+- Symptom: A disposable C-3 evidence row requires the qualification/E decisions that the evidence run is supposed to produce, and C35-I10 requires its own qualification event before the controller can emit that event.
+- Context: C-3 qualification must run the production activation path in an isolated synthetic environment without granting Pilot authority or bypassing the final current-state resolver.
+- What we tried: Applying one unconditional qualification/Go resolver predicate to every candidate kind and describing the envelope/event/resolver as one undifferentiated I10 prerequisite.
+- Root cause: Evidence execution, qualification commit, Pilot authorization, and qualification exit were collapsed into one authority phase.
+- Fix / workaround: `c3_component_v1` accepts only current Base-owned `c3_evidence_run_authorization_v1`, signed by the isolated evidence controller and resolved from an append-only fail-closed My-Chat store for one disposable scope; the path makes zero qualification/E resolver calls. `complete_pilot_v1` requires current C-3 qualification, E decision, and Pilot-1 deployment. I10 is ordered: complete I0–I9 and prequalification seal; CAS-append the deterministic signed `verifying` genesis; controller signs the envelope and CAS-appends the qualified/rejected child; resolver returns `qualified_default_off`; then I10 success exits.
+- Prevention: Cross-kind negative tests, authority signer/trust/revocation/outage/expiry tests, zero-resolver-call disposable tests, genesis-crash retry, deterministic event idempotency, unique-head predecessor CAS, concurrent qualify/invalidate conflicts, and resolver-exit assertions prohibit hidden bypass or self-reference.
+- References: `02-architecture.md` C-3-5, `06-ib-nurture-schema-spec.md` C-3-5, `08-iia-schema-policy-test-design.md` qualification/activation tests, `09-pilot-readiness.md` C-3-5a-c/f.
+
+### 2026-07-20 — Mutating the C-3 component while claiming an additive C-4 extension
+
+- Symptom: adding Institution surfaces, producers, schema, and routes to the same manifest/module/build makes the C-3 candidate contain capabilities that its qualification explicitly proved absent, while a nested C-3 id still labels the new artifact as unchanged.
+- Context: C-4 must reuse C-3 Guardian/Caregiver capabilities and generic Host renderer/runtime seams without invalidating the immutable component evidence or creating an E-to-candidate authorization cycle.
+- What we tried: treating one later repository commit and combined Prisma schema as sufficient proof that the old C-3 source, manifest, migration, and artifact identities remained intact; using the C-3 disposable authority or future Pilot-0-E decision to run C-4 evidence.
+- Root cause: source evolution, component identity, manifest composition, migration order, evidence execution, qualification, and Pilot authorization were collapsed into one monolithic release identity.
+- Fix / workaround: freeze the content-addressed C-3 component and migration ledger; add a separate `nurture.institution.iib.v1` fragment, C-4 sources/migrations, extension candidate, deterministic composition recipe, and composite candidate; use a separate pre-E `c4_composite_v1` evidence authority and C-4 qualification chain. Current C-3 qualification is only a fail-closed evidence-admission predicate. D creates the later complete candidate and E only reviews it.
+- Prevention: composition conformance rejects collision, partial fragment, C-3 redeclaration, changed nested hash, legacy fallback, migration drift, and unpinned rebuild. Candidate tests reject qualification/evidence/E/deployment/activation values in identity. Teardown proves every switch false, active Workspace rows empty, evidence authority revoked, disposable credential destroyed, and no traffic.
+- References: `02-architecture.md` section 14, `06-ib-nurture-schema-spec.md` section 12, `08-iia-schema-policy-test-design.md` C-4-0 tests, `09-pilot-readiness.md` C-4-0.
+
+### 2026-07-20 — Collapsing Host invitation, Participant, Caregiver, and Lead into one staff grant
+
+- Symptom: an Admin-entered contact or accepted workspace invitation immediately creates teacher access, the first teacher becomes Lead, provider retry duplicates a role, or a later same-user role silently inherits an old claim.
+- Context: Institution setup crosses My-Chat identity/contact ownership and Nurture participant/role ownership, while Pilot requires exactly one operational Caregiver and a separately designated Lead.
+- What we tried: mapping `initiate_participant_invitation` directly to a Host invite, assigning a generic role after delivery, representing Lead in Group/policy JSON, or using one Workflow Step/Handoff to carry recipient and business authority across both databases.
+- Root cause: identity delivery, user acceptance, Participant correlation, operational role, Lead responsibility, and work-claim episode were treated as one state even though each has a different owner, transaction, replay identity, and revocation rule.
+- Fix / workaround: My-Chat creates a non-deliverable contact shell; Nurture commits a seven-day exact Staff Invitation intent; My-Chat activates delivery; exact Host acceptance commits membership; a signed callback binds/reuses Participant and consumes the intent; Admin then separately creates one exact Caregiver role and one Lead RoleAssignment bound by typed self-FK to that role episode. Role revoke terminalizes the bound Lead but preserves Participant/history and derives body-free staffing review.
+- Prevention: saga tests cover every response-loss, cancel/reissue/expiry/accept race and raw-contact boundary. Role tests reject assignment before consumed intent, generic role/scope/permission, Lead without exact Caregiver, more than one Lead, Admin/Caregiver overlap, same-user old-claim inheritance, and Step/Handoff invitation transport.
+- References: `02-architecture.md` C-4-1, `06-ib-nurture-schema-spec.md` sections 12.3/12.4, `08-iia-schema-policy-test-design.md` C-4-1 tests, `09-pilot-readiness.md` C-4-1.
+### 2026-07-20 — Collapsing roster intake, Host invitation, child profile, and Enrollment
+
+- Symptom: A RosterEntry becomes a shadow child profile or carries one mutable Host invitation pointer, and Host acceptance appears to enroll the child.
+- Context: Institution intake must remain usable before a family has adopted My-Chat, while longitudinal child identity and relationship authority remain family-confirmed.
+- What we tried: correlating delivery with one Roster field, treating accepted Host membership as consumed business invitation, or updating institution prefill into an existing child by label/date/contact match.
+- Root cause: Institution-local intake, Host identity coordination, family-owned profile authority, and Enrollment confirmation were collapsed into one record or lifecycle.
+- Fix / workaround: C-4-2 keeps RosterEntry minimal `active|linked|closed`, stores invitation correlation on versioned EnrollmentInvitation intent lineage, treats Host acceptance as identity/membership evidence only, and lets only the exact C-3 family confirmation atomically consume the intent/create Enrollment/link Roster. Grant and Thread remain later independent family authorization.
+- Prevention: Lifecycle, privacy, response-loss, reissue lineage, first-commit-wins, profile-retention-after-decline, no-fuzzy-match, no-implicit-Grant, and fresh-re-entry tests must all bind the same composite candidate.
+- References: `02-architecture.md` C-4-2, `06-ib-nurture-schema-spec.md` section 12.6, `08-iia-schema-policy-test-design.md` C-4-2 tests, `09-pilot-readiness.md` C-4-2.
+
+### 2026-07-20 — Making Enrollment notification the business transition or replay authority
+
+- Symptom: transfer/service close waits for provider success, an old Notification executes a transition, a late Guardian receives backfill, or another Step reconstructs a lost snapshot from current recipients.
+- Context: Institution Enrollment mutations are Nurture-local facts, while My-Chat provides optional durable relationship attention and retry/recovery.
+- What we tried: direct-empty transfer proposal followed by asynchronous audience lookup, storing target/status in Notification, requiring active Enrollment for terminal-history open, or treating delivery failure as transaction compensation.
+- Root cause: business commit, commit-time audience, Handoff materialization, provider delivery, owner presentation, and re-entry were treated as one distributed lifecycle.
+- Fix / workaround: C-4-3 keeps Hold/cancel explicit-empty, makes transfer proposal/service close claimed-Step before commit, stores immutable commit-time per-role snapshots or `[]`, and opens through current owner reread. Transfer confirmation remains C-3, terminal history does not require active Enrollment/Grant, and re-entry remains a fresh invitation.
+- Prevention: same-Step/wrong-Step, zero/partial audience, no-backfill, stale/open, provider/owner outage, terminal-history, retained-role/new-role, and no-compensation tests bind the exact composite candidate.
+- References: `02-architecture.md` C-4-3, `06-ib-nurture-schema-spec.md` section 12.7, `08-iia-schema-policy-test-design.md` C-4-3 tests, `09-pilot-readiness.md` C-4-3.
+
+### 2026-07-20 — Reassigning or silently suppressing work after claimant offboarding
+
+- Symptom: a new Caregiver can read/reply to an old claimed question, the Item stays acknowledged forever, Institution closes by fabricating a reply, or family receives no terminal status because suppression hides the operational failure.
+- Context: C-3 deliberately binds protected work to one exact Caregiver role episode, while a complete Institution product still needs an auditable no-takeover resolution and safe family continuity.
+- What we tried: a mutable staffing-case aggregate, claim transfer, generic Item close, privacy suppression, widening `user_attention`, or direct-empty close followed by asynchronous current-recipient lookup.
+- Root cause: staffing responsibility, protected receiver authority, operational terminal outcome, privacy invalidation, and Host notification were collapsed into one lifecycle.
+- Fix / workaround: C-4-4 derives the case from canonical Item/Attention/terminal-role facts, closes only through exact Admin claimed-Step as typed `claimant_role_ended_unfulfilled`, creates no reply/reassignment, and emits a separate generic `family_care_status_attention` cohort frozen at commit. C-3 terminal presentation remains immutable and safe.
+- Prevention: exact predicate/no-aggregate, closed-versus-suppressed, terminal-role/reply, privacy/topology race, old/new role, zero/partial audience, no-backfill, Group-pause/technical-disable, protected-field scan, and rendered family/Institution/teacher tests are qualification gates.
+- References: `02-architecture.md` C-4-4, `06-ib-nurture-schema-spec.md` section 12.8, `08-iia-schema-policy-test-design.md` C-4-4 tests, `09-pilot-readiness.md` C-4-4.
+
+### 2026-07-20 — Folding candidate identity, evidence authority, qualification, and Pilot approval together
+
+- Symptom: C-4 rebuilds mutable C-3 source, qualification digests enter candidate identity, Pilot-0-E appears to authorize pre-E evidence, a failed test alone is rerun, or a qualified label is treated as an active Workspace gate.
+- Context: C-4 must prove a new Institution extension over an already qualified immutable Guardian/Caregiver component without creating a hash/authority cycle or silently enabling traffic.
+- What we tried: one monolithic release hash, one controller for evidence/qualification/Pilot activation, parallel cross-repo adoption, cached status, or a combined test pass with no layer/journey/teardown identities.
+- Root cause: build identity, disposable evidence execution, signed qualification, complete-Pilot operations, deployment, and activation were treated as one phase.
+- Fix / workaround: C-4-5 requires current C-3 qualification, strict C40–C45, separate extension/composite candidates, isolated `c4_evidence_run_authorization_v1`, L0–L7/JI1–JI8, a pre-seal followed by signed C-4 qualification, and final false/empty teardown. D/E/Pilot-1/2 remain later identities and authorities.
+- Prevention: candidate-field negatives, cross-kind/controller tests, deterministic qualification genesis/recovery, source/migration/hash drift, three fresh high-risk runs, no-retry rule, current nested resolver checks, and exact `C4_QUALIFIED_DEFAULT_OFF / PILOT0_D_PENDING / EXTERNAL_TRAFFIC_NO_GO` exit.
+- References: `02-architecture.md` C-4-5, `06-ib-nurture-schema-spec.md` section 12.9, `08-iia-schema-policy-test-design.md` C-4-5 tests, `09-pilot-readiness.md` C-4-5.
+
+### 2026-07-20 — Letting later C-4 normalization coexist with older lifecycle and authority shorthand
+
+- Symptom: Roster has both `closed` and `withdrawn|ended|transferred` statuses, JI1 needs a D-owned provisioning authority before D, complete-Pilot admission checks only C-3, one consumed staff intent can create another role, or C-4 treats a no-reply resolved Item as if C-3 had already defined it.
+- Context: C-4 extends an immutable C-3 component and must also refine older C2f planning language without creating a second schema, evidence authority, or activation predicate.
+- What we tried: leaving historical shorthand unqualified, using a generic pre-E evidence controller for C0 bootstrap, relying on nested candidate ids as authority, accepting Host `already_member` as staff acceptance, or assuming generic terminal presentation implied a valid source graph and delivery fence.
+- Root cause: later normalization, disposable evidence execution, current authority, identity invitation, canonical business graph, and presentation were not traced as separate layers.
+- Fix / workaround: C-4 makes Roster canonical `active|linked|closed + terminalReason`; adds single-use isolated bootstrap evidence while leaving real Pilot provisioning to D; requires current C3+C4+E+Pilot-1 deployment for complete-Pilot admission; makes Staff intent single-use with explicit existing-member acknowledgement; and adds a C-4 complete-graph adapter plus privacy-after-close and pre-send Grant/Enrollment/redaction/retention checks.
+- Prevention: supersession searches, separately named source-set hashes, wrong-authority/old-intent/replayed-bootstrap negatives, four-authority activation tests, C-3 versus C-4 graph conformance, and send/open fence separation are mandatory before C-4 qualification.
+- References: `02-architecture.md` C-4-0/C-4-5, `06-ib-nurture-schema-spec.md` sections 12.4/12.6/12.8/12.9, `08-iia-schema-policy-test-design.md` C-4 tests, `09-pilot-readiness.md` C-4-0 through C-4-5.
+
+### 2026-07-20 — Consuming cross-database bootstrap authority before owner outcome is recoverable
+
+- Symptom: My-Chat consumes a one-time authorization, then crashes before Nurture commits or loses the response after Nurture commits; the first case cannot retry and the second cannot recover without risking a duplicate effect.
+- Context: Pre-D C-4 evidence must exercise the real C0 handler across separate Host and Nurture databases while retaining exact replay.
+- What we tried: atomically consuming the Host authorization before the owner call and treating any later replay as forbidden.
+- Root cause: transport attempt, authorization use, owner commit, and recovered outcome were collapsed into one cross-database instant that does not exist.
+- Fix / workaround: claim one deterministic body-free `C4BootstrapEvidenceOperationV1` without consuming success; bind accepted invitation/membership/spec/handler/request/command/principal/payload; rely on Nurture CommandExecution idempotency; and classify only through isolated `committed|confirmed_no_effect|unknown` recovery. Consume on committed, bounded-retry only the same confirmed-no-effect operation, and quarantine unknown.
+- Prevention: crash-before-call, claim-before-send, commit-before-response-loss, wrong binding, exact/different replay, expiry/revoke during claim, unknown quarantine, and teardown tests are mandatory.
+- References: `02-architecture.md` C-4 evidence authority, `06-ib-nurture-schema-spec.md` section 12.9, `08-iia-schema-policy-test-design.md` C-4-5 tests, `09-pilot-readiness.md` C-4-0/C-4-5.
+
+### 2026-07-20 — Reusing one activation profile across component evidence, composite evidence, and complete Pilot
+
+- Symptom: a C-3-only or C-4 disposable evidence row can be interpreted as complete-Pilot activation, or C-4 design pre-authorizes D topology/configuration that does not yet exist.
+- Context: the same positive-only activation table carries stage-typed rows, but each candidate kind has a different complete source/runtime bundle and authority predicate.
+- What we tried: one additive `nurture_institution_ecology_pilot_v1` profile for both C-4 evidence and complete-Pilot rows.
+- Root cause: evidence composition and deployable Pilot composition were treated as the same artifact.
+- Fix / workaround: C-3 evidence uses `nurture_guardian_caregiver_pilot_v1`; C-4 disposable evidence uses only `nurture_institution_composite_evidence_v1`; Pilot-0-D later locks a third exact complete-Pilot profile into the D candidate. No inference, alias, or fallback is legal.
+- Prevention: profile/candidate-kind cross-product negatives, normalized profile content hashes, candidate binding, and D-profile absence checks remain qualification gates.
+- References: `02-architecture.md` C-3-5/C-4-5, `06-ib-nurture-schema-spec.md` section 12.9, `08-iia-schema-policy-test-design.md` C-4-5 tests, `09-pilot-readiness.md` C-3-5c/C-4-5.
+
+### 2026-07-20 — Retaining unverified roster PII as permanent audit
+
+- Symptom: an ignored, declined, cancelled, expired, or manually closed invitation leaves a child's institution-entered label/age/birth prefill visible indefinitely even though no family ever confirmed the record.
+- Context: RosterEntry is a useful intake/audit shell but is not a longitudinal child profile or justification for perpetual personal-data retention.
+- What we tried: keeping the complete immutable Roster row and applying only status closure.
+- Root cause: business audit retention and unverified personal-field retention were treated as one lifecycle.
+- Fix / workaround: unverified PII has an absolute 30-day deadline; terminal invitation without successor accelerates purge to seven days; manual close erases immediately; retention closure leaves only a body-free shell. Link clears Institution prefill, uses a Guardian-confirmed safe label, and de-identifies that label after 365 days. Restore replays erasure before reads.
+- Prevention: retention-worker/race, reissue-no-extension, link-time replacement, presenter/cache/export/log, backup/restore, and no-revival tests bind the same candidate.
+- References: `02-architecture.md` C-4-2, `06-ib-nurture-schema-spec.md` section 12.6, `08-iia-schema-policy-test-design.md` C-4-2 tests, `09-pilot-readiness.md` C-4-2.
+
+### 2026-07-20 — Treating one absent bootstrap lookup as confirmed no effect
+
+- Symptom: Host retries or tears down after one missing CommandExecution read while an accepted C0 writer may still be in flight, creating a late commit or second effect.
+- Context: Pre-D JI1 crosses Host and Nurture databases without a distributed transaction and must classify response loss deterministically.
+- What we tried: interpreting an absent status response, elapsed request timeout, or expired authorization as proof that the owner did not commit.
+- Root cause: transport observation was mistaken for a linearized owner outcome.
+- Fix / workaround: `confirmed_no_effect` requires all issued attempts terminal, latest claim expiry plus skew and the bounded owner-transaction deadline elapsed, acquisition of the exact C0 writer fence, and fence-protected absence of the deterministic CommandExecution. Lock timeout, store/owner outage, possible in-flight work, ambiguity, or one absent read remains `unknown`; the operation stays claimed and `outcome_unknown` until convergence.
+- Prevention: writer-fence, late-writer, timeout/outage, concurrent lookup, exact absent-under-fence, and teardown-blocking tests must bind one deterministic operation.
+- References: `02-architecture.md` C-4 evidence authority, `06-ib-nurture-schema-spec.md` section 12.9, `08-iia-schema-policy-test-design.md` bootstrap-recovery linearization tests, `09-pilot-readiness.md` C-4-0/C-4-5.
+
+### 2026-07-20 — Creating one Workflow Handoff draft per recipient
+
+- Symptom: one relationship or status business effect creates multiple drafts/Handoffs, makes partial recipient delivery look like multiple business effects, or lets recipient membership drift between drafts.
+- Context: Nurture owns the exact commit-time Guardian RoleAssignment audience, while My-Chat owns technical delivery fan-out.
+- What we tried: binding the draft key directly to each recipient RoleAssignment episode and materializing one Handoff per role.
+- Root cause: business replay seed identity and per-recipient delivery identity were collapsed.
+- Fix / workaround: zero eligible recipients stores `[]`; otherwise Nurture stores one cohort-level draft keyed by business effect/purpose/source plus canonical commit-time recipient-set hash, yielding at most one Handoff. My-Chat derives per-recipient candidate/link identities beneath that Handoff and owner-rereads each recipient before send/open.
+- Prevention: zero/one/two-recipient, canonical set-order, duplicate/partial candidate materialization, late-join/no-backfill, role-loss, and same-Step/wrong-Step tests must assert one business effect and at most one Handoff.
+- References: `02-architecture.md` C-2f-5/C-4-3/C-4-4, `06-ib-nurture-schema-spec.md` relationship-attention rules, `08-iia-schema-policy-test-design.md` recipient snapshot tests, `09-pilot-readiness.md` C-3-2/C-4-3/C-4-4.
+
+### 2026-07-20 — Assuming My-Chat had no platform Child/Family identity after the boundary changed
+
+- Symptom: Active C-3/C-4 documents still said My-Chat owned only adult accounts and had no canonical Child or stable cross-scenario correlation after My-Chat introduced protected Child/Family ownership.
+- Context: The platform identity direction is compatible with Nurture ownership only when shared identity and workspace-local care subject/authority are modeled as separate layers.
+- What we tried: Preserving the historical “all child/family identity is Nurture-local” shorthand and treating the workflow-contract pin as the complete future dependency.
+- Root cause: A late cross-repository ownership change was reviewed as schema drift instead of a semantic dependency change, so the current context contract and Pilot decision bundle diverged.
+- Fix / workaround: The prior no-platform-Child wording is superseded. My-Chat owns protected Child/Family identity, stewardship/membership, and binding lifecycle; Nurture owns local Child/Process/child-scoped Family and all care authority. C-3 adds independently pinned `platform_child_family_identity_source_v1`. My-Chat `db22de6` remains schema-only observed input and cannot satisfy adoption or replace the historical workflow pin.
+- Prevention: Every final cross-repository review compares current repository ownership contracts and candidate source registries, not only pinned package bytes. A platform identity revision must invalidate qualification until schema/migrations/runtime/APIs, owner adoption, and joint conformance are complete.
+- References: `docs/context/workflow/nurture-scenario-contract.md`, `00-overview.md`, `02-architecture.md` C-4-5, `06-ib-nurture-schema-spec.md` 3.2a, `08-iia-schema-policy-test-design.md` C-3/C-4 identity tests, `09-pilot-readiness.md` C-4-5.
+- Supersession note: this entry also replaces any earlier historical “current rule” sentence in this ledger that says My-Chat owns only account/shell or that all Child/Family identity belongs to Nurture; those entries remain historical evidence, not executable guidance.
+
+### 2026-07-20 — Pointing a platform scenario binding at a workspace-local Nurture object
+
+- Symptom: One My-Chat `(Child|Family, scenarioKey)` binding appeared to point directly at one workspace-local `NurtureChild`, ChildCareProcess, or child-scoped Family, making cross-workspace reuse and one-Family/multiple-child cardinality impossible or ambiguous.
+- Context: My-Chat bindings are scenario-global, while Nurture profiles and Family/Process facts are workspace- and child-scoped.
+- What we tried: Adding a nullable `myChatChildId` to `NurtureChild` or storing the local object ref directly as binding `ownerRef`.
+- Root cause: Global identity correlation, scenario binding endpoint, local dossier identity, and business authority were collapsed into one foreign-key-like relation across database owners.
+- Fix / workaround: My-Chat `ownerRef` points only to typed scenario-global `NurtureChildBindingAnchor` / `NurtureFamilyBindingAnchor`. Separate exact workspace associations map anchors to local Child and `(Family anchor, Child anchor)` to child-scoped Family/Process. Anchors are body/PII/authority-free, invisible, and unavailable to ordinary list/count/existence queries.
+- Prevention: Schema/cardinality tests require bidirectional child mapping uniqueness, pair-scoped family mapping, one Family/multiple-child denial, W1/W2 noninterference, wrong-workspace no-leak behavior, and static absence of direct platform ids on local profiles.
+- References: `docs/context/workflow/nurture-scenario-contract.md`, `02-architecture.md` object model/C-4-5, `06-ib-nurture-schema-spec.md` 3.2a, `08-iia-schema-policy-test-design.md` identity tests, `09-pilot-readiness.md` C-4-5.
+
+### 2026-07-20 — Letting a binding anchor become cross-workspace authorization or discovery
+
+- Symptom: Reusing one platform identity/anchor could be read as permission to list another workspace's dossier, authorize through binding/membership alone, auto-merge profiles, or let Institution intake create a child before a parent participates.
+- Context: Exact identity reuse is necessary for parent-first and Institution-invited growth, but privacy and authority remain local to each Nurture relationship graph.
+- What we tried: Treating the anchor as a subject, repository lookup key, cache correlation id, or provisional profile; alternatively banning all global identity reuse and copying profile basics between workspaces.
+- Root cause: Routing identity, local association, relationship authority, dossier portability, and Institution intake were not independently fenced.
+- Fix / workaround: Product resolution first verifies exact Workspace and current Host binding/membership evidence, performs one exact compound association lookup, and immediately reads current local role/scope plus all Nurture predicates before returning a result. Roster/Intent is the only Institution provisional path and stores no platform/anchor candidates. Global revoke fences routing without rewriting facts; local exit does not mutate global binding; merge conflicts quarantine; the old copy-and-reconfirm profile protocol is withdrawn.
+- Prevention: Tests deny anchor/binding/stewardship/membership/id-only reads, cross-workspace list/count/existence, one-Family cross-child access, Institution minting, automatic merge/rebind, and platform-id/anchor leakage across every client/delivery/telemetry/search destination.
+- References: `docs/context/workflow/nurture-scenario-contract.md`, `02-architecture.md` C-2a/C-2f/C-4-5, `06-ib-nurture-schema-spec.md` Roster/anchor rules, `08-iia-schema-policy-test-design.md` C-2f/C-4 tests, `09-pilot-readiness.md` C-2f-4-3/C-4-2/C-4-5.
+
+### 2026-07-20 — Reusing P0/P1 labels across design review, traffic readiness, and qualification
+
+- Symptom: The current Pilot checkpoint claimed zero P0/P1/P2 while the same readiness document listed six P0 and three P1 blockers, so a reader could interpret a design-review PASS as permission for traffic.
+- Context: Pilot-0-C separately evaluates decision quality, missing implementation/operations for real traffic, and findings against a future immutable qualification candidate.
+- What we tried: Using one unqualified severity vocabulary and relying on nearby prose such as `NO-GO for external traffic` to disambiguate it.
+- Root cause: Three independent gates shared one label namespace, and the 3975-line decision ledger was also used as the status entrypoint.
+- Fix / workaround: Current status uses `DR-P0/DR-P1/DR-P2`; traffic blockers use `TR-P0/TR-P1`; candidate qualification uses `QR-P0/QR-P1`. `10-pilot0-c-current-decision-index.md` is the concise status/precedence entrypoint, while `09-pilot-readiness.md` remains the detailed ledger.
+- Prevention: Current summaries and exit criteria MUST use qualified severity labels. A design PASS cannot close traffic or qualification findings, and a future candidate result cannot rewrite the decision ledger.
+- References: `10-pilot0-c-current-decision-index.md`, `00-overview.md`, `01-plan.md`, `04-verification.md`, `09-pilot-readiness.md`.
+
+### 2026-07-20 — Describing the opaque platform/local binding in two incompatible ways
+
+- Symptom: One section called `child_id/family_id` required canonical refs while another prohibited raw platform ids in Nurture, leaving implementers to choose between direct-id persistence and an anchor-only path.
+- Context: My-Chat owns shared protected identity; Nurture owns local care dossiers. The cross-database relationship must be stable without copying platform identity fields or turning routing into authority.
+- What we tried: Documenting the My-Chat scenario binding and the Nurture anchor association separately without stating that their composition is the repository-required opaque binding.
+- Root cause: Owner-side persistence and the end-to-end logical relationship were described at different abstraction levels without an explicit equivalence rule or minimum owner API contract.
+- Fix / workaround: The context contract now defines one normative chain: My-Chat raw ids -> My-Chat typed scenario-binding owner refs -> Nurture typed anchors -> workspace-local associations -> local Child/Process/Family. Raw ids remain in My-Chat. The contract also fixes the minimum owner API responsibilities and makes concrete types/ports a mandatory C30-I1/I2 deliverable before candidate freeze.
+- Prevention: Cross-repository reviews must trace both owner stores and the signed current-evidence boundary. Direct-id persistence, anchor-as-authority, raw-id wire leakage, unspecified fallback, and candidate freeze without a pinned owner API all fail.
+- References: `AGENTS.md`, `docs/context/workflow/nurture-scenario-contract.md`, `06-ib-nurture-schema-spec.md`, `10-pilot0-c-current-decision-index.md`.
+
+### 2026-07-20 — Blanket anchor-leakage language forbidding the private owner envelope
+
+- Symptom: The owner API contract required typed anchor refs in short-lived signed current-owner evidence while nearby privacy text said anchors could never appear in any evidence body.
+- Context: Nurture needs an opaque endpoint to join My-Chat's current binding decision to one exact local association without receiving raw platform identity.
+- What we tried: Expressing the privacy rule as an absolute destination ban instead of an explicit minimum allowlist.
+- Root cause: Qualification/operational evidence and the private request-time owner envelope were both called “evidence,” even though they have different audiences and retention.
+- Fix / workaround: Anchors are allowed only in My-Chat scenario-binding `ownerRef`, Nurture anchor/association persistence, the short-lived private signed current-owner envelope, and the strongly authenticated reconciliation boundary. Client, UI, Chat, Notification, Handoff, provider, telemetry, analytics, search, shared cache, and qualification/operational evidence remain forbidden.
+- Prevention: Privacy contracts for opaque identifiers must name the exact allowed carriers before listing forbidden destinations; conformance covers both required private carriage and leakage denial.
+- References: `docs/context/workflow/nurture-scenario-contract.md`, `06-ib-nurture-schema-spec.md`, `09-pilot-readiness.md`, `10-pilot0-c-current-decision-index.md`.
+
+### 2026-07-21 — Making Pilot-0-E depend on the deployment it authorizes
+
+- Symptom: “complete candidate” could be read as a live Pilot environment even though Pilot-1 provisioning is allowed only after E.
+- Context: E must review executable bytes and exact topology/operations semantics without creating cloud state, secrets, databases, or traffic.
+- Root cause: Candidate inputs, pre-deployment evidence, approval, and deployment binding were treated as one release object.
+- Fix / workaround: D locks a deterministic recipe. Current qualified C-3/C-4 plus implemented D inputs assemble an immutable undeployed candidate; a separate D evidence seal proves it; E signs that exact pair; Pilot-1 later publishes the same OCI bytes and binds real resources/secrets in `pilot_deployment_binding_v1`.
+- Prevention: Candidate identity excludes qualification state, D evidence, E, ACR tag/URL, live resources, secret values, activation and observations. Any binary/behavior/schema/topology input change creates a new candidate and invalidates the old E decision.
+- References: `11-pilot0-d-topology-operations-contract.md` D-0/D-2/D-7, `09-pilot-readiness.md` Pilot-0-D.
+
+### 2026-07-21 — Reusing the kill-switch rehearsal row for observation
+
+- Symptom: Pilot-3 must delete/disable its activation row, Technical Operator cannot re-enable, but Pilot-4 was described as following the rehearsal without a new authority.
+- Context: Kill-switch evidence is invalid if the stopped authority can be silently restored or extended.
+- Root cause: Pilot-2/3 rehearsal and Pilot-4 observation were modeled as one activation lease.
+- Fix / workaround: Pilot-3 permanently ends its row and leaves capability false/active rows empty. Pilot-4 requires a new signed stage/resume decision and a newly created exact row. Any later kill, restore, binding/config/trust change, or evidence gap terminates the 120-hour window and requires a fresh authorization/window.
+- Prevention: Technical Operator remains disable-only; activation rows cannot be restored, copied, auto-renewed, wildcarded, or retargeted. Tests require final false/empty census and two distinct row identities.
+- References: `11-pilot0-d-topology-operations-contract.md` D-3/D-7, `09-pilot-readiness.md` success/rollback contract.
+
+### 2026-07-21 — Letting Pilot-3 terminal transitions invalidate their own plan
+
+- Symptom: the rehearsal plan required row removal, capability closure, binding rotation, plan consumption, and stage-authority consumption, while also saying any bound-head drift or consumed authority invalidated the plan.
+- Context: Pilot-3 must end effect-decreasing and provide independently verifiable provenance without leaving an executable rehearsal authority.
+- What we tried: binding the plan to only the initially current heads and adding a prose exception for the final rotation.
+- Root cause: execution currentness and historical lineage verification were collapsed, and the complete terminal sequence was not enumerated.
+- Fix / workaround: lock the sole successful lineage as `gates_closed -> final_binding_bound -> plan consumed_success -> Pilot-2 stage authority consumed -> terminal seal`. Transition mode accepts a valid partial prefix only to append/retrieve the next successor; consumed plan/stage heads prove only stage consumption/sealing respectively. Verification mode accepts historical consumed heads only through the complete append-only chain.
+- Prevention: conformance rejects early consume/seal, missing/duplicate/divergent successor, order gap, attempted re-enable, unrelated deployment/config drift, and every terminal state other than the exact consumed lineage.
+- References: `11-pilot0-d-topology-operations-contract.md` D-3/D-7, `02-architecture.md` 0.2, `08-iia-schema-policy-test-design.md` Pilot-0-D operations conformance.
+
+### 2026-07-21 — Using ambiguous readiness, sample, and traffic shorthand at a release gate
+
+- Symptom: E “may” require zero P0 and closure of undefined critical P1 items; one P1 mixed an accepted native exclusion with a required Web capability; an extra Pilot-4 question had no terminal result; and “zero external traffic” contradicted public My-Chat ingress.
+- Context: release and observation gates need deterministic machine inputs even though the Pilot intentionally allows only internal users through a public Host surface.
+- What we tried: relying on list positions, counts, nearby scope prose, and operator interpretation.
+- Root cause: one historical finding combined two dispositions, and business-product traffic was not distinguished from denied edge/control/service network traffic.
+- Fix / workaround: introduce stable `TR-P0-1..6` and `TR-P1-1|2|3a|3b` ids in `pilot0_traffic_readiness_census_v1`; require all P0 plus P1-1/2/3b closed and permit only P1-3a as `accepted_scope_exclusion`. Derive `externalProductTrafficCount` from exact trusted source session/account/service and recipient/provider boundaries rather than untrusted target claims; external authenticated requests count even when Host-denied, while exact internal wrong-target probes remain internal only when denied before owner effect. Any admitted unplanned Nurture question/effect is `no_pass`; only pre-admission zero-effect denial is a negative probe.
+- Prevention: census cross-product tests reject missing/renamed/duplicate/waived rows and wrong exclusions; traffic tests cover allowlisted internal ingress, edge scans, control traffic, external principals/providers, and provider attempts; observation tests cover admitted eighth question versus pre-admission rejection.
+- References: `11-pilot0-d-topology-operations-contract.md` D-0.5/D-7, `09-pilot-readiness.md` Blocking findings/Pilot-0-E, `08-iia-schema-policy-test-design.md` Pilot-0-D operations conformance.

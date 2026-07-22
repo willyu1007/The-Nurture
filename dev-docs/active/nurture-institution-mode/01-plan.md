@@ -1,6 +1,25 @@
 # Plan — Institution Ecology
 
-> 分阶段推进（IA → III）。当前重点是 IB：把 My-Chat account/shell 与 Nurture care ecology graph 的边界落成 schema SPEC，并让 `family_to_org` 能支撑班级沟通中枢。
+> 分阶段推进（IA → III）。Pilot-0-C 是 `DECISION COMPLETE / IMPLEMENTATION OPEN / EXTERNAL TRAFFIC NO-GO`；Pilot-0-D 是 `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`。设计缺陷使用 `DR-P0/DR-P1/DR-P2`，流量阻断使用 `TR-P0/TR-P1`，候选资格化问题使用 `QR-P0/QR-P1`。D-0..D-7 已闭环且不授权 C-3/C4/D 实施、候选组装、Pilot-0-E 或 Pilot-1。当前索引见 `10-pilot0-c-current-decision-index.md` 与 `11-pilot0-d-topology-operations-contract.md`。
+
+---
+
+## C30-I0 — Implementation baseline isolation（进行中）
+
+`C30-I0` 只建立可归属、可回放、不可变的实施入口，不实现 C30-I1
+合同，也不修改 schema/runtime/database/gate。详细证据见
+`artifacts/12-c30-i0-baseline-inventory.md`。
+
+| Sub-gate | State | Exit |
+| --- | --- | --- |
+| `C30-I0-A` 三仓/worktree/依赖/schema/gate census | Complete | 精确 revision、dirty ownership、重叠路径、migration/source/gate 和验证状态已记录。 |
+| `C30-I0-B` T-029 donor disposition | Complete | `artifacts/13-c30-i0-b-t029-disposition.md` 覆盖 Base 57、My-Chat 79、Nurture 40 个候选文件；无文件可原样合并，可抽取机制全部标为 `REWORK`，直接平台 ref、umbrella source、双 manifest/Execution track 和跨节点混合迁移均已排除。 |
+| `C30-I0-C` scoped commits and clean worktrees | Pending | T-002、T-003、cloud-deployment、T-029 可独立归属；三仓 C30 worktree 从精确 commit 启动。 |
+| `C30-I0-D` immutable pins and false/empty proof | Pending | 可变 local path 不再作为 evidence；clean-install verifier、exact revision/source pins、C-3 gate false/empty 和 canonical baseline suite 全绿。 |
+
+`C30-I1` 仅在 I0-B/C/D 全部完成后进入 `in_progress`。数据库 apply、
+环境 row census、capability/Workspace activation、artifact/cloud/secret/traffic
+仍需各自的单独授权。
 
 ---
 
@@ -30,7 +49,7 @@
 
 1. **中心对象**：Nurture 的基本单位是 `NurtureChildCareProcess`。家长加入这个过程；老师把这个过程并入班级工作流；机构管理者治理这些过程。
 2. **用户边界**：家长、老师、机构管理者都是 My-Chat 用户；小孩不是 My-Chat 用户。
-3. **ownership**：My-Chat owns account identity and scenario shell; Nurture owns the care ecology graph。
+3. **ownership**：My-Chat owns adult account plus protected platform Child/Family identity, stewardship/membership, scenario binding, and shell；Nurture owns body-free typed anchors, exact workspace associations, local Child/Process/child-scoped Family, roles, Enrollment/Grant, and the care ecology graph。
 4. **场景关系**：家庭、孩子、机构、班级、老师分配、入托、授权、家园沟通都归 Nurture canonical。
 5. **家园沟通**：Nurture 保存 `NurtureFamilyCareMessage` 原文和 `NurtureFamilyCareItem` 结构化事项；My-Chat 只做 shell/render/notification/deep link。
 6. **老师痛点**：一个班 10 个孩子产生 10 个私密沟通线程，老师侧必须聚合成 `class_family_inbox`。
@@ -204,10 +223,10 @@
 | Checkpoint | Status | Scope / exit evidence |
 | --- | --- | --- |
 | Pilot-0 | Authorized / In progress | Readiness and scope lock only: identify the pilot institution/workspace/cohort, roles and data classes; audit IIB teacher/guardian UX gaps; choose the delivery/environment shape; define observation duration, success/stop criteria, privacy ownership, and rollback evidence. No runtime or environment enablement is authorized. |
-| Pilot-1 | Not authorized | Prepare an isolated pilot environment only after Pilot-0 acceptance: exact revisions/hashes, database and backup/restore plan, service-token scope, artifact provenance, and secret handling. ACR becomes a prerequisite here only if the approved pilot deployment uses the current container publication path. |
-| Pilot-2 | Not authorized | Enable the activation composition and `workflow_handoff_materialization_v1` only for an explicit workspace allowlist; all other workspaces and staging/production remain default-off. |
-| Pilot-3 | Not authorized | Rehearse response loss, same-Step reclaim, wrong-Step denial, revoke/redaction/cancel, dead-letter/Admin recovery, stale deep links, owner outage, capability kill-switch, credential rotation, and database recovery in the approved pilot topology. |
-| Pilot-4 | Not authorized | Run the bounded observation window, review latency/errors/retries/LLM/cache/manual-work/privacy evidence, rehearse rollback, and make an explicit continue/expand/stop decision. It cannot authorize staging, production, or GA. |
+| Pilot-1 | Not authorized | Prepare the locked isolated ECS/Compose Pilot environment only after Pilot-0-E Go: publish the exact approved OCI bytes to private Alibaba ACR without rebuild, bind exact revisions/digests, provision owner-separated databases and backup/restore, and configure scoped Secrets Manager/KMS references. Private ACR is an unconditional prerequisite for the selected persistent Pilot topology, while no ACR action is authorized before Pilot-1. |
+| Pilot-2 | Not authorized | Under a current `pilot2_rehearsal` authorization, enable the exact complete profile/candidate/deployment/E/current C-3/C-4-qualified environment while rows remain empty, then create one exact Workspace row last; all other Workspaces and environments stay default-off. |
+| Pilot-3 | Not authorized | Under the exact rehearsal-plan authorization, rehearse response loss, same-Step reclaim, wrong-Step denial, Grant revoke/redaction, C-4 invitation/transfer cancellation, dead-letter/Admin recovery, stale opens, owner/KMS outage, credential rotation, exact-topology restore, and the complete kill switch; family-care immediate route has no `cancel_route`. Finish with capability false, rows `[]`, terminal evidence, and no reusable row. |
+| Pilot-4 | Not authorized | After a fresh baseline seal, stage authorization, and row, run one uninterrupted 120-hour observation window and make only a continue-internal-observation, stop, or separately reviewed next-scope recommendation. Any rollback/restore/gate shutdown ends the window; this stage cannot authorize expansion, staging, production, or GA. |
 
 The 2026-07-16 approval opens only Pilot-0 inside the existing T-002 task bundle. Any database apply, ACR publication, repository/environment secret configuration, capability or manifest-composition change, external pilot traffic, or Pilot-1 through Pilot-4 entry requires a new explicit approval. Pilot rollback remains capability/activation deactivation and must not rewrite committed Nurture business facts.
 
@@ -217,9 +236,9 @@ Pilot-0 detailed evidence and recommendations are canonical in `09-pilot-readine
 | --- | --- | --- |
 | Pilot-0-A baseline/actual-capability audit | Complete | Exact cross-repo baseline and contract/source hashes pass; actual runtime, UX, provisioning, delivery, security, and observability gaps are classified. |
 | Pilot-0-B cohort/role/surface/data lock | Complete | Revised B1/B2, B3-0/B3-1, B3-2a-d, B3-3a-d, and B3-4 are locked. The coverage contract requires complete action/surface conformance, four representative business journeys across three child scopes, Institution/Operator strands, layered fault/privacy evidence, and explicit exit gates. |
-| Pilot-0-C IIB/onboarding contract | In progress — C-3-0d complete | C-3-0d closes action-execution/recovery planning with atomic capability, static direct-empty/claimed-Step drivers, pre-claim Step binding, owner-derived identity and typed actor, atomic transactions, deterministic replay/reconciliation, exact action matrix, named adoption evidence, legacy/no-fallback behavior, and negative conformance. C-3-0e protected/offline/complete adoption is next; actual adoption remains unsatisfied. |
-| Pilot-0-D topology/operations contract | Proposed | Accept the isolated environment, exact scenario artifact, two-key workspace gate, observation, stop, recovery, and rollback terms. |
-| Pilot-0-E Go/No-Go review | Pending | Assign implementation owners and review all evidence. Pilot-1 remains separately authorized. |
+| Pilot-0-C IIB/onboarding contract | **DECISION COMPLETE / IMPLEMENTATION OPEN / EXTERNAL TRAFFIC NO-GO** | The late My-Chat Child/Family boundary adds required public C-3 source `platform_child_family_identity_source_v1`, the normative My-Chat binding -> typed Nurture anchor -> workspace association chain, durable parent-owned binding-resolution recovery, Roster-only Institution intake, three executable JI3 journeys/scopes, and separate conformance for all four binding-resolution branches. Three independent final rereviews plus the clarity repair returned `DR-P0=0 / DR-P1=0 / DR-P2=0`; six `TR-P0` and three `TR-P1` remain open, while native/external delivery `TR-P1-3a` is an accepted scope exclusion. `db22de6` is schema-only input, not adoption. C40 still requires a current qualified immutable C-3 and strict C40–C45; no implementation/adoption/schema/runtime/manifest enablement is claimed. |
+| Pilot-0-D topology/operations contract | **DESIGN LOCKED / IMPLEMENTATION UNAUTHORIZED** | D-0..D-7 lock the dedicated dual-ECS/dual-RDS Pilot topology, immutable undeployed candidate recipe, ACR-at-Pilot-1 rule, KMS/secret custody, dual technical gates, RACI, incident/recovery, retention/rollback, and fresh-row 120-hour observation contract at `DR-P0=0 / DR-P1=0 / DR-P2=0`. |
+| Pilot-0-E Go/No-Go review | Blocked on separately authorized C-3/C-4/D implementation | E requires one assembled immutable complete candidate, current C-3/C-4 qualification, D evidence seal, closed critical traffic blockers, and zero `QR-P0/QR-P1`; it neither deploys nor activates. Pilot-1 remains separately authorized. |
 
 X5 acceptance matrix (each row must have deterministic evidence; adjacent single-repo tests may support but cannot replace the joint boundary where noted):
 

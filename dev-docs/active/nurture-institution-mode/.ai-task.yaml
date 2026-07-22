@@ -3,7 +3,7 @@ task_id: T-002
 project: main
 slug: nurture-institution-mode
 status: in-progress
-updated: "2026-07-16"
+updated: "2026-07-21"
 keywords:
   - institution-ecology
   - multi-family
@@ -24,12 +24,19 @@ keywords:
   - mobile-chat-role-agnostic
   - single-active-family
   - iia-schema-policy-test-design
-  - class-of-10-journey
+  - three-child-pilot-cohort
   - iia-test-contract
   - iia-capability-slice
   - iia-surface-contract
   - pilot-enablement
   - pilot-readiness
+  - pilot0-c-decision-index
+  - pilot0-d-topology-operations
+  - complete-pilot-candidate
+  - dual-technical-gates
+  - pilot-observation-contract
+  - severity-namespaces
+  - platform-child-family-binding
   - capability-allowlist
   - iia-resolver-contract
   - resolver-output-consumers
