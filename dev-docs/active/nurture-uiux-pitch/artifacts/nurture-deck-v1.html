@@ -1,0 +1,1278 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>成长协同 · 园长共创演示</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --cream:#F5F2EA;--paper:#FFFFFF;--sand:#EDE9DD;--sand2:#E3DDCD;--float:#F9F6EE;
+    --ink:#1F1E1B;--ink3:#4A4843;--ink4:#6E6B65;--ink5:#A09D96;
+    --navy:#283E68;--navy7:#1F3354;--navy5:#4761A0;--navy50:#EEF1F7;--navy100:#DCE2EE;
+    --orange:#E1703C;--or700:#C75D2C;--or50:#FDF1E9;--or100:#FAE2D5;--or300:#F0A989;
+    --pine:#2C5F55;--pinet:#DDE8E2;--sage:#9BB0A5;--saget:#E4EAE5;
+    --succ:#2E8B6B;--succbg:#E4F2EC;--warn:#C98A2B;--warnbg:#FBEFD8;
+    --bd:rgba(40,62,104,.10);--bd2:rgba(40,62,104,.18);
+    --dark:#1B2233;--on-dark:#EEF1F7;--on-dark2:#9AA7C2;
+    --sans:Manrope,Inter,"PingFang SC","Noto Sans SC","HarmonyOS Sans",system-ui,sans-serif;
+    --serif:"Source Serif 4","Noto Serif SC","Songti SC",Georgia,serif;
+  }
+  html,body{height:100%}
+  body{background:#12151d;font-family:var(--sans);overflow:hidden}
+  .deck{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 120% at 50% 0%,#1e2534 0%,#10141c 100%);overflow:hidden}
+  .holder{position:relative}
+  body.editing .holder{outline:3px dashed var(--orange);outline-offset:8px}
+  .stage{width:1280px;height:720px;transform-origin:top left;overflow:hidden;border-radius:16px;
+    background:var(--cream);box-shadow:0 40px 120px -30px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.05)}
+  .track{display:flex;width:100%;height:100%;transition:transform .55s cubic-bezier(.66,0,.18,1)}
+  .slide{flex:0 0 1280px;width:1280px;height:720px;position:relative;overflow:hidden;
+    background:var(--cream);padding:64px 84px 70px}
+  .slide.dark{background:linear-gradient(160deg,#232C42 0%,#1B2233 100%)}
+
+  .eyebrow{font-size:14px;font-weight:700;letter-spacing:.18em;color:var(--or700);display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:"";width:30px;height:2px;background:var(--orange);opacity:.7}
+  .dark .eyebrow{color:var(--or300)}
+  h1{font-family:var(--serif);font-size:54px;line-height:1.18;font-weight:700;color:var(--ink);max-width:21ch;text-wrap:balance}
+  .dark h1{color:var(--on-dark)}
+  h1 em{font-style:normal;color:var(--orange)}
+  h2{font-family:var(--serif);font-size:36px;line-height:1.2;font-weight:700;color:var(--ink);text-wrap:balance}
+  .dark h2{color:var(--on-dark)}
+  .lede{font-size:19px;line-height:1.6;color:var(--ink3)}
+  .dark .lede{color:var(--on-dark2)}
+  .footbar{position:absolute;left:84px;right:84px;bottom:32px;display:flex;align-items:center;
+    justify-content:space-between;border-top:1px solid var(--bd);padding-top:13px}
+  .dark .footbar{border-color:rgba(255,255,255,.12)}
+  .ftag{font-size:12.5px;color:var(--ink4);display:flex;align-items:center;gap:8px}
+  .dark .ftag{color:var(--on-dark2)}
+  .ftag .dot2{width:7px;height:7px;border-radius:50%;background:var(--orange)}
+  .tagpill{font-size:12.5px;color:var(--on-dark2);border:1px solid rgba(255,255,255,.2);padding:5px 14px;border-radius:999px}
+
+  .demo-grid{display:grid;grid-template-columns:auto minmax(0,540px);gap:66px;align-items:center;
+    justify-content:center;margin-top:10px;height:528px}
+  .phonebox{width:264px;height:546px;flex:none}
+  .phonebox .phone{transform:scale(.88);transform-origin:top left}
+  .notes{display:flex;flex-direction:column;gap:20px;max-width:520px}
+  .notes h2{font-size:32px;margin-bottom:2px}
+  .np{display:flex;gap:14px;align-items:flex-start}
+  .np .n{flex:none;width:30px;height:30px;border-radius:9px;background:var(--or100);color:var(--or700);
+    display:grid;place-items:center;font-size:14px;font-weight:800}
+  .np .t3{font-size:17px;font-weight:600;color:var(--ink);line-height:1.4}
+  .np .d3{font-size:13.5px;color:var(--ink4);line-height:1.5;margin-top:2px}
+  .np .d3 b{color:var(--or700);font-weight:600}
+  .trybadge{align-self:flex-start;font-size:12px;font-weight:700;color:var(--or700);background:var(--or100);
+    padding:5px 14px;border-radius:999px}
+
+  .phone{width:300px;height:620px;border-radius:40px;background:#161a22;padding:10px;flex:none;
+    box-shadow:0 26px 60px -24px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.06)}
+  .scr{width:100%;height:100%;border-radius:31px;background:var(--cream);overflow:hidden;
+    display:flex;flex-direction:column;color:var(--ink);position:relative;text-align:left}
+  .appscreen{position:absolute;inset:0;display:flex;flex-direction:column;border-radius:31px;overflow:hidden;background:var(--cream)}
+  .sb{height:22px;flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px 0 24px;font-size:10.5px;font-weight:600;color:var(--ink3);margin-top:4px}
+  .tb{flex:none;display:flex;align-items:center;gap:9px;padding:7px 15px 9px}
+  .burger{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ink3);background:var(--sand);cursor:pointer;flex:none}
+  .tb .tt{font-size:14px;font-weight:700}
+  .tb .tt small{font-size:9.5px;font-weight:500;color:var(--ink4);display:block;margin-top:1px}
+  .tb .avx{margin-left:auto;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 34% 30%,var(--orange),var(--navy))}
+  .vswitch{margin:0 15px 8px;flex:none;display:flex;background:var(--sand);border-radius:999px;padding:3px;gap:2px}
+  .vswitch span{flex:1;text-align:center;font-size:11px;font-weight:600;color:var(--ink3);padding:6px 0;border-radius:999px;cursor:pointer}
+  .vswitch span.on{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(17,24,39,.06)}
+  .body{flex:1;overflow:hidden;padding:2px 15px;display:flex;flex-direction:column}
+  .sec{font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--ink4);margin:12px 0 6px}
+  .sec:first-child{margin-top:2px}
+  .grp{background:var(--sand);border-radius:13px;padding:3px 12px}
+  .grow{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:11.5px;color:var(--ink)}
+  .grow:last-child{border-bottom:0}
+  .grow .r{margin-left:auto;color:var(--ink4);font-size:10.5px}
+  .gdate{font-size:9.5px;color:var(--ink4);margin-bottom:3px}
+  .glance{font-size:12.5px;line-height:1.55;color:var(--ink);padding:2px 1px}
+  .glance b{color:var(--or700)}
+  .focus{background:var(--or50);border:1px solid rgba(225,112,60,.25);border-radius:14px;padding:12px 13px}
+  .focus .fl{font-size:9px;font-weight:700;color:var(--or700);margin-bottom:4px}
+  .focus .ft{font-size:12.5px;font-weight:700;line-height:1.45}
+  .trend{display:flex;align-items:flex-end;gap:6px;margin:10px 0 3px;height:28px}
+  .trend i{width:17px;border-radius:4px 4px 0 0;background:var(--navy);opacity:.4}
+  .trend i.hi{opacity:1;background:var(--orange)}
+  .trend span{font-size:9px;color:var(--or700);align-self:center;margin-left:4px;line-height:1.4}
+  .frow2{display:flex;align-items:center;gap:9px;padding:10px 1px;font-size:12px;font-weight:600;color:var(--ink)}
+  .frow2 .st2{font-size:9px;font-weight:700;color:var(--ink4);background:var(--sand);padding:3px 8px;border-radius:99px}
+  .dirrow{display:flex;align-items:center;gap:6px;padding:10px 1px;font-size:11px;color:var(--ink3);border-top:1px solid var(--bd)}
+  .dirrow b{color:var(--navy);font-weight:600}
+  .dirrow .chev{margin-left:auto;color:var(--ink4)}
+  .qops{display:flex;gap:8px;margin-top:11px}
+  .qops span{flex:1;text-align:center;font-size:11px;font-weight:700;padding:9px 0;border-radius:11px}
+  .qops .a{background:var(--orange);color:#fff}
+  .qops .b2{border:1.5px dashed var(--navy100);color:var(--navy)}
+  .srcb{font-size:8px;font-weight:700;padding:2px 6px;border-radius:5px;flex:none}
+  .srcb.org{background:var(--pinet);color:var(--pine)}
+  .srcb.home{background:var(--saget);color:#5d6f65}
+  .photo{border-radius:10px;background:linear-gradient(140deg,#DCD6C6,#C9C2AE);display:grid;place-items:center;color:#8b8574}
+  .photo svg{width:20px;height:20px}
+  .fchips{display:flex;gap:5px;flex:none;padding:2px 0 4px}
+  .fchips span{font-size:9.5px;font-weight:600;color:var(--ink3);border-radius:999px;padding:4px 9px;background:var(--sand)}
+  .fchips span.on{background:var(--navy);color:#fff}
+  .anchor{display:flex;align-items:baseline;gap:7px;margin:10px 0 7px}
+  .anchor b{font-size:11px;font-weight:700}
+  .anchor i{font-style:normal;font-size:9px;color:var(--ink4)}
+  .anchor::after{content:"";flex:1;height:1px;background:var(--bd2);align-self:center}
+  .mile{background:var(--paper);border:1.5px solid var(--orange);border-radius:14px;padding:10px 11px;position:relative;margin-top:6px}
+  .mile .star{position:absolute;top:-9px;left:11px;background:var(--orange);color:#fff;font-size:8.5px;font-weight:700;padding:2px 9px;border-radius:99px}
+  .mile .mt{display:flex;justify-content:space-between;align-items:baseline;margin-top:7px}
+  .mile .mt b{font-size:12px}
+  .mile .mt span{font-size:9px;color:var(--ink4)}
+  .flrow{display:flex;gap:9px;align-items:center;padding:8px 1px;border-bottom:1px solid var(--bd)}
+  .flrow:last-child{border-bottom:0}
+  .flrow .thumb{width:36px;height:36px;flex:none}
+  .flrow .tx{flex:1;font-size:11px;line-height:1.45}
+  .flrow .tx small{display:block;font-size:8.5px;color:var(--ink4);margin-top:1px}
+  .datebar{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;
+    background:var(--paper);border:1px solid var(--bd);border-radius:12px}
+  .datebar .nav2{color:var(--ink4);font-size:15px;font-weight:700;cursor:pointer}
+  .datebar .nav2.off{opacity:.22}
+  .datebar b{flex:1;text-align:center;font-size:12px}
+  .datebar svg{width:15px;height:15px;color:var(--navy5)}
+  .stat4{display:grid;grid-template-columns:repeat(2,1fr);gap:0 14px;background:var(--sand);border-radius:13px;padding:4px 13px}
+  .stat{padding:8px 0;border-bottom:1px solid var(--bd)}
+  .stat:nth-last-child(-n+2){border-bottom:0}
+  .stat .k{font-size:9.5px;color:var(--ink4)}
+  .stat .v{font-size:14px;font-weight:700;margin-top:2px}
+  .stat .v small{font-size:9.5px;font-weight:400;color:var(--ink3)}
+  .bub-group{position:absolute;right:12px;bottom:20px;width:44px;height:44px;border-radius:50%;
+    background:var(--navy);display:grid;place-items:center;box-shadow:0 10px 22px -8px rgba(31,51,84,.6);
+    border:2.5px solid var(--cream);cursor:pointer;z-index:5}
+  .bub-group svg{width:20px;height:20px}
+  .bub-group .bdg{position:absolute;top:-3px;right:-3px;background:var(--orange);color:#fff;font-size:8px;font-weight:700;border-radius:99px;padding:1px 5px;border:2px solid var(--cream)}
+
+  .ovl{position:absolute;inset:0;z-index:10;display:none}
+  .ovl.show{display:block}
+  .ovl .oscrim{position:absolute;inset:0;background:rgba(20,25,35,.36);border-radius:31px}
+  .drawer{position:absolute;left:0;top:0;bottom:0;width:79%;background:var(--float);
+    border-radius:31px 18px 18px 31px;box-shadow:0 12px 32px rgba(17,24,39,.18);
+    display:flex;flex-direction:column;padding:24px 11px 13px}
+  .vsgrp{background:var(--sand);border-radius:12px;padding:4px;display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
+  .vsrow{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--ink3);padding:8px 10px;border-radius:9px;cursor:pointer}
+  .vsrow.on{background:var(--paper);color:var(--navy);box-shadow:0 1px 2px rgba(17,24,39,.06)}
+  .vsrow .ck2{margin-left:auto;color:var(--orange);font-weight:800}
+  .vsrow svg{width:14px;height:14px}
+  .drl{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--ink4);padding:9px 10px 4px}
+  .dritem{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink3);padding:8px 10px;border-radius:9px;cursor:pointer}
+  .dritem.on{background:var(--sand2);color:var(--navy);font-weight:700}
+  .dritem svg{width:15px;height:15px}
+  .dritem .r2{margin-left:auto;font-size:9.5px;color:var(--ink4)}
+  .drfoot{margin-top:auto;border-top:1px solid var(--bd);padding-top:5px}
+  .kidrow2{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;font-size:12px;font-weight:600}
+  .kidrow2 .ka{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 34% 30%,var(--orange),var(--navy))}
+  .kidrow2 .ck2{margin-left:auto;color:var(--orange);font-weight:800}
+
+  .airoom{background:#FAF7EF}
+  .starmk{width:30px;height:30px;border-radius:10px;background:var(--or100);display:grid;place-items:center;color:var(--or700);flex:none;font-size:13px}
+  .privb{margin-left:auto;font-size:8.5px;font-weight:700;color:var(--navy);background:var(--navy50);padding:3px 8px;border-radius:99px}
+  .chat{flex:1;overflow:hidden;padding:4px 15px;display:flex;flex-direction:column;gap:9px}
+  .aiblk{position:relative;align-self:stretch;font-size:11.5px;line-height:1.6;color:var(--ink);padding-left:19px;max-width:95%}
+  .aiblk::before{content:"✦";position:absolute;left:2px;top:2px;font-size:10px;color:var(--orange)}
+  .mybub{align-self:flex-end;max-width:84%;background:var(--paper);border:1px solid var(--bd2);color:var(--ink);
+    font-size:11.5px;line-height:1.55;padding:8px 11px;border-radius:13px;border-bottom-right-radius:4px}
+  .chipline{display:flex;gap:6px;margin-top:7px}
+  .chipline span{font-size:9.5px;font-weight:700;color:var(--navy);background:var(--navy50);padding:4px 10px;border-radius:99px}
+  .kds2{display:flex;gap:6px;margin-top:7px}
+  .kds2 i{width:24px;height:24px;border-radius:50%}
+  .sendcard{align-self:stretch;border:1.5px solid var(--orange);border-radius:13px;padding:9px 10px;background:var(--paper)}
+  .sendcard .sl{font-size:8.5px;font-weight:700;color:var(--or700);margin-bottom:6px}
+  .sendcard .pv{background:var(--navy);color:#fff;font-size:11px;line-height:1.5;padding:8px 10px;
+    border-radius:11px;border-bottom-right-radius:4px;margin-left:22px}
+  .sendcard .acts{display:flex;gap:7px;margin-top:8px;justify-content:flex-end}
+  .sendcard .acts span{font-size:10px;font-weight:700;padding:5px 12px;border-radius:99px;cursor:pointer}
+  .sendcard .acts .go2{background:var(--orange);color:#fff}
+  .sendcard .acts .ed2{border:1px solid var(--bd2);color:var(--ink3)}
+  .rcptrow{display:flex;gap:5px;margin-top:8px}
+  .rcptrow span{font-size:8.5px;font-weight:700;color:var(--succ);background:var(--succbg);padding:2px 8px;border-radius:99px}
+  .suggrow{flex:none;display:flex;gap:6px;padding:0 15px 6px}
+  .suggrow span{font-size:9.5px;color:var(--navy);background:var(--navy50);border-radius:99px;padding:4px 10px}
+  .inbar{flex:none;margin:5px 13px 11px;background:var(--paper);border:1px solid var(--bd2);
+    border-radius:999px;padding:7px 8px 7px 13px;display:flex;align-items:center;gap:8px}
+  .inbar .ph{flex:1;font-size:10.5px;color:var(--ink5)}
+  .inbar .mic{width:25px;height:25px;border-radius:50%;background:var(--orange);display:grid;place-items:center;flex:none}
+  .inbar .mic svg{width:13px;height:13px}
+
+  .thead2{padding:5px 15px 7px;flex:none;display:flex;align-items:center;gap:9px}
+  .thead2 .tt{font-size:14px;font-weight:700}
+  .thead2 .tt small{font-size:9.5px;font-weight:400;color:var(--ink4);margin-left:4px}
+  .organize{margin-left:auto;display:flex;align-items:center;gap:5px;background:var(--orange);color:#fff;
+    font-size:10.5px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer}
+  .organize svg{width:12px;height:12px}
+  .kstrip{display:flex;gap:6px;padding:0 15px 7px;flex:none}
+  .kid{width:24px;height:24px;border-radius:50%;position:relative}
+  .kid.warn::after{content:"";position:absolute;right:-1px;bottom:-1px;width:8px;height:8px;border-radius:50%;background:var(--orange);border:2px solid var(--cream)}
+  .tstamp{font-size:8.5px;color:var(--ink4);text-align:center;margin:6px 0 5px}
+  .raw{display:flex;gap:6px;margin-bottom:4px}
+  .rawtx{font-size:11.5px;line-height:1.5;color:var(--ink);padding:1px 1px 5px}
+  .aicard{background:var(--paper);border:1.5px solid var(--orange);border-radius:14px;padding:10px 11px 8px;margin:5px 0;transition:opacity .4s,transform .4s}
+  .aicard .ahd{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .aicard .ahd .ai{font-size:9px;font-weight:700;color:var(--or700);display:flex;align-items:center;gap:4px}
+  .aicard .ahd .ai svg{width:10px;height:10px}
+  .aicard .ahd .cd{margin-left:auto;font-size:9.5px;font-weight:700;color:var(--or700);font-variant-numeric:tabular-nums}
+  .aicard .arow{display:flex;align-items:center;gap:8px}
+  .aicard .kds{display:flex}
+  .aicard .kds i{width:22px;height:22px;border-radius:50%;border:2px solid var(--paper);margin-left:-6px}
+  .aicard .kds i:first-child{margin-left:0}
+  .aicard .atx{font-size:11.5px;font-weight:700;line-height:1.35}
+  .aicard .atx small{display:block;font-size:9px;font-weight:400;color:var(--ink4);margin-top:2px}
+  .cdbar{height:4px;border-radius:99px;background:var(--or100);margin-top:8px;overflow:hidden}
+  .cdbar i{display:block;height:100%;width:100%;border-radius:99px;background:var(--orange)}
+  .aicard.q{border-color:var(--bd2);opacity:.88}
+  .aicard.q .ahd .ai{color:var(--ink4)}
+  .aicard.gone{opacity:0;transform:translateY(-6px)}
+  .strow{display:flex;align-items:center;gap:7px;padding:7px 2px;font-size:10.5px;color:var(--ink3)}
+  .strow .ok{color:var(--succ);font-weight:700}
+  .strow .r{margin-left:auto;color:var(--ink4);font-size:9.5px}
+  .strow.dim2{color:var(--ink4);font-size:10px}
+  .fab{position:absolute;left:50%;transform:translateX(-50%);bottom:22px;width:46px;height:46px;
+    border-radius:50%;background:var(--orange);display:grid;place-items:center;cursor:pointer;
+    box-shadow:0 10px 22px -8px rgba(199,93,44,.55);border:3px solid var(--cream);z-index:5}
+  .fab svg{width:20px;height:20px}
+  .tinput{flex:none;margin:4px 13px 9px;display:flex;align-items:center;gap:7px;background:var(--paper);
+    border:1px solid var(--bd2);border-radius:999px;padding:6px 8px 6px 13px}
+  .tinput .ph{flex:1;font-size:10.5px;color:var(--ink5)}
+  .tinput svg{width:16px;height:16px;color:var(--ink3)}
+
+  .sheet{position:absolute;left:0;right:0;bottom:0;top:52px;background:var(--cream);
+    border-radius:22px 22px 31px 31px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,.22)}
+  .sheet .grab{width:36px;height:4px;border-radius:99px;background:var(--sand2);margin:8px auto 6px;cursor:pointer;padding:4px 0;background-clip:content-box}
+  .segh{margin:0 13px 6px;flex:none;display:flex;background:var(--sand);border-radius:999px;padding:3px;gap:2px}
+  .segh span{flex:1;text-align:center;font-size:11px;font-weight:600;color:var(--ink3);padding:6px 0;border-radius:999px;display:flex;justify-content:center;gap:5px;align-items:center;cursor:pointer}
+  .segh span.on{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(17,24,39,.06)}
+  .segh .b3{background:var(--orange);color:#fff;font-size:8px;font-weight:700;border-radius:99px;padding:0 5px;line-height:13px}
+  .memline{flex:none;text-align:center;font-size:9px;color:var(--ink4);padding-bottom:5px}
+  .gchat{flex:1;overflow:hidden;padding:5px 13px;display:flex;flex-direction:column;gap:9px}
+  .ailb{align-self:flex-start;font-size:8.5px;color:var(--ink4);margin:0 0 -6px 4px}
+  .hbub{align-self:flex-start;max-width:84%;background:var(--paper);border:1px solid var(--bd);color:var(--ink);
+    font-size:11.5px;line-height:1.55;padding:8px 11px;border-radius:13px;border-bottom-left-radius:4px}
+  .hme{align-self:flex-end;max-width:84%;background:var(--navy);color:#fff;font-size:11.5px;line-height:1.55;
+    padding:8px 11px;border-radius:13px;border-bottom-right-radius:4px}
+  .readrow{align-self:flex-end;font-size:8.5px;color:var(--ink4);margin-top:-6px}
+  .syschip{align-self:center;font-size:8.5px;font-weight:700;color:var(--navy);background:var(--navy50);padding:3px 10px;border-radius:99px}
+  .ginput{flex:none;margin:5px 11px 11px;display:flex;align-items:center;gap:7px;background:var(--paper);
+    border:1px solid var(--bd2);border-radius:999px;padding:6px 9px 6px 12px}
+  .ginput .ph{flex:1;font-size:10.5px;color:var(--ink5)}
+  .gpics{display:flex;gap:5px;margin-top:5px}
+
+  .grhead{flex:none;display:flex;align-items:center;gap:9px;padding:7px 15px 9px}
+  .grhead .back{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ink3);background:var(--sand);cursor:pointer;font-size:15px;font-weight:700}
+  .grhead .tt{font-size:14px;font-weight:700}
+  .grrow{display:flex;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid var(--bd)}
+  .grrow:last-child{border-bottom:0}
+  .grrow .gt2{flex:1;font-size:11.5px;font-weight:600}
+  .grrow .gt2 small{display:block;font-size:9px;font-weight:400;color:var(--ink4);margin-top:2px}
+  .sw{width:34px;height:20px;border-radius:99px;background:var(--succ);position:relative;cursor:pointer;flex:none;transition:.2s}
+  .sw::after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+  .sw.off{background:var(--sand2)}
+  .sw.off::after{right:16px}
+  .grnote{font-size:9.5px;color:var(--ink4);line-height:1.55;padding:10px 2px}
+
+  .ibrow{display:flex;gap:10px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--bd);cursor:pointer}
+  .ibrow:last-child{border-bottom:0}
+  .ibrow .iav{width:36px;height:36px;border-radius:11px;flex:none}
+  .ibrow .t2{flex:1;min-width:0}
+  .ibrow .t2 b{font-size:12px;display:block}
+  .ibrow .t2 small{font-size:9.5px;color:var(--ink4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:140px}
+  .ibrow .meta2{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .ibrow .meta2 i{font-style:normal;font-size:8.5px;color:var(--ink4)}
+  .ubdg{background:var(--orange);color:#fff;font-size:8.5px;font-weight:700;border-radius:99px;padding:1px 6px}
+
+  .cam{position:absolute;inset:0;z-index:20;background:#1a1d18;border-radius:31px;display:none;flex-direction:column}
+  .cam.show{display:flex}
+  .cam .camtop{flex:none;display:flex;justify-content:flex-end;padding:16px 16px 0}
+  .cam .camx{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;
+    display:grid;place-items:center;font-size:14px;cursor:pointer}
+  .cam .view{flex:1;margin:12px 14px;border-radius:14px;background:linear-gradient(150deg,#8f9b84 0%,#b9ad8e 55%,#d3c7a4 100%);
+    position:relative;overflow:hidden}
+  .cam .view::before{content:"";position:absolute;inset:0;
+    background:linear-gradient(transparent 32.5%,rgba(255,255,255,.14) 33%,transparent 33.5%,transparent 65.5%,rgba(255,255,255,.14) 66%,transparent 66.5%),
+    linear-gradient(90deg,transparent 32.5%,rgba(255,255,255,.14) 33%,transparent 33.5%,transparent 65.5%,rgba(255,255,255,.14) 66%,transparent 66.5%)}
+  .cam .k1{position:absolute;left:24%;bottom:14%;width:44px;height:64px;border-radius:16px 16px 8px 8px;background:rgba(60,58,48,.5)}
+  .cam .k1::before{content:"";position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;background:rgba(60,58,48,.5)}
+  .cam .k2{position:absolute;right:22%;bottom:20%;width:38px;height:52px;border-radius:14px 14px 7px 7px;background:rgba(60,58,48,.38)}
+  .cam .k2::before{content:"";position:absolute;top:-19px;left:50%;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;background:rgba(60,58,48,.38)}
+  .cam .cambot{flex:none;display:flex;justify-content:center;padding:6px 0 26px}
+  .shutter{width:56px;height:56px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.25);cursor:pointer}
+  .flash{position:absolute;inset:0;background:#fff;border-radius:31px;opacity:0;pointer-events:none;z-index:30;transition:opacity .12s}
+  .flash.on{opacity:.9}
+
+  .kid{cursor:pointer}
+  .sched{flex:none;display:flex;gap:5px;padding:0 15px 7px;overflow:hidden;cursor:pointer}
+  .sc{font-size:9px;font-weight:700;color:var(--ink3);background:var(--sand);border-radius:99px;padding:4px 9px;white-space:nowrap}
+  .sc.done{color:var(--ink4);font-weight:600}
+  .sc.now{background:var(--orange);color:#fff}
+  .schedfull{flex:none;margin:0 15px 7px;background:var(--sand);border-radius:12px;padding:3px 12px;display:none}
+  .schedfull.show{display:block}
+  .sfrow{display:flex;gap:9px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--bd);font-size:11px}
+  .sfrow:last-child{border-bottom:0}
+  .sfrow .t4{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:var(--ink4);width:34px;flex:none}
+  .sfrow b{font-weight:600}
+  .sfrow .n4{margin-left:auto;font-size:9px;color:var(--ink4)}
+  .sfrow.now b{color:var(--or700)}
+  .kidpanel{flex:none;margin:0 15px 7px;background:var(--paper);border:1px solid var(--bd);border-radius:13px;padding:10px 12px;display:none}
+  .kidpanel.show{display:block}
+  .kp-h{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .kp-h .ka2{width:24px;height:24px;border-radius:50%;flex:none}
+  .kp-h b{font-size:12px}
+  .kp-h .x2{margin-left:auto;color:var(--ink4);cursor:pointer;font-size:13px;font-weight:700}
+  .kp-stats{display:flex;gap:6px;margin-bottom:4px}
+  .kp-stats span{flex:1;text-align:center;font-size:8.5px;color:var(--ink4);background:var(--sand);border-radius:8px;padding:5px 2px}
+  .kp-stats b{display:block;font-size:10.5px;color:var(--ink);font-weight:700;margin-bottom:1px}
+  .kp-note{display:flex;gap:7px;align-items:baseline;font-size:10.5px;line-height:1.5;padding:5px 0;border-top:1px solid var(--bd)}
+  .kp-note .t4{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:var(--ink4);flex:none}
+  .kp-note.warn2{color:var(--or700);font-weight:600;border-top:0}
+  .kp-foot{display:flex;align-items:center;gap:6px;margin-top:4px}
+  .kp-tag{font-size:9px;font-weight:700;color:var(--or700);background:var(--or100);padding:3px 9px;border-radius:99px}
+  .kp-add{margin-left:auto;font-size:9.5px;font-weight:700;color:var(--navy);border:1px dashed var(--navy100);border-radius:99px;padding:3px 10px}
+  .rail{flex:none;display:flex;gap:8px;align-items:center;padding:2px 14px 8px;overflow:hidden}
+  .rit{position:relative;cursor:pointer;flex:none}
+  .rit .ra{width:33px;height:33px;border-radius:50%;display:grid;place-items:center}
+  .rit.sel .ra{box-shadow:0 0 0 2px var(--cream),0 0 0 3.5px var(--orange)}
+  .rit .rb{position:absolute;top:-4px;right:-4px;background:var(--orange);color:#fff;font-size:8px;font-weight:700;border-radius:99px;padding:1px 5px;border:2px solid var(--cream)}
+  .sheettitle{flex:none;text-align:center;font-size:9px;color:var(--ink4);padding-bottom:5px}
+  .fxempty{flex:1;display:grid;place-items:center;font-size:10.5px;color:var(--ink4)}
+  .dlv{display:flex;gap:8px;align-items:center}
+  .dlv .photo{width:40px;height:32px;flex:none}
+  .dlv .dt2{font-size:10.5px;line-height:1.45}
+  .dlv .dt2 small{display:block;font-size:8.5px;opacity:.8}
+  .stgbub{align-self:flex-end;max-width:86%;background:var(--navy50);border:1.5px dashed var(--navy100);
+    color:var(--ink);padding:8px 10px;border-radius:13px;border-bottom-right-radius:4px}
+  .stgbub .dt2 small{color:var(--ink4);opacity:1}
+  .stgtag{display:flex;align-items:center;gap:6px;margin-top:7px;font-size:8.5px;font-weight:700;color:var(--navy)}
+  .stgacts{margin-left:auto;display:flex;gap:5px}
+  .stgacts span{cursor:pointer;font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px}
+  .sgo{background:var(--navy);color:#fff}
+  .scancel{border:1px solid var(--bd2);color:var(--ink3)}
+
+  .journey{display:flex;align-items:stretch;gap:0;margin-top:46px}
+  .jstep{flex:1;position:relative;padding:0 10px}
+  .jstep .jn{width:34px;height:34px;border-radius:11px;background:var(--navy);color:#fff;display:grid;
+    place-items:center;font-size:15px;font-weight:800;margin-bottom:14px}
+  .jstep.hot .jn{background:var(--orange)}
+  .jstep .jt{font-size:17px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:5px}
+  .jstep .jd{font-size:13px;color:var(--ink4);line-height:1.5;max-width:20ch}
+  .jstep::after{content:"→";position:absolute;right:-7px;top:5px;color:var(--sand2);font-size:20px;font-weight:700}
+  .jstep:last-child::after{content:""}
+
+  .cmts{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px}
+  .cmt{border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:22px 24px;background:rgba(255,255,255,.04)}
+  .cmt .ct2{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--on-dark);margin-bottom:7px}
+  .cmt .cd3{font-size:14px;color:var(--on-dark2);line-height:1.6}
+  .cmt .ct2 em{font-style:normal;color:var(--or300)}
+  .qlist{margin-top:34px;display:flex;flex-direction:column;max-width:960px}
+  .qitem{display:flex;gap:18px;align-items:baseline;padding:15px 4px;border-bottom:1px solid var(--bd)}
+  .qitem:last-child{border-bottom:0}
+  .qitem .qn{flex:none;font-family:var(--serif);font-size:20px;font-weight:700;color:var(--or700);width:28px}
+  .qitem .qt{font-size:19px;font-weight:600;color:var(--ink);line-height:1.45}
+  .qitem .qs{font-size:13.5px;color:var(--ink4);margin-left:10px}
+  .pilot{display:flex;gap:20px;margin-top:38px}
+  .pcard{flex:1;background:var(--paper);border:1px solid var(--bd);border-radius:16px;padding:22px 24px}
+  .pcard .pn{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--or700);margin-bottom:8px}
+  .pcard .pt2{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--ink);line-height:1.3}
+  .pcard .pd2{font-size:13.5px;color:var(--ink4);line-height:1.55;margin-top:7px}
+
+  .webwrap{width:1000px;transform:scale(.92);transform-origin:top left;margin-top:22px}
+  .mtw{display:flex;height:440px;background:var(--cream);color:var(--ink);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+  .mtw .side{width:172px;flex:none;margin:10px;background:var(--float);border-radius:14px;
+    box-shadow:0 4px 12px rgba(17,24,39,.06);padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+  .mtw .brand{display:flex;align-items:center;gap:8px;padding:2px 6px 10px}
+  .mtw .brand i{width:24px;height:24px;border-radius:7px;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;font-style:normal}
+  .mtw .brand b{font-size:12.5px;display:block;line-height:1.15}
+  .mtw .brand small{font-size:9.5px;color:var(--ink4)}
+  .mtw .nit{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink3);padding:7px 10px;border-radius:8px}
+  .mtw .nit.on{background:var(--sand2);color:var(--navy);font-weight:600}
+  .mtw .nit .ct{margin-left:auto;font-size:9.5px;font-family:ui-monospace,Menlo,monospace;color:var(--or700)}
+  .mtw .main{flex:1;padding:14px 20px 0;display:flex;flex-direction:column;overflow:hidden}
+  .mtw .crumb{font-size:11.5px;color:var(--ink4);margin-bottom:10px}
+  .mtw .crumb b{color:var(--ink);font-size:13.5px;font-weight:700}
+  .mtw .toolbar{display:flex;align-items:center;margin-bottom:12px}
+  .mtw .segw{display:inline-flex;gap:2px;padding:3px;background:var(--sand);border-radius:999px}
+  .mtw .segw span{font-size:11px;font-weight:500;color:var(--ink3);padding:5px 11px;border-radius:999px;display:flex;gap:5px;align-items:center}
+  .mtw .segw span.on{background:var(--paper);color:var(--ink);font-weight:600}
+  .mtw .segw .c{font-size:9.5px;font-family:ui-monospace,Menlo,monospace;color:var(--or700)}
+  .mtw .pill{margin-left:auto;background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:7px 14px;border-radius:999px}
+  .mtw .stats{display:flex;gap:34px;margin-bottom:12px}
+  .mtw .st .f{font-size:22px;font-weight:700;font-family:var(--serif);line-height:1.1}
+  .mtw .st .l{font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--ink4);margin-top:2px}
+  .mtw .cols{display:flex;gap:14px;flex:1;overflow:hidden;padding-bottom:14px}
+  .mtw .quiet{flex:1.4;background:var(--sand);border-radius:14px;padding:3px 13px;align-self:flex-start}
+  .mtw .rowi{display:flex;align-items:center;gap:9px;padding:9px 2px;border-bottom:1px solid var(--bd);font-size:11.5px}
+  .mtw .rowi:last-child{border-bottom:0}
+  .mtw .rowi .avm{width:22px;height:22px;border-radius:50%;flex:none}
+  .mtw .rowi .who b{display:block;font-size:12px;line-height:1.2}
+  .mtw .rowi .who small{font-size:10px;color:var(--ink4)}
+  .mtw .rowi .bdg{margin-left:auto;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px}
+  .mtw .bdg.ok{background:var(--succbg);color:var(--succ)}
+  .mtw .bdg.wt{background:var(--warnbg);color:var(--warn)}
+  .mtw .rowi .tm{font-size:9.5px;font-family:ui-monospace,Menlo,monospace;color:var(--ink4)}
+  .mtw .insight{flex:1;background:var(--paper);border-radius:14px;padding:14px 15px;align-self:flex-start;border:1px solid var(--bd)}
+  .mtw .insight .cap2{font-size:9.5px;font-weight:700;letter-spacing:.08em;color:var(--ink4);text-transform:uppercase;margin-bottom:7px}
+  .mtw .insight .narr{font-family:var(--serif);font-size:13.5px;line-height:1.5;margin-bottom:10px}
+  .mtw .insight .narr b{color:var(--navy)}
+  .mtw .insight .hair{height:1px;background:var(--bd);margin-bottom:8px}
+  .mtw .insight .br{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;color:var(--ink3)}
+  .mtw .insight .br b{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--navy);font-weight:600}
+
+  .pulse-row{display:flex;gap:9px}
+  .pulse-row .pt{flex:1;background:var(--sand);border-radius:13px;padding:10px 11px}
+  .pulse-row .pt b{font-size:15px;font-weight:700;display:block;font-family:var(--serif)}
+  .pulse-row .pt b small{font-size:9.5px;font-weight:400;color:var(--ink3);font-family:var(--sans)}
+  .pulse-row .pt span{font-size:9px;color:var(--ink4)}
+  .flowrow{display:flex;align-items:center;gap:8px;background:var(--sand);border-radius:13px;padding:11px 13px;justify-content:space-between}
+  .flowrow .f{text-align:center}
+  .flowrow .f b{display:block;font-size:14px;font-weight:700}
+  .flowrow .f span{font-size:9px;color:var(--ink4)}
+  .flowrow .ar{color:var(--ink5);font-size:12px}
+  .ideabar{display:flex;align-items:flex-end;gap:4px;height:24px;margin-top:7px}
+  .ideabar i{width:11px;border-radius:3px 3px 0 0;background:var(--navy);opacity:.35}
+  .ideabar i.hi{opacity:1;background:var(--orange)}
+
+  .prog{position:fixed;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.10);z-index:40}
+  .prog i{display:block;height:100%;background:var(--orange);transition:width .4s ease;border-radius:0 3px 3px 0}
+  .pageno{position:fixed;top:13px;right:20px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.5);
+    z-index:40;font-variant-numeric:tabular-nums;letter-spacing:.05em}
+  .arrow{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.14);background:rgba(31,30,27,.92);color:#F5F2EA;
+    font-size:23px;cursor:pointer;display:grid;place-items:center;z-index:40;transition:background .18s;
+    box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .arrow:hover{background:var(--orange)}
+  .arrow:disabled{opacity:.25;cursor:default}
+  .arrow.l{left:16px}.arrow.r{right:16px}
+  .hint{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:11.5px;color:rgba(255,255,255,.32);z-index:40}
+  .editbar{position:fixed;left:16px;bottom:14px;z-index:50;display:flex;gap:8px}
+  .editbar button{appearance:none;border:1px solid rgba(255,255,255,.14);background:rgba(31,30,27,.92);
+    color:#F5F2EA;font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;
+    font-family:var(--sans);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .editbar button:hover{background:rgba(60,58,50,.95)}
+  .editbar button.on{background:var(--orange);border-color:var(--orange)}
+  :focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){.track{transition:none}}
+</style>
+
+<div class="deck"><div class="holder" id="holder"><div class="stage"><div class="track" id="track">
+
+  <!-- 01 title -->
+  <section class="slide dark">
+    <p class="eyebrow">先说我们想做什么</p>
+    <h1 style="margin-top:30px">把孩子的每一天<em>记下来</em>，<br>让家里和园里说得上话。</h1>
+    <p class="lede" style="margin-top:28px;max-width:48ch">孩子在园里的情况，现在散在老师手机、家长群和纸面记录里，<br>很多事过了就没了。我们想把这些整合到一起。</p>
+    <div class="footbar"><span class="tagpill">还在设想阶段 · 不是成品</span><span class="tagpill">界面里都是演示数据</span></div>
+  </section>
+
+  <!-- 02 storyline -->
+  <section class="slide">
+    <p class="eyebrow">从一件小事说起</p>
+    <h2 style="margin-top:20px">最近宝宝<span style="color:var(--or700)">要不到东西就哭闹</span>。<br>很常见的一件事，我们拿它举例。</h2>
+    <div class="journey">
+      <div class="jstep"><div class="jn">1</div><div class="jt">家里遇到的事</div><div class="jd">超市里躺地上哭，家长回家跟 AI 说了说</div></div>
+      <div class="jstep"><div class="jn">2</div><div class="jt">定成关注点</div><div class="jd">家里决定重点关注"想要什么用嘴说"</div></div>
+      <div class="jstep"><div class="jn">3</div><div class="jt">请老师一起留意</div><div class="jd">家长同意后，老师那边也会留意</div></div>
+      <div class="jstep hot"><div class="jn">4</div><div class="jt">园里的第一次</div><div class="jd">想要铲子没抢，说了"给我玩玩"</div></div>
+      <div class="jstep"><div class="jn">5</div><div class="jt">当天反馈到家</div><div class="jd">家长晚上就看到了；过两周一起看效果</div></div>
+    </div>
+    <p class="lede" style="margin-top:44px">下面是两台手机，一台家长的，一台老师的，这件事的每一步都能点开看。</p>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>示例宝宝 · 2岁3个月 · 入托第6周</span><span class="ftag">人名和数据都是虚构的</span></div>
+  </section>
+
+  <!-- 03 parent phone -->
+  <section class="slide">
+    <p class="eyebrow">家长这边</p>
+    <div class="demo-grid">
+      <div class="phonebox"><div class="phone"><div class="scr">
+
+        <div class="appscreen" id="ps-board">
+          <div class="sb"><span>9:41</span><span>●●●</span></div>
+          <div class="tb"><span class="burger" data-open="ps-drawer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+            <div class="tt">宝宝<small>2岁3个月 · 入托第6周</small></div><span class="avx"></span></div>
+          <div class="vswitch" id="p4sw"><span class="on" data-v="a">养育</span><span data-v="b">成长线</span><span data-v="c">园区</span></div>
+          <div class="body" data-p4="a">
+            <div class="gdate">7月21日 周三</div>
+            <div class="glance">今天在园里主动说了<b>"给我玩玩"</b>。</div>
+            <div class="sec">当前关注</div>
+            <div class="focus">
+              <div class="fl">第 2 周 · 始于 7月7日</div>
+              <div class="ft">想要什么用嘴说，慢慢能接受"等一下"</div>
+              <div class="trend"><i style="height:9px"></i><i style="height:17px"></i><i class="hi" style="height:28px"></i>
+                <span>每周表达次数 2 → 3 → 5<br>本周观察 · 园所 3 · 家 2</span></div>
+            </div>
+            <div class="frow2">睡前安抚过渡<span class="st2">第 1 周</span></div>
+            <div class="dirrow"><b>尊重表达</b> · 学会与情绪相处<span class="chev">›</span></div>
+            <div class="qops"><span class="b2">＋ 关注点</span><span class="a">记一笔</span></div>
+          </div>
+          <div class="body" data-p4="b" style="display:none">
+            <div class="fchips"><span class="on">全部</span><span>照片</span><span>里程碑</span><span>园所</span><span>家庭</span></div>
+            <div class="anchor"><b>7月 · 第3周</b><i>入托第6周</i></div>
+            <div class="mile"><span class="star">★ 第一次</span>
+              <div class="photo" style="height:66px;margin-top:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+              <div class="mt"><b>第一次用语言代替哭闹</b><span>7月16日</span></div></div>
+            <div style="margin-top:5px">
+              <div class="flrow"><div class="photo thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+                <div class="tx">沙池合作游戏<small>7月18日</small></div><span class="srcb org">园所</span></div>
+              <div class="flrow"><div class="tx">散步看到小狗，主动说"狗狗"<small>7月19日 傍晚</small></div><span class="srcb home">家·祖辈</span></div>
+            </div>
+            <div class="anchor"><b>7月 · 第2周</b><i>入托第5周</i></div>
+            <div class="flrow"><div class="tx">午餐自己用勺，吃完大半碗<small>7月11日</small></div><span class="srcb org">园所</span></div>
+          </div>
+          <div class="body" data-p4="c" style="display:none">
+            <div class="datebar" style="margin-bottom:2px"><span class="nav2" id="p4prev">‹</span><b id="p4date">今天 · 7月21日 周三</b><span class="nav2 off" id="p4next">›</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+            <div class="sec">在园</div>
+            <div class="stat4" id="p4stats">
+              <div class="stat"><div class="k">入园</div><div class="v">8:32</div></div>
+              <div class="stat"><div class="k">午睡</div><div class="v">1<small>小时</small>20<small>分</small></div></div>
+              <div class="stat"><div class="k">三餐</div><div class="v">良好</div></div>
+              <div class="stat"><div class="k">饮水</div><div class="v">4<small>次</small></div></div>
+            </div>
+            <div class="sec">动态</div>
+            <div class="flrow" style="border:0" id="p4dyn"><div class="photo thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+              <div class="tx">户外 · 沙池<small>10:24</small></div></div>
+            <div class="sec">通知</div>
+            <div class="grp"><div class="grow">春季亲子日报名<span class="r">›</span></div><div class="grow">本周食谱<span class="r">›</span></div></div>
+          </div>
+          <div class="bub-group" id="pBubble"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8a5 5 0 1 0-9.6 2M17 8a5 5 0 0 1-5 5H7l-3 3V8a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5Z"/></svg><span class="bdg">4</span></div>
+        </div>
+
+        <div class="appscreen airoom" id="ps-assist" style="display:none">
+          <div class="sb"><span>9:41</span><span>●●●</span></div>
+          <div class="tb"><span class="burger" data-open="ps-drawer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+            <span class="starmk">✦</span><div class="tt">助手</div><span class="privb">仅家庭可见</span></div>
+          <div class="chat">
+            <div class="mybub">今天在超市又因为要糖果躺地上了，我没答应，她哭了好一阵</div>
+            <div class="aiblk">记下来了。这周第 2 次了，都是想要的东西没得到的时候——正是你们在关注的方向。
+              <span class="chipline"><span>已记入 · 关注点</span></span></div>
+            <div class="aiblk">要不要跟老师说一声？园里明天也好留意。</div>
+            <div class="sendcard" id="p3card">
+              <div class="sl">将发出 → 老师们</div>
+              <div class="pv">昨晚孩子因为没买糖果闹了情绪，白天麻烦老师留意下她要不到东西时的反应</div>
+              <div class="acts"><span class="ed2">改一改</span><span class="go2" id="p3send">发给老师</span></div>
+            </div>
+          </div>
+          <div class="suggrow"><span>最近哭闹少了吗</span><span>看看这周的情况</span></div>
+          <div class="inbar"><span class="ph">说点什么…</span><span class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+        </div>
+
+        <div class="appscreen" id="ps-grant" style="display:none">
+          <div class="sb"><span>9:41</span><span>●●●</span></div>
+          <div class="grhead"><span class="back" id="grBack">‹</span><div class="tt">授权</div></div>
+          <div class="body">
+            <div class="sec">园所可见 · 随时可撤</div>
+            <div class="grp" style="padding:2px 13px">
+              <div class="grrow"><div class="gt2">日常与活动记录<small>吃睡、活动、老师观察</small></div><span class="sw" data-sw></span></div>
+              <div class="grrow"><div class="gt2">照片与影像<small>含合照政策，园所另行约定</small></div><span class="sw" data-sw></span></div>
+              <div class="grrow"><div class="gt2">观察与关注点协同<small>家里定的关注点，老师帮着看</small></div><span class="sw" data-sw></span></div>
+            </div>
+            <div class="grnote">每一次数据流动都有回执；撤回后园所端即刻不可见，并向双方留痕。</div>
+          </div>
+        </div>
+
+        <div class="ovl" id="ps-drawer">
+          <div class="oscrim" data-close="ps-drawer"></div>
+          <div class="drawer">
+            <div class="vsgrp" id="p7vs">
+              <div class="vsrow on" data-l="baby"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-2 0-3.5 1.6-3.5 3.6 0 1.4.8 2.6 2 3.2C8 10.6 6 13 6 16v2h12v-2c0-3-2-5.4-4.5-6.2 1.2-.6 2-1.8 2-3.2C15.5 4.6 14 3 12 3Z"/></svg>宝宝视图<span class="ck2">✓</span></div>
+              <div class="vsrow" data-l="gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/></svg>通用视图</div>
+            </div>
+            <div id="p7baby">
+              <div class="dritem on" id="dnav-board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>看板</div>
+              <div class="dritem" id="dnav-assist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/></svg>助手</div>
+              <div class="drl">孩子</div>
+              <div class="kidrow2"><span class="ka"></span>宝宝<span class="ck2">✓</span></div>
+              <div class="dritem" style="font-size:11px;color:var(--ink4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>添加孩子</div>
+              <div class="drl">快捷</div>
+              <div class="dritem" style="padding:6px 10px;font-size:11px" data-q="a">养育</div>
+              <div class="dritem" style="padding:6px 10px;font-size:11px" data-q="b">成长线</div>
+              <div class="dritem" style="padding:6px 10px;font-size:11px" data-q="c">园区</div>
+            </div>
+            <div id="p7gen" style="display:none">
+              <div class="dritem on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12Z"/></svg>聊天</div>
+              <div class="dritem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 10h16M4 14h10"/></svg>论坛</div>
+              <div class="dritem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>看板</div>
+              <div class="drl">最近会话</div>
+              <div class="dritem" style="padding:6px 10px;font-size:11px;color:var(--ink4)">周末去哪儿遛娃</div>
+              <div class="dritem" style="padding:6px 10px;font-size:11px;color:var(--ink4)">辅食有什么新做法</div>
+            </div>
+            <div class="drfoot">
+              <div class="dritem" id="dnav-grant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>授权<span class="r2">3 项生效中 ›</span></div>
+              <div class="dritem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.5-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.5 2 1.5A7 7 0 0 0 5 12"/></svg>设置</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ovl" id="ps-sheet">
+          <div class="oscrim" data-close="ps-sheet"></div>
+          <div class="sheet">
+            <div class="grab" data-close="ps-sheet"></div>
+            <div class="segh" id="p5seg"><span data-h="g">班级群<span class="b3">3</span></span><span class="on" data-h="t">老师们<span class="b3">1</span></span></div>
+            <div class="memline" id="p5mem">妈妈 · 爸爸 · 李老师 · 王老师</div>
+            <div class="gchat" data-p5="t">
+              <div class="hme">昨晚睡得比较晚，早上没吃什么，麻烦老师午餐多留意一下</div>
+              <div class="readrow">李老师已读</div>
+              <div class="syschip">已记入 · 今日叮嘱</div>
+              <div class="ailb">李老师</div>
+              <div class="hbub">收到，午餐我会注意，有情况随时同步</div>
+              <div class="ailb">李老师 · 12:35</div>
+              <div class="hbub">午餐吃了大半碗，状态不错
+                <div class="photo" style="height:52px;width:145px;margin-top:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div></div>
+              <div class="hme">太好了，谢谢老师！</div>
+            </div>
+            <div class="gchat" data-p5="g" style="display:none">
+              <div class="ailb">李老师 · 15:02</div>
+              <div class="hbub">今天的户外时光，大家一起搭了"大城堡"
+                <div class="gpics">
+                  <div class="photo" style="width:72px;height:54px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+                  <div class="photo" style="width:72px;height:54px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+                </div></div>
+              <div class="hme">谢谢老师！辛苦啦</div>
+              <div class="ailb">某家长 · 15:11</div>
+              <div class="hbub">请问明天亲子日需要带什么呀？</div>
+              <div class="ailb">李老师 · 15:14</div>
+              <div class="hbub">带一双室内鞋就可以，详情在园所通知里～</div>
+            </div>
+            <div class="ginput"><span class="ph">说点什么…</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A4843" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4.5 4.5 0 0 0 7 0M9 10h.01M15 10h.01"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A4843" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div>
+          </div>
+        </div>
+
+      </div></div></div>
+      <div class="notes">
+        <h2>家长这边，<br>就一个 App。</h2>
+        <div class="np"><span class="n">1</span><div><div class="t3">看板：孩子今天怎么样</div><div class="d3">上面切"养育 / 成长线 / 园区"；园区里点「‹」能翻回昨天。</div></div></div>
+        <div class="np"><span class="n">2</span><div><div class="t3">左上角三道杠是菜单</div><div class="d3">切视图、换孩子；进"助手"跟 AI 说话，可以试下<b>发给老师</b>；"授权"里能看到园里能看什么。</div></div></div>
+        <div class="np"><span class="n">3</span><div><div class="t3">右下角气泡是找人</div><div class="d3">班级群、老师都在这，用法和微信一样；区别是消息有回执，内容会存进孩子的记录。</div></div></div>
+      </div>
+    </div>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>家长手机 · 宝宝视图</span><span class="ftag">03</span></div>
+  </section>
+
+  <!-- 04 teacher phone -->
+  <section class="slide">
+    <p class="eyebrow">老师这边</p>
+    <div class="demo-grid">
+      <div class="phonebox"><div class="phone"><div class="scr">
+
+        <div class="appscreen" id="ts-stream">
+          <div class="sb"><span>9:41</span><span>●●●</span></div>
+          <div class="thead2"><span class="burger" data-open="ts-drawer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+            <span class="tt">小一班<small>周三 · 8/10</small></span>
+            <span class="organize" id="p6replay"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>整理</span></div>
+          <div class="kstrip" id="kstrip">
+            <div class="kid warn" data-k="0" style="background:#D8B49A"></div><div class="kid" data-k="1" style="background:#A9BFA9"></div>
+            <div class="kid" data-k="2" style="background:#C9B79A"></div><div class="kid" data-k="3" style="background:#B5C6BA"></div>
+            <div class="kid warn" data-k="4" style="background:#D5C4B2"></div><div class="kid" data-k="5" style="background:#9FB5A8"></div>
+            <div class="kid" data-k="6" style="background:#C7BBA6"></div><div class="kid" data-k="7" style="background:#B8AF9E"></div>
+          </div>
+          <div class="sched" id="sched">
+            <span class="sc done">晨间 ✓</span><span class="sc now">● 户外沙池</span><span class="sc">午餐</span><span class="sc">午睡</span><span class="sc">手工</span>
+          </div>
+          <div class="schedfull" id="schedFull">
+            <div class="sfrow"><span class="t4">8:00</span><b>晨间接待</b><span class="n4">✓ 已完成</span></div>
+            <div class="sfrow now"><span class="t4">10:00</span><b>户外 · 沙池</b><span class="n4">进行中 · 衔接"表达需求"练习</span></div>
+            <div class="sfrow"><span class="t4">11:30</span><b>午餐</b></div>
+            <div class="sfrow"><span class="t4">12:30</span><b>午睡</b></div>
+            <div class="sfrow"><span class="t4">15:00</span><b>亲子手工</b><span class="n4">理念活动 · 情绪认知</span></div>
+          </div>
+          <div class="kidpanel" id="kidPanel"></div>
+          <div class="body" style="padding-top:0" id="p6feed"></div>
+          <div class="tinput"><span class="ph">说点什么…</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+          <div class="fab" id="tFab"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
+          <div class="bub-group" id="tBubble"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8a5 5 0 1 0-9.6 2M17 8a5 5 0 0 1-5 5H7l-3 3V8a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5Z"/></svg><span class="bdg">4</span></div>
+          <div class="cam" id="ts-camera">
+            <div class="camtop"><span class="camx" id="camClose">×</span></div>
+            <div class="view"><span class="k1"></span><span class="k2"></span></div>
+            <div class="cambot"><span class="shutter" id="shutter"></span></div>
+          </div>
+          <div class="flash" id="flash"></div>
+        </div>
+
+        <div class="appscreen airoom" id="ts-assist" style="display:none">
+          <div class="sb"><span>9:41</span><span>●●●</span></div>
+          <div class="tb"><span class="burger" data-open="ts-drawer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+            <span class="starmk">✦</span><div class="tt">助手<small>小一班</small></div><span class="privb">仅你可见</span></div>
+          <div class="chat">
+            <div class="mybub">今天谁还没有午睡记录？</div>
+            <div class="aiblk">还有 2 位：
+              <span class="kds2"><i style="background:#C9B79A"></i><i style="background:#B5C6BA"></i></span>
+              <span class="chipline"><span>补记午睡</span></span></div>
+            <div class="aiblk">下午有 2 张卡待发布，1 张照片待关联。
+              <span class="chipline"><span>去班级流</span></span></div>
+            <div class="mybub">帮我把本周表达需求相关的观察汇总一下</div>
+            <div class="aiblk">共 5 条，涉及 2 位宝宝，已整理成周报草稿。
+              <span class="chipline"><span>查看草稿</span></span></div>
+          </div>
+          <div class="suggrow"><span>今天还缺哪些记录</span></div>
+          <div class="inbar"><span class="ph">说点什么…</span><span class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+        </div>
+
+        <div class="ovl" id="ts-sheet">
+          <div class="oscrim" data-close="ts-sheet"></div>
+          <div class="sheet">
+            <div class="grab" data-close="ts-sheet"></div>
+            <div class="rail" id="trail">
+              <div class="rit" data-r="g"><span class="ra" style="background:var(--navy)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8a5 5 0 1 0-9.6 2M17 8a5 5 0 0 1-5 5H7l-3 3V8a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5Z"/></svg></span><span class="rb">3</span></div>
+              <div class="rit" data-r="0"><span class="ra" style="background:#D8B49A"></span><span class="rb">1</span></div>
+              <div class="rit" data-r="1"><span class="ra" style="background:#A9BFA9"></span></div>
+              <div class="rit" data-r="2"><span class="ra" style="background:#C9B79A"></span></div>
+              <div class="rit" data-r="3"><span class="ra" style="background:#B5C6BA"></span></div>
+              <div class="rit" data-r="4"><span class="ra" style="background:#D5C4B2"></span></div>
+              <div class="rit" data-r="5"><span class="ra" style="background:#9FB5A8"></span></div>
+            </div>
+            <div class="sheettitle" id="tmem">小一班家长群 · 32 人</div>
+            <div class="gchat" data-tp="g">
+              <div class="hme">今天的户外时光，大家一起搭了"大城堡"
+                <div class="gpics">
+                  <div class="photo" style="width:72px;height:54px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+                  <div class="photo" style="width:72px;height:54px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div>
+                </div></div>
+              <div class="ailb">某家长 · 15:07</div>
+              <div class="hbub">谢谢老师！辛苦啦</div>
+              <div class="ailb">某家长 · 15:11</div>
+              <div class="hbub">请问明天亲子日需要带什么呀？</div>
+              <div class="hme">带一双室内鞋就可以，详情在园所通知里～</div>
+            </div>
+            <div class="gchat" data-tp="fx" style="display:none">
+              <div class="fxempty">和这个家庭还没有消息</div>
+            </div>
+            <div class="gchat" data-tp="fa" style="display:none">
+              <div class="ailb">妈妈 · 8:12</div>
+              <div class="hbub">昨晚睡得比较晚，早上没吃什么，麻烦老师午餐多留意一下</div>
+              <div class="syschip">已记入 · 今日叮嘱</div>
+              <div class="hme">收到，午餐我会注意，有情况随时同步</div>
+              <div class="hme">午餐吃了大半碗，状态不错
+                <div class="photo" style="height:52px;width:145px;margin-top:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg></div></div>
+              <div class="ailb">妈妈 · 12:41</div>
+              <div class="hbub">太好了，谢谢老师！</div>
+            </div>
+            <div class="ginput"><span class="ph">说点什么…</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A4843" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+          </div>
+        </div>
+
+        <div class="ovl" id="ts-drawer">
+          <div class="oscrim" data-close="ts-drawer"></div>
+          <div class="drawer">
+            <div class="vsgrp">
+              <div class="vsrow on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>班级视图<span class="ck2">✓</span></div>
+              <div class="vsrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/></svg>通用视图</div>
+            </div>
+            <div class="dritem on" id="tnav-stream"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>班级流</div>
+            <div class="dritem" id="tnav-assist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/></svg>助手</div>
+            <div class="drl">我的班级</div>
+            <div class="kidrow2"><span class="ka" style="background:radial-gradient(circle at 34% 30%,#9BB0A5,#283E68)"></span>小一班<span class="ck2">✓</span></div>
+            <div class="dritem" style="font-size:11px;color:var(--ink4)">小二班</div>
+            <div class="drfoot">
+              <div class="dritem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.5-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.5 2 1.5A7 7 0 0 0 5 12"/></svg>设置</div>
+            </div>
+          </div>
+        </div>
+
+      </div></div></div>
+      <div class="notes">
+        <h2>老师只需要拍照、说话，<br>剩下的交给系统。</h2>
+        <div class="np"><span class="n">1</span><div><div class="t3">点橙色相机拍一张</div><div class="d3">照片进班级流后 AI 会整理成一张卡，<b>15 秒倒计时结束进待发队列</b>；点一下卡片就暂停。</div></div></div>
+        <div class="np"><span class="n">2</span><div><div class="t3">右下角气泡找家长</div><div class="d3">整理好的内容先停在家长会话里，<b>17:00 统一发出</b>；点开"家庭 A"可以现在发送或撤回，老师自己打的字随时发。</div></div></div>
+        <div class="np"><span class="n">3</span><div><div class="t3">左上角三道杠</div><div class="d3">换班级、进"助手"：谁还没记午睡、这周的观察汇总，直接问它。</div></div></div>
+      </div>
+    </div>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>老师手机 · 班级视图</span><span class="ftag">04</span></div>
+  </section>
+
+  <!-- 05 org mobile -->
+  <section class="slide">
+    <p class="eyebrow">您这边</p>
+    <div class="demo-grid">
+      <div class="phonebox"><div class="phone"><div class="scr">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="tb"><span class="burger"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+          <div class="tt">示例园<small>7月21日 周三</small></div>
+          <span class="avx" style="background:radial-gradient(circle at 34% 30%,#E1703C,#283E68)"></span></div>
+        <div class="body">
+          <div class="sec" style="margin-top:2px">今日</div>
+          <div class="pulse-row">
+            <div class="pt"><b>45<small> /48</small></b><span>在园</span></div>
+            <div class="pt"><b>6<small> 场</small></b><span>活动</span></div>
+            <div class="pt"><b>22<small> /23</small></b><span>消息已回应</span></div>
+          </div>
+          <div class="sec">家园流动</div>
+          <div class="flowrow">
+            <div class="f"><b>12</b><span>家 → 园</span></div><span class="ar">⇄</span>
+            <div class="f"><b>31</b><span>园 → 家</span></div><span class="ar">·</span>
+            <div class="f"><b>2</b><span>授权变更</span></div>
+          </div>
+          <div class="sec">理念在发生</div>
+          <div class="grp"><div class="grow" style="display:block;padding:10px 0">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:700">「表达需求」相关观察</span><span style="color:var(--navy);font-weight:700;font-size:12.5px">23 条</span></div>
+            <div class="ideabar"><i style="height:8px"></i><i style="height:12px"></i><i style="height:15px"></i><i class="hi" style="height:22px"></i></div>
+          </div></div>
+          <div class="sec">需要关注</div>
+          <div class="grp">
+            <div class="grow">小一班今日消息较多，要不要安排人支援<span class="r">›</span></div>
+            <div class="grow">3 个家庭本周设了新关注点<span class="r">›</span></div>
+          </div>
+        </div>
+      </div></div></div>
+      <div class="notes">
+        <h2>能看到运营情况，<br>看不到各家隐私，也不考核老师。</h2>
+        <div class="np"><span class="n">1</span><div><div class="t3">运营数据按班级看</div><div class="d3">出勤、活动、消息回复情况，只到班级，不做老师排名。</div></div></div>
+        <div class="np"><span class="n">2</span><div><div class="t3">数据进出有记录</div><div class="d3">家里发来什么、园里发出什么、谁改了授权，都查得到。</div></div></div>
+        <div class="np"><span class="n">3</span><div><div class="t3">这页想听您的想法</div><div class="d3">您每天最想看到哪几个数字？我们按这个来设计。</div></div></div>
+      </div>
+    </div>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>园长手机 · 园所视图</span><span class="ftag">05</span></div>
+  </section>
+
+  <!-- 06 web console -->
+  <section class="slide">
+    <p class="eyebrow">园里的电脑端</p>
+    <h2 style="margin-top:14px;font-size:30px">入托简化成发一个邀请；园里的理念，能看到它落在每天的活动里。</h2>
+    <div class="webwrap">
+      <div class="mtw">
+        <div class="side">
+          <div class="brand"><i>示</i><span><b>示例园</b><small>机构操作台</small></span></div>
+          <div class="nit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 12 4l8 8M6 10v10h12V10"/></svg>概览</div>
+          <div class="nit on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>入托与邀请<span class="ct">1</span></div>
+          <div class="nit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>班级与老师</div>
+          <div class="nit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12Z"/></svg>家园沟通</div>
+          <div class="nit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M4 20V8l4-4h8l4 4v12M9 12h6"/></svg>素材归档</div>
+          <div class="nit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 1 4 10.5V17H8v-3.5A6 6 0 0 1 12 3ZM9 21h6"/></svg>理念与目标</div>
+        </div>
+        <div class="main">
+          <div class="crumb">示例园 / <b>入托与邀请</b></div>
+          <div class="toolbar">
+            <div class="segw"><span class="on">全部<span class="c">12</span></span><span>待确认<span class="c">1</span></span><span>已建档<span class="c">11</span></span></div>
+            <span class="pill">＋ 发送邀请</span>
+          </div>
+          <div class="stats">
+            <div class="st"><div class="f">48</div><div class="l">在册</div></div>
+            <div class="st"><div class="f">2</div><div class="l">本周新入托</div></div>
+            <div class="st"><div class="f">1</div><div class="l">待家长确认</div></div>
+          </div>
+          <div class="cols">
+            <div class="quiet">
+              <div class="rowi"><span class="avm" style="background:#D8B49A"></span><span class="who"><b>家庭 A</b><small>小一班</small></span><span class="bdg ok">已确认建档</span><span class="tm">7/18</span></div>
+              <div class="rowi"><span class="avm" style="background:#B5C6BA"></span><span class="who"><b>家庭 B</b><small>小一班</small></span><span class="bdg wt">待家长确认</span><span class="tm">今天</span></div>
+              <div class="rowi"><span class="avm" style="background:#A9BFA9"></span><span class="who"><b>家庭 C</b><small>小二班</small></span><span class="bdg ok">已确认建档</span><span class="tm">7/12</span></div>
+            </div>
+            <div class="insight">
+              <div class="cap2">理念 → 日常</div>
+              <div class="narr">「<b>尊重表达</b>」正在 3 个班的日常里发生。</div>
+              <div class="hair"></div>
+              <div class="br">轮流与等待游戏<b>2/3 班</b></div>
+              <div class="br">情绪认知绘本共读<b>3/3 班</b></div>
+              <div class="br">"我想要…"表达练习<b>23 条观察</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>家长确认后档案才会建立，园所只负责发邀请</span><span class="ftag">06</span></div>
+  </section>
+
+  <!-- 07 commitments -->
+  <section class="slide dark">
+    <p class="eyebrow">几条底线，先说清楚</p>
+    <div class="cmts">
+      <div class="cmt"><div class="ct2">孩子的数据<em>归家庭</em></div><div class="cd3">园所能看什么，需要家长逐项同意；随时可以撤回，每次数据流动都有记录。</div></div>
+      <div class="cmt"><div class="ct2">只做记录，<em>不打分</em></div><div class="cd3">不给孩子打分，不和别的孩子比较，不做排名。</div></div>
+      <div class="cmt"><div class="ct2">AI 只负责<em>整理</em></div><div class="cd3">不评价孩子，不做诊断，健康问题只会建议去问医生；所有发出去的内容都要人确认。</div></div>
+      <div class="cmt"><div class="ct2">不用来<em>考核老师</em></div><div class="cd3">数据只到班级。这套系统是帮老师减负的，不是监控老师的。</div></div>
+    </div>
+    <div class="footbar"><span class="tagpill">这些是产品设计层面的约束，不只是口头承诺</span><span class="tagpill">07</span></div>
+  </section>
+
+  <!-- 08 questions -->
+  <section class="slide">
+    <p class="eyebrow">想请教您的</p>
+    <h2 style="margin-top:16px">有几个问题，想听听您的经验。</h2>
+    <div class="qlist">
+      <div class="qitem"><span class="qn">1</span><span class="qt">老师每天花多少时间在记录和家长群上？<span class="qs">最花时间的是哪部分？</span></span></div>
+      <div class="qitem"><span class="qn">2</span><span class="qt">园里的理念落到日常带班时，主要卡在哪里？</span></div>
+      <div class="qitem"><span class="qn">3</span><span class="qt">家长问得最多、老师最难回答的是什么？</span></div>
+      <div class="qitem"><span class="qn">4</span><span class="qt">几个孩子的合照，园里现在怎么发？<span class="qs">发群里、单独发、还是不发？</span></span></div>
+      <div class="qitem"><span class="qn">5</span><span class="qt">您每天最想看到园里的哪几个数字？</span></div>
+    </div>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>这些答案会直接影响产品怎么做</span><span class="ftag">08</span></div>
+  </section>
+
+  <!-- 09 next -->
+  <section class="slide">
+    <p class="eyebrow">如果愿意试试</p>
+    <h2 style="margin-top:16px">从最小的范围开始试。</h2>
+    <div class="pilot">
+      <div class="pcard"><div class="pn">范围小</div><div class="pt2">1 个班 · 3 个孩子</div><div class="pd2">家长自愿参加，先只记一类内容，随时可以停。</div></div>
+      <div class="pcard"><div class="pn">负担轻</div><div class="pt2">老师习惯不用改</div><div class="pd2">还是拍照、说话；多出来的工作由 AI 和我们处理。</div></div>
+      <div class="pcard"><div class="pn">一起定</div><div class="pt2">规则试点里商量</div><div class="pd2">看什么数据、发什么内容、自动化开多大，都按园里的实际情况来。</div></div>
+    </div>
+    <p class="lede" style="margin-top:40px;max-width:44ch">产品我们来做；怎么用，试点里一起定。</p>
+    <div class="footbar"><span class="ftag"><span class="dot2"></span>谢谢您的时间</span><span class="ftag">09</span></div>
+  </section>
+
+</div></div></div></div>
+
+<div class="prog"><i id="prog"></i></div>
+<div class="pageno" id="pageno">01 / 09</div>
+<button class="arrow l" id="prev" aria-label="上一页">‹</button>
+<button class="arrow r" id="next" aria-label="下一页">›</button>
+<div class="editbar">
+  <button id="editToggle">✎ 编辑文本</button>
+  <button id="editReset">↺ 恢复默认</button>
+  <button id="editExport">⬇ 导出副本</button>
+</div>
+
+<script>
+(function(){
+  var EDIT_KEY='nurtureDeckEdits.v6';
+  var track=document.getElementById('track');
+  var saved=null;
+  try{saved=localStorage.getItem(EDIT_KEY);}catch(e){}
+  if(saved){track.innerHTML=saved;}
+
+  var holder=document.getElementById('holder'),stage=holder.firstElementChild;
+  var slides=track.children.length,i=0,editMode=false;
+  var prev=document.getElementById('prev'),next=document.getElementById('next');
+  var prog=document.getElementById('prog'),pageno=document.getElementById('pageno');
+
+  function render(){
+    track.style.transform='translateX('+(-i*1280)+'px)';
+    prog.style.width=((i+1)/slides*100)+'%';
+    pageno.textContent=(i<9?'0':'')+(i+1)+' / 0'+slides;
+    prev.disabled=i===0;next.disabled=i===slides-1;
+    if(i===3&&!editMode){resetStream();startStream();}else{stopStream();}
+  }
+  function go(n){i=Math.max(0,Math.min(slides-1,n));render();}
+  prev.onclick=function(){go(i-1);};next.onclick=function(){go(i+1);};
+  document.addEventListener('keydown',function(e){
+    if(editMode)return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+  });
+  var sx=0;
+  window.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
+  window.addEventListener('touchend',function(e){if(editMode)return;var dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>60)go(i+(dx<0?1:-1));},{passive:true});
+  function resize(){var s=Math.min(window.innerWidth/1280,window.innerHeight/720)*0.90;
+    stage.style.transform='scale('+s+')';holder.style.width=(1280*s)+'px';holder.style.height=(720*s)+'px';
+    var m=(window.innerWidth-1280*s)/2;
+    var off=Math.max(10,m/2-26);
+    prev.style.left=off+'px';next.style.right=off+'px';}
+  window.addEventListener('resize',resize);resize();
+
+  /* ---------- edit mode ---------- */
+  var editToggle=document.getElementById('editToggle'),editReset=document.getElementById('editReset');
+  editToggle.addEventListener('click',function(){
+    editMode=!editMode;
+    document.designMode=editMode?'on':'off';
+    document.body.classList.toggle('editing',editMode);
+    editToggle.classList.toggle('on',editMode);
+    editToggle.textContent=editMode?'✓ 完成并保存':'✎ 编辑文本';
+    if(editMode){stopStream();}
+    else{
+      try{localStorage.setItem(EDIT_KEY,track.innerHTML);}catch(e){}
+      if(i===3){resetStream();startStream();}
+    }
+  });
+  editReset.addEventListener('click',function(){
+    if(editMode){document.designMode='off';}
+    try{localStorage.removeItem(EDIT_KEY);}catch(e){}
+    location.reload();
+  });
+  document.getElementById('editExport').addEventListener('click',function(){
+    if(editMode)editToggle.click();
+    var html=document.documentElement.outerHTML;
+    if(!/charset/i.test(html))html=html.replace(/<html([^>]*)>/i,'<html$1><meta charset="utf-8">');
+    html='<!doctype html>\n'+html;
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='成长协同演示-定制版.html';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+  });
+  document.addEventListener('click',function(e){
+    if(editMode&&e.target.closest&&e.target.closest('.stage')){e.stopPropagation();}
+  },true);
+
+  /* ---------- generic helpers ---------- */
+  function on(id,fn){var el=document.getElementById(id);if(el)el.addEventListener('click',fn);}
+  document.addEventListener('click',function(e){
+    var op=e.target.closest&&e.target.closest('[data-open]');
+    if(op){var o=document.getElementById(op.getAttribute('data-open'));if(o)o.classList.add('show');return;}
+    var cl=e.target.closest&&e.target.closest('[data-close]');
+    if(cl){var c=document.getElementById(cl.getAttribute('data-close'));if(c)c.classList.remove('show');return;}
+  });
+
+  /* ---------- parent phone ---------- */
+  var pScreens=['ps-board','ps-assist','ps-grant'];
+  function showP(id){pScreens.forEach(function(s){var el=document.getElementById(s);if(el)el.style.display=s===id?'':'none';});
+    var d=document.getElementById('ps-drawer');if(d)d.classList.remove('show');}
+  on('dnav-board',function(){setDr('dnav-board');showP('ps-board');});
+  on('dnav-assist',function(){setDr('dnav-assist');showP('ps-assist');});
+  on('dnav-grant',function(){showP('ps-grant');});
+  on('grBack',function(){showP('ps-board');});
+  function setDr(id){['dnav-board','dnav-assist'].forEach(function(x){var el=document.getElementById(x);if(el)el.classList.toggle('on',x===id);});}
+  on('pBubble',function(){var s=document.getElementById('ps-sheet');if(s)s.classList.add('show');});
+
+  document.querySelectorAll('#p7baby [data-q]').forEach(function(q){
+    q.addEventListener('click',function(){
+      setBoardView(q.getAttribute('data-q'));setDr('dnav-board');showP('ps-board');
+    });
+  });
+  var p7vs=document.getElementById('p7vs');
+  if(p7vs)p7vs.addEventListener('click',function(e){
+    var b=e.target.closest('.vsrow');if(!b)return;
+    p7vs.querySelectorAll('.vsrow').forEach(function(x){
+      var onx=x===b;x.classList.toggle('on',onx);
+      var ck=x.querySelector('.ck2');
+      if(onx&&!ck){x.insertAdjacentHTML('beforeend','<span class="ck2">✓</span>');}
+      if(!onx&&ck){ck.remove();}
+    });
+    var baby=b.getAttribute('data-l')==='baby';
+    document.getElementById('p7baby').style.display=baby?'':'none';
+    document.getElementById('p7gen').style.display=baby?'none':'';
+  });
+
+  var p4sw=document.getElementById('p4sw');
+  function setBoardView(v){
+    p4sw.querySelectorAll('span').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-v')===v);});
+    document.querySelectorAll('[data-p4]').forEach(function(p){p.style.display=p.getAttribute('data-p4')===v?'':'none';});
+  }
+  p4sw.addEventListener('click',function(e){
+    var b=e.target.closest('span[data-v]');if(!b)return;setBoardView(b.getAttribute('data-v'));
+  });
+  var day=0;
+  var days=[
+    {d:'今天 · 7月21日 周三',s:['8:32','1<small>小时</small>20<small>分</small>','良好','4<small>次</small>'],dyn:'户外 · 沙池<small>10:24</small>'},
+    {d:'昨天 · 7月20日 周二',s:['8:40','1<small>小时</small>05<small>分</small>','良好','3<small>次</small>'],dyn:'室内 · 绘本时间<small>10:10</small>'}
+  ];
+  function renderDay(){
+    var dd=days[day];
+    document.getElementById('p4date').textContent=dd.d;
+    var st=document.getElementById('p4stats').children;
+    for(var k=0;k<4;k++)st[k].querySelector('.v').innerHTML=dd.s[k];
+    document.getElementById('p4dyn').querySelector('.tx').innerHTML=dd.dyn;
+    document.getElementById('p4prev').classList.toggle('off',day===1);
+    document.getElementById('p4next').classList.toggle('off',day===0);
+  }
+  on('p4prev',function(){if(day===0){day=1;renderDay();}});
+  on('p4next',function(){if(day===1){day=0;renderDay();}});
+
+  var p5seg=document.getElementById('p5seg'),p5mem=document.getElementById('p5mem');
+  if(p5seg)p5seg.addEventListener('click',function(e){
+    var b=e.target.closest('span[data-h]');if(!b)return;
+    p5seg.querySelectorAll('span[data-h]').forEach(function(x){x.classList.toggle('on',x===b);});
+    document.querySelectorAll('[data-p5]').forEach(function(p){p.style.display=p.getAttribute('data-p5')===b.getAttribute('data-h')?'':'none';});
+    p5mem.textContent=b.getAttribute('data-h')==='t'?'妈妈 · 爸爸 · 李老师 · 王老师':'小一班家长群 · 32 人';
+  });
+
+  on('p3send',function(){
+    var c=document.getElementById('p3card');
+    c.innerHTML='<div class="sl">已发出 → 老师们</div>'+
+      '<div class="pv" style="opacity:.92">昨晚孩子因为没买糖果闹了情绪，白天麻烦老师留意下她要不到东西时的反应</div>'+
+      '<div class="rcptrow"><span>已送达</span><span id="p3r2" style="display:none">老师已确认</span></div>';
+    setTimeout(function(){var r=document.getElementById('p3r2');if(r)r.style.display='';},1200);
+  });
+
+  document.querySelectorAll('[data-sw]').forEach(function(sw){
+    sw.addEventListener('click',function(){sw.classList.toggle('off');});
+  });
+
+  /* ---------- teacher phone ---------- */
+  var tScreens=['ts-stream','ts-assist'];
+  function showT(id){tScreens.forEach(function(s){var el=document.getElementById(s);if(el)el.style.display=s===id?'':'none';});
+    var d=document.getElementById('ts-drawer');if(d)d.classList.remove('show');
+    ['tnav-stream','tnav-assist'].forEach(function(x){
+      var el=document.getElementById(x);if(el)el.classList.toggle('on',
+        (x==='tnav-stream'&&id==='ts-stream')||(x==='tnav-assist'&&id==='ts-assist'));});}
+  on('tnav-stream',function(){showT('ts-stream');});
+  on('tnav-assist',function(){showT('ts-assist');});
+  on('tBubble',function(){var s=document.getElementById('ts-sheet');if(s)s.classList.add('show');});
+  var famLetters=['A','B','C','D','E','F'];
+  function railSelect(k){
+    var pane=k==='g'?'g':(k==='0'?'fa':'fx');
+    document.querySelectorAll('[data-tp]').forEach(function(p){p.style.display=p.getAttribute('data-tp')===pane?'':'none';});
+    document.querySelectorAll('#trail .rit').forEach(function(r){r.classList.toggle('sel',r.getAttribute('data-r')===k);});
+    var mem=document.getElementById('tmem');
+    if(k==='g')mem.textContent='小一班家长群 · 32 人';
+    else if(k==='0')mem.textContent='家庭 A · 妈妈 · 爸爸 · 我 · 王老师';
+    else mem.textContent='家庭 '+famLetters[+k]+' · 宝宝';
+  }
+  var trail=document.getElementById('trail');
+  if(trail)trail.addEventListener('click',function(e){
+    var r=e.target.closest('.rit');if(!r)return;railSelect(r.getAttribute('data-r'));});
+  railSelect('g');
+
+  /* schedule strip + kid panel */
+  on('sched',function(){document.getElementById('schedFull').classList.toggle('show');});
+  var kidData={
+    0:{c:'#D8B49A',fam:'A',stats:['8:32','良好','1h20','平稳'],din:'昨晚睡得比较晚，午餐多留意',
+       notes:[['10:24','想要别人的铲子，说了"给我玩玩"'],['8:32','到园，情绪平稳']],tag:'家庭关注 · 表达需求'},
+    4:{c:'#D5C4B2',fam:'E',stats:['8:45','偏少','1h05','安静'],din:'今早有点流鼻涕，请留意饮水',notes:[['11:35','午餐吃得偏少，饭后加了水果']],tag:null}
+  };
+  var kidOpen=-1;
+  var kstripEl=document.getElementById('kstrip');
+  if(kstripEl)kstripEl.addEventListener('click',function(e){
+    var kd=e.target.closest('.kid');if(!kd)return;
+    var k=+kd.getAttribute('data-k');
+    var panel=document.getElementById('kidPanel');
+    if(kidOpen===k){panel.classList.remove('show');kidOpen=-1;return;}
+    kidOpen=k;
+    var d=kidData[k]||{c:kd.style.background,fam:famLetters[k]||'—',stats:['8:40','良好','1h10','平稳'],din:null,
+      notes:[['午前','参与集体活动，状态自然']],tag:null};
+    var h='<div class="kp-h"><span class="ka2" style="background:'+d.c+'"></span><b>宝宝 · 家庭 '+d.fam+'</b><span class="x2" id="kpClose">×</span></div>'+
+      '<div class="kp-stats"><span><b>'+d.stats[0]+'</b>到园</span><span><b>'+d.stats[1]+'</b>三餐</span><span><b>'+d.stats[2]+'</b>午睡</span><span><b>'+d.stats[3]+'</b>情绪</span></div>';
+    if(d.din)h+='<div class="kp-note warn2">今日叮嘱 · '+d.din+'</div>';
+    d.notes.forEach(function(n){h+='<div class="kp-note"><span class="t4">'+n[0]+'</span>'+n[1]+'</div>';});
+    h+='<div class="kp-foot">'+(d.tag?'<span class="kp-tag">'+d.tag+'</span>':'')+'<span class="kp-add">＋ 补记</span></div>';
+    panel.innerHTML=h;panel.classList.add('show');
+    on('kpClose',function(){panel.classList.remove('show');kidOpen=-1;});
+  });
+
+  on('tFab',function(){document.getElementById('ts-camera').classList.add('show');});
+  on('camClose',function(){document.getElementById('ts-camera').classList.remove('show');});
+  var shotN=0;
+  on('shutter',function(){
+    var fl=document.getElementById('flash');
+    fl.classList.add('on');
+    setTimeout(function(){fl.classList.remove('on');},140);
+    setTimeout(function(){
+      document.getElementById('ts-camera').classList.remove('show');
+      shotN++;
+      var id='cap'+shotN;
+      var html='<div class="tstamp">10:3'+(5+shotN)+'</div>'+
+        '<div class="raw"><div class="photo" style="width:82px;height:58px">'+photoSvg+'</div></div>'+
+        '<div class="aicard" id="'+id+'"><div class="ahd"><span class="ai">'+sparkSvg+'已整理</span><span class="cd">15 秒后发布</span></div>'+
+        '<div class="arow"><span class="kds"><i style="background:#D8B49A"></i></span>'+
+        '<div class="atx">沙池 · 独立搭塔<small>家庭 A · 班级相册</small></div></div>'+
+        '<div class="cdbar"><i></i></div></div>';
+      var feedEl=document.getElementById('p6feed');
+      feedEl.insertAdjacentHTML('afterbegin',html);
+      runCard(id,15,function(){
+        var el=document.getElementById(id);
+        if(!el)return;
+        el.classList.add('gone');
+        setTimeout(function(){if(el.parentNode){
+          el.insertAdjacentHTML('afterend','<div class="strow"><span class="ok">✓</span>已整理 · 待发送 · 沙池观察 · 家庭 A<span class="r" data-goto="0">查看 ›</span></div>');
+          el.remove();}},420);
+        stageFam('沙池 · 独立搭塔');
+      });
+    },220);
+  });
+
+  var timers={};
+  function runCard(id,secs,done){
+    var t=secs;
+    stopCard(id);
+    timers[id]=setInterval(function(){
+      t-=0.1;
+      var el=document.getElementById(id);
+      if(!el){stopCard(id);return;}
+      var bar=el.querySelector('.cdbar i'),cd=el.querySelector('.cd');
+      if(bar)bar.style.width=Math.max(0,t/secs*100)+'%';
+      if(cd)cd.textContent=Math.max(0,Math.ceil(t))+' 秒后发布';
+      if(t<=0){stopCard(id);done();}
+    },100);
+    var el=document.getElementById(id);
+    if(el)el.addEventListener('click',function(){stopCard(id);
+      var cd=el.querySelector('.cd');if(cd)cd.textContent='已暂停 · 点整理重播';},{once:true});
+  }
+  function stopCard(id){if(timers[id]){clearInterval(timers[id]);delete timers[id];}}
+  function stopStream(){Object.keys(timers).forEach(stopCard);}
+
+  /* delivery: published content lands in the matching conversation */
+  function pane(tp){return document.querySelector('[data-tp="'+tp+'"]');}
+  var baseG=null,baseFa=null;
+  function snapPanes(){if(baseG===null){var g=pane('g'),f=pane('fa');baseG=g?g.innerHTML:'';baseFa=f?f.innerHTML:'';}}
+  function restorePanes(){var g=pane('g'),f=pane('fa');
+    if(g&&baseG!==null)g.innerHTML=baseG;if(f&&baseFa!==null)f.innerHTML=baseFa;
+    var b=document.querySelector('#tBubble .bdg');if(b)b.textContent='4';}
+  var queueN=0,stgN=0;
+  function qUpdate(){var q=document.getElementById('qsum'),c=document.getElementById('qcount');
+    if(!q)return;if(c)c.textContent=queueN;q.style.display=queueN>0?'':'none';}
+  function stgHTML(id,title){
+    return '<div class="stgbub" id="'+id+'"><div class="dlv"><div class="photo">'+photoSvg+'</div>'+
+      '<div class="dt2">'+title+'<small>自动整理</small></div></div>'+
+      '<div class="stgtag">待发送 · 今天 17:00<span class="stgacts">'+
+      '<span class="sgo" data-send="'+id+'">现在发送</span><span class="scancel" data-cancel="'+id+'">撤回</span></span></div></div>';
+  }
+  function stageFam(title){var f=pane('fa');if(f){stgN++;f.insertAdjacentHTML('beforeend',stgHTML('st'+stgN,title));queueN++;qUpdate();}}
+  function stageGroup(){var g=pane('g');if(g){stgN++;g.insertAdjacentHTML('beforeend',stgHTML('st'+stgN,'今日花絮 · 3 张照片'));queueN++;qUpdate();}}
+  document.addEventListener('click',function(e){
+    if(editMode)return;
+    var sb=e.target.closest&&e.target.closest('[data-send]');
+    if(sb){var el=document.getElementById(sb.getAttribute('data-send'));
+      if(el){var t=el.querySelector('.dt2').innerHTML;
+        el.outerHTML='<div class="ailb" style="align-self:flex-end">我 · 刚刚</div>'+
+          '<div class="hme"><div class="dlv"><div class="photo">'+photoSvg+'</div><div class="dt2">'+t+'</div></div></div>'+
+          '<div class="readrow">已送达</div>';
+        queueN=Math.max(0,queueN-1);qUpdate();}
+      return;}
+    var cb=e.target.closest&&e.target.closest('[data-cancel]');
+    if(cb){var el2=document.getElementById(cb.getAttribute('data-cancel'));
+      if(el2){el2.remove();queueN=Math.max(0,queueN-1);qUpdate();}return;}
+  });
+  document.addEventListener('click',function(e){
+    var g=e.target.closest&&e.target.closest('[data-goto]');
+    if(!g||editMode)return;
+    var s=document.getElementById('ts-sheet');if(s)s.classList.add('show');
+    railSelect(g.getAttribute('data-goto'));
+  });
+
+  var photoSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="9" cy="10" r="1.4"/></svg>';
+  var sparkSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>';
+  function feedHTML(){
+    return '<div class="strow" id="qsum" style="display:none"><span style="color:var(--or700);font-weight:700">◷</span>今天 17:00 统一发出 · <b id="qcount" style="margin:0 2px">0</b> 条<span class="r" data-goto="0">看一眼 ›</span></div>'+
+    '<div class="tstamp">10:24</div>'+
+    '<div class="raw"><div class="photo" style="width:82px;height:58px">'+photoSvg+'</div><div class="photo" style="width:82px;height:58px">'+photoSvg+'</div></div>'+
+    '<div class="rawtx">想要别人的铲子，没抢，说了"给我玩玩"</div>'+
+    '<div class="aicard" id="c1"><div class="ahd"><span class="ai">'+sparkSvg+'已整理</span><span class="cd">15 秒后发布</span></div>'+
+      '<div class="arow"><span class="kds"><i style="background:#D8B49A"></i><i style="background:#A9BFA9"></i></span>'+
+      '<div class="atx">户外观察 · 表达需求<small>2 个家庭 · 班级相册</small></div></div>'+
+      '<div class="cdbar"><i></i></div></div>'+
+    '<div class="aicard q" id="c2"><div class="ahd"><span class="ai">'+sparkSvg+'已整理</span><span class="cd" style="color:var(--ink4)">排队中</span></div>'+
+      '<div class="arow"><span class="kds"><i style="background:#B5C6BA"></i><i style="background:#C9B79A"></i><i style="background:#9FB5A8"></i></span>'+
+      '<div class="atx">群像 3 张 → 班级群</div></div>'+
+      '<div class="cdbar" style="display:none"><i></i></div></div>'+
+    '<div id="done"></div>'+
+    '<div class="strow"><span class="ok">✓</span>12:30 已发出 · 早餐观察 · 3 个家庭<span class="r">查看</span></div>'+
+    '<div class="strow dim2">◌ 1 张照片待关联<span class="r">›</span></div>';
+  }
+  function resetStream(){stopStream();shotN=0;queueN=0;stgN=0;
+    var f=document.getElementById('p6feed');if(f)f.innerHTML=feedHTML();
+    snapPanes();restorePanes();qUpdate();}
+  function startStream(){
+    snapPanes();
+    runCard('c1',15,function(){
+      var c1=document.getElementById('c1');
+      if(c1){c1.classList.add('gone');
+        setTimeout(function(){if(c1.parentNode){
+          document.getElementById('done').insertAdjacentHTML('beforebegin',
+            '<div class="strow"><span class="ok">✓</span>已整理 · 待发送 · 户外观察 · 2 个家庭<span class="r" data-goto="0">查看 ›</span></div>');
+          c1.remove();}},420);}
+      stageFam('户外观察 · 表达需求');
+      var c2=document.getElementById('c2');
+      if(c2){c2.classList.remove('q');
+        var cd=c2.querySelector('.cd');if(cd){cd.style.color='';cd.textContent='15 秒后发布';}
+        var bw=c2.querySelector('.cdbar');if(bw)bw.style.display='';
+        runCard('c2',15,function(){
+          var cx=document.getElementById('c2');
+          if(cx){cx.classList.add('gone');
+            setTimeout(function(){if(cx.parentNode){
+              document.getElementById('done').insertAdjacentHTML('beforebegin',
+                '<div class="strow"><span class="ok">✓</span>已整理 · 待发送 · 群像 3 张 · 班级群<span class="r" data-goto="g">查看 ›</span></div>');
+              cx.remove();}},420);}
+          stageGroup();
+        });}
+    });
+  }
+  on('p6replay',function(){resetStream();startStream();});
+  resetStream();
+
+  render();
+})();
+</script>
+
+</html>

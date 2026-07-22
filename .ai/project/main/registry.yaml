@@ -54,4 +54,11 @@ tasks:
     milestone_id: M-002
     feature_id: F-002
     dev_docs_path: dev-docs/active/nurture-institution-mode
-    updated: 2026-07-16
+    updated: 2026-07-21
+  - id: T-003
+    slug: nurture-uiux-pitch
+    status: in-progress
+    milestone_id: M-002
+    feature_id: F-002
+    dev_docs_path: dev-docs/active/nurture-uiux-pitch
+    updated: 2026-07-21

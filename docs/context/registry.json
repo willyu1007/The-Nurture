@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-20T08:35:35.576Z",
+  "updatedAt": "2026-07-22T23:43:55.560Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "8bb739b2ca186c8befce1f5cf89fe63ceb27827747970364e23329133f17ff4f",
-      "lastUpdated": "2026-07-20T08:35:35.574Z",
+      "checksumSha256": "eda2b2047c116baea2db886b1c62862a8d56f8481a3cca52030736089d787610",
+      "lastUpdated": "2026-07-20T14:02:45.531Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -159,6 +159,27 @@
       ],
       "checksumSha256": "0d60f07a08e312d973123dfd38d778e6a2b638208c8e6f2e01775b042a104c5c",
       "lastUpdated": "2026-07-20T08:35:35.575Z",
+      "source": {
+        "kind": "command",
+        "command": "ctl-context add-artifact",
+        "cwd": "."
+      }
+    },
+    {
+      "id": "product-nurture-mobile-ux-contract",
+      "type": "markdown",
+      "path": "docs/context/product/nurture-mobile-ux-contract.md",
+      "mode": "contract",
+      "tags": [
+        "product",
+        "ux",
+        "nurture",
+        "mobile",
+        "my-chat",
+        "llm"
+      ],
+      "checksumSha256": "0075d0f758035583d87a9b05fef2ec620c0bc2b56d889ce1b8659f50bd35b73b",
+      "lastUpdated": "2026-07-22T23:43:55.559Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

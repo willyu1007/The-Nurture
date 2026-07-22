@@ -12,4 +12,5 @@ Project: `main`
 | --- | --- | --- | --- |
 | T-001 nurture-mvp | done | F-001 | dev-docs/active/nurture-mvp |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
+| T-003 nurture-uiux-pitch | in-progress | F-002 | dev-docs/active/nurture-uiux-pitch |
 <!-- AUTO-GENERATED:END task-index -->

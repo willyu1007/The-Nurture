@@ -15,6 +15,7 @@ Key artifacts:
 - Glossary: `docs/context/glossary.json`
 - Architecture rules: `docs/context/architecture-principles.md`
 - Workflow product design: `docs/context/product/workflow-product-design-contract.md`
+- Nurture mobile UX contract: `docs/context/product/nurture-mobile-ux-contract.md`
 - Nurture workflow contract: `docs/context/workflow/nurture-scenario-contract.md`
 
 Rules:
