@@ -122,7 +122,22 @@ Exact repaired pin evidence now passes:
 
 The expanded Host source population covers the public DTO/validation/module
 boundary, private resolver/service, domain contract, repository, Prisma SSOT,
-and both Wave 4 migrations. Native CI and joint owner review remain pending.
+and both Wave 4 migrations.
+
+Repaired Nurture exact-source result:
+
+- revision:
+  `1db91b3b1c79bde298c2e58b2d8c7baca091aabc`;
+- native run:
+  [`30375174703`](https://github.com/willyu1007/The-Nurture/actions/runs/30375174703);
+- result: 7 check runs pass with zero annotations, including exact pin/strict
+  boundary, full typecheck/unit, 37 disposable production-DB tests, dev-host
+  E2E, context/environment, governance, and frontend lint/build.
+
+Decision: `BLOCKER-NURTURE-AUTHORITY-ATOMICITY` is closed at the published
+exact revision. Formal cross-owner/PR adoption review remains. No persistent
+database, migration, artifact publication, deployment, capability, provider,
+or traffic state changed.
 
 ## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
 

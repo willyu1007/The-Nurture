@@ -3,18 +3,15 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor repair（locally verified and exact Host-pinned, Nurture revision/CI pending, default-deny）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor repair（exact source and native CI green, formal adoption pending, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
-- **Next step:** Publish this transaction-atomic Nurture repair and run native
-  plus joint conformance against the exact repaired My-Chat pin. Current
-  role/grant/purpose/lifecycle reread, exact anchor lock, and receipt
-  persistence now share one Nurture owner transaction in local source and pass
-  a real PostgreSQL revoke/issue interleaving. CI runs `30366195095` and
-  `30366571495` remain historical regression evidence, not qualification for
-  the replacement source. The additive migration remains unapplied outside
-  disposable CI and every consumer remains default-disabled. C30-I1,
+- **Next step:** Complete formal cross-owner/PR adoption review of exact Host
+  `30792cd` and Nurture `1db91b3`, then allow P3/joint conformance. Native run
+  `30375174703` passes 7/7 with zero annotations, including the exact Host pin
+  and 37 disposable-PostgreSQL tests. The additive migration remains unapplied
+  outside disposable CI and every consumer remains default-disabled. C30-I1,
   C31, C4, D implementation, Pilot-0-E, Pilot-1, any persistent database
   apply, artifact publication, capability activation, and external traffic
   remain NO-GO.

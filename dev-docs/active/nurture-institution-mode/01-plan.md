@@ -43,21 +43,21 @@ or activation.
 
 | Work item | State | Exit |
 | --- | --- | --- |
-| Freeze exact Host receipt contract | Exact replacement pinned; CI pending | My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7` keeps anchors private and adds durable replay, monotonic versions, CAS, and PostgreSQL race convergence. The expanded 15-file Host source population verifies at `3dadb0...f0c5`; native CI is pending. |
+| Freeze exact Host receipt contract | Exact replacement pinned and CI-green | My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7` keeps anchors private and adds durable replay, monotonic versions, CAS, and PostgreSQL race convergence. The expanded 15-file Host source population verifies at `3dadb0...f0c5`; Host CI `30375174861` passes with zero annotations. |
 | Add typed body-free anchors | Complete locally | Child and Family owner refs use separate namespaces and random UUID anchors. Normal lifecycle is `reserved|bound_empty|associated|retired`; `revoked|quarantined` fail closed. |
 | Add owner authorization adapter | Repair complete locally, default-deny | A transaction-scoped adapter receives the exact Prisma transaction, rereads/locks or CAS-validates the exact authority source after the anchor lock, and persists or exact-replays the receipt in that transaction. Default wiring denies; no production reader is wired. |
 | Add exact local association schema | Complete as target schema | Workspace/Child/Process/Family integrity is enforced with composite keys and foreign keys. No sibling ORM/source or cross-database join is introduced. |
 | Stop new plaintext birth-date writes | Complete as unapplied migration | A column-scoped trigger blocks non-null inserts and explicit birth-date updates once applied while allowing unrelated updates to historical rows. No existing value is read, deleted, migrated, or inferred. |
 | Add derived age/stage boundary | Complete locally | Only `age_band_key`, owner-defined `stage_key`, `as_of_date`, positive `source_version`, and current canonical UTC expiry are accepted; raw birth date, exact age, unknown fields, future as-of dates, and expired values fail closed. |
 | P2 negative and replay verification | Repair tests complete locally | Existing negatives remain green. A real PostgreSQL interleaving now locks the exact care-role source, proves concurrent revoke cannot overtake issuance, and proves post-commit revoke denies the next issue. Three target rounds pass. |
-| Refresh pins/context/governance and cloud CI | Pending replacement revisions | Historical 31-file hash and CI remain regression evidence. Refresh the exact repaired Host pin and Nurture source hash, then run native no-publication CI. |
+| Refresh pins/context/governance and cloud CI | Complete for repaired source | Exact Host pin, 31-file Nurture source `c4d9ee...0bda`, strict boundary, context/governance, type/unit, 37 DB tests, dev-host E2E, and frontend gates pass in native run `30375174703` with zero annotations. |
 | Apply migration or activate consumers | Not authorized | Requires the separate T-027/T-028 environment, row-count, owner-review, release-unit, backup/rollback, and activation decisions. |
 
-Exit for the Wave 4 increment remains open. Transaction-atomic owner
-authorization and targeted concurrency/privacy tests now pass locally. Exit
-still requires exact repaired Host and Nurture revisions, refreshed pin/source
-hash, native CI, and joint owner review. The resulting revision is not a C30 component
-candidate, qualified Pilot artifact, applied migration, or release approval.
+The Wave 4 P2 implementation repair is complete at exact source `1db91b3`.
+Transaction-atomic owner authorization, targeted concurrency/privacy,
+refreshed pin/source hashes, and native CI pass. Formal joint owner/PR adoption
+review remains. The resulting revision is not a C30 component candidate,
+qualified Pilot artifact, applied migration, or release approval.
 
 ## C30-I0 — Implementation baseline isolation（进行中）
 

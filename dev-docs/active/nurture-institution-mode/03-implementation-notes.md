@@ -1031,3 +1031,10 @@
   files, Prisma SSOT, and both Wave 4 migrations. Base/My-Chat contract parity,
   161-file X5 source `cac294...ccf6`, 15-file Host source `3dadb0...f0c5`, and
   31-file Nurture source `c4d9ee...0bda` all verify exactly.
+- Published repaired Nurture source
+  `1db91b3b1c79bde298c2e58b2d8c7baca091aabc`. Native CI `30375174703`
+  passed all 7 check runs with zero annotations: exact pin/strict boundary,
+  context/environment, governance, full typecheck/unit, 37 disposable
+  production-DB tests, dev-host E2E, and frontend lint/build.
+- The P2 atomicity blocker is closed. Formal cross-owner/PR adoption review,
+  P3/P4, persistent migration, and activation remain separate gates.
