@@ -1660,3 +1660,23 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: A factory return type may be inferred only when the factory
   parameters do not depend on that inferred type; always retain a full
   typecheck gate in addition to transpile-and-run tests.
+
+### 2026-07-29 — Leaving the registered normative contract on a superseded pin
+
+- Symptom: Implementation and task handoff docs named the repaired Host and
+  transaction-scoped authority flow, while the registered Nurture scenario
+  contract still named Host `64f4165` and described the pre-repair source
+  posture.
+- Context: The workflow contract itself participates in the 31-file
+  cross-repository source hash, so narrative drift is also pin drift.
+- What we tried: Treating the implementation notes and cloud evidence as
+  sufficient synchronization.
+- Root cause: The final handoff scan checked code, tests, and task docs but did
+  not compare every living registered context artifact against the current
+  exact-source evidence.
+- Fix / workaround: Update the normative contract, run `ctl-context touch`,
+  recompute the full source hash, verify the exact Base/Host/Nurture pins, and
+  rerun native CI at the synchronized source.
+- Prevention: Every cross-repository source repair must include a registered
+  context-artifact census before evidence closure; if a contract path changes,
+  refresh its checksum, source hash, exact revision, and native CI together.

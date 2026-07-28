@@ -1038,3 +1038,17 @@
   production-DB tests, dev-host E2E, and frontend lint/build.
 - The P2 atomicity blocker is closed. Formal cross-owner/PR adoption review,
   P3/P4, persistent migration, and activation remain separate gates.
+
+## 2026-07-29 — Wave 4 P2 normative contract and handoff sync
+
+- Reconciled the registered Nurture scenario contract with the repaired
+  implementation: exact Host `30792cd`, transaction-scoped authority
+  reread/lock-or-CAS, atomic anchor/receipt/association writes, default deny,
+  and current-authority exact replay are now normative.
+- Refreshed the workflow context checksum and the 31-file Nurture source hash
+  from historical `c4d9ee...0bda` to `354bb2...c83f`.
+- Published exact synchronized source
+  `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`. Native CI `30403774597`
+  passed 7/7 jobs with zero annotations.
+- Formal cross-owner/PR adoption, P3/P4, persistent migration, activation,
+  deployment, and traffic remain outside this synchronization change.

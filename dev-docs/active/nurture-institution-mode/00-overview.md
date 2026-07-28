@@ -8,13 +8,13 @@
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
 - **Next step:** Complete formal cross-owner/PR adoption review of exact Host
-  `30792cd` and Nurture `1db91b3`, then allow P3/joint conformance. Native run
-  `30375174703` passes 7/7 with zero annotations, including the exact Host pin
-  and 37 disposable-PostgreSQL tests. The additive migration remains unapplied
-  outside disposable CI and every consumer remains default-disabled. C30-I1,
-  C31, C4, D implementation, Pilot-0-E, Pilot-1, any persistent database
-  apply, artifact publication, capability activation, and external traffic
-  remain NO-GO.
+  `30792cd` and Nurture `b615a57`, then allow P3/joint conformance. Native run
+  `30403774597` passes 7/7 with zero annotations, including the exact Host pin,
+  refreshed normative contract, and 37 disposable-PostgreSQL tests. The
+  additive migration remains unapplied outside disposable CI and every
+  consumer remains default-disabled. C30-I1, C31, C4, D implementation,
+  Pilot-0-E, Pilot-1, any persistent database apply, artifact publication,
+  capability activation, and external traffic remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
@@ -33,9 +33,11 @@
   the broader X5 source hash is
   `cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6`.
   The repaired 31-file Nurture source population hashes to
-  `c4d9ee5dd9c5c3ae0a9ac579729153551c2981e4dca9ecf288546f8348f90bda`.
+  `354bb2206b9fb4248d7df247467c9422235e730f2056eff7a47967f92960c83f`.
   Exact Base/My-Chat parity and all three source hashes pass the native pin
-  verifier. Replacement native CI and joint owner review remain required.
+  verifier at exact Nurture source
+  `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`; native CI `30403774597`
+  passes 7/7 with zero annotations. Joint owner review remains required.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.

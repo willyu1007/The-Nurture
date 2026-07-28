@@ -3,9 +3,11 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-28
-- Current phase: Wave 4 P2 implementation is CI-green and default-deny, but
-  source qualification is reopened by the authority-transaction and Host
-  transport/concurrency blockers; Pilot-0-C decision complete; Pilot-0-D
+- Current phase: Wave 4 P2 implementation and normative contract sync are
+  CI-green and default-deny at exact Nurture source `b615a57`; the former
+  authority-transaction and Host transport/concurrency blockers are closed,
+  while formal cross-owner/PR adoption remains open. Pilot-0-C decision
+  complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
 - Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
@@ -1039,3 +1041,13 @@ For Pilot-0 readiness work:
 | 2026-07-28 | Native-cloud action-runtime closure run `30347782865` | PASS | All seven jobs passed at `e210980`; GitHub check-runs report zero annotations for every job. |
 | 2026-07-28 | Public Base evidence re-pin | LOCAL PASS | Exact Base `63d47d2`, web-workbench hash `43bb51e2...`, unchanged workflow/My-Chat hashes, and four negative verifier tests pass. Native cloud and renewed federation remain pending. |
 | 2026-07-28 | Wave 4 P2 association lifecycle review | PASS AFTER REPAIR | Replaced all-row uniqueness with SSOT-modeled nullable current keys, added immutable plus current-only Child-association FKs, tightened lifecycle checks, and extended the real PostgreSQL case to prove active dependency fencing plus historical replacement. Cloud execution remains pending. |
+
+## Wave 4 P2 normative contract synchronization — 2026-07-29
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Workflow context contract | PASS | `docs/context/workflow/nurture-scenario-contract.md` now names exact Host `30792cd`, transaction-scoped authority reread/lock-or-CAS, same-transaction anchor/receipt/association semantics, default deny, and current-authority replay. |
+| Context registry | PASS | `ctl-context touch` refreshed the registered workflow checksum to `90d3da...6e46`; strict context verification passed. |
+| Three-repository pin | PASS | Base `63d47d2`, Host `30792cd`, 15-file Host hash `3dadb0...f0c5`, and 31-file Nurture hash `354bb2...c83f` verify exactly. |
+| Native CI | PASS | Exact source `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`; run `30403774597` passed all 7 jobs with zero annotations, including exact pin/boundary, context/governance, type/unit, 37 disposable production-DB tests, dev-host E2E, and frontend lint/build. |
+| Effect boundary | PASS | No persistent database or migration apply, package/image publication, environment/secret/provider change, Scenario/capability activation, deployment, or traffic change occurred. |

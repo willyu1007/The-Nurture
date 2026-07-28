@@ -50,10 +50,11 @@ or activation.
 | Stop new plaintext birth-date writes | Complete as unapplied migration | A column-scoped trigger blocks non-null inserts and explicit birth-date updates once applied while allowing unrelated updates to historical rows. No existing value is read, deleted, migrated, or inferred. |
 | Add derived age/stage boundary | Complete locally | Only `age_band_key`, owner-defined `stage_key`, `as_of_date`, positive `source_version`, and current canonical UTC expiry are accepted; raw birth date, exact age, unknown fields, future as-of dates, and expired values fail closed. |
 | P2 negative and replay verification | Repair tests complete locally | Existing negatives remain green. A real PostgreSQL interleaving now locks the exact care-role source, proves concurrent revoke cannot overtake issuance, and proves post-commit revoke denies the next issue. Three target rounds pass. |
-| Refresh pins/context/governance and cloud CI | Complete for repaired source | Exact Host pin, 31-file Nurture source `c4d9ee...0bda`, strict boundary, context/governance, type/unit, 37 DB tests, dev-host E2E, and frontend gates pass in native run `30375174703` with zero annotations. |
+| Refresh pins/context/governance and cloud CI | Complete for synchronized repaired source | Exact Host pin, 31-file Nurture source `354bb2...c83f`, normative context contract, strict boundary, context/governance, type/unit, 37 DB tests, dev-host E2E, and frontend gates pass at exact revision `b615a57` in native run `30403774597` with zero annotations. |
 | Apply migration or activate consumers | Not authorized | Requires the separate T-027/T-028 environment, row-count, owner-review, release-unit, backup/rollback, and activation decisions. |
 
-The Wave 4 P2 implementation repair is complete at exact source `1db91b3`.
+The Wave 4 P2 implementation repair and normative contract sync are complete
+at exact source `b615a57`.
 Transaction-atomic owner authorization, targeted concurrency/privacy,
 refreshed pin/source hashes, and native CI pass. Formal joint owner/PR adoption
 review remains. The resulting revision is not a C30 component candidate,

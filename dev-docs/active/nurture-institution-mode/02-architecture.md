@@ -58,8 +58,10 @@ receives the exact Prisma transaction after the anchor lock and must lock or
 database-CAS the exact role/grant/purpose/lifecycle source before receipt
 insertion or exact replay. Default wiring denies when no transactional reader
 is supplied. A real PostgreSQL interleaving proves a concurrent revoke cannot
-overtake issuance and that a later revoked source denies the next issue. Exact
-replacement pin and native CI remain qualification gates.
+overtake issuance and that a later revoked source denies the next issue. The
+exact replacement and synchronized normative contract are pinned at Nurture
+`b615a57`; native CI `30403774597` passes 7/7 with zero annotations. Formal
+cross-owner/PR adoption review remains the qualification gate.
 
 No production authority-reader wiring, association consumer, manifest
 activation, Scenario row, database apply, environment change, artifact
