@@ -33,6 +33,30 @@ institution view
 
 `CareGroup` 和 `Institution` 可以拥有组织配置，例如班级节奏、老师分配、机构理念和活动模板。但一旦记录描述某个孩子的照护、沟通、观察、媒体曝光或授权流动，它必须带 `childCareProcessId`。换句话说，班级 inbox 是多个 child scopes 的聚合工作台，不是脱离孩子的事实源。
 
+## 0.1a Cross-repo alignment acceptance (2026-07-28)
+
+T-002 adopts the ecosystem boundary published by My-Workflow-Base revision
+`26fac97fc82ec5f5df23528aacabbc16b749b490`:
+
+- Base publishes neutral contracts, conformance, templates, and immutable
+  distribution guidance; Nurture does not import Base sibling source as an
+  application dependency.
+- My-Chat publishes the shared workflow packages and remains the Host/runtime
+  owner. Nurture may use an exact materialized My-Chat source only as a bounded
+  verification fixture until the package is distributable; a mutable local
+  path is never release or qualification evidence.
+- The current Fastify application remains a local/test harness. The repository
+  requirement is still a NestJS scenario service; `RB-6` and `DB-4(b)` own the
+  replacement decision and timing before any pilot-runtime claim.
+- Base allocates Nurture backend/frontend ports `3200/3201`. `ST-2` must align
+  the env contract, backend listener, frontend default, documentation, and
+  tests; no compatibility alias is assumed.
+- `ST-4(c)` must make the API index describe the implemented owner surface
+  without turning the index into a second contract or authorization source.
+
+The coordination record is an architectural acceptance only and changes no package, source,
+schema, migration, runtime, environment, gate, or traffic state.
+
 ## 0.2 Pilot-0-D deployment projection
 
 Pilot-0-D does not change the domain center or create a Nurture product shell.

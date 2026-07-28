@@ -2,10 +2,22 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-21
+- Last updated: 2026-07-28
 - Current phase: Pilot-0-C decision complete; Pilot-0-D `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; both current design reviews are `DR-P0=0 / DR-P1=0 / DR-P2=0`; the canonical readiness census has six open `TR-P0`, three open `TR-P1`, and one accepted-scope `TR-P1`; no complete candidate exists and `QR-*` is not applicable; implementation remains separately unauthorized
 - Code/config/schema impact: Pilot-0-D closure changes task/project planning documentation only. It does not change the current workflow context/pin, product code, Prisma schema/migration, Base/My-Chat source or contract bytes, database, artifact/ACR, secret/KMS, environment, capability/activation, provider, or traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## My-Chat/T-030 N2 Acceptance Verification — 2026-07-28
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact coordination inputs | PASS | Base ecosystem policy is pinned to `26fac97fc82ec5f5df23528aacabbc16b749b490`; My-Chat coordination baseline is `33264981515d75dd9768b720a1d1127cba70cbbe`; the Nurture acceptance starts from clean `aefc180fb4766c66efda1676794399fab9b23e78`. |
+| Repo-qualified ownership | PASS | T-002 accepts `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)` under `My-Chat/T-030`; no unqualified cross-repository `T-###` reference is used as authority. |
+| Consumer-boundary scan | PASS / TWO OPEN FINDINGS | Base `check-consumer-boundaries.mjs --consumer-role scenario --json` reports exactly `ECO-CONSUMER-002` at `apps/frontend/package.json` and `ECO-CONSUMER-004` at `packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts`. Advisory detection is acceptance evidence, not closure. |
+| Framework and port census | PASS / IMPLEMENTATION OPEN | `apps/backend/src/server.ts` is Fastify and its package/README identifies a dev-host harness, while repository requirements call for NestJS. The env contract default is `8000`, frontend defaults target backend `3001`, and Base assigns Nurture `3200/3201`. |
+| Documentation/governance/context/whitespace | PASS WITH EXISTING WARNINGS | Scoped document/anchor lint checks 31 files with 0 errors and the existing 18 vague-reference warnings; governance lint and T-002 query pass; strict context verification passes with the built-in validator; `git diff --check` passes. |
+| Effect boundary | PASS | The acceptance increment changes T-002 documentation only and changes no package/source/schema/migration/lockfile, database, environment, artifact, activation, provider, or traffic. |
+| Implementation authorization | NOT GRANTED | Re-pin, package publication, dependency cleanup, framework replacement, port migration, API-index repair, and governance cleanup remain pending and require their own implementation evidence. |
 
 ## C30-I0-B T-029 Disposition Verification — 2026-07-21
 

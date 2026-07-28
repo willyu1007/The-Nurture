@@ -4,6 +4,7 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not treat an advisory consumer-boundary finding as fixed merely because it is recorded in a task bundle; closure requires the local Base artifact link and direct sibling-source import to be removed and the clean joint gates to pass.
 - Do not reduce institution ecology to an authorization feature; institution is the child's external growth environment.
 - Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
@@ -1365,3 +1366,26 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: introduce stable `TR-P0-1..6` and `TR-P1-1|2|3a|3b` ids in `pilot0_traffic_readiness_census_v1`; require all P0 plus P1-1/2/3b closed and permit only P1-3a as `accepted_scope_exclusion`. Derive `externalProductTrafficCount` from exact trusted source session/account/service and recipient/provider boundaries rather than untrusted target claims; external authenticated requests count even when Host-denied, while exact internal wrong-target probes remain internal only when denied before owner effect. Any admitted unplanned Nurture question/effect is `no_pass`; only pre-admission zero-effect denial is a negative probe.
 - Prevention: census cross-product tests reject missing/renamed/duplicate/waived rows and wrong exclusions; traffic tests cover allowlisted internal ingress, edge scans, control traffic, external principals/providers, and provider attempts; observation tests cover admitted eighth question versus pre-admission rejection.
 - References: `11-pilot0-d-topology-operations-contract.md` D-0.5/D-7, `09-pilot-readiness.md` Blocking findings/Pilot-0-E, `08-iia-schema-policy-test-design.md` Pilot-0-D operations conformance.
+
+### 2026-07-28 — Treating advisory detection as conflict closure
+
+- Symptom: A cross-repository scan can be green as an executed advisory check
+  while still returning findings, making an acceptance-only increment look like
+  completed dependency cleanup.
+- Context: My-Chat/T-030 N2 coordination acceptance for Nurture/T-002.
+- Root cause: Work assignment, policy adoption, mechanical detection, source
+  cleanup, exact dependency re-pin, and release verification were compressed
+  into one “aligned” status.
+- What we tried: Re-ran the Base consumer-boundary scanner against the clean
+  Nurture baseline and inspected the dependency, direct-import, framework, and
+  port surfaces before editing implementation code.
+- Fix / workaround: Record acceptance separately from implementation. Keep
+  `ECO-CONSUMER-002` and `ECO-CONSUMER-004` open until the local Base artifact
+  link and sibling-source import are removed, then require exact My-Chat pin,
+  clean install, typecheck/tests, and joint conformance evidence.
+- Prevention: Every cross-repository status update states exact revisions,
+  repo-qualified owner/task, scanner finding count, effect boundary, and the
+  remaining exit gate. Advisory output is evidence of detection only.
+- References: `00-overview.md`, `01-plan.md`, `04-verification.md`,
+  My-Workflow-Base `docs/context/ecosystem/contract-status.md`, and
+  My-Chat/T-030.

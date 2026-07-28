@@ -5,12 +5,24 @@
 - State: in-progress
 - **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 joint acceptance（complete）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-21
+- **Updated:** 2026-07-28
 - **Owner:** willyu1007
 - **Next step:** Pilot-0-D remains `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO` at `DR-P0=0 / DR-P1=0 / DR-P2=0`; the canonical readiness census still has six open `TR-P0`, three open `TR-P1`, and one accepted-scope `TR-P1`, no complete candidate exists, and `QR-*` is not applicable. C30-I0-A baseline inventory and C30-I0-B T-029 disposition are complete in `artifacts/12-c30-i0-baseline-inventory.md` and `artifacts/13-c30-i0-b-t029-disposition.md`. The disposition covers all 176 donor files, permits no direct merge, retains only named mechanisms for clean reimplementation, and excludes direct platform Child/Family refs, umbrella sources, dual manifest/Execution tracks, mutable evidence, T-028 cutover, C34/C35, and protected AI from C30. The next action is C30-I0-C scoped T-002/T-003/cloud-deployment separation plus clean three-repository worktrees, followed by C30-I0-D immutable pins, hermetic verification, false/empty proof, and canonical rerun; C30-I1, C31, C4, D implementation, Pilot-0-E, and Pilot-1 remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
+- My-Workflow-Base ecosystem-policy revision: `26fac97fc82ec5f5df23528aacabbc16b749b490`.
+- My-Chat/T-030 coordination baseline: `33264981515d75dd9768b720a1d1127cba70cbbe`.
+- On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
+  `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
+  `ST-6(b)`. Acceptance assigns the work; it does not claim that dependency
+  publication, the My-Chat re-pin, the Fastify-to-NestJS transition, port
+  migration, API-index repair, or governance cleanup is complete.
+- The Base advisory consumer scan currently reports
+  `ECO-CONSUMER-002` at `apps/frontend/package.json` for the local
+  `@willyu1007/web-workbench` link and `ECO-CONSUMER-004` at
+  `packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts` for a
+  direct sibling-source import. Both remain open implementation work.
 - My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
 - My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).

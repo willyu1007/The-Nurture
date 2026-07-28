@@ -3,9 +3,11 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-07-21
+- Last updated: 2026-07-28
 
 ## What changed
+
+- 2026-07-28: Accepted the Nurture-owned My-Chat/T-030 alignment scope against Base ecosystem-policy revision `26fac97fc82ec5f5df23528aacabbc16b749b490` and My-Chat baseline `33264981515d75dd9768b720a1d1127cba70cbbe`. T-002 now owns `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)`. The Base advisory scanner reproduced two open findings: `ECO-CONSUMER-002` for the local Base web-workbench link and `ECO-CONSUMER-004` for the X5 direct sibling-source import. The accepted order is Base publication, exact My-Chat adoption/re-pin, Nurture dependency/source cleanup, then joint verification. The current Fastify server remains a local/test harness pending the separately verified NestJS transition; the env/code/default-port drift remains open pending adoption of the Base-assigned `3200/3201` pair. The acceptance increment updates task documentation only and does not claim the scanner findings, re-pin, framework, port, API-index, or governance work complete; no product source, schema, migration, dependency lock, database, environment, artifact, gate, provider, or traffic changed.
 
 - 2026-07-21: Completed the read-only `C30-I0-B` disposition of all 176 uncommitted T-029 donor files and recorded the exhaustive path-group matrix in `artifacts/13-c30-i0-b-t029-disposition.md`. No candidate file is directly mergeable. Closed-field codecs, stable command hashing, owner transaction plus refs-only outbox, same-subject FK, and duplicate/wrong-Step/response-loss/privacy tests remain reusable mechanisms only and must be reimplemented on clean C30 branches. Base hard-codes My-Chat/product policy and lacks the four separate C30 sources and trusted principal/direct-claimed contracts; My-Chat mixes C30 identity/ingress with T-028 removal, C34 events, C35 activation, and protected AI; Nurture reverses the locked anchor direction, persists rejected/compensated Executions through a second command kernel, and exports dual vNext/preactivation manifests. The disposition removes those tracks, defers later DAG work, requires generated evidence to be rebuilt, and preserves Base-first -> My-Chat -> Nurture -> joint adoption. No candidate source, schema, migration, package, lock, gate, database, artifact, secret, provider, or traffic was changed. `C30-I0-B=COMPLETE`; C/D remain pending and `C30-I1_NO_GO` remains unchanged.
 

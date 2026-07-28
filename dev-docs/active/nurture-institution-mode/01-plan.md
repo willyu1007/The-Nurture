@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-07-28 — My-Chat/T-030 acceptance increment
+
+The 2026-07-28 increment accepts the Nurture-owned portion of the cross-repository
+alignment plan against Base revision
+`26fac97fc82ec5f5df23528aacabbc16b749b490` and My-Chat baseline
+`33264981515d75dd9768b720a1d1127cba70cbbe`.
+
+| Work item | State | Exit |
+| --- | --- | --- |
+| Accept repo-qualified ownership | Complete | T-002 owns `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)`; references use repository-qualified task ids. |
+| Adopt Base ecosystem policy | Complete | Package distribution, source-boundary, schema-convention, and port-allocation decisions cite Base `26fac97`; local-path dependencies are development-only and cannot be release evidence. |
+| Replace Base web-workbench local link | Pending | Publish/consume an immutable package or content-addressed artifact; remove `ECO-CONSUMER-002`; clean install, typecheck, lint, and frontend tests pass. |
+| Remove direct sibling-source import | Pending | X5 joint acceptance consumes a published package/artifact or an explicitly materialized exact-revision fixture; remove `ECO-CONSUMER-004`. |
+| Re-pin My-Chat workflow packages | Pending | T-002 consumes the N3-approved exact My-Chat revision, refreshes the installed `file:` snapshot where still required, and passes the pin verifier plus joint regression. |
+| Resolve service-framework timing | Pending | Record and implement the approved transition from the current Fastify dev-host harness to the required NestJS scenario service without promoting the harness to a pilot runtime. |
+| Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. |
+| Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. |
+
+Ordering is Base publication -> My-Chat exact adoption/re-pin -> Nurture
+dependency/source cleanup -> joint verification. No database apply, artifact
+publication, environment mutation, activation, provider, or traffic is
+authorized by the 2026-07-28 acceptance increment.
+
 ## C30-I0 — Implementation baseline isolation（进行中）
 
 `C30-I0` 只建立可归属、可回放、不可变的实施入口，不实现 C30-I1
