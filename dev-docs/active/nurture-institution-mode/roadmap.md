@@ -15,6 +15,7 @@ My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、st
 | Ecosystem policy | My-Workflow-Base `26fac97fc82ec5f5df23528aacabbc16b749b490` | Adopted | Consumers implement package/source/port rules. |
 | Coordination baseline | My-Chat/T-030 baseline `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision `533cbf715315bc724ddeb82174c0a981e667d77b` | N3 adopted | Preserve exact revision/source verification. |
 | Nurture dependency boundary | T-002: Nurture leg of `X-2`, `RB-2`, `RB-3(a)` | Complete | Registry UI package, public My-Chat exports, exact source pin, strict scanner and X5 remain green. |
+| Wave 4 P1/P2 repair | My-Chat/T-028 + The-Nurture/T-002 | Locally verified; exact pins/CI pending | Publish repaired Host, refresh Nurture pin, publish transaction-atomic owner issuance, then run native and joint review. P3 remains held. |
 | Nurture remaining scope | T-002: `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Implementation open | Resolve framework, ports, API index, and governance drift in independently reviewable increments. |
 | Enablement | Cross-repo | Closed | No staging, production, capability, provider, or external traffic activation from this overlay. |
 

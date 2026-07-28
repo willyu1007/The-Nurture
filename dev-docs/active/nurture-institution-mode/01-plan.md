@@ -43,21 +43,20 @@ or activation.
 
 | Work item | State | Exit |
 | --- | --- | --- |
-| Freeze exact Host receipt contract | Reopened by quality review | My-Chat `64f4165fe571a46ded094ebf6f771bdea61383d1` remains the reviewed historical source, but replacement is required because the Host client DTO exposes stable anchors and Host command replay/version concurrency is not deterministic. |
+| Freeze exact Host receipt contract | Exact replacement pinned; CI pending | My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7` keeps anchors private and adds durable replay, monotonic versions, CAS, and PostgreSQL race convergence. The expanded 15-file Host source population verifies at `3dadb0...f0c5`; native CI is pending. |
 | Add typed body-free anchors | Complete locally | Child and Family owner refs use separate namespaces and random UUID anchors. Normal lifecycle is `reserved|bound_empty|associated|retired`; `revoked|quarantined` fail closed. |
-| Add owner authorization adapter | Implemented locally, qualification blocked, default-deny | The domain port rereads an injected current Nurture authority source, but the reread currently finishes before the repository transaction. Move authority reread/lock, exact anchor lock, and receipt persistence into one owner transaction. No production reader is wired. |
+| Add owner authorization adapter | Repair complete locally, default-deny | A transaction-scoped adapter receives the exact Prisma transaction, rereads/locks or CAS-validates the exact authority source after the anchor lock, and persists or exact-replays the receipt in that transaction. Default wiring denies; no production reader is wired. |
 | Add exact local association schema | Complete as target schema | Workspace/Child/Process/Family integrity is enforced with composite keys and foreign keys. No sibling ORM/source or cross-database join is introduced. |
 | Stop new plaintext birth-date writes | Complete as unapplied migration | A column-scoped trigger blocks non-null inserts and explicit birth-date updates once applied while allowing unrelated updates to historical rows. No existing value is read, deleted, migrated, or inferred. |
 | Add derived age/stage boundary | Complete locally | Only `age_band_key`, owner-defined `stage_key`, `as_of_date`, positive `source_version`, and current canonical UTC expiry are accepted; raw birth date, exact age, unknown fields, future as-of dates, and expired values fail closed. |
-| P2 negative and replay verification | Regression suite complete; concurrency gate open | Existing negatives remain green, including native CI `30366195095` and final run `30366571495`. Add a real PostgreSQL authority-revoke/receipt-issue interleaving that proves no usable receipt can commit after the exact authority source changes. |
-| Refresh pins/context/governance and cloud CI | Complete | The 31-file Nurture hash is `2a6cd497de67deb34c4650ca47f9f6a26ecc0f0376f1f2ceac53a37f17333d75`; exact Base/My-Chat pins, generated DB context, governance, full typecheck, 187 unit tests, 35 DB tests, 19 dev-host tests, and frontend lint/build pass in native run `30366195095`. |
+| P2 negative and replay verification | Repair tests complete locally | Existing negatives remain green. A real PostgreSQL interleaving now locks the exact care-role source, proves concurrent revoke cannot overtake issuance, and proves post-commit revoke denies the next issue. Three target rounds pass. |
+| Refresh pins/context/governance and cloud CI | Pending replacement revisions | Historical 31-file hash and CI remain regression evidence. Refresh the exact repaired Host pin and Nurture source hash, then run native no-publication CI. |
 | Apply migration or activate consumers | Not authorized | Requires the separate T-027/T-028 environment, row-count, owner-review, release-unit, backup/rollback, and activation decisions. |
 
-Exit for the Wave 4 increment is reopened. The current revision is a committed,
-CI-green implementation with a negative activation census, not a qualified P2
-source candidate. Exit now requires a transaction-atomic owner authorization
-repair, the repaired Host pin, targeted concurrency/privacy tests, native CI,
-and joint owner review. The resulting revision is not a C30 component
+Exit for the Wave 4 increment remains open. Transaction-atomic owner
+authorization and targeted concurrency/privacy tests now pass locally. Exit
+still requires exact repaired Host and Nurture revisions, refreshed pin/source
+hash, native CI, and joint owner review. The resulting revision is not a C30 component
 candidate, qualified Pilot artifact, applied migration, or release approval.
 
 ## C30-I0 — Implementation baseline isolation（进行中）

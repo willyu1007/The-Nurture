@@ -997,3 +997,37 @@
   migration, persistent database, secret, environment, artifact, capability,
   Scenario row, provider, deployment, or traffic state changed in this
   review/documentation increment.
+
+## 2026-07-28 — Wave 4 P2 authority-atomicity repair
+
+- Removed the out-of-transaction `verifyCurrent` call from the domain
+  verifier. The domain now passes raw private `authorityInput` to the
+  repository and never treats caller-supplied evidence fields as proof.
+- Added `TransactionalNurtureBindingAuthorityReader`. It receives the exact
+  Prisma transaction and must reread/lock or database-CAS the exact current
+  role/grant/purpose/lifecycle source. The default implementation denies.
+- The repository locks the typed anchor, invokes that reader inside the same
+  transaction, validates the returned evidence, and only then inserts or
+  exact-replays the authorization receipt. Exact replay also rereads current
+  authority.
+- Added a real PostgreSQL interleaving using the exact
+  `nurture_care_role_assignment` source row. While issuance holds that row, a
+  concurrent revoke with a bounded lock timeout cannot overtake it; after
+  issuance commits, revocation makes the next request fail closed.
+- Raised the production-DB population floor from 35 to 37 for the default-deny
+  and interleaving cases. All five migrations apply to disposable PostgreSQL;
+  all 37 database tests and the static routing/persistence boundaries pass.
+- Three targeted rounds pass, each with 6 domain and 13 database tests. The
+  runnable full local unit population passes 175 tests; three existing suites
+  require the exact pinned My-Chat generated package payload that native CI
+  prepares.
+- No persistent migration, database, birth-date operation, production reader,
+  environment, secret, package/image publication, deployment, Scenario,
+  capability, provider, or traffic change occurred. Exact Host pin, Nurture
+  source revision/hash, native CI, and owner review remain.
+- The repaired Host source is now published at
+  `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The pin population was expanded
+  from the earlier narrow runtime subset to include all public API transport
+  files, Prisma SSOT, and both Wave 4 migrations. Base/My-Chat contract parity,
+  161-file X5 source `cac294...ccf6`, 15-file Host source `3dadb0...f0c5`, and
+  31-file Nurture source `c4d9ee...0bda` all verify exactly.

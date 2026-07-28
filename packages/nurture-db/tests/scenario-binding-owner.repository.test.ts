@@ -6,7 +6,10 @@ import {
   type IssueNurtureBindingAuthorizationInput,
 } from "@the-nurture/scenario";
 import { HmacNurtureBindingEvidenceHasher } from "../src/binding-evidence-hasher.js";
-import { PrismaNurtureScenarioBindingAuthorizationRepository } from "../src/repositories/scenario-binding-owner.repository.js";
+import {
+  PrismaNurtureScenarioBindingAuthorizationRepository,
+  type TransactionalNurtureBindingAuthorityReader,
+} from "../src/repositories/scenario-binding-owner.repository.js";
 
 const childAnchorId = "55a6c91b-dac9-4a17-9d61-dff098243d42";
 const familyAnchorId = "6975acbe-7272-4e5d-acad-b85140070598";
@@ -30,10 +33,9 @@ describe("HmacNurtureBindingEvidenceHasher", () => {
 describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
   it("reserves and exact-replays one body-free child anchor", async () => {
     const prisma = new FakePrismaClient();
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(
-        prisma as unknown as PrismaClient,
-      );
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+    );
 
     const first = await repository.reserveAnchor({
       subjectType: "child",
@@ -64,10 +66,10 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
         reservationKeyHash: digest("family-reservation"),
       }),
     });
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(
-        prisma as unknown as PrismaClient,
-      );
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+      allowAuthority(prisma),
+    );
 
     const issued = await repository.issueAuthorization(
       issueInput({
@@ -89,10 +91,10 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
 
   it("issues and exact-replays an authorization without persisting platform subject or actor ids", async () => {
     const prisma = new FakePrismaClient({ childAnchor: anchor() });
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(
-        prisma as unknown as PrismaClient,
-      );
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+      allowAuthority(prisma),
+    );
     const input = issueInput();
 
     const first = await repository.issueAuthorization(input);
@@ -102,6 +104,7 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
     expect(replay).toEqual({ ...first, replayed: true });
     expect(prisma.transaction.authorizationsCreated).toBe(1);
     expect(prisma.transaction.anchorLocks).toBe(2);
+    expect(prisma.transaction.authorityReads).toBe(2);
     expect(
       JSON.stringify(prisma.transaction.authorizationCreateData),
     ).not.toContain("platform-child-1");
@@ -112,10 +115,10 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
 
   it("rejects divergent payload replay under the same idempotency digest", async () => {
     const prisma = new FakePrismaClient({ childAnchor: anchor() });
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(
-        prisma as unknown as PrismaClient,
-      );
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+      allowAuthority(prisma),
+    );
     await repository.issueAuthorization(issueInput());
 
     await expect(
@@ -129,13 +132,12 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
 
   it("rejects a stale anchor version before issuing a receipt", async () => {
     const prisma = new FakePrismaClient({ childAnchor: anchor() });
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(
-        prisma as unknown as PrismaClient,
-      );
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+    );
 
     await expect(
-      repository.issueAuthorization({ ...issueInput(), ownerVersion: 2 }),
+      repository.issueAuthorization(issueInput({ ownerVersion: 2 })),
     ).rejects.toMatchObject({ code: "anchor_not_current" });
     expect(prisma.transaction.authorizationsCreated).toBe(0);
   });
@@ -151,14 +153,26 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
         expiresAt: new Date("2026-07-28T13:05:00.000Z"),
       },
     });
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(
-        prisma as unknown as PrismaClient,
-      );
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+      allowAuthority(prisma),
+    );
 
     await expect(
       repository.issueAuthorization(issueInput()),
     ).rejects.toMatchObject({ code: "authorization_receipt_inactive" });
+  });
+
+  it("fails closed when no transactional authority reader is configured", async () => {
+    const prisma = new FakePrismaClient({ childAnchor: anchor() });
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+    );
+
+    await expect(
+      repository.issueAuthorization(issueInput()),
+    ).rejects.toMatchObject({ code: "owner_authorization_unavailable" });
+    expect(prisma.transaction.authorizationsCreated).toBe(0);
   });
 });
 
@@ -200,6 +214,7 @@ class FakeTransaction {
   childAnchorsCreated = 0;
   authorizationsCreated = 0;
   anchorLocks = 0;
+  authorityReads = 0;
   authorizationCreateData?: Record<string, unknown>;
   private childAnchor: AnchorRow | null;
   private familyAnchor: AnchorRow | null;
@@ -313,24 +328,53 @@ function anchor(overrides: Partial<AnchorRow> = {}) {
 function issueInput(
   overrides: Partial<IssueNurtureBindingAuthorizationInput> = {},
 ): IssueNurtureBindingAuthorizationInput {
+  const anchorId = overrides.anchorId ?? childAnchorId;
+  const subjectType = overrides.subjectType ?? "child";
+  const ownerRef =
+    overrides.ownerRef ?? formatNurtureBindingOwnerRef(subjectType, anchorId);
+  const ownerVersion = overrides.ownerVersion ?? 1;
   return {
-    anchorId: childAnchorId,
-    subjectType: "child",
+    anchorId,
+    subjectType,
     workspaceId: "workspace-1",
-    ownerRef: formatNurtureBindingOwnerRef("child", childAnchorId),
-    ownerVersion: 1,
+    ownerRef,
+    ownerVersion,
     idempotencyKeyHash: digest("idempotency"),
     requestFingerprint: digest("request"),
     subjectEvidenceHash: digest("platform-child-1"),
     userEvidenceHash: digest("platform-user-1"),
     actorEvidenceHash: digest("platform-actor-1"),
     purpose: "scenario_binding_write",
-    authorizationSourceRef: "nurture-binding-intent-1",
-    authorizationSourceVersion: 1,
-    verifiedAt: now,
-    expiresAt: new Date("2026-07-28T13:05:00.000Z"),
+    authorityInput: {
+      workspaceId: "workspace-1",
+      actingUserId: "platform-user-1",
+      actingActorId: "platform-actor-1",
+      subjectType,
+      ownerRef,
+      ownerVersion,
+      purpose: "scenario_binding_write",
+      anchorId,
+    },
     now,
     ...overrides,
+  };
+}
+
+function allowAuthority(
+  prisma: FakePrismaClient,
+): TransactionalNurtureBindingAuthorityReader {
+  return {
+    verifyCurrent: async (transaction) => {
+      expect(transaction).toBe(prisma.transaction);
+      expect(prisma.transaction.anchorLocks).toBeGreaterThan(0);
+      prisma.transaction.authorityReads += 1;
+      return {
+        authorizationSourceRef: "nurture-binding-intent-1",
+        authorizationSourceVersion: 1,
+        verifiedAt: now,
+        expiresAt: new Date("2026-07-28T13:05:00.000Z"),
+      };
+    },
   };
 }
 

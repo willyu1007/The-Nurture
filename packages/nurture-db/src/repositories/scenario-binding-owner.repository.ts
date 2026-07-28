@@ -4,12 +4,15 @@ import {
   NurtureScenarioBindingError,
   formatNurtureBindingOwnerRef,
   parseNurtureBindingOwnerRef,
+  validateNurtureBindingAuthorityEvidence,
   type IssueNurtureBindingAuthorizationInput,
   type IssuedNurtureBindingAuthorization,
+  type NurtureBindingAuthorityEvidence,
   type NurtureBindingSubjectType,
   type NurtureScenarioBindingAuthorizationRepository,
   type ReservedNurtureBindingAnchor,
   type ReserveNurtureBindingAnchorInput,
+  type VerifyCurrentNurtureBindingAuthorityInput,
 } from "@the-nurture/scenario";
 
 type TransactionClient = Prisma.TransactionClient;
@@ -28,10 +31,38 @@ type PersistedAuthorization = {
   expiresAt: Date;
 };
 
+/**
+ * Private infrastructure port for the exact role/grant/purpose/lifecycle
+ * source that authorizes a binding. Implementations must use the supplied
+ * transaction and lock or compare-and-set the exact source row. Network or
+ * out-of-transaction authority reads are not valid implementations.
+ */
+export type TransactionalNurtureBindingAuthorityReader = {
+  verifyCurrent(
+    transaction: TransactionClient,
+    input: VerifyCurrentNurtureBindingAuthorityInput,
+  ): Promise<NurtureBindingAuthorityEvidence>;
+};
+
+export class DenyTransactionalNurtureBindingAuthorityReader
+  implements TransactionalNurtureBindingAuthorityReader
+{
+  async verifyCurrent(): Promise<never> {
+    throw new NurtureScenarioBindingError(
+      "owner_authorization_unavailable",
+      "Nurture binding authority is not configured; owner verification remains disabled.",
+    );
+  }
+}
+
 export class PrismaNurtureScenarioBindingAuthorizationRepository
   implements NurtureScenarioBindingAuthorizationRepository
 {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly authorityReader: TransactionalNurtureBindingAuthorityReader =
+      new DenyTransactionalNurtureBindingAuthorityReader(),
+  ) {}
 
   reserveAnchor(
     input: ReserveNurtureBindingAnchorInput,
@@ -79,6 +110,12 @@ export class PrismaNurtureScenarioBindingAuthorizationRepository
         );
       }
 
+      const authority = await this.authorityReader.verifyCurrent(
+        transaction,
+        input.authorityInput,
+      );
+      validateNurtureBindingAuthorityEvidence(authority, input.now);
+
       const existing =
         await transaction.nurtureScenarioBindingAuthorization.findUnique({
           where: { idempotencyKeyHash: input.idempotencyKeyHash },
@@ -109,11 +146,11 @@ export class PrismaNurtureScenarioBindingAuthorizationRepository
             actorEvidenceHash: input.actorEvidenceHash,
             organizationEvidenceHash: input.organizationEvidenceHash,
             purpose: input.purpose,
-            authorizationSourceRef: input.authorizationSourceRef,
-            authorizationSourceVersion: input.authorizationSourceVersion,
+            authorizationSourceRef: authority.authorizationSourceRef,
+            authorizationSourceVersion: authority.authorizationSourceVersion,
             status: "active",
-            verifiedAt: input.verifiedAt,
-            expiresAt: input.expiresAt,
+            verifiedAt: authority.verifiedAt,
+            expiresAt: authority.expiresAt,
           },
         });
       return issued.id === candidateId
@@ -247,14 +284,11 @@ function assertAnchorReservable(anchor: PersistedAnchor): void {
   }
 }
 
-function validateIssueInput(input: IssueNurtureBindingAuthorizationInput): void {
+function validateIssueInput(
+  input: IssueNurtureBindingAuthorizationInput,
+): void {
   requireSubjectType(input.subjectType);
   requireCanonicalText(input.workspaceId, "workspace id", 128);
-  requireCanonicalText(
-    input.authorizationSourceRef,
-    "authorization source reference",
-    512,
-  );
   const ownerRef = parseNurtureBindingOwnerRef(input.ownerRef);
   if (
     ownerRef.subjectType !== input.subjectType ||
@@ -277,21 +311,36 @@ function validateIssueInput(input: IssueNurtureBindingAuthorizationInput): void 
   if (input.organizationEvidenceHash) {
     requireDigest(input.organizationEvidenceHash, "organization evidence hash");
   }
+  const authorityInput = input.authorityInput;
+  if (
+    !authorityInput ||
+    authorityInput.workspaceId !== input.workspaceId ||
+    authorityInput.subjectType !== input.subjectType ||
+    authorityInput.anchorId !== input.anchorId ||
+    authorityInput.ownerRef !== input.ownerRef ||
+    authorityInput.ownerVersion !== input.ownerVersion ||
+    authorityInput.purpose !== input.purpose
+  ) {
+    throw new NurtureScenarioBindingError(
+      "owner_authorization_denied",
+      "The transactional authority request does not match the binding command.",
+    );
+  }
+  requireCanonicalText(authorityInput.actingUserId, "acting user id", 128);
+  requireCanonicalText(authorityInput.actingActorId, "acting actor id", 128);
+  if (authorityInput.representedOrganizationId !== undefined) {
+    requireCanonicalText(
+      authorityInput.representedOrganizationId,
+      "represented organization id",
+      128,
+    );
+  }
   if (
     input.purpose !== "scenario_binding_write" ||
     !Number.isSafeInteger(input.ownerVersion) ||
     input.ownerVersion < 1 ||
-    !Number.isSafeInteger(input.authorizationSourceVersion) ||
-    input.authorizationSourceVersion < 1 ||
     !(input.now instanceof Date) ||
-    Number.isNaN(input.now.getTime()) ||
-    !(input.verifiedAt instanceof Date) ||
-    Number.isNaN(input.verifiedAt.getTime()) ||
-    !(input.expiresAt instanceof Date) ||
-    Number.isNaN(input.expiresAt.getTime()) ||
-    input.verifiedAt > input.now ||
-    input.expiresAt <= input.now ||
-    input.expiresAt <= input.verifiedAt
+    Number.isNaN(input.now.getTime())
   ) {
     throw new NurtureScenarioBindingError(
       "owner_authorization_denied",

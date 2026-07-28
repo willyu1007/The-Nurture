@@ -3,17 +3,18 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor implementation（CI green, qualification reopened, default-deny）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor repair（locally verified and exact Host-pinned, Nurture revision/CI pending, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
-- **Next step:** Repair the Wave 4 P2 authorization boundary so current
+- **Next step:** Publish this transaction-atomic Nurture repair and run native
+  plus joint conformance against the exact repaired My-Chat pin. Current
   role/grant/purpose/lifecycle reread, exact anchor lock, and receipt
-  persistence occur in one Nurture owner transaction; then repin the repaired
-  My-Chat private-anchor/idempotency contract and rerun native plus joint
-  conformance. CI runs `30366195095` and `30366571495` remain regression
-  evidence, not source qualification. The additive migration remains unapplied
-  outside disposable CI and every consumer remains default-disabled. C30-I1,
+  persistence now share one Nurture owner transaction in local source and pass
+  a real PostgreSQL revoke/issue interleaving. CI runs `30366195095` and
+  `30366571495` remain historical regression evidence, not qualification for
+  the replacement source. The additive migration remains unapplied outside
+  disposable CI and every consumer remains default-disabled. C30-I1,
   C31, C4, D implementation, Pilot-0-E, Pilot-1, any persistent database
   apply, artifact publication, capability activation, and external traffic
   remain NO-GO.
@@ -26,19 +27,18 @@
 - My-Chat/T-030 accepted coordination baseline:
   `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
   `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
-- Wave 4 P2 consumes the narrower host-binding contract candidate
-  `64f4165fe571a46ded094ebf6f771bdea61383d1`. Its owner-verifier input includes
-  exact Workspace, acting User, Actor, represented Organization when present,
-  idempotency key, typed subject, owner ref/version, purpose, and trace
-  context; the returned receipt is Workspace-bound. This pin does not replace
-  the broader C30/C35 qualification DAG. The 31-file P2-extended Nurture source
-  population is pinned at
-  `2a6cd497de67deb34c4650ca47f9f6a26ecc0f0376f1f2ceac53a37f17333d75`.
-  The 2026-07-28 implementation-quality review rejects both this Host pin and
-  the current P2 implementation as adoption evidence: the Host transports
-  stable anchors through client DTOs and lacks deterministic command
-  idempotency/version concurrency, while Nurture persists authorization after
-  an out-of-transaction authority reread. Replacement exact pins are required.
+- Wave 4 P2 now pins the repaired Host binding source at
+  `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The public transport excludes
+  stable anchors; the private resolver and durable command ledger enforce
+  current-owner replay, monotonic versions, CAS, and deterministic races. The
+  expanded 15-file Host population hash is
+  `3dadb0b89fc7a782a590b5e7d8e2d6510b4c34029b0dc1a046a6a65f0c82f0c5`;
+  the broader X5 source hash is
+  `cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6`.
+  The repaired 31-file Nurture source population hashes to
+  `c4d9ee5dd9c5c3ae0a9ac579729153551c2981e4dca9ecf288546f8348f90bda`.
+  Exact Base/My-Chat parity and all three source hashes pass the native pin
+  verifier. Replacement native CI and joint owner review remain required.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.

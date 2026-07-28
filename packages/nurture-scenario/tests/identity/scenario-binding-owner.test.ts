@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  DenyNurtureBindingAuthorityReader,
+  NurtureScenarioBindingError,
   NurtureScenarioBindingOwnerVerifier,
   formatNurtureBindingOwnerRef,
   type IssueNurtureBindingAuthorizationInput,
@@ -15,32 +15,14 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
   it("issues a My-Chat-compatible receipt with exact workspace and actor context", async () => {
     let issued: IssueNurtureBindingAuthorizationInput | undefined;
     const verifier = new NurtureScenarioBindingOwnerVerifier(
-      {
-        verifyCurrent: async (input) => {
-          expect(input).toMatchObject({
-            workspaceId: "workspace-1",
-            actingUserId: "user-1",
-            actingActorId: "actor-1",
-            subjectType: "child",
-            anchorId: childAnchorId,
-            purpose: "scenario_binding_write",
-          });
-          return {
-            authorizationSourceRef: "nurture-binding-intent-1",
-            authorizationSourceVersion: 3,
-            verifiedAt: now,
-            expiresAt: new Date("2026-07-28T13:05:00.000Z"),
-          };
-        },
-      },
       repository({
         issueAuthorization: async (input) => {
           issued = input;
           return {
             authorizationRef:
               "nurture_scenario_binding_authorization_v1:receipt-1",
-            verifiedAt: input.verifiedAt,
-            expiresAt: input.expiresAt,
+            verifiedAt: now,
+            expiresAt: new Date("2026-07-28T13:05:00.000Z"),
             replayed: false,
           };
         },
@@ -56,8 +38,14 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
       workspaceId: "workspace-1",
       ownerVersion: 1,
       purpose: "scenario_binding_write",
-      authorizationSourceRef: "nurture-binding-intent-1",
-      authorizationSourceVersion: 3,
+      authorityInput: {
+        workspaceId: "workspace-1",
+        actingUserId: "user-1",
+        actingActorId: "actor-1",
+        subjectType: "child",
+        anchorId: childAnchorId,
+        purpose: "scenario_binding_write",
+      },
     });
     expect(issued?.requestFingerprint).not.toContain("child-1");
     expect(receipt).toMatchObject({
@@ -75,13 +63,12 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
   it("rejects a wrong owner-reference object type before authority lookup", async () => {
     let authorityRead = false;
     const verifier = new NurtureScenarioBindingOwnerVerifier(
-      {
-        verifyCurrent: async () => {
+      repository({
+        issueAuthorization: async () => {
           authorityRead = true;
           throw new Error("unexpected");
         },
-      },
-      repository(),
+      }),
       { hash: (parts) => parts.join("|") },
       () => now,
     );
@@ -96,17 +83,21 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
       }),
     ).rejects.toMatchObject({ code: "invalid_owner_ref" });
     await expect(
-      verifier.verify(
-        null as unknown as NurtureScenarioOwnerVerificationInput,
-      ),
+      verifier.verify(null as unknown as NurtureScenarioOwnerVerificationInput),
     ).rejects.toMatchObject({ code: "invalid_binding_request" });
     expect(authorityRead).toBe(false);
   });
 
-  it("keeps owner verification disabled and rejects invalid authority evidence", async () => {
+  it("propagates the repository's fail-closed authority decision", async () => {
     const verifier = new NurtureScenarioBindingOwnerVerifier(
-      new DenyNurtureBindingAuthorityReader(),
-      repository(),
+      repository({
+        issueAuthorization: async () => {
+          throw new NurtureScenarioBindingError(
+            "owner_authorization_unavailable",
+            "Authority is not configured.",
+          );
+        },
+      }),
       { hash: (parts) => parts.join("|") },
       () => now,
     );
@@ -114,28 +105,17 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
     await expect(verifier.verify(request())).rejects.toMatchObject({
       code: "owner_authorization_unavailable",
     });
-
-    const invalidEvidenceVerifier = new NurtureScenarioBindingOwnerVerifier(
-      { verifyCurrent: async () => null as never },
-      repository(),
-      { hash: (parts) => parts.join("|") },
-      () => now,
-    );
-    await expect(
-      invalidEvidenceVerifier.verify(request()),
-    ).rejects.toMatchObject({ code: "owner_authorization_denied" });
   });
 
   it("rejects a self-asserted care role instead of treating it as Host or Education authority", async () => {
     let authorityRead = false;
     const verifier = new NurtureScenarioBindingOwnerVerifier(
-      {
-        verifyCurrent: async () => {
+      repository({
+        issueAuthorization: async () => {
           authorityRead = true;
           throw new Error("unexpected");
         },
-      },
-      repository(),
+      }),
       { hash: (parts) => parts.join("|") },
       () => now,
     );
@@ -152,13 +132,12 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
   it("rejects an Education scenario request before Nurture authority lookup", async () => {
     let authorityRead = false;
     const verifier = new NurtureScenarioBindingOwnerVerifier(
-      {
-        verifyCurrent: async () => {
+      repository({
+        issueAuthorization: async () => {
           authorityRead = true;
           throw new Error("unexpected");
         },
-      },
-      repository(),
+      }),
       { hash: (parts) => parts.join("|") },
       () => now,
     );
@@ -175,7 +154,6 @@ describe("NurtureScenarioBindingOwnerVerifier", () => {
   it("uses a keyed digest for anchor reservation idempotency", async () => {
     let reservationKeyHash: string | undefined;
     const verifier = new NurtureScenarioBindingOwnerVerifier(
-      new DenyNurtureBindingAuthorityReader(),
       repository({
         reserveAnchor: async (input) => {
           reservationKeyHash = input.reservationKeyHash;
@@ -225,10 +203,9 @@ function repository(
       replayed: false,
     }),
     issueAuthorization: async (input) => ({
-      authorizationRef:
-        "nurture_scenario_binding_authorization_v1:receipt-1",
-      verifiedAt: input.verifiedAt,
-      expiresAt: input.expiresAt,
+      authorizationRef: "nurture_scenario_binding_authorization_v1:receipt-1",
+      verifiedAt: input.now,
+      expiresAt: new Date(input.now.getTime() + 5 * 60_000),
       replayed: false,
     }),
     ...overrides,

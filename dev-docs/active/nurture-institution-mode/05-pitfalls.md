@@ -6,6 +6,9 @@ This file exists to prevent repeating mistakes within this task.
 
 - Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
 - Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
+- Do not treat locking the binding anchor as fencing an independently mutable
+  authority source; reread and lock/CAS that exact source in the receipt
+  transaction.
 - Do not collapse `reserved|bound_empty|associated` into a generic anchor `active` state; a generic state hides whether the Host binding or local association exists.
 - Do not accept JavaScript's broad date parser as an ISO contract. Derived age/stage expiry must be canonical UTC, current, and paired with a non-future calendar `as_of_date`.
 - Do not treat a version-shaped package dependency plus a local override as immutable by itself. The override is acceptable only when the checkout revision and every bounded source set are verified before install/use; release distribution remains a separate decision.
@@ -1621,6 +1624,25 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: Any authorization derived from a mutable prerequisite must
   either lock that prerequisite or perform a database-enforced conditional
   write; a plain read followed by insert is not a current-state proof.
+
+### 2026-07-28 — Locking only the anchor while authority changes elsewhere
+
+- Symptom: Receipt issuance locked the exact typed anchor but accepted
+  role/grant/purpose evidence read before the transaction.
+- Context: Anchor lifecycle/version and scenario authority are independent
+  mutable prerequisites. Fencing one does not fence the other.
+- What we tried: Calling a domain `verifyCurrent` port first, then passing its
+  evidence into a repository transaction that locked only the anchor.
+- Root cause: The adapter boundary modeled authority as input data instead of
+  a transaction-local prerequisite owned by Nurture persistence.
+- Fix / workaround: Pass private authority lookup input to the repository.
+  Inside the exact Prisma transaction, lock the anchor, then call a
+  transaction-scoped reader that locks or database-CAS-validates the exact
+  authority source before insertion or replay. Default wiring denies. A real
+  PostgreSQL interleaving covers concurrent revoke and post-commit denial.
+- Prevention: For every receipt, enumerate every independently mutable
+  prerequisite and prove each is locked or conditionally validated in the
+  commit transaction. Never accept pre-read evidence as current authority.
 
 ### 2026-07-28 — Inferring a fixture type from a helper that consumes that type
 

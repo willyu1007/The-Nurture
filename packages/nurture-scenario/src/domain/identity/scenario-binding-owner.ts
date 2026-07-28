@@ -63,12 +63,6 @@ export type VerifyCurrentNurtureBindingAuthorityInput = Omit<
   anchorId: string;
 };
 
-export type NurtureBindingAuthorityReader = {
-  verifyCurrent(
-    input: VerifyCurrentNurtureBindingAuthorityInput,
-  ): Promise<NurtureBindingAuthorityEvidence>;
-};
-
 export type NurtureBindingEvidenceHasher = {
   hash(parts: readonly string[]): string;
 };
@@ -98,10 +92,7 @@ export type IssueNurtureBindingAuthorizationInput = {
   actorEvidenceHash: string;
   organizationEvidenceHash?: string;
   purpose: "scenario_binding_write";
-  authorizationSourceRef: string;
-  authorizationSourceVersion: number;
-  verifiedAt: Date;
-  expiresAt: Date;
+  authorityInput: VerifyCurrentNurtureBindingAuthorityInput;
   now: Date;
 };
 
@@ -141,18 +132,8 @@ export class NurtureScenarioBindingError extends Error {
   }
 }
 
-export class DenyNurtureBindingAuthorityReader implements NurtureBindingAuthorityReader {
-  async verifyCurrent(): Promise<never> {
-    throw new NurtureScenarioBindingError(
-      "owner_authorization_unavailable",
-      "Nurture binding authority is not configured; owner verification remains disabled.",
-    );
-  }
-}
-
 export class NurtureScenarioBindingOwnerVerifier {
   constructor(
-    private readonly authorityReader: NurtureBindingAuthorityReader,
     private readonly repository: NurtureScenarioBindingAuthorizationRepository,
     private readonly evidenceHasher: NurtureBindingEvidenceHasher,
     private readonly now: () => Date = () => new Date(),
@@ -187,21 +168,6 @@ export class NurtureScenarioBindingOwnerVerifier {
     }
 
     const now = this.now();
-    const authority = await this.authorityReader.verifyCurrent({
-      workspaceId: input.workspaceId,
-      actingUserId: input.actingUserId,
-      actingActorId: input.actingActorId,
-      representedOrganizationId: input.representedOrganizationId,
-      subjectType: input.subjectType,
-      ownerRef: input.ownerRef,
-      ownerVersion: input.ownerVersion,
-      purpose: input.purpose,
-      correlationId: input.correlationId,
-      traceId: input.traceId,
-      anchorId: ownerRef.anchorId,
-    });
-    validateAuthorityEvidence(authority, now);
-
     const optionalOrganization = input.representedOrganizationId ?? "";
     const hash = (label: string, value: string) =>
       this.evidenceHasher.hash([
@@ -242,10 +208,19 @@ export class NurtureScenarioBindingOwnerVerifier {
         ? hash("organization", optionalOrganization)
         : undefined,
       purpose: input.purpose,
-      authorizationSourceRef: authority.authorizationSourceRef,
-      authorizationSourceVersion: authority.authorizationSourceVersion,
-      verifiedAt: authority.verifiedAt,
-      expiresAt: authority.expiresAt,
+      authorityInput: {
+        workspaceId: input.workspaceId,
+        actingUserId: input.actingUserId,
+        actingActorId: input.actingActorId,
+        representedOrganizationId: input.representedOrganizationId,
+        subjectType: input.subjectType,
+        ownerRef: input.ownerRef,
+        ownerVersion: input.ownerVersion,
+        purpose: input.purpose,
+        correlationId: input.correlationId,
+        traceId: input.traceId,
+        anchorId: ownerRef.anchorId,
+      },
       now,
     });
 
@@ -379,7 +354,7 @@ function validateVerificationInput(
   }
 }
 
-function validateAuthorityEvidence(
+export function validateNurtureBindingAuthorityEvidence(
   evidence: NurtureBindingAuthorityEvidence,
   now: Date,
 ): void {

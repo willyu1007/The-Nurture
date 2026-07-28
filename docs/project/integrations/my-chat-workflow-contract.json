@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "64f4165fe571a46ded094ebf6f771bdea61383d1",
+    "revision": "30792cd48e35cce3720bfa8fb9a1094a59b0ccd7",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -76,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "4bd231f1c2fc85e7acf6822266fbe22a79b60a5c8e8e350046ae306e94f9c334"
+        "sha256": "cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6"
       },
       {
         "key": "wave4_binding_host",
@@ -85,10 +85,18 @@
           "packages/domain/child-identity",
           "packages/domain/package.json",
           "packages/domain/index.ts",
+          "apps/api/src/child-identity/child-identity.controller.ts",
+          "apps/api/src/child-identity/child-identity.dto.ts",
+          "apps/api/src/child-identity/child-identity.module.ts",
           "apps/api/src/child-identity/child-identity.service.ts",
-          "packages/db/src/scenario-binding-repository.ts"
+          "apps/api/src/child-identity/child-identity.validation.ts",
+          "apps/api/src/child-identity/tokens.ts",
+          "packages/db/src/scenario-binding-repository.ts",
+          "prisma/schema.prisma",
+          "prisma/migrations/20260728190000_wave4_binding_owner_evidence/migration.sql",
+          "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql"
         ],
-        "sha256": "c62197a83b1fc731674b3567e18021b10a0445c244f869cd0d070b3dea2d6c69"
+        "sha256": "3dadb0b89fc7a782a590b5e7d8e2d6510b4c34029b0dc1a046a6a65f0c82f0c5"
       }
     ]
   },
@@ -126,6 +134,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "2a6cd497de67deb34c4650ca47f9f6a26ecc0f0376f1f2ceac53a37f17333d75"
+    "contractSha256": "c4d9ee5dd9c5c3ae0a9ac579729153551c2981e4dca9ecf288546f8348f90bda"
   }
 }

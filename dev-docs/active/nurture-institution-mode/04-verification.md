@@ -71,6 +71,59 @@ Result:
 Exit requires a new Nurture exact revision, repaired Host pin, targeted
 concurrency/privacy tests, native CI, and joint owner review.
 
+## Wave 4 P2 authority-atomicity repair verification — 2026-07-28
+
+Three consecutive targeted rounds pass:
+
+```bash
+pnpm exec vitest run -c vitest.config.ts \
+  packages/nurture-scenario/tests/identity/scenario-binding-owner.test.ts
+
+DATABASE_URL=postgresql://... pnpm exec vitest run -c vitest.db.config.ts \
+  packages/nurture-db/tests/scenario-binding-owner.repository.test.ts \
+  packages/nurture-db/tests/scenario-binding-owner.integration.test.ts
+```
+
+Each round passes 6 domain tests and 13 database tests. The new evidence proves:
+
+- default repository wiring cannot issue an authorization;
+- authority lookup receives the exact repository transaction;
+- exact replay rereads current authority;
+- issuance holds the exact care-role source against concurrent revoke;
+- post-commit revoke makes later issuance fail closed.
+
+Additional evidence:
+
+- all five migrations apply to disposable PostgreSQL;
+- the complete production database population passes 37 / 37 tests;
+- Prisma validation, DB boundary, test routing, and persistence boundaries
+  pass;
+- the runnable local unit population passes 175 tests;
+- `git diff --check` passes.
+
+Three existing unit suites and full local typecheck require generated exact-pin
+My-Chat packages that are not prepared in the clean worktree. Native CI
+prepares those inputs and remains authoritative. No build was run locally.
+
+Result: `BLOCKER-NURTURE-AUTHORITY-ATOMICITY` is closed in local source and
+PostgreSQL evidence. Qualification remains pending the repaired exact Host pin,
+new Nurture revision/source hash, native no-publication CI, and joint owner
+review. Only disposable local PostgreSQL was used; no persistent or cloud
+state changed.
+
+Exact repaired pin evidence now passes:
+
+- My-Chat revision:
+  `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`;
+- shared Base/My-Chat workflow contract: `8dd53b...34d`;
+- 161-file X5 Host source: `cac294...ccf6`;
+- expanded 15-file Wave 4 Host source: `3dadb0...f0c5`;
+- repaired 31-file Nurture source: `c4d9ee...0bda`.
+
+The expanded Host source population covers the public DTO/validation/module
+boundary, private resolver/service, domain contract, repository, Prisma SSOT,
+and both Wave 4 migrations. Native CI and joint owner review remain pending.
+
 ## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
 
 | Check | Result | Evidence |

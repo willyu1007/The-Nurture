@@ -5,9 +5,8 @@
 
 ## Wave 4 P2 implementation boundary
 
-P2 currently implements against the reviewed historical owner-verifier
-contract from My-Chat
-`64f4165fe571a46ded094ebf6f771bdea61383d1`. The request is bound to
+P2 now implements against the repaired exact owner-verifier contract from
+My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The request is bound to
 Workspace, acting User, Actor, optional represented Organization, idempotency
 key, platform subject type/id, typed Nurture owner ref/version, purpose, and
 trace context. Nurture returns a Workspace-bound short-lived authorization
@@ -53,13 +52,14 @@ freezing unrelated updates to historical rows. The source increment does not
 delete or inspect historical values. Scenario input uses only an expiring
 derived age/stage result and rejects raw birth date or exact age.
 
-The current implementation does not yet satisfy the transaction shape above:
-`verifyCurrent` completes before `issueAuthorization`, and the repository
-transaction locks only the anchor. Before qualification, the repository/port
-boundary must make the exact authority-source version and lifecycle a
-transaction-local prerequisite of receipt insertion or exact replay. A
-concurrent role/grant/purpose revoke or version transition must prevent a
-usable receipt from committing.
+The replacement implementation satisfies the transaction shape above.
+`authorityInput` remains private domain input; a transaction-scoped reader
+receives the exact Prisma transaction after the anchor lock and must lock or
+database-CAS the exact role/grant/purpose/lifecycle source before receipt
+insertion or exact replay. Default wiring denies when no transactional reader
+is supplied. A real PostgreSQL interleaving proves a concurrent revoke cannot
+overtake issuance and that a later revoked source denies the next issue. Exact
+replacement pin and native CI remain qualification gates.
 
 No production authority-reader wiring, association consumer, manifest
 activation, Scenario row, database apply, environment change, artifact

@@ -1,12 +1,17 @@
 import { randomBytes, randomUUID } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import { afterAll, describe, expect, it } from "vitest";
 import {
+  NurtureScenarioBindingError,
   NurtureScenarioBindingOwnerVerifier,
   parseNurtureBindingOwnerRef,
 } from "@the-nurture/scenario";
 import { HmacNurtureBindingEvidenceHasher } from "../src/binding-evidence-hasher.js";
 import { createPrismaClient } from "../src/client.js";
-import { PrismaNurtureScenarioBindingAuthorizationRepository } from "../src/repositories/scenario-binding-owner.repository.js";
+import {
+  PrismaNurtureScenarioBindingAuthorizationRepository,
+  type TransactionalNurtureBindingAuthorityReader,
+} from "../src/repositories/scenario-binding-owner.repository.js";
 
 const prisma = createPrismaClient();
 
@@ -19,9 +24,8 @@ describe("Wave 4 binding persistence", () => {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 5 * 60_000);
     const authorizationSourceRef = `nurture-binding-intent:${randomUUID()}`;
-    const repository =
-      new PrismaNurtureScenarioBindingAuthorizationRepository(prisma);
-    const verifier = new NurtureScenarioBindingOwnerVerifier(
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma,
       {
         verifyCurrent: async () => ({
           authorizationSourceRef,
@@ -30,6 +34,8 @@ describe("Wave 4 binding persistence", () => {
           expiresAt,
         }),
       },
+    );
+    const verifier = new NurtureScenarioBindingOwnerVerifier(
       repository,
       new HmacNurtureBindingEvidenceHasher("k".repeat(32)),
       () => now,
@@ -66,6 +72,145 @@ describe("Wave 4 binding persistence", () => {
     expect(family.ownerRef).toMatch(
       /^nurture_family_binding_anchor_v1:[0-9a-f-]{36}$/,
     );
+  });
+
+  it("locks the exact authority source until receipt issuance commits", async () => {
+    const now = new Date();
+    const workspaceId = randomUUID();
+    const participant = await prisma.nurtureParticipant.create({
+      data: {
+        workspaceId,
+        myChatUserId: `platform-user:${randomUUID()}`,
+        status: "active",
+      },
+    });
+    const role = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId,
+        participantId: participant.id,
+        role: "guardian",
+        scopeType: "family",
+        scopeId: randomUUID(),
+        status: "active",
+        aggregateVersion: 1,
+      },
+    });
+    const authorityLocked = deferred();
+    const releaseAuthority = deferred();
+    let pauseFirstRead = true;
+    const authorityReader: TransactionalNurtureBindingAuthorityReader = {
+      verifyCurrent: async (transaction, input) => {
+        const rows = await transaction.$queryRaw<
+          {
+            id: string;
+            workspaceId: string;
+            status: string;
+            aggregateVersion: number;
+          }[]
+        >(
+          Prisma.sql`
+            SELECT
+              "id",
+              "workspace_id" AS "workspaceId",
+              "status",
+              "aggregate_version" AS "aggregateVersion"
+            FROM "nurture_care_role_assignment"
+            WHERE "id" = ${role.id}
+            FOR UPDATE
+          `,
+        );
+        const current = rows[0];
+        if (
+          !current ||
+          current.workspaceId !== input.workspaceId ||
+          current.status !== "active"
+        ) {
+          throw new NurtureScenarioBindingError(
+            "owner_authorization_denied",
+            "The exact Nurture care role is not current.",
+          );
+        }
+        if (pauseFirstRead) {
+          pauseFirstRead = false;
+          authorityLocked.resolve();
+          await releaseAuthority.promise;
+        }
+        return {
+          authorizationSourceRef: `nurture-care-role:${current.id}`,
+          authorizationSourceVersion: current.aggregateVersion,
+          verifiedAt: now,
+          expiresAt: new Date(now.getTime() + 5 * 60_000),
+        };
+      },
+    };
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma,
+      authorityReader,
+    );
+    const verifier = new NurtureScenarioBindingOwnerVerifier(
+      repository,
+      new HmacNurtureBindingEvidenceHasher("k".repeat(32)),
+      () => now,
+    );
+    const reserved = await verifier.reserveAnchor("child", randomUUID());
+    const ownerRef = parseNurtureBindingOwnerRef(reserved.ownerRef);
+    const request = {
+      workspaceId,
+      actingUserId: participant.myChatUserId,
+      idempotencyKey: randomUUID(),
+      subjectType: "child" as const,
+      subjectId: `platform-child:${randomUUID()}`,
+      scenarioKey: "nurture" as const,
+      ownerRef: reserved.ownerRef,
+      ownerVersion: reserved.ownerVersion,
+      actingActorId: `platform-actor:${randomUUID()}`,
+      purpose: "scenario_binding_write" as const,
+    };
+
+    const issuance = verifier.verify(request);
+    await authorityLocked.promise;
+    try {
+      await expect(
+        prisma.$transaction(async (transaction) => {
+          await transaction.$executeRaw(
+            Prisma.sql`SET LOCAL lock_timeout = '100ms'`,
+          );
+          await transaction.nurtureCareRoleAssignment.update({
+            where: { id: role.id },
+            data: {
+              status: "revoked",
+              aggregateVersion: { increment: 1 },
+            },
+          });
+        }),
+      ).rejects.toThrow();
+      await expect(
+        prisma.nurtureCareRoleAssignment.findUniqueOrThrow({
+          where: { id: role.id },
+        }),
+      ).resolves.toMatchObject({ status: "active", aggregateVersion: 1 });
+    } finally {
+      releaseAuthority.resolve();
+    }
+    await expect(issuance).resolves.toMatchObject({
+      ownerRef: reserved.ownerRef,
+      ownerVersion: reserved.ownerVersion,
+    });
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: role.id },
+      data: {
+        status: "revoked",
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    await expect(
+      verifier.verify({ ...request, idempotencyKey: randomUUID() }),
+    ).rejects.toMatchObject({ code: "owner_authorization_denied" });
+    await expect(
+      prisma.nurtureScenarioBindingAuthorization.count({
+        where: { childAnchorId: ownerRef.anchorId },
+      }),
+    ).resolves.toBe(1);
   });
 
   it("blocks new plaintext birth dates but permits unrelated updates", async () => {
@@ -231,3 +376,22 @@ describe("Wave 4 binding persistence", () => {
     expect(replacementFamilyAssociation.status).toBe("active");
   });
 });
+
+function deferred(): {
+  promise: Promise<void>;
+  resolve: () => void;
+} {
+  let resolve: (() => void) | undefined;
+  const promise = new Promise<void>((accept) => {
+    resolve = accept;
+  });
+  return {
+    promise,
+    resolve: () => {
+      if (!resolve) {
+        throw new Error("Deferred promise is not initialized.");
+      }
+      resolve();
+    },
+  };
+}
