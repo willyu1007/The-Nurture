@@ -3,11 +3,20 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor source candidate（complete, default-deny）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor implementation（CI green, qualification reopened, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
-- **Next step:** Return the completed Wave 4 P2 source revision and native CI run `30366195095` to My-Chat/T-030, then resume C30-I0-C scoped T-002/T-003/cloud-deployment separation and C30-I0-D immutable baseline proof. The additive migration remains unapplied outside disposable CI and every consumer remains default-disabled. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, any persistent database apply, artifact publication, capability activation, and external traffic remain NO-GO.
+- **Next step:** Repair the Wave 4 P2 authorization boundary so current
+  role/grant/purpose/lifecycle reread, exact anchor lock, and receipt
+  persistence occur in one Nurture owner transaction; then repin the repaired
+  My-Chat private-anchor/idempotency contract and rerun native plus joint
+  conformance. CI runs `30366195095` and `30366571495` remain regression
+  evidence, not source qualification. The additive migration remains unapplied
+  outside disposable CI and every consumer remains default-disabled. C30-I1,
+  C31, C4, D implementation, Pilot-0-E, Pilot-1, any persistent database
+  apply, artifact publication, capability activation, and external traffic
+  remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
@@ -25,6 +34,11 @@
   the broader C30/C35 qualification DAG. The 31-file P2-extended Nurture source
   population is pinned at
   `2a6cd497de67deb34c4650ca47f9f6a26ecc0f0376f1f2ceac53a37f17333d75`.
+  The 2026-07-28 implementation-quality review rejects both this Host pin and
+  the current P2 implementation as adoption evidence: the Host transports
+  stable anchors through client DTOs and lacks deterministic command
+  idempotency/version concurrency, while Nurture persists authorization after
+  an out-of-transaction authority reread. Replacement exact pins are required.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.

@@ -3,7 +3,11 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-28
-- Current phase: Wave 4 P2 additive source candidate in progress and default-deny; Pilot-0-C decision complete; Pilot-0-D `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists and `QR-*` is not applicable.
+- Current phase: Wave 4 P2 implementation is CI-green and default-deny, but
+  source qualification is reopened by the authority-transaction and Host
+  transport/concurrency blockers; Pilot-0-C decision complete; Pilot-0-D
+  `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
+  EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
 - Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
 
@@ -23,10 +27,49 @@
 | Exact three-repository pin | PASS | Base `63d47d2`, My-Chat `64f4165`, shared contract `8dd53b...34d`, Host binding source `c62197...c69`, and 31-file Nurture source `2a6cd4...3d75` match. |
 | Generated context and governance | PASS | DB context regenerated, strict context verification passes, governance sync/lint/query returns T-002 `in-progress`, and no database was contacted. |
 | Whitespace | PASS | `git diff --check` passes after the source and migration review. |
-| Remaining Wave 4 P2 gates | CLOSED | Scoped docs lint remains at the proven baseline of 31 files / 0 errors / 18 warnings; source/fix commits are pushed and native CI is green. |
+| Remaining Wave 4 P2 gates | REOPENED | Scoped docs lint and native CI remain green, but owner review requires transaction-atomic authority issuance plus repaired Host private-anchor/idempotency semantics and new concurrency evidence. |
 | Negative effect census | PASS | Only disposable CI databases received the migration history and test writes. No persistent DB connection/apply, birth-date inventory/deletion, authority-reader wiring, manifest/capability/Scenario activation, cloud/image publication, secret/environment/provider change, or traffic action occurred. |
 | Native CI run `30365905930` | PARTIAL PASS / REPAIRED | Disposable PostgreSQL migration, catalog boundary, and all 35 DB tests pass; dev-host, pin, context, governance also pass. Full TypeScript checking found a circular test-only `AnchorRow = ReturnType<typeof anchor>` alias and consequently blocked the unit and frontend-build jobs. The alias is now explicit; exact rerun pending. |
 | Native CI run `30366195095` | PASS | Exact head `8e8b5cb26233b171ce01d68ee6fd0ee19afa100f`; 7/7 jobs pass with zero annotations: exact pins/strict consumer boundary, context/environment, governance, full typecheck, 187 unit tests, 35 disposable-PostgreSQL tests, 19 dev-host tests, and frontend lint/build. |
+
+## Wave 4 P2 implementation-quality review — 2026-07-28
+
+Reviewed exact sources:
+
+```text
+My-Chat: 64f4165fe571a46ded094ebf6f771bdea61383d1
+Nurture: bfadbaf2bcf2c719dd26c250a31359c72b22094c
+```
+
+Targeted rerun:
+
+```bash
+pnpm exec vitest run -c vitest.config.ts \
+  packages/nurture-scenario/tests/identity/scenario-binding-owner.test.ts \
+  packages/nurture-scenario/tests/identity/derived-age-stage.test.ts
+```
+
+Result:
+
+- Two files / 12 tests pass.
+- Existing native CI `30366571495` remains 7/7 green with zero annotations.
+- Review status: **BLOCKED**.
+- `BLOCKER-NURTURE-AUTHORITY-ATOMICITY`: current authority is read before the
+  repository transaction; that transaction locks only the anchor and accepts
+  authority source evidence as input. A concurrent role/grant/purpose revoke
+  is not fenced by receipt persistence.
+- Cross-owner blockers remain the Host client anchor exposure and
+  non-deterministic Host command idempotency/version concurrency documented by
+  My-Chat/T-028 and My-Chat/T-030.
+- Missing evidence: a real PostgreSQL test that pauses after current-authority
+  read, revokes or advances the exact authority source, resumes issuance, and
+  proves no active receipt commits.
+- No persistent database, migration, historical birth-date operation, secret,
+  environment, artifact, capability, Scenario row, provider, deployment, or
+  traffic state changed.
+
+Exit requires a new Nurture exact revision, repaired Host pin, targeted
+concurrency/privacy tests, native CI, and joint owner review.
 
 ## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
 

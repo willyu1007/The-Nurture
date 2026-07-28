@@ -971,3 +971,29 @@
   PostgreSQL, 19 dev-host tests, exact pins, context/governance, and frontend
   lint/build. The runner database was ephemeral; no persistent environment,
   artifact publication, capability, or traffic path changed.
+
+## 2026-07-28 — Wave 4 P2 implementation-quality review reopened qualification
+
+- Exact source implementation `8e8b5cb`, final evidence revision `bfadbaf`,
+  source hash `2a6cd497...3d75`, and native CI `30366571495` remain valid
+  regression evidence. They are not owner/PR source qualification.
+- The domain verifier calls `authorityReader.verifyCurrent` before invoking
+  the repository. `issueAuthorization` then opens a new transaction, locks
+  only the typed anchor, and persists the supplied authority source
+  ref/version. It does not transaction-locally reread or lock the exact
+  role/grant/purpose/lifecycle authority source.
+- A concurrent authority revoke or version transition can therefore occur
+  after the current-authority read and before receipt persistence. Anchor
+  locking correctly fences anchor lifecycle/version changes, but does not
+  fence independent authority-source changes.
+- Repair the port/repository shape so the exact authority source and anchor are
+  reread/locked or database-CAS-validated inside the same transaction that
+  inserts/exact-replays the authorization. Add a disposable-PostgreSQL
+  revoke/version interleaving test.
+- Joint review also rejected the pinned Host revision because its public
+  bind/revoke DTO exposes stable Nurture anchors and its command
+  idempotency/version/concurrency does not converge deterministically.
+- P2 qualification and P3/joint adoption are held. No product source, schema,
+  migration, persistent database, secret, environment, artifact, capability,
+  Scenario row, provider, deployment, or traffic state changed in this
+  review/documentation increment.

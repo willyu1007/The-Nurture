@@ -3,9 +3,10 @@
 > 本文是 T-002 的架构投影。当前 Pilot-0-C 决策索引见 `10-pilot0-c-current-decision-index.md`，Pilot-0-D 拓扑/运营 SSOT 见 `11-pilot0-d-topology-operations-contract.md`；精确跨仓场景合同见 `docs/context/workflow/nurture-scenario-contract.md`。发生冲突时，仓级 `AGENTS.md`、context contract、对应阶段当前索引依次优先于本文。立场基准见 `docs/context/product/workflow-product-design-contract.md`。
 > 本设计不引入独立产品壳；The Nurture 是 My-Chat 场景模块，但 Nurture 拥有托育生态图谱和业务事实。
 
-## Wave 4 P2 source candidate boundary
+## Wave 4 P2 implementation boundary
 
-P2 consumes the exact structural owner-verifier contract from My-Chat
+P2 currently implements against the reviewed historical owner-verifier
+contract from My-Chat
 `64f4165fe571a46ded094ebf6f771bdea61383d1`. The request is bound to
 Workspace, acting User, Actor, optional represented Organization, idempotency
 key, platform subject type/id, typed Nurture owner ref/version, purpose, and
@@ -15,9 +16,10 @@ receipt only after an injected owner-specific authority reader succeeds.
 ```text
 My-Chat authenticated binding command
   -> Nurture exact owner-verifier input
-  -> current Nurture authority-reader port (default: deny)
-  -> local anchor/version reread
-  -> keyed evidence + idempotent local authorization row
+  -> one Nurture owner transaction
+       -> current authority-source reread and lock/CAS
+       -> exact local anchor/version lock
+       -> keyed evidence + idempotent local authorization row
   -> short-lived owner receipt
   -> My-Chat canonical binding transaction
 ```
@@ -50,6 +52,14 @@ explicit birth-date updates when the migration is eventually applied without
 freezing unrelated updates to historical rows. The source increment does not
 delete or inspect historical values. Scenario input uses only an expiring
 derived age/stage result and rejects raw birth date or exact age.
+
+The current implementation does not yet satisfy the transaction shape above:
+`verifyCurrent` completes before `issueAuthorization`, and the repository
+transaction locks only the anchor. Before qualification, the repository/port
+boundary must make the exact authority-source version and lifecycle a
+transaction-local prerequisite of receipt insertion or exact replay. A
+concurrent role/grant/purpose revoke or version transition must prevent a
+usable receipt from committing.
 
 No production authority-reader wiring, association consumer, manifest
 activation, Scenario row, database apply, environment change, artifact
