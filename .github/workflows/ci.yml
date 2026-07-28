@@ -132,7 +132,7 @@ jobs:
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
           path: My-Workflow-Base
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
 
@@ -232,7 +232,7 @@ jobs:
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
           path: My-Workflow-Base
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
 
@@ -319,7 +319,7 @@ jobs:
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
           path: My-Workflow-Base
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
 
@@ -397,7 +397,7 @@ jobs:
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
           path: My-Workflow-Base
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
 

@@ -870,11 +870,14 @@
   the linked My-Chat runtime source but did not install that workspace; it now
   prepares the pinned My-Chat dependency before running the clean-runner E2E
   suite.
-- All first-party `actions/checkout` and `actions/setup-node` references in the
-  Nurture CI workflow were upgraded from v4 to v6 after GitHub reported the v4
-  Node 20 action runtime as deprecated.
+- All `actions/checkout`, `actions/setup-node`, and `pnpm/action-setup`
+  references in the Nurture CI workflow were upgraded from v4 to v6 after
+  GitHub reported their v4 Node 20 action runtimes as deprecated. Official
+  pnpm/action-setup release metadata identifies v6 as the current major.
 - Local Node 24 verification against disposable PostgreSQL passes production
   DB `24/24`, dev-host `19/19`, unit `175/175`, full typecheck, frontend lint,
   exact source-pin verification, workflow YAML parsing, whitespace/diff
   checks, and debug-instrumentation cleanup. A fresh full native-cloud run
-  remains the final exit for this repair increment.
+  remains the final exit for this repair increment. Run `30347574708` already
+  passes every functional job at commit `a887a8a`; its sole annotation is the
+  now-repaired pnpm action runtime.

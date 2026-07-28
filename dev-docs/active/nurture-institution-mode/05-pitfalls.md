@@ -1479,3 +1479,18 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: Every clean-runner job that executes linked workspace source must
   prepare that workspace explicitly; checkout alone is not dependency
   materialization.
+
+### 2026-07-28 — Upgrading only some Node-based GitHub Actions
+
+- Symptom: Full CI run `30347574708` passed every job but still emitted a
+  deprecated Node 20 action-runtime annotation.
+- Context: Checkout and setup-node had already moved to v6.
+- What we tried: Replacing only the two action families named in the first
+  runner annotations.
+- Root cause: `pnpm/action-setup@v4` was a third Node-based action with the same
+  deprecated runtime and was missed by the narrow scan.
+- Fix / workaround: Verify official release metadata and upgrade all four
+  `pnpm/action-setup` uses to the current v6 major.
+- Prevention: After an action-runtime warning, inventory every `uses:` entry
+  and inspect the completed run annotations; do not limit the repair to the
+  first action names reported.
