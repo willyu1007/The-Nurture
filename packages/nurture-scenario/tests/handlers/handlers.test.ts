@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { DomainContextRef, WorkflowStepHandlerInput } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowStepHandlerInput } from "@my-chat/workflow-contracts";
 import type { ActivityComparisonDraft, NurtureProfileProjection, NurtureWorkflowProject } from "../../src/repositories.js";
 import type { CanonicalSnapshot, NurtureHandlerDeps, RunMaterial } from "../../src/deps.js";
 import {
@@ -22,12 +22,13 @@ import {
 const WS = "ws-1";
 const RUN = "run-1";
 
+type DomainContextRef = CanonicalRef;
+
 const familyRef: DomainContextRef = {
+  schema_version: 1,
   namespace: "my_chat",
   object_type: "family",
   object_id: `${WS}:family`,
-  owner_scope: "workspace",
-  canonical_ref: { service: "my_chat", object_type: "family", object_id: `${WS}:family` },
 };
 
 const stepInput = (over: Partial<WorkflowStepHandlerInput> = {}): WorkflowStepHandlerInput => ({
@@ -246,8 +247,20 @@ describe("compare_activities", () => {
     workspace_id: WS,
     target_refs: [familyRef],
     option_refs: [
-      { kind: "downstream_object", id: "opt-a", version: 1 },
-      { kind: "downstream_object", id: "opt-b", version: 1 },
+      {
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "downstream_object",
+        object_id: "opt-a",
+        version: 1,
+      },
+      {
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "downstream_object",
+        object_id: "opt-b",
+        version: 1,
+      },
     ],
     safe_summary: "draft",
   };
@@ -318,7 +331,7 @@ describe("apply_medical_safety_gate", () => {
 describe("evaluate_pregnancy_stage", () => {
   it("derives the stage from the resolved mother snapshot and never escalates", async () => {
     const { deps } = buildDeps({
-      startContext: { context_refs: [{ ...familyRef }, { namespace: "my_chat", object_type: "expectant_mother", object_id: `${WS}:mom`, owner_scope: "workspace" }] },
+      startContext: { context_refs: [{ ...familyRef }, { schema_version: 1, namespace: "my_chat", object_type: "expectant_mother", object_id: `${WS}:mom` }] },
       safeFieldsByType: { expectant_mother: { gestational_age_weeks: 20 } },
     });
     const r = await makeEvaluatePregnancyStage(deps)(stepInput());
@@ -366,7 +379,7 @@ describe("generic step handlers", () => {
     const r = await makeRequestHandoff(deps)(stepInput());
     expect(r.status).toBe("completed");
     expect(hasEvent(r, "workflow.handoff.requested")).toBe(true);
-    expect(r.output_refs.some((ref) => ref.kind === "workflow_handoff")).toBe(true);
+    expect(r.output_refs.some((ref) => ref.object_type === "workflow_handoff")).toBe(true);
   });
 
   it("write_artifact completes", async () => {

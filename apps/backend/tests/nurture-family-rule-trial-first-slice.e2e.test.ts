@@ -31,7 +31,7 @@ describe("nurture-family-rule-trial-first-slice", () => {
         capability_key: capability,
         entrypoint_key: entrypoint,
         requirement_values: {
-          context_refs: [{ namespace: "my_chat", object_type: "family", object_id: familyId, owner_scope: "workspace", canonical_ref: { service: "my_chat", object_type: "family", object_id: familyId } }],
+          context_refs: [{ schema_version: 1, namespace: "my_chat", object_type: "family", object_id: familyId }],
           issue_type: "bedtime",
           safety_boundary_acknowledged: true,
           ...extra,

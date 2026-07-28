@@ -7,13 +7,12 @@ import {
   WorkflowWorker,
   type WorkflowRegistry,
 } from "@my-chat/workflow-runtime";
-import type { WorkflowPresenters } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowPresenters } from "@my-chat/workflow-contracts";
 import { createNurtureScenarioModule } from "@the-nurture/scenario";
 import {
   resolveNurtureUserAttention,
   type NurtureUserAttentionResolution,
 } from "@the-nurture/scenario";
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
 import { createDevHostPrismaClient, type DevHostPrismaClient } from "./db/dev-host-client.js";
 import { MockCanonicalObjectResolver, PgArtifactPreviewPort, PgRunContextPort } from "./deps/mock-deps.js";
@@ -22,6 +21,8 @@ import { PgWorkflowLedgerRepository } from "./ledger/pg-workflow-ledger.reposito
 import { WorkflowActionService } from "./actions/action-service.js";
 import { StepDispatcher } from "./dispatcher.js";
 import { devHostSnapshot } from "./host-snapshot.js";
+
+type DomainContextRef = CanonicalRef;
 
 export type NurtureApp = {
   nurturePrisma: NurturePrismaClient;

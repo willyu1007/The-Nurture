@@ -1,5 +1,7 @@
-import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import { canonicalJsonV1, type NurtureCommandSpec } from "./command-kernel.js";
+
+type DomainContextRef = CanonicalRef;
 
 export type CalibrateFamilyStrategyCommandInput = {
   workspace_id: string;
@@ -12,12 +14,11 @@ export type CalibrateFamilyStrategyCommandInput = {
 };
 
 export const workflowProjectRef = (projectId: string, version: number): DomainContextRef => ({
+  schema_version: 1,
   namespace: "nurture",
-  consumer_scenario_key: "nurture",
   object_type: "workflow_project",
   object_id: projectId,
   version,
-  owner_scope: "workspace",
 });
 
 export const calibrateFamilyStrategyCommand: NurtureCommandSpec<CalibrateFamilyStrategyCommandInput> = {

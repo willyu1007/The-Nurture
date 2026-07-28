@@ -1,6 +1,5 @@
 import type {
   CanonicalRef,
-  DomainContextRef,
   ScenarioCommandDriverContext,
   ScenarioHandoffRequestSnapshot,
   WorkflowExposureLevel,
@@ -20,6 +19,8 @@ import {
   createInMemoryNurtureCommandRepository,
 } from "./domain/testing/in-memory-institution-ports.js";
 import type { NurtureInstitutionWorkflowTelemetry } from "./observability/institution-workflow-telemetry.js";
+
+type DomainContextRef = CanonicalRef;
 
 // ---------------------------------------------------------------------------
 // Injected ports. Handlers/policies/presenters are pure functions that close
@@ -135,11 +136,10 @@ export type NurtureHandlerDeps = {
 // ---------------------------------------------------------------------------
 
 const familyDomainRef = (workspaceId: string): DomainContextRef => ({
+  schema_version: 1,
   namespace: "my_chat",
   object_type: "family",
   object_id: `${workspaceId}:family`,
-  owner_scope: "workspace",
-  canonical_ref: { service: "my_chat", object_type: "family", object_id: `${workspaceId}:family` },
 });
 
 const synthDraft = (workspaceId: string, comparisonId: string): ActivityComparisonDraft => ({
@@ -147,8 +147,20 @@ const synthDraft = (workspaceId: string, comparisonId: string): ActivityComparis
   workspace_id: workspaceId,
   target_refs: [familyDomainRef(workspaceId)],
   option_refs: [
-    { kind: "downstream_object", id: "option-a", version: 1 } as CanonicalRef,
-    { kind: "downstream_object", id: "option-b", version: 1 } as CanonicalRef,
+    {
+      schema_version: 1,
+      namespace: "nurture",
+      object_type: "downstream_object",
+      object_id: "option-a",
+      version: 1,
+    },
+    {
+      schema_version: 1,
+      namespace: "nurture",
+      object_type: "downstream_object",
+      object_id: "option-b",
+      version: 1,
+    },
   ],
   safe_summary: "synthetic activity comparison draft (default deps)",
 });

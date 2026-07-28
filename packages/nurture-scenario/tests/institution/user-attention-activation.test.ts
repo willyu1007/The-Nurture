@@ -7,28 +7,25 @@ import {
 
 const refs = () => [
   {
+    schema_version: 1 as const,
     namespace: "nurture",
-    consumer_scenario_key: "nurture",
     object_type: "family_care_message",
     object_id: "message-1",
-    version: 0,
-    owner_scope: "workspace" as const,
+    version: 1,
   },
   {
+    schema_version: 1 as const,
     namespace: "nurture",
-    consumer_scenario_key: "nurture",
     object_type: "child_link_receipt",
     object_id: "receipt-1",
-    version: 0,
-    owner_scope: "workspace" as const,
+    version: 1,
   },
   {
+    schema_version: 1 as const,
     namespace: "nurture",
-    consumer_scenario_key: "nurture",
     object_type: "family_care_item",
     object_id: "item-1",
-    version: 0,
-    owner_scope: "workspace" as const,
+    version: 1,
   },
 ];
 

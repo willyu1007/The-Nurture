@@ -6,12 +6,12 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "26fac97fc82ec5f5df23528aacabbc16b749b490",
+    "revision": "ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa",
+    "contractSha256": "8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d",
     "sourcePins": [
       {
         "key": "web_workbench",
@@ -30,12 +30,12 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "533cbf715315bc724ddeb82174c0a981e667d77b",
+    "revision": "53bf92b5c2d2c1d2e7835e34b1ac50337d64f336",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa",
+    "contractSha256": "8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d",
     "sourcePins": [
       {
         "key": "x5_joint_api",
@@ -76,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "581a5cec7b640823332453cf01f0024f1e36c88131da85ac65b423f1ee68640b"
+        "sha256": "78a20458a5f4504ecd0e6f1520b782fa07db826106e03791bc12dd53b7b5ba73"
       }
     ]
   },
@@ -109,6 +109,6 @@
       "packages/nurture-scenario/src/registry.ts",
       "packages/nurture-scenario/src/repositories.ts"
     ],
-    "contractSha256": "e92582d9b710e62f087d92549e1e473a9a22d64b9ad0d058eb010c8c46a67d35"
+    "contractSha256": "622b74397f470dce81976d9c69dc5d59c3d3f295295d1eec6b38398f6d262ecf"
   }
 }

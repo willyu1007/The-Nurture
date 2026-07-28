@@ -1,4 +1,4 @@
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   NurtureFamilyInputWorkflowCommand,
   NurtureFamilyInputWorkflowPort,
@@ -7,6 +7,8 @@ import type {
 } from "./deps.js";
 import type { NurtureInstitutionContextRepository } from "./domain/institution/institution-context.js";
 import type { FamilyInputRoutePayload } from "./domain/institution/family-care-transaction.js";
+
+type DomainContextRef = CanonicalRef;
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const OUTER_KEYS = new Set([
@@ -38,12 +40,11 @@ const PAYLOAD_KEYS = new Set([
   "requires_reply",
 ]);
 const REF_KEYS = new Set([
+  "schema_version",
   "namespace",
-  "consumer_scenario_key",
   "object_type",
   "object_id",
   "version",
-  "owner_scope",
 ]);
 const DATA_CLASSES = new Set([
   "daily_care_log",
@@ -88,22 +89,20 @@ const contextRef = (value: unknown): DomainContextRef | null => {
   const input = record(value);
   if (!input || !onlyKeys(input, REF_KEYS)) return null;
   if (
+    input.schema_version !== 1 ||
     !id(input.namespace) ||
     !id(input.object_type) ||
     !id(input.object_id) ||
-    input.owner_scope !== "workspace" ||
-    (input.consumer_scenario_key !== undefined && input.consumer_scenario_key !== "nurture") ||
     (input.version !== undefined && (!Number.isSafeInteger(input.version) || Number(input.version) < 0))
   ) {
     return null;
   }
   return {
+    schema_version: 1,
     namespace: input.namespace,
-    ...(input.consumer_scenario_key ? { consumer_scenario_key: "nurture" } : {}),
     object_type: input.object_type,
     object_id: input.object_id,
     ...(input.version !== undefined ? { version: Number(input.version) } : {}),
-    owner_scope: "workspace",
   };
 };
 

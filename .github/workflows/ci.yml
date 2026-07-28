@@ -82,8 +82,8 @@ jobs:
       - name: Lint skill sources and wrappers
         run: node .ai/scripts/lint-skills.mjs --strict
 
-      - name: Lint project governance
-        run: node .ai/scripts/ctl-project-governance.mjs lint --check --project main
+      - name: Verify project governance through shared CI entrypoint
+        run: node .ai/skills/features/ci/scripts/ci-verify.mjs --suite governance
 
   context-verify:
     name: Context and Environment Contracts
@@ -157,6 +157,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
+
+      - name: Build pinned workflow contracts
+        working-directory: The-Nurture
+        run: pnpm build:pinned-workflow-contracts
 
       - name: Generate and validate production Prisma client
         working-directory: The-Nurture
@@ -246,6 +250,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
 
+      - name: Build pinned workflow contracts
+        working-directory: The-Nurture
+        run: pnpm build:pinned-workflow-contracts
+
       - name: Generate and deploy Nurture schema
         working-directory: The-Nurture
         run: |
@@ -329,6 +337,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
 
+      - name: Build pinned workflow contracts
+        working-directory: The-Nurture
+        run: pnpm build:pinned-workflow-contracts
+
       - name: Create separate dev-host database
         run: psql -h 127.0.0.1 -p 5432 -U nurture -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE nurture_dev_host'
 
@@ -406,6 +418,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
+
+      - name: Build pinned workflow contracts
+        working-directory: The-Nurture
+        run: pnpm build:pinned-workflow-contracts
 
       - name: Lint and build
         working-directory: The-Nurture

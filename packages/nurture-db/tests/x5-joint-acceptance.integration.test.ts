@@ -237,8 +237,10 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
       status: "completed" as const,
       output_refs: [
         {
-          kind: "domain_context_ref" as const,
-          id: `nurture:command_execution:${replay.execution_ref.object_id}`,
+          schema_version: 1 as const,
+          namespace: "nurture",
+          object_type: "command_execution",
+          object_id: replay.execution_ref.object_id,
           version: replay.execution_ref.version,
         },
       ],
@@ -279,7 +281,7 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
     await handler.handle(requested!);
     await handler.handle(requested!);
 
-    const handoffId = completion.data.materialized_handoffs[0]!.handoff_ref.id;
+    const handoffId = completion.data.materialized_handoffs[0]!.handoff_ref.object_id;
     const handoff = await ledger.get({
       workspace_id: workspaceId,
       handoff_id: handoffId,
@@ -590,10 +592,10 @@ function activation(
     request_id: "x5-user-attention-request",
     driver_context: {
       driverRef: {
-        namespace: "host.workflow",
+        schema_version: 1,
+        namespace: "my_chat",
         object_type: "workflow_step",
         object_id: stepId,
-        owner_scope: "workspace",
       },
       contractHash: CONTRACT_HASH,
       capabilityKey: "class_family_inbox",

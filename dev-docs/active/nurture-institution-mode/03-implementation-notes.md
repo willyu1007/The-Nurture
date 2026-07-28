@@ -804,6 +804,7 @@
 ## Pitfalls / dead ends (do not repeat)
 
 - Keep the detailed log in `05-pitfalls.md` (append-only).
+
 ## 2026-07-14 — N1-F DB and direct-surface closure
 
 - Received target-specific approval and applied `20260713150000_nurture_institution_n1_core` only to local PostgreSQL `localhost:5433/nurture`; migration status is current and the production catalog remains Nurture-only (`43` tables, `71` enums).
@@ -815,3 +816,36 @@
 - Prevented orphan clarification contexts: direct surfaces retain structured token delivery, while durable workflow handlers suppress token issuance and fail closed to manual review when scope is ambiguous.
 - Repaired governance drift: aligned YAML/TypeScript manifest ordering and expanded the Nurture scenario source pin to include the live `registry.ts`; final self hash is `de32f2f2caa943575db972e9cd28b3c78f55418cd47f43348f2bf6c93625c125`.
 - Final locked populations: `152` unit tests, `22` production DB tests, `16` dev-host DB/E2E tests; routing census `16 / 3 / 7` files.
+
+## 2026-07-28 — Canonical-ref compatibility repair and X5 requalification
+
+- Re-pinned the consumer baseline to My-Workflow-Base
+  `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a` and My-Chat
+  `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`. Their 11-file workflow-contract
+  populations are byte-identical at
+  `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d`;
+  the bounded My-Chat X5 source population is
+  `78a20458a5f4504ecd0e6f1520b782fa07db826106e03791bc12dd53b7b5ba73`.
+- Replaced removed `DomainContextRef` and legacy `{ kind, id }` shapes with the
+  sole public `CanonicalRef` schema across the scenario domain, backend bridge,
+  Prisma adapters, replay fencing, fixtures, unit tests, and DB/E2E tests.
+  Version `0` is preserved because the pinned federation validator accepts a
+  non-negative canonical version.
+- Added forward migration
+  `20260728160000_nurture_canonical_ref_v1`. It converts legacy profile,
+  comparison, evidence, command execution, replay snapshot, family-message,
+  receipt-driver, and clarification-driver refs; changes the durable driver
+  from `host.workflow/workflow_step` to `my_chat/workflow_step`; and installs
+  `ck_nurture_command_execution_handoff_v2`.
+- Added `build:pinned-workflow-contracts` and made clean typecheck/build/lint
+  paths materialize the exact linked contract package. All CI jobs that execute
+  code against linked My-Chat sources now build that package after install.
+- The final 25-file Nurture scenario population is
+  `622b74397f470dce81976d9c69dc5d59c3d3f295295d1eec6b38398f6d262ecf`.
+  This `contractSha256` is local path-content evidence and must not be compared
+  to Education's differently defined federation `source_hash`; each consumer
+  is verified with its native algorithm, while federation closure compares
+  exact repository revisions and native verifier results.
+- No shared, staging, or production database was touched. Migration execution
+  and legacy-row conversion were verified only in a disposable local
+  PostgreSQL 16 container, removed immediately after the check.

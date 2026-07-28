@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 joint acceptance（complete）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（local complete, federation pending）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
@@ -11,23 +11,37 @@
 
 ## Current Cross-Repo Contract Baseline
 
-- My-Workflow-Base ecosystem-policy revision: `26fac97fc82ec5f5df23528aacabbc16b749b490`.
+- My-Workflow-Base ecosystem-policy and workflow-contract revision:
+  `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`.
 - My-Chat/T-030 accepted coordination baseline:
   `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
-  `533cbf715315bc724ddeb82174c0a981e667d77b`.
+  `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.
-- The N3 dependency/source-boundary increment is complete for the T-002
-  consumer leg. Nurture consumes published
+- The N3 dependency/source-boundary repair is locally complete for the T-002
+  consumer leg and remains open only at the four-repository federation gate.
+  Nurture consumes published
   `@willyu1007/web-workbench@0.7.0`, imports My-Chat only through public
-  package exports, pins Base at `26fac97fc82ec5f5df23528aacabbc16b749b490`
-  and My-Chat at `533cbf715315bc724ddeb82174c0a981e667d77b`,
+  package exports, pins Base at `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`
+  and My-Chat at `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`,
+  verifies their byte-identical workflow-contract source at
+  `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d`,
   verifies the bounded My-Chat X5 source set as
-  `581a5cec7b640823332453cf01f0024f1e36c88131da85ac65b423f1ee68640b`,
+  `78a20458a5f4504ecd0e6f1520b782fa07db826106e03791bc12dd53b7b5ba73`,
+  verifies the 25-file Nurture scenario source set as
+  `622b74397f470dce81976d9c69dc5d59c3d3f295295d1eec6b38398f6d262ecf`,
   and has zero strict Base consumer-boundary findings. The exact-checkout
   package overrides are verification materialization, not a mutable release
   dependency.
+- The repin exposed a real source incompatibility hidden by the previous
+  revision/hash-only check: Nurture still compiled against removed
+  `DomainContextRef` and legacy `{ kind, id }` references. All live scenario,
+  repository, backend, test, replay-seed, and persisted-ref paths now use
+  `CanonicalRef { schema_version, namespace, object_type, object_id, version? }`.
+  Migration `20260728160000_nurture_canonical_ref_v1` converts durable legacy
+  refs and replaces the X4 driver CHECK with the canonical
+  `my_chat/workflow_step` constraint.
 - The Fastify-to-NestJS transition, port migration, API-index repair, and
   governance cleanup remain open. N3 changes no schema, migration, default-off
   activation, environment, provider, staging/production state, or traffic.

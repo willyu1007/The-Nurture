@@ -6,27 +6,29 @@
 
 ## 2026-07-28 — My-Chat/T-030 acceptance increment
 
-The 2026-07-28 increment accepts the Nurture-owned portion of the cross-repository
-alignment plan against Base revision
-`26fac97fc82ec5f5df23528aacabbc16b749b490` and My-Chat baseline
-`33264981515d75dd9768b720a1d1127cba70cbbe`.
+The 2026-07-28 increment accepts and repairs the Nurture-owned portion of the
+cross-repository alignment plan against Base revision
+`ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a` and the My-Chat contract/X5
+revision `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
 
 | Work item | State | Exit |
 | --- | --- | --- |
 | Accept repo-qualified ownership | Complete | T-002 owns `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)`; references use repository-qualified task ids. |
-| Adopt Base ecosystem policy | Complete | Package distribution, source-boundary, schema-convention, and port-allocation decisions cite Base `26fac97`; local-path dependencies are development-only and cannot be release evidence. |
+| Adopt Base ecosystem policy | Complete | Package distribution, source-boundary, schema-convention, and port-allocation decisions cite Base `ed69bbd`; local-path dependencies are development-only and cannot be release evidence. |
 | Replace Base web-workbench local link | Complete | Frontend consumes published exact `@willyu1007/web-workbench@0.7.0`; the Base template build/install steps are removed; frozen install, typecheck, lint, unit tests, and strict scan pass. |
 | Remove direct sibling-source import | Complete | X5 imports only My-Chat public package exports, including the new worker subpath; the exact X5 source set is revision- and content-pinned; `ECO-CONSUMER-004` is absent. |
-| Re-pin My-Chat workflow packages | Complete | T-002 pins My-Chat `533cbf715315bc724ddeb82174c0a981e667d77b`, materializes package overrides from that exact checkout, and passes the pin verifier, 175 unit tests, and real two-database X5 regression. |
+| Re-pin and migrate My-Chat workflow packages | Local complete; federation pending | T-002 pins My-Chat `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336` and Base `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`, migrates all shared references to canonical-ref schema v1, adds the forward data/constraint migration, builds the pinned contract package in clean CI jobs, and passes native pin, typecheck, 175-unit, migration-replay, persistence, and strict consumer-boundary gates. Closure still requires the coordinator-owned four-repository qualification run. |
 | Resolve service-framework timing | Pending | Record and implement the approved transition from the current Fastify dev-host harness to the required NestJS scenario service without promoting the harness to a pilot runtime. |
 | Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. |
 | Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. |
 
-Ordering through dependency/source cleanup and joint verification is complete.
-The next accepted work remains the independently reviewable framework, port,
-API-index, and governance items. No database apply, artifact publication,
-environment mutation, activation, provider, or traffic is authorized by the
-2026-07-28 increment.
+Ordering through dependency/source cleanup and native consumer verification is
+complete. Four-repository qualification remains pending and is the only N3
+closure authority; a native green check cannot close the federated gate. The
+next accepted work after that gate remains the independently reviewable
+framework, port, API-index, and governance items. No shared/staging/production
+database apply, artifact publication, environment mutation, activation,
+provider, or traffic is authorized by the 2026-07-28 increment.
 
 ## C30-I0 — Implementation baseline isolation（进行中）
 

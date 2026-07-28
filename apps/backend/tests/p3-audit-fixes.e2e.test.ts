@@ -24,7 +24,7 @@ describe("P3 audit fixes", () => {
         capability_key: "activity_comparison",
         entrypoint_key: "compare_activity_options",
         requirement_values: {
-          context_refs: [{ namespace: "my_chat", object_type: "family", object_id: familyId, owner_scope: "workspace", canonical_ref: { service: "my_chat", object_type: "family", object_id: familyId } }],
+          context_refs: [{ schema_version: 1, namespace: "my_chat", object_type: "family", object_id: familyId }],
         },
       },
     });
@@ -75,7 +75,7 @@ describe("P3 audit fixes", () => {
         workspace_id: ws,
         capability_key: "family_strategy",
         entrypoint_key: "calibrate_family_strategy",
-        requirement_values: { context_refs: [{ namespace: "my_chat", object_type: "family", object_id: familyId, owner_scope: "workspace", canonical_ref: { service: "my_chat", object_type: "family", object_id: familyId } }], issue_type: "bedtime" },
+        requirement_values: { context_refs: [{ schema_version: 1, namespace: "my_chat", object_type: "family", object_id: familyId }], issue_type: "bedtime" },
       },
     });
     const runId = (start.json() as { data: { run_id: string } }).data.run_id;

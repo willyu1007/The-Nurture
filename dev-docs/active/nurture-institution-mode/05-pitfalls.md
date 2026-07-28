@@ -1393,3 +1393,39 @@ This file exists to prevent repeating mistakes within this task.
 - References: `00-overview.md`, `01-plan.md`, `04-verification.md`,
   My-Workflow-Base `docs/context/ecosystem/contract-status.md`, and
   My-Chat/T-030.
+
+### 2026-07-28 — Treating an exact revision/hash pin as source compatibility
+
+- Symptom: The native pin verifier passed after updating the Base and My-Chat
+  revisions, but `pnpm typecheck` failed because Nurture still imported removed
+  `DomainContextRef` and emitted legacy `{ kind, id }` references.
+- Context: The verifier proves immutable source identity and selected
+  path-content parity. It does not build linked packages or compile the
+  consumer.
+- What we tried: Updating only the revision and path-content hashes.
+- Root cause: Pin identity, source compatibility, generated package
+  materialization, persisted JSON compatibility, and four-repository
+  qualification were treated as one gate.
+- Fix / workaround: Migrate all shared refs to canonical schema v1, add a
+  forward data/CHECK migration, build the exact linked contract before
+  typecheck/build/lint and DB jobs, then require native tests plus the
+  coordinator-owned federation workflow.
+- Prevention: A repin is incomplete until the exact linked package is built,
+  the consumer compiles, replay/persistence populations pass, legacy persisted
+  refs have a forward migration, and the federated revision lock is green.
+
+### 2026-07-28 — Comparing unrelated hash fields across consumer schemas
+
+- Symptom: Education `scenario_release.source_hash` and Nurture
+  `nurtureScenario.contractSha256` appeared different and could be reported as
+  cross-project drift.
+- Context: The two fields cover different path populations and use different
+  lock schemas; equality is not part of either contract.
+- Root cause: Both values are SHA-256 strings, so field appearance was mistaken
+  for semantic equivalence.
+- Fix / workaround: Compare exact Base/My-Chat revisions across consumers, then
+  execute each repository's native verifier against its own declared
+  population. Record both results without cross-comparing the hash values.
+- Prevention: Federation qualification must declare each evidence field's
+  algorithm and population identity. Only fields with the same schema,
+  algorithm, and population may be compared directly.

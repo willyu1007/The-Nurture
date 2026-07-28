@@ -9,7 +9,8 @@
   },
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "prepare:pinned-source": "pnpm verify:workflow-contract-pin",
+    "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm build:pinned-workflow-contracts",
+    "build:pinned-workflow-contracts": "pnpm exec tsc -p ../My-Chat/packages/workflow-contracts/tsconfig.json --typeRoots ./node_modules/@types",
     "build": "pnpm prepare:pinned-source && pnpm db:generate:all && pnpm typecheck && pnpm --filter @the-nurture/frontend build",
     "dev": "node scripts/run-with-local-env.mjs pnpm --filter @the-nurture/backend dev",
     "dev:frontend": "pnpm --filter @the-nurture/frontend dev",
@@ -24,7 +25,7 @@
     "test:x5": "pnpm exec vitest run -c vitest.x5.config.ts",
     "test:local-env-runner": "node --test scripts/run-with-local-env.test.mjs",
     "test:all": "pnpm test:unit && pnpm test:db && pnpm test:dev-host",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm build:pinned-workflow-contracts && tsc --noEmit",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:generate": "node scripts/run-with-local-env.mjs pnpm exec prisma generate --schema prisma/schema.prisma",

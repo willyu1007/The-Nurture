@@ -85,7 +85,15 @@ export const createNurturePresenters = (
       return {
         safe_title: "The Nurture",
         safe_summary: `Nurture workflows for ${input.actor_id ?? "workspace"}.`,
-        run_refs: [{ kind: "workflow_run", id: dashRun.run_id, version: dashRun.aggregate_version }],
+        run_refs: [
+          {
+            schema_version: 1,
+            namespace: "my_chat",
+            object_type: "workflow_run",
+            object_id: dashRun.run_id,
+            version: dashRun.aggregate_version,
+          },
+        ],
         action_availability: [availability(dashRun.run_id, "confirm")],
       };
     },

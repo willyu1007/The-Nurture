@@ -1,4 +1,4 @@
-import type { DomainContextRef, WorkflowExposureLevel } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowExposureLevel } from "@my-chat/workflow-contracts";
 import type {
   ArtifactPreviewFacts,
   CanonicalObjectResolver,
@@ -9,6 +9,8 @@ import type {
   RunMaterial,
 } from "@the-nurture/scenario";
 import type { DevHostPrismaClient } from "../db/dev-host-client.js";
+
+type DomainContextRef = CanonicalRef;
 
 /**
  * Dev mock for the My-Chat canonical object resolver. Returns synthetic

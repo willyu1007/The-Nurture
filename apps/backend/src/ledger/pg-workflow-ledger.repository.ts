@@ -101,7 +101,15 @@ export class PgWorkflowLedgerRepository implements WorkflowLedgerRepository {
     return {
       ok: true,
       data,
-      canonical_refs: [{ kind: "workflow_run", id: run.id, version: run.aggregateVersion }],
+      canonical_refs: [
+        {
+          schema_version: 1,
+          namespace: "my_chat",
+          object_type: "workflow_run",
+          object_id: run.id,
+          version: run.aggregateVersion,
+        },
+      ],
       aggregate_versions: { [run.id]: run.aggregateVersion },
       action_availability: [],
       outbox_event_ids: [],
