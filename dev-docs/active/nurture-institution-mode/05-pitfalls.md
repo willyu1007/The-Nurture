@@ -4,6 +4,10 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not treat a version-shaped package dependency plus a local override as immutable by itself. The override is acceptable only when the checkout revision and every bounded source set are verified before install/use; release distribution remains a separate decision.
+- Do not re-pin a source dependency without reconciling the consumer CI runtime and registry authentication. The current My-Chat pin requires Node 22 or newer, and GitHub Packages installation requires an authenticated read token.
+- Do not rebuild a published UI package from a Base sibling template in each consumer CI job. Consume the exact registry version and keep Base source pins as conformance evidence, not runtime resolution.
+- Do not close a direct sibling-source finding by changing only the import spelling. The package must export the required subpath, the consumer must use it, and the exact transitive source population must be revision/content pinned.
 - Do not treat an advisory consumer-boundary finding as fixed merely because it is recorded in a task bundle; closure requires the local Base artifact link and direct sibling-source import to be removed and the clean joint gates to pass.
 - Do not reduce institution ecology to an authorization feature; institution is the child's external growth environment.
 - Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.

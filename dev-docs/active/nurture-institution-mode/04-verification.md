@@ -7,6 +7,19 @@
 - Code/config/schema impact: Pilot-0-D closure changes task/project planning documentation only. It does not change the current workflow context/pin, product code, Prisma schema/migration, Base/My-Chat source or contract bytes, database, artifact/ACR, secret/KMS, environment, capability/activation, provider, or traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
 
+## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact dependency identity | PASS | Base=`26fac97fc82ec5f5df23528aacabbc16b749b490`; My-Chat=`533cbf715315bc724ddeb82174c0a981e667d77b`; workflow contract=`0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa`; X5 API source=`581a5cec7b640823332453cf01f0024f1e36c88131da85ac65b423f1ee68640b` over 158 files; Nurture scenario=`e92582d9b710e62f087d92549e1e473a9a22d64b9ad0d058eb010c8c46a67d35`. |
+| Package/source boundary | PASS | Frontend consumes registry `@willyu1007/web-workbench@0.7.0`; CI configures GitHub Packages read authentication; X5 uses only `@my-chat/*` public exports; manifests no longer use direct `file:` sibling dependencies; exact-checkout root overrides are covered by the revision/source verifier. Cross-source jobs use Node 24 for the pinned My-Chat `node>=22` toolchain. |
+| Consumer-boundary enforcement | PASS / ZERO FINDINGS | Base `check-consumer-boundaries.mjs --consumer-role scenario --strict` reports zero findings. CI repeats the strict check from the pinned Base checkout. |
+| Install, type, lint, unit/static | PASS | Frozen install passes; pin verifier and 4 verifier tests pass; `pnpm typecheck`, `pnpm lint`, 19 files/175 unit tests, test-routing, persistence-boundary, N1 schema-contract, X4 replay, and both Prisma schema validations pass. |
+| Real joint regression | PASS | Fresh temporary My-Chat and Nurture databases received all 19 and 3 migrations respectively. `test:x5` passes the committed-result recovery, same-Step single materialization, and post-revoke fail-closed journey. |
+| Cleanup | PASS | Both temporary databases and the temporary My-Chat database role were dropped after X5. Exact dependency worktrees remain only until the commit handoff checks finish. |
+| Remaining alignment scope | OPEN, UNCHANGED | Fastify-to-NestJS (`RB-6`/`DB-4(b)`), ports (`ST-2`), API index (`ST-4(c)`), and governance hygiene (`ST-6(b)`) remain separate work. |
+| Effect boundary | PASS | No schema/migration, persistent database, runtime activation, environment, provider, staging/production state, or external traffic changed. |
+
 ## My-Chat/T-030 N2 Acceptance Verification — 2026-07-28
 
 | Check | Result | Evidence |

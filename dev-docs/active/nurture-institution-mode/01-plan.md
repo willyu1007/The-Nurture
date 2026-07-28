@@ -15,17 +15,18 @@ alignment plan against Base revision
 | --- | --- | --- |
 | Accept repo-qualified ownership | Complete | T-002 owns `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)`; references use repository-qualified task ids. |
 | Adopt Base ecosystem policy | Complete | Package distribution, source-boundary, schema-convention, and port-allocation decisions cite Base `26fac97`; local-path dependencies are development-only and cannot be release evidence. |
-| Replace Base web-workbench local link | Pending | Publish/consume an immutable package or content-addressed artifact; remove `ECO-CONSUMER-002`; clean install, typecheck, lint, and frontend tests pass. |
-| Remove direct sibling-source import | Pending | X5 joint acceptance consumes a published package/artifact or an explicitly materialized exact-revision fixture; remove `ECO-CONSUMER-004`. |
-| Re-pin My-Chat workflow packages | Pending | T-002 consumes the N3-approved exact My-Chat revision, refreshes the installed `file:` snapshot where still required, and passes the pin verifier plus joint regression. |
+| Replace Base web-workbench local link | Complete | Frontend consumes published exact `@willyu1007/web-workbench@0.7.0`; the Base template build/install steps are removed; frozen install, typecheck, lint, unit tests, and strict scan pass. |
+| Remove direct sibling-source import | Complete | X5 imports only My-Chat public package exports, including the new worker subpath; the exact X5 source set is revision- and content-pinned; `ECO-CONSUMER-004` is absent. |
+| Re-pin My-Chat workflow packages | Complete | T-002 pins My-Chat `533cbf715315bc724ddeb82174c0a981e667d77b`, materializes package overrides from that exact checkout, and passes the pin verifier, 175 unit tests, and real two-database X5 regression. |
 | Resolve service-framework timing | Pending | Record and implement the approved transition from the current Fastify dev-host harness to the required NestJS scenario service without promoting the harness to a pilot runtime. |
 | Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. |
 | Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. |
 
-Ordering is Base publication -> My-Chat exact adoption/re-pin -> Nurture
-dependency/source cleanup -> joint verification. No database apply, artifact
-publication, environment mutation, activation, provider, or traffic is
-authorized by the 2026-07-28 acceptance increment.
+Ordering through dependency/source cleanup and joint verification is complete.
+The next accepted work remains the independently reviewable framework, port,
+API-index, and governance items. No database apply, artifact publication,
+environment mutation, activation, provider, or traffic is authorized by the
+2026-07-28 increment.
 
 ## C30-I0 — Implementation baseline isolation（进行中）
 

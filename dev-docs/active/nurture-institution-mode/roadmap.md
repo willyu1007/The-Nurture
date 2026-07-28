@@ -13,13 +13,15 @@ My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、st
 | Item | Owner / input | State | Next gate |
 | --- | --- | --- | --- |
 | Ecosystem policy | My-Workflow-Base `26fac97fc82ec5f5df23528aacabbc16b749b490` | Adopted | Consumers implement package/source/port rules. |
-| Coordination baseline | My-Chat/T-030 `33264981515d75dd9768b720a1d1127cba70cbbe` | Accepted | My-Chat publishes the N3 exact revision before Nurture re-pins. |
-| Nurture scope | T-002: `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Accepted, implementation open | Remove two scanner findings; resolve framework, ports, API index, and governance drift. |
+| Coordination baseline | My-Chat/T-030 baseline `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision `533cbf715315bc724ddeb82174c0a981e667d77b` | N3 adopted | Preserve exact revision/source verification. |
+| Nurture dependency boundary | T-002: Nurture leg of `X-2`, `RB-2`, `RB-3(a)` | Complete | Registry UI package, public My-Chat exports, exact source pin, strict scanner and X5 remain green. |
+| Nurture remaining scope | T-002: `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Implementation open | Resolve framework, ports, API index, and governance drift in independently reviewable increments. |
 | Enablement | Cross-repo | Closed | No staging, production, capability, provider, or external traffic activation from this overlay. |
 
-Execution order is Base publication -> My-Chat exact adoption/re-pin -> Nurture
-dependency/source cleanup -> joint conformance. The overlay does not replace
-the stricter C30/Pilot gates below.
+The Base publication -> My-Chat exact adoption/re-pin -> Nurture
+dependency/source cleanup -> joint conformance sequence is complete for the
+Nurture dependency leg. The overlay does not replace the stricter C30/Pilot
+gates below.
 
 ## 已确认的关键决策
 

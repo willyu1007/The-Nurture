@@ -27,18 +27,20 @@ import {
   PrismaOutboxRepository,
   PrismaWorkflowHandoffRepository,
   PrismaWorkflowRuntimePort,
-} from "../../../../My-Chat/packages/db/src/index.js";
+} from "@my-chat/db";
 import {
   createWorkflowHandoffDraftsFromScenarioSnapshots,
-} from "../../../../My-Chat/packages/workflow-runtime/src/index.js";
+} from "@my-chat/workflow-runtime";
 import {
   createNurtureUserAttentionHttpSource,
-  createNurtureUserAttentionOwner,
   resolveNurtureAttentionOpen,
-} from "../../../../My-Chat/apps/workers/src/nurture-user-attention-owner.js";
+} from "@my-chat/scenario-integrations";
+import {
+  createNurtureUserAttentionOwner,
+} from "@my-chat/workers/nurture-user-attention-owner";
 import {
   createWorkflowHandoffOwnerHandler,
-} from "../../../../My-Chat/apps/workers/src/workflow-handoff-owner.js";
+} from "@my-chat/workers/workflow-handoff-owner";
 
 const NURTURE_DATABASE_URL = process.env.X5_NURTURE_DATABASE_URL;
 const MY_CHAT_DATABASE_URL = process.env.X5_MY_CHAT_DATABASE_URL;

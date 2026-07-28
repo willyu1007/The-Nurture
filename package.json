@@ -9,7 +9,7 @@
   },
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm --dir ../My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile && pnpm --dir ../My-Workflow-Base/templates/web-workbench build",
+    "prepare:pinned-source": "pnpm verify:workflow-contract-pin",
     "build": "pnpm prepare:pinned-source && pnpm db:generate:all && pnpm typecheck && pnpm --filter @the-nurture/frontend build",
     "dev": "node scripts/run-with-local-env.mjs pnpm --filter @the-nurture/backend dev",
     "dev:frontend": "pnpm --filter @the-nurture/frontend dev",
@@ -66,7 +66,14 @@
   },
   "pnpm": {
     "overrides": {
-      "@my-chat/workflow-contracts": "link:../My-Chat/packages/workflow-contracts"
+      "@my-chat/db": "link:../My-Chat/packages/db",
+      "@my-chat/domain": "link:../My-Chat/packages/domain",
+      "@my-chat/outbox": "link:../My-Chat/packages/outbox",
+      "@my-chat/permissions": "link:../My-Chat/packages/permissions",
+      "@my-chat/scenario-integrations": "link:../My-Chat/packages/scenario-integrations",
+      "@my-chat/workers": "link:../My-Chat/apps/workers",
+      "@my-chat/workflow-contracts": "link:../My-Chat/packages/workflow-contracts",
+      "@my-chat/workflow-runtime": "link:../My-Chat/packages/workflow-runtime"
     }
   }
 }

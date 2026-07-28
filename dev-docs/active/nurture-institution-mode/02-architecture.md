@@ -57,6 +57,28 @@ T-002 adopts the ecosystem boundary published by My-Workflow-Base revision
 The coordination record is an architectural acceptance only and changes no package, source,
 schema, migration, runtime, environment, gate, or traffic state.
 
+## 0.1b N3 dependency/source boundary (2026-07-28)
+
+The accepted consumer implementation separates package resolution from source
+identity:
+
+- Nurture package manifests use versioned My-Chat package names and public
+  exports. Root overrides materialize those packages only from the exact
+  checkout named by the integration pin; no test imports sibling `src` paths.
+- The X5 source pin hashes the complete bounded My-Chat public/transitive source
+  population used by the joint test. Revision plus source hash, rather than the
+  local directory name, is the verification identity.
+- `@willyu1007/web-workbench@0.7.0` comes from the package registry, so Nurture
+  no longer installs or builds a Base template as an application dependency.
+- CI verifies revisions and hashes first and then runs the Base scenario
+  consumer scanner in strict mode. Any new local Base link, unpinned My-Chat
+  override, forked workflow contract/runtime, or direct sibling-source import
+  fails the boundary job.
+
+This closes the Nurture leg of `X-2`, `RB-2`, and `RB-3(a)`. It does not close
+`RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, or `ST-6(b)`, and it does not authorize a
+pilot runtime or release.
+
 ## 0.2 Pilot-0-D deployment projection
 
 Pilot-0-D does not change the domain center or create a Nurture product shell.

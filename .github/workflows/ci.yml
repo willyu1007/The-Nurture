@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout The-Nurture
         uses: actions/checkout@v4
+        with:
+          path: The-Nurture
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -30,6 +32,7 @@ jobs:
 
       - name: Read pinned dependencies
         id: pin
+        working-directory: The-Nurture
         run: |
           node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
@@ -38,23 +41,32 @@ jobs:
         with:
           repository: ${{ steps.pin.outputs.my_chat_repository }}
           ref: ${{ steps.pin.outputs.my_chat_revision }}
-          path: .ci-deps/my-chat
+          path: My-Chat
 
       - name: Checkout My-Workflow-Base contract source
         uses: actions/checkout@v4
         with:
           repository: ${{ steps.pin.outputs.workflow_base_repository }}
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
-          path: .ci-deps/my-workflow-base
+          path: My-Workflow-Base
 
       - name: Verify revisions and contract hashes
+        working-directory: The-Nurture
         run: >-
           node scripts/verify-workflow-contract-pin.mjs
-          --my-chat-repo .ci-deps/my-chat
-          --workflow-base-repo .ci-deps/my-workflow-base
+          --my-chat-repo ../My-Chat
+          --workflow-base-repo ../My-Workflow-Base
 
       - name: Test contract hash verifier
+        working-directory: The-Nurture
         run: node --test scripts/verify-workflow-contract-pin.test.mjs
+
+      - name: Enforce scenario consumer boundaries
+        run: >-
+          node My-Workflow-Base/conformance/scripts/check-consumer-boundaries.mjs
+          --repo The-Nurture
+          --consumer-role scenario
+          --strict
 
   governance-lint:
     name: Governance Lint
@@ -126,14 +138,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
           cache-dependency-path: The-Nurture/pnpm-lock.yaml
-
-      - name: Build pinned web-workbench dependency
-        run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
-          pnpm --dir My-Workflow-Base/templates/web-workbench build
+          registry-url: https://npm.pkg.github.com
+          scope: "@willyu1007"
 
       - name: Prepare pinned My-Chat source dependency
         working-directory: My-Chat
@@ -145,6 +154,8 @@ jobs:
 
       - name: Install
         working-directory: The-Nurture
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
 
       - name: Generate and validate production Prisma client
@@ -223,17 +234,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
           cache-dependency-path: The-Nurture/pnpm-lock.yaml
-
-      - name: Build pinned web-workbench dependency
-        run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
-          pnpm --dir My-Workflow-Base/templates/web-workbench build
+          registry-url: https://npm.pkg.github.com
+          scope: "@willyu1007"
 
       - name: Install
         working-directory: The-Nurture
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
 
       - name: Generate and deploy Nurture schema
@@ -307,17 +317,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
           cache-dependency-path: The-Nurture/pnpm-lock.yaml
-
-      - name: Build pinned web-workbench dependency
-        run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
-          pnpm --dir My-Workflow-Base/templates/web-workbench build
+          registry-url: https://npm.pkg.github.com
+          scope: "@willyu1007"
 
       - name: Install
         working-directory: The-Nurture
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
 
       - name: Create separate dev-host database
@@ -378,14 +387,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
           cache-dependency-path: The-Nurture/pnpm-lock.yaml
-
-      - name: Build pinned web-workbench dependency
-        run: |
-          pnpm --dir My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile
-          pnpm --dir My-Workflow-Base/templates/web-workbench build
+          registry-url: https://npm.pkg.github.com
+          scope: "@willyu1007"
 
       - name: Prepare pinned My-Chat source dependency
         working-directory: My-Chat
@@ -397,6 +403,8 @@ jobs:
 
       - name: Install
         working-directory: The-Nurture
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm install --frozen-lockfile
 
       - name: Lint and build

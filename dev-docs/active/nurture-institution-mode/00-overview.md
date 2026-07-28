@@ -12,17 +12,25 @@
 ## Current Cross-Repo Contract Baseline
 
 - My-Workflow-Base ecosystem-policy revision: `26fac97fc82ec5f5df23528aacabbc16b749b490`.
-- My-Chat/T-030 coordination baseline: `33264981515d75dd9768b720a1d1127cba70cbbe`.
+- My-Chat/T-030 accepted coordination baseline:
+  `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
+  `533cbf715315bc724ddeb82174c0a981e667d77b`.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
-  `ST-6(b)`. Acceptance assigns the work; it does not claim that dependency
-  publication, the My-Chat re-pin, the Fastify-to-NestJS transition, port
-  migration, API-index repair, or governance cleanup is complete.
-- The Base advisory consumer scan currently reports
-  `ECO-CONSUMER-002` at `apps/frontend/package.json` for the local
-  `@willyu1007/web-workbench` link and `ECO-CONSUMER-004` at
-  `packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts` for a
-  direct sibling-source import. Both remain open implementation work.
+  `ST-6(b)`.
+- The N3 dependency/source-boundary increment is complete for the T-002
+  consumer leg. Nurture consumes published
+  `@willyu1007/web-workbench@0.7.0`, imports My-Chat only through public
+  package exports, pins Base at `26fac97fc82ec5f5df23528aacabbc16b749b490`
+  and My-Chat at `533cbf715315bc724ddeb82174c0a981e667d77b`,
+  verifies the bounded My-Chat X5 source set as
+  `581a5cec7b640823332453cf01f0024f1e36c88131da85ac65b423f1ee68640b`,
+  and has zero strict Base consumer-boundary findings. The exact-checkout
+  package overrides are verification materialization, not a mutable release
+  dependency.
+- The Fastify-to-NestJS transition, port migration, API-index repair, and
+  governance cleanup remain open. N3 changes no schema, migration, default-off
+  activation, environment, provider, staging/production state, or traffic.
 - My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
 - My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).

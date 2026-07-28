@@ -6,7 +6,7 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "acba4e792c85131c19e63e08a5f671133c481c57",
+    "revision": "26fac97fc82ec5f5df23528aacabbc16b749b490",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -30,12 +30,55 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "a1b5e64c84c9865e34abb7068be10352cf42c949",
+    "revision": "533cbf715315bc724ddeb82174c0a981e667d77b",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa"
+    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa",
+    "sourcePins": [
+      {
+        "key": "x5_joint_api",
+        "root": ".",
+        "paths": [
+          "apps/workers/package.json",
+          "apps/workers/src/nurture-user-attention-owner.ts",
+          "apps/workers/src/workflow-handoff-owner.ts",
+          "apps/workers/src/workflow-handoff-telemetry.ts",
+          "packages/db/package.json",
+          "packages/db/src",
+          "packages/domain/package.json",
+          "packages/domain/index.ts",
+          "packages/domain/actor",
+          "packages/domain/admin-governance",
+          "packages/domain/agent-participation",
+          "packages/domain/audit",
+          "packages/domain/chat",
+          "packages/domain/community-routing",
+          "packages/domain/content",
+          "packages/domain/domain-capabilities",
+          "packages/domain/forum",
+          "packages/domain/growth-record",
+          "packages/domain/identity",
+          "packages/domain/knowledge",
+          "packages/domain/media",
+          "packages/domain/memory",
+          "packages/domain/notification",
+          "packages/domain/personalization",
+          "packages/domain/projection",
+          "packages/domain/public-draft",
+          "packages/outbox/package.json",
+          "packages/outbox/src",
+          "packages/permissions/package.json",
+          "packages/permissions/src",
+          "packages/scenario-integrations/package.json",
+          "packages/scenario-integrations/src",
+          "packages/workflow-runtime/package.json",
+          "packages/workflow-runtime/src"
+        ],
+        "sha256": "581a5cec7b640823332453cf01f0024f1e36c88131da85ac65b423f1ee68640b"
+      }
+    ]
   },
   "nurtureScenario": {
     "contractRoot": ".",
