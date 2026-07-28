@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（local complete, federation pending）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（federation complete, native cloud CI repair verifying）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
@@ -19,8 +19,10 @@
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.
-- The N3 dependency/source-boundary repair is locally complete for the T-002
-  consumer leg and remains open only at the four-repository federation gate.
+- The N3 dependency/source-boundary repair is complete for the T-002 consumer
+  leg. The coordinator-owned four-repository qualification run `30343562287`
+  passed against exact Base `ed69bbd`, My-Chat `53bf92b`, Education `d44286b`,
+  and Nurture `edd7cef`.
   Nurture consumes published
   `@willyu1007/web-workbench@0.7.0`, imports My-Chat only through public
   package exports, pins Base at `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`
@@ -43,8 +45,9 @@
   refs and replaces the X4 driver CHECK with the canonical
   `my_chat/workflow_step` constraint.
 - The Fastify-to-NestJS transition, port migration, API-index repair, and
-  governance cleanup remain open. N3 changes no schema, migration, default-off
-  activation, environment, provider, staging/production state, or traffic.
+  governance cleanup remain open. The current native-cloud CI repair changes
+  no schema, migration, default-off activation, environment, provider,
+  staging/production state, or traffic.
 - My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
 - My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).

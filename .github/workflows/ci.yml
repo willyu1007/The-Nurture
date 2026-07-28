@@ -21,12 +21,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout The-Nurture
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: The-Nurture
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
 
@@ -37,14 +37,14 @@ jobs:
           node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat contract source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.my_chat_repository }}
           ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
 
       - name: Checkout My-Workflow-Base contract source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.workflow_base_repository }}
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
@@ -73,9 +73,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "20"
 
@@ -90,9 +90,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "20"
 
@@ -108,7 +108,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout The-Nurture
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: The-Nurture
 
@@ -119,14 +119,14 @@ jobs:
           node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.my_chat_repository }}
           ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
 
       - name: Checkout My-Workflow-Base source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.workflow_base_repository }}
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
@@ -136,7 +136,7 @@ jobs:
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: pnpm
@@ -208,7 +208,7 @@ jobs:
       DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture?schema=public
     steps:
       - name: Checkout The-Nurture
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: The-Nurture
 
@@ -219,14 +219,14 @@ jobs:
           node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.my_chat_repository }}
           ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
 
       - name: Checkout My-Workflow-Base source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.workflow_base_repository }}
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
@@ -236,7 +236,7 @@ jobs:
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: pnpm
@@ -295,7 +295,7 @@ jobs:
       PGPASSWORD: nurture
     steps:
       - name: Checkout The-Nurture
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: The-Nurture
 
@@ -306,14 +306,14 @@ jobs:
           node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.my_chat_repository }}
           ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
 
       - name: Checkout My-Workflow-Base source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.workflow_base_repository }}
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
@@ -323,7 +323,7 @@ jobs:
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: pnpm
@@ -340,6 +340,10 @@ jobs:
       - name: Build pinned workflow contracts
         working-directory: The-Nurture
         run: pnpm build:pinned-workflow-contracts
+
+      - name: Prepare pinned My-Chat runtime dependency
+        working-directory: My-Chat
+        run: pnpm install --frozen-lockfile
 
       - name: Create separate dev-host database
         run: psql -h 127.0.0.1 -p 5432 -U nurture -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE nurture_dev_host'
@@ -369,7 +373,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout The-Nurture
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: The-Nurture
 
@@ -380,14 +384,14 @@ jobs:
           node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
 
       - name: Checkout My-Chat source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.my_chat_repository }}
           ref: ${{ steps.pin.outputs.my_chat_revision }}
           path: My-Chat
 
       - name: Checkout My-Workflow-Base source dependency
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pin.outputs.workflow_base_repository }}
           ref: ${{ steps.pin.outputs.workflow_base_revision }}
@@ -397,7 +401,7 @@ jobs:
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: pnpm

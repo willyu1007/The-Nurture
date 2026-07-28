@@ -352,7 +352,7 @@ describe("N1 family-care Postgres journey", () => {
       object_id: `step:${suffix}`,
     });
     expect(JSON.stringify(execution)).not.toContain("claim-token-initial");
-    expect(JSON.stringify(execution.handoffDriverRef)).not.toContain("version");
+    expect(execution.handoffDriverRef).not.toHaveProperty("version");
     await expect(
       prisma.nurtureCommandExecution.update({
         where: { id: execution.id },

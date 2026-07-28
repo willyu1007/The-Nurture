@@ -1429,3 +1429,53 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: Federation qualification must declare each evidence field's
   algorithm and population identity. Only fields with the same schema,
   algorithm, and population may be compared directly.
+
+### 2026-07-28 — Using a repository-scoped token for an unrelated private package
+
+- Symptom: Clean GitHub runners could check out the public source repositories
+  but failed every frozen install that resolved
+  `@willyu1007/web-workbench@0.7.0`.
+- Context: Nurture consumes a shared UI package published from another public
+  repository.
+- What we tried: Supplying the calling repository's `GITHUB_TOKEN` with
+  `packages:read`.
+- Root cause: The token is repository-scoped and did not have access to the
+  unrelated private package; the declared shared distribution model and actual
+  package visibility disagreed.
+- Fix / workaround: With explicit owner approval, change only the package to
+  public. Run `30345550728` then passed all four clean-runner install steps.
+  GitHub does not support changing this public package back to private.
+- Prevention: Keep the package manifest/publishing documentation aligned with
+  the intended public distribution model, and prove package resolution from a
+  clean unrelated repository before treating a release as consumable.
+
+### 2026-07-28 — Searching serialized canonical refs for the word `version`
+
+- Symptom: Production DB CI failed even though the persisted canonical driver
+  correctly omitted the legacy top-level `version` field.
+- Context: Canonical schema v1 requires `schema_version`.
+- What we tried: `JSON.stringify(ref).not.toContain("version")`.
+- Root cause: The substring assertion cannot distinguish forbidden `version`
+  from required `schema_version`.
+- Fix / workaround: Assert structurally with
+  `expect(ref).not.toHaveProperty("version")`; the production DB suite then
+  passes `24/24` locally on Node 24.
+- Prevention: Validate object keys and values structurally; do not use raw
+  substring checks for schemas whose legal field names overlap legacy names.
+
+### 2026-07-28 — Checking out a linked workspace without installing it
+
+- Symptom: The dev-host DB/E2E job failed on a clean runner while the same suite
+  passed in a prepared local multi-repository worktree.
+- Context: Nurture links `@my-chat/workflow-runtime` to the exact sibling
+  My-Chat checkout for source-level qualification.
+- What we tried: Installing Nurture and building only the pinned
+  workflow-contract package.
+- Root cause: The clean runner had My-Chat source files but no installed
+  My-Chat workspace dependencies, so runtime source resolution differed from
+  the prepared local environment.
+- Fix / workaround: Install the pinned My-Chat workspace in the dev-host job
+  before running migrations/E2E. The local equivalent passes `19/19`.
+- Prevention: Every clean-runner job that executes linked workspace source must
+  prepare that workspace explicitly; checkout alone is not dependency
+  materialization.

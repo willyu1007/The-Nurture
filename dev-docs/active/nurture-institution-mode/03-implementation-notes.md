@@ -849,3 +849,32 @@
 - No shared, staging, or production database was touched. Migration execution
   and legacy-row conversion were verified only in a disposable local
   PostgreSQL 16 container, removed immediately after the check.
+
+## 2026-07-28 — Public package and native-cloud DB-job repair
+
+- Owner approval changed `@willyu1007/web-workbench` from private to public.
+  GitHub confirms the package is public; no repository visibility, other
+  package, Actions access entry, secret, or token was changed. The visibility
+  change is irreversible under the current GitHub Packages policy.
+- Four-repository qualification run `30343562287` passed against exact Base
+  `ed69bbd`, My-Chat `53bf92b`, Education `d44286b`, and Nurture `edd7cef`,
+  closing the N3 federation gate.
+- Nurture run `30345550728` then passed all four previously blocked frozen
+  install steps, proving that public package distribution closed the clean
+  runner access failure. Frontend lint/build, typecheck, 175 unit tests,
+  workflow pin, context/environment, and governance also passed.
+- The same run exposed two deterministic DB-job defects. The production DB
+  suite serialized `handoffDriverRef` and searched for substring `version`,
+  which falsely matched legal `schema_version`; the assertion now checks only
+  the absent top-level legacy `version` property. The dev-host job checked out
+  the linked My-Chat runtime source but did not install that workspace; it now
+  prepares the pinned My-Chat dependency before running the clean-runner E2E
+  suite.
+- All first-party `actions/checkout` and `actions/setup-node` references in the
+  Nurture CI workflow were upgraded from v4 to v6 after GitHub reported the v4
+  Node 20 action runtime as deprecated.
+- Local Node 24 verification against disposable PostgreSQL passes production
+  DB `24/24`, dev-host `19/19`, unit `175/175`, full typecheck, frontend lint,
+  exact source-pin verification, workflow YAML parsing, whitespace/diff
+  checks, and debug-instrumentation cleanup. A fresh full native-cloud run
+  remains the final exit for this repair increment.

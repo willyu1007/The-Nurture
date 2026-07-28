@@ -17,18 +17,20 @@ revision `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
 | Adopt Base ecosystem policy | Complete | Package distribution, source-boundary, schema-convention, and port-allocation decisions cite Base `ed69bbd`; local-path dependencies are development-only and cannot be release evidence. |
 | Replace Base web-workbench local link | Complete | Frontend consumes published exact `@willyu1007/web-workbench@0.7.0`; the Base template build/install steps are removed; frozen install, typecheck, lint, unit tests, and strict scan pass. |
 | Remove direct sibling-source import | Complete | X5 imports only My-Chat public package exports, including the new worker subpath; the exact X5 source set is revision- and content-pinned; `ECO-CONSUMER-004` is absent. |
-| Re-pin and migrate My-Chat workflow packages | Local complete; federation pending | T-002 pins My-Chat `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336` and Base `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`, migrates all shared references to canonical-ref schema v1, adds the forward data/constraint migration, builds the pinned contract package in clean CI jobs, and passes native pin, typecheck, 175-unit, migration-replay, persistence, and strict consumer-boundary gates. Closure still requires the coordinator-owned four-repository qualification run. |
+| Re-pin and migrate My-Chat workflow packages | Complete | T-002 pins My-Chat `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336` and Base `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`, migrates all shared references to canonical-ref schema v1, adds the forward data/constraint migration, builds the pinned contract package in clean CI jobs, and passes native pin, typecheck, 175-unit, migration-replay, persistence, and strict consumer-boundary gates. Coordinator-owned four-repository qualification run `30343562287` passed against exact Nurture `edd7cef`. |
 | Resolve service-framework timing | Pending | Record and implement the approved transition from the current Fastify dev-host harness to the required NestJS scenario service without promoting the harness to a pilot runtime. |
 | Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. |
 | Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. |
 
 Ordering through dependency/source cleanup and native consumer verification is
-complete. Four-repository qualification remains pending and is the only N3
-closure authority; a native green check cannot close the federated gate. The
-next accepted work after that gate remains the independently reviewable
-framework, port, API-index, and governance items. No shared/staging/production
-database apply, artifact publication, environment mutation, activation,
-provider, or traffic is authorized by the 2026-07-28 increment.
+complete. Four-repository qualification is complete and closes the N3
+federated gate. A subsequent native-cloud run proved public package resolution
+and exposed two deterministic DB-job defects; their minimal CI/test repair is
+under verification. The next accepted work remains the independently
+reviewable framework, port, API-index, and governance items. No
+shared/staging/production database apply, artifact publication, environment
+mutation, activation, provider, or traffic is authorized by the 2026-07-28
+increment.
 
 ## C30-I0 — Implementation baseline isolation（进行中）
 
