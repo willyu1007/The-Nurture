@@ -35,6 +35,27 @@ shared/staging/production database apply, artifact publication, environment
 mutation, activation, provider, or traffic is authorized by the 2026-07-28
 increment.
 
+## 2026-07-28 — Wave 4 P2 binding-anchor increment
+
+The bounded Wave 4 increment implements the Nurture-owned P2 source candidate from
+My-Chat/T-030 without claiming full C30-I3 adoption or activation.
+
+| Work item | State | Exit |
+| --- | --- | --- |
+| Freeze exact Host receipt contract | Complete | My-Chat `64f4165fe571a46ded094ebf6f771bdea61383d1` is pinned with the Workspace/User/Actor/idempotency-complete owner-verifier input and Workspace-bound receipt. |
+| Add typed body-free anchors | Complete locally | Child and Family owner refs use separate namespaces and random UUID anchors. Normal lifecycle is `reserved|bound_empty|associated|retired`; `revoked|quarantined` fail closed. |
+| Add owner authorization adapter | Complete locally, default-deny | The domain port rereads an injected current Nurture authority source; no production authority reader is wired. HMAC evidence and Prisma persistence store no raw platform subject, User, or Actor id. |
+| Add exact local association schema | Complete as target schema | Workspace/Child/Process/Family integrity is enforced with composite keys and foreign keys. No sibling ORM/source or cross-database join is introduced. |
+| Stop new plaintext birth-date writes | Complete as unapplied migration | A column-scoped trigger blocks non-null inserts and explicit birth-date updates once applied while allowing unrelated updates to historical rows. No existing value is read, deleted, migrated, or inferred. |
+| Add derived age/stage boundary | Complete locally | Only `age_band_key`, owner-defined `stage_key`, `as_of_date`, positive `source_version`, and current canonical UTC expiry are accepted; raw birth date, exact age, unknown fields, future as-of dates, and expired values fail closed. |
+| P2 negative and replay verification | Unit-complete; production DB pending cloud | Wrong type/namespace, self-asserted care role, Education scenario substitution, stale anchor version, revoked/expired receipt, divergent replay, and non-canonical derived data are denied. Child/Family and local rebuild paths are covered; the standard disposable PostgreSQL job must prove the trigger and composite FK behavior. |
+| Refresh pins/context/governance and cloud CI | In progress | Recompute the Nurture source hash, verify exact Base/My-Chat worktrees, refresh generated DB context, run repository governance, push an exact T-002 revision, and require green native CI. |
+| Apply migration or activate consumers | Not authorized | Requires the separate T-027/T-028 environment, row-count, owner-review, release-unit, backup/rollback, and activation decisions. |
+
+Exit for the Wave 4 increment is a committed, exact-pinned, CI-green P2 source
+candidate with a negative activation census. The resulting revision is not a C30 component
+candidate, qualified Pilot artifact, applied migration, or release approval.
+
 ## C30-I0 — Implementation baseline isolation（进行中）
 
 `C30-I0` 只建立可归属、可回放、不可变的实施入口，不实现 C30-I1

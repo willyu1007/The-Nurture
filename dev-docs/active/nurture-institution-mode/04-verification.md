@@ -3,9 +3,28 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-28
-- Current phase: Pilot-0-C decision complete; Pilot-0-D `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; both current design reviews are `DR-P0=0 / DR-P1=0 / DR-P2=0`; the canonical readiness census has six open `TR-P0`, three open `TR-P1`, and one accepted-scope `TR-P1`; no complete candidate exists and `QR-*` is not applicable; implementation remains separately unauthorized
-- Code/config/schema impact: Pilot-0-D closure changes task/project planning documentation only. It does not change the current workflow context/pin, product code, Prisma schema/migration, Base/My-Chat source or contract bytes, database, artifact/ACR, secret/KMS, environment, capability/activation, provider, or traffic.
+- Current phase: Wave 4 P2 additive source candidate in progress and default-deny; Pilot-0-C decision complete; Pilot-0-D `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists and `QR-*` is not applicable.
+- Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## Wave 4 P2 local verification — 2026-07-28
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact Host contract input | PASS | My-Chat revision `64f4165fe571a46ded094ebf6f771bdea61383d1` supplies Workspace/User/Actor/idempotency-complete owner verification and a Workspace-bound receipt. My-Chat CI run `30361520780` is green with publication disabled. |
+| Prisma SSOT | PASS / MIGRATION UNAPPLIED | Node 24 `pnpm exec prisma format`, `validate`, and `generate` pass. The additive migration exists only in source and was not deployed to any database. |
+| Domain verification | PASS | `pnpm exec vitest run -c vitest.config.ts` over the two identity files passes 2 files / 12 tests. Coverage includes exact receipt context, wrong typed owner ref, default deny, self-asserted care-role rejection, Education substitution rejection, keyed reservation, derived field allowlist, canonical dates, expiry, and future-date denial. |
+| Repository verification | PASS | `pnpm exec vitest run -c vitest.db.config.ts packages/nurture-db/tests/scenario-binding-owner.repository.test.ts` passes 1 file / 8 tests. Coverage includes explicit HMAC key requirements and length framing, fresh local rebuild/replay, exact anchor row locking, Child and Family persistence, no raw platform subject/Actor persistence, divergent idempotency replay, stale owner version, and revoked receipt. |
+| Production PostgreSQL P2 verification | SOURCE READY / CLOUD PENDING | Three additive tests use the repository's standard disposable PostgreSQL job to prove real Prisma authorization replay and no raw id persistence, non-null birth-date write denial with ordinary local-label update success, and composite-FK rejection of a cross-child Family association plus current-dependency fencing and revoked-history replacement. |
+| Pin-verifier unit tests | PASS | `node --test scripts/verify-workflow-contract-pin.test.mjs` passes 4/4. |
+| Type boundary | PASS WITH KNOWN BUILD-ORDER PREREQUISITE | The two standalone identity domain sources pass strict isolated TypeScript checking. Direct DB-package isolation resolves the package public index and therefore reports the already-known missing prepared `@my-chat/workflow-contracts` distribution plus cascading legacy implicit types in this clean worktree; the repository CI prepares that pinned package before full typecheck. No build was run locally. |
+| Full local unit attempt | 18 FILES / 175 TESTS PASS; 3 SUITES NEED PREPARED PIN | All loadable suites pass. The three remaining existing suites fail module loading only because the clean worktree has no built pinned `@my-chat/workflow-contracts` / runtime distribution. Cloud CI runs `prepare:pinned-source` before the authoritative 21-file / 187-test population gate. |
+| Test routing and static boundaries | PASS | Routing is updated to 21 unit / 5 production-DB / 8 dev-host / 1 X5 files; minimum populations are 187 unit and 35 production-DB tests. Persistence, N1 schema, and X4 replay boundary scripts pass. |
+| Exact three-repository pin | PASS | Base `63d47d2`, My-Chat `64f4165`, shared contract `8dd53b...34d`, Host binding source `c62197...c69`, and 31-file Nurture source `2a6cd4...3d75` match. |
+| Generated context and governance | PASS | DB context regenerated, strict context verification passes, governance sync/lint/query returns T-002 `in-progress`, and no database was contacted. |
+| Whitespace | PASS | `git diff --check` passes after the source and migration review. |
+| Remaining local gates | CLOSED | Scoped docs lint remains at the proven baseline of 31 files / 0 errors / 18 warnings. Commit/push and green native CI with the standard pinned-package build order and disposable PostgreSQL jobs remain pending. |
+| Negative effect census | PASS | No migration apply, DB connection/write, data inventory/deletion, authority-reader wiring, manifest/capability/Scenario activation, cloud/image publication, secret/environment/provider change, or traffic action occurred. |
 
 ## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
 
@@ -906,3 +925,4 @@ For Pilot-0 readiness work:
 | 2026-07-28 | Native-cloud DB-job repair run `30347574708` | PASS / ONE ANNOTATION | All seven jobs passed at `a887a8a`; both repaired DB jobs are green. The only annotation targets `pnpm/action-setup@v4`, now upgraded to v6 pending a clean rerun. |
 | 2026-07-28 | Native-cloud action-runtime closure run `30347782865` | PASS | All seven jobs passed at `e210980`; GitHub check-runs report zero annotations for every job. |
 | 2026-07-28 | Public Base evidence re-pin | LOCAL PASS | Exact Base `63d47d2`, web-workbench hash `43bb51e2...`, unchanged workflow/My-Chat hashes, and four negative verifier tests pass. Native cloud and renewed federation remain pending. |
+| 2026-07-28 | Wave 4 P2 association lifecycle review | PASS AFTER REPAIR | Replaced all-row uniqueness with SSOT-modeled nullable current keys, added immutable plus current-only Child-association FKs, tightened lifecycle checks, and extended the real PostgreSQL case to prove active dependency fencing plus historical replacement. Cloud execution remains pending. |

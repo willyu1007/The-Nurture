@@ -3,6 +3,60 @@
 > 本文是 T-002 的架构投影。当前 Pilot-0-C 决策索引见 `10-pilot0-c-current-decision-index.md`，Pilot-0-D 拓扑/运营 SSOT 见 `11-pilot0-d-topology-operations-contract.md`；精确跨仓场景合同见 `docs/context/workflow/nurture-scenario-contract.md`。发生冲突时，仓级 `AGENTS.md`、context contract、对应阶段当前索引依次优先于本文。立场基准见 `docs/context/product/workflow-product-design-contract.md`。
 > 本设计不引入独立产品壳；The Nurture 是 My-Chat 场景模块，但 Nurture 拥有托育生态图谱和业务事实。
 
+## Wave 4 P2 source candidate boundary
+
+P2 consumes the exact structural owner-verifier contract from My-Chat
+`64f4165fe571a46ded094ebf6f771bdea61383d1`. The request is bound to
+Workspace, acting User, Actor, optional represented Organization, idempotency
+key, platform subject type/id, typed Nurture owner ref/version, purpose, and
+trace context. Nurture returns a Workspace-bound short-lived authorization
+receipt only after an injected owner-specific authority reader succeeds.
+
+```text
+My-Chat authenticated binding command
+  -> Nurture exact owner-verifier input
+  -> current Nurture authority-reader port (default: deny)
+  -> local anchor/version reread
+  -> keyed evidence + idempotent local authorization row
+  -> short-lived owner receipt
+  -> My-Chat canonical binding transaction
+```
+
+The Nurture domain layer is Prisma-free. `packages/nurture-db` is the sole
+adapter for `NurtureChildBindingAnchor`, `NurtureFamilyBindingAnchor`,
+`NurtureScenarioBindingAuthorization`, and the two exact Workspace association
+tables. Platform subject/User/Actor/Organization evidence is HMAC-hashed before
+persistence; raw platform Child/Family ids never enter the Nurture schema.
+Workspace remains explicit routing scope, and owner refs remain typed
+scenario-local anchor refs.
+
+Anchor state is technical only. `reserved`, `bound_empty`, `associated`, and
+`retired` describe the normal endpoint lifecycle; `revoked` and `quarantined`
+are fail-closed recovery states. An anchor, association, platform stewardship,
+or `NurtureCareRole` is never a Nurture protected-read permission and cannot
+authorize a Host or Education operation.
+
+The target migration is additive and unapplied. It adds anchor,
+authorization, and association tables plus composite integrity keys. The
+association rows use nullable `currentKey="current"` sentinels: active rows
+participate in exact Workspace-local unique keys, while revoked/quarantined
+history clears the sentinel and no longer blocks an authorized replacement.
+Each Family association keeps an immutable Child-association reference plus a
+second current-only composite foreign key, so an active Child association
+cannot be deactivated while an active Family association depends on it. The
+`NurtureChild.birthDate` column is retained for an owner-approved inventory and
+deletion proof. A column-scoped database trigger blocks non-null inserts and
+explicit birth-date updates when the migration is eventually applied without
+freezing unrelated updates to historical rows. The source increment does not
+delete or inspect historical values. Scenario input uses only an expiring
+derived age/stage result and rejects raw birth date or exact age.
+
+No production authority-reader wiring, association consumer, manifest
+activation, Scenario row, database apply, environment change, artifact
+publication, or traffic path is part of P2. Full C30-I3 adoption still requires
+the remaining principal, association transaction, presenter/action, protected
+content, lifecycle, and joint conformance work in the strict C30 DAG.
+
 ## 0. 一句话
 
 Nurture 的基本单位不是家庭，也不是班级，而是**小孩的养育过程**（`NurtureChildCareProcess`）。

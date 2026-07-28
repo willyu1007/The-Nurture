@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-28T08:02:29.214Z",
+  "updatedAt": "2026-07-28T13:47:58.779Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -80,8 +80,8 @@
       "tags": [
         "db"
       ],
-      "checksumSha256": "cf66b5be210cf2fe3b43b40aa7be1597ef527e3f867ef04925a8724e69441024",
-      "lastUpdated": "2026-07-13T15:20:55.962Z",
+      "checksumSha256": "178d7c65b161f0a69fcecab8d285b95768885427861dc706e8709d28b5b2de78",
+      "lastUpdated": "2026-07-28T13:47:58.777Z",
       "source": {
         "kind": "command",
         "command": "node .ai/scripts/ctl-db-ssot.mjs sync-to-context",
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "f1039cfe90b034f52daf670f33dfdbee2db283a1f0b63e0e60fa52a492602d64",
-      "lastUpdated": "2026-07-28T08:02:29.212Z",
+      "checksumSha256": "ea562aeb6adb1428bbc311f1cecf12d1249f2e44916b579b03309a895801d06d",
+      "lastUpdated": "2026-07-28T13:27:50.270Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

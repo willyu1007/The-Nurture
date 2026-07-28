@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "53bf92b5c2d2c1d2e7835e34b1ac50337d64f336",
+    "revision": "64f4165fe571a46ded094ebf6f771bdea61383d1",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -76,7 +76,19 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "78a20458a5f4504ecd0e6f1520b782fa07db826106e03791bc12dd53b7b5ba73"
+        "sha256": "4bd231f1c2fc85e7acf6822266fbe22a79b60a5c8e8e350046ae306e94f9c334"
+      },
+      {
+        "key": "wave4_binding_host",
+        "root": ".",
+        "paths": [
+          "packages/domain/child-identity",
+          "packages/domain/package.json",
+          "packages/domain/index.ts",
+          "apps/api/src/child-identity/child-identity.service.ts",
+          "packages/db/src/scenario-binding-repository.ts"
+        ],
+        "sha256": "c62197a83b1fc731674b3567e18021b10a0445c244f869cd0d070b3dea2d6c69"
       }
     ]
   },
@@ -87,15 +99,18 @@
       "apps/backend/src/main.ts",
       "apps/backend/src/server.ts",
       "docs/context/workflow/nurture-scenario-contract.md",
+      "packages/nurture-db/src/binding-evidence-hasher.ts",
       "packages/nurture-db/src/index.ts",
       "packages/nurture-db/src/repositories/family-care-command.transaction.ts",
       "packages/nurture-db/src/repositories/institution-core.repositories.ts",
       "packages/nurture-db/src/repositories/port-repositories.ts",
+      "packages/nurture-db/src/repositories/scenario-binding-owner.repository.ts",
       "packages/nurture-db/src/repositories/user-attention.repository.ts",
       "packages/nurture-scenario/scenario.manifest.yaml",
       "packages/nurture-scenario/src/deps.ts",
       "packages/nurture-scenario/src/domain/commands/command-kernel.ts",
       "packages/nurture-scenario/src/domain/commands/handoff-replay.ts",
+      "packages/nurture-scenario/src/domain/identity",
       "packages/nurture-scenario/src/domain/institution/family-care-commands.ts",
       "packages/nurture-scenario/src/domain/institution/family-care-transaction.ts",
       "packages/nurture-scenario/src/domain/institution/user-attention-activation.ts",
@@ -107,8 +122,10 @@
       "packages/nurture-scenario/src/module.ts",
       "packages/nurture-scenario/src/policies.ts",
       "packages/nurture-scenario/src/registry.ts",
-      "packages/nurture-scenario/src/repositories.ts"
+      "packages/nurture-scenario/src/repositories.ts",
+      "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
+      "prisma/schema.prisma"
     ],
-    "contractSha256": "622b74397f470dce81976d9c69dc5d59c3d3f295295d1eec6b38398f6d262ecf"
+    "contractSha256": "2a6cd497de67deb34c4650ca47f9f6a26ecc0f0376f1f2ceac53a37f17333d75"
   }
 }

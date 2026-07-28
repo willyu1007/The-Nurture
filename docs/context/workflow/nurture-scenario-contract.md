@@ -1,8 +1,18 @@
 # Nurture Scenario Contract
 
+Status: target contract; migration not activated
+
 ## Decision
 
 The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
+
+The Wave 4 P2 implementation is an additive, default-deny source candidate
+against My-Chat host-binding revision
+`64f4165fe571a46ded094ebf6f771bdea61383d1`. It adds typed local anchors,
+workspace-local association schema, an owner-authorization receipt adapter,
+and strict derived age/stage parsing. The migration is not applied, no
+authority-reader production wiring exists, and no manifest, capability,
+Scenario row, environment, database, or traffic path is activated.
 
 My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, workflows, and data.
 

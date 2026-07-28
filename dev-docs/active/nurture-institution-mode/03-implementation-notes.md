@@ -905,3 +905,62 @@
   shallow clone and passes run `30348474446` with zero annotations. The final
   evidence revision adds only the cloud result; both changes leave the 58-file
   web-workbench hash unchanged.
+
+## 2026-07-28 — Wave 4 P2 typed binding-anchor source candidate
+
+- Project orchestration reused The-Nurture/T-002 under `M-002 > F-002 > T-002`.
+  This is a bounded Wave 4 source increment against My-Chat/T-028, not full
+  C30-I3 adoption, C-3 qualification, or activation.
+- My-Chat P1 was repaired before P2 adoption. The exact pinned revision
+  `64f4165fe571a46ded094ebf6f771bdea61383d1` adds Workspace to the receipt and
+  Workspace, acting User, and idempotency key to the owner-verifier input. Its
+  root CI run `30361520780` passes with ACR publication disabled.
+- `packages/nurture-scenario/src/domain/identity/` now defines strict typed
+  Child/Family owner refs, a default-deny current-authority port, keyed
+  evidence/idempotency preparation, an exact My-Chat-compatible receipt, and a
+  closed derived age/stage parser. Self-asserted care roles, Education
+  substitution, unknown request fields, wrong owner kind, raw birth date,
+  exact age, future as-of dates, expired results, and non-canonical expiry
+  timestamps fail before persistence.
+- `packages/nurture-db` now supplies an HMAC-SHA-256 evidence adapter and a
+  Prisma repository. Reservation and authorization use atomic upsert plus
+  candidate ids for concurrent exact replay; divergent payload replay, stale
+  anchor version, revoked/expired receipt, malformed digest, and noncanonical
+  owner refs fail closed. Raw platform subject/User/Actor/Organization ids are
+  not stored by this adapter.
+- Authorization issuance locks the exact typed anchor row with
+  `SELECT ... FOR UPDATE` before checking its lifecycle/version and inserting
+  or replaying the receipt. A concurrent revoke or version transition therefore
+  cannot pass between the current-anchor read and authorization commit.
+- `prisma/schema.prisma` adds scenario-global typed anchors, local
+  authorization evidence, exact Workspace association tables, and composite
+  integrity keys to the existing Child/Process/Family graph. Migration
+  `20260728210000_wave4_binding_anchors` is additive and unapplied; its
+  column-scoped birth-date trigger preserves existing rows for a separately
+  approved inventory/deletion proof while blocking non-null inserts and
+  explicit birth-date updates without freezing unrelated historical-row
+  updates.
+- Final schema review replaced all-row association uniqueness with a nullable
+  `currentKey` discriminator. Active rows use `current`; historical
+  revoked/quarantined rows use null, so they remain immutable evidence without
+  blocking a later authorized mapping. A separate current-only Child
+  association foreign key prevents an active Family mapping from outliving its
+  active Child mapping.
+- Review replaced the draft generic anchor `active` state with
+  `reserved|bound_empty|associated|retired` plus fail-closed
+  `revoked|quarantined`, matching the identity-operation contract. Review also
+  tightened runtime type/text/field/date validation and added database checks
+  that typed owner refs match their exact anchor columns.
+- Local verification currently passes Prisma format/validate/generate, 12
+  domain tests, 8 repository tests, 4 pin-verifier tests, test routing,
+  persistence/N1/X4 static boundaries, standalone strict identity-domain
+  TypeScript checking, exact Base/My-Chat/Nurture source pins, generated DB
+  context, governance/context checks, whitespace, and scoped docs lint with the
+  unchanged 18-warning baseline. Final commit/push/native cloud CI remain the
+  next actions. The cloud
+  production-DB suite has three new real-PostgreSQL checks for exact receipt
+  replay/no raw id persistence, the birth-date write trigger, and cross-child
+  composite-FK rejection; the new DB minimum is 35 tests across 5 files.
+- No target DB was contacted or changed; no birth-date row was read/deleted;
+  no authority-reader, association consumer, manifest, capability, Scenario
+  row, environment, artifact, provider, or traffic path was activated.

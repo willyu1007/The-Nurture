@@ -43,3 +43,49 @@ git diff --check
 ```
 
 SQL execution and PostgreSQL integration tests remain pending the mandatory apply approval.
+
+## 2026-07-28 — Wave 4 P2 schema diff preview
+
+Source:
+
+- `prisma/schema.prisma`
+- `prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql`
+
+Additive target objects:
+
+- enums for typed anchor, association, subject, and authorization lifecycle;
+- `nurture_child_binding_anchor`;
+- `nurture_family_binding_anchor`;
+- `nurture_scenario_binding_authorization`;
+- `nurture_child_anchor_association`;
+- `nurture_family_anchor_association`;
+- composite uniqueness required to prove exact Workspace/Child/Process/Family
+  integrity.
+
+Association uniqueness is current-row-only without relying on an
+unrepresented partial index. Prisma SSOT carries nullable `current_key`
+columns: active rows require the literal `current`, while revoked/quarantined
+history requires null. The Family table also carries an immutable Child
+association reference and a current-only composite reference; the latter
+prevents an active Family row from surviving deactivation of its Child
+association.
+
+The migration adds one column-scoped trigger requiring new
+`nurture_child.birth_date` values to remain null. The trigger runs for inserts
+and explicit `UPDATE OF birth_date`, so unrelated updates to a historical row
+remain possible before the separately approved cleanup. The migration does not
+select, rewrite, null, export, or delete any existing birth date.
+
+Custom SQL checks additionally bind Child/Family owner-ref namespaces to their
+matching anchor columns, require keyed evidence digest shapes, enforce positive
+versions and current authorization windows, and require exact fail-closed
+lifecycle timestamps/current-key combinations.
+
+Destructive review:
+
+- no table/column/type drop;
+- no truncate/delete/update/backfill;
+- no raw platform Child/Family/User/Actor column;
+- no sibling database foreign key or cross-database join;
+- existing values require a separate inventory, retention decision, deletion
+  action, and proof before any future column removal.

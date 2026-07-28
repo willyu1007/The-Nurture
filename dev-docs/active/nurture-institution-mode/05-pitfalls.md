@@ -4,11 +4,15 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
+- Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
+- Do not collapse `reserved|bound_empty|associated` into a generic anchor `active` state; a generic state hides whether the Host binding or local association exists.
+- Do not accept JavaScript's broad date parser as an ISO contract. Derived age/stage expiry must be canonical UTC, current, and paired with a non-future calendar `as_of_date`.
 - Do not treat a version-shaped package dependency plus a local override as immutable by itself. The override is acceptable only when the checkout revision and every bounded source set are verified before install/use; release distribution remains a separate decision.
 - Do not re-pin a source dependency without reconciling the consumer CI runtime and registry authentication. The current My-Chat pin requires Node 22 or newer, and GitHub Packages installation requires an authenticated read token.
 - Do not rebuild a published UI package from a Base sibling template in each consumer CI job. Consume the exact registry version and keep Base source pins as conformance evidence, not runtime resolution.
-- Do not close a direct sibling-source finding by changing only the import spelling. The package must export the required subpath, the consumer must use it, and the exact transitive source population must be revision/content pinned.
-- Do not treat an advisory consumer-boundary finding as fixed merely because it is recorded in a task bundle; closure requires the local Base artifact link and direct sibling-source import to be removed and the clean joint gates to pass.
+- Do not close a direct sibling-source finding by changing only the import spelling. The package must export the required subpath, the consumer must use the exported subpath, and the exact transitive source population must be revision/content pinned.
+- Do not treat an advisory consumer-boundary finding as fixed merely because a finding is recorded in a task bundle; closure requires the local Base artifact link and direct sibling-source import to be removed and the clean joint gates to pass.
 - Do not reduce institution ecology to an authorization feature; institution is the child's external growth environment.
 - Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
@@ -17,7 +21,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not let one service token prove both workload and represented adult, map Host Actor to Nurture Participant, reuse nonce as command identity, or fall back to legacy metadata after vNext verification fails.
 - Do not relabel the existing handoff contract hash as C-3 presentation adoption, split provider/presentation/renderer into independently activatable paths, or maintain a second handwritten pre-activation manifest.
 - Do not use `Direct domain action` to mean both “not a legacy Run action” and “direct-empty effect driver.” Driver is a static action-contract property; caregiver reply and every non-empty-capable relationship action remain claimed-Step even when the current snapshot array is empty.
-- Do not persist submit token, owner target/version, Nurture body/context, or claim evidence in a Workflow Step. Persist a content-free non-claimable Step, bind it immutably in Nurture, then expose only that original Step to claim/replay.
+- Do not persist submit token, owner target/version, Nurture body/context, or claim evidence in a Workflow Step. Persist a content-free non-claimable Step, bind the Step immutably in Nurture, then expose only that original Step to claim/replay.
 - Do not treat a synthetic protected ref, nullable Message body, encrypted flag, ordinary Chat turn, `PublicDraft`, local/browser cache, or AI provider policy as a complete protected-content boundary. Use the owner-encrypted aggregate, protected composer/read path, crypto-erasure, retention/restore fence, and exact cross-repo evidence together.
 - Do not seed the protected composer from sent or unsent ordinary Chat text. Pilot opens an empty manual composer and keeps protected AI absent/off.
 - Do not promise that private text mistakenly typed into ordinary Chat was never retained. The zero-copy guarantee begins at the protected composer; Chat remains under My-Chat policy and never auto-promotes content.
@@ -28,7 +32,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not admit a complete-Pilot row from current C-3 plus E alone. Independently resolve current C-3 qualification, current C-4 qualification, E decision, and exact Pilot-1 deployment every time.
 - Do not require a live Pilot-1 deployment before Pilot-0-E or hash E/evidence/deployment back into the candidate. E reviews an immutable undeployed artifact/topology/config/operations candidate; Pilot-1 later binds exact live resources and secrets.
 - Do not defer static behavior-affecting configuration until Pilot-1 or hash the current environment capability/activation row into the candidate. The candidate freezes ordinary behavior values plus gate schema/default/policy; governed gate values remain live authority state.
-- Do not let an informal test report satisfy E. Only a separately authorized disposable D evidence environment may produce the signed/current `pilot0_d_predeployment_evidence_seal_v1`, and it must finish false/empty, revoke credentials, prove zero external traffic, and be destroyed.
+- Do not let an informal test report satisfy E. Only a separately authorized disposable D evidence environment may produce the signed/current `pilot0_d_predeployment_evidence_seal_v1`; the environment must finish false/empty, revoke credentials, prove zero external traffic, and be destroyed.
 - Do not reuse `c4_bootstrap_evidence_*`, ambient Workspace admin, Institution Admin, or Technical Operator to create the real Pilot Institution. Use the isolated real-Pilot provisioning spec/controller plus exact invitation acceptance, one-effect claim/status recovery, permanent close, and no replacement while outcome is unknown.
 - Do not make a remote My-Chat gate read from inside a Nurture transaction or claim cross-database disable/commit total ordering. Host admission rereads current authorities before the owner attempt; Nurture first verifies the fresh signed private invocation/nonce and then the persisted bounded admission locally, and an already admitted in-flight attempt may commit at most once.
 - Do not model an infrastructure hard stop as choosing one of ingress, private route, workers, send/open, or capability. When the application gate store is unavailable, close all ordinary effect-producing seams together and retain only the separately trusted frozen-recovery lane.
@@ -1523,3 +1527,97 @@ This file exists to prevent repeating mistakes within this task.
   revision and rerun native verifiers.
 - Prevention: Never derive or autocomplete Git SHA suffixes; copy the complete
   value from Git output or an authoritative lock.
+
+### 2026-07-28 — Freezing an owner receipt without complete caller scope
+
+- Symptom: The first Host P1 owner-verifier input had typed subject and Actor
+  data but omitted Workspace, acting User, and the already-required
+  idempotency key; the receipt also omitted Workspace.
+- Context: Nurture authority and Participant mapping are Workspace-local, while
+  the My-Chat binding command is authenticated as a User plus Actor and may
+  replay.
+- What we tried: Structurally adopting the initial receipt as the P2 boundary.
+- Root cause: The contract was reviewed as a result shape without tracing every
+  owner lookup and replay key back to the authenticated Host command context.
+- Fix / workaround: Repair My-Chat P1 first, pin exact revision
+  `64f4165fe571a46ded094ebf6f771bdea61383d1`, bind the receipt to Workspace,
+  and include Workspace/User/Actor/idempotency in the Nurture request hash and
+  local authorization evidence.
+- Prevention: For every cross-owner receipt, enumerate authentication,
+  partition, representation, idempotency, purpose, and expiry inputs before a
+  consumer implementation starts.
+
+### 2026-07-28 — Using one generic active state for a multi-step anchor
+
+- Symptom: The first P2 schema draft used `active`, which could not distinguish
+  a reserved anchor, a Host-bound endpoint with no local association, and an
+  associated local aggregate.
+- Context: Response-loss recovery depends on distinguishing `reserved`,
+  `bound_empty`, and `associated`; revoked or ambiguous states must fail
+  closed.
+- What we tried: Treating `active` as the common accepted state and relying on
+  association queries for the missing detail.
+- Root cause: The implementation enum was created from a rollback shorthand
+  instead of the already locked Nurture identity-operation lifecycle.
+- Fix / workaround: Replace `active` with explicit normal states
+  `reserved|bound_empty|associated|retired`, retain `revoked|quarantined` as
+  failure states, and align the schema spec, Prisma enum, migration, domain
+  type, and repository checks.
+- Prevention: Before adding a lifecycle enum, search the current context
+  contract and task SSOT for every state transition and recovery branch; do
+  not infer states from a summary label.
+
+### 2026-07-28 — Adding tests without moving the population gates
+
+- Symptom: The new identity tests passed directly, but
+  `verify:test-routing` rejected `unit=21/19` and `productionDb=4/3`.
+- Context: Nurture treats test-file routing and minimum test populations as
+  release gates so silently excluded suites cannot appear green.
+- What we tried: Running the new files directly before the repository routing
+  census.
+- Root cause: The implementation added two scenario test files and one DB test
+  file without updating the hard-coded file and test-count expectations.
+- Fix / workaround: Move the routing expectations to 21 unit, 5 production-DB,
+  8 dev-host, and 1 X5 files; move minimum populations to 187 unit and 35
+  production-DB tests; rerun the routing gate.
+- Prevention: Any test-file addition must update and execute both
+  `scripts/assert-test-routing.mjs` and the `verify:*population` thresholds in
+  `package.json` before cloud CI.
+
+### 2026-07-28 — Making historical association rows occupy current uniqueness
+
+- Symptom: The first P2 schema made `(workspace, anchor/local target)` unique
+  across every association row, so a revoked row would permanently block the
+  replacement mapping that the contract allows.
+- Context: Association history is immutable, but uniqueness and the
+  Family-to-Child dependency apply to current rows.
+- What we tried: Reusing ordinary Prisma composite uniques while also adding a
+  lifecycle status.
+- Root cause: The relational key was reviewed for current integrity without
+  replaying the revoke-then-reassociate lifecycle.
+- Fix / workaround: Add a nullable `currentKey` discriminator represented in
+  Prisma SSOT; require `current` only for active rows and null for historical
+  rows. Keep one immutable Family-to-Child-association FK and add a current-only
+  composite FK that blocks Child deactivation while an active Family depends
+  on it.
+- Prevention: For every status-bearing unique key, test create, deactivate,
+  historical retention, authorized replacement, and parent-dependency
+  deactivation—not only duplicate active creation.
+
+### 2026-07-28 — Checking anchor version without locking the issuance window
+
+- Symptom: Authorization initially read the anchor version and then inserted
+  the receipt in the same transaction, but the ordinary read did not prevent a
+  concurrent revoke/version update between those statements.
+- Context: The receipt is valid only for the exact current typed anchor
+  lifecycle and aggregate version.
+- What we tried: Relying on transaction grouping plus the later idempotent
+  upsert.
+- Root cause: Transaction atomicity did not itself lock the prerequisite row;
+  replay safety and prerequisite-state concurrency are separate concerns.
+- Fix / workaround: Read the exact Child or Family anchor through
+  `SELECT ... FOR UPDATE`, then validate lifecycle/version and issue or replay
+  before releasing the row lock.
+- Prevention: Any authorization derived from a mutable prerequisite must
+  either lock that prerequisite or perform a database-enforced conditional
+  write; a plain read followed by insert is not a current-state proof.

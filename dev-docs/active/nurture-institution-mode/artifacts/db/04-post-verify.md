@@ -21,3 +21,22 @@ X4-A database verification is PASS on the approved disposable target.
 ## Remaining gate
 
 This result authorizes moving to My-Chat X4-B implementation only. It does not enable the Nurture manifest handoff declaration, My-Chat development capability, notification/deep-link consumer, pilot, or GA activation.
+
+## 2026-07-28 — Wave 4 P2 post-verification state
+
+Result: source/schema validation PASS; database apply NOT RUN.
+
+| Check | Result |
+| --- | --- |
+| Prisma format/validate/generate | PASS |
+| Domain/repository unit tests | PASS — 12 domain and 8 repository tests |
+| Migration SQL review | PASS as an unapplied additive candidate |
+| Generated DB context | PASS — refreshed from repo Prisma SSOT |
+| Real P2 PostgreSQL test source | READY — 3 checks covering receipt privacy/replay, birth-date fencing, composite scope, current dependency, and historical replacement; execution pending native cloud |
+| Fresh apply / baseline upgrade | Not run locally; native CI disposable fresh apply pending |
+| Historical birth-date inventory | Not run; values and counts remain unknown |
+| Backup / restore / rollback rehearsal | Not run |
+| Environment/capability/Scenario state | Unchanged; no activation performed |
+
+This evidence does not authorize any database target, birth-date cleanup,
+consumer wiring, C30/Pilot qualification, or cloud release.

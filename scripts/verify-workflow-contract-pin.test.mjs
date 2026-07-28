@@ -107,6 +107,12 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
             paths: ['source/value.txt'],
             sha256: sourceHash.sha256,
           },
+          {
+            key: 'wave4_binding_host',
+            root: '.',
+            paths: ['source/value.txt'],
+            sha256: sourceHash.sha256,
+          },
         ],
       },
       nurtureScenario: {

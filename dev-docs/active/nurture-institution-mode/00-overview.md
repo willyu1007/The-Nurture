@@ -3,11 +3,11 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean, public Base SSOT re-pin verifying）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor source candidate（in progress, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
-- **Next step:** Pilot-0-D remains `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO` at `DR-P0=0 / DR-P1=0 / DR-P2=0`; the canonical readiness census still has six open `TR-P0`, three open `TR-P1`, and one accepted-scope `TR-P1`, no complete candidate exists, and `QR-*` is not applicable. C30-I0-A baseline inventory and C30-I0-B T-029 disposition are complete in `artifacts/12-c30-i0-baseline-inventory.md` and `artifacts/13-c30-i0-b-t029-disposition.md`. The disposition covers all 176 donor files, permits no direct merge, retains only named mechanisms for clean reimplementation, and excludes direct platform Child/Family refs, umbrella sources, dual manifest/Execution tracks, mutable evidence, T-028 cutover, C34/C35, and protected AI from C30. The next action is C30-I0-C scoped T-002/T-003/cloud-deployment separation plus clean three-repository worktrees, followed by C30-I0-D immutable pins, hermetic verification, false/empty proof, and canonical rerun; C30-I1, C31, C4, D implementation, Pilot-0-E, and Pilot-1 remain NO-GO.
+- **Next step:** Finish the bounded Wave 4 P2 source candidate against immutable My-Chat host revision `64f4165fe571a46ded094ebf6f771bdea61383d1`: refresh DB/context and exact source pins, pass local/governance/cloud verification, then return the exact Nurture revision and evidence to My-Chat/T-030. The additive migration remains unapplied and every consumer remains default-disabled. After this increment, resume C30-I0-C scoped T-002/T-003/cloud-deployment separation and C30-I0-D immutable baseline proof. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, database apply, artifact publication, capability activation, and external traffic remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
@@ -17,6 +17,14 @@
 - My-Chat/T-030 accepted coordination baseline:
   `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
   `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
+- Wave 4 P2 consumes the narrower host-binding contract candidate
+  `64f4165fe571a46ded094ebf6f771bdea61383d1`. Its owner-verifier input includes
+  exact Workspace, acting User, Actor, represented Organization when present,
+  idempotency key, typed subject, owner ref/version, purpose, and trace
+  context; the returned receipt is Workspace-bound. This pin does not replace
+  the broader C30/C35 qualification DAG. The 31-file P2-extended Nurture source
+  population is pinned at
+  `2a6cd497de67deb34c4650ca47f9f6a26ecc0f0376f1f2ceac53a37f17333d75`.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.

@@ -9,6 +9,8 @@ export * from "./repositories/family-care-query.repository.js";
 export * from "./repositories/user-attention.repository.js";
 export * from "./repositories/family-care-command.transaction.js";
 export * from "./repositories/scenario-repositories.js";
+export * from "./repositories/scenario-binding-owner.repository.js";
+export * from "./binding-evidence-hasher.js";
 
 // Re-export Prisma-generated model TYPES as the data layer's domain entities,
 // so host consumers depend on @the-nurture/db (not @prisma/client) and the

@@ -34,3 +34,20 @@ node .ai/tests/run.mjs --suite database
 ```
 
 The DB test was run again after adding negative constraint probes. No command logged a credential or full connection URL.
+
+## 2026-07-28 — Wave 4 P2 execution log
+
+No migration execution occurred.
+
+Local source-only commands:
+
+```text
+pnpm exec prisma format
+pnpm exec prisma validate
+pnpm exec prisma generate
+```
+
+All passed under Node 24 with a non-routable placeholder database URL.
+`prisma migrate dev`, `prisma migrate deploy`, `prisma db push`, SQL clients,
+row-count queries, backup commands, and data cleanup commands were not run.
+No credential or real connection string was logged.
