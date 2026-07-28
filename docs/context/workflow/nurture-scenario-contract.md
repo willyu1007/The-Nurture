@@ -1,18 +1,20 @@
 # Nurture Scenario Contract
 
-Status: target contract; migration not activated
+Status: repaired source and native CI green; formal adoption pending; migration not activated
 
 ## Decision
 
 The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
 
-The Wave 4 P2 implementation is an additive, default-deny source candidate
-against My-Chat host-binding revision
-`64f4165fe571a46ded094ebf6f771bdea61383d1`. It adds typed local anchors,
-workspace-local association schema, an owner-authorization receipt adapter,
-and strict derived age/stage parsing. The migration is not applied, no
-authority-reader production wiring exists, and no manifest, capability,
-Scenario row, environment, database, or traffic path is activated.
+The repaired Wave 4 P2 implementation is an additive, default-deny source
+candidate against My-Chat host-binding revision
+`30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. It adds typed local anchors,
+workspace-local association schema, a transaction-scoped owner-authorization
+receipt adapter, and strict derived age/stage parsing. The repaired Host and
+Nurture source sets pass their native CI gates; formal cross-owner adoption
+review is still required. The migration is not applied, no authority-reader
+production wiring exists, and no manifest, capability, Scenario row,
+environment, database, or traffic path is activated.
 
 My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, workflows, and data.
 
@@ -330,6 +332,18 @@ independently owner-read:
   RoleAssignment, ChildCareProcess, child-scoped Family, Enrollment, Grant,
   purpose, policy/consent, source lifecycle, and destination lifecycle required
   by that operation.
+
+For every anchor reservation or association write, the exact Nurture authority
+reader receives the same database transaction used by the binding owner
+repository. That transaction locks or database-CAS-validates the current
+authority source after the exact anchor row is locked and before the
+authorization receipt and association result are committed. The authority
+read, anchor lifecycle transition, authorization receipt insert or exact
+replay, and association mutation therefore share one atomic owner transaction.
+Default wiring denies when no production reader is provided. An exact command
+replay must reread and validate the current authority in a fresh transaction;
+an earlier receipt or result cannot mask revoke, expiry, scope drift, owner
+outage, or another current denial.
 
 A co-Guardian invitation is one versioned two-owner saga. The inviting adult
 must be both a current Nurture Guardian and a current My-Chat Family member with
