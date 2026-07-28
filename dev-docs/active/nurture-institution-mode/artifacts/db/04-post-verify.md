@@ -24,7 +24,8 @@ This result authorizes moving to My-Chat X4-B implementation only. It does not e
 
 ## 2026-07-28 — Wave 4 P2 post-verification state
 
-Result: source/schema validation PASS; database apply NOT RUN.
+Result: source/schema validation PASS; disposable CI fresh apply PASS;
+persistent database apply NOT RUN.
 
 | Check | Result |
 | --- | --- |
@@ -32,8 +33,9 @@ Result: source/schema validation PASS; database apply NOT RUN.
 | Domain/repository unit tests | PASS — 12 domain and 8 repository tests |
 | Migration SQL review | PASS as an unapplied additive candidate |
 | Generated DB context | PASS — refreshed from repo Prisma SSOT |
-| Real P2 PostgreSQL test source | READY — 3 checks covering receipt privacy/replay, birth-date fencing, composite scope, current dependency, and historical replacement; execution pending native cloud |
-| Fresh apply / baseline upgrade | Not run locally; native CI disposable fresh apply pending |
+| Real P2 PostgreSQL verification | PASS — run `30366195095`, 35/35 tests including receipt privacy/replay, birth-date fencing, composite scope, current dependency, and historical replacement |
+| Fresh apply | PASS on native CI disposable PostgreSQL 16 only |
+| Supported-baseline upgrade | Not run; requires a separately selected disposable baseline and approval |
 | Historical birth-date inventory | Not run; values and counts remain unknown |
 | Backup / restore / rollback rehearsal | Not run |
 | Environment/capability/Scenario state | Unchanged; no activation performed |

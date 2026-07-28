@@ -961,6 +961,13 @@
   production-DB suite has three new real-PostgreSQL checks for exact receipt
   replay/no raw id persistence, the birth-date write trigger, and cross-child
   composite-FK rejection; the new DB minimum is 35 tests across 5 files.
-- No target DB was contacted or changed; no birth-date row was read/deleted;
+- No persistent target DB was contacted or changed; no birth-date row was
+  read/deleted outside isolated test fixtures;
   no authority-reader, association consumer, manifest, capability, Scenario
   row, environment, artifact, provider, or traffic path was activated.
+- Native CI run `30366195095` is green at source/fix revision
+  `8e8b5cb26233b171ce01d68ee6fd0ee19afa100f`. All seven jobs pass, including
+  full typecheck, 187 unit tests, 35 production-DB tests on fresh disposable
+  PostgreSQL, 19 dev-host tests, exact pins, context/governance, and frontend
+  lint/build. The runner database was ephemeral; no persistent environment,
+  artifact publication, capability, or traffic path changed.

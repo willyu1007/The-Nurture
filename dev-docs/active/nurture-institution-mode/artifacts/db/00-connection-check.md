@@ -5,12 +5,12 @@
 - Direction: repository Prisma/migration history to PostgreSQL.
 - DB SSOT mode: `repo-prisma`.
 - Schema source: `prisma/schema.prisma`.
-- Migration strategy: versioned Prisma migrations; `db push` is not permitted for this node.
+- Migration strategy: versioned Prisma migrations; `db push` is not permitted for X4-A.
 - Evidence date: 2026-07-15.
 
 ## Redacted configuration result
 
-The local environment resolves a PostgreSQL target at `localhost:5433/nurture`. Credentials were not printed or copied into this evidence.
+The local environment resolves a PostgreSQL target at `localhost:5433/nurture`. Credentials were not printed or copied into the evidence.
 
 No network connection, migration status query, DDL, or test write was performed during X4-A preview. The configured `nurture` database is treated as an existing local production-shaped target and must not be migrated implicitly.
 
@@ -36,3 +36,7 @@ No network connection, migration status query, DDL, or test write was performed 
   current row inventory, backup/rollback decision, T-027/T-028 release gates,
   and explicit authorization. The earlier disposable X4 approval does not
   authorize the Wave 4 P2 migration.
+- Native CI run `30366195095` selected only its GitHub-hosted disposable
+  PostgreSQL 16 service. The service accepted a fresh ordered migration apply
+  and was destroyed with the runner. The disposable run does not select or
+  authorize any local, shared, staging, or production target.

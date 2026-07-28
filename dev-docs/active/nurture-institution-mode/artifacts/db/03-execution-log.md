@@ -35,7 +35,7 @@ node .ai/tests/run.mjs --suite database
 
 The DB test was run again after adding negative constraint probes. No command logged a credential or full connection URL.
 
-## 2026-07-28 — Wave 4 P2 execution log
+## 2026-07-28 — Wave 4 P2 local execution log
 
 No migration execution occurred.
 
@@ -51,3 +51,13 @@ All passed under Node 24 with a non-routable placeholder database URL.
 `prisma migrate dev`, `prisma migrate deploy`, `prisma db push`, SQL clients,
 row-count queries, backup commands, and data cleanup commands were not run.
 No credential or real connection string was logged.
+
+## 2026-07-28 — Wave 4 P2 native CI disposable execution
+
+Native run `30366195095` created a fresh PostgreSQL 16 service scoped to one
+GitHub runner, ran `pnpm db:generate`, `pnpm db:validate`, and
+`pnpm db:deploy`, asserted the generated production ownership contract, then
+ran the 35-test production DB population. The P2 migration applied
+successfully in order and all checks passed. GitHub stopped and destroyed the
+service after the job; no reusable target, backup, credential, or data artifact
+was retained.

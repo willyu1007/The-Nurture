@@ -3,11 +3,11 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor source candidate（in progress, default-deny）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor source candidate（complete, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
-- **Next step:** Finish the bounded Wave 4 P2 source candidate against immutable My-Chat host revision `64f4165fe571a46ded094ebf6f771bdea61383d1`: refresh DB/context and exact source pins, pass local/governance/cloud verification, then return the exact Nurture revision and evidence to My-Chat/T-030. The additive migration remains unapplied and every consumer remains default-disabled. After this increment, resume C30-I0-C scoped T-002/T-003/cloud-deployment separation and C30-I0-D immutable baseline proof. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, database apply, artifact publication, capability activation, and external traffic remain NO-GO.
+- **Next step:** Return the completed Wave 4 P2 source revision and native CI run `30366195095` to My-Chat/T-030, then resume C30-I0-C scoped T-002/T-003/cloud-deployment separation and C30-I0-D immutable baseline proof. The additive migration remains unapplied outside disposable CI and every consumer remains default-disabled. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, any persistent database apply, artifact publication, capability activation, and external traffic remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
