@@ -5,7 +5,7 @@
 - State: in-progress
 - **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor repair（exact source and native CI green, formal adoption pending, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-28
+- **Updated:** 2026-07-29
 - **Owner:** willyu1007
 - **Next step:** Complete formal cross-owner/PR adoption review of exact Host
   `30792cd` and Nurture `b615a57`, then allow P3/joint conformance. Native run
