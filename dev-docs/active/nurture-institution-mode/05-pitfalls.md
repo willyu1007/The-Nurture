@@ -1621,3 +1621,20 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: Any authorization derived from a mutable prerequisite must
   either lock that prerequisite or perform a database-enforced conditional
   write; a plain read followed by insert is not a current-state proof.
+
+### 2026-07-28 — Inferring a fixture type from a helper that consumes that type
+
+- Symptom: Native CI rejected
+  `type AnchorRow = ReturnType<typeof anchor>` because `anchor()` accepted
+  `Partial<AnchorRow>`, creating a circular test-only type alias.
+- Context: Vitest transpilation ran the repository tests successfully, while
+  the authoritative repository-wide TypeScript pass analyzed the fixture
+  types.
+- What we tried: Avoiding a duplicate fixture shape by inferring the row type
+  from its constructor helper.
+- Root cause: The helper and inferred alias referenced each other.
+- Fix / workaround: Define the four-field `AnchorRow` test fixture type
+  explicitly and keep `anchor(overrides: Partial<AnchorRow>)` one-way.
+- Prevention: A factory return type may be inferred only when the factory
+  parameters do not depend on that inferred type; always retain a full
+  typecheck gate in addition to transpile-and-run tests.

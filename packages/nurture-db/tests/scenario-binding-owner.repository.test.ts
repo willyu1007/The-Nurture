@@ -162,7 +162,12 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
   });
 });
 
-type AnchorRow = ReturnType<typeof anchor>;
+type AnchorRow = {
+  id: string;
+  reservationKeyHash: string;
+  status: string;
+  aggregateVersion: number;
+};
 type AuthorizationRow = {
   id: string;
   requestFingerprint: string;

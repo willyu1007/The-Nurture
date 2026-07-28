@@ -25,6 +25,7 @@
 | Whitespace | PASS | `git diff --check` passes after the source and migration review. |
 | Remaining local gates | CLOSED | Scoped docs lint remains at the proven baseline of 31 files / 0 errors / 18 warnings. Commit/push and green native CI with the standard pinned-package build order and disposable PostgreSQL jobs remain pending. |
 | Negative effect census | PASS | No migration apply, DB connection/write, data inventory/deletion, authority-reader wiring, manifest/capability/Scenario activation, cloud/image publication, secret/environment/provider change, or traffic action occurred. |
+| Native CI run `30365905930` | PARTIAL PASS / REPAIRED | Disposable PostgreSQL migration, catalog boundary, and all 35 DB tests pass; dev-host, pin, context, governance also pass. Full TypeScript checking found a circular test-only `AnchorRow = ReturnType<typeof anchor>` alias and consequently blocked the unit and frontend-build jobs. The alias is now explicit; exact rerun pending. |
 
 ## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
 
