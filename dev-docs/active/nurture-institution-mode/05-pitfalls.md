@@ -1494,3 +1494,32 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: After an action-runtime warning, inventory every `uses:` entry
   and inspect the completed run annotations; do not limit the repair to the
   first action names reported.
+
+### 2026-07-28 — Changing hashed publishing metadata without moving the consumer pin
+
+- Symptom: The package's external visibility was public, but Base still
+  declared `publishConfig.access=restricted`; repairing the manifest changed
+  Nurture's exact source population even though no UI runtime byte changed.
+- Context: Nurture hashes Base's package manifest as one of 58 web-workbench
+  source inputs.
+- What we tried: Treating visibility as out-of-band package administration
+  unrelated to the source qualification lock.
+- Root cause: Publishing metadata is part of the consumer's reproducible source
+  contract and cannot be corrected independently of its exact revision/hash.
+- Fix / workaround: Commit the Base SSOT repair, recalculate the native source
+  hash, re-pin Nurture and Education to the exact Base revision, then renew the
+  coordinator-owned four-repository qualification.
+- Prevention: Before changing package metadata, enumerate every consumer source
+  population and qualification lock that includes the manifest.
+
+### 2026-07-28 — Reconstructing a full revision from a short Git prefix
+
+- Symptom: The pin file contained a lowercase 40-character value with the
+  intended short prefix, but `git rev-parse --verify <sha>^{commit}` rejected
+  it before any source comparison.
+- Root cause: The suffix was typed rather than copied from the owning
+  worktree's exact `git rev-parse HEAD`.
+- Fix / workaround: Replace every affected consumer pin with the exact opaque
+  revision and rerun native verifiers.
+- Prevention: Never derive or autocomplete Git SHA suffixes; copy the complete
+  value from Git output or an authoritative lock.

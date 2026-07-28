@@ -6,7 +6,7 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a",
+    "revision": "63d47d2ebc6f5062181b721a25182710f7974b17",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -24,7 +24,7 @@
           "templates/web-workbench/src",
           "templates/web-workbench/lint"
         ],
-        "sha256": "9af31018673aae06ef8d440b69d93196a9bf160aa1557c4f8b370299647e888b"
+        "sha256": "43bb51e21f900067582fd059f79b1cc4bbfd8120ca26f4d7eb586c09bb51509d"
       }
     ]
   },

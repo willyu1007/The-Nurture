@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（federation complete, native cloud CI repair verifying）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean, public Base SSOT re-pin verifying）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-28
 - **Owner:** willyu1007
@@ -11,8 +11,9 @@
 
 ## Current Cross-Repo Contract Baseline
 
-- My-Workflow-Base ecosystem-policy and workflow-contract revision:
-  `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`.
+- My-Workflow-Base ecosystem-policy, workflow-contract, and public
+  web-workbench publishing revision:
+  `63d47d2ebc6f5062181b721a25182710f7974b17`.
 - My-Chat/T-030 accepted coordination baseline:
   `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
   `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
@@ -22,13 +23,17 @@
 - The N3 dependency/source-boundary repair is complete for the T-002 consumer
   leg. The coordinator-owned four-repository qualification run `30343562287`
   passed against exact Base `ed69bbd`, My-Chat `53bf92b`, Education `d44286b`,
-  and Nurture `edd7cef`.
+  and Nurture `edd7cef`. That exact run remains historical evidence; the
+  owner-approved public publishing SSOT repair advances Base and Nurture pins
+  and therefore requires a renewed exact qualification run.
   Nurture consumes published
   `@willyu1007/web-workbench@0.7.0`, imports My-Chat only through public
-  package exports, pins Base at `ed69bbd7961352cf5a2a4b41bd2ea6e4d56d774a`
+  package exports, pins Base at `63d47d2ebc6f5062181b721a25182710f7974b17`
   and My-Chat at `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`,
   verifies their byte-identical workflow-contract source at
   `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d`,
+  verifies the public Base web-workbench source set as
+  `43bb51e21f900067582fd059f79b1cc4bbfd8120ca26f4d7eb586c09bb51509d`,
   verifies the bounded My-Chat X5 source set as
   `78a20458a5f4504ecd0e6f1520b782fa07db826106e03791bc12dd53b7b5ba73`,
   verifies the 25-file Nurture scenario source set as

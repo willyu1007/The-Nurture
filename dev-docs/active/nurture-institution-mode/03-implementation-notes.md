@@ -881,3 +881,27 @@
   remains the final exit for this repair increment. Run `30347574708` already
   passes every functional job at commit `a887a8a`; its sole annotation is the
   now-repaired pnpm action runtime.
+
+## 2026-07-28 — Public Base publishing SSOT re-pin
+
+- Base evidence revision `63d47d2ebc6f5062181b721a25182710f7974b17`
+  aligns `templates/web-workbench/package.json` with the already-public GitHub
+  package by setting `publishConfig.access=public`, documents the authenticated
+  repository-token read path, and upgrades Base CI to Node 24 actions.
+- Nurture now pins that exact Base revision. The 58-file web-workbench source
+  population changes only because the package manifest changed and hashes to
+  `43bb51e21f900067582fd059f79b1cc4bbfd8120ca26f4d7eb586c09bb51509d`;
+  the workflow-contract and My-Chat source hashes remain unchanged.
+- This is a source/evidence re-pin only. No package version was published, and
+  no Nurture product source, schema, migration, database, runtime activation,
+  environment, provider, or traffic changed.
+- Native Nurture CI at `30347782865` is already functionally clean with zero
+  annotations before this hash-only re-pin. The updated exact pin must pass the
+  native verifier/full cloud gate and then the coordinator-owned four-repository
+  qualification.
+- Base source/config revision
+  `2af7c45e576af272f36400636ca02c122a14e643` adds full-history checkout after its
+  first cloud run proved the ancestor-bound source lock cannot execute from a
+  shallow clone and passes run `30348474446` with zero annotations. The final
+  evidence revision adds only the cloud result; both changes leave the 58-file
+  web-workbench hash unchanged.
