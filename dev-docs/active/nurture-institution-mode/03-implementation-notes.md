@@ -1064,3 +1064,35 @@
   two-database X5 passes cleanly. Promotion to `main` unblocked;
   executed as publish-cycle P3 by `My-Chat/T-030` under owner decision
   O-3.
+
+## 2026-07-29 — CareGroup responsibility supersedes exact claimant
+
+- Product alignment fixed family CareItems as shared work of the exact original
+  `Enrollment + CareGroup`. Acknowledge records class receipt and actor audit;
+  it no longer creates an exclusive claimant, personal assignment, or unique
+  reply authority.
+- Any currently eligible Caregiver in that exact CareGroup may reply after
+  current original-Grant/Enrollment/role/policy reread. Expected-version and
+  unique reply-graph fences allow only one terminal reply.
+- Historical C-3-3 same-claimant reply and C-4-4 terminal-claimant
+  staffing-blocked/no-takeover decisions and evidence are superseded at the
+  product layer. Existing source/schema remain unchanged and default-off;
+  redesign plus requalification is required before activation.
+
+## 2026-07-29 — CareGroup multi-reply supersedes unique terminal reply
+
+- Product alignment now treats the CareGroup as the family-facing business
+  sender and CareReply as an append-only collection. Individual
+  Participant/RoleAssignment remains executor audit and optional secondary
+  attribution.
+- Different valid reply commands from current eligible caregivers in the exact
+  CareGroup may all commit. The first reply moves response to `responded` and
+  resolves waiting-for-reply Attention; later replies append without closing
+  the Item or resolving Attention again.
+- Reply concurrency is `append_compatible`: another valid reply is not stale.
+  Original Grant/Enrollment/CareGroup, role, policy, retention and lifecycle
+  drift still fail closed. Same command identity remains exact replay.
+- Historical unique reply graph, `replied` terminal, second-reply denial,
+  exact whole-Item version winner and derived terminal-claimant C-4 rules are
+  superseded. Source/schema/evidence remain unchanged, default-off and
+  unqualified until redesigned.

@@ -1,5 +1,18 @@
 # IB Decision Convergence — Nurture Schema SPEC
 
+> **当前产品语义优先级（2026-07-29）：** 本文保留的 `workflow`、
+> `family_care_workflow`、claimed Step 等名称属于已锁定 schema/runtime contract
+> 与历史决策证据，不扩大当前产品 Workflow 的范围。当前产品 Workflow 只指园区管理
+> `InstitutionWorkflow`；家庭操作、投递与交流分别按 `ActionExecution`、
+> `ActionDelivery`、`CareInteraction` 理解。以
+> `docs/context/product/workflow-product-design-contract.md` 为术语 SSOT。
+>
+> CareItem 当前由精确 `Enrollment + CareGroup` 共同承接；acknowledge actor
+> 只用于审计，不形成独占 claimant/assignment。本文要求 same-claimant reply、
+> unique/terminal reply 或基于 terminal claimant 的 staffing-blocked 决策
+> 已被 supersede。当前 reply 是 CareGroup-owned append collection，第一条解除
+> Attention 但不关闭 Item；相关实现与 qualification 继续 default-off / NO-GO。
+
 ## Status
 
 - **Phase:** IB decision convergence

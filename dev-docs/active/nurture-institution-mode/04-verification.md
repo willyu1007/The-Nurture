@@ -1,5 +1,13 @@
 # Verification — Institution Mode
 
+> **Current product override (2026-07-29):** Historical same-claimant,
+> unique/terminal reply, second-reply denial, whole-Item first-winner and
+> terminal-claimant staffing-blocked PASS rows no longer qualify current
+> family-care behavior. Current target is CareGroup-owned multi-reply append:
+> first reply resolves waiting Attention without closing the Item. Replacement
+> implementation and qualification evidence are required; default-off /
+> external-traffic NO-GO remains.
+
 ## Current Verification Status
 
 - Last updated: 2026-07-29

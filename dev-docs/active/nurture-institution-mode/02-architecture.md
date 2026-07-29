@@ -2,6 +2,16 @@
 
 > 本文是 T-002 的架构投影。当前 Pilot-0-C 决策索引见 `10-pilot0-c-current-decision-index.md`，Pilot-0-D 拓扑/运营 SSOT 见 `11-pilot0-d-topology-operations-contract.md`；精确跨仓场景合同见 `docs/context/workflow/nurture-scenario-contract.md`。发生冲突时，仓级 `AGENTS.md`、context contract、对应阶段当前索引依次优先于本文。立场基准见 `docs/context/product/workflow-product-design-contract.md`。
 > 本设计不引入独立产品壳；The Nurture 是 My-Chat 场景模块，但 Nurture 拥有托育生态图谱和业务事实。
+> 本文保留的 family workflow、claimed Step 等名称只描述既有
+> schema/runtime compatibility 与历史证据；产品 Workflow 当前只指园区管理
+> `InstitutionWorkflow`。家庭操作、投递与交流分别使用 `ActionExecution`、
+> `ActionDelivery`、`CareInteraction`。
+> 当前 CareItem 由精确 `Enrollment + CareGroup` 共同承接；acknowledge actor
+> 只是审计证据，不是独占 claimant/assignee。本文后续 same-claimant reply、
+> unique/terminal reply、terminal-claimant staffing-blocked 与 no-takeover
+> 段落保留为历史 Pilot 设计，已被 2026-07-29 产品决策 supersede。CareGroup 是
+> 家庭侧业务发送主体，同班当前合格老师可追加多条回复；第一条只解除待回复
+> Attention，不关闭 Item。旧段落不得用于实现或 activation qualification。
 
 ## Wave 4 P2 implementation boundary
 

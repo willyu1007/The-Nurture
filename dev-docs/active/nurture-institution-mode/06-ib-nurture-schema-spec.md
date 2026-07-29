@@ -1,5 +1,19 @@
 # IB Schema SPEC — Nurture Care Ecology Canonical
 
+> **当前产品语义优先级（2026-07-29）：** 本文保留的 `workflow`、
+> `family_care_workflow`、claimed Step 等名称属于已锁定 schema/runtime contract
+> 与历史设计证据，不扩大当前产品 Workflow 的范围。当前产品 Workflow 只指园区管理
+> `InstitutionWorkflow`；家庭操作、投递与交流分别按 `ActionExecution`、
+> `ActionDelivery`、`CareInteraction` 理解。以
+> `docs/context/product/workflow-product-design-contract.md` 为术语 SSOT。
+>
+> CareItem 当前由精确 `Enrollment + CareGroup` 共同承接；acknowledge actor
+> 只用于审计，不形成独占 claimant/assignment。本文要求 same-claimant reply、
+> unique/terminal reply 或基于 terminal claimant 的 staffing-blocked schema
+> 投影已被 supersede。当前 reply 是 CareGroup-owned append collection，第一条
+> 解除 Attention 但不关闭 Item；相关 schema/source/qualification 待重新设计，
+> 不能据旧证据激活。
+
 ## Status
 
 - **Phase:** IB schema SPEC locked; C-3/C4 identity-repair projection final-reviewed; Pilot-0-C decision complete/implementation open; Pilot-0-D design locked at `DR-P0=0 / DR-P1=0 / DR-P2=0`; C-3/C4/D implementation pending; external traffic NO-GO

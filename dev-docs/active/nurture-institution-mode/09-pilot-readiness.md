@@ -1,5 +1,20 @@
 # Pilot Readiness — Institution Ecology
 
+> **当前产品语义优先级（2026-07-29）：** 本文保留的 `workflow`、
+> `family_care_workflow`、claimed Step 等名称属于已锁定 runtime/qualification
+> contract 与历史交付证据，不扩大当前产品 Workflow 的范围。当前产品 Workflow
+> 只指园区管理 `InstitutionWorkflow`；家庭操作、投递与交流分别按
+> `ActionExecution`、`ActionDelivery`、`CareInteraction` 理解。以
+> `docs/context/product/workflow-product-design-contract.md` 为术语 SSOT。
+>
+> **当前 CareGroup 责任优先级（2026-07-29）：** CareItem 由精确
+> `Enrollment + CareGroup` 共同承接；acknowledge actor 只用于审计，不形成
+> 独占 claimant/assignment。CareGroup 是家庭侧业务发送主体，同班当前合格老师
+> 可追加多条回复；第一条只解除待回复 Attention，不关闭 Item。本文
+> same-claimant、unique/terminal reply、terminal claimant staffing-blocked、
+> no-takeover 及其 C-3-3/C-4-4 qualification 行保留为历史证据，已被当前产品决策
+> supersede。相关实现与证据必须重做，继续 default-off / NO-GO。
+
 ## Status and authorization
 
 - **Review date:** 2026-07-21

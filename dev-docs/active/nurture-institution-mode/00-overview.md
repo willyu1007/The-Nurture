@@ -20,6 +20,38 @@
   persistent database apply, artifact publication, capability activation, and
   external traffic remain NO-GO.
 
+## Current Product Terminology Override (2026-07-29)
+
+- 本任务包保留的 `workflow`、claimed Step、`workflow_step_complete_v1` 与
+  My-Workflow-Base contract 名称，描述的是既有 runtime/owner contract 与历史交付证据；
+  它们不自动定义当前产品层的 Workflow。
+- 当前产品层 Workflow 只指园区管理业务过程，统一称为
+  `InstitutionWorkflow`；一次执行实例称为 `InstitutionWorkflowRun`。
+- 家庭照护的 submit/acknowledge/reply 是 `ActionExecution`，跨 owner 投递、
+  retry、reconcile 是 `ActionDelivery`，交流链路是 `CareInteraction`。
+- 现有 claimed-Step 路径保持 default-off compatibility seam。它在迁移或重新限定
+  为园区管理 Workflow 前不得成为新家庭 action 的产品建模依据，也不得据此激活
+  consumer、外部流量或持久化迁移。
+- 当前术语 SSOT：
+  `docs/context/product/workflow-product-design-contract.md`。
+
+## Current CareGroup Responsibility Override (2026-07-29)
+
+- 家庭 CareItem 当前由 submit 时绑定的精确 `Enrollment + CareGroup` 共同承接；
+  acknowledge actor 只用于审计，不形成独占 claimant、个人 assignment 或唯一 reply authority。
+- CareGroup 是家庭侧主要业务发送主体；reply MAY 由同一精确 CareGroup 内任一
+  当前合格照护者追加，且允许多位老师/多个独立 command 形成多条回复。个人身份
+  保留为内部审计与可选次级署名。
+- 第一条 reply 只将 response 标记为 responded 并解除待回复 Attention；CareItem
+  不关闭，后续合法 reply 是 append-compatible。每次仍重新检查原始 Grant/
+  Enrollment、当前 RoleAssignment、policy、retention 与 lifecycle。
+- 本任务包中要求 same exact claimant reply、因 claimant 角色终止形成
+  staffing-blocked case、unique/terminal reply、禁止同班其他照护者接续的旧
+  C-3-3/C-4-4 产品规则已被 supersede。相关 schema/source/qualification 证据
+  保留为历史记录，但不再支持激活。
+- 这项决策不授权代码、schema、manifest、数据库或流量变更。实施前必须完成差异设计、
+  concurrency/authority 测试与重新 qualification；所有相关 consumer 继续 default-off。
+
 ## Current Cross-Repo Contract Baseline
 
 - My-Workflow-Base ecosystem-policy, workflow-contract, and public

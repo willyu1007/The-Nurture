@@ -1,5 +1,19 @@
 # IIA Schema / Policy / Test Design
 
+> **当前产品语义优先级（2026-07-29）：** 本文保留的 `workflow`、
+> `family_care_workflow`、claimed Step 等名称属于已锁定 schema/runtime contract
+> 与历史测试设计证据，不扩大当前产品 Workflow 的范围。当前产品 Workflow 只指园区管理
+> `InstitutionWorkflow`；家庭操作、投递与交流分别按 `ActionExecution`、
+> `ActionDelivery`、`CareInteraction` 理解。以
+> `docs/context/product/workflow-product-design-contract.md` 为术语 SSOT。
+>
+> CareItem 当前由精确 `Enrollment + CareGroup` 共同承接；acknowledge actor
+> 只用于审计，不形成独占 claimant/assignment。本文 same-claimant reply、
+> unique/terminal reply、terminal claimant staffing-blocked 与 no-takeover
+> 测试设计已被 supersede。当前 reply 是 append-compatible；替代多回复、
+> first-reply Attention、authority/lifecycle 测试完成前不得用于 qualification
+> 或 activation。
+
 ## Status
 
 - **Phase:** Pilot-0-C4/Pilot-0-C `DECISION COMPLETE / IMPLEMENTATION OPEN / EXTERNAL TRAFFIC NO-GO`; Pilot-0-D `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO` at `DR-P0=0 / DR-P1=0 / DR-P2=0`; implementation remains separately unauthorized
