@@ -12,8 +12,25 @@
 
 ## Principles
 
-(none yet — add the first principle below this line)
+### P-001 — Workflow is an institution-management product concept
+
+- `Workflow` MUST mean a durable `InstitutionWorkflow` with resumable business stages,
+  progress, responsibility, blockers, and next actions.
+- The Institution Web workbench is the current primary Workflow operation surface.
+- Boards MAY consume role-safe `InstitutionWorkflowProjection` values. Institution mobile
+  is read-only in the current phase; other roles see only their authorized external slice.
+- `ActionExecution`, `ActionDelivery`, `CareInteraction`, and `PublishProcess` MUST NOT be
+  renamed to Workflow because they are asynchronous, cross-owner, retried, or delivered
+  through Handoff/Outbox.
+- `My-Workflow-Base` and existing compatibility interface names describe platform/runtime
+  ownership; they do not broaden the current product Workflow scope.
+
+Canonical definitions: `docs/context/product/workflow-product-design-contract.md`.
 
 ## Rejected Approaches
 
-(none yet — record rejected design alternatives below this line, with rationale)
+### R-001 — Treat every asynchronous or cross-owner action as Workflow
+
+Rejected because transport durability is not a product lifecycle. The broad definition
+made family communication, notification delivery, publish state, and institution management
+indistinguishable and caused contract drift across task packages.

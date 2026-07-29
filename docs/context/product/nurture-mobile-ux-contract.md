@@ -7,9 +7,22 @@
 > Pilot-0-B 锁定表面（Guardian Nurture Chat / family board / family workbench、
 > Caregiver Nurture Chat / teacher board、Institution board / workbench）的具象化。
 > 上游立场基准：`docs/context/product/workflow-product-design-contract.md`
-> （Family Charter / Current Focus / Anti-Metrics / AI 整理者定位 / 非诊断红线）。
+> （Workflow/Action/Projection 术语、surface ownership 与非诊断红线）。
 >
 > 分层标记：**[A]** 可直接实现的规格 · **[C]** 依赖未建工程能力 · **[试点]** 假设待验证。
+
+> **Current semantic overrides（2026-07-29）**：
+> 本文件是 T-003 设计输入，不是当前实现 SSOT。Guardian/Caregiver 不建立共享聊天室、
+> 家园直聊或直接 DM；两侧消费 `CareInteraction` 的角色安全投影。当前产品 Workflow
+> 仅指园区管理 `InstitutionWorkflow`：Institution Web workbench 是主要操作面，
+> Institution mobile board 可只读投影关键内容与进度。与 T-004～T-008 最新决策冲突时，
+> 以 `workflow-product-design-contract.md` 和对应任务包为准。
+> 家庭 CareItem 以精确 CareGroup 为业务主体；acknowledge 不表示个人接手。
+> 同班当前合格老师可追加多条 CareGroup reply，第一条只解除待回复 Attention，
+> 不关闭 Item；个人身份保留为内部审计与可选次级署名。
+> 本文件中“待发送气泡撤回”属于 `PublishProcess` 的发布前取消。已发送
+> `CareInteraction` 中 correction、family request withdrawal 与 message redaction
+> 分别作用于内容解释、事项工作和内容可见性，不得按本文件旧文案合并为“撤回消息”。
 
 ## 1. 横切原则
 
@@ -40,7 +53,11 @@ App = My-Chat（shell 归属不变），Nurture 以**场景视图**接管 shell�
 - Shell 形态：左侧模态抽屉（复用 My-Chat NavDrawer：UpperRail + LowerContext + footer）；
   无底部 tab；顶部栏=汉堡+位置标题；浮标是屏幕上唯一悬浮元素。
 
-## 3. 对话空间模型 [A]
+## 3. 对话空间模型 [SUPERSEDED DESIGN INPUT]
+
+本节保留视觉设计历史，不得作为 T-005 的产品/授权契约。当前家庭—园区沟通采用
+family-private Guardian Chat、authorized Caregiver projection 和 Nurture-owned
+Message/CareItem/Event/Receipt 链，不建立下表所述的跨角色共享房间。
 
 | 空间 | 成员 | 性质 | 入口 |
 | --- | --- | --- | --- |
@@ -107,6 +124,9 @@ AI 定时整理（如 10 分钟无操作）或点"整理"手动触发。语音�
             → 送达家长（回执链开始）
 ```
 
+此处“撤回”仅取消仍未跨边界的待发送 PublishProcess 内容，不是已发送
+CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
+
 - 读条走完 = 入待发队列（园所侧内部动作，未跨边界）；跨边界只发生在发送时刻：
   手动发=显式确认；定时发=显式配置的常设策略。
 - 待发送态以灰虚线气泡停在**目标会话内**（老师可在收件人语境下审、删、补一句、即发）；
@@ -114,18 +134,23 @@ AI 定时整理（如 10 分钟无操作）或点"整理"手动触发。语音�
 - 低置信（待关联）/敏感类（情绪低落、磕碰、健康）**永不自动**：待关联内容只进班级档案、
   进不了家庭时间线；园所可整体切"全手动"。
 - **只有 AI 整理内容走队列**：老师亲手输入的消息永远即时发出。
-- 关联宝宝三源：照片识别 / 文字语音点名 / 活动上下文；头像区发布前可编辑（防错分发），
-  发布后修改=撤回替换+回执（对应底层 revoke/redaction 语义）。
+- 关联宝宝三源：照片识别 / 文字语音点名 / 活动上下文；头像区发布前可编辑（防错分发）。
+  发布后修改属于 PublishProcess 的 correction/replacement 设计输入；不得覆盖 T-005
+  已锁定的 CareInteraction correction/withdrawal/redaction 契约。
 - 合照双路由：1-2 主角→对应家庭；群像→班级群/相册；AI 预判可改；机构可配更严政策。**[试点：政策]**
 - 落点可见：发出后内容真实出现在对应会话；状态行"查看"跳转定位。
 - 默认参数（**[试点]** 均可配）：否决窗 15s；批次 12:30/17:00。
 
 ## 6. 机构端表面（框架级，细节共创待定）
 
-- **移动看板（只读）**：今日脉搏（在园/活动/消息回应，按班聚合）→ 家园流动
+- **移动看板（只读）**：除今日脉搏和支持信号外，可消费
+  `InstitutionWorkflowProjection`，展示 actor-safe 的 Workflow 关键内容、当前阶段、
+  已完成里程碑、阻塞和下一步；不得显示 raw Run/Step 或提供隐藏写操作。今日脉搏
+  （在园/活动/消息回应，按班聚合）→ 家园流动
   （进/出条数 + 授权变更）→ 理念在发生（关注类观察计数+周趋势）→ 需要关注
   （支持视角推送，如"某班今日消息较多，要不要安排人支援"）。禁止：按老师聚合/排名。
-- **Web 操作台**：基于 `My-Workflow-Base/templates/web-workbench`（morethan kit，
+- **Web 操作台**：当前 `InstitutionWorkflow` 的主要操作面，基于
+  `My-Workflow-Base/templates/web-workbench`（morethan kit，
   Hub/List/Insight 范式）。首批模块：入托与邀请（Roster→邀请→**家长确认才建档**）、
   班级与老师、家园沟通、素材归档、理念与目标（理念→阶段目标→活动模板→班级采纳与观察回流）。
 - **[试点]** 园长看板最想看的数字、推送口径——留作共创问题。

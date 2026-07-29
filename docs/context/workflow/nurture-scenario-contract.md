@@ -2,6 +2,25 @@
 
 Status: repaired source and native CI green; formal adoption pending; migration not activated
 
+## Product Terminology Compatibility
+
+Current product semantics are defined by
+`docs/context/product/workflow-product-design-contract.md`:
+
+- product `Workflow` means an institution-management `InstitutionWorkflow`;
+- family-care submit/acknowledge/reply are `ActionExecution`;
+- notification/Handoff/Outbox materialization is `ActionDelivery`;
+- family-care Message/CareItem/Event/Receipt facts form a `CareInteraction`;
+- caregiver draft/review/publish is a `PublishProcess`.
+
+This file also records existing platform/runtime compatibility names such as
+`workflow-contracts`, Workflow Run/Step, and `workflow_step_complete_v1`. Those names
+describe current implementation seams and My-Chat runtime ownership; they MUST NOT be
+used to broaden product Workflow scope. No new family-care action may be classified as
+Workflow merely because it is asynchronous, cross-owner, retried, or delivered through
+Handoff/Outbox. Existing family-care claimed-Step activation remains a compatibility gap
+and MUST stay default-off until the owner contract is reconciled with the product semantics.
+
 ## Decision
 
 The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
@@ -16,9 +35,9 @@ review is still required. The migration is not applied, no authority-reader
 production wiring exists, and no manifest, capability, Scenario row,
 environment, database, or traffic path is activated.
 
-My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, workflows, and data.
+My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, InstitutionWorkflows, and data.
 
-The Nurture basic product unit is not family or classroom. The basic unit is a child's care process: parents join the child's care process, teachers incorporate the child's care process into their daily care workflow, and institution managers govern how these processes are organized and executed.
+The Nurture basic product unit is not family or classroom. The basic unit is a child's care process: parents join the child's care process, teachers incorporate the child's care process into their daily care work, and institution managers govern how these processes are organized and executed.
 
 ## Ownership
 
@@ -44,9 +63,9 @@ Do not copy My-Workflow-Base host runtime into this repo. Integration should reg
 
 Do not put My-Chat account auth, session, or global user semantics into Nurture. Do not put Nurture-specific family, child, institution, caregiver, enrollment, consent, or care communication semantics into My-Chat as canonical business facts.
 
-## Declared Workflows
+## Runtime-declared Scenario Entrypoints (legacy workflow API)
 
-P0 workflows:
+Historical P0 runtime entrypoint groups:
 
 - `pregnancy_stage_management`
 - `family_strategy`
@@ -54,12 +73,12 @@ P0 workflows:
 - `activity_comparison`
 - `execution_review`
 
-N1 institution owner-read workflows:
+N1 institution owner-read capability groups:
 
 - `class_family_inbox` / `open_class_family_inbox` / `capture_family_input`
 - `teacher_attention_board` / `open_today_attention_board`
 
-The N1 institution workflows resolve the current Nurture participant, role, and care-group scope on every read. Their direct surface handlers return display-safe items and opaque refs only. Existing owner-read workflow handlers remain explicit-empty. The activation-only `capture_family_input` Step may emit one refs-only `user_attention` draft only when the host loads the vNext manifest with `workflow_handoff_materialization_v1` enabled.
+The N1 institution owner-read capabilities resolve the current Nurture participant, role, and care-group scope on every read. Their direct surface handlers return display-safe items and opaque refs only. Existing legacy runtime handlers remain explicit-empty. The activation-only `capture_family_input` Step is an existing compatibility seam, not a product Workflow. It may emit one refs-only `user_attention` draft only when the host loads the vNext manifest with `workflow_handoff_materialization_v1` enabled, and it remains default-off pending semantic/owner-contract reconciliation.
 
 ## Object And Profile Rules
 
@@ -419,13 +438,23 @@ shared key.
 - One `child_id` can route separately to Nurture and Education without a
   cross-database join, dossier transfer, or cross-scenario permission leak.
 
-Nurture family-care communication is Nurture-owned when the conversation is created through a Nurture care workflow. My-Chat MAY render the thread, deliver notifications, and hold display-safe shell references, but the message body, care item extraction, status, acknowledgment, reply, and follow-up facts remain Nurture canonical.
+Nurture family-care communication is a Nurture-owned `CareInteraction` when an authorized `ActionExecution` creates its business facts. My-Chat MAY render role-safe projections, deliver notifications, and hold display-safe shell references, but the message body, care item extraction, status, acknowledgment, reply, and continuation facts remain Nurture canonical.
+
+The current family-care business subject is the exact original
+`Enrollment + CareGroup`, not an individual Caregiver claimant. Acknowledge
+records CareGroup receipt plus individual executor audit. Reply is a
+CareGroup-owned append collection: any currently eligible Caregiver in that
+exact CareGroup MAY append an independently idempotent reply, and another
+valid reply is not a concurrency conflict. The first reply changes response
+to `responded` and resolves waiting-for-reply attention; later replies do not
+close the Item or resolve attention again. Individual Participant and
+RoleAssignment remain internal audit and optional secondary attribution.
 
 ## Handoffs
 
 Handoff payloads are refs-only.
 
-The canonical vNext manifest declares `capture_family_input` and one `user_attention` handoff with `workflow_step_complete_v1` materialization. Its source contract is exactly one `family_care_message`, `child_link_receipt`, and `family_care_item`, with no artifact refs. This declaration is not a global enablement: `nurtureScenarioModule`, `createNurtureScenarioModule`, and the local dev host use the derived pre-activation manifest. Only `createNurtureActivationScenarioModule` exposes vNext and its constructor requires a materializing host runtime, the claimed-Step bridge, and the production family-input source port.
+The canonical vNext manifest currently declares `capture_family_input` and one `user_attention` handoff with legacy `workflow_step_complete_v1` materialization. Its source contract is exactly one `family_care_message`, `child_link_receipt`, and `family_care_item`, with no artifact refs. This declaration documents the current compatibility implementation; it does not classify family communication as product Workflow and is not a global enablement. `nurtureScenarioModule`, `createNurtureScenarioModule`, and the local dev host use the derived pre-activation manifest. `createNurtureActivationScenarioModule` remains default-off and MUST NOT activate until the claimed-Step seam is replaced or explicitly reconciled with the `ActionExecution`/`ActionDelivery` contract.
 
 The transient driver is validated before command identity lookup or mutation. Nurture persists only the shared canonical ref `{ schema_version: 1, namespace: "my_chat", object_type: "workflow_step", object_id }`; claim token and Step version are neither hashed nor stored. Same-Step reclaim may rotate that evidence, but another Step cannot replay the seed. Snapshot contents are bounded refs-only values over the Nurture-owned message, receipt, and item; downstream content still requires current owner reread.
 

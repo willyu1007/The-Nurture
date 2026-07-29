@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-29T00:09:31.451Z",
+  "updatedAt": "2026-07-29T10:32:10.370Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -47,8 +47,8 @@
         "glossary",
         "llm"
       ],
-      "checksumSha256": "9458ae377bdcc652618258440d671969f72ca05423f8f78124c114e21d8358f5",
-      "lastUpdated": "2026-05-28T13:26:12.217Z",
+      "checksumSha256": "940e5a330d334ed47fb3e061922f8a81fa6bb425b256f537da02bb1d73457313",
+      "lastUpdated": "2026-07-29T09:04:21.839Z",
       "source": {
         "kind": "manual",
         "notes": "Edit via ctl-context add-term/remove-term; then run ctl-context touch."
@@ -64,8 +64,8 @@
         "architecture",
         "llm"
       ],
-      "checksumSha256": "6cc617057c651f0bfbd1eb8e4b8e224c38d5b1bc1a302266bc5d0b0d3f120f9e",
-      "lastUpdated": "2026-05-28T09:16:20.635Z",
+      "checksumSha256": "1fe8b5177a12d806f527703a3ba2d7978be8edc0c862a7088c0866ca3237c3bb",
+      "lastUpdated": "2026-07-29T08:57:07.451Z",
       "source": {
         "kind": "manual",
         "notes": "Edit the Markdown file directly; then run ctl-context touch."
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "90d3da00979bb920692683558a8a954580c6d59392bc0cb72b50f5daf7286e46",
-      "lastUpdated": "2026-07-28T22:12:22.489Z",
+      "checksumSha256": "182a6daf2a7304ac1556a71a140995329156c6250e6eee950f602305097f9d8b",
+      "lastUpdated": "2026-07-29T09:56:21.241Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -157,8 +157,8 @@
         "nurture",
         "my-chat"
       ],
-      "checksumSha256": "0d60f07a08e312d973123dfd38d778e6a2b638208c8e6f2e01775b042a104c5c",
-      "lastUpdated": "2026-07-20T08:35:35.575Z",
+      "checksumSha256": "00e92a45e6fbf34ea6bc88b6a4cf5f3872137d7cc4c5931a5409122f816ca59c",
+      "lastUpdated": "2026-07-29T10:32:10.328Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -178,8 +178,8 @@
         "my-chat",
         "llm"
       ],
-      "checksumSha256": "0075d0f758035583d87a9b05fef2ec620c0bc2b56d889ce1b8659f50bd35b73b",
-      "lastUpdated": "2026-07-22T23:43:55.559Z",
+      "checksumSha256": "994b43f878c56057615dccff424b913508028d368f4e4c58ceebdfb4bbcb24ba",
+      "lastUpdated": "2026-07-29T10:32:10.369Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

@@ -37,6 +37,11 @@ features:
     status: in-progress
     description: "Deliver class family inbox, teacher attention, daily care, and child media attribution through grant-gated child scopes and owner-reread surfaces."
     milestone_id: M-002
+  - id: F-003
+    title: "Six-surface store-beta readiness"
+    status: planned
+    description: "Turn the six-surface product design into a qualified Nurture service candidate and versioned interface that My-Chat can integrate and validate through TestFlight Internal and Google Play Internal Testing."
+    milestone_id: M-002
 
 requirements: []
 
@@ -62,3 +67,38 @@ tasks:
     feature_id: F-002
     dev_docs_path: dev-docs/active/nurture-uiux-pitch
     updated: 2026-07-21
+  - id: T-004
+    slug: nurture-surface-contract-foundation
+    status: planned
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/nurture-surface-contract-foundation
+    updated: 2026-07-29
+  - id: T-005
+    slug: nurture-family-care-conversation
+    status: planned
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/nurture-family-care-conversation
+    updated: 2026-07-29
+  - id: T-006
+    slug: nurture-child-care-boards
+    status: planned
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/nurture-child-care-boards
+    updated: 2026-07-29
+  - id: T-007
+    slug: nurture-institution-surfaces
+    status: planned
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/nurture-institution-surfaces
+    updated: 2026-07-29
+  - id: T-008
+    slug: nurture-store-beta-readiness
+    status: planned
+    milestone_id: M-002
+    feature_id: F-003
+    dev_docs_path: dev-docs/active/nurture-store-beta-readiness
+    updated: 2026-07-29
