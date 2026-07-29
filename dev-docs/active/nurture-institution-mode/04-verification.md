@@ -1066,3 +1066,21 @@ For Pilot-0 readiness work:
 | Three-repository pin | PASS | Base `63d47d2`, Host `30792cd`, 15-file Host hash `3dadb0...f0c5`, and 31-file Nurture hash `354bb2...c83f` verify exactly. |
 | Native CI | PASS | Exact source `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`; run `30403774597` passed all 7 jobs with zero annotations, including exact pin/boundary, context/governance, type/unit, 37 disposable production-DB tests, dev-host E2E, and frontend lint/build. |
 | Effect boundary | PASS | No persistent database or migration apply, package/image publication, environment/secret/provider change, Scenario/capability activation, deployment, or traffic change occurred. |
+
+## 2026-07-29 - P3 re-pin and clean X5 rerun (supersedes the 64f4165-era rows above)
+
+Driven by `My-Chat/T-030` publish-cycle P3 on this consolidation branch,
+after the My-Chat owner fixes landed. The earlier "Exact Host contract
+input" and "Exact three-repository pin" rows citing `64f4165` describe
+the rejected checkpoint and are historical.
+
+| Check | Result | Evidence |
+|---|---|---|
+| My-Chat owner fixes | PASS | `5f52327` accepts contract version zero in the handoff value codec; `a4768fe` returns canonically ordered completion output refs (replay determinism). Both published on My-Chat main with 75 files / 389 unit tests green |
+| Exact three-repository pin | PASS | Base `5c04dce` (docs-only over `63d47d2`; contract and web-workbench hashes unchanged), My-Chat `a4768fe` (x5_joint_api 161 files `56a7c9…6393`, wave4_binding_host 15 files `3dadb0…f0c5` unchanged), Nurture scenario 31 files `354bb2…c83f` |
+| Pin verifier + tests | PASS | `verify:workflow-contract-pin` green against real sibling checkouts; `test:workflow-contract-pin` green |
+| Pinned contracts build | PASS | `build:pinned-workflow-contracts` reproduces My-Chat's committed dist byte-identically (clean sibling tree) |
+| Typecheck / lint / units | PASS | full `pnpm typecheck`, full `pnpm lint` chain (incl. pin verify), 187 unit tests |
+| N1 / X4 contracts | PASS | `verify:n1-schema-contract` (21 tables), `verify:x4-handoff-replay-contract` (batch=32) |
+| Routing / boundaries | PASS | `verify:test-routing` (35 files), `verify:persistence-boundaries` |
+| Real two-database X5 | PASS | disposable `x5_mychat_p3` (all 21 My-Chat migrations replayed clean) + `x5_nurture_p3` (all Nurture production migrations); committed-result recovery, single materialization, post-revoke fail-closed, and completion/replay deep-equality green with the version-0 `command_execution` ref |

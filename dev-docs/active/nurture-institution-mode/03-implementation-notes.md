@@ -1054,3 +1054,11 @@
   passed 7/7 jobs with zero annotations.
 - Formal cross-owner/PR adoption, P3/P4, persistent migration, activation,
   deployment, and traffic remain outside this synchronization change.
+- 2026-07-29 (P3): My-Chat shipped both owner fixes for the consolidation
+  blocker - `5f52327` (codec accepts contract version zero) and `a4768fe`
+  (completion output refs canonically ordered so exact replay deep-equals
+  the first response). Re-pinned to My-Chat `a4768fe` + Base `5c04dce`
+  (docs-only over `63d47d2`), reran the full battery, and the real
+  two-database X5 passes cleanly. Promotion to `main` unblocked;
+  executed as publish-cycle P3 by `My-Chat/T-030` under owner decision
+  O-3.

@@ -6,7 +6,7 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "63d47d2ebc6f5062181b721a25182710f7974b17",
+    "revision": "5c04dce2ac52460b41a4a94874591155d2b476fe",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "30792cd48e35cce3720bfa8fb9a1094a59b0ccd7",
+    "revision": "a4768fe1c86abfe8a864fe7668a9ca9bc7850fb7",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -76,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6"
+        "sha256": "56a7c976287230bf87dd972a34e6c9da54c6d9448da428b6539da76e43956393"
       },
       {
         "key": "wave4_binding_host",
