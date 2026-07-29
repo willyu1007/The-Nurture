@@ -1,0 +1,14 @@
+version: 1
+task_id: T-008
+project: main
+slug: nurture-store-beta-readiness
+status: planned
+updated: "2026-07-29"
+keywords:
+  - store-beta
+  - testflight
+  - google-play-internal
+  - conformance
+  - revision-pin
+  - six-surface-journey
+  - my-chat-handoff
