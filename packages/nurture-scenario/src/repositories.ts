@@ -1,9 +1,11 @@
-import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type { NurtureCommandRepository } from "./domain/commands/command-kernel.js";
 import type { NurtureInteractionContextRepository } from "./domain/interactions/interaction-context.js";
 import type { NurtureInstitutionContextRepository } from "./domain/institution/institution-context.js";
 import type { NurtureFamilyCareQueryRepository } from "./domain/institution/family-care-query.js";
 import type { NurtureUserAttentionRepository } from "./domain/institution/user-attention-activation.js";
+
+type DomainContextRef = CanonicalRef;
 
 export type NurtureProfileProjection = {
   profile_id: string;

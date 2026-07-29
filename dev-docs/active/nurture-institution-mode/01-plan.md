@@ -4,6 +4,85 @@
 
 ---
 
+## 2026-07-29 — Current-project consolidation and readiness gate
+
+The current-project consolidation branch is
+`codex/T-002-nurture-consolidation`. It merges the complete Nurture T-002
+owner-alignment increment and selectively adopts only the fail-closed
+environment repair from the stale environment donor. The stale
+scenario-platform-convergence worktrees remain donor evidence and are not
+merge inputs.
+
+| Work item | State | Exit |
+| --- | --- | --- |
+| Consolidate Nurture branches | Complete on integration branch | T-002 owner-alignment is fully merged; only the reviewed environment commit is harvested; unrelated stale donor source is excluded. |
+| Revalidate static and unit gates | Pass | Frozen install, exact pin, context, environment, governance, docs, typecheck, lint, 187 unit tests, routing, persistence, N1 schema, X4 replay, and strict consumer-boundary checks pass. |
+| Rehearse Nurture databases | Pass in disposable PostgreSQL | All five production and one dev-host migrations apply from empty; ownership boundaries pass; production DB is 37/37 and dev-host is 19/19. No persistent database is contacted. |
+| Requalify real X5 journey | Blocked on Host semantic drift | Exact two-database X5 reaches completion but My-Chat rejects legal `CanonicalRef.version=0`, returns `manual_review_required`, and materializes zero Handoffs. |
+| Promote integration branch to `main` | Held | Requires a published My-Chat codec repair, refreshed exact revision/source hash, passing X5, and green branch CI. |
+
+This checkpoint does not authorize a Nurture-side workaround that drops a
+valid zero version. Base canonical-ref v1 defines `version` as a non-negative
+integer; the fix belongs in the Host runtime codec and its conformance tests.
+Until that owner repair is adopted, current-project consolidation is safe but
+cross-repository implementation readiness is **NO-GO**.
+
+## 2026-07-28 — My-Chat/T-030 acceptance increment
+
+The 2026-07-28 increment accepts and repairs the Nurture-owned portion of the
+cross-repository alignment plan against Base revision
+`63d47d2ebc6f5062181b721a25182710f7974b17` and the My-Chat contract/X5
+revision `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
+
+| Work item | State | Exit |
+| --- | --- | --- |
+| Accept repo-qualified ownership | Complete | T-002 owns `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)`; references use repository-qualified task ids. |
+| Adopt Base ecosystem policy | Complete | Package distribution, source-boundary, schema-convention, and port-allocation decisions cite Base `63d47d2`; local-path dependencies are development-only and cannot be release evidence. |
+| Replace Base web-workbench local link | Complete | Frontend consumes published exact `@willyu1007/web-workbench@0.7.0`; the Base template build/install steps are removed; frozen install, typecheck, lint, unit tests, and strict scan pass. |
+| Remove direct sibling-source import | Complete | X5 imports only My-Chat public package exports, including the new worker subpath; the exact X5 source set is revision- and content-pinned; `ECO-CONSUMER-004` is absent. |
+| Re-pin and migrate My-Chat workflow packages | Base public-SSOT re-pin verifying | T-002 pins My-Chat `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336` and Base `63d47d2ebc6f5062181b721a25182710f7974b17`, migrates all shared references to canonical-ref schema v1, adds the forward data/constraint migration, builds the pinned contract package in clean CI jobs, and passes native pin, typecheck, 175-unit, migration-replay, persistence, and strict consumer-boundary gates. Historical coordinator run `30343562287` passed the prior exact Base/Nurture revisions; renewed native and four-repository cloud evidence is required for the public publishing SSOT revision. |
+| Resolve service-framework timing | Pending | Record and implement the approved transition from the current Fastify dev-host harness to the required NestJS scenario service without promoting the harness to a pilot runtime. |
+| Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. |
+| Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. |
+
+Ordering through dependency/source cleanup and native consumer verification is
+complete. Four-repository qualification closed the N3 federated gate for the
+prior exact revisions. A subsequent native-cloud run proved public package
+resolution, and run `30347782865` closed all functional and action-runtime
+findings with zero annotations. Base then aligned its hashed publishing
+manifest to the irreversible public visibility; Nurture has adopted that exact
+revision/hash and awaits renewed native/federated cloud evidence. The next
+accepted work remains the independently
+reviewable framework, port, API-index, and governance items. No
+shared/staging/production database apply, artifact publication, environment
+mutation, activation, provider, or traffic is authorized by the 2026-07-28
+increment.
+
+## 2026-07-28 — Wave 4 P2 binding-anchor increment
+
+The bounded Wave 4 increment implements the Nurture-owned P2 source boundary
+from My-Chat/T-030 without claiming source qualification, full C30-I3 adoption,
+or activation.
+
+| Work item | State | Exit |
+| --- | --- | --- |
+| Freeze exact Host receipt contract | Exact replacement pinned and CI-green | My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7` keeps anchors private and adds durable replay, monotonic versions, CAS, and PostgreSQL race convergence. The expanded 15-file Host source population verifies at `3dadb0...f0c5`; Host CI `30375174861` passes with zero annotations. |
+| Add typed body-free anchors | Complete locally | Child and Family owner refs use separate namespaces and random UUID anchors. Normal lifecycle is `reserved|bound_empty|associated|retired`; `revoked|quarantined` fail closed. |
+| Add owner authorization adapter | Repair complete locally, default-deny | A transaction-scoped adapter receives the exact Prisma transaction, rereads/locks or CAS-validates the exact authority source after the anchor lock, and persists or exact-replays the receipt in that transaction. Default wiring denies; no production reader is wired. |
+| Add exact local association schema | Complete as target schema | Workspace/Child/Process/Family integrity is enforced with composite keys and foreign keys. No sibling ORM/source or cross-database join is introduced. |
+| Stop new plaintext birth-date writes | Complete as unapplied migration | A column-scoped trigger blocks non-null inserts and explicit birth-date updates once applied while allowing unrelated updates to historical rows. No existing value is read, deleted, migrated, or inferred. |
+| Add derived age/stage boundary | Complete locally | Only `age_band_key`, owner-defined `stage_key`, `as_of_date`, positive `source_version`, and current canonical UTC expiry are accepted; raw birth date, exact age, unknown fields, future as-of dates, and expired values fail closed. |
+| P2 negative and replay verification | Repair tests complete locally | Existing negatives remain green. A real PostgreSQL interleaving now locks the exact care-role source, proves concurrent revoke cannot overtake issuance, and proves post-commit revoke denies the next issue. Three target rounds pass. |
+| Refresh pins/context/governance and cloud CI | Complete for synchronized repaired source | Exact Host pin, 31-file Nurture source `354bb2...c83f`, normative context contract, strict boundary, context/governance, type/unit, 37 DB tests, dev-host E2E, and frontend gates pass at exact revision `b615a57` in native run `30403774597` with zero annotations. |
+| Apply migration or activate consumers | Not authorized | Requires the separate T-027/T-028 environment, row-count, owner-review, release-unit, backup/rollback, and activation decisions. |
+
+The Wave 4 P2 implementation repair and normative contract sync are complete
+at exact source `b615a57`.
+Transaction-atomic owner authorization, targeted concurrency/privacy,
+refreshed pin/source hashes, and native CI pass. Formal joint owner/PR adoption
+review remains. The resulting revision is not a C30 component candidate,
+qualified Pilot artifact, applied migration, or release approval.
+
 ## C30-I0 — Implementation baseline isolation（进行中）
 
 `C30-I0` 只建立可归属、可回放、不可变的实施入口，不实现 C30-I1

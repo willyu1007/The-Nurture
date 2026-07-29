@@ -27,7 +27,7 @@ describe("approval pause/resume: family_strategy run", () => {
         entrypoint_key: "calibrate_family_strategy",
         requirement_values: {
           context_refs: [
-            { namespace: "my_chat", object_type: "family", object_id: familyId, owner_scope: "workspace", canonical_ref: { service: "my_chat", object_type: "family", object_id: familyId } },
+            { schema_version: 1, namespace: "my_chat", object_type: "family", object_id: familyId },
           ],
           issue_type: "bedtime",
         },

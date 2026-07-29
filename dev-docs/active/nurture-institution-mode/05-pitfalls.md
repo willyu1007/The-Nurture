@@ -4,6 +4,19 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
+- Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
+- Do not treat locking the binding anchor as fencing an independently mutable
+  authority source; reread and lock/CAS that exact source in the receipt
+  transaction.
+- Do not collapse `reserved|bound_empty|associated` into a generic anchor `active` state; a generic state hides whether the Host binding or local association exists.
+- Do not accept JavaScript's broad date parser as an ISO contract. Derived age/stage expiry must be canonical UTC, current, and paired with a non-future calendar `as_of_date`.
+- Do not treat a version-shaped package dependency plus a local override as immutable by itself. The override is acceptable only when the checkout revision and every bounded source set are verified before install/use; release distribution remains a separate decision.
+- Do not re-pin a source dependency without reconciling the consumer CI runtime and registry authentication. The current My-Chat pin requires Node 22 or newer, and GitHub Packages installation requires an authenticated read token.
+- Do not prepare an exact X5 worktree with production Prisma generation only. The backend import graph also requires the generated dev-host client, so use `db:generate:all` before test collection.
+- Do not rebuild a published UI package from a Base sibling template in each consumer CI job. Consume the exact registry version and keep Base source pins as conformance evidence, not runtime resolution.
+- Do not close a direct sibling-source finding by changing only the import spelling. The package must export the required subpath, the consumer must use the exported subpath, and the exact transitive source population must be revision/content pinned.
+- Do not treat an advisory consumer-boundary finding as fixed merely because a finding is recorded in a task bundle; closure requires the local Base artifact link and direct sibling-source import to be removed and the clean joint gates to pass.
 - Do not reduce institution ecology to an authorization feature; institution is the child's external growth environment.
 - Do not treat institution ecology as an independent product shell; institution ecology remains inside the My-Chat scenario boundary.
 - Do not put My-Chat account/auth/session semantics inside The Nurture; they belong to My-Chat.
@@ -12,7 +25,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not let one service token prove both workload and represented adult, map Host Actor to Nurture Participant, reuse nonce as command identity, or fall back to legacy metadata after vNext verification fails.
 - Do not relabel the existing handoff contract hash as C-3 presentation adoption, split provider/presentation/renderer into independently activatable paths, or maintain a second handwritten pre-activation manifest.
 - Do not use `Direct domain action` to mean both “not a legacy Run action” and “direct-empty effect driver.” Driver is a static action-contract property; caregiver reply and every non-empty-capable relationship action remain claimed-Step even when the current snapshot array is empty.
-- Do not persist submit token, owner target/version, Nurture body/context, or claim evidence in a Workflow Step. Persist a content-free non-claimable Step, bind it immutably in Nurture, then expose only that original Step to claim/replay.
+- Do not persist submit token, owner target/version, Nurture body/context, or claim evidence in a Workflow Step. Persist a content-free non-claimable Step, bind the Step immutably in Nurture, then expose only that original Step to claim/replay.
 - Do not treat a synthetic protected ref, nullable Message body, encrypted flag, ordinary Chat turn, `PublicDraft`, local/browser cache, or AI provider policy as a complete protected-content boundary. Use the owner-encrypted aggregate, protected composer/read path, crypto-erasure, retention/restore fence, and exact cross-repo evidence together.
 - Do not seed the protected composer from sent or unsent ordinary Chat text. Pilot opens an empty manual composer and keeps protected AI absent/off.
 - Do not promise that private text mistakenly typed into ordinary Chat was never retained. The zero-copy guarantee begins at the protected composer; Chat remains under My-Chat policy and never auto-promotes content.
@@ -23,7 +36,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not admit a complete-Pilot row from current C-3 plus E alone. Independently resolve current C-3 qualification, current C-4 qualification, E decision, and exact Pilot-1 deployment every time.
 - Do not require a live Pilot-1 deployment before Pilot-0-E or hash E/evidence/deployment back into the candidate. E reviews an immutable undeployed artifact/topology/config/operations candidate; Pilot-1 later binds exact live resources and secrets.
 - Do not defer static behavior-affecting configuration until Pilot-1 or hash the current environment capability/activation row into the candidate. The candidate freezes ordinary behavior values plus gate schema/default/policy; governed gate values remain live authority state.
-- Do not let an informal test report satisfy E. Only a separately authorized disposable D evidence environment may produce the signed/current `pilot0_d_predeployment_evidence_seal_v1`, and it must finish false/empty, revoke credentials, prove zero external traffic, and be destroyed.
+- Do not let an informal test report satisfy E. Only a separately authorized disposable D evidence environment may produce the signed/current `pilot0_d_predeployment_evidence_seal_v1`; the environment must finish false/empty, revoke credentials, prove zero external traffic, and be destroyed.
 - Do not reuse `c4_bootstrap_evidence_*`, ambient Workspace admin, Institution Admin, or Technical Operator to create the real Pilot Institution. Use the isolated real-Pilot provisioning spec/controller plus exact invitation acceptance, one-effect claim/status recovery, permanent close, and no replacement while outcome is unknown.
 - Do not make a remote My-Chat gate read from inside a Nurture transaction or claim cross-database disable/commit total ordering. Host admission rereads current authorities before the owner attempt; Nurture first verifies the fresh signed private invocation/nonce and then the persisted bounded admission locally, and an already admitted in-flight attempt may commit at most once.
 - Do not model an infrastructure hard stop as choosing one of ingress, private route, workers, send/open, or capability. When the application gate store is unavailable, close all ordinary effect-producing seams together and retain only the separately trusted frozen-recovery lane.
@@ -1365,3 +1378,323 @@ This file exists to prevent repeating mistakes within this task.
 - Fix / workaround: introduce stable `TR-P0-1..6` and `TR-P1-1|2|3a|3b` ids in `pilot0_traffic_readiness_census_v1`; require all P0 plus P1-1/2/3b closed and permit only P1-3a as `accepted_scope_exclusion`. Derive `externalProductTrafficCount` from exact trusted source session/account/service and recipient/provider boundaries rather than untrusted target claims; external authenticated requests count even when Host-denied, while exact internal wrong-target probes remain internal only when denied before owner effect. Any admitted unplanned Nurture question/effect is `no_pass`; only pre-admission zero-effect denial is a negative probe.
 - Prevention: census cross-product tests reject missing/renamed/duplicate/waived rows and wrong exclusions; traffic tests cover allowlisted internal ingress, edge scans, control traffic, external principals/providers, and provider attempts; observation tests cover admitted eighth question versus pre-admission rejection.
 - References: `11-pilot0-d-topology-operations-contract.md` D-0.5/D-7, `09-pilot-readiness.md` Blocking findings/Pilot-0-E, `08-iia-schema-policy-test-design.md` Pilot-0-D operations conformance.
+
+### 2026-07-28 — Treating advisory detection as conflict closure
+
+- Symptom: A cross-repository scan can be green as an executed advisory check
+  while still returning findings, making an acceptance-only increment look like
+  completed dependency cleanup.
+- Context: My-Chat/T-030 N2 coordination acceptance for Nurture/T-002.
+- Root cause: Work assignment, policy adoption, mechanical detection, source
+  cleanup, exact dependency re-pin, and release verification were compressed
+  into one “aligned” status.
+- What we tried: Re-ran the Base consumer-boundary scanner against the clean
+  Nurture baseline and inspected the dependency, direct-import, framework, and
+  port surfaces before editing implementation code.
+- Fix / workaround: Record acceptance separately from implementation. Keep
+  `ECO-CONSUMER-002` and `ECO-CONSUMER-004` open until the local Base artifact
+  link and sibling-source import are removed, then require exact My-Chat pin,
+  clean install, typecheck/tests, and joint conformance evidence.
+- Prevention: Every cross-repository status update states exact revisions,
+  repo-qualified owner/task, scanner finding count, effect boundary, and the
+  remaining exit gate. Advisory output is evidence of detection only.
+- References: `00-overview.md`, `01-plan.md`, `04-verification.md`,
+  My-Workflow-Base `docs/context/ecosystem/contract-status.md`, and
+  My-Chat/T-030.
+
+### 2026-07-28 — Treating an exact revision/hash pin as source compatibility
+
+- Symptom: The native pin verifier passed after updating the Base and My-Chat
+  revisions, but `pnpm typecheck` failed because Nurture still imported removed
+  `DomainContextRef` and emitted legacy `{ kind, id }` references.
+- Context: The verifier proves immutable source identity and selected
+  path-content parity. It does not build linked packages or compile the
+  consumer.
+- What we tried: Updating only the revision and path-content hashes.
+- Root cause: Pin identity, source compatibility, generated package
+  materialization, persisted JSON compatibility, and four-repository
+  qualification were treated as one gate.
+- Fix / workaround: Migrate all shared refs to canonical schema v1, add a
+  forward data/CHECK migration, build the exact linked contract before
+  typecheck/build/lint and DB jobs, then require native tests plus the
+  coordinator-owned federation workflow.
+- Prevention: A repin is incomplete until the exact linked package is built,
+  the consumer compiles, replay/persistence populations pass, legacy persisted
+  refs have a forward migration, and the federated revision lock is green.
+
+### 2026-07-28 — Comparing unrelated hash fields across consumer schemas
+
+- Symptom: Education `scenario_release.source_hash` and Nurture
+  `nurtureScenario.contractSha256` appeared different and could be reported as
+  cross-project drift.
+- Context: The two fields cover different path populations and use different
+  lock schemas; equality is not part of either contract.
+- Root cause: Both values are SHA-256 strings, so field appearance was mistaken
+  for semantic equivalence.
+- Fix / workaround: Compare exact Base/My-Chat revisions across consumers, then
+  execute each repository's native verifier against its own declared
+  population. Record both results without cross-comparing the hash values.
+- Prevention: Federation qualification must declare each evidence field's
+  algorithm and population identity. Only fields with the same schema,
+  algorithm, and population may be compared directly.
+
+### 2026-07-28 — Using a repository-scoped token for an unrelated private package
+
+- Symptom: Clean GitHub runners could check out the public source repositories
+  but failed every frozen install that resolved
+  `@willyu1007/web-workbench@0.7.0`.
+- Context: Nurture consumes a shared UI package published from another public
+  repository.
+- What we tried: Supplying the calling repository's `GITHUB_TOKEN` with
+  `packages:read`.
+- Root cause: The token is repository-scoped and did not have access to the
+  unrelated private package; the declared shared distribution model and actual
+  package visibility disagreed.
+- Fix / workaround: With explicit owner approval, change only the package to
+  public. Run `30345550728` then passed all four clean-runner install steps.
+  GitHub does not support changing this public package back to private.
+- Prevention: Keep the package manifest/publishing documentation aligned with
+  the intended public distribution model, and prove package resolution from a
+  clean unrelated repository before treating a release as consumable.
+
+### 2026-07-28 — Searching serialized canonical refs for the word `version`
+
+- Symptom: Production DB CI failed even though the persisted canonical driver
+  correctly omitted the legacy top-level `version` field.
+- Context: Canonical schema v1 requires `schema_version`.
+- What we tried: `JSON.stringify(ref).not.toContain("version")`.
+- Root cause: The substring assertion cannot distinguish forbidden `version`
+  from required `schema_version`.
+- Fix / workaround: Assert structurally with
+  `expect(ref).not.toHaveProperty("version")`; the production DB suite then
+  passes `24/24` locally on Node 24.
+- Prevention: Validate object keys and values structurally; do not use raw
+  substring checks for schemas whose legal field names overlap legacy names.
+
+### 2026-07-28 — Checking out a linked workspace without installing it
+
+- Symptom: The dev-host DB/E2E job failed on a clean runner while the same suite
+  passed in a prepared local multi-repository worktree.
+- Context: Nurture links `@my-chat/workflow-runtime` to the exact sibling
+  My-Chat checkout for source-level qualification.
+- What we tried: Installing Nurture and building only the pinned
+  workflow-contract package.
+- Root cause: The clean runner had My-Chat source files but no installed
+  My-Chat workspace dependencies, so runtime source resolution differed from
+  the prepared local environment.
+- Fix / workaround: Install the pinned My-Chat workspace in the dev-host job
+  before running migrations/E2E. The local equivalent passes `19/19`.
+- Prevention: Every clean-runner job that executes linked workspace source must
+  prepare that workspace explicitly; checkout alone is not dependency
+  materialization.
+
+### 2026-07-28 — Upgrading only some Node-based GitHub Actions
+
+- Symptom: Full CI run `30347574708` passed every job but still emitted a
+  deprecated Node 20 action-runtime annotation.
+- Context: Checkout and setup-node had already moved to v6.
+- What we tried: Replacing only the two action families named in the first
+  runner annotations.
+- Root cause: `pnpm/action-setup@v4` was a third Node-based action with the same
+  deprecated runtime and was missed by the narrow scan.
+- Fix / workaround: Verify official release metadata and upgrade all four
+  `pnpm/action-setup` uses to the current v6 major.
+- Prevention: After an action-runtime warning, inventory every `uses:` entry
+  and inspect the completed run annotations; do not limit the repair to the
+  first action names reported.
+
+### 2026-07-28 — Changing hashed publishing metadata without moving the consumer pin
+
+- Symptom: The package's external visibility was public, but Base still
+  declared `publishConfig.access=restricted`; repairing the manifest changed
+  Nurture's exact source population even though no UI runtime byte changed.
+- Context: Nurture hashes Base's package manifest as one of 58 web-workbench
+  source inputs.
+- What we tried: Treating visibility as out-of-band package administration
+  unrelated to the source qualification lock.
+- Root cause: Publishing metadata is part of the consumer's reproducible source
+  contract and cannot be corrected independently of its exact revision/hash.
+- Fix / workaround: Commit the Base SSOT repair, recalculate the native source
+  hash, re-pin Nurture and Education to the exact Base revision, then renew the
+  coordinator-owned four-repository qualification.
+- Prevention: Before changing package metadata, enumerate every consumer source
+  population and qualification lock that includes the manifest.
+
+### 2026-07-28 — Reconstructing a full revision from a short Git prefix
+
+- Symptom: The pin file contained a lowercase 40-character value with the
+  intended short prefix, but `git rev-parse --verify <sha>^{commit}` rejected
+  it before any source comparison.
+- Root cause: The suffix was typed rather than copied from the owning
+  worktree's exact `git rev-parse HEAD`.
+- Fix / workaround: Replace every affected consumer pin with the exact opaque
+  revision and rerun native verifiers.
+- Prevention: Never derive or autocomplete Git SHA suffixes; copy the complete
+  value from Git output or an authoritative lock.
+
+### 2026-07-28 — Freezing an owner receipt without complete caller scope
+
+- Symptom: The first Host P1 owner-verifier input had typed subject and Actor
+  data but omitted Workspace, acting User, and the already-required
+  idempotency key; the receipt also omitted Workspace.
+- Context: Nurture authority and Participant mapping are Workspace-local, while
+  the My-Chat binding command is authenticated as a User plus Actor and may
+  replay.
+- What we tried: Structurally adopting the initial receipt as the P2 boundary.
+- Root cause: The contract was reviewed as a result shape without tracing every
+  owner lookup and replay key back to the authenticated Host command context.
+- Fix / workaround: Repair My-Chat P1 first, pin exact revision
+  `64f4165fe571a46ded094ebf6f771bdea61383d1`, bind the receipt to Workspace,
+  and include Workspace/User/Actor/idempotency in the Nurture request hash and
+  local authorization evidence.
+- Prevention: For every cross-owner receipt, enumerate authentication,
+  partition, representation, idempotency, purpose, and expiry inputs before a
+  consumer implementation starts.
+
+### 2026-07-28 — Using one generic active state for a multi-step anchor
+
+- Symptom: The first P2 schema draft used `active`, which could not distinguish
+  a reserved anchor, a Host-bound endpoint with no local association, and an
+  associated local aggregate.
+- Context: Response-loss recovery depends on distinguishing `reserved`,
+  `bound_empty`, and `associated`; revoked or ambiguous states must fail
+  closed.
+- What we tried: Treating `active` as the common accepted state and relying on
+  association queries for the missing detail.
+- Root cause: The implementation enum was created from a rollback shorthand
+  instead of the already locked Nurture identity-operation lifecycle.
+- Fix / workaround: Replace `active` with explicit normal states
+  `reserved|bound_empty|associated|retired`, retain `revoked|quarantined` as
+  failure states, and align the schema spec, Prisma enum, migration, domain
+  type, and repository checks.
+- Prevention: Before adding a lifecycle enum, search the current context
+  contract and task SSOT for every state transition and recovery branch; do
+  not infer states from a summary label.
+
+### 2026-07-28 — Adding tests without moving the population gates
+
+- Symptom: The new identity tests passed directly, but
+  `verify:test-routing` rejected `unit=21/19` and `productionDb=4/3`.
+- Context: Nurture treats test-file routing and minimum test populations as
+  release gates so silently excluded suites cannot appear green.
+- What we tried: Running the new files directly before the repository routing
+  census.
+- Root cause: The implementation added two scenario test files and one DB test
+  file without updating the hard-coded file and test-count expectations.
+- Fix / workaround: Move the routing expectations to 21 unit, 5 production-DB,
+  8 dev-host, and 1 X5 files; move minimum populations to 187 unit and 35
+  production-DB tests; rerun the routing gate.
+- Prevention: Any test-file addition must update and execute both
+  `scripts/assert-test-routing.mjs` and the `verify:*population` thresholds in
+  `package.json` before cloud CI.
+
+### 2026-07-28 — Making historical association rows occupy current uniqueness
+
+- Symptom: The first P2 schema made `(workspace, anchor/local target)` unique
+  across every association row, so a revoked row would permanently block the
+  replacement mapping that the contract allows.
+- Context: Association history is immutable, but uniqueness and the
+  Family-to-Child dependency apply to current rows.
+- What we tried: Reusing ordinary Prisma composite uniques while also adding a
+  lifecycle status.
+- Root cause: The relational key was reviewed for current integrity without
+  replaying the revoke-then-reassociate lifecycle.
+- Fix / workaround: Add a nullable `currentKey` discriminator represented in
+  Prisma SSOT; require `current` only for active rows and null for historical
+  rows. Keep one immutable Family-to-Child-association FK and add a current-only
+  composite FK that blocks Child deactivation while an active Family depends
+  on it.
+- Prevention: For every status-bearing unique key, test create, deactivate,
+  historical retention, authorized replacement, and parent-dependency
+  deactivation—not only duplicate active creation.
+
+### 2026-07-28 — Checking anchor version without locking the issuance window
+
+- Symptom: Authorization initially read the anchor version and then inserted
+  the receipt in the same transaction, but the ordinary read did not prevent a
+  concurrent revoke/version update between those statements.
+- Context: The receipt is valid only for the exact current typed anchor
+  lifecycle and aggregate version.
+- What we tried: Relying on transaction grouping plus the later idempotent
+  upsert.
+- Root cause: Transaction atomicity did not itself lock the prerequisite row;
+  replay safety and prerequisite-state concurrency are separate concerns.
+- Fix / workaround: Read the exact Child or Family anchor through
+  `SELECT ... FOR UPDATE`, then validate lifecycle/version and issue or replay
+  before releasing the row lock.
+- Prevention: Any authorization derived from a mutable prerequisite must
+  either lock that prerequisite or perform a database-enforced conditional
+  write; a plain read followed by insert is not a current-state proof.
+
+### 2026-07-28 — Locking only the anchor while authority changes elsewhere
+
+- Symptom: Receipt issuance locked the exact typed anchor but accepted
+  role/grant/purpose evidence read before the transaction.
+- Context: Anchor lifecycle/version and scenario authority are independent
+  mutable prerequisites. Fencing one does not fence the other.
+- What we tried: Calling a domain `verifyCurrent` port first, then passing its
+  evidence into a repository transaction that locked only the anchor.
+- Root cause: The adapter boundary modeled authority as input data instead of
+  a transaction-local prerequisite owned by Nurture persistence.
+- Fix / workaround: Pass private authority lookup input to the repository.
+  Inside the exact Prisma transaction, lock the anchor, then call a
+  transaction-scoped reader that locks or database-CAS-validates the exact
+  authority source before insertion or replay. Default wiring denies. A real
+  PostgreSQL interleaving covers concurrent revoke and post-commit denial.
+- Prevention: For every receipt, enumerate every independently mutable
+  prerequisite and prove each is locked or conditionally validated in the
+  commit transaction. Never accept pre-read evidence as current authority.
+
+### 2026-07-28 — Inferring a fixture type from a helper that consumes that type
+
+- Symptom: Native CI rejected
+  `type AnchorRow = ReturnType<typeof anchor>` because `anchor()` accepted
+  `Partial<AnchorRow>`, creating a circular test-only type alias.
+- Context: Vitest transpilation ran the repository tests successfully, while
+  the authoritative repository-wide TypeScript pass analyzed the fixture
+  types.
+- What we tried: Avoiding a duplicate fixture shape by inferring the row type
+  from its constructor helper.
+- Root cause: The helper and inferred alias referenced each other.
+- Fix / workaround: Define the four-field `AnchorRow` test fixture type
+  explicitly and keep `anchor(overrides: Partial<AnchorRow>)` one-way.
+- Prevention: A factory return type may be inferred only when the factory
+  parameters do not depend on that inferred type; always retain a full
+  typecheck gate in addition to transpile-and-run tests.
+
+### 2026-07-29 — Leaving the registered normative contract on a superseded pin
+
+- Symptom: Implementation and task handoff docs named the repaired Host and
+  transaction-scoped authority flow, while the registered Nurture scenario
+  contract still named Host `64f4165` and described the pre-repair source
+  posture.
+- Context: The workflow contract itself participates in the 31-file
+  cross-repository source hash, so narrative drift is also pin drift.
+- What we tried: Treating the implementation notes and cloud evidence as
+  sufficient synchronization.
+- Root cause: The final handoff scan checked code, tests, and task docs but did
+  not compare every living registered context artifact against the current
+  exact-source evidence.
+- Fix / workaround: Update the normative contract, run `ctl-context touch`,
+  recompute the full source hash, verify the exact Base/Host/Nurture pins, and
+  rerun native CI at the synchronized source.
+- Prevention: Every cross-repository source repair must include a registered
+  context-artifact census before evidence closure; if a contract path changes,
+  refresh its checksum, source hash, exact revision, and native CI together.
+
+### 2026-07-29 — Generating only one Prisma client before exact X5
+
+- Symptom: The first exact X5 attempt failed before test collection because
+  `apps/backend/src/generated/dev-host-prisma/index.js` was missing.
+- Context: X5 uses the production Nurture database, but importing the backend
+  server also loads the dev-host client module.
+- What we tried: Running only `pnpm db:generate`, which prepared the production
+  Prisma client but not the backend-private generated client.
+- Root cause: The disposable-worktree preparation differed from the repository
+  CI preparation and did not account for the backend import graph.
+- Fix / workaround: Run `pnpm db:generate:all` with valid placeholder
+  production and dev-host URLs before X5 collection. The rerun reached the real
+  two-database journey.
+- Prevention: Exact X5 harnesses must mirror CI generation order and assert
+  both generated client entrypoints exist before starting disposable
+  databases.

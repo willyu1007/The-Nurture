@@ -1,4 +1,6 @@
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
+
+type DomainContextRef = CanonicalRef;
 
 export const nurtureUserAttentionStopReasons = [
   "source_redacted",
@@ -85,9 +87,8 @@ const sourceIds = (
   const byType = new Map<string, string>();
   for (const ref of refs) {
     if (
+      ref.schema_version !== 1 ||
       ref.namespace !== "nurture" ||
-      ref.consumer_scenario_key !== "nurture" ||
-      ref.owner_scope !== "workspace" ||
       !["family_care_message", "child_link_receipt", "family_care_item"].includes(ref.object_type) ||
       byType.has(ref.object_type)
     ) {

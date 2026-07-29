@@ -9,7 +9,8 @@
   },
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm --dir ../My-Workflow-Base/templates/web-workbench install --ignore-workspace --frozen-lockfile && pnpm --dir ../My-Workflow-Base/templates/web-workbench build",
+    "prepare:pinned-source": "pnpm verify:workflow-contract-pin && pnpm build:pinned-workflow-contracts",
+    "build:pinned-workflow-contracts": "pnpm exec tsc -p ../My-Chat/packages/workflow-contracts/tsconfig.json --typeRoots ./node_modules/@types",
     "build": "pnpm prepare:pinned-source && pnpm db:generate:all && pnpm typecheck && pnpm --filter @the-nurture/frontend build",
     "dev": "node scripts/run-with-local-env.mjs pnpm --filter @the-nurture/backend dev",
     "dev:frontend": "pnpm --filter @the-nurture/frontend dev",
@@ -24,7 +25,7 @@
     "test:x5": "pnpm exec vitest run -c vitest.x5.config.ts",
     "test:local-env-runner": "node --test scripts/run-with-local-env.test.mjs",
     "test:all": "pnpm test:unit && pnpm test:db && pnpm test:dev-host",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm build:pinned-workflow-contracts && tsc --noEmit",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:generate": "node scripts/run-with-local-env.mjs pnpm exec prisma generate --schema prisma/schema.prisma",
@@ -40,8 +41,8 @@
     "dev-host:db:assert-boundary": "node scripts/run-with-local-env.mjs node scripts/assert-dev-host-db-boundary.mjs",
     "db:generate:all": "pnpm db:generate && pnpm dev-host:db:generate",
     "db:migrate:all": "pnpm db:migrate && pnpm dev-host:db:migrate",
-    "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 175",
-    "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 24",
+    "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 187",
+    "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 37",
     "verify:dev-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/dev-host.json dev-host 19",
     "verify:test-routing": "node scripts/assert-test-routing.mjs",
     "verify:persistence-boundaries": "node scripts/assert-persistence-boundaries.mjs",
@@ -66,7 +67,14 @@
   },
   "pnpm": {
     "overrides": {
-      "@my-chat/workflow-contracts": "link:../My-Chat/packages/workflow-contracts"
+      "@my-chat/db": "link:../My-Chat/packages/db",
+      "@my-chat/domain": "link:../My-Chat/packages/domain",
+      "@my-chat/outbox": "link:../My-Chat/packages/outbox",
+      "@my-chat/permissions": "link:../My-Chat/packages/permissions",
+      "@my-chat/scenario-integrations": "link:../My-Chat/packages/scenario-integrations",
+      "@my-chat/workers": "link:../My-Chat/apps/workers",
+      "@my-chat/workflow-contracts": "link:../My-Chat/packages/workflow-contracts",
+      "@my-chat/workflow-runtime": "link:../My-Chat/packages/workflow-runtime"
     }
   }
 }

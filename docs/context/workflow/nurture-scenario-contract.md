@@ -1,8 +1,20 @@
 # Nurture Scenario Contract
 
+Status: repaired source and native CI green; formal adoption pending; migration not activated
+
 ## Decision
 
 The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
+
+The repaired Wave 4 P2 implementation is an additive, default-deny source
+candidate against My-Chat host-binding revision
+`30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. It adds typed local anchors,
+workspace-local association schema, a transaction-scoped owner-authorization
+receipt adapter, and strict derived age/stage parsing. The repaired Host and
+Nurture source sets pass their native CI gates; formal cross-owner adoption
+review is still required. The migration is not applied, no authority-reader
+production wiring exists, and no manifest, capability, Scenario row,
+environment, database, or traffic path is activated.
 
 My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, workflows, and data.
 
@@ -321,6 +333,18 @@ independently owner-read:
   purpose, policy/consent, source lifecycle, and destination lifecycle required
   by that operation.
 
+For every anchor reservation or association write, the exact Nurture authority
+reader receives the same database transaction used by the binding owner
+repository. That transaction locks or database-CAS-validates the current
+authority source after the exact anchor row is locked and before the
+authorization receipt and association result are committed. The authority
+read, anchor lifecycle transition, authorization receipt insert or exact
+replay, and association mutation therefore share one atomic owner transaction.
+Default wiring denies when no production reader is provided. An exact command
+replay must reread and validate the current authority in a fresh transaction;
+an earlier receipt or result cannot mask revoke, expiry, scope drift, owner
+outage, or another current denial.
+
 A co-Guardian invitation is one versioned two-owner saga. The inviting adult
 must be both a current Nurture Guardian and a current My-Chat Family member with
 Host permission to invite that exact recipient. My-Chat acceptance first
@@ -403,7 +427,7 @@ Handoff payloads are refs-only.
 
 The canonical vNext manifest declares `capture_family_input` and one `user_attention` handoff with `workflow_step_complete_v1` materialization. Its source contract is exactly one `family_care_message`, `child_link_receipt`, and `family_care_item`, with no artifact refs. This declaration is not a global enablement: `nurtureScenarioModule`, `createNurtureScenarioModule`, and the local dev host use the derived pre-activation manifest. Only `createNurtureActivationScenarioModule` exposes vNext and its constructor requires a materializing host runtime, the claimed-Step bridge, and the production family-input source port.
 
-The transient driver is validated before command identity lookup or mutation. Nurture persists only a canonical `host.workflow/workflow_step` ref bound to the `nurture` consumer; claim token and Step version are neither hashed nor stored. Same-Step reclaim may rotate that evidence, but another Step cannot replay the seed. Snapshot contents are bounded refs-only values over the Nurture-owned message, receipt, and item; downstream content still requires current owner reread.
+The transient driver is validated before command identity lookup or mutation. Nurture persists only the shared canonical ref `{ schema_version: 1, namespace: "my_chat", object_type: "workflow_step", object_id }`; claim token and Step version are neither hashed nor stored. Same-Step reclaim may rotate that evidence, but another Step cannot replay the seed. Snapshot contents are bounded refs-only values over the Nurture-owned message, receipt, and item; downstream content still requires current owner reread.
 
 The live handler receives two explicit ports. A host-injected bridge derives `ScenarioCommandDriverContext` from the already claimed Step and maps returned immutable snapshots to host drafts. A scenario-owned command-source adapter parses one opaque persisted Run requirement and resolves stable invocation, command, and handoff request IDs. Before participant lookup, the host must map the Run's canonical Actor to an active My-Chat user through current workspace membership; the queue cannot supply this identity. The IDs do not come from claim/version evidence: same-Step reclaim reuses the Execution, while another Step presenting the same command ID is rejected by persisted original-Step provenance before a second business effect. The handler emits no host-standard event and exposes only an opaque Nurture CommandExecution ref as Step output; message, receipt, and item remain owner-readable context refs inside the handoff draft.
 

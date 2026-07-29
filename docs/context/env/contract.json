@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-07-15T02:56:21Z",
+  "generated_at_utc": "2026-07-26T22:20:58Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -95,9 +95,9 @@
       "type": "int"
     },
     "SERVICE_NAME": {
-      "default": "your-service",
+      "default": "the-nurture",
       "deprecate_after": null,
-      "description": "Service name (logical).",
+      "description": "Nurture owner service name used by logs and deployment metadata.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null

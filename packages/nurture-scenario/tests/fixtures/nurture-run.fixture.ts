@@ -1,17 +1,11 @@
-import type { DomainContextRef, WorkflowCommandMeta, WorkflowStepHandlerInput } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowCommandMeta, WorkflowStepHandlerInput } from "@my-chat/workflow-contracts";
 
-export const familyContextRef: DomainContextRef = {
+export const familyContextRef: CanonicalRef = {
+  schema_version: 1,
   namespace: "my_chat",
-  consumer_scenario_key: "nurture",
   object_type: "family",
   object_id: "family-demo",
   version: 1,
-  owner_scope: "workspace",
-  canonical_ref: {
-    service: "my_chat",
-    object_type: "family",
-    object_id: "family-demo",
-  },
 };
 
 export const nurtureCommandMeta: WorkflowCommandMeta = {

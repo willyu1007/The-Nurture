@@ -90,7 +90,7 @@ business subject.
 | `id` | string | yes | Child id. |
 | `workspaceId` | string | yes | Scenario partition. |
 | `displayName` | string | yes | Nurture-owned workspace-local care label explicitly entered/confirmed by a current Guardian. It is not copied from, synchronized with, or versioned against the platform Child name and cannot be used for match/merge/uniqueness. |
-| `birthDate` | date | no | Must be `NULL` for activated bound rows. My-Chat owns the encrypted birth fact; Nurture may receive only an explicitly policy-allowed derived age/stage value. |
+| `birthDate` | date | no | Must be `NULL` for activated bound rows. My-Chat owns the encrypted birth fact; Nurture may receive only an explicitly policy-allowed derived age/stage value. The Wave 4 target migration blocks non-null inserts and explicit birth-date updates without freezing unrelated updates to historical rows; cleanup remains a separate owner-approved action. |
 | `profileBasicsPayload` | json | no | Stable basics such as allergies/preferences must be treated as care constraints, not medical diagnosis. |
 | `status` | enum | yes | `active`, `archived`, `merged`, `deleted`. |
 
@@ -113,10 +113,10 @@ local association side of this chain; neither side grants business authority.
 
 | Model | Required fields | Cardinality and boundary |
 | --- | --- | --- |
-| `NurtureChildBindingAnchor` | opaque random `id`, kind/version, technical state/timestamps | Scenario-global, body/PII/workspace/role/Grant/consent/business-lifecycle-free binding endpoint. My-Chat `ChildScenarioBinding.ownerRef` points here, never to a local Child/Process. Technical state is only `reserved|bound_empty|associated|retired` and grants nothing. |
-| `NurtureFamilyBindingAnchor` | opaque random `id`, kind/version, technical state/timestamps | Scenario-global, body/PII/authority-free endpoint. My-Chat `FamilyScenarioBinding.ownerRef` points here, never to a child-scoped local Family. Technical state has the same non-business meaning. |
-| `NurtureChildAnchorAssociation` | `workspaceId`, `childAnchorId`, `nurtureChildId`, lifecycle/version/audit | One current mapping is unique in both directions for `(workspaceId, childAnchorId)` and `(workspaceId, nurtureChildId)`. |
-| `NurtureFamilyAnchorAssociation` | `workspaceId`, `familyAnchorId`, `childAnchorId`, `nurtureFamilyId`, `childCareProcessId`, lifecycle/version/audit | Current mappings are unique for `(workspaceId, familyAnchorId, childAnchorId)`, `(workspaceId, nurtureFamilyId)`, and `(workspaceId, childCareProcessId)`. One Family anchor may serve multiple children, but never expands without the exact Child anchor. |
+| `NurtureChildBindingAnchor` | opaque random `id`, kind/version, technical state/timestamps | Scenario-global, body/PII/workspace/role/Grant/consent/business-lifecycle-free binding endpoint. My-Chat `ChildScenarioBinding.ownerRef` points here, never to a local Child/Process. Normal technical state is `reserved|bound_empty|associated|retired`; `revoked|quarantined` are fail-closed recovery states. None grants authority. |
+| `NurtureFamilyBindingAnchor` | opaque random `id`, kind/version, technical state/timestamps | Scenario-global, body/PII/authority-free endpoint. My-Chat `FamilyScenarioBinding.ownerRef` points here, never to a child-scoped local Family. Technical state has the same non-business and fail-closed meanings. |
+| `NurtureChildAnchorAssociation` | `workspaceId`, `childAnchorId`, `nurtureChildId`, nullable `currentKey`, lifecycle/version/audit | `currentKey="current"` participates in one current mapping unique in both directions for `(workspaceId, childAnchorId)` and `(workspaceId, nurtureChildId)`; revoked/quarantined history clears it. |
+| `NurtureFamilyAnchorAssociation` | `workspaceId`, `familyAnchorId`, `childAnchorId`, immutable/current Child-association refs, `nurtureFamilyId`, `childCareProcessId`, nullable `currentKey`, lifecycle/version/audit | Current mappings are unique for `(workspaceId, familyAnchorId, childAnchorId)`, `(workspaceId, nurtureFamilyId)`, and `(workspaceId, childCareProcessId)`. The current-only Child-association FK blocks Child deactivation while an active Family mapping depends on it. One Family anchor may serve multiple children, but never expands without the exact Child anchor. |
 
 Anchors contain no display name, birth fact, contact, profile, workspace,
 Participant, RoleAssignment, Enrollment, Grant, policy result, or business

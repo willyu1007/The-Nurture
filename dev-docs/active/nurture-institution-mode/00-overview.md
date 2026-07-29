@@ -3,14 +3,93 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 joint acceptance（complete）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ historical X5（complete）/ Wave 4 joint requalification（blocked on Host zero-version codec drift, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-21
+- **Updated:** 2026-07-29
 - **Owner:** willyu1007
-- **Next step:** Pilot-0-D remains `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO` at `DR-P0=0 / DR-P1=0 / DR-P2=0`; the canonical readiness census still has six open `TR-P0`, three open `TR-P1`, and one accepted-scope `TR-P1`, no complete candidate exists, and `QR-*` is not applicable. C30-I0-A baseline inventory and C30-I0-B T-029 disposition are complete in `artifacts/12-c30-i0-baseline-inventory.md` and `artifacts/13-c30-i0-b-t029-disposition.md`. The disposition covers all 176 donor files, permits no direct merge, retains only named mechanisms for clean reimplementation, and excludes direct platform Child/Family refs, umbrella sources, dual manifest/Execution tracks, mutable evidence, T-028 cutover, C34/C35, and protected AI from C30. The next action is C30-I0-C scoped T-002/T-003/cloud-deployment separation plus clean three-repository worktrees, followed by C30-I0-D immutable pins, hermetic verification, false/empty proof, and canonical rerun; C30-I1, C31, C4, D implementation, Pilot-0-E, and Pilot-1 remain NO-GO.
+- Next step: Repair and publish the My-Chat Handoff codec so the Base-authorized
+  `CanonicalRef.version=0` reaches atomic materialization, re-pin the exact Host
+  revision/source hash, and rerun the two-database X5 gate before promoting
+  `codex/T-002-nurture-consolidation` to `main`. The current integration branch
+  safely consolidates the Nurture T-002 and environment increments, and its
+  static, unit, migration, production-DB, and dev-host gates pass. Exact X5
+  currently completes the Step as `manual_review_required` with zero
+  materialized Handoffs because My-Chat accepts only positive ref versions
+  while Base schema v1 permits non-negative versions. The additive migration
+  remains unapplied outside disposable databases and every consumer remains
+  default-disabled. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, any
+  persistent database apply, artifact publication, capability activation, and
+  external traffic remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
+- My-Workflow-Base ecosystem-policy, workflow-contract, and public
+  web-workbench publishing revision:
+  `63d47d2ebc6f5062181b721a25182710f7974b17`.
+- My-Chat/T-030 accepted coordination baseline:
+  `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
+  `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
+- Wave 4 P2 now pins the repaired Host binding source at
+  `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The public transport excludes
+  stable anchors; the private resolver and durable command ledger enforce
+  current-owner replay, monotonic versions, CAS, and deterministic races. The
+  expanded 15-file Host population hash is
+  `3dadb0b89fc7a782a590b5e7d8e2d6510b4c34029b0dc1a046a6a65f0c82f0c5`;
+  the broader X5 source hash is
+  `cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6`.
+  The repaired 31-file Nurture source population hashes to
+  `354bb2206b9fb4248d7df247467c9422235e730f2056eff7a47967f92960c83f`.
+  Exact Base/My-Chat parity and all three source hashes pass the native pin
+  verifier at exact Nurture source
+  `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`; native CI `30403774597`
+  passes 7/7 with zero annotations. Joint owner review remains required.
+- On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
+  `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
+  `ST-6(b)`.
+- The N3 dependency/source-boundary repair is complete for the T-002 consumer
+  leg. The coordinator-owned four-repository qualification run `30343562287`
+  passed against exact Base `ed69bbd`, My-Chat `53bf92b`, Education `d44286b`,
+  and Nurture `edd7cef`. That exact run remains historical evidence; the
+  owner-approved public publishing SSOT repair advances Base and Nurture pins
+  and therefore requires a renewed exact qualification run.
+  Nurture consumes published
+  `@willyu1007/web-workbench@0.7.0`, imports My-Chat only through public
+  package exports, pins Base at `63d47d2ebc6f5062181b721a25182710f7974b17`
+  and My-Chat at `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`,
+  verifies their byte-identical workflow-contract source at
+  `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d`,
+  verifies the public Base web-workbench source set as
+  `43bb51e21f900067582fd059f79b1cc4bbfd8120ca26f4d7eb586c09bb51509d`,
+  verifies the bounded My-Chat X5 source set as
+  `78a20458a5f4504ecd0e6f1520b782fa07db826106e03791bc12dd53b7b5ba73`,
+  verifies the 25-file Nurture scenario source set as
+  `622b74397f470dce81976d9c69dc5d59c3d3f295295d1eec6b38398f6d262ecf`,
+  and has zero strict Base consumer-boundary findings. The exact-checkout
+  package overrides are verification materialization, not a mutable release
+  dependency.
+- The repin exposed a real source incompatibility hidden by the previous
+  revision/hash-only check: Nurture still compiled against removed
+  `DomainContextRef` and legacy `{ kind, id }` references. All live scenario,
+  repository, backend, test, replay-seed, and persisted-ref paths now use
+  `CanonicalRef { schema_version, namespace, object_type, object_id, version? }`.
+  Migration `20260728160000_nurture_canonical_ref_v1` converts durable legacy
+  refs and replaces the X4 driver CHECK with the canonical
+  `my_chat/workflow_step` constraint.
+- The 2026-07-29 current-project consolidation reran the real two-database X5
+  journey against exact Base `63d47d2`, My-Chat `30792cd`, and the consolidated
+  Nurture source. It exposed a second incompatibility that revision/source-hash
+  verification cannot detect: Base's canonical-ref v1 JSON schema and
+  validation accept `version=0`, and Nurture correctly preserves its
+  zero-based aggregate versions, but My-Chat `handoff-value-codec.ts` rejects
+  every version below `1`. My-Chat therefore records
+  `workflow_handoff_invalid_draft`, completes the Step for manual review, and
+  creates no Handoff. No current My-Chat branch contains a repair. This is the
+  active cross-repository readiness blocker; a green Nurture CI run without the
+  joint X5 route cannot supersede it.
+- The Fastify-to-NestJS transition, port migration, API-index repair, and
+  governance cleanup remain open. The current native-cloud CI repair changes
+  no schema, migration, default-off activation, environment, provider,
+  staging/production state, or traffic.
 - My-Workflow-Base merged revision: `acba4e792c85131c19e63e08a5f671133c481c57`.
 - My-Chat X1 adoption revision: `2c783675de896b93cf1157b7d1c7ae9e3051150e`.
 - My-Chat X3 delivery revision: `4d40d81cceaa5eee84134729900cc3f5c2e15547` (`packages/workflow-contracts` remains byte-identical to the X1 revision).

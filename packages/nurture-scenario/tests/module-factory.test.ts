@@ -106,10 +106,10 @@ describe("createNurtureActivationScenarioModule(deps)", () => {
         scenarioCommandBridge: {
           createDriverContext: () => ({
             driverRef: {
-              namespace: "host.workflow",
+              schema_version: 1,
+              namespace: "my_chat",
               object_type: "workflow_step",
               object_id: "step-1",
-              owner_scope: "workspace",
             },
             contractHash: "a".repeat(64),
             capabilityKey: "class_family_inbox",

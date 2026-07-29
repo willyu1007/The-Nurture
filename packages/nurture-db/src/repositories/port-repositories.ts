@@ -1,5 +1,5 @@
 import { Prisma, type NurtureWorkflowProject as PrismaProjectRow, type PrismaClient } from "@prisma/client";
-import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   ActivityComparisonDraft,
   ActivityComparisonRepository,
@@ -17,6 +17,8 @@ import {
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
 import { PrismaFamilyCareQueryRepository } from "./family-care-query.repository.js";
 import { PrismaUserAttentionRepository } from "./user-attention.repository.js";
+
+type DomainContextRef = CanonicalRef;
 
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
 

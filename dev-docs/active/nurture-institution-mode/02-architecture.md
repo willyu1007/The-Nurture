@@ -3,6 +3,72 @@
 > 本文是 T-002 的架构投影。当前 Pilot-0-C 决策索引见 `10-pilot0-c-current-decision-index.md`，Pilot-0-D 拓扑/运营 SSOT 见 `11-pilot0-d-topology-operations-contract.md`；精确跨仓场景合同见 `docs/context/workflow/nurture-scenario-contract.md`。发生冲突时，仓级 `AGENTS.md`、context contract、对应阶段当前索引依次优先于本文。立场基准见 `docs/context/product/workflow-product-design-contract.md`。
 > 本设计不引入独立产品壳；The Nurture 是 My-Chat 场景模块，但 Nurture 拥有托育生态图谱和业务事实。
 
+## Wave 4 P2 implementation boundary
+
+P2 now implements against the repaired exact owner-verifier contract from
+My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The request is bound to
+Workspace, acting User, Actor, optional represented Organization, idempotency
+key, platform subject type/id, typed Nurture owner ref/version, purpose, and
+trace context. Nurture returns a Workspace-bound short-lived authorization
+receipt only after an injected owner-specific authority reader succeeds.
+
+```text
+My-Chat authenticated binding command
+  -> Nurture exact owner-verifier input
+  -> one Nurture owner transaction
+       -> current authority-source reread and lock/CAS
+       -> exact local anchor/version lock
+       -> keyed evidence + idempotent local authorization row
+  -> short-lived owner receipt
+  -> My-Chat canonical binding transaction
+```
+
+The Nurture domain layer is Prisma-free. `packages/nurture-db` is the sole
+adapter for `NurtureChildBindingAnchor`, `NurtureFamilyBindingAnchor`,
+`NurtureScenarioBindingAuthorization`, and the two exact Workspace association
+tables. Platform subject/User/Actor/Organization evidence is HMAC-hashed before
+persistence; raw platform Child/Family ids never enter the Nurture schema.
+Workspace remains explicit routing scope, and owner refs remain typed
+scenario-local anchor refs.
+
+Anchor state is technical only. `reserved`, `bound_empty`, `associated`, and
+`retired` describe the normal endpoint lifecycle; `revoked` and `quarantined`
+are fail-closed recovery states. An anchor, association, platform stewardship,
+or `NurtureCareRole` is never a Nurture protected-read permission and cannot
+authorize a Host or Education operation.
+
+The target migration is additive and unapplied. It adds anchor,
+authorization, and association tables plus composite integrity keys. The
+association rows use nullable `currentKey="current"` sentinels: active rows
+participate in exact Workspace-local unique keys, while revoked/quarantined
+history clears the sentinel and no longer blocks an authorized replacement.
+Each Family association keeps an immutable Child-association reference plus a
+second current-only composite foreign key, so an active Child association
+cannot be deactivated while an active Family association depends on it. The
+`NurtureChild.birthDate` column is retained for an owner-approved inventory and
+deletion proof. A column-scoped database trigger blocks non-null inserts and
+explicit birth-date updates when the migration is eventually applied without
+freezing unrelated updates to historical rows. The source increment does not
+delete or inspect historical values. Scenario input uses only an expiring
+derived age/stage result and rejects raw birth date or exact age.
+
+The replacement implementation satisfies the transaction shape above.
+`authorityInput` remains private domain input; a transaction-scoped reader
+receives the exact Prisma transaction after the anchor lock and must lock or
+database-CAS the exact role/grant/purpose/lifecycle source before receipt
+insertion or exact replay. Default wiring denies when no transactional reader
+is supplied. A real PostgreSQL interleaving proves a concurrent revoke cannot
+overtake issuance and that a later revoked source denies the next issue. The
+exact replacement and synchronized normative contract are pinned at Nurture
+`b615a57`; native CI `30403774597` passes 7/7 with zero annotations. Formal
+cross-owner/PR adoption review remains the qualification gate.
+
+No production authority-reader wiring, association consumer, manifest
+activation, Scenario row, database apply, environment change, artifact
+publication, or traffic path is part of P2. Full C30-I3 adoption still requires
+the remaining principal, association transaction, presenter/action, protected
+content, lifecycle, and joint conformance work in the strict C30 DAG.
+
 ## 0. 一句话
 
 Nurture 的基本单位不是家庭，也不是班级，而是**小孩的养育过程**（`NurtureChildCareProcess`）。
@@ -32,6 +98,52 @@ institution view
 ```
 
 `CareGroup` 和 `Institution` 可以拥有组织配置，例如班级节奏、老师分配、机构理念和活动模板。但一旦记录描述某个孩子的照护、沟通、观察、媒体曝光或授权流动，它必须带 `childCareProcessId`。换句话说，班级 inbox 是多个 child scopes 的聚合工作台，不是脱离孩子的事实源。
+
+## 0.1a Cross-repo alignment acceptance (2026-07-28)
+
+T-002 adopts the ecosystem boundary published by My-Workflow-Base revision
+`26fac97fc82ec5f5df23528aacabbc16b749b490`:
+
+- Base publishes neutral contracts, conformance, templates, and immutable
+  distribution guidance; Nurture does not import Base sibling source as an
+  application dependency.
+- My-Chat publishes the shared workflow packages and remains the Host/runtime
+  owner. Nurture may use an exact materialized My-Chat source only as a bounded
+  verification fixture until the package is distributable; a mutable local
+  path is never release or qualification evidence.
+- The current Fastify application remains a local/test harness. The repository
+  requirement is still a NestJS scenario service; `RB-6` and `DB-4(b)` own the
+  replacement decision and timing before any pilot-runtime claim.
+- Base allocates Nurture backend/frontend ports `3200/3201`. `ST-2` must align
+  the env contract, backend listener, frontend default, documentation, and
+  tests; no compatibility alias is assumed.
+- `ST-4(c)` must make the API index describe the implemented owner surface
+  without turning the index into a second contract or authorization source.
+
+The coordination record is an architectural acceptance only and changes no package, source,
+schema, migration, runtime, environment, gate, or traffic state.
+
+## 0.1b N3 dependency/source boundary (2026-07-28)
+
+The accepted consumer implementation separates package resolution from source
+identity:
+
+- Nurture package manifests use versioned My-Chat package names and public
+  exports. Root overrides materialize those packages only from the exact
+  checkout named by the integration pin; no test imports sibling `src` paths.
+- The X5 source pin hashes the complete bounded My-Chat public/transitive source
+  population used by the joint test. Revision plus source hash, rather than the
+  local directory name, is the verification identity.
+- `@willyu1007/web-workbench@0.7.0` comes from the package registry, so Nurture
+  no longer installs or builds a Base template as an application dependency.
+- CI verifies revisions and hashes first and then runs the Base scenario
+  consumer scanner in strict mode. Any new local Base link, unpinned My-Chat
+  override, forked workflow contract/runtime, or direct sibling-source import
+  fails the boundary job.
+
+This closes the Nurture leg of `X-2`, `RB-2`, and `RB-3(a)`. It does not close
+`RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, or `ST-6(b)`, and it does not authorize a
+pilot runtime or release.
 
 ## 0.2 Pilot-0-D deployment projection
 

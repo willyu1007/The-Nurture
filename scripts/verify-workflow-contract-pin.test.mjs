@@ -100,6 +100,20 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
         contractRoot: 'contract',
         contractPaths: ['value.ts'],
         contractSha256: dependencyHash.sha256,
+        sourcePins: [
+          {
+            key: 'x5_joint_api',
+            root: '.',
+            paths: ['source/value.txt'],
+            sha256: sourceHash.sha256,
+          },
+          {
+            key: 'wave4_binding_host',
+            root: '.',
+            paths: ['source/value.txt'],
+            sha256: sourceHash.sha256,
+          },
+        ],
       },
       nurtureScenario: {
         contractRoot: '.',

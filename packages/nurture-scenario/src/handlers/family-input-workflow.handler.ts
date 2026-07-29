@@ -1,6 +1,5 @@
 import type {
   CanonicalRef,
-  DomainContextRef,
   WorkflowHandoffDraft,
   WorkflowStepHandler,
   WorkflowStepHandlerInput,
@@ -20,6 +19,8 @@ import {
   type NurtureCommandTelemetryOutcome,
 } from "../observability/institution-workflow-telemetry.js";
 
+type DomainContextRef = CanonicalRef;
+
 const workflowResult = (
   status: "retry_requested" | "manual_review_required",
   reasonCode: string,
@@ -31,18 +32,13 @@ const workflowResult = (
 });
 
 const childCareProcessRef = (objectId: string): DomainContextRef => ({
+  schema_version: 1,
   namespace: "nurture",
-  consumer_scenario_key: "nurture",
   object_type: "child_care_process",
   object_id: objectId,
-  owner_scope: "workspace",
 });
 
-const executionRefToCanonical = (ref: DomainContextRef): CanonicalRef => ({
-  kind: "domain_context_ref",
-  id: `nurture:command_execution:${ref.object_id}`,
-  ...(ref.version !== undefined ? { version: ref.version } : {}),
-});
+const executionRefToCanonical = (ref: DomainContextRef): CanonicalRef => ({ ...ref });
 
 const createDriver = (
   bridge: NurtureScenarioCommandBridgePort,

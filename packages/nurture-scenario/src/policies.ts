@@ -1,7 +1,9 @@
-import type { DomainContextRef, WorkflowPolicies } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowPolicies } from "@my-chat/workflow-contracts";
 import { defaultNurtureDeps, type NurtureHandlerDeps } from "./deps.js";
 import { nurtureScenarioManifest } from "./registry.js";
 import { NurtureUserAttentionService } from "./domain/institution/user-attention-activation.js";
+
+type DomainContextRef = CanonicalRef;
 
 // Port-derived, FAIL-CLOSED handoff/exposure gates. Caller-supplied bag values
 // (exposure_level, guardian_approval, ...) are UNTRUSTED hints; authoritative

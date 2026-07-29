@@ -1,17 +1,9 @@
-# Development environment configuration
+# Development owner-service planning record.
+# No runnable Nurture deployment artifact is registered.
 
 environment: dev
-
-# Common settings
-replicas: 1
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
-
-# Dev-specific settings
+status: planned
+deployModel: vm
+platform: aliyun-ecs+docker-compose
 debug: true
 logLevel: debug

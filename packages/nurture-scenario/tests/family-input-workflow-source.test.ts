@@ -23,12 +23,11 @@ const seed = () => ({
     urgency: "today_attention",
     safe_summary: "Please review the current family input.",
     protected_content_ref: {
+      schema_version: 1,
       namespace: "nurture",
-      consumer_scenario_key: "nurture",
       object_type: "protected_content",
       object_id: "content-1",
       version: 1,
-      owner_scope: "workspace",
     },
     attachment_refs: [],
     source_surface: "mobile",
@@ -44,6 +43,20 @@ describe("Nurture family-input workflow source", () => {
     expect(parseNurtureFamilyInputWorkflowSeed(seed())).toMatchObject({
       command_request_id: "command-1",
       payload: { participant_id: "participant-1", route_mode: "immediate" },
+    });
+    expect(
+      parseNurtureFamilyInputWorkflowSeed({
+        ...seed(),
+        payload: {
+          ...seed().payload,
+          protected_content_ref: {
+            ...seed().payload.protected_content_ref,
+            version: 0,
+          },
+        },
+      }),
+    ).toMatchObject({
+      payload: { protected_content_ref: { version: 0 } },
     });
   });
 

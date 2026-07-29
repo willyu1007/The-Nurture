@@ -3,7 +3,7 @@
 import { readFile } from "node:fs/promises";
 
 const migrationPath =
-  "prisma/migrations/20260715070000_nurture_handoff_replay_seed_x4/migration.sql";
+  "prisma/migrations/20260728160000_nurture_canonical_ref_v1/migration.sql";
 const [schema, migration] = await Promise.all([
   readFile("prisma/schema.prisma", "utf8"),
   readFile(migrationPath, "utf8"),
@@ -21,12 +21,20 @@ if (!/handoffDriverRef\s+Json\?/.test(schema)) {
   failures.push("Execution durable driver ref is not optional JSON in Prisma");
 }
 requireMatch(
-  /DROP CONSTRAINT "ck_nurture_command_execution_n1"/,
-  "X4 migration does not replace the N1 explicit-empty constraint",
+  /DROP CONSTRAINT "ck_nurture_command_execution_handoff_v1"/,
+  "Canonical-ref migration does not replace the legacy X4 replay constraint",
 );
 requireMatch(
-  /ADD CONSTRAINT "ck_nurture_command_execution_handoff_v1"/,
-  "X4 migration does not add the versioned replay-seed constraint",
+  /ADD CONSTRAINT "ck_nurture_command_execution_handoff_v2"/,
+  "Canonical-ref migration does not add the v2 replay-seed constraint",
+);
+requireMatch(
+  /SET "handoff_driver_ref" = jsonb_build_object\([\s\S]*'schema_version', 1[\s\S]*'namespace', 'my_chat'/,
+  "Legacy durable drivers are not migrated to the canonical reference shape",
+);
+requireMatch(
+  /SET "handoff_request_snapshots_payload" = transformed_snapshots\.payload/,
+  "Legacy replay snapshot refs are not migrated to the canonical reference shape",
 );
 requireMatch(
   /jsonb_array_length\("handoff_request_snapshots_payload"\) <= 32/,
@@ -41,10 +49,9 @@ requireMatch(
   "Non-empty replay seeds do not require a durable driver object",
 );
 for (const expected of [
-  "'namespace' = 'host.workflow'",
-  "'consumer_scenario_key' = 'nurture'",
+  "'schema_version' = '1'::jsonb",
+  "'namespace' = 'my_chat'",
   "'object_type' = 'workflow_step'",
-  "'owner_scope' = 'workspace'",
 ]) {
   if (!migration.includes(expected)) failures.push(`Durable driver constraint is missing ${expected}`);
 }
@@ -54,7 +61,7 @@ for (const forbidden of ["version", "claimToken", "claim_token", "expectedStepVe
   }
 }
 requireMatch(
-  /"handoff_driver_ref" = jsonb_build_object\([\s\S]*'consumer_scenario_key', 'nurture'[\s\S]*'object_id', "handoff_driver_ref" ->> 'object_id'/,
+  /"handoff_driver_ref" = jsonb_build_object\([\s\S]*'schema_version', 1,[\s\S]*'namespace', 'my_chat',[\s\S]*'object_id', "handoff_driver_ref" ->> 'object_id'/,
   "Durable driver constraint does not reject unknown or extra object keys",
 );
 for (const forbiddenSnapshotField of [
@@ -62,6 +69,11 @@ for (const forbiddenSnapshotField of [
   "claim_token",
   "expectedStepVersion",
   "contractHash",
+  "consumer_scenario_key",
+  "owner_scope",
+  "canonical_ref",
+  "kind",
+  "id",
 ]) {
   if (!migration.includes(forbiddenSnapshotField)) {
     failures.push(`Replay-seed payload constraint does not forbid ${forbiddenSnapshotField}`);
@@ -75,4 +87,4 @@ if (failures.length > 0) {
   throw new Error(`X4 handoff replay contract violations:\n- ${failures.join("\n- ")}`);
 }
 
-process.stdout.write("[ok] X4 handoff replay contract batch=32 driver=host.workflow/workflow_step\n");
+process.stdout.write("[ok] X4 handoff replay contract batch=32 driver=my_chat/workflow_step schema=1\n");

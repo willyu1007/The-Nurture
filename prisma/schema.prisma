@@ -352,6 +352,31 @@ enum NurtureChildLinkGrantStatus {
   deleted
 }
 
+enum NurtureBindingAnchorStatus {
+  reserved
+  bound_empty
+  associated
+  revoked
+  quarantined
+  retired
+}
+
+enum NurtureBindingAnchorAssociationStatus {
+  active
+  revoked
+  quarantined
+}
+
+enum NurtureBindingSubjectType {
+  child
+  family
+}
+
+enum NurtureScenarioBindingAuthorizationStatus {
+  active
+  revoked
+}
+
 enum NurtureGrantDirection {
   family_to_org
   org_to_family
@@ -1314,6 +1339,136 @@ model NurtureHealthStateSummary {
 // INSTITUTION ECOLOGY — N1 EXPLICIT-EMPTY CORE (T-002)
 // ============================================================================
 
+model NurtureChildBindingAnchor {
+  id                 String                     @id @default(uuid())
+  reservationKeyHash String                     @unique(map: "uq_nurture_child_anchor_reservation") @map("reservation_key_hash")
+  status             NurtureBindingAnchorStatus @default(reserved)
+  aggregateVersion   Int                        @default(1) @map("aggregate_version")
+  revokedAt          DateTime?                  @map("revoked_at")
+  quarantinedAt      DateTime?                  @map("quarantined_at")
+  quarantineReason   String?                    @map("quarantine_reason")
+  createdAt          DateTime                   @default(now()) @map("created_at")
+  updatedAt          DateTime                   @updatedAt @map("updated_at")
+
+  authorizations NurtureScenarioBindingAuthorization[]
+  associations   NurtureChildAnchorAssociation[]
+  familyLinks    NurtureFamilyAnchorAssociation[]
+
+  @@index([status, updatedAt], map: "ix_nurture_child_anchor_status")
+  @@map("nurture_child_binding_anchor")
+}
+
+model NurtureFamilyBindingAnchor {
+  id                 String                     @id @default(uuid())
+  reservationKeyHash String                     @unique(map: "uq_nurture_family_anchor_reservation") @map("reservation_key_hash")
+  status             NurtureBindingAnchorStatus @default(reserved)
+  aggregateVersion   Int                        @default(1) @map("aggregate_version")
+  revokedAt          DateTime?                  @map("revoked_at")
+  quarantinedAt      DateTime?                  @map("quarantined_at")
+  quarantineReason   String?                    @map("quarantine_reason")
+  createdAt          DateTime                   @default(now()) @map("created_at")
+  updatedAt          DateTime                   @updatedAt @map("updated_at")
+
+  authorizations NurtureScenarioBindingAuthorization[]
+  associations   NurtureFamilyAnchorAssociation[]
+
+  @@index([status, updatedAt], map: "ix_nurture_family_anchor_status")
+  @@map("nurture_family_binding_anchor")
+}
+
+model NurtureScenarioBindingAuthorization {
+  id                         String                                    @id @default(uuid())
+  workspaceId                String                                    @map("workspace_id")
+  subjectType                NurtureBindingSubjectType                 @map("subject_type")
+  childAnchorId              String?                                   @map("child_anchor_id")
+  familyAnchorId             String?                                   @map("family_anchor_id")
+  ownerRef                   String                                    @map("owner_ref")
+  ownerVersion               Int                                       @map("owner_version")
+  idempotencyKeyHash         String                                    @unique(map: "uq_nurture_binding_auth_idempotency") @map("idempotency_key_hash")
+  requestFingerprint         String                                    @map("request_fingerprint")
+  subjectEvidenceHash        String                                    @map("subject_evidence_hash")
+  userEvidenceHash           String                                    @map("user_evidence_hash")
+  actorEvidenceHash          String                                    @map("actor_evidence_hash")
+  organizationEvidenceHash   String?                                   @map("organization_evidence_hash")
+  purpose                    String
+  authorizationSourceRef     String                                    @map("authorization_source_ref")
+  authorizationSourceVersion Int                                       @map("authorization_source_version")
+  status                     NurtureScenarioBindingAuthorizationStatus @default(active)
+  verifiedAt                 DateTime                                  @map("verified_at")
+  expiresAt                  DateTime                                  @map("expires_at")
+  revokedAt                  DateTime?                                 @map("revoked_at")
+  aggregateVersion           Int                                       @default(1) @map("aggregate_version")
+  createdAt                  DateTime                                  @default(now()) @map("created_at")
+  updatedAt                  DateTime                                  @updatedAt @map("updated_at")
+
+  childAnchor  NurtureChildBindingAnchor?  @relation(fields: [childAnchorId], references: [id], onDelete: Restrict)
+  familyAnchor NurtureFamilyBindingAnchor? @relation(fields: [familyAnchorId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, subjectType, status, expiresAt], map: "ix_nurture_binding_auth_current")
+  @@index([ownerRef, ownerVersion, status], map: "ix_nurture_binding_auth_owner")
+  @@map("nurture_scenario_binding_authorization")
+}
+
+model NurtureChildAnchorAssociation {
+  id               String                                @id @default(uuid())
+  workspaceId      String                                @map("workspace_id")
+  childAnchorId    String                                @map("child_anchor_id")
+  childId          String                                @map("child_id")
+  status           NurtureBindingAnchorAssociationStatus @default(active)
+  currentKey       String?                               @default("current") @map("current_key")
+  aggregateVersion Int                                   @default(1) @map("aggregate_version")
+  revokedAt        DateTime?                             @map("revoked_at")
+  quarantinedAt    DateTime?                             @map("quarantined_at")
+  quarantineReason String?                               @map("quarantine_reason")
+  createdAt        DateTime                              @default(now()) @map("created_at")
+  updatedAt        DateTime                              @updatedAt @map("updated_at")
+
+  childAnchor        NurtureChildBindingAnchor        @relation(fields: [childAnchorId], references: [id], onDelete: Restrict)
+  child              NurtureChild                     @relation(fields: [workspaceId, childId], references: [workspaceId, id], onDelete: Restrict)
+  familyLinks        NurtureFamilyAnchorAssociation[] @relation("NurtureChildAssociationHistory")
+  currentFamilyLinks NurtureFamilyAnchorAssociation[] @relation("NurtureCurrentChildAssociation")
+
+  @@unique([workspaceId, childAnchorId, currentKey], map: "uq_nurture_child_anchor_workspace")
+  @@unique([workspaceId, childId, currentKey], map: "uq_nurture_child_anchor_local_child")
+  @@unique([id, workspaceId, childAnchorId, childId], map: "uq_nurture_child_anchor_integrity")
+  @@unique([id, currentKey], map: "uq_nurture_child_anchor_current")
+  @@index([workspaceId, status, updatedAt], map: "ix_nurture_child_anchor_assoc_status")
+  @@map("nurture_child_anchor_association")
+}
+
+model NurtureFamilyAnchorAssociation {
+  id                        String                                @id @default(uuid())
+  workspaceId               String                                @map("workspace_id")
+  familyAnchorId            String                                @map("family_anchor_id")
+  childAnchorId             String                                @map("child_anchor_id")
+  childAssociationId        String                                @map("child_association_id")
+  currentChildAssociationId String?                               @map("current_child_association_id")
+  childId                   String                                @map("child_id")
+  childCareProcessId        String                                @map("child_care_process_id")
+  familyId                  String                                @map("family_id")
+  status                    NurtureBindingAnchorAssociationStatus @default(active)
+  currentKey                String?                               @default("current") @map("current_key")
+  aggregateVersion          Int                                   @default(1) @map("aggregate_version")
+  revokedAt                 DateTime?                             @map("revoked_at")
+  quarantinedAt             DateTime?                             @map("quarantined_at")
+  quarantineReason          String?                               @map("quarantine_reason")
+  createdAt                 DateTime                              @default(now()) @map("created_at")
+  updatedAt                 DateTime                              @updatedAt @map("updated_at")
+
+  familyAnchor            NurtureFamilyBindingAnchor     @relation(fields: [familyAnchorId], references: [id], onDelete: Restrict)
+  childAnchor             NurtureChildBindingAnchor      @relation(fields: [childAnchorId], references: [id], onDelete: Restrict)
+  childAssociation        NurtureChildAnchorAssociation  @relation("NurtureChildAssociationHistory", fields: [childAssociationId, workspaceId, childAnchorId, childId], references: [id, workspaceId, childAnchorId, childId], onDelete: Restrict)
+  currentChildAssociation NurtureChildAnchorAssociation? @relation("NurtureCurrentChildAssociation", fields: [currentChildAssociationId, currentKey], references: [id, currentKey], onDelete: Restrict)
+  childCareProcess        NurtureChildCareProcess        @relation(fields: [workspaceId, childCareProcessId, childId], references: [workspaceId, id, childId], onDelete: Restrict)
+  family                  NurtureFamily                  @relation(fields: [workspaceId, familyId, childCareProcessId], references: [workspaceId, id, childCareProcessId], onDelete: Restrict)
+
+  @@unique([workspaceId, familyAnchorId, childAnchorId, currentKey], map: "uq_nurture_family_anchor_pair")
+  @@unique([workspaceId, familyId, currentKey], map: "uq_nurture_family_anchor_local_family")
+  @@unique([workspaceId, childCareProcessId, currentKey], map: "uq_nurture_family_anchor_process")
+  @@index([workspaceId, status, updatedAt], map: "ix_nurture_family_anchor_assoc_status")
+  @@map("nurture_family_anchor_association")
+}
+
 model NurtureParticipant {
   id               String                   @id @default(uuid())
   workspaceId      String                   @map("workspace_id")
@@ -1349,8 +1504,10 @@ model NurtureChild {
   updatedAt            DateTime           @updatedAt @map("updated_at")
   deletedAt            DateTime?          @map("deleted_at")
 
-  careProcesses NurtureChildCareProcess[]
+  careProcesses      NurtureChildCareProcess[]
+  anchorAssociations NurtureChildAnchorAssociation[]
 
+  @@unique([workspaceId, id], map: "uq_nurture_child_workspace_id")
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_child_status")
   @@map("nurture_child")
 }
@@ -1369,19 +1526,21 @@ model NurtureChildCareProcess {
   updatedAt          DateTime                      @updatedAt @map("updated_at")
   deletedAt          DateTime?                     @map("deleted_at")
 
-  child             NurtureChild                   @relation(fields: [childId], references: [id], onDelete: Restrict)
-  families          NurtureFamily[]
-  enrollments       NurtureEnrollment[]
-  grants            NurtureChildLinkGrant[]
-  receipts          NurtureChildLinkReceipt[]
-  threads           NurtureFamilyCareThread[]
-  messages          NurtureFamilyCareMessage[]
-  items             NurtureFamilyCareItem[]
-  dailyCareLogs     NurtureDailyCareLog[]
-  attentionItems    NurtureTeacherAttentionItem[]
-  mediaAttributions NurtureChildMediaAttribution[]
-  commandExecutions NurtureCommandExecution[]
+  child                    NurtureChild                     @relation(fields: [childId], references: [id], onDelete: Restrict)
+  families                 NurtureFamily[]
+  enrollments              NurtureEnrollment[]
+  grants                   NurtureChildLinkGrant[]
+  receipts                 NurtureChildLinkReceipt[]
+  threads                  NurtureFamilyCareThread[]
+  messages                 NurtureFamilyCareMessage[]
+  items                    NurtureFamilyCareItem[]
+  dailyCareLogs            NurtureDailyCareLog[]
+  attentionItems           NurtureTeacherAttentionItem[]
+  mediaAttributions        NurtureChildMediaAttribution[]
+  commandExecutions        NurtureCommandExecution[]
+  familyAnchorAssociations NurtureFamilyAnchorAssociation[]
 
+  @@unique([workspaceId, id, childId], map: "uq_nurture_child_process_integrity")
   @@index([workspaceId, childId, status], map: "ix_nurture_child_process_child")
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_child_process_status")
   @@map("nurture_child_care_process")
@@ -1399,10 +1558,12 @@ model NurtureFamily {
   updatedAt            DateTime            @updatedAt @map("updated_at")
   deletedAt            DateTime?           @map("deleted_at")
 
-  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  threads          NurtureFamilyCareThread[]
-  items            NurtureFamilyCareItem[]
+  childCareProcess   NurtureChildCareProcess          @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  threads            NurtureFamilyCareThread[]
+  items              NurtureFamilyCareItem[]
+  anchorAssociations NurtureFamilyAnchorAssociation[]
 
+  @@unique([workspaceId, id, childCareProcessId], map: "uq_nurture_family_process_integrity")
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_family_process")
   @@map("nurture_family")
 }

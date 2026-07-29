@@ -9,8 +9,8 @@ variables:
   SERVICE_NAME:
     type: string
     required: true
-    default: your-service
-    description: Service name (logical).
+    default: the-nurture
+    description: Nurture owner service name used by logs and deployment metadata.
   PORT:
     type: int
     required: true

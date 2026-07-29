@@ -34,8 +34,10 @@ const runRef = (
 });
 
 const canonicalRunRef = (run: WorkflowRunRef): CanonicalRef => ({
-  kind: "workflow_run",
-  id: run.run_id,
+  schema_version: 1,
+  namespace: "my_chat",
+  object_type: "workflow_run",
+  object_id: run.run_id,
   version: run.aggregate_version,
 });
 
@@ -173,8 +175,8 @@ export const nurtureAdapters: WorkflowScenarioModule["adapters"] = {
             action: input.action,
             available: false,
             reason_code: input.reason_code,
-            target_type: input.target_ref.kind,
-            target_id: input.target_ref.id,
+            target_type: input.target_ref.object_type,
+            target_id: input.target_ref.object_id,
             expected_version: input.expected_version,
           },
         ],
@@ -195,7 +197,7 @@ export const nurtureAdapters: WorkflowScenarioModule["adapters"] = {
     async create_handoff(input): Promise<WorkflowHandoffResult> {
       const sourceRef = input.source_refs[0];
       return {
-        handoff_id: `${input.handoff_type}:${sourceRef?.id ?? "unknown"}:${input.requested_purpose}`,
+        handoff_id: `${input.handoff_type}:${sourceRef?.object_id ?? "unknown"}:${input.requested_purpose}`,
         handoff_type: input.handoff_type,
         status: "requested",
         source_refs: input.source_refs,
@@ -239,8 +241,8 @@ export const nurtureAdapters: WorkflowScenarioModule["adapters"] = {
             action: input.action,
             available: false,
             reason_code: input.client_surface,
-            target_type: input.target_ref.kind,
-            target_id: input.target_ref.id,
+            target_type: input.target_ref.object_type,
+            target_id: input.target_ref.object_id,
             expected_version: input.expected_version,
           },
         ],

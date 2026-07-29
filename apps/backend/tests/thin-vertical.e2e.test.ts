@@ -30,8 +30,8 @@ describe("thin vertical: pregnancy_stage run end-to-end", () => {
         entrypoint_key: "create_pregnancy_stage_plan",
         requirement_values: {
           context_refs: [
-            { namespace: "my_chat", object_type: "family", object_id: familyId, owner_scope: "workspace", canonical_ref: { service: "my_chat", object_type: "family", object_id: familyId } },
-            { namespace: "my_chat", object_type: "expectant_mother", object_id: motherId, owner_scope: "workspace" },
+            { schema_version: 1, namespace: "my_chat", object_type: "family", object_id: familyId },
+            { schema_version: 1, namespace: "my_chat", object_type: "expectant_mother", object_id: motherId },
           ],
           safety_boundary_acknowledged: true,
         },

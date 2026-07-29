@@ -1,4 +1,4 @@
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   NurtureCommandPreconditionDecision,
   NurtureCommandSpec,
@@ -13,6 +13,8 @@ import type {
   FamilyCareReplyPayload,
   FamilyInputRoutePayload,
 } from "./family-care-transaction.js";
+
+type DomainContextRef = CanonicalRef;
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const REASON_CODE = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$/;
@@ -39,50 +41,34 @@ const URGENCIES = new Set([
   "urgent_non_emergency",
 ]);
 const REF_KEYS = new Set([
+  "schema_version",
   "namespace",
-  "consumer_scenario_key",
   "object_type",
   "object_id",
   "version",
-  "owner_scope",
-  "canonical_ref",
 ]);
 const validId = (value: unknown): value is string => typeof value === "string" && ID.test(value);
 
 const ref = (objectType: string, objectId: string, version = 1): DomainContextRef => ({
+  schema_version: 1,
   namespace: "nurture",
-  consumer_scenario_key: "nurture",
   object_type: objectType,
   object_id: objectId,
   version,
-  owner_scope: "workspace",
 });
 
 const validRef = (value: DomainContextRef | undefined): value is DomainContextRef => {
   if (!value || typeof value !== "object") return false;
   if (Object.keys(value).some((key) => !REF_KEYS.has(key))) return false;
   if (
+    value.schema_version !== 1 ||
     !validId(value.namespace) ||
     !validId(value.object_type) ||
     !validId(value.object_id) ||
-    !["workspace", "organization", "platform", "external"].includes(value.owner_scope) ||
-    (value.consumer_scenario_key !== undefined && !validId(value.consumer_scenario_key)) ||
     (value.version !== undefined &&
       (!Number.isSafeInteger(value.version) || value.version < 0))
   ) {
     return false;
-  }
-  if (value.canonical_ref) {
-    if (
-      Object.keys(value.canonical_ref).some(
-        (key) => !["service", "object_type", "object_id"].includes(key),
-      ) ||
-      !validId(value.canonical_ref.service) ||
-      !validId(value.canonical_ref.object_type) ||
-      !validId(value.canonical_ref.object_id)
-    ) {
-      return false;
-    }
   }
   return JSON.stringify(value).length <= 2_000;
 };
@@ -90,21 +76,17 @@ const validRef = (value: DomainContextRef | undefined): value is DomainContextRe
 const validProtectedContentRef = (value: DomainContextRef | undefined): value is DomainContextRef =>
   validRef(value) &&
   value.namespace === "nurture" &&
-  value.object_type === "protected_message_content" &&
-  value.owner_scope === "workspace";
+  value.object_type === "protected_message_content";
 
 const validAttachmentRef = (value: DomainContextRef | undefined): value is DomainContextRef =>
   validRef(value) &&
   value.namespace === "nurture" &&
-  value.object_type === "media_asset_ref" &&
-  value.owner_scope === "workspace";
+  value.object_type === "media_asset_ref";
 
 const validWorkflowDriverRef = (value: DomainContextRef | undefined): value is DomainContextRef =>
   validRef(value) &&
-  value.namespace === "host.workflow" &&
-  value.consumer_scenario_key === "nurture" &&
+  value.namespace === "my_chat" &&
   value.object_type === "workflow_step" &&
-  value.owner_scope === "workspace" &&
   value.version === undefined;
 
 const requireFamilyCare = (

@@ -32,3 +32,30 @@ Applying to the existing `localhost:5433/nurture` database requires a separate e
 ## Pending execution evidence
 
 Approval was granted and this plan was executed against the disposable target. See `03-execution-log.md` and `04-post-verify.md`; the plan remains the historical pre-apply contract.
+
+## 2026-07-28 — Wave 4 P2 migration plan
+
+This plan is not authorized for execution yet.
+
+1. Freeze the exact My-Chat and Nurture source revisions and migration
+   checksum.
+2. Select a new disposable target for fresh-apply and supported-baseline
+   upgrade proof; do not reuse the earlier X4 approval.
+3. Before any non-disposable target, record exact non-null `birth_date` row
+   counts without exporting values and obtain the owner-approved retention,
+   deletion, backup, and rollback decision.
+4. Apply the full ordered migration history with `prisma migrate deploy`.
+5. Verify all five P2 tables, enums, indexes, composite FKs, CHECK constraints,
+   and schema-context parity.
+6. Prove new non-null birth-date insert/update denial, preservation of
+   historical rows plus unrelated historical-row updates during the
+   trigger-protected phase, exact Child/Family replay, stale/revoked denial,
+   active Family-to-current Child dependency, revoked-history replacement, and
+   rollback-by-disable without cross-owner deletion.
+7. Keep every consumer/default capability false and active Scenario rows empty
+   after disposable proof.
+
+Rollback is forward-only. Disable receipt consumption first, preserve
+authorization and local scenario evidence, mark local anchors
+revoked/quarantined through a separately reviewed owner command, and repair
+schema with a later migration. Never delete My-Chat facts or use `db push`.

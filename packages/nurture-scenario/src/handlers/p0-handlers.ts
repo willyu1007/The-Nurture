@@ -1,7 +1,6 @@
 import type {
   CanonicalRef,
   ContextBindingDraft,
-  DomainContextRef,
   OutboxEventDraft,
   WorkflowArtifactDraft,
   WorkflowHandlerRegistry,
@@ -23,19 +22,25 @@ import {
 import { readInstitutionSurface, type InstitutionSurfaceKey } from "../institution-surfaces.js";
 import { makeCaptureFamilyInput } from "./family-input-workflow.handler.js";
 
+type DomainContextRef = CanonicalRef;
+
 // ---------------------------------------------------------------------------
 // input-only ref/event/artifact builders (no deps)
 // ---------------------------------------------------------------------------
 
 const workflowRunRef = (input: WorkflowStepHandlerInput): CanonicalRef => ({
-  kind: "workflow_run",
-  id: input.run_id,
+  schema_version: 1,
+  namespace: "my_chat",
+  object_type: "workflow_run",
+  object_id: input.run_id,
   version: input.expected_step_version,
 });
 
 const artifactRef = (input: WorkflowStepHandlerInput, artifactType: string): CanonicalRef => ({
-  kind: "workflow_artifact",
-  id: `${input.run_id}:${artifactType}`,
+  schema_version: 1,
+  namespace: "my_chat",
+  object_type: "workflow_artifact",
+  object_id: `${input.run_id}:${artifactType}`,
   version: input.expected_step_version,
 });
 
@@ -78,12 +83,10 @@ const artifactDraft = (
 });
 
 const familyDomainRef = (objectId: string): DomainContextRef => ({
+  schema_version: 1,
   namespace: "my_chat",
-  consumer_scenario_key: "nurture",
   object_type: "family",
   object_id: objectId,
-  owner_scope: "workspace",
-  canonical_ref: { service: "my_chat", object_type: "family", object_id: objectId },
 });
 
 const manualReview = (
@@ -124,7 +127,13 @@ export const makeCollectContext = (deps: NurtureHandlerDeps): WorkflowStepHandle
       continue; // optional refs are skipped, not fatal
     }
     contextRefs.push(ref);
-    snapshotRefs.push({ kind: "context_snapshot", id: snap.snapshot_id, version: snap.version });
+    snapshotRefs.push({
+      schema_version: 1,
+      namespace: "nurture",
+      object_type: "context_snapshot",
+      object_id: snap.snapshot_id,
+      version: snap.version,
+    });
   }
 
   const events: OutboxEventDraft[] = [eventDraft(input, "workflow.context.bound"), eventDraft(input, "workflow.step.completed")];
@@ -134,7 +143,13 @@ export const makeCollectContext = (deps: NurtureHandlerDeps): WorkflowStepHandle
   if (familyRef) {
     const projection = await deps.repositories.profiles.getByCanonicalObjectRef({ workspace_id: ws, canonical_object_ref: familyRef });
     if (projection) {
-      snapshotRefs.push({ kind: "context_snapshot", id: `${input.run_id}:nurture_profile`, version: projection.projection_version });
+      snapshotRefs.push({
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "context_snapshot",
+        object_id: `${input.run_id}:nurture_profile`,
+        version: projection.projection_version,
+      });
       events.push(eventDraft(input, "nurture.profile.snapshot_attached"));
     }
   }
@@ -202,8 +217,10 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
       constraint_payload: constraintPayload,
       evidence_target_ref: workflowRunRef(input),
       evidence_ref: {
-        kind: "context_snapshot",
-        id: `${input.run_id}:family_strategy_basis`,
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "context_snapshot",
+        object_id: `${input.run_id}:family_strategy_basis`,
         version: project.aggregate_version,
       },
     },
@@ -290,9 +307,17 @@ export const makeCompareActivities = (deps: NurtureHandlerDeps): WorkflowStepHan
 
   const options: ActivityOption[] = [];
   for (const ref of draft.option_refs) {
-    const snap = await deps.canonicalResolver.resolveObject({ workspace_id: ws, object_type: "activity_option", object_id: ref.id });
+    const snap = await deps.canonicalResolver.resolveObject({
+      workspace_id: ws,
+      object_type: "activity_option",
+      object_id: ref.object_id,
+    });
     const sf = (snap?.safe_fields ?? {}) as { scores?: Partial<Record<ComparisonCriterion, number>>; hard_constraint_violation?: boolean };
-    options.push({ option_ref_id: ref.id, scores: sf.scores ?? {}, hard_constraint_violation: sf.hard_constraint_violation });
+    options.push({
+      option_ref_id: ref.object_id,
+      scores: sf.scores ?? {},
+      hard_constraint_violation: sf.hard_constraint_violation,
+    });
   }
 
   const result = rankActivities(options, draft.weight_override_payload as Record<ComparisonCriterion, number> | undefined);
@@ -401,7 +426,13 @@ export const makeApplyMedicalSafetyGate = (deps: NurtureHandlerDeps): WorkflowSt
     const evidenceRef = await deps.repositories.evidence.appendEvidenceRef({
       workspace_id: ws,
       target_ref: workflowRunRef(input),
-      evidence_ref: { kind: "context_snapshot", id: `${input.run_id}:health_safety_escalation`, version: input.expected_step_version },
+      evidence_ref: {
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "context_snapshot",
+        object_id: `${input.run_id}:health_safety_escalation`,
+        version: input.expected_step_version,
+      },
       reason_code: "health_safety_escalation_reason",
     });
     sourceRefs.push(evidenceRef);
@@ -454,7 +485,16 @@ export const makeRequestApproval = (_deps: NurtureHandlerDeps): WorkflowStepHand
 
 export const makeRequestHandoff = (_deps: NurtureHandlerDeps): WorkflowStepHandler => async (input) => ({
   status: "completed",
-  output_refs: [workflowRunRef(input), { kind: "workflow_handoff", id: `${input.run_id}:handoff`, version: input.expected_step_version }],
+  output_refs: [
+    workflowRunRef(input),
+    {
+      schema_version: 1,
+      namespace: "my_chat",
+      object_type: "workflow_handoff",
+      object_id: `${input.run_id}:handoff`,
+      version: input.expected_step_version,
+    },
+  ],
   event_drafts: [eventDraft(input, "workflow.handoff.requested")],
 });
 
@@ -503,13 +543,7 @@ export const makeOpenTodayAttentionBoard = (deps: NurtureHandlerDeps): WorkflowS
     "Teacher attention board",
   );
 
-const familyRefToCanonical = (ref: DomainContextRef): CanonicalRef => ({
-  kind: "domain_context_ref",
-  id: `${ref.namespace}.${ref.object_type}.${ref.object_id}`,
-  // A domain object ref carries no workflow-aggregate version (the step version
-  // would be semantically wrong here); only emit version if the ref resolved one.
-  ...(ref.version !== undefined ? { version: ref.version } : {}),
-});
+const familyRefToCanonical = (ref: DomainContextRef): CanonicalRef => ({ ...ref });
 
 // ---------------------------------------------------------------------------
 // registry factory + default-deps bare exports (keep journey/conformance green)

@@ -172,8 +172,10 @@ describe("claimed-Step family input workflow handler", () => {
       status: "completed",
       output_refs: [
         {
-          kind: "domain_context_ref",
-          id: expect.stringMatching(/^nurture:command_execution:/),
+          schema_version: 1,
+          namespace: "nurture",
+          object_type: "command_execution",
+          object_id: expect.any(String),
           version: 1,
         },
       ],
