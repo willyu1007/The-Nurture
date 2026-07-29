@@ -4,7 +4,12 @@
 > 松林奶油主色、分发确认卡、逐条自动发布等）。**当前有效规格以
 > `docs/context/product/nurture-mobile-ux-contract.md` 为准**；本文仅作决策历史与理由追溯。
 
-> 本文件是讨论沉淀，随对齐进度更新。上游立场：`workflow-product-design-contract.md`
+> 本文件是历史讨论沉淀和设计输入。当前产品语义以
+> `docs/context/product/workflow-product-design-contract.md` 与 T-004～T-008
+> 最新决策为准。家园直聊/共享人类房间已被 T-005 的 `CareInteraction` 双投影方案
+> supersede；当前 Workflow 只指园区管理 `InstitutionWorkflow`。本文“老师确认接手”
+> 或单回复闭环文字也已 supersede：CareGroup 是业务主体，同班老师可追加多条回复，
+> 第一条只解除待回复 Attention。
 > （Family Charter / Current Focus / Anti-Metrics / AI 只做整理者 / 非诊断红线）。
 
 ## 0. 贯穿故事线

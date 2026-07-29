@@ -1,5 +1,14 @@
 # Implementation Notes
 
+## 2026-07-29 — Product terminology supersession
+
+- 本任务保留为 T-003 设计/共创历史，不再作为 Workflow、跨角色 Chat 或实现边界 SSOT。
+- 当前 Workflow 只指园区管理 `InstitutionWorkflow`；Institution mobile board 可只读
+  投影关键内容/进度，Web workbench 是主要操作面。
+- 家园直聊/共享人类房间被 T-005 family-private + role-safe `CareInteraction`
+  projections supersede。
+- 视觉稿和 deck 中的旧表达保留用于追溯，不得未经 T-004～T-008 contract 转换直接实现。
+
 ## 2026-07-23 — 交互范式提炼落地（§7b + My-Chat 立项线索）
 
 1. UX 契约新增 **§7b 交互范式提炼**：九个场景无关范式+铁律表（AI/人类房间、跨界预览卡、

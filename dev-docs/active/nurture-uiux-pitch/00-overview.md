@@ -17,6 +17,20 @@
 2. **园长共创演示 HTML**：以六界面高保真可交互 demo 为主线的 16:9 翻页 deck，
    用于与托育机构（0-3）园长一对一首次沟通。概念内容极简（开场/收尾各一页），主要靠口头交流。
 
+## Current Semantic Precedence
+
+T-003 是设计输入，不是产品/实现 SSOT。当前 Workflow、对话和 surface 语义分别以
+`docs/context/product/workflow-product-design-contract.md` 与 T-004～T-008 最新任务
+决策为准：
+
+- 当前产品 Workflow 只指园区管理 `InstitutionWorkflow`。
+- Institution Web workbench 是主要操作面，Institution mobile board 只读投影关键内容与进度。
+- Guardian/Caregiver 不建立共享聊天室、家园直聊或直接 DM；两侧消费
+  `CareInteraction` 的角色安全投影。
+- 家庭事项以精确 CareGroup 为业务主体；acknowledge 不表示个人接手，班级老师可
+  追加多条班级回复，第一条只解除待回复 Attention 而不关闭事项。
+- demo 中与以上规则冲突的画面/文字保留为共创历史，不得直接转译为实现要求。
+
 ## 六个 surface（demo 主线，与 Pilot-0-B 锁定表面对应）
 
 | # | Surface | 对应锁定表面 | 定位一句话 |
@@ -53,5 +67,6 @@
 
 - 设计细节与讨论沉淀：`02-architecture.md`
 - 阶段计划：`01-plan.md`
-- 上游立场基准：`docs/context/product/workflow-product-design-contract.md`（Family Charter / Current Focus / Anti-Metrics / AI 定位）
+- 当前产品语义基准：`docs/context/product/workflow-product-design-contract.md`
+  （Workflow/Action/Projection/Surface ownership）
 - 机构生态设计包：`dev-docs/active/nurture-institution-mode/`（surface 锁定见 09/10）
