@@ -6,8 +6,10 @@
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-29
-- Next step: 以已锁定的两增量产品契约盘点 T-002 message/item/receipt、correction
-  version、withdrawal event 与 redaction cascade 差距，并固定对应 typed schemas。
+- Next step: 按 [T-002 fact/schema gap](06-t002-fact-schema-gap.md) 的实施顺序，
+  先采用 T-004 exact
+  contract pin，再冻结三轴 CareItem、immutable command result、protected ingress、
+  context continuation 与 correction/withdrawal/redaction schemas。
 
 ## Goal
 
@@ -37,17 +39,26 @@
   - Query lane：`query` 与 `readResult`，无业务写入。
   - Action lane：`prepareAction` 与 `executeAction`，统一确认和确定性执行。
 - preview 是 `prepareAction` 的语义输出，confirm 是用户提交给 `executeAction` 的确认；二者仍是一个 `ActionExecution`，不是 approval Workflow。
-- `prepareAction` 不持久化 prepared draft；它返回 5 分钟、不可延长/复活、对新 effect 单次使用的 opaque `confirmationRef`。
-- execute 重新提交 typed input 并校验 canonical input hash；ref 不携带原始正文或 PII，且不得跨 actor、surface/device 或 account 使用。
-- capability-specific typed input 只包含业务字段；target 与 expected version 属于
-  generic prepare context，版本在 prepare 时冻结进 `confirmationRef`。
-- concurrency precondition 按 capability 定义：acknowledge 使用精确 work-state
-  version；reply 绑定 replyable lifecycle/authority heads，不把其他合法 reply
-  视为冲突。CommandExecution identity 仍独立处理重复请求。
+- `prepareAction` 不持久化 business draft、正文或待发送 Message。Nurture MAY
+  持久化一个 body-free、短期 `InteractionContext`（token hash、target/heads、
+  keyed input integrity、expiry 和 stable command identity），并返回 5 分钟、
+  不可延长/复活、对新 effect 单次使用的 opaque `confirmationRef`。
+- execute 重新提交 typed input 并校验 canonical input integrity；低熵 protected
+  body 使用 secret-keyed tag，不保存 bare body hash。ref 不携带原始正文或 PII，
+  且不得跨 actor、surface/device 或 account 使用。
+- capability-specific typed input 只包含业务字段；target 与 concurrency
+  preconditions 属于 generic prepare context，所需 heads 在 prepare 时冻结进
+  `confirmationRef`。
+- concurrency precondition 按 capability 定义：acknowledge 使用精确
+  acknowledgement head，并声明“已 acknowledged”convergent postcondition；reply
+  绑定 replyable lifecycle/authority heads，不把其他合法 reply 视为冲突。
+  CommandExecution identity 仍独立处理重复请求。
 - My-Chat 拥有每次接口调用的 invocation identity；Nurture 在 prepare 时生成并绑定稳定 business command identity。
 - `executeAction` 顶层结果为 `committed | not_committed | outcome_unknown`，并分别表达 `executed | replayed` 与 `applied | already_satisfied`。
 - `committed` 使用可变调用判定外壳包裹不可变 `committedResult`；replay 只改变
-  `executionDisposition`，必须返回同一个 result/output/receipt refs。当前回复数量、
+  `executionDisposition`，必须返回同一个 typed output/receipt refs。
+  `commandExecutionRef` 同时是 committed-result authority，不另建重复 result row。
+  当前回复数量、
   notification/delivery 与当前权限状态不进入不可变结果，由 `readResult` 重新读取。
 - `acknowledge` 是可收敛状态动作：另一名老师已完成确认且其他执行条件仍有效时，
   返回 `executed + already_satisfied`，不创建第二条 acknowledgement event，也不把
@@ -88,13 +99,18 @@
   不在 `acknowledge` 时独占分配给某个照护者。
 - `acknowledge` 只表示班级已收到；操作者 Participant/RoleAssignment 只作为审计证据，
   不成为 reply authority 或个人 assignment。
-- 同一精确 CareGroup 内任一当前合格照护者都可以追加 reply；不同老师或不同
-  command 的并发回复均可成功，每条回复保持独立 identity、真实操作者审计与 Receipt。
+- 同一精确 CareGroup 内任一当前 `caregiver | lead_caregiver` 都可以追加 reply；
+  `institution_admin` 只有另持一个有效 operational caregiver role 时才可执行。不同
+  老师或不同 command 的并发回复均可成功，每条回复保持独立 Message identity、
+  真实操作者审计与 Receipt。
 - 用户需要继续交流时创建新的 CareItem，并可选携带仅用于展示/总结的 `contextContinuationOfItemRef`；不使用含义模糊的通用 `followUpOf`。
 - 上下文续接关系不表示事项依赖，不继承原 Item 的 Grant、authority、owner、SLA 或状态；真正的事项 successor/trigger 需在未来以 `CareItemDependency` 独立表达。
 - Increment 1 `submit` 的逻辑 operation input 只包含 1–2000 字符受保护纯文本正文和可选 `contextContinuationOfItemRef`。
 - 多目标选择使用 Nurture owner-issued `targetOptionRef`，属于 prepare target context，不进入 operation input；唯一合法目标可按 capability policy 确定性绑定。
-- `dataClass=family_care_question`、`category=question`、`urgency=today_attention`、`direction=family_to_org`、ack/reply 要求、空附件、作者、Grant、route、safe summary 与 command identity 均由 Nurture 推导。
+- `dataClass=family_care_question`、`category=question`、`urgency=today_attention`、
+  `direction=family_to_org`、ack/reply 要求、空附件、作者、同时允许
+  `family_to_org + org_to_family` 的 original Grant、route、safe summary 与 command
+  identity 均由 Nurture 推导。
 - 普通 Chat 只能识别发送意图并打开空的受保护 composer；正文不得从普通 Chat 自动复制、由 LLM 改写或持久化到 Chat transcript。
 - 第一增量不支持附件、富文本、批量发送、用户自选分类/优先级，以及医疗、用药或紧急事项写入。
 - UX confirmation 以“一次结构化、效果明确的用户手势”为原则，不把技术 prepare/execute 映射成两次可见操作。
@@ -104,7 +120,8 @@
 - 同一 Nurture-owned `CareInteraction` 的 guardian timeline projection 与 caregiver work projection。
 - family-care message、structured care item、receipt 与附件/媒体引用语义。
 - 如复用现有 family-care thread，其仅作为按 Enrollment 隔离的路由/历史技术容器，不是产品共享房间、成员关系或授权来源。
-- private draft → explicit preview → authorized send → delivery/read/acknowledge 的状态链。
+- client-local protected composer → explicit preview → authorized send →
+  delivery/read/acknowledge 的状态链；未确认 composer 不成为 Nurture business fact。
 - withdraw、redaction、correction 与 owner-reread / replay。
 - 每次跨边界发送绑定精确 Institution Enrollment 和原始 Grant，且不得跨机构串联。
 - 角色化 presenter、commands、errors 与合成 fixture。
@@ -126,6 +143,14 @@
 - T-004 公共 surface 和 presenter 契约。
 - T-002 的 participant/grant、owner-reread、receipt、authority reread、idempotency 与 host pin。
 - T-003 对两类 chat surface 的产品交互输入。
+- 本任务的 T-002 landed fact/schema/source 对齐清单：
+  [06-t002-fact-schema-gap.md](06-t002-fact-schema-gap.md)。
+- 第一增量 protected submit/confirmation：
+  [08-increment-1-submit-ux-contract.md](08-increment-1-submit-ux-contract.md)。
+- 第二增量变更动作：
+  [07-increment-2-change-contract.md](07-increment-2-change-contract.md)。
+- capability registry 与 query outputs：
+  [09-capability-query-contract.md](09-capability-query-contract.md)。
 
 ## Acceptance Criteria
 
@@ -134,25 +159,39 @@
 - [ ] ordinary chat、Chat-assisted action 与 board-direct action 有可测试的不同结果；普通聊天不产生业务写入。
 - [ ] Chat-assisted action 与 board-direct action 对同一 capability 产生相同 canonical effect、receipt 和错误语义。
 - [ ] Harness 使用统一逻辑 envelope，但每个 capability 保持独立的版本化 typed input/result、policy、command/handler 和 presenter binding。
+- [ ] T-005 V1 capability registry 使用 stable key + 独立 `1.0.0` version；query、
+  Increment 1、Increment 2 author action 与 internal system action 的 discovery 边界
+  均为封闭且可机械验证。
 - [ ] Query lane 不进入 CommandExecution；Action lane 的写入复用现有 CommandExecution，且 family-care action 不创建产品 Workflow Run/Step。
 - [ ] `surface_origin` 只能影响 presenter、审计或观测，不能改变 authority、canonical effect 或 replay identity。
 - [ ] `prepareAction` 只接受 authenticated trusted context、capability-specific typed input 与用户可选 opaque target ref；Grant、role、policy 和内部 route fields 均由 Nurture 解析。
 - [ ] acknowledge typed input 为空对象，reply typed input 只含受保护正文；CareItem
   target/version、actor/scope 与 command identity 不进入 capability business schema。
-- [ ] acknowledge 的 work-state version 在 prepare 时冻结；reply 则冻结
-  replyable lifecycle/authority precondition。另一条合法班级回复不得使当前 reply stale。
-- [ ] prepare 只返回 `ready_to_confirm | needs_input | denied | unavailable`，未确认时不创建 draft、Message、CareItem、Receipt 或 CommandExecution。
+- [ ] acknowledge 的 acknowledgement head 在 prepare 时冻结，并显式声明
+  acknowledged convergence；reply 则冻结 replyable lifecycle/authority
+  precondition。另一条合法班级回复不得使当前 reply stale。
+- [ ] acknowledge 只有在 current state 恰好已达到同一个 acknowledged postcondition、
+  且其余 authority/lifecycle heads 仍有效时才能收敛为 already-satisfied；其他
+  version drift 仍 stale/denied。
+- [ ] prepare 只返回 `ready_to_confirm | needs_input | denied | unavailable`，未确认时
+  不创建 business draft、正文、Message、CareItem、Receipt 或 CommandExecution；
+  允许的 body-free `InteractionContext` 只承担短期协议绑定，不进入产品投影。
 - [ ] `confirmationRef` 五分钟过期、不延长、不原地复活；过期、input/target/authority/version 漂移均重新 prepare。
 - [ ] ref 对新 effect 单次消费，但 execute 成功后的相同 command request 仍可通过 CommandExecution exact replay 返回原结果。
 - [ ] confirmation consumption、owner-reread、domain effect 与 CommandExecution 对原子动作在同一 Nurture transaction 内完成。
 - [ ] 相同 command identity + 相同 canonical payload 返回 exact replay；相同 identity + payload drift 返回 idempotency conflict。
 - [ ] `committed` 只表示 Nurture 业务事务已提交，不等于 notification/provider delivery、设备展示或 Nurture acknowledge。
 - [ ] `outcome_unknown` 禁止新 prepare/替代 command，必须用原 command identity status/reconcile 至 committed 或 confirmed-no-effect。
-- [ ] committed 的 typed result 保持不可变；replay 返回同一 result/output/receipt refs，
+- [ ] committed 的 typed result 保持不可变；replay 返回同一
+  `commandExecutionRef`、output/receipt refs，
   不把 mutable current state、reply count 或 delivery/notification 状态混入历史结果。
+- [ ] `commandExecutionRef` 是 immutable committed-result authority；持久化
+  result schema version、body-free typed output 和 invalidation scopes，不要求第二个
+  result table/ref。
 - [ ] 第二个有效 acknowledge command 在班级已确认、事项仍可执行时返回
   `already_satisfied`，不制造 stale、重复 event 或虚假个人确认归属。
-- [ ] 不同 command 的合法 reply 始终追加新 CareReply；第一条/后续回复通过
+- [ ] 不同 command 的合法 reply 始终追加新的 canonical reply Message；第一条/后续
+  回复通过 `CareReplyV1` projection 的
   `responseEffect` 与 `attentionEffect` 表达，不用 `already_satisfied` 去重。
 - [ ] stale 仅在当前 actor 仍可读取时返回最小 role-safe current state；Grant、
   Enrollment、CareGroup 或角色权限丧失时不得借错误响应泄漏状态。
@@ -163,6 +202,8 @@
   闭环 checkpoint。
 - [ ] correction 是 exact-author、append-only 的 Message 内容版本；严格绑定当前
   correction head，不能原地改写历史或由同班其他老师修改作者事实。
+- [ ] submit/acknowledge/reply/correction/withdrawal/redaction 的 committed output
+  都有封闭的 V1 shape；内部 protected-content ref 不进入 public output。
 - [ ] 家长问题在 awaiting-reply 阶段可同 Item 更正；responded 后的新信息必须通过
   新 CareItem/context continuation 表达。
 - [ ] withdrawal 只关闭家庭发起的 CareItem 工作，不删除 Message/Reply/Receipt；
@@ -170,6 +211,8 @@
 - [ ] source redaction 原子移除问题及其 correction 内容、抑制依赖 work/Attention；
   reply redaction 只移除该 reply/correction 内容，不级联删除其他作者事实，也不重开
   原 Attention。
+- [ ] redaction cascade 必须在一个事务/fence 内更新到闭包或整笔失败；固定分页
+  `take` 上限后部分提交不能通过 qualification。
 - [ ] 用户 redaction 只允许确切作者；policy/safety/admin redaction 具有独立 capability、
   server-owned reason 与审计身份。
 - [ ] correction/withdrawal/redaction 的 pending ActionDelivery 候选可被当前状态跳过；
@@ -178,15 +221,22 @@
   CareItem；同班合格照护者可继续追加回复。
 - [ ] `acknowledge` 不创建个人 claim/assignment；确认者身份只用于审计，家庭侧默认显示“班级已确认收到”。
 - [ ] reply authority 在执行时基于原始 `Enrollment + CareGroup + Grant` 与当前照护资格重新解析，不要求回复者等于确认者。
-- [ ] 两名合格照护者并发 reply 时，两条不同 command 均可提交；稳定数据库顺序
-  决定展示次序，同一 command retry 才走 exact replay。
+- [ ] reply 只允许同一精确 CareGroup 的 current caregiver/lead-caregiver；
+  Institution Admin 身份、ThreadParticipant row 或“同园区”本身不授予 reply。
+- [ ] 两名合格照护者并发 reply 时，两条不同 command 均可提交；server-issued
+  immutable `replyOrderKey` 决定展示次序，同一 command retry 返回同一顺序键。
 - [ ] 新 Item 可选引用同一 ChildCareProcess、同一 Enrollment、response 已为
   responded 且当前可读的 Item 作为 `contextContinuationOfItemRef`。
 - [ ] `contextContinuationOfItemRef` 只影响角色安全的展示与总结，不授予读取权限，不继承 Grant/authority/owner/SLA，也不驱动状态或 `CareItemDependency`。
-- [ ] 新 Item 使用执行时的当前 Grant 和新的 business command identity；源 Item 变为不可读时只隐藏关联，不影响新 Item 本身。
+- [ ] 新 Item 从执行时的 current eligibility 选择 Grant，将其固化为该 Item 的
+  immutable original Grant，并使用新的 business command identity；源 Item 变为
+  不可读时只隐藏关联，不影响新 Item 本身。
 - [ ] `submit` operation input 只接受规范化后 1–2000 字符纯文本正文与可选上下文续接引用；不接受 raw target、Grant、分类、优先级、route 或 command identity。
 - [ ] 多 Enrollment 时只接受当前 prepare 返回的 owner-issued `targetOptionRef`；LLM/客户端不得提交 raw Enrollment ID 或静默选择。
 - [ ] 受保护正文不进入普通 Chat、LLM、confirmationRef、日志、receipt 或 body-free presenter；提交前用户看到的 exact text 与最终写入语义一致。
+- [ ] public typed input 的 `body` 与内部 content write ref/command DTO 分层：client/LLM
+  不能提交 `protected_content_ref`，execute 在 Nurture protected ingress 内原子加密并
+  绑定 Message；prepare 只保存 keyed integrity tag。
 - [ ] 附件、富文本、AI protected draft、用户自选 urgency/category、医疗/用药/紧急输入在 Increment 1 写入前明确拒绝，不静默降级或改路由。
 - [ ] 每个业务 effect 默认只要求一次结构化用户手势；Harness、confirmationRef、Grant 和 CareItem 内部术语不暴露给用户。
 - [ ] Chat action card 或 board form 本身可作为 submit/reply 的 review surface；用户无需再经过通用确认弹窗。
@@ -204,9 +254,10 @@
 
 ## Next Step
 
-已统一 Workflow 术语：家庭沟通是 `CareInteraction`，submit/acknowledge/reply 是
-`ActionExecution`，宿主投递是 `ActionDelivery`；只有园区管理属于
-`InstitutionWorkflow`。已锁定班级业务主体、个人执行审计、多回复追加集合，
-capability-specific concurrency precondition、Increment 1 不可变结果/replay/current-state
-契约、低打扰反馈，以及第二增量 correction/withdrawal/redaction 的对象、权限、
-cascade 与通知边界。下一步盘点 T-002 的精确事实/schema 差距并固定 typed contracts。
+已统一 Workflow 术语和两增量产品语义，并完成 T-002 landed fact/schema/source
+盘点。结论是复用现有 transaction/CommandExecution、Message/Receipt/Event/Attention
+骨架，增量迁移三轴 CareItem、多回复、protected ingress、typed result、continuation
+和第二增量事实；legacy Thread membership、institution-admin authority、raw command
+DTO、whole-Item reply CAS、single reply slot 和 claimed-Step 路径不得进入新 activation。
+下一步先采用 T-004 exact contract artifacts，再按 gap inventory 的 schema → Harness →
+Increment 1 → Increment 2 → Host companion 顺序实施。

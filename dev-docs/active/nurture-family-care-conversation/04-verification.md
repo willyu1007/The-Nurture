@@ -20,7 +20,7 @@
 | 2026-07-29 | Historical atomic-versus-Workflow dispatch wording recorded | SUPERSEDED |
 | 2026-07-29 | Governance sync/lint, task resume and whitespace check after Harness contract decision | PASS |
 | 2026-07-29 | Five-minute ephemeral, body-free, single-new-effect confirmationRef locked | PASS |
-| 2026-07-29 | No persisted prepared draft; execute resubmits and hashes typed input | PASS |
+| 2026-07-29 | No persisted prepared business draft/body; execute resubmits typed input and checks bound integrity | PASS |
 | 2026-07-29 | Prepare output union and trusted/user/server-resolved input split locked | PASS |
 | 2026-07-29 | Governance sync/lint, task resume and whitespace check after PrepareAction decision | PASS |
 | 2026-07-29 | Execute result/disposition/business-outcome separation locked | PASS |
@@ -63,6 +63,8 @@
 | 2026-07-29 | Source/reply redaction cascades and reply-redaction no-reopen semantics locked | PASS |
 | 2026-07-29 | Pending-notification invalidation and already-sent deep-link owner-reread boundary locked | PASS |
 | 2026-07-29 | Context checksums refreshed; strict context verification, project governance lint and Markdown whitespace passed | PASS |
+| 2026-07-29 | T-002 landed facts/schema separated from historical target design and mapped to T-005 as REUSE/EXTEND/REPLACE/ADD/HOST_GATED | PASS |
+| 2026-07-29 | Full T-004/T-005 contract audit resolved identity, concurrency, result-authority, protected-input, reply-model and role-policy ambiguity | PASS |
 
 ## Planned Verification
 
@@ -74,31 +76,67 @@
 - Presenter snapshots for guardian and caregiver.
 - Ordinary-chat no-side-effect tests, including summary and suggested-but-unconfirmed action.
 - Chat/board equivalence tests for the same capability, canonical input, effect, receipt, replay and error class.
+- Registry tests proving stable keys use a separate `1.0.0` version, user discovery excludes
+  the system-redaction capability, and schema/policy/handler/presenter bindings match the exact
+  T-004 contract digest.
+- Query-schema tests for guardian multi-Enrollment provenance, caregiver exact-CareGroup
+  isolation, role-derived detail projection, closed item unions, unknown-field rejection and
+  snapshot-bound pagination.
 - Query-lane tests proving no `CommandExecution`, Message, CareItem or Receipt is created.
 - Contract tests proving preview is prepare output and confirmation cannot be synthesized by the LLM.
 - Prepare union tests for ready/needs-input/denied/unavailable without unauthorized choice disclosure.
-- TTL, no-extension/no-reactivation, wrong actor/account/device/surface, wrong conversation hash and expired-ref tests.
-- Input canonicalization/hash mismatch, target/Grant/authority/version drift and fresh reprepare tests.
-- Persistence probes proving no prepared draft, protected body, Message, CareItem, Receipt or CommandExecution is written by prepare.
+- TTL, no-extension/no-reactivation, wrong actor/account/device/surface, wrong bound
+  conversation and expired-ref tests.
+- Input canonicalization/integrity mismatch, target/original-Grant/authority/head drift and
+  fresh reprepare tests.
+- Persistence probes proving prepare writes no business draft, protected body, Message,
+  CareItem, Receipt or CommandExecution; a permitted body-free short-lived
+  `InteractionContext` must remain protocol-only and absent from product projections.
+- Protected-input probes proving low-entropy body integrity uses a secret-keyed tag, no bare
+  body hash enters storage/logs/telemetry, and client/LLM-supplied
+  `protected_content_ref` is rejected.
 - Execute transaction tests for confirmation consumption + authority reread + effect/receipt + CommandExecution atomicity.
 - Concurrent same-command winner, exact replay, payload drift conflict and intentionally-new-prepare tests.
 - Result matrix for committed/not-committed/outcome-unknown, executed/replayed and applied/already-satisfied.
+- Error-schema table tests proving every V1 reason code maps to one fixed decision/recovery,
+  retryable is emitted only after confirmed no-effect, and unresolved effects use
+  outcome-unknown.
 - Exact committed-result stability across response-loss replay, with mutable current state and
   delivery status excluded.
+- Result-authority tests proving `CommandExecution` stores the immutable typed result
+  schema/payload and replay returns its same `commandExecutionRef`; no parallel result row/ref
+  may exist.
+- Output-schema tests for submit/acknowledge/reply/correction/withdrawal/redaction, including
+  required stable refs, closed unions, unknown-field rejection and absence of internal
+  protected-content refs.
 - Acknowledge concurrent already-satisfied test proving no duplicate event or false individual
   attribution.
 - Reply first/additional effect tests proving all distinct commands append and only the first
   reply resolves Attention.
+- Reply identity/order tests proving the canonical fact is reply Message + ItemEvent + Receipt,
+  `CareReplyV1` is projection-only, and immutable `replyOrderKey` remains stable under
+  concurrency and replay without a mutable counter.
 - Stale state disclosure tests proving current-state hint is emitted only while the current
   actor remains authorized; authority loss returns no protected state.
 - Presenter interaction snapshots proving applied/already-satisfied/replayed settle inline,
   unchanged-view reprepare is transparent, and only material visible/safety drift interrupts.
 - Correction version-chain tests: exact author, strict head race, immutable history, independent
   Receipt/replay and responded-family-question rejection/new-Item path.
+- Exact-author policy tests proving identity is sender Participant, a replacement current
+  RoleAssignment in the same scope is acceptable, another class member/admin is not, and
+  historical role audit never grants authority.
 - Withdrawal tests: exact source author, body-free input, retained Message/Reply/Receipt history,
   Attention closure, reply race, already-satisfied and no caregiver-reply/Grant-revoke alias.
-- Redaction tests: exact author versus system-policy actor, irreversible content/correction
-  erasure, tombstone/audit retention, source cascade, reply-local cascade and no Attention reopen.
+- Redaction tests: exact sender Participant plus current same-side relationship versus separate
+  system-policy actor, irreversible content/correction erasure, tombstone/audit retention,
+  source cascade, reply-local cascade and no Attention reopen.
+- Redaction convergence tests proving a fully completed same-target cascade may return
+  already-satisfied with existing evidence, while partial/unknown cascade and post-redaction
+  correction fail closed.
+- Post-revoke author-redaction tests proving any owner-policy exception can remove only the
+  author's content and cannot restore body read, delivery, correction, withdrawal or reply.
+- Cascade scale tests with more than the repository page size, proving redaction locks/updates to
+  closure or commits nothing; a fixed `take` limit may not leave partial visible content.
 - ActionDelivery tests proving correction creates a new candidate, withdrawal/redaction skip
   pending candidates, and already-sent push opens through current owner-reread without cached body.
 - Proof that Nurture committed is independent from Host/provider delivery, device read and domain acknowledge.
@@ -107,7 +145,8 @@
 - Multi-reply append tests for one/multiple teachers, repeated same-teacher reply and no explicit close action.
 - Context-continuation tests for same ChildCareProcess/Enrollment, readable responded source and body-free reference.
 - Negative tests proving a context relation does not inherit Grant/authority/owner/SLA/state/command identity or trigger a `CareItemDependency`.
-- New continuation Item tests proving current Grant and a new business command identity are used.
+- New continuation Item tests proving a newly selected current Grant becomes that Item's immutable
+  original Grant and a new business command identity is used.
 - Presenter tests proving an unreadable source relation is suppressed without invalidating the new Item.
 - Submit input boundary tests for empty/whitespace, 1/2000/2001 characters, newline normalization, rich text and attachments.
 - Tests proving only body/context continuation are operation input while target uses a current owner-issued option ref.
@@ -119,8 +158,11 @@
 - Acknowledge one-gesture tests proving no confirmation modal and no Harness bypass.
 - Tests proving acknowledge creates no personal assignment and another currently eligible
   caregiver in the same exact CareGroup may reply.
-- Cross-CareGroup, stale-role and Institution-admin negative tests plus same-CareGroup
-  concurrent dual-reply positive tests.
+- Cross-CareGroup, stale-role, Institution-admin-only and ThreadParticipant-only negative tests
+  plus same-CareGroup current `caregiver | lead_caregiver` concurrent dual-reply positive tests.
+- Grant-policy tests proving both direction values accepted by the family-care contract are
+  handled explicitly, the exact original Grant is reread, and a newer replacement Grant cannot
+  take over authority for an existing Item.
 - Input-schema tests rejecting client/LLM CareItem ids, versions, Grant/CareGroup/actor/state fields.
 - Two reply prepares/two distinct commands test proving both compatible appends commit;
   lifecycle/authority drift still returns stale/denied.
@@ -128,10 +170,23 @@
 - Expired-token unchanged-view transparent reprepare and changed-view forced-rereview tests.
 - Contract tests proving family-care ActionExecution reuses CommandExecution, ActionDelivery is
   separately idempotent, and neither creates an InstitutionWorkflow Run/Step.
+- Activation-negative tests proving legacy `capture_family_input`, raw command specs,
+  claimed-Step/`workflow_step_complete_v1`, single reply slot and caller-supplied authority
+  cannot register as the T-005 public Harness path.
 - Negative contract tests for shared room membership, direct role DM, shared transcript and host-unread authority.
 - Opaque-ref transient owner-read tests proving protected caregiver bodies are not copied into My-Chat Chat history.
 - Black-box end-to-end journey through public scenario contract.
 - Non-diagnostic health-language review.
+
+## Documentation Verification
+
+| Date | Command / check | Result |
+| --- | --- | --- |
+| 2026-07-29 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS |
+| 2026-07-29 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS |
+| 2026-07-29 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` | PASS |
+| 2026-07-29 | Relative Markdown link and duplicate-heading checks across T-004/T-005 | PASS |
+| 2026-07-29 | `git diff --check` | PASS |
 
 ## Required Evidence
 

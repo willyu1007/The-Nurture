@@ -13,21 +13,30 @@
 - 不要把通用 Harness 退化成接受任意 JSON 的万能命令；每个 capability 必须有独立的 typed schema、version、policy 与 binding。
 - 不要让 `surface_origin` 改变 authority、effect 或 replay identity。
 - 不要让 Query lane 或未确认的 `prepareAction` 产生 `CommandExecution` 或业务事实。
+- 不要把“不持久化 prepared business draft”误读成禁止 body-free、短期
+  `InteractionContext`；后者只保存协议绑定，不能保存正文、成为 timeline 事实或显示
+  为待发送。
 - 不要把 preview/confirmation、异步、跨 owner、worker、Handoff 或通知当成
   Workflow 分类条件；family-care action 是 `ActionExecution`。
 - 不要让 `prepareAction` 重新承担 capability 路由；它只接收已选定的 exact capability/version。
 - 不要接受客户端/LLM 提供 Grant、role、policy、data class/direction/purpose、内部 route 或 expected-head 真相。
 - 不要把 raw body/PII 放入 `confirmationRef`，也不要把 ref 当成通用对象访问或长期授权凭证。
+- 不要保存可枚举的 bare body hash；低熵 protected body 必须使用 secret-keyed
+  integrity tag，且 client/LLM 不得提交内部 `protected_content_ref`。
 - 不要延长、复活或跨 actor/account/device/surface 搬运五分钟 confirmation context。
 - 不要为恢复响应丢失重新 prepare 并创建新 effect；使用相同 command request 的 CommandExecution exact replay。
 - 不要让 My-Chat/LLM 自行生成 Nurture business command identity；prepare context 负责稳定绑定。
 - 不要把 `already_satisfied` 当作 replay，也不要把 `replayed` 当作新 effect。
 - 不要把 replay 时可变化的 reply count、当前权限或 delivery/notification 状态写回
   不可变 committedResult；最新状态必须由 `readResult` 重新读取。
+- 不要为 immutable result 再创建平行 `resultRef`/result row；
+  `CommandExecution` 是唯一结果 authority，负责持久化 typed result version/payload。
 - 不要把另一个老师已经完成 acknowledge 当作错误或 stale；只要其他 fence 仍有效，
   它应低打扰地收敛为 already-satisfied，且不得生成重复 event 或虚假个人归属。
 - 不要让不同 reply command 因正文相同或 Item 已 responded 而 already-satisfied；
   reply 是追加内容，只有同一 command identity 才 replay。
+- 不要建立第二张 canonical `CareReply` 表；reply Message + ItemEvent + Receipt 是
+  canonical facts，`CareReplyV1` 只是 projection。
 - 不要把 `committed` 翻译成通知已送达、设备已读或照护者已确认。
 - 不要在 `outcome_unknown` 时换 command identity 或重新 prepare；必须先解析原 effect。
 - 不要使用通用 `followUpOf` 同时表达交流上下文续接和事项 successor/dependency；两者具有不同的授权、状态与执行语义。
@@ -56,11 +65,18 @@
   当前工作单元是精确 CareGroup，个人身份只用于审计和真实回复作者归属。
 - 不要因为“班级共同承接”放宽到同园区或同角色；reply 仍必须匹配原始
   Enrollment/CareGroup/Grant，并重新验证当前照护资格。
+- 不要让 Institution Admin、ThreadParticipant 或同园区关系替代 current exact
+  CareGroup 的 `caregiver | lead_caregiver` operational role。
+- 不要用新的 replacement Grant 接管既有 Item；每次动作都必须重读该 Item 固化的
+  exact original Grant。新续接 Item 才从 current eligibility 选择并固化自己的
+  original Grant。
 - 不要在 Increment 1 隐式实现个人转交；未来 assignment/transfer 必须使用独立契约。
 - 不要把 capability concurrency heads 放进 acknowledge/reply 业务 input，或接受
   客户端/LLM 自报；它必须由 prepare 解析并冻结进 confirmation precondition。
 - 不要让 reply 对整个 CareItem 使用严格版本 CAS；其他合法回复是兼容 append，
   不应制造虚假 stale。closed/suppressed/authority drift 仍必须失败关闭。
+- 不要用可变 reply counter 或未定义的“稳定 sequence”作为顺序事实；使用
+  server-issued immutable `replyOrderKey`，并在 exact replay 中返回同一值。
 - 不要用 command/idempotency identity 代替 capability precondition；exact replay
   与 lifecycle/authority safety 是不同契约。
 - 不要把多位老师的不同 reply command 去重成一条；只对同一 command identity 重放。
@@ -78,11 +94,16 @@
   correction 作用于内容解释，withdrawal 作用于 CareItem 工作，redaction 作用于内容可见性。
 - 不要因为 CareGroup 是业务发送主体就允许一位老师修改/更正/redact 另一位老师的具体
   作者文字；其他老师只能追加新的班级 reply。
+- 不要要求 exact author 的历史 RoleAssignment row 仍 current。内容权利绑定
+  sender Participant；执行时另外验证 current same-side relationship。管理员
+  policy redaction 必须是独立 system capability，不能伪装作者操作。
 - 不要在 response 已 responded 后用 correction 改写原家长问题；创建新的续接 Item。
 - 不要让 withdrawal 删除问题/回复/Receipt，或把 Grant revoke、caregiver reply
   redaction 伪装成“家长结束事项”。
 - 不要把 redaction 实现为物理删除或 `deleted`，也不要级联删除独立作者的回复；
   保留 tombstone/audit，并按 source/reply 各自 cascade。
+- 不要用固定 `take` 上限提交部分 redaction cascade；必须分页锁定并循环至闭包，
+  使用等价集合更新，或整笔失败。
 - 不要因唯一可见 reply 被 redaction 就暗中重开原 Attention；Item 保持可追加，
   replacement reply 使用新的 command。
 - 不要宣称已发 push 被 withdrawal/redaction 召回；pending candidate 可跳过，

@@ -41,7 +41,10 @@
 
 ## 2026-07-29 — PrepareAction ephemeral confirmation locked
 
-- 用户确认 prepare 不持久化 prepared draft，execute 在同一 surface 重新提交 typed input 并校验 canonical input hash。
+- 用户当时确认 prepare 不持久化 prepared business draft，execute 在同一 surface
+  重新提交 typed input 并校验 canonical input integrity；本轮审阅进一步固定：
+  protected low-entropy body 使用 secret-keyed tag，允许 body-free protocol
+  `InteractionContext`，但不允许 bare hash 或正文副本。
 - prepare 不承担 capability discovery；它接收 exact capability/version，并分离 My-Chat authenticated trusted context、capability-specific user input 与 Nurture server-resolved authority/route facts。
 - Grant、role、policy、data class/direction/purpose、expected heads 和内部 route fields 均不得由客户端或 LLM 填写。
 - 输出锁定为 `ready_to_confirm | needs_input | denied | unavailable`；ready 返回 canonical semantic preview、safe target/effect/warning、opaque `confirmationRef` 与 expiry。
@@ -129,7 +132,10 @@
 
 ## Open Items
 
-- 现有 T-002 的 message/item/receipt 类型与本任务目标的精确差距。
+- T-004 exact contract artifact/digest 的最终 pin，以及 T-005 family-care schema refs
+  在该 artifact set 中的落点。
+- `06-t002-fact-schema-gap.md` 已完成 landed fact/schema/source 盘点；其 schema
+  migration、legacy-row preflight 和 dual-read/rollback 方案仍待实施任务冻结。
 - T-002 legacy claimed-Step seam 迁移到 `ActionExecution` / `ActionDelivery` 的独立上游契约任务；不阻塞 synthetic contract 规划，但阻塞真实 activation。
 - 独立 `CareItemDependency` 模型的精确字段与语义；不阻塞 Increment 1。
 - 撤回与 redaction 对已推送通知的宿主侧表现，需要在 My-Chat companion 中验证。
@@ -157,12 +163,13 @@
 - CareItem 拆分 acknowledgement、response 与 lifecycle 三轴。第一条 reply 将
   response 置为 responded 并解除待回复 Attention，但 Item 保持 active/appendable；
   后续 reply 不重复完成 Attention。
-- CareReply 成为追加式集合。不同 command identity 的并发回复都可
-  `committed + applied`；同一 identity 的 retry 才 exact replay。数据库时间和稳定
-  sequence 决定展示顺序。
+- canonical reply Message 成为追加式集合；`CareReplyV1` 是 Message/Event/Receipt
+  的 typed projection。不同 command identity 的并发回复都可
+  `committed + applied`；同一 identity 的 retry 才 exact replay。immutable
+  `replyOrderKey` 决定稳定展示顺序。
 - reply confirmation 绑定 replyable lifecycle、原始 Grant/Enrollment/CareGroup、
-  当前 role/policy/retention heads；兼容的新 reply 不使其 stale。acknowledge 仍使用
-  精确 work-state version。
+  当前 role/policy/retention heads；兼容的新 reply 不使其 stale。acknowledge 使用
+  exact acknowledgement head，并只对 declared acknowledged postcondition 收敛。
 - 家庭侧主要业务发送主体为 CareGroup；真实 Participant/RoleAssignment 作为内部
   审计与可选次级署名保留。Increment 1 不增加显式 close action。
 - 家长继续提问仍创建新 Item；老师对原 Item 的多条补充回复不建立共享聊天室。
@@ -174,7 +181,7 @@
   result schema，并补充交互原则应保持低打扰。
 - 结果采用“调用判定外壳 + 不可变 committedResult + 可选 role-safe current-state
   hint”。outer `executionDisposition` 可以从 executed 变为 replayed；内部稳定
-  result/output/receipt refs 与 business outcome 不重新计算。
+  `commandExecutionRef`、output/receipt refs 与 business outcome 不重新计算。
 - mutable reply count、最新 CareItem projection、authority、delivery/notification/
   read 状态不进入 committedResult，统一通过 `readResult` owner-reread。
 - acknowledge 是可收敛状态动作：另一老师已完成班级确认且其他 fence 仍有效时返回
@@ -182,7 +189,7 @@
 - reply 是追加内容动作：不同 command 均为 applied；第一条返回
   `first_response + attention resolved`，后续返回
   `additional_response + attention unchanged`。同一 command retry 才 replay 同一
-  CareReply/sequence。
+  reply Message/Event/Receipt/`replyOrderKey`。
 - stale current-state 只在当前 actor 仍有读取权限时返回最小三轴状态与 action
   availability；authority/association loss 使用 generic denied，禁止状态泄漏。
 - 成功、already-satisfied、replay 与语义不变的 transparent reprepare 均原位反馈，
@@ -216,3 +223,33 @@
 - 下一步盘点现有 schema 与本契约的 correction version、CareItem withdrawal、
   multi-reply redaction cascade 及 notification companion 差距。
 - 当前只更新文档；无代码、manifest、schema 或数据库变更。
+
+## 2026-07-29 — T-002 gap inventory and full T-004/T-005 contract review
+
+- 以 Prisma SSOT、family-care command/query source、manifest/module/API registry 为
+  landed evidence，完成 `06-t002-fact-schema-gap.md`；T-002 设计目标与已实现事实分开标注。
+- 确认可复用：Enrollment/CareGroup/Grant、Message、Receipt、Event、Attention、
+  InteractionContext/CommandExecution 概念和同事务 effect/receipt/execution 骨架。
+- 确认必须替换语义：single-status CareItem、personal assignment、single linked
+  reply、ThreadParticipant authorization、institution-admin-as-caregiver、raw command
+  DTO、whole-Item reply CAS 和 terminal reply。
+- 确认必须新增：三轴 Item/heads、typed continuation、protected ingress、
+  correction fact、family withdrawal、typed committed-result payload、context
+  dependencies、reply order 与 loop-to-closure cascade audit。
+- 修复 prepare 文案歧义：不持久化的是 business draft/body/effect；允许保存 body-free
+  short-lived InteractionContext。受保护正文使用 keyed integrity tag，不保存 bare hash。
+- `commandExecutionRef` 被固定为 immutable result authority；移除平行 `resultRef`
+  概念，typed body-free result payload/version 必须随 Execution 持久化。
+- caregiver reply 的 canonical fact 固定为 Message + ItemEvent + Receipt；
+  `CareReplyV1` 仅为 typed projection。顺序改为 immutable `replyOrderKey`，不引入
+  mutable reply counter/whole-Item CAS。
+- caregiver authority 明确为 exact CareGroup 的 current
+  `caregiver | lead_caregiver`；Institution Admin、ThreadParticipant 或同园区本身不授权。
+- exact author 明确为 sender Participant + current same-side relationship；历史
+  RoleAssignment 保留审计但不要求同一 row 仍 current。author redaction input 为空，
+  system redaction 使用独立 capability/reason。
+- capability identity 固定为 stable key + 独立 SemVer；补齐 submit 与第二增量
+  committed output，并把过长架构拆为第一增量 submit/UX、第二增量 change 两个
+  normative contract；capability registry/query outputs 也独立成可直接生成 schema
+  的合同。主架构保持跨增量不变量和引用。
+- 当前仅修改任务合同和差距清单，无应用代码、manifest、schema 或数据库变更。
