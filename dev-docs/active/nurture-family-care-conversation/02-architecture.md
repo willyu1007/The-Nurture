@@ -1,0 +1,510 @@
+# Architecture — 家庭与照护者对话能力
+
+## Domain Model
+
+- `FamilyPrivateConversation`：家庭拥有的私密上下文，不是共享线程。
+- `BoundarySendIntent`：由有权 guardian 明确创建的跨边界发送意图。
+- `FamilyCareMessage`：Nurture-owned、面向明确 audience 的 canonical 消息事实，保留 protected body、provenance、author 与 direction。
+- `CareItem`：相关跨边界 capability 被确认执行后，承载一次问题、观察或跟进闭环的结构化照护事项；普通 Chat turn、安全查询和未确认 action suggestion 不创建 CareItem。
+- `DeliveryReceipt` / `ReadReceipt` / `Acknowledgement`：状态事实，不以 UI 本地状态代替；`Acknowledgement` 表示精确 CareGroup 已收到，不等于个人 assignment。
+- `Correction` / `Withdrawal` / `Redaction`：追加式变更，不静默改写历史。
+- `GuardianCareProjection` / `CaregiverWorkProjection`：从同一组当前可读领域事实生成的角色化投影，不是复制的业务真相。
+- `FamilyCareThread`：如复用现有模型，只能作为单一 Enrollment 下的路由、索引或历史技术容器；不得表示跨角色共享聊天室、成员关系或权限。
+
+具体命名需在 discovery 中与现有 T-002 实现对齐，不能重复建模。
+
+## Three Interaction Paths
+
+### Ordinary Chat
+
+- My-Chat 处理普通对话；没有业务动作意图时不进入 Nurture write path。
+- 当回答需要 Nurture facts 时，只能通过当前 actor/role/scope 下的安全 query capability 读取 policy-filtered context。
+- 查询总结、建议动作卡和未确认草稿均不创建 Message、CareItem、Receipt 或跨边界投影。
+
+### Chat-assisted Action
+
+- Chat 可以把自然语言整理成 capability 与 typed input 候选，但候选不是执行授权。
+- My-Chat 必须调用与看板相同的 Nurture Capability Harness；目标不唯一时进入澄清或看板选择，LLM 不静默选择 Enrollment。
+- preview 后只有明确 confirmation 才允许执行；执行端重新校验 actor、target、Grant、version、policy 与 idempotency。
+
+### Board-direct Action
+
+- 看板通过结构化交互直接给出 capability 与 typed input，可以跳过自然语言 semantic selection。
+- 看板不能绕过同一 Harness 的 prepare/confirmation/authority/execution/result contract。
+- 对同一 capability 与 canonical input，Chat 和看板必须得到相同业务 effect、receipt、replay 和错误类别；只有 presenter 不同。
+
+## Unified Capability Harness Boundary
+
+- Harness 是 Chat 与看板共享的 Nurture 业务调用边界，不是第三套产品 surface，也不是共享聊天室。
+- Harness 复用 T-004 的 capability identity 与通用 invocation contract；T-005 负责 family-care queries/actions、输入、领域 effects、receipts 和角色化结果。
+- Harness 不拥有 LLM provider、Chat transcript、native/web component、导航或设备交互。
+- Harness 采用通用 envelope + capability-specific typed schemas；不按 surface 复制 API，也不接受无类型的任意 JSON command。
+- `surface_origin=chat|board` 只用于 presenter selection、审计与观测；同一 capability + canonical input + current authority 必须得到相同 canonical effect、receipt、replay 和 error class。
+
+### Query Lane
+
+- `query`：在 current actor/role/scope/policy 下读取 capability-specific safe facts，不产生业务写入或 `CommandExecution`。
+- `readResult`：根据 canonical refs 与当前 owner state 重新生成 role-safe result projection；不从 Chat transcript 或设备缓存恢复业务结果。
+- ordinary Chat 可以把 query 结果交给 My-Chat LLM 总结；Nurture 只返回过滤后的事实与 provenance，不拥有模型调用。
+
+### Action Lane
+
+- `prepareAction`：接收 capability identity/version 与 typed input，解析当前 actor/scope/target/Grant，规范化输入，并返回 clarification、denial/unavailable 或 semantic preview + 短期 `confirmationRef`。
+- preview 是 prepare 的输出，不是新的 canonical business fact；未确认 prepare 不创建 Message、CareItem、Receipt 或 `CommandExecution`。
+- `executeAction`：接收 `confirmationRef` 与稳定 request identity，重新 owner-read 并校验 current authority、target、policy、capability-specific concurrency precondition、canonical input hash 和 idempotency，然后执行 capability-specific command。
+- confirmation 是用户通过 My-Chat UI 提交给 execute 的显式证据，不由 LLM 自行生成，也不建立 approval Workflow。
+- CareItem 在第一条 reply 后保持 active/appendable；班级可继续追加回复，家长继续
+  提问则创建新的 Item。
+
+### PrepareAction Contract
+
+`prepareAction` 不做 capability discovery/router。Chat 的 semantic selection 已在调用前产生 exact capability candidate；看板直接提供 exact capability。Prepare 只判断该动作在当前 owner state 下是否具备进入确认的条件。
+
+输入分层：
+
+- trusted context：My-Chat 私有认证接口提供的 current principal、Workspace、capability identity/version、invocation identity 与 surface context。
+- user input：capability-specific typed fields，以及用户明确选择的 opaque target option ref。
+- server-resolved facts：Nurture 当前 Participant/role、ChildCareProcess、Enrollment/CareGroup、原始 Grant、direction/data class/purpose、policy、capability-specific concurrency heads 与内部 route fields；这些字段不能由客户端或 LLM 声明。
+
+多 Enrollment 时，prepare 返回当前 actor-safe 的 `needs_input` choices；只有恰好一个 current eligible target 且 capability policy 明确允许时才确定性绑定。LLM 不选择或补写 Enrollment/Grant。
+
+输出是封闭 union：
+
+- `ready_to_confirm`：canonical normalized preview、safe target label、expected effect、必要 warning、opaque `confirmationRef` 和 `expiresAt`。
+- `needs_input`：缺失/不合法字段与 actor-safe allowed choices，不包含未授权 target 或内部 refs。
+- `denied`：当前业务条件明确不允许，返回 actor-safe reason class。
+- `unavailable`：owner/policy/dependency 无法可靠确认，fail closed 且只返回安全 retryability。
+
+`confirmationRef`：
+
+- 复用短期 submit-action context 语义，TTL 固定五分钟；不可延长、不可原地复活，过期后必须重新 prepare。
+- opaque/body-free，绑定 actor、Workspace、capability/version、canonical input hash、精确 target/原始 Grant、expected authority/entity/policy heads、issued/expires time、nonce 与允许 consume 的当前 surface context。
+- Chat ref 可额外绑定 hashed host conversation；任何 ref 都不包含 raw body、PII、可客户端修改的 Grant/role 或通用对象访问能力。
+- 不跨 actor、account、device 或 surface 搬运。`surface_origin` 本身仍不是业务 authority，也不改变 canonical effect/replay identity。
+- 对一个新 business effect 只能消费一次；execute 已提交后的响应丢失由相同 command request 的 CommandExecution replay 恢复，而不是重新使用 ref 创建第二个 effect。
+
+Prepare 不建立持久化 prepared-draft/domain row，不复制正文到 `PublicDraft` 或
+`ActionDelivery` payload，也不创建 Message、CareItem、Receipt 或 CommandExecution。
+执行时客户端在同一 surface 重新提交 typed input；Nurture 重新 canonicalize 并与 ref
+绑定 hash 比较，然后 owner-reread current state。
+
+### Acknowledge and Reply Input / Concurrency Contract
+
+capability-specific operation input 与通用 target/concurrency contract 分离：
+
+```text
+AcknowledgeFamilyCareItemInputV1
+  {}
+
+ReplyFamilyCareItemInputV1
+  body: ProtectedPlainText<trimmed, 1..2000>
+```
+
+- surface/invocation envelope 提供 owner-issued opaque CareItem target ref；它不是业务
+  input，也不授权读取或执行。
+- raw CareItem/Enrollment/CareGroup/Grant ids、concurrency heads、actor/role、state、
+  receipt/event 类型与 command identity 均不得由客户端或 LLM 提交。
+- prepare 从当前 owner state 解析精确 Item 与 capability-specific precondition，
+  并把它连同 actor/scope、canonical input hash 和 expiry 冻结进 `confirmationRef`。
+- acknowledge precondition 包含精确 acknowledgement work-state version；并发第二次
+  acknowledge 可解析为当前班级已确认状态，不重复领域 event。
+- reply precondition 只绑定 replyable lifecycle、原始 Grant/Enrollment/CareGroup、
+  当前 role/policy/retention heads。另一条合法 reply 是兼容 append，不导致 stale。
+- execute 不得放宽被冻结的 authority/lifecycle precondition；Item closed/suppressed、
+  source/Grant 失效或角色/班级漂移必须 stale/denied，不能采用最新状态继续。
+- acknowledge 没有用户正文或个人认领字段；reply 只接收 exact protected body。
+  CareGroup scope、当前 reply eligibility 与真实回复作者由服务端重新解析。
+- capability precondition 与 stable business command identity 正交：前者保护当前动作
+  的必要状态/authority，后者支持相同业务提交的 transport retry 与 exact replay。
+- 不新增第二个重复携带 version 的 action token；target ref 选择 Item，
+  `confirmationRef` 承担确认和 concurrency precondition。
+
+### ExecuteAction Contract
+
+请求身份分层：
+
+- `invocationRequestId` 属于 My-Chat 当前接口调用/attempt，用于调用链、审计与技术关联，不是业务 effect identity。
+- stable business `commandRequestId` 由 Nurture prepare context 生成并绑定在 opaque `confirmationRef` 中；My-Chat/LLM 不拼接或替换。
+- 同一次用户确认的 transport retry 复用相同 business identity；用户有意再次执行相同内容必须重新 prepare 并获得新的 identity。
+
+对单事务 action，以下步骤共享一个 Nurture transaction/fence：
+
+`validate/lock confirmation → canonical input hash match → current owner/authority/version reread → command identity lock → confirmation consumption → domain effect/receipt → CommandExecution commit`
+
+同一 command identity 的并发 execute 只有一个 winner。相同 identity + exact
+command/scope/precondition/payload hash 返回原 Execution；相同 identity 的 payload
+drift 返回 idempotency conflict，不能创建第二个 effect。不同 command identity
+的合法 reply 是不同追加 effect，可以并发提交。
+
+外部结果是封闭 union，并把调用判定与不可变业务结果分离：
+
+```text
+ExecuteActionResultV1<Output>
+  committed
+    executionDisposition: executed | replayed
+    commandExecutionRef
+    committedResult
+      resultRef
+      businessOutcome: applied | already_satisfied
+      output: Output
+      invalidationScopes[]
+
+  not_committed
+    decision: invalid | denied | stale | conflict | retryable
+    reasonCode
+    recovery: none | refresh | reprepare | retry_same_command
+    currentState?: RoleSafeCurrentStateV1
+
+  outcome_unknown
+    commandStatusRef
+    recovery: reconcile_same_command
+```
+
+- `committedResult` 是 CommandExecution 绑定的不可变业务结果。exact replay 只把外层
+  `executionDisposition` 置为 `replayed`，内部 result/output/receipt refs 与原始
+  business outcome 保持一致。
+- `committedResult` 不包含当前 reply count、最新 CareItem projection、当前 authority、
+  Handoff/notification/delivery/read 状态；这些可变事实必须通过 `readResult` 在当前
+  owner policy 下重新读取。
+- `not_committed` 不伪装为业务成功。只有 current actor 仍有权读取该 Item 时，
+  `stale` 才可携带最小 role-safe current state；authority/association loss 返回通用
+  `denied`，不得借错误结果暴露目标是否存在或当前状态。
+- `outcome_unknown` 当前不能证明 committed 或 no-effect。调用方不得换 command
+  identity、重新 prepare 或创建替代 effect，只能按原 identity status/reconcile。
+
+`disposition` 与 `businessOutcome` 正交：
+
+- `executed + applied`：本次提交了新 effect。
+- `executed + already_satisfied`：新命令确认领域状态已满足，没有重复 effect。
+- `replayed + applied|already_satisfied`：返回此前同一命令已提交的原结果。
+
+capability-specific committed output：
+
+```text
+AcknowledgeFamilyCareItemOutputV1
+  careItemRef
+  acknowledgementEventRef
+  receiptRef
+  acknowledgementState: acknowledged
+  acknowledgedAt
+
+ReplyFamilyCareItemOutputV1
+  careItemRef
+  careReplyRef
+  messageRef
+  receiptRef
+  sequence
+  responseEffect: first_response | additional_response
+  attentionEffect: resolved | unchanged
+```
+
+- 第一个有效 acknowledge command 返回 `executed + applied`。若另一个老师已经
+  完成班级确认，且 lifecycle、authority、target、retention 等其他 fence 仍有效，
+  当前 command 返回 `executed + already_satisfied`，引用现有 acknowledgement
+  fact，不创建第二条 event，也不把当前 actor 伪记为实际确认者。
+- reply 是追加内容动作。每个不同 command 都返回 `applied` 并创建独立 CareReply；
+  第一条是 `first_response + resolved`，后续是
+  `additional_response + unchanged`。同一 command retry 才返回
+  `replayed + applied` 与同一 CareReply/sequence。
+- reply preview 不承诺当前回复一定是第一条，只说明“发送一条班级回复；如果当前仍
+  在等待回复，将同时解除提醒”，从而允许兼容的并发 reply 在不重新确认的情况下提交。
+
+最小 current-state hint：
+
+```text
+RoleSafeCurrentStateV1
+  lifecycle: active | closed | suppressed
+  acknowledgementState: pending | acknowledged
+  responseState: awaiting_reply | responded
+  actionAvailability: available | already_satisfied | unavailable
+```
+
+该 hint 不包含 protected body、内部 version/Grant/policy 细节、其他 Institution
+信息或具体权限丧失原因。它是一次 actor-safe 诊断提示，不是 canonical result；
+My-Chat 需要最新展示时仍调用 `readResult`。
+
+重试规则：
+
+- deterministic invalid/denied/stale/conflict：confirmation 失效；需要修正或重新 prepare，不重试原 effect。
+- 明确未提交的 retryable technical failure：ref 在剩余 TTL 内保持可用，只能用原 command identity/input 重试。
+- commit 后 response loss：相同 identity/input exact replay 原 result。
+- outcome unknown：隔离原 identity，直到 status/reconcile 得到 committed 或 confirmed-no-effect；不能用新 identity 绕过。
+
+`committed` 只证明 Nurture business transaction。Host Handoff/Outbox、provider send、device display/read 与 Nurture acknowledge/reply 都是独立事实；inline safe result 也不替代 `readResult` 的当前 owner projection。
+
+### Low-interruption Result UX
+
+结果交互默认原位、低打扰：
+
+- `applied`、`already_satisfied` 与 `replayed` 都在当前 card/form/composer 原位收敛，
+  不追加通用 modal；replay 不需要向用户暴露“幂等重放”等技术说明。
+- acknowledge 对操作者统一表达“班级已确认收到”；不得在 already-satisfied 时显示
+  错误，也不得声称当前操作者完成了首次确认。
+- reply 统一表达“回复已发送”；第一条可附加“待回复提醒已解除”，后续可附加
+  “已追加到该事项”。
+- token 单纯过期且 fresh prepare 的 content/target/effect 完全一致时，允许同一手势
+  内透明 reprepare；不弹出“凭证过期”等技术提示。
+- stale 且仍可读时使用“事项状态已更新，请刷新后再操作”；denied 使用不泄漏事实的
+  “当前无法执行此操作”；outcome unknown 使用“正在确认提交结果，请勿重复操作”
+  并冻结替代提交。
+- 只有 content、target、可见 effect、authority-visible consequence 或 action
+  availability 实质变化时，才中止执行并要求 refresh/reprepare/rereview。
+
+### Increment 1 Capability Boundary
+
+- `submit`：创建 family-authored Message、open CareItem、family-to-org logical Receipt、初始 Event/Attention projection 与 CommandExecution。
+- `acknowledge`：在 expected open/version/original-Grant fence 下追加 acknowledge Event、更新 Item/Receipt 与 CommandExecution。
+- `reply`：允许同一精确 CareGroup 的当前合格照护者在 replyable lifecycle 下追加
+  caregiver Message、org-to-family Receipt、reply Event 与 CommandExecution；
+  回复者不必等于 acknowledge actor，也不受已有合法 reply 数量限制。
+- 第一条 reply 原子地将 response `awaiting_reply → responded` 并解除待回复 Attention；
+  后续 reply 保持 responded/Attention-resolved，只追加独立回复事实。
+- CareItem 不因第一条 reply 关闭；Increment 1 不提供显式 close action。closed/
+  suppressed、原始 Grant/Enrollment/source 失效与 retention fence 仍会阻止新回复。
+- 三者均为 `ActionExecution` 原子 command，不创建产品 Workflow Run/Step。
+- correction、family request withdrawal 与 redaction 是第二增量；Grant revoke/
+  cross-boundary suppression 是独立授权动作。第二增量不阻塞 Increment 1 原子闭环
+  checkpoint，但未实现前不能宣称 T-005 final exit。
+
+### CareGroup Responsibility and Individual Audit
+
+- CareItem 的工作 scope 固定为 submit 时绑定的原始 `Enrollment + CareGroup`；
+  它不是个人任务，也不因某位照护者 acknowledge 而改变 scope。
+- acknowledge transaction MAY 记录实际操作者 Participant/RoleAssignment 作为不可变审计，
+  但不得设置 reply authority、个人 assignment、owner transfer 或隐式 SLA。
+- reply 每次执行都重新读取原始 Grant、Enrollment、CareGroup、当前 caregiver
+  RoleAssignment 与 policy。班级中任一当前合格照护者均可回复。
+- 家庭侧 reply 的主要业务发送主体是 CareGroup；每条 reply 仍保留真实执行
+  Participant/RoleAssignment 作为内部审计与可选次级署名，不得丢失真实作者证据。
+- 多个合格照护者并发 reply 时，各自不同的 command identity 创建独立 reply
+  Message/Event/Receipt；数据库时间与稳定 sequence 决定展示顺序。
+- 未来如需个人分工，必须引入独立、显式的 `CareItemAssignment` / assign/transfer
+  契约；不得重新把 acknowledge 解释为独占认领。
+
+逻辑状态与回复集合分离：
+
+```text
+CareItemProgressV1
+  acknowledgementState: pending | acknowledged
+  responseState: awaiting_reply | responded
+  lifecycle: active | closed | suppressed
+  replyCount
+  firstRepliedAt?
+  lastRepliedAt?
+
+CareReplyV1
+  careItemRef
+  careGroupRef
+  protectedBodyRef
+  authoredByParticipantRef
+  authoredByRoleAssignmentRef
+  createdAt
+  sequence
+  commandExecutionRef
+  receiptRef
+```
+
+`replyCount` 与 first/last timestamps MAY 由 canonical reply facts 派生，不要求
+作为可变计数器单独成为事实源。CareReply 是追加式集合，不存在 unique reply slot。
+
+### Increment 2 Correction, Withdrawal, and Redaction
+
+三种动作具有不同 target/effect，不得压缩成通用 delete/revoke：
+
+| Capability | Target | Canonical effect | Content visibility |
+| --- | --- | --- | --- |
+| `correct_family_care_message` | Message | append correction version | 原文与历史保留，最新有效解释为主投影 |
+| `withdraw_family_care_request` | family-authored CareItem | `active → closed(family_withdrawn)` | 问题、回复与 Receipt 保留 |
+| `redact_family_care_message` | Message | irreversible content erasure + tombstone | 正文/附件/correction versions 不再可读 |
+
+#### Correction
+
+- correction 只允许原 Message 的 exact author 执行。CareGroup 是 reply 的业务发送
+  主体，但不授予一个老师修改另一位老师具体文字的权限；其他老师仍可追加新的 reply。
+- operation input 只含规范化后的 1–2000 字符 protected plain text；target Message、
+  author、Enrollment/CareGroup、Grant、current correction head、route 与 command
+  identity 均由 prepare 解析。
+- correction 追加不可变 version/fact，不覆盖 source Message。presenter 默认显示最新
+  有效解释，并在原消息上显示“已更正”；历史按 current actor policy 可展开。
+- correction 使用 strict correction-head precondition。两个不同 command 并发更正时
+  只有当前 head 的一个 successor 可以提交；另一个返回 stale/current-safe state。
+- family source question 只在 response=`awaiting_reply` 时允许同 Item correction。
+  response 已为 `responded` 后，任何新增/修正请求创建新 CareItem，并可携带
+  `contextContinuationOfItemRef`。
+- correction 是新的跨边界内容 effect，拥有独立 Receipt、CommandExecution、
+  immutable result 与 ActionDelivery candidate。
+
+#### Withdrawal
+
+- withdrawal 的产品 target 是 family-authored CareItem work，而不是 Message。
+  用户文案 SHOULD 使用“无需老师继续跟进”/“家长已结束该事项”，避免误解为删除消息。
+- `withdraw_family_care_request` 只允许 source question 的 exact Guardian author
+  执行；typed input 为空，prepare 显示“历史仍保留、班级不能继续回复”的 effect。
+- commit 将 lifecycle 置为 `closed(family_withdrawn)`，解除/关闭 active Attention，
+  阻止未来 acknowledge/reply，同时保留 source/reply Message、Receipt、
+  delivery/read/acknowledgement 与审计历史。
+- 已 withdrawal 的同等 command/新 command 可收敛为 `already_satisfied`。并发 reply
+  与 withdrawal 按事务顺序决定：reply 先提交则保留并随后关闭；withdrawal 先提交则
+  reply stale。
+- caregiver reply 不提供 withdrawal；需要调整使用 correction，需要内容移除使用
+  redaction。Grant revoke 改变访问授权，也不得复用 withdrawal capability/state。
+
+#### Redaction
+
+- `redact_family_care_message` 使用 empty typed input、exact Message/version/author
+  precondition 与一次明确的不可逆 effect-labeled confirmation。
+- author redaction 只允许 exact author；policy/safety/admin redaction 使用独立
+  system actor/capability 和 server-owned reason，不能伪装成作者操作。
+- commit 使正文、附件和该 Message 的 correction versions 对普通 reader 不可恢复，
+  保留 Message tombstone、redaction reason、Receipt、Event、Execution 与审计 refs。
+  `deleted` 不是领域状态，物理删除属于 retention/legal mechanism。
+- source question redaction 原子 suppress 依赖 Item 与 active Attention，阻止未来
+  acknowledge/reply，并让派生 summary/detail 不可见。已有 caregiver replies 是独立
+  作者事实，不自动 redaction，但只能在各自 current policy 下呈现并关联安全 tombstone。
+- caregiver reply redaction 只移除该 reply/correction chain，terminalize/更新对应
+  Receipt；source question、其他 replies 与 CareItem appendability 保持。它不把
+  responseState 改回 awaiting_reply，也不重开原 waiting Attention；班级可追加新 reply。
+
+#### Delivery and Low-interruption Projection
+
+- correction 产生新内容，因此可以创建一次正常的 update ActionDelivery candidate。
+- withdrawal/redaction 提交后，尚未 materialize/send 的相关 notification candidate
+  必须在 owner reread 时跳过；已经送达 provider/device 的通知不能声明召回。
+- stale notification/deep-link open 必须重新读取 Nurture current projection，显示
+  body-free “事项已结束”或“内容已移除”，不得展示缓存正文。
+- applied/already-satisfied/replayed 原位更新 timeline/card，不显示技术状态。redaction
+  虽不可逆，也只需要一次清楚的 confirmation sheet；不追加通用第二次确认。
+
+### CareItem Lifecycle and Context Continuation
+
+第一增量不使用含义模糊的 `followUpOfItemRef`。继续交流通过新的 `submit` 创建新 Message、CareItem、Receipt 与 CommandExecution，并可选携带 `contextContinuationOfItemRef`。
+
+`contextContinuationOfItemRef` 的含义严格限定为交流上下文：
+
+- body-free，只引用一个源 Item；用于 role-safe timeline 分组、返回“继续此前事项”的标签，以及为当前 actor 生成可授权的上下文总结。
+- 源 Item 与新 Item 必须属于同一 `ChildCareProcess`、同一 Institution Enrollment；
+  第一增量要求源 Item response 已为 `responded` 且当前可读。
+- 创建关系时，当前 actor 必须有权读取源 Item；展示或总结时仍对源 Item重新执行 current visibility/owner policy，不能凭关系穿透权限。
+- 新 Item 绑定执行时的当前 Grant、当前 authority source、当前 expected heads 和新的 business command identity；不得继承或复用源 Item 的 Grant、owner、SLA、command identity 或 confirmation。
+- 关系不改变任一 Item 的状态、优先级、顺序、SLA、receipt 或可执行动作，不作为 authorization、routing、idempotency 或 lifecycle input。
+- 如果源 Item 后续因授权或可见性变化而不可读，presenter 隐藏/抑制续接关系；新 Item 仍只按自身 facts 与当前权限读取，不级联失效。
+
+真正的事项依赖必须使用独立、语义明确的未来 `CareItemDependency` 模型，例如
+`predecessorItemRef` 或 `triggeredByItemRef`。该模型才可表达前置条件、触发、
+状态传播或 SLA 语义，且不进入 Increment 1；它不属于 `InstitutionWorkflow`。
+
+### SubmitFamilyCareQuestion Input V1
+
+第一增量只开放一个 family-to-org 问题 capability。它的逻辑 operation input 是封闭类型：
+
+```text
+SubmitFamilyCareQuestionInputV1
+  body: ProtectedPlainText<trimmed, 1..2000>
+  contextContinuationOfItemRef?: OpaqueCareItemRef
+```
+
+- `body` 是产品语义字段，但必须经 T-002 固定的 protected-content/composer lifecycle 传输和持久化；不得把 raw body 放入 ordinary Chat payload、Chat transcript、`confirmationRef`、日志、Receipt、CommandExecution 或 body-free presenter。
+- canonicalization 只做首尾空白、换行形式等确定性机械规范化；不允许 LLM 改写、总结或补全 protected body。用户在 commit gesture 前看到的 exact normalized text 就是将提交的正文。
+- `contextContinuationOfItemRef` 遵守前述 context-only 约束，不改变分类、目标、授权、优先级或 lifecycle。
+
+目标选择与 operation input 分离：
+
+- `targetOptionRef` 是 Nurture 在 `needs_input` 中签发的 owner-issued、actor-safe、opaque prepare target option，不是 raw Enrollment/CareGroup ID。
+- 多个 eligible Enrollment 时用户必须选择；只有一个当前 eligible target 且 capability policy 允许时，Nurture 才可确定性绑定。
+- execute 重新解析 option/current default，并 reread current Participant、Enrollment、Grant、scope、policy 和 expected heads；option ref 本身不授权。
+
+Nurture 固定或推导以下字段，客户端与 LLM 不得提交：
+
+- `dataClass=family_care_question`
+- `category=question`
+- `urgency=today_attention`
+- `direction=family_to_org`
+- `requiresAck=true`、`requiresReply=true`
+- `attachmentRefs=[]`
+- author/current Participant、ChildCareProcess、Enrollment、CareGroup、original/current Grant binding、purpose/route、body-free safe summary、expected heads、receipt refs 与 business command identity
+
+第一增量明确不支持 rich text、附件/媒体、批量发送、用户选择 category/urgency/route、AI protected draft，以及医疗、用药或紧急事项。普通 Chat 只能识别 intent 并打开空的受保护 composer，不得自动复制 Chat 原文。unsupported/safety-gated 输入在任何 Message、CareItem、Receipt、protected committed content 或 CommandExecution 产生前，以安全的 `unavailable`/alternate-process 结果失败；不得静默降级为普通问题。
+
+### Confirmation UX Contract
+
+确认按用户可见 effect 定义，不按后端调用次数定义。技术上的 `prepareAction → executeAction` 默认只对应一次结构化、effect-labeled 用户手势。
+
+- `submit`：Chat 的 action card 或看板 form/detail 必须先显示 canonical normalized content、safe target label 和 expected effect；一个“发送给 {target}”CTA 同时构成 confirmation 与 execute trigger，不要求通用二次弹窗。
+- `reply`：reply composer/card 必须显示确切回复、家庭/孩子 safe target 和“以班级身份发送回复”的 append effect；第一条回复会解除待回复提醒，但不关闭事项。一个 CTA 提交，不要求二次弹窗。
+- `acknowledge`：没有新正文，使用一次“确认收到”direct gesture；该效果表示班级已收到，
+  不承诺“由我跟进”。实现仍走相同 Harness/owner-reread/CommandExecution，不因单击 UX 建立旁路。
+- 普通自然语言、“好的”“发吧”等文本不能由 LLM 单独解释为 confirmation；最终 effect 必须绑定结构化 UI gesture 与 exact confirmation context。
+- Harness、confirmationRef、Grant、command identity 和 CareItem 内部状态不作为用户心智模型；UI 只表达目标、内容、效果与当前结果。
+
+额外可见步骤只在两类情况出现：
+
+- 多个 eligible Enrollment 或其他必要字段存在真实歧义，用户必须选择。
+- reprepare 发现 content、target、effect、authority-visible consequence 或当前状态变化，必须重新呈现并等待新的手势。
+
+五分钟 token 单纯过期时，如果当前 UI 展示的 canonical content/target/effect 与 fresh prepare 完全一致，可以在同一 CTA gesture 中透明 reprepare + execute；任何差异都中止执行。此优化不延长/复活旧 token，也不放宽 owner-reread。
+
+### Action Execution and Delivery
+
+- family-care action 进入现有 Nurture CommandExecution kernel，复用 canonicalization、
+  locking、idempotency、exact replay 与 output refs。
+- My-Chat 在 Nurture committed/replayed result 后，按稳定 result/receipt ref 幂等
+  materialize Handoff、Outbox、notification 与 deep link；该技术阶段称为
+  `ActionDelivery`，不是产品 Workflow。
+- response loss 使用原 command identity exact replay；`outcome_unknown` 先 reconcile，
+  未解析前不得创建替代 delivery/effect。
+- Harness 不复制 CommandExecution、worker、outbox 或 handoff runtime，也不为
+  CareInteraction 创建 Workflow Run/Step。
+- T-004 拥有 Harness 的通用 invocation envelope/compatibility contract；T-005
+  拥有 family-care capability specs、policies、commands、effects、receipts、
+  delivery result binding 与 presenters。
+- T-002 当前 claimed-Step / `workflow_step_complete_v1` 路径是 compatibility seam。
+  在其被替换或显式重新分类前，真实 activation 保持 NO-GO；不得把该旧路径写回
+  T-005 产品契约。
+
+## Cross-boundary Action Flow
+
+`guardian private context → previewed → confirmed → family-to-org Message + CareItem + Receipt → caregiver work projection → acknowledged → one-or-more CareGroup reply Messages + Receipts → guardian projection`
+
+例外路径：
+
+- authority changed：fail closed，旧 intent 失效。
+- duplicate retry：返回同一幂等结果。
+- withdrawal/redaction/correction：保留原事实引用和审计原因。
+
+## No Shared Cross-role Room
+
+- Guardian Chat 是家庭私密的 child-centered AI/feedback surface；Caregiver Chat 是当前授权 work/item 的交互投影。
+- 两个角色不会加入同一个 room，也没有共享 participant roster、presence、typing、direct-message 或统一未读状态。
+- 同一 CareItem 的两侧正文、动作和状态可以不同；provenance、原始 Grant、Message/Event/Receipt 链负责连接，不靠共享 transcript 连接。
+- My-Chat Chat transcript 只是宿主会话历史，不是 Nurture draft、结果、业务历史或授权来源。
+- caregiver 受保护正文通过 opaque ref 临时 owner-reread；不得复制进 My-Chat Chat history。
+- 多 Institution Enrollment 之间各自隔离；同一孩子不存在跨机构共享房间或可推断其他机构关系的会话列表。
+
+## Authorization
+
+- 发送前与持久化事务内均需校验 authority source。
+- 所有业务写入只能经统一 Harness 进入 deterministic command execution；Chat 和看板不得拥有旁路写入。
+- 所有跨边界写入和读取绑定精确 Institution Enrollment、原始 Grant、direction、data class 与 purpose。
+- route/binding 只负责定位，不授予事实读取权限。
+- caregiver 访问必须同时满足 actor、role、grant、child scope 与事实可见性策略。
+- owner-reread 是持久化与 replay 的强约束，不是可选展示逻辑。
+- thread、room、host unread 或 Chat participant 状态均不得参与授权判定。
+
+## Presenter Boundary
+
+presenter 可输出：
+
+- 当前 actor-safe message body / structured item / role projection。
+- delivery/read/ack 状态。
+- correction / withdrawal 的可解释状态。
+- 可执行动作及拒绝原因。
+
+presenter 不得输出：
+
+- 未发送的家庭私密草稿。
+- private anchor、repository key、Prisma ID 或 authority 内部快照。
+- 另一角色的完整 transcript、room membership、其他 Institution Enrollment 的存在或内容。
+
+## My-Chat Integration
+
+My-Chat 将公共 queries、commands 和 role-safe view-model 分别映射为 Guardian Chat、Caregiver Chat 与相应看板体验。普通 Chat 由 My-Chat 承载；需要 Nurture facts 或动作时通过版本化 Harness contract 调用。My-Chat 不创建共享业务 room，也不把宿主 Chat history 反写为 Nurture canonical 状态。Nurture 不拥有导航、消息总线、推送或设备通知。
