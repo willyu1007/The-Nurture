@@ -1,0 +1,127 @@
+# Implementation Notes — 六个核心 Surface 的产品契约基座
+
+## 2026-07-29 — Task package created
+
+- 创建 T-004 规划包。
+- 将任务定位为 T-003 设计到产品实现之间的公共契约基座。
+- 锁定 My-Chat 只通过版本化场景契约消费，不在本仓库实现宿主 UI。
+- 当前无代码、schema、manifest 或 runtime 变更。
+
+## 2026-07-29 — Contract organization aligned
+
+- 用户确认 T-004 只做到 engine-ready，不建设跨 Scenario 共享引擎。
+- 锁定双平面模型：capability discovery metadata + deterministic typed execution。
+- 锁定 queries/commands 按 capability 组织，presenters 按 surface 组织。
+- LLM 只能在 policy-filtered candidates 内选择；权限与写入前置条件由 handler 重验。
+- 完整共享引擎留给 My-Workflow-Base / My-Chat 的独立平台任务，不阻塞 Nurture。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更。
+
+## 2026-07-29 — Surface output model aligned
+
+- 用户确认当前先按 The Nurture 项目节奏推进，My-Chat 适配后置到 companion。
+- 锁定 atomic surface envelope + 三类 content family：
+  Conversation timeline、Board semantic modules、Workbench Hub/List/Insight。
+- Nurture owns 输出内容、业务状态、语义顺序和 capability affordances；My-Chat owns 终端组件与交互实现。
+- 排除通用 server-driven UI、像素级 layout contract 和 LLM 任意组件树。
+- 允许当前项目使用参考 renderer/检验工具验证 contract，但不创建独立 App shell。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更。
+
+## 2026-07-29 — Golden Journey Portfolio baseline aligned
+
+- 用户否决“唯一主线足以代表完整产品”的假设。
+- 暂定并记录五条产品 Journey：GJ-1 家庭→照护者、GJ-2 照护者→家庭、GJ-3 成长连续性、GJ-4 关系/授权建立、GJ-5 机构支持。
+- 增加 RJ-1 撤权/纠正/恢复作为跨域韧性 Journey。
+- 六条 Journey 共用版本化 synthetic world，但各自从 fresh isolated state 独立运行。
+- `waiting_and_turn_taking` 仅作为 GJ-1 主题；Journey 细节可在不改变 Portfolio 结构的前提下继续细化。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更。
+
+## 2026-07-29 — Identity, multi-institution and Chat/Board baseline aligned
+
+- 六个正式 surface 不纳入 product-visible provisional child；当前以 synthetic bound fixtures 开发，真实采用必须由家长授权建立 My-Chat Child/Family binding。
+- identity binding、Family/Guardian、Institution Enrollment/CareGroup、per-Enrollment Grant 被锁定为独立 authority 轴，不使用单一状态枚举代替 owner-reread。
+- 一个 ChildCareProcess 可以同时或先后关联多个彼此隔离的 Institution Enrollment；机构侧不得获知其他机构的存在、数量、名称、状态或内容。
+- Enrollment 不是 Grant。机构可以针对自己的 Enrollment 发起 GrantRequest，但请求本身不授权；当前 Guardian 明确确认后才创建 Grant，且首个成功确认者是 sole replace/revoke owner。
+- Guardian Chat 定位为 child-centered、跨当前授权来源的反馈和总结入口；Nurture 先做权限过滤、来源整理和多 Enrollment 聚合，LLM 不选择机构 API。
+- 需要选择接收机构的开放式写操作默认进入家庭看板；Chat 只直接处理目标已绑定的 action card，或单机构试点中唯一合法目标的确定性动作。
+- GJ-1 调整为 Chat 私域理解/整理后在 family board 选择 Enrollment 并显式分享；GJ-3 覆盖带 provenance 的多 Institution 聚合；GJ-4 增加 Institution GrantRequest → Guardian Grant。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更。
+- 当前任务包和项目治理视图仍在未提交 worktree 中，尚无携带 `Task: T-004` 的提交；这些决策已落稿但不能描述为 landed implementation。
+
+## 2026-07-29 — T-002 parallelism and activation fence aligned
+
+- 用户确认 T-004 不因 T-002 runtime/qualification 尚未完成而整体 blocked。
+- 锁定 contract-first parallel development：capability/schema/ports/presenters/synthetic fixtures/Journey/conformance 可以先行。
+- 锁定 owner-integration gate：真实 binding、Enrollment/Grant、authenticated principal、owner-reread、receipt、persistence/public adapters 等待对应 T-002 exact contract/version。
+- 锁定 activation gate：T-008 candidate freeze、My-Chat adoption 与真机构建必须等待所需 T-002 adapters 和 qualification pins。
+- synthetic owner fixture 只能用于测试和参考呈现，不能成为真实 runtime、fallback、identity/Grant 来源或 migration seed。
+- T-004 可完成 synthetic contract qualification，但必须保留 default-off、dependency NO-GO，并准确声明真实 owner path 未实现。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更；worktree 仍未提交。
+
+## 2026-07-29 — Immutable Candidate adoption unit aligned
+
+- 用户确认 My-Chat 采用一个不可变 Candidate bundle。
+- Candidate bundle 是唯一 external adoption/pin 单元；My-Chat 不分别选择 capability、surface、fixture、manifest 或 dependency 版本。
+- 内部 contract/schema/fixture 仍独立版本化，用于 compatibility、diff 与 evidence，但不成为 consumer 可自由组合的 rollout knobs。
+- 任一 pinned 内容变化必须产生新 Candidate identity；禁止 mutable `latest`、版本范围、浮动依赖和原地覆盖。
+- exact Candidate pin 与 qualification、activation、internal testing、traffic authorization 保持分离。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更；worktree 仍未提交。
+
+## 2026-07-29 — Service/API boundary correction
+
+- 用户指出 My-Chat 与 Nurture 是接口调用关系，不应描述为 My-Chat 采用 Nurture 代码或 Candidate bundle；该纠正 supersedes 上一节的 adoption-unit 表述。
+- Nurture Service Candidate 保留为 Nurture-owned release/qualification/rollback 单元。
+- My-Chat 只通过认证私有 API 消费 versioned interface contract，不 import Nurture package/ORM、不下载 bundle、不直连数据库。
+- TestFlight/Play 证据改由 composite validation binding 关联 My-Chat build/backend revision、Nurture Service Candidate、interface contract digest 和 test environment。
+- Service Candidate、contract compatibility、qualification、deployment、activation 与 traffic authority 保持独立。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更；worktree 仍未提交。
+
+## 2026-07-29 — Identity ownership split locked
+
+- 用户确认按建议锁定三类 identity 的任务归属。
+- T-004 只负责 interface contract logical identity、version/digest 语义和兼容规则；确切 wire 字段/canonicalization 在 discovery 中确定。
+- T-008 负责 Service Candidate identifier/digest、bundle freeze、qualification 和 rollback 证据。
+- T-008 与 My-Chat companion 联合负责 composite validation binding。
+- Service Candidate identity/composite binding 不进入普通业务请求或 Nurture authorization；其具体格式不阻塞 T-004～T-007。
+- T-004 的顶层产品/架构决策至此收敛，下一步进入 Phase 0 discovery。
+- 本次仅更新规划文档，无应用代码、配置、schema 或数据库变更；worktree 仍未提交。
+
+## 2026-07-29 — Workflow/Action/Projection terminology aligned
+
+- Workflow 收敛为园区管理 `InstitutionWorkflow`；Web workbench 是主要操作面。
+- Boards 可以消费角色安全 `InstitutionWorkflowProjection`，但不拥有 Run/Step 或权限。
+- family-care 使用 `CareInteraction`/`ActionExecution`/`ActionDelivery`，caregiver
+  two-stage publish 使用 `PublishProcess`。
+- capability descriptor 必须显式 operation class；异步、跨 owner、worker 或通知不构成
+  Workflow 分类依据。
+- 当前只更新文档，无应用代码、配置、manifest、schema 或数据库变更。
+
+## Open Items
+
+- T-002 当前哪些 contract 可以直接复用，哪些仍被 C30+ / qualification blocker 阻断。
+- engine-ready descriptor 的最小字段与共享 Base contract 的最终落点，需在 discovery 中确认。
+- interface contract identity 的确切 wire 位置、canonicalization 与 digest 生成方式，需在 discovery 后确定。
+- 每条 Journey 的详细步骤、最小 fixture 和 negative branch 在对应 capability discovery 后细化，不重新打开 Portfolio 结构。
+
+## 2026-07-29 — Business input and concurrency precondition separated
+
+- 用户确认采用通用 optimistic-concurrency/idempotency 分层，但不把某一种 wire
+  token 形式误称为唯一行业标准。
+- capability-specific typed input 只包含业务字段；target、expected version、
+  authenticated actor/scope 和 command identity 属于通用 Harness contract。
+- prepare 冻结并将 expected version、精确 target、actor/scope、canonical input
+  hash 和 expiry 绑定到 opaque `confirmationRef`；execute 不得自动追随最新版本。
+- expected version 与 CommandExecution idempotency identity 保持正交；前者防止
+  stale intent/lost update，后者支持 transport retry 与 exact replay。
+- 当前只更新规划文档，无应用代码、配置、manifest、schema 或数据库变更。
+
+## 2026-07-29 — Capability-specific concurrency classes locked
+
+- 用户确认 T-005 reply 是 CareGroup-owned append，不存在单一回复 winner。
+- 本决策 supersede 将所有 action 一律绑定 whole-aggregate exact version 的解释。
+- descriptor 增加 `exact_state | lifecycle_authority | append_compatible`
+  concurrency class。acknowledge 使用 exact work-state；reply 使用 append-compatible
+  lifecycle/authority/policy heads。
+- 另一个合法 reply 不使 confirmation stale；closed/suppressed、Grant/Enrollment/
+  CareGroup、role、policy 或 retention 漂移仍失败关闭。
+- concurrency precondition 与 CommandExecution idempotency identity 继续正交。
+- 当前只更新规划文档，无应用代码、配置、manifest、schema 或数据库变更。

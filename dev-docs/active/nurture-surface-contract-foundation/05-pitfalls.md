@@ -1,0 +1,41 @@
+# Pitfalls — 六个核心 Surface 的产品契约基座
+
+## Known Guardrails
+
+- 不要把 T-003 的可点击 demo 当成已实现产品能力。
+- 不要为方便 UI 联调复制 My-Chat identity、auth、route 或 runtime。
+- 不要把 opaque `child_id`、family binding 或 scenario binding 当作授权。
+- 不要用真实儿童或家庭数据构造 fixture。
+- 不要因为调用成功就跳过 authority reread、receipt 或 owner-reread 验证。
+- 不要把 capability descriptor、supported role 或 LLM 选择结果当作 authorization grant。
+- 不要在 T-004 内建设跨 Scenario 共享 LLM 路由引擎或直接调用 provider SDK。
+- 不要把 semantic module 退化为通用 `type + props` component tree 或像素级布局协议。
+- 不要让当前参考呈现演化成独立 Nurture shell；My-Chat 仍拥有最终 native/web rendering。
+- 不要用一条故事主线替代六个 surface 的代表性产品闭环和反向数据流。
+- 不要让多条 Journey 共享一个按顺序变异的数据库状态；必须可独立、确定性重跑。
+- 不要把单机构试点固化为“一名孩子只能有一个 Institution Enrollment”；多机构数据必须按 Enrollment 隔离。
+- 不要把 Institution 发出的 GrantRequest 当成 Grant，或让机构角色代替当前 Guardian 建立、替换、撤销授权。
+- 不要让 LLM 为开放式写操作静默选择 Institution；多目标写入应在 family board 绑定具体 Enrollment。
+- 不要把 Guardian 可读的跨机构 child-context summary 暴露给任一 Institution，或在聚合时丢失 provenance 和原始 Grant fence。
+- 不要把 synthetic owner fixture 接入真实 runtime、fallback 或 migration，也不要用它替代 T-002 owner-path qualification。
+- 不要因为 T-004 contract tests 通过就宣称真实 identity、Enrollment/Grant、authenticated path、notification 或 traffic 已通过。
+- 不要为绕过 T-002 gate 复制 My-Chat/T-002 的 identity、auth、owner-reread、receipt 或 persistence 代码。
+- 不要把 My-Chat/Nurture 的认证接口调用关系写成 My-Chat 采用 Nurture 代码、package 或 Candidate bundle。
+- 不要让 My-Chat 浮动组合 API/capability/presenter contract，也不要把 fixture、migration 或 source bundle 变成运行时 consumer dependency。
+- 不要原地修改已经分配 identity 的 Service Candidate，也不要把 Service Candidate/contract pin 当作 qualification、activation 或 traffic authorization。
+- 不要让 T-004 设计 T-008 的 Service Candidate identifier、发布工具或 composite device-evidence schema；T-004 只负责 interface contract identity/compatibility。
+- 不要把异步、跨 owner、worker、Handoff 或通知当作 Workflow 分类条件。
+- 不要把 board 能展示 Workflow 进度误写成 board 拥有 Run/Step 或可绕过 authority。
+- 不要用未限定的 `workflow` 指代 CareInteraction、ActionDelivery 或 PublishProcess。
+- 不要把 concurrency heads 塞进 capability-specific business input，或允许客户端/LLM
+  自报；它属于 prepare-time precondition。
+- 不要让 exact-state action 在 execute 时“重新获取最新版本后继续”，这会把 stale
+  user intent 伪装成有效确认。
+- 不要把 strict whole-aggregate CAS 套在 append-compatible action 上；兼容的新
+  append 不是冲突。
+- 不要用 idempotency key 替代 concurrency precondition；重复请求与状态/authority
+  安全是两个问题。
+
+## Resolved Pitfalls
+
+当前尚未进入实现阶段。发生并解决实际问题后，按 symptom、root cause、attempts、fix、prevention 的结构补充。
