@@ -3,21 +3,20 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ historical X5（complete）/ Wave 4 joint requalification（blocked on Host zero-version codec drift, default-deny）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P3 joint requalification（complete, default-deny）/ C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-29
 - **Owner:** willyu1007
-- Next step: Repair and publish the My-Chat Handoff codec so the Base-authorized
-  `CanonicalRef.version=0` reaches atomic materialization, re-pin the exact Host
-  revision/source hash, and rerun the two-database X5 gate before promoting
-  `codex/T-002-nurture-consolidation` to `main`. The current integration branch
-  safely consolidates the Nurture T-002 and environment increments, and its
-  static, unit, migration, production-DB, and dev-host gates pass. Exact X5
-  currently completes the Step as `manual_review_required` with zero
-  materialized Handoffs because My-Chat accepts only positive ref versions
-  while Base schema v1 permits non-negative versions. The additive migration
-  remains unapplied outside disposable databases and every consumer remains
-  default-disabled. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, any
+- Next step: Complete the remaining cross-repository `C30-I0-C` isolation for
+  My-Workflow-Base and My-Chat, then close `C30-I0-D` with clean-install exact
+  pins, canonical baseline suites, and C-3 false/empty proof. The Nurture
+  repository is already consolidated on sole local/remote `main`
+  `ab92fde6c277ffd1278a85a6165a033918c8be79`; exact main CI
+  `30412303062` passes 7/7. Base `5c04dce` and My-Chat `a4768fe` are pinned,
+  and the real two-database X5 version-zero journey passes. The additive
+  migration remains unapplied outside disposable databases and every consumer
+  remains default-disabled. `C30-I1` functional contract development cannot
+  start until I0-C/D close. C31, C4, D implementation, Pilot-0-E, Pilot-1, any
   persistent database apply, artifact publication, capability activation, and
   external traffic remain NO-GO.
 
@@ -75,17 +74,15 @@
   Migration `20260728160000_nurture_canonical_ref_v1` converts durable legacy
   refs and replaces the X4 driver CHECK with the canonical
   `my_chat/workflow_step` constraint.
-- The 2026-07-29 current-project consolidation reran the real two-database X5
-  journey against exact Base `63d47d2`, My-Chat `30792cd`, and the consolidated
-  Nurture source. It exposed a second incompatibility that revision/source-hash
-  verification cannot detect: Base's canonical-ref v1 JSON schema and
-  validation accept `version=0`, and Nurture correctly preserves its
-  zero-based aggregate versions, but My-Chat `handoff-value-codec.ts` rejects
-  every version below `1`. My-Chat therefore records
-  `workflow_handoff_invalid_draft`, completes the Step for manual review, and
-  creates no Handoff. No current My-Chat branch contains a repair. This is the
-  active cross-repository readiness blocker; a green Nurture CI run without the
-  joint X5 route cannot supersede it.
+- The current-project consolidation initially exposed a zero-version
+  incompatibility hidden by revision/source hashes. That historical blocker is
+  resolved: My-Chat `5f52327` accepts Base-authorized
+  `CanonicalRef.version=0`, `a4768fe` makes completion output ordering
+  deterministic, and Nurture pins the resulting 161-file X5 source hash
+  `56a7c976287230bf87dd972a34e6c9da54c6d9448da428b6539da76e43956393`.
+  The exact two-database X5 journey now materializes once, exact-replays, and
+  fails closed after revoke. P3 was merged to Nurture `main` at `ab92fde`; the
+  former integration branch and every Nurture auxiliary worktree were removed.
 - The Fastify-to-NestJS transition, port migration, API-index repair, and
   governance cleanup remain open. The current native-cloud CI repair changes
   no schema, migration, default-off activation, environment, provider,

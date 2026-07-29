@@ -6,26 +6,24 @@
 
 ## 2026-07-29 — Current-project consolidation and readiness gate
 
-The current-project consolidation branch is
-`codex/T-002-nurture-consolidation`. It merges the complete Nurture T-002
-owner-alignment increment and selectively adopts only the fail-closed
-environment repair from the stale environment donor. The stale
-scenario-platform-convergence worktrees remain donor evidence and are not
-merge inputs.
+The current-project consolidation is merged to Nurture `main` at
+`ab92fde6c277ffd1278a85a6165a033918c8be79`. It includes the complete Nurture
+T-002 owner-alignment increment and only the fail-closed environment repair
+from the stale environment donor. The stale scenario-platform-convergence
+worktrees were excluded and have been removed from this repository.
 
 | Work item | State | Exit |
 | --- | --- | --- |
-| Consolidate Nurture branches | Complete on integration branch | T-002 owner-alignment is fully merged; only the reviewed environment commit is harvested; unrelated stale donor source is excluded. |
+| Consolidate Nurture branches | Complete on `main` | T-002 owner-alignment is fully merged; only the reviewed environment commit is harvested; unrelated stale donor source is excluded. Local and remote now retain only `main`. |
 | Revalidate static and unit gates | Pass | Frozen install, exact pin, context, environment, governance, docs, typecheck, lint, 187 unit tests, routing, persistence, N1 schema, X4 replay, and strict consumer-boundary checks pass. |
 | Rehearse Nurture databases | Pass in disposable PostgreSQL | All five production and one dev-host migrations apply from empty; ownership boundaries pass; production DB is 37/37 and dev-host is 19/19. No persistent database is contacted. |
-| Requalify real X5 journey | Blocked on Host semantic drift | Exact two-database X5 reaches completion but My-Chat rejects legal `CanonicalRef.version=0`, returns `manual_review_required`, and materializes zero Handoffs. |
-| Promote integration branch to `main` | Held | Requires a published My-Chat codec repair, refreshed exact revision/source hash, passing X5, and green branch CI. |
+| Requalify real X5 journey | Complete | My-Chat `a4768fe` accepts legal `CanonicalRef.version=0` and returns deterministic output refs; the exact two-database journey materializes once, exact-replays, and fails closed after revoke. |
+| Promote integration branch to `main` | Complete | Merge commit `ab92fde` is on local and remote `main`; exact main CI `30412303062` passes 7/7. |
 
-This checkpoint does not authorize a Nurture-side workaround that drops a
-valid zero version. Base canonical-ref v1 defines `version` as a non-negative
-integer; the fix belongs in the Host runtime codec and its conformance tests.
-Until that owner repair is adopted, current-project consolidation is safe but
-cross-repository implementation readiness is **NO-GO**.
+The Nurture consolidation and P3 joint-requalification gate are closed without
+a lossy zero-version workaround. Cross-repository functional development is
+still **NO-GO** because `C30-I0-C` is complete only for Nurture and
+`C30-I0-D` remains pending.
 
 ## 2026-07-28 — My-Chat/T-030 acceptance increment
 
@@ -93,7 +91,7 @@ qualified Pilot artifact, applied migration, or release approval.
 | --- | --- | --- |
 | `C30-I0-A` 三仓/worktree/依赖/schema/gate census | Complete | 精确 revision、dirty ownership、重叠路径、migration/source/gate 和验证状态已记录。 |
 | `C30-I0-B` T-029 donor disposition | Complete | `artifacts/13-c30-i0-b-t029-disposition.md` 覆盖 Base 57、My-Chat 79、Nurture 40 个候选文件；无文件可原样合并，可抽取机制全部标为 `REWORK`，直接平台 ref、umbrella source、双 manifest/Execution track 和跨节点混合迁移均已排除。 |
-| `C30-I0-C` scoped commits and clean worktrees | Pending | T-002、T-003、cloud-deployment、T-029 可独立归属；三仓 C30 worktree 从精确 commit 启动。 |
+| `C30-I0-C` scoped commits and clean worktrees | Partial: Nurture complete | Nurture has one clean local/remote `main` at `ab92fde`; T-002/T-003/environment work is committed and stale donors are removed. Base and My-Chat still have auxiliary branches/worktrees that require separate owner-scoped disposition before a clean C30 worktree starts. |
 | `C30-I0-D` immutable pins and false/empty proof | Pending | 可变 local path 不再作为 evidence；clean-install verifier、exact revision/source pins、C-3 gate false/empty 和 canonical baseline suite 全绿。 |
 
 `C30-I1` 仅在 I0-B/C/D 全部完成后进入 `in_progress`。数据库 apply、

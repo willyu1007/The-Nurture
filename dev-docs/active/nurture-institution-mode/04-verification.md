@@ -3,11 +3,11 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-29
-- Current phase: Wave 4 P2 implementation and normative contract sync remain
-  default-deny. Current-project consolidation passes all Nurture-local static,
-  unit, production-DB, and dev-host gates, but exact joint X5 is blocked by a
-  My-Chat canonical-ref zero-version codec drift. Promotion to `main` and
-  cross-repository implementation readiness are held. Pilot-0-C decision
+- Current phase: Wave 4 P3 joint requalification and Nurture consolidation are
+  complete and default-deny. Exact two-database X5 and Nurture main CI pass;
+  local/remote Nurture retain only clean `main`. Cross-repository
+  implementation readiness remains held on the Base/My-Chat portion of
+  `C30-I0-C` and all of `C30-I0-D`. Pilot-0-C decision
   complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
@@ -18,15 +18,16 @@
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Branch scope | PASS | `codex/T-002-nurture-consolidation` contains the full T-002 alignment branch plus only the reviewed environment repair; stale scenario-platform donors are excluded. |
+| Branch scope | PASS | Merge commit `ab92fde` contains the full T-002 alignment branch plus only the reviewed environment repair. The fully merged integration branch and stale Nurture donors are removed; local/remote retain only `main`. |
 | Static/local gates | PASS | Frozen install; exact pins and four verifier tests; strict context, environment, governance, and docs; typecheck; frontend lint; 187/187 unit tests; 35-file routing; persistence, N1, X4, and strict consumer boundaries. An unqualified deploy exits 1 with the expected owner-artifact/environment-approval denial. |
 | Native branch CI | PASS | Workflow-dispatch run `30410972094` at exact source `493839d` passes 7/7: pin/boundary, context/environment, governance, type/unit, production DB, dev-host E2E, and frontend lint/build. The workflow has no joint X5 job and therefore does not supersede the X5 blocker below. |
 | Disposable Nurture DB gates | PASS | Dynamic-port PostgreSQL applied five production and one dev-host migrations from empty. Production boundary reports 48 tables / 75 enums with 37/37 tests; dev-host reports 6 tables / 2 enums with 19/19 tests. |
 | Exact joint preparation | PASS AFTER HARNESS REPAIR | The first attempt generated only the production Prisma client and failed before collection while importing the dev-host client. Re-running `db:generate:all` prepared both clients; exact Base `63d47d2`, My-Chat `30792cd`, and Nurture source then reached the real X5 test. |
-| Exact two-database X5 | BLOCKED | Nurture commits and replays the business result, but My-Chat rejects source context refs at legal version `0`, records `workflow_handoff_invalid_draft`, returns `manual_review_required`, and materializes 0 Handoffs where 1 is required. |
-| Contract diagnosis | OWNER DEFECT CONFIRMED | Base `canonical-ref-v1.schema.json` declares `version.minimum=0` and Base validation accepts non-negative integers. Nurture's unit test preserves zero. My-Chat `handoff-value-codec.ts` uses `isPositiveVersion` for canonical refs. No existing My-Chat branch contains a repair. |
-| Cleanup/effect boundary | PASS | Both disposable database containers and all temporary exact-revision worktrees were removed. No persistent DB, migration apply, publication, secret/environment provider, activation, deployment, or traffic changed. |
-| Readiness decision | NO-GO | Keep the integration branch out of `main` until the Host owner fix is published, the pin/source hash is refreshed, X5 passes, and branch CI is green. |
+| Exact two-database X5 | HISTORICAL BLOCKER / RESOLVED BY P3 | The initial `30792cd` run rejected legal version `0`. My-Chat `a4768fe` supersedes that pin, and the P3 X5 row at the end of this file records the clean materialization/replay/revoke result. |
+| Contract diagnosis | CLOSED | My-Chat `5f52327` aligns canonical-ref validation with Base's non-negative contract; `a4768fe` also canonicalizes completion output ordering. Nurture pins the repaired source and hash. |
+| Cleanup/effect boundary | PASS | Disposable containers and temporary exact-revision worktrees were removed. Local/remote Nurture retain only clean `main`. No persistent DB, migration apply, publication, secret/environment provider, activation, deployment, or traffic changed. |
+| Main integration | PASS | Local and remote `main` are `ab92fde`; exact main workflow-dispatch run `30412303062` passes 7/7. |
+| Readiness decision | PREPARATION GO / FUNCTIONAL C30-I1 NO-GO | Nurture baseline consolidation is complete. Close Base/My-Chat `C30-I0-C` and the three-repository `C30-I0-D` immutable false/empty proof before starting functional contract implementation. |
 
 ## Wave 4 P2 local verification — 2026-07-28
 
