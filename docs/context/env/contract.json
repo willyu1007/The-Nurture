@@ -60,6 +60,23 @@
       "state": "active",
       "type": "url"
     },
+    "NURTURE_BINDING_EVIDENCE_KEY": {
+      "default": null,
+      "deprecate_after": null,
+      "description": "HMAC key (at least 32 characters) enabling the scenario-binding owner endpoint; absence keeps the endpoint disabled and never degrades to an unhashed path.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": true,
+      "secret_ref": "nurture_binding_evidence_key",
+      "state": "active",
+      "type": "string"
+    },
     "NURTURE_INTERNAL_SERVICE_TOKEN": {
       "default": null,
       "deprecate_after": null,

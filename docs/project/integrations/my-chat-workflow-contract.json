@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "a4768fe1c86abfe8a864fe7668a9ca9bc7850fb7",
+    "revision": "f00b86861cf0b751d747c7e0bc5cb86a952900de",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -76,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "56a7c976287230bf87dd972a34e6c9da54c6d9448da428b6539da76e43956393"
+        "sha256": "901fd406f93fe9e584f5e972d50046e5c44458352266fb4d4fd04ee17d35dcff"
       },
       {
         "key": "wave4_binding_host",
@@ -96,7 +96,7 @@
           "prisma/migrations/20260728190000_wave4_binding_owner_evidence/migration.sql",
           "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql"
         ],
-        "sha256": "3dadb0b89fc7a782a590b5e7d8e2d6510b4c34029b0dc1a046a6a65f0c82f0c5"
+        "sha256": "ae22312716ad520129a89ea3c69c63f02028d9efe60f929aa6c6d8abd55fd242"
       }
     ]
   },
@@ -104,6 +104,7 @@
     "contractRoot": ".",
     "contractPaths": [
       "apps/backend/src/app.ts",
+      "apps/backend/src/binding-owner.ts",
       "apps/backend/src/main.ts",
       "apps/backend/src/server.ts",
       "docs/context/workflow/nurture-scenario-contract.md",
@@ -134,6 +135,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "354bb2206b9fb4248d7df247467c9422235e730f2056eff7a47967f92960c83f"
+    "contractSha256": "cf0a47233f6c3c5645ecee40ee5c4b57090b4d48a6d9e20de7b172d9e37e074d"
   }
 }

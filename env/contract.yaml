@@ -29,6 +29,12 @@ variables:
     secret: true
     secret_ref: dev_host_database_url
     description: PostgreSQL connection URL for backend-private workflow dev-host schema and migrations.
+  NURTURE_BINDING_EVIDENCE_KEY:
+    type: string
+    required: false
+    secret: true
+    secret_ref: nurture_binding_evidence_key
+    description: HMAC key (at least 32 characters) enabling the scenario-binding owner endpoint; absence keeps the endpoint disabled and never degrades to an unhashed path.
   NURTURE_INTERNAL_SERVICE_TOKEN:
     type: string
     required: false

@@ -7,7 +7,11 @@ const PORT = Number(process.env.PORT ?? 3001);
 
 async function main(): Promise<void> {
   assertDevHostEnvironment(process.env.APP_ENV);
-  const app = createNurtureApp();
+  const app = createNurtureApp({
+    ...(process.env.NURTURE_BINDING_EVIDENCE_KEY
+      ? { bindingEvidenceKey: process.env.NURTURE_BINDING_EVIDENCE_KEY }
+      : {}),
+  });
   const server = buildServer(app, {
     internalServiceToken: process.env.NURTURE_INTERNAL_SERVICE_TOKEN,
   });
