@@ -27,6 +27,8 @@
 - 不要把异步、跨 owner、worker、Handoff 或通知当作 Workflow 分类条件。
 - 不要把 board 能展示 Workflow 进度误写成 board 拥有 Run/Step 或可绕过 authority。
 - 不要用未限定的 `workflow` 指代 CareInteraction、ActionDelivery 或 PublishProcess。
+- 不要把 domain、execution、delivery 和持久化 process 压成一个 `operationClass`；
+  `CareInteraction`、`ActionExecution` 与 `ActionDelivery` 是不同轴。
 - 不要把 concurrency heads 塞进 capability-specific business input，或允许客户端/LLM
   自报；它属于 prepare-time precondition。
 - 不要让 exact-state action 在 execute 时“重新获取最新版本后继续”，这会把 stale
@@ -35,6 +37,17 @@
   append 不是冲突。
 - 不要用 idempotency key 替代 concurrency precondition；重复请求与状态/authority
   安全是两个问题。
+- 不要只声明一个 concurrency enum 而省略 exact head bindings 和 declared
+  convergence；否则 acknowledge 的合法收敛会与任意 stale version 混淆。
+- 不要对受保护正文保存 bare canonical hash；低熵内容完整性必须使用 secret-keyed
+  tag，且正文不得进入 confirmation、日志或 telemetry。
+- 不要让 surface cursor 跨 contract digest、actor、scope、query、sort 或 snapshot
+  复用，也不要静默把两个 snapshot 拼成一个列表。
+- 不要把 source revision、build time 或生成环境混进 semantic interface digest；
+  它们是 provenance。contract 内容不变时 identity 应可重建，内容变化时才产生新
+  version/digest。
+- 不要把未确认 `prepareAction` 或技术调用进行中状态自动投影为 canonical
+  `pending-send`；只有对应 capability 确有业务/投递状态时才能展示。
 
 ## Resolved Pitfalls
 

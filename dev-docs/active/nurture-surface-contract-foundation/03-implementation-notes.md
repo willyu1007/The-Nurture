@@ -78,7 +78,8 @@
 ## 2026-07-29 — Identity ownership split locked
 
 - 用户确认按建议锁定三类 identity 的任务归属。
-- T-004 只负责 interface contract logical identity、version/digest 语义和兼容规则；确切 wire 字段/canonicalization 在 discovery 中确定。
+- T-004 只负责 interface contract logical identity、version/digest 语义和兼容规则；
+  当时将确切 wire 字段/canonicalization 留给 discovery，该开放项已被本轮合同审阅收敛。
 - T-008 负责 Service Candidate identifier/digest、bundle freeze、qualification 和 rollback 证据。
 - T-008 与 My-Chat companion 联合负责 composite validation binding。
 - Service Candidate identity/composite binding 不进入普通业务请求或 Nurture authorization；其具体格式不阻塞 T-004～T-007。
@@ -91,25 +92,31 @@
 - Boards 可以消费角色安全 `InstitutionWorkflowProjection`，但不拥有 Run/Step 或权限。
 - family-care 使用 `CareInteraction`/`ActionExecution`/`ActionDelivery`，caregiver
   two-stage publish 使用 `PublishProcess`。
-- capability descriptor 必须显式 operation class；异步、跨 owner、worker 或通知不构成
-  Workflow 分类依据。
+- 当时要求 capability descriptor 显式 operation class；该单轴表述已被本轮审阅替换为
+  domain/execution/delivery 三轴。异步、跨 owner、worker 或通知仍不构成 Workflow
+  分类依据。
 - 当前只更新文档，无应用代码、配置、manifest、schema 或数据库变更。
 
 ## Open Items
 
-- T-002 当前哪些 contract 可以直接复用，哪些仍被 C30+ / qualification blocker 阻断。
-- engine-ready descriptor 的最小字段与共享 Base contract 的最终落点，需在 discovery 中确认。
-- interface contract identity 的确切 wire 位置、canonicalization 与 digest 生成方式，需在 discovery 后确定。
+- T-002 到 family-care 落地合同的事实/schema 差距已由 T-005
+  `06-t002-fact-schema-gap.md` 盘点；T-004 Phase 0 只需验证实际公共接口是否满足
+  exact interface contract，不再重复推断数据库事实。
+- V1 descriptor/envelope/invocation schemas 的最终 repo 落点和生成器命令，需在
+  Phase 0 盘点后确定；本任务已固定逻辑字段和依赖方向。
+- interface artifact registry 的精确文件集合、schema validator 与 digest builder
+  落点，需在实现时固定；wire ref 和 canonicalization 规则已收敛。
 - 每条 Journey 的详细步骤、最小 fixture 和 negative branch 在对应 capability discovery 后细化，不重新打开 Portfolio 结构。
 
-## 2026-07-29 — Business input and concurrency precondition separated
+## 2026-07-29 — Business input and concurrency precondition separated (historical)
 
 - 用户确认采用通用 optimistic-concurrency/idempotency 分层，但不把某一种 wire
   token 形式误称为唯一行业标准。
 - capability-specific typed input 只包含业务字段；target、expected version、
   authenticated actor/scope 和 command identity 属于通用 Harness contract。
-- prepare 冻结并将 expected version、精确 target、actor/scope、canonical input
-  hash 和 expiry 绑定到 opaque `confirmationRef`；execute 不得自动追随最新版本。
+- 当时使用单一 expected-version/hash 表述；本轮审阅将其替换为 typed
+  `headBindings[]` 与 canonical input integrity。protected low-entropy body 使用
+  secret-keyed tag；execute 不得自动追随最新状态。
 - expected version 与 CommandExecution idempotency identity 保持正交；前者防止
   stale intent/lost update，后者支持 transport retry 与 exact replay。
 - 当前只更新规划文档，无应用代码、配置、manifest、schema 或数据库变更。
@@ -119,9 +126,30 @@
 - 用户确认 T-005 reply 是 CareGroup-owned append，不存在单一回复 winner。
 - 本决策 supersede 将所有 action 一律绑定 whole-aggregate exact version 的解释。
 - descriptor 增加 `exact_state | lifecycle_authority | append_compatible`
-  concurrency class。acknowledge 使用 exact work-state；reply 使用 append-compatible
-  lifecycle/authority/policy heads。
+  concurrency summary class。acknowledge 使用 exact acknowledgement head +
+  declared convergence；reply 使用 append-compatible lifecycle/authority/policy heads。
 - 另一个合法 reply 不使 confirmation stale；closed/suppressed、Grant/Enrollment/
   CareGroup、role、policy 或 retention 漂移仍失败关闭。
 - concurrency precondition 与 CommandExecution idempotency identity 继续正交。
 - 当前只更新规划文档，无应用代码、配置、manifest、schema 或数据库变更。
+
+## 2026-07-29 — Full contract coherence and executability review
+
+- 完整审阅 T-004 overview/plan/architecture/verification/pitfalls，并对照 product/workflow
+  context、scenario manifest/module 和 T-005 family-care contract。
+- 修复“所有跨边界动作都可撤回/更正”的过度承诺，改为逐 capability 明确
+  correction/withdrawal/redaction/irreversible audit。
+- 发现 `CareInteraction`、`ActionExecution`、`ActionDelivery`、`PublishProcess` 和
+  `InstitutionWorkflow` 原本被要求塞进一个 operation class；现改为
+  domain/execution/delivery 三轴，固定 `CapabilityDescriptorV1` 最小字段。
+- 固定 `InterfaceContractRefV1` 的 exact key/version/digest wire 语义、artifact-set
+  canonicalization、admission 和 no-range/no-latest 规则。
+- 将 concurrency 从单一 summary enum 扩展为 typed `headBindings[]`，补充
+  `must_equal`、`must_satisfy`、`compatible_append` 和
+  `convergent_postcondition`。因此 acknowledge 可以在目标状态已满足时合法收敛，
+  reply 可以兼容 append，而其他 drift 仍 fail closed。
+- 固定 `SurfaceEnvelopeV1` 最小字段、atomic snapshot、cursor binding、refresh/rebase
+  和 dependency NO-GO 语义；未确认 prepare 不再被误写为 canonical pending timeline。
+- 修正 Caregiver teacher board：它同时承载 family-care work action 和独立
+  PublishProcess，不再被描述为“只有两阶段发布”。
+- 当前仅修改 T-004 规划合同，无应用代码、manifest、schema 或数据库变更。

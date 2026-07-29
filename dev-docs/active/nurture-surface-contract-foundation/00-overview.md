@@ -6,7 +6,8 @@
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-29
-- Next step: 顶层决策已收敛；进入 Phase 0 discovery，盘点现有 manifest/module/contracts 与 T-002 可复用/受阻边界。
+- Next step: 按本轮合同审阅后的规范字段完成 Phase 0 复用/门禁矩阵，并冻结
+  `SurfaceContractV1`、`CapabilityDescriptorV1` 与通用 invocation/result schemas。
 
 ## Goal
 
@@ -23,7 +24,9 @@
   - Institution workbench（Web）
 - actor / role / workspace / child scope / visibility 矩阵。
 - capability-first queries / commands 与 surface-first presenter / view-model 的版本化契约。
-- machine-readable capability descriptors：intent、typed schemas、eligibility policy reference、side-effect/confirmation class 与 handler/presenter binding。
+- machine-readable capability descriptors：domain/execution/delivery 三轴分类、intent、
+  typed input/result/error schemas、eligibility policy reference、target/confirmation/
+  concurrency policy 与 handler/presenter binding。
 - atomic surface envelope，以及 Conversation timeline、Board semantic modules、Workbench Hub/List/Insight 三类语义内容模型。
 - Nurture-owned 内容、状态、语义顺序与 capability affordances；终端视觉/布局继续归 My-Chat。
 - Workflow 术语与投影基线：当前产品 Workflow 只指园区管理
@@ -58,7 +61,8 @@
 ## Acceptance Criteria
 
 - [ ] 六个 surface 均有明确的 actor、workspace、read/write、child scope 和数据敏感度定义。
-- [ ] 所有跨家庭/机构边界的动作均显式授权、可审计、可撤回或可更正。
+- [ ] 所有跨家庭/机构边界的动作均显式授权、可审计，并明确其
+  correction/withdrawal/redaction/irreversible 边界；任何动作都不得静默覆盖或删除历史。
 - [ ] public API 与 presenter/view-model 契约可由 My-Chat 在不访问 Nurture 数据库的前提下消费。
 - [ ] capability catalog 可由未来共享 discovery/invocation protocol 消费，但 T-004 不依赖该共享引擎落地。
 - [ ] LLM 选择只发生在 deterministic policy 过滤后的候选集中，执行端仍重新验证所有业务前置条件。
@@ -69,17 +73,26 @@
 - [ ] 每条产品 Journey 同时证明一个用户价值闭环和最高风险拒绝路径；RJ-1 证明跨 surface 的 revoke/correction/recovery。
 - [ ] 契约明确默认关闭、失败关闭、兼容性 pin 和非诊断健康表达。
 - [ ] 未引入 My-Chat ORM、宿主 runtime、shell 或 canonical identity 的本地副本。
-- [ ] capability catalog 明确区分 `ActionExecution`、`ActionDelivery`、
-  `CareInteraction`、`PublishProcess` 与 `InstitutionWorkflow`，不以异步/跨 owner
-  作为 Workflow 分类条件。
-- [ ] capability-specific typed input 只包含业务字段；target、expected version、
-  actor/scope 与 idempotency 分别属于通用 invocation/confirmation contract。
-- [ ] capability descriptor 声明 concurrency precondition class；exact-state transition
-  可冻结版本，append-compatible action 冻结 lifecycle/authority heads，不能一律使用
+- [ ] capability catalog 用独立的 domain、execution 和 delivery 字段区分
+  `CareInteraction`、`ActionExecution`、`ActionDelivery`、`PublishProcess` 与
+  `InstitutionWorkflow`；不得把 domain/process/transport 混进一个枚举，也不以
+  异步/跨 owner 作为 Workflow 分类条件。
+- [ ] capability-specific typed input 只包含业务字段；target、typed concurrency
+  heads、actor/scope 与 idempotency 分别属于通用 invocation/confirmation contract。
+- [ ] capability descriptor 声明 concurrency summary class 和逐项 head bindings；
+  exact-state transition 可冻结版本并显式声明 already-satisfied convergence，
+  append-compatible action 冻结 lifecycle/authority heads，不能一律使用
   whole-aggregate strict CAS。
 - [ ] Board envelope 可以承载 Workflow projection，但不包含 raw Run/Step 或
   绕过 current authority 的 action payload。
+- [ ] discovery、surface response 与 invocation 均携带 exact interface contract
+  key/version/digest；不存在 version range、mutable `latest` 或 digest 缺失时的 fallback。
 
 ## Next Step
 
-T-004 顶层决策已收敛：契约组织、共享引擎边界、semantic UI、Journey Portfolio、Identity/Grant、多机构、Chat/Board、T-002 parallelism、Service/API 边界与 interface identity ownership 均已锁定。下一步进入 Phase 0 discovery，盘点既有 manifest、module、presenter、repository port 与 context contract，并把结果标为复用、扩展、owner-integration-gated 或 activation-gated。
+T-004 顶层决策已收敛：契约组织、共享引擎边界、semantic UI、Journey Portfolio、
+Identity/Grant、多机构、Chat/Board、T-002 parallelism、Service/API 边界与 interface
+identity ownership 均已锁定。本轮合同审阅进一步固定了 descriptor 三轴分类、最小
+envelope、contract identity/digest、组合式 concurrency heads 与 exact-state convergence。
+下一步完成现有 manifest/module/presenter/repository port 的复用/扩展/门禁矩阵，并产出
+可生成 schema 与 conformance fixture 的 V1 contract artifacts。

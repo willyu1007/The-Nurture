@@ -38,6 +38,13 @@
 | 2026-07-29 | Business typed input separated from target/concurrency/idempotency metadata; prepare-time precondition binding locked | PASS |
 | 2026-07-29 | Exact-state versus append-compatible concurrency classes separated; T-005 reply classified append-compatible | PASS |
 | 2026-07-29 | Board Workflow projection kept read-only/non-owning and authority-filtered | PASS |
+| 2026-07-29 | Full T-004 contract reread against product/workflow context, manifest/module and T-005 | PASS |
+| 2026-07-29 | Domain/execution/delivery descriptor axes replace the ambiguous single operation-class enum | PASS |
+| 2026-07-29 | CapabilityDescriptorV1 and SurfaceEnvelopeV1 minimum fields are explicit and testable | PASS |
+| 2026-07-29 | InterfaceContractRefV1 wire placement, canonicalization, exact digest admission and no-latest rule are explicit | PASS |
+| 2026-07-29 | Head bindings distinguish strict equality, predicate validity, compatible append and convergent postcondition | PASS |
+| 2026-07-29 | Cross-boundary mutation acceptance no longer promises that every action is reversible | PASS |
+| 2026-07-29 | Caregiver teacher board covers family-care work plus a separate PublishProcess | PASS |
 
 ## Implementation Verification (planned)
 
@@ -47,11 +54,27 @@
 - Fixture determinism and snapshot checks.
 - Negative authorization, private-data leakage and fail-closed tests.
 - Descriptor operation-class tests and negative “async implies Workflow” classification cases.
+- Descriptor schema tests for required domain/execution/delivery axes, typed schema refs,
+  target/confirmation/concurrency policies, handler/presenter parity and dependency gates.
+- Contract identity determinism tests: repeated build yields the same digest; duplicate/unknown
+  keys, unordered registry input, missing artifact, changed semantic order and digest mismatch fail.
+- Provenance-separation tests proving source revision/build time/environment do not perturb the
+  semantic digest when canonical artifacts are identical, while any artifact content change does.
+- Exact admission tests proving no version range, mutable latest, silent digest negotiation or
+  cross-artifact floating combination.
+- Surface envelope tests for one-snapshot required content, actor-safe context, typed union
+  closure, dependency NO-GO and absence of arbitrary UI props.
+- Cursor tests for contract/actor/scope/query/sort/snapshot/expiry binding and explicit
+  refresh/rebase on drift.
 - Projection schema tests excluding raw Run/Step/token/internal runtime state.
 - Exact-state stale-intent tests proving execute cannot adopt a newer work-state version.
+- Exact-state convergence tests proving only a declared already-satisfied postcondition can
+  converge across version drift.
 - Append-compatible tests proving another legal append does not invalidate confirmation while
   lifecycle/authority drift still fails closed.
 - Contract tests proving concurrency precondition and idempotency identity remain independent.
+- Protected-input tests proving low-entropy body integrity uses a keyed tag and no bare body hash
+  enters confirmation, logs, telemetry, Receipt or presenter output.
 
 ## Documentation Verification
 
@@ -67,6 +90,7 @@
 | 2026-07-29 | Service/API boundary correction documentation recheck using the three commands above | PASS |
 | 2026-07-29 | Interface/Service Candidate/composite identity ownership-split documentation recheck using the three commands above | PASS |
 | 2026-07-29 | Workflow/Action/Delivery/Interaction/Publish/Projection terminology SSOT and affected task-package recheck | PASS |
+| 2026-07-29 | Full contract-coherence revision: governance sync/lint, strict context verification, relative-link/heading checks and `git diff --check` | PASS |
 
 ## Evidence Policy
 

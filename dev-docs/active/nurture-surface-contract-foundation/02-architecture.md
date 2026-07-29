@@ -14,8 +14,11 @@ T-004 采用“语义发现平面 + 确定性执行平面”。它发布可机�
 - `CareInteraction`：家庭与照护者的 Message/CareItem/Event/Receipt 闭环。
 - `PublishProcess`：caregiver draft/review/publish 状态机。
 
-T-004 descriptor MUST 显式声明 operation class，不得因为 capability 异步、跨 owner、
-需要 worker 或产生通知就标记为 Workflow。
+这些术语不属于同一抽象层。`CareInteraction` 是业务 domain，`ActionExecution` 是
+提交方式，`ActionDelivery` 是提交后的宿主投递，`InstitutionWorkflow` 与
+`PublishProcess` 是不同的持久化业务过程。descriptor MUST 分轴声明，不能把五个术语
+压进一个 `operationClass` 枚举，也不得因为 capability 异步、跨 owner、需要 worker
+或产生通知就标记为 Workflow。
 
 ## Two-plane Contract Model
 
@@ -32,19 +35,78 @@ T-004 descriptor MUST 显式声明 operation class，不得因为 capability 异
 - presenters 按六个 surface 组织，只把已授权的 capability 结果转换为 role-safe view-model。
 - LLM 的建议或选择没有授权效力。
 
+### CapabilityDescriptorV1
+
+每个 descriptor 是发现和绑定元数据，不是 authorization snapshot。V1 最小字段为：
+
+```text
+CapabilityDescriptorV1
+  capabilityKey
+  capabilityVersion
+  contract: InterfaceContractRefV1
+  domainClass
+  executionClass
+  deliveryClass
+  intentKeys[]
+  inputSchemaRef
+  resultSchemaRef
+  errorSchemaRef
+  targetPolicy
+  confirmationPolicy
+  concurrencyPolicy
+  eligibilityPolicyRef
+  handlerBinding
+  presenterBindings[]
+  invalidationScopeKinds[]
+  dependencyGates[]
+```
+
+字段语义：
+
+- `domainClass` 至少区分 `care_interaction | institution_management |
+  publish_process | read_model`。
+- `executionClass` 至少区分 `query | action_execution |
+  institution_workflow_action | publish_process_transition`。
+- `deliveryClass` 为 `none | action_delivery_candidate`；它只声明提交后是否可能产生
+  宿主投递，不把投递状态并入 action result。
+- `intentKeys` 是版本化、allowlisted 的产品意图 key；自然语言 description 只供解释，
+  不能成为 handler binding。
+- `targetPolicy` 明确 `none | exact_bound | owner_option_required |
+  unique_eligible_default`，并定义 owner-issued option schema。
+- `confirmationPolicy` 明确 `none | direct_commit | reviewable_commit |
+  strong_confirmation`；技术 prepare/execute 阶段数不是 UI 手势数。
+- `eligibilityPolicyRef` 包含 stable key/version。descriptor 可声明适用角色，但执行端
+  每次仍根据 current actor/scope/owner facts 计算。
+- schema、policy、handler、presenter 或 dependency binding 任一变化都进入新的
+  contract artifact/digest；不存在 consumer 自由拼装的半版本组合。
+
 ### Invocation, Business Input and Preconditions
 
 - capability-specific `typedInput` 只包含用户实际提供的业务字段，不携带 actor、
   Workspace、raw target、Grant、expected version、command identity 或 transport retry metadata。
 - generic invocation context 携带 authenticated principal、surface、capability/version
   与 owner-issued opaque target ref；target ref 不是 authority。
-- capability descriptor MUST 声明 concurrency precondition class：
-  `exact_state`、`lifecycle_authority` 或 `append_compatible`。
+- capability descriptor MUST 声明 concurrency summary class：
+  `exact_state`、`lifecycle_authority` 或 `append_compatible`，并提供
+  `headBindings[]`。summary class 方便 discovery；真正执行条件以 typed head binding
+  schema 为准。
 - `prepareAction` 在当前 owner state 下解析精确 target 和该 capability 所需的
-  entity/authority/policy heads，并把它们连同 actor/scope、canonical input hash、
-  expiry 和 stable command identity 绑定进 opaque `confirmationRef`。
-- `exact_state` action 比较 prepare 时冻结的 work-state version；不得重新解释为
-  “使用当前最新版本”。
+  entity/authority/policy heads，并把它们连同 actor/scope、canonical input integrity、
+  expiry 和 stable command identity 绑定进 opaque `confirmationRef`。普通输入可使用
+  canonical hash；低熵受保护正文必须使用 secret-keyed integrity tag，不能存 bare
+  body hash。
+- `headBindings[]` 的 mode 为：
+  - `must_equal`：execute 时必须等于 prepare 冻结值。
+  - `must_satisfy`：execute 时必须继续满足 descriptor 指定的封闭 predicate/version。
+  - `compatible_append`：其他合法 append 可以改变集合，但不能改变已冻结的
+    lifecycle/authority predicates。
+  - `convergent_postcondition`：仅当 descriptor 声明的目标状态已由另一合法命令满足，
+    且其他 heads 仍有效时，允许 `already_satisfied`。
+- `exact_state` action 默认比较 prepare 时冻结的 work-state version；不得重新解释为
+  “使用当前最新版本”。若同时声明 `convergent_postcondition`，只允许向同一已满足
+  postcondition 收敛，不能把任意 version drift 当成功。T-005 acknowledge 使用该组合。
+- `lifecycle_authority` action 不关心明确列出的正交事实变化，但 frozen lifecycle、
+  association、Grant、role、policy 或 retention predicate 任一失效即 stale/denied。
 - `append_compatible` action 只要求 lifecycle/authority/policy 仍允许追加；其他合法
   append 不构成冲突。T-005 reply 属于该类。
 - concurrency precondition 解决 stale intent/invalid lifecycle；CommandExecution
@@ -76,6 +138,40 @@ My-Chat owns:
 7. Conformance contract：fixtures、selection cases 与预期 outputs；不进入生产运行。
 
 依赖方向只能由 catalog/surface/host contract 指向 typed application contract，再指向 policy/domain/repository；domain 不得依赖 surface 或 LLM。
+
+## Interface Contract Identity
+
+T-004 的 adoption/pin 单元是一个 exact interface contract ref：
+
+```text
+InterfaceContractRefV1
+  key: "nurture.surface-contract"
+  version: SemVer
+  digest: "sha256:<64 lowercase hex>"
+```
+
+- discovery document、每个 surface/query/action response 的根部 MUST 返回 exact ref。
+- invocation request MUST 提交它已采用的 exact ref；key/version/digest 缺失或不匹配
+  fail closed，并返回不含受保护业务状态的 compatibility error。
+- `version` 表达 compatibility 意图；`digest` 绑定确切 artifact contents。即使是
+  additive optional change，也生成新 version/digest，不原地覆盖旧 artifact。
+- 不允许 version range、mutable `latest`、服务器静默协商另一个 digest，或让 API、
+  descriptor、presenter、fixture 各自浮动。
+
+digest 输入是一个有序 artifact set：descriptor registry、surface schemas、
+invocation/result/error schemas、policy/schema refs、fixture manifest 和 conformance
+manifest。每个 artifact 先解析为严格数据模型，拒绝 unknown/duplicate keys，再按 UTF-8
+canonical JSON 生成字节：object keys 词典序，数组保持契约语义顺序；registry 类数组
+必须先按其 stable key 排序。digest 字段自身不进入 digest 输入。生成器必须能够从相同
+contract artifacts 重建相同 digest。
+
+source revision、build time 和生成器运行环境是 registry/evidence provenance，不进入
+semantic interface digest；否则没有语义变化的重建也会制造新 contract identity。
+不同 source revision 只要规范 artifact bytes 完全相同就得到同一 digest；任何
+descriptor/schema/policy ref/fixture/conformance 内容变化仍必须生成新 version/digest。
+
+T-008 只 pin 该 exact ref；Service Candidate identity 和 composite validation binding
+仍由 T-008/companion 定义，不进入普通业务 authorization。
 
 ## Runtime Ownership and Evolution
 
@@ -163,7 +259,7 @@ exact Service Candidate、contract compatibility、qualification result、deploy
 
 | Identity | Owner task | T-004 responsibility |
 | --- | --- | --- |
-| Interface contract identity/version/digest | T-004 | 定义逻辑身份、兼容规则和可重复 canonicalization；确切 wire 位置在 discovery 后确定 |
+| Interface contract identity/version/digest | T-004 | 定义 exact wire ref、artifact-set canonicalization、兼容规则和可重复 digest |
 | Nurture Service Candidate identity/digest | T-008 | 不设计具体 identifier；只交付 T-008 必须 pin 的 interface contract identity |
 | Composite validation binding | T-008 + My-Chat companion | 只定义必须关联 interface identity；不生成 build/environment evidence |
 
@@ -175,14 +271,51 @@ Service Candidate identity 不进入普通业务请求、capability eligibility 
 
 当前阶段先按 The Nurture 的节奏实现和验证 semantic UI contract，后续再由 My-Chat companion 适配 native/web shell。这里的“展示形式”是产品语义形式，不是像素级 UI。
 
-每次 surface open 返回一个原子一致的 envelope，至少标识 surface key、contract version、state、snapshot version、actor-safe context 和 content family。content 分为：
+每次 surface open 返回一个原子一致的 `SurfaceEnvelopeV1`：
 
-1. Conversation：有序 timeline items，例如 human message、AI structured response、boundary preview、clarification、confirmation、pending-send、receipt 和 correction/withdrawal notice。
+```text
+SurfaceEnvelopeV1
+  contract: InterfaceContractRefV1
+  surfaceKey
+  surfaceVersion
+  state: ready | limited | needs_setup | unavailable
+  snapshotRef
+  snapshotVersion
+  generatedAt
+  actorContext
+  contentFamily
+  content[]
+  actions[]
+  pageInfo?
+  dependencyNoGos[]
+```
+
+- `actorContext` 只包含当前角色/工作范围的 display-safe labels 和 opaque refs，不输出
+  account、Prisma、anchor、Grant 或 policy internals。
+- `content` 和 `actions` 是按 schema ref 封闭的 typed union。每个 action 只携带
+  capability/version 与 owner-issued target option ref，不携带可绕过 prepare/
+  owner-reread 的完整 command payload。
+- `dependencyNoGos` 只表达 machine-readable dependency class/version 和 safe retry/
+  setup hint；不暴露另一个 Institution、隐藏对象或具体权限丧失原因。
+- `snapshotRef`、cursor 和 target option 都是 body-free locator，不是 authority。
+
+content 分为：
+
+1. Conversation：有序 timeline items，例如 human message、AI structured response、
+   boundary preview、clarification、confirmation、receipt 和
+   correction/withdrawal/redaction notice。`pending-send` 只在某个 capability
+   （例如 PublishProcess 或 ActionDelivery projection）确有 canonical pending
+   state 时出现；未确认的 `prepareAction` 本身不是 timeline business fact。
 2. Board：有序 semantic modules，例如 guardian current focus、caregiver child-today panel、institution pulse；模块可以独立 pagination/refresh，但不能变成通用视觉 `Card`/`Grid` props。
 3. Workbench：Hub/List/Insight operational model，包括 collection、detail、
    `InstitutionWorkflow` queue、filters 和 authorized actions。
 
-初始 envelope 保证一致快照；大列表和历史内容通过 module/item cursor 增量读取。mutation 返回 canonical result、receipt 与 invalidation scope，不下发 UI patch。
+初始 envelope 的 required modules/items 来自同一 snapshot。大列表和历史内容通过
+module/item cursor 增量读取；cursor 必须绑定 exact contract、actor/scope、query、
+sort、snapshot 和 expiry。owner state 前移或 cursor 过期时返回 `refresh | rebase`
+而不是把不同 snapshot 静默拼成一个视图。mutation 返回 canonical result、适用的
+Receipt refs 与 invalidation scopes，不下发 UI patch；consumer 按 invalidation
+重新 `readResult`/query。
 
 ### Product Ownership
 
@@ -190,7 +323,8 @@ Nurture owns：
 
 - 输出哪些业务事实、状态和 provenance。
 - module/item 的产品语义、顺序、必要/可选属性和 capability actions。
-- 跨边界 preview/confirmation、pending-send、receipt、withdrawal/correction 的表现语义。
+- 跨边界 preview/confirmation、capability-specific pending state、receipt、
+  withdrawal/correction/redaction 的表现语义。
 
 My-Chat owns：
 
@@ -236,9 +370,9 @@ T-004 不以一条故事代表完整产品，而是维护五条代表性产品 J
 | --- | --- | --- | --- |
 | Guardian Nurture Chat | guardian | child-centered private synthesis | 仅执行目标已绑定或唯一目标的确定性动作；不做多机构 LLM 写路由 |
 | Guardian family board | guardian | family-owned record and target selection | 按具体 Enrollment 确认、发送、纠正与管理授权 |
-| Caregiver Nurture Chat | caregiver | care coordination | 只在被授权 child scope 内写入 |
-| Caregiver teacher board | caregiver | class work queue | 两阶段发布，不直接进入家庭私域 |
-| Institution board | institution steward | read-only aggregate + `InstitutionWorkflowProjection` | 无直接事实编辑 |
+| Caregiver Nurture Chat | caregiver / lead caregiver | current-item explanation and bounded care coordination | 只对精确 CareGroup/current child scope 执行已注册 action |
+| Caregiver teacher board | caregiver / lead caregiver | class work queue + family-care detail + PublishProcess | 通过同一 Harness acknowledge/reply；发布仍走独立 PublishProcess |
+| Institution board | authorized institution operator | read-only aggregate + `InstitutionWorkflowProjection` | 无直接事实编辑 |
 | Institution workbench | authorized institution operator | `InstitutionWorkflow` operational workspace | 可发 GrantRequest；不能代 Guardian 建立/替换/撤销 Grant |
 
 ## Identity and Permission Invariants
@@ -252,15 +386,26 @@ T-004 不以一条故事代表完整产品，而是维护五条代表性产品 J
 
 ## Compatibility Model
 
-- 每个候选版本必须声明 source revision、manifest/API/presenter contract 版本和 fixture 版本。
-- capability descriptor 的 intent、schema ref、side-effect/confirmation class 与 eligibility policy reference 都是版本化契约。
+- 每个 interface contract registry record 必须声明 source revision 作为 provenance，
+  并关联 descriptor/surface/API schema、policy refs 和 fixture/conformance manifest；
+  exact version/digest 只由规范 artifact contents 生成，不把 revision/build metadata
+  混入 semantic digest。
+- capability descriptor 的 intent、domain/execution/delivery、schema refs、
+  target/confirmation/concurrency policy 与 eligibility policy reference 都是版本化契约。
 - 添加可选字段可在兼容范围内演进；删除、改义、权限放宽均视为 breaking。
 - 未知 actor、缺失 grant、pin 不匹配或 authority reread 失败时必须 fail closed。
+- consumer admission 始终使用 exact digest。兼容新增不等于服务器可以对旧 consumer
+  静默切换 digest；采用新 artifact set 仍需显式 pin 和 conformance。
 
 ## Key Risks
 
 - 把 UI 需要的字段误当作读取授权。
 - 把 capability descriptor 中的 supported role 或 LLM 选择结果误当作执行授权。
+- 把 `CareInteraction`、`ActionExecution`、`ActionDelivery` 和 Workflow/PublishProcess
+  塞进一个 operation enum，导致 domain、提交和投递边界漂移。
+- 只写一个 concurrency class 而不固定 head bindings/convergence predicate，导致
+  acknowledge 的合法收敛与 reply 的合法 append 被实现成同一种 version CAS。
+- 对低熵受保护正文保存 bare canonical hash，形成可枚举的内容指纹。
 - 把唯一机构试点假设固化成“一名孩子只能有一个 Enrollment”，或让 LLM 在多个机构间静默选择写入目标。
 - 把 Institution GrantRequest 当成 Grant，或让一个 Enrollment 的授权扩散到另一个 Institution。
 - 把 Guardian 可读的跨机构总结暴露给任一 Institution，或丢失来源、时间和原始 Grant fences。
@@ -273,6 +418,7 @@ T-004 不以一条故事代表完整产品，而是维护五条代表性产品 J
 - 为未来 LLM 使用提前建设完整共享引擎，形成不必要的跨仓关键路径。
 - 把 semantic modules 扩张为通用 server-driven UI，或把 My-Chat 视觉布局写入 Nurture contract。
 - 让 LLM 生成未经注册的 item/module/action，形成 UI 或权限注入面。
+- 让 pagination cursor 跨 contract/actor/scope/snapshot 复用，或静默拼接不同 snapshot。
 - 用一条演示主线代表整个产品，遗漏反向流、成长连续性、关系建立、机构运营和恢复。
 - 把多条 Journey 串成一个可变数据库脚本，导致顺序依赖、重跑不稳定和证据归属不清。
 - 为六个 surface 各自复制领域事实，导致来源分裂。
