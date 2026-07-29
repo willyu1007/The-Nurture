@@ -3,18 +3,23 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5 consumer requalification（native CI clean）/ Wave 4 P2 binding-anchor repair（exact source and native CI green, formal adoption pending, default-deny）/ Pilot-0 readiness（authorized, in-progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ historical X5（complete）/ Wave 4 joint requalification（blocked on Host zero-version codec drift, default-deny）/ Pilot-0 readiness（authorized, in-progress）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-29
 - **Owner:** willyu1007
-- **Next step:** Complete formal cross-owner/PR adoption review of exact Host
-  `30792cd` and Nurture `b615a57`, then allow P3/joint conformance. Native run
-  `30403774597` passes 7/7 with zero annotations, including the exact Host pin,
-  refreshed normative contract, and 37 disposable-PostgreSQL tests. The
-  additive migration remains unapplied outside disposable CI and every
-  consumer remains default-disabled. C30-I1, C31, C4, D implementation,
-  Pilot-0-E, Pilot-1, any persistent database apply, artifact publication,
-  capability activation, and external traffic remain NO-GO.
+- Next step: Repair and publish the My-Chat Handoff codec so the Base-authorized
+  `CanonicalRef.version=0` reaches atomic materialization, re-pin the exact Host
+  revision/source hash, and rerun the two-database X5 gate before promoting
+  `codex/T-002-nurture-consolidation` to `main`. The current integration branch
+  safely consolidates the Nurture T-002 and environment increments, and its
+  static, unit, migration, production-DB, and dev-host gates pass. Exact X5
+  currently completes the Step as `manual_review_required` with zero
+  materialized Handoffs because My-Chat accepts only positive ref versions
+  while Base schema v1 permits non-negative versions. The additive migration
+  remains unapplied outside disposable databases and every consumer remains
+  default-disabled. C30-I1, C31, C4, D implementation, Pilot-0-E, Pilot-1, any
+  persistent database apply, artifact publication, capability activation, and
+  external traffic remain NO-GO.
 
 ## Current Cross-Repo Contract Baseline
 
@@ -70,6 +75,17 @@
   Migration `20260728160000_nurture_canonical_ref_v1` converts durable legacy
   refs and replaces the X4 driver CHECK with the canonical
   `my_chat/workflow_step` constraint.
+- The 2026-07-29 current-project consolidation reran the real two-database X5
+  journey against exact Base `63d47d2`, My-Chat `30792cd`, and the consolidated
+  Nurture source. It exposed a second incompatibility that revision/source-hash
+  verification cannot detect: Base's canonical-ref v1 JSON schema and
+  validation accept `version=0`, and Nurture correctly preserves its
+  zero-based aggregate versions, but My-Chat `handoff-value-codec.ts` rejects
+  every version below `1`. My-Chat therefore records
+  `workflow_handoff_invalid_draft`, completes the Step for manual review, and
+  creates no Handoff. No current My-Chat branch contains a repair. This is the
+  active cross-repository readiness blocker; a green Nurture CI run without the
+  joint X5 route cannot supersede it.
 - The Fastify-to-NestJS transition, port migration, API-index repair, and
   governance cleanup remain open. The current native-cloud CI repair changes
   no schema, migration, default-off activation, environment, provider,

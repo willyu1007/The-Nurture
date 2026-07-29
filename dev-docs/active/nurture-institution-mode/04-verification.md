@@ -2,16 +2,30 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-28
-- Current phase: Wave 4 P2 implementation and normative contract sync are
-  CI-green and default-deny at exact Nurture source `b615a57`; the former
-  authority-transaction and Host transport/concurrency blockers are closed,
-  while formal cross-owner/PR adoption remains open. Pilot-0-C decision
+- Last updated: 2026-07-29
+- Current phase: Wave 4 P2 implementation and normative contract sync remain
+  default-deny. Current-project consolidation passes all Nurture-local static,
+  unit, production-DB, and dev-host gates, but exact joint X5 is blocked by a
+  My-Chat canonical-ref zero-version codec drift. Promotion to `main` and
+  cross-repository implementation readiness are held. Pilot-0-C decision
   complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
 - Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## Current-project consolidation verification — 2026-07-29
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Branch scope | PASS | `codex/T-002-nurture-consolidation` contains the full T-002 alignment branch plus only the reviewed environment repair; stale scenario-platform donors are excluded. |
+| Static/local gates | PASS | Frozen install; exact pins and four verifier tests; strict context, environment, governance, and docs; typecheck; frontend lint; 187/187 unit tests; 35-file routing; persistence, N1, X4, and strict consumer boundaries. An unqualified deploy exits 1 with the expected owner-artifact/environment-approval denial. |
+| Disposable Nurture DB gates | PASS | Dynamic-port PostgreSQL applied five production and one dev-host migrations from empty. Production boundary reports 48 tables / 75 enums with 37/37 tests; dev-host reports 6 tables / 2 enums with 19/19 tests. |
+| Exact joint preparation | PASS AFTER HARNESS REPAIR | The first attempt generated only the production Prisma client and failed before collection while importing the dev-host client. Re-running `db:generate:all` prepared both clients; exact Base `63d47d2`, My-Chat `30792cd`, and Nurture source then reached the real X5 test. |
+| Exact two-database X5 | BLOCKED | Nurture commits and replays the business result, but My-Chat rejects source context refs at legal version `0`, records `workflow_handoff_invalid_draft`, returns `manual_review_required`, and materializes 0 Handoffs where 1 is required. |
+| Contract diagnosis | OWNER DEFECT CONFIRMED | Base `canonical-ref-v1.schema.json` declares `version.minimum=0` and Base validation accepts non-negative integers. Nurture's unit test preserves zero. My-Chat `handoff-value-codec.ts` uses `isPositiveVersion` for canonical refs. No existing My-Chat branch contains a repair. |
+| Cleanup/effect boundary | PASS | Both disposable database containers and all temporary exact-revision worktrees were removed. No persistent DB, migration apply, publication, secret/environment provider, activation, deployment, or traffic changed. |
+| Readiness decision | NO-GO | Keep the integration branch out of `main` until the Host owner fix is published, the pin/source hash is refreshed, X5 passes, and branch CI is green. |
 
 ## Wave 4 P2 local verification — 2026-07-28
 

@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-07-29 — Current-project consolidation and readiness gate
+
+The current-project consolidation branch is
+`codex/T-002-nurture-consolidation`. It merges the complete Nurture T-002
+owner-alignment increment and selectively adopts only the fail-closed
+environment repair from the stale environment donor. The stale
+scenario-platform-convergence worktrees remain donor evidence and are not
+merge inputs.
+
+| Work item | State | Exit |
+| --- | --- | --- |
+| Consolidate Nurture branches | Complete on integration branch | T-002 owner-alignment is fully merged; only the reviewed environment commit is harvested; unrelated stale donor source is excluded. |
+| Revalidate static and unit gates | Pass | Frozen install, exact pin, context, environment, governance, docs, typecheck, lint, 187 unit tests, routing, persistence, N1 schema, X4 replay, and strict consumer-boundary checks pass. |
+| Rehearse Nurture databases | Pass in disposable PostgreSQL | All five production and one dev-host migrations apply from empty; ownership boundaries pass; production DB is 37/37 and dev-host is 19/19. No persistent database is contacted. |
+| Requalify real X5 journey | Blocked on Host semantic drift | Exact two-database X5 reaches completion but My-Chat rejects legal `CanonicalRef.version=0`, returns `manual_review_required`, and materializes zero Handoffs. |
+| Promote integration branch to `main` | Held | Requires a published My-Chat codec repair, refreshed exact revision/source hash, passing X5, and green branch CI. |
+
+This checkpoint does not authorize a Nurture-side workaround that drops a
+valid zero version. Base canonical-ref v1 defines `version` as a non-negative
+integer; the fix belongs in the Host runtime codec and its conformance tests.
+Until that owner repair is adopted, current-project consolidation is safe but
+cross-repository implementation readiness is **NO-GO**.
+
 ## 2026-07-28 — My-Chat/T-030 acceptance increment
 
 The 2026-07-28 increment accepts and repairs the Nurture-owned portion of the

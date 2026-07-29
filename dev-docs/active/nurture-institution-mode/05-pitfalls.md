@@ -13,6 +13,7 @@ This file exists to prevent repeating mistakes within this task.
 - Do not accept JavaScript's broad date parser as an ISO contract. Derived age/stage expiry must be canonical UTC, current, and paired with a non-future calendar `as_of_date`.
 - Do not treat a version-shaped package dependency plus a local override as immutable by itself. The override is acceptable only when the checkout revision and every bounded source set are verified before install/use; release distribution remains a separate decision.
 - Do not re-pin a source dependency without reconciling the consumer CI runtime and registry authentication. The current My-Chat pin requires Node 22 or newer, and GitHub Packages installation requires an authenticated read token.
+- Do not prepare an exact X5 worktree with production Prisma generation only. The backend import graph also requires the generated dev-host client, so use `db:generate:all` before test collection.
 - Do not rebuild a published UI package from a Base sibling template in each consumer CI job. Consume the exact registry version and keep Base source pins as conformance evidence, not runtime resolution.
 - Do not close a direct sibling-source finding by changing only the import spelling. The package must export the required subpath, the consumer must use the exported subpath, and the exact transitive source population must be revision/content pinned.
 - Do not treat an advisory consumer-boundary finding as fixed merely because a finding is recorded in a task bundle; closure requires the local Base artifact link and direct sibling-source import to be removed and the clean joint gates to pass.
@@ -1680,3 +1681,20 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: Every cross-repository source repair must include a registered
   context-artifact census before evidence closure; if a contract path changes,
   refresh its checksum, source hash, exact revision, and native CI together.
+
+### 2026-07-29 — Generating only one Prisma client before exact X5
+
+- Symptom: The first exact X5 attempt failed before test collection because
+  `apps/backend/src/generated/dev-host-prisma/index.js` was missing.
+- Context: X5 uses the production Nurture database, but importing the backend
+  server also loads the dev-host client module.
+- What we tried: Running only `pnpm db:generate`, which prepared the production
+  Prisma client but not the backend-private generated client.
+- Root cause: The disposable-worktree preparation differed from the repository
+  CI preparation and did not account for the backend import graph.
+- Fix / workaround: Run `pnpm db:generate:all` with valid placeholder
+  production and dev-host URLs before X5 collection. The rerun reached the real
+  two-database journey.
+- Prevention: Exact X5 harnesses must mirror CI generation order and assert
+  both generated client entrypoints exist before starting disposable
+  databases.
