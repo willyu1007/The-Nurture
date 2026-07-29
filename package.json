@@ -43,7 +43,7 @@
     "db:migrate:all": "pnpm db:migrate && pnpm dev-host:db:migrate",
     "verify:unit-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/unit.json unit 187",
     "verify:db-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/production-db.json production-db 37",
-    "verify:dev-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/dev-host.json dev-host 19",
+    "verify:dev-host-population": "node scripts/assert-vitest-population.mjs .ai/.tmp/test-results/dev-host.json dev-host 21",
     "verify:test-routing": "node scripts/assert-test-routing.mjs",
     "verify:persistence-boundaries": "node scripts/assert-persistence-boundaries.mjs",
     "verify:n1-schema-contract": "node scripts/assert-n1-schema-contract.mjs",

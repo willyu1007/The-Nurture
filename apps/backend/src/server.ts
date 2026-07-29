@@ -9,6 +9,7 @@ import {
 } from "@the-nurture/db";
 import { WorkflowApprovalStatus } from "./db/dev-host-client.js";
 import type { NurtureApp } from "./app.js";
+import { registerScenarioBindingOwnerRoute } from "./binding-owner.js";
 
 type DomainContextRef = CanonicalRef;
 
@@ -29,6 +30,15 @@ export const buildServer = (
   const fastify = Fastify({ logger: false });
 
   fastify.get("/health", async () => ({ ok: true }));
+
+  registerScenarioBindingOwnerRoute(fastify, {
+    ...(app.scenarioBindingOwner
+      ? { authorizer: app.scenarioBindingOwner }
+      : {}),
+    ...(options.internalServiceToken
+      ? { internalServiceToken: options.internalServiceToken }
+      : {}),
+  });
 
   fastify.post<{
     Body: {

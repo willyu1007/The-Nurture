@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@my-chat/scenario-integrations": "0.1.0",
     "@my-chat/workflow-contracts": "0.1.0",
     "@my-chat/workflow-runtime": "0.1.0",
     "@the-nurture/db": "workspace:*",

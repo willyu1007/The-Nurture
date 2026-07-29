@@ -14,6 +14,7 @@ import {
   type NurtureUserAttentionResolution,
 } from "@the-nurture/scenario";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
+import { createScenarioBindingOwnerAuthorizer, type ScenarioBindingOwnerAuthorizer } from "./binding-owner.js";
 import { createDevHostPrismaClient, type DevHostPrismaClient } from "./db/dev-host-client.js";
 import { MockCanonicalObjectResolver, PgArtifactPreviewPort, PgRunContextPort } from "./deps/mock-deps.js";
 import { PgWorkflowRuntimePort } from "./runtime/pg-workflow-runtime.port.js";
@@ -42,6 +43,8 @@ export type NurtureApp = {
     source_context_refs: readonly DomainContextRef[];
     actor_user_id?: string;
   }): Promise<NurtureUserAttentionResolution>;
+  /** Present only when the binding evidence key is configured (P7 owner endpoint). */
+  scenarioBindingOwner?: ScenarioBindingOwnerAuthorizer;
   disconnect(): Promise<void>;
 };
 
@@ -51,7 +54,11 @@ export type NurtureApp = {
  * backend-private dev-host client. There is no cross-database transaction.
  */
 export const createNurtureApp = (
-  opts: { nurtureDatabaseUrl?: string; devHostDatabaseUrl?: string } = {},
+  opts: {
+    nurtureDatabaseUrl?: string;
+    devHostDatabaseUrl?: string;
+    bindingEvidenceKey?: string;
+  } = {},
 ): NurtureApp => {
   const nurturePrisma = createPrismaClient(opts.nurtureDatabaseUrl);
   const devHostPrisma = createDevHostPrismaClient(opts.devHostDatabaseUrl);
@@ -100,6 +107,14 @@ export const createNurtureApp = (
     presenters,
     scenarioRepositories: createScenarioRepositories(nurturePrisma),
     resolveUserAttention: (input) => resolveNurtureUserAttention(handlerDeps, input),
+    ...(opts.bindingEvidenceKey && opts.bindingEvidenceKey.length >= 32
+      ? {
+          scenarioBindingOwner: createScenarioBindingOwnerAuthorizer({
+            nurturePrisma,
+            evidenceKey: opts.bindingEvidenceKey,
+          }),
+        }
+      : {}),
     async disconnect() {
       await Promise.all([nurturePrisma.$disconnect(), devHostPrisma.$disconnect()]);
     },

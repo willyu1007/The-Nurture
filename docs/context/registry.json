@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-29T10:32:10.370Z",
+  "updatedAt": "2026-07-29T14:44:23.337Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "182a6daf2a7304ac1556a71a140995329156c6250e6eee950f602305097f9d8b",
-      "lastUpdated": "2026-07-29T09:56:21.241Z",
+      "checksumSha256": "7fc424307020e3b23389d8ddec4343911a04717144bdad2f6475877288780929",
+      "lastUpdated": "2026-07-29T14:43:52.025Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -136,8 +136,8 @@
         "config",
         "llm"
       ],
-      "checksumSha256": "0067d3aaff5ab894702a84a367d218bdf0fdd509dc41bb1f84cca9237dc8d186",
-      "lastUpdated": "2026-07-29T00:09:31.450Z",
+      "checksumSha256": "caab7ec70a691ba787dcc25dada955434f94981977268847e4aa9ab42dc5d986",
+      "lastUpdated": "2026-07-29T14:44:23.336Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

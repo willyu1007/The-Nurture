@@ -43,6 +43,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@my-chat/scenario-integrations':
+        specifier: link:../../../My-Chat/packages/scenario-integrations
+        version: link:../../../My-Chat/packages/scenario-integrations
       '@my-chat/workflow-contracts':
         specifier: link:../../../My-Chat/packages/workflow-contracts
         version: link:../../../My-Chat/packages/workflow-contracts
