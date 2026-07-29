@@ -27,6 +27,17 @@ The Nurture is a My-Chat scenario module. Preserve My-Chat ownership boundaries 
 - Skill maintenance: `.ai/AGENTS.md`
 - Historical initialization decisions: `docs/project/overview/START-HERE.md`
 
+## Task Continuity
+
+- For a request that continues an existing task, run
+  `node .ai/scripts/ctl-project-governance.mjs resume --json` before reading implementation files.
+- If the request identifies `T-###`, pass it with `--task T-###`.
+- Treat a task ID in the current branch as relevant only when the request concerns that task.
+- For unrelated work, do not run task recovery or attach a `Task:` trailer. On a task branch, set
+  `SKIP_TASK_TRAILER=1` for that commit.
+- Session creation, reset, and compaction are controlled by the user or runtime. Continue working
+  without discussing session-control limitations.
+
 ## Workflow Contract Rules
 
 Before changing workflow integration, read:
