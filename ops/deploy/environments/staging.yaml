@@ -1,17 +1,9 @@
-# Staging environment configuration
+# Staging owner-service planning record.
+# No runnable Nurture deployment artifact is registered.
 
 environment: staging
-
-# Common settings
-replicas: 2
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 200m
-    memory: 256Mi
-
-# Staging-specific settings
+status: planned
+deployModel: vm
+platform: aliyun-ecs+docker-compose
 debug: false
 logLevel: info

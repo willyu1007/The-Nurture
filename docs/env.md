@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-07-15T02:56:21Z`
+Generated at (UTC): `2026-07-26T22:20:58Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -16,7 +16,7 @@ Generated at (UTC): `2026-07-15T02:56:21Z`
 | `DEV_HOST_DATABASE_URL` | `active` | `url` | yes | yes | `` | `dev_host_database_url` | `dev` | `` | `` | `` | PostgreSQL connection URL for backend-private workflow dev-host schema and migrations. |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `nurture_internal_service_token` | `*` | `` | `` | `` | Shared service-auth token for refs-only activation owner reads; never persisted or logged. |
 | `PORT` | `active` | `int` | yes | no | `8000` | `` | `*` | `` | `` | `` | Service listen port. |
-| `SERVICE_NAME` | `active` | `string` | yes | no | `your-service` | `` | `*` | `` | `` | `` | Service name (logical). |
+| `SERVICE_NAME` | `active` | `string` | yes | no | `the-nurture` | `` | `*` | `` | `` | `` | Nurture owner service name used by logs and deployment metadata. |
 
 ## Loading model (recommended)
 
