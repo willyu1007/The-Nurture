@@ -136,10 +136,10 @@ const handoffActivation = (
   request_id: "attention-family-input-1",
   driver_context: {
     driverRef: {
-      namespace: "host.workflow",
+      schema_version: 1,
+      namespace: "my_chat",
       object_type: "workflow_step",
       object_id: stepId,
-      owner_scope: "workspace",
     },
     contractHash: "nurture-contract-hash-1",
     capabilityKey: "class_family_inbox",
@@ -403,11 +403,10 @@ describe("family input to class inbox command closure", () => {
         ...routePayload,
         route_mode: "pending_workflow" as const,
         pending_driver_ref: {
-          namespace: "host.workflow",
-          consumer_scenario_key: "nurture",
+          schema_version: 1 as const,
+          namespace: "my_chat",
           object_type: "workflow_step",
           object_id: "step-1",
-          owner_scope: "workspace" as const,
         },
       },
       "capture-pending-valid",

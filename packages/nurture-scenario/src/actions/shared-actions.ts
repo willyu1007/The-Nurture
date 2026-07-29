@@ -18,8 +18,10 @@ const runRef = (input: WorkflowStepHandlerInput, status: string): WorkflowRunRef
 });
 
 const canonicalRunRef = (input: WorkflowStepHandlerInput): CanonicalRef => ({
-  kind: "workflow_run",
-  id: input.run_id,
+  schema_version: 1,
+  namespace: "my_chat",
+  object_type: "workflow_run",
+  object_id: input.run_id,
   version: input.expected_step_version,
 });
 

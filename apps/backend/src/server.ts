@@ -1,6 +1,6 @@
 import { randomUUID, timingSafeEqual } from "node:crypto";
 import Fastify, { type FastifyInstance } from "fastify";
-import type { DomainContextRef, WorkflowCommandMeta } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowCommandMeta } from "@my-chat/workflow-contracts";
 import {
   NurtureCaptureExtractionStatus,
   NurtureCaptureInputModality,
@@ -9,6 +9,8 @@ import {
 } from "@the-nurture/db";
 import { WorkflowApprovalStatus } from "./db/dev-host-client.js";
 import type { NurtureApp } from "./app.js";
+
+type DomainContextRef = CanonicalRef;
 
 const DEFAULT_WORKSPACE = "ws-dev";
 

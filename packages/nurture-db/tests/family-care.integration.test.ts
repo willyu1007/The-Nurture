@@ -305,10 +305,10 @@ describe("N1 family-care Postgres journey", () => {
       request_id: `attention:${suffix}`,
       driver_context: {
         driverRef: {
-          namespace: "host.workflow",
+          schema_version: 1,
+          namespace: "my_chat",
           object_type: "workflow_step",
           object_id: stepId,
-          owner_scope: "workspace",
         },
         contractHash: "contract-hash-for-db-test",
         capabilityKey: "class_family_inbox",
@@ -346,14 +346,13 @@ describe("N1 family-care Postgres journey", () => {
       where: { workspaceId: fixture.workspaceId, commandKey: familyInputRouteSpec.command_key },
     });
     expect(execution.handoffDriverRef).toEqual({
-      namespace: "host.workflow",
-      consumer_scenario_key: "nurture",
+      schema_version: 1,
+      namespace: "my_chat",
       object_type: "workflow_step",
       object_id: `step:${suffix}`,
-      owner_scope: "workspace",
     });
     expect(JSON.stringify(execution)).not.toContain("claim-token-initial");
-    expect(JSON.stringify(execution.handoffDriverRef)).not.toContain("version");
+    expect(execution.handoffDriverRef).not.toHaveProperty("version");
     await expect(
       prisma.nurtureCommandExecution.update({
         where: { id: execution.id },
@@ -761,11 +760,10 @@ describe("N1 family-care Postgres journey", () => {
       ...routePayload(fixture, suffix),
       route_mode: "pending_workflow" as const,
       pending_driver_ref: {
-        namespace: "host.workflow",
-        consumer_scenario_key: "nurture",
+        schema_version: 1 as const,
+        namespace: "my_chat",
         object_type: "workflow_step",
         object_id: `step:${suffix}`,
-        owner_scope: "workspace" as const,
       },
     };
     const pending = await execute({

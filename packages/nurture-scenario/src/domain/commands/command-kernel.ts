@@ -1,7 +1,6 @@
 import { createHash } from "node:crypto";
 import type {
   CanonicalRef,
-  DomainContextRef,
   ScenarioHandoffRequestSnapshot,
 } from "@my-chat/workflow-contracts";
 import type { NurtureWorkflowProject } from "../../repositories.js";
@@ -16,6 +15,8 @@ import {
   type NurtureCommandHandoffPolicy,
   type PreparedNurtureHandoffActivation,
 } from "./handoff-replay.js";
+
+type DomainContextRef = CanonicalRef;
 
 export const NURTURE_COMMAND_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const HASH_HEX_PATTERN = /^[0-9a-f]{64}$/;
@@ -190,15 +191,15 @@ export const hashCommandPayload = (value: unknown): string =>
   sha256(`nurture.command-payload.v1\0${canonicalJsonV1(value)}`);
 
 const executionRef = (record: NurtureCommandExecutionRecord): DomainContextRef => ({
+  schema_version: 1,
   namespace: "nurture",
-  consumer_scenario_key: "nurture",
   object_type: "command_execution",
   object_id: record.id,
   version: 1,
-  owner_scope: "workspace",
 });
 
 const isBodylessRef = (ref: DomainContextRef): boolean =>
+  ref.schema_version === 1 &&
   typeof ref.namespace === "string" &&
   ref.namespace.length > 0 &&
   typeof ref.object_type === "string" &&

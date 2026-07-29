@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-07-13T15:20:55.933Z",
+  "updatedAt": "2026-07-28T13:47:58.745Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -15,6 +15,32 @@
     "schemas": []
   },
   "enums": [
+    {
+      "name": "NurtureBindingAnchorAssociationStatus",
+      "values": [
+        "active",
+        "revoked",
+        "quarantined"
+      ]
+    },
+    {
+      "name": "NurtureBindingAnchorStatus",
+      "values": [
+        "reserved",
+        "bound_empty",
+        "associated",
+        "revoked",
+        "quarantined",
+        "retired"
+      ]
+    },
+    {
+      "name": "NurtureBindingSubjectType",
+      "values": [
+        "child",
+        "family"
+      ]
+    },
     {
       "name": "NurtureCaptureExtractionStatus",
       "values": [
@@ -668,6 +694,13 @@
         "archived",
         "escalated",
         "cancelled"
+      ]
+    },
+    {
+      "name": "NurtureScenarioBindingAuthorizationStatus",
+      "values": [
+        "active",
+        "revoked"
       ]
     },
     {
@@ -1774,6 +1807,15 @@
       ],
       "relations": [
         {
+          "field": "anchorAssociations",
+          "to": "NurtureChildAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "careProcesses",
           "to": "NurtureChildCareProcess",
           "optional": false,
@@ -1793,6 +1835,400 @@
           ],
           "name": null,
           "map": "ix_nurture_child_status"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_workspace_id"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildAnchorAssociation",
+      "dbName": "nurture_child_anchor_association",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childAnchorId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_key",
+          "dbType": null,
+          "default": "\"current\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "quarantinedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantined_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "quarantineReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantine_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureBindingAnchorAssociationStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "child",
+          "to": "NurtureChild",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workspaceId",
+            "childId"
+          ],
+          "references": [
+            "workspaceId",
+            "id"
+          ]
+        },
+        {
+          "field": "childAnchor",
+          "to": "NurtureChildBindingAnchor",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "currentFamilyLinks",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureCurrentChildAssociation",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familyLinks",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureChildAssociationHistory",
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_child_anchor_assoc_status"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "id",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_anchor_current"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "id",
+            "workspaceId",
+            "childAnchorId",
+            "childId"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_anchor_integrity"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "childAnchorId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_anchor_workspace"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "childId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_anchor_local_child"
+        }
+      ]
+    },
+    {
+      "name": "NurtureChildBindingAnchor",
+      "dbName": "nurture_child_binding_anchor",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "quarantinedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantined_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "quarantineReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantine_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reservationKeyHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reservation_key_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureBindingAnchorStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "reserved",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "associations",
+          "to": "NurtureChildAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "authorizations",
+          "to": "NurtureScenarioBindingAuthorization",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "familyLinks",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_child_anchor_status"
         }
       ]
     },
@@ -1994,6 +2430,15 @@
           "references": []
         },
         {
+          "field": "familyAnchorAssociations",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "grants",
           "to": "NurtureChildLinkGrant",
           "optional": false,
@@ -2068,6 +2513,16 @@
           ],
           "name": null,
           "map": "ix_nurture_child_process_status"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id",
+            "childId"
+          ],
+          "name": null,
+          "map": "uq_nurture_child_process_integrity"
         }
       ]
     },
@@ -5118,6 +5573,15 @@
       ],
       "relations": [
         {
+          "field": "anchorAssociations",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "childCareProcess",
           "to": "NurtureChildCareProcess",
           "optional": false,
@@ -5159,6 +5623,486 @@
           ],
           "name": null,
           "map": "ix_nurture_family_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id",
+            "childCareProcessId"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_process_integrity"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyAnchorAssociation",
+      "dbName": "nurture_family_anchor_association",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childAnchorId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childAssociationId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_association_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentChildAssociationId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_child_association_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_key",
+          "dbType": null,
+          "default": "\"current\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAnchorId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "quarantinedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantined_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "quarantineReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantine_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureBindingAnchorAssociationStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childAnchor",
+          "to": "NurtureChildBindingAnchor",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childAssociation",
+          "to": "NurtureChildAnchorAssociation",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureChildAssociationHistory",
+          "fields": [
+            "childAssociationId",
+            "workspaceId",
+            "childAnchorId",
+            "childId"
+          ],
+          "references": [
+            "id",
+            "workspaceId",
+            "childAnchorId",
+            "childId"
+          ]
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "childId"
+          ],
+          "references": [
+            "workspaceId",
+            "id",
+            "childId"
+          ]
+        },
+        {
+          "field": "currentChildAssociation",
+          "to": "NurtureChildAnchorAssociation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureCurrentChildAssociation",
+          "fields": [
+            "currentChildAssociationId",
+            "currentKey"
+          ],
+          "references": [
+            "id",
+            "currentKey"
+          ]
+        },
+        {
+          "field": "family",
+          "to": "NurtureFamily",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workspaceId",
+            "familyId",
+            "childCareProcessId"
+          ],
+          "references": [
+            "workspaceId",
+            "id",
+            "childCareProcessId"
+          ]
+        },
+        {
+          "field": "familyAnchor",
+          "to": "NurtureFamilyBindingAnchor",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_anchor_assoc_status"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_anchor_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "familyAnchorId",
+            "childAnchorId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_anchor_pair"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "familyId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_anchor_local_family"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyBindingAnchor",
+      "dbName": "nurture_family_binding_anchor",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "quarantinedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantined_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "quarantineReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "quarantine_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reservationKeyHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reservation_key_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureBindingAnchorStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "reserved",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "associations",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "authorizations",
+          "to": "NurtureScenarioBindingAuthorization",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_anchor_status"
         }
       ]
     },
@@ -10438,6 +11382,317 @@
           ],
           "name": null,
           "map": "ix_26"
+        }
+      ]
+    },
+    {
+      "name": "NurtureScenarioBindingAuthorization",
+      "dbName": "nurture_scenario_binding_authorization",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_evidence_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorizationSourceRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorization_source_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorizationSourceVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "authorization_source_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childAnchorId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAnchorId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "idempotencyKeyHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "idempotency_key_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "organizationEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "organization_evidence_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ownerRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "owner_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ownerVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "owner_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purpose",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestFingerprint",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_fingerprint",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureScenarioBindingAuthorizationStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_evidence_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectType",
+          "type": "NurtureBindingSubjectType",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "userEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "user_evidence_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "verifiedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "verified_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childAnchor",
+          "to": "NurtureChildBindingAnchor",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "familyAnchor",
+          "to": "NurtureFamilyBindingAnchor",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "ownerRef",
+            "ownerVersion",
+            "status"
+          ],
+          "name": null,
+          "map": "ix_nurture_binding_auth_owner"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "subjectType",
+            "status",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_binding_auth_current"
         }
       ]
     },

@@ -11,8 +11,14 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@my-chat/workflow-contracts": "file:../../../My-Chat/packages/workflow-contracts",
+    "@my-chat/workflow-contracts": "0.1.0",
     "@prisma/client": "^5.22.0",
     "@the-nurture/scenario": "workspace:*"
+  },
+  "devDependencies": {
+    "@my-chat/db": "0.1.0",
+    "@my-chat/scenario-integrations": "0.1.0",
+    "@my-chat/workers": "0.1.0",
+    "@my-chat/workflow-runtime": "0.1.0"
   }
 }

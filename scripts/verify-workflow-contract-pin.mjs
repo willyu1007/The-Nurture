@@ -121,6 +121,12 @@ function assertPinShape(pin) {
   if (!pin.myWorkflowBase.sourcePins?.some((entry) => entry.key === 'web_workbench')) {
     throw new Error('My-Workflow-Base web_workbench source pin is required');
   }
+  if (!pin.myChat.sourcePins?.some((entry) => entry.key === 'x5_joint_api')) {
+    throw new Error('My-Chat x5_joint_api source pin is required');
+  }
+  if (!pin.myChat.sourcePins?.some((entry) => entry.key === 'wave4_binding_host')) {
+    throw new Error('My-Chat wave4_binding_host source pin is required');
+  }
   if (
     typeof pin?.nurtureScenario?.contractRoot !== 'string' ||
     !Array.isArray(pin?.nurtureScenario?.contractPaths) ||

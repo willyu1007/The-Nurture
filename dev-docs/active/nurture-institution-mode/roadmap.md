@@ -8,6 +8,22 @@
 
 My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、stewardship/membership/scenario binding 和场景外壳；Nurture 通过无 PII/无权限 typed anchors 与 exact workspace associations 连接平台 identity，并拥有 workspace-local 托育生态图谱、角色、入托、授权、家园沟通、照护记录和媒体归属。
 
+## My-Chat/T-030 coordination overlay（2026-07-28）
+
+| Item | Owner / input | State | Next gate |
+| --- | --- | --- | --- |
+| Ecosystem policy | My-Workflow-Base `26fac97fc82ec5f5df23528aacabbc16b749b490` | Adopted | Consumers implement package/source/port rules. |
+| Coordination baseline | My-Chat/T-030 baseline `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision `533cbf715315bc724ddeb82174c0a981e667d77b` | N3 adopted | Preserve exact revision/source verification. |
+| Nurture dependency boundary | T-002: Nurture leg of `X-2`, `RB-2`, `RB-3(a)` | Complete | Registry UI package, public My-Chat exports, exact source pin, strict scanner and X5 remain green. |
+| Wave 4 P1/P2 repair | My-Chat/T-028 + The-Nurture/T-002 | Exact source, normative contract, and native CI green | Host `30792cd` / `30375174861` and Nurture `b615a57` / `30403774597` pass with zero annotations; Nurture source hash is `354bb2...c83f`. Formal adoption review remains; P3 stays held. |
+| Nurture remaining scope | T-002: `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Implementation open | Resolve framework, ports, API index, and governance drift in independently reviewable increments. |
+| Enablement | Cross-repo | Closed | No staging, production, capability, provider, or external traffic activation from this overlay. |
+
+The Base publication -> My-Chat exact adoption/re-pin -> Nurture
+dependency/source cleanup -> joint conformance sequence is complete for the
+Nurture dependency leg. The overlay does not replace the stricter C30/Pilot
+gates below.
+
 ## 已确认的关键决策
 
 | 决策点 | 结论 |

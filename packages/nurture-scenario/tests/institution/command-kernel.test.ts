@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type {
-  DomainContextRef,
+  CanonicalRef,
   ScenarioCommandDriverContext,
 } from "@my-chat/workflow-contracts";
 import {
@@ -17,13 +17,15 @@ import {
 import { calibrateFamilyStrategyCommand } from "../../src/domain/commands/family-strategy.command.js";
 import { createInMemoryNurtureCommandRepository } from "../../src/domain/testing/in-memory-institution-ports.js";
 
+type DomainContextRef = CanonicalRef;
+
 const workspaceId = "ws-command";
 const outputRef = (version = 1): DomainContextRef => ({
+  schema_version: 1,
   namespace: "nurture",
   object_type: "test_output",
   object_id: "output-1",
   version,
-  owner_scope: "workspace",
 });
 
 const driver = (
@@ -32,10 +34,10 @@ const driver = (
   expectedStepVersion = 2,
 ): ScenarioCommandDriverContext => ({
   driverRef: {
-    namespace: "host.workflow",
+    schema_version: 1,
+    namespace: "my_chat",
     object_type: "workflow_step",
     object_id: stepId,
-    owner_scope: "workspace",
   },
   contractHash: "contract-hash-1",
   capabilityKey: "test_capability",
@@ -189,14 +191,13 @@ describe("NurtureCommandRunner", () => {
       command_request_id_hash: hashCommandRequestId(workspaceId, "command-1"),
     });
     expect(record?.handoff_driver_ref).toEqual({
-      namespace: "host.workflow",
-      consumer_scenario_key: "nurture",
+      schema_version: 1,
+      namespace: "my_chat",
       object_type: "workflow_step",
       object_id: "step-1",
-      owner_scope: "workspace",
     });
     expect(JSON.stringify(record)).not.toContain("claim-token-1");
-    expect(JSON.stringify(record?.handoff_driver_ref)).not.toContain("version");
+    expect(record?.handoff_driver_ref?.version).toBeUndefined();
 
     const reclaimed = await command(repository, commandSpec, {
       handoff_activation: {
@@ -220,7 +221,7 @@ describe("NurtureCommandRunner", () => {
     });
   });
 
-  it("omits a zero-based Nurture aggregate version at the shared Handoff boundary", async () => {
+  it("preserves a zero-based Nurture aggregate version at the shared Handoff boundary", async () => {
     const repository = createInMemoryNurtureCommandRepository();
     const zeroVersionSpec: NurtureCommandSpec<{ value: number }> = {
       ...spec(() => undefined),
@@ -245,10 +246,11 @@ describe("NurtureCommandRunner", () => {
     if (result.status !== "ok") throw new Error("zero-version command did not commit");
     expect(result.handoff_request_snapshots[0]?.sourceContextRefs).toEqual([
       {
+        schema_version: 1,
         namespace: "nurture",
         object_type: "test_output",
         object_id: "output-1",
-        owner_scope: "workspace",
+        version: 0,
       },
     ]);
   });
@@ -273,7 +275,7 @@ describe("NurtureCommandRunner", () => {
           request_id: "attention-consumer",
           driver_context: {
             ...driver(),
-            driverRef: { ...driver().driverRef, consumer_scenario_key: "another_scenario" },
+            driverRef: { ...driver().driverRef, namespace: "nurture" },
           },
         },
       }),
@@ -393,8 +395,20 @@ describe("family_strategy.calibrate command adoption", () => {
       project_id: "project-1",
       expected_version: 0,
       goal_payload: { objective: "reduce conflict" },
-      evidence_target_ref: { kind: "workflow_run" as const, id: "family-run", version: 1 },
-      evidence_ref: { kind: "context_snapshot" as const, id: "basis", version: 0 },
+      evidence_target_ref: {
+        schema_version: 1 as const,
+        namespace: "my_chat",
+        object_type: "workflow_run",
+        object_id: "family-run",
+        version: 1,
+      },
+      evidence_ref: {
+        schema_version: 1 as const,
+        namespace: "nurture",
+        object_type: "context_snapshot",
+        object_id: "basis",
+        version: 1,
+      },
     };
     const left = calibrateFamilyStrategyCommand.canonicalize({
       ...base,
@@ -454,8 +468,20 @@ describe("family_strategy.calibrate command adoption", () => {
         expected_version: 0,
         goal_payload: { objective: "reduce conflict" },
         constraint_payload: { safety_floor: "non-punitive" },
-        evidence_target_ref: { kind: "workflow_run" as const, id: "family-run", version: 1 },
-        evidence_ref: { kind: "context_snapshot" as const, id: "basis", version: 0 },
+        evidence_target_ref: {
+          schema_version: 1 as const,
+          namespace: "my_chat",
+          object_type: "workflow_run",
+          object_id: "family-run",
+          version: 1,
+        },
+        evidence_ref: {
+          schema_version: 1 as const,
+          namespace: "nurture",
+          object_type: "context_snapshot",
+          object_id: "basis",
+          version: 1,
+        },
       },
       spec: calibrateFamilyStrategyCommand,
     };

@@ -1,9 +1,10 @@
 import type {
   CanonicalRef,
-  DomainContextRef,
   ScenarioCommandDriverContext,
   ScenarioHandoffRequestSnapshot,
 } from "@my-chat/workflow-contracts";
+
+type DomainContextRef = CanonicalRef;
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const CONTROL = /[\u0000-\u001f\u007f]/;
@@ -16,36 +17,19 @@ const DRIVER_KEYS = new Set([
   "expectedStepVersion",
 ]);
 const DRIVER_REF_KEYS = new Set([
+  "schema_version",
   "namespace",
-  "consumer_scenario_key",
   "object_type",
   "object_id",
-  "owner_scope",
 ]);
 const CONTEXT_REF_KEYS = new Set([
+  "schema_version",
   "namespace",
-  "consumer_scenario_key",
   "object_type",
   "object_id",
   "version",
-  "owner_scope",
-  "canonical_ref",
 ]);
-const CANONICAL_REF_KEYS = new Set(["kind", "id", "version"]);
-const CANONICAL_REF_KINDS = new Set<CanonicalRef["kind"]>([
-  "scenario",
-  "capability",
-  "workflow_version",
-  "workflow_run",
-  "workflow_step",
-  "workflow_artifact",
-  "workflow_approval",
-  "workflow_handoff",
-  "domain_context_ref",
-  "context_snapshot",
-  "downstream_object",
-]);
-const CANONICAL_IDENTITY_KEYS = new Set(["service", "object_type", "object_id"]);
+const CANONICAL_REF_KEYS = CONTEXT_REF_KEYS;
 const SNAPSHOT_KEYS = new Set([
   "requestId",
   "handoffKey",
@@ -82,52 +66,25 @@ const validIsoInstant = (value: unknown): value is string => {
   return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === value;
 };
 
-const normalizeCanonicalIdentity = (
-  value: unknown,
-): DomainContextRef["canonical_ref"] | undefined => {
-  if (value === undefined) return undefined;
-  if (!isRecord(value) || !hasOnlyKeys(value, CANONICAL_IDENTITY_KEYS)) {
-    throw new Error("invalid canonical context identity");
-  }
-  if (!validId(value.service) || !validId(value.object_type) || !validId(value.object_id)) {
-    throw new Error("invalid canonical context identity");
-  }
-  return {
-    service: value.service,
-    object_type: value.object_type,
-    object_id: value.object_id,
-  };
-};
-
 const normalizeContextRef = (value: unknown): DomainContextRef => {
   if (!isRecord(value) || !hasOnlyKeys(value, CONTEXT_REF_KEYS)) {
     throw new Error("invalid handoff context ref");
   }
   if (
+    value.schema_version !== 1 ||
     !validId(value.namespace) ||
     !validId(value.object_type) ||
     !validId(value.object_id) ||
-    !["workspace", "organization", "platform", "external"].includes(String(value.owner_scope)) ||
-    (value.consumer_scenario_key !== undefined && !validId(value.consumer_scenario_key)) ||
     (value.version !== undefined && !validVersion(value.version))
   ) {
     throw new Error("invalid handoff context ref");
   }
-  const canonicalRef = normalizeCanonicalIdentity(value.canonical_ref);
-  // Nurture aggregates are 0-based, while the shared Handoff context-ref
-  // contract represents an initial/unversioned owner reread by omitting the
-  // optional version and accepts only positive versions when one is present.
-  const version = Number(value.version);
   const normalized: DomainContextRef = {
+    schema_version: 1,
     namespace: value.namespace,
-    ...(value.consumer_scenario_key
-      ? { consumer_scenario_key: value.consumer_scenario_key }
-      : {}),
     object_type: value.object_type,
     object_id: value.object_id,
-    ...(version > 0 ? { version } : {}),
-    owner_scope: value.owner_scope as DomainContextRef["owner_scope"],
-    ...(canonicalRef ? { canonical_ref: canonicalRef } : {}),
+    ...(value.version !== undefined ? { version: value.version } : {}),
   };
   if (JSON.stringify(normalized).length > MAX_SERIALIZED_REF) {
     throw new Error("handoff context ref is too large");
@@ -140,17 +97,19 @@ const normalizeCanonicalRef = (value: unknown): CanonicalRef => {
     throw new Error("invalid handoff artifact ref");
   }
   if (
-    typeof value.kind !== "string" ||
-    !CANONICAL_REF_KINDS.has(value.kind as CanonicalRef["kind"]) ||
-    !validId(value.id) ||
+    value.schema_version !== 1 ||
+    !validId(value.namespace) ||
+    !validId(value.object_type) ||
+    !validId(value.object_id) ||
     (value.version !== undefined && !validVersion(value.version))
   ) {
     throw new Error("invalid handoff artifact ref");
   }
-  const kind = value.kind as CanonicalRef["kind"];
   const normalized: CanonicalRef = {
-    kind,
-    id: value.id,
+    schema_version: 1,
+    namespace: value.namespace,
+    object_type: value.object_type,
+    object_id: value.object_id,
     ...(value.version !== undefined ? { version: value.version } : {}),
   };
   if (JSON.stringify(normalized).length > MAX_SERIALIZED_REF) {
@@ -205,22 +164,18 @@ const normalizeDriverRef = (value: unknown): DomainContextRef => {
     throw new Error("invalid durable handoff driver ref");
   }
   if (
-    value.namespace !== "host.workflow" ||
-    (value.consumer_scenario_key !== undefined && value.consumer_scenario_key !== "nurture") ||
+    value.schema_version !== 1 ||
+    value.namespace !== "my_chat" ||
     value.object_type !== "workflow_step" ||
-    !validId(value.object_id) ||
-    value.owner_scope !== "workspace"
+    !validId(value.object_id)
   ) {
     throw new Error("invalid durable handoff driver ref");
   }
   return {
-    namespace: "host.workflow",
-    // The shared driver fixture is owner-shaped and omits a consumer. Persist
-    // the scenario binding explicitly so a replay seed cannot cross scenarios.
-    consumer_scenario_key: "nurture",
+    schema_version: 1,
+    namespace: "my_chat",
     object_type: "workflow_step",
     object_id: value.object_id,
-    owner_scope: "workspace",
   };
 };
 
@@ -365,11 +320,11 @@ export const sameHandoffDriverRef = (
   Boolean(
     left &&
       right &&
+      left.schema_version === right.schema_version &&
       left.namespace === right.namespace &&
-      left.consumer_scenario_key === right.consumer_scenario_key &&
       left.object_type === right.object_type &&
       left.object_id === right.object_id &&
-      left.owner_scope === right.owner_scope,
+      left.version === right.version,
   );
 
 export const sameHandoffActivationSnapshot = <Input>(

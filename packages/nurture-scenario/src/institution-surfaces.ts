@@ -1,4 +1,4 @@
-import type { DomainContextRef, WorkflowInternalApiRegistry } from "@my-chat/workflow-contracts";
+import type { CanonicalRef, WorkflowInternalApiRegistry } from "@my-chat/workflow-contracts";
 import type { NurtureHandlerDeps } from "./deps.js";
 import { NurtureInteractionContextService } from "./domain/interactions/interaction-context.js";
 import {
@@ -14,6 +14,8 @@ import {
   NurtureUserAttentionService,
   type NurtureUserAttentionResolution,
 } from "./domain/institution/user-attention-activation.js";
+
+type DomainContextRef = CanonicalRef;
 
 export type InstitutionSurfaceKey = "class_family_inbox" | "teacher_attention_board";
 

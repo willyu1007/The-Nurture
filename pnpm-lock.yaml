@@ -5,7 +5,14 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@my-chat/db': link:../My-Chat/packages/db
+  '@my-chat/domain': link:../My-Chat/packages/domain
+  '@my-chat/outbox': link:../My-Chat/packages/outbox
+  '@my-chat/permissions': link:../My-Chat/packages/permissions
+  '@my-chat/scenario-integrations': link:../My-Chat/packages/scenario-integrations
+  '@my-chat/workers': link:../My-Chat/apps/workers
   '@my-chat/workflow-contracts': link:../My-Chat/packages/workflow-contracts
+  '@my-chat/workflow-runtime': link:../My-Chat/packages/workflow-runtime
 
 importers:
 
@@ -40,8 +47,8 @@ importers:
         specifier: link:../../../My-Chat/packages/workflow-contracts
         version: link:../../../My-Chat/packages/workflow-contracts
       '@my-chat/workflow-runtime':
-        specifier: file:../../../My-Chat/packages/workflow-runtime
-        version: file:../My-Chat/packages/workflow-runtime
+        specifier: link:../../../My-Chat/packages/workflow-runtime
+        version: link:../../../My-Chat/packages/workflow-runtime
       '@the-nurture/db':
         specifier: workspace:*
         version: link:../../packages/nurture-db
@@ -58,8 +65,8 @@ importers:
   apps/frontend:
     dependencies:
       '@willyu1007/web-workbench':
-        specifier: link:../../../My-Workflow-Base/templates/web-workbench
-        version: link:../../../My-Workflow-Base/templates/web-workbench
+        specifier: 0.7.0
+        version: 0.7.0(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next:
         specifier: ^16
         version: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -97,6 +104,19 @@ importers:
       '@the-nurture/scenario':
         specifier: workspace:*
         version: link:../nurture-scenario
+    devDependencies:
+      '@my-chat/db':
+        specifier: link:../../../My-Chat/packages/db
+        version: link:../../../My-Chat/packages/db
+      '@my-chat/scenario-integrations':
+        specifier: link:../../../My-Chat/packages/scenario-integrations
+        version: link:../../../My-Chat/packages/scenario-integrations
+      '@my-chat/workers':
+        specifier: link:../../../My-Chat/apps/workers
+        version: link:../../../My-Chat/apps/workers
+      '@my-chat/workflow-runtime':
+        specifier: link:../../../My-Chat/packages/workflow-runtime
+        version: link:../../../My-Chat/packages/workflow-runtime
 
   packages/nurture-scenario:
     dependencies:
@@ -105,8 +125,8 @@ importers:
         version: link:../../../My-Chat/packages/workflow-contracts
     devDependencies:
       '@my-chat/workflow-runtime':
-        specifier: file:../../../My-Chat/packages/workflow-runtime
-        version: file:../My-Chat/packages/workflow-runtime
+        specifier: link:../../../My-Chat/packages/workflow-runtime
+        version: link:../../../My-Chat/packages/workflow-runtime
 
 packages:
 
@@ -680,9 +700,6 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@my-chat/workflow-runtime@file:../My-Chat/packages/workflow-runtime':
-    resolution: {directory: ../My-Chat/packages/workflow-runtime, type: directory}
-
   '@next/env@16.2.10':
     resolution: {integrity: sha512-zLPxg9M0MEHmygpj5OuxjQ+vHMiy/K7cSp74G8ecYolmgUWw0RwN02tF56npup/+qaI8JB97hQgS/r2Hb6QwVA==}
 
@@ -983,6 +1000,13 @@ packages:
 
   '@vitest/utils@2.1.9':
     resolution: {integrity: sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ==}
+
+  '@willyu1007/web-workbench@0.7.0':
+    resolution: {integrity: sha512-WLB/Wlgn5ZwOfDhAHcgDJsHWMtWX4a3qcKDrTBOo81Qt9j6nI/HhhBZkTD23oF85/eFoVbmBg+cQS+zFwpSyfw==, tarball: https://npm.pkg.github.com/download/@willyu1007/web-workbench/0.7.0/5dad29c66e84a405e3e0cf6f4a75ac091a1cc33b}
+    peerDependencies:
+      next: '>=15'
+      react: '>=19'
+      react-dom: '>=19'
 
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
@@ -2369,10 +2393,6 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@my-chat/workflow-runtime@file:../My-Chat/packages/workflow-runtime':
-    dependencies:
-      '@my-chat/workflow-contracts': link:../My-Chat/packages/workflow-contracts
-
   '@next/env@16.2.10': {}
 
   '@next/swc-darwin-arm64@16.2.10':
@@ -2624,6 +2644,12 @@ snapshots:
       '@vitest/pretty-format': 2.1.9
       loupe: 3.2.1
       tinyrainbow: 1.2.0
+
+  '@willyu1007/web-workbench@0.7.0(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      next: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
 
   abstract-logging@2.0.1: {}
 

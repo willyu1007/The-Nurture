@@ -6,12 +6,12 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "acba4e792c85131c19e63e08a5f671133c481c57",
+    "revision": "63d47d2ebc6f5062181b721a25182710f7974b17",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa",
+    "contractSha256": "8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d",
     "sourcePins": [
       {
         "key": "web_workbench",
@@ -24,18 +24,81 @@
           "templates/web-workbench/src",
           "templates/web-workbench/lint"
         ],
-        "sha256": "9af31018673aae06ef8d440b69d93196a9bf160aa1557c4f8b370299647e888b"
+        "sha256": "43bb51e21f900067582fd059f79b1cc4bbfd8120ca26f4d7eb586c09bb51509d"
       }
     ]
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "a1b5e64c84c9865e34abb7068be10352cf42c949",
+    "revision": "30792cd48e35cce3720bfa8fb9a1094a59b0ccd7",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
     ],
-    "contractSha256": "0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa"
+    "contractSha256": "8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d",
+    "sourcePins": [
+      {
+        "key": "x5_joint_api",
+        "root": ".",
+        "paths": [
+          "apps/workers/package.json",
+          "apps/workers/src/nurture-user-attention-owner.ts",
+          "apps/workers/src/workflow-handoff-owner.ts",
+          "apps/workers/src/workflow-handoff-telemetry.ts",
+          "packages/db/package.json",
+          "packages/db/src",
+          "packages/domain/package.json",
+          "packages/domain/index.ts",
+          "packages/domain/actor",
+          "packages/domain/admin-governance",
+          "packages/domain/agent-participation",
+          "packages/domain/audit",
+          "packages/domain/chat",
+          "packages/domain/community-routing",
+          "packages/domain/content",
+          "packages/domain/domain-capabilities",
+          "packages/domain/forum",
+          "packages/domain/growth-record",
+          "packages/domain/identity",
+          "packages/domain/knowledge",
+          "packages/domain/media",
+          "packages/domain/memory",
+          "packages/domain/notification",
+          "packages/domain/personalization",
+          "packages/domain/projection",
+          "packages/domain/public-draft",
+          "packages/outbox/package.json",
+          "packages/outbox/src",
+          "packages/permissions/package.json",
+          "packages/permissions/src",
+          "packages/scenario-integrations/package.json",
+          "packages/scenario-integrations/src",
+          "packages/workflow-runtime/package.json",
+          "packages/workflow-runtime/src"
+        ],
+        "sha256": "cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6"
+      },
+      {
+        "key": "wave4_binding_host",
+        "root": ".",
+        "paths": [
+          "packages/domain/child-identity",
+          "packages/domain/package.json",
+          "packages/domain/index.ts",
+          "apps/api/src/child-identity/child-identity.controller.ts",
+          "apps/api/src/child-identity/child-identity.dto.ts",
+          "apps/api/src/child-identity/child-identity.module.ts",
+          "apps/api/src/child-identity/child-identity.service.ts",
+          "apps/api/src/child-identity/child-identity.validation.ts",
+          "apps/api/src/child-identity/tokens.ts",
+          "packages/db/src/scenario-binding-repository.ts",
+          "prisma/schema.prisma",
+          "prisma/migrations/20260728190000_wave4_binding_owner_evidence/migration.sql",
+          "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql"
+        ],
+        "sha256": "3dadb0b89fc7a782a590b5e7d8e2d6510b4c34029b0dc1a046a6a65f0c82f0c5"
+      }
+    ]
   },
   "nurtureScenario": {
     "contractRoot": ".",
@@ -44,15 +107,18 @@
       "apps/backend/src/main.ts",
       "apps/backend/src/server.ts",
       "docs/context/workflow/nurture-scenario-contract.md",
+      "packages/nurture-db/src/binding-evidence-hasher.ts",
       "packages/nurture-db/src/index.ts",
       "packages/nurture-db/src/repositories/family-care-command.transaction.ts",
       "packages/nurture-db/src/repositories/institution-core.repositories.ts",
       "packages/nurture-db/src/repositories/port-repositories.ts",
+      "packages/nurture-db/src/repositories/scenario-binding-owner.repository.ts",
       "packages/nurture-db/src/repositories/user-attention.repository.ts",
       "packages/nurture-scenario/scenario.manifest.yaml",
       "packages/nurture-scenario/src/deps.ts",
       "packages/nurture-scenario/src/domain/commands/command-kernel.ts",
       "packages/nurture-scenario/src/domain/commands/handoff-replay.ts",
+      "packages/nurture-scenario/src/domain/identity",
       "packages/nurture-scenario/src/domain/institution/family-care-commands.ts",
       "packages/nurture-scenario/src/domain/institution/family-care-transaction.ts",
       "packages/nurture-scenario/src/domain/institution/user-attention-activation.ts",
@@ -64,8 +130,10 @@
       "packages/nurture-scenario/src/module.ts",
       "packages/nurture-scenario/src/policies.ts",
       "packages/nurture-scenario/src/registry.ts",
-      "packages/nurture-scenario/src/repositories.ts"
+      "packages/nurture-scenario/src/repositories.ts",
+      "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
+      "prisma/schema.prisma"
     ],
-    "contractSha256": "e92582d9b710e62f087d92549e1e473a9a22d64b9ad0d058eb010c8c46a67d35"
+    "contractSha256": "354bb2206b9fb4248d7df247467c9422235e730f2056eff7a47967f92960c83f"
   }
 }

@@ -1,8 +1,10 @@
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   NurtureGrantDataClass,
   NurtureGrantDirection,
 } from "./institution-context.js";
+
+type DomainContextRef = CanonicalRef;
 
 export type FamilyCareCurrentGrant = {
   grant_id: string;

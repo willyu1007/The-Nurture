@@ -1,22 +1,23 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
-import type { CanonicalRef, DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import { createPrismaClient } from "../src/client.js";
 import { createNurtureRepositories } from "../src/index.js";
 
 const prisma = createPrismaClient();
 const repos = createNurtureRepositories(prisma);
 
+type DomainContextRef = CanonicalRef;
+
 afterAll(async () => {
   await prisma.$disconnect();
 });
 
 const familyRef = (workspaceId: string): DomainContextRef => ({
+  schema_version: 1,
   namespace: "my_chat",
   object_type: "family",
   object_id: `${workspaceId}:family`,
-  owner_scope: "workspace",
-  canonical_ref: { service: "my_chat", object_type: "family", object_id: `${workspaceId}:family` },
 });
 
 describe("NurtureProfileRepository (port)", () => {
@@ -70,7 +71,15 @@ describe("ActivityComparisonRepository (port)", () => {
     const workspaceId = randomUUID();
     const comparisonId = randomUUID();
     const targetRefs: DomainContextRef[] = [familyRef(workspaceId)];
-    const optionRefs: CanonicalRef[] = [{ kind: "downstream_object", id: "option-a", version: 1 }];
+    const optionRefs: CanonicalRef[] = [
+      {
+        schema_version: 1,
+        namespace: "nurture",
+        object_type: "downstream_object",
+        object_id: "option-a",
+        version: 1,
+      },
+    ];
 
     const created = await repos.activityComparisons.createDraft({
       comparison_id: comparisonId,
@@ -86,7 +95,7 @@ describe("ActivityComparisonRepository (port)", () => {
       comparison_id: comparisonId,
     });
     expect(fetched).not.toBeNull();
-    expect(fetched?.option_refs[0]?.id).toBe("option-a");
+    expect(fetched?.option_refs[0]?.object_id).toBe("option-a");
     expect(fetched?.target_refs[0]?.object_id).toBe(targetRefs[0]?.object_id);
   });
 });
@@ -94,8 +103,20 @@ describe("ActivityComparisonRepository (port)", () => {
 describe("NurtureEvidenceRepository (port)", () => {
   it("appends an evidence ref and returns it", async () => {
     const workspaceId = randomUUID();
-    const evidenceRef: CanonicalRef = { kind: "context_snapshot", id: randomUUID(), version: 1 };
-    const targetRef: CanonicalRef = { kind: "workflow_run", id: randomUUID(), version: 1 };
+    const evidenceRef: CanonicalRef = {
+      schema_version: 1,
+      namespace: "nurture",
+      object_type: "context_snapshot",
+      object_id: randomUUID(),
+      version: 1,
+    };
+    const targetRef: CanonicalRef = {
+      schema_version: 1,
+      namespace: "my_chat",
+      object_type: "workflow_run",
+      object_id: randomUUID(),
+      version: 1,
+    };
 
     const returned = await repos.evidence.appendEvidenceRef({
       workspace_id: workspaceId,
@@ -103,7 +124,7 @@ describe("NurtureEvidenceRepository (port)", () => {
       evidence_ref: evidenceRef,
       reason_code: "execution_review_outcome",
     });
-    expect(returned.id).toBe(evidenceRef.id);
+    expect(returned.object_id).toBe(evidenceRef.object_id);
 
     const count = await prisma.nurtureEvidenceRef.count({ where: { workspaceId } });
     expect(count).toBe(1);
@@ -118,7 +139,15 @@ describe("ActivityComparisonRepository weight/result persistence (port)", () => 
       comparison_id: comparisonId,
       workspace_id: workspaceId,
       target_refs: [familyRef(workspaceId)],
-      option_refs: [{ kind: "downstream_object", id: "opt-a", version: 1 }],
+      option_refs: [
+        {
+          schema_version: 1,
+          namespace: "nurture",
+          object_type: "downstream_object",
+          object_id: "opt-a",
+          version: 1,
+        },
+      ],
       safe_summary: "draft",
     });
 

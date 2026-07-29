@@ -17,17 +17,18 @@ import type {
   FamilyInputRoutePayload,
   NurtureFamilyCareCommandTransaction,
 } from "@the-nurture/scenario";
-import type { DomainContextRef } from "@my-chat/workflow-contracts";
+import type { CanonicalRef } from "@my-chat/workflow-contracts";
+
+type DomainContextRef = CanonicalRef;
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 
 const domainRef = (objectType: string, objectId: string, version = 1): DomainContextRef => ({
+  schema_version: 1,
   namespace: "nurture",
-  consumer_scenario_key: "nurture",
   object_type: objectType,
   object_id: objectId,
   version,
-  owner_scope: "workspace",
 });
 
 const roleCurrent = (row: {

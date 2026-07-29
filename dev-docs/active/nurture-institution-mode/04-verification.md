@@ -2,10 +2,175 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-21
-- Current phase: Pilot-0-C decision complete; Pilot-0-D `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; both current design reviews are `DR-P0=0 / DR-P1=0 / DR-P2=0`; the canonical readiness census has six open `TR-P0`, three open `TR-P1`, and one accepted-scope `TR-P1`; no complete candidate exists and `QR-*` is not applicable; implementation remains separately unauthorized
-- Code/config/schema impact: Pilot-0-D closure changes task/project planning documentation only. It does not change the current workflow context/pin, product code, Prisma schema/migration, Base/My-Chat source or contract bytes, database, artifact/ACR, secret/KMS, environment, capability/activation, provider, or traffic.
+- Last updated: 2026-07-28
+- Current phase: Wave 4 P2 implementation and normative contract sync are
+  CI-green and default-deny at exact Nurture source `b615a57`; the former
+  authority-transaction and Host transport/concurrency blockers are closed,
+  while formal cross-owner/PR adoption remains open. Pilot-0-C decision
+  complete; Pilot-0-D
+  `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
+  EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
+- Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## Wave 4 P2 local verification — 2026-07-28
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact Host contract input | PASS | My-Chat revision `64f4165fe571a46ded094ebf6f771bdea61383d1` supplies Workspace/User/Actor/idempotency-complete owner verification and a Workspace-bound receipt. My-Chat CI run `30361520780` is green with publication disabled. |
+| Prisma SSOT | PASS / PERSISTENT MIGRATION UNAPPLIED | Node 24 `pnpm exec prisma format`, `validate`, and `generate` pass. Native CI deployed the ordered migration history only to its disposable PostgreSQL service; no persistent target was selected or changed. |
+| Domain verification | PASS | `pnpm exec vitest run -c vitest.config.ts` over the two identity files passes 2 files / 12 tests. Coverage includes exact receipt context, wrong typed owner ref, default deny, self-asserted care-role rejection, Education substitution rejection, keyed reservation, derived field allowlist, canonical dates, expiry, and future-date denial. |
+| Repository verification | PASS | `pnpm exec vitest run -c vitest.db.config.ts packages/nurture-db/tests/scenario-binding-owner.repository.test.ts` passes 1 file / 8 tests. Coverage includes explicit HMAC key requirements and length framing, fresh local rebuild/replay, exact anchor row locking, Child and Family persistence, no raw platform subject/Actor persistence, divergent idempotency replay, stale owner version, and revoked receipt. |
+| Production PostgreSQL P2 verification | PASS | Native CI run `30366195095` deploys the full ordered history to fresh disposable PostgreSQL and passes all 35 DB tests. The three P2 checks prove real Prisma authorization replay/no raw id persistence, non-null birth-date write denial with ordinary local-label update success, cross-child composite-FK denial, current Child dependency fencing, and revoked-history replacement. |
+| Pin-verifier unit tests | PASS | `node --test scripts/verify-workflow-contract-pin.test.mjs` passes 4/4. |
+| Type boundary | PASS WITH KNOWN BUILD-ORDER PREREQUISITE | The two standalone identity domain sources pass strict isolated TypeScript checking. Direct DB-package isolation resolves the package public index and therefore reports the already-known missing prepared `@my-chat/workflow-contracts` distribution plus cascading legacy implicit types in this clean worktree; the repository CI prepares that pinned package before full typecheck. No build was run locally. |
+| Full local unit attempt | 18 FILES / 175 TESTS PASS; 3 SUITES NEED PREPARED PIN | All loadable suites pass. The three remaining existing suites fail module loading only because the clean worktree has no built pinned `@my-chat/workflow-contracts` / runtime distribution. Cloud CI runs `prepare:pinned-source` before the authoritative 21-file / 187-test population gate. |
+| Test routing and static boundaries | PASS | Routing is updated to 21 unit / 5 production-DB / 8 dev-host / 1 X5 files; minimum populations are 187 unit and 35 production-DB tests. Persistence, N1 schema, and X4 replay boundary scripts pass. |
+| Exact three-repository pin | PASS | Base `63d47d2`, My-Chat `64f4165`, shared contract `8dd53b...34d`, Host binding source `c62197...c69`, and 31-file Nurture source `2a6cd4...3d75` match. |
+| Generated context and governance | PASS | DB context regenerated, strict context verification passes, governance sync/lint/query returns T-002 `in-progress`, and no database was contacted. |
+| Whitespace | PASS | `git diff --check` passes after the source and migration review. |
+| Remaining Wave 4 P2 gates | REOPENED | Scoped docs lint and native CI remain green, but owner review requires transaction-atomic authority issuance plus repaired Host private-anchor/idempotency semantics and new concurrency evidence. |
+| Negative effect census | PASS | Only disposable CI databases received the migration history and test writes. No persistent DB connection/apply, birth-date inventory/deletion, authority-reader wiring, manifest/capability/Scenario activation, cloud/image publication, secret/environment/provider change, or traffic action occurred. |
+| Native CI run `30365905930` | PARTIAL PASS / REPAIRED | Disposable PostgreSQL migration, catalog boundary, and all 35 DB tests pass; dev-host, pin, context, governance also pass. Full TypeScript checking found a circular test-only `AnchorRow = ReturnType<typeof anchor>` alias and consequently blocked the unit and frontend-build jobs. The alias is now explicit; exact rerun pending. |
+| Native CI run `30366195095` | PASS | Exact head `8e8b5cb26233b171ce01d68ee6fd0ee19afa100f`; 7/7 jobs pass with zero annotations: exact pins/strict consumer boundary, context/environment, governance, full typecheck, 187 unit tests, 35 disposable-PostgreSQL tests, 19 dev-host tests, and frontend lint/build. |
+
+## Wave 4 P2 implementation-quality review — 2026-07-28
+
+Reviewed exact sources:
+
+```text
+My-Chat: 64f4165fe571a46ded094ebf6f771bdea61383d1
+Nurture: bfadbaf2bcf2c719dd26c250a31359c72b22094c
+```
+
+Targeted rerun:
+
+```bash
+pnpm exec vitest run -c vitest.config.ts \
+  packages/nurture-scenario/tests/identity/scenario-binding-owner.test.ts \
+  packages/nurture-scenario/tests/identity/derived-age-stage.test.ts
+```
+
+Result:
+
+- Two files / 12 tests pass.
+- Existing native CI `30366571495` remains 7/7 green with zero annotations.
+- Review status: **BLOCKED**.
+- `BLOCKER-NURTURE-AUTHORITY-ATOMICITY`: current authority is read before the
+  repository transaction; that transaction locks only the anchor and accepts
+  authority source evidence as input. A concurrent role/grant/purpose revoke
+  is not fenced by receipt persistence.
+- Cross-owner blockers remain the Host client anchor exposure and
+  non-deterministic Host command idempotency/version concurrency documented by
+  My-Chat/T-028 and My-Chat/T-030.
+- Missing evidence: a real PostgreSQL test that pauses after current-authority
+  read, revokes or advances the exact authority source, resumes issuance, and
+  proves no active receipt commits.
+- No persistent database, migration, historical birth-date operation, secret,
+  environment, artifact, capability, Scenario row, provider, deployment, or
+  traffic state changed.
+
+Exit requires a new Nurture exact revision, repaired Host pin, targeted
+concurrency/privacy tests, native CI, and joint owner review.
+
+## Wave 4 P2 authority-atomicity repair verification — 2026-07-28
+
+Three consecutive targeted rounds pass:
+
+```bash
+pnpm exec vitest run -c vitest.config.ts \
+  packages/nurture-scenario/tests/identity/scenario-binding-owner.test.ts
+
+DATABASE_URL=postgresql://... pnpm exec vitest run -c vitest.db.config.ts \
+  packages/nurture-db/tests/scenario-binding-owner.repository.test.ts \
+  packages/nurture-db/tests/scenario-binding-owner.integration.test.ts
+```
+
+Each round passes 6 domain tests and 13 database tests. The new evidence proves:
+
+- default repository wiring cannot issue an authorization;
+- authority lookup receives the exact repository transaction;
+- exact replay rereads current authority;
+- issuance holds the exact care-role source against concurrent revoke;
+- post-commit revoke makes later issuance fail closed.
+
+Additional evidence:
+
+- all five migrations apply to disposable PostgreSQL;
+- the complete production database population passes 37 / 37 tests;
+- Prisma validation, DB boundary, test routing, and persistence boundaries
+  pass;
+- the runnable local unit population passes 175 tests;
+- `git diff --check` passes.
+
+Three existing unit suites and full local typecheck require generated exact-pin
+My-Chat packages that are not prepared in the clean worktree. Native CI
+prepares those inputs and remains authoritative. No build was run locally.
+
+Result: `BLOCKER-NURTURE-AUTHORITY-ATOMICITY` is closed in local source and
+PostgreSQL evidence. Qualification remains pending the repaired exact Host pin,
+new Nurture revision/source hash, native no-publication CI, and joint owner
+review. Only disposable local PostgreSQL was used; no persistent or cloud
+state changed.
+
+Exact repaired pin evidence now passes:
+
+- My-Chat revision:
+  `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`;
+- shared Base/My-Chat workflow contract: `8dd53b...34d`;
+- 161-file X5 Host source: `cac294...ccf6`;
+- expanded 15-file Wave 4 Host source: `3dadb0...f0c5`;
+- repaired 31-file Nurture source: `c4d9ee...0bda`.
+
+The expanded Host source population covers the public DTO/validation/module
+boundary, private resolver/service, domain contract, repository, Prisma SSOT,
+and both Wave 4 migrations.
+
+Repaired Nurture exact-source result:
+
+- revision:
+  `1db91b3b1c79bde298c2e58b2d8c7baca091aabc`;
+- native run:
+  [`30375174703`](https://github.com/willyu1007/The-Nurture/actions/runs/30375174703);
+- result: 7 check runs pass with zero annotations, including exact pin/strict
+  boundary, full typecheck/unit, 37 disposable production-DB tests, dev-host
+  E2E, context/environment, governance, and frontend lint/build.
+
+Decision: `BLOCKER-NURTURE-AUTHORITY-ATOMICITY` is closed at the published
+exact revision. Formal cross-owner/PR adoption review remains. No persistent
+database, migration, artifact publication, deployment, capability, provider,
+or traffic state changed.
+
+## My-Chat/T-030 N3 Dependency Boundary Verification — 2026-07-28
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact dependency identity | PASS | Base=`26fac97fc82ec5f5df23528aacabbc16b749b490`; My-Chat=`533cbf715315bc724ddeb82174c0a981e667d77b`; workflow contract=`0bd8925ec8da88e0b7d0aa76b33bef94c471ff52499651c7b0c2a5da381501aa`; X5 API source=`581a5cec7b640823332453cf01f0024f1e36c88131da85ac65b423f1ee68640b` over 158 files; Nurture scenario=`e92582d9b710e62f087d92549e1e473a9a22d64b9ad0d058eb010c8c46a67d35`. |
+| Package/source boundary | PASS | Frontend consumes registry `@willyu1007/web-workbench@0.7.0`; CI configures GitHub Packages read authentication; X5 uses only `@my-chat/*` public exports; manifests no longer use direct `file:` sibling dependencies; exact-checkout root overrides are covered by the revision/source verifier. Cross-source jobs use Node 24 for the pinned My-Chat `node>=22` toolchain. |
+| Consumer-boundary enforcement | PASS / ZERO FINDINGS | Base `check-consumer-boundaries.mjs --consumer-role scenario --strict` reports zero findings. CI repeats the strict check from the pinned Base checkout. |
+| Install, type, lint, unit/static | PASS | Frozen install passes; pin verifier and 4 verifier tests pass; `pnpm typecheck`, `pnpm lint`, 19 files/175 unit tests, test-routing, persistence-boundary, N1 schema-contract, X4 replay, and both Prisma schema validations pass. |
+| Real joint regression | PASS | Fresh temporary My-Chat and Nurture databases received all 19 and 3 migrations respectively. `test:x5` passes the committed-result recovery, same-Step single materialization, and post-revoke fail-closed journey. |
+| Cleanup | PASS | Both temporary databases and the temporary My-Chat database role were dropped after X5. Exact dependency worktrees remain only until the commit handoff checks finish. |
+| Four-repository federation qualification | PASS | Coordinator-owned run `30343562287` passed against exact Base `ed69bbd`, My-Chat `53bf92b`, Education `d44286b`, and Nurture `edd7cef`. |
+| Public package clean-runner access | PASS | Owner-approved publication made `@willyu1007/web-workbench@0.7.0` public. Nurture run `30345550728` passed all four formerly blocked frozen-install steps without changing repository visibility, secrets, tokens, or package access entries. |
+| Native-cloud run after DB-job repair | PASS / ACTION RUNTIME REVERIFYING | Run `30347574708` passed all seven functional jobs at commit `a887a8a`, including production DB and dev-host DB/E2E. Its sole annotation identified `pnpm/action-setup@v4` as another deprecated Node 20 action runtime; the workflow now uses official current major v6 and awaits one clean rerun. |
+| Native-cloud action-runtime closure | PASS | Run `30347782865` passed all seven jobs at exact `e210980`; every check reports `annotations_count=0`. |
+| Public Base publishing SSOT re-pin | LOCAL PASS / CLOUD VERIFYING | Nurture pins Base `63d47d2` and the recalculated 58-file web-workbench hash `43bb51e2...`; contract/My-Chat hashes are unchanged. Exact pin, four verifier tests, typecheck, and lint pass locally; Base run `30348474446` passed its source/config parent with zero annotations. Full native cloud and renewed four-repository qualification remain pending. |
+| Local Node 24 regression after repair | PASS | Disposable PostgreSQL: `pnpm test:db` passes 3 files / 24 tests; `pnpm test:dev-host` passes 8 files / 19 tests. Unit tests pass 19 files / 175 tests; `pnpm typecheck`, `pnpm lint`, exact source-pin verification, YAML parse, `git diff --check`, and debug-marker scan pass. No shared database was touched. |
+| Remaining alignment scope | OPEN, UNCHANGED | Fastify-to-NestJS (`RB-6`/`DB-4(b)`), ports (`ST-2`), API index (`ST-4(c)`), and governance hygiene (`ST-6(b)`) remain separate work. |
+| Effect boundary | PASS | No schema/migration, persistent database, runtime activation, environment, provider, staging/production state, or external traffic changed. |
+
+## My-Chat/T-030 N2 Acceptance Verification — 2026-07-28
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact coordination inputs | PASS | Base ecosystem policy is pinned to `26fac97fc82ec5f5df23528aacabbc16b749b490`; My-Chat coordination baseline is `33264981515d75dd9768b720a1d1127cba70cbbe`; the Nurture acceptance starts from clean `aefc180fb4766c66efda1676794399fab9b23e78`. |
+| Repo-qualified ownership | PASS | T-002 accepts `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and `ST-6(b)` under `My-Chat/T-030`; no unqualified cross-repository `T-###` reference is used as authority. |
+| Consumer-boundary scan | PASS / TWO OPEN FINDINGS | Base `check-consumer-boundaries.mjs --consumer-role scenario --json` reports exactly `ECO-CONSUMER-002` at `apps/frontend/package.json` and `ECO-CONSUMER-004` at `packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts`. Advisory detection is acceptance evidence, not closure. |
+| Framework and port census | PASS / IMPLEMENTATION OPEN | `apps/backend/src/server.ts` is Fastify and its package/README identifies a dev-host harness, while repository requirements call for NestJS. The env contract default is `8000`, frontend defaults target backend `3001`, and Base assigns Nurture `3200/3201`. |
+| Documentation/governance/context/whitespace | PASS WITH EXISTING WARNINGS | Scoped document/anchor lint checks 31 files with 0 errors and the existing 18 vague-reference warnings; governance lint and T-002 query pass; strict context verification passes with the built-in validator; `git diff --check` passes. |
+| Effect boundary | PASS | The acceptance increment changes T-002 documentation only and changes no package/source/schema/migration/lockfile, database, environment, artifact, activation, provider, or traffic. |
+| Implementation authorization | NOT GRANTED | Re-pin, package publication, dependency cleanup, framework replacement, port migration, API-index repair, and governance cleanup remain pending and require their own implementation evidence. |
 
 ## C30-I0-B T-029 Disposition Verification — 2026-07-21
 
@@ -864,3 +1029,25 @@ For Pilot-0 readiness work:
 | 2026-07-14 | Workflow contract pin verification | PASS AFTER REPAIR | Base and My-Chat remain byte-identical at shared hash `0bd892...`; Nurture source pin now covers four files and verifies at `de32f2...`. |
 | 2026-07-14 | Context strict verification | PASS | Workflow context checksum refreshed; context layer strict verification passed. |
 | 2026-07-14 | Persistence/schema/test-routing gates | PASS | Persistence boundaries, N1 schema contract, routing census 16 unit / 3 production DB / 7 dev-host files, and population locks all pass. |
+| 2026-07-28 | Exact workflow-contract pin verifier | PASS | Base `ed69bbd` and My-Chat `53bf92b` resolve to the same 11-file hash `8dd53be4...`; My-Chat X5 source is `78a20458...`; Nurture scenario source is `622b7439...`; verifier tests pass 4/4. |
+| 2026-07-28 | `pnpm typecheck` | PASS | The exact linked `@my-chat/workflow-contracts` package is built first; all removed `DomainContextRef` and legacy canonical-ref callers compile against schema v1. |
+| 2026-07-28 | `pnpm test:unit:ci && pnpm verify:unit-population` | PASS | 175/175 unit tests pass, including zero-version preservation, exact-Step replay fencing, family-input replay, handler output refs, and canonical parsing. |
+| 2026-07-28 | Static scenario boundaries | PASS | `verify:test-routing`, `verify:persistence-boundaries`, `verify:n1-schema-contract`, updated `verify:x4-handoff-replay-contract`, project governance lint, and strict Base scenario-consumer scan all pass. |
+| 2026-07-28 | Disposable PostgreSQL 16 migration rehearsal | PASS | All four production migrations deploy from empty; a legacy driver plus profile/comparison/evidence/Execution/snapshot ref population converts to schema v1, preserves version `0`, leaves zero legacy ref keys, validates `ck_nurture_command_execution_handoff_v2`, and reports Prisma schema current. The disposable container was removed; no shared DB was mutated. |
+| 2026-07-28 | Four-repository federation qualification | PASS | Coordinator-owned run `30343562287` passed exact Base `ed69bbd`, My-Chat `53bf92b`, Education `d44286b`, and Nurture `edd7cef`. |
+| 2026-07-28 | Public package clean-runner access | PASS | After owner-approved public visibility, run `30345550728` passed all four frozen-install steps and every non-DB job. |
+| 2026-07-28 | Local native-cloud DB-job repair verification | PASS | Node 24 plus disposable PostgreSQL passes production DB `24/24`, dev-host `19/19`, unit `175/175`, full typecheck, frontend lint, exact source pin, YAML parse, diff check, and debug-marker cleanup. Fresh native cloud remains pending. |
+| 2026-07-28 | Native-cloud DB-job repair run `30347574708` | PASS / ONE ANNOTATION | All seven jobs passed at `a887a8a`; both repaired DB jobs are green. The only annotation targets `pnpm/action-setup@v4`, now upgraded to v6 pending a clean rerun. |
+| 2026-07-28 | Native-cloud action-runtime closure run `30347782865` | PASS | All seven jobs passed at `e210980`; GitHub check-runs report zero annotations for every job. |
+| 2026-07-28 | Public Base evidence re-pin | LOCAL PASS | Exact Base `63d47d2`, web-workbench hash `43bb51e2...`, unchanged workflow/My-Chat hashes, and four negative verifier tests pass. Native cloud and renewed federation remain pending. |
+| 2026-07-28 | Wave 4 P2 association lifecycle review | PASS AFTER REPAIR | Replaced all-row uniqueness with SSOT-modeled nullable current keys, added immutable plus current-only Child-association FKs, tightened lifecycle checks, and extended the real PostgreSQL case to prove active dependency fencing plus historical replacement. Cloud execution remains pending. |
+
+## Wave 4 P2 normative contract synchronization — 2026-07-29
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Workflow context contract | PASS | `docs/context/workflow/nurture-scenario-contract.md` now names exact Host `30792cd`, transaction-scoped authority reread/lock-or-CAS, same-transaction anchor/receipt/association semantics, default deny, and current-authority replay. |
+| Context registry | PASS | `ctl-context touch` refreshed the registered workflow checksum to `90d3da...6e46`; strict context verification passed. |
+| Three-repository pin | PASS | Base `63d47d2`, Host `30792cd`, 15-file Host hash `3dadb0...f0c5`, and 31-file Nurture hash `354bb2...c83f` verify exactly. |
+| Native CI | PASS | Exact source `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`; run `30403774597` passed all 7 jobs with zero annotations, including exact pin/boundary, context/governance, type/unit, 37 disposable production-DB tests, dev-host E2E, and frontend lint/build. |
+| Effect boundary | PASS | No persistent database or migration apply, package/image publication, environment/secret/provider change, Scenario/capability activation, deployment, or traffic change occurred. |
