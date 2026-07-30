@@ -118,32 +118,41 @@ Message/CareItem/Event/Receipt 链，不建立下表所述的跨角色共享房�
 今日笔记=按孩过滤的流投影 / 关注标签 + 补记）→ 班级流（类群聊图文流）→ 输入条 + 拍照 FAB。
 
 采集范式：**发了就走**——老师把照片/文字/语音直接发进班级流（与微信群行为一致）；
-AI 定时整理（如 10 分钟无操作）或点"整理"手动触发。语音一律转写为文字，**系统不保留音频形态**。
+老师点“整理”可立即按 stable watermark 切批；自动整理可由 10 分钟班级采集静默或发送
+窗口前兜底触发。兜底触发必须先通过默认 60 秒、园区可配 30 秒～3 分钟的班级用户操作
+quiescence gate；手动整理绕过该 gate。后台上传/缩略图/provider 进度不是用户操作，
+不能无限阻塞切批。语音一律转写为文字，**系统不保留音频形态**。
 
 ### 5.2 两段式发布（核心交互契约）
 
 ```
-原始内容入流 → AI 整理成卡（15s 否决窗，触碰即停）→ 【已整理 · 待发送】停在目标会话
-            → 发送时刻：定时批量（默认 12:30 / 17:00，机构可配）/ 手动"现在发送" / 撤回
+原始内容入流 → 明确 trigger 切出稳定批次 → 整理成卡（30s 快捷调整，触碰/编辑即停）
+            → 【已整理 · 待发送】停在目标会话
+            → 发送时刻：定时批量（Pilot 默认 17:00，机构可配）/ 手动"现在发送" / 取消
             → 送达家长（回执链开始）
 ```
 
-此处“撤回”仅取消仍未跨边界的待发送 PublishProcess 内容，不是已发送
+此处“取消”仅取消仍未跨边界的待发送 PublishProcess 内容，不是已发送
 CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
 
-- 读条走完 = 入待发队列（园所侧内部动作，未跨边界）；跨边界只发生在发送时刻：
+- 30 秒结束 = 入待发队列（园所侧内部动作，未跨边界且不等于发布）；跨边界只发生在发送时刻：
   手动发=显式确认；定时发=显式配置的常设策略。
 - 待发送态以灰虚线气泡停在**目标会话内**（老师可在收件人语境下审、删、补一句、即发）；
   班级流顶部有队列汇总行（"今天 17:00 统一发出 · N 条"）；离园前提醒扫一眼。
+- 快捷调整内触碰候选或取得 edit hold 会暂停自动入队；进入待发送后仍可持续编辑、
+  调整目标/媒体/时间或取消，直到 release commit 真正发生。
 - 低置信（待关联）/敏感类（情绪低落、磕碰、健康）**永不自动**：待关联内容只进班级档案、
   进不了家庭时间线；园所可整体切"全手动"。
 - **只有 AI 整理内容走队列**：老师亲手输入的消息永远即时发出。
 - 关联宝宝三源：照片识别 / 文字语音点名 / 活动上下文；头像区发布前可编辑（防错分发）。
-  发布后修改属于 PublishProcess 的 correction/replacement 设计输入；不得覆盖 T-005
+  发布后没有 5 分钟/24 小时快捷修改窗；低频安全修正使用 versioned
+  correction/replacement/visibility-removal/redaction capability，不得覆盖 T-005
   已锁定的 CareInteraction correction/withdrawal/redaction 契约。
 - 合照双路由：1-2 主角→对应家庭；群像→班级群/相册；AI 预判可改；机构可配更严政策。**[试点：政策]**
 - 落点可见：发出后内容真实出现在对应会话；状态行"查看"跳转定位。
-- 默认参数（**[试点]** 均可配）：否决窗 15s；批次 12:30/17:00。
+- 默认参数（**[试点]** 均可配）：快捷调整 30s；采集静默 10 分钟；自动触发
+  quiescence 60s（范围 30s～3 分钟）；Pilot 定时发送 17:00；发送前兜底整理 lead time
+  30 分钟。参数不改变 authority、idempotency、发布事务或 source-watermark 语义。
 
 ## 6. Institution Admin 表面
 
@@ -180,28 +189,84 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
   园区首页最多突出三个跨班信号，班级卡只显示 body-free 数量/原因并通过 exact
   owner-read 下钻。Mobile 不提供 dismiss/ack/escalate；Admin Web 配置 policy、
   查看来源并执行独立 source action。来源解决/撤回/纠正/redaction/revoke 后信号
-  自动消失，不自动回复、通知、创建 WorkItem/Workflow 或形成长期标红历史。
+  自动消失，不自动回复、通知、创建 WorkItem/Workflow 或形成长期标红历史。Web 仅可
+  显式创建 WorkItem，或启动当前 registry 已注册且 eligible 的 Workflow；普通 signal
+  不能启动 Enrollment Journey。
 - **AI 关注候选（后置）**：只在上述同一 owner-read 范围内，以来源引用突出可能需要
   介入的沟通；不自动行动、诊断、归责或评分，最多映射为“建议关注”，不能自行升级
   为“需要处理”。
 - **首个园区 Workflow**：第一实现增量只选择
   `EnrollmentJourneyWorkflowV1`，顶层覆盖意向咨询/沟通、可选到访、可选满班候补、
-  试入园准备/过程/复盘、正式入园确认、identity/Grant/Enrollment activation、
-  入园适应期和完成。`capacity_waitlist` 只表示目标班级满员；等待 Guardian、
-  caregiver、system owner、未来日期或 blocker 是 waiting/blocking state，不进入
-  候补顺序或容量统计。意向期只允许最少 local provisional data；试入园前需明确
-  Guardian consent，family-facing 试入园照片/文字还需 current binding/Grant。
-  Enrollment 激活是 milestone，Workflow 在适应期闭环后才完成且不产生适应评分。
-  当前只锁顶层旅程，精确 enum、transition、候补政策、trial consent、activation 和
-  completion schema 留待后续深入决策。
+  试入园前 identity/binding 与 pending Enrollment/Grant/CareGroup、普通试入园
+  适应/复盘、formal Enrollment 和完成。`capacity_waitlist` 只表示
+  目标班级满员；等待 Guardian、caregiver、system owner、未来日期或 blocker 是
+  waiting/blocking state，不进入
+  候补顺序或容量统计。意向/候补期允许最少 local provisional data，但实际试入园前
+  必须完成 Guardian-authorized My-Chat Child/Family、current binding、Nurture
+  association、pending Enrollment/Grant 与 exact CareGroup assignment。
+  试入园本身就是适应期；需要继续观察时在正式激活前显式延长 trial。正式激活把
+  同一关系的 `participationPhase` 从 `trial` 转为 `formal`，`status` 继续为
+  `active`；确认成功后 Workflow 幂等完成，不增加 post-activation settling、额外
+  反馈表或人工完成门。现有 `NurtureEnrollmentStatus` 不新增 `trial`；精确 DTO/
+  transition/migration 由 T-007 freeze register 冻结后才可启用。
+- **意向数据与沟通**：inquiry 默认只记录孩子称呼、出生月份或年龄段、期望入园
+  时间、目标班型/年龄段、照护时间需求、来源渠道、Host-owned opaque contact ref、
+  安全 label 和 last/next touchpoint；法定姓名和完整出生日期留到有明确 purpose/
+  consent 的后续阶段。raw phone/WeChat/email/account identity 不进入 Nurture。
+  native 园区业务沟通通过 canonical source owner-read；external phone/WeChat 只记
+  Admin structured summary、channel/time、confirmed needs 和 next action，不保存或
+  伪装 transcript。AI 仅从当前授权、可引用的 native source 生成待 Admin 确认的摘要
+  candidate，不生成意向/适配/转化评分，也不自动推进 `inquiry`。
+- **满班候补**：只有目标班级已满、家庭明确接受候补、目标班级和最少意向数据确认
+  后才生成 `waitlistQualifiedAt`；首次咨询不预占资格。园区使用版本化 priority
+  category，同类按资格时间 FIFO；未配置 category 时为纯 FIFO，AI 不参与排序。
+  Admin 调整顺序必须显式、说明原因并保留 append-only history。家庭只看自身状态、
+  目标班级和复核/联系时间，不显示精确名次、队列长度或排序依据。每条候补必须有
+  `nextReviewAt`；未回复进入 `waiting_on_guardian` 并按配置 reminder/deadline
+  处理，一次未回复不自动删除。空位只生成 Admin task，由 Admin 发出限时 offer；
+  Guardian 明确接受前不自动创建 identity、Grant 或 Enrollment。
+- **试入园身份与状态**：provisional subject 只存在于意向/到访/候补。真实试入园前，
+  Guardian 必须创建/选择并授权 My-Chat Child/Family，完成 current binding、
+  Nurture association、pending Enrollment/Grant 和 exact CareGroup assignment。
+  trial-start commit 原子写入 `status=active, participationPhase=trial`。
+  进入班级后与其他孩子共用普通 roster、attendance、care facts、照片自动关联、
+  board、family publication 和 PublishProcess；不建立 TrialChild、独立
+  trial consent/media/attendance/retention pipeline 或 caregiver Surface。phase
+  不授予权限。当天真实照护和出勤计入安全人数；正式在园统计只计算
+  `status=active && participationPhase=formal`，转正式不复制孩子或历史事实。
+- **试入园复盘**：家庭接受 trial offer 后关闭原 waitlist entry，并为 exact class
+  建立有 `trialStartsAt`、`trialEndsAt`、`reviewAt <= trialEndsAt` 的单一 capacity
+  reservation。review 到期只生成 Admin task/signal；不自动延长、录取、结束、释放
+  名额或联系下一位，超过 endsAt 继续试入园必须先显式延长。复盘复用已有出勤、
+  照护、普通观察和家园沟通，不要求老师填写 trial 评分表；AI 只提供带引用 draft。
+  Admin 只可延长、提出待 Guardian 接受的正式入园、或结束并释放名额；正式方案
+  等待期间继续占位。结束后继续等待需重新取得 D-07B qualification 和新的
+  `waitlistQualifiedAt`，不自动恢复旧名次。trial-start 前 Guardian 撤回由
+  `cancel_trial_preparation` 关闭 preparation shell 并释放 reservation；trial 已开始
+  后改走 end-trial。
+- **转正式与退出**：正式激活必须先有 Guardian 对 current proposal 的明确接受，再由
+  My-Chat 重验 Child/Family membership 与 scenario binding currentness。Nurture 在
+  一个 expected-version/idempotent local transaction 中同时完成 Enrollment
+  `participationPhase: trial → formal`（`status` 保持 `active`）、
+  reservation→active occupancy、Grant/CareGroup 更新；跨 owner
+  不宣称 distributed transaction。owner unavailable、binding drift、evidence expiry
+  或本地失败时保持 `active trial + reserved`，Workflow 显示 `waiting_on_system`，
+  所有 Surface 只在 commit 后显示 formal。end trial 是可在 My-Chat outage 下执行的
+  本地降权事务：同时将 `status` 转为 `ended`、结束 CareGroup/trial Grant、释放
+  reservation，之后只
+  创建 Admin task。退出不删除 My-Chat identity/binding、Nurture association 或历史
+  care facts，未来访问/发布停止，历史沿用 T-006 lifecycle。Workflow 完成后的正式
+  离园是普通 Enrollment maintenance，不重新打开 Journey。
 - **Web 操作台**：当前仅 `InstitutionAdminWorkbench` 可用，是
   `InstitutionWorkflow` 的主要操作面。首批包含人员与关系、日常运营、家长触达、
   数字资源、园区知识/RAG 与流程队列。出勤由 AI 在每日提交时提供推理，当前班级
   老师确认后才成为正式事实；Admin 可查看、催办、退回或跨日 reopen，不能代确认。
   园区编辑的知识可关联权威来源，产品内 AI 回答应提供来源引用。Admin 可新增园区
-  来源照片/文字、查看完整原图/正文、设置可选封面并调整活动/孩子关联；老师原始
-  内容、作者和时间不可原地覆盖，调整必须保留原始自动匹配、操作者、原因及完整
-  revision history。完整事实仍由 Nurture 持有，Web 不复制第二份 canonical 数据。
+  来源照片/文字、查看完整原图/正文、设置可选封面、调整活动落位并执行 downscope
+  hide；Admin 对 child attribution 只能提出 correction candidate/WorkItem，由
+  exact CareGroup caregiver 确认。老师原始内容、作者和时间不可原地覆盖，调整必须
+  保留原始自动匹配、操作者、原因及完整 revision history。完整事实仍由 Nurture
+  持有，Web 不复制第二份 canonical 数据。
 
 ## 7. 设计系统 [A]
 
@@ -224,7 +289,7 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
 | --- | --- | --- |
 | AI 房间 / 人类房间 | 对话界面按对方是谁分两种形态 | AI 无气泡（✦ 结构块+行动芯片）、无头像、无已读；人类经典气泡+回执。形态即身份，进错房间 3 秒可感知 |
 | 跨界预览卡 | 要离开私域的内容，长成目的地的样子 | 出边界内容渲染为"人类气泡"预览 + 显式动作；永不静默跨界 |
-| 读条卡（否决窗） | AI 将替你做某事的标准形态 | 卡片 + 流失进度条 + 触碰即停；AI 敢做，人持否决权 |
+| 读条卡（快捷调整窗） | 系统将执行可撤销内部推进的标准形态 | 卡片 + 流失进度条 + 触碰即停；30 秒后只进入待发送，不跨边界发布 |
 | 暂存气泡（两段式） | AI 产出停在目的地会话里的未发送态 | 灰虚线气泡 + 定时标签 + 现在发送/撤回；自动化永不跨边界，跨界=发送时刻；人工消息永远即时 |
 | 状态行 | 生命周期的一行收缩态 | 可跳转定位（"查看›"）；状态用生活语言，不用工单语言 |
 | 浮标 + 底部抽屉 | "第二空间"的唯一悬浮入口 | 抽屉=找功能，浮标=找人；抽屉头部按对象数选形态（≤2 segmented，多对象头像横轨一步直达） |
@@ -245,7 +310,7 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
 | 依赖 | 说明 | 现有衔接点 |
 | --- | --- | --- |
 | AI 整理管线 | 时间窗/活动包聚簇、关联宝宝三源、置信门控、敏感类兜底 | T-002 iia-resolver-contract（远不止） |
-| 调度 | 定时整理触发（无操作窗）、定时批量发送（12:30/17:00） | worker/outbox |
+| 调度 | 手动/静默/发送前兜底整理触发、quiescence gate、定时批量发送（Pilot 17:00） | worker/outbox |
 | 回执链 | 送达/已读/已确认跨端一致 | message lifecycle 有 receipt/redaction，需扩展"已读" |
 | 日程↔活动模板 | 班级日程 schema、理念→活动下发、整理归类钩子 | cohort_care_plan（未建） |
 | 场景视图机制 | shell 接管（落点/rail/悬浮/上下文） | My-Chat 跨仓立项（scenario-token 铺垫） |
@@ -253,7 +318,8 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
 
 ## 9. 待验证假设（试点清单）[试点]
 
-否决窗 15s 手感；批次时点（12:30/17:00）与家长接收体验；老师真实采集习惯与"整理"触发节奏；
+快捷调整 30s 手感；Pilot 17:00 与园区自定义批次时点的家长接收体验；10 分钟静默、
+60 秒 quiescence 与老师真实采集/“整理”触发节奏；
 班级群放开发言后的噪音；家长通知疲劳与推送分级规则；合照肖像政策；园长移动看板的数字选择；
 共创五问（记录耗时/理念落地卡点/家长最难答问题/合照政策/园长三数字）。
 
@@ -264,5 +330,17 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
   Institution-Admin-only Web 与班级优先 mobile，加入精确授权的园区业务沟通只读
   投影，固定确定性最新照片、完整 Web 照片/文字记录、append-only 关联修订，以及
   两级、非绩效、绝对阈值驱动的 support signals；首个 Workflow 只选择从意向到
-  适应期闭环的 Enrollment Journey，并将满班候补与普通 waiting state 分离。
+  试入园适应/复盘、正式激活和完成的 Enrollment Journey，将满班候补与普通
+  waiting state 分离，并以
+  D-07A 固定最少 inquiry data、Host contact owner 和 external-summary 边界，以
+  D-07B 固定候补资格、policy/FIFO 排序、家庭可见性、复核和限时 offer 边界，以
+  D-07C 固定 My-Chat-bound 普通试入园照护、trial lifecycle 标签和统计边界，以
+  D-07D 固定单名额 reservation、Admin 三结果复盘和不恢复旧候补名次的边界，以
+  D-07E 固定 My-Chat currentness 重验、Nurture 本地原子转换与安全 exit 边界，
+  以 D-07F 明确 trial 即适应期、activation success 后直接幂等完成 Workflow。
+- v1.2（2026-07-30）：同步 T-006 已锁定的 30 秒快捷调整、10 分钟采集静默、
+  60 秒 quiescence、Pilot 17:00 发送与发布前持续可编辑语义；同步 T-007 package
+  closeout 的 Admin activity/child-attribution authority、Enrollment
+  `status + participationPhase`、`cancel_trial_preparation`、普通 formal offboarding
+  和 contract freeze register。
 - 变更流程：先在任务包记录讨论与拍板，再更新本契约并 `ctl-context touch`。

@@ -6,9 +6,9 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-30
-- Next step: 深入讨论已锁定顶层范围的 D-07 `EnrollmentJourneyWorkflowV1`，依次
-  固定意向字段/沟通边界、满班候补规则、试入园授权与记录、复盘、activation 顺序和
-  适应期闭环；在此之前不冻结精确状态机或 schema。
+- Next step: 进入 Phase 0 contract/schema inventory，按 freeze register 先冻结
+  Enrollment `status + participationPhase`、trial reservation/cancellation、
+  Admin activity/child-attribution authority 和首个 Workflow public contract。
 
 ## Goal
 
@@ -31,8 +31,10 @@ Admin mobile 以班级为顶层入口，每个班级按自己的当日有效日�
 班级卡只提供当前活动、正式出勤提交状态、最新一张合格班级照片、最新文字、来源
 时间和待处理数量；不生成 AI “代表照片”或 freshness/绩效分数。班级详情展开完整
 日程活动、沟通、家园反馈和必要的目的限定 child-level 信息。Admin Web 可记录和
-查看完整照片/文字，并可调整活动/孩子关联或设置可选封面，但不得覆盖老师原始内容、
-伪造作者或抹去自动匹配及后续修订历史。
+查看完整照片/文字，并可调整活动落位、设置可选封面、添加园区说明或执行 downscope
+hide；不得覆盖老师原始内容、伪造作者或抹去自动匹配及后续修订历史。Admin-only
+不能确认、新增或替换 canonical child attribution，只能提出由 exact CareGroup
+caregiver 确认的修正候选。
 
 Support Signal 只表示“园区可能需要提供支持”。第一版由确定性业务状态和园区显式
 配置的绝对数量/时间窗口规则生成，用户只看到“需要处理 / 建议关注”两级，不形成
@@ -40,10 +42,56 @@ Support Signal 只表示“园区可能需要提供支持”。第一版由确�
 Web。内容语义介入仍是后置、default-off 的 AI candidate。
 
 首个实现的园区 Workflow 只选择 `EnrollmentJourneyWorkflowV1`，覆盖意向咨询、
-意向沟通、可选到访、班级满员候补、试入园准备/过程/复盘、正式入园确认、身份与
-授权/Enrollment 激活、入园适应期和完成。`capacity_waitlist` 只表示目标班级满员；
-等待家长、老师、系统或未来日期是当前等待状态，不是候补业务阶段。Workflow 在正式
-Enrollment 激活后继续到适应期闭环，但详细状态机与 schema 留待后续共创。
+意向沟通、可选到访、班级满员候补、试入园准备/过程/复盘、正式入园确认、正式
+Enrollment 正式化和完成。`capacity_waitlist` 只表示目标班级满员；等待
+家长、老师、系统或未来日期是当前等待状态，不是候补业务阶段。实际试入园前已经
+完成 My-Chat identity/binding、pending Enrollment/Grant/CareGroup；开始试入园时
+同一本地事务将 Enrollment 写为 `status=active, participationPhase=trial`。正式确认
+只把 phase 从 `trial` 转为 `formal`，不新增 `trial` 主状态。试入园本身就是适应期；
+若仍需观察，必须在转正式前按 D-07D 显式延长。正式化成功是最后一个业务里程碑，
+Workflow 随确认结果幂等完成，不再增加 post-activation settling stage。
+
+意向阶段默认只记录孩子称呼、出生月份或年龄段、期望入园时间、目标班型/年龄段、
+照护时间需求、来源渠道、Host-owned opaque contact ref、安全标签及最近/下一
+touchpoint；这些 provisional 信息不能进入实际试入园。原生园区业务沟通可按
+owner-read 保留正文；电话/微信等外部沟通只保存 Admin 确认的结构化摘要，不伪造完整
+transcript。AI 只能形成带来源的摘要候选，不能判断意向等级、转化概率或自动推进阶段。
+
+满班候补只在家庭明确接受候补、目标班级和必要信息已确认后进入，排序起点为
+`waitlistQualifiedAt`，不是首次咨询时间。园区可配置少量、透明、可审计的优先类别，
+类别内 FIFO；无类别配置时为纯 FIFO，AI 不参与排序。家庭只看候补状态、目标班级和
+复核/联系时间，不显示精确名次；Admin 查看当前顺序和依据。名额出现后仍由 Admin
+发出限时 offer，不能自动进入试入园或创建 Enrollment。
+
+家庭接受试入园后，先由 Guardian 创建/选择并授权 My-Chat Child/Family，完成 current
+scenario binding、Nurture association、pending Enrollment/Grant 和 exact CareGroup
+assignment，之后由 trial-start commit 进入真实照护。试入园孩子与班内其他孩子使用
+相同的名册、出勤、照护记录、照片自动关联、看板与 PublishProcess；产品使用 canonical
+`participationPhase=trial` 区分正式关系，不建立独立 TrialChild、媒体、retention 或
+caregiver 流程。phase 不授予权限。试入园当天计入照护/安全人数和实际出勤，但正式
+在园统计只计算 `status=active && participationPhase=formal`。
+
+试入园开始后占用一个真实班级名额，直到明确结束或转为 formal Enrollment；延长和
+待 Guardian 接受的正式方案期间都继续保留该名额。每次 trial 都有
+`trialStartsAt`、`trialEndsAt` 和不晚于结束时间的 `reviewAt`；到期只产生
+Admin 待办/支持信号，不自动录取、结束或释放名额。老师不填写专用评估表，系统从
+既有出勤、照护、观察和家园沟通中汇总证据；AI 只能提供带引用的 review draft，不
+判断“适不适合”。家庭接受正式方案后才转为 `participationPhase=formal`；结束后释放
+名额。offer 已接受但 trial 尚未开始时，Guardian 撤回由
+`cancel_trial_preparation` 关闭 preparation shell 并释放 reservation，不要求不存在的
+Enrollment/Grant/CareGroup 先执行 end-trial。原候补 entry
+在接受 trial offer 时关闭，结束试入园不会自动恢复旧名次；如需继续等待，按 D-07B
+重新取得候补资格，特殊调整必须可审计。
+
+转正式不使用跨 owner 分布式事务：Guardian 接受正式方案后，先由 My-Chat 重验
+current Child/Family membership 与 scenario binding，再由 Nurture 在一个本地事务中
+保持同一 Enrollment `status=active`、把 `participationPhase` 从 `trial` 改为
+`formal`、将 reservation 转为 active occupancy，并更新 Grant/CareGroup。owner 不可用、
+binding 失效或事务失败时保持 `active trial + reserved`，Workflow 进入
+`waiting_on_system`，幂等重试后才能显示正式在园。结束 trial 则由 Nurture 一个本地
+事务把 `status` 改为 `ended`、结束 CareGroup、关闭 trial-purpose Grant 并释放名额；
+My-Chat Child/Family/binding 与已有照护历史不删除。Workflow 完成后的正式离园属于
+普通 Enrollment maintenance，不重新打开 Journey，也不默认创建第二个 Workflow。
 
 ## Scope In
 
@@ -66,14 +114,34 @@ Enrollment 激活后继续到适应期闭环，但详细状态机与 schema 留�
 - `InstitutionSupportSignalProjectionV1`：从确定性业务 deadline/blocker 与园区
   配置的绝对负荷阈值生成“需要处理 / 建议关注”两级只读投影；不做跨班比较、历史
   基线异常检测或自动 Workflow。
-- `EnrollmentJourneyWorkflowV1` 顶层旅程：单一首发 Workflow，覆盖意向到适应期
-  闭环；园区 Admin 对整体负责，Guardian/Caregiver/system 仅在各自步骤成为当前
-  waiting party，不因此进入 Admin Web。
+- `EnrollmentJourneyWorkflowV1` 顶层旅程：单一首发 Workflow，覆盖意向、试入园
+  适应/复盘到正式激活和完成；园区 Admin 对整体负责，Guardian/Caregiver/system
+  仅在各自步骤成为当前 waiting party，不因此进入 Admin Web。
+- D-07A inquiry/touchpoint：最少 local provisional child data、Host-owned contact
+  ref、native owner-read message 与 external manual summary 分流、append-only
+  correction，以及 Admin 显式阶段推进。
+- D-07B capacity waitlist：明确候补资格时点、versioned priority category + 组内
+  FIFO、Admin-only ordered view、家庭无精确名次、定期意向复核和人工限时 offer。
+- D-07C trial handling：实际试入园前完成 My-Chat Child/Family 与 current binding、
+  Nurture pending Enrollment/Grant/CareGroup；trial-start 后使用现有
+  `status=active` 加 `participationPhase=trial`，照护链路与其他孩子一致。
+- D-07D trial review：trial 占用真实名额并有 starts/ends/review 时间；Admin 只可
+  显式延长、提出正式入园或结束，老师无专用评估表，AI 无 suitability decision，
+  结束后不自动恢复旧候补位置。
+- D-07E formalization/exit：My-Chat 只重验 identity/binding currentness；Nurture
+  本地事务原子更新 `participationPhase`、reservation、Grant 与 CareGroup。失败保留
+  safe active trial，结束不删除平台身份或历史事实。
+- D-07F completion：trial 本身承担适应期；需要更多观察时延长 trial。正式激活成功
+  后 Workflow 幂等完成，不增加 post-activation settling、额外反馈表或人工完成门。
+- D-07G cancellation/offboarding：trial-start 前撤回通过 preparation cancellation
+  释放 reservation；Workflow 完成后的正式离园使用普通 Enrollment lifecycle，
+  不重新打开 Journey 或默认创建第二个 Workflow。
 - `InstitutionAdminWorkbench`：人员与关系、日常运营、家长触达、数字资源、知识/RAG、
   roster/invite、parent confirmation、grant lifecycle 和 `InstitutionWorkflow` 操作。
 - Admin Web 完整活动记录：园区可新增照片/文字、查看完整原图和正文、设置可选活动
-  封面，并对活动/孩子关联进行可审计修订；原始内容、作者、capture/source time、
-  自动匹配结果与 revision history 保留。
+  封面、调整活动落位并执行 downscope hide；child attribution 修正由 Admin 提议、
+  exact CareGroup caregiver 确认。原始内容、作者、capture/source time、自动匹配
+  结果与 revision history 保留。
 - 每日班级出勤闭环：AI submission-time inference、当前班级老师确认、同日可审计
   修订，以及跨日由 Admin 重新打开后再由老师修订。
 - 园区可编辑和发布的知识库，包括儿童沟通/发展、日常照护、园区制度、活动资源、
@@ -90,6 +158,10 @@ Enrollment 激活后继续到适应期闭环，但详细状态机与 schema 留�
 - 完整 CRM、ERP、排班、计费、人事或市场化机构后台。
 - 招生销售漏斗、家庭价值/转化概率/孩子适配评分或通用 prospect marketing automation；
   入园 Workflow 只保存完成该旅程所需的最少 provisional 信息和业务 touchpoints。
+- 在 Nurture Workflow/projection 中复制原始手机号、微信号、邮箱或 Host account
+  identity；联系信息由 My-Chat invitation/contact owner 持有。
+- 将电话/微信等外部沟通摘要伪装成完整消息 transcript，或在没有可引用 source 时
+  让 AI 生成“沟通总结”。
 - Caregiver、Guardian 或其他非 Admin 角色的 Web 操作台；Lead designation 当前不
   形成独立 Surface。后续 Web 按真实角色分别定义，不创建空壳或共享 Admin Web。
 - 教师、儿童、家庭、班级或机构排名。
@@ -100,13 +172,38 @@ Enrollment 激活后继续到适应期闭环，但详细状态机与 schema 留�
 - 使用生成式/审美模型挑选“最佳代表照片”，或要求老师必须为每个活动挑封面。
 - Admin 原地改写老师照片/文字、伪造原始作者/时间，或用关联调整删除自动匹配与
   历史 revision。
+- Admin-only 确认、新增或替换 canonical child attribution，扩大 audience，或让
+  未经 exact CareGroup caregiver 确认的修正候选满足 publish eligibility。
 - 将支持信号变成班级/老师绩效分、红黄绿排名、同伴比较或隐藏 AI risk score。
 - 仅因“没有活动记录”生成支持信号，或由信号自动回复、通知他人、创建 WorkItem/
   Workflow。
 - 将所有等待都塞进 `capacity_waitlist`，或在班级未满时用候补阶段代替
   `waiting_on_guardian | caregiver | system | scheduled_for_future | blocked`。
-- 在家长授权前创建/推断 My-Chat child/family identity，或在缺少试入园同意、
-  binding/Grant 时向家庭发布试入园照片与记录。
+- 按首次咨询时间占位、使用 AI/家庭价值/孩子适配分排序、静默手工插队，或向家庭
+  展示可推断其他家庭信息的精确候补名次。
+- 名额出现后自动录取、自动建立 Enrollment/Grant，或一次未回复就从候补中删除。
+- 在家长授权前创建/推断 My-Chat child/family identity，或允许只有 local
+  provisional record 的孩子进入实际试入园。
+- 为试入园另建 TrialChild、独立媒体/出勤/retention/caregiver 流程，或把 `trial`
+  标签本身当作读取授权。
+- 用同一个空位并行安排多个试入园孩子，或在试入园尚未明确结束时把名额再次承诺
+  给其他家庭。
+- 让 `reviewAt`/`trialEndsAt` 自动录取、自动结束、自动释放名额，或允许过期 trial
+  不经显式延长继续产生新的计划照护。
+- accepted offer 在 trial-start 前撤回时继续占用 reservation，或要求不存在的
+  Enrollment/Grant/CareGroup 先执行 `end trial`。
+- 要求老师填写另一套试入园评分/报告，允许 AI 判断“是否适合”，或结束后自动恢复
+  原候补名次。
+- 把 My-Chat currentness check 与 Nurture 写入伪装成跨库原子事务，或在任一 owner/
+  本地事务失败时显示半完成的 active Enrollment。
+- 激活过程中先释放 trial reservation、先扩张正式 Grant，或让 mobile/Web 在本地
+  commit 前显示 active。
+- 结束试入园时删除 My-Chat Child/Family/scenario binding、复制/删除已有 care
+  facts，或因 My-Chat owner 暂时不可用而无法关闭 Nurture 本地照护权限。
+- 因收到一次咨询、AI 判断高意向或设置了下一跟进时间而自动从 `inquiry` 推进到
+  `intent_conversation`。
+- 首轮绕过 trial 直接正式入园，或把文档中的 enrollment offer 解释为 direct-formal
+  Enrollment 旁路。
 - 诊断、处方、替代急救/医疗人员的回答，或把园区材料伪装成权威医疗结论。
 - My-Chat 的通用知识存储、向量检索、模型 gateway、RAG runtime、Web/native shell、
   admin runtime、账号、通知和商店分发。
@@ -142,25 +239,94 @@ Enrollment 激活后继续到适应期闭环，但详细状态机与 schema 留�
 - [ ] 未配置负荷阈值时该类信号保持 disabled；来源解决、撤回、纠正、撤权或失效后
   派生信号自动消失，不形成长期绩效历史。
 - [ ] Admin mobile 最多突出三个跨班级信号并只读下钻；阈值配置、source action 与
-  显式创建 WorkItem/Workflow 位于 Admin Web，信号本身不自动产生业务动作。
+  显式创建 WorkItem/当前已注册且 eligible 的 Workflow 位于 Admin Web；普通 signal
+  不能启动 `EnrollmentJourneyWorkflowV1`，信号本身不自动产生业务动作。
 - [ ] 首个实现只包含 `EnrollmentJourneyWorkflowV1`；Grant change、出勤修订、知识
   编辑、CareInteraction、PublishProcess 和 support signal 不伪装成第二个 Workflow。
-- [ ] 顶层阶段覆盖意向 → 沟通/可选到访 → 满班候补（可选）→ 试入园 → 复盘 →
-  正式确认 → identity/Grant/Enrollment activation → 适应期 → 完成。
+- [ ] 顶层阶段覆盖意向 → 沟通/可选到访 → 满班候补（可选）→ My-Chat/binding 与
+  trial relationship preparation/start → 试入园适应 → 复盘 → 正式确认/formal phase
+  → 完成。
 - [ ] `capacity_waitlist` 只由目标班级容量不足进入；其他等待保持为 waiting state，
   并显示当前等待方和下一次复核/预计时间。
-- [ ] 意向期只保留最少本地 provisional record；试入园前需要明确 Guardian 同意，
-  family-facing 试入园内容还需 current binding/Grant。
-- [ ] Enrollment 可在 Workflow 完成前激活；Workflow 只有在配置的适应期闭环后完成，
-  且不输出孩子适应评分。
+- [ ] 意向/候补期可以只保留最少本地 provisional record；实际试入园前必须由
+  Guardian 创建/选择并授权 My-Chat Child/Family，完成 current binding、Nurture
+  association、pending Enrollment/Grant 和 exact CareGroup assignment，再通过
+  trial-start commit 进入真实照护。
+- [ ] 试入园本身就是适应期；如需继续观察必须在正式激活前显式延长 trial。确认
+  Nurture 激活成功后 Workflow 幂等完成，不要求额外老师/家庭反馈、Admin 确认或
+  post-activation settling gate。
+- [ ] D-07A 默认只收集称呼 + 出生月份/年龄段等最少 provisional 信息；法定姓名、
+  完整出生日期和更深敏感事实仅在后续明确 purpose/consent 下采集。
+- [ ] 成人联系信息由 Host owner 持有；Nurture 只保存 opaque contact ref 与安全
+  label，无法取得受支持 owner contract 时不降级复制 raw contact。
+- [ ] native 园区业务沟通使用 canonical Message/source refs；外部电话/微信只保存
+  structured manual summary、channel、occurredAt、confirmed needs、next action/dueAt
+  和责任角色，修订 append-only。
+- [ ] AI 摘要必须基于当前授权、可引用的 native source，并由 Admin 确认后成为
+  touchpoint note；AI 不生成 intent/fit/conversion score，也不自动推进阶段。
+- [ ] D-07B 只有家庭明确接受候补、目标班级和最少信息已确认时才产生
+  `waitlistQualifiedAt`；首次咨询/到访时间不预占候补顺序。
+- [ ] 候补使用 versioned priority categories + category 内 FIFO；未配置优先类别时
+  为单一 FIFO，Admin 手工调整必须记录 reason 和前后顺序，AI 不参与。
+- [ ] 候补记录包含目标班级、期望日期/窗口、qualifiedAt、capacity/policy revision、
+  priority basis、nextReviewAt、continued-interest 状态、最近确认和 waiting party。
+- [ ] 家庭端不显示精确名次，只显示候补中、目标班级、最近复核和下次预计联系；
+  Admin Web 才能查看完整顺序及依据。
+- [ ] 名额释放只产生 Admin 待处理事项；Admin 发出限时 offer，Guardian 接受后才进入
+  `trial_preparation`。拒绝/超时后再处理下一位，不自动激活 Enrollment。
+- [ ] `nextReviewAt` 必填；复核未回复先进入 `waiting_on_guardian`，只在园区配置的
+  reminder/deadline 完成后过期，不因一次未回复自动删除。
+- [ ] D-07C 不创建独立 TrialChild、trial media/attendance/retention 或 caregiver
+  Surface；老师使用普通 role-bound mobile，记录进入既有 care facts、照片关联、
+  attendance、board 和 PublishProcess。
+- [ ] `NurtureEnrollmentStatus` 不新增 `trial`：preparation 使用 `pending`，真实
+  trial/formal relationship 都使用 `active`，并由 canonical
+  `participationPhase=trial|formal` 区分；phase 不是 authority。
+- [ ] 试入园孩子当天计入照护安全人数和真实出勤，但不计入 formal Enrollment
+  统计；转正式只更新同一关系的 lifecycle，不复制孩子、照片或照护记录。
+- [ ] D-07D trial offer 接受后关闭原 waitlist entry，并创建绑定 exact class 与
+  `trialStartsAt`/`trialEndsAt`/`reviewAt` 的 capacity reservation；同一名额不能
+  并行承诺。
+- [ ] trial-start 前撤回使用 `cancel_trial_preparation` 原子关闭 preparation shell
+  并释放 reservation，不要求 Enrollment/Grant/CareGroup 已存在；trial 已开始后改走
+  end-trial。
+- [ ] `reviewAt` 到期只产生 Admin 待办/支持信号；未完成显式延长、正式激活或结束
+  时不自动转换。超过 `trialEndsAt` 后不得继续安排试入园照护。
+- [ ] 复盘使用既有 attendance/care facts/观察/家园沟通；caregiver 无专用报告。
+  AI draft 必须引用来源且不能评分、推荐录取或判断孩子适配度。
+- [ ] Admin 复盘结果只允许 `extend trial | propose formal enrollment | end trial`：
+  延长更新期限并保留名额，正式方案等待 Guardian 明确接受且期间继续占位，结束
+  释放名额。
+- [ ] 结束后需要继续等待时重新满足 D-07B qualification 并产生新的
+  `waitlistQualifiedAt`；旧名次不自动恢复，例外只允许带原因的 append-only override。
+- [ ] D-07E formal activation 必须先取得 Guardian acceptance，并在 Nurture commit
+  前重验 current My-Chat Child/Family membership、scenario binding 和 signed owner
+  evidence；cached/stale/unavailable evidence 均不能激活。
+- [ ] Nurture formalization 在一个本地事务中保持 `status=active`、完成
+  `participationPhase: trial → formal`、reservation→active occupancy 和
+  Grant/CareGroup 更新；失败或重试期间保持 `active trial + reserved`。
+- [ ] `trial_start_pending | formalization_pending | exit_pending | waiting_on_system`
+  只属于 Workflow，不增加 Enrollment 主状态；mobile/Web 只在 canonical local commit
+  后显示 trial/formal/ended。
+- [ ] end trial 是可在 My-Chat owner outage 下执行的 Nurture 本地降权事务：同时
+  `status: active → ended`（历史 phase=`trial`）、结束 CareGroup、关闭 trial-purpose
+  Grant、释放 reservation，
+  之后只创建下一候补 Admin task，不自动 offer。
+- [ ] end trial 不删除 My-Chat Child/Family/membership/scenario binding 或 Nurture
+  association/care history；只停止未来 caregiver access 和新 publication，历史沿用
+  T-006 retention/redaction/revoke。
+- [ ] Workflow 完成后的 formal Enrollment 离园属于普通
+  `status: active → ended` lifecycle maintenance，不重新打开 Enrollment Journey，
+  也不默认创建第二个 Workflow。
 - [ ] Admin mobile board 可查看当前 actor-safe Workflow 关键内容、阶段、里程碑、阻塞和
   下一步，但不暴露 raw Run/Step 或提供隐藏写操作。
 - [ ] 当前只有 `institution_admin` 可以进入 `InstitutionAdminWorkbench`；非 Admin
   角色不能进入或借用其 capability。
 - [ ] Admin Web 的 roster/invite/confirmation/grant、日常运营、家长触达、数字资源和
   知识操作均有明确 authority、状态和审计。
-- [ ] Admin Web 可记录/查看完整照片和文字，并可设置封面、调整活动/孩子关联；
-  所有修改追加 revision，老师原始内容/作者/时间与自动匹配 provenance 不被覆盖。
+- [ ] Admin Web 可记录/查看完整照片和文字，并可设置封面、调整活动落位与 downscope
+  visibility；这些修改追加 revision；child attribution 由 Admin 提议、exact
+  CareGroup caregiver 确认，老师原始内容/作者/时间与自动匹配 provenance 不被覆盖。
 - [ ] AI 只在每日提交时生成带证据的出勤推理；当前班级老师明确提交后才产生正式
   出勤，同日修订和跨日 reopen 均保留审计，Admin 不能代确认。
 - [ ] 出勤事实、记录覆盖率和 AI 推理候选在 contract 与 UI 中保持不同语义。
@@ -171,15 +337,12 @@ Enrollment 激活后继续到适应期闭环，但详细状态机与 schema 留�
 - [ ] aggregate 无法反推出家庭私密正文或未授权 child-level facts。
 - [ ] 产品中不存在教师/孩子/家庭的排名、评分或诊断性结论。
 - [ ] institution presenter 可被 My-Chat 消费且不暴露内部 persistence。
-- [ ] 所有仍开放的产品问题有 owner、决策门和默认安全行为。
+- [ ] 顶层产品问题已收口；所有实现前 contract/schema 项均在 freeze register 中
+  标明 owner、启用门和默认安全行为。
 
 ## Next Step
 
-继续 D-07 深入共创，按顺序固定：
-
-1. 意向阶段最少信息和沟通 touchpoint；
-2. `capacity_waitlist` 名额/顺序/复核规则；
-3. 试入园 consent、临时数据和 caregiver 记录；
-4. 试入园复盘与人类决定边界；
-5. guardian confirmation、binding、Grant、Enrollment 的精确顺序；
-6. 适应期长度、反馈和完成条件。
+按 `02-architecture.md` 的 Pre-implementation Contract Freeze Register 进入 Phase 0：
+先盘点现有 Enrollment/Grant/CareGroup/capacity、冻结 `status + participationPhase`
+与 trial cancellation/formalization transaction，再定义
+`EnrollmentJourneyWorkflowV1` public contract；在资格验证前保持 default-off。

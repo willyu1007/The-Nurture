@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-29T09:04:21.829Z",
+  "updatedAt": "2026-07-30T07:59:48.858Z",
   "terms": [
     {
       "term": "Evidence record",
@@ -449,6 +449,34 @@
       "see_also": [
         "Evidence record",
         "ActionExecution",
+        "PublishProcess"
+      ]
+    },
+    {
+      "term": "Lead designation",
+      "definition": "由园区 Admin 指定的日常协调/责任分工标识。它不增加 visibility、capability、Surface 或 Admin/teacher authority；同一用户必须另有当前精确角色并切换 active role 才能执行相应操作。当前持久化可能使用 lead_caregiver 兼容值，但 designation 本身从不授权。",
+      "scope": "nurture",
+      "aliases": [
+        "Lead",
+        "负责人标识",
+        "日常协调人"
+      ],
+      "see_also": [
+        "lead_caregiver",
+        "InstitutionAdminWorkbench"
+      ]
+    },
+    {
+      "term": "lead_caregiver",
+      "definition": "现有 Nurture schema/兼容契约中的角色值。只有某个版本化 capability 明确接受该值，且 actor 同时满足当前 exact CareGroup operational-caregiver、Enrollment、Grant、purpose 与 source-lifecycle predicate 时，才可按该 capability 作为 caregiver 操作；该值不授予 T-007 Admin Web、跨班读取或独立 Lead 权限。",
+      "scope": "nurture",
+      "aliases": [
+        "lead caregiver",
+        "主班老师兼容角色值"
+      ],
+      "see_also": [
+        "Lead designation",
+        "CareInteraction",
         "PublishProcess"
       ]
     }

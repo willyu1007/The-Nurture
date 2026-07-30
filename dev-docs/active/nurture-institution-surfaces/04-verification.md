@@ -30,8 +30,29 @@
 | 2026-07-30 | Mobile read-only signal projection separated from Admin Web policy/source actions | PASS |
 | 2026-07-30 | D-07 first implementation limited to one complete EnrollmentJourneyWorkflow | PASS |
 | 2026-07-30 | Capacity waitlist limited to full-class capacity and separated from generic waiting/blocking state | PASS |
-| 2026-07-30 | Journey fixed from inquiry through trial, activation and settling without freezing detailed state/schema | PASS |
-| 2026-07-30 | Provisional identity, Guardian trial consent and binding/Grant publication gates retained | PASS |
+| 2026-07-30 | Journey originally included post-activation settling before detailed state/schema freeze | SUPERSEDED by D-07F |
+| 2026-07-30 | Provisional identity limited to pre-trial stages; actual trial requires My-Chat binding and care authority | PASS |
+| 2026-07-30 | D-07A inquiry fixed to minimum provisional child data and Host-owned contact refs | PASS |
+| 2026-07-30 | Native owner-read communication separated from external Admin-authored summaries | PASS |
+| 2026-07-30 | AI summary candidate separated from intent scoring and explicit Admin stage advance | PASS |
+| 2026-07-30 | D-07B waitlist qualification separated from first inquiry and generic waiting | PASS |
+| 2026-07-30 | Versioned category plus FIFO ordering separated from AI and unaudited manual ranking | PASS |
+| 2026-07-30 | Family-safe status view separated from Admin full ordering and override history | PASS |
+| 2026-07-30 | Mandatory review and time-limited Guardian offer separated from automatic Enrollment | PASS |
+| 2026-07-30 | D-07C trial fixed to normal My-Chat-bound care with a separate canonical participation phase | PASS |
+| 2026-07-30 | Trial attendance/safety headcount separated from formal active Enrollment totals | PASS |
+| 2026-07-30 | D-07D trial fixed as one bounded exact-class capacity reservation | PASS |
+| 2026-07-30 | Admin three-outcome review separated from caregiver scoring and AI suitability decisions | PASS |
+| 2026-07-30 | Trial end separated from automatic old-rank waitlist restoration | PASS |
+| 2026-07-30 | D-07E My-Chat currentness revalidation separated from Nurture local atomic mutation | PASS |
+| 2026-07-30 | Activation failure fixed to trial-plus-reserved without half-active projections | PASS |
+| 2026-07-30 | Trial exit fixed as local downscope without platform-identity/history deletion | PASS |
+| 2026-07-30 | Trial fixed as the adaptation period; successful activation is the final business milestone | PASS |
+| 2026-07-30 | Post-activation settling, extra feedback forms and human completion gates removed | PASS |
+| 2026-07-30 | D-05 Admin activity/downscope authority separated from exact-CareGroup caregiver child-attribution confirmation | PASS |
+| 2026-07-30 | Enrollment mapping reconciled with existing status enum through canonical `participationPhase=trial|formal` | PASS |
+| 2026-07-30 | Pre-trial `cancel_trial_preparation` and post-completion ordinary offboarding boundaries locked | PASS |
+| 2026-07-30 | Every remaining contract/schema item assigned an owner, enablement gate and default-safe behavior | PASS |
 
 ## Documentation Verification
 
@@ -39,11 +60,19 @@
 | --- | --- | --- |
 | 2026-07-30 | `git diff --check` | PASS |
 | 2026-07-30 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS |
+| 2026-07-30 | `node .ai/scripts/ctl-project-governance.mjs lint --strict --project main` | PASS |
+| 2026-07-30 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS |
 | 2026-07-30 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` | PASS |
-| 2026-07-30 | stale generic mobile/Web and non-editable-medical wording audit | PASS |
-| 2026-07-30 | stale D-05 pending wording and latest-photo/Web-canonical-boundary audit | PASS |
-| 2026-07-30 | stale D-06/open-threshold wording and signal/action-separation audit | PASS |
-| 2026-07-30 | stale narrow-onboarding/generic-waitlist/D-07 activation wording audit | PASS |
+| 2026-07-30 | `node .ai/scripts/ctl-project-state.mjs verify` | PASS |
+| 2026-07-30 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-surfaces --check-anchors` | PASS — 0 errors/warnings |
+| 2026-07-30 | `node .ai/scripts/lint-docs.mjs --path docs/context/product/nurture-mobile-ux-contract.md --check-anchors` | PASS — 0 errors/warnings |
+| 2026-07-30 | `node .ai/scripts/lint-docs.mjs --path docs/context/workflow/nurture-scenario-contract.md --check-anchors` | PASS — 0 errors, 2 pre-existing vague-reference warnings |
+| 2026-07-30 | `! rg -n '15s\|15 秒\|12:30\|否决窗' docs/context/product/nurture-mobile-ux-contract.md` | PASS |
+| 2026-07-30 | `! rg -n --glob '!03-implementation-notes.md' --glob '!04-verification.md' --glob '!05-pitfalls.md' 'trial-status\|trial → active\|trial→active\|trial -> active\|调整活动/孩子关联\|confirmed child association\|wjw/s9502' .ai/project/main/feature-map.md dev-docs/active/nurture-institution-surfaces docs/context/product/nurture-mobile-ux-contract.md docs/context/workflow/nurture-scenario-contract.md` | PASS |
+| 2026-07-30 | Parse `docs/context/db/schema.json` and require `NurtureEnrollmentStatus` contains `pending/active/ended` and excludes `trial` | PASS |
+| 2026-07-30 | `! rg -n 'EnrollmentJourneyWorkflowV1\|InstitutionBusinessCommunicationProjectionV1\|InstitutionSupportSignalProjectionV1' packages/nurture-scenario/src packages/nurture-scenario/scenario.manifest.yaml` | PASS — T-007 remains absent/default-off |
+| 2026-07-30 | `rg -n 'nurturePreActivationScenarioModule\|createNurtureActivationScenarioModule' packages/nurture-scenario/src/module.ts` | PASS — default module remains pre-activation |
+| 2026-07-30 | Open [NHC official announcement for WS/T 821-2023](https://www.nhc.gov.cn/fzs/c100048/202311/57f6f5c484bf40b79d3fe84b590bd791.shtml) | PASS — official landing page resolves; command-line curl is WAF-limited (412), not recorded as a 200 check |
 
 ## Planned Verification
 
@@ -62,7 +91,10 @@
 - Class-detail tests for complete actor-safe activity media/text, communication, family feedback,
   attendance and exact-purpose child-level drill-down.
 - Admin Web tests for institution-authored media/text creation, full authorized retrieval,
-  cover selection, placement/child-association revisions and source lifecycle invalidation.
+  cover selection, activity placement, downscope hide and source lifecycle invalidation.
+- Child-attribution authority tests proving Admin-only can create a correction candidate/WorkItem
+  or reduce visibility, but cannot confirm/add/replace canonical attribution, expand audience or
+  make content publishable; exact CareGroup caregiver confirmation is required.
 - Immutability/audit tests proving Admin cannot overwrite teacher body/media/author/source time
   and every adjustment retains original automatic/teacher provenance plus revision history.
 - Institution Admin communication owner-read tests for exact Institution/Enrollment/CareGroup,
@@ -90,19 +122,93 @@
   `EnrollmentJourneyWorkflowV1`; Grant change, attendance, knowledge, CareInteraction,
   PublishProcess and support signal remain Action/WorkItem/projection semantics.
 - Journey branch tests for inquiry, intent touchpoints, optional visit, optional capacity
-  waitlist, trial preparation/in-progress/review, offer, activation, settling and completion.
+  waitlist, trial preparation/start/in-progress/adaptation/review, formalization and completion.
 - Negative waitlist tests proving only class-capacity unavailability enters the stage; waiting on
   Guardian/caregiver/system/future date/blocker does not affect waitlist ordering or statistics.
 - Provisional/identity tests proving inquiry cannot mint/infer My-Chat Child/Family identity and
   no local provisional relation grants protected Nurture access.
-- Trial tests for Guardian consent, exact trial CareGroup caregiver scope, internal-only
-  provisional data and current binding/Grant before family-facing media/text projection.
+- D-07C gate tests proving local provisional subjects cannot enter actual trial care and all
+  current My-Chat Child/Family binding, Nurture association, pending Enrollment/Grant and exact
+  CareGroup predicates are required before the atomic trial-start commit and roster/care facts.
+- Shared-care-path tests proving trial children use ordinary caregiver mobile, attendance,
+  care facts, media attribution, board and PublishProcess, with no TrialChild or parallel
+  consent/media/retention/caregiver pipeline.
+- Enrollment state-mapping tests proving preparation uses `status=pending`, actual trial/formal
+  relationships use `status=active`, canonical `participationPhase=trial|formal` does not replace
+  request-time role/binding/Grant/CareGroup/purpose/source-lifecycle checks, and formal totals
+  require `status=active && participationPhase=formal`.
+- Trial counting/continuity tests proving same-day attendance and safety headcount include trial
+  children, formal Enrollment totals require phase=formal, and trial→formal does not copy
+  child/media/care facts.
+- D-07D reservation tests proving accepted trial closes the waitlist entry, reserves one exact
+  class capacity unit and prevents concurrent promise/reuse before explicit outcome.
+- Preparation-cancellation tests proving Guardian withdrawal before trial-start closes the
+  accepted-offer/preparation shell and releases reservation without requiring Enrollment/Grant/
+  CareGroup or mutating My-Chat identity/binding; after trial-start the end-trial path is required.
+- Review-clock tests for required starts/ends/review times, `reviewAt <= trialEndsAt`, Admin
+  task/signal on due and no automatic extend/activate/end/capacity release.
+- Expiry tests proving planned trial care cannot continue past `trialEndsAt` without explicit,
+  reasoned extension and unresolved review cannot silently double-allocate the capacity.
+- Evidence tests proving review reuses existing attendance/care/observation/communication
+  sources, caregivers have no special assessment and AI returns cited draft only.
+- Outcome tests proving only Admin can extend, propose formal enrollment or end; formal proposal
+  waits for Guardian acceptance and every action records actor/time/source/reason/before/after.
+- Requalification tests proving ended trial receives no old-rank restoration; a new
+  `waitlistQualifiedAt` is required and any exception is an append-only Admin override.
+- D-07E human/owner-gate tests proving current Guardian proposal acceptance plus fresh My-Chat
+  Child/Family membership/binding evidence are required; Admin review/date/cached evidence fail.
+- Local transaction tests proving Enrollment remains `status=active`,
+  `participationPhase: trial→formal`, reservation→active occupancy, formal Grant/CareGroup and
+  audit/idempotency commit together under expected versions.
+- Failure/replay tests for owner outage, binding drift, evidence expiry, version conflict and
+  local error, proving canonical `active trial + reserved`, waiting_on_system and exact replay.
+- Cross-surface tests proving mobile/Web/notification cannot show active before local commit and
+  delivery retry cannot roll back or fabricate Enrollment state.
+- Exit-downscope tests proving `status: active→ended` for phase=trial, CareGroup/trial-Grant close
+  and reservation release commit together even during My-Chat outage; downstream task failure
+  does not reopen access.
+- Identity/history negative tests proving exit never deletes My-Chat Child/Family/membership/
+  binding, Nurture association or care facts and future access/publication stops under T-006.
 - Responsibility tests for Admin accountability, current waiting party, Lead/coordinator
   no-permission-delta and no caregiver Admin-Web access.
-- Activation/settling tests proving Enrollment may become active before Workflow completion,
-  completion requires the later configured settling gate, and no adaptation score is produced.
+- Activation/completion tests proving confirmed Nurture activation success idempotently completes
+  the Workflow without a post-activation business stage, extra caregiver/Guardian/Admin gate or
+  adaptation score; delivery/replay failure is technical waiting only.
+- Post-completion offboarding tests proving formal `status: active→ended` is ordinary Enrollment
+  maintenance and neither reopens Enrollment Journey nor creates a second Workflow by default.
 - Activation-negative tests keeping exact journey enums/transitions/commands/schema default-off
-  until the six documented D-07 deep-dive decisions are closed.
+  until every Pre-implementation Contract Freeze Register gate is closed.
+- D-07A field tests for preferred label, birth year-month or age band, expected entry date/window,
+  target class type/age band, care schedule, source channel, Host contact ref and last/next
+  touchpoint, with legal name/full birth date absent by default.
+- Host contact-owner tests proving raw phone/WeChat/email/account identity never enters Nurture
+  persistence, Workflow projection, logs or AI context; unavailable owner contract fails closed.
+- Native-message tests proving Workflow stores source refs only and rereads current body/
+  correction/redaction lifecycle through the protected owner contract.
+- External-summary tests for explicit source class, channel/time, participant side, Admin author,
+  protected summary, confirmed needs/disclosures, next action/dueAt/responsible role and
+  append-only correction; raw recordings/screenshots/exports are rejected.
+- AI-summary tests for eligible-source citations, Admin review, AI provenance, revoke/redaction/
+  provider/low-confidence no-note behavior and no intent/fit/conversion score.
+- Stage-advance tests proving only explicit Admin action after a current touchpoint advances
+  inquiry; new inquiry, due date, AI summary or repeated no-response attempts do not.
+- D-07B qualification tests proving first inquiry does not reserve a place and
+  `waitlistQualifiedAt` is assigned only after full-class confirmation, explicit family
+  acceptance, target-class confirmation and minimum-data completion.
+- Waitlist policy tests for versioned priority categories, FIFO within a category, pure FIFO when
+  no categories are configured, immutable tie-break and no AI/fit/value/conversion ordering.
+- Admin override tests proving every order adjustment is explicit and append-only with actor,
+  time, reason, prior/new position and original qualification/order basis preserved.
+- Waitlist projection tests proving families receive status, target class, `nextReviewAt` and
+  last contact only, while exact rank, queue length, category/basis and other families remain
+  Admin-only.
+- Review tests proving `nextReviewAt` is mandatory; non-response enters
+  `waiting_on_guardian` and follows configured reminder/deadline behavior without one-attempt
+  deletion or silent reordering.
+- Capacity-offer tests proving vacancy creates an Admin task, the Admin issues an expiring offer,
+  Guardian acceptance is explicit and no identity/Grant/Enrollment is created before acceptance.
+- Activation-negative tests keeping policy-revision treatment for existing queue entries and the
+  exact waitlist/offer DTO/commands default-off until their contract is closed.
 - Roster/invite/confirmation/grant state-machine tests.
 - Cross-institution, cross-group and wrong-child negative tests.
 - Black-box six-role fixture segment through public contracts.

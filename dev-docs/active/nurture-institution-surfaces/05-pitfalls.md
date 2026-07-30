@@ -14,7 +14,9 @@
 - 不要在班级卡展示沟通正文、孩子名单、AI 出勤推测、匹配 confidence/embedding 或
   freshness/绩效分数；完整数据属于详情/Web 的精确 owner-read。
 - 不要因为 Admin Web 能记录完整照片/文字就允许原地改写老师内容、作者或时间。
-  placement/child-association/correction/hide 必须追加 revision 并保留来源历史。
+  placement/downscope/correction/hide 必须追加 revision 并保留来源历史。Admin-only
+  child-attribution 修正只能形成 candidate/WorkItem，由 exact CareGroup caregiver
+  确认，不能扩大 audience 或获得 publish eligibility。
 - 不要让 My-Chat Web shell 复制照片/文字 canonical facts；完整数据仍由 Nurture
   持有，Web 通过 query/action contract 操作。
 - 不要要求老师升级后 Admin 才能查看已明确披露的园区业务沟通。
@@ -37,7 +39,9 @@
 - 不要仅因缺少照片/文字生成 support signal；无记录不等于活动未开展。
 - 不要把 signal 复制成长期老师/班级“标红”历史；来源解决或失效后投影应自动消失。
 - 不要让 mobile signal 卡产生 dismiss/ack/escalate 隐藏写操作，或自动回复、通知、
-  创建 WorkItem/Workflow。处理必须在 Web 通过独立 source action 完成。
+  创建 WorkItem/Workflow。处理必须在 Web 通过独立 source action 完成；只有当前
+  registry 已注册且业务 eligible 的 Workflow 才能显式启动，普通 signal 不能启动
+  Enrollment Journey。
 - 不要把 body、孩子名单或个人老师指标放入园区首页 signal；下钻必须重新 owner-read。
 - 不要把“有业务记录的孩子数”当作正式出勤人数。
 - 不要让 AI 推理或 Admin 代替当前班级老师确认出勤。
@@ -49,18 +53,82 @@
   `EnrollmentJourneyWorkflowV1`，其他事项继续使用 Action/WorkItem/projection。
 - 不要把所有等待泛化成“等待期”。`capacity_waitlist` 只表示目标班级满员；等待
   Guardian/caregiver/system、未来日期或 blocker 是独立 state。
+- 不要用首次咨询时间预占候补资格；只有家庭明确接受候补、目标班级和最少数据确认
+  后才生成 `waitlistQualifiedAt`。
 - 不要让候补阶段演变成家庭价值、转化概率或孩子适配排序；AI 不决定候补顺序或
-  试入园结果。
+  试入园结果。排序只来自版本化 category policy 与 category 内 FIFO，未配置
+  category 时为纯 FIFO。
+- 不要静默改写 `waitlistQualifiedAt`、category 或队列位置；Admin 调整必须显式、
+  有原因并保留 append-only history。新 policy revision 如何作用于既有队列在 contract
+  冻结前不得擅自实现。
+- 不要向家庭显示精确名次、队列长度、priority category、排序依据或其他家庭信息；
+  家庭只获得自身状态、目标班级和复核/联系时间。
+- 不要创建没有 `nextReviewAt` 的无限期候补，也不要因一次未回复自动删除、降级或
+  重排；应进入 `waiting_on_guardian` 并执行配置的 reminder/deadline。
+- 不要因出现空位自动推进候补、创建 Enrollment/Grant 或发送无期限承诺；先创建
+  Admin task，由 Admin 发出限时 offer，并等待 Guardian 明确接受。
 - 不要在意向阶段 mint/infer My-Chat child/family identity，或把 provisional record
   当成 Enrollment、binding、Grant 或读取权限。
-- 不要在缺少 Guardian trial consent 时开始试入园，或在没有 current binding/Grant
-  时把试入园照片/文字投影给家庭。
-- 不要为了 Workflow 给 caregiver 创建 Admin Web；老师继续在 exact trial CareGroup
-  的 role-bound mobile/action 中记录，Workflow 只引用授权事实。
-- 不要在 Enrollment 激活时自动结束 journey。适应期是后续业务阶段，但不得生成
-  孩子适应评分。
-- 不要把当前顶层阶段标签误作已冻结 public enum/schema；六组 D-07 细节未收敛前
-  implementation activation 保持 NO-GO。
+- 不要在 inquiry 默认收集法定姓名、完整出生日期、健康/过敏等尚无当前 purpose 的
+  深层信息；称呼 + 出生月份/年龄段足以支持早期班型判断。
+- 不要把 raw phone、WeChat、email 或 account identity 复制进 Nurture Workflow、
+  presenter、日志或 AI context；使用 Host-owned contact ref，owner 不可用时 fail closed。
+- 不要把 external phone/WeChat manual summary 伪装成 transcript，也不要隐式附加
+  recording、screenshot、raw export 或外部 participant roster。
+- 不要原地覆盖 external summary；更正必须 append revision 并保留 Admin author/time。
+- 不要让 AI 从无 source 的 external note 推断完整沟通、意向等级、家庭价值、转化率
+  或孩子适配度；只有可引用 native source 可生成待 Admin 确认的 summary candidate。
+- 不要因新 inquiry、AI summary、next-follow-up 或多次未回复自动推进/降级 stage；
+  `inquiry → intent_conversation` 是独立 Admin action。
+- 不要让只有 local provisional record 的孩子进入实际试入园；真实照护前必须完成
+  Guardian-authorized My-Chat Child/Family、current binding/association、
+  pending Enrollment/Grant 和 exact CareGroup assignment，再由 trial-start commit
+  写入 `status=active, participationPhase=trial`。
+- 不要建立 TrialChild、独立 trial consent/media/attendance/retention pipeline 或
+  caregiver Web/表单；老师继续使用普通 role-bound mobile，Workflow 只引用授权事实。
+- 不要向现有 `NurtureEnrollmentStatus` 增加 `trial`，或把
+  `participationPhase=trial` 当作 authority。真实 trial/formal relationship 都使用
+  `status=active`，仍需 binding、Grant、CareGroup、purpose 和 source-lifecycle。
+- 不要把试入园孩子排除在当天照护安全人数或真实出勤之外，也不要在转正式前把其
+  计入 formal Enrollment 总数。
+- 不要在 `participationPhase: trial→formal` 时复制 child、media 或 care facts；
+  更新同一关系并保留连续 provenance。退出时也不得用删除历史代替
+  status/assignment/Grant lifecycle。
+- 不要让同一个名额同时进入多个 trial offer/reservation；接受 trial 后旧 waitlist
+  entry 应关闭，名额保持占用直到明确延长、正式激活或结束。
+- 不要让 trial-start 前的 Guardian withdrawal 留下永久 reservation，也不要要求
+  尚不存在的 Enrollment/Grant/CareGroup 先执行 end-trial；
+  `cancel_trial_preparation` 应关闭 shell 并释放占位。
+- 不要把 `reviewAt`/`trialEndsAt` 当作自动转换定时器；到期只生成 Admin task/signal，
+  不自动录取、结束、释放名额或联系下一位。
+- 不要让过期 trial 在没有显式延期时继续安排照护，也不要在复盘未决时把名额再次
+  承诺给其他家庭。
+- 不要要求 caregiver 填写试入园评分表，或让 AI 判断“是否适合”、推荐录取/结束；
+  复盘复用既有事实，由 Admin 作三选一的人类决定。
+- 不要在 trial 结束后恢复旧 `waitlistQualifiedAt` 或名次；重新等待需要新的
+  qualification，例外通过可审计 override。
+- 不要把 My-Chat currentness revalidation 与 Nurture commit 描述成一个 distributed
+  transaction；两者是有明确失败边界的顺序 owner operation。
+- 不要在 Guardian 接受正式方案前、使用 stale/cached owner evidence、或只完成部分
+  Grant/CareGroup 写入时标记 active。
+- 不要在 activation 失败时释放 reservation、扩大权限或显示半完成 active；保留
+  `status=active + participationPhase=trial + reserved`，把 pending/waiting 放在
+  Workflow 并幂等重试。
+- 不要让 mobile/Web/notification 各自猜测 activation；只能消费 Nurture commit 后
+  的同一 canonical lifecycle。
+- 不要让 My-Chat owner outage 阻止 Nurture 本地降权 exit，也不要把下游 task/
+  notification 失败当成重新开放照护权限的理由。
+- 不要因 end trial 删除 My-Chat Child/Family/membership/binding、Nurture association
+  或历史 care facts；binding/history 不等于当前 authority。
+- [SUPERSEDED by D-07F] 原口径要求不要在 Enrollment 激活时结束 journey，并把适应期
+  作为后续业务阶段；现已明确 trial 本身就是适应期。
+- 不要在正式激活后再增加 settling period、额外 caregiver/Guardian 反馈表或 Admin
+  完成门；需要继续观察时必须在激活前显式延长 trial。activation delivery/replay
+  只可产生 technical waiting，不得伪装成新的业务阶段。
+- 不要把 Workflow 完成后的正式离园重新塞回 Enrollment Journey；它是普通 Enrollment
+  lifecycle maintenance，不默认产生第二个 Workflow。
+- 不要把当前顶层阶段标签误作 public enum/schema；Pre-implementation Contract
+  Freeze Register 未通过前 implementation activation 保持 NO-GO。
 - 不要让 Admin mobile board 拥有或修改 Workflow；它只消费 role-safe projection。
 - 不要把相同 institution role 当作读取完整 Workflow 的充分权限。
 - 不要用无业务依据的百分比冒充进度；优先展示阶段、里程碑、阻塞和下一步。
@@ -101,3 +169,43 @@
   继续不可见。
 - Prevention：消息/投影必须携带 channel class、disclosure、purpose 和 source
   lifecycle；Admin read 与 CareGroup action authority 分别测试。
+
+### 2026-07-30 — Admin Web child attribution 越过 T-006 caregiver authority
+
+- Symptom：D-05 初稿允许 Admin 直接调整 confirmed child association，与 T-006 只允许
+  current exact CareGroup caregiver 确认/纠正归属的规则冲突。
+- Root cause：把 Admin Web 的便捷整理能力与 canonical child-attribution authority
+  合并成一个“关联调整”动作。
+- What was tried：让 Admin append-only 修改 association，并仅依赖历史审计降低风险。
+- Fix：Admin 可改 activity placement/cover/note，并可立即 downscope hide；child
+  attribution 只能提出 correction candidate/WorkItem，由 exact CareGroup caregiver
+  确认。多角色用户必须切换 caregiver role。
+- Prevention：activity placement、visibility downscope、child attribution 和 publish
+  eligibility 使用不同 capability/negative tests，禁止共享通用 patch endpoint。
+
+### 2026-07-30 — Trial 主状态与现有 DB enum 不一致
+
+- Symptom：D-07E 初稿使用 `trial | active | ended` 主状态，但现有
+  `NurtureEnrollmentStatus` 没有 `trial`，且 trial 孩子需要复用 active 照护路径。
+- Root cause：把业务 participation phase、关系 lifecycle 和 Workflow waiting state
+  压成了一个 enum。
+- What was tried：把 `trial` 同时描述成主状态或安全标签，导致 formal 统计和 authority
+  predicate 不确定。
+- Fix：preparation 使用 `status=pending`；真实 trial/formal relationship 都使用
+  `status=active`，另设 canonical `participationPhase=trial|formal`；trial exit 写
+  `status=ended`，Workflow waiting 继续独立。
+- Prevention：schema inventory 必须验证 status/phase 组合、正式统计、trial-start、
+  formalization/exit 原子性与 UI projection，禁止 label 代替 policy predicate。
+
+### 2026-07-30 — Accepted trial offer 缺少 preparation cancellation
+
+- Symptom：Guardian 接受 offer 后 reservation 已占用，但 identity/binding 或 trial
+  Enrollment 尚未建立时，原设计只有要求完整 trial facts 的 end-trial 路径。
+- Root cause：把“已接受 offer”误当作“trial relationship 已 commit”。
+- What was tried：等待 owner 恢复或复用 end-trial；前者可能永久占位，后者依赖不存在的
+  facts。
+- Fix：增加 `cancel_trial_preparation`，在一个本地事务中关闭 preparation shell、
+  释放 reservation 并记录审计；不修改 My-Chat identity/binding。trial-start 已 commit
+  后才使用 end-trial。
+- Prevention：waitlist offer、capacity reservation、trial preparation、trial-start
+  relationship 必须有独立状态与取消/重放测试。

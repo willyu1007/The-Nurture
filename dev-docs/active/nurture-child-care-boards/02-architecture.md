@@ -194,8 +194,12 @@ Lead designation 属于园区日常运营管理，不属于 T-006 capability、r
 visibility scope。Institution Admin、Lead、general Institution member 与 system
 operator 都不能凭该身份读取、编辑、确认或发布班级内容；某人只有另行持有当前 exact
 CareGroup caregiver RoleAssignment 时，才能以普通本班老师身份参与 T-006。若异常
-需要园区级运营处理，使用单独的 T-007 `InstitutionWorkflow`/workbench 边界，不在
-`PublishProcess` 内增加 Lead 审批。
+需要园区级运营处理，使用 T-007 workbench/WorkItem 边界，不在 `PublishProcess` 内
+增加 Lead 审批。T-007 Admin Web 可以调整 activity placement、设置封面、添加园区
+说明，以及执行只缩小可见性/暂停发布资格的 safety action；Admin-only 不得确认、
+新增或替换 canonical child attribution，也不得据此使内容满足 publish eligibility。
+Admin 发现归属错误时只创建 correction candidate/WorkItem，由当前 exact CareGroup
+caregiver 通过本节 capability 确认；多角色用户必须切换到 caregiver role。
 
 organizer、AI provider、scheduler 和 worker 也不是 caregiver。它们只能在 D-08/D-09
 冻结的 revision 与发布授权条件下执行技术动作，不能静默选择另一位老师、继承失效角色

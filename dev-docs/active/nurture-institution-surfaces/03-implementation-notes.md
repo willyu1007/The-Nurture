@@ -100,37 +100,173 @@
 
 - 首个实现的 `InstitutionWorkflow` 只选择
   `EnrollmentJourneyWorkflowV1`；不并行实现 Grant-change 或通用 Workflow builder。
-- 顶层旅程覆盖意向、沟通、可选到访、可选满班候补、试入园准备/过程/复盘、正式
-  确认、identity/Grant/Enrollment activation、适应期和完成。
+- 顶层旅程覆盖意向、沟通、可选到访、可选满班候补、identity/binding 与
+  pending Enrollment/Grant/CareGroup 准备、trial-start、试入园/复盘、formal
+  Enrollment 和完成。
 - 将此前泛化的“等待期”纠正为 `capacity_waitlist`：只在目标班级满员时进入。等待
   Guardian、caregiver、system、未来日期或 blocker 是独立 waiting/blocking state，
   不进入候补顺序或容量统计。
-- 意向期只保留最少 local provisional data；实际试入园前必须有 Guardian consent，
-  family-facing 试入园照片/文字还要求 current My-Chat binding 和 Grant。
+- 意向期只保留最少 local provisional data；D-07C 后，实际试入园前必须完成
+  Guardian-authorized My-Chat identity/binding 与 pending Enrollment/Grant/CareGroup，
+  再由 trial-start commit 建立 active trial relationship；未绑定 provisional child
+  不再允许产生内部试入园事实。
 - Admin 对整体 journey accountable；Guardian、trial CareGroup caregiver 和 system
   owner 在各自步骤成为 waiting party。Caregiver 继续使用 role-bound mobile，不新增
   caregiver Web；Lead/coordinator 不增加权限。
-- 正式 Enrollment 激活是 milestone；Workflow 在配置的 settling period 闭环后才完成，
-  不产生孩子适应或家庭价值评分。
-- 本轮只锁顶层产品范围，精确阶段 enum、transition、commands、候补顺序、trial
-  consent、activation transaction 和 settling completion 明确保留后续深入讨论。
+- 原顶层草案曾把正式激活后的 settling period 作为完成前阶段；该部分已由 D-07F
+  supersede。试入园本身承担适应过程，激活成功后不再等待第二段业务闭环。
+- 本轮只锁顶层产品范围；精确阶段 enum、command/schema 与
+  activation-success/completion event contract 仍待冻结；最终 `status +
+  participationPhase` 映射与 owner/local 业务顺序由 package closeout 和 D-07E 锁定。
 - 当前仍为共享 dirty worktree 中的未提交文档决策；没有代码、schema、manifest、
   module 或 runtime activation 变更。
 
-## Open Items
+## 2026-07-30 — D-07A inquiry/touchpoint boundary locked
 
-- aggregate 的隐私阈值与时间窗口。
-- workbench 首轮是否只支持单条操作。
-- D-07 意向最少字段/touchpoint、capacity waitlist 排序/优先/复核、trial consent/
-  provisional data/caregiver evidence、复盘人类决定、Guardian confirmation/binding/
-  Grant/Enrollment 顺序、settling completion 和 projection 的精确 schema。
-- attendance evidence/inference/submission/fact 的精确 schema、source watermark 与
-  并发修订 contract。
-- 园区知识 revision/publish lifecycle、来源冲突复核动作、citation DTO 和 RAG owner
-  contract。
-- `InstitutionBusinessCommunicationProjectionV1`、parent-direct-to-institution
-  Message、渠道 disclosure、Grant purpose 和 owner-read endpoint。
-- 后置 `InstitutionAttentionCandidate` 的 policy/model/prompt、privacy/retention、
-  correction/redaction/revoke invalidation 和 activation gate。
-- `InstitutionSupportSignalProjectionV1`、policy config、stable source identity、
-  deadline/category allowlist 和 Web command 的精确 schema。
+- inquiry 默认最少数据固定为孩子称呼、出生月份或年龄段、期望入园时间、目标班型/
+  年龄段、照护时间需求、来源、Host contact ref、安全 label 和 last/next touchpoint；
+  法定姓名/完整出生日期推迟到后续明确 purpose/consent。
+- raw phone/WeChat/email/account identity 由 My-Chat invitation/contact owner 持有；
+  Nurture 只保存 opaque ref，owner contract 不可用时不降级复制明文。
+- native 园区业务沟通通过 canonical Message/source owner-read；external phone/WeChat
+  只保存 Admin structured summary，不保存/伪造 transcript、recording、screenshot 或
+  raw export。修订 append-only。
+- AI 只从当前授权、可引用的 native source 生成 summary candidate；Admin 确认后才
+  形成 note。AI 不生成 intent/fit/conversion score，也不推进 Journey stage。
+- `inquiry → intent_conversation` 必须由 Admin 在真实沟通后显式确认；新咨询、AI
+  summary 或 next-follow-up 不能自动推进。
+- 当前仍是未提交产品文档；exact DTO/persistence/owner-contact interface 未冻结，
+  没有代码、schema、manifest、module 或 runtime 变更。
+
+## 2026-07-30 — D-07B capacity waitlist qualification/order/offer locked
+
+- 只有目标班级已满、家庭明确接受候补、目标班级和最少意向数据均已确认时，才形成
+  `capacity_waitlist` 资格；`waitlistQualifiedAt` 不得回填为首次咨询时间。
+- 园区可配置版本化 priority category；同一 category 内按 `waitlistQualifiedAt`
+  FIFO，无 category 时全队列纯 FIFO。AI 不排序、不预测转化或适配。
+- Admin 人工调整必须是显式 append-only override，记录前后位置、原因、操作者和
+  时间；不得静默改写原资格时间或排序依据。
+- 候补记录至少需要目标班级、期望入园日期/窗口、`waitlistQualifiedAt`、容量/
+  policy revision、category/basis、`nextReviewAt`、continued-interest state、
+  last-confirmed-at 和当前 waiting party；exact persistence schema 尚未冻结。
+- 家庭只看候补状态、目标班级、下次复核时间和最近联系时间，不显示精确名次；
+  Admin 可看完整顺序、category、依据和 override history。
+- 每条候补必须有 `nextReviewAt`。未回复进入 `waiting_on_guardian`，按园区配置执行
+  reminder/deadline；一次未回复不自动删除、降级或重排。
+- 空位只创建 Admin source task。Admin 核实后发送有 `expiresAt` 的限时 offer；
+  Guardian 必须显式接受，接受前不得自动创建 identity、Grant 或 Enrollment。
+- 当前仍是未提交产品文档；没有代码、schema、manifest、module 或 runtime
+  activation 变更。
+
+## 2026-07-30 — D-07C My-Chat-bound normal trial care locked
+
+- 前一版“缺少 binding 时可保留有限内部试入园事实”的分支已被本决定 supersede。
+  provisional subject 只停留在 inquiry/visit/waitlist，不能进入实际照护。
+- Guardian 接受 trial 后，先完成 current My-Chat Child/Family、scenario binding、
+  Nurture association、pending Enrollment/Grant 和 exact CareGroup assignment；
+  未完成时 Workflow 保持 `trial_preparation`，完成后由 trial-start commit 写 active
+  trial relationship。
+- 试入园不建立 TrialChild、独立 trial consent aggregate、媒体/出勤/retention
+  pipeline 或 caregiver Surface。Guardian 接受以普通 owner action/evidence 保留。
+- 班级老师按其他孩子的相同 role-bound mobile 流程记录 attendance、care facts 和
+  media；照片自动关联、board、family publication 和 PublishProcess 复用既有 policy。
+- `participationPhase=trial` 是既有 Enrollment/roster 的 canonical phase，不产生权限。
+  试入园当天计入照护/安全人数和真实出勤，但不进入 formal Enrollment 统计。
+- 转正式只把同一关系改为 `active`，不复制孩子或历史记录；退出时结束 assignment/
+  Grant，历史沿用统一 retention/redaction。
+- exact lifecycle field 与 command schema 仍未冻结；owner/local transaction
+  ordering 已由 D-07E 锁定。没有代码、schema、manifest、module 或 runtime
+  activation 变更。
+
+## 2026-07-30 — D-07D bounded trial review locked
+
+- trial offer 接受后关闭原 waitlist entry，并将 exact class capacity 转为一条有
+  `trialStartsAt`、`trialEndsAt`、`reviewAt <= trialEndsAt` 的有界 reservation；
+  同一名额不可并行承诺。
+- review 到期只创建 Admin task/signal，不自动改变 trial、capacity、Enrollment、
+  Grant 或 CareGroup。超过 endsAt 继续试入园必须先显式延长。
+- caregiver 不填专用试入园报告；复盘复用 attendance、care facts、普通 observations
+  和 family communication。AI 只生成 source-cited draft，不作 suitability/录取建议。
+- Admin 结果限定为延长、提出正式入园、结束。正式方案等待 Guardian 明确接受且
+  期间继续保留名额；结束释放名额。所有决定记录
+  actor/time/source/reason/before/after。
+- 结束 trial 不自动恢复旧候补位置；继续等待需重新取得 D-07B qualification 和新的
+  `waitlistQualifiedAt`，例外走 append-only Admin override。
+- 当前仍是未提交产品文档；exact reservation/review/formal-proposal/exit schema
+  未冻结，没有代码、schema、manifest、module 或 runtime 变更。
+
+## 2026-07-30 — D-07E safe formalization/exit ordering locked
+
+- [SUPERSEDED by 2026-07-30 package closeout state mapping] 初稿把 Enrollment lifecycle
+  表达为 `trial | active | ended`；最终映射复用现有 status enum，并增加独立 canonical
+  `participationPhase=trial|formal`。
+- formal activation 需要 Guardian 接受 current proposal；随后 My-Chat 重验
+  Child/Family membership 和 scenario binding，Nurture 在 commit 时验证短期 signed
+  evidence。
+- 一个 Nurture local transaction 原子完成 trial→formal phase、reservation→active
+  occupancy、Grant/CareGroup 更新和 audit/idempotency。跨 owner 不宣称 distributed
+  transaction。
+- owner outage、binding drift、evidence expiry、version conflict 或本地失败均保持
+  `status=active + participationPhase=trial + reserved`，进入 waiting_on_system 并
+  exact replay；surface 只在 commit 后显示 formal。
+- end trial 是 owner outage 下仍可执行的 Nurture local downscope transaction：
+  `status: active→ended`（历史 phase=`trial`）、结束 CareGroup/trial Grant、释放
+  reservation。之后只创建 Admin task。
+- exit 不删除 My-Chat identity/membership/binding、Nurture association 或历史 care
+  facts；只停止未来 caregiver access/publication，历史沿用 T-006 lifecycle。
+- 当前仍是未提交产品文档；exact command/evidence/idempotency/outbox schema 未冻结，
+  没有代码、schema、manifest、module 或 runtime activation 变更。
+
+## 2026-07-30 — D-07F separate settling period removed
+
+- 产品判断更正为：trial 本身就是适应期，不在正式 active Enrollment 后增加第二段
+  settling period。
+- 需要更多观察时在正式激活前显式延长 trial；继续复用普通 attendance/care/
+  observation/communication，不新增 caregiver 表单或 AI 适应评分。
+- Nurture activation commit 是最后一个业务里程碑。Workflow 消费成功事实后幂等
+  complete；delivery/replay 失败只产生 technical waiting，不是业务阶段。
+- 不要求额外 Guardian 回复、Admin 完成确认或时间门。trial end 走 D-07E 的未正式
+  入园结束路径。
+- exact completion terminal label、event/envelope 和 projection schema 仍未冻结；
+  没有代码、schema、manifest、module 或 runtime activation 变更。
+
+## 2026-07-30 — Package closeout audit fixes locked
+
+- D-05 与 T-006 authority 对齐：Admin 可调整 activity placement、封面、园区说明和
+  downscope hide，但不能确认/新增/替换 canonical child attribution。Admin 只创建
+  correction candidate/WorkItem，exact CareGroup caregiver 确认；多角色用户必须切换
+  caregiver role。
+- Enrollment 状态映射固定为现有 `NurtureEnrollmentStatus` 加 canonical
+  `participationPhase=trial|formal`：preparation=`pending`，真实 trial/formal
+  relationship=`active`；正式入园只切 phase，trial exit 写 `ended`。
+- 新增 `cancel_trial_preparation`：accepted offer 已占位但 trial-start 尚未 commit 时，
+  可关闭 preparation shell 并释放 reservation，不依赖 Enrollment/Grant/CareGroup
+  已存在，也不修改 My-Chat identity/binding。
+- Workflow formalization 成功后完成；正式离园属于 ordinary Enrollment maintenance，
+  不重新打开 Journey，也不默认创建第二个 Workflow。
+- “enrollment offer”明确为 accepted trial-offer preparation shell；首轮没有 direct
+  formal-enrollment bypass。
+- D-06 创建边界改为 WorkItem 或“当前 registry 已注册且 eligible 的 Workflow”；普通
+  support signal 不得启动 `EnrollmentJourneyWorkflowV1`。
+- 所有未冻结 contract/schema 已迁入 `02-architecture.md` 的
+  Pre-implementation Contract Freeze Register，逐项具有 owner、enablement gate 和
+  default-safe behavior；首轮 roster/invite 固定单条操作。
+- Workflow context、mobile UX、T-006 authority 说明、Lead glossary、feature checkpoint
+  与官方 NHC 链接同步修正。当前仍无代码、schema、manifest/module 或 runtime activation。
+
+## Contract Freeze Work Queue
+
+顶层产品问题已关闭。以下为实现前工作队列；权威 owner/gate/default 见
+`02-architecture.md#pre-implementation-contract-freeze-register`。
+
+1. **P0 — Enrollment/Workflow core**：盘点现有 status/Enrollment/Grant/CareGroup/
+   capacity，冻结 `participationPhase` migration、trial-start/preparation-cancel/
+   formalization/exit transaction、waitlist/offer DTO 和 completion event。
+2. **P0 — Cross-owner contracts**：冻结 My-Chat prospective-contact/current-binding
+   evidence、Admin business-communication owner-read 和 Workflow private carrier。
+3. **P1 — Institution operations**：冻结 attendance、support signal、aggregate privacy、
+   activity placement/downscope 与 caregiver-confirmed child-attribution contracts。
+4. **P1 — Knowledge/RAG**：冻结 knowledge revision/publish、citation、medical-conflict
+   review 和 My-Chat RAG owner contract。
+5. **P2 — Deferred AI attention**：完成 model/policy/privacy/retention/invalidation
+   qualification 前保持 absent/default-off。

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-30T03:35:13.096Z",
+  "updatedAt": "2026-07-30T08:02:37.172Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -47,8 +47,8 @@
         "glossary",
         "llm"
       ],
-      "checksumSha256": "940e5a330d334ed47fb3e061922f8a81fa6bb425b256f537da02bb1d73457313",
-      "lastUpdated": "2026-07-29T09:04:21.839Z",
+      "checksumSha256": "6693d0fda3c08ebad9b468274bb99f2044f38f2f3fd11849d81180304d68761a",
+      "lastUpdated": "2026-07-30T07:59:48.861Z",
       "source": {
         "kind": "manual",
         "notes": "Edit via ctl-context add-term/remove-term; then run ctl-context touch."
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "1fb4a99057ea55602386e3191868ae4b625be172209e1d453143b31106771e5d",
-      "lastUpdated": "2026-07-30T00:36:25.389Z",
+      "checksumSha256": "2fe54f001bb0a77495095de8c9f9006597a1a40633b6dec34ecc4c01c75c7aec",
+      "lastUpdated": "2026-07-30T07:59:48.831Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -178,8 +178,8 @@
         "my-chat",
         "llm"
       ],
-      "checksumSha256": "6545f40c4b823097dadf7f43811a915cc01185827bdd3c670cc29833e82c27fe",
-      "lastUpdated": "2026-07-30T03:35:13.094Z",
+      "checksumSha256": "2b1641ad8b1b011af766e43045c095ded1296651b19a0b429b03e678ee91459e",
+      "lastUpdated": "2026-07-30T08:02:37.170Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

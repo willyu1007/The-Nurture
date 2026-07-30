@@ -491,6 +491,77 @@ interface. Activation requires an additive versioned interface/digest,
 body-safe private carrier, current-owner policy implementation, correction /
 redaction / revoke invalidation, and positive plus negative contract tests.
 
+## Planned Enrollment Journey Workflow (T-007 D-07)
+
+`EnrollmentJourneyWorkflowV1` is the only product `InstitutionWorkflow` planned
+for the first T-007 implementation increment. It covers minimum-data inquiry,
+intent conversation, optional visit, optional full-class capacity waitlist,
+trial preparation/start, ordinary trial care/review, formalization, and
+completion. Grant changes, attendance closeout, knowledge editing, support
+signals, `CareInteraction`, `PublishProcess`, and ordinary Enrollment
+offboarding are not additional Workflows.
+
+Business stage and waiting state are orthogonal. `capacity_waitlist` means only
+that the exact target class currently has no capacity. Waiting on a Guardian,
+Caregiver, owner system, agreed future date, or resolvable blocker does not
+enter or reorder the waitlist. A support signal may create an explicit
+WorkItem, but it cannot start `EnrollmentJourneyWorkflowV1` unless a separately
+authorized enrollment command satisfies that Workflow's own eligibility.
+
+The planned Enrollment mapping reuses the existing `NurtureEnrollmentStatus`
+instead of adding a `trial` status:
+
+- trial preparation may hold `status=pending` and cannot produce real care;
+- trial start atomically establishes
+  `status=active, participationPhase=trial` with current reservation, Grant,
+  and exact CareGroup assignment;
+- formalization keeps `status=active` and changes only
+  `participationPhase: trial -> formal`;
+- trial exit changes `status: active -> ended` while retaining historical
+  phase/provenance.
+
+`participationPhase` is a canonical discriminator for statistics and
+transitions, but it grants no authority. Every protected trial or formal read,
+command, publication, and delivery still rereads current owner binding,
+workspace association, Participant/role, Enrollment status, Grant, exact
+CareGroup, purpose, and source lifecycle. Formal Enrollment totals require
+`status=active && participationPhase=formal`; trial attendance still contributes
+to real daily care and safety headcount.
+
+An accepted trial offer closes its waitlist entry and reserves one exact class
+capacity unit. If the Guardian withdraws before trial-start commit,
+`cancel_trial_preparation` closes the accepted-offer/preparation shell and
+releases that reservation in one idempotent Nurture transaction; it does not
+require Enrollment/Grant/CareGroup to exist and does not create, revoke, or
+delete My-Chat Child/Family/bindings. After trial-start commit, the downscope
+path is `end trial`. Neither path restores the previous waitlist rank.
+
+Formalization is a two-owner sequence, not a distributed transaction. After
+the Guardian accepts the current formal proposal, My-Chat rereads current
+Child/Family membership and both scenario-binding heads and issues short-lived,
+purpose-bound evidence. Nurture then validates current expected versions and
+atomically changes participation phase, converts the reservation to active
+occupancy, updates Grant/CareGroup, and records idempotency/audit evidence.
+Owner outage, binding drift, evidence expiry, version conflict, or local
+failure leaves the canonical relationship
+`status=active, participationPhase=trial, reserved` and may expose only a
+technical `waiting_on_system` state.
+
+Trial is the adaptation period. If more observation is needed, Admin extends
+trial before formalization. A confirmed Nurture formalization commit is the
+last business milestone and idempotently completes the Workflow; no
+post-formalization settling stage, feedback form, timer, or extra human
+completion gate exists. Later formal offboarding is ordinary Enrollment/Grant/
+CareGroup lifecycle maintenance and does not reopen this Workflow or create a
+second Workflow by default.
+
+The current scenario manifest/module/source declare none of this Workflow,
+projection, or command surface. Activation remains default-off until the
+status/phase migration, waitlist/offer/reservation/preparation-cancel contracts,
+My-Chat owner evidence, formalization/exit transactions, projection schema,
+event/replay behavior, fixtures, and joint positive/negative qualification are
+immutable and pinned.
+
 ## Handoffs
 
 Handoff payloads are refs-only.
@@ -544,6 +615,12 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
   until a new exact interface version/digest, private carrier, per-request
   owner-read policy, lifecycle invalidation, no-copy controls and negative
   privacy/action-authority tests are adopted by both owners.
+- The T-007 D-07 `EnrollmentJourneyWorkflowV1` remains absent/default-off until
+  the existing Enrollment status plus `participationPhase` mapping,
+  trial-start/preparation-cancel/formalization/exit transactions, waitlist and
+  reservation contracts, My-Chat current-owner evidence, projection/event/
+  replay schemas, fixtures, and cross-owner conformance are adopted. No caller
+  may infer or assemble this Workflow from the planned stage labels.
 - Institution owner reads re-resolve current participant/role/care-group scope and recheck enrollment, thread membership, the item-linked grant, source lifecycle, and redaction before every display.
 - The default/dev scenario module remains pre-activation. The canonical vNext manifest may be loaded only through `createNurtureActivationScenarioModule` and only when the My-Chat development composition advertises `workflow_handoff_materialization_v1` and provides the claimed requirement, Actor-to-user, bridge, and materializing runtime ports.
 - `NURTURE_INTERNAL_SERVICE_TOKEN` is configured on both sides of the owner-read boundary; absence disables activation owner reads and never falls back to an unauthenticated route.

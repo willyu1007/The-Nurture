@@ -74,20 +74,63 @@ Project: `main`
   home–institution dynamics; park-level presentation only summarizes park-wide items and
   cross-class exceptions. Class cards use deterministic latest eligible media rather than an
   AI-selected representative image, expose canonical attendance submission state rather than
-  inference, and keep full communication/child detail behind exact-purpose drill-down. Admin Web
-  may create and read complete authorized photo/text records, set optional covers, and revise
-  activity/child associations append-only while preserving teacher originals and automatic-match
-  provenance. Support signals are noncanonical, two-tier (`action_required` /
+    inference, and keep full communication/child detail behind exact-purpose drill-down. Admin Web
+    may create and read complete authorized photo/text records, set optional covers, and revise
+    activity placement/downscope visibility append-only while preserving teacher originals and
+    automatic-match provenance. Admin-only child-attribution correction creates a candidate/
+    WorkItem; the current exact CareGroup caregiver confirms canonical attribution. Support
+    signals are noncanonical, two-tier (`action_required` /
   `attention_suggested`) projections derived from canonical deadlines/blockers or explicit
   Institution absolute count/time-window policies; they never use peer ranking, hidden AI scores,
   or automatic WorkItem/Workflow creation. Mobile displays at most three cross-class signals and
-  body-free class counts, while Admin Web owns threshold configuration and explicit source
-  actions. The first Institution Workflow implementation is limited to
-  `EnrollmentJourneyWorkflowV1`, spanning inquiry, intent/optional visit, optional full-class
-  capacity waitlist, trial preparation/care/review, enrollment offer, identity/Grant/Enrollment
-  activation, settling, and completion. Capacity waitlist is distinct from waiting on a Guardian,
-  caregiver, system owner, future date, or blocker; exact states/schema remain open until the
-  journey deep dive closes. Explicitly disclosed institution-business communication is available
+    body-free class counts, while Admin Web owns threshold configuration and explicit source
+    actions. Admin Web may create a WorkItem or start only a currently registered and eligible
+    Workflow; an ordinary signal cannot start Enrollment Journey. The first Institution Workflow
+    implementation is limited to
+    `EnrollmentJourneyWorkflowV1`, spanning inquiry, intent/optional visit, optional full-class
+    capacity waitlist, pre-trial identity/binding plus pending Enrollment/Grant/CareGroup,
+    ordinary trial adaptation/review, formal Enrollment and
+    completion. Capacity waitlist is distinct from waiting on a Guardian,
+    caregiver, system owner, future date, or blocker. The product journey is closed; exact
+    contracts/schemas remain default-off behind an owner/gate/default freeze register. Inquiry
+    stores only minimum provisional
+  child data and a Host-owned opaque contact ref. Native business communication is owner-read
+  from canonical sources;
+  external phone/WeChat touchpoints are Admin-authored structured summaries, not transcripts.
+  Only cited authorized native sources may produce an Admin-reviewed AI summary candidate, and
+  neither AI nor a new inquiry advances the stage or assigns intent/fit/conversion scores.
+  Capacity waitlist qualification begins only after explicit family acceptance plus confirmed
+  target class/minimum data, uses versioned priority categories with FIFO inside each category
+  (or pure FIFO without categories), and never uses AI ordering. Families do not see exact rank;
+    vacancies create an Admin task and time-limited offer, never automatic Enrollment or Grant.
+    Before actual trial care, the Guardian-authorized My-Chat Child/Family binding, Nurture
+    association, pending Enrollment/Grant and exact CareGroup assignment must all be current;
+    trial start atomically writes `status=active, participationPhase=trial`.
+    Trial children then use the same roster, attendance, care-fact, media-attribution, board and
+    PublishProcess paths as other children; participation phase is canonical metadata, never
+    authority. Trial attendance counts for same-day care/safety, while formal totals require
+    `status=active && participationPhase=formal`; formalization updates the same relationship
+    without copying historical facts.
+    Accepted trial closes the waitlist entry and reserves one exact class seat for bounded
+    starts/ends/review times. Review due creates an Admin task only: Admin explicitly extends,
+    proposes formal enrollment for Guardian acceptance, or ends and releases the seat. Caregivers
+    have no trial scoring report, AI makes no suitability decision, and ended trial never restores
+    an old waitlist rank without a new qualification or audited override. Guardian withdrawal
+    before trial-start uses `cancel_trial_preparation` to close the shell and release reservation
+    without requiring Enrollment/Grant/CareGroup or mutating My-Chat identity/binding.
+    Formal activation requires Guardian acceptance and fresh My-Chat Child/Family
+    membership/binding evidence, then one Nurture local transaction keeps Enrollment active,
+    changes `participationPhase: trial -> formal`, and converts reservation, Grant and CareGroup
+    together. Failure remains `active trial + reserved` and surfaces only a Workflow wait state.
+    Trial exit is a local downscope transaction that closes care access
+    and releases capacity without deleting My-Chat identity/bindings, Nurture associations or
+    historical care facts. Trial itself is the adaptation period: when more observation is needed,
+    Admin extends trial before activation. Confirmed activation success is the final business
+    milestone and idempotently completes the Workflow; there is no post-activation settling stage
+    or additional caregiver, Guardian or Admin completion gate. Later formal offboarding is
+    ordinary Enrollment maintenance and neither reopens Journey nor creates a second Workflow by
+    default.
+  Explicitly disclosed institution-business communication is available
   to the exact Institution Admin through a request-time owner-read projection without teacher
   escalation, while family-private AI/drafts/private chat remain excluded and Admin read never
   grants CareGroup reply authority. A later AI attention capability may only highlight cited
@@ -115,11 +158,12 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 through T-008 (`planned`).
-- Next Checkpoint: T-004～T-006 顶层契约以及 T-007 角色/Admin Web、每日出勤和
-  知识/RAG 决策已完成对齐；继续收敛 T-007 首批 `InstitutionWorkflow`、聚合隐私
-  阈值与精确 schema。随后各任务仍需在 T-002 owner gates 下
-  分别完成 contract/schema inventory、实现与资格验证；所有能力保持 default-off，
-  external traffic 继续 NO-GO。
+- Next Checkpoint: T-004～T-007 顶层产品决策已完成对齐。T-007 下一步按 freeze
+  register 先完成 Enrollment `status + participationPhase`、trial reservation/
+  cancellation/formalization、Admin attribution authority、aggregate privacy 与
+  `EnrollmentJourneyWorkflowV1` public contract/schema inventory；随后各任务仍需在
+  T-002 owner gates 下分别实现与资格验证。所有新增能力保持 default-off，external
+  traffic 继续 NO-GO。
 
 ## Notes (manual)
 - Keep human notes here. Everything below the AUTO section is generated by sync.
