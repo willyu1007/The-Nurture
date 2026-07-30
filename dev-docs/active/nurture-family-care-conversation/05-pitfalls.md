@@ -64,6 +64,22 @@
 - 不要把当前 claimed-Step / `workflow_step_complete_v1` compatibility name 解释为
   family-care 产品 Workflow；它保持 default-off，等待上游迁移。
 - 不要把 Increment 1 checkpoint 描述成 T-005 final completion；第二增量仍是显式未完成范围。
+- 不要把 G2-A 描述成一个跨 submit/acknowledge/reply 的“原子闭环”；只有每个
+  ActionExecution 各自事务原子，整个多人闭环不是长事务或 Workflow。
+- 不要在 G2-B 未完成 correction/withdrawal/redaction/Admin owner-read，或 G2-C
+  未完成 dedicated caregiver direct interaction 时把 T-005 标为 done。
+- 不要让 T-006 `direct_interaction_required` 复用普通
+  `submit_family_care_question`、复制 sensitive source body、自动创建
+  CareInteraction 或降级进入 PublishProcess；G2-C 必须是独立 exact-target
+  caregiver-initiated capability。
+- 不要在 G2-C exact effect/response/Receipt contract 尚未冻结时发布占位 key 或让
+  consumer 猜测 capability name/schema。
+- 不要让 legacy single status、personal assignment、single reply slot、raw DTO 或
+  claimed-Step 与三轴 Harness 双写同一 G2 row；旧 consumer 只能读取单向 derived
+  compatibility projection，歧义旧行必须 quarantine。
+- 不要让 T-005 G2-C provider qualification 等待 T-006 整体完成；先用 exact
+  synthetic consumer fixture 完成 provider handoff，再由 T-006 G3-E 做真实 consumer
+  joint qualification。
 - 不要把 prepare/execute 两个技术阶段机械映射成两个页面、两次按钮或通用确认弹窗。
 - 不要隐藏 submit/reply 的目标、确切正文或 append effect；第一次回复解除待回复
   Attention 但不关闭事项，这一效果必须可见。

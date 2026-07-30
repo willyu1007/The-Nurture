@@ -54,9 +54,11 @@
 - 成功 execute 后的响应丢失由相同 command request 的 CommandExecution exact replay 恢复，不通过第二次新 effect 消费。
 - 该方案复用 T-002 已锁定的五分钟 `submit_action` context 与现有 CommandExecution 机制；当前仍为规划落稿，无代码或数据模型变更。
 
-## 2026-07-29 — ExecuteAction correctness spine and atomic MVP locked
+## 2026-07-29 — ExecuteAction correctness spine and per-action atomic MVP locked
 
-- 用户确认保留完整正确性骨架，但第一增量缩小为 `submit → acknowledge → reply` 三个原子动作。
+- 用户确认保留完整正确性骨架，但第一增量缩小为 `submit → acknowledge → reply`
+  三个各自原子的动作；后续 G2 决策明确整个多人闭环不是一个跨步骤事务或
+  Workflow。
 - My-Chat 拥有 per-call invocation identity；Nurture prepare 生成并绑定 stable business command identity，My-Chat/LLM 不自行拼接。
 - 对原子 action，confirmation consumption、canonical input match、current authority/version reread、effect/receipt 与 CommandExecution 共享一个 Nurture transaction。
 - same command identity + exact payload 返回 exact replay；payload drift 返回 idempotency conflict，并发只有一个 effect winner。
@@ -270,3 +272,41 @@
   action、诊断、归责或评分。
 - 当前 manifest/module/source 未声明或实现此 protected interface，因此保持
   default-off；本次仅同步 T-004/T-005/T-007 与 context contracts。
+
+## 2026-07-30 — Stage G2 structure and cross-task reinforcements accepted
+
+- 用户确认 Stage G2 继续复用 T-005，不创建新任务；结构固定为 G2-A Core
+  CareInteraction Loop、G2-B Lifecycle and Owner-read Completion、G2-C Caregiver
+  Direct Interaction Bridge 和一个最终 Nurture-side qualified handoff。
+- “Atomic Loop”表述被纠正：submit/acknowledge/reply 的每个 ActionExecution 各自
+  transaction-atomic，整个多人闭环不是长事务、saga 或 Workflow。
+- G2-A 是中间 checkpoint；correction/withdrawal/redaction、Admin owner-read 和
+  dedicated caregiver direct interaction 未完成前，T-005 不得转为 done。
+- 跨任务审计发现 T-006 已把 `direct_interaction_required` 路由绑定到一个尚不存在的
+  T-005 caregiver-initiated capability。G2-C 现被纳入 T-005 final Exit：exact
+  CareGroup caregiver 选择 owner-issued child/family target，进入 empty protected
+  composer；T-006 不复制 sensitive source、不自动创建 interaction、不降级到普通
+  family question 或 PublishProcess。
+- G2-C 首版只允许 caregiver 人工填写受保护纯文本。事实性事件/健康信息保持
+  非诊断、非处方；紧急处理继续走线下 protocol，Nurture message 不是替代路径。
+  exact canonical effect、response expectation 和 Receipt 在 Phase 0 冻结前不注册
+  capability。
+- legacy cutover 固定为 single writer：新 G2 rows 只由三轴 Harness path 写入；
+  single status、personal assignment、single reply slot、raw DTO、ThreadParticipant
+  authority 与 claimed-Step 只读兼容/default-off。旧 consumer 只能从 canonical
+  facts 单向派生，不 dual-write；歧义旧行 inventory/quarantine，不猜测。
+- G2 Exit 必须经 formal NestJS ingress + real pinned owner path，在 disposable
+  PostgreSQL 完成 transaction/concurrency/replay/cascade、cross-scope、privacy 和
+  final false/empty qualification。该 PASS 不表示 My-Chat native/device 完成。
+- 本轮只更新规划/架构/验证合同，无应用代码、schema、migration、database、
+  environment、Candidate、activation 或 traffic 变更。
+
+## 2026-07-30 — G2-C provider / G3-E consumer dependency clarified
+
+- T-005 G2-C provider contract 与 qualification 独立完成，不等待 T-006 整体 task
+  completion；provider evidence 使用 exact T-004 digest 与 synthetic owner-issued
+  consumer fixture。
+- T-006 Stage G3-E 必须在同一 contract identity 上完成真实 safety-route consumer
+  joint qualification，之后才可签发 T-006 Beta Profile Handoff。
+- 该边界避免 T-005 等 T-006、T-006 又等 G2-C 的循环依赖；两份 task handoff 仍各自
+  保留 exact evidence，不相互替代。

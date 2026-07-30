@@ -3,7 +3,7 @@ task_id: T-005
 project: main
 slug: nurture-family-care-conversation
 status: planned
-updated: "2026-07-29"
+updated: "2026-07-30"
 keywords:
   - guardian-chat
   - caregiver-chat
@@ -11,3 +11,6 @@ keywords:
   - explicit-send
   - receipts
   - owner-reread
+  - stage-g2
+  - caregiver-direct-interaction
+  - single-writer-cutover

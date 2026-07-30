@@ -41,6 +41,13 @@ T-005 不是重建这套骨架。主要差距集中在四处：
    precondition。
 4. correction、family request withdrawal、typed committed result、context continuation
    与完整 ActionDelivery invalidation 尚未落地。
+5. T-006 已要求一个 dedicated caregiver-initiated direct-interaction capability，
+   但 T-005 当前 registry 只有 family-to-org question 与对既有 Item 的 reply；普通
+   question 还会拒绝健康/用药/紧急输入，不能作为反向或降级路径。
+
+此外，legacy single status、personal assignment、single reply slot 与新三轴模型之间
+尚无明确 single-writer cutover。G2 实现前必须冻结“新 row 只由 Harness 写、旧 consumer
+只读单向派生、歧义旧行 quarantine”的规则，禁止 dual-write。
 
 因此 T-005 应在既有事务/幂等内核上增量迁移，不 fork 一个新的聊天或工作流 runtime。
 
@@ -74,6 +81,7 @@ T-005 不是重建这套骨架。主要差距集中在四处：
 | Capability/API | manifest 只有 legacy Workflow entrypoints 和两个 institution GET；除 legacy capture 外，其余 family-care specs只被 tests直接调用 | T-004 catalog + query/prepare/execute/readResult private API | `ADD` | 在 T-004 pin 后增加 additive domain-action API/registry；不得把 family-care actions塞回 Workflow Run/Step manifest |
 | ActionDelivery | submit 有 default-off `workflow_step_complete_v1` user_attention seam；reply/correction 等无完整公开 delivery contract | My-Chat 独立幂等 materialize，send/open 都 owner-reread | `HOST_GATED` | Nurture返回 stable refs/invalidation scopes；My-Chat companion 实现 candidate/notification/deep-link；legacy claimed-Step 不可作为 activation 证据 |
 | Safety gate | 当前 family input验证结构和 allowlisted枚举，不读取 protected body做医疗/用药/紧急拒绝 | unsupported/safety-gated input 在任何业务事实前失败 | `ADD` | 增加 protected、no-log、deterministic policy port和明确 alternate-process result；不把正文交给普通 Chat LLM |
+| Caregiver direct interaction | 无 dedicated caregiver-initiated protected capability；现有 family question direction/role/safety contract 不匹配 | T-006 `direct_interaction_required` 只导航到独立 exact-target capability，打开 empty protected composer | `ADD` / `HOST_GATED` | Phase 0 冻结 exact key/effect/response/Receipt；T-006 不复制 source body、不自动创建 interaction；能力缺失时安全阻塞 |
 
 ## Target Schema Delta
 
@@ -115,6 +123,19 @@ ackedByRoleAssignmentId?
 - reply collection 由 Message/Event 事实派生；`replyCount` 不作为 authorization 或
   concurrency head。
 
+### Single-writer cutover
+
+- 新 G2 Item/Message/Receipt/Execution 只由 T-004 exact contract 下的三轴 Harness
+  path 写入。
+- legacy handler 不写新 rows；legacy `status`、assignment 和 linked-reply 字段不参与
+  authority/concurrency/replay。
+- 旧 consumer 如需过渡显示，只能从三轴 state、canonical reply Message collection
+  和 Receipt 单向派生 read-only compatibility projection；不得回写或双写。
+- 旧行 backfill 只接受 mechanically provable mapping。claimant、Grant、reply owner、
+  lifecycle 或 old terminal state 有歧义时 inventory/quarantine，不猜测。
+- claimed-Step/raw DTO/ThreadParticipant path 继续 default-off，不得作为 G2 evidence
+  或 fallback。
+
 ### Required additions
 
 - append-only `NurtureFamilyCareMessageCorrection`（或同等单一 correction fact）：
@@ -141,6 +162,7 @@ ackedByRoleAssignmentId?
 | `correct_family_care_message` | `body` | strict correction head + exact author/current same-side reach；family source must still await reply | correction version + Receipt + update delivery candidate |
 | `withdraw_family_care_request` | `{}` | active family-authored Item + exact source author/current family reach | lifecycle closed(`family_withdrawn`) + Event + Attention closure；Receipt unchanged |
 | `redact_family_care_message` | `{}` | exact Message/redaction head + exact author/current same-side reach | encrypted content/corrections erased + tombstone + scoped cascade |
+| dedicated caregiver direct interaction（exact key 在 Phase 0 冻结） | caregiver-authored protected plain text；不含 raw source/target/Grant | owner-issued exact child/family target；current CareGroup caregiver；org-to-family Grant/data class/purpose/safety heads | canonical effect、family response expectation、Receipt 与 change lifecycle 在 G2-C contract 冻结；不得复用 family-question Item semantics |
 
 `policy_redact_family_care_message` 是单独的 system capability，原因由服务端产生，
 不能与 author redaction 共用 actor 或 business input。
@@ -149,9 +171,10 @@ ackedByRoleAssignmentId?
 
 1. **T-004 contract pin**：冻结 descriptor、contract identity、surface envelope、
    invocation/result/error 和 concurrency-head schema。
-2. **Schema migration**：三轴 Item、typed original-scope relations、reply order、
+2. **Schema migration and cutover**：三轴 Item、typed original-scope relations、reply order、
    context continuation、correction、typed context dependencies、immutable result 和
-   cascade audit；迁移前报告旧行歧义，不猜测。
+   cascade audit；冻结 single writer/read-only compatibility，迁移前报告旧行歧义，
+   不猜测。
 3. **Harness ingress**：实现 authenticated `query/prepareAction/executeAction/readResult`；
    body-free InteractionContext、owner-issued target refs、keyed input integrity、稳定
    Nurture command identity和 status/reconcile。
@@ -162,13 +185,21 @@ ackedByRoleAssignmentId?
    Chat/board equivalence、多 Enrollment isolation、并发 reply、response-loss replay。
 6. **Increment 2 commands**：correction、withdrawal、author/system redaction 和完整
    cascade/delivery invalidation。
-7. **Host companion + activation**：My-Chat ActionDelivery、notification/deep-link、
+7. **G2-C direct interaction**：冻结并实现 dedicated caregiver-initiated exact-target
+   capability；验证 T-006 owner-issued action、安全阻塞、empty protected composer、
+   non-diagnostic factual communication 和 no-source-copy。
+8. **G2 Exit qualification**：formal NestJS ingress + real owner path 上联合验证 G2-A/
+   B/C、legacy no-dual-write、privacy/leakage 和 final false/empty，并形成 T-005
+   Beta Profile Handoff。
+9. **Host companion + activation**：My-Chat ActionDelivery、notification/deep-link、
    native rendering 与 TestFlight/Play composite validation；在 T-002 owner pins 和
    qualification 完成前保持 default-off。
 
 ## Activation Statement
 
 当前 landed schema/source 只能证明 T-002 的局部 transaction/domain foundation。
-它不能证明 T-005 Harness、三轴 Item、多回复、第二增量、My-Chat delivery 或六-surface
-产品已实现。T-005 可以据本清单继续 contract/schema implementation，但真实 owner path、
-claimed-Step replacement、Host delivery 和 traffic 仍是 `ACTIVATION_NO_GO`。
+它不能证明 T-005 Harness、三轴 Item、多回复、第二增量、G2-C direct interaction、
+My-Chat delivery 或六-surface 产品已实现。T-005 可以据本清单继续 contract/schema
+implementation，但真实 owner path、claimed-Step replacement、Host delivery 和 traffic
+仍是 `ACTIVATION_NO_GO`。G2-A/B/C 与 final qualification 全部通过前，T-005 不得转为
+done。

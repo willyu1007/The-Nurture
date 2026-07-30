@@ -6,15 +6,21 @@
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-30
-- Next step: 按 [T-002 fact/schema gap](06-t002-fact-schema-gap.md) 的实施顺序，
-  先采用 T-004 exact
-  contract pin，再冻结三轴 CareItem、immutable command result、protected ingress、
-  context continuation 与 correction/withdrawal/redaction schemas；同时按 T-007 D-04
-  冻结园区业务沟通的 Institution Admin 只读投影，不扩张 caregiver action authority。
+- Next step: 按 Stage G2 顺序先采用 T-004 exact contract pin，冻结三轴 CareItem、
+  legacy single-writer cutover、encrypted protected content 和 G2-C dedicated
+  caregiver direct-interaction exact contract；随后依次实施/资格化 G2-A Core Loop、
+  G2-B Lifecycle/Admin owner-read 和 G2-C Bridge。所有真实 protected qualification
+  经 formal NestJS ingress + pinned owner path，能力保持 default-off。
 
 ## Goal
 
 落地 Guardian Nurture Chat 与 Caregiver Nurture Chat 的 Nurture 侧产品能力：Guardian Chat 保持家庭私密、以孩子为中心的总结与反馈；Caregiver Chat 呈现当前授权的照护事项与工作动作。普通聊天、Chat-assisted action 与 board-direct action 是三种不同交互；后两者必须收敛到同一 Nurture Capability Harness。跨家庭—机构边界的闭环由 Nurture-owned Message、CareItem、Receipt 和追加式变更事实连接，两个角色消费不同投影，不建立跨角色共享聊天室或共享 transcript。My-Chat 负责呈现和宿主交互，本任务负责业务语义与可消费契约。
+
+本任务同时承载 Stage G2：G2-A 完成 family-to-CareGroup
+`submit → acknowledge → one-or-more reply` 核心闭环；G2-B 完成
+correction/withdrawal/redaction 与 Institution Admin source-side owner-read；G2-C
+完成 T-006 `direct_interaction_required` 所需的 caregiver-initiated protected
+bridge。只有 A/B/C 与 G2 Exit Qualification 全部通过，T-005 才可完成。
 
 ## Terminology Boundary
 
@@ -114,6 +120,10 @@
   identity 均由 Nurture 推导。
 - 普通 Chat 只能识别发送意图并打开空的受保护 composer；正文不得从普通 Chat 自动复制、由 LLM 改写或持久化到 Chat transcript。
 - 第一增量不支持附件、富文本、批量发送、用户自选分类/优先级，以及医疗、用药或紧急事项写入。
+- 独立 G2-C caregiver direct-interaction bridge：只允许 exact CareGroup current
+  caregiver 选择 owner-issued child/family target 后打开空 protected composer；
+  不自动复制 T-006 sensitive source、AI 文案或附件。事实性健康/事件沟通保持
+  非诊断、非处方，紧急流程不得由 Nurture 消息替代。
 - UX confirmation 以“一次结构化、效果明确的用户手势”为原则，不把技术 prepare/execute 映射成两次可见操作。
 - `submit` / `reply` 使用 reviewable commit：准确内容、目标和效果先可见，再以一次 CTA 提交；不强制二次弹窗。
 - `acknowledge` 使用 direct commit：一次“确认收到”手势即可；自然语言本身永远不构成 confirmation。
@@ -126,6 +136,9 @@
 - withdraw、redaction、correction 与 owner-reread / replay。
 - 每次跨边界发送绑定精确 Institution Enrollment 和原始 Grant，且不得跨机构串联。
 - 角色化 presenter、commands、errors 与合成 fixture。
+- legacy 单状态、个人 assignment、single reply slot、ThreadParticipant authority、
+  raw DTO 和 claimed-Step 只作 migration/read compatibility；新 G2 rows 由三轴
+  Harness 单写入，禁止 dual-write，歧义旧行 quarantine。
 - 面向当前 `institution_admin` 的园区业务沟通只读投影：仅覆盖发送前已披露 Admin
   监督的 `family_to_org | org_to_family` 业务消息，逐请求重读精确 Institution、
   Enrollment、CareGroup、original Grant、data class、direction、purpose 与源事实
@@ -214,8 +227,10 @@
 - [ ] success、already-satisfied、replay 与语义不变的 transparent reprepare 均原位、
   低打扰反馈；只有实质可见变化或安全边界变化才增加用户步骤。
 - [ ] Increment 1 只覆盖 submit/acknowledge/reply；第二增量
-  correction/withdrawal/redaction 未实现前不得宣称 T-005 完成，但不阻塞首个原子
-  闭环 checkpoint。
+  correction/withdrawal/redaction 未实现前不得宣称 T-005 完成，但不阻塞首个
+  Core CareInteraction Loop checkpoint。
+- [ ] G2-A 只作为 Core CareInteraction Loop checkpoint；G2-B lifecycle/Admin
+  owner-read 与 G2-C caregiver direct-interaction 未完成前不得宣称 T-005 final Exit。
 - [ ] correction 是 exact-author、append-only 的 Message 内容版本；严格绑定当前
   correction head，不能原地改写历史或由同班其他老师修改作者事实。
 - [ ] submit/acknowledge/reply/correction/withdrawal/redaction 的 committed output
@@ -259,6 +274,14 @@
 - [ ] acknowledge 是一次 effect-labeled gesture；过期/状态漂移只能刷新当前状态，不能执行旧动作。
 - [ ] token 过期但可见内容/目标/效果未变时可透明重新 prepare；任一可见语义变化必须重新展示并要求新的手势。
 - [ ] LLM 不能绕过 Harness 的目标解析、授权、确认、版本和幂等校验。
+- [ ] G2-C 使用独立 versioned caregiver-initiated capability；T-006 只传
+  body-free owner-issued action/navigation context，不复制 source body，不复用普通
+  family-question，也不降级为 PublishProcess。
+- [ ] G2-C 未冻结 exact effect/response/Receipt contract、owner unavailable、
+  contract mismatch 或资格化未通过时，只返回安全阻塞且不创建 CareInteraction。
+- [ ] 新 G2 Item/Message 只有三轴 Harness writer；legacy handler 对新 rows
+  default-off，旧 consumer 只能读取单向 derived compatibility projection，歧义旧行
+  不猜测迁移。
 - [ ] caregiver 只能在有效 child scope 和授权来源下查看/发送。
 - [ ] 每个跨边界 Message、CareItem 和 Receipt 均可追溯到精确 Enrollment 与原始 Grant，且不会泄漏其他机构关系。
 - [ ] delivery/read/acknowledge/withdraw/redaction/correction 状态可审计且可重放。
@@ -270,10 +293,11 @@
 
 ## Next Step
 
-已统一 Workflow 术语和两增量产品语义，并完成 T-002 landed fact/schema/source
-盘点。结论是复用现有 transaction/CommandExecution、Message/Receipt/Event/Attention
-骨架，增量迁移三轴 CareItem、多回复、protected ingress、typed result、continuation
-和第二增量事实；legacy Thread membership、institution-admin authority、raw command
-DTO、whole-Item reply CAS、single reply slot 和 claimed-Step 路径不得进入新 activation。
-下一步先采用 T-004 exact contract artifacts，再按 gap inventory 的 schema → Harness →
-Increment 1 → Increment 2 → Host companion 顺序实施。
+Stage G2 结构已确认：G2-A Core CareInteraction Loop、G2-B Lifecycle and
+Owner-read Completion、G2-C Caregiver Direct Interaction Bridge 与一个最终
+Nurture-side qualified handoff。结论是复用现有 transaction/CommandExecution、
+Message/Receipt/Event/Attention 骨架，增量迁移三轴 CareItem、多回复、encrypted
+protected content、typed result、continuation 和第二增量事实；legacy paths 对新 rows
+只读兼容、单向派生、禁止 dual-write。下一步采用 T-004 exact contract artifacts，
+冻结 G2-C exact effect 与 cutover matrix，再按 schema → Harness → G2-A → G2-B →
+G2-C → G2 Exit Qualification 顺序实施。

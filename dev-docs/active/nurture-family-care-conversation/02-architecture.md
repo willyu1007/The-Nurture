@@ -22,6 +22,53 @@
 single linked reply、ThreadParticipant authorization 和 raw command DTO 都是迁移输入，
 不是新 T-005 activation contract。
 
+## Stage G2 Architecture Boundary
+
+Stage G2 复用 T-005，并分为三个可独立验证但共同组成 task Exit 的 checkpoint：
+
+```text
+G2-A Core CareInteraction Loop
+  Guardian protected submit
+    -> exact Enrollment/CareGroup/original Grant
+    -> CareGroup acknowledge
+    -> one-or-more caregiver replies
+    -> Guardian/Caregiver role-safe projections
+
+G2-B Lifecycle and Owner-read Completion
+  correction + family withdrawal + author/system redaction
+    -> delivery invalidation
+    -> Institution Admin exact owner-read source projection
+
+G2-C Caregiver Direct Interaction Bridge
+  T-006 owner-issued navigation/action
+    -> exact caregiver + child/family target + org-to-family authority
+    -> empty protected composer
+    -> dedicated CareInteraction capability
+```
+
+G2-A 的每个 action 各自 transaction-atomic；整个多用户闭环不是长事务、saga 或
+Workflow。G2-A PASS 不等于 T-005 Exit。G2-B/C 与最终 formal-ingress qualification
+全部通过后，才形成 Nurture-side Beta Profile Handoff；My-Chat native delivery/device
+evidence 仍由 T-008 companion 负责。
+
+### Legacy compatibility and single-writer cutover
+
+新 G2 row 的唯一 writer 是 exact T-004 contract 下的三轴 Harness path。legacy
+single `status`、`assignedToRoleAssignmentId`、`linkedReplyMessageId`、raw command
+DTO、ThreadParticipant authority、whole-Item reply CAS 和 claimed-Step handler：
+
+- 不得写入或改变新 G2 row；
+- 不得参与 authority、concurrency、replay 或 reply identity；
+- 如旧 consumer 暂时需要显示，只能从三轴 CareItem、canonical reply Messages 和
+  Receipts 单向派生 read-only compatibility projection；
+- 不得将 legacy read projection 回写为 canonical state，也不得做双向 dual-write；
+- 旧行只迁移可由 complete graph 与现有 facts 机械证明的状态；claimant、Grant、
+  reply owner、lifecycle 或 single-slot 含义不明确时进入 inventory/quarantine。
+
+该 cutover 允许 additive schema/migration 和 disposable PostgreSQL replay，但不授权
+persistent environment apply。legacy path 继续 default-off；它的存在不能阻塞 G2-A
+纯新路径实现，也不能成为 G2 qualification evidence。
+
 ## Three Interaction Paths
 
 ### Ordinary Chat
@@ -317,8 +364,8 @@ My-Chat 需要最新展示时仍调用 `readResult`。
   suppressed、原始 Grant/Enrollment/source 失效与 retention fence 仍会阻止新回复。
 - 三者均为 `ActionExecution` 原子 command，不创建产品 Workflow Run/Step。
 - correction、family request withdrawal 与 redaction 是第二增量；Grant revoke/
-  cross-boundary suppression 是独立授权动作。第二增量不阻塞 Increment 1 原子闭环
-  checkpoint，但未实现前不能宣称 T-005 final exit。
+  cross-boundary suppression 是独立授权动作。第二增量不阻塞 G2-A Core
+  CareInteraction Loop checkpoint，但未实现前不能宣称 T-005 final exit。
 
 ### CareGroup Responsibility and Individual Audit
 
@@ -443,6 +490,43 @@ fields 和一次手势 confirmation 见
 - My-Chat Chat transcript 只是宿主会话历史，不是 Nurture draft、结果、业务历史或授权来源。
 - caregiver 受保护正文通过 opaque ref 临时 owner-reread；不得复制进 My-Chat Chat history。
 - 多 Institution Enrollment 之间各自隔离；同一孩子不存在跨机构共享房间或可推断其他机构关系的会话列表。
+
+## G2-C Caregiver Direct Interaction Bridge
+
+T-006 `ContentSafetyPolicy` 的 `direct_interaction_required` 不等于禁止家庭知情，也
+不能降级为普通 `PublishProcess`。它要求 T-005 提供一个独立、versioned、
+caregiver-initiated capability。该 capability 不复用
+`submit_family_care_question`，因为后者是 family-to-org question、要求
+ack/reply，并在业务写入前拒绝健康/用药/紧急输入。
+
+G2-C 的固定边界为：
+
+- initiator 必须是 exact Enrollment/CareGroup 的 current operational
+  `caregiver | lead_caregiver`；Institution Admin、同园区关系、ThreadParticipant
+  或 T-006 risk result 本身不授权；
+- target 必须由 Nurture owner-issued action/option 明确到 exact child/family；
+  execute 重新验证 org-to-family Grant、data class、purpose、current relationship、
+  source/policy heads 和 contract ref；
+- T-006 action 只携带 body-free source/navigation context。T-005 打开空 protected
+  composer，不复制内部 observation/media/health source，不让 AI 自动生成待发送正文；
+- 首版只接受 caregiver 人工填写的 protected plain text，不接受自动附件搬运；
+  事实性事件/健康沟通必须保持非诊断、非处方、非处置建议。紧急情况使用线下紧急
+  protocol，Nurture message 不能成为唯一或替代路径；
+- G2-C 必须明确自己的 canonical effect、original-scope relation、family-side
+  projection/response expectation、logical Receipt、correction/redaction 和
+  ActionDelivery invalidation。不得把 G2-A family-authored CareItem 状态机反向套用；
+- capability 未冻结进 T-004 exact digest、owner/policy unavailable、contract mismatch
+  或 qualification 未通过时，T-006 只显示安全阻塞并保留内部 source。
+
+exact public capability key、typed input/output 与是否创建独立 CareItem/response
+obligation 在 Phase 0 冻结；在该决定完成前不得注册 handler、写 migration、启用
+T-006 action 或把 T-005 标为 done。
+
+G2-C provider qualification 不以 T-006 整体完成为前置。T-005 使用 exact T-004
+digest、owner-issued synthetic consumer fixture 和 provider-side positive/negative
+suite 证明 capability 可独立交付；T-006 在 Stage G3-E 再绑定真实 safety-route
+consumer 并运行 joint qualification。两份 evidence 使用同一 contract identity，
+但各自属于 T-005 与 T-006 handoff，不能相互冒充。
 
 ## T-007 D-04 — Institution Admin Business Communication Read
 

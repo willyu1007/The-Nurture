@@ -9,6 +9,12 @@
 | 2026-07-30 | Admin read scope excludes Guardian private AI, unsent drafts, My-Chat private chat and other Enrollment | PASS |
 | 2026-07-30 | Admin read authority kept separate from caregiver/author action authority | PASS |
 | 2026-07-30 | Current manifest/module/source implementation remains default-off pending a new protected interface version | PASS |
+| 2026-07-30 | Stage G2 split into G2-A Core Loop, G2-B Lifecycle/Admin owner-read and G2-C Caregiver Direct Interaction Bridge | PASS |
+| 2026-07-30 | G2-A classified as checkpoint rather than T-005 Exit or cross-step atomic transaction | PASS |
+| 2026-07-30 | T-006 `direct_interaction_required` dependency closed by required dedicated G2-C capability; ordinary family question fallback forbidden | PASS |
+| 2026-07-30 | Legacy single-status/assignment/single-reply/claimed-Step cutover fixed as read-only, single-writer and no-dual-write | PASS |
+| 2026-07-30 | G2 Exit separated from My-Chat native/device completion and kept default-off | PASS |
+| 2026-07-30 | G2-C provider qualification separated from T-006 Stage G3-E consumer joint qualification without a completion cycle | PASS |
 | 2026-07-29 | Explicit cross-boundary send retained | PASS |
 | 2026-07-29 | My-Chat UI/runtime kept out of local scope | PASS |
 | 2026-07-29 | No shared cross-role room; guardian/caregiver consume role-specific projections | PASS |
@@ -29,7 +35,7 @@
 | 2026-07-29 | Governance sync/lint, task resume and whitespace check after PrepareAction decision | PASS |
 | 2026-07-29 | Execute result/disposition/business-outcome separation locked | PASS |
 | 2026-07-29 | Stable Nurture command identity and exact replay/drift-conflict rules locked | PASS |
-| 2026-07-29 | Increment 1 limited to atomic submit/acknowledge/reply | PASS |
+| 2026-07-29 | Increment 1 described as atomic submit/acknowledge/reply | SUPERSEDED — each ActionExecution is atomic; the multi-actor G2-A loop is not one transaction or Workflow |
 | 2026-07-29 | Governance sync/lint, task resume and whitespace check after ExecuteAction/Increment 1 decision | PASS |
 | 2026-07-29 | One structured user gesture per business effect locked | PASS |
 | 2026-07-29 | Submit/reply reviewable commit and acknowledge direct commit locked | PASS |
@@ -186,6 +192,18 @@
 - Action-separation tests proving Admin-only cannot acknowledge/reply/correct/withdraw/redact,
   while a multi-role user must switch role and pass the original exact action policy.
 - Opaque-ref transient owner-read tests proving protected caregiver bodies are not copied into My-Chat Chat history.
+- G2-C contract tests proving a dedicated caregiver-initiated capability uses an
+  owner-issued exact child/family target, current exact CareGroup role, org-to-family
+  Grant/data class/purpose and an empty protected composer.
+- G2-C negative tests proving T-006 cannot copy internal sensitive body, publish an
+  unregistered placeholder key, reuse `submit_family_care_question`, auto-create
+  CareInteraction or degrade to `PublishProcess`.
+- G2-C health/safety tests proving only human-authored factual communication is accepted,
+  AI diagnostic/prescriptive copy is absent and emergency handling is never replaced by
+  Nurture messaging.
+- Legacy cutover tests proving new G2 rows have one Harness writer, legacy handlers cannot
+  mutate them, compatibility projection is one-way/read-only and ambiguous old rows
+  quarantine instead of guessed backfill.
 - Black-box end-to-end journey through public scenario contract.
 - Non-diagnostic health-language review.
 
@@ -199,6 +217,11 @@
 | 2026-07-29 | Relative Markdown link and duplicate-heading checks across T-004/T-005 | PASS |
 | 2026-07-29 | `git diff --check` | PASS |
 | 2026-07-30 | T-007 D-04 Institution Admin owner-read presenter addendum: governance lint, strict context verification and `git diff --check` | PASS |
+| 2026-07-30 | Stage G2 A/B/C, G2-C cross-task dependency and legacy single-writer consistency scan across T-005/T-006/T-008 and project hub | PASS |
+| 2026-07-30 | `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` then `lint --check` | PASS |
+| 2026-07-30 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-family-care-conversation --check-anchors` | PASS; 10/10 files, no errors or warnings |
+| 2026-07-30 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` and `git diff --check` | PASS |
+| 2026-07-30 | Stage G2-C provider / T-006 G3-E consumer no-cycle cross-task review | PASS |
 
 ## Required Evidence
 

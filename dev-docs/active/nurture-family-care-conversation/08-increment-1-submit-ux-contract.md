@@ -6,6 +6,10 @@
 通用 prepare/execute envelope、confirmation identity 和 result/error union 由 T-004
 exact interface contract ref 提供。
 
+本文对应 Stage G2-A 的 Guardian-initiated ordinary family-care question，不覆盖
+G2-C caregiver-initiated direct interaction。后者必须使用独立 versioned capability、
+org-to-family authority/purpose 和 exact target contract；不得反向复用本文 schema。
+
 ## SubmitFamilyCareQuestion Input V1
 
 第一增量只开放一个 family-to-org 问题 capability。它的逻辑 operation input 是封闭类型：

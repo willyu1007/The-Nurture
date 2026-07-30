@@ -14,6 +14,18 @@ key 不携带 `_v1` 后缀。V1 registry 是封闭集合：
 - internal system action：`policy_redact_family_care_message`；它不进入普通用户
   discovery candidate。
 
+上列集合是 G2-A/B 已冻结 registry。Stage G2 final Exit 还要求 G2-C dedicated
+caregiver-initiated direct-interaction capability。它不是
+`submit_family_care_question` 的反向 alias；Phase 0 必须先冻结 exact stable key、
+typed input/result、canonical effect、family-side response expectation、Receipt、
+policy/handler/presenter binding，再把它加入新的 capability version 和 T-004 exact
+interface digest。在此之前：
+
+- 当前 V1 discovery 不发布一个占位或可调用的 G2-C key；
+- T-006 只显示 safe unavailable/dependency NO-GO；
+- consumer 不得猜测 capability name、复用 family-question schema 或调用 legacy raw
+  command。
+
 新增、删除、改义、改变 typed schema/policy/handler/presenter binding 必须生成新的
 capability version 和 T-004 interface contract digest；客户端不能靠 key 后缀猜版本。
 

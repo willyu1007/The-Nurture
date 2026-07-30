@@ -1,5 +1,185 @@
 # Plan — 家庭与照护者对话能力
 
+## G1 Progressive Entry Boundary
+
+- At G1 start, T-005 MAY design `CareInteraction`/CareItem state, pure
+  acknowledge/reply/correction/redaction policies, role-safe presenters and isolated
+  synthetic fixtures. This work MUST NOT freeze a private owner shape or claim a real
+  protected journey.
+- Contract Boundary PASS opens capability-specific schemas, handlers, presenters and
+  contract tests against the exact T-004 interface ref.
+- Owner Integration Readiness PASS opens isolated integration with the real trusted
+  caller, binding/association, current-authority reread and Receipt adapter.
+- Joint Conformance PASS is required before T-005 may qualify a real
+  submit/acknowledge/reply path or issue a Beta Profile Handoff. The PASS must cite
+  the exact T-004 Surface Contract Artifact Set and T-002 Owner Integration Handoff
+  and execute through the formal NestJS Nurture ingress; Fastify-only evidence is
+  provisional.
+- No G1 state authorizes capability activation, persistent database apply or traffic.
+
+## Stage G2 Decision Register — Accepted
+
+Stage G2 复用 T-005，不创建新任务。它交付 Nurture 侧第一个真实
+family-to-CareGroup `CareInteraction` 闭环，而不是两个聊天页面或共享聊天室。
+为避免与 T-002 测试 fixture 中的 Guardian `G1/G2` 标签混淆，任务文档在测试身份
+语境之外统一使用 `Stage G2` 或 `G2-*`。
+
+### G2-01 — Stage structure and task Exit
+
+- `G2-A Core CareInteraction Loop`：完成
+  `submit → acknowledge → one-or-more reply`、Guardian/Caregiver role-safe
+  projections，以及 Chat/Board 同 capability 等价。这里每个 ActionExecution 独立
+  transaction-atomic；整个闭环不是跨步骤长事务。
+- `G2-B Lifecycle and Owner-read Completion`：完成 correction、family request
+  withdrawal、author/system redaction、delivery invalidation 和
+  `InstitutionBusinessCommunicationProjectionV1` source-side owner-read。
+- `G2-C Caregiver Direct Interaction Bridge`：完成 T-006
+  `direct_interaction_required` 所需的专用 caregiver-initiated、exact-target、
+  protected capability；不得复用会拒绝该类内容的普通 family-question action。
+- G2-A 是可演示、可资格化的中间 checkpoint，不是 T-005 final Exit。只有
+  G2-A/B/C 全部完成并通过 G2 Exit Qualification，T-005 才可转为 done 并产生
+  Beta Profile Handoff。
+
+### G2-02 — Product space and AI boundary
+
+- Guardian Chat 保持 family-private AI/feedback surface；Caregiver Chat 只呈现
+  current authorized work/item projection。两侧不进入共享 room、直接 DM 或共同
+  transcript。
+- ordinary Chat 默认无业务副作用；LLM 只能在 deterministic eligibility 后帮助选择
+  capability/input candidate，不能产生 authority 或 confirmation。
+- 跨边界正文必须进入受保护 composer，由用户看到 exact normalized content、target
+  与 effect 后明确提交。普通 Chat 不自动复制正文，My-Chat LLM 不改写 protected
+  body。
+- My-Chat 拥有 LLM gateway、shell 和 rendering；Nurture 只发布当前授权 query
+  context、deterministic capability 和 role-safe presenter。
+
+### G2-03 — One Capability Harness
+
+- ordinary Chat、Chat-assisted action 与 board-direct action 的业务 effect 必须收敛
+  到 T-004 exact contract 下的 `query | prepareAction | executeAction | readResult`。
+- Query lane 不写业务事实。prepare 不创建 Message/CareItem/Receipt/Execution；
+  只允许五分钟、body-free、不可跨 actor/account/device/surface 的
+  `InteractionContext`。
+- Nurture 在 prepare 绑定 stable business command identity、exact target、actor/
+  scope、keyed input integrity、expiry 和 capability-specific heads。
+- execute 在一个 Nurture transaction 内完成 confirmation consumption、current
+  owner reread、effect、Receipt 和 `CommandExecution`。
+- 结果正交表达 `committed | not_committed | outcome_unknown`、
+  `executed | replayed` 和 `applied | already_satisfied`。未解析
+  `outcome_unknown` 禁止替代 command。
+- family-care action 是 `ActionExecution`；Handoff/notification/retry 是
+  `ActionDelivery`。两者都不是 `InstitutionWorkflow`，不得创建新 Workflow Run/Step。
+
+### G2-04 — Canonical facts, migration and single-writer cutover
+
+- 增量复用 Enrollment、CareGroup、Grant、Message、ItemEvent、Receipt、Attention、
+  InteractionContext 和 CommandExecution，不 fork 第二套聊天/runtime。
+- CareItem 新路径只认 acknowledgement、response、lifecycle 三轴及独立 heads。
+  reply canonical fact 是 Message + ItemEvent + Receipt；`CareReplyV1` 只是
+  projection，不新增第二个 canonical reply store。
+- legacy `status`、`assignedToRoleAssignmentId`、`linkedReplyMessageId`、
+  ThreadParticipant authority、whole-Item reply CAS、raw command DTO 和 claimed-Step
+  path 只作为 migration/read compatibility input，不能成为第二个写入面。
+- 新 T-005 rows 只由三轴 Harness path 写入；legacy handler 对这些 rows
+  default-off。若旧 consumer 必须显示，只允许从新 canonical state 单向派生
+  read-only compatibility projection，禁止双向 dual-write。
+- 旧行只迁移可机械证明的状态。claimant、reply owner、Grant 或 lifecycle 有歧义时
+  inventory/quarantine，不猜测、不自动 merge。
+- migration 可以 author/replay 于 disposable PostgreSQL；Stage G2 不授权 persistent
+  environment apply。
+
+### G2-05 — Exact responsibility, authority and concurrency
+
+- submit 固定 exact Enrollment + CareGroup + original bidirectional Grant。后续 action
+  重读同一 original Grant；replacement Grant 不接管旧 Item。
+- 多个 eligible Enrollment 必须由 Guardian 选择 owner-issued `targetOptionRef`；
+  只有唯一合法目标且 capability policy 允许时才可确定性绑定。
+- acknowledge 表示 CareGroup 已收到，不创建个人 claim/assignment。并发第二条
+  acknowledge 仅在相同 postcondition 已达成且其他 fence 仍有效时返回
+  `already_satisfied`，不伪造实际确认者。
+- reply 是 append-compatible。同一 exact CareGroup 内任一 current
+  `caregiver | lead_caregiver` 可追加独立 reply；第一条只解除 waiting Attention，
+  后续 reply 不重复处理 Attention，Item 保持 active/appendable。
+- Institution Admin、ThreadParticipant 或同园区关系本身不授权 reply。多角色 Admin
+  必须显式切换并通过原 action 的 current caregiver policy。
+
+### G2-06 — Protected content, confirmation and safety
+
+- G2-A 普通 family question/reply 只接受 1–2000 字符 protected plain text；
+  acknowledge input 为空。首版不支持附件、富文本、批量、AI protected draft 或用户
+  自选 category/urgency。
+- public body 与 internal protected-content ref 分层。execute 经 no-store ingress
+  原子加密并绑定 content；InteractionContext 只保存 secret-keyed integrity tag，
+  不保存正文或 bare body hash。
+- submit/reply 使用一个展示准确 content/target/effect 的 CTA；acknowledge 使用一次
+  effect-labeled direct gesture。技术 prepare/execute 不增加通用二次弹窗。
+- success、already-satisfied、replay 和语义未变的 transparent reprepare 原位收敛；
+  content、target、effect 或安全后果变化必须重新展示并取得新 gesture。
+- ordinary family-question capability 在业务写入前拒绝医疗、用药和紧急输入，并返回
+  machine-readable alternate process；不得静默降级、改写或自动转到 G2-C。
+
+### G2-07 — Correction, withdrawal and redaction
+
+- correction 由 exact Message author 追加版本，不覆盖历史；family source 已
+  responded 后必须创建新 Item/context continuation。
+- withdrawal 只由 exact family source author 关闭 CareItem work 为
+  `closed(family_withdrawn)`，保留 Message/replies/Receipts/history，并阻止未来
+  acknowledge/reply。它不是 Grant revoke 或 message deletion。
+- author redaction 不可逆清除该 Message body/attachments/corrections，保留 tombstone、
+  audit、Receipt 和 Execution。source cascade 抑制依赖 Item/Attention；reply
+  redaction 只影响该 reply，不重开 Attention，也不删除其他作者事实。
+- policy/safety/admin redaction 使用独立 system capability 和 server-owned reason，
+  不能伪装作者。cascade 必须 loop-to-closure 或整笔失败。
+
+### G2-08 — Projection and ActionDelivery boundary
+
+- Guardian/Caregiver 从同一 canonical CareInteraction 生成不同 role-safe projection，
+  不产生共享 super DTO 或 transcript。
+- G2-B 交付 `InstitutionBusinessCommunicationProjectionV1` 的 Nurture owner-read
+  source/query/presenter；T-007 拥有 Admin surface composition。Admin read 只覆盖
+  已披露监督的 exact Institution/Enrollment/CareGroup/original Grant/purpose/current
+  lifecycle，且不产生 caregiver/author action authority。
+- Nurture `committed` 只证明业务 transaction。G2 输出 stable refs、logical Receipts
+  和 invalidation scopes；My-Chat 拥有 Handoff、notification、provider send/open、
+  deep link 和 device state。
+- T-005 Nurture-side Exit 不等待 TestFlight/Play/native push；真实 consumer/device
+  闭环由 T-008 + My-Chat companion 验证，不能被 G2 PASS 冒充。
+
+### G2-09 — Caregiver Direct Interaction Bridge
+
+- G2-C 是独立、versioned、caregiver-initiated capability，不是
+  `submit_family_care_question` 的反向复用。
+- 只有 exact CareGroup 的 current operational caregiver 可发起；必须显式选择
+  owner-issued exact child/family target，并重读 org-to-family Grant/data class/
+  purpose/current safety policy。
+- T-006 只可展示 owner-issued navigation/action。它不自动创建 CareInteraction，
+  不复制内部 sensitive body，不把 direct-interaction 内容降级为 ordinary
+  `PublishProcess`。
+- 首版打开空的 protected composer，由 caregiver 人工填写受保护纯文本；不自动搬运
+  T-006 source、AI 文案或附件。健康/事件信息只允许事实沟通，不生成诊断、处方或
+  处置建议；紧急情况必须使用线下紧急流程，Nurture 消息不是替代。
+- G2-C exact canonical effect、typed input/result、original-scope relation、
+  family-side projection/response expectation 和 Receipt 语义必须在 implementation
+  前冻结进 T-004 interface digest。未冻结或未资格化时 T-006 只显示安全阻塞。
+
+### G2-10 — Sequencing, qualification and handoff
+
+1. 采用 T-004 exact contract pin。
+2. 冻结三轴 schema、legacy cutover 和 G2-C exact capability contract；完成旧行
+   ambiguity inventory。
+3. 经 formal NestJS ingress 实现 Harness 与 protected-content boundary。
+4. 实现并资格化 G2-A。
+5. 实现并资格化 G2-B。
+6. 实现并资格化 G2-C。
+7. 形成 G2 Exit Qualification 与 T-005 Beta Profile Handoff。
+
+G2 protected qualification 必须引用 G1 Surface Contract Artifact Set、Owner
+Integration Handoff 和 Joint Conformance Record。它在 formal NestJS ingress +
+real pinned owner path 上运行 disposable PostgreSQL transaction/concurrency/replay/
+cascade、Chat/Board equivalence、cross-family/CareGroup/Institution、Admin-only、
+stale owner/Grant、privacy/leakage 和 default-off/final-empty tests。G2 PASS 不授权
+Candidate、persistent DB apply、native/internal-store testing、activation 或 traffic。
+
 ## Phase 0 — Conversation Contract Discovery
 
 - 已完成 T-002 landed family-care fact/schema/source 盘点，详见
@@ -13,6 +193,12 @@
 - 采用 T-004 exact `InterfaceContractRefV1`、`CapabilityDescriptorV1`、
   `SurfaceEnvelopeV1` 和 generic invocation/result/error schemas；T-005 只定义
   family-care capability-specific extensions。
+- 冻结 G2-C dedicated caregiver-initiated capability 的 exact canonical effect、
+  typed schemas、source/target relation、family-side response expectation 和 Receipt；
+  在此之前 T-006 direct-interaction action 保持不可用。
+- 输出 legacy single-status/assignment/single-reply/claimed-Step 到三轴新路径的
+  migration/cutover matrix，明确 single writer、read-only compatibility 与 ambiguous
+  row quarantine。
 
 ## Phase 1 — Entry Paths and Unified Harness
 
@@ -143,7 +329,7 @@
 
 ## Phase 3 — Correction and Revocation
 
-- 作为第二增量，在 submit/acknowledge/reply 原子闭环 checkpoint 之后开始。
+- 作为第二增量，在 G2-A Core CareInteraction Loop checkpoint 之后开始。
 - `correct_family_care_message` 只允许确切 Message 作者追加 1–2000 字符受保护纯文本
   correction version；原文和历史版本不可变，presenter 默认展示最新有效解释并允许
   展开历史。
@@ -195,7 +381,7 @@
 - 当前 manifest/module/source 尚无该 protected presenter 接口；在新版本 interface、
   digest、carrier、owner-read 与负向测试齐备前保持 default-off。
 
-## Increment 1 Checkpoint
+## G2-A — Core CareInteraction Loop Checkpoint
 
 - `submit → acknowledge → reply` 三个 action 全部使用同一 Harness/CommandExecution contract。
 - 验证 acknowledge actor 只进入审计，不进入 reply authority；同班其他当前合格照护者可回复。
@@ -207,7 +393,38 @@
 - 家长继续提问仍创建新 Item；老师对原 Item 的多条补充回复不构成跨角色聊天室，
   且上下文关系不影响授权、状态或 `CareItemDependency`。
 - happy path、duplicate click、concurrent execute、response loss、stale Grant/version 与 outcome-unknown safety 通过。
-- correction/withdrawal/redaction 仍明确显示为第二增量未实现，不宣称 T-005 final exit。
+- correction/withdrawal/redaction 和 G2-C caregiver direct interaction 仍明确显示为
+  未完成，不宣称 T-005 final Exit。
+
+## G2-B — Lifecycle and Owner-read Completion Checkpoint
+
+- correction、withdrawal、author/system redaction 全部使用统一 Harness、
+  CommandExecution、immutable result、exact replay 和独立 Receipt。
+- source/reply redaction cascade、correction-chain erasure、Attention behavior、
+  pending-delivery invalidation 与 stale deep-link owner-reread 全部通过。
+- `InstitutionBusinessCommunicationProjectionV1` 只在 exact disclosed
+  Institution-business scope 内 current owner-read，并与 caregiver/author actions
+  分离。
+- G2-B 不改变 G2-A submit/ack/reply 的 original Grant、CareGroup responsibility、
+  append-compatible reply 或 role-safe projection 语义。
+
+## G2-C — Caregiver Direct Interaction Bridge Checkpoint
+
+- dedicated caregiver-initiated capability 使用独立 capability key/version、typed
+  input/result、policy、handler 和 presenter binding，不复用
+  `submit_family_care_question`。
+- T-006 owner-issued action 只传递 body-free source/navigation context；T-005
+  prepare 解析 exact caregiver、CareGroup、child/family target、Grant、data class、
+  purpose 和 safety policy，打开空 protected composer。
+- 首版正文由 caregiver 人工填写；T-006 internal source、AI suggestion、附件和医疗
+  建议不自动搬运。事实性健康/事件沟通保持非诊断、非处方，紧急流程不由消息替代。
+- exact canonical effect、family-side projection/response expectation、Receipt、
+  correction/redaction 和 ActionDelivery invalidation 已冻结并通过正向/负向测试。
+- capability 缺失、contract mismatch、owner/policy unavailable 或资格化未通过时，
+  T-006 保留内部 source 并显示安全阻塞，不创建 CareInteraction、不降级批量发布。
+- T-005 G2-C provider qualification 使用 exact T-004 contract 与 synthetic
+  owner-issued consumer fixture 独立完成，不等待 T-006 整体；T-006 在 Stage G3-E
+  负责真实 consumer joint qualification。该分工避免 T-005/T-006 completion cycle。
 
 ## Phase 4 — Black-box Qualification
 
@@ -249,6 +466,9 @@
 - 验证 legacy `capture_family_input`/claimed-Step、ThreadParticipant、
   institution-admin-only role、single reply slot 和 raw command DTO 均不能进入新
   T-005 activation path。
+- 验证新 G2 rows 只有三轴 Harness writer；legacy handlers/default-off paths 不写，
+  read-only compatibility 只从 canonical state 单向派生，ambiguous old rows
+  quarantine 而不猜测。
 - 验证 capability registry 的 exact key/version、user/system discovery boundary、
   typed input/output refs 与 T-004 contract digest 双向一致。
 - 验证不存在共享 room membership、共享 transcript 或 My-Chat Chat-history authority。
@@ -260,8 +480,33 @@
   exact-author/system-policy separation 与 reply-redaction no-reopen。
 - 验证 correction 新 Receipt/ActionDelivery、withdrawal/redaction pending candidate
   invalidation，以及已发 push open 时 current owner-reread。
+- 验证 G2-C exact CareGroup/current caregiver、owner-issued child/family target、
+  org-to-family Grant/data class/purpose 和 empty protected composer；cross-CareGroup、
+  Admin-only、raw target、source-body copy、AI medical copy 与 emergency-replacement
+  路径全部 fail closed。
+- 验证 T-006 action 在 G2-C unavailable/contract mismatch/owner outage 时只返回安全
+  阻塞，不复用普通 family question、不创建 CareInteraction、不进入 PublishProcess。
 - 固化 consumer adoption 示例与 contract evidence。
 
 ## Exit Gate
 
-所有正向与负向旅程通过；T-002 仍未满足的部署/流量门禁不得被本任务结果替代。
+- [ ] G2-A Core CareInteraction Loop 通过。
+- [ ] G2-B Lifecycle and Owner-read Completion 通过。
+- [ ] G2-C Caregiver Direct Interaction Bridge 通过。
+- [ ] 三轴 CareItem、reply collection、protected content、typed result 和 cascade
+  schema 可由 clean checkout 重建；legacy cutover 保持 single writer，ambiguous
+  old rows 不被猜测迁移。
+- [ ] G2 protected qualification 精确引用当前 G1 三类输入，并经 formal NestJS
+  ingress + real pinned owner path 在 disposable PostgreSQL 运行。
+- [ ] Chat/Board canonical effect/error 等价；ordinary Chat 无副作用；不存在共享
+  room/transcript、raw target/authority input 或 protected-body leakage。
+- [ ] transaction/concurrency/replay/response-loss/cascade 与全部 cross-family/
+  CareGroup/Institution、Admin-only、stale Grant/role、contract mismatch negatives
+  通过。
+- [ ] 最终 capability/environment 为 false、active test rows 为空，无 PII、secret、
+  persistent DB apply、Candidate、native/internal-store effect、activation 或 traffic。
+- [ ] 形成 exact G2 Exit Qualification 与 T-005 Beta Profile Handoff；该 handoff
+  只声明 Nurture-side qualified capability，不冒充 My-Chat native/device completion。
+
+所有清单项满足后 T-005 才可转为 done。T-002 仍未满足的部署/流量门禁不得被本任务
+结果替代。
