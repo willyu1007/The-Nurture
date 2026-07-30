@@ -5,8 +5,11 @@
 - State: in-progress
 - **Phase:** C deck 组装（v1 已产出，待用户试用反馈）；A/B 已完成
 - **Milestone/Feature:** M-002 / F-002（Institution ecology 的产品表面具象化与对外共创材料）
-- **Updated:** 2026-07-21
+- **Updated:** 2026-07-30
 - **Owner:** willyu1007
+- Next step: 对当前 9 页正式 artifact 做一次最终渲染/交互核验并记录用户反馈去向；
+  该收尾与后续共创反馈均为非阻塞设计轨，不构成 T-004～T-008 的开发入口、
+  owner-integration 或验收门禁。
 
 ## Goal
 
@@ -30,6 +33,8 @@ T-003 是设计输入，不是产品/实现 SSOT。当前 Workflow、对话和 s
 - 家庭事项以精确 CareGroup 为业务主体；acknowledge 不表示个人接手，班级老师可
   追加多条班级回复，第一条只解除待回复 Attention 而不关闭事项。
 - demo 中与以上规则冲突的画面/文字保留为共创历史，不得直接转译为实现要求。
+- T-003 的任务状态、artifact 收尾或后续园长反馈不阻塞 T-004 contract baseline。
+  反馈只有在被当前 T-004～T-007 产品合同明确吸收后才成为实现要求。
 
 ## 六个 surface（demo 主线，与 Pilot-0-B 锁定表面对应）
 

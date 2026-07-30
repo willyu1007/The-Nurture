@@ -1,5 +1,14 @@
 # Verification
 
+## 2026-07-30
+
+- 静态复核当前正式 `artifacts/nurture-deck-v1.html`：共 9 个 `.slide`
+  section，页码初始化为 `01 / 09`，与当前 mobile UX contract 和 overview 的 9 页
+  口径一致。
+- 2026-07-21 记录中的“Phase C v1（deck 12 页）”属于当时的历史组装状态，不再代表
+  当前正式 artifact。最终浏览器渲染、键盘/触控和全部交互仍待一次用户侧或可用浏览器
+  实链核验；该核验不阻塞 T-004 contract baseline。
+
 ## 2026-07-21
 
 - 样板 2/3 的 deck 骨架（1280×720 缩放舞台、左右翻页、键盘/触控、居中修复）已在浏览器
