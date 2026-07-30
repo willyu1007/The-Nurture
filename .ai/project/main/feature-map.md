@@ -23,15 +23,16 @@ Project: `main`
 - Intent: deliver child-scope-first family/institution care coordination with Nurture-owned business facts and My-Chat-owned account, shell, and durable runtime.
 - Scope In: participants/roles, child care process, institution/group/enrollment/grant, family-care messages/items/receipts, class inbox, teacher attention, daily care, and media attribution.
 - Scope Out: institution ranking, marketplace behavior, competitive caregiver scoring, My-Chat identity duplication, and ambient access to family-private data.
-- Decision: X0-X5 and N1/X4-N2 are complete with exact cross-repository pins and default-off boundaries. The Wave 4 P2 implementation is CI-green but its source qualification is reopened until authority reread and receipt persistence are transaction-atomic and the repaired Host private-anchor/idempotency contract is pinned. Pilot-0-B/C and Pilot-0-D historical decisions remain traceable, but the 2026-07-29 CareGroup shared-responsibility decision supersedes C-3-3/C-4-4 exact-claimant reply and terminal-claimant staffing-blocked semantics. Those slices require redesign and requalification; C-3/C-4/D implementation remains unauthorized, and external traffic stays NO-GO.
+- Decision: X0-X5 and N1/X4-N2 are complete with exact cross-repository pins and default-off boundaries. The bounded Wave 4 P7 Nurture owner endpoint is merged and CI-green with transaction-local authority reread/Receipt persistence, private anchors and exact Host integration pins; it remains default-disabled and still requires the separately named owner-integration and joint surface-conformance gates before protected six-surface use. T-002 owner/source repair now proceeds in controlled parallel with T-004 contract qualification rather than blocking all contract work. G1 uses progressive entry: start opens downstream design/pure-domain/synthetic work, Contract Boundary opens exact public-contract implementation, Owner Integration Readiness opens isolated real-adapter integration, and Joint Conformance alone opens protected qualification/Beta handoff. Pilot-0-B/C and Pilot-0-D historical decisions remain traceable, but the 2026-07-29 CareGroup shared-responsibility decision supersedes C-3-3/C-4-4 exact-claimant reply and terminal-claimant staffing-blocked semantics. Those slices require redesign and requalification; C-3/C-4/D implementation remains unauthorized, and external traffic stays NO-GO.
 - Dependencies: the current Pilot-0-C index, Pilot-0-D topology/operations contract and workflow context contract; pinned Base/My-Chat/Nurture revisions/hashes; strict C30-C35 then C40-C45 implementation/qualification; D implementation and immutable complete-candidate/evidence assembly; then Pilot-0-E before any Pilot-1 decision.
 - Risks: confusing `DR-*` design findings with `TR-*` traffic blockers, treating green CI/design completion/X5 PASS or superseded exact-claimant evidence as source/deployment authority, issuing a receipt after its authority source changed, exposing stable anchors through Host clients, widening CareGroup responsibility to same-Institution access, bypassing the opaque My-Chat Child/Family binding chain, publishing mutable artifacts, or weakening owner-reread/revoke/privacy fences for pilot convenience.
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
-- Next Checkpoint: repair and qualify the Wave 4 P1/P2 owner boundary with
-  transaction/concurrency/privacy evidence, then run the separately scoped
-  C30-C35, C40-C45 and D readiness review; Pilot-0-E and Pilot-1 remain
-  blocked.
+- Next Checkpoint: classify and qualify the merged P7 endpoint as the bounded
+  six-surface owner-source prerequisite, close remaining C30-I0-C/D exact-pin and
+  false/empty evidence, and meet T-004 at the separate Joint Conformance gate.
+  Broader C30-C35, C40-C45 and D readiness, Pilot-0-E and Pilot-1 remain
+  separately blocked.
 
 ### F-003 Six-surface store-beta readiness
 - Intent: turn the six-surface T-003 design into a qualified, default-off Nurture Service Candidate and versioned interface that My-Chat can integrate through authenticated API calls and validate on iOS and Android internal-testing channels.
@@ -43,7 +44,167 @@ Project: `main`
   `InstitutionWorkflow`, Web operations and mobile read-only
   `InstitutionWorkflowProjection`; T-008 freezes and qualifies one independently deployed
   Nurture Service Candidate plus its interface handoff. Store builds and device distribution
-  remain in one external My-Chat companion task.
+  remain in one external My-Chat companion task. The Candidate is an immutable Nurture
+  server release unit, not a source tag or full-stack/mobile release: its identity freezes the
+  executable artifact, schema/migrations, scenario manifest, exact interfaces, gate/config
+  contract and owner pins. Qualification results, deployment bindings, My-Chat builds and
+  device evidence reference that identity externally; they do not become Candidate inputs or
+  runtime dependencies. This is the release/qualification composition layer in a layered
+  version model, not a global version that replaces Git, migrations, interface identities,
+  owner pins, environment bindings or cross-owner validation identities. Candidate creation
+  and qualification leave every capability default-off and grant no activation or traffic
+  authority. Freeze begins only after T-004 through T-007 complete their task-level Exit Gates
+  with exact qualified handoffs and the specific T-002 owner/source paths used by the beta
+  profile are implemented, jointly qualified and pinned. T-002 may otherwise remain in progress
+  and production/external traffic may remain NO-GO; a missing required six-surface path blocks
+  Freeze rather than becoming a default-off or limited-pass placeholder. Each Candidate
+  deployment is identified separately by an immutable, post-deploy readback-verified
+  `NurtureDeploymentBindingV1` that records the actual executable, migration head,
+  qualification-relevant configuration, owner deployments and effective gates without secrets
+  or traffic authority. Environment drift and rollback create new bindings while leaving the
+  Candidate and historical bindings unchanged. My-Chat consumes that deployment only through
+  authenticated APIs pinned to the exact Interface Contract ref/digest; generated consumer
+  clients/types are allowed, but Candidate/source/ORM/runtime adoption and Host copies of
+  Nurture canonical facts are forbidden. Host authentication supplies trusted caller/Workspace
+  context while Nurture independently rereads business authority for every protected request;
+  contract mismatch or dependency loss fails closed without floating, legacy or synthetic
+  fallback. My-Chat then produces immutable, internal-store real-device
+  `PlatformValidationRecordV1` evidence for iOS and Android. T-008 may compose a final
+  `CompositeValidationBindingV1` only when Nurture local qualification and both platform
+  records share the exact Candidate, interface, Deployment Binding, beta profile and suite.
+  Shared-input changes require both platforms to rerun; a one-platform build-only change may
+  reuse the unchanged platform record but always creates a new composite identity. Each
+  composite receives an immutable `InternalBetaDecisionV1`: PASS requires all required
+  profile/safety checks; `PASS_WITH_LIMITATIONS` may complete T-008 only for structured,
+  optional and fail-closed limitations while every required and authorization/privacy/data-
+  integrity invariant passes. Required-path, security, lifecycle, migration, contract or
+  real-device evidence defects are always NO-GO, and no internal verdict authorizes external
+  beta, production or real traffic. Defects route to the smallest owning layer:
+  Candidate/contract fixes mint a new Candidate, deployment fixes a new observed binding,
+  platform-consumer fixes a new affected build/record, and evidence-only faults rebuild only
+  the affected evidence when all inputs remain exact. Append-only invalidation removes current
+  applicability without deleting history. Rollback requires exact consumer/schema/owner
+  compatibility and always produces a new binding plus full local and dual-platform
+  revalidation; destructive database down migration is not the default. These evidence roles
+  are implemented just in time by T-008 and do not require T-004～T-007 to build a new release
+  service, database or control plane. Upstream work supplies its existing exact handoff
+  artifacts; the initial T-008 implementation should prefer canonical manifests, digests,
+  append-only evidence and CI/CLI checks.
+- G1 Foundation: G1 fixes a four-layer chain from My-Chat authenticated principal
+  through canonical Child/Family binding and Nurture typed workspace-local association
+  to Nurture current business authority. Private service identity never substitutes for
+  the adult; binding-owner Receipt and business Execution/Receipt remain transactionally
+  exact but semantically distinct. T-004 publishes one reproducible exact Surface Contract
+  Artifact Set; T-002 publishes an Owner Integration Handoff through the formal NestJS
+  scenario-service ingress after provisional Fastify owner proof; one Joint Conformance
+  Record runs the same fixtures against both. Public-contract drift invalidates synthetic
+  and joint evidence, owner/pin/ingress drift invalidates owner and joint evidence, and
+  security/privacy risk invalidates immediately. G1 PASS still grants no Candidate Freeze,
+  persistent DB apply, internal-store testing, activation or traffic.
+- Stage G2: reuse T-005 for the first Nurture-side family/CareGroup CareInteraction
+  delivery. G2-A qualifies the Guardian submit → CareGroup acknowledge → one-or-more
+  caregiver reply Core Loop; G2-B completes correction/withdrawal/redaction and the
+  Institution Admin source-side owner-read projection; G2-C supplies T-006 with a
+  dedicated caregiver-initiated, exact-target protected direct-interaction capability.
+  G2-A is only a checkpoint. T-005 Exit requires A/B/C, formal NestJS ingress + real
+  owner-path qualification, and a single-writer cutover in which legacy status,
+  assignment, single-reply and claimed-Step paths are read-only/default-off and never
+  dual-write new G2 rows. G2 PASS is a Nurture-side Beta Profile Handoff, not My-Chat
+  native/device completion, Candidate Freeze, activation or traffic authority.
+- Stage G3: reuse T-006 and deliver five checkpoints. G3-A builds the shared,
+  role-safe Guardian/Caregiver board foundation; G3-B carries CareGroup capture to
+  one exact saved draft through deterministic assembly; G3-C owns content/media
+  eligibility, manual attribution and the G2-C safety route; G3-D owns the five-state
+  PublishProcess and per-target PublicationRelease; G3-E performs real cross-task
+  qualification and issues the T-006 Beta Profile Handoff. G3-B1 deterministic and
+  G3-C1 manual paths are required. Explicit AI copy and ClassScopedFaceMatch are
+  optional parallel enhancements unless the beta profile marks them required.
+  G3-E requires the exact T-005 G2-C provider and T-007 publication-policy subset,
+  but G3-A～D do not wait for them and T-006 does not wait for full T-007 completion.
+  The 2026-07-30 overall audit is PASS: goal/ownership/dependency/critical-path/Exit
+  closure is complete, and remaining exact query/schema/source-head/DB/fixture work
+  belongs to G3-0 rather than another top-level decision round.
+- Stage G4: reuse T-007 and organize delivery as G4-0 Contract & Fact Freeze,
+  G4-A Authority/Aggregate Foundation, G4-B Role-bound Mobile Operations,
+  G4-C InstitutionAdminWorkbench Core, G4-D Enrollment Journey Workflow,
+  G4-E Institution Knowledge/RAG and G4-F Integration Qualification/Handoff.
+  This is a delivery/acceptance view over the existing Phase 0～5 and does not
+  reopen D-01～D-07G. G4-0 is a rolling per-domain gate rather than a monolithic
+  serial phase: its publication-policy subset is delivered first for T-006 G3-D/E,
+  then B/C/D/E proceed dependency-aware in parallel after their exact freeze rows
+  and relevant G4-A foundation are ready. D supplies versioned Workflow
+  projections/commands to B/C; absence remains a legal mobile empty state and Web
+  does not register placeholders. G4-F is the final join, while branch-local
+  negative/integration qualification remains mandatory. G4-0 itself is fixed as
+  0A Freeze Protocol/Fact Inventory, 0B publication-policy fast lane, 0C
+  Authority/Surface, 0D Daily Operations, 0E Workflow/Enrollment, 0F Knowledge/RAG
+  and 0G rolling audit/branch release. The register explicitly includes active-role/
+  Surface, class activity/revision/attribution and generic InstitutionWorkflow
+  carrier/projection records. A Branch Freeze PASS opens only its implementation
+  inputs; it is not Owner Readiness, Joint Conformance, Beta Handoff or activation.
+  G4-0A now has a dedicated freeze ledger structure for dependency pins, fact
+  ownership, schema-delta classification, branch routing and a default-safe census;
+  exact inventory/pins remain pending rather than being inferred from planning docs.
+  Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
+  Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
+  has its own DoD; overall acceptance covers contract/ownership, required product
+  closure, authority/privacy/safety, consistency/recovery, formal integration and
+  handoff/cleanup. Verdicts are PASS, PASS_WITH_LIMITATIONS only for optional
+  fail-closed limitations, or NO_GO for any required/safety/owner/ingress/cleanup
+  gap. A qualifying T-007 Beta Profile Handoff is consumed by T-008 and is not
+  Candidate Freeze, native/device completion, activation or traffic authority.
+- Stage G5: reuse T-008 and organize delivery as G5-0 Readiness Inventory/Beta
+  Profile, G5-A Service Candidate Freeze, G5-B Deployment Binding/Local
+  Qualification, G5-C Interface Handoff/Consumer Readiness, G5-D Dual-platform
+  Internal Validation and G5-E Composite Decision/Evidence Lifecycle. D08-01～D08-07
+  remain closed. G5-A is the strict serial Freeze gate; B/C may partially overlap,
+  iOS/Android records run in parallel only against identical Candidate/interface/
+  Binding/profile/suite inputs, and E is the final exact join. Internal-test
+  enablement is a separate scoped/revocable gate that Binding observes but does not
+  authorize. T-002 production/external traffic gates are not Freeze prerequisites.
+  Defects route to the smallest owning version layer; rollback creates a new observed
+  Binding and reruns local, both platforms, Composite and Decision. Tooling remains
+  just-in-time/minimal and does not block T-004～T-007 implementation.
+- Stage G6: top-level planning is accepted as G6-0 Candidate/Evidence
+  Reconciliation, G6-A C3/C4/D Implementation Closure, G6-B Pilot-0-E,
+  G6-C Pilot-1 Private Publication/Default-off Deployment, and G6-D Default-off
+  Qualification/G7 Handoff. G6-0, C3->C4 qualification, complete-candidate/D-seal
+  join, E, separate Pilot-1 authorization, deployment, and final readiness join
+  are serial. D source/IaC/runbook preparation may overlap late C3/C4 work after
+  exact-input freeze; owner-separated Pilot-1 provisioning may overlap only
+  after E Go and separate authorization. G5's Service Candidate is an exact
+  component input, not the complete Pilot candidate: Candidate-defining G6
+  changes require a successor Service Candidate and affected G5 revalidation.
+  G6 exits with capability false, active rows empty, zero external product
+  traffic and a Pilot-2 readiness seal; it grants no G7 activation. Execution
+  task identity remains pending and this planning decision authorizes no
+  implementation, publication, persistent deployment, secret, database or cloud
+  mutation. The detailed scope review makes G6-A a closure over, not a duplicate
+  implementation of, T-004～T-007. It orders A1 C-3 qualification, A2 C-4
+  qualification, A3 D preparation, A4 complete-candidate assembly and A5 disposable
+  D evidence/TR census；G6-C/D separately own authorized default-off deployment and
+  restore/hard-stop/readiness sealing. Drift is classified as G5-shared,
+  complete-Pilot-only or evidence-only, so only the first class reruns affected G5
+  evidence. G5-0 maintains a read-only Pilot carry-forward census to surface this
+  before Freeze. G6 has no generic limited PASS: all P0 and P1-1/2/3b rows close,
+  only P1-3a may be an accepted scope exclusion, and the exit remains
+  `PILOT2_STAGE_AUTHORIZATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`.
+- Stage G7: accepted planning projects the locked D-3.3/D-4～D-7 contract into
+  G7-0 current-head/authority freeze, G7-A Pilot-2 activation and exact synthetic
+  cohort bootstrap, G7-B ordered Pilot-3 rehearsal with terminal disable, G7-C
+  final-Binding/no-reset-baseline Pilot-4 activation and five contiguous 24-hour
+  observation segments, and G7-D terminal evidence/recommendation. Pilot-2 and
+  Pilot-4 use different authorizations and fresh rows；the rehearsal row is never
+  restored. Scope is one seven-account synthetic cohort and exactly seven planned
+  paths；real users/data, a second cohort/window, native/external delivery, staging,
+  production, GA and external product traffic remain out. `pass|no_pass|stopped`
+  are disjoint, only pass satisfies success, no generic limited pass exists, and no
+  recommendation grants next scope. The 120-hour window freezes only the observed
+  environment, so mainline successor development may continue without deploying
+  into it. Future execution is triaged as `NEW_TASK`, proposed slug
+  `nurture-bounded-pilot-observation`, under a proposed Internal Pilot Operations
+  feature with a separate My-Chat companion；Task/Feature IDs remain pending and
+  this planning sync creates neither.
 - Care Responsibility: family CareItems are jointly handled by the exact original
   `Enrollment + CareGroup`; acknowledge records class receipt and individual audit but does
   not create an exclusive claimant/assignment. The CareGroup is the family-facing business
@@ -146,7 +307,10 @@ Project: `main`
   hash and expiry into `confirmationRef`. Acknowledge uses exact-state concurrency; reply is
   append-compatible, so another valid reply is not stale. Preconditions and stable
   CommandExecution identity independently protect action safety and exact replay.
-- Dependencies: T-003 six-surface design input; T-002 identity, authority, receipt, owner-reread, source-qualification and traffic gates; exact Base/My-Chat owner-contract pins.
+- Dependencies: T-003 six-surface design input; the exact T-002 identity, authority, Receipt,
+  owner-reread and source-qualification subset consumed by the beta profile; exact Base/My-Chat
+  owner-contract pins. Production/external traffic gates remain separate and do not block
+  Candidate Freeze or internal-beta evidence once the required source-owner subset is qualified.
 - Risks: mistaking design or green CI for implementation authority, copying host runtime for
   speed, conflating interface integration with code/bundle adoption, allowing floating
   contract/environment bindings, leaking family-private facts into institution aggregates,
@@ -158,12 +322,19 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 through T-008 (`planned`).
-- Next Checkpoint: T-004～T-007 顶层产品决策已完成对齐。T-007 下一步按 freeze
-  register 先完成 Enrollment `status + participationPhase`、trial reservation/
-  cancellation/formalization、Admin attribution authority、aggregate privacy 与
-  `EnrollmentJourneyWorkflowV1` public contract/schema inventory；随后各任务仍需在
-  T-002 owner gates 下分别实现与资格验证。所有新增能力保持 default-off，external
-  traffic 继续 NO-GO。
+- Next Checkpoint: T-004～T-008 顶层决策已完成对齐。T-002 被六 surface 使用的
+  owner/source repair 与 T-004 shared contract baseline 立即受控并行：T-004 可先
+  完成 synthetic qualification，真实 owner integration 只在精确 T-002 pins/evidence
+  就绪后通过 Joint Conformance。T-003 是非阻塞设计输入。T-005～T-007 从 G1 start
+  即可并行做设计、纯领域逻辑与 synthetic work；Contract Boundary、Owner Readiness
+  和 Joint Conformance 依次开放公共合同实现、真实 adapter 与 protected
+  qualification。T-008 Candidate/evidence tooling 等上游 Exit Gates 接近完成时再
+  按需实现，不进入当前关键路径。所有新增能力保持 default-off，external traffic
+  继续 NO-GO。Stage G2 已确认复用 T-005；G2-A/B/C 可按 G1 progressive gates
+  dependency-aware 并行推进，T-006 的其他 board work 不等待 G2-C，但
+  `direct_interaction_required` 在 G2-C exact contract/qualification 前保持安全不可用。
+  Stage G3 已确认复用 T-006；下一步先执行 G3-0 freeze，再从 G3-A 开始逐组确认/
+  实施，G3-B/C 可依赖感知并行。
 
 ## Notes (manual)
 - Keep human notes here. Everything below the AUTO section is generated by sync.
