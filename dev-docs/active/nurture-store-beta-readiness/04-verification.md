@@ -11,6 +11,17 @@
 | 2026-07-29 | Nurture Service Candidate identity separated from interface contract compatibility | PASS |
 | 2026-07-29 | Composite validation binding defined across builds, service candidate, contract and environment | PASS |
 | 2026-07-29 | T-008 owns Service Candidate identity; T-004 identity format dependency excluded | PASS |
+| 2026-07-30 | T-005 Candidate prerequisite fixed to Stage G2 A/B/C, legacy single-writer cutover and formal-ingress qualification | PASS |
+| 2026-07-30 | G2-A/task status/placeholder capability rejected as Candidate Freeze evidence | PASS |
+| 2026-07-30 | T-006 Candidate prerequisite fixed to Stage G3-A～E with deterministic/manual required lanes and exact G2-C/T-007 subset integration | PASS |
+| 2026-07-30 | AI copy, face match and Workflow board module allowed as optional only with explicit profile exclusion and qualified fallback | PASS |
+| 2026-07-30 | Stage G5 overall goal and G5-0/A/B/C/D/E delivery structure aligned with D08-01～D08-07 | PASS |
+| 2026-07-30 | G5-A serial Freeze, G5-B/C partial parallelism, dual-platform parallel validation and G5-E final join accepted | PASS |
+| 2026-07-30 | Internal-test enablement separated from Candidate/Binding and T-002 traffic gates separated from Freeze Readiness | PASS |
+| 2026-07-30 | Rollback fixed to new observed Binding plus full local/dual-platform/composite revalidation | PASS |
+| 2026-07-30 | G5→G6 handoff keeps Service Candidate as an exact component input; Candidate-defining G6 drift requires successor Candidate and affected G5 revalidation | PASS |
+| 2026-07-31 | G5-0 Pilot carry-forward census separates G5-shared, complete-Pilot-only, evidence-only and unknown inputs without authorizing G6 | PASS |
+| 2026-07-31 | Only G5-shared drift reruns affected local/platform/composite evidence; Host/topology/operations-only drift stays in the complete-Pilot lifecycle | PASS |
 
 ## Task-package Validation
 
@@ -21,6 +32,12 @@
 | 2026-07-29 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` | PASS |
 | 2026-07-29 | `git diff --check` | PASS |
 | 2026-07-29 | Service Candidate/interface/composite-binding documentation and project-view recheck using the three commands above | PASS |
+| 2026-07-30 | Cross-task G2 Exit dependency review across T-005/T-006/T-008 and project hub | PASS |
+| 2026-07-30 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-store-beta-readiness --check-anchors` | PASS; no errors, two pre-existing vague-reference warnings |
+| 2026-07-30 | Cross-task Stage G3 Exit dependency review across T-005/T-006/T-007/T-008 and project hub | PASS |
+| 2026-07-30 | Stage G5 structure sync: governance lint/sync, project-state verify, task-doc anchor lint, strict context verify and `git diff --check` | PASS |
+| 2026-07-30 | Stage G6 boundary sync: G5 Service Candidate/complete-Pilot identity separation, governance sync/lint, T-002/T-008 doc lint, strict context verification and `git diff --check` | PASS; doc lint has 0 errors and only non-blocking vague-reference warnings |
+| 2026-07-31 | Detailed G6 scope/order/acceptance and G5 carry-forward sync: governance apply/lint, T-002/T-008 doc lint, strict context verify, semantic scan and `git diff --check` | PASS; T-002 0 errors/21 warnings, T-008 0 errors/2 warnings |
 
 ## Candidate Verification (planned)
 

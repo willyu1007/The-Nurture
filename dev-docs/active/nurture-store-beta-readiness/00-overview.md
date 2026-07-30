@@ -5,12 +5,35 @@
 - State: planned
 - Task: T-008
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-29
-- Next step: 待 T-004 至 T-007 进入 qualification 后，建立 Service Candidate inventory、interface contract/证据清单和 My-Chat companion handoff 模板。
+- Updated: 2026-07-30
+- Next step: Stage G5 整体结构和实施顺序已确认；下一步展开 G5-0 Freeze Readiness
+  输入、六 surface beta profile 与 pre-candidate inventory。
 
 ## Goal
 
 在 T-004 至 T-007 完成后，冻结并验证一个独立部署的 Nurture 六 surface Service Candidate，提供 conformance suite、接口兼容性矩阵、integration checklist、默认关闭/回滚证据，并协调 My-Chat companion 通过认证接口完成 TestFlight Internal 与 Google Play Internal 真机验证。
+
+## Stage G5 Delivery Structure — Accepted
+
+G5 复用 T-008，把 T-004～T-007 的精确 handoff 组成一个不可变、可独立部署但
+capability-default-off 的 Nurture Service Candidate，并将 observed Deployment
+Binding、Nurture local qualification、My-Chat iOS/Android internal-store real-device
+evidence 组合成可审计的 Internal Beta Decision。
+
+交付结构固定为：
+
+- **G5-0 Readiness Inventory & Beta Profile**；
+- **G5-A Service Candidate Freeze**；
+- **G5-B Deployment Binding & Local Qualification**；
+- **G5-C Interface Handoff & Consumer Readiness**；
+- **G5-D Dual-platform Internal Validation**；
+- **G5-E Composite Decision & Evidence Lifecycle**。
+
+G5-A 是严格串行 Freeze gate；A 后 B/C 可部分并行，C 的最终 handoff 引用 B 的
+readback-verified Binding；D 的 iOS/Android 记录基于同一 shared inputs 并行执行；
+E 只组合同一 Candidate/interface/Binding/profile/suite 的 local+iOS+Android evidence。
+D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建立新运行时控制
+系统。G5 只证明 internal beta 精确组合，不授权 external beta、production 或 traffic。
 
 ## Scope In
 
@@ -34,8 +57,16 @@
 ## Dependencies and Gates
 
 - T-004、T-005、T-006、T-007 全部达到各自 exit gate。
+- T-005 Stage G2-A/B/C 与 single-writer legacy cutover 通过 formal-ingress G2 Exit
+  Qualification；G2-A/Increment 1 或占位 G2-C 不能代替。
+- T-006 Stage G3-A～E 全部通过并形成 exact Beta Profile Handoff；其中
+  deterministic G3-B1、manual G3-C1、G3-D release 与 G3-E G2-C/policy-owner
+  integration 是 required，AI copy/face match/Workflow board module 按 profile
+  明确 optional 或 required。
 - T-004 已发布可重复验证的 interface contract identity/version/digest 与 compatibility rules。
-- T-002 的 source qualification、identity、authority、receipt 和 traffic gates。
+- T-002 中 Candidate 实际消费的 source qualification、identity、authority、Receipt、
+  revoke/concurrency/privacy subset；production/external traffic gates 保持独立，
+  不作为 Candidate Freeze 前置。
 - My-Chat companion 只通过版本化认证接口连接测试环境中部署的精确 Nurture Service Candidate，不采用 Nurture 代码或 bundle。
 
 ## Acceptance Criteria
@@ -51,4 +82,5 @@
 
 ## Next Step
 
-待 T-004 至 T-007 进入 qualification 后，建立 Service Candidate inventory、interface contract/证据清单和 My-Chat companion handoff 模板。
+展开 G5-0 Freeze Readiness inputs、versioned six-surface beta profile 和
+pre-candidate inventory；上游 handoff 未通过前不分配正式 Candidate identity。

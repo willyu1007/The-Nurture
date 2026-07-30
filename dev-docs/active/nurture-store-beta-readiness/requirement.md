@@ -59,7 +59,14 @@ role-safe projection，但不拥有 Run/Step。
 - 不持久化 prepared draft；execute 在同一 surface 重交 typed input 并校验 canonical hash。prepare/expire/reprepare 不产生 Message、CareItem、Receipt、CommandExecution 或正文副本，execute 响应丢失依赖 exact replay。
 - My-Chat 拥有 per-call invocation identity；Nurture prepare 生成 stable business command identity。原子 execute 在同一事务完成 confirmation consumption、owner/authority/capability-specific concurrency reread、effect/receipt 与 CommandExecution。
 - execute 结果分为 `committed | not_committed | outcome_unknown`；committed 分开表达 `executed | replayed` 和 `applied | already_satisfied`。outcome unknown 禁止替代 command，必须解析原 identity。
-- T-005 Increment 1 只交付原子 `submit → acknowledge → reply`；correction/redaction/revoke 是第二增量。Increment 1 checkpoint 不得误写为 T-005 final completion。
+- T-005 Stage G2-A 交付 `submit → acknowledge → one or more replies` Core
+  CareInteraction Loop；每个 ActionExecution 各自在一个 Nurture transaction
+  内原子提交，但整个多人闭环不是一个跨步骤原子事务或产品 Workflow。
+- G2-B 继续交付 correction/withdrawal/author-or-system redaction、delivery
+  invalidation 与 Admin exact owner-read；Grant revoke 仍是独立授权动作。G2-A
+  checkpoint 不得误写为 T-005 final completion，T-005 Exit 还要求 G2-C
+  caregiver direct-interaction、legacy single-writer cutover 和 formal-ingress
+  qualification。
 - T-005 CareItem 由原始精确 CareGroup 共同承接；第一条 reply 将 response 置为
   responded 并解除待回复 Attention，但不关闭 Item。同班当前合格老师可通过不同
   command 追加多条回复；家长继续提问仍创建新的 Item。
@@ -79,6 +86,16 @@ role-safe projection，但不拥有 Run/Step。
 - 只有 target/input 歧义或 fresh prepare 发现可见语义漂移才增加用户步骤；token 过期但可见语义完全一致时可在同一手势内透明 reprepare。
 - 所有事实访问同时满足 actor、role、grant、child scope 和 fact visibility。
 - guardian/caregiver 看板使用同一事实来源和不同角色投影。
+- T-006 Stage G3 由 G3-A shared boards、G3-B capture/draft、G3-C content/media
+  safety、G3-D publish/release 和 G3-E integration qualification 组成；仅完成
+  capture、draft 或安全阻塞不等于 T-006 Exit。
+- deterministic teacher-text/transcript/template/photo-only assembly 与 manual
+  attribution/exposure/needs-review 是 required main paths。显式 AI copy、
+  `ClassScopedFaceMatch` 与 Workflow board module 只有在 beta profile 标为 required
+  时才阻止 Exit；optional 时必须保持安全 absent/default-off 并保留完整 fallback。
+- `direct_interaction_required` 必须在 G3-E 与 T-005 G2-C 完成真实联合资格验证；
+  T-007 publication-policy exact subset 必须为 scheduled release 提供
+  timezone/send/cutoff/trigger/policy-head owner evidence。两者都不能用占位代替。
 - 看板可以展示当前 actor-safe 的 `InstitutionWorkflowProjection`；相同角色仍需通过
   Workspace、Institution、scope、assignment 和 visibility policy，且不得暴露 raw Run/Step。
 - 照护内容采用两阶段发布并保留 provenance、authority 和 receipt。

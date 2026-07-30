@@ -30,3 +30,18 @@
 - My-Chat consumer conformance 的可调用入口。
 - 双平台最小设备/OS 矩阵。
 - 商店内部测试证据如何回链到当前任务而不复制敏感资料。
+
+## 2026-07-30 — Stage G5 delivery structure accepted
+
+- G5 复用 T-008，交付结构固定为 G5-0 Readiness/Profile、G5-A Candidate Freeze、
+  G5-B Deployment/Local Qualification、G5-C Interface Handoff、G5-D Dual-platform
+  Internal Validation 和 G5-E Composite Decision/Evidence Lifecycle。
+- 审查确认该结构与 D08-01～D08-07 一致，不重开 Candidate、Binding、consumer、
+  composite、verdict 或 rollback 顶层决策。
+- G5-A 是严格串行门；B/C 可部分并行；D 的 iOS/Android exact shared-input records
+  并行；E 最终汇合。G5 tooling just-in-time，不阻塞 T-004～T-007。
+- 明确 internal-test enablement 是独立 gate，Binding 只记录 observed state；T-002
+  production/external traffic gate 不作为 Freeze 前置。
+- 回滚部署必须生成新 Binding 并完整重验，不能复用旧 PASS。当前仍无 Candidate、
+  deployment、schema/database、secret、store build、activation 或 traffic 变更。
+- 下一步展开 G5-0 Freeze Readiness inputs、beta profile 和 pre-candidate inventory。
