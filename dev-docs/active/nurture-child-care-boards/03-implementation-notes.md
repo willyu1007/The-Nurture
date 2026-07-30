@@ -280,7 +280,7 @@
 
 ## Implementation Follow-ups
 
-- D-01 已决定使用共享的请求期 projection pipeline 与角色独立 presenter；Phase 0
+- D-01 已决定使用共享的请求期 projection pipeline 与角色独立 presenter；Stage G3-0
   仍需盘点哪些 landed facts 可直接复用、哪些需要 adapter 或局部可重建索引。
 - D-03 已决定 daily care、attention 等领域事实保持独立并由 presenter 组合；精确
   module/content schemas 留给 contract implementation。
@@ -289,3 +289,40 @@
 - T-007 `InstitutionWorkflowProjection` 与 T-006 board external-slice 的最小共享 schema。
 - T-005 专用 caregiver-initiated direct-interaction capability 的 contract key、
   eligibility、protected-content ingress 与 role-safe blocked projection。
+
+## 2026-07-30 — Stage G3 delivery structure accepted
+
+- 用户确认 Stage G3 复用 T-006，并按 G3-A Shared Board Foundation、G3-B
+  Capture-to-Draft、G3-C Content/Media Safety、G3-D Publish and Release、G3-E
+  Integration Qualification 五组交付。
+- G3-A～C 在 G3-0 contract/fact/schema freeze 后依赖感知并行；G3-D 消费 B 的
+  saved revision 与 C 的 publish eligibility；G3-E 汇合真实 owner/provider/
+  consumer/ingress evidence。
+- T-005 G2-C provider qualification 不等待 T-006 整体，避免循环依赖；T-006 G3-E
+  必须完成 direct-interaction 真实联合资格验证，不能以 safe-unavailable 占位完成。
+- G3-C1 manual attribution/exposure/needs-review 是必需路径；G3-C2
+  `ClassScopedFaceMatch` 在 C1 contract 稳定后实现，可与 G3-D 并行。首个 beta
+  profile 未列 required 时 optional/default-off，不阻塞 Exit；真实启用仍需 biometric
+  privacy/legal gates。
+- G3-B1 deterministic teacher-text/transcript/template/photo-only assembly 是必需路径；
+  G3-B2 explicit AI copy 是可选增强，不阻塞 Exit，采用后必须形成新 revision 并
+  重新安全判定。
+- T-007 publication-policy subset 是 G3-D/E 硬依赖，但 T-007 全任务不是前置；
+  `InstitutionWorkflowProjection` 是按 profile 选择的只读模块，absence/empty 不
+  阻塞核心双看板/发布旅程。
+- 当前只更新规划/架构/验证合同，无应用代码、schema、migration、database、
+  environment、Candidate、activation 或 traffic 变更。
+
+## 2026-07-30 — Stage G3 overall audit accepted
+
+- 用户要求整体确认 Stage G3；审查覆盖 goal closure、A～E 完整性、ownership、
+  serial/parallel path、required/optional lanes、T-005/T-007/T-008 dependencies 与
+  final Exit。
+- 结论为 `PASS`，没有需要重新打开的顶层产品或架构决策。
+- G3-0 只冻结 exact query/capability/module keys、Board Envelope/module payload、
+  cursor/source heads、T-002 reuse/DB delta、T-005/T-007 contract versions 与 fixtures。
+- G3-A 的共享 Envelope + typed modules 是当前一致方向；具体组合 query 与
+  module-query topology 留给 G3-0，只要不创建 super DTO、第二事实源或 snapshot
+  mutation authority。
+- 当前只更新文档与治理状态，无代码、schema、migration、database、environment、
+  Candidate、activation 或 traffic 变更。

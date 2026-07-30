@@ -4,6 +4,49 @@
 
 看板是 Nurture facts 的角色化 projection，不是新的事实所有者。Guardian board 和 Caregiver board 不各自维护一份“孩子状态”。
 
+## Stage G3 Architecture Boundary
+
+Stage G3 的依赖结构为：
+
+`G3-0 exact facts/contracts/schema`
+
+`→ G3-A role-safe shared board foundation`
+
+`→ G3-B capture-to-saved-draft`
+
+`→ G3-C content/media publish eligibility`
+
+`→ G3-D per-target release + Guardian reread`
+
+`→ G3-E real cross-task qualification + Beta Profile Handoff`
+
+G3-A/B/C 可在 shared refs/heads 冻结后并行。G3-D 不直接读取 capture transport、
+provider state 或 derived board cache，只消费 G3-B 的 exact saved revision 与
+G3-C 的 current eligibility。G3-E 才把 provider/consumer、owner path 和正式 ingress
+合并为一个 qualification subject。
+
+### Required and optional lanes
+
+- Required：G3-B1 deterministic assembler、G3-C1 manual attribution/exposure、
+  G3-D publication/release、G2-C direct-interaction integration 和 publication-policy
+  owner contract。
+- Optional：G3-B2 explicit AI copy、G3-C2 `ClassScopedFaceMatch`、按 beta profile
+  选择的 `InstitutionWorkflowProjection` board module。
+- optional capability absent/default-off 必须是明确 profile 选择，不能伪装为
+  `PASS_WITH_LIMITATIONS`，也不能削弱 deterministic/manual main path。
+
+### Cross-task ownership without cycles
+
+- T-005 owns G2-C provider effect/Receipt/protected composer；T-005 provider
+  qualification 可使用 exact synthetic consumer fixture，不等待 T-006 completion。
+- T-006 owns safety-route consumer action and G3-E joint journey；它等待 exact G2-C
+  provider，但不反向成为 T-005 Exit 的整任务依赖。
+- T-007 owns publication-policy configuration and version head；T-006 resolves and
+  persists schedule values for each process。T-007 full task/Workflow completion is
+  not a G3 prerequisite。
+- T-008 owns later beta-profile freeze and Candidate evidence；G3 只交付 qualified
+  T-006 handoff。
+
 ## D-01 — Operable Shared Projection Pipeline
 
 双看板共享 canonical facts、board 模块语义、provenance、snapshot 与排序规则，但
@@ -577,9 +620,16 @@ T-005 状态吸收进 `PublishProcess`。
 
 该路由也不表示 T-005 现有普通 family-question action 已经具备承接能力。该 action
 当前会在业务写入前拒绝健康、用药等输入，且不是 caregiver-initiated process。只有
-T-005 owner 后续发布专门、版本化、对当前 actor/target 可用的 direct-interaction
+T-005 Stage G2-C 后续发布专门、版本化、对当前 actor/target 可用的
+direct-interaction
 capability 时，T-006 presenter 才输出可执行 action；否则只保留内部来源、显示安全
 阻塞/下一步，不得复用普通 action、复制正文或降级为批量 PublishProcess。
+
+T-006 只消费 G2-C exact public contract，不拥有其 canonical effect、family-side
+response expectation、Receipt 或 change lifecycle，也不发布占位 capability key。
+G2-C 未冻结进当前 T-004 digest 或 qualification/current owner path 不可用时，
+`direct_interaction_required` 保持安全不可执行；ordinary/review-required board work
+可以继续。
 
 最终判定责任：
 
@@ -621,8 +671,20 @@ capability 时，T-006 presenter 才输出可执行 action；否则只保留内�
 ## Decision Register Closure
 
 T-006 顶层决策登记在 D-01～D-03、D-05～D-15 与 D-17～D-22。D-04 和 D-16 在本任务
-中未被分配，是编号间隙而非缺失的开放决策。后续 Phase 0 的 fact/schema/adapter 盘点
+中未被分配，是编号间隙而非缺失的开放决策。后续 Stage G3-0 的
+fact/schema/adapter 盘点
 属于实现设计；只有当其需要改变上述业务边界时，才重新进入顶层决策对齐。
+
+2026-07-30 后的 Stage G3 结构没有重开这些产品决策，只把交付重新分为
+G3-A～E，并把 deterministic/manual required lanes 与 AI/face-match optional lanes、
+G2-C/T-007 exact subsets 和 final qualification 边界显式化。
+
+Stage G3 overall architecture audit 为 `PASS`：从 canonical facts 到两类角色投影、
+从 internal capture 到逐目标家庭可见事实、从 provider/owner subset 到 final
+handoff 均有唯一 owner 和明确 contract boundary。具体 Board Envelope/module query
+topology 属于 G3-0 contract design；只要继续满足共享 pipeline、角色独立 schema、
+module-level provenance/snapshot/invalidation 和 owner capability mutation，就不构成
+新的顶层架构决策。
 
 ## Logical Components
 

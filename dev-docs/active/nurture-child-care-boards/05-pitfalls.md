@@ -2,6 +2,23 @@
 
 ## Known Guardrails
 
+- 不要把 Stage G3 当作 T-006 之外的新任务，也不要继续用一个过大的 Phase 2 同时承载
+  capture、draft、media、AI、安全和 release；按 G3-A～E checkpoint 交付。
+- 不要让 T-005 G2-C provider qualification 等待 T-006 整体 completion；T-005 先
+  独立交付 provider，T-006 只在 G3-E 完成 consumer joint qualification。
+- 不要因 AI copy 或 `ClassScopedFaceMatch` 未实现阻塞 deterministic/manual 主路径；
+  optional enhancement 不得成为隐藏 hard dependency。
+- 不要把 optional/default-off 写成已实现占位；beta profile 必须明确 inclusion，
+  required 时完整资格化，optional 时保持安全 absent/default-off。
+- 不要等待 T-007 全任务才开始 G3；只冻结/消费 exact publication-policy subset。
+  也不要把可选 `InstitutionWorkflowProjection` absence 当作发布主路径失败。
+- 不要在 G3 overall audit PASS 后把 module key、query topology、cursor field 或
+  adapter choice 再包装成顶层产品争论；除非它改变 ownership、权限、required path
+  或 Exit，均在 G3-0 contract freeze 内解决。
+- 不要因为 T-005/G2-A 核心 family-question 闭环通过就认为
+  `direct_interaction_required` 已有可用 action；它单独依赖 Stage G2-C。
+- 不要让 T-006 猜测 G2-C capability key/schema、发布占位 action、复制 sensitive
+  source body，或在 G2-C unavailable 时降级为 family question/PublishProcess。
 - 不要为两个 board 各建一套不可同步的 child state。
 - 不要把“derived snapshot 不是 canonical fact”误解为“看板只能只读”；看板可以原地
   微调，但业务修改必须进入正确的 canonical owner capability。

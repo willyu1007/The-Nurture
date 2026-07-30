@@ -6,8 +6,9 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-30
-- Next step: T-006 顶层决策整包审计已通过；保持 `planned`，下一步进入 Phase 0
-  fact/contract/schema inventory 与实现分期。跨任务顶层决策对齐转入 T-007。
+- Next step: 保持 `planned` 并进入 Stage G3-0 fact/contract/schema freeze；随后按
+  G3-A Shared Board Foundation、G3-B Capture-to-Draft、G3-C Content/Media
+  Safety、G3-D Publish and Release、G3-E Integration Qualification 推进。
 
 ## Goal
 
@@ -34,8 +35,23 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 检查后追加一条或多条回复。班级是家庭侧主要业务发送主体，个人身份用于操作审计
 与可选次级署名；第一条回复解除待回复提醒，但不关闭事项。
 
+Stage G3 复用 T-006，不创建新任务。G3-A～C 可以在 G3-0 合同冻结后依赖感知地
+并行；G3-D 消费 B 的 saved revision 与 C 的 publish eligibility；G3-E 汇合
+T-004/T-002、T-005 G2-C、T-007 发布策略子合同与 formal NestJS ingress，形成
+Nurture-side Beta Profile Handoff。
+
+2026-07-30 Stage G3 overall audit 结论为 `PASS`：从共享看板、capture/draft、
+content/media safety、publish/release 到 integration handoff 的目标链完整；事实/
+projection/process/delivery/Workflow ownership 不混层；T-005/T-006 与 T-006/T-007
+无整任务循环依赖；optional enhancement 不成为隐藏 hard dependency。剩余 exact
+keys/schemas/source heads/DB delta/fixtures 属于 G3-0 implementation contract freeze，
+不再重开顶层产品边界。
+
 ## Scope In
 
+- Stage G3 五组交付：G3-A shared board foundation、G3-B capture-to-draft、
+  G3-C content/media safety、G3-D publish/release、G3-E integration
+  qualification。
 - family charter / focus、current focus、daily care、attention 与成长记录的角色化投影。
 - focus、daily care、attention、media、publication 与 CareInteraction 按领域事实含义
   分离，在 presenter 层组合成角色化内容和模块。
@@ -74,6 +90,11 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
   direct-interaction-required；磕碰/健康/用药/明显情绪行为事件和身体隐私等退出
   批量发布，由老师显式进入 T-005 家庭沟通。
 - 专用班级内人脸 matcher 是唯一允许按 D-14 高置信规则自动确认归属的首轮 AI 例外。
+- G3-C1 的人工归属、群像 exposure 与 `needs_review` fallback 是必需主路径；
+  `ClassScopedFaceMatch` 在 G3-C2 实现，可与 G3-D 并行，首个 beta profile
+  未声明 required 时保持 optional/default-off，不阻塞 G3 Exit。
+- G3-B1 的老师原文、带 provenance 转写、版本化模板和 photo-only 确定性组装是必需
+  主路径；G3-B2 的显式 AI copy 是可选增强，不阻塞 G3 Exit。
 - guardian/caregiver presenter、queries、commands、fixtures 与黑盒旅程。
 
 ## Scope Out
@@ -87,9 +108,18 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 
 - T-004 的 surface、visibility、presenter 和 fixture 基座。
 - T-005 的家庭—照护者通信、回执与纠正语义。
-- T-005 还需提供专门、可授权的 caregiver-initiated direct-interaction capability，
+- T-005 Stage G2-C 还需提供专门、可授权的 caregiver-initiated
+  direct-interaction capability，
   才能承接 T-006 的 `direct_interaction_required` 路由；现有会拒绝健康/用药等输入的
   普通 family-question action 不能被 T-006 静默复用。
+- G3-E 必须完成 T-006 与 G2-C 的真实联合资格验证；该依赖不阻塞 G3-A～D。除非后续
+  另有顶层决策缩减整个 beta profile，否则不能用 safe-unavailable 占位签发 T-006
+  Beta Profile Handoff。
+- T-007 拥有园区发布策略子合同：institution timezone、默认发送时点、重试截止、
+  organize trigger/quiescence 配置与 `policyHead`。该精确子合同是 G3-D/E 硬依赖，
+  但不要求 T-007 整体先完成。
+- T-007 `InstitutionWorkflowProjection` 仅是 G3-A 按 beta profile 选择的只读展示
+  依赖；无适用 Workflow 时合法空态/隐藏模块不阻塞双看板或发布主路径。
 - T-002 的 child scope、grant、daily care、attention、media attribution 与 owner-reread 门禁。
 
 ## Acceptance Criteria
@@ -190,23 +220,24 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
   owner-reread 失败、logout 或相关撤权后不能继续展示受保护缓存内容。
 - [ ] domain effect、Receipt 与 CommandExecution 原子提交；重试 exact replay，
   board cache、ActionDelivery 与 AI provider 状态均不能替代 owner-reread。
-- [ ] `ClassScopedFaceMatch` 只使用当前 exact CareGroup、current Enrollment 和当前
+- [ ] 若 beta profile 包含 G3-C2，`ClassScopedFaceMatch` 只使用当前 exact
+  CareGroup、current Enrollment 和当前
   允许用途的头像 reference set；禁止全园/跨班/历史图库匹配及 raw child/family ID、
   姓名进入 matcher。
-- [ ] 同时满足版本化质量、top-1 与 margin 门槛的结果可以自动 confirmed，不要求老师
+- [ ] G3-C2 同时满足版本化质量、top-1 与 margin 门槛的结果可以自动 confirmed，不要求老师
   逐张确认；低置信、相似/遮挡、未知或冲突只进入 needs_review，且人工纠正 supersede
   自动结果。
-- [ ] 原图保持不变；reference template 按班级/用途隔离并加密，照片临时 embedding
+- [ ] G3-C2 原图保持不变；reference template 按班级/用途隔离并加密，照片临时 embedding
   匹配后删除，provider 不得训练、二次使用或写入普通日志。
-- [ ] 人脸 matcher 默认关闭；专门告知/单独同意与监护人同意、PIPIA、retention、
+- [ ] G3-C2 人脸 matcher 默认关闭；专门告知/单独同意与监护人同意、PIPIA、retention、
   撤回、processor contract 和法律/隐私评审任一门禁不满足时回退人工归属。
-- [ ] 可选 AI copy 必须可采用、可修改、可拒绝，且不产生排名或诊断；不得借 D-14
+- [ ] 若实现 G3-B2，可选 AI copy 必须可采用、可修改、可拒绝，且不产生排名或诊断；不得借 D-14
   自动归属例外扩张正文、敏感判断或发布授权。
 - [ ] 自动 photo-first 路径不依赖生成式文案：老师文字保持原文，语音使用有 provenance
   的转写，活动/时间/媒体数等通过版本化模板组装；photo-only 可以没有自由正文。
-- [ ] AI copy 只在老师显式点击“帮我整理一句/润色”或独立日/周总结能力中出现；日常
+- [ ] 若实现 G3-B2，AI copy 只在老师显式点击“帮我整理一句/润色”或独立日/周总结能力中出现；日常
   自动整理不能静默调用。老师选择采用后才写入当前 draftRevision。
-- [ ] 生成式文案不得新增事实、情绪、原因、频率、引语或发展结论，不把不确定改成
+- [ ] G3-B2 生成式文案不得新增事实、情绪、原因、频率、引语或发展结论，不把不确定改成
   确定，也不覆盖老师原文；provider 失败不阻塞原文/转写/模板/photo-only 路径。
 - [ ] Nurture 版本化 ContentSafetyPolicy 是最终 route owner；硬规则优先，classifier
   只提供 signals。园区只能收紧，老师可以提高 tier 或修正灰区，不能降低硬门禁。
@@ -219,6 +250,18 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 - [ ] 只有 T-005 返回当前 actor/target 可用的专用 caregiver-initiated capability 时，
   T-006 才显示可执行 direct-interaction action；能力尚未交付或不满足门禁时保持内部
   来源并显示安全阻塞，不降级为普通批量发布或现有 family-question action。
+- [ ] Stage G2-C 未冻结 exact effect/response/Receipt contract、未进入当前 T-004
+  digest 或未通过 qualification 时，T-006 不猜测 capability key/schema，不发布
+  占位 action；G3-E 未完成真实 provider/consumer 联合资格验证时不得签发 T-006
+  Beta Profile Handoff。
+- [ ] G3-C1 人工归属与 exposure 路径完整可用；G3-C2 自动人脸匹配未进入首个 beta
+  profile 时可保持 absent/default-off，但不得削弱人工 fallback 或发布资格检查。
+- [ ] G3-B1 确定性内容组装在无生成式 provider 时完整可用；G3-B2 AI copy 未实现或
+  不可用不阻塞 G3 Exit，若实现则采用后重新经过 ContentSafetyPolicy。
+- [ ] T-007 发布策略子合同通过 exact owner contract 解析并固化
+  `scheduledAt/notAfter/timezone/policyHead`；后续策略变化不静默移动既有 process。
+- [ ] `InstitutionWorkflowProjection` 不可用或无适用 Workflow 时只产生合法空态，
+  不阻塞家庭看板、采集、草稿或发布。
 - [ ] risk 在 candidate、edit 和 release 时 current-reread；provider 失败/低置信/
   规则冲突不能默认 ordinary，policy drift 立即使既有 draft/pending 失去发布资格，
   但不增加 PublishProcess 状态。
@@ -229,13 +272,8 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 
 ## Next Step
 
-T-006 顶层决策已整包收口。有效决策编号为 D-01～D-03、D-05～D-15 与 D-17～D-22；
-D-04、D-16 是未使用的编号间隙，不代表遗漏的开放决策。共享角色投影、五状态
-`PublishProcess`、逐目标 `PublicationRelease`、exact-CareGroup caregiver 权限、
-发布前持续调整、采集/整理/30 秒入队、媒体三轴与删除、人脸匹配、确定性内容组装、
-安全分流及正确性骨架之间已完成一致性复核。
-
-任务保持 `planned`：下一步不是继续增加顶层产品判断，而是执行 Phase 0
-fact/contract/schema inventory，明确 landed reuse、adapter、DB SSOT delta、T-004
-Harness 接口以及 T-005 direct-interaction capability 依赖，再形成可实施分期。跨任务
-顶层决策讨论进入 T-007。
+T-006 顶层产品决策和 Stage G3 交付结构均已收口。下一步执行 G3-0
+fact/contract/schema freeze，明确 landed reuse、adapter、DB SSOT delta、T-004
+Harness、T-005 G2-C provider contract 与 T-007 publication-policy owner contract；
+随后从 G3-A 开始逐组实现/资格化。G2-C 不阻塞 G3-A～D，但 G3-E 必须完成真实联合
+资格验证。G3-C2 face match 与 G3-B2 AI copy 是可选并行增强，不进入首个关键路径。

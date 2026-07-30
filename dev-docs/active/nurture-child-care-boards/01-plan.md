@@ -1,6 +1,90 @@
 # Plan — 儿童照护双看板
 
-## Phase 0 — Fact and Projection Inventory
+## G1 Progressive Entry Boundary
+
+- At G1 start, T-006 MAY design the shared read model, `PublishProcess`, content/media
+  safety policy, role-safe presenters and isolated synthetic fixtures.
+- Contract Boundary PASS opens public board queries, capability handlers, typed
+  publication inputs/results and contract tests against the exact T-004 interface ref.
+- Owner Integration Readiness PASS opens isolated integration for current child scope,
+  CareGroup/Grant authority, Receipt, revoke and publication owner-reread.
+- Joint Conformance PASS is required before T-006 may qualify a real protected
+  board/publication journey or issue a Beta Profile Handoff. The sensitive-content
+  route remains separately dependent on T-005 Stage G2-C and the exact dedicated
+  caregiver direct-interaction capability it consumes. The
+  PASS must cite the exact T-004 Surface Contract Artifact Set and T-002 Owner
+  Integration Handoff and execute through the formal NestJS Nurture ingress;
+  Fastify-only evidence is provisional.
+- No G1 state authorizes capability activation, persistent database apply or traffic.
+
+## Stage G3 Decision Register — Accepted
+
+Stage G3 复用 T-006，并把现有交付计划重组为五个共同组成 task Exit 的 checkpoint：
+
+- `G3-A Shared Board Foundation`：同一 canonical facts、共享模块语义与 provenance，
+  通过 guardian/caregiver 独立 query/presenter 形成角色安全看板；内联 mutation
+  只能调用 canonical owner capability。
+- `G3-B Capture-to-Draft Pipeline`：CareGroup 内部采集批次、manual/idle/fallback
+  organize、stable watermark、确定性内容组装、versioned draft、autosave/edit
+  hold 与 30 秒进入待发送队列。
+- `G3-C Content and Media Safety`：media/attribution/exposure 三轴、
+  ContentSafetyPolicy、群像门禁、人工归属与 direct-interaction route。
+- `G3-D Publish and Release Loop`：五状态 `PublishProcess`、逐目标
+  `PublicationRelease`、现在/定时发送、revision freeze、partial/retry/reconcile、
+  Receipt、Guardian 回读与发布后低频安全动作。
+- `G3-E Integration Qualification`：exact T-004/T-002 inputs、T-005 G2-C、
+  T-007 publication-policy subset、formal NestJS ingress、disposable PostgreSQL
+  黑盒与负向资格验证，并形成 T-006 Beta Profile Handoff。
+
+交付映射保持可追溯：原 Phase 1 对应 G3-A；原 Phase 2 拆为 G3-B/C；原 Phase 3
+对应 G3-D；原 Phase 4 对应 G3-E。G3-A～C 可在 G3-0 冻结后并行，G3-D 消费
+G3-B saved revision 和 G3-C publish eligibility，G3-E 汇合全部真实 owner/consumer
+证据。
+
+### G3 optional enhancement boundary
+
+- `G3-B1` 确定性组装是必需路径；`G3-B2` 显式 AI copy 是 optional enhancement。
+  B2 不可用不能阻塞 B1/G3 Exit，采用 suggestion 后必须生成新 draft revision 并
+  重新经过 G3-C policy。
+- `G3-C1` 人工 attribution/exposure/needs-review 是必需路径；`G3-C2`
+  `ClassScopedFaceMatch` 在 C1 contract 稳定后实现，可与 G3-D 并行。首个 beta
+  profile 未声明 required 时可保持 absent/default-off，不阻塞 G3 Exit。
+- 代码/contract qualification 不等于 biometric activation。consent、PIPIA、
+  retention、withdrawal、processor 与法律/隐私门禁未齐时只允许人工 fallback。
+
+### G3 cross-task boundary
+
+- G2-C provider contract/qualification 由 T-005 独立完成，不等待 T-006 整体；
+  G3-E 再完成 T-006 consumer 的真实联合资格验证，避免 T-005/T-006 循环依赖。
+- T-007 publication-policy subset 是 G3-D/E 硬依赖；T-007 全任务不是前置条件。
+- T-007 `InstitutionWorkflowProjection` 是按 beta profile 选择的 G3-A 只读模块；
+  absent/empty 不阻塞核心看板与发布路径。
+- T-008 Candidate/Deployment/Platform tooling 不进入 G3 开发关键路径。
+
+## Stage G3 Overall Audit — PASS
+
+- **Goal closure**：G3-A～E 覆盖 shared facts → role-safe board → internal capture →
+  exact saved draft → content/media eligibility → per-target release/Receipt →
+  Guardian reread → real qualified handoff，不存在中间无 owner 的产品空档。
+- **Ownership closure**：board projection、`PublishProcess`、
+  `PublicationRelease`、CareInteraction、ActionDelivery 与
+  `InstitutionWorkflow` 分层明确，没有第二事实源或跨 owner 混写。
+- **Dependency closure**：T-005 G2-C provider 与 T-006 G3-E consumer 分离交付；
+  T-007 只先交付 publication-policy subset；T-008 tooling 后置，无 completion
+  cycle。
+- **Critical-path closure**：G3-0 是短时 contract/fact/schema freeze；G3-A/B/C
+  并行，G3-D 可提前做 pure-domain/synthetic work，G3-E 最后汇合真实依赖。
+- **Required/optional closure**：G3-B1/G3-C1/D/E required；G3-B2/G3-C2/optional
+  Workflow module 不削弱 deterministic/manual/absent-empty fallback。
+- **Exit closure**：formal NestJS ingress、real pinned owner paths、disposable
+  PostgreSQL、negative matrix、final false/empty 与 exact T-006 handoff 全部进入
+  Exit；Candidate/native/device/activation/traffic 保持在任务外。
+
+Board Envelope/module query 拓扑、capability/module keys、cursor/source-head fields、
+T-002 reuse/DB SSOT delta、exact T-005/T-007 schemas 与 fixture composition 留给
+G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重新进入顶层讨论。
+
+## Stage G3-0 — Fact, Contract and Schema Freeze
 
 - 盘点 T-002 中 focus、attention、daily care、media 和 publication 相关事实。
 - 区分园所内部 raw capture、家庭发布候选、published care fact/visibility 与
@@ -9,9 +93,17 @@
   CareInteraction 的 owner、lifecycle、authority 和 mutation capability；看板模块
   只在 presenter 层组合这些事实。
 - 将 T-003 两个 board surface 的模块映射到共享事实与角色投影。
+- 将 T-005 Stage G2-C exact capability key/version、owner-issued action context、
+  canonical effect/response/Receipt contract 和 unavailable behavior 纳入依赖矩阵；
+  未冻结时不由 T-006 猜测或占位。
+- 冻结 T-007 publication-policy owner contract：institution timezone、默认发送时间、
+  notAfter、organize idle/fallback/quiescence 参数、effective version 与
+  `policyHead`；区分新 process 解析与既有 process 固化语义。
+- 将 G3-B1/B2、G3-C1/C2 capability/profile inclusion 分开登记，避免 optional
+  enhancement 成为主路径的隐式 hard dependency。
 - 列出缺失字段、权限来源和待解锁 gate。
 
-## Phase 1 — Shared Care Read Model
+## G3-A — Shared Board Foundation
 
 - 建立 child-scope-first 的 care timeline / current focus / daily care 查询。
 - 建立共享的 board projection pipeline，复用 canonical facts、模块语义、
@@ -29,7 +121,7 @@
 - 同一事实的两种投影保持一致 provenance。
 - 任意 aggregate 均不能绕过 row/fact-level policy。
 
-## Phase 2 — Caregiver Capture and Work Queue
+## G3-B — Capture-to-Draft Pipeline
 
 - 定义快速记录、photo/media attribution、attention 和待办/待确认项目。
 - 只有内部采集被明确选为家庭发布候选时才创建/进入 `PublishProcess`；普通班级记录
@@ -59,17 +151,6 @@
   photo-only 不强制生成正文，也不因 copy provider 不可用而阻塞。
 - AI copy 只在本班老师显式请求“帮我整理一句/润色”，或独立日/周总结能力中产生
   suggestion；老师选择采用后才进入当前 draftRevision，不自动覆盖原文。
-- Nurture `ContentSafetyPolicy` 结合硬规则与可选 classifier signals，最终派生
-  ordinary / review-required / direct-interaction-required；classifier 不拥有 route。
-- ordinary 进入 D-10，灰区进入 needs_review。磕碰/健康/用药、明显情绪行为事件、
-  身体隐私/裸露/如厕影像、证件/联系方式等 direct-interaction 内容不进入批量发布；
-  只有 T-005 提供当前可用的专用 caregiver-initiated capability 时，本班老师才通过
-  owner-issued action 显式启动 CareInteraction；现有普通 family-question action
-  不能作为降级路径。
-- T-007 园区策略只能提高 tier/阈值；老师可提高 tier 或修改灰区后重判，不能降低硬
-  门禁。provider failure/低置信/冲突不默认 ordinary。
-- D-14 专用 `ClassScopedFaceMatch` 可在默认关闭的隐私门禁、当前班级范围和高置信
-  profile 全部满足时自动确认孩子归属；该例外不扩张到文案或安全路由。
 - 同一内容面向多个孩子/家庭时，teacher board 保留一个共享编辑的
   `PublishProcess` 卡片；target 使用 Nurture owner-issued opaque ref，不接受客户端
   或 AI 自行拼装 raw child/family ID。
@@ -80,6 +161,20 @@
   scheduler，却不形成个人 owner、业务 authority 或新的 lifecycle。
 - pending_release 内容只允许在线取得 hold 后编辑；离线只准备尚未进入服务端待发送
   队列的新草稿/media。
+
+## G3-C — Content and Media Safety
+
+- Nurture `ContentSafetyPolicy` 结合硬规则与可选 classifier signals，最终派生
+  ordinary / review-required / direct-interaction-required；classifier 不拥有 route。
+- ordinary 进入 G3-B/D，灰区进入 needs_review。磕碰/健康/用药、明显情绪行为事件、
+  身体隐私/裸露/如厕影像、证件/联系方式等 direct-interaction 内容不进入批量发布；
+  只有 T-005 提供当前可用的专用 caregiver-initiated capability 时，本班老师才通过
+  owner-issued action 显式启动 CareInteraction；现有普通 family-question action
+  不能作为降级路径。
+- T-007 园区策略只能提高 tier/阈值；老师可提高 tier 或修改灰区后重判，不能降低硬
+  门禁。provider failure/低置信/冲突不默认 ordinary。
+- D-14 专用 `ClassScopedFaceMatch` 可在默认关闭的隐私门禁、当前班级范围和高置信
+  profile 全部满足时自动确认孩子归属；该例外不扩张到文案或安全路由。
 - stable media ref 进入 Nurture 后，分别维护 media asset lifecycle 与 child
   attribution；publish eligibility 始终派生，不增加统一 media-publication 状态。
 - 支持从单张卡片 detach、未发布 asset 全局 discarded、发布后逐目标 visibility
@@ -94,7 +189,7 @@
   consent/PIPIA/retention/withdrawal/processor contract/正式隐私评审未齐时禁用 matcher
   并回退人工归属。
 
-## Phase 3 — Two-stage Publish
+## G3-D — Publish and Release Loop
 
 - 以 `PublishProcess` 管理一个 caregiver 可见、共享编辑的 family-publication
   content unit；同一 source CareGroup、source refs 与 shared content revision 可以
@@ -143,7 +238,7 @@
   exact replay，payload/head drift 明确 conflict/stale。
 - 将已发布事实投影到 guardian board 和必要的 conversation item。
 
-## Phase 4 — Qualification
+## G3-E — Integration Qualification
 
 - 跑同一孩子的 caregiver capture → review → family board receipt 旅程。
 - 验证看板内联微调提交到正确 canonical owner，并在重新读取后反映；直接修改
@@ -167,6 +262,9 @@
   保留内部来源且只提供 T-005 owner-issued action；T-006 不自动创建 CareInteraction。
 - 验证 T-005 专用 caregiver-initiated capability 不存在、不可用或不满足当前门禁时，
   T-006 显示安全阻塞且不复用普通 family-question action、不降级到批量发布。
+- 验证 Stage G2-C provider 与 T-006 owner-issued consumer action 通过同一 exact
+  T-004 digest 在 formal ingress 上联合运行；仅 safe-unavailable 或 synthetic
+  provider 不能签发 T-006 Beta Profile Handoff。
 - 验证 candidate/edit/release current-reread source/content/policy/target/risk heads；
   provider failure/低置信/冲突 fail closed，policy drift 阻止既有 draft/pending 发布
   而不新增 PublishProcess state。
@@ -206,15 +304,42 @@
   exposure、Grant、scope 和 redaction 任一不满足都阻止 release。
 - 验证 detach 只影响当前 process；全局 discarded 仅限无 committed release，发布后
   target removal/redaction 不删除 Receipt/audit，storage GC 遵循引用与 retention。
-- 验证 `ClassScopedFaceMatch` 只使用当前班级有效头像 opaque refs；质量/top-1/margin
+- 若 G3-C2 被实现或列为 profile required，验证 `ClassScopedFaceMatch` 只使用当前
+  班级有效头像 opaque refs；质量/top-1/margin
   均过线时自动 confirmed，低置信、相似/遮挡、未知或冲突进入 needs_review，且人工
   纠正 supersede 自动结果。
 - 验证群像中的未知、未确认或不允许跨家庭展示孩子阻止自动入队，只能通过纠正归属、
   整图移除、目标调整或拆分解决；发布引用始终是未改动的 exact original-media revision。
-- 验证禁用/撤回/离班/Enrollment 结束立即停止匹配并失效 reference template；临时
+- 对已实现的 G3-C2，验证禁用/撤回/离班/Enrollment 结束立即停止匹配并失效
+  reference template；临时
   embedding 删除、班级隔离和 provider no-training/no-secondary-use 均有证据。
 - 验证没有 ranking、诊断或私域泄漏。
+- 验证 G3-B1 在无 AI copy provider 时完成 deterministic draft；B2 不存在时不产生
+  placeholder，存在时只有明确采用才改变 revision 并触发重新安全判定。
+- 验证 G3-C1 人工归属/群像 exposure/needs-review 完整；C2 未列入 beta profile 时
+  default-off 不影响 Exit，列为 required 时 provider/privacy/threshold/evidence
+  全部门禁必须通过。
+- 验证 T-007 publication-policy exact owner contract 解析并固化 schedule heads；
+  `InstitutionWorkflowProjection` absent/empty 不阻塞核心旅程。
 
 ## Exit Gate
 
-双看板黑盒旅程通过；宿主相机、原生列表性能和设备交互留给 My-Chat companion。
+- [ ] G3-A Shared Board Foundation 通过。
+- [ ] G3-B1 Capture-to-Draft deterministic main path 通过；G3-B2 optional AI copy
+  不成为隐式前置条件。
+- [ ] G3-C1 manual content/media safety path 通过；G3-C2 face match 按 beta profile
+  明确 required 或 optional/default-off。
+- [ ] G3-D Publish and Release Loop 通过。
+- [ ] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
+  PostgreSQL 完成完整黑盒与负向资格验证。
+- [ ] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；
+  不接受 safe-unavailable 占位、普通 family-question 或 PublishProcess fallback。
+- [ ] T-007 publication-policy subset 已按 exact owner contract 资格化；可选
+  `InstitutionWorkflowProjection` 的 absent/empty 行为与 beta profile 一致。
+- [ ] 最终 capability/environment 为 false、active test rows 为空；无 persistent
+  DB apply、Candidate、native/internal-store、activation 或 traffic effect。
+- [ ] 形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
+  notification/delivery 留给 My-Chat companion/T-008。
+
+所有清单项满足后 T-006 才可转为 done。T-008 仍需独立核验该 handoff 后才能开始
+Candidate Freeze。

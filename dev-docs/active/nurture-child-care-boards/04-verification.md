@@ -47,6 +47,11 @@
 | 2026-07-30 | released+partial handling preserves the first-release exact revision freeze | PASS |
 | 2026-07-30 | T-006 direct-interaction route fails closed until a dedicated T-005 caregiver-initiated capability is available | PASS |
 | 2026-07-30 | D-04 and D-16 confirmed as unused numbering gaps rather than open decisions | PASS |
+| 2026-07-30 | Stage G3 split into G3-A shared boards, G3-B capture/draft, G3-C content/media safety, G3-D publish/release and G3-E integration qualification | PASS |
+| 2026-07-30 | G2-C provider qualification separated from G3-E consumer qualification without a T-005/T-006 completion cycle | PASS |
+| 2026-07-30 | G3-B1 deterministic and G3-C1 manual lanes fixed as required; AI copy and face match fixed as optional parallel enhancements | PASS |
+| 2026-07-30 | T-007 publication-policy subset fixed as hard dependency while full T-007 and optional Workflow projection remain non-blocking | PASS |
+| 2026-07-30 | Stage G3 overall audit across goal, ownership, dependencies, critical path, optional lanes and Exit | PASS |
 
 ## Planned Verification
 
@@ -156,10 +161,12 @@
   candidate/confirmed/rejected/superseded attribution and PublicationRelease.
 - Eligibility tests proving ready alone cannot publish and every visible child/exposure,
   exact original-media revision, Grant, target and redaction fence is current.
-- Face-match scope tests proving only current exact-CareGroup/current-Enrollment authorized
+- If G3-C2 is implemented or profile-required, face-match scope tests proving only current
+  exact-CareGroup/current-Enrollment authorized
   avatar opaque refs enter the matcher; raw IDs/names, institution-wide, cross-class,
   departed-child and history-match inputs are rejected.
-- Face-match decision tests proving versioned quality/top-1/margin gates automatically
+- If G3-C2 is implemented or profile-required, face-match decision tests proving versioned
+  quality/top-1/margin gates automatically
   confirm only high-confidence results; low-confidence, occluded, look-alike, unknown and
   conflicting results enter needs_review, and manual correction supersedes the automatic fact.
 - Group-photo tests proving every clearly visible child requires current confirmed attribution
@@ -167,7 +174,8 @@
   only by attribution correction, whole-photo removal, target adjustment or process split.
 - Original-media tests proving published media is the exact unchanged source revision and no
   crop, blur, beautification or other visual rendition is created.
-- Biometric-lifecycle tests proving the matcher is default-off until consent/PIPIA/privacy
+- If G3-C2 is implemented or profile-required, biometric-lifecycle tests proving the matcher
+  is default-off until consent/PIPIA/privacy
   gates pass, reference templates remain encrypted and CareGroup/purpose-scoped, temporary
   photo embeddings are deleted, and withdrawal/Enrollment end disables further matching.
 - Deletion tests proving process detach is local, global discard requires zero committed
@@ -185,3 +193,8 @@
 | 2026-07-30 | `git diff --check` | PASS — no whitespace errors |
 | 2026-07-30 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS — project governance lint passed |
 | 2026-07-30 | `rg -n -i "下一步审计\|未逐项\|Open Items\|待锁定\|待决定\|15 秒否决窗\|否决窗 15s\|12:30" dev-docs/active/nurture-child-care-boards .ai/project/main/feature-map.md --glob '!04-verification.md'` | PASS — no stale open-decision wording or superseded prototype constants |
+| 2026-07-30 | Stage G2-C dependency review against T-005 and T-008 | PASS — exact dedicated capability required; no guessed key, source-body copy, auto-create or PublishProcess fallback |
+| 2026-07-30 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --check-anchors` | PASS — 6/6 files, no errors or warnings |
+| 2026-07-30 | Stage G3 cross-task consistency review across T-005/T-006/T-007/T-008 and project hub | PASS |
+| 2026-07-30 | Governance sync/lint, strict context verification, Markdown links/anchors/headings and `git diff --check` | PASS |
+| 2026-07-30 | G3 overall audit landing: governance sync/lint, project-state verify, 6/6 task-doc link/anchor lint, strict context verification and `git diff --check` | PASS |
