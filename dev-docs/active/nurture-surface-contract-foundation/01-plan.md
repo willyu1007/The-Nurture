@@ -1,5 +1,189 @@
 # Plan — 六个核心 Surface 的产品契约基座
 
+## Controlled-Parallel Entry Contract
+
+- T-004 MUST proceed in parallel with the bounded T-002 owner/source repair. It MUST
+  NOT wait for T-002 as a whole, Pilot-0-D/E, Pilot-1, production topology or external
+  traffic readiness.
+- T-004 MAY freeze public capability/surface schemas, deterministic fixtures,
+  dependency failure behavior and `InterfaceContractRefV1` through synthetic
+  qualification before the real T-002 adapter is ready.
+- Synthetic PASS MUST remain distinct from owner-integration PASS. Missing owner
+  dependencies keep the affected capability default-off with explicit dependency
+  NO-GO; synthetic adapters MUST NOT appear in candidate or real-integration evidence.
+- The Contract Boundary checkpoint precedes protected slice implementation. Owner
+  Integration Readiness then binds the exact T-002 endpoint and source pins. Joint
+  Conformance finally reruns the same fixtures against that real owner path; only the
+  jointly passing capability may enter protected T-005～T-007 implementation.
+- Internal T-002 anchor, ORM, repository, authority-evidence and Receipt persistence
+  shapes MUST NOT leak into the public T-004 contract. A T-002 implementation or pin
+  change that preserves the public behavior renews owner evidence rather than forcing
+  an unrelated surface-contract rewrite.
+- T-003 supplies non-blocking information architecture and interaction design. Demo
+  or feedback changes become implementation requirements only after explicit adoption
+  into the current T-004～T-007 product contracts.
+- G1 is progressive, not a single serial barrier:
+  - G1 start opens downstream product-state design, pure domain/policy logic,
+    presenter design and isolated synthetic fixtures.
+  - Contract Boundary PASS opens implementation against the exact public contract.
+  - Owner Integration Readiness PASS opens isolated real-adapter integration.
+  - Joint Conformance PASS alone opens protected qualification and Beta-profile
+    handoff.
+- None of these gates grants database apply, capability activation, Candidate Freeze,
+  internal-store testing or traffic authority.
+
+## G1 Decision Register — Accepted
+
+G1 的目标不是完成某一个 task，而是在不激活能力、不持久化 apply、不创建
+Candidate、也不接入真实流量的前提下，完成六 surface 的 exact public contract、
+真实 owner/source path 和联合资格化。以下七项顶层决策共同构成 G1，不得用其中
+一项 PASS 代替其他项。
+
+### G1-01 — Progressive parallel execution
+
+- G1 start 开放产品状态设计、纯 domain/policy、presenter 设计和隔离 synthetic
+  fixtures。
+- Contract Boundary PASS 开放针对 exact public contract 的实现。
+- Owner Integration Readiness PASS 开放隔离 real-adapter integration。
+- Joint Conformance PASS 才开放 protected qualification 和 Beta Profile Handoff。
+- 任一层级都不授权 persistent DB apply、Candidate Freeze、internal-store testing、
+  activation 或 traffic。
+
+### G1-02 — Four-layer identity and authority chain
+
+1. My-Chat 建立 authenticated Workspace/User/Actor principal。
+2. My-Chat 拥有 canonical Child/Family identity、stewardship/membership 和
+   scenario binding。
+3. Nurture 使用 typed、body-free、PII-free anchor 和 exact workspace-local
+   association，把 opaque owner identity 绑定到本地 child/care process。
+4. Nurture 在每次 protected request 中解析并重新验证 current business authority。
+
+- 只有 Parent/steward 或其明确授权的成人可以创建平台 Child。Institution Admin、
+  Caregiver 和 Nurture 不得 mint、推断或通过 PII 匹配 global identity。
+- 缺少创建 authority 时，只能保留 local provisional record；不得产生 anchor
+  candidate 或 global identity。
+- Child 与 Family anchor 使用不同 namespace；仅允许存在于 My-Chat owner ref、
+  Nurture persistence 和短生命周期 private server-to-server envelope 中，不得进入
+  client、Chat、Notification、Handoff、log、search 或 evidence payload。
+- 正常 anchor lifecycle 为 `reserved | bound_empty | associated | retired`；
+  `revoked | quarantined | ambiguous` 一律 fail closed。
+- association 必须是 exact workspace-local：Child anchor 只绑定本地
+  child/process；Family + Child pair 只绑定 child-scoped family/process。
+- principal、binding、anchor、association 和 route 都只是 routing/policy input，
+  任何一个都不是 protected-fact authorization。
+
+### G1-03 — Transactional authority, Receipt and replay
+
+- private invocation 同时验证 service workload 与 exact Workspace/User/Actor、
+  purpose、expiry、nonce、idempotency key 和 canonical request hash；service token
+  不能代表成人身份。
+- binding-owner Receipt 的固定顺序为：验证 private invocation → 开启 Nurture
+  transaction → lock exact typed anchor → transaction-scoped reread 并 lock/CAS exact
+  authority source → 校验 association/role/purpose/version → insert 或 exact replay
+  Receipt → commit。
+- 后续 business action 必须把 business effect、`CommandExecution` 和 business
+  `Receipt` 放在同一个 Nurture transaction；每个 mutable prerequisite 都必须
+  lock/CAS。不得使用 transaction 外 pre-read 作为 authority，也不得在 Nurture
+  transaction 内调用远端 My-Chat。
+- Host principal/binding admission 发生在 owner attempt 之前；已 admission 的
+  in-flight attempt 最多提交一次。相同 idempotency key + 相同 hash 返回原结果；
+  相同 key + 不同 hash 冲突；业务唯一性/CAS 的 loser 必须重读 canonical winner。
+- revoke-before-lock 拒绝；Receipt-first 可以恰好提交一次，后续请求拒绝；响应丢失
+  只能恢复原 `Execution`，不能再次执行业务。
+- 短生命周期 binding-owner Receipt 与持久 business
+  `CommandExecution`/`Receipt` 是两个独立语义，不能合并。
+
+### G1-04 — Exact public surface contract
+
+T-004 交付 `InterfaceContractRefV1`、`SurfaceContractV1`、capability descriptors、
+typed query/action/result/error、`SurfaceEnvelopeV1`、confirmation/concurrency/
+idempotency/replay contract，以及 fixtures、conformance manifest 和可重建 exact
+version/digest。
+
+- capability-specific input 只包含业务字段。generic invocation 承担 exact target、
+  actor/scope、expected heads、idempotency、confirmation、expiry 和 expected exact
+  interface ref。
+- client 不得提交 raw Enrollment/Grant/RoleAssignment/anchor、authority outcome、
+  routing/current-permission、internal endpoint 或 owner evidence。
+- `prepareAction` 把 exact target、actor/scope、canonical input integrity、concurrency
+  heads 和 expiry 绑定进 opaque `confirmationRef`。
+- public result 只返回 actor-safe semantic content、opaque refs、current
+  affordances、exact contract ref 和 generic safe errors；不得泄漏 Prisma/internal
+  ids、anchors、raw platform identity 或 internal lifecycle。
+- admission 只接受 exact key/version/digest；禁止 `latest`、version range、
+  major-only 或 fallback。
+- public behavior 变化必须生成新 interface identity。owner pin/实现变化但 public
+  behavior 不变时，更新 Owner Integration Handoff 与 Joint Conformance，不强制改写
+  interface identity。
+
+### G1-05 — Formal target-service ingress
+
+- contract boundary 保持 framework-neutral。Owner Integration Readiness 可以先通过
+  当前 P7 Fastify dev-host 证明 transaction/revoke/replay，但该证据是 provisional。
+- 最终 G1 Joint Conformance 必须经过 production-intended Nurture service ingress；
+  当前批准目标是 NestJS scenario service。Fastify-only dev-host 证据不能成为最终
+  G1 PASS 或 T-008 输入。
+- Joint Conformance 前必须完成 NestJS target ingress、`PORT=8000`、backend
+  `3001`、Base-assigned `3200/3201` 端口对齐、formal route/API index、service-auth
+  middleware、size/timeout/error boundary、env contract 和 default-disabled startup。
+- clean install/build/start/health/contract test 必须通过；缺 secret 必须安全拒绝，
+  不得退化为弱认证。
+- 该服务仍是 disposable、zero-PII、default-off 的资格化目标，不等于 deployment、
+  persistent environment 或 traffic authorization。
+
+### G1-06 — Three distinct qualification layers
+
+| Layer | Required proof | What it cannot claim |
+| --- | --- | --- |
+| Synthetic Contract Qualification | schema、descriptor/handler/presenter 一致性、deterministic fixtures、digest rebuild、visibility 和 dependency fail-closed | 真实 owner 或 authenticated integration |
+| Owner Integration Readiness | exact pins、clean install/build、private endpoint/service auth、binding lifecycle、transaction authority/Receipt、PostgreSQL revoke/concurrency、replay/response-loss、privacy scan、final false/empty | 六 surface 联合通过 |
+| Joint Conformance | 相同 T-004 fixtures 经 formal Nurture ingress 运行于真实 pinned owner path，覆盖正向 binding/association/auth、wrong workspace/user/actor/purpose、`bound_empty` recovery、post-revoke、owner unavailable、contract mismatch、stale confirmation/heads、replay、concurrency、leakage 和 final false/empty | Candidate、activation 或 traffic |
+
+只有 Joint Conformance PASS 才完成 G1。
+
+### G1-07 — Delivery roles and invalidation
+
+G1 只交付三类 artifact/evidence role，不建立新服务、数据库或控制平面：
+
+1. T-004 `Surface Contract Artifact Set`：exact interface ref、schemas、registry、
+   fixtures 和 conformance manifest。
+2. T-002 `Owner Integration Handoff`：exact pins、formal ingress、env/default-off、
+   transaction/revoke/replay/privacy evidence 和 final false/empty。
+3. `G1 Joint Conformance Record`：精确引用前两者及 suite/fixtures/revisions/
+   commands/results/negative cases/final census，结论只能是
+   `PASS | NO_GO | INVALIDATED`。
+
+T-008 pre-Candidate gate 直接引用上述三类角色。T-004 public contract drift 使
+synthetic + joint 失效；T-002 owner/pin/ingress drift 使 owner + joint 失效；
+fixture/suite drift 使受影响 synthetic/joint 失效；source population 之外的纯展示
+文档变化不失效。auth/privacy/security 风险立即 `INVALIDATED` 并保持 default-off。
+历史 PASS append-only 保留，不删除或改写。
+
+G1 完成后 T-004 可以转为 done，T-002 仍可继续保持 in-progress；T-005～T-007
+获得 protected qualification 入口，T-008 只把 G1 作为 required input。它仍不授权
+Candidate Freeze、persistent DB apply、internal-store testing、activation 或 traffic。
+
+## G1 Completion Checklist
+
+- [ ] 四层 principal → canonical identity/binding → typed anchor/association →
+  current business authority 链路已实现并验证全部 normal/fail-closed 分支。
+- [ ] transaction boundary 在真实 disposable PostgreSQL 上通过 revoke、CAS、
+  concurrency、exact replay 和 response-loss tests。
+- [ ] T-004 Surface Contract Artifact Set 可由 clean checkout 确定性重建，并且
+  exact key/version/digest 双向一致。
+- [ ] formal NestJS ingress、env contract、route/API index 和
+  `8000/3001/3200/3201` 端口分工在 clean install/build/start/health/contract tests
+  中通过。
+- [ ] Synthetic、Owner Integration Readiness、Joint Conformance 三层资格化分别
+  形成独立 PASS，不互相替代。
+- [ ] wrong workspace/user/actor/purpose、cross-Institution、revoked、
+  quarantined/ambiguous、owner unavailable、stale heads、contract mismatch 和
+  leakage negatives 全部 fail closed。
+- [ ] 最终 environment/default capability gates 为 false，active rows 为空，未留下
+  persistent environment、PII、secret 或外部 effect。
+- [ ] 三类 delivery/evidence role 精确互链，任一 currentness drift 能机械失效受影响
+  结果，历史记录 append-only 保留。
+
 ## Phase 0 — Discovery and Gate Reconciliation
 
 - 读取 workflow、product、DB context contract，以及 scenario manifest/module 的当前公共边界。
@@ -115,7 +299,9 @@
 
 - 形成可供后续任务消费的版本化基线。
 - 形成 engine-ready 而非 engine-complete 的交付；未来共享引擎可以消费 descriptor，但不成为 T-004 完成条件。
-- T-004 可以在 T-002 runtime 未完成时完成 contract baseline，但不能宣称真实 binding、Enrollment/Grant、authenticated path、notification 或 traffic 已通过。
+- T-004 可以在 T-002 runtime 未完成时完成 contract baseline milestone；这不是
+  T-004 task Exit 或 G1 PASS，也不能宣称真实 binding、Enrollment/Grant、
+  authenticated path、notification 或 traffic 已通过。
 - interface contract 变化按 compatibility 规则版本化，不存在 mutable `latest`、浮动 contract 或原地覆盖；T-004 不因 Service Candidate ID 格式尚未确定而 blocked。
 - 所有 T-002 未满足门禁继续显示为 NO-GO，而非被本任务“补齐”。
 - descriptor registry、surface schemas、invocation/result/error schemas 与 fixture/

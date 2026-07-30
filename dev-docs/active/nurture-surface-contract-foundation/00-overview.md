@@ -6,9 +6,11 @@
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-30
-- Next step: 按本轮合同审阅后的规范字段完成 Phase 0 复用/门禁矩阵，并将 T-007
-  D-04 的 Institution Admin 园区业务沟通只读投影纳入 `SurfaceContractV1`
-  visibility/versioning 设计；当前能力保持未实现、default-off。
+- Next step: 先完成 G1 Contract Boundary：输出 Phase 0 复用/门禁矩阵与可重建的
+  `Surface Contract Artifact Set`，并将 T-007 D-04 的 Institution Admin 园区业务
+  沟通只读投影纳入 `SurfaceContractV1` visibility/versioning。随后使用同一 fixtures
+  经正式 NestJS Nurture ingress 与 T-002 exact owner path 执行 Joint Conformance；
+  当前能力保持未实现、default-off。
 
 ## Goal
 
@@ -61,6 +63,13 @@
 
 - 设计输入：`docs/context/product/nurture-mobile-ux-contract.md` 与 T-003。
 - 平台和领域输入：T-002 及 `docs/context/workflow/nurture-scenario-contract.md`。
+- G1 start 即允许 T-005～T-007 同步进行不依赖最终 owner path 的产品状态设计、
+  纯领域/policy 逻辑、presenter 设计和隔离 synthetic fixtures。
+- Contract Boundary PASS 开放针对 exact public contract 的正式实现；Owner Integration
+  Readiness PASS 开放隔离的真实 adapter 集成；Joint Conformance PASS 才开放 protected
+  qualification 与 Beta Profile Handoff。
+- G1 最终 Joint Conformance 必须通过 production-intended NestJS scenario-service
+  ingress；Fastify dev-host 只可提供 provisional owner-readiness evidence。
 - 在 T-002 对应的身份、授权、owner-reread、receipt、host pin 门禁未满足前，只允许契约设计与本地合成数据验证，不得宣称跨仓集成或真实流量可用。
 
 ## Acceptance Criteria
@@ -102,5 +111,8 @@ T-004 顶层决策已收敛：契约组织、共享引擎边界、semantic UI、
 Identity/Grant、多机构、Chat/Board、T-002 parallelism、Service/API 边界与 interface
 identity ownership 均已锁定。本轮合同审阅进一步固定了 descriptor 三轴分类、最小
 envelope、contract identity/digest、组合式 concurrency heads 与 exact-state convergence。
-下一步完成现有 manifest/module/presenter/repository port 的复用/扩展/门禁矩阵，并产出
-可生成 schema 与 conformance fixture 的 V1 contract artifacts。
+G1-01～G1-07 进一步锁定渐进并行、四层 identity/authority、transactional Receipt/
+Execution、exact public contract、formal NestJS ingress、三层资格化与三类交付/
+失效规则。下一步完成现有 manifest/module/presenter/repository port 的复用/扩展/
+门禁矩阵，产出可重建的 Surface Contract Artifact Set，并与 T-002 Owner Integration
+Handoff 汇合执行 Joint Conformance。

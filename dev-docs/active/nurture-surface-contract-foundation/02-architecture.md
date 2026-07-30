@@ -193,6 +193,71 @@ T-008 只 pin 该 exact ref；Service Candidate identity 和 composite validatio
 
 surface envelope 的总体状态为 `ready | limited | needs_setup | unavailable`；route 可达不等于 module/action 可用，每个 capability 仍按当前四轴、版本、policy 与 fact lifecycle 独立计算 eligibility。
 
+### G1 four-layer identity/authority chain
+
+G1 的 authenticated protected path 固定为四层，每层只提供下一层所需的最小输入，
+不得越级授权：
+
+```text
+My-Chat authenticated Workspace/User/Actor principal
+  -> My-Chat canonical Child/Family + stewardship/membership + scenario binding
+  -> Nurture typed anchor + exact workspace-local association
+  -> Nurture current business authority
+```
+
+第一层证明成人 principal 和 Workspace；第二层解析平台 owner identity/binding；第三层
+只把 opaque typed owner ref 定位到 Nurture local child/process；第四层才依据 current
+Participant/RoleAssignment/Enrollment/CareGroup/Grant/purpose/lifecycle/policy 判定当前
+请求。service workload credential 与 represented adult 是两份独立证明，任何 service
+token、route、binding、anchor 或 association 都不能替代第四层。
+
+只有 Parent/steward 或其明确授权的成人可以创建 platform Child/Family。Institution
+Admin、Caregiver 和 Nurture 都不能 mint、推断或用 PII 匹配 canonical identity。
+无该 authority 时，Nurture 可保留 provisional local setup/draft，但不能创建 anchor
+candidate、猜测 owner ref 或进入 bound surface baseline。
+
+Child/Family anchor namespace 必须分离；anchor 是 body-free、PII-free、
+authority-free 的 private locator，仅存在于 My-Chat owner ref、Nurture persistence
+或短生命周期 server-to-server envelope。它不能进入 client、Chat、Notification、
+Handoff、logs/traces/metrics、search 或 evidence payload。正常状态只有
+`reserved | bound_empty | associated | retired`；`revoked | quarantined |
+ambiguous` fail closed。Child association 精确绑定
+`Workspace + Child anchor + local child/process`；Family association 额外绑定同一
+Child association，不能成为跨 child 或跨 Workspace 的 family shortcut。
+
+资格化必须覆盖 no platform identity、no binding、`reserved`、`bound_empty`、
+`associated`、`retired`、`revoked`、`quarantined` 和 `ambiguous`。任何恢复都走
+owner-issued、versioned transition；禁止自动 merge、猜测 replacement 或静默 rebind。
+
+### G1 transaction and replay boundary
+
+private ingress 首先验证允许的 service workload 与 exact
+Workspace/User/Actor/purpose/expiry/nonce/idempotency/canonical request hash。
+binding-owner Receipt 的唯一合法写入顺序为：
+
+```text
+verify private invocation
+  -> begin Nurture transaction
+  -> lock exact typed anchor
+  -> transaction-scoped reread + lock/CAS exact authority source
+  -> validate association/role/purpose/version
+  -> insert or exact-replay short-lived owner Receipt
+  -> commit
+```
+
+后续业务命令把 effect、`CommandExecution` 和 business `Receipt` 放入一个 Nurture
+transaction，并 lock/CAS 每个 mutable prerequisite。transaction 外 authority
+pre-read 不是执行依据；Nurture transaction 内不发远端 My-Chat 请求。Host
+principal/binding admission 发生在 owner attempt 之前；已经 admission 的 in-flight
+attempt 可以恰好 commit 一次，但不能在失效后开始新 effect。
+
+same idempotency key + same canonical hash 返回原结果；same key + different hash
+冲突。业务唯一键或 CAS 冲突的 loser 重读 canonical winner。revoke-before-lock
+拒绝；Receipt-first interleaving 允许该请求提交一次而下一请求拒绝。response loss
+只恢复原 `CommandExecution`。private binding-owner Receipt 与 persistent business
+Execution/Receipt 的 owner、TTL、replay 和 retention 均不同，wire/schema/storage
+不能合并。
+
 ### Multi-institution isolation
 
 - 一个 ChildCareProcess 可以同时或先后拥有多个 Institution Enrollment；这不是一个 Institution 下的 Campus 层级。
@@ -234,9 +299,61 @@ T-004 采用 contract-first parallel development，不把 T-002 的完整 runtim
 
 synthetic owner fixture 必须携带明确的测试来源和 fixture version，只能进入 reference renderer、contract/conformance test 与 isolated Journey setup。它不能被 runtime 自动选择，不能生成 canonical identity 或 Grant，不能写入 production migration，也不能作为 owner outage 时的 fallback。
 
-未解锁的真实能力保持 default-off。presenter 可以诚实返回 `needs_setup`、`unavailable` 或 machine-readable dependency NO-GO；不得伪造“暂时可用”的成功路径。T-004 contract baseline 可以在这些 NO-GO 仍存在时完成，但验收只能声明 synthetic contract qualification，不能声明真实 owner integration、authenticated public path、notification、native adoption 或 traffic qualification。
+未解锁的真实能力保持 default-off。presenter 可以诚实返回 `needs_setup`、
+`unavailable` 或 machine-readable dependency NO-GO；不得伪造“暂时可用”的成功
+路径。T-004 contract baseline milestone 可以在这些 NO-GO 仍存在时完成，但它不是
+T-004 task Exit 或 G1 PASS；当时只能声明 synthetic contract qualification，不能
+声明真实 owner integration、authenticated public path、notification、native adoption
+或 traffic qualification。
 
 纯领域和 surface 工作可以继续进入 T-005～T-007；任何与未稳定 T-002 持久化行、owner API 或 migration 强耦合的实现，必须等 discovery 得到 exact contract/pin 后再接。T-008 immutable candidate 是集成汇合点，不能在所需 T-002 qualification pins 缺失时冻结。
+
+### G1 formal ingress boundary
+
+T-004 contract artifacts 保持 framework-neutral；但是 Joint Conformance 的执行路径
+不能是任意测试 harness。当前 P7 Fastify dev-host 只可用于提前证明 owner transaction、
+revoke、concurrency 和 replay，证据分类为 provisional Owner Integration Readiness。
+
+最终 G1 必须让同一 T-004 fixture/conformance suite 经过
+production-intended NestJS scenario-service ingress 调用 exact pinned owner path。
+在此之前 T-002 必须对齐：
+
+- formal route/API index；
+- My-Chat service authentication 与 verified principal/envelope middleware；
+- request-size、timeout 和 safe error boundary；
+- env contract、default-disabled startup 和 no-secret safe denial；
+- `PORT=8000`、Nurture backend `3001`、Base-assigned `3200/3201`；
+- clean install/build/start/health/contract tests。
+
+该 ingress 仍运行在 disposable、zero-PII、default-off qualification environment，
+不构成 persistent deployment、Candidate、activation 或 traffic authority。
+
+### G1 qualification and evidence composition
+
+G1 保持三层独立结论：
+
+1. `Synthetic Contract Qualification` 验证 schema、registry、descriptor/handler/
+   presenter consistency、deterministic fixtures、digest rebuild、visibility 和
+   dependency fail-closed，不声称真实 owner。
+2. `Owner Integration Handoff` 固定 exact revisions/source hashes/private route/env，
+   并在 disposable PostgreSQL 验证 service auth、binding lifecycle、transaction
+   authority/Receipt、revoke/concurrency、exact replay/response loss、privacy scan 和
+   final false/empty；Fastify-only 结果只能是 provisional。
+3. `G1 Joint Conformance Record` 精确引用前两项，由同一 T-004 fixtures 经 formal
+   NestJS ingress 执行真实 owner path 的 positive 和 negative matrix，并记录 exact
+   suite、commands、results、revisions、final census 与
+   `PASS | NO_GO | INVALIDATED`。
+
+Joint matrix 至少覆盖正向 binding/association/current authority、wrong
+Workspace/User/Actor/purpose、`bound_empty` recovery、post-revoke、owner unavailable、
+contract mismatch、stale confirmation/heads、exact replay、response loss、
+concurrency、cross-Institution 与 leakage。三层 PASS 不能互相代替。
+
+这三类 artifact/evidence role 直接供 T-008 pre-Candidate gate 引用，不创建额外
+release service、database 或 control plane。public contract drift 失效 synthetic +
+joint；owner pin/source/ingress drift 失效 owner + joint；fixture/suite drift 失效受影响
+synthetic/joint；source population 外的 display-only docs 不失效。auth/privacy/security
+风险立即失效并保持 default-off。历史结果 append-only 保留。
 
 ## Service Candidate and Interface Consumption Boundary
 

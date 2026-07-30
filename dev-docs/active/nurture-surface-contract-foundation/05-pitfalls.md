@@ -5,6 +5,22 @@
 - 不要把 T-003 的可点击 demo 当成已实现产品能力。
 - 不要为方便 UI 联调复制 My-Chat identity、auth、route 或 runtime。
 - 不要把 opaque `child_id`、family binding 或 scenario binding 当作授权。
+- 不要把 authenticated principal、platform binding、typed anchor 或 local association
+  中任一层当作 Nurture current business authority。
+- 不要让 Institution Admin、Caregiver 或 Nurture 创建、推断、PII 匹配或自动合并/
+  rebind My-Chat canonical Child/Family。
+- 不要让 service token 同时代表 workload 和成人身份；二者必须独立验证。
+- 不要用 transaction 外 pre-read authority 签发 Receipt，也不要在 Nurture
+  transaction 内调用远端 My-Chat。
+- 不要把短生命周期 binding-owner Receipt 与 business
+  `CommandExecution`/`Receipt` 合成一种 replay 或 persistence 语义。
+- 不要让 client/LLM 提交 raw Enrollment、Grant、RoleAssignment、anchor、
+  authority outcome、current permission 或 owner evidence。
+- 不要把 Fastify dev-host-only evidence 当作 G1 Joint Conformance；最终 G1 必须经
+  formal NestJS scenario-service ingress。
+- 不要因为 task 状态、CI 链接或说明文档存在就认为 G1 已完成；必须精确关联
+  Surface Contract Artifact Set、Owner Integration Handoff 和 Joint Conformance
+  Record。
 - 不要用真实儿童或家庭数据构造 fixture。
 - 不要因为调用成功就跳过 authority reread、receipt 或 owner-reread 验证。
 - 不要把 capability descriptor、supported role 或 LLM 选择结果当作 authorization grant。
