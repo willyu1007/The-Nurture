@@ -16,6 +16,37 @@
 | 2026-07-29 | D-01 board retained as an operable low-interruption surface without making derived snapshots a write authority | PASS |
 | 2026-07-29 | D-02 PublishProcess limited to the caregiver-side family-release boundary from explicit candidate to publish/cancel | PASS |
 | 2026-07-29 | D-02 raw capture, CareInteraction, ActionDelivery, InstitutionWorkflow and AI-provider ownership excluded | PASS |
+| 2026-07-29 | D-03 domain facts retain independent meaning/lifecycle/authority while presenters compose semantic content | PASS |
+| 2026-07-29 | D-10 thirty-second quick-adjust timeout enters pending queue without publication or Receipt | PASS |
+| 2026-07-29 | D-11 normal edits remain available until release; no post-publication review window or teacher duty added | PASS |
+| 2026-07-29 | D-13 My-Chat protected local media cache separated from Nurture business media authority | PASS |
+| 2026-07-29 | D-17 through D-22 correctness/integration spine locked without pre-deciding D-05 publication unit | PASS |
+| 2026-07-29 | D-05 HTML one-card/multi-family experience mapped to one shared PublishProcess and target-specific PublicationRelease effects | PASS |
+| 2026-07-29 | D-05 per-target authority/Receipt, explicit partial result and retry boundary locked | PASS |
+| 2026-07-29 | D-06 five-state PublishProcess lifecycle separated from target execution and ActionDelivery states | PASS |
+| 2026-07-29 | D-06 exception-only review, first-release revision freeze and partial-result derivation locked | PASS |
+| 2026-07-30 | D-07 exact-CareGroup caregivers share T-006 work without creator claim or Lead review gate | PASS |
+| 2026-07-30 | D-07 Lead retained for institution operations and excluded as T-006 authority | PASS |
+| 2026-07-30 | D-08 Nurture draft/revision separated from My-Chat protected local working buffer | PASS |
+| 2026-07-30 | D-08 autosave, single short edit hold, strict revision conflict and online pending edit locked | PASS |
+| 2026-07-30 | D-09 explicit now-send and no per-item second approval for pending release locked | PASS |
+| 2026-07-30 | D-09 17:00 schedule, 19:00 retry cutoff, current reread and missed-send handling locked | PASS |
+| 2026-07-30 | D-12 asset, attribution and PublicationRelease lifecycles separated | PASS |
+| 2026-07-30 | D-12 derived media eligibility, group-photo exposure and staged deletion semantics locked | PASS |
+| 2026-07-30 | D-10 capture accumulation separated from organize trigger and thirty-second quick-adjust window | PASS |
+| 2026-07-30 | D-10 manual, configurable idle and daily fallback triggers bound to stable source watermark | PASS |
+| 2026-07-30 | D-10 one-minute quiescence gate separated from ten-minute trigger and thirty-second quick-adjust | PASS |
+| 2026-07-30 | D-10 manual bypass, class-wide activity reset and background-progress exclusion locked | PASS |
+| 2026-07-30 | D-14 original media remains unchanged while exact-CareGroup face matching minimizes routine teacher confirmation | PASS |
+| 2026-07-30 | D-14 high-confidence automatic attribution, exception review and default-off privacy activation gate locked | PASS |
+| 2026-07-30 | D-15 automatic photo-first content assembly uses source text, transcript and deterministic templates without generated prose | PASS |
+| 2026-07-30 | D-15 AI copy limited to explicit caregiver requests or separately designed summaries | PASS |
+| 2026-07-30 | D-15 Nurture ContentSafetyPolicy owns ordinary/review/direct-interaction routing | PASS |
+| 2026-07-30 | D-15 sensitive care events leave batch publication for explicit T-005 caregiver action | PASS |
+| 2026-07-30 | Full T-006 package cross-check against F-003, T-004/T-005 and current UX/owner boundaries | PASS |
+| 2026-07-30 | released+partial handling preserves the first-release exact revision freeze | PASS |
+| 2026-07-30 | T-006 direct-interaction route fails closed until a dedicated T-005 caregiver-initiated capability is available | PASS |
+| 2026-07-30 | D-04 and D-16 confirmed as unused numbering gaps rather than open decisions | PASS |
 
 ## Planned Verification
 
@@ -23,7 +54,8 @@
 - Repository transaction, concurrency and idempotency tests.
 - Presenter snapshots for both roles.
 - Wrong-child, revoked-grant and cross-family leakage tests.
-- AI provider failure / malformed suggestion tests.
+- Optional AI-copy provider failure / malformed suggestion tests proving the deterministic
+  assembly and manual path remain available.
 - Media attribution and correction tests.
 - Full capture → review → publish → guardian reread black-box journey.
 - Projection tests proving same-role visibility still requires Workspace/scope/policy.
@@ -38,7 +70,118 @@
   a Guardian-visible publication or Receipt.
 - Boundary tests proving published means Nurture fact/Receipt commit rather than Host
   notification, provider or device delivery.
+- Capture-batch tests proving a photo, upload completion or media-ready event does not create
+  a family candidate or start the thirty-second window; pre-organize removal only changes
+  the batch input.
+- Organize-trigger tests covering manual action, configurable ten-minute idle and
+  default-send-minus-thirty-minute fallback (16:30 for 17:00), due-without-cut while capture
+  remains active, server clock/timezone, stable source watermark, in-flight upload rollover
+  and exact replay without duplicate PublishProcess.
+- Quiescence tests proving manual organize bypasses the gate, ten-minute idle does not wait
+  twice, and fallback due cuts after the configurable one-minute user-idle gate rather than
+  another ten minutes.
+- Multi-caregiver activity tests proving any current exact-CareGroup capture/edit activity or
+  valid short activity lease resets quiescence, while upload percentage, thumbnails,
+  heartbeat and provider progress do not; enabling automatic triggers rejects a zero gate.
+- Timer tests proving only a committed ordinary/high-confidence organizer draft starts the
+  thirty-second advance, edit interaction pauses it, timeout only queues, and scheduler
+  cannot publish before the candidate-specific deadline.
+- Deterministic-assembly tests proving teacher text remains unchanged, voice transcript keeps
+  provenance, versioned activity/time/media-count templates are stable, and photo-only content
+  needs no generated body.
+- Optional-copy tests proving routine auto-organize never calls the copy provider; explicit
+  caregiver invocation returns a suggestion that changes the draft only after adoption, while
+  rejection preserves the exact prior draft.
+- Claim-fidelity tests proving adopted AI copy maps every claim to exact source refs, preserves
+  uncertainty/negation/quotes/numbers, adds no unsupported emotion/cause/frequency/development
+  conclusion, and stores no chain-of-thought.
+- Safety-policy tests proving deterministic hard rules precede optional classifier signals,
+  institution policy can only tighten, caregiver can raise risk or resolve reviewable text,
+  and no actor/provider can lower a hard restricted route.
+- Routing tests proving ordinary creates a D-10 draft, review-required maps to needs_review,
+  and injury/health/medication/serious emotion-behavior/body-privacy/identity-contact content
+  remains internal with only an owner-issued explicit T-005 action.
+- Negative tests proving T-006 never auto-creates CareInteraction or copies restricted body,
+  provider failure/low confidence/conflict cannot default ordinary, and policy drift blocks
+  existing draft/pending release without adding a PublishProcess state.
+- Capability-availability tests proving T-006 does not reuse the ordinary T-005 family-question
+  action for restricted caregiver-originated content and remains safely blocked until the
+  dedicated owner-issued capability is current and eligible.
+- Pending-release tests proving content remains editable until commit and an active/unsaved
+  edit is skipped rather than published from a stale revision.
+- Post-publication tests proving no review task/window is created while correction, target
+  visibility removal, replacement and redaction remain auditable low-frequency actions.
+- My-Chat cache tests for account/Workspace isolation, TTL/logout cleanup, offline retry and
+  denial after current owner-reread fails.
+- Transaction/replay tests proving owner-reread, effect, Receipt and CommandExecution share
+  the declared commit boundary and delivery/cache/provider state cannot substitute for it.
+- Multi-target tests proving one shared revision creates independently authorized releases,
+  one target failure does not roll back valid targets, and each target has its own Receipt.
+- Retry/reconcile tests proving only failed or outcome-unknown targets are retried and an
+  already committed release is not duplicated.
+- Split-unit tests proving target-specific body or media composition cannot be hidden under one
+  shared revision.
+- State-transition tests covering draft, exception-only needs_review, pending_release,
+  released and pre-release cancelled, including rejection of illegal rollback.
+- Partial-release tests proving first committed target freezes the shared revision, zero
+  commits remain pending, partial/full are derived from explicit target results, and remaining
+  targets only retry/reconcile the exact frozen revision.
+- Partial-release mutation tests proving body/media/target-semantic changes after the first
+  commit require a new process/replacement rather than rewriting the released process.
+- Ownership tests proving timer, scheduledAt, CommandExecution, rejected/outcome-unknown and
+  ActionDelivery do not become PublishProcess lifecycle values.
+- Shared-caregiver tests proving another current caregiver in the exact CareGroup can edit,
+  review, send, cancel and perform safety actions without taking a personal claim.
+- Negative role tests proving wrong-CareGroup, Lead-only, Institution-Admin-only, general
+  institution membership and system-operator identities cannot access T-006 content.
+- Audit tests proving CareGroup remains the family-facing sender while each creator, editor,
+  reviewer, release executor and safety executor remains attributable.
+- Autosave tests for debounce, saving/saved/failed feedback, exact replay, exit flush and
+  explicit retry/discard behavior.
+- Edit-hold tests for single active editor, authorized renewal, scheduler skip, release on
+  completion/leave/expiry and absence of personal ownership semantics.
+- Conflict tests proving expectedDraftRevision drift cannot last-write-win and local-only or
+  failed saves cannot become a published revision.
+- Offline tests proving pending-release edit/cancel/pause requires an online hold, while a
+  protected new local draft can re-enter through current owner/policy/revision checks.
+- Schedule tests proving institution-timezone 17:00/19:00 resolution uses server time and
+  later default-policy changes do not silently move existing processes.
+- Manual-send tests proving one explicit tap has no second modal but cannot bypass saved
+  revision, edit-hold, role, Grant, target, media or policy gates.
+- Retry-window tests proving exact retry/reconcile before notAfter, target-local partial
+  compensation, no blind retry for policy rejection, and visible queue retention after cutoff.
+- Boundary tests proving notification quiet hours/provider/device delivery cannot rewrite
+  Nurture scheduledAt, notAfter or publication results.
+- Media lifecycle tests for preparing/ready/unavailable/discarded/redacted independent from
+  candidate/confirmed/rejected/superseded attribution and PublicationRelease.
+- Eligibility tests proving ready alone cannot publish and every visible child/exposure,
+  exact original-media revision, Grant, target and redaction fence is current.
+- Face-match scope tests proving only current exact-CareGroup/current-Enrollment authorized
+  avatar opaque refs enter the matcher; raw IDs/names, institution-wide, cross-class,
+  departed-child and history-match inputs are rejected.
+- Face-match decision tests proving versioned quality/top-1/margin gates automatically
+  confirm only high-confidence results; low-confidence, occluded, look-alike, unknown and
+  conflicting results enter needs_review, and manual correction supersedes the automatic fact.
+- Group-photo tests proving every clearly visible child requires current confirmed attribution
+  and audience exposure; unresolved/disallowed faces block automatic queueing and are resolved
+  only by attribution correction, whole-photo removal, target adjustment or process split.
+- Original-media tests proving published media is the exact unchanged source revision and no
+  crop, blur, beautification or other visual rendition is created.
+- Biometric-lifecycle tests proving the matcher is default-off until consent/PIPIA/privacy
+  gates pass, reference templates remain encrypted and CareGroup/purpose-scoped, temporary
+  photo embeddings are deleted, and withdrawal/Enrollment end disables further matching.
+- Deletion tests proving process detach is local, global discard requires zero committed
+  releases, post-release removal/redaction preserves Receipt/audit, and storage cleanup
+  respects references and retention.
 
 ## Required Evidence
 
 证据必须绑定精确 source pin 与 fixture version，并包含失败路径。UI mock、静态截图或数据库直查不能替代发布回执和权限验证。
+
+## Documentation Checks
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-07-30 | `git diff --check` | PASS — no whitespace errors |
+| 2026-07-30 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS — project governance lint passed |
+| 2026-07-30 | `rg -n -i "下一步审计\|未逐项\|Open Items\|待锁定\|待决定\|15 秒否决窗\|否决窗 15s\|12:30" dev-docs/active/nurture-child-care-boards .ai/project/main/feature-map.md --glob '!04-verification.md'` | PASS — no stale open-decision wording or superseded prototype constants |

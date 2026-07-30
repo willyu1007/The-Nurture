@@ -5,9 +5,9 @@
 - State: planned
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-29
-- Next step: D-01/D-02 已锁定可操作共享投影与 `PublishProcess` 的产品用途；
-  下一步确定它的精确发布单位、状态机、自动保存和人工/定时发布授权。
+- Updated: 2026-07-30
+- Next step: T-006 顶层决策整包审计已通过；保持 `planned`，下一步进入 Phase 0
+  fact/contract/schema inventory 与实现分期。跨任务顶层决策对齐转入 T-007。
 
 ## Goal
 
@@ -37,14 +37,43 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 ## Scope In
 
 - family charter / focus、current focus、daily care、attention 与成长记录的角色化投影。
+- focus、daily care、attention、media、publication 与 CareInteraction 按领域事实含义
+  分离，在 presenter 层组合成角色化内容和模块。
 - 共享的 board projection pipeline、角色独立 presenter 与可操作的内联微调能力。
 - caregiver 的 class/work queue、快速记录、photo-first capture 与待发布内容。
 - 园所内部采集成为家庭发布候选后，由 `PublishProcess` 管理到原子 publish 或
   pre-publish cancel 的两阶段发布。
+- 一个 caregiver 可见、共享编辑的 `PublishProcess` 内容卡片可以覆盖多个家庭目标；
+  实际发布拆为逐目标 `PublicationRelease`，分别授权、提交、回执和重试。
+- `PublishProcess` 使用 draft / needs_review / pending_release / released / cancelled
+  五个业务状态；逐目标发布结果、调度、执行和投递状态不塞入主状态机。
+- T-006 的 teacher-board actor 只有当前精确 CareGroup 范围内的合格 caregiver
+  （产品简称“本班老师”）；Lead 留在园区日常运营管理，不参与 T-006 发布授权。
+- Nurture 拥有服务端 PublishProcess draft/revision 与短期 edit hold；My-Chat 提供
+  约 1 秒自动保存的受保护本地编辑缓冲，pending-release 只允许在线编辑。
+- pending-release 默认使用园区当地时间 17:00，允许本班老师“现在发送”或改时；
+  自动补发默认截止 19:00，超时留队而不静默顺延。
+- media asset、child attribution 与 PublicationRelease 保持三轴分离；媒体支持卡片
+  detach、发布前 discarded、发布后 target removal/redaction，不做无审计硬删除。
+- 拍摄/录入先进入待整理采集批次；本班老师手动“整理”，或命中园区可配置的
+  10 分钟静默期/默认发送前 30 分钟兜底时点后，才按 source watermark 切出整理输入。
+- 自动 trigger 使用一分钟无用户操作 gate 防打断；本班老师活动重置，后台机器进度
+  不重置，手动“整理”绕过。
+- 普通、高置信整理结果提交后才启动 30 秒快捷调整；超时后进入直到实际发布前持续
+  可编辑的 pending-release queue。
+- My-Chat 侧按账号/Workspace 隔离的受保护本地媒体缓存、缩略图与离线上传队列；
+  Nurture 只消费稳定 media ref 并拥有业务 attribution/publication。
+- 不修改原图或生成 crop/blur 变体；在单独隐私启用门禁下，专用 matcher 只将照片与
+  当前 exact CareGroup 的有效孩子头像匹配，高置信自动确认，异常才要求老师处理。
 - 角色安全的 `InstitutionWorkflowProjection` 外部切片，例如待处理授权申请或结果；
   不暴露园区内部步骤。
 - provenance、authority、receipt、correction 与 owner-reread。
-- AI 仅作为整理和建议 provider，保留人工确认边界。
+- 自动整理默认使用老师原文、语音转写和确定性模板，不生成自由文案；AI copy 仅在
+  老师明确请求或独立日/周总结场景中作为可采用/修改/拒绝的 suggestion。
+- Nurture `ContentSafetyPolicy` 最终派生 ordinary、review-required 或
+  direct-interaction-required；磕碰/健康/用药/明显情绪行为事件和身体隐私等退出
+  批量发布，由老师显式进入 T-005 家庭沟通。
+- 专用班级内人脸 matcher 是唯一允许按 D-14 高置信规则自动确认归属的首轮 AI 例外。
 - guardian/caregiver presenter、queries、commands、fixtures 与黑盒旅程。
 
 ## Scope Out
@@ -58,6 +87,9 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 
 - T-004 的 surface、visibility、presenter 和 fixture 基座。
 - T-005 的家庭—照护者通信、回执与纠正语义。
+- T-005 还需提供专门、可授权的 caregiver-initiated direct-interaction capability，
+  才能承接 T-006 的 `direct_interaction_required` 路由；现有会拒绝健康/用药等输入的
+  普通 family-question action 不能被 T-006 静默复用。
 - T-002 的 child scope、grant、daily care、attention、media attribution 与 owner-reread 门禁。
 
 ## Acceptance Criteria
@@ -75,14 +107,121 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
   内其他当前合格照护者仍可回复，跨班级或仅同园区不可操作。
 - [ ] 同班不同老师的独立回复可以并发提交并稳定排序；board 不把第一条回复投影成
   terminal/unique reply，也不重复创建待回复 Attention。
-- [ ] 任一发布都经历可验证的 draft/review/publish 状态并保留 provenance 与 receipt。
+- [ ] `PublishProcess` 只使用 draft、needs_review、pending_release、released 与
+  cancelled 五个业务状态；低置信/归属不明/D-15 可修正灰区进入 needs_review，普通
+  内容不增加逐条审核；direct-interaction-required 不伪装成第六个状态。
+- [ ] 30 秒倒计时、scheduledAt、CommandExecution、逐目标失败和 ActionDelivery
+  不成为 `PublishProcess` 状态；产品标签映射清晰且 owner 仍可解释。
+- [ ] 单次拍照、记录、上传完成或 media ready 不创建家庭发布候选、不启动 30 秒；
+  老师可以在待整理批次中高频移出素材而不触发全局 discard。
+- [ ] 整理只由本班老师手动点击，或园区可配置的静默期/每日兜底时点触发；Pilot 默认
+  10 分钟静默期与 `default send window - 30 分钟` 兜底（17:00 对应 16:30），均使用
+  服务端时间并保存 policy head。
+- [ ] 一分钟 quiescence 只是自动 trigger 的防打断 gate：正常 10 分钟 idle 已满足；
+  兜底 due 后一分钟无用户操作即切批；手动“整理”绕过，不形成独立 trigger。
+- [ ] 任一本班老师的采集/增删/选择/编辑或有效 capture-activity lease 重置 gate；
+  后台上传/缩略图/heartbeat/provider 进度不重置、不阻塞。默认可在 30 秒～3 分钟配置，
+  自动整理启用时不可设为 0。
+- [ ] trigger 按 stable source watermark 原子切批；进行中的上传及之后的新拍摄进入
+  下一批，相同 trigger exact replay，不能重复创建 PublishProcess。
+- [ ] 30 秒快捷调整超时只进入待发送队列，不发布、不产生 Receipt，也不形成 AI
+  发布授权；用户开始编辑时暂停推进，scheduler 不得早于该候选的 deadline 发布。
+- [ ] pending-release 内容在实际 release commit 前始终可编辑；正在编辑或存在未保存
+  revision 的内容不得被定时任务发布。
+- [ ] 发布后不设置老师复查窗口或持续修改义务；低频 correction、target visibility
+  removal、replacement 与 redaction 能力长期存在并保留审计。
 - [ ] 原始班级采集不因存在而自动创建家庭发布或跨边界；只有成为明确的家庭发布候选后
   才进入 `PublishProcess`。
 - [ ] `PublishProcess` 不吸收 device upload、AI provider execution、CareInteraction、
   ActionDelivery 或 InstitutionWorkflow 的状态和所有权。
+- [ ] 一个共享内容 revision 只需编辑一次，但每个目标 family 的
+  `PublicationRelease` 独立绑定 ChildCareProcess、Enrollment、child-scoped Family、
+  Grant 与 Receipt；不得用一个跨家庭事务冒充整体成功。
+- [ ] 多目标发布返回明确的逐目标结果；一个目标失败不回滚其他合法发布，重试只作用于
+  失败或 outcome-unknown 目标且不得重复发布。
+- [ ] 首个逐目标 release commit 将 process 转为 released 并冻结共享 revision；部分
+  成功通过逐目标结果/派生 summary 表达，零目标提交则保持 pending_release。
+- [ ] process 已进入 released 后，未提交目标只能基于冻结的 exact revision
+  reconcile/retry；若需要改变共享正文、媒体组合或目标语义，必须创建新的
+  `PublishProcess`/replacement，不得回写原 revision。
+- [ ] cancelled 仅允许发生在任何 release commit 之前；released 后的 correction、
+  target visibility removal、replacement 与 redaction 不倒退主状态。
+- [ ] 任一本班老师可以查看和共同处理同一 CareGroup 的 PublishProcess，包括创建、
+  发布前调整、异常确认、立即发送和发布前取消；不按创建者形成个人所有权或独占认领。
+- [ ] Lead designation、Institution Admin、园区成员身份或 system operator 均不成为
+  T-006 内容读取/发布 authority；具备这些身份的人只有同时拥有 exact CareGroup
+  caregiver RoleAssignment 时，才以普通本班老师身份操作。
+- [ ] CareGroup 是家庭侧业务发送方；creator、editor、reviewer 与 release executor
+  分别留存个人审计，但不改变共同责任或扩张班级范围。
+- [ ] 草稿使用约 1 秒 debounce 自动保存并明确显示 saving/saved/failed；仅 Nurture
+  已提交的 draftRevision 可以进入发布，My-Chat 本地缓冲不能成为发布事实。
+- [ ] 一个 process 同时只有一个短期 edit hold；它暂停 scheduler 和其他编辑者，但
+  不是个人 owner、authority 或 PublishProcess lifecycle，离开/完成/过期后释放。
+- [ ] 每次保存携带 expectedDraftRevision；并发变化明确 conflict/rebase，禁止
+  last-write-wins 静默覆盖。
+- [ ] pending_release 编辑前必须在线取得 edit hold；离线只允许准备新的本地草稿/
+  media，不能声称暂停或修改已经等待发送的服务端 revision。
+- [ ] pending_release 本身表达已获得定时发送意图，不要求逐条二次审批；needs_review
+  不可发送，“现在发送”的明确点击不再增加确认弹窗。
+- [ ] 园区默认发送时段由 T-007 运营管理，T-006 保存解析后的 scheduledAt/notAfter、
+  timezone 与 policy head；默认 17:00/19:00 是 Pilot 参数，设备时间不参与判定。
+- [ ] 定时执行前重新读取 exact saved revision、edit hold、authorizing caregiver
+  RoleAssignment、CareGroup、Enrollment、Grant、targets、media 和 policy；任一漂移
+  跳过而非发布旧内容，也不静默换一位老师授权。
+- [ ] 自动重试仅发生在 notAfter 前；outcome-unknown 先以原 command identity
+  reconcile，逐目标失败只补偿对应目标。超过 notAfter 保持可见待处理状态。
+- [ ] media asset 使用 preparing/ready/unavailable/discarded/redacted 业务生命周期；
+  child attribution 使用 candidate/confirmed/rejected/superseded，published 不成为
+  asset 或 attribution 状态。
+- [ ] 发布资格从 exact ready media revision、confirmed attributions、所有可见孩子的
+  exposure policy、当前 Grant/scope 和非 redacted 状态实时派生；ready 本身不授权。
+- [ ] 从卡片删除默认只 detach 当前 PublishProcess；没有任何 committed release 时可
+  显式全局 discarded，存储物理清理由无引用与 retention policy 决定。
+- [ ] 发布后“删除”映射为 target visibility removal 或 redaction，后续读取停止展示
+  但保留 actor、原 release/Receipt 与审计，不宣称召回已查看内容或通知。
+- [ ] 群像照片中所有清晰可见孩子必须 confirmed 且 exposure policy 允许目标 audience；
+  未确认/不允许时进入 needs_review，只能纠正归属、移除整张原图、调整目标或拆分
+  process；首轮产品不 crop、不 blur。
+- [ ] 若不同目标需要不同正文或媒体组合，必须拆成不同 `PublishProcess`，不得在同一
+  共享 revision 下隐藏目标特有内容。
 - [ ] 发布成功只表示 Nurture 已提交家庭可见事实与 Receipt，不冒充 notification、
   provider 或 device delivery。
-- [ ] AI 整理结果必须可审阅、可修改、可拒绝，且不产生排名或诊断。
+- [ ] My-Chat 本地缓存只优化离线/上传体验，不成为授权或 canonical media 状态；
+  owner-reread 失败、logout 或相关撤权后不能继续展示受保护缓存内容。
+- [ ] domain effect、Receipt 与 CommandExecution 原子提交；重试 exact replay，
+  board cache、ActionDelivery 与 AI provider 状态均不能替代 owner-reread。
+- [ ] `ClassScopedFaceMatch` 只使用当前 exact CareGroup、current Enrollment 和当前
+  允许用途的头像 reference set；禁止全园/跨班/历史图库匹配及 raw child/family ID、
+  姓名进入 matcher。
+- [ ] 同时满足版本化质量、top-1 与 margin 门槛的结果可以自动 confirmed，不要求老师
+  逐张确认；低置信、相似/遮挡、未知或冲突只进入 needs_review，且人工纠正 supersede
+  自动结果。
+- [ ] 原图保持不变；reference template 按班级/用途隔离并加密，照片临时 embedding
+  匹配后删除，provider 不得训练、二次使用或写入普通日志。
+- [ ] 人脸 matcher 默认关闭；专门告知/单独同意与监护人同意、PIPIA、retention、
+  撤回、processor contract 和法律/隐私评审任一门禁不满足时回退人工归属。
+- [ ] 可选 AI copy 必须可采用、可修改、可拒绝，且不产生排名或诊断；不得借 D-14
+  自动归属例外扩张正文、敏感判断或发布授权。
+- [ ] 自动 photo-first 路径不依赖生成式文案：老师文字保持原文，语音使用有 provenance
+  的转写，活动/时间/媒体数等通过版本化模板组装；photo-only 可以没有自由正文。
+- [ ] AI copy 只在老师显式点击“帮我整理一句/润色”或独立日/周总结能力中出现；日常
+  自动整理不能静默调用。老师选择采用后才写入当前 draftRevision。
+- [ ] 生成式文案不得新增事实、情绪、原因、频率、引语或发展结论，不把不确定改成
+  确定，也不覆盖老师原文；provider 失败不阻塞原文/转写/模板/photo-only 路径。
+- [ ] Nurture 版本化 ContentSafetyPolicy 是最终 route owner；硬规则优先，classifier
+  只提供 signals。园区只能收紧，老师可以提高 tier 或修正灰区，不能降低硬门禁。
+- [ ] ordinary 可进入 D-10；可纠正的评价性/上下文不明内容进入 needs_review；磕碰/
+  事故、健康症状、用药/医疗资料、明显情绪行为冲突、身体隐私/裸露/如厕影像以及
+  证件/联系方式进入 direct-interaction-required，不进入自动批量发布。
+- [ ] direct-interaction-required 只提供 owner-issued T-005 navigation/action；本班
+  老师明确选择 child/family target 后才创建 CareInteraction，T-006 不自动建对话或
+  复制敏感 body。
+- [ ] 只有 T-005 返回当前 actor/target 可用的专用 caregiver-initiated capability 时，
+  T-006 才显示可执行 direct-interaction action；能力尚未交付或不满足门禁时保持内部
+  来源并显示安全阻塞，不降级为普通批量发布或现有 family-question action。
+- [ ] risk 在 candidate、edit 和 release 时 current-reread；provider 失败/低置信/
+  规则冲突不能默认 ordinary，policy drift 立即使既有 draft/pending 失去发布资格，
+  但不增加 PublishProcess 状态。
 - [ ] My-Chat 可通过公共 view-model 实现看板，无需访问 Nurture persistence。
 - [ ] two-stage publish 使用 `PublishProcess`，不因多状态或异步投递被归类为 Workflow。
 - [ ] Workflow 信息只通过当前授权的 projection 展示；board 不拥有 Run/Step，也不以
@@ -90,8 +229,13 @@ acknowledge 表示班级已收到，不创建个人认领；同班任一当前�
 
 ## Next Step
 
-D-01 已锁定“共享 canonical facts / 模块语义 / 投影管线，分离角色查询与 presenter，
-不新增统一持久化 child-state”的边界，同时确认看板可通过正式 capability 提供低打扰
-微调。D-02 已锁定 `PublishProcess` 只管理园所内部内容成为家庭发布候选后的 review /
-release boundary，不管理采集 transport、家庭沟通、通知投递或园区 Workflow。下一步
-对齐 D-03：精确发布单位、状态机、草稿自动保存、人工/定时发布授权和发布后变更衔接。
+T-006 顶层决策已整包收口。有效决策编号为 D-01～D-03、D-05～D-15 与 D-17～D-22；
+D-04、D-16 是未使用的编号间隙，不代表遗漏的开放决策。共享角色投影、五状态
+`PublishProcess`、逐目标 `PublicationRelease`、exact-CareGroup caregiver 权限、
+发布前持续调整、采集/整理/30 秒入队、媒体三轴与删除、人脸匹配、确定性内容组装、
+安全分流及正确性骨架之间已完成一致性复核。
+
+任务保持 `planned`：下一步不是继续增加顶层产品判断，而是执行 Phase 0
+fact/contract/schema inventory，明确 landed reuse、adapter、DB SSOT delta、T-004
+Harness 接口以及 T-005 direct-interaction capability 依赖，再形成可实施分期。跨任务
+顶层决策讨论进入 T-007。

@@ -50,6 +50,20 @@ Project: `main`
   sender; any currently eligible caregiver in that exact CareGroup may append multiple replies,
   while individual executor identity remains audit/optional secondary attribution. The first
   reply resolves waiting-for-reply attention but does not close the Item.
+- Board Publication: raw capture first accumulates in a CareGroup batch; only an explicit or
+  institution-policy organize trigger cuts a stable source watermark, after which an
+  ordinary/high-confidence draft gets a quick-adjust window and remains editable until actual
+  release. Automatic triggers pass a short class-wide user-activity quiescence gate; manual
+  organize bypasses it, and background upload/provider progress cannot hold the batch open.
+  Routine content assembly uses caregiver-authored text, transcript and deterministic
+  templates; generative copy is optional only after explicit caregiver request or within a
+  separately governed summary. Nurture policy routes ordinary content through low-friction
+  publication, reviewable ambiguity to caregiver review, and sensitive care events to an
+  explicit T-005 family interaction rather than batch publication. Original media is not
+  visually transformed. A dedicated, default-off,
+  exact-CareGroup face matcher may automatically confirm only high-confidence child attribution;
+  ambiguous results require caregiver handling, and biometric consent/PIPIA/privacy gates remain
+  mandatory before activation.
 - Invocation Contract: capability-specific typed input contains business fields only.
   Prepare binds the exact target and declared concurrency heads, actor/scope, canonical input
   hash and expiry into `confirmationRef`. Acknowledge uses exact-state concurrency; reply is
