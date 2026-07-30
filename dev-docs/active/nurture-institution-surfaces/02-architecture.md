@@ -4,6 +4,28 @@
 
 机构关联、group membership、enrollment 或 scenario binding 只决定路由候选范围。读取事实仍需 actor role、grant、child scope、fact visibility 和用途策略同时通过。
 
+## T-006 Stage G3 Publication-policy Owner Contract
+
+T-007 拥有园区运营配置；T-006 拥有 `PublishProcess` 与 release execution。两者通过
+一个 versioned owner contract 连接，不共享数据库模型或 UI state。
+
+最小 owner output 包括：
+
+- institution timezone；
+- default send local time 与 automatic retry cutoff local time；
+- organize idle duration、fallback lead time 与 capture-quiescence duration；
+- automatic-trigger enablement/profile；
+- effective range、stable `policyRef`/`policyHead` 与 source revision。
+
+T-006 在创建或重新排期一个尚未发布的 process 时通过 current owner-read 解析并保存
+`scheduledAt`、`notAfter`、timezone 与 policy head。T-007 后续配置变化不能静默移动
+既有 process；是否允许显式重新排期由 T-006 capability/current policy 决定。
+
+该子合同是 T-006 G3-D/E 硬依赖，但不是 T-007 整体 completion gate。T-007 可先交付
+contract/provider qualification，T-006 再在 G3-E 完成 consumer joint qualification。
+`InstitutionWorkflowProjection` 是另一条独立、可选、只读的 G3-A module；无适用
+Workflow 或 owner unavailable 时返回合法 absent/empty，不影响 publication policy。
+
 ## Confirmed Product Decisions
 
 ### D-01 — Role and Lead semantics
@@ -305,6 +327,54 @@
   `status=active, participationPhase=formal` 转为 `status=ended`，并完成普通
   Grant/CareGroup downscope。它不重新打开 Enrollment Journey，也不默认创建第二个
   Workflow；复杂异常仍可先使用 WorkItem，只有未来另行注册的业务 Workflow 才能承接。
+
+## Stage G4 Delivery Dependency Model
+
+Stage G4 的交付结构是现有 Phase 0～5 上的执行/验收视图，不改变 D-01～D-07G 产品
+语义。Phase 3 被拆成两个不同 owner/failure domain：G4-C 负责通用 Admin Web
+运营能力，G4-D 负责 Enrollment Journey 状态、容量、reservation、owner revalidation
+与本地事务；二者通过 versioned Workflow projection/command contract 集成，不共享
+可由 Web 自行解释的状态。
+
+依赖方向固定为：
+
+```text
+G4-0a publication-policy subset -> T-006 G3-D/E
+
+G4-0 per-domain freeze -> G4-A authority/aggregate foundation
+G4-A + branch-specific freeze -> G4-B | G4-C | G4-D | G4-E
+G4-D projection/commands -> G4-B read-only module + G4-C queue/actions
+G4-B + G4-C + G4-D + G4-E -> G4-F joint qualification/handoff
+```
+
+G4-0 是 rolling gate：每个 downstream branch 只等待自己的 exact contract/fact/schema
+条目，而不是等待全部 register。G4-B/C 在 G4-D 未就绪时不得猜测 Workflow state：
+mobile 使用合法 absent/empty，Web 不注册 placeholder Workflow。G4-F 汇合所有必选
+能力，但不替代分支内的 negative/integration qualification。
+
+## G4 Implementation Gate and Acceptance Model
+
+实现权限沿 I0 Design/Synthetic、I1 Branch Freeze、I2 T-004 Contract Boundary、
+I3 Owner Integration Readiness 和 I4 Joint Conformance 单向推进。一个较高层 PASS
+必须精确引用所有较低层 artifact/evidence；source/schema/pin/fixture drift 只使受影响
+分支及其上层 evidence 失效，但历史记录 append-only 保留。
+
+I1 允许实现 migration artifact，不允许对 shared/persistent database apply；I3
+qualification 只使用 disposable PostgreSQL。I4 必须通过 formal NestJS scenario
+service ingress；Fastify evidence 不能成为 T-007 completion proof。所有 capability、
+manifest activation、Candidate 和 traffic gate 均位于本任务以外。
+
+G4-F 从各分支消费 versioned handoff，而不是重新推断其 business truth。Mobile/Web
+从相同 canonical facts 生成 projection；T-007 的 Workflow projection 是自身 Exit
+required，但 T-006 在它 absent 时仍保持合法空态。任何 required path 都不能用
+placeholder 或恒定 unavailable 通过；optional path 只有在 default-safe 且不影响
+required/safety 时才能记录 limitation。
+
+总体 verdict 固定为 `PASS | PASS_WITH_LIMITATIONS | NO_GO`。Limited pass 只能容纳
+optional fail-closed；required、authority/privacy、安全、transaction/replay、
+formal ingress、real owner path 或 cleanup 缺口一律 `NO_GO`。合格 verdict 输出
+T-007 Beta Profile Handoff，供 T-008 消费；该 handoff 不冻结 Candidate，也不证明
+My-Chat native/device 或 traffic readiness。
 
 ## Logical Components
 
@@ -862,6 +932,25 @@ vector/RAG runtime、model gateway、prompt/model registry、host route 和 tele
 - [WHO: Ethics and governance of AI for health](https://www.who.int/publications/i/item/9789240084759)
 - [人工智能生成合成内容标识办法](https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm)
 
+## G4-0 Freeze Protocol and Branch Release
+
+G4-0 按 0A～0G 执行：0A 建立 owner/fact/schema/gate ledger；0B 先交付 T-006
+publication-policy 快线；0C 冻结 Authority/Surface；0D、0E、0F 分别冻结 Daily
+Operations、Workflow/Enrollment 和 Knowledge/RAG；0G 从首个分支开始滚动审计并
+签发 branch Freeze PASS。
+
+每条 freeze record 必须绑定 exact owner/consumer/source pin、fact/projection/candidate
+类型、schema version、actor/scope/Grant/purpose predicate、lifecycle/concurrency/
+idempotency/replay、default-safe behavior、fixtures/negative tests 和 DB delta plan。
+DB delta 只描述 SSOT/migration 需求；G4-0 不执行 apply，也不改变 manifest、
+capability、Candidate 或 traffic。
+
+Branch Freeze PASS 只表示该分支的实现输入已经精确，不替代 G1 的 Owner Integration
+Readiness 或 Joint Conformance。唯一需要在早期完成 provider/consumer conformance
+的快线是 0B，因为 T-006 G3-D/E 会跨任务消费它。0G 最终关闭 G4-0 时，所有必选
+分支都必须具有 exact freeze record；optional/deferred 能力也必须明确锁为安全关闭，
+不能以“以后再定”为由留给实现者。
+
 ## Pre-implementation Contract Freeze Register
 
 T-007 顶层产品决策已收口；以下是实现前必须冻结的 contract/schema。每项都具有明确
@@ -869,13 +958,17 @@ owner、启用门和默认安全行为，不能被实现者视为自由设计空
 
 | Topic | Decision owner | Enablement gate | Default safe behavior |
 | --- | --- | --- | --- |
+| active-role / exact Institution Surface | Nurture Surface Policy + My-Chat auth/session owner | T-004 exact Surface contract、active-role evidence、Institution/class/child scope 与 capability negative tests 通过 | role/context/scope 任一缺失或不匹配即 fail closed；不合并多角色权限 |
 | 家庭可共享理念/目标范围 | Nurture Product + Privacy | family projection/export schema 与同意 UX 评审通过 | 全部保持 Institution-only，不进入家庭投影、RAG 回答或导出 |
 | roster/invite 操作粒度 | Institution Admin Web Product | bulk command、selection、partial-failure 与 audit contract 通过 | 第一增量仅支持单条、显式操作 |
 | aggregate 隐私阈值/时间窗 | Nurture Privacy + Institution Product | 小样本、跨窗、撤权/更正/删除 negative fixtures 通过 | 未配置/未批准时不返回可区分 child/family 的 aggregate |
 | Admin 业务沟通读取 | Nurture + My-Chat owner-contract owners | versioned interface/digest、disclosure/Grant purpose、private carrier 与负向测试通过 | capability absent/default-off |
 | AI attention | Nurture AI/Safety + Privacy | model/policy/review/retention/invalidation qualification 通过 | capability absent/default-off |
 | support signal schema/policy | Nurture Institution domain owner | type/category allowlist、stable identity、policy revision 与 Web action tests 通过 | 只保留已冻结确定性规则；未配置负荷规则 disabled |
+| T-006 publication policy | Nurture Institution policy owner | timezone/send/cutoff/organize/quiescence schema、effective version/head、provider/consumer conformance 通过 | owner unavailable 或 contract mismatch 时不解析新 schedule；既有 process 保留固化值但 release current policy 失败关闭 |
 | attendance facts | Nurture Care domain owner | evidence/inference/submission/fact、watermark、并发修订 contract 通过 | 无有效 caregiver submission 时保持 `unsubmitted` |
+| class schedule/activity/revision/attribution | Nurture Institution + Care/Content domain owners | effective schedule、placement precedence、append-only revision/downscope、cover 与 exact-caregiver attribution capability/negative tests 通过 | 不确定 evidence 保留在 exact class 待归位；Admin 不确认 child attribution、不扩大 audience |
+| InstitutionWorkflow registry/carrier/projection/command | Nurture Workflow domain + My-Workflow-Base owner | 单一 registry、private carrier、public projection、waiting/stage/milestone union、command/idempotency 与 role-safe negative tests 通过 | Workflow absent/default-off；mobile 返回合法空态，Web 不注册 placeholder |
 | waitlist/offer/preparation cancellation | Nurture Enrollment domain owner | DTO、policy revision、offer expiry、reservation、`cancel_trial_preparation` transaction tests 通过 | Workflow 未注册；不自动录取、取消、释放或发下一 offer |
 | trial state mapping/start/review/exit | Nurture Enrollment domain owner | `status + participationPhase` migration、transaction、reason 与 family-safe projection tests 通过 | 不新增 `trial` status；无完整 gate 不开始真实照护 |
 | formalization/completion | Nurture + My-Chat identity/workflow owners | owner-evidence、expected-version/idempotency、Grant/CareGroup、outbox/event/replay tests 通过 | Workflow absent/default-off；失败保持 active trial + reserved |

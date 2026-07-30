@@ -3,7 +3,7 @@ task_id: T-007
 project: main
 slug: nurture-institution-surfaces
 status: planned
-updated: "2026-07-29"
+updated: "2026-07-30"
 keywords:
   - institution-mobile
   - institution-web
@@ -11,3 +11,4 @@ keywords:
   - workbench
   - aggregates
   - grants
+  - stage-g3-policy-owner

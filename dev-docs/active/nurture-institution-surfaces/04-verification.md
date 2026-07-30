@@ -53,6 +53,18 @@
 | 2026-07-30 | Enrollment mapping reconciled with existing status enum through canonical `participationPhase=trial|formal` | PASS |
 | 2026-07-30 | Pre-trial `cancel_trial_preparation` and post-completion ordinary offboarding boundaries locked | PASS |
 | 2026-07-30 | Every remaining contract/schema item assigned an owner, enablement gate and default-safe behavior | PASS |
+| 2026-07-30 | T-007 publication-policy exact subset separated from full task completion for T-006 Stage G3-D/E consumption | PASS |
+| 2026-07-30 | T-006 Workflow projection consumption fixed as optional read-only absent/empty-safe module | PASS |
+| 2026-07-30 | Stage G4 overall goal and G4-0/A/B/C/D/E/F delivery structure accepted without reopening D-01～D-07G | PASS |
+| 2026-07-30 | G4 rolling per-domain freeze, A-then-B/C/D/E parallelism and F final-join model accepted | PASS |
+| 2026-07-30 | Phase 3 delivery split keeps Admin Workbench Core separate from Enrollment Journey owner/failure domain | PASS |
+| 2026-07-30 | G4-0A～0G freeze scope, fast lane, parallel order, branch release and Exit boundary accepted | PASS |
+| 2026-07-30 | Freeze register explicitly covers active-role/Surface, class activity/revision/attribution and InstitutionWorkflow carrier/projection | PASS |
+| 2026-07-30 | Branch Freeze PASS separated from Owner Readiness, Joint Conformance, Beta Handoff and activation | PASS |
+| 2026-07-30 | G4-0A freeze-ledger structure accepted with exact inventory/pins explicitly pending | PASS |
+| 2026-07-30 | G4 I0～I4 implementation gates and package-level Definition of Done accepted | PASS |
+| 2026-07-30 | G4 six-dimension overall acceptance and PASS/PASS_WITH_LIMITATIONS/NO_GO verdict rules accepted | PASS |
+| 2026-07-30 | T-007 Beta Profile Handoff separated from Candidate Freeze, native/device completion, activation and traffic | PASS |
 
 ## Documentation Verification
 
@@ -73,6 +85,11 @@
 | 2026-07-30 | `! rg -n 'EnrollmentJourneyWorkflowV1\|InstitutionBusinessCommunicationProjectionV1\|InstitutionSupportSignalProjectionV1' packages/nurture-scenario/src packages/nurture-scenario/scenario.manifest.yaml` | PASS — T-007 remains absent/default-off |
 | 2026-07-30 | `rg -n 'nurturePreActivationScenarioModule\|createNurtureActivationScenarioModule' packages/nurture-scenario/src/module.ts` | PASS — default module remains pre-activation |
 | 2026-07-30 | Open [NHC official announcement for WS/T 821-2023](https://www.nhc.gov.cn/fzs/c100048/202311/57f6f5c484bf40b79d3fe84b590bd791.shtml) | PASS — official landing page resolves; command-line curl is WAF-limited (412), not recorded as a 200 check |
+| 2026-07-30 | Stage G3 publication-policy subset sync: governance lint, task-doc links/anchors, strict context verification and `git diff --check` | PASS |
+| 2026-07-30 | Stage G4 structure sync: governance lint/sync, project-state verify, task-doc anchor lint, strict context verify and `git diff --check` | PASS |
+| 2026-07-30 | Stage G4-0 scope/order sync: governance lint/sync, project-state verify, task-doc anchor lint, strict context verify and `git diff --check` | PASS |
+| 2026-07-30 | G4-0A ledger-structure sync: governance lint/sync, project-state verify, task-doc anchor lint, strict context verify and `git diff --check` | PASS |
+| 2026-07-30 | G4 implementation/acceptance sync: governance lint/sync, project-state verify, task-doc anchor lint, strict context verify and `git diff --check` | PASS |
 
 ## Planned Verification
 

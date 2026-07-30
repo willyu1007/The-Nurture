@@ -254,19 +254,97 @@
 - Workflow context、mobile UX、T-006 authority 说明、Lead glossary、feature checkpoint
   与官方 NHC 链接同步修正。当前仍无代码、schema、manifest/module 或 runtime activation。
 
-## Contract Freeze Work Queue
+## Contract Freeze Work Queue — Superseded by G4-0A～0G
 
-顶层产品问题已关闭。以下为实现前工作队列；权威 owner/gate/default 见
+以下 P0/P1/P2 是结构确认前的初始优先级草案，保留为历史映射；2026-07-30 起由
+G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default 继续见
 `02-architecture.md#pre-implementation-contract-freeze-register`。
 
 1. **P0 — Enrollment/Workflow core**：盘点现有 status/Enrollment/Grant/CareGroup/
    capacity，冻结 `participationPhase` migration、trial-start/preparation-cancel/
    formalization/exit transaction、waitlist/offer DTO 和 completion event。
 2. **P0 — Cross-owner contracts**：冻结 My-Chat prospective-contact/current-binding
-   evidence、Admin business-communication owner-read 和 Workflow private carrier。
+   evidence、Admin business-communication owner-read、Workflow private carrier，以及
+   T-006 G3-D/E publication-policy owner contract/provider。
 3. **P1 — Institution operations**：冻结 attendance、support signal、aggregate privacy、
    activity placement/downscope 与 caregiver-confirmed child-attribution contracts。
 4. **P1 — Knowledge/RAG**：冻结 knowledge revision/publish、citation、medical-conflict
    review 和 My-Chat RAG owner contract。
 5. **P2 — Deferred AI attention**：完成 model/policy/privacy/retention/invalidation
    qualification 前保持 absent/default-off。
+
+## 2026-07-30 — T-006 Stage G3 policy-owner subset accepted
+
+- 用户确认 T-007 全任务不成为 T-006 Stage G3 的串行前置；T-007 先交付
+  publication-policy exact owner contract/provider。
+- 子合同覆盖 institution timezone、default send、retry cutoff、organize
+  idle/fallback/quiescence、effective version 与 policy head。T-006 解析并固化
+  process schedule，后续策略变化不静默移动既有 process。
+- T-006 对 `InstitutionWorkflowProjection` 的消费是按 beta profile 选择的只读
+  module；absence/empty 不阻塞其核心看板、采集、草稿或发布。
+- 当前只更新规划/架构合同，无代码、schema、migration、database、environment、
+  capability activation 或 traffic 变更。
+
+## 2026-07-30 — Stage G4 delivery structure accepted
+
+- G4 overall goal 固定为 My-Chat host ownership 下的机构角色化治理闭环，不建立
+  独立机构产品壳或 unioned super-surface。
+- 交付视图固定为 G4-0 Contract & Fact Freeze、G4-A Authority/Aggregate、
+  G4-B Role-bound Mobile、G4-C Admin Workbench Core、G4-D Enrollment Journey、
+  G4-E Knowledge/RAG 和 G4-F Integration Qualification/Handoff。
+- Phase 3 只在交付视图中拆成 C/D：普通 Web 运营与 Enrollment Journey 分属不同
+  owner/failure domain；既有 D-01～D-07G 产品决策和 Phase 0～5 内容不被删除。
+- 执行采用 rolling per-domain freeze；A 后 B/C/D/E dependency-aware 并行，D 的
+  projection/commands 后接入 B/C，F 最终汇合。publication-policy subset 继续作为
+  最早独立交付解除 T-006 G3-D/E 依赖。
+- 下一步是整体确认 G4-0 的冻结范围和内部顺序。当前未提前冻结其 exact schema，
+  也无代码、migration、database、manifest/capability、Candidate 或 traffic 变更。
+
+## 2026-07-30 — Stage G4-0 scope and internal order accepted
+
+- G4-0 固定为 0A Freeze Protocol/Fact Inventory、0B publication-policy fast lane、
+  0C Authority/Surface、0D Daily Operations、0E Workflow/Enrollment、
+  0F Knowledge/RAG 和 0G Cross-contract Audit/Branch Release。
+- 0A 只建立最小 owner/fact/schema/gate ledger；0B 优先解除 T-006 G3-D/E 依赖；
+  0C 是 G4 公共基础；0D/0E/0F dependency-aware 并行；0G 为各分支滚动签发
+  Freeze PASS，而不是末尾一次性放行。
+- freeze record 必须包含 exact owner/source pin、fact/projection/candidate 边界、
+  schema version、authority predicate、lifecycle/concurrency/idempotency/replay、
+  default-safe behavior、fixtures/negative tests 和 DB delta plan。
+- register 补入三条原先只存在于正文的独立记录：active-role/exact Surface、
+  class schedule/activity/revision/attribution，以及 InstitutionWorkflow
+  registry/carrier/projection/command。
+- G4-0 Branch Freeze PASS 不替代 Owner Integration Readiness、Joint Conformance 或
+  G4-F。除 0B 的早期跨任务 consumer conformance 外，真实 owner/protected
+  qualification 不前置到 G4-0。
+- 下一步进入 0A 具体交付物确认。当前仍无代码、schema/migration apply、database、
+  manifest/capability、Candidate 或 traffic 变更。
+
+## 2026-07-30 — G4-0A deliverable structure accepted
+
+- 新增 `06-g4-0-freeze-ledger.md` 作为 0A 的独立工作台账，包含 dependency pin、
+  fact ownership、schema delta、branch routing、drift/default-safe census 和 Exit
+  checklist。
+- inventory state 固定为 `PRESENT_PINNED | DEFINED_UNQUALIFIED | GAP |
+  DEFERRED_SAFE | NOT_APPLICABLE`；文档定义完成不能被误报为 qualified/pinned。
+- 当前只记录可由正式 Context/task artifact 证明的 baseline。Exact revisions、
+  digests、schema deltas 和 PASS 状态仍待 0A 实施核验。
+- 下一步转入 G4 整体实施门、包级 DoD、总体验收与 T-007 Beta Profile Handoff
+  收敛；无代码、migration apply、activation 或 traffic 变更。
+
+## 2026-07-30 — Stage G4 implementation and overall acceptance accepted
+
+- 实施门固定为 I0 Design/Synthetic、I1 Branch Freeze、I2 Contract Boundary、
+  I3 Owner Integration Readiness 和 I4 Joint Conformance；每层只开放明确的下一类
+  工作，不能越级声明真实 owner/protected readiness。
+- G4-0/A/B/C/D/E/F 均具有独立 DoD；D 预计为最长业务分支，B/C 的非 Workflow
+  能力继续并行，G4-F 只汇合已完成分支而不首次执行其负向验证。
+- 总体验收固定为 Contract/Ownership、Product Closure、Authority/Privacy/Safety、
+  Consistency/Recovery、Formal Integration 和 Handoff/Cleanup 六个维度。
+- verdict 固定为 `PASS | PASS_WITH_LIMITATIONS | NO_GO`；limited pass 只能容纳
+  optional fail-closed，任何 required/safety/owner/formal-ingress/cleanup 缺口均
+  `NO_GO`。
+- T-007 完成输出 Nurture-side Beta Profile Handoff，供 T-008 消费；不等于
+  Candidate Freeze、native/device completion、activation 或 traffic authority。
+- Stage G4 顶层规划至此收口。若开始实施，从 G4-0A exact inventory 开始；当前没有
+  code、migration apply、database、manifest/capability、Candidate 或 traffic 变更。

@@ -2,6 +2,36 @@
 
 ## Known Guardrails
 
+- 不要把 G4-0 实现成等待全部 freeze rows PASS 的单体串行阶段；只等待当前分支
+  所需的 exact contract/fact/schema，其他分支继续按 G1 gates 工作。
+- 不要重新把 G4-C 普通 Workbench 运营与 G4-D Enrollment Journey 压成一个不可
+  独立验收的交付包，也不要让 Web/mobile 自行解释未冻结的 Workflow 状态。
+- 不要把 G4-F 当作首次验证时点；每个 G4-B/C/D/E 分支必须随包完成负向和集成验证。
+- 不要把 G4-0A 扩张成全库重审或重新讨论 D-01～D-07G；它只建立后续 freeze 所需的
+  exact owner/fact/schema/gate ledger。
+- 不要把 Branch Freeze PASS 当成 Owner Integration Readiness、Joint Conformance、
+  Beta Handoff 或 capability activation；除 0B publication-policy 快线外，G4-0
+  不强制提前完成所有真实 consumer 集成。
+- 不要把 active-role/Surface、class activity/revision/attribution 或通用
+  InstitutionWorkflow carrier/projection 继续留在正文供实现者自行推断；它们必须
+  各自成为 freeze register 的显式记录。
+- 不要越过 I0～I4 实施门：Branch Freeze 不证明真实 owner，Owner Readiness 不证明
+  六 surface Joint Conformance，Fastify-only evidence 不能完成 T-007。
+- 不要用 placeholder、恒 false、synthetic-only adapter 或 safe-unavailable 正常态
+  替代任何 required G4 path；default-safe 只适用于明确 optional/deferred 能力。
+- 不要把 `PASS_WITH_LIMITATIONS` 用于 required、authority/privacy、安全、事务、
+  replay、formal ingress、real owner 或 cleanup 缺口，这些一律 `NO_GO`。
+- 不要把 T-007 Beta Profile Handoff 当成 Candidate Freeze、My-Chat native/device
+  completion、capability activation 或 traffic authorization；后续组合资格化属于
+  T-008。
+- 不要因 migration artifact 已实现就对 shared/persistent database apply；G4
+  qualification 仅使用 disposable PostgreSQL，其他环境需要独立授权。
+- 不要让 T-006 等待 T-007 全任务才实现 scheduled publication；T-007 先交付 exact
+  publication-policy owner subset，T-006 保存解析结果与 policy head。
+- 不要让 T-007 后续配置变更静默移动既有 `PublishProcess` 的 scheduledAt/notAfter；
+  已解析 schedule 只能通过 T-006 显式、授权的重新排期能力改变。
+- 不要把可选 `InstitutionWorkflowProjection` absence/empty 当成 T-006 核心
+  board/publication 失败，也不要让它与 publication-policy contract 形成同一硬依赖。
 - 不要把 institution membership 当作读取全部 child/family facts 的权限。
 - 不要通过 aggregate 间接泄漏小样本家庭或孩子。
 - 不要聚合家庭 AI 私密正文、未发送草稿或 My-Chat 私人聊天；园区业务沟通必须走

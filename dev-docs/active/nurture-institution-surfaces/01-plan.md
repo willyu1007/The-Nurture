@@ -1,8 +1,219 @@
 # Plan — 机构端双 Surface
 
+## G1 Progressive Entry Boundary
+
+- At G1 start, T-007 MAY design role-bound surfaces, attendance and support-signal
+  policy, `InstitutionWorkflow` state, pure transition logic, presenters and isolated
+  synthetic fixtures.
+- Contract Boundary PASS opens public Institution mobile/Web schemas, capability and
+  Workflow contracts, handlers/presenters and contract tests against the exact T-004
+  interface ref.
+- Owner Integration Readiness PASS opens isolated integration for trusted Admin/
+  Caregiver context, binding/association, Enrollment/Grant/CareGroup authority and
+  owner-read failure behavior.
+- Joint Conformance PASS is required before T-007 may qualify a real protected
+  Institution or Enrollment Journey path or issue a Beta Profile Handoff. The PASS
+  must cite the exact T-004 Surface Contract Artifact Set and T-002 Owner Integration
+  Handoff and execute through the formal NestJS Nurture ingress; Fastify-only evidence
+  is provisional.
+- No G1 state authorizes capability activation, persistent database apply or traffic.
+
+## Stage G4 Delivery Structure — Accepted
+
+### Overall goal
+
+G4 在 My-Chat host ownership 下交付机构角色化治理闭环：Admin mobile 安全观察、
+caregiver mobile 每日出勤、Admin Web 明确操作、完整 Enrollment Journey，以及
+source-aware Institution Knowledge/RAG。它不创建独立产品壳、合并权限的超级
+Surface、My-Chat identity/runtime 副本或通用 CRM/ERP。
+
+### Delivery packages
+
+| Package | Required delivery | Existing phase mapping |
+| --- | --- | --- |
+| G4-0 Contract & Fact Freeze | 按域冻结 owner contract、facts/schema、enablement gate 与 default-safe behavior；优先发布 T-006 publication-policy subset | Phase 0 |
+| G4-A Authority & Aggregate Foundation | active role、Institution/class/child scope、Grant policy、安全 aggregate 与 support-signal 基础 | Phase 1 |
+| G4-B Role-bound Mobile Operations | B1 Admin read-only class-first board；B2 caregiver attendance submit/revise | Phase 2 |
+| G4-C InstitutionAdminWorkbench Core | people/relationships、daily operations、communication owner-read、activity records、responsibility queue 与 signal action | Phase 3 的普通运营部分 |
+| G4-D Enrollment Journey Workflow | D1 inquiry/waitlist；D2 trial；D3 formalization/exit/completion | 从 Phase 3 独立出的 Workflow 交付线 |
+| G4-E Institution Knowledge & RAG | revision/publish、provenance、retrieval eligibility、citation 与 medical-conflict abstention | Phase 4 |
+| G4-F Integration Qualification & Handoff | formal ingress、real owner paths、privacy/negative conformance、final false/empty census 与 T-007 Beta Profile Handoff | Phase 5 + Exit Gate |
+
+G4-0、G4-A～F 都是 T-007 Exit 的必选交付。可选能力只存在于包内：AI attention
+保持 absent/default-off；bulk roster/invite 不进入首增量；未配置的绝对负荷规则
+保持 disabled；首个 registry 只允许 `EnrollmentJourneyWorkflowV1`。
+
+### Parallel and critical-path rules
+
+1. G4-0 采用按域 rolling freeze。一个分支所需的 freeze rows 通过后即可放行该分支，
+   不等待整个 register 全部 PASS。
+2. T-006 G3-D/E publication-policy owner subset 是 G4-0 的最早独立交付，不等待
+   G4-A～F，也不代表 T-007 task completion。
+3. G4-A 是公共权限/聚合基础；按 G1 progressive gates，B/C/D/E 可提前进行设计、
+   纯领域逻辑和 synthetic fixtures，但公开合同、真实 adapter 和 protected
+   qualification 仍分别受 Contract Boundary、Owner Readiness 与 Joint Conformance
+   约束。
+4. 所需合同与 G4-A 对应基础就绪后，G4-B/C/D/E 并行。G4-B attendance 不等待
+   Journey；G4-C 普通运营不等待 D；G4-E 只额外等待 exact RAG owner contract。
+5. G4-D 是预计最长的业务关键分支。B 的 Workflow read-only module 与 C 的
+   Workflow queue/actions 在 D 的 exact projection/command contract 就绪后接入；
+   此前 B 返回合法 absent/empty，C 不注册占位 Workflow。
+6. G4-F 是最终汇合 gate，但各包随包完成 contract、negative 和 integration tests；
+   不把验证全部推迟到 G4-F。
+7. 以上分组只改变交付和验收视图，不重开 D-01～D-07G，不授权 schema/database
+   apply、manifest/capability activation、Candidate Freeze 或 traffic。
+
+## Stage G4-0 Scope and Internal Order — Accepted
+
+The working ledger for 0A is
+[`06-g4-0-freeze-ledger.md`](./06-g4-0-freeze-ledger.md). Its structure is accepted;
+exact inventory rows remain pending until their cited artifacts and pins are verified.
+
+### Freeze record contract
+
+G4-0 的目标是把后续实现所依赖的事实、所有权、权限谓词、schema、生命周期和失败
+行为冻结到实现者无需重新作产品判断。每个 freeze record 必须给出：
+
+1. canonical owner、consumer、exact source ref/pin；
+2. canonical fact、derived projection 与 AI/manual candidate 的类型边界；
+3. schema identity/version、兼容策略和禁止调用方自造的字段；
+4. query/command capability 与 actor/active-role/scope/Grant/purpose predicate；
+5. lifecycle、expected-version、idempotency、concurrency、outbox/replay 语义；
+6. owner unavailable、contract mismatch、source drift 时的 default-safe behavior；
+7. synthetic/negative fixtures 和后续 owner/joint conformance gate；
+8. 需要的 DB delta/migration plan，但不在 G4-0 执行 apply 或 activation。
+
+### Internal packages
+
+| Package | Freeze scope | Rolling release |
+| --- | --- | --- |
+| G4-0A Freeze Protocol & Fact Inventory | 盘点 T-002/T-004/T-005/T-006、My-Workflow-Base、My-Chat contact/identity/RAG owner refs；建立 owner/fact/schema/gate ledger | 所有后续 freeze 分支 |
+| G4-0B Publication-policy Fast Lane | timezone、default send、cutoff、organize/quiescence、effective version、`policyHead` 与 provider/consumer conformance | T-006 G3-D/E |
+| G4-0C Authority & Surface Contracts | active role、Institution/class/child scope、Grant、Surface envelope、Admin business communication owner-read、aggregate privacy、首版单条 roster/invite | G4-A，并为 G4-B/C/D/E 提供公共权限基础 |
+| G4-0D Daily Operations Facts | attendance、class schedule/activity placement、append-only revision/downscope、child-attribution authority、support signal；AI attention 保持 deferred/default-off | G4-B/C |
+| G4-0E Workflow & Enrollment Contracts | Workflow registry/private carrier/projection/command；inquiry、waitlist/offer/cancel、trial、formalization/exit/completion | G4-D，并为 G4-B/C 提供 Workflow 集成 |
+| G4-0F Knowledge & RAG Contracts | revision/publish、provenance、audience/safety、retrieval eligibility、citation 与 medical-conflict abstention | G4-E |
+| G4-0G Cross-contract Audit & Branch Release | 检查跨合同 invariant，为各分支滚动签发 Freeze PASS，最后关闭完整 G4-0 | G4-A～E |
+
+### Internal order and critical paths
+
+1. 0A 先完成最小 owner/fact/schema inventory；它不得演变为全库重审或重新讨论
+   D-01～D-07G。
+2. 0B 紧随 0A，作为独立快线完成 provider/consumer conformance：
+   `0A → 0B → T-006 G3-D/E`。
+3. 0C 是 G4 公共关键基础。0D/0E/0F 可在 0A 后并行开展领域设计，但分支 public
+   contract 放行必须引用 0C exact authority/surface contract。
+4. T-007 预计主关键链为
+   `0A → 0C → 0E → G4-D → G4-F`；日常运营链为
+   `0A → 0C → 0D → G4-A/B/C`；知识链为
+   `0A → 0C + 0F → G4-E`。
+5. 0G 从首个分支开始滚动审计，不等待 0D/0E/0F 全部结束才首次检查。分支 Freeze
+   PASS 只开放相应实现；真实 owner integration、protected qualification 与 Beta
+   Handoff 继续受 G1 gates 和 G4-F 约束。
+
+### Register completion and G4-0 Exit
+
+现有 freeze register 增加三条独立记录，禁止继续只依赖正文隐式推断：
+
+- active-role / exact Institution Surface contract；
+- class schedule/activity/revision/downscope/child-attribution contract；
+- `InstitutionWorkflow` registry/private carrier/projection/command contract。
+
+G4-0 Exit 要求全部必选分支有 exact freeze record、owner/pin/version/default/negative
+fixture 与明确 branch release；0B 已完成早期 consumer conformance。family-share 若
+首版无 approved schema 则冻结为 Institution-only；AI attention 冻结为
+absent/default-off；bulk roster/invite 明确不进入首增量。其余真实 owner/joint
+qualification 不强行前置到 G4-0，也不存在 DB apply、capability activation、
+Candidate Freeze 或 traffic effect。
+
+## Stage G4 Implementation and Overall Acceptance — Accepted
+
+### Implementation gates
+
+| Gate | Opens | Does not authorize |
+| --- | --- | --- |
+| I0 Design/Synthetic | 纯领域逻辑、状态机、presenter 和 isolated synthetic fixtures | public contract、真实 owner 或 protected data |
+| I1 Branch Freeze PASS | 该分支 exact schema/policy/repository/service implementation 和 migration authoring | shared/persistent DB apply 或真实权限声明 |
+| I2 Contract Boundary PASS | 对照 T-004 exact digest 的 public handler/presenter/command 与 contract tests | 真实 binding/Grant 已通过 |
+| I3 Owner Integration Readiness PASS | pinned T-002/T-005/T-006/My-Chat adapters 与 disposable PostgreSQL qualification | Beta Handoff、activation 或 traffic |
+| I4 Joint Conformance PASS | formal NestJS ingress 上的 protected qualification、G4-F 和 T-007 Beta Profile Handoff | Candidate Freeze、native-device completion、activation 或 traffic |
+
+Migration artifact 可在 I1 后实现，但 qualification 只可在 disposable PostgreSQL
+执行。Fastify-only evidence 始终 provisional；任何 shared、persistent、staging 或
+production DB apply 需要独立授权。
+
+### Package Definition of Done
+
+| Package | Definition of Done |
+| --- | --- |
+| G4-0 | 0A inventory 具有 exact truth；0B publication subset 已 provider/consumer qualification；0C～0F 各有 branch Freeze PASS；0G 完成跨合同审计 |
+| G4-A | active-role、Institution/class/child scope、RoleAssignment/Grant、安全 aggregate 与 revoke/redaction negative tests 通过；无角色权限合并 |
+| G4-B | Admin class-first mobile 全程只读；caregiver attendance 的 preview/confirm/same-day revise/Admin reopen + caregiver cross-day revise 与所有 safe states 通过 |
+| G4-C | 单条 roster/invite、people/relationship、daily operations、communication owner-read、activity revision/downscope、responsibility queue 与 signal source action 通过；Admin 不代替 caregiver authority |
+| G4-D | `EnrollmentJourneyWorkflowV1` 的 inquiry/waitlist/trial preparation/start/review/formalization/exit/completion、waiting、recovery、concurrency 与 replay 全部通过 |
+| G4-E | knowledge revision/publish/revoke、provenance/audience、eligible retrieval、source-cited positive answer、no-source abstention 与 medical-conflict review 通过 |
+| G4-F | formal NestJS ingress、real pinned owner paths、cross-surface consistency、privacy/negative matrix、final false/empty census 与 Beta Profile Handoff 完成 |
+
+### Required and optional posture
+
+G4-0/A/B/C/D/E/F、Admin mobile、caregiver canonical attendance、deterministic support
+signals、Workbench Core、完整 Enrollment Journey、Knowledge/RAG 正向引用路径、
+publication-policy subset、formal ingress 和 real owner qualification 均为 required。
+`InstitutionWorkflowProjection` 对 T-006 G3 是 optional dependency，但对 T-007 Exit
+本身是 required。
+
+AI attention、bulk roster/invite、未批准的 family-share、external communication
+connector/transcript、第二个 Institution Workflow 保持 optional/deferred safe。
+Attendance AI inference 必须验证受控正向路径，但 provider failure 不得阻塞老师
+手工确认；RAG 必须证明至少一条 eligible source-cited positive path，只有拒答不能
+满足 G4-E。
+
+### Overall acceptance dimensions
+
+1. **Contract/ownership**：全部 public schemas 引用同一 T-004 digest；owner adapters
+   引用 exact T-002/T-005/T-006/My-Chat pins；无 canonical fact/runtime 复制。
+2. **Product closure**：Mobile、Web、Workflow、Knowledge required paths 均有真实
+   正向路径，不以 placeholder、恒 false 或 synthetic-only adapter 替代。
+3. **Authority/privacy/safety**：wrong role/workspace/institution/class/enrollment/
+   CareGroup/Grant/purpose、revoke/redaction、小样本与跨机构泄漏全部安全拒绝。
+4. **Consistency/recovery**：replay、response loss、version conflict、concurrent
+   revoke、source drift、owner outage 和 cross-surface projection 结果确定。
+5. **Formal integration**：经 formal NestJS ingress 与 disposable PostgreSQL 运行
+   real pinned owner paths，并复用 T-004 fixtures。
+6. **Handoff/cleanup**：exact artifacts/evidence/invalidation rules 可追溯，最终
+   capability/env false、active evidence rows 和 external effects 为空。
+
+### Verdict and task completion
+
+- `PASS`：全部 required 与 safety 路径通过。
+- `PASS_WITH_LIMITATIONS`：全部 required 与 safety 路径通过，仅允许 optional
+  能力安全关闭且 limitations 完整记录。
+- `NO_GO`：任一 required、authority、privacy、transaction、formal ingress、real
+  owner path 或 final false/empty census 未通过。
+
+Required placeholder、synthetic-only/fastify-only evidence、无 RAG 正向引用路径、
+不完整 Enrollment Journey、权限/隐私泄漏或不确定 replay/concurrency 不得降格为
+`PASS_WITH_LIMITATIONS`。T-007 只有 `PASS` 或符合规则的
+`PASS_WITH_LIMITATIONS` 才可完成。
+
+### T-007 Beta Profile Handoff
+
+Handoff 必须引用 T-004 interface ref/version/digest、T-002 Owner Integration Handoff
+和 Joint Conformance、T-005/T-006/My-Chat owner pins、schema/migration heads、
+required/optional profile、suite/fixtures/commands/results/negative matrix、limitations、
+invalidation rules 与 final false/empty census。它是 Nurture-side handoff，不是
+Candidate Freeze、My-Chat native/device completion、capability activation 或 traffic
+authority；T-008 消费它完成后续 Candidate 与 composite qualification。
+
 ## Phase 0 — Product Questions and Data Inventory
 
 - 盘点 T-002 institution/group/enrollment/grant 的实际能力。
+- 作为独立 P0 cross-task subdeliverable，冻结 T-006 G3-D/E 所需的
+  publication-policy owner contract：institution timezone、default send local time、
+  retry cutoff、organize idle/fallback/quiescence、effective version 与
+  `policyHead`。该子合同可以先于 T-007 全任务实现/资格化。
+- 将 `InstitutionWorkflowProjection` 对 T-006 G3-A 的消费固定为 optional read-only
+  module；absence/empty 不阻塞 T-006 core board/publication。
 - 将 T-003 机构端框架拆成“已决定 / 待共创 / 明确不做”。
 - 为每个 aggregate 和 workbench action 指定数据来源与授权规则。
 - [x] 固定角色化 Surface：多角色用户显式切换上下文，Lead 不增加权限，当前 Web
@@ -313,3 +524,7 @@
 commands 可由 My-Chat consumer 使用；`02-architecture.md` freeze register 的每个
 contract/schema gate 均通过并保留默认安全行为，通用 runtime、应用壳与分发留在
 My-Chat companion。
+
+T-006 可在 T-007 整体 Exit 前消费并资格化 publication-policy 精确子合同；这份
+subdeliverable 不等于 T-007 task completion。T-006 可选 Workflow projection 的
+absence/empty 也不得被解释为 T-007 或 T-006 核心路径失败。

@@ -6,9 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-30
-- Next step: 进入 Phase 0 contract/schema inventory，按 freeze register 先冻结
-  Enrollment `status + participationPhase`、trial reservation/cancellation、
-  Admin activity/child-attribution authority 和首个 Workflow public contract。
+- Next step: Stage G4 顶层结构、实施门和总体验收已收口；项目级规划转入 G5/T-008
+  讨论。若开始 T-007 实施，首个动作仍是执行 G4-0A exact inventory。
 
 ## Goal
 
@@ -93,8 +92,46 @@ binding 失效或事务失败时保持 `active trial + reserved`，Workflow 进�
 My-Chat Child/Family/binding 与已有照护历史不删除。Workflow 完成后的正式离园属于
 普通 Enrollment maintenance，不重新打开 Journey，也不默认创建第二个 Workflow。
 
+## Stage G4 Delivery Structure — Accepted
+
+G4 的整体目标是形成机构角色化治理闭环，而不是建立独立的机构产品壳。Nurture
+交付 role-bound policy、presenter、command、`InstitutionWorkflow` 业务语义和
+scenario artifact；My-Chat 继续拥有身份、宿主 Surface、通用 Workflow/RAG runtime
+与分发。
+
+交付视图固定为：
+
+- **G4-0 Contract & Fact Freeze**：按域冻结 owner contract、事实模型、schema、
+  enablement gate 与默认安全行为；T-006 所需 publication-policy subset 是最早的
+  独立交付。
+- **G4-A Authority & Aggregate Foundation**：active-role、Institution/class/child
+  scope、Grant policy、安全聚合与 support-signal 基础。
+- **G4-B Role-bound Mobile Operations**：B1 Admin 只读班级看板与 B2 caregiver
+  每日出勤闭环。
+- **G4-C InstitutionAdminWorkbench Core**：人员关系、日常运营、沟通读取、活动
+  记录、责任队列和 support-signal 处理。
+- **G4-D Enrollment Journey Workflow**：D1 inquiry/waitlist、D2 trial、
+  D3 formalization/exit/completion。
+- **G4-E Institution Knowledge & RAG**：知识 revision/publish、来源、检索资格、
+  引用和医疗冲突拒答。
+- **G4-F Integration Qualification & Handoff**：正式入口、owner conformance、
+  隐私/负向验证和 T-007 Beta Profile Handoff。
+
+G4-0 是按域滚动放行的 gate，不是等待全部条目冻结后才开始后续工作的单一串行阶段。
+在各自必需合同和 G4-A 基础就绪后，G4-B/C/D/E 可并行；G4-D 的 Workflow projection
+后接入 B/C，未就绪时保持合法 absent/empty。G4-F 汇合全部必选路径，但各任务包的
+contract、negative 与 integration verification 必须随包完成，不能全部后置。
+
+G4-0 内部顺序固定为 0A Freeze Protocol/Fact Inventory、0B publication-policy
+fast lane、0C Authority/Surface、0D Daily Operations、0E Workflow/Enrollment、
+0F Knowledge/RAG 和 0G Cross-contract Audit/Branch Release。0A 之后 0B 立即解除
+T-006 依赖；0C 是 G4 自身公共基础，0D/0E/0F 按域并行，0G 滚动签发分支 PASS。
+
 ## Scope In
 
+- T-006 Stage G3 publication-policy owner contract：园区 timezone、默认发送时点、
+  automatic retry cutoff、organize idle/fallback/quiescence 配置、effective version
+  与 `policyHead`。T-007 拥有配置，T-006 为每个 `PublishProcess` 解析并固化结果。
 - 角色化 Surface policy：同一用户显式切换角色；Lead 仅为 Admin 确定的内部分工
   标识，不授予权限，也不代表园区负责人。
 - `institution_admin` mobile read-only board：园区级事项、班级列表、班级独立一日
@@ -213,11 +250,19 @@ My-Chat Child/Family/binding 与已有照护历史不删除。Workflow 完成后
 - T-004 公共 surface、visibility 和 aggregate contract。
 - T-005 family-care communication 与 owner-reread。
 - T-006 care facts、publication 和 role projections。
+- T-006 G3-D/E 只硬依赖上述 publication-policy 精确子合同，不等待 T-007 全任务；
+  T-006 G3-A 对 `InstitutionWorkflowProjection` 的消费是按 beta profile 选择的
+  只读展示依赖，absence/empty 不阻塞其核心看板/发布路径。
 - T-002 institution/group/enrollment/grant、opaque identity binding 与 qualification gates。
 - T-003 机构 surface 仅为框架级输入，未决定内容不得被实现者默认为产品承诺。
 
 ## Acceptance Criteria
 
+- [ ] publication-policy contract 可独立于 T-007 全任务发布 exact version/head；
+  T-006 解析后的 `scheduledAt/notAfter/timezone/policyHead` 对既有 process 保持稳定，
+  后续配置变更只影响新解析。
+- [ ] T-006 对 `InstitutionWorkflowProjection` 的 optional board module 在无适用
+  Workflow 或 projection unavailable 时返回合法空态，不形成整任务依赖。
 - [ ] 每个 mobile/Web Surface 都绑定一个显式角色上下文；多角色用户不会获得合并
   权限，Lead 不产生额外 capability。
 - [ ] `institution_admin` mobile board 为 read-only，且只显示 policy-approved
