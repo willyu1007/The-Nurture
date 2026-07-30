@@ -3,22 +3,150 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P3 joint requalification（complete, default-deny）/ C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-29
+- **Updated:** 2026-07-31
 - **Owner:** willyu1007
-- Next step: Complete the remaining cross-repository `C30-I0-C` isolation for
-  My-Workflow-Base and My-Chat, then close `C30-I0-D` with clean-install exact
-  pins, canonical baseline suites, and C-3 false/empty proof. The Nurture
-  repository is already consolidated on sole local/remote `main`
-  `ab92fde6c277ffd1278a85a6165a033918c8be79`; exact main CI
-  `30412303062` passes 7/7. Base `5c04dce` and My-Chat `a4768fe` are pinned,
-  and the real two-database X5 version-zero journey passes. The additive
-  migration remains unapplied outside disposable databases and every consumer
-  remains default-disabled. `C30-I1` functional contract development cannot
-  start until I0-C/D close. C31, C4, D implementation, Pilot-0-E, Pilot-1, any
-  persistent database apply, artifact publication, capability activation, and
-  external traffic remain NO-GO.
+- Next step: Continue the bounded six-surface owner/source repair from the merged
+  Wave 4 P7 endpoint, then move the qualified path from provisional Fastify
+  dev-host evidence into the formal NestJS scenario-service ingress. Reconcile
+  the route/API index, service auth, env contract and `8000/3001/3200/3201`
+  ports; close the remaining cross-repository `C30-I0-C/D` isolation and
+  exact-pin/false-empty proof without reclassifying P7 as broad C30 functional
+  implementation. The current handoff pins My-Chat `f00b868` and the 31-path
+  Nurture source set; all consumers remain default-disabled. Protected
+  T-005～T-007 integration stays NO-GO until the exact owner path and T-004
+  contract pass Joint Conformance through that formal ingress.
+  C31, C4, D implementation, Pilot-0-E, Pilot-1, persistent database apply,
+  artifact publication, capability activation, and external traffic remain
+  separately unauthorized.
+
+## Current Controlled-Parallel Development Decision (2026-07-30)
+
+- T-002 and T-004 are parallel workstreams. T-002 owns the exact identity/binding,
+  trusted caller context, current-authority reread, transaction-atomic Receipt,
+  revoke/concurrency/privacy and cross-repository source qualification required by
+  the six surfaces. T-004 owns the public surface/capability contract, fixtures,
+  deterministic conformance and interface identity.
+- T-004 MAY complete synthetic contract qualification while a real owner adapter is
+  unavailable. It MUST keep the affected capabilities default-off, return an explicit
+  dependency NO-GO and MUST NOT claim real binding, Grant, Receipt, notification,
+  activation or traffic readiness.
+- G1 is a progressive parallel gate rather than a serial phase. G1 start permits
+  T-005～T-007 design, pure domain/policy work and clearly isolated synthetic
+  conformance. Contract Boundary opens implementation against the exact public
+  contract; Owner Integration Readiness opens isolated real-adapter integration.
+  Joint Conformance then uses the same T-004 fixtures against the real pinned T-002
+  owner path and is the only gate that opens protected qualification and Beta-profile
+  handoff.
+- T-003 remains non-blocking design input. Its demo or later feedback cannot directly
+  change authority, capability or implementation scope without adoption by the
+  current T-004～T-007 product contracts.
+- T-002 external-Pilot topology, Pilot-0-E/Pilot-1 and traffic-readiness work remain a
+  separate release track and do not block contract-parallel T-004 work.
+
+## Stage G6 Top-level Structure — Accepted (2026-07-30)
+
+G6 的目标固定为 **Pilot Release Readiness & Default-off Deployment**：把 G5
+已经资格化的 Nurture Service Candidate/Interface/Binding/Internal Beta evidence
+作为版本化输入，与 T-002 的 C-3/C-4 qualification、Pilot-0-D complete-candidate
+recipe 和 operations evidence 精确对齐；随后完成 Pilot-0-E 决策，以及在独立授权
+后完成 Pilot-1 私有制品发布和默认关闭的隔离部署。G6 Exit 仍须
+`capability=false`、active Workspace rows `[]`、
+`externalProductTrafficCount=0`，只向 G7 交付可复核的 default-off readiness
+evidence，不创建业务激活或真实流量权限。
+
+G6 固定为五组交付：
+
+- `G6-0 Candidate & Evidence Reconciliation`；
+- `G6-A C3/C4/D Implementation Closure`；
+- `G6-B Pilot-0-E Go/No-Go`；
+- `G6-C Pilot-1 Private Publication & Default-off Deployment`；
+- `G6-D Default-off Qualification & G7 Handoff`。
+
+G6-0 是严格串行入口。G6-A 内部仍保持 C-3 qualification → C-4
+qualification 的依赖顺序；D 的 source/IaC/runbook/observability/disposable-
+evidence 准备可以在 exact inputs 冻结后与 C-3/C-4 后半段依赖感知并行，但
+complete candidate assembly 与 D pre-deployment seal 必须在当前 C-3/C-4
+qualification 后汇合。G6-B 严格等待该汇合。G6-C 只有在 E=`go` 且 Pilot-1
+另行授权后开始；My-Chat/Nurture owner-separated provisioning 可按锁定拓扑并行，
+但 ACR publication、migration/deployment/readback 各自保持受控依赖。G6-D 是
+最终汇合，不允许以任一单分支 PASS 提前进入 G7。
+
+G5 `NurtureServiceCandidateV1` 不自动等于
+`complete_pilot_candidate_id`。G6-0 必须明确记录：若 G6 没有改变
+Candidate-defining inputs，可将 exact G5 Candidate 作为完整 Pilot 候选的 Nurture
+组件；若 C-3/C-4/D closure 改变 executable/schema/manifest/interface/gate/config
+contract/owner pins，则必须生成 successor Service Candidate，并重跑受影响的
+G5 local/platform/composite decision 后再组装完整 Pilot 候选。任何 G5 verdict、
+Pilot-0-E 或 Pilot-1 state 都不能相互替代。
+
+这项结论只锁定未来执行结构；G6 尚未登记独立任务，也未授权 C-3/C-4/D
+implementation、disposable D evidence、Pilot-0-E、ACR、cloud resources、
+secrets/KMS、persistent DB apply 或 Pilot-1 deployment。
+
+2026-07-31 further scope/order/acceptance review is accepted:
+
+- G6-A is a Pilot-level closure over the exact G1～G5 handoffs, not a second
+  implementation of T-004～T-007 routes, DTOs, domain facts or product surfaces.
+- G6-0 classifies each delta as exact G5 reuse, successor Service Candidate
+  required, complete-Pilot-only change, or NO-GO. Only changes to G5 shared inputs
+  trigger affected local/platform/composite revalidation; Host/topology/operations-
+  only changes do not automatically rerun G5.
+- G6-A is executed as C-3 closure/qualification, C-4 closure/qualification, D
+  implementation preparation, complete-candidate assembly, and disposable D
+  evidence/readiness census. G6-C and G6-D separately own authorized persistent
+  default-off deployment and deployed-topology qualification.
+- G6 has no generic `PASS_WITH_LIMITATIONS`. G5 limitations may carry forward only
+  when explicitly optional, fail-closed and outside the responsive-Web Pilot profile.
+  At E, all `TR-P0-1..6` plus `TR-P1-1|2|3b` MUST be `closed`; only
+  `TR-P1-3a-native-external-delivery` may be `accepted_scope_exclusion`.
+- The only qualifying overall exit is
+  `G6_DEFAULT_OFF_QUALIFIED / PILOT2_STAGE_AUTHORIZATION_PENDING /
+  EXTERNAL_TRAFFIC_NO_GO`, backed by a current Pilot-2 readiness seal. Current-head
+  drift invalidates G7 entry even after the planning task is administratively done.
+- A read-only Pilot carry-forward census MAY be prepared during late G5 to identify
+  Candidate-defining drift early. It does not open G6, mint a Candidate, create cloud
+  resources or authorize deployment.
+
+## Stage G7 Top-level Structure — Accepted (2026-07-31)
+
+G7 的目标固定为 **Bounded Internal Pilot Rehearsal & 120-hour Observation**：
+消费 G6 当前的 default-off Pilot-2 readiness handoff，在独立 stage authorization
+下建立唯一 synthetic cohort，完成首次受控激活/bootstrap、Pilot-3 故障恢复与
+kill-switch 演练，然后以最终 Binding、新 Pilot-4 authorization 和新 activation
+row 开始一个不可暂停、不可补时的 120 小时内部观察窗口。G7 不引入真实小孩/
+家庭/机构数据，不开放 cohort 外产品流量，也不授权 staging、production、GA、
+native/external delivery 或下一阶段范围。
+
+G7 固定为五组交付：
+
+- `G7-0 Stage Entry & Authority Freeze`；
+- `G7-A Pilot-2 Activation & Cohort Bootstrap`；
+- `G7-B Pilot-3 Rehearsal & Terminal Disable`；
+- `G7-C Pilot-4 Fresh Baseline & 120-hour Observation`；
+- `G7-D Terminal Evidence & Next-Scope Recommendation`。
+
+主体链严格串行：G7-0 current-head census → G7-A 首次 activation/bootstrap →
+G7-B ordered rehearsal/terminal disable → final Binding + fresh baseline/new
+authorization/new row → G7-C uninterrupted observation → G7-D terminal result。
+Pilot-2 row 在 G7-B 结束后永不恢复；Pilot-4 不能复用 Pilot-2 authorization、
+row 或 rehearsed Binding。并行只允许 body-free telemetry/evidence collection
+和不改变 observed Pilot environment 的主线开发。
+
+G7 没有 `PASS_WITH_LIMITATIONS`。权威 terminal result 仅为
+`pass | no_pass | stopped`；只有 `pass` 满足 G7 success signal，任一 result 都
+不能授权下一范围。项目级汇总状态分别为
+`G7_INTERNAL_PILOT_PASS / NEXT_SCOPE_REVIEW_REQUIRED /
+EXTERNAL_TRAFFIC_NO_GO`、`G7_INTERNAL_PILOT_NO_GO / GATES_CLOSED` 或
+`G7_INTERNAL_PILOT_STOPPED / GATES_CLOSED`；这些标签不替代签名的
+`pilot4_observation_result_v1`。
+
+这项结论只锁定未来执行结构。G7 尚未登记独立任务，也未创建 stage
+authorization、capability、Workspace row、business effect、observation window
+或 traffic。未来执行建议使用一个 Nurture 主任务
+`nurture-bounded-pilot-observation` 和独立 My-Chat companion；任务/Feature
+identity 仍待单独登记。
 
 ## Current Product Terminology Override (2026-07-29)
 
@@ -54,26 +182,30 @@
 
 ## Current Cross-Repo Contract Baseline
 
+The P7 bullet below is the current handoff. Earlier X/N/P1/P2/P3 revisions and
+hashes retained later in this section are historical adoption lineage unless they
+are explicitly promoted again; they MUST NOT be selected as a current consumer pin.
+
 - My-Workflow-Base ecosystem-policy, workflow-contract, and public
   web-workbench publishing revision:
   `63d47d2ebc6f5062181b721a25182710f7974b17`.
 - My-Chat/T-030 accepted coordination baseline:
   `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision:
   `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
-- Wave 4 P2 now pins the repaired Host binding source at
-  `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The public transport excludes
-  stable anchors; the private resolver and durable command ledger enforce
-  current-owner replay, monotonic versions, CAS, and deterministic races. The
-  expanded 15-file Host population hash is
-  `3dadb0b89fc7a782a590b5e7d8e2d6510b4c34029b0dc1a046a6a65f0c82f0c5`;
-  the broader X5 source hash is
-  `cac29455be498e56fb292256fc26110780d34c27ebeec0a63ef0f2627c8bccf6`.
-  The repaired 31-file Nurture source population hashes to
-  `354bb2206b9fb4248d7df247467c9422235e730f2056eff7a47967f92960c83f`.
-  Exact Base/My-Chat parity and all three source hashes pass the native pin
-  verifier at exact Nurture source
-  `b615a57e7e5f52d9400c2a0a84205d3de8e1de65`; native CI `30403774597`
-  passes 7/7 with zero annotations. Joint owner review remains required.
+- Wave 4 P7 is the current bounded owner-source handoff. It pins My-Chat
+  `f00b86861cf0b751d747c7e0bc5cb86a952900de`; the X5 source set hashes to
+  `901fd406f93fe9e584f5e972d50046e5c44458352266fb4d4fd04ee17d35dcff`
+  and the Host binding source hashes to
+  `ae22312716ad520129a89ea3c69c63f02028d9efe60f929aa6c6d8abd55fd242`.
+  Nurture commit `e9868c5` adds the service-authenticated private binding-owner
+  endpoint, transaction-locked Guardian authority reread, deterministic anchor
+  reservation and exact replay; merge `993e0c9` places it on `main`. The current
+  31-path Nurture source set hashes to
+  `cf0a47233f6c3c5645ecee40ee5c4b57090b4d48a6d9e20de7b172d9e37e074d`.
+  Branch CI `30462510704` passed 7/7, including the real My-Chat resolver journey.
+  Absence of `NURTURE_BINDING_EVIDENCE_KEY` keeps the endpoint disabled. This
+  supersedes the P2 `b615a57` handoff as the current source input but remains
+  neither a C30 component candidate nor activation or traffic authority.
 - On 2026-07-28, T-002 accepted the repo-qualified My-Chat/T-030 scope
   `X-2`, `RB-2`, `RB-3(a)`, `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, and
   `ST-6(b)`.

@@ -1910,11 +1910,19 @@ C-2f-4-2 evidence must cover current-Guardian aggregation allowlists, protected-
 
 **C-2f-4-3 — Cross-workspace identity reuse and future scenario-data portability (LOCKED / C-4-5 RECONCILED)**
 
-1. Pilot permits only exact reuse of a current My-Chat Child/Family identity through current typed scenario bindings and fresh exact target-workspace Nurture associations. It exposes no cross-workspace Nurture lookup, candidate search, count, existence signal, dossier route, or association directory.
+1. Pilot permits only exact reuse of a current My-Chat Child/Family identity through
+   current typed scenario bindings and fresh exact target-workspace Nurture
+   associations. The Pilot exposes no cross-workspace Nurture lookup, candidate
+   search, count, existence signal, dossier route, or association directory.
 2. The target workspace creates or resolves its own Child/ChildCareProcess/child-scoped Family/Guardian facts through the parent-owned binding saga. Source-workspace RoleAssignment, Enrollment, Grant, Thread, content, history, stage, media, policy, audit visibility, and authority do not transfer or become target defaults.
 3. Shared platform identity is exact routing evidence only. Same adult, name, birth fact, contact, roster, relationship label, or media is never proof and cannot trigger matching, disclosure, binding, merge, or possible-match output. A current target binding is still insufficient without the exact target association and full target-local owner-read predicates.
 4. Cross-workspace presentation, profile import/export, copied profile basics, dossier merge, and scenario-data portability remain Pilot `NO-GO`. The earlier copy-and-reconfirm design—including copying `displayName` or `birthDate` from another Nurture workspace—is withdrawn. Platform identity fields are read only from the current My-Chat owner API; Nurture receives no raw ids or birth fact.
-5. A future scenario-data transfer, if separately authorized, is a distinct versioned consent protocol over the already current platform identity and fresh target-local association. It must be minimum-allowlisted, source- and target-owner-reread, expiring, replay-safe, revocable before consume, audited, and zero-authority by default. It cannot use Workflow Handoff/Outbox/provider payloads as a body ledger or commit authority.
+5. A future scenario-data transfer, if separately authorized, is a distinct
+   versioned consent protocol over the already current platform identity and fresh
+   target-local association. The transfer protocol must be minimum-allowlisted,
+   source- and target-owner-reread, expiring, replay-safe, revocable before consume,
+   audited, and zero-authority by default. The transfer protocol cannot use Workflow
+   Handoff/Outbox/provider payloads as a body ledger or commit authority.
 6. My-Chat global binding revoke fences every workspace route without rewriting local facts. Closing one target association, Enrollment, or workspace relationship affects only that target. Merge/split does not auto-follow, rewrite, or merge anchors/dossiers; an already-different target anchor is quarantined for owner reconciliation. Technical Operator cannot edit either side.
 7. C-2f-4-3 remains planning-only and introduces no current protocol route, token, capability, schema implementation, database, Handoff, or traffic. The late C-4-5 reconciliation and `platform_child_family_identity_source_v1` qualification are authoritative for implementation.
 
@@ -1979,23 +1987,29 @@ The recovery matrix is:
 | Presenter/Handoff/provider fails | Business fact remains committed; technical path retries/stops independently. |
 | Recipient role lost before open | Generic unavailable after current owner reread. |
 
-C-2f-5 evidence must cover every result vocabulary combination, exact output-ref codec, ref non-disclosure, four presenters on every entitled surface, route-only navigation, stable Execution lookup ordering, response loss at each post-commit seam, same-Step/wrong-Step behavior, lost-command-id fallback, precommit denial, pinned legacy `user_attention`, absent/default-off future additive contract, exact Host-effect/recipient/expiry matrix, original-Step provenance, notification privacy/open ordering, current owner reread, and planning-only scope. C-2f is complete as a decision contract; no manifest, registry, contract package, source, schema, migration, route, runtime, capability, database, environment, provider, or traffic changed. At this historical boundary the following C-3 section entered design work while C-4 remained open; the later C-3/C-4 sections in this document supersede that next-step status and now close Pilot-0-C design only.
+C-2f-5 evidence must cover every result vocabulary combination, exact output-ref codec, ref non-disclosure, four presenters on every entitled surface, route-only navigation, stable Execution lookup ordering, response loss at each post-commit seam, same-Step/wrong-Step behavior, lost-command-id fallback, precommit denial, pinned legacy `user_attention`, absent/default-off future additive contract, exact Host-effect/recipient/expiry matrix, original-Step provenance, notification privacy/open ordering, current owner reread, and planning-only scope. C-2f is complete as a decision contract; no manifest, registry, contract package, source, schema, migration, route, runtime, capability, database, environment, provider, or traffic changed. At the historical C-2f boundary the following C-3 section entered design work while C-4 remained open；the later C-3/C-4 sections in the decision ledger supersede that next-step status and now close Pilot-0-C design only.
 
 ### Pilot-0-C3 — Guardian/Caregiver operational IIB (DESIGN COMPLETE / IMPLEMENTATION OPEN)
 
-Status terms in this section are deliberately two-dimensional. `LOCKED` means a decision is no longer open; `LOCKED / COMPLETE` means the named decision set is complete, not that code or operations exist. Only `DESIGN COMPLETE / IMPLEMENTATION OPEN`, `DEFAULT-OFF ADOPTED`, and `C3_QUALIFIED_DEFAULT_OFF` describe implementation progress. The later C-4 section closes Pilot-0-C design and the later D section locks Pilot-0-D design; overall Pilot-0 remains in progress until separately authorized implementation/candidate assembly and Pilot-0-E.
+Status terms in C-2f are deliberately two-dimensional. `LOCKED` means a decision
+is no longer open；`LOCKED / COMPLETE` means the named decision set is complete,
+not that code or operations exist. Only `DESIGN COMPLETE / IMPLEMENTATION OPEN`,
+`DEFAULT-OFF ADOPTED`, and `C3_QUALIFIED_DEFAULT_OFF` describe implementation
+progress. The later C-4 section closes Pilot-0-C design and the later D section locks
+Pilot-0-D design；overall Pilot-0 remains in progress until separately authorized
+implementation/candidate assembly and Pilot-0-E.
 
 The C-3 documentation authority is:
 
 | Document | C-3 authority |
 | --- | --- |
 | `09-pilot-readiness.md` | Decision, product-scope, phase, dependency, and qualification SSOT. |
-| `02-architecture.md` | Architecture projection of this SSOT; the projection cannot introduce different behavior. |
-| `06-ib-nurture-schema-spec.md` | Persistence/schema projection of this SSOT; the projection cannot redefine product or trust semantics. |
-| `08-iia-schema-policy-test-design.md` | Verification projection of this SSOT; tests must prove, not reinterpret, the decision. |
+| `02-architecture.md` | Architecture projection of the Pilot-0-C3 SSOT; the projection cannot introduce different behavior. |
+| `06-ib-nurture-schema-spec.md` | Persistence/schema projection of the Pilot-0-C3 SSOT; the projection cannot redefine product or trust semantics. |
+| `08-iia-schema-policy-test-design.md` | Verification projection of the Pilot-0-C3 SSOT; tests must prove, not reinterpret, the decision. |
 | `00-overview.md`, `01-plan.md`, `roadmap.md` | Status and navigation summaries only. |
 
-If a projection conflicts with this decision SSOT, implementation stops until the documents are reconciled. The main path is `C30 shared baseline -> C31 Guardian communication -> C32 Guardian authority -> C33 Caregiver operations -> C34 continuity -> C35 convergence/qualification -> C4 Institution IIB`; later nodes consume immutable earlier evidence and never recreate an earlier semantic source.
+If a projection conflicts with the Pilot-0-C3 decision SSOT, implementation stops until the documents are reconciled. The main path is `C30 shared baseline -> C31 Guardian communication -> C32 Guardian authority -> C33 Caregiver operations -> C34 continuity -> C35 convergence/qualification -> C4 Institution IIB`; later nodes consume immutable earlier evidence and never recreate an earlier semantic source.
 
 | Checkpoint | State | Decision boundary |
 | --- | --- | --- |
@@ -3441,7 +3455,7 @@ My-Chat owns the append-only authorization record plus signature verifier and cu
 
 The exact C-3 profile is `nurture_guardian_caregiver_pilot_v1`. The profile enumerates the complete required source/capability/manifest/route/handler bundle and cannot partially enable Guardian-only, Caregiver-only, protected-write-only, or Notification-only behavior. The profile is a Host activation profile rather than a new Base business capability or a replacement for the named source hashes.
 
-C-4 later adds the evidence-only Host profile `nurture_institution_composite_evidence_v1`. It content-addresses the exact immutable C-3 profile plus all C-4 fragment/source/surface/action/invitation/Handoff/runtime bindings and is legal only for disposable `c4_composite_v1` evidence. Pilot-0-D adds the separate disposable `nurture_institution_complete_pilot_evidence_v1` profile for `complete_pilot_evidence_v1`; candidate kind `complete_pilot_v1` uses distinct exact activation profile `nurture_institution_complete_pilot_v1`, owned and locked by Pilot-0-D as part of the complete candidate. No profile mutates, aliases, substitutes for, or falls back to another kind.
+C-4 later adds the evidence-only Host profile `nurture_institution_composite_evidence_v1`. The C-4 evidence profile content-addresses the exact immutable C-3 profile plus all C-4 fragment/source/surface/action/invitation/Handoff/runtime bindings and is legal only for disposable `c4_composite_v1` evidence. Pilot-0-D adds the separate disposable `nurture_institution_complete_pilot_evidence_v1` profile for `complete_pilot_evidence_v1`; candidate kind `complete_pilot_v1` uses distinct exact activation profile `nurture_institution_complete_pilot_v1`, owned and locked by Pilot-0-D as part of the complete candidate. No profile mutates, aliases, substitutes for, or falls back to another kind.
 
 Normal business ingress, owner reads/actions, replay that may execute business work, Notification delivery, and interactive open require the conjunction of:
 
@@ -3970,6 +3984,79 @@ D design lock
   -> continue/stop recommendation
 ```
 
+Stage G6 is the accepted execution view over the chain from the separately
+authorized C3/C4/D implementation through Pilot-1 default-off qualification:
+
+```text
+G6-0 exact G5/Pilot component reconciliation
+  -> G6-A C3 qualification -> C4 qualification + D implementation/evidence join
+  -> G6-B Pilot-0-E signed decision
+  -> separate Pilot-1 authorization
+  -> G6-C private publication + persistent default-off deployment
+  -> G6-D pilot2_rehearsal_readiness_seal_v1
+```
+
+G6 does not alter the stage authorities above. G5's
+`NurtureServiceCandidateV1` may be an exact Nurture component of the complete
+Pilot candidate only when its Candidate-defining inputs remain unchanged. A
+C3/C4/D change to executable, schema/migrations, manifest, interface, gate or
+configuration contract, or owner pins requires a successor Service Candidate
+and affected G5 revalidation before complete-candidate assembly. D source/IaC/
+runbook preparation may overlap late C3/C4 work after exact-input freeze, but
+complete-candidate assembly and the D seal wait for current C3/C4
+qualification. Pilot-1 owner-separated provisioning may overlap only after
+current E `go` and separate Pilot-1 authorization; G6 ends false/empty with zero
+external product traffic and grants no Pilot-2 activation.
+
+The accepted G6 scope/acceptance refinement additionally requires:
+
+- G6-A consumes T-004～T-007 product handoffs and MUST NOT build a duplicate product
+  path inside T-002；
+- only G5 shared-input drift triggers affected G5 revalidation；complete-Pilot-only
+  Host/topology/operations drift remains within complete-candidate/D/E lifecycle；
+- E accepts only `TR-P0-1..6=closed`,
+  `TR-P1-1|2|3b=closed`, and
+  `TR-P1-3a-native-external-delivery=accepted_scope_exclusion`；
+- G6 has no generic limited PASS；any required/authority/privacy/migration/recovery/
+  evidence defect is NO-GO；
+- G6-D ends only as
+  `G6_DEFAULT_OFF_QUALIFIED / PILOT2_STAGE_AUTHORIZATION_PENDING /
+  EXTERNAL_TRAFFIC_NO_GO`, and all current heads are reread before G7.
+
+Stage G7 is the accepted execution view over Pilot-2 through Pilot-4:
+
+```text
+G7-0 current-head and authority freeze
+  -> G7-A Pilot-2 fresh row + bootstrap_only -> ordinary_ready cohort
+  -> G7-B ordered Pilot-3 rehearsal + terminal false/empty disable
+  -> final Binding + no-reset baseline
+  -> new Pilot-4 authorization + fresh row
+  -> G7-C five contiguous 24-hour observation segments
+  -> G7-D terminal result and non-authorizing recommendation
+```
+
+G7 uses only the exact seven-account synthetic cohort and the locked seven planned
+question paths. It admits no real family/child/institution data, second cohort/window,
+external product traffic, native/external delivery, staging, production, GA or
+automatic next scope. Pilot-2 and Pilot-4 have distinct stage authorizations and
+rows；Pilot-3 permanently consumes/closes the Pilot-2 lineage before the fresh
+Pilot-4 baseline and row. The final Binding may differ from the rehearsed Binding
+only by an allowlisted secret/KMS/trust successor.
+
+The Pilot-4 clock is exactly `[T0,T0+120h)` with five contiguous signed 24-hour
+segments. Any SEV0/1, restore, gate shutdown, bound-identity drift, telemetry/audit/
+backup gap, incomplete seal, admitted extra effect, external traffic or unresolved
+outcome terminates the clock and requires a new authorization/row plus a full fresh
+window after repair. Mainline work may continue outside the observed environment；
+G7 does not freeze the repository.
+
+The authoritative terminal outcome is signed
+`pilot4_observation_result_v1.result=pass|no_pass|stopped`. Only `pass` satisfies
+the G7 success signal；there is no `PASS_WITH_LIMITATIONS`, and the result/
+recommendation never grants external traffic or next-scope authority. Detailed
+G7 packaging is in `01-plan.md`；the D-3.3/D-4～D-7 clauses below remain normative
+for bootstrap, authority separation, incident/recovery and observation semantics.
+
 The complete candidate binds exact C-3/C-4 identities,
 `pilot_topology_operations_source_v1`, source/lock/schema/migration/registry
 closure, immutable OCI/SBOM/provenance, the complete-Pilot activation profile,
@@ -4065,16 +4152,16 @@ reset, hidden repair, or Technical-Operator business role.
 
 The real first-Institution bootstrap uses
 `pilot0_institution_provisioning_spec_v1` and a dedicated one-effect controller,
-store/current resolver, claim, operation and status-recovery path. It binds the
+store/current resolver, claim, operation and status-recovery path. The provisioning path binds the
 exact Workspace, initial Admin, Host invitation, candidate and deployment; the
 claimed operation rereads and binds current Host membership, stage and gate
-state. It cannot alias C-4 evidence bootstrap or any
+state. The provisioning path cannot alias C-4 evidence bootstrap or any
 product/Technical Admin authority. Response loss returns the original outcome,
 unknown quarantines replacement work, and successful bootstrap closes
 permanently.
 `confirmed_no_effect` is a fenced classification of stale `claimed`, never a
 reopened `closed_no_effect`; one Host transaction either returns the same
-operation to `prepared` within budget or closes it. Nurture commit writes only
+operation to `prepared` within budget or closes the operation. Nurture commit writes only
 Nurture facts, while a later result/status-proved Host transaction records
 `owner_committed`, consumes the spec, and clears `outcome_unknown` atomically.
 The first live row derives `bootstrapAdmissionMode=bootstrap_only` while the

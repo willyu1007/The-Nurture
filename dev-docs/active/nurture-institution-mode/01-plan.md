@@ -4,6 +4,540 @@
 
 ---
 
+## 2026-07-30 — Controlled-parallel development and current P7 handoff
+
+The six-surface program MUST run two bounded workstreams in parallel:
+
+1. T-002 completes only the exact owner/source subset consumed by the six surfaces:
+   trusted caller/Workspace context, private Child/Family binding evidence,
+   transaction-local current-authority reread and Receipt persistence,
+   revoke/concurrency/privacy behavior, exact replay and cross-repository pins.
+2. T-004 completes the public capability/surface contract, fixtures, deterministic
+   synthetic conformance and interface identity without implementing or faking the
+   owner runtime.
+
+Wave 4 P7 is the current Nurture-side input to the controlled-parallel decision. Nurture commit
+`e9868c5` and merge `993e0c9` expose the default-disabled private binding-owner
+endpoint and pin My-Chat `f00b868`. The endpoint rereads and locks the exact
+Guardian-role authority source in the Receipt transaction and passes the real
+My-Chat resolver journey. P7 is classified as a bounded prerequisite owner-source
+repair; it MUST NOT be used to claim broad C30 functional implementation,
+Candidate readiness, activation or traffic authority while C30-I0-C/D remain open.
+
+G1 starts as soon as both tracks are owned. At G1 start, T-005～T-007 MAY proceed
+with product-state design, pure domain/policy logic, presenter design and clearly
+isolated synthetic fixtures. Work that would freeze a public contract, wire a real
+owner adapter or claim a protected journey remains gated as follows:
+
+| Gate | Exit |
+| --- | --- |
+| Contract Boundary | T-004 freezes actor-safe public schemas, dependency failure, opaque refs, version/digest and default-off behavior. The Contract Boundary gate opens downstream implementation against the exact public contract; synthetic qualification MAY pass here. |
+| Owner Integration Readiness | T-002 supplies the exact endpoint/source pins plus transaction, replay, revoke, concurrency and privacy evidence. Owner Integration Readiness opens isolated real-adapter integration, but endpoint CI alone does not satisfy surface conformance. |
+| Joint Conformance | The same T-004 fixtures execute against the real pinned T-002 owner path. Only this gate opens protected qualification and Beta-profile handoff for the corresponding T-005～T-007 path. |
+
+T-003 remains non-blocking design input. T-002 Pilot-0-D/E/Pilot-1, external
+traffic and topology/operations work remain a separate release track. No database
+apply, environment mutation, capability activation, artifact publication, secret
+configuration or traffic is authorized by this planning decision.
+
+### G1 owner/source obligations — Accepted
+
+T-002 对 G1 的责任只覆盖六 surface 实际消费的 owner/source path，不要求先完成
+整个 T-002。交付 `Owner Integration Handoff` 前必须满足：
+
+1. **Four-layer owner chain**
+   - My-Chat 提供 authenticated Workspace/User/Actor principal，并独占 canonical
+     Child/Family、stewardship/membership 和 scenario binding。
+   - Parent/steward 或其明确授权成人之外的 actor 不得创建、推断或通过 PII 匹配
+     platform Child。无 authority 时 Nurture 只能保留 provisional local record。
+   - Nurture Child/Family anchors 使用独立 namespace，body-free、PII-free、
+     authority-free；仅存在于 owner ref、Nurture persistence 和短生命周期 private
+     envelope。不得进入 client、Chat、Notification、Handoff、logs、search 或 evidence。
+   - lifecycle 为 `reserved | bound_empty | associated | retired`；
+     `revoked | quarantined | ambiguous` fail closed。association 必须是 exact
+     workspace-local Child→local child/process 或 Family+Child→child-scoped
+     family/process。
+   - principal、binding、anchor、association 都只是 routing/policy input；protected
+     access 始终依赖 Nurture current business authority。
+
+2. **Transactional authority and replay**
+   - private invocation 独立验证 service workload 与 exact Workspace/User/Actor、
+     purpose、expiry、nonce、idempotency 和 canonical request hash；service token
+     不代表成人。
+   - binding-owner issuance 固定为：verify invocation → Nurture transaction →
+     lock typed anchor → transaction-scoped reread + lock/CAS exact authority source →
+     validate association/role/purpose/version → insert or exact replay Receipt → commit。
+   - 后续 business effect、`CommandExecution` 和 business `Receipt` 必须同一 Nurture
+     transaction；所有 mutable prerequisite 均 lock/CAS。不得依赖 transaction 外
+     pre-read，不得在 Nurture transaction 内调用远端 My-Chat。
+   - same key/same hash exact replay；same key/different hash conflict；业务
+     uniqueness/CAS loser 重读 winner。revoke-before-lock deny；已 admission 的
+     in-flight attempt 最多 commit once；response loss 只恢复原 Execution。
+   - private short-lived binding-owner Receipt 与 business
+     `CommandExecution`/`Receipt` 不得合并。
+
+3. **Formal target-service ingress**
+   - 当前 P7 Fastify dev-host 可以生成 provisional owner-readiness evidence，但不能
+     完成 G1 Joint Conformance。
+   - G1 最终路径必须迁入 production-intended NestJS scenario service，并对齐
+     `PORT=8000`、backend `3001`、Base-assigned `3200/3201`、formal route/API
+     index、service-auth middleware、body size/timeout/error boundary、env contract
+     和 default-disabled startup。
+   - clean install/build/start/health/contract test 必须通过；缺少 secret 时安全拒绝，
+     不允许 legacy/weak-auth fallback。
+
+4. **Owner Integration Readiness evidence**
+   - 固定 exact Base/My-Chat/Nurture revisions、bounded source hashes、private route、
+     envelope/interface versions 和环境契约。
+   - 在 disposable PostgreSQL 上证明 `reserved`、`bound_empty`、`associated`、
+     `retired`、revoke/quarantine/ambiguity、wrong actor/workspace/purpose、并发 revoke、
+     exact replay 和 response-loss。
+   - 完成 privacy/leakage scan；最终环境/能力 gate 为 false、active rows 为空、
+     无 PII、secret、persistent DB apply 或 external effect。
+
+T-002 交付的 `Owner Integration Handoff` 与 T-004 `Surface Contract Artifact Set`
+共同进入 `G1 Joint Conformance Record`。owner pin、source population 或 formal
+ingress 漂移使 Owner Integration Readiness 与 Joint Conformance 失效；auth/privacy/
+security 风险立即失效并保持 default-off。该 handoff 不是 Candidate、activation、
+deployment 或 traffic authority。
+
+## 2026-07-30/31 — Stage G6 delivery, scope and acceptance accepted
+
+### G6 overall goal
+
+G6 将 G5 internal-beta handoff 推进到一个 **可被 Pilot-0-E 审查、经单独批准后
+可在 Pilot-1 部署、但始终默认关闭** 的完整 Pilot release state。它不把 internal
+beta PASS 外推成部署或流量授权，也不把 Nurture Service Candidate、complete
+Pilot candidate、E decision、deployment binding 和 stage authorization 合并成
+一个版本或状态。
+
+### G6 accepted scope boundary
+
+G6 Scope In：
+
+- exact G5 Service Candidate、Internal Beta Decision、interface、test-environment
+  Binding、profile、suite 和 limitation handoff；
+- 当前 C-3/C-4 的 Pilot-level implementation/qualification closure，包括
+  2026-07-29 CareGroup shared-responsibility/multi-reply override；
+- Pilot-0-D 锁定的 release、topology、dual-gate、telemetry、restore、KMS、
+  incident、evidence-controller 和 traffic-census implementation；
+- immutable complete Pilot candidate、detached signature、disposable D evidence、
+  exact `pilot0_traffic_readiness_census_v1` 和 Pilot-0-E；
+- 经独立授权后的 Pilot-1 private ACR publication、isolated persistent deployment、
+  real secret/KMS binding、readback 和 default-off qualification；
+- dual-owner isolated restore、hard-stop/dual-gate evidence、final false/empty census
+  和 `pilot2_rehearsal_readiness_seal_v1`。
+
+G6 Scope Out：
+
+- Pilot-2 activation row、Pilot-3 rehearsal 或 Pilot-4 observation；
+- real family/child data、external product traffic、native Pilot distribution、
+  external push/SMS/email/provider、staging、production、GA 或 cohort expansion；
+- 在 T-002/G6 内复制 T-004～T-007 已拥有的 product route、DTO、business fact、
+  presenter 或 surface implementation；
+- destructive down migration、cross-owner database/credential sharing、direct DB
+  repair，或把 Candidate/E/Binding/stage state 折叠成一个 global version；
+- 仅为通过 release gate 而增加本轮 beta profile 未要求的新产品 feature。
+
+### G6-0 — Candidate & Evidence Reconciliation
+
+- 冻结 exact G5 Candidate/interface/Deployment Binding/beta profile/suite/
+  InternalBetaDecision refs，并登记适用于 Pilot responsive-Web profile 的
+  limitations/exclusions。
+- 对照 C-3 component、C-4 composite、D complete-candidate recipe 与所有 source/
+  schema/migration/manifest/config/owner-pin inputs，输出 exact component mapping。
+- G5 Candidate 只有在所有 Candidate-defining inputs 未改变时，才能作为 complete
+  Pilot candidate 的 Nurture component。任何 executable、schema/migration、
+  manifest、interface、gate/config contract 或 owner pin 变化都走 successor
+  Candidate + affected G5 revalidation 分支；不得原地修改或仅“补证据”。
+- G6-0 MUST classify every delta as
+  `reuse_exact_g5_candidate | successor_service_candidate_required |
+  complete_pilot_only_change | no_go`。
+- G5 `PASS_WITH_LIMITATIONS` 只有在 limitation 明确 optional、fail-closed、位于
+  G6 responsive-Web profile 外，且不触及 authority/privacy/migration/recovery/
+  required journey 时才可承接。
+- `NurtureDeploymentBindingV1` 只证明 G5 internal-test environment；它不是
+  Pilot-1 `pilot_deployment_binding_v1`，不得复用或改名。
+- 正式 G6-0 PASS 等待 exact G5 decision；late G5 MAY 维护 read-only Pilot
+  carry-forward census 以提前发现 drift，但该 census 不是 G6 entry evidence。
+- G6-0 PASS 只开放 G6-A 的精确实现输入，不授权 D evidence、E、Pilot-1 或云状态。
+
+### G6-A — C3/C4/D Implementation Closure
+
+G6-A does not reopen product ownership. T-004～T-007 supply their exact qualified
+handoffs；G6-A closes only remaining T-002/My-Chat owner/admission/qualification and
+Pilot release/operations gaps.
+
+1. **G6-A1 C-3 closure and qualification**
+   - consume T-004～T-006 Guardian/Caregiver handoffs；
+   - complete exact identity/binding/admission/current-owner reread and qualification
+     controllers without reviving historical exact-claimant evidence；
+   - run strict C30～C35 and produce current `C3_QUALIFIED_DEFAULT_OFF`。
+2. **G6-A2 C-4 closure and qualification**
+   - consume T-007 Institution handoff rather than rebuilding its surfaces；
+   - run strict C40～C45 against the current C-3 component；
+   - produce current `C4_QUALIFIED_DEFAULT_OFF`。Any C-3 candidate/qualification drift
+     invalidates the dependent C-4 result.
+3. **G6-A3 D implementation preparation**
+   - implement D source/recipe, immutable OCI/SBOM/provenance, migration/config/
+     topology/secret-class/operations inputs, dual gates, telemetry, restore,
+     rotation/kill-switch, traffic census and evidence controllers；
+   - source/IaC/runbook/observability/disposable-environment preparation MAY overlap
+     late A1/A2 after exact-input freeze；
+   - persistent Pilot resources、real secret/KMS binding 和 ACR publication remain
+     forbidden.
+4. **G6-A4 complete-candidate assembly**
+   - wait for current C-3/C-4 qualification and every candidate-defining D input；
+   - assemble/sign one immutable body/secret-free complete candidate；
+   - if a G5 shared input changed, first mint a successor Service Candidate and rerun
+     the affected G5 local/platform/composite decision；complete-Pilot-only Host/
+     topology/operations drift does not by itself rerun G5.
+5. **G6-A5 disposable D evidence and readiness census**
+   - use only the authorized disposable D environment/profile；
+   - seal deployability, recovery, dual-gate, observability and terminal teardown
+     evidence with `externalProductTrafficCount=0`；
+   - require `QR-P0=0 / QR-P1=0` and the exact E-ready traffic census；
+   - finish with no persistent Pilot environment, capability false and rows `[]`。
+
+### G6-B — Pilot-0-E Go/No-Go
+
+- 严格消费 current C-3/C-4 qualification、one immutable complete candidate、
+  current D pre-deployment evidence seal、`QR-P0=0 / QR-P1=0`、known-limitations
+  digest 和 exact `pilot0_traffic_readiness_census_v1`。
+- `TR-P0-1..6` 和 `TR-P1-1|2|3b` MUST be `closed`；only
+  `TR-P1-3a-native-external-delivery` MAY be `accepted_scope_exclusion`。Missing、
+  unknown、waived、duplicate 或 differently named rows are NO-GO.
+- 只产生 exact signed `go|no_go`。`no_go` 返回最小 owning layer 修复。
+- Evidence-only defect MAY rebuild only the affected seal when all candidate/current
+  inputs remain exact；D/Host candidate drift mints a new complete candidate；G5
+  shared-input drift additionally follows the successor Service Candidate branch。
+- E 不发布 artifact、不配置 cloud/secret、不迁移 persistent DB、不创建 Workspace/
+  activation row，也不自行授权 Pilot-1。
+
+### G6-C — Pilot-1 Private Publication & Default-off Deployment
+
+- 只有 `E=go` 和独立 Pilot-1 authorization 同时 current 时进入。
+- 将 E 审核过的 exact OCI bytes 发布到 private Alibaba ACR，不得 rebuild 或依赖
+  mutable tag；按 D-locked dedicated VPC/dual-ECS/dual-RDS/Redis/KMS topology
+  部署并生成 readback-verified deployment binding。
+- My-Chat 与 Nurture 的 owner-separated infrastructure/database/secret/observability
+  tracks 可在共同 topology/binding contract 下并行；各自 artifact→migration→
+  deployment→readback 的顺序不可跨越，跨 owner 不能共享 DB credentials 或事实。
+- Pilot-1 始终以 capability false、active rows `[]` 结束。它可以在 gates closed
+  时准备 exact synthetic Workspace/accounts/bootstrap spec，但不得创建业务激活。
+- Internal order is:
+  1. freeze authorized change window、region/resource/cost/RACI/rollback plan；
+  2. publish exact reviewed bytes and provision locked network/compute/database/
+     Redis/KMS/telemetry resources；
+  3. apply owner-separated ordered migrations and initialize independent backup/PITR；
+  4. deploy and bind exact non-secret config plus secret/KMS refs；
+  5. read back executable、migration heads、owner deployments、resources、trust and
+     effective gates, then sign one current `pilot_deployment_binding_v1`。
+- ACR、database、KMS 和 telemetry provisioning MAY overlap where independent, but
+  deployment waits for its exact prerequisites and final Binding is a mandatory join.
+  Nurture remains private behind My-Chat ingress throughout.
+
+### G6-D — Default-off Qualification & G7 Handoff
+
+- 汇合 exact Candidate、E decision、Pilot-1 deployment binding、current C-3/C-4
+  qualification、isolated restore、dual-gate/hard-stop、secret/KMS/trust custody、
+  telemetry/audit 和 final false/empty census。
+- 形成 G7 Pilot-2 所需的 current `pilot2_rehearsal_readiness_seal_v1`，其输入必须
+  证明 `capability=false`、active rows `[]`、
+  `externalProductTrafficCount=0` 且无 unresolved outcome/drift。
+- G6 Exit 只授权把该 seal 提交给独立的 G7/Pilot-2 stage-authorization review；
+  seal、E Go、deployment binding 或 G5 PASS 均不能创建 activation row。
+- Internal order is:
+  1. reread all current Candidate/E/C-3/C-4/Binding heads；
+  2. qualify isolated restore independently for both owner databases；
+  3. prove each technical gate denies new work and the infrastructure hard-stop closes
+     ingress/private call/claim/worker/Notification send-open seams；
+  4. verify real secret/KMS custody、telemetry、audit、backup and drift detection；
+  5. prepare the exact synthetic Workspace/accounts/bootstrap spec and bound bootstrap
+     operation while gates remain closed and ordinary business remains unavailable；
+  6. seal the final false/empty/zero-traffic/no-unresolved census。
+
+### G6 dependency and parallelism
+
+```text
+G5 exact handoff
+  -> G6-0 reconciliation
+  -> G6-A1 C3 qualification -> G6-A2 C4 qualification ------\
+       \-> G6-A3 D source/IaC/runbook preparation -----------+-> G6-A4 complete candidate
+                                                             -> G6-A5 disposable D seal/census
+                                                             -> G6-B Pilot-0-E
+                                                             -> separate Pilot-1 authorization
+                                                             -> G6-C default-off deployment
+                                                             -> G6-D readiness seal
+                                                             -> separate G7 review
+```
+
+允许的并行只有：
+
+1. G6-A3 的非状态性准备与 G6-A1/A2 后半段依赖感知并行；
+2. G6-C 中 My-Chat/Nurture owner-separated provisioning 在共同锁定输入后的并行；
+3. 分支内测试、文档、runbook 和 body-free evidence assembly 的局部并行。
+
+严格串行的是 G6-0 entry、A1→A2 qualification、A4/A5 join、Pilot-0-E、独立
+Pilot-1 authorization、Pilot-1 deployment 和 G6-D final join。
+
+### G6 acceptance boundary
+
+| Package | Qualifying outcome | Mandatory NO-GO |
+| --- | --- | --- |
+| G6-0 | exact reuse, controlled successor-Service-Candidate branch, or explicit complete-Pilot-only delta | mutable alias, unclassified drift, required/authority/privacy limitation |
+| G6-A | current C-3/C-4 qualifications, signed complete candidate, current D seal, `QR=0`, exact TR census | historical/superseded qualification, missing owner, non-zero traffic, incomplete teardown, persistent Pilot state |
+| G6-B | one current signed `go|no_go` over exact inputs | inferred/count-only readiness, waived/missing/ambiguous census or stale input |
+| G6-C | one current readback-verified Pilot Binding with deployment complete and false/empty | rebuild, mutable tag, shared DB/credential, positive gate/row or unbound drift |
+| G6-D | current Pilot-2 readiness seal over restore/hard-stop/custody/false-empty evidence | active row, non-zero external traffic, incomplete restore/hard-stop, unresolved outcome or stale head |
+
+G6 has no generic `PASS_WITH_LIMITATIONS`. The only pre-authorized E scope
+exclusion is exact `TR-P1-3a`；all required-path、authority、privacy、security、
+migration、recovery、evidence-integrity or drift gaps are NO-GO. The accepted overall
+exit statement is:
+
+```text
+G6_DEFAULT_OFF_QUALIFIED
+PILOT2_STAGE_AUTHORIZATION_PENDING
+EXTERNAL_TRAFFIC_NO_GO
+```
+
+G7 MUST reread every current head at entry. Administrative completion of a future G6
+task never preserves eligibility after qualification/E/Binding/seal invalidation.
+
+### G6 schedule protection and task boundary
+
+- Late G5 MAY prepare a read-only Pilot carry-forward census so known
+  Candidate-defining work can be completed before G5 Freeze where practical.
+- G6 remains outside the G1～G5 development critical path. IaC/runbook/evidence-schema
+  drafts and read-only region/quota/permission census MAY start early；artifact/ACR、
+  persistent DB/cloud resources、real secret/KMS and deployment MUST wait for their
+  explicit gates.
+- T-002 remains the C/D/Pilot contract SSOT；T-008 owns the G5 Service Candidate and
+  internal-beta evidence. G6 execution is proposed as one new future task,
+  `nurture-pilot-default-off-release`, with five packages and a separate My-Chat
+  companion task. No task or feature is registered by this decision.
+
+## 2026-07-31 — Stage G7 scope, order and acceptance accepted
+
+### G7 overall goal
+
+G7 将 G6 的 default-off Pilot deployment/readiness 推进到一次 **有界内部
+synthetic Pilot 演练与 120 小时观察**。它证明 exact deployed topology、双门禁、
+owner boundaries、恢复路径和六 surface scripted contract 可以在一个锁定的内部
+cohort 上连续运行；它不证明真实家庭价值、机构采用、生产可用性、native delivery
+或外部流量 readiness。
+
+### G7 accepted scope boundary
+
+G7 Scope In：
+
+- G6 当前 complete candidate、C-3/C-4 qualification、E decision、final
+  Pilot-1 Binding、policy/trust/profile heads 和
+  `pilot2_rehearsal_readiness_seal_v1`；
+- 一个 exact synthetic cohort：1 internal test Workspace、1 synthetic
+  Institution、1 CareGroup、3 child scopes、3 independent families、4
+  Guardians、1 Institution Admin、1 sole-Lead Caregiver 和 1 不持有 Nurture
+  business role 的 Technical Operator，共 7 个内部账号；
+- Pilot-2 stage authorization、dual-gate activation、first-Institution bootstrap
+  和真实 product workbench/Guardian flow cohort completion；
+- Pilot-3 ordered fault/restore/rotation/delivery/stale-open/revoke/redaction/
+  `outcome_unknown`/kill-switch rehearsal；
+- Pilot-4 no-reset baseline、新 stage authorization、新 row、五个连续 24 小时
+  segment 和 exact seven-question sample；
+- terminal false/empty census、daily/stop/result evidence 和下一范围建议。
+
+G7 Scope Out：
+
+- 真实 child/family/institution/caregiver、cohort expansion 或第二
+  Workspace/window/cohort；
+- cohort 外 external product traffic、external beta、staging、production、GA；
+- native mobile、OS push、SMS/email、external provider/recipient delivery；
+- protected AI、attachments 或任何为通过 Pilot 而新增的产品 capability；
+- A/B experiment、随机/ad hoc business traffic 或未冻结的额外 question/effect；
+- SQL、direct fact edit、DB reset/reseed、destructive rollback 或跨 owner
+  database/credential sharing；
+- 自动批准 real-user next scope、生产 SLA、用户价值、效率或 adoption 结论。
+
+### G7-0 — Stage Entry & Authority Freeze
+
+- 在任何正向 gate mutation 前，MUST reread current complete candidate、C-3/C-4
+  qualification、E、final Pilot Binding、Pilot-2 readiness seal、profile/schema/
+  migration/config/policy/trust/surface-registry heads、false/empty census 和
+  `externalProductTrafficCount=0`。
+- MUST 冻结 exact cohort、seven planned question paths、runbook、RACI、time
+  source、incident/stop criteria、evidence destinations 和 expected terminal
+  state；missing、ambiguous、stale、invalidated 或 unresolved input 均为 NO-GO。
+- 独立 `pilot2_rehearsal` stage authorization MUST 只绑定该 exact
+  environment/Workspace/candidate/Binding/profile/interval 和 readiness seal。
+  Signer 不能 deploy、enable、create row、执行 fault 或持有 Pilot business role。
+- G7-0 PASS 只开放 G7-A 的 exact activation input；readiness seal、E、Binding
+  或 G6 completion 均不能替代 stage authorization。
+
+### G7-A — Pilot-2 Activation & Cohort Bootstrap
+
+执行顺序固定为：
+
+1. initial Institution Admin 先通过 My-Chat 接受 exact bootstrap invitation 并
+   提交 current Workspace membership；
+2. `pilot_release_controller` 在 active rows 仍为 `[]` 时启用 environment
+   capability，并完成单谓词 fail-closed census；
+3. controller 最后创建唯一、time-bounded、exact
+   `pilot2_rehearsal` Workspace row；
+4. row 首先保持 `bootstrapAdmissionMode=bootstrap_only`，只允许 dedicated C-0
+   controller claim/recovery path；
+5. Nurture C-0 transaction exact-once 创建一个 Institution、Participant、first
+   Institution Admin role 和 CommandExecution；
+6. Host 只在 `owner_committed + exact spec consumed + quarantine clear` 后将
+   provisioning lineage 推进为 `ordinary_ready`；
+7. current Institution Admin 通过真实 workbench 创建 CareGroup、staff、roster
+   和三条 Enrollment；Guardians 通过真实 product flow 创建七条计划路径所需的
+   current Grant/Thread state。
+
+G7-A qualifying outcome 是 exact cohort ready for rehearsal，不是独立 G7 PASS。
+它要求 cohort/cardinality/role/row 精确、七条路径均 eligible、无 authority
+ambiguity、无 SQL/operator bypass、无 unresolved outcome，且
+`externalProductTrafficCount=0`。Bootstrap response loss 只可恢复 same
+operation/spec；不得创建 replacement operation 或猜测成功。
+
+### G7-B — Pilot-3 Rehearsal & Terminal Disable
+
+- 独立 `pilot3_rehearsal_plan_authorization_v1` MUST 在 G7-A current row 和
+  Pilot-2 authorization 上冻结 exact ordered fault matrix、executors、expected
+  results 和 terminal false/empty state；它不能 mint/re-enable/replace row 或
+  扩大 traffic。
+- Matrix MUST 覆盖 owner/KMS/Secrets、Outbox/dispatcher/DLQ、stale open、
+  Grant revoke/redaction、response loss/`outcome_unknown`、双 owner DB isolated
+  restore、credential/key rotation、Workspace-row/capability kill switch 和
+  infrastructure hard stop。
+- 若 rehearsal revoke 的 Grant 为 Pilot-4 七条路径所需，replacement MUST 在
+  final kill switch 之前通过当前真实 Guardian flow 创建；baseline 不得恢复旧
+  Grant、使用 SQL/reset/reseed 或暗示事实修复。
+- 成功 lineage 只有：
+
+```text
+gates_closed
+  -> final_binding_bound
+  -> plan consumed_success
+  -> Pilot-2 stage authorization consumed
+  -> pilot3_terminal_rehearsal_seal_v1
+```
+
+- Binding-changing rotation 只能产生 same-candidate successor，并只改变 plan
+  allowlist 内的 secret/KMS/trust refs。Artifact、schema/migration、topology、
+  resource、environment 或 behavior configuration drift 不是合法 successor。
+- G7-B MUST 结束为 capability false、active rows `[]`、old Pilot-2 row
+  permanently non-restorable、final Binding current 且无 unresolved outcome。
+  Failure、expiry、revoke、out-of-order、partial consumption 或 unexpected drift
+  产生 non-passing evidence，并阻断 G7-C；修复路由到最小 owning layer。
+
+### G7-C — Pilot-4 Fresh Baseline & 120-hour Observation
+
+1. 在 gates closed 下运行 owner-path census；不得 SQL、DB reset/reseed 或事实
+   注入。Census 必须对 exact unchanged cohort、current Grant/Thread、
+   Institution/CareGroup/Enrollment、required surfaces、final Binding、
+   policy/trust 和 zero unresolved state 签发
+   `pilot4_observation_baseline_seal_v1`。
+2. 独立签发新的 `pilot4_observation` authorization，并创建新的 exact Workspace
+   row。它 MUST 同时绑定 terminal rehearsal seal 和 baseline seal；Pilot-2
+   authorization/row 不得复用。
+3. 观察窗口严格为 `[T0,T0+120h)`，由五个无 gap/overlap 的 24 小时 segment
+   组成。每段至少完成一条 planned authenticated journey，并完成 Institution
+   board read、gate/authority/telemetry/backup/incident/unresolved census。
+4. 七条计划 question paths 覆盖三个 child scopes、Guardian Chat/family board/
+   family workbench，以及 Caregiver `Chat|teacher_board` 的四种
+   acknowledge/reply pairing；每条均 explicit acknowledge 且 exactly one reply。
+   推荐 runbook 分布为 `2/1/1/1/2`，但具体分布只在 T0 前冻结的 operation plan
+   中生效，不升级为产品合同。
+5. 每个 admitted technical submit/acknowledge/reply action MUST 在 60 秒内达到
+   committed/replayable success 或 safe unavailability；这不是对人工完整
+   question-to-reply 时长的约束。In-app Notification MUST 在五分钟内 available
+   或 terminally classified。
+6. `externalProductTrafficCount=0` 表示没有 cohort 外产品/owner/business/
+   Notification/open traffic，不表示七个内部账号没有 planned product traffic。
+   Negative probe 只允许 exact synthetic source 在 Nurture admission/owner call
+   前被拒绝且产生零 effect；任何 admitted 第八条 question 或 unplanned business
+   effect 立即使窗口 `no_pass` 并触发 shutdown。
+7. Pilot-4 不重复 Pilot-3 planned faults。SEV0/SEV1、gate shutdown、DB restore、
+   Candidate/Binding/schema/migration/config/trust/policy/surface/row change、
+   telemetry/audit/backup gap、incomplete daily seal、non-zero external traffic、
+   unplanned effect 或 unresolved outcome 均终止当前 clock。修复后 MUST 重新走
+   所需最小资格化层，使用新 authorization/row 并从零开始完整 120 小时；不得
+   pause/resume、padding 或拼接窗口。
+
+### G7-D — Terminal Evidence & Next-Scope Recommendation
+
+- 到 `Tend` 或提前 stop 时，MUST 关闭/移除 row、关闭 capability 并确认没有
+  business route。隔离 evidence lane MAY 使用最多两小时 sealing grace 完成
+  terminal daily seal、mandatory stop evidence 和 result；期间不得有 product
+  route、owner command、delivery、retry 或 open。
+- `pilot4_observation_result_v1` 的 exact result 只有：
+  - `pass`：五个连续 passing daily seals + passing terminal false/empty census，
+    且没有 stop record；
+  - `no_pass`：任一 failed full/partial segment、PASS criterion failure，或五个
+    pass seals 后 terminal census/sealing/review failure；
+  - `stopped`：preventive/manual/authority withdrawal，且没有 observed PASS
+    criterion failure；failure 与 stop 同时成立时 `no_pass` 优先。
+- G7 没有 `PASS_WITH_LIMITATIONS`。Evidence-complete 的 `no_pass` 或 `stopped`
+  仍不满足 G7 success signal；只有 `pass` 才满足。
+- Recommendation 只能是
+  `continue_internal | stop | request_separate_next_scope_review`，且任何值都不
+  授权下一范围。
+- Project summary labels are:
+  - pass：`G7_INTERNAL_PILOT_PASS / NEXT_SCOPE_REVIEW_REQUIRED /
+    EXTERNAL_TRAFFIC_NO_GO`；
+  - no-pass：`G7_INTERNAL_PILOT_NO_GO / GATES_CLOSED`；
+  - stopped：`G7_INTERNAL_PILOT_STOPPED / GATES_CLOSED`。
+  这些标签是治理摘要，不得替代签名 result 或充当 activation/traffic authority。
+
+### G7 dependency, parallelism and development boundary
+
+```text
+G6 current readiness handoff
+  -> G7-0 current-head/authority freeze
+  -> G7-A Pilot-2 activation + bootstrap/cohort readiness
+  -> G7-B Pilot-3 ordered rehearsal + terminal disable
+  -> final Binding + no-reset baseline
+  -> new Pilot-4 authorization + fresh row
+  -> G7-C five contiguous 24h segments
+  -> G7-D terminal close/evidence/recommendation
+```
+
+Stage spine、Pilot-3 state transitions 和 daily-seal predecessor chain 均严格串行。
+只允许 body-free telemetry/evidence collectors 在同一阶段内并行；它们不能签发
+authority、改变 facts、调整 cohort 或跨 segment 填补证据。不存在第二
+Workspace/window/cohort 作为并行捷径。
+
+未来 successor development MAY 在其他环境/主线继续，但 MUST NOT deploy、repin
+或改变被当前 G7 观察的 exact Pilot environment。120 小时窗口不能压缩，执行排期
+SHOULD 另外预留 entry/bootstrap、rehearsal、terminal sealing 和失败后 full
+restart buffer。G7 冻结的是 observed environment，不是整个 repo 或后续开发。
+
+### G7 acceptance boundary
+
+| Package | Qualifying outcome | Mandatory NO-GO |
+| --- | --- | --- |
+| G7-0 | exact current heads, exact frozen cohort/runbook and current Pilot-2 authorization | stale/ambiguous/missing head, unresolved state, positive gate/row, cohort or authority ambiguity |
+| G7-A | one exact ordinary-ready synthetic cohort and current rehearsal row with all seven paths eligible | SQL/operator bypass, duplicate/wrong role or row, incomplete bootstrap, unresolved outcome, external traffic |
+| G7-B | full ordered rehearsal, terminal false/empty, current allowlisted final Binding and terminal seal | re-enable/restore old row, out-of-order/partial plan, unrelated drift, unresolved recovery |
+| G7-C | five contiguous passing 24h seals over one unchanged baseline/authorization/row and exact seven paths | pause/padding, planned fault, identity drift, admitted extra effect, SEV0/1, evidence gap or external traffic |
+| G7-D | signed `pass|no_pass|stopped`, terminal false/empty census and bounded recommendation | business route during sealing, ambiguous/overlapping evidence, generic limited pass or inferred next authority |
+
+### G7 task-governance boundary
+
+- Governance triage is `NEW_TASK` for future execution because G7 first creates
+  business activation and carries a long-running operational evidence lineage that
+  must not be merged into G6 default-off release work.
+- Proposed slug: `nurture-bounded-pilot-observation`；Task ID remains pending.
+  Proposed mapping is `M-002 > proposed F-004 Internal Pilot Operations > pending
+  task`，with one G7 Nurture main task and a separate My-Chat companion.
+- Pilot-2/3/4 remain one G7 main task because they share one exact
+  authorization/row/terminal-seal/baseline/result lineage；splitting them would
+  weaken end-to-end ownership and handoff closure.
+- This accepted planning text creates no task/Feature and authorizes no code,
+  schema/migration, database/cloud, secret/KMS, artifact/deployment, capability,
+  row, activation, observation window or traffic mutation.
+
 ## 2026-07-29 — Current-project consolidation and readiness gate
 
 The current-project consolidation is merged to Nurture `main` at
@@ -350,7 +884,13 @@ X5 remains a validation and hardening gate. It does not authorize schema ownersh
 
 ---
 
-## Phase IIB — 操作台 + 同意 UX（本仓）
+## Phase IIB — Historical product-delivery decomposition（superseded/delegated）
+
+This section is retained as historical intent only. Current implementation ownership
+is delegated to T-004 shared contracts, T-005 family-care interaction, T-006 boards
+and publication, and T-007 institution surfaces/workflow. These steps MUST NOT be
+implemented as a second product path inside T-002; T-002 supplies only the exact
+owner/source prerequisites and separately governed Pilot track.
 
 **目标：** 机构、老师、家长可用；同意/撤销/沟通工作流可演示。
 

@@ -242,13 +242,18 @@ Rules:
 - Institution-specific labels, templates, and routing rules may map to system `dataClass` and `category`; they do not create new cross-role data classes in MVP.
 - `pickup_or_schedule` and `other` may exist as workflow categories, but they must not become grant-controlled data classes without explicit policy review.
 - Grants, receipts, runtime policy checks, revoke fences, AI context filters, and delivery decisions must use `dataClass`, not institution-local labels.
-- Institution vocabulary may change how an item is named, displayed, templated, or routed; it must not silently expand what crosses the family/institution boundary.
+- Institution vocabulary may change how an item is named, displayed, templated, or
+  routed；institution vocabulary must not silently expand what crosses the family/
+  institution boundary.
 - Pilot-0 accepts only `dataClass=family_care_question` with `category=question`, `urgency=today_attention`, immediate routing, acknowledgment/reply required, and no attachments. These values are derived by the trusted Nurture Pilot adapter rather than supplied by a client or inferred by an LLM.
-- The Pilot restriction is an additive profile gate. It does not remove the broader system vocabulary or create parallel Message/Receipt/Item types.
+- The Pilot restriction is an additive profile gate. The additive gate does not
+  remove the broader system vocabulary or create parallel Message/Receipt/Item types.
 
 Rationale:
 
-- Consent and policy need stable keys. Local institution vocabulary is useful, but it should not silently expand what crosses the family/institution boundary.
+- Consent and policy need stable keys. Local institution vocabulary is useful, but
+  local institution vocabulary should not silently expand what crosses the family/
+  institution boundary.
 - This keeps institution adoption flexible without letting local naming mutate authorization semantics.
 
 Implementation implication:

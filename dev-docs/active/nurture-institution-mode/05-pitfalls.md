@@ -6,6 +6,20 @@ This file exists to prevent repeating mistakes within this task.
 
 - Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
 - Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
+- Do not let a service token stand in for the represented adult principal, or let
+  principal/binding admission stand in for Nurture current business authority.
+- Do not mint, infer, PII-match, auto-merge, or silently rebind a My-Chat Child/Family
+  from Institution Admin, Caregiver, or Nurture context.
+- Do not perform a remote My-Chat read inside the Nurture transaction or rely on an
+  authority pre-read outside it; lock/CAS the exact Nurture authority source in the
+  Receipt/effect transaction.
+- Do not conflate the short-lived binding-owner Receipt with persistent business
+  `CommandExecution`/`Receipt`; their identity, replay, TTL and retention differ.
+- Do not claim final G1 Joint Conformance from the Fastify dev host. The same T-004
+  fixtures must pass through the formal NestJS scenario-service ingress with exact
+  env/port/auth boundaries.
+- Do not let task status, CI links, or prose substitute for the three exact G1
+  delivery roles and their append-only currentness/invalidation chain.
 - Do not treat locking the binding anchor as fencing an independently mutable
   authority source; reread and lock/CAS that exact source in the receipt
   transaction.
@@ -644,7 +658,7 @@ This file exists to prevent repeating mistakes within this task.
 - Symptom: The discussion starts as "托育机构是否并入面向家长的产品", which can imply adding an institution role inside a family-owned workspace.
 - Context: Institution workflows are one organization to many caregivers and children, closer to My-Chat's education-domain organization topology than to a single-family workspace.
 - What we tried: Reframed as "same scenario, second tenancy mode" rather than a family-mode subfeature.
-- Why it failed (or current hypothesis): A simple role addition would blur ownership and privacy boundaries.
+- Why the simple-role approach failed (or current hypothesis): A simple role addition would blur ownership and privacy boundaries.
 - Fix / workaround: Model institution mode on `organization` workspace, with My-Chat-owned care canonical objects and The Nurture-owned projections/workflows.
 - Superseded 2026-07-05: The ownership part of this workaround is superseded. Current rule: My-Chat owns account identity and scenario shell; Nurture owns the care ecology graph, including role assignments, child care process, enrollment, grant, family-care messages, and care items.
 - Prevention: Start every institution-mode design review from `02-architecture.md` sections 1-4 and confirm ownership before fields or UI.
@@ -655,9 +669,11 @@ This file exists to prevent repeating mistakes within this task.
 - Symptom: The design over-centers `ChildLinkGrant`, making the institution look like an authorization extension of family mode.
 - Context: The institution is a real external environment in the child's growth process, with its own organization, teachers, group rhythms, workflows, and operational incentives.
 - What we tried: Reframed `ChildLinkGrant` as the cross-ecology data-flow mechanism only.
-- Why it failed (or current hypothesis): If the product does not help institutions and teachers directly, they have no reason to adopt it.
+- Why the cross-ecology-only framing failed (or current hypothesis): If the product
+  does not help institutions and teachers directly, they have no reason to adopt
+  the product.
 - Fix / workaround: Add an explicit institution/teacher value model before capabilities: record reduction, group care operations, parent need intake, handoff, and quality review.
-- Prevention: Before designing a capability, state which institution/teacher pain it solves and how it helps the child.
+- Prevention: Before designing a capability, state the institution/teacher pain addressed and the resulting child benefit.
 - References: `02-architecture.md` section 5, `03-implementation-notes.md` D-004.
 
 ### 2026-07-04 — Treating face recognition as direct publication

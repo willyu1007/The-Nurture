@@ -48,7 +48,9 @@ disposition, activation row, or rehearsal state machine.
 
 1. **Child scope first:** `NurtureChildCareProcess.id` is the independent child scope for care facts. Any child-specific action, query, write, event, message, item, log, grant, or media attribution must resolve to one child care process.
 2. **Views are reorganizations:** teacher, parent, institution, and care group surfaces are reorganizations over one or more child care process scopes. `careGroupId`, `familyId`, `participantId`, and parent/teacher filters are query and workflow dimensions, not replacement data scopes for care facts.
-3. **Child-centered:** `NurtureChildCareProcess` is the center. Families join it; teachers include one or more such scopes in class workflows; institution managers govern how these scopes are organized.
+3. **Child-centered:** `NurtureChildCareProcess` is the center. Families join the
+   process；teachers include one or more such scopes in class workflows；institution
+   managers govern how these scopes are organized.
 4. **User boundary:** parents, teachers, and institution managers are My-Chat users; children are not My-Chat users.
 5. **Participant mapping:** Nurture references My-Chat users through `myChatUserId`, but Nurture role, scope, and relationship semantics come from Nurture tables.
 6. **Surface role boundary:** Guardian Nurture work is entitled to Chat, the family board, and the family domain web workbench; caregiver Nurture work is entitled to Chat and the teacher board; institution-admin Nurture work is entitled to the institution board and institution domain web workbench, not Chat; technical operations remain in host Admin. My-Chat never selects a trusted Nurture role. Nurture resolves participant, surface entitlement, role, scope, target, business direction, and output. Surface changes do not create another participant identity or authorization source.
@@ -62,10 +64,15 @@ disposition, activation row, or rehearsal state machine.
 
 - Prisma model names should stay PascalCase; domain fields should stay camelCase; DB table/column mapping should stay snake_case via `@@map`/`@map`.
 - All persistent models should include `id`, `workspaceId`, `status` where meaningful, `aggregateVersion`, `createdAt`, `updatedAt`, and `deletedAt` for soft-deleteable objects.
-- `workspaceId` is a scenario shell/runtime partition reference supplied by My-Chat. It does not make My-Chat the owner of Nurture role or care facts.
+- `workspaceId` is a scenario shell/runtime partition reference supplied by
+  My-Chat. The partition reference does not make My-Chat the owner of Nurture role
+  or care facts.
 - My-Chat IDs are external references, not cross-database ownership. Prefer `myChatUserId` and display-safe `myChatUserRefPayload` when a surface needs denormalized metadata.
 - Child/family/institution objects may carry display-safe profile payloads, but authorization must be resolved from role assignments, enrollments, grants, and policies, not from cached payloads.
-- Organization-level configuration, such as institution profile, care group rhythm, and teacher assignment, may exist without `childCareProcessId`. Once a record describes an individual child's care, communication, observation, media exposure, or delivery state, it must include `childCareProcessId`.
+- Organization-level configuration, such as institution profile, care group rhythm,
+  and teacher assignment, may exist without `childCareProcessId`. Once a record
+  describes an individual child's care, communication, observation, media exposure,
+  or delivery state, the record must include `childCareProcessId`.
 
 ## 3. Core Ecology Objects
 
@@ -392,18 +399,29 @@ Pilot-0-C2b-1 first-Guardian refinement:
 - After exact Host acceptance, the adult first creates or selects the My-Chat Child/Family pair. The durable identity operation reuses both valid bindings, reuses one and adds the other, or adds both; Nurture reserves only missing typed anchors, and one My-Chat transaction commits or exact-replays every missing binding. Only then may one Nurture `CommandExecution` transaction bind/reuse `NurtureParticipant`, create or resolve `NurtureChild`, `NurtureChildCareProcess`, `NurtureFamily`, the first active Guardian RoleAssignment and both workspace associations, and persist result/audit refs. Unique/version/idempotency/association failures roll back all local rows; a product-visible authority-free or unbound local aggregate is forbidden.
 - Existing child processes are selectable only through current owner resolution for an already active Guardian in the same workspace. A non-Guardian Enrollment Invitation recipient cannot claim an existing child and must first complete the separate current-Guardian-initiated Co-Guardian flow.
 - No `primary_guardian` role or implicit higher authority is introduced. Family-confirmed `father`, `mother`, or `other_guardian` relationship/display metadata may be retained on the role/profile contract but must not change policy permissions.
-- The Pilot records a product assertion and audit result, not legal guardian verification. Identity documents, civil-status evidence, institution attestation, and offline review are outside this command and require a separate sensitive-data contract before real use.
+- The Pilot records a product assertion and audit result, not legal guardian
+  verification. Identity documents, civil-status evidence, institution attestation,
+  and offline review are outside the product-assertion command and require a
+  separate sensitive-data contract before real use.
 
 Pilot-0-C2b-2 Co-Guardian Invitation refinement:
 
 - Issue requires the inviter to be both a current Nurture Guardian in the exact Family/ChildCareProcess and a current My-Chat member of that exact Family with Host permission to invite the exact recipient under current family policy. The role model adds no primary/family-admin hierarchy. Institution Admin, Caregiver, and Technical Operator cannot initiate, accept, or substitute a recipient.
-- My-Chat owns raw contact, provider delivery, recipient authentication, invitation acceptance, and exact recipient Workspace plus Family membership. A future Nurture invitation-intent record owns only opaque Host invitation ref, inviter/family/process binding, suggested relationship metadata, expiry/version/canonical payload hash, lifecycle/audit, and current-policy evidence; the current Prisma schema does not yet implement this intent.
+- My-Chat owns raw contact, provider delivery, recipient authentication, invitation
+  acceptance, and exact recipient Workspace plus Family membership. A future Nurture
+  invitation-intent record owns only opaque Host invitation ref, inviter/family/
+  process binding, suggested relationship metadata, expiry/version/canonical payload
+  hash, lifecycle/audit, and current-policy evidence；the current Prisma schema does
+  not yet implement the invitation intent.
 - My-Chat Host acceptance proves exact recipient identity/membership but is not the business invitation lifecycle. The current Nurture intent is the sole Guardian-creation eligibility fence; Host/provider accepted or delivered state cannot override Nurture expiry/revoke/cancel/policy denial.
 - Invitation issue creates no recipient `NurtureParticipant`, Guardian RoleAssignment, historical visibility, Grant ownership, Enrollment, roster link, or new Child/Process/Family. Suggested `father|mother|other_guardian` metadata is untrusted until the recipient confirms/edits it and never changes permission.
 - Acceptance requires exact My-Chat recipient identity and rereads the inviter's current Nurture Guardian role plus current Host Family-invite authority, Family/ChildCareProcess lifecycle, invitation state/expiry/version, exact recipient Workspace and Family memberships, recipient uniqueness, and the Pilot cohort gate. Host acceptance first creates or exact-replays those recipient memberships and grants no Nurture authority; one later Nurture `CommandExecution` transaction binds/reuses the recipient Participant and creates one active Guardian RoleAssignment plus result/audit refs.
 - Host membership and Nurture role use two separate stable operation ids. Exact issue/membership/role replay returns original refs; changed family/process/recipient/relationship payload conflicts. Membership-commit followed by role denial or response loss resumes only the same role operation, and either owner's fact alone grants no product access. Inviter role/Host-authority loss, family/process disablement, wrong recipient/workspace/Family membership, revoked/expired/consumed invitation, or topology drift fails before role creation.
 - The exact inviter may cancel only before Host acceptance. After either owner commits, cancel/expiry/self-exit/revoke never compensates the other owner's fact; later Guardian self-exit or Host membership/role revoke remains owner-local, and C-2b-4 owns Nurture relationship exit.
-- Pilot policy permits one Co-Guardian acceptance for Family-1 and none for Family-2/Family-3, producing the exact `2 + 1 + 1` topology. This is a cohort gate, not a unique constraint, Schema cardinality, or product maximum; later multi-Guardian policy remains separate.
+- Pilot policy permits one Co-Guardian acceptance for Family-1 and none for
+  Family-2/Family-3, producing the exact `2 + 1 + 1` topology. The exact
+  `2 + 1 + 1` limit is a cohort gate, not a unique constraint, Schema cardinality,
+  or product maximum；later multi-Guardian policy remains separate.
 
 Pilot-0-C2b-3 Guardian rights/history refinement:
 
@@ -551,7 +569,7 @@ Pilot-0-C2e-3 Grant result, recovery, and explicit-empty refinement:
 
 - CommandExecution is the immutable committed receipt. `disposition=executed|replayed` remains response-only, `businessOutcome=applied|already_satisfied` remains persisted, and `outputRefs` contain exactly one versioned Grant ref plus the exact versioned Enrollment-private Thread ref. Execution/output refs never grant visibility and never enter client payloads, URLs, route state, Host transcript, notifications, analytics, or query dimensions.
 - User presentation is a current owner-read type `family_care_grant_current`, not a cached `grant_confirmed` receipt. Safe source-result values are `activated`, `already_active`, and `processed_but_unavailable`; current actor relation is `owner`, `family_user`, or `none`. The presenter exposes only safe child label, Institution/CareGroup, fixed scope summary, actual `effectiveFrom`/`expiresAt`, and current actions. Owner identity is expressed as “you” or “another current Guardian”, never raw Participant/account identity.
-- A new `already_satisfied` Execution records the requesting Guardian as business actor but points to the winning Grant/Thread. Current presentation may say that authorization already exists and that the actor can use it, but cannot say that the actor confirmed, owns, jointly approved, or may administer it.
+- A new `already_satisfied` Execution records the requesting Guardian as business actor but points to the winning Grant/Thread. Current presentation may say that authorization already exists and that the actor can use the authorization, but cannot say that the actor confirmed, owns, jointly approved, or may administer the winning Grant.
 - Exact response-loss retry finds and compares the immutable Execution before checking the already-consumed or later-expired submit context. A compatible original caller needs no second confirmation. User output still reruns current Host/Nurture identity, Guardian/Family, Enrollment/CareGroup, Grant, policy, and lifecycle visibility; wrong/stale callers receive generic unavailable without Execution/Grant existence disclosure.
 - If the source cannot recover the original command identity, recovery uses the ordinary current Grant presenter. It cannot mint another command identity to probe completion, issue an `open_result` token, or carry Execution/Grant/Thread refs across surfaces. Exact replay preserves the original outcome; presenter state may truthfully change after expiry/revoke/replacement/authority loss.
 - Deterministic actor/scope/Enrollment/CareGroup/policy/allowlist/version drift makes the old submit context unusable and commits no Execution/business success. Retryable transaction, contention, owner-service, or transport failure leaves the context active only while its original TTL remains. Presenter/network failure after commit never compensates or deletes Grant/Thread/Execution.
@@ -803,7 +821,7 @@ Pilot-0-C2f-5 lifecycle result, recovery, presenter, and Host-effect refinement:
 - Recipients are exact RoleAssignments resolved into one typed owner-owned audience cohort in the business commit. Later-added Guardians never receive an old notification; a target that loses current role is stopped by owner reread. No eligible target produces explicit `[]`; any nonempty cohort produces exactly one stable request/draft and therefore at most one Handoff for the business effect. Exact replay returns the same snapshot/cohort. My-Chat fans that one Handoff out into at most one logical Notification candidate per exact `(Handoff, recipient RoleAssignment, continuity key)`; per-recipient candidates are technical delivery state, not extra drafts or Handoffs. Transfer-review Handoff expiry cannot outlive its TransferIntent. Relationship-termination attention uses a fixed seven-day expiry capped by the Pilot allowlist expiry.
 - Any command path capable of a non-empty snapshot is Host-first: the original My-Chat Step must be durably persisted and currently claimed before the first Nurture commit. Missing trusted original-Step provenance fails before the business commit; Nurture cannot invent a replay seed afterward. Same-Step replay preserves exact snapshots; wrong-Step, recipient/source/expiry mutation, Admin-created drafts, and raw claim-token persistence/logging are forbidden. My-Chat later atomically materializes Handoff/Outbox; a materialization or provider failure cannot roll back Nurture facts.
 - Provider payload is limited to generic durable copy such as `有一项托育关系更新待查看` plus My-Chat `notification_id`; it contains no child/Institution name, body, target, action state, business ref, or Nurture context. An open first validates exact My-Chat user/workspace/Notification before any Nurture call, then eligible Handoff state, current Nurture owner resolver, a destination-bound `open_notification` token, and destination owner reread. Wrong user/workspace/id returns generic unavailable without a Nurture call. Host read/unread and provider delivery remain technical state, not Nurture lifecycle.
-- C-2f-5 completes C-2f planning only. The four presenter names and additive Handoff key/purposes/source types are design contracts, not implemented declarations. No manifest, registry, contract package, source, Prisma schema, migration, route, capability, database, environment, provider, or traffic changes in this checkpoint. C-3 owns Guardian/Caregiver operational IIB implementation readiness and C-4 owns Institution IIB/closure evidence.
+- C-2f-5 completes C-2f planning only. The four presenter names and additive Handoff key/purposes/source types are design contracts, not implemented declarations. No manifest, registry, contract package, source, Prisma schema, migration, route, capability, database, environment, provider, or traffic changes at the C-2f-5 checkpoint. C-3 owns Guardian/Caregiver operational IIB implementation readiness and C-4 owns Institution IIB/closure evidence.
 
 Pilot-0-C3-0a Account–Subject reachability refinement:
 

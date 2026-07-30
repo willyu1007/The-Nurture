@@ -13,9 +13,176 @@
 > 家庭侧业务发送主体，同班当前合格老师可追加多条回复；第一条只解除待回复
 > Attention，不关闭 Item。旧段落不得用于实现或 activation qualification。
 
+## Current G1 owner-source override
+
+本节是六 surface G1 的当前 owner/source 架构入口，优先于下方 Wave 4 P2 历史
+implementation boundary。P2 的 `30792cd` / `b615a57` 只保留 adoption lineage；
+当前 P7 handoff pin 为 My-Chat
+`f00b86861cf0b751d747c7e0bc5cb86a952900de`，X5 source hash
+`901fd406f93fe9e584f5e972d50046e5c44458352266fb4d4fd04ee17d35dcff`，
+Host binding source hash
+`ae22312716ad520129a89ea3c69c63f02028d9efe60f929aa6c6d8abd55fd242`，
+Nurture commit `e9868c5` / merge `993e0c9`，Nurture 31-path source hash
+`cf0a47233f6c3c5645ecee40ee5c4b57090b4d48a6d9e20de7b172d9e37e074d`。
+branch CI `30462510704` passed 7/7。private endpoint 为
+`/internal/nurture/scenario-binding/authorize`；缺少
+`NURTURE_BINDING_EVIDENCE_KEY` 时 default-disabled。
+
+G1 owner path 固定为四层：
+
+```text
+My-Chat authenticated Workspace/User/Actor principal
+  -> My-Chat canonical Child/Family + current stewardship/membership/binding
+  -> Nurture typed private anchor + exact workspace-local association
+  -> Nurture current business authority
+```
+
+My-Chat 独占 canonical identity。只有 Parent/steward 或其明确授权成人可创建
+platform Child；Institution Admin、Caregiver 和 Nurture 不能 mint、推断或通过 PII
+匹配。无 authority 时只能保留 provisional local record，不得创建 global identity
+或 anchor candidate。Child/Family anchor namespace 分离，body-free、PII-free、
+authority-free，只能存在于 owner ref、Nurture persistence 和短生命周期 private
+envelope；不得进入 client、Chat、Notification、Handoff、logs、search 或 evidence。
+`reserved | bound_empty | associated | retired` 是正常 lifecycle；
+`revoked | quarantined | ambiguous` fail closed。association 必须 exact
+workspace-local，并且与 principal/binding/anchor 一样只是 routing/policy input。
+
+private invocation 同时证明 service workload 和 exact
+Workspace/User/Actor/purpose/expiry/nonce/idempotency/canonical request hash；
+service token 不代表成人。binding-owner Receipt 的写入顺序固定为 verify invocation
+→ begin Nurture transaction → lock exact typed anchor → transaction-scoped reread +
+lock/CAS exact authority source → validate association/role/purpose/version → insert
+or exact-replay Receipt → commit。后续 business effect、`CommandExecution` 和
+business `Receipt` 必须同一 Nurture transaction，并 lock/CAS 全部 mutable
+prerequisites。禁止 transaction 外 pre-read authority 和 transaction 内 remote
+My-Chat call。
+
+same idempotency key/same hash exact replay；same key/different hash conflict；
+CAS/uniqueness loser 重读 winner。revoke-before-lock deny；已 admission 的 in-flight
+request 最多 commit once；response loss 只恢复原 Execution。短生命周期
+binding-owner Receipt 与 persistent business Execution/Receipt 不得合并。
+
+当前 Fastify dev-host 只可产生 provisional Owner Integration Readiness evidence。
+最终 G1 Joint Conformance 必须经 production-intended NestJS scenario-service
+ingress，完成 formal route/API index、service-auth middleware、size/timeout/error
+boundary、env/default-off contract、no-secret denial、`PORT=8000`、backend `3001`
+和 Base `3200/3201` 端口对齐，以及 clean install/build/start/health/contract tests。
+Owner Integration Handoff 还必须包含 exact pins、disposable PostgreSQL
+binding/revoke/concurrency/replay/response-loss、privacy scan 和 final false/empty。
+任何 owner pin/source/ingress drift 使该 handoff 与下游 Joint Conformance 失效。
+
+以上工作只完成 G1 owner/source input。它不授权 persistent DB apply、Candidate、
+deployment、internal-store testing、activation 或 traffic。
+
+## Stage G6 candidate and deployment composition
+
+G6 使用分层、不可互换的 release identities：
+
+```text
+G5 NurtureServiceCandidate + InternalBetaDecision
+  -> G6-0 exact component mapping or successor-candidate/revalidation branch
+  -> current C3 component qualification
+  -> current C4 composite qualification
+  -> D complete_pilot_candidate_recipe_v1
+  -> immutable undeployed complete_pilot_candidate_id
+  -> disposable pilot0_d_predeployment_evidence_seal_v1
+  -> pilot0_e_release_decision_v1
+  -> separately authorized Pilot-1 pilot_deployment_binding_v1
+  -> default-off pilot2_rehearsal_readiness_seal_v1
+```
+
+`NurtureServiceCandidateV1` 回答“哪一个 Nurture service release 已通过六 surface
+internal-beta qualification”；`complete_pilot_candidate_id` 回答“哪一组精确
+C-3/C-4/D/Host/topology static inputs 将被 E 审核”。前者可以成为后者的组件，但
+二者不是别名。E decision、live secret/cloud resource、deployment binding、
+Workspace row 和 observation evidence 均不进入任一 Candidate identity。
+
+G6-0 MUST distinguish three drift layers:
+
+1. a G5 shared-input change to Nurture executable/schema/migrations/manifest/interface/
+   gate/config contract/owner pin, G5 Binding/profile or suite requires a successor
+   Service Candidate or corresponding new G5 evidence and affected local/dual-platform/
+   composite revalidation；
+2. a complete-Pilot-only Host/topology/operations/controller change requires a new
+   complete Pilot candidate and D/E evidence but does not automatically rerun G5；
+3. evidence-only repair may rebuild only the affected evidence while every bound input
+   remains byte- and identity-exact.
+
+Old PASS cannot migrate to new bytes. Mutable aliases、same tags、old
+`NurtureDeploymentBindingV1` or Pilot Binding cannot bridge these layers.
+`NurtureDeploymentBindingV1` identifies the G5 internal-test deployment；
+`pilot_deployment_binding_v1` independently identifies the persistent Pilot-1
+deployment and its real resource/secret-ref/trust census.
+
+G6 的并行边界是 join-safe 的：D source/IaC/runbook 可以与后半段 C-3/C-4
+implementation 并行，但 candidate assembly 和 disposable D seal 等待 current
+C-3/C-4 qualifications；Pilot-1 owner tracks 可并行 provision，但只有一个
+readback-verified binding 汇合 exact artifacts、migration heads、configuration、
+owner deployments 和 effective false/empty gates。G6-D 的 readiness seal 是 G7
+entry evidence，不是 stage authorization。
+
+The G6 overall result is current-head based, not a mutable release flag. G7 admission
+MUST independently resolve current C-3/C-4 qualification, E decision, Pilot Binding
+and Pilot-2 readiness seal. G6 permits no generic `PASS_WITH_LIMITATIONS`; exact
+`TR-P1-3a-native-external-delivery` is the only accepted scope exclusion, while all
+other required/authority/privacy/migration/recovery/evidence gaps deny.
+
+## Stage G7 activation and evidence lineage
+
+G7 is an execution projection over the already locked D-3.3/D-4～D-7 contract. It
+does not define a second product path, surface contract, deployment identity or
+global version:
+
+```text
+current pilot2_rehearsal_readiness_seal_v1
+  -> separate pilot2_rehearsal stage authorization
+  -> capability enabled with rows []
+  -> fresh Pilot-2 row
+  -> bootstrap_only -> owner_committed/spec-consumed/quarantine-clear
+  -> ordinary_ready synthetic cohort
+  -> separate ordered Pilot-3 rehearsal plan
+  -> gates closed + allowlisted final Binding successor
+  -> plan consumed + Pilot-2 authority consumed
+  -> pilot3_terminal_rehearsal_seal_v1
+  -> no-reset pilot4_observation_baseline_seal_v1
+  -> separate pilot4_observation authorization + fresh row
+  -> five contiguous 24h daily seals
+  -> terminal false/empty close
+  -> pilot4_observation_result_v1
+```
+
+The authority domains remain disjoint: stage authorizer cannot deploy, enable or
+write rows；`pilot_release_controller` can create/disable only the exact authorized
+row；Pilot-3 plan signer cannot execute faults；Technical Operator is disable/
+refs-only-recovery only and has no Nurture business role；stage-evidence and
+observation-result signers cannot activate or expand scope.
+
+Pilot-2 authorization and row are one rehearsal lineage consumed by Pilot-3.
+Pilot-4 MUST use the final Binding, terminal rehearsal seal, a body-free no-reset
+baseline seal, a different authorization and a fresh row. The old row is
+verification provenance only and cannot be restored. A rotation-time Binding
+successor may change only allowlisted secret/KMS/trust refs while candidate,
+schema/migrations, topology, resources, environment and behavior configuration
+remain exact.
+
+The 120-hour observation locks one candidate/Binding/profile/row/schema/config/
+policy/trust/surface registry and one seven-account synthetic cohort. It contains
+five append-only 24-hour segments and exactly seven planned question paths. Any
+identity drift, SEV0/1, restore, gate shutdown, evidence gap, admitted extra effect
+or external traffic terminates the clock；repair creates a new authorization/row
+and a full fresh window. Evidence collectors may run concurrently but cannot change
+facts or authority. Mainline successor development may continue outside the
+observed environment.
+
+`G7_INTERNAL_PILOT_PASS|NO_GO|STOPPED` are project summary labels only. The
+authoritative terminal record is `pilot4_observation_result_v1` with exact
+`pass|no_pass|stopped` and a non-authorizing recommendation. There is no generic
+limited PASS and no result grants external traffic or next-scope authority.
+
 ## Wave 4 P2 implementation boundary
 
-P2 now implements against the repaired exact owner-verifier contract from
+The following P2 section is retained as historical implementation lineage. P2
+implemented against the then-current repaired exact owner-verifier contract from
 My-Chat `30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. The request is bound to
 Workspace, acting User, Actor, optional represented Organization, idempotency
 key, platform subject type/id, typed Nurture owner ref/version, purpose, and
@@ -151,14 +318,15 @@ identity:
   override, forked workflow contract/runtime, or direct sibling-source import
   fails the boundary job.
 
-This closes the Nurture leg of `X-2`, `RB-2`, and `RB-3(a)`. It does not close
-`RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, or `ST-6(b)`, and it does not authorize a
+The accepted subset closes the Nurture leg of `X-2`, `RB-2`, and `RB-3(a)`.
+The accepted subset does not close `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, or
+`ST-6(b)`, and the accepted subset does not authorize a
 pilot runtime or release.
 
 ## 0.2 Pilot-0-D deployment projection
 
 Pilot-0-D does not change the domain center or create a Nurture product shell.
-It locks one dedicated Alibaba Cloud Hangzhou `pilot` environment with separate
+Pilot-0-D locks one dedicated Alibaba Cloud Hangzhou `pilot` environment with separate
 My-Chat and private Nurture ECS/Compose hosts, separate owner RDS instances,
 My-Chat-only Redis, public ingress only through My-Chat, and no Nurture dev-host
 or Kubernetes scaffold. Responsive My-Chat Web surfaces plus recipient-bound
@@ -288,7 +456,7 @@ Pilot-0-B3-1a locks the Guardian action boundary over those three surfaces. Chat
 
 Pilot-0-B3-1b locks the Caregiver action boundary across generic AI Chat and the teacher board, with no caregiver domain-workbench fallback. Both surfaces close acknowledge/reply through the same Nurture commands. Chat may open a transient protected-detail view by opaque ref after current owner reread, but protected family bodies never become persisted Chat messages or activation content. Opening an item remains read-only; acknowledge is an explicit business action distinct from host notification read state. The later C-3-0e decision supersedes the earlier AI-draft shorthand for Pilot-0: protected AI is off and a named caregiver manually composes in the protected composer. The teacher board owns complete authorized current/history views because no other Caregiver work surface exists. Direct family Chat, bulk actions, clarification loops, daily-care outcomes, reassignment, and multi-caregiver handoff are excluded from the first internal experiment.
 
-Pilot-0-B3-1c locks the Institution action boundary. The institution board is read-only and exposes safe topology/readiness aggregates plus navigation; it does not execute durable commands from projections. The institution domain web workbench owns strongly confirmed Nurture topology/configuration commands for institution/care-group lifecycle, adult-invitation initiation, staff roles, enrollment lifecycle, lead-caregiver designation, policy, and scoped business disablement. Every authoritative write uses `CommandExecution` and current role/scope/version/policy checks. My-Chat still owns account invitation/authentication and technical capability/runtime controls; Guardian relationships/grants remain family authority. Institution administrators receive no ambient family-body or child-care-fact access, cannot act as caregivers, hard-delete audit facts, or create ranking/competitive scoring. Current direct-Prisma synthetic provisioning is test preparation, not this control-plane authority.
+Pilot-0-B3-1c locks the Institution action boundary. The institution board is read-only and exposes safe topology/readiness aggregates plus navigation; projection-backed cards do not execute durable commands. The institution domain web workbench owns strongly confirmed Nurture topology/configuration commands for institution/care-group lifecycle, adult-invitation initiation, staff roles, enrollment lifecycle, lead-caregiver designation, policy, and scoped business disablement. Every authoritative write uses `CommandExecution` and current role/scope/version/policy checks. My-Chat still owns account invitation/authentication and technical capability/runtime controls; Guardian relationships/grants remain family authority. Institution administrators receive no ambient family-body or child-care-fact access, cannot act as caregivers, hard-delete audit facts, or create ranking/competitive scoring. Current direct-Prisma synthetic provisioning is test preparation, not this control-plane authority.
 
 Pilot-0-B3-1d-0 separates product and execution identities. A cross-surface Nurture product action is identified by `(scenario_key, action_key)` with a stable snake-case action key; the Nurture `command_key` identifies an immutable dotted `CommandExecution` contract; `entrypoint_key` starts a Workflow; `handler_key` is implementation binding; My-Chat technical recovery actions remain Host-owned. Action/surface/ref/confirmation values are untrusted until current owner revalidation. Six existing family-care mappings retain their persisted command keys. The current manifest `scenario_actions` registry is Run/Step-shaped and cannot be reinterpreted as Message/Grant/Item/Enrollment action transport; cross-surface domain actions require an additive contract rather than a second business lifecycle.
 
@@ -620,9 +788,23 @@ An immutable replay seed is durable but cannot wake My-Chat by itself. Therefore
 
 The persisted Step ref is the exclusive recovery owner. A later retry may reclaim the same Step with a new claim token/version, but a different Step cannot read or materialize that Execution's non-empty snapshots. Admin reconciliation operates the original Step; MVP has no replacement/transfer protocol. Once a Handoff exists, technical replay operates the My-Chat Handoff Ledger instead; a new business resend creates a new command, Step, and snapshot identity. Nurture does not synchronously call back into My-Chat to owner-read the Step and does not interpret host lease/retry state. My-Chat validates claim/lease/version during atomic `complete_step`, preserving the boundary without a cyclic service call, polling scanner, Nurture transport outbox, Redis recovery state, or signed-driver-token platform.
 
-X4-A implements this boundary inside the shared Nurture command kernel without advertising it through the scenario manifest. The transient shared driver ref is owner-shaped (`host.workflow/workflow_step`) and may omit a consumer; Nurture canonicalizes the persisted provenance to an exact five-field object with `consumer_scenario_key=nurture`, while dropping claim token and Step version. Stored snapshots are parsed as bounded refs-only contract values and replay additionally verifies request id, handoff key, purpose, expiry, and the exact original Step. The first allowed policy is `familyInputRouteSpec` in `immediate` mode and emits one `user_attention` snapshot over message, receipt, and item refs. Direct calls without activation continue to commit `[]`; pending-workflow routing cannot request this handoff.
+X4-A implements the X4-A boundary inside the shared Nurture command kernel without
+advertising the capability through the scenario manifest. The transient shared
+driver ref is owner-shaped (`host.workflow/workflow_step`) and may omit a consumer；
+Nurture canonicalizes the persisted provenance to an exact five-field object with
+`consumer_scenario_key=nurture`, while dropping claim token and Step version. Stored
+snapshots are parsed as bounded refs-only contract values and replay additionally
+verifies request id, handoff key, purpose, expiry, and the exact original Step. The
+first allowed policy is `familyInputRouteSpec` in `immediate` mode and emits one
+`user_attention` snapshot over message, receipt, and item refs. Direct calls without
+activation continue to commit `[]`；pending-workflow routing cannot request the
+X4-A handoff.
 
-This is a persistence foundation, not activation. No X4-A change adds `handoff_key` or source declarations to the manifest, passes driver context from a live workflow handler, creates a My-Chat Handoff, sends an event, or enables `workflow_handoff_materialization_v1`. Those remain ordered X4-B/X4-C work after the database-backed foundation passes.
+X4-A remains a persistence foundation, not activation. No X4-A change adds
+`handoff_key` or source declarations to the manifest, passes driver context from a
+live workflow handler, creates a My-Chat Handoff, sends an event, or enables
+`workflow_handoff_materialization_v1`. Those remain ordered X4-B/X4-C work after
+the database-backed foundation passes.
 
 X4-B/X4-C1 add the bridge without moving authority across repositories. My-Chat owns the concrete bridge implementation and injects only a two-operation port: claimed-Step input becomes a transient `ScenarioCommandDriverContext`, and returned scenario snapshots become whitelisted `WorkflowHandoffDraft` values. Nurture does not take a production dependency on My-Chat runtime code. A separate scenario-owned source port resolves the stable invocation, command, and handoff request identities plus the current family-input payload; those identities are independent of claim token, Step version, and reclaim attempt. The handler derives child scope from the Nurture payload and lets the command kernel re-resolve policy/current state, so the source port is not a second scope or authorization authority.
 
@@ -1096,7 +1278,7 @@ before dispatch; drift permits recovery only. A dedicated
 `C4BootstrapExecutionStatusLookupV1` lane with caller
 `my-chat-c4-bootstrap-recovery`, issuer `my-chat.c4-bootstrap-recovery`, and
 audience `nurture.c4-bootstrap-recovery.v1` returns only
-`committed|confirmed_no_effect|unknown`. It acquires the same deterministic
+`committed|confirmed_no_effect|unknown`. The status lookup acquires the same deterministic
 command fence as the C0 writer. Confirmed-no-effect requires every issued attempt
 terminal, latest claim expiry plus skew and owner deadline elapsed, the writer
 fence, and fence-protected absence of the exact CommandExecution. Lock timeout,
@@ -1104,9 +1286,9 @@ owner/store outage, possible in-flight work, compatible ambiguity, or one absent
 read returns unknown; no accepted writer may commit after confirmed-no-effect.
 Committed closes the operation, clears quarantine, and consumes authority;
 confirmed-no-effect may retry only the same current/budgeted operation or closes
-it no-effect; unknown remains claimed/outcome-unknown and blocks new claim,
+the operation no-effect; unknown remains claimed/outcome-unknown and blocks new claim,
 evidence seal, and destruction until resolved. Expired/revoked claimed work
-may retrieve an already committed result but cannot start an effect. It cannot
+may retrieve an already committed result but cannot start an effect. Expired or revoked claimed work cannot
 target Pilot-0-D, Pilot, staging, production, activation, or external traffic.
 Current C-3 qualification is an admission predicate, not candidate identity.
 C-4 has a separate qualification controller/event chain/resolver. Every evidence

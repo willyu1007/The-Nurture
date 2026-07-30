@@ -10,7 +10,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-29
+- Last updated: 2026-07-31
 - Current phase: Wave 4 P3 joint requalification and Nurture consolidation are
   complete and default-deny. Exact two-database X5 and Nurture main CI pass;
   local/remote Nurture retain only clean `main`. Cross-repository
@@ -21,6 +21,48 @@
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
 - Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
 - Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## Documentation warning remediation — 2026-07-31
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Linter syntax and detection boundary | PASS | `node --check .ai/scripts/lint-docs.mjs` passes. Vague-reference density now uses a 20-line local prose unit and resets at paragraph, heading, list-item and table-row boundaries instead of aggregating unrelated occurrences across a whole file. |
+| Strict scoped document and anchor lint | PASS | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors --strict` checks 31 files with 0 errors and 0 warnings. The original 21 whole-file warnings reduced to 3 actionable local clusters after the detector repair; explicit-noun cleanup closed those clusters and the two subsequently exposed table/list-item clusters. |
+| Strict repository-wide document and anchor lint | PASS AFTER CLEANUP | The first strict repository scan exposed three additional local clusters outside T-002 and the next scan exposed one later cluster in the same historical document. Explicit-reference and paragraph-boundary cleanup closed all four; the final `node .ai/scripts/lint-docs.mjs --check-anchors --strict` checks 372 files with 0 errors and 0 warnings. |
+| Governance, context, project-state and whitespace | PASS | Project governance sync/apply and lint pass; strict context verification passes after refreshing the changed Nurture workflow-contract checksum to `9177d4293a62a68fe6c566e6da2b8914c039914e8520f21ea9d02c4e4dd6080a`; project-state verification and `git diff --check` pass. |
+| Decision and runtime effect boundary | PASS | Rewording preserves the existing G1-G7 contracts, order, parallelism and acceptance gates. The lint repair changes diagnostics only and creates no product source/schema/migration, database/cloud, artifact/deployment, secret/KMS, capability, activation row, observation window or traffic effect. |
+
+## Stage G7 planning verification — 2026-07-31
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Goal and scope closure | PASS | G7-0/A/B/C/D cover entry, Pilot-2 activation/bootstrap, Pilot-3 rehearsal/terminal disable, Pilot-4 fresh 120-hour observation and terminal recommendation without adding real users, external traffic or a new product capability. |
+| G6 handoff consistency | PASS | G7 independently rereads current Candidate/C-3/C-4/E/Binding/readiness heads and requires a separate Pilot-2 authorization；G6 completion or evidence cannot create a row. |
+| Authority separation | PASS | Stage signer, release executor, Pilot-3 plan signer/executors, Technical Operator, stage-evidence signer and result reviewer retain disjoint capabilities. |
+| Activation/bootstrap order | PASS | Invitation/membership precede capability；capability precedes the fresh row；`bootstrap_only` precedes exact-once C-0 closure and `ordinary_ready`；product flows complete the cohort without SQL/operator bypass. |
+| Rehearsal/Binding lineage | PASS | Pilot-3 follows one ordered effect-decreasing chain, permanently closes the old row/authority, and permits only an allowlisted same-candidate secret/KMS/trust Binding successor before terminal seal. |
+| Observation/restart boundary | PASS | Pilot-4 uses no-reset baseline, new authorization/row, five contiguous 24-hour seals and full restart after any terminating event；pause, padding, second cohort/window and planned faults are forbidden. |
+| Sample/traffic boundary | PASS | Exact seven planned paths cover all required Guardian/Caregiver surfaces；cohort-internal product traffic is distinguished from `externalProductTrafficCount=0`；any admitted extra effect is immediate `no_pass`. |
+| Terminal result boundary | PASS | `pass|no_pass|stopped` are disjoint, `no_pass` wins on failure, only `pass` satisfies success, and recommendations cannot authorize next scope. There is no generic limited PASS. |
+| Development schedule protection | PASS | G7 freezes only the observed Pilot environment. Other mainline/successor development may continue without deploy/repin into that environment；120 hours remains a real wall-clock qualification requirement. |
+| Documentation/governance/context/whitespace | PASS | T-002 strict document/anchor lint checks 31 files with 0 errors and 0 warnings after the local-prose-unit detector repair and explicit-reference cleanup. Governance sync/lint, strict context verification and `git diff --check` pass. |
+| Exact cross-repository pin census | EXISTING DRIFT / NO QUALIFICATION CLAIM | `pnpm verify:workflow-contract-pin` expects My-Chat `f00b86861cf0b751d747c7e0bc5cb86a952900de` but the sibling repository is currently at local `328bcb005c81b306b3cac0e0628a48a782ef3253` (`main` ahead of `origin/main` by one commit). G7 planning changed no pin；the mismatch does not invalidate this documentation sync, but MUST be reconciled before any new exact cross-repository qualification claim. |
+| Runtime effect census | PASS | Planning/governance documents only；no task/Feature, source/schema/migration, database/cloud, artifact/deployment, secret/KMS, capability, row, activation, observation window or traffic state was created or changed. |
+
+## Stage G6 planning verification — 2026-07-30/31
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Goal and package closure | PASS | G6-0/A/B/C/D cover Candidate reconciliation, C3/C4/D closure, Pilot-0-E, separately authorized Pilot-1 default-off deployment and G7 handoff without adding activation. |
+| Candidate identity consistency | PASS | G5 Service Candidate is only a component input; Candidate-defining G6 drift requires a successor Service Candidate and affected G5 revalidation before complete-Pilot assembly. |
+| Dependency/parallelism consistency | PASS | G6-0, C3→C4 qualification, candidate/D-seal join, E, Pilot-1 authorization, deployment and G6-D are serial. Only non-stateful D preparation and owner-separated post-authorization provisioning have bounded parallelism. |
+| Exit/authority boundary | PASS | G6 Exit remains capability false, active rows `[]`, `externalProductTrafficCount=0`; the Pilot-2 readiness seal does not create a stage authorization or activation row. |
+| Detailed scope and ownership | PASS | G6-A consumes T-004～T-007 handoffs and owns only remaining Pilot owner/admission/qualification/release/operations closure; Pilot-2～4, real data, external traffic, native distribution and production remain out. |
+| Internal order | PASS | A1 C-3 → A2 C-4 joins A3 D preparation at A4 complete-candidate assembly; A5 disposable D evidence/census precedes E, separately authorized Pilot-1 deployment and D readiness qualification. |
+| Drift and schedule protection | PASS | G5-shared, complete-Pilot-only and evidence-only drift are distinct; only G5-shared drift reruns affected G5 evidence. T-008 G5-0 carries a read-only census without making G6 a G5 gate. |
+| Verdict boundary | PASS | No generic G6 limited PASS. P0 and P1-1/2/3b close; only exact P1-3a is an accepted scope exclusion. Overall exit is default-off with Pilot-2 authorization pending. |
+| Documentation/governance/context/whitespace | PASS WITH NON-BLOCKING WARNINGS | T-002 docs lint: 31 files, 0 errors, 21 vague-reference warnings; T-008 docs lint: 8 files, 0 errors, 2 warnings. Governance sync/lint, strict context verification and `git diff --check` pass. |
+| Runtime effect census | PASS | Planning/governance documents only; no task registration, source/schema/migration, disposable or persistent database, artifact/ACR, cloud resource, secret/KMS, capability, Workspace row, deployment, activation or traffic change. |
 
 ## Current-project consolidation verification — 2026-07-29
 
