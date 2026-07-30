@@ -444,6 +444,30 @@ fields 和一次手势 confirmation 见
 - caregiver 受保护正文通过 opaque ref 临时 owner-reread；不得复制进 My-Chat Chat history。
 - 多 Institution Enrollment 之间各自隔离；同一孩子不存在跨机构共享房间或可推断其他机构关系的会话列表。
 
+## T-007 D-04 — Institution Admin Business Communication Read
+
+`InstitutionBusinessCommunicationProjectionV1` 是受保护、非 canonical、按请求组合的
+owner-read 投影，不是新的 Message、room、thread 或 transcript。它只面向当前
+`institution_admin`，并且每次读取必须同时通过：
+
+- 精确 Institution、Enrollment、CareGroup 与 original Grant；
+- 该消息的 data class、direction、purpose 和发送前已披露的 Admin 监督范围；
+- 当前 Message/CareItem/correction/withdrawal/redaction lifecycle；
+- 当前 actor 与 source fact 的可见性策略。
+
+通过后，presenter 可以返回该园区业务沟通的当前正文、附件、作者/方向和变更状态。
+Guardian private AI、未发送 composer、My-Chat private chat 与其他 Institution
+Enrollment 始终排除。投影不复制受保护正文到 My-Chat 或园区本地共享历史。
+
+该读取不授予任何业务动作。Admin 不能据此 acknowledge、reply、correct、withdraw
+或 redact；多角色用户必须显式切换到相应 caregiver/author role，并重新通过该动作
+原有 exact authority。后续 AI attention candidate 也只能在同一读取范围内引用来源，
+不能自动执行、诊断、归责或评分。
+
+这是对当前 presenter/owner-read 的 additive、security-sensitive interface change。
+当前 manifest/module/source 仅提供 display-safe item / opaque ref，尚未实现本投影；
+必须使用新的 versioned interface/digest、受保护 carrier 与完整负向测试后才能启用。
+
 ## Authorization
 
 - 发送前与持久化事务内均需校验 authority source。
@@ -474,6 +498,8 @@ presenter 不得输出：
 - 未发送的家庭私密草稿。
 - private anchor、repository key、Prisma ID 或 authority 内部快照。
 - 另一角色的完整 transcript、room membership、其他 Institution Enrollment 的存在或内容。
+- 未通过 T-007 D-04 exact owner-read 的园区业务沟通正文；Admin 投影是逐条业务事实
+  的受保护读取，不是对另一角色 transcript 的访问。
 
 ## My-Chat Integration
 

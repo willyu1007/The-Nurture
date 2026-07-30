@@ -78,7 +78,17 @@ N1 institution owner-read capability groups:
 - `class_family_inbox` / `open_class_family_inbox` / `capture_family_input`
 - `teacher_attention_board` / `open_today_attention_board`
 
-The N1 institution owner-read capabilities resolve the current Nurture participant, role, and care-group scope on every read. Their direct surface handlers return display-safe items and opaque refs only. Existing legacy runtime handlers remain explicit-empty. The activation-only `capture_family_input` Step is an existing compatibility seam, not a product Workflow. It may emit one refs-only `user_attention` draft only when the host loads the vNext manifest with `workflow_handoff_materialization_v1` enabled, and it remains default-off pending semantic/owner-contract reconciliation.
+The current N1 institution owner-read capabilities resolve the current Nurture
+participant, role, and care-group scope on every read. Their direct surface
+handlers return display-safe items and opaque refs only. Existing legacy runtime
+handlers remain explicit-empty. T-007 D-04 plans a separate protected
+Institution Admin business-communication projection; it is not declared by the
+current manifest/module/source and remains default-off until its new interface,
+carrier, owner-read policy and qualification are pinned. The activation-only
+`capture_family_input` Step is an existing compatibility seam, not a product
+Workflow. It may emit one refs-only `user_attention` draft only when the host
+loads the vNext manifest with `workflow_handoff_materialization_v1` enabled, and
+it remains default-off pending semantic/owner-contract reconciliation.
 
 ## Object And Profile Rules
 
@@ -450,6 +460,37 @@ to `responded` and resolves waiting-for-reply attention; later replies do not
 close the Item or resolve attention again. Individual Participant and
 RoleAssignment remain internal audit and optional secondary attribution.
 
+## Planned Institution Business Communication Read (T-007 D-04)
+
+`InstitutionBusinessCommunicationProjectionV1` is a protected, noncanonical,
+request-composed owner-read projection for a current `institution_admin`. It is
+not a Message copy, room, thread, transcript, or My-Chat-owned business fact.
+
+Each request must reread the exact Institution, Enrollment, CareGroup, original
+Grant, data class, direction, purpose, pre-send Admin-supervision disclosure,
+and current source Message/CareItem/correction/withdrawal/redaction lifecycle.
+An opaque ref, Institution membership, Admin label, `child_id`, `family_id`, or
+scenario binding is never sufficient authority. Within that exact scope the
+projection may return the current business-message body, attachments,
+author/direction and change state.
+
+Guardian private AI, unsent composers, My-Chat private chats, and another
+Institution Enrollment are excluded. Protected content must not be copied into
+a My-Chat transcript, notification, aggregate cache, or second Nurture
+canonical fact.
+
+This read is separate from action authority. Admin-only actors cannot
+acknowledge, reply, correct, withdraw, or redact. A multi-role user must switch
+to the relevant caregiver/author role and pass the original exact action
+policy. A later `InstitutionAttentionCandidate` may only cite sources within
+the same authorized projection and may not auto-act, diagnose, assign blame, or
+score a child, teacher, class, or Institution.
+
+The current scenario manifest, module and source do not expose this protected
+interface. Activation requires an additive versioned interface/digest,
+body-safe private carrier, current-owner policy implementation, correction /
+redaction / revoke invalidation, and positive plus negative contract tests.
+
 ## Handoffs
 
 Handoff payloads are refs-only.
@@ -495,7 +536,14 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
 - My-Chat canonical account/user resolver keys exist.
 - Nurture resolver keys exist for child care process, participant, family, institution, care group, enrollment, child link grant, family-care thread, message, and item.
 - Shared surfaces consume only standard workflow refs and safe artifact previews.
-- Institution inbox/attention surfaces call Nurture owner-read handlers and receive only safe labels, generic badges, aggregate versions, and opaque item refs; My-Chat must not branch on Nurture business lifecycle values.
+- Current N1 institution inbox/attention surfaces call Nurture owner-read
+  handlers and receive only safe labels, generic badges, aggregate versions,
+  and opaque item refs; My-Chat must not branch on Nurture business lifecycle
+  values.
+- The T-007 D-04 protected Admin business-communication read remains disabled
+  until a new exact interface version/digest, private carrier, per-request
+  owner-read policy, lifecycle invalidation, no-copy controls and negative
+  privacy/action-authority tests are adopted by both owners.
 - Institution owner reads re-resolve current participant/role/care-group scope and recheck enrollment, thread membership, the item-linked grant, source lifecycle, and redaction before every display.
 - The default/dev scenario module remains pre-activation. The canonical vNext manifest may be loaded only through `createNurtureActivationScenarioModule` and only when the My-Chat development composition advertises `workflow_handoff_materialization_v1` and provides the claimed requirement, Actor-to-user, bridge, and materializing runtime ports.
 - `NURTURE_INTERNAL_SERVICE_TOKEN` is configured on both sides of the owner-read boundary; absence disables activation owner reads and never falls back to an unauthenticated route.

@@ -153,3 +153,18 @@
 - 修正 Caregiver teacher board：它同时承载 family-care work action 和独立
   PublishProcess，不再被描述为“只有两阶段发布”。
 - 当前仅修改 T-004 规划合同，无应用代码、manifest、schema 或数据库变更。
+
+## 2026-07-30 — T-007 D-04 Institution Admin protected-read addendum
+
+- T-007 将 Admin mobile 固定为班级优先，并允许 Admin 无需老师升级即可只读查看从
+  发送前已披露的园区业务沟通。
+- T-004 visibility matrix 增加 planned
+  `InstitutionBusinessCommunicationProjectionV1`：逐请求验证 exact current
+  Admin、Institution/Enrollment/CareGroup、original Grant/data class/purpose、
+  disclosure 与 source lifecycle。
+- 该 projection 不包含家庭私密 AI/草稿/私人聊天/其他 Institution，也不授予
+  acknowledge/reply/correction/redaction。
+- 这是 additive、security-sensitive interface 变化；实现时必须产生新的 exact
+  contract version/digest，不得复用旧 interface identity。
+- 当前 manifest/module/source 仍只有 display-safe legacy institution owner reads；
+  没有新增 route、handler、schema、runtime 或 activation。

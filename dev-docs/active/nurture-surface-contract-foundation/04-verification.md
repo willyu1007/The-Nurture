@@ -45,6 +45,8 @@
 | 2026-07-29 | Head bindings distinguish strict equality, predicate validity, compatible append and convergent postcondition | PASS |
 | 2026-07-29 | Cross-boundary mutation acceptance no longer promises that every action is reversible | PASS |
 | 2026-07-29 | Caregiver teacher board covers family-care work plus a separate PublishProcess | PASS |
+| 2026-07-30 | T-007 D-04 Admin institution-business communication read separated from CareGroup action authority | PASS |
+| 2026-07-30 | Protected Admin read classified as additive versioned contract; current source remains default-off | PASS |
 
 ## Implementation Verification (planned)
 
@@ -75,6 +77,13 @@
 - Contract tests proving concurrency precondition and idempotency identity remain independent.
 - Protected-input tests proving low-entropy body integrity uses a keyed tag and no bare body hash
   enters confirmation, logs, telemetry, Receipt or presenter output.
+- Institution Admin business-communication read tests for channel disclosure, exact
+  Institution/Enrollment/CareGroup/original Grant/data class/direction/purpose, current source
+  lifecycle, cross-Institution denial and no family-private AI/draft/private-chat leakage.
+- Capability-separation tests proving Admin body read never exposes CareGroup
+  acknowledge/reply/correction/redaction and does not create a shared transcript.
+- Contract identity tests proving addition of the protected Admin projection changes the exact
+  interface version/digest and cannot activate against the current display-safe-only manifest.
 
 ## Documentation Verification
 
@@ -91,6 +100,7 @@
 | 2026-07-29 | Interface/Service Candidate/composite identity ownership-split documentation recheck using the three commands above | PASS |
 | 2026-07-29 | Workflow/Action/Delivery/Interaction/Publish/Projection terminology SSOT and affected task-package recheck | PASS |
 | 2026-07-29 | Full contract-coherence revision: governance sync/lint, strict context verification, relative-link/heading checks and `git diff --check` | PASS |
+| 2026-07-30 | T-007 D-04 protected Institution Admin read addendum: governance lint, strict context verification and `git diff --check` | PASS |
 
 ## Evidence Policy
 

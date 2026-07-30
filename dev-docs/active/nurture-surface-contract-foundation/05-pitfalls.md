@@ -17,6 +17,13 @@
 - 不要把 Institution 发出的 GrantRequest 当成 Grant，或让机构角色代替当前 Guardian 建立、替换、撤销授权。
 - 不要让 LLM 为开放式写操作静默选择 Institution；多目标写入应在 family board 绑定具体 Enrollment。
 - 不要把 Guardian 可读的跨机构 child-context summary 暴露给任一 Institution，或在聚合时丢失 provenance 和原始 Grant fence。
+- 不要把 T-007 的园区业务沟通只读投影实现成 Institution membership 的 ambient body
+  access；必须逐请求校验 disclosure、exact original Grant/data class/purpose 和
+  source lifecycle。
+- 不要因 Admin 可读园区业务沟通就把 Admin 加入 CareGroup、共享 transcript，或授予
+  acknowledge/reply/correction/redaction。
+- 不要把 family-private AI、草稿、My-Chat 私人聊天或其他 Institution 内容混入
+  `InstitutionBusinessCommunicationProjectionV1`。
 - 不要把 synthetic owner fixture 接入真实 runtime、fallback 或 migration，也不要用它替代 T-002 owner-path qualification。
 - 不要因为 T-004 contract tests 通过就宣称真实 identity、Enrollment/Grant、authenticated path、notification 或 traffic 已通过。
 - 不要为绕过 T-002 gate 复制 My-Chat/T-002 的 identity、auth、owner-reread、receipt 或 persistence 代码。

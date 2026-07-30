@@ -353,6 +353,31 @@ T-004 不以一条故事代表完整产品，而是维护五条代表性产品 J
 | GJ-5 | 机构理念流向日常支持 | template/adoption → care observations → privacy-safe aggregate/support |
 | RJ-1 | 撤权、纠正与恢复 | revoke/redaction/role loss/stale access/replay → fail closed and retained audit |
 
+### T-007 D-04 visibility addendum
+
+园区业务沟通与 Guardian family-private AI conversation 是不同数据面。对于家长发送前
+已明确披露为园区业务渠道、且 exact original Grant/data class/direction/purpose
+允许 Institution supervision 的 Nurture Message/CareInteraction，T-007 可定义一个
+非 canonical、逐请求组合的 `InstitutionBusinessCommunicationProjectionV1`：
+
+- reader 必须是 exact current `institution_admin`，并重新验证 Workspace、
+  Institution、Enrollment、CareGroup、child/thread scope、original Grant 和 source
+  lifecycle；
+- projection 可只读返回当前可见正文、附件、更正/redaction 状态和 source refs；
+- My-Chat 只渲染 owner-read 结果，不复制正文为共享 transcript、搜索、缓存或第二
+  canonical message；
+- Admin read 不授予 acknowledge/reply/correction/redaction。Admin 同时拥有
+  caregiver role 时也必须切换 active role，并通过 T-005 exact-CareGroup action policy；
+- Guardian 私密 AI、未发送草稿、My-Chat 私人聊天和其他 Institution Enrollment
+  始终不可见；
+- 后置 AI attention 只能在相同 authorized projection 上生成带来源候选，不能扩大
+  visibility 或自动执行 action。
+
+这是 additive、security-sensitive 的 surface contract 变化，必须产生新 interface
+version/digest 并通过 owner-read/revoke/redaction/cross-Institution qualification。
+当前 manifest/module/source 只提供 display-safe legacy institution items，不能把本
+设计 addendum 误报为已实现或已激活。
+
 `waiting_and_turn_taking`（用户侧叙事“要不到东西时会哭闹”）只是 GJ-1 的中性主题，不是唯一产品主线。
 
 ### Fixture and Evidence Rules
@@ -372,7 +397,7 @@ T-004 不以一条故事代表完整产品，而是维护五条代表性产品 J
 | Guardian family board | guardian | family-owned record and target selection | 按具体 Enrollment 确认、发送、纠正与管理授权 |
 | Caregiver Nurture Chat | caregiver / lead caregiver | current-item explanation and bounded care coordination | 只对精确 CareGroup/current child scope 执行已注册 action |
 | Caregiver teacher board | caregiver / lead caregiver | class work queue + family-care detail + PublishProcess | 通过同一 Harness acknowledge/reply；发布仍走独立 PublishProcess |
-| Institution board | authorized institution operator | read-only aggregate + `InstitutionWorkflowProjection` | 无直接事实编辑 |
+| Institution board | authorized institution operator | class-first read-only aggregate + explicitly authorized institution-business communication projection + `InstitutionWorkflowProjection` | 无直接事实编辑；Admin read 不授予 CareGroup action |
 | Institution workbench | authorized institution operator | `InstitutionWorkflow` operational workspace | 可发 GrantRequest；不能代 Guardian 建立/替换/撤销 Grant |
 
 ## Identity and Permission Invariants
@@ -382,6 +407,8 @@ T-004 不以一条故事代表完整产品，而是维护五条代表性产品 J
 - 无权创建平台 child 的 actor 只能保留 provisional local child；它不进入六个正式 surface 的 bound baseline。
 - 一个 ChildCareProcess 可有多个相互隔离的 Institution Enrollment；Enrollment、CareGroup 或 route 都不是 Grant。
 - GrantRequest 不产生 authority；Grant 由当前 Guardian 确认并绑定 exact Enrollment、data class、direction 和 purpose。
+- Institution membership/Admin role 本身不授权园区业务沟通正文；必须同时满足渠道
+  disclosure、exact original Grant/data class/direction/purpose 与 current owner-read。
 - 不从 PII 推导 canonical identity，不查询 My-Chat 数据库。
 
 ## Compatibility Model

@@ -253,3 +253,20 @@
   normative contract；capability registry/query outputs 也独立成可直接生成 schema
   的合同。主架构保持跨增量不变量和引用。
 - 当前仅修改任务合同和差距清单，无应用代码、manifest、schema 或数据库变更。
+
+## 2026-07-30 — T-007 D-04 Institution Admin owner-read addendum
+
+- 新增规划中的 `InstitutionBusinessCommunicationProjectionV1`：它按请求从当前
+  Nurture-owned Message/CareItem/变更事实组合，不建立新的 canonical 数据或共享
+  transcript。
+- Admin 读取被限定为发送前已披露监督的园区业务沟通，并逐请求校验 current
+  `institution_admin`、精确 Institution / Enrollment / CareGroup、original Grant、
+  data class、direction、purpose 和 source lifecycle。
+- 当前正文、附件、correction/withdrawal/redaction 状态可在上述边界内投影；家庭
+  私密 AI、未发送草稿、My-Chat private chat 与其他 Enrollment 明确排除。
+- read 与 action authority 明确分离。Admin-only 不获得 acknowledge/reply 或作者
+  变更能力；多角色 actor 必须切换角色并通过原 action policy。
+- 后续 AI 仅可在同一 owner-read 范围内生成带来源的 attention candidate，不自动
+  action、诊断、归责或评分。
+- 当前 manifest/module/source 未声明或实现此 protected interface，因此保持
+  default-off；本次仅同步 T-004/T-005/T-007 与 context contracts。

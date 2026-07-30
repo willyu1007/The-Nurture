@@ -5,9 +5,10 @@
 - State: planned
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-29
-- Next step: 按本轮合同审阅后的规范字段完成 Phase 0 复用/门禁矩阵，并冻结
-  `SurfaceContractV1`、`CapabilityDescriptorV1` 与通用 invocation/result schemas。
+- Updated: 2026-07-30
+- Next step: 按本轮合同审阅后的规范字段完成 Phase 0 复用/门禁矩阵，并将 T-007
+  D-04 的 Institution Admin 园区业务沟通只读投影纳入 `SurfaceContractV1`
+  visibility/versioning 设计；当前能力保持未实现、default-off。
 
 ## Goal
 
@@ -23,6 +24,10 @@
   - Institution board（mobile read-only）
   - Institution workbench（Web）
 - actor / role / workspace / child scope / visibility 矩阵。
+- T-007 D-04 visibility addendum：家长发送前已披露为园区业务渠道的沟通，可通过
+  精确 Institution/Enrollment/CareGroup/Grant/purpose owner-read projection 向
+  `institution_admin` 返回当前正文/附件；不开放家庭私密 AI/草稿/私人聊天，也不
+  授予 CareGroup reply 权限。
 - capability-first queries / commands 与 surface-first presenter / view-model 的版本化契约。
 - machine-readable capability descriptors：domain/execution/delivery 三轴分类、intent、
   typed input/result/error schemas、eligibility policy reference、target/confirmation/
@@ -61,6 +66,9 @@
 ## Acceptance Criteria
 
 - [ ] 六个 surface 均有明确的 actor、workspace、read/write、child scope 和数据敏感度定义。
+- [ ] Institution Admin 园区业务沟通 read 与 CareGroup action authority 分离：
+  Admin 可在披露且精确授权的渠道读取，不因读取获得 acknowledge/reply/correction/
+  redaction；家庭私密 AI、草稿、私人聊天和其他 Institution 保持不可见。
 - [ ] 所有跨家庭/机构边界的动作均显式授权、可审计，并明确其
   correction/withdrawal/redaction/irreversible 边界；任何动作都不得静默覆盖或删除历史。
 - [ ] public API 与 presenter/view-model 契约可由 My-Chat 在不访问 Nurture 数据库的前提下消费。

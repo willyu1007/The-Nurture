@@ -6,6 +6,13 @@
 - 不要把 Guardian Chat 与 Caregiver Chat 建模为共享聊天室、直接 DM 或共同 transcript。
 - 不要用 room membership、presence、typing、host unread 或 My-Chat Chat history 表示 Nurture 权限和回执。
 - 不要因两个 surface 消费同一 CareItem 就向双方暴露相同正文、动作或历史。
+- 不要把 T-007 D-04 的 Institution Admin 业务沟通只读投影理解为共享 transcript
+  或 “Admin 能看本园全部聊天”；它必须逐请求通过 exact scope、Grant、purpose、
+  disclosure 与 source lifecycle。
+- 不要因为 Admin 能读取园区业务沟通就赋予 acknowledge、reply、correct、withdraw
+  或 redact。读取能力与 caregiver/author action authority 是两套独立判定。
+- 不要把 Guardian private AI、未发送 composer、My-Chat private chat 或其他
+  Enrollment 内容带入 Admin 投影，也不要把投影正文持久化为第二份业务事实。
 - 不要让 Enrollment-private Thread 跨机构复用，或让一个机构推断其他 Institution Enrollment 的存在。
 - 不要把普通 Chat turn、只读总结或未确认的 action suggestion 自动持久化为 CareItem。
 - 不要让 Chat 和看板分别实现发送、授权、幂等、回执或错误语义；它们必须调用同一 Capability Harness。

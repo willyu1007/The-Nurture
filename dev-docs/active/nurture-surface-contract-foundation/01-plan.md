@@ -35,6 +35,11 @@
 
 - 任意 view-model 字段都能追溯到 Nurture-owned fact 或明确的 My-Chat opaque identity / policy input。
 - institution 聚合不能读取家庭私密正文。
+- T-007 D-04 的园区业务沟通不是 ambient aggregate：定义一个 request-time、
+  versioned Admin read-only projection，绑定 exact Institution/Enrollment/CareGroup、
+  original Grant/data class/purpose、渠道 disclosure 与 source lifecycle。
+- 明确 Admin protected read 不授予 CareGroup action authority；当前 manifest/source
+  在新 owner-read contract 和 qualification 完成前保持 default-off。
 - capability descriptor 只描述可发现性，不复制或弱化真正的授权 policy。
 - content family 只表达产品语义，不携带任意视觉组件树、像素布局或 host navigation。
 - 单机构试点路径可确定性收敛到唯一 Enrollment，但多机构时不得由 LLM 静默选择写入目标。

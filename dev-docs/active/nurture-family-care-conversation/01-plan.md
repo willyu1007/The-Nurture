@@ -176,6 +176,25 @@
 - 对 author authority、授权撤销、跨机构隔离、并发 head、cascade、response loss、
   notification invalidation 和 replay 建立测试。
 
+## T-007 D-04 — Institution Admin Read-only Projection Addendum
+
+- 在 T-005 presenter family 中新增
+  `InstitutionBusinessCommunicationProjectionV1`，它是非 canonical、按请求组合的
+  owner-read 结果，不是 Message 副本、共享 room 或共享 transcript。
+- 每次读取都重新验证 current `institution_admin`、精确 Institution / Enrollment /
+  CareGroup、original Grant、data class、direction、purpose、发送前监督披露与源
+  Message/CareItem lifecycle；opaque ref、同园区关系或 Admin 标签本身不授权。
+- 允许投影当前可见的园区业务沟通正文、附件、作者/方向、correction、
+  withdrawal/redaction tombstone 与当前状态；不允许 Guardian private AI、未发送
+  composer、My-Chat private chat 或其他 Institution Enrollment。
+- Admin projection 只读。acknowledge/reply 仍要求 exact CareGroup current
+  `caregiver | lead_caregiver`；correction/withdrawal/redaction 仍使用各自
+  exact-author 或独立 system-policy capability。
+- 后续 `InstitutionAttentionCandidate` 只能在同一 owner-read 范围内引用原始材料并
+  突出可能需要介入的事项；不自动执行、诊断、归责或评分，也不属于当前增量。
+- 当前 manifest/module/source 尚无该 protected presenter 接口；在新版本 interface、
+  digest、carrier、owner-read 与负向测试齐备前保持 default-off。
+
 ## Increment 1 Checkpoint
 
 - `submit → acknowledge → reply` 三个 action 全部使用同一 Harness/CommandExecution contract。

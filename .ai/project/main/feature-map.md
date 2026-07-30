@@ -64,6 +64,40 @@ Project: `main`
   exact-CareGroup face matcher may automatically confirm only high-confidence child attribution;
   ambiguous results require caregiver handling, and biometric consent/PIPIA/privacy gates remain
   mandatory before activation.
+- Institution Surfaces: mobile and Web are bound to one explicit active-role context; a
+  multi-role user must switch roles and never receives a unioned super-surface. Lead is an
+  Admin-managed internal designation with no permission delta. Current T-007 Web scope is only
+  `InstitutionAdminWorkbench`, covering people/relationships, daily operations, parent reach,
+  digital resources, institution knowledge/RAG and responsibility queues; non-Admin Web
+  workbenches remain undefined. Admin mobile stays read-only and is class-first: each class has
+  its own effective schedule, activity evidence timeline, today communication/attention and
+  home–institution dynamics; park-level presentation only summarizes park-wide items and
+  cross-class exceptions. Class cards use deterministic latest eligible media rather than an
+  AI-selected representative image, expose canonical attendance submission state rather than
+  inference, and keep full communication/child detail behind exact-purpose drill-down. Admin Web
+  may create and read complete authorized photo/text records, set optional covers, and revise
+  activity/child associations append-only while preserving teacher originals and automatic-match
+  provenance. Support signals are noncanonical, two-tier (`action_required` /
+  `attention_suggested`) projections derived from canonical deadlines/blockers or explicit
+  Institution absolute count/time-window policies; they never use peer ranking, hidden AI scores,
+  or automatic WorkItem/Workflow creation. Mobile displays at most three cross-class signals and
+  body-free class counts, while Admin Web owns threshold configuration and explicit source
+  actions. The first Institution Workflow implementation is limited to
+  `EnrollmentJourneyWorkflowV1`, spanning inquiry, intent/optional visit, optional full-class
+  capacity waitlist, trial preparation/care/review, enrollment offer, identity/Grant/Enrollment
+  activation, settling, and completion. Capacity waitlist is distinct from waiting on a Guardian,
+  caregiver, system owner, future date, or blocker; exact states/schema remain open until the
+  journey deep dive closes. Explicitly disclosed institution-business communication is available
+  to the exact Institution Admin through a request-time owner-read projection without teacher
+  escalation, while family-private AI/drafts/private chat remain excluded and Admin read never
+  grants CareGroup reply authority. A later AI attention capability may only highlight cited
+  candidates inside that same scope and remains default-off. At daily attendance submission,
+  AI may infer from stable business evidence, but only a currently assigned class caregiver can
+  confirm canonical attendance. Admin may oversee, remind, return and reopen a prior day but
+  cannot substitute for teacher confirmation. Institution Admin may author and publish medical
+  as well as general knowledge and link authoritative sources; RAG must distinguish and cite
+  institution versus authority revisions, retain provenance on reuse, and abstain rather than
+  silently merge material medical conflicts.
 - Invocation Contract: capability-specific typed input contains business fields only.
   Prepare binds the exact target and declared concurrency heads, actor/scope, canonical input
   hash and expiry into `confirmationRef`. Acknowledge uses exact-state concurrency; reply is
@@ -74,10 +108,18 @@ Project: `main`
   speed, conflating interface integration with code/bundle adoption, allowing floating
   contract/environment bindings, leaking family-private facts into institution aggregates,
   calling every asynchronous/cross-owner action a Workflow, treating board projection as
-  Workflow ownership, or treating internal beta as production approval.
+  Workflow ownership, starting release intent from individual photo events, widening biometric
+  matching beyond the current CareGroup/purpose/consent boundary, or treating internal beta as
+  production approval; merging role surfaces, treating record coverage or AI inference as
+  canonical attendance, letting Admin substitute for class-teacher confirmation, or presenting
+  institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 through T-008 (`planned`).
-- Next Checkpoint: begin T-004 discovery after reconciling the current T-002 gates; keep all capabilities default-off and external traffic NO-GO.
+- Next Checkpoint: T-004～T-006 顶层契约以及 T-007 角色/Admin Web、每日出勤和
+  知识/RAG 决策已完成对齐；继续收敛 T-007 首批 `InstitutionWorkflow`、聚合隐私
+  阈值与精确 schema。随后各任务仍需在 T-002 owner gates 下
+  分别完成 contract/schema inventory、实现与资格验证；所有能力保持 default-off，
+  external traffic 继续 NO-GO。
 
 ## Notes (manual)
 - Keep human notes here. Everything below the AUTO section is generated by sync.

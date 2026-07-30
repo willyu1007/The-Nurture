@@ -5,11 +5,12 @@
 - State: planned
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-29
+- Updated: 2026-07-30
 - Next step: 按 [T-002 fact/schema gap](06-t002-fact-schema-gap.md) 的实施顺序，
   先采用 T-004 exact
   contract pin，再冻结三轴 CareItem、immutable command result、protected ingress、
-  context continuation 与 correction/withdrawal/redaction schemas。
+  context continuation 与 correction/withdrawal/redaction schemas；同时按 T-007 D-04
+  冻结园区业务沟通的 Institution Admin 只读投影，不扩张 caregiver action authority。
 
 ## Goal
 
@@ -125,6 +126,10 @@
 - withdraw、redaction、correction 与 owner-reread / replay。
 - 每次跨边界发送绑定精确 Institution Enrollment 和原始 Grant，且不得跨机构串联。
 - 角色化 presenter、commands、errors 与合成 fixture。
+- 面向当前 `institution_admin` 的园区业务沟通只读投影：仅覆盖发送前已披露 Admin
+  监督的 `family_to_org | org_to_family` 业务消息，逐请求重读精确 Institution、
+  Enrollment、CareGroup、original Grant、data class、direction、purpose 与源事实
+  lifecycle 后，返回当前正文、附件及 correction/withdrawal/redaction 状态。
 - 非诊断、非处方、非紧急替代的健康表达边界。
 
 ## Scope Out
@@ -135,6 +140,11 @@
 - Chat 或看板绕过 Capability Harness 直接写入家园沟通事实，或各自维护一套发送/回执逻辑。
 - 把普通聊天、查询总结或未确认的 action suggestion 自动转换为 CareItem。
 - 默认把家庭 AI 对话同步给机构或照护者。
+- 将 Institution Admin 只读投影扩张到 Guardian 私密 AI、未发送草稿、My-Chat
+  private chat、其他 Institution Enrollment，或把该投影复制成园区共享 transcript。
+- 让 Institution Admin 只读投影隐含 acknowledge、reply、correct、withdraw、
+  redact 或 caregiver 身份；这些 action 继续使用各自 exact-author / exact-CareGroup
+  authority。
 - 医疗诊断、处方建议、紧急服务替代。
 - 仅凭 child/family binding 自动建立通信权限。
 
@@ -156,6 +166,12 @@
 
 - [ ] 家庭 AI 房间内容默认仅家庭可见，跨边界必须有明确 preview 和 send 动作。
 - [ ] guardian/caregiver 不进入共享聊天室；同一照护事项只生成各自当前可见的角色投影。
+- [ ] Institution Admin 仅能通过独立、非 canonical、按请求组合的园区业务沟通
+  owner-read 投影查看已披露监督的当前正文、附件与 lifecycle；投影不复制 Message，
+  不建立共享 transcript，也不暴露家庭私密上下文。
+- [ ] Institution Admin 的 read authority 与 action authority 分离；仅持 Admin
+  身份不能 acknowledge/reply/correct/withdraw/redact。多角色用户必须切换到相应
+  caregiver/author role，并重新通过原 action 的 exact authority。
 - [ ] ordinary chat、Chat-assisted action 与 board-direct action 有可测试的不同结果；普通聊天不产生业务写入。
 - [ ] Chat-assisted action 与 board-direct action 对同一 capability 产生相同 canonical effect、receipt 和错误语义。
 - [ ] Harness 使用统一逻辑 envelope，但每个 capability 保持独立的版本化 typed input/result、policy、command/handler 和 presenter binding。

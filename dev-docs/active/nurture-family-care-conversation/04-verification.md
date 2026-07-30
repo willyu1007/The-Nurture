@@ -5,6 +5,10 @@
 | Date | Check | Result |
 | --- | --- | --- |
 | 2026-07-29 | Family-private and shared-thread boundaries separated | PASS |
+| 2026-07-30 | T-007 D-04 Admin business-communication read modeled as noncanonical per-request owner-read projection | PASS |
+| 2026-07-30 | Admin read scope excludes Guardian private AI, unsent drafts, My-Chat private chat and other Enrollment | PASS |
+| 2026-07-30 | Admin read authority kept separate from caregiver/author action authority | PASS |
+| 2026-07-30 | Current manifest/module/source implementation remains default-off pending a new protected interface version | PASS |
 | 2026-07-29 | Explicit cross-boundary send retained | PASS |
 | 2026-07-29 | My-Chat UI/runtime kept out of local scope | PASS |
 | 2026-07-29 | No shared cross-role room; guardian/caregiver consume role-specific projections | PASS |
@@ -174,6 +178,13 @@
   claimed-Step/`workflow_step_complete_v1`, single reply slot and caller-supplied authority
   cannot register as the T-005 public Harness path.
 - Negative contract tests for shared room membership, direct role DM, shared transcript and host-unread authority.
+- Institution Admin owner-read tests for exact Institution/Enrollment/CareGroup/original
+  Grant/data class/direction/purpose/disclosure/source-lifecycle matching, including current
+  body, attachment and correction/withdrawal/redaction projection.
+- Negative Admin-read tests for private AI, unsent composer, My-Chat private chat, another
+  Enrollment, revoked Grant, redacted source and stale opaque refs.
+- Action-separation tests proving Admin-only cannot acknowledge/reply/correct/withdraw/redact,
+  while a multi-role user must switch role and pass the original exact action policy.
 - Opaque-ref transient owner-read tests proving protected caregiver bodies are not copied into My-Chat Chat history.
 - Black-box end-to-end journey through public scenario contract.
 - Non-diagnostic health-language review.
@@ -187,6 +198,7 @@
 | 2026-07-29 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` | PASS |
 | 2026-07-29 | Relative Markdown link and duplicate-heading checks across T-004/T-005 | PASS |
 | 2026-07-29 | `git diff --check` | PASS |
+| 2026-07-30 | T-007 D-04 Institution Admin owner-read presenter addendum: governance lint, strict context verification and `git diff --check` | PASS |
 
 ## Required Evidence
 

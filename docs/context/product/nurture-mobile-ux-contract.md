@@ -11,7 +11,7 @@
 >
 > 分层标记：**[A]** 可直接实现的规格 · **[C]** 依赖未建工程能力 · **[试点]** 假设待验证。
 
-> **Current semantic overrides（2026-07-29）**：
+> **Current semantic overrides（2026-07-30）**：
 > 本文件是 T-003 设计输入，不是当前实现 SSOT。Guardian/Caregiver 不建立共享聊天室、
 > 家园直聊或直接 DM；两侧消费 `CareInteraction` 的角色安全投影。当前产品 Workflow
 > 仅指园区管理 `InstitutionWorkflow`：Institution Web workbench 是主要操作面，
@@ -23,6 +23,10 @@
 > 本文件中“待发送气泡撤回”属于 `PublishProcess` 的发布前取消。已发送
 > `CareInteraction` 中 correction、family request withdrawal 与 message redaction
 > 分别作用于内容解释、事项工作和内容可见性，不得按本文件旧文案合并为“撤回消息”。
+> Institution Admin mobile 已改为班级优先：首页为园区级事项、班级列表和跨班级
+> 异常摘要，每个班级使用自己的有效日程组织一日活动、今日沟通与关注、家园共育。
+> 园区业务沟通可通过逐请求、精确授权的只读投影向 Admin 展示当前正文和附件，但
+> 不建立共享 transcript，也不授予老师的回复或作者修改能力。
 
 ## 1. 横切原则
 
@@ -141,19 +145,63 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
 - 落点可见：发出后内容真实出现在对应会话；状态行"查看"跳转定位。
 - 默认参数（**[试点]** 均可配）：否决窗 15s；批次 12:30/17:00。
 
-## 6. 机构端表面（框架级，细节共创待定）
+## 6. Institution Admin 表面
 
-- **移动看板（只读）**：除今日脉搏和支持信号外，可消费
-  `InstitutionWorkflowProjection`，展示 actor-safe 的 Workflow 关键内容、当前阶段、
-  已完成里程碑、阻塞和下一步；不得显示 raw Run/Step 或提供隐藏写操作。今日脉搏
-  （在园/活动/消息回应，按班聚合）→ 家园流动
-  （进/出条数 + 授权变更）→ 理念在发生（关注类观察计数+周趋势）→ 需要关注
-  （支持视角推送，如"某班今日消息较多，要不要安排人支援"）。禁止：按老师聚合/排名。
-- **Web 操作台**：当前 `InstitutionWorkflow` 的主要操作面，基于
-  `My-Workflow-Base/templates/web-workbench`（morethan kit，
-  Hub/List/Insight 范式）。首批模块：入托与邀请（Roster→邀请→**家长确认才建档**）、
-  班级与老师、家园沟通、素材归档、理念与目标（理念→阶段目标→活动模板→班级采纳与观察回流）。
-- **[试点]** 园长看板最想看的数字、推送口径——留作共创问题。
+- **角色边界**：mobile board 与 Web workbench 都绑定显式 active role；多角色用户
+  必须切换角色。当前只定义 `institution_admin` Web 操作台。Lead 是 Admin 指定的
+  内部分工标识，不增加 permission、visibility、capability 或独立 Surface。
+- **移动首页（只读）**：以班级为顶层入口，园区层只保留园区级事项、班级列表和
+  跨班级异常摘要，不用一条统一时间线假设全部班级同步活动。禁止按老师、孩子、班级
+  或园区评分/排名。
+- **班级卡（只读）**：展示当前/下一活动、正式出勤提交状态、最新合格照片、最新
+  文字、source timestamp 和待回应/新反馈/待处理数量；不展示沟通正文、孩子名单、
+  AI 出勤推测、匹配 confidence 或 freshness/绩效分数。照片优先使用有效的可选活动
+  封面，否则按当前活动最新 → 本班今日最近活动的确定性规则选择；待复核、归属不明、
+  withdrawn/redacted/revoked/invalid 内容排除。系统不以审美/生成式 AI 挑图，也不
+  crop、beautify 或 face-focus。
+- **班级详情（只读）**：每班独立展示有效日程、一日活动、今日沟通与关注、家园共育、
+  正式出勤状态和 actor-safe `InstitutionWorkflowProjection`。日程解析顺序为
+  当日临时安排 → 班级覆盖 → 园区默认，并保留 effective date/version。孩子级
+  下钻只用于明确的沟通、出勤或活动证据核对 purpose，不形成可任意浏览的全量档案。
+- **活动证据落位**：照片、文字和活动记录只在精确班级内，依次按显式 activity ref、
+  当日临时安排、班级日程/时间和后置 AI 语义辅助落位；无法确定时保留为班级内
+  “待归位”。无记录不等于活动未开展，也不构成老师绩效。
+- **今日沟通与关注**：Admin 不需要老师主动升级即可查看发送前已披露监督的园区业务
+  沟通。读取通过非 canonical、逐请求组合的
+  `InstitutionBusinessCommunicationProjectionV1`，每次重新校验精确 Institution /
+  Enrollment / CareGroup / original Grant / data class / direction / purpose /
+  source lifecycle。可见当前正文、附件与 correction/withdrawal/redaction 状态；
+  Guardian private AI、未发送草稿、My-Chat private chat 和其他 Enrollment 排除。
+  该投影不授予 acknowledge/reply/correct/withdraw/redact。
+- **支持信号**：只表示园区可能需要提供支持，不是异常定责或绩效。第一版从明确
+  deadline/blocker 和园区显式配置的 absolute count/time-window 规则派生；未配置的
+  负荷规则保持 disabled，不做跨班/跨老师比较、历史异常基线或隐藏 AI score。产品只
+  显示“需要处理 / 建议关注”两级；只有 canonical overdue/blocker 可进入前者。
+  园区首页最多突出三个跨班信号，班级卡只显示 body-free 数量/原因并通过 exact
+  owner-read 下钻。Mobile 不提供 dismiss/ack/escalate；Admin Web 配置 policy、
+  查看来源并执行独立 source action。来源解决/撤回/纠正/redaction/revoke 后信号
+  自动消失，不自动回复、通知、创建 WorkItem/Workflow 或形成长期标红历史。
+- **AI 关注候选（后置）**：只在上述同一 owner-read 范围内，以来源引用突出可能需要
+  介入的沟通；不自动行动、诊断、归责或评分，最多映射为“建议关注”，不能自行升级
+  为“需要处理”。
+- **首个园区 Workflow**：第一实现增量只选择
+  `EnrollmentJourneyWorkflowV1`，顶层覆盖意向咨询/沟通、可选到访、可选满班候补、
+  试入园准备/过程/复盘、正式入园确认、identity/Grant/Enrollment activation、
+  入园适应期和完成。`capacity_waitlist` 只表示目标班级满员；等待 Guardian、
+  caregiver、system owner、未来日期或 blocker 是 waiting/blocking state，不进入
+  候补顺序或容量统计。意向期只允许最少 local provisional data；试入园前需明确
+  Guardian consent，family-facing 试入园照片/文字还需 current binding/Grant。
+  Enrollment 激活是 milestone，Workflow 在适应期闭环后才完成且不产生适应评分。
+  当前只锁顶层旅程，精确 enum、transition、候补政策、trial consent、activation 和
+  completion schema 留待后续深入决策。
+- **Web 操作台**：当前仅 `InstitutionAdminWorkbench` 可用，是
+  `InstitutionWorkflow` 的主要操作面。首批包含人员与关系、日常运营、家长触达、
+  数字资源、园区知识/RAG 与流程队列。出勤由 AI 在每日提交时提供推理，当前班级
+  老师确认后才成为正式事实；Admin 可查看、催办、退回或跨日 reopen，不能代确认。
+  园区编辑的知识可关联权威来源，产品内 AI 回答应提供来源引用。Admin 可新增园区
+  来源照片/文字、查看完整原图/正文、设置可选封面并调整活动/孩子关联；老师原始
+  内容、作者和时间不可原地覆盖，调整必须保留原始自动匹配、操作者、原因及完整
+  revision history。完整事实仍由 Nurture 持有，Web 不复制第二份 canonical 数据。
 
 ## 7. 设计系统 [A]
 
@@ -212,4 +260,9 @@ CareInteraction 的 `withdraw_family_care_request` 或 Message redaction。
 ## 10. 版本
 
 - v1（2026-07-23）：基线 = deck v2.5 + 效果图 r4；九轮决策全录于任务包 02-architecture.md。
+- v1.1（2026-07-30）：同步 T-007 D-01～D-07，机构端改为 role-bound、
+  Institution-Admin-only Web 与班级优先 mobile，加入精确授权的园区业务沟通只读
+  投影，固定确定性最新照片、完整 Web 照片/文字记录、append-only 关联修订，以及
+  两级、非绩效、绝对阈值驱动的 support signals；首个 Workflow 只选择从意向到
+  适应期闭环的 Enrollment Journey，并将满班候补与普通 waiting state 分离。
 - 变更流程：先在任务包记录讨论与拍板，再更新本契约并 `ctl-context touch`。
