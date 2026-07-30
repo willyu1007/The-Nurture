@@ -326,3 +326,13 @@
   mutation authority。
 - 当前只更新文档与治理状态，无代码、schema、migration、database、environment、
   Candidate、activation 或 traffic 变更。
+
+## 2026-07-31 — Acceptance-to-check mapping accepted
+
+- 用户确认验收条目机械化映射方案：G3-0 及 G3-A～E 各组冻结时为该组验收条目分配
+  稳定 `T006-AC-###` ID，逐条映射到 conformance fixture、negative case、
+  unit/integration test、lint/静态检查或 evidence census 之一；不可机械验证的条目
+  显式降级为 `design_note`。
+- 未映射条目不得勾选；各组资格化与 G3-E PASS 依据是映射检查通过。回链使用
+  T-004 conformance manifest 的 AC 引用字段。详见 `01-plan.md`
+  Acceptance-to-Check Mapping 小节。本次只更新规划文档，无代码或 schema 变更。

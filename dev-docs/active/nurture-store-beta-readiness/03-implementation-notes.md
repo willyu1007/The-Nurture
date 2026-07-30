@@ -45,3 +45,18 @@
 - 回滚部署必须生成新 Binding 并完整重验，不能复用旧 PASS。当前仍无 Candidate、
   deployment、schema/database、secret、store build、activation 或 traffic 变更。
 - 下一步展开 G5-0 Freeze Readiness inputs、beta profile 和 pre-candidate inventory。
+
+## 2026-07-31 — Beta Profile v0 early freeze accepted
+
+- 用户确认 beta profile 的首个版本化草案提前到 G1 Joint Conformance 前后、
+  G2 实施开始之前冻结，不等待 G5-0；所有权保持在 T-008。
+- 动机：profile 判定被上游大量消费——T-006 G3-B2/C2 与 G3-A Workflow board
+  module 的 required/optional、T-002 必须资格化的 owner/source subset 都取决于
+  它；晚定义的失败模式是 G5-0 时发现 required 缺口返工回 G3/G4，或上游为保险
+  过度实现 optional 能力。v0 同时是裁剪关键路径的工具：把大块机构侧能力标为
+  optional-absent 可显著缩小 required 面并提前 Freeze。
+- 决策落点：`01-plan.md` 新增 Beta Profile v0 Early Freeze 小节（v0 两部分内容、
+  versioned drift 修订规则、G5-0 职责改为确认/终版化）；`00-overview.md`
+  Next step 同步。
+- required 面的逐项裁剪（Enrollment Journey、Knowledge/RAG 等）留待 v0 起草时
+  决定。本次只更新规划文档，无代码、配置、schema、数据库或部署变更。

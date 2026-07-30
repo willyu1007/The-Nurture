@@ -6,8 +6,10 @@
 - Task: T-008
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-07-30
-- Next step: Stage G5 整体结构和实施顺序已确认；下一步展开 G5-0 Freeze Readiness
-  输入、六 surface beta profile 与 pre-candidate inventory。
+- Next step: Stage G5 整体结构和实施顺序已确认。Beta Profile v0 草案已决定提前
+  到 G1 Joint Conformance 前后、G2 实施开始之前冻结（见 `01-plan.md` 的
+  Beta Profile v0 Early Freeze 小节）；G5-0 届时确认并终版化该 profile，再展开
+  Freeze Readiness 输入与 pre-candidate inventory。
 
 ## Goal
 

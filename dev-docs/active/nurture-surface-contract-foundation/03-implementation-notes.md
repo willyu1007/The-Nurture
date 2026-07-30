@@ -168,3 +168,26 @@
   contract version/digest，不得复用旧 interface identity。
 - 当前 manifest/module/source 仍只有 display-safe legacy institution owner reads；
   没有新增 route、handler、schema、runtime 或 activation。
+
+## 2026-07-31 — Slice-hash invalidation granularity accepted
+
+- 用户确认在 Phase 2 冻结 `InterfaceContractRefV1` 前采用分片哈希决策。
+- 动机：按原字面规则，additive 能力新增旋转 root digest 并使 G1 synthetic +
+  joint 证据整体失效，而 G2～G4 全程都在新增能力，G1 证据将处于持续字面失效
+  状态；"受影响"缺少机械定义时只能在全量重跑与人工判断之间二选一。
+- 决策：conformance manifest 逐 capability/逐 surface 记录 canonical slice hash，
+  slice 边界与哈希顺序进入 canonicalization 规则；admission 仍只用 exact root
+  digest。失效范围由 slice hash 机械判定：slice 未变化的既有证据保持有效，
+  additive 新增只要求新 slice 资格化；共享 invocation/confirmation/error 信封层
+  变化仍全量失效，恢复路径是单命令确定性全量重跑。
+- 落点：`01-plan.md` Phase 2 条目与验收、G1-07 粒度细化段、`00-overview.md`
+  验收条目。
+- 当前只更新规划文档，无应用代码、配置、manifest、schema 或数据库变更。
+
+## 2026-07-31 — Conformance manifest AC-reference field accepted
+
+- 配合 T-005/T-006/T-007 的 acceptance-to-check mapping 决策，conformance
+  manifest 的 fixture/case 条目增加可选 acceptance-item 引用字段
+  （如 `T005-AC-###`），使消费任务能把验收条目机械回链到具体检查。
+- 该字段属于 manifest schema；缺失引用不影响 T-004 自身资格化。落点为
+  `01-plan.md` Phase 4。本次只更新规划文档，无代码、manifest 或 schema 变更。

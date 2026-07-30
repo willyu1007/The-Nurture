@@ -180,6 +180,18 @@ cascade、Chat/Board equivalence、cross-family/CareGroup/Institution、Admin-on
 stale owner/Grant、privacy/leakage 和 default-off/final-empty tests。G2 PASS 不授权
 Candidate、persistent DB apply、native/internal-store testing、activation 或 traffic。
 
+## Acceptance-to-Check Mapping — Accepted (2026-07-31)
+
+- 本任务验收条目在 G2 contract/schema freeze 及各 checkpoint（G2-A/B/C、Phase 4、
+  Exit Gate）冻结时获得稳定 ID（`T005-AC-###`），并逐条映射到恰好一类机械检查：
+  conformance fixture、negative case、unit/integration test、lint/静态检查或
+  evidence census 字段。
+- 无法机械验证的条目显式重分类为 `design_note`：仍是设计约束，但退出资格化门禁。
+- 未映射的验收条目不得勾选；checkpoint/Exit 资格化 PASS 的依据是映射检查全部
+  通过，而不是对散文条目的自评。
+- 映射按 stage 摊销，不做一次性回溯；映射表随该 stage 的 freeze 记录一起交付，
+  fixture/case 侧使用 T-004 conformance manifest 的 AC 引用字段回链。
+
 ## Phase 0 — Conversation Contract Discovery
 
 - 已完成 T-002 landed family-care fact/schema/source 盘点，详见

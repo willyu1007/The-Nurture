@@ -367,6 +367,22 @@ Nurture local qualification 和 My-Chat 双平台 internal-store real-device evi
    部署旧 Candidate 后生成新 Binding，并完整重跑 local、iOS、Android、Composite
    与 Decision；destructive DB down migration 默认禁止。
 
+### Beta Profile v0 Early Freeze — Accepted (2026-07-31)
+
+- beta profile 所有权保持在 T-008，但其首个版本化草案（Beta Profile v0）提前到
+  G1 Joint Conformance 前后、G2 实施开始之前冻结，不等待 G5-0。
+- v0 内容固定为两部分：已知 optional 能力的逐项 required / optional-absent 判定
+  （至少覆盖 G3-B2 AI copy、G3-C2 `ClassScopedFaceMatch`、G3-A Workflow board
+  module），以及六 surface 各自的最小 required capability 集合；后者直接推导出
+  T-002 必须在 Freeze 前 implemented / jointly qualified / pinned 的 owner/source
+  subset 清单。
+- v0 是 versioned planning input，不是资格化证据，不改变任何门禁语义。修订按
+  drift 对待：optional→required 翻转必须触发受影响 stage 的显式影响分析，禁止
+  静默扩 scope。G5-0 的职责相应从"定义 profile"变为"确认并终版化 profile"。
+- required 面的具体裁剪（例如 G4-D Enrollment Journey、G4-E Knowledge/RAG 是否
+  进入首个 internal beta）在 v0 起草时逐项决定，当前未定；"缺失 required 路径
+  阻塞 Freeze 而非降级为占位"的规则不变。
+
 ### Critical path
 
 ```text

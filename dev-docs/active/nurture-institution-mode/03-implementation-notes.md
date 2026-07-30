@@ -7,6 +7,26 @@
 
 ## What changed
 
+- 2026-07-31: Accepted the bounded NestJS ingress migration decomposition in
+  `12-nestjs-ingress-migration-plan.md`. Key decisions: a new
+  `apps/scenario-service` NestJS application is created while `apps/backend`
+  stays a never-promoted dev-host harness (ING-D1); the migration is
+  behavior-preserving with a byte-identical wire contract so the Nurture-owned
+  endpoint contract and the My-Chat pin do not change (ING-D2); host/port
+  topology is consumer environment configuration, so the only My-Chat-side
+  change is retargeting the joint resolver-journey test at Joint Conformance
+  (ING-D3); the dev-host P7 route is removed or hard-disabled after
+  qualification to prevent dual-ingress evidence drift (ING-D4); the v1 route
+  set is fixed at M0 from Joint Conformance fixture needs (ING-D5); the full
+  G1-03 private invocation contract and C-3 source sets stay out of scope
+  (ING-D6); a future Base/My-Chat-defined SPI envelope is recorded as a
+  non-work-item note for a hypothetical second binding-owner scenario
+  (ING-D7). Work is sliced M0 Decision Freeze → M1 skeleton/startup safety →
+  M2 service-auth guard → M3 P7 endpoint migration → M4 governance alignment
+  (parallel-capable) → M5 Owner Integration Handoff regeneration. The
+  acceptance changes task documentation only; no code, schema, environment,
+  activation or traffic effect.
+
 - 2026-07-31: Repaired the 21 previously reported T-002 documentation warnings.
   The vague-reference lint now detects three or more occurrences only within a
   20-line local prose unit and resets at paragraph, heading, list-item and table-row

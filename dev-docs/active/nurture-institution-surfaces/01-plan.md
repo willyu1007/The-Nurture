@@ -205,6 +205,17 @@ invalidation rules 与 final false/empty census。它是 Nurture-side handoff，
 Candidate Freeze、My-Chat native/device completion、capability activation 或 traffic
 authority；T-008 消费它完成后续 Candidate 与 composite qualification。
 
+## Acceptance-to-Check Mapping — Accepted (2026-07-31)
+
+- 本任务验收条目在 G4-0 各分支 freeze（0B～0F）及各 G4 package DoD 冻结时获得
+  稳定 ID（`T007-AC-###`），并逐条映射到恰好一类机械检查：conformance fixture、
+  negative case、unit/integration test、lint/静态检查或 evidence census 字段。
+- 无法机械验证的条目显式重分类为 `design_note`：仍是设计约束，但退出资格化门禁。
+- 未映射的验收条目不得勾选；package DoD 与 G4-F PASS 的依据是映射检查全部通过，
+  而不是对散文条目的自评。
+- 映射随各分支 freeze 摊销，不做一次性回溯；映射表随对应 freeze record 一起
+  交付，fixture/case 侧使用 T-004 conformance manifest 的 AC 引用字段回链。
+
 ## Phase 0 — Product Questions and Data Inventory
 
 - 盘点 T-002 institution/group/enrollment/grant 的实际能力。

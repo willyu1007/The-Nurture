@@ -348,3 +348,13 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   Candidate Freeze、native/device completion、activation 或 traffic authority。
 - Stage G4 顶层规划至此收口。若开始实施，从 G4-0A exact inventory 开始；当前没有
   code、migration apply、database、manifest/capability、Candidate 或 traffic 变更。
+
+## 2026-07-31 — Acceptance-to-check mapping accepted
+
+- 用户确认验收条目机械化映射方案：G4-0 各分支 freeze（0B～0F）及各 package DoD
+  冻结时为对应验收条目分配稳定 `T007-AC-###` ID，逐条映射到 conformance fixture、
+  negative case、unit/integration test、lint/静态检查或 evidence census 之一；
+  不可机械验证的条目显式降级为 `design_note`。
+- 未映射条目不得勾选；package DoD 与 G4-F PASS 依据是映射检查通过。回链使用
+  T-004 conformance manifest 的 AC 引用字段。详见 `01-plan.md`
+  Acceptance-to-Check Mapping 小节。本次只更新规划文档，无代码或 schema 变更。

@@ -326,6 +326,7 @@ Schema 作用域上，`NurtureChildCareProcess` 是独立 child scope。所有�
 - IIA schema/policy/test design：`08-iia-schema-policy-test-design.md`
 - Pilot-0-C 当前决策索引：`10-pilot0-c-current-decision-index.md`
 - Pilot-0-D 拓扑/运营合同：`11-pilot0-d-topology-operations-contract.md`
+- NestJS ingress 迁移拆解与决策：`12-nestjs-ingress-migration-plan.md`
 - Pilot-0 readiness 详细决策账本：`09-pilot-readiness.md`
 - 阶段计划与退出标准：`01-plan.md`
 - 里程碑视图：`roadmap.md`

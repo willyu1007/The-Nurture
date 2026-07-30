@@ -159,6 +159,15 @@ fixture/suite drift 使受影响 synthetic/joint 失效；source population 之�
 文档变化不失效。auth/privacy/security 风险立即 `INVALIDATED` 并保持 default-off。
 历史 PASS append-only 保留，不删除或改写。
 
+2026-07-31 粒度细化（accepted）："受影响"由 conformance manifest 的
+per-capability/per-surface slice hash 机械判定，不依赖人工判断。additive 变更
+旋转 root digest 时，slice hash 未变化的既有证据保持有效：绑定旧 ref 的记录
+append-only 保留，新 ref 只需资格化新增/变更的 slice，并重跑自动化的共享核心
+suite。共享 invocation envelope、confirmation/concurrency 或 error 信封层的
+变化仍使全部 synthetic/joint 证据失效；该场景的恢复路径是单命令全量重跑，
+不是重新人工联合验证。若无此细化，G2～G4 期间每次能力新增都会使 G1 联合
+证据进入字面失效状态。
+
 G1 完成后 T-004 可以转为 done，T-002 仍可继续保持 in-progress；T-005～T-007
 获得 protected qualification 入口，T-008 只把 G1 作为 required input。它仍不授权
 Candidate Freeze、persistent DB apply、internal-store testing、activation 或 traffic。
@@ -238,6 +247,10 @@ Candidate Freeze、persistent DB apply、internal-store testing、activation 或
 - 冻结 `InterfaceContractRefV1` 的 wire 形状、artifact-set canonicalization 与 digest：
   discovery、surface/query/action response 必须返回 exact key/version/digest，invocation
   必须声明 expected exact ref。
+- 2026-07-31 已接受的分片哈希决策：artifact set 除 root digest 外，必须在
+  conformance manifest 中逐 capability、逐 surface 记录 canonical slice hash；slice
+  边界定义与哈希顺序属于 canonicalization 规则本身，一并冻结。admission 仍然只
+  使用 exact root digest，不因分片放宽为 version range 或 partial admission。
 - 定义 presenter 输出的稳定字段、可选字段和兼容性策略。
 - 定义 Nurture-owned semantic order、module/item kinds、actions 与 invalidation scopes；My-Chat 保留响应式布局和组件实现权。
 - 定义 deterministic eligibility result 与通用 invocation envelope；不实现 LLM provider、语义检索或跨 Scenario router。
@@ -262,6 +275,12 @@ Candidate Freeze、persistent DB apply、internal-store testing、activation 或
   漂移必须 stale。
 - compatibility 检查以 exact digest 为 admission，optional additive change 仍生成新
   digest/version；consumer 不使用版本范围或 `latest`。
+- 证据失效范围可由 slice hash 机械判定：某 slice hash 变化只失效引用该 slice 的
+  synthetic/joint 证据；additive 新增 slice 不失效任何既有证据，只要求新 slice
+  自身完成资格化；共享 invocation envelope、confirmation/concurrency 与 error
+  信封层变化仍使全部受影响证据失效。
+- conformance suite 必须可在 clean checkout 用单条命令确定性全量重跑；全量失效
+  后的恢复成本是机器时间，不是一轮人工联合验证。
 
 ## Phase 3 — Fixtures and Cross-role Journey
 
@@ -294,6 +313,9 @@ Candidate Freeze、persistent DB apply、internal-store testing、activation 或
 - 输出机器可验证的 `SurfaceContractV1` artifact set：descriptor registry、surface
   schemas、invocation/result/error schemas、policy/schema refs、fixture manifest 与
   conformance manifest；这些 artifact 的规范内容共同生成 interface digest。
+- conformance manifest 的 fixture/case 条目支持可选的 acceptance-item 引用字段
+  （如 `T005-AC-###`），供消费任务把验收条目机械回链到具体检查；该字段属于
+  manifest schema，缺失引用不影响 T-004 自身资格化。
 
 验收：
 

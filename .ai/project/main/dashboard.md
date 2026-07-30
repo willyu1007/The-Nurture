@@ -51,6 +51,20 @@ Project: `main`
   internal validation and G5-E composite decision/evidence lifecycle. The structure
   audit is PASS; G5-0 details are the next discussion, while tooling remains
   just-in-time and does not enter the current upstream critical path.
+- Execution backbone (2026-07-31): the recommended single-mainline order is
+  T-004 Phase 0 → T-002 ingress M0→M3 with M4 interleaved (see T-002
+  `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 → T-002 M5 plus
+  T-004 Phase 3-4 → G1 Joint Conformance → early T-007 G4-0A/0B
+  publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →
+  T-006 G3-0 through G3-E → remaining T-007 G4 branches → T-008 G5.
+  Beta Profile v0 freezes near G1 Joint Conformance (see T-008 plan).
+- Controlled-progress rules (2026-07-31): exactly one lane sits on the critical
+  path at any time and is reflected in Current Focus; parallel executors take
+  only read-only/design work or disjoint-ownership work without pending shared
+  freeze inputs, and never co-write one contract artifact; every work unit
+  lands as a verified unit (lint/tests plus docs plus a commit point) or is
+  rolled back; human decisions occur only at gates (ingress M0, Contract
+  Boundary, Joint Conformance, each G*-0 freeze, Beta Profile v0).
 - Decision deadline: before any DB apply, artifact publication, secret configuration, capability/manifest change, external pilot traffic, staging, production, or GA action.
 
 ### Next Governance Checkpoint

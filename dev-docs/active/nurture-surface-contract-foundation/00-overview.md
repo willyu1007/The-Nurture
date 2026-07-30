@@ -104,6 +104,9 @@
   绕过 current authority 的 action payload。
 - [ ] discovery、surface response 与 invocation 均携带 exact interface contract
   key/version/digest；不存在 version range、mutable `latest` 或 digest 缺失时的 fallback。
+- [ ] conformance manifest 逐 capability/surface 记录 canonical slice hash；证据
+  失效范围由 slice hash 机械判定，additive 新增不失效既有证据；conformance suite
+  可单命令确定性全量重跑。
 
 ## Next Step
 
