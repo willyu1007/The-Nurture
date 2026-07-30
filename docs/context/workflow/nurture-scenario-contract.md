@@ -82,13 +82,13 @@ The current N1 institution owner-read capabilities resolve the current Nurture
 participant, role, and care-group scope on every read. Their direct surface
 handlers return display-safe items and opaque refs only. Existing legacy runtime
 handlers remain explicit-empty. T-007 D-04 plans a separate protected
-Institution Admin business-communication projection; it is not declared by the
+Institution Admin business-communication projection; the projection is not declared by the
 current manifest/module/source and remains default-off until its new interface,
 carrier, owner-read policy and qualification are pinned. The activation-only
 `capture_family_input` Step is an existing compatibility seam, not a product
-Workflow. It may emit one refs-only `user_attention` draft only when the host
+Workflow. The compatibility seam may emit one refs-only `user_attention` draft only when the host
 loads the vNext manifest with `workflow_handoff_materialization_v1` enabled, and
-it remains default-off pending semantic/owner-contract reconciliation.
+the compatibility seam remains default-off pending semantic/owner-contract reconciliation.
 
 ## Object And Profile Rules
 

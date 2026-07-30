@@ -396,52 +396,61 @@ structured filters before semantic retrieval.
 
 `NurtureRuntimeContextPack` records the context material selected for one harness or
 orchestration decision, such as planning, checkpointing, adjustment, review, or mobile
-handoff. It SHOULD preserve selected material refs, excluded material refs, known context,
+handoff. `NurtureRuntimeContextPack` SHOULD preserve selected material refs, excluded material refs, known context,
 missing context, assumptions, safety boundary, orchestration input, and output contract.
-It MUST remain a scenario-side context assembly artifact, not a complete prompt log,
-provider invocation log, or host trace. It SHOULD preserve trigger, selection-policy,
+`NurtureRuntimeContextPack` MUST remain a scenario-side context assembly artifact, not a complete prompt log,
+provider invocation log, or host trace. `NurtureRuntimeContextPack` SHOULD preserve trigger, selection-policy,
 material-set hash, pack hash, token-budget, and pack-stat information so planning and review
 decisions can be replayed without storing unnecessary provider details.
 In P1, selected and excluded material refs MAY remain JSON arrays, but they MUST be shaped
 as stable row-like refs with material id/key, source version, semantic version, materializer
 version, material hash, reason code, token estimate, redaction level, and safety metadata so
 they can later be migrated into a join table without losing replayability.
+
 `candidate_filter_payload` MUST record the admission rules used to form the material
 candidate pool, not the candidate result set. `context_layer_coverage_payload` MUST record
 the L0-L7 coverage result, including missing or blocked required layers, without storing
 full context explanations.
+
 `known_context_payload` MUST remain a compact structured index of usable context, not a
 copy of selected material text or the sole LLM context. `missing_context_payload` MUST be an
 actionable gap list that can become a user question, form field, workflow action, downgrade,
 or safety path.
+
 `assumptions_payload` MUST contain only explicit, bounded, temporary assumptions derived
 from assumable missing-context items. Assumptions MUST be scoped, confirmable, and excluded
 from final review conclusions unless they are confirmed.
+
 `safety_boundary_payload` SHOULD remain a thin pack-level boundary in P1. It MUST decide
 whether normal orchestration may proceed, which output modes are allowed or blocked, and
 which sourced safety signals require output limits or review. It MUST NOT become an
 independent safety platform or replace My-Chat host safety policy.
+
 `orchestration_input_payload` MUST remain a structured task input for scenario harnesses and
 workflow orchestration. It SHOULD contain the task key, task mode, workflow position,
 normalized intent, slot values, decision constraints, requested operations, and refs to known,
 missing, assumed, or safety-bound context. It MUST NOT duplicate selected material text,
 known-context summaries, full prompts, provider requests, or host runtime state.
+
 `output_contract_payload` MUST define the allowed output boundary for the same pack. It
 SHOULD contain output mode, artifact type/schema key, required sections, allowed and blocked
 actions, validation rules, persistence targets, and fallback policy. It MUST respect
 `safety_boundary_payload`, stay within The Nurture-owned scenario artifacts, and avoid becoming
 a full workflow engine DSL or provider response schema.
+
 `token_budget_payload` SHOULD stay simple and cost-aware: it MAY define estimated context and
 output token budgets, selected-material limits, truncation policy, and fallback policy. It MUST
 NOT store provider billing, model price tables, full prompt token ledgers, or complex cost
 optimizer state. `pack_stats_payload` SHOULD store only the actual pack-builder facts needed
 for replay and operations, such as candidate/selected/excluded/truncated counts, estimated
 tokens, estimated cost units, budget-exceeded flag, applied fallback, and build duration.
+
 `model_profile_key` and `model_runtime_hints_payload` MAY express provider-agnostic capability
 and behavior preferences, such as latency preference, reasoning depth, determinism, creativity,
 and structured-output need. They MUST NOT store concrete provider model ids, provider-specific
 parameter names, prompt templates, billing keys, or provider request options. The My-Chat host
 runtime remains responsible for mapping these scenario hints to provider-specific settings.
+
 `provider_invocation_ref` MAY store only the My-Chat host/provider invocation reference, while
 `result_artifact_ref` MAY point only to The Nurture-owned scenario artifacts or scenario table
 fields produced from the pack.

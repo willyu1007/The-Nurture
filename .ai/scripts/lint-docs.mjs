@@ -67,6 +67,7 @@ const MOJIBAKE_PATTERNS = [
 // Vague reference words to detect
 const VAGUE_REFS = ['it', 'this', 'above', 'below', 'related'];
 const VAGUE_REF_PATTERN = new RegExp(`\\b(${VAGUE_REFS.join('|')})\\b`, 'gi');
+const VAGUE_REF_WINDOW_LINES = 20;
 
 // ============================================================================
 // Colors for terminal output
@@ -438,11 +439,14 @@ function checkVagueReferences(content) {
   const issues = [];
   const lines = content.split('\n');
 
-  // Track occurrences per file
-  const counts = {};
+  // Track local occurrence windows. Whole-file counts create false positives in
+  // long-lived specifications where an otherwise clear pronoun appears a few
+  // times across hundreds or thousands of unrelated lines.
+  const occurrenceLines = {};
   for (const ref of VAGUE_REFS) {
-    counts[ref] = 0;
+    occurrenceLines[ref] = [];
   }
+  const warnedRefs = new Set();
 
   // Track fenced code block state
   let inCodeBlock = false;
@@ -451,6 +455,22 @@ function checkVagueReferences(content) {
     const line = lines[i];
     const lineNum = i + 1;
     const trimmed = line.trim();
+
+    // Paragraphs, headings, list items, and table rows are independent prose
+    // units. Do not combine their pronouns merely because source lines are
+    // nearby; wrapped continuation lines still share the same local window.
+    const startsProseUnit =
+      trimmed === '' ||
+      /^#{1,6}\s/.test(trimmed) ||
+      /^[-*+]\s/.test(trimmed) ||
+      /^\d+[.)]\s/.test(trimmed) ||
+      /^\|/.test(trimmed);
+    if (startsProseUnit) {
+      for (const ref of VAGUE_REFS) {
+        occurrenceLines[ref] = [];
+      }
+      if (trimmed === '') continue;
+    }
 
     // Toggle code block state on fence lines (```)
     if (trimmed.startsWith('```')) {
@@ -479,14 +499,23 @@ function checkVagueReferences(content) {
     let match;
     while ((match = VAGUE_REF_PATTERN.exec(lineWithoutInlineCode)) !== null) {
       const word = match[1].toLowerCase();
-      counts[word]++;
+      const windowStart = lineNum - VAGUE_REF_WINDOW_LINES;
+      const recentLines = occurrenceLines[word].filter(
+        (occurrenceLine) => occurrenceLine >= windowStart
+      );
+      recentLines.push(lineNum);
+      occurrenceLines[word] = recentLines;
 
-      // Only warn if the word appears frequently (threshold: 3)
-      if (counts[word] === 3) {
+      // Warn once per word only when the usage is locally dense. Three uses
+      // spread across an entire large design document are not actionable.
+      if (recentLines.length === 3 && !warnedRefs.has(word)) {
+        warnedRefs.add(word);
         issues.push({
           type: 'warning',
           line: lineNum,
-          message: `Frequent use of vague reference "${word}" (3+ occurrences)`,
+          message:
+            `Frequent local use of vague reference "${word}" ` +
+            `(3+ occurrences within ${VAGUE_REF_WINDOW_LINES} lines)`,
         });
       }
     }

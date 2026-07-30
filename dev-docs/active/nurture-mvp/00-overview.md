@@ -29,7 +29,7 @@ The pre-G0 implementation was preserved on local branch `codex/g0-preservation` 
 - [x] My-Chat/Base contract revisions and hashes are machine-verifiable.
 - [x] Nurture production persistence contains no My-Chat-owned workflow runtime tables.
 - [x] Dev-host workflow persistence is private to `apps/backend` and uses a separate database.
-- [x] Unit tests remain at or above 86, production DB tests at or above 15, and dev-host E2E tests at or above 16 after closure hardening.
+- [x] Closure hardening preserves minimum counts of 86 unit tests, 15 production DB tests, and 16 dev-host E2E tests.
 - [x] PR and main CI pass, a fresh post-merge worktree passes the complete matrix, and temporary backup/database/worktree/branch artifacts are removed.
 - [x] The local-only dev host binds to loopback, refuses non-dev/test startup, and loads `.env.local` consistently for repository commands.
 - [x] The pinned Base `web-workbench` source is content-verified in addition to the workflow contract.
