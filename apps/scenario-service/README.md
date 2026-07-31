@@ -1,19 +1,25 @@
 # Scenario service
 
 `@the-nurture/scenario-service` is the production-intended NestJS ingress for
-Nurture-owned APIs. M1 exposes only health and a fail-closed placeholder for
-the binding-owner route. It does not replace My-Chat auth/runtime ownership and
-does not enable any scenario capability.
+Nurture-owned APIs. M2 exposes health and a fail-closed binding-owner route
+with the frozen P7 service-auth guard. It does not replace My-Chat auth/runtime
+ownership and does not enable any scenario capability.
 
 ## Current routes
 
 | Method | Path | Current behavior |
 | --- | --- | --- |
 | `GET` | `/health` | `200 {"ok":true}` |
-| `POST` | `/internal/nurture/scenario-binding/authorize` | `503 {"error":"binding_owner_disabled"}` until M2/M3 |
+| `POST` | `/internal/nurture/scenario-binding/authorize` | Disabled-first M2 guard; the M3 owner controller is not connected |
 
 All other paths return a body-safe `404`. The legacy Fastify workflow harness
 and `user_attention` route do not run in this service.
+
+The owner route returns `503 {"error":"binding_owner_disabled"}` when either
+the M3 authorizer composition or the service token is absent. Only when both
+are supplied does a missing/wrong bearer return
+`401 {"error":"service_auth_required"}`. The exact bearer passes the M2 guard,
+but the current M3 placeholder still returns the disabled response.
 
 ## Configuration
 
@@ -24,9 +30,11 @@ The service reads configuration only through `src/config.ts`.
 | `APP_ENV` | `dev` | `dev`, `staging` or `prod` |
 | `SERVICE_NAME` | `the-nurture` | lower-case service identifier |
 | `PORT` | `8000` | integer from 1 through 65535 |
+| `NURTURE_INTERNAL_SERVICE_TOKEN` | unset | optional secret; absence disables the owner guard |
 
-Owner secrets remain optional and are not consumed by M1. Their absence keeps
-the binding-owner endpoint disabled. Configuration errors fail startup without
+The service token is loaded into a dedicated timing-safe authenticator rather
+than the printable non-secret configuration object. The evidence key and real
+owner authorizer remain M3 inputs. Configuration errors fail startup without
 printing environment values.
 
 ## Local verification
@@ -53,5 +61,7 @@ routes, then terminates it.
   values are never logged.
 - Unknown HTTP methods are normalized to `UNKNOWN`, and the Express
   `X-Powered-By` header is disabled.
-- M2 adds the timing-safe service-auth guard. M3 composes the existing P7
-  authorizer without changing the wire contract.
+- The route-scoped M2 guard preserves P7 ordering: owner composition/token
+  absence is `503` before credentials are inspected; an invalid bearer is
+  `401`; an exact bearer passes using length-gated `timingSafeEqual`.
+- M3 composes the existing P7 authorizer without changing the wire contract.

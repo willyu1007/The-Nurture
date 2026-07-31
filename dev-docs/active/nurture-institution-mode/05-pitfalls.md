@@ -1771,3 +1771,22 @@ This file exists to prevent repeating mistakes within this task.
   child is still live.
 - Prevention: Process-control tests must measure green-path wall time and
   explicitly dispose every listener/timer created for timeout races.
+
+### 2026-07-31 — Treating a configured service token as owner readiness
+
+- Symptom: A NestJS auth guard could return `401` or pass a request merely
+  because `NURTURE_INTERNAL_SERVICE_TOKEN` exists, even though the P7
+  authorizer/database composition is absent.
+- Context: Fastify P7 has a three-state contract. Dependency absence is a
+  disabled service, not an authentication failure, and credentials are not
+  inspected until both the authorizer and token exist.
+- Root cause: Collapsing “credential configured” and “business owner available”
+  into one enabled flag loses the fail-closed ordering and makes a secret look
+  like capability authority.
+- Fix / workaround: Keep separate composition availability and service-auth
+  dependencies; check both before bearer comparison. The composition seam
+  defaults false and has no environment toggle. Smoke runs with the correct
+  token/bearer but no authorizer and must still receive
+  `503 binding_owner_disabled`.
+- Prevention: Every M3 composition change must rerun all three guard states and
+  prove that token presence alone cannot enable owner behavior.

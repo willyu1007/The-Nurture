@@ -338,6 +338,27 @@ The root TypeScript configuration enables legacy decorator metadata solely so
 the repository-wide compiler can parse the NestJS application; the
 scenario-service retains its own bounded build/typecheck configuration.
 
+M2 adds service authentication as a route-scoped NestJS guard without moving
+business authority into the ingress. `config.ts` is the only environment
+reader; it closes `NURTURE_INTERNAL_SERVICE_TOKEN` inside a dedicated
+`BindingOwnerServiceAuth` object so the token is absent from the printable
+non-secret service configuration. The guard preserves the Fastify P7 order:
+
+1. absent owner-authorizer composition or absent token returns
+   `503 binding_owner_disabled` before any credential comparison;
+2. when both dependencies exist, a missing/malformed/wrong bearer returns
+   `401 service_auth_required`;
+3. an exact bearer passes only after length equality plus
+   `timingSafeEqual`.
+
+No environment value can assert owner-authorizer availability: the application
+composition seam defaults it to false, and M3 must supply it together with the
+real authorizer. Therefore a token alone never enables the endpoint. The
+current controller remains the M3-disabled stub after successful guard
+evaluation. Health remains public, the guard is not global, and no My-Chat ORM,
+runtime, principal or business-authorization concern enters the service-auth
+object.
+
 The coordination record is an architectural acceptance only and changes no package, source,
 schema, migration, runtime, environment, gate, or traffic state.
 

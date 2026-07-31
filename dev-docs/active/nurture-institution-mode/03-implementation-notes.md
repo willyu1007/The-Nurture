@@ -1247,3 +1247,28 @@
   contract remain green. Production dependency audit reports no advisory path
   through `apps/scenario-service`; unrelated existing Fastify/frontend
   advisories remain outside this ingress work unit.
+
+## 2026-07-31 — NestJS ingress M2 service-auth guard completed
+
+- Added a route-scoped NestJS guard that reproduces the current Fastify P7
+  service-auth order exactly: missing authorizer composition or token is
+  disabled `503`; only an otherwise enabled route evaluates the bearer and
+  returns unauthorized `401`; an exact bearer passes.
+- Preserved the existing strict `Bearer ` shape, UTF-8 byte-length equality and
+  `timingSafeEqual` comparison. Tests cover absent authorizer, absent token,
+  missing/blank/non-bearer credentials, different-length and same-length wrong
+  tokens, and the exact authorized case.
+- Kept secret handling separate from the public service configuration.
+  `NURTURE_INTERNAL_SERVICE_TOKEN` is closed inside the authenticator and is
+  absent from JSON serialization and structured logs.
+- The application composition seam defaults owner-authorizer availability to
+  false. A configured token cannot enable P7 by itself; built-process smoke
+  verifies that a correct bearer still receives `binding_owner_disabled`
+  without the M3 authorizer.
+- Scenario-service verification is 5 files / 25 tests plus typecheck,
+  build and real-process smoke. Routing now classifies 41 files, including
+  five scenario-service files.
+- M2 adds no DTO/controller business logic, owner repository, schema/migration,
+  API/context artifact, env-contract key, secret value, capability,
+  deployment, activation or traffic. M3 P7 endpoint migration is the next
+  serial slice; M4 governance alignment may run alongside it.

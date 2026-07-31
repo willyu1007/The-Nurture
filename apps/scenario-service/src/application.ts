@@ -3,7 +3,9 @@ import type { Server } from "node:http";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module.js";
+import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
 import {
+  loadBindingOwnerServiceAuth,
   loadScenarioServiceConfig,
   type ScenarioServiceConfig,
 } from "./config.js";
@@ -24,14 +26,24 @@ export type ScenarioServiceApplication = Readonly<{
 export async function createScenarioServiceApplication(input?: {
   config?: ScenarioServiceConfig;
   logSink?: ScenarioStructuredLogSink;
+  bindingOwnerAuthorizerAvailable?: boolean;
+  bindingOwnerServiceAuth?: BindingOwnerServiceAuth;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    abortOnError: false,
-    bodyParser: false,
-    logger: false,
-  });
+  const bindingOwnerServiceAuth =
+    input?.bindingOwnerServiceAuth ?? loadBindingOwnerServiceAuth();
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule.register({
+      authorizerAvailable: input?.bindingOwnerAuthorizerAvailable ?? false,
+      serviceAuth: bindingOwnerServiceAuth,
+    }),
+    {
+      abortOnError: false,
+      bodyParser: false,
+      logger: false,
+    },
+  );
 
   app.disable("x-powered-by");
   const requestLogging = new RequestLoggingMiddleware(logger);

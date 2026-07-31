@@ -1,3 +1,8 @@
+import {
+  createBindingOwnerServiceAuth,
+  type BindingOwnerServiceAuth,
+} from "./binding-owner-service-auth.js";
+
 export type ScenarioServiceEnvironment = "dev" | "staging" | "prod";
 
 export type ScenarioServiceConfig = Readonly<{
@@ -30,6 +35,14 @@ export function loadScenarioServiceConfig(
     bodyLimitBytes: BODY_LIMIT_BYTES,
     requestTimeoutMs: REQUEST_TIMEOUT_MS,
   });
+}
+
+export function loadBindingOwnerServiceAuth(
+  env: NodeJS.ProcessEnv = process.env,
+): BindingOwnerServiceAuth {
+  return createBindingOwnerServiceAuth(
+    env.NURTURE_INTERNAL_SERVICE_TOKEN,
+  );
 }
 
 function parseEnvironment(value: string | undefined): ScenarioServiceEnvironment {

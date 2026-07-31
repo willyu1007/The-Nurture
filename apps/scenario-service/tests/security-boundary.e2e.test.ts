@@ -2,9 +2,10 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
 import { createScenarioServiceApplication } from "../src/application.js";
+import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
 import type { ScenarioStructuredLogRecord } from "../src/structured-logger.js";
 
-describe("scenario-service M1 HTTP boundary", () => {
+describe("scenario-service M1/M2 HTTP boundary", () => {
   let close: (() => Promise<void>) | undefined;
 
   afterEach(async () => {
@@ -118,4 +119,33 @@ describe("scenario-service M1 HTTP boundary", () => {
       error: "payload_too_large",
     });
   });
+
+  it.each([
+    { authorization: undefined, condition: "missing" },
+    { authorization: "Bearer wrong-token", condition: "wrong" },
+  ])(
+    "returns 401 when owner composition is available but the bearer is $condition",
+    async ({ authorization }) => {
+      const { app } = await createScenarioServiceApplication({
+        bindingOwnerAuthorizerAvailable: true,
+        bindingOwnerServiceAuth:
+          createBindingOwnerServiceAuth("expected-token"),
+        logSink: () => undefined,
+      });
+      await app.listen(0, "127.0.0.1");
+      close = () => app.close();
+      const address = app.getHttpServer().address() as AddressInfo;
+      const headers = new Headers();
+      if (authorization) headers.set("authorization", authorization);
+      const response = await fetch(
+        `http://127.0.0.1:${address.port}/internal/nurture/scenario-binding/authorize`,
+        { method: "POST", headers },
+      );
+
+      expect(response.status).toBe(401);
+      expect(await response.json()).toEqual({
+        error: "service_auth_required",
+      });
+    },
+  );
 });

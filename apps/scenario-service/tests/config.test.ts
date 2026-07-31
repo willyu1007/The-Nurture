@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { loadScenarioServiceConfig } from "../src/config.js";
+import {
+  loadBindingOwnerServiceAuth,
+  loadScenarioServiceConfig,
+} from "../src/config.js";
 
 describe("scenario-service configuration", () => {
   it("loads env-contract defaults without owner secrets", () => {
@@ -30,5 +33,17 @@ describe("scenario-service configuration", () => {
       NURTURE_INTERNAL_SERVICE_TOKEN: "service-secret-marker",
     });
     expect(JSON.stringify(config)).not.toContain("secret-marker");
+  });
+
+  it("loads service auth separately without exposing the token", () => {
+    const serviceAuth = loadBindingOwnerServiceAuth({
+      NURTURE_INTERNAL_SERVICE_TOKEN: "service-secret-marker",
+    });
+
+    expect(serviceAuth.configured).toBe(true);
+    expect(
+      serviceAuth.bearerAuthorized("Bearer service-secret-marker"),
+    ).toBe(true);
+    expect(JSON.stringify(serviceAuth)).not.toContain("secret-marker");
   });
 });

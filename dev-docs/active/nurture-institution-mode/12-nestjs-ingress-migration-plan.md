@@ -6,13 +6,13 @@
 - Scope: move the qualified six-surface owner path from the provisional Fastify
   dev-host into the formal, production-intended NestJS scenario-service ingress
   required by G1-05.
-- State: M0 decision freeze and M1 skeleton completed 2026-07-31; M2 service
-  auth implementation open.
+- State: M0 decision freeze, M1 skeleton and M2 service auth completed
+  2026-07-31; M3 P7 endpoint migration open.
 - This document records planning truth only. It is not an Owner Integration
   Handoff, a Joint Conformance record, activation, deployment or traffic
   authority.
 
-## Current State Census (2026-07-31)
+## M0 Baseline Census (captured 2026-07-31)
 
 - `apps/backend` is a Fastify dev-host harness: local-only, binds `127.0.0.1`,
   refuses to start outside `APP_ENV=dev|test`, and its README forbids promotion
@@ -29,8 +29,8 @@
   `@the-nurture/scenario` (`NurtureScenarioBindingOwnerVerifier`) and
   `@the-nurture/db` repositories, composed by
   `createScenarioBindingOwnerAuthorizer` in `apps/backend/src/binding-owner.ts`.
-- No NestJS code exists anywhere in this repository. The formal scenario
-  service is greenfield.
+- At M0, no NestJS code existed anywhere in this repository and the formal
+  scenario service was greenfield. M1/M2 have since created and hardened it.
 - `docs/context/api/openapi.yaml` currently declares zero endpoints; the formal
   route/API index required by `ST-4(c)` starts from empty.
 - Port census: the env contract default is `PORT=8000`; the frontend defaults
@@ -107,16 +107,19 @@ built-process smoke are green; the bounded frozen install is reproducible.
 Remote CI execution awaits the next pushed source. M2 must preserve the
 disabled state while adding unauthorized/authorized behavior.
 
-### M2 — Service-auth Guard
+### M2 — Service-auth Guard (complete 2026-07-31)
 
-- Promote the timing-safe bearer check to a NestJS guard with the same
+- [x] Promote the timing-safe bearer check to a NestJS guard with the same
   three-state behavior as P7: disabled (`503`), unauthorized (`401`),
   authorized.
-- Negative tests: no token, wrong token, disabled service.
-- No authentication-contract extension (ING-D6).
+- [x] Negative tests: no token, wrong token, disabled service.
+- [x] No authentication-contract extension (ING-D6).
 
-Acceptance: guard behavior is state-for-state identical to the Fastify route
-checks.
+Acceptance: PASS locally. Guard behavior is state-for-state identical to the
+Fastify route checks. Package typecheck, 5 files / 25 tests, build and
+built-process smoke pass. The smoke configures the exact bearer while leaving
+the authorizer absent and proves disabled state still wins. M3 remains
+default-disabled and is now implementation-open.
 
 ### M3 — P7 Endpoint Migration
 

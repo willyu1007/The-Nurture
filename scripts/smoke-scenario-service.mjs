@@ -22,7 +22,7 @@ const child = spawn(
       SERVICE_NAME: "the-nurture",
       PORT: String(port),
       NURTURE_BINDING_EVIDENCE_KEY: "",
-      NURTURE_INTERNAL_SERVICE_TOKEN: "",
+      NURTURE_INTERNAL_SERVICE_TOKEN: "smoke-service-token",
     },
     stdio: ["ignore", "pipe", "pipe"],
   },
@@ -49,7 +49,13 @@ try {
 
   const disabled = await fetch(
     `${baseUrl}/internal/nurture/scenario-binding/authorize`,
-    { method: "POST", headers: { connection: "close" } },
+    {
+      method: "POST",
+      headers: {
+        authorization: "Bearer smoke-service-token",
+        connection: "close",
+      },
+    },
   );
   await assertResponse(disabled, 503, {
     error: "binding_owner_disabled",

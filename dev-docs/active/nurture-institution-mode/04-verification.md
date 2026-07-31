@@ -1178,3 +1178,17 @@ the rejected checkpoint and are historical.
 | Smoke cleanup | PASS AFTER REPAIR | Signal-aware cleanup clears timeout handles and completes the successful built-process check in under one second instead of waiting five seconds. |
 | `pnpm audit --prod --json` scenario-service path census | PASS | No advisory path includes `apps/scenario-service`. The repository-wide audit still reports pre-existing Fastify/frontend findings outside this M1/M2 slice. |
 | M1 regression battery | PASS | Scenario typecheck, 4 files / 14 tests, build, smoke, 21 files / 187 existing units, routing, persistence boundaries, N1 schema contract and diff check pass. |
+
+## 2026-07-31 — NestJS ingress M2 service-auth guard
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Fastify P7 state-order review | PASS | Nest guard checks authorizer/token availability before reading the bearer, then preserves exact `Bearer ` parsing, UTF-8 byte length and `timingSafeEqual`; no G1-03 extension was added. |
+| Disabled-state negatives | PASS | Missing authorizer or missing token returns `503 binding_owner_disabled`, including a request carrying the otherwise-correct bearer. |
+| Unauthorized-state negatives | PASS | With the composition seam and token present, missing, blank, non-Bearer, different-length wrong and same-length wrong credentials return `401 service_auth_required`. |
+| Authorized-state unit | PASS | Exact bearer returns `true` from the guard; the M3-disabled controller remains fail-closed until real composition is added. |
+| Secret boundary | PASS | Token loading is separate from the non-secret service config; its JSON representation and request logs contain no secret marker. |
+| Scenario-service typecheck/test | PASS | Package typecheck passes; 5 files / 25 tests cover config, guard states, timeout, exception safety and HTTP boundary behavior. |
+| Scenario-service build/smoke | PASS | Built process starts and serves health; with a configured token and exact bearer but no authorizer it still returns `503`; legacy route remains `404`. |
+| Test routing | PASS | 41 test files are classified: 21 unit, 5 production DB, 9 dev-host, 5 scenario-service and 1 X5. |
+| Effect boundary | PASS | No schema/migration, database, API/context artifact, env-contract key/value, My-Chat source, capability, deployment, activation or traffic change. |
