@@ -1490,3 +1490,26 @@
   above and in My-Chat/T-030. Remaining for the joint journey:
   cross-owner side-channel suite at pinned revisions, qualification
   lock v4, then the record-through stage.
+
+## 2026-07-31 My-Chat drift census (pin-advance decision input)
+
+- Read-only census of My-Chat `f00b868..96d96d0` recomputed both pinned
+  source-set hashes offline with a faithful `sha256-path-content-v1`
+  replica (byte-exact sanity match against both pins at `f00b868`).
+  Full evidence: `15-mychat-drift-census-pin-advance-input.md`.
+- Verdict: the binding-owner wire contract is unchanged — controller/
+  dto/service/validation, `scenario-binding-repository.ts`, prisma
+  schema/migrations and `createNurtureBindingOwnerHttpSource` are all
+  byte-identical; population drift is additive (Education leg R2b,
+  ST-5 issuing surface) plus R2a DI recomposition that keeps the P7
+  `nurture_http` env configuration working unchanged.
+- New coherence fact: the merged ST-5 derived-read client consumes an
+  owner surface that postdates `f00b868`, so a declared pin advance is
+  now required, not merely preferred. Coverage gap found:
+  `nurture-owner.resolver.ts` and the new R2a registry sit outside
+  `wave4_binding_host`; the advance should add them.
+- Recommendation `WIRE_CONTRACT_UNCHANGED / PIN_ADVANCE_RECOMMENDED /
+  NO_ADOPTION`: My-Chat declares a P8-style cut, the advance closes the
+  coverage gap and recomputes hashes, then M5 runs exactly once against
+  the advanced pin. No pin, code, capability or environment changed;
+  everything stays default-off and NO-GO until Joint Conformance.

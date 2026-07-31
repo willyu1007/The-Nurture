@@ -1296,3 +1296,14 @@ the rejected checkpoint and are historical.
 | Context/governance/whitespace | PASS | Strict context verification, governance lint and `git diff --check` pass. |
 | Build-aware full regression | NOT RUN / UNCHANGED | Direct package Vitest was intentionally not accepted as evidence because it bypasses the official compiled-runtime dependency hook. The build-aware CI jobs remain authoritative; this M4 slice does not alter runtime package composition. |
 | Effect boundary | PASS | No build, schema/migration, persistent database, external repository, secret value, capability, deployment, activation or traffic action was performed. |
+
+## 2026-07-31 — My-Chat drift census (read-only)
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Hash-replica sanity | PASS | Offline `sha256-path-content-v1` replica reproduces both pinned values byte-exactly at `f00b868` (`x5_joint_api` `901fd406…`, `wave4_binding_host` `ae223127…`) before any comparison. |
+| Population recompute at `96d96d0` | PASS | `x5_joint_api` 165→169 files `89a61355…`; `wave4_binding_host` 15→17 files `33ebe5d9…`; per-file diff enumerated in `15-mychat-drift-census-pin-advance-input.md`. |
+| Binding-owner wire stability | PASS | Controller/dto/service/validation, `scenario-binding-repository.ts`, prisma schema and both pinned migrations byte-identical; `createNurtureBindingOwnerHttpSource` byte-identical; R2a registry keeps `nurture_http` env semantics unchanged. |
+| Nurture-side reference scan | PASS | Zero Nurture references to the moved env factory or its env keys; the formal-ingress journey imports only the unchanged HTTP source. |
+| Census-head currency | PASS | `96d96d0..5ce8d51` shows zero drift inside either pinned population (docs plus root dependency-override housekeeping only). |
+| Effect boundary | PASS | Read-only git-object inspection; census script confined to the session scratchpad; no pin, code, schema, capability, environment, secret, deployment or traffic change. |
