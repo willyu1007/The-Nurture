@@ -14,7 +14,7 @@
     "lint:css": "stylelint \"src/**/*.css\""
   },
   "dependencies": {
-    "@willyu1007/web-workbench": "0.7.0",
+    "@willyu1007/web-workbench": "0.8.0",
     "next": "^16",
     "react": "^19",
     "react-dom": "^19"
