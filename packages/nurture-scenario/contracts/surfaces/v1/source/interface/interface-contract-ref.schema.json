@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/interface/interface-contract-ref.schema.json",
+  "title": "InterfaceContractRefV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "key",
+    "version",
+    "digest"
+  ],
+  "properties": {
+    "key": {
+      "const": "nurture.surface-contract"
+    },
+    "version": {
+      "$ref": "contract-primitives.schema.json#/$defs/semver"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

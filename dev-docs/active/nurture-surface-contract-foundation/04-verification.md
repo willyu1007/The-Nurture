@@ -126,3 +126,21 @@
 ## Evidence Policy
 
 每次运行需记录命令、精确 source revision、结果和失败原因。只接受通过公共契约获得的黑盒证据；直接读取数据库不能作为 consumer 验收证据。
+
+## Phase 1 Verification — 2026-07-31
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| T-004 recovery and prerequisite state | PASS | Explicit resume selected T-004 at clean head `9a90ab5`; T-002 M0-M4 is complete while exact My-Chat owner-pin drift remains an Owner Integration NO-GO. |
+| Normative source boundary | PASS | Interface, capability, surface and visibility JSON sources exist only under `packages/nurture-scenario/contracts/surfaces/v1/source/`; no generated identity, My-Chat runtime, Prisma or provider dependency was added. |
+| Capability descriptor closure | PASS AFTER REPAIR | Required domain/execution/delivery axes, schema/policy/handler/presenter bindings, target/confirmation/concurrency policies and dependency gates are closed. Runtime availability was removed from semantic handler binding, and system-only capabilities may have no presenter. |
+| Six-surface and visibility contract | PASS AFTER REPAIR | Exactly six role-bound surfaces map to closed conversation/board/workbench content kinds. The visibility matrix totally classifies every data class for every surface and names its canonical My-Chat/Nurture owner; Guardian cross-Institution provenance is allowed only on family surfaces, while Institution/Caregiver views deny other-Institution presence. |
+| Institution Admin protected read | PASS | Mobile Admin write boundary is `none`; exact disclosure/Institution/class/original Grant/data class/direction/purpose/source-lifecycle rules are required, and Admin read does not grant CareGroup action. |
+| Readiness, snapshot and response semantics | PASS | Four independent readiness axes, surface states, atomic initial snapshot, cursor bindings, refresh/rebase drift, dependency NO-GO, empty/loading/failure/permission/correction/withdrawal semantics are machine-readable. |
+| Schema reference review | PASS AFTER REPAIR | Stable HTTPS schema IDs make relative interface-ref references resolvable; one primitive SSOT supplies shared types, system-policy roles are excluded from surface actor contexts, source names are kebab-case and no placeholder digest or generated manifest exists. |
+| Focused source contract suite | PASS | `pnpm exec vitest run -c vitest.config.ts packages/nurture-scenario/tests/surface-contract/phase-1-source.test.ts`: 1 file / 10 tests. |
+| Scenario TypeScript | PASS | `pnpm --filter @the-nurture/scenario typecheck`. |
+| Full unit regression and population | PASS | `pnpm test:unit`: 22 files / 197 tests; `pnpm test:unit:ci && pnpm verify:unit-population` reports 197/197. |
+| Test routing and whitespace | PASS | `node scripts/assert-test-routing.mjs` reports 47 files with 22 unit files; `git diff --check` passes. |
+| Build boundary | NOT RUN / NOT YET APPLICABLE | Phase 1 intentionally assigns no exact digest and has no generated manifest. Phase 2 lands canonicalization and deterministic build/verify together; no application build was run. |
+| Effect boundary | PASS | No runtime capability/manifest, schema/migration, database, external repository, environment, secret, deployment, activation or traffic changed. |

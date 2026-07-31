@@ -11,8 +11,10 @@ Project: `main`
 - Supporting feature: F-003 Six-surface store-beta readiness
 - Goal this cycle: T-004 Phase 0 discovery/gate reconciliation is complete.
   T-002 ingress M0-M4 is complete with exact-consumer,
-  disposable-PostgreSQL and API/env/port governance evidence. The current
-  critical lane is T-004 Phase 1-2 Contract Boundary, followed by T-002 M5
+  disposable-PostgreSQL and API/env/port governance evidence. T-004 Phase 1
+  normative capability/surface/visibility source is complete. The current
+  critical lane is T-004 Phase 2 exact typed contract and interface identity,
+  followed by T-002 M5
   handoff regeneration and exact Joint Conformance.
   Runtime/environment activation and external traffic remain gated.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
@@ -26,11 +28,13 @@ Project: `main`
   lock-concurrency evidence. M4 governance is complete. Protected use still
   requires M5 Owner Integration Handoff regeneration and Joint Conformance with T-004; the
   remaining Fastify route is transitional only.
-- T-004 Phase 0: the current manifest/module/handler/presenter/repository/API/DB
+- T-004 Phase 0-1: the current manifest/module/handler/presenter/repository/API/DB
   foundations are classified in
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
-  Contract-parallel inputs are clear; My-Chat checkout drift from exact `f00b868`
-  to `2573635` keeps Owner Integration NO-GO and is not a floating-repin request.
+  The Phase 1 source now freezes six surfaces, descriptor/envelope schemas,
+  visibility, four readiness axes and atomic snapshot/cursor rules without an
+  activation or placeholder digest. My-Chat checkout drift from exact `f00b868`
+  keeps Owner Integration NO-GO and is not a floating-repin request.
 - T-002 ingress M0-M4: port semantics, the two-route formal v1 surface, G1-03
   satisfied/deferred census and zero-wire-change fence are fixed in
   `dev-docs/active/nurture-institution-mode/13-nestjs-ingress-m0-decision-record.md`.
@@ -67,7 +71,8 @@ Project: `main`
   just-in-time and does not enter the current upstream critical path.
 - Execution backbone (2026-07-31): the recommended single-mainline order is
   T-004 Phase 0 → T-002 ingress M0-M4 (complete; see
-  `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 → T-002 M5 plus
+  `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1 (complete) → T-004
+  Phase 2 → T-002 M5 plus
   T-004 Phase 3-4 → G1 Joint Conformance → early T-007 G4-0A/0B
   publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →
   T-006 G3-0 through G3-E → remaining T-007 G4 branches → T-008 G5.

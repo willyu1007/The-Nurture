@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/capability-descriptor.schema.json",
+  "title": "CapabilityDescriptorV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capabilityKey",
+    "capabilityVersion",
+    "contract",
+    "domainClass",
+    "executionClass",
+    "deliveryClass",
+    "intentKeys",
+    "inputSchemaRef",
+    "resultSchemaRef",
+    "errorSchemaRef",
+    "targetPolicy",
+    "confirmationPolicy",
+    "concurrencyPolicy",
+    "eligibilityPolicyRef",
+    "handlerBinding",
+    "presenterBindings",
+    "invalidationScopeKinds",
+    "dependencyGates"
+  ],
+  "properties": {
+    "capabilityKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "capabilityVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "contract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "domainClass": {
+      "enum": [
+        "care_interaction",
+        "institution_management",
+        "publish_process",
+        "read_model"
+      ]
+    },
+    "executionClass": {
+      "enum": [
+        "query",
+        "action_execution",
+        "institution_workflow_action",
+        "publish_process_transition"
+      ]
+    },
+    "deliveryClass": {
+      "enum": [
+        "none",
+        "action_delivery_candidate"
+      ]
+    },
+    "intentKeys": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+      }
+    },
+    "inputSchemaRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/schemaRef"
+    },
+    "resultSchemaRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/schemaRef"
+    },
+    "errorSchemaRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/schemaRef"
+    },
+    "targetPolicy": {
+      "$ref": "#/$defs/targetPolicy"
+    },
+    "confirmationPolicy": {
+      "enum": [
+        "none",
+        "direct_commit",
+        "reviewable_commit",
+        "strong_confirmation"
+      ]
+    },
+    "concurrencyPolicy": {
+      "$ref": "#/$defs/concurrencyPolicy"
+    },
+    "eligibilityPolicyRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/versionedRef"
+    },
+    "handlerBinding": {
+      "$ref": "#/$defs/handlerBinding"
+    },
+    "presenterBindings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/presenterBinding"
+      }
+    },
+    "invalidationScopeKinds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "capability",
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment",
+          "institution"
+        ]
+      }
+    },
+    "dependencyGates": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/dependencyGate"
+      }
+    },
+    "supportedRoles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "../interface/contract-primitives.schema.json#/$defs/capabilityActorRole"
+      }
+    }
+  },
+  "$defs": {
+    "targetPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "optionSchemaRef"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "exact_bound",
+            "owner_option_required",
+            "unique_eligible_default"
+          ]
+        },
+        "optionSchemaRef": {
+          "oneOf": [
+            {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/schemaRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "none"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "optionSchemaRef": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "optionSchemaRef": {
+                "$ref": "../interface/contract-primitives.schema.json#/$defs/schemaRef"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "concurrencyPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "headBindings"
+      ],
+      "properties": {
+        "class": {
+          "enum": [
+            "exact_state",
+            "lifecycle_authority",
+            "append_compatible"
+          ]
+        },
+        "headBindings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "headKey",
+              "mode"
+            ],
+            "properties": {
+              "headKey": {
+                "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+              },
+              "mode": {
+                "enum": [
+                  "must_equal",
+                  "must_satisfy",
+                  "compatible_append",
+                  "convergent_postcondition"
+                ]
+              },
+              "predicateRef": {
+                "$ref": "../interface/contract-primitives.schema.json#/$defs/versionedRef"
+              },
+              "postconditionRef": {
+                "$ref": "../interface/contract-primitives.schema.json#/$defs/versionedRef"
+              }
+            }
+          }
+        }
+      }
+    },
+    "handlerBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bindingKey",
+        "bindingKind"
+      ],
+      "properties": {
+        "bindingKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "bindingKind": {
+          "enum": [
+            "query",
+            "action",
+            "institution_workflow",
+            "publish_process"
+          ]
+        }
+      }
+    },
+    "presenterBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surfaceKey",
+        "presenterKey"
+      ],
+      "properties": {
+        "surfaceKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "presenterKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        }
+      }
+    },
+    "dependencyGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dependencyKey",
+        "minimumVersion",
+        "requiredGate"
+      ],
+      "properties": {
+        "dependencyKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "minimumVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "requiredGate": {
+          "enum": [
+            "contract_boundary",
+            "owner_integration",
+            "joint_conformance",
+            "activation"
+          ]
+        }
+      }
+    }
+  }
+}

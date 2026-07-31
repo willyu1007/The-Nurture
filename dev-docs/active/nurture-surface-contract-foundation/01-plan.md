@@ -210,44 +210,48 @@ reuse/extend/gate matrix are in
 - [x] 每个待实现项都有 owner、source of truth 与 gate。
 - [x] synthetic owner fixture 与真实 owner contract 的来源、可用范围和禁止路径可以机械区分。
 
-Phase 0 PASS 只开放既定执行主线，不开放 protected implementation。下一关键
-lane 是 T-002 ingress M0→M3/M4；其决策和 Owner Integration Handoff 未完成前，
-T-004 Phase 1-2 只可准备 contract-parallel artifact source、schema、pure policy
-和 synthetic conformance，不得宣称真实 owner readiness。
+Phase 0 PASS 只开放既定执行主线，不开放 protected implementation。T-002 ingress
+M0-M4 与 T-004 Phase 1 现已完成；Phase 2 仍只可准备 contract-parallel exact
+artifact source、loader 和 deterministic qualification。T-002 M5 Owner Integration
+Handoff 完成前，不得宣称真实 owner readiness。
 
 ## Phase 1 — Capability, Surface and Visibility Contract
 
-- 定义六个 surface 的 actor、workspace、scope、read/write 与敏感度矩阵。
-- 定义 `CapabilityDescriptorV1` 的最小 engine-ready 字段：stable key/version、
+**Result:** PASS on 2026-07-31 for the normative Phase 1 source and
+contract-parallel verification. This result creates no exact root digest,
+capability activation or Owner Integration PASS.
+
+- [x] 定义六个 surface 的 actor、workspace、scope、read/write 与敏感度矩阵。
+- [x] 定义 `CapabilityDescriptorV1` 的最小 engine-ready 字段：stable key/version、
   domain/execution/delivery 三轴、intent keys、typed input/result/error schema refs、
   target/confirmation/concurrency policy、eligibility policy key/version、handler binding、
   presenter bindings、invalidation scope kinds 与 dependency gates。
-- 锁定 queries/commands 按 capability 组织、presenters 按 surface 组织的单向依赖。
-- 定义 `SurfaceEnvelopeV1`：exact contract ref、surface/version、state、snapshot、
+- [x] 锁定 queries/commands 按 capability 组织、presenters 按 surface 组织的单向依赖。
+- [x] 定义 `SurfaceEnvelopeV1`：exact contract ref、surface/version、state、snapshot、
   actor-safe context、content family、typed content、actions、page info、dependency NO-GO；
   再按 Conversation timeline、Board semantic modules、Workbench Hub/List/Insight
   三类 content family 建立强类型内容联合。
-- 定义同一事实如何投影给 guardian、caregiver、institution，而不复制事实所有权。
-- 定义 identity binding、Family/Guardian、多个 Institution Enrollment/CareGroup、per-Enrollment GrantRequest/Grant 四个独立就绪轴，不使用单一状态枚举代替 authority 判断。
-- 定义 `ready | limited | needs_setup | unavailable` surface state，并保持 module/action eligibility 独立计算。
-- 定义 Guardian Chat 的跨授权来源聚合查询、目标已绑定动作卡，以及家庭看板的 per-Enrollment 目标选择和命令边界。
-- 锁定空态、加载、失败、权限不足、已撤回与已更正的语义。
+- [x] 定义同一事实如何投影给 guardian、caregiver、institution，而不复制事实所有权。
+- [x] 定义 identity binding、Family/Guardian、多个 Institution Enrollment/CareGroup、per-Enrollment GrantRequest/Grant 四个独立就绪轴，不使用单一状态枚举代替 authority 判断。
+- [x] 定义 `ready | limited | needs_setup | unavailable` surface state，并保持 module/action eligibility 独立计算。
+- [x] 定义 Guardian Chat 的跨授权来源聚合查询、目标已绑定动作卡，以及家庭看板的 per-Enrollment 目标选择和命令边界。
+- [x] 锁定空态、加载、失败、权限不足、已撤回与已更正的语义。
 
 验收：
 
-- 任意 view-model 字段都能追溯到 Nurture-owned fact 或明确的 My-Chat opaque identity / policy input。
-- institution 聚合不能读取家庭私密正文。
-- T-007 D-04 的园区业务沟通不是 ambient aggregate：定义一个 request-time、
+- [x] 任意 view-model 字段都能追溯到 Nurture-owned fact 或明确的 My-Chat opaque identity / policy input。
+- [x] institution 聚合不能读取家庭私密正文。
+- [x] T-007 D-04 的园区业务沟通不是 ambient aggregate：定义一个 request-time、
   versioned Admin read-only projection，绑定 exact Institution/Enrollment/CareGroup、
   original Grant/data class/purpose、渠道 disclosure 与 source lifecycle。
-- 明确 Admin protected read 不授予 CareGroup action authority；当前 manifest/source
+- [x] 明确 Admin protected read 不授予 CareGroup action authority；当前 manifest/source
   在新 owner-read contract 和 qualification 完成前保持 default-off。
-- capability descriptor 只描述可发现性，不复制或弱化真正的授权 policy。
-- content family 只表达产品语义，不携带任意视觉组件树、像素布局或 host navigation。
-- 单机构试点路径可确定性收敛到唯一 Enrollment，但多机构时不得由 LLM 静默选择写入目标。
-- descriptor 的 supported role/eligibility metadata 只用于发现；它不能替代执行时
+- [x] capability descriptor 只描述可发现性，不复制或弱化真正的授权 policy。
+- [x] content family 只表达产品语义，不携带任意视觉组件树、像素布局或 host navigation。
+- [x] 单机构试点路径可确定性收敛到唯一 Enrollment，但多机构时不得由 LLM 静默选择写入目标。
+- [x] descriptor 的 supported role/eligibility metadata 只用于发现；它不能替代执行时
   current owner/policy reread。
-- 初始 envelope 的所有 required content 来自同一 snapshot；后续 module/item cursor
+- [x] 初始 envelope 的所有 required content 来自同一 snapshot；后续 module/item cursor
   绑定 actor/scope/contract/snapshot，过期或状态前移时返回 refresh/rebase，不拼接不一致视图。
 
 ## Phase 2 — Typed Capability and Presenter Contract

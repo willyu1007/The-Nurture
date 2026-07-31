@@ -7,8 +7,9 @@
 - Evidence head: `13efdb4`
 - Completed: 2026-07-31
 - Result: **PASS for discovery and gate classification**
-- Next critical lane: T-002 NestJS ingress M0→M3, with M4 interleaved, before
-  T-004 Phase 1-2 implementation.
+- Next critical lane at Phase 0 close: T-002 NestJS ingress M0→M4 before
+  T-004 Phase 1-2 implementation. T-002 M0-M4 and T-004 Phase 1 are now
+  complete; Phase 2 is the current lane.
 
 This result means the current source boundaries, reusable foundations, required
 extensions and owner/activation gates are explicit enough to begin the accepted
@@ -55,8 +56,8 @@ opaque ID MUST NOT advance an item to a later gate.
 | Scenario public boundary | `packages/nurture-scenario/scenario.manifest.yaml`, `src/registry.ts`, `src/module.ts` | Canonical vNext and derived pre-activation manifests exist; the default module is pre-activation. |
 | Handler/policy/presenter boundary | `src/handlers/`, `src/policies.ts`, `src/presenters.ts`, `src/institution-surfaces.ts` | Factory/port patterns exist; current presenters and owner reads are not the six-surface contract. |
 | Persistence ports | `src/repositories.ts`, `src/deps.ts`, `packages/nurture-db/src/repositories/` | Scenario business code remains Prisma-free and real repositories are injected by the host composition. |
-| HTTP boundary | `apps/backend`, `docs/context/api/openapi.yaml` | Current HTTP application is a local-only Fastify dev host; OpenAPI declares zero endpoints. |
-| Formal ingress plan | T-002 `12-nestjs-ingress-migration-plan.md` | `apps/scenario-service` is planned but does not exist. |
+| HTTP boundary | `apps/scenario-service`, `apps/backend`, `docs/context/api/openapi.yaml` | Formal NestJS ingress exposes exactly health plus binding-owner on `PORT=8000`; the Fastify dev host remains transitional on `DEV_HOST_PORT=3001`. |
+| Formal ingress plan | T-002 `12-nestjs-ingress-migration-plan.md` | M0-M4 are complete with exact API/env/port gates; M5 handoff regeneration and Fastify route disposition remain. |
 | Family-care delta | T-005 `06-t002-fact-schema-gap.md` | Existing family-care commands require semantic replacement/extension before G2. |
 | Institution delta | T-007 `06-g4-0-freeze-ledger.md` | T-004 and T-002 exact handoffs remain `DEFINED_UNQUALIFIED`; T-007 public capabilities are absent/default-off. |
 
@@ -64,9 +65,9 @@ Current verification notes:
 
 - Context strict verification, test routing, persistence boundaries and the N1
   schema contract pass.
-- `pnpm verify:workflow-contract-pin` currently fails because the exact T-002
-  pin expects My-Chat `f00b86861cf0b751d747c7e0bc5cb86a952900de`, while the
-  sibling checkout is `e1a5cdd581cc3e1adf9c4e814b2616c13006fa1b`.
+- `pnpm verify:workflow-contract-pin` remains an Owner Integration NO-GO when
+  the floating sibling checkout differs from exact T-002 My-Chat pin
+  `f00b86861cf0b751d747c7e0bc5cb86a952900de`.
 - That drift is an `OWNER_INTEGRATION` NO-GO. It does not invalidate this
   repository-local Phase 0 census and MUST NOT be repaired by silently adopting
   the live checkout.
@@ -100,10 +101,13 @@ Current verification notes:
 
 - The vNext manifest declares six internal routes; the pre-activation manifest
   exposes five.
-- The P7 binding-owner route exists only in the Fastify dev host and is not in
-  the scenario manifest or OpenAPI contract.
-- `docs/context/api/openapi.yaml` and the generated API index contain zero
-  endpoints.
+- The P7 binding-owner route now runs through the formal NestJS scenario
+  service with the frozen application behavior. The Fastify copy remains
+  transitional until M5 removes or hard-disables it.
+- `docs/context/api/openapi.yaml` and the generated API index contain exactly
+  `GET /health` and
+  `POST /internal/nurture/scenario-binding/authorize`; CI checks
+  source/OpenAPI/index parity.
 - Current `WorkflowPresenters` return generic Run/Card/Artifact shapes and use
   `activity_comparison` placeholders. They are reusable only as an exposure and
   dependency-injection pattern.
@@ -182,9 +186,9 @@ owner and reread current authority.
 
 | Layer | Owner | Current state | Required evidence before protected use |
 | --- | --- | --- | --- |
-| Authenticated adult principal / Workspace / active role context | My-Chat | No formal T-004 public invocation carrier exists | Exact trusted-context contract through formal NestJS ingress; service identity remains separate from adult identity. |
+| Authenticated adult principal / Workspace / active role context | My-Chat | Formal service auth exists; no T-004 public trusted-context invocation carrier exists | Exact trusted-context contract through formal NestJS ingress; service identity remains separate from adult identity. |
 | Canonical Child/Family and scenario binding | My-Chat | P7 Host integration was pinned historically; current sibling checkout is drifted | Current exact Host pin, binding lifecycle and negative pair/revoke/recovery evidence. |
-| Nurture typed anchor and workspace-local association | T-002 | Schema/repository and private owner endpoint exist; Fastify evidence is provisional | Renewed Owner Integration Handoff through formal ingress, current pins and final false/empty census. |
+| Nurture typed anchor and workspace-local association | T-002 | Schema/repository and formal private owner endpoint exist; M4 governance is complete | Renewed M5 Owner Integration Handoff through formal ingress, current pins and final false/empty census. |
 | Nurture current business authority | T-002/T-005/T-006/T-007 by capability | Partial current policies/facts exist | Per-request current Participant/Role/Enrollment/CareGroup/Grant/purpose/source-lifecycle reread and transaction-local effect/Receipt/Execution. |
 
 No layer substitutes for another. In particular, a service token, opaque
@@ -193,45 +197,45 @@ descriptor eligibility never grants Nurture fact access.
 
 ## Surface Contract Artifact Set Landing
 
-Phase 1 MUST use one scenario-owned, framework-neutral artifact source instead
+Phase 1 uses one scenario-owned, framework-neutral artifact source instead
 of adding contract truth to the host or copying implementation types into
 My-Chat.
 
-Reserved layout (not created by Phase 0):
+Current layout after Phase 1:
 
 ```text
 packages/nurture-scenario/
   contracts/surfaces/v1/
+    README.md
     source/
       interface/
       capabilities/
       surfaces/
-      invocation/
-      fixtures/
-      conformance/
-    generated/
-      surface-contract.manifest.json
-  src/surface-contract/
   tests/surface-contract/
-scripts/surface-contract/
 ```
+
+Phase 2 adds `source/invocation/`, concrete capability registry inputs,
+`generated/surface-contract.manifest.json`, `src/surface-contract/` and
+`scripts/surface-contract/`. Phase 3 adds fixture inputs; Phase 4 adds the
+conformance manifest and qualification cases.
 
 Rules:
 
 - Files under `source/` are the normative machine-readable artifact inputs.
-- `generated/surface-contract.manifest.json` is reproducible output and MUST
+- Once added, `generated/surface-contract.manifest.json` is reproducible output and MUST
   record the exact interface ref, root digest, per-capability/per-surface slice
   hashes and canonical file inventory. Generated output is not part of its own
   digest.
-- `src/surface-contract/` owns Nurture-side loaders, typed bindings and
+- Phase 2 `src/surface-contract/` owns Nurture-side loaders, typed bindings and
   framework-neutral helpers. It MUST NOT import Prisma, My-Chat ORM/runtime or a
   model provider.
 - `tests/surface-contract/` owns schema, binding, determinism, negative and
   fixture tests.
-- `scripts/surface-contract/` owns ESM build/verify commands. Phase 1 should add
-  root commands `build:surface-contract` and `verify:surface-contract`; the
-  latter MUST rebuild in a clean temporary location, compare checked output and
-  fail on drift.
+- `scripts/surface-contract/` will own ESM build/verify commands. Phase 2 adds
+  root commands `build:surface-contract` and `verify:surface-contract` together
+  with the exact canonicalization/digest rules; this avoids creating a
+  placeholder generated identity in Phase 1. The verifier MUST rebuild in a
+  clean `.ai/.tmp/` location, compare checked output and fail on drift.
 - My-Chat consumes the exact generated interface through authenticated API
   handoff or generated consumer types. It MUST NOT import
   `@the-nurture/scenario`, read this source directory at runtime or adopt a
@@ -249,9 +253,12 @@ The initial normative source set will cover:
 6. versioned synthetic-world and Journey fixture manifests;
 7. conformance manifest entries with optional downstream acceptance-item refs.
 
-Canonicalization, exact wire fields and slice boundaries remain Phase 1-2
-implementation work. This layout decision does not assign an interface identity
-or create a published artifact.
+Phase 1 now provides the interface-ref and descriptor schemas, six-surface
+registry, atomic envelope/content unions, visibility matrix and shared
+readiness/snapshot rules. Phase 2 owns concrete descriptors, typed
+invocation/result/error/cursor artifacts, canonicalization, slice boundaries,
+exact root digest and generated manifest. Phase 1 does not assign an interface
+identity or create a published artifact.
 
 ## Work Release Map
 
@@ -298,5 +305,6 @@ or create a published artifact.
 - [x] No design/demo/route/task-status evidence is treated as authority.
 - [x] Final effect census is documentation/governance only.
 
-Phase 0 is complete. T-004 remains `in-progress`; the accepted project
-backbone now moves to T-002 ingress M0→M3/M4, then returns to T-004 Phase 1-2.
+Phase 0 remains a historical PASS. T-002 ingress M0-M4 and T-004 Phase 1 are
+now complete; T-004 remains `in-progress` and the accepted project backbone
+continues with Phase 2.

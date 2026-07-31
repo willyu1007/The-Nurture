@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "surfaces": [
+    {
+      "surfaceKey": "guardian_nurture_chat",
+      "surfaceVersion": "1.0.0",
+      "actorRoles": [
+        "guardian"
+      ],
+      "workspaceScope": "family",
+      "primaryMode": "child_centered_private_synthesis",
+      "contentFamily": "conversation",
+      "writeBoundary": "bound_or_unique_target_capability_only",
+      "targetSelection": "board_required_for_multiple_eligible_enrollments",
+      "stateWhenDependenciesMissing": "limited",
+      "presenterBinding": "present_guardian_nurture_chat",
+      "orderedContentKinds": [
+        "human_message",
+        "ai_structured_response",
+        "boundary_preview",
+        "clarification",
+        "confirmation",
+        "receipt",
+        "correction_notice",
+        "withdrawal_notice",
+        "redaction_tombstone"
+      ],
+      "dependencyGates": [
+        "t002_owner_integration",
+        "t005_care_interaction",
+        "my_chat_authenticated_principal"
+      ]
+    },
+    {
+      "surfaceKey": "guardian_family_board",
+      "surfaceVersion": "1.0.0",
+      "actorRoles": [
+        "guardian"
+      ],
+      "workspaceScope": "family",
+      "primaryMode": "family_record_and_enrollment_target_selection",
+      "contentFamily": "board",
+      "writeBoundary": "exact_enrollment_capability",
+      "targetSelection": "owner_option_required_when_multiple",
+      "stateWhenDependenciesMissing": "needs_setup",
+      "presenterBinding": "present_guardian_family_board",
+      "orderedContentKinds": [
+        "guardian_current_focus",
+        "guardian_enrollment_activity",
+        "institution_workflow_projection"
+      ],
+      "dependencyGates": [
+        "t002_owner_integration",
+        "t005_care_interaction",
+        "t006_family_board_projection",
+        "my_chat_authenticated_principal"
+      ]
+    },
+    {
+      "surfaceKey": "caregiver_nurture_chat",
+      "surfaceVersion": "1.0.0",
+      "actorRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ],
+      "workspaceScope": "care_group",
+      "primaryMode": "current_item_explanation_and_bounded_coordination",
+      "contentFamily": "conversation",
+      "writeBoundary": "exact_care_group_capability",
+      "targetSelection": "exact_bound",
+      "stateWhenDependenciesMissing": "unavailable",
+      "presenterBinding": "present_caregiver_nurture_chat",
+      "orderedContentKinds": [
+        "ai_structured_response",
+        "human_message",
+        "clarification",
+        "confirmation",
+        "receipt",
+        "correction_notice",
+        "redaction_tombstone"
+      ],
+      "dependencyGates": [
+        "t002_owner_integration",
+        "t005_care_interaction",
+        "my_chat_authenticated_principal"
+      ]
+    },
+    {
+      "surfaceKey": "caregiver_teacher_board",
+      "surfaceVersion": "1.0.0",
+      "actorRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ],
+      "workspaceScope": "care_group",
+      "primaryMode": "class_work_and_publish_process",
+      "contentFamily": "board",
+      "writeBoundary": "canonical_capability_or_publish_process_only",
+      "targetSelection": "exact_bound",
+      "stateWhenDependenciesMissing": "limited",
+      "presenterBinding": "present_caregiver_teacher_board",
+      "orderedContentKinds": [
+        "caregiver_child_today",
+        "caregiver_family_care_work",
+        "teacher_publish_queue"
+      ],
+      "dependencyGates": [
+        "t002_owner_integration",
+        "t005_care_interaction",
+        "t006_teacher_board_projection",
+        "t007_publication_policy",
+        "my_chat_authenticated_principal"
+      ]
+    },
+    {
+      "surfaceKey": "institution_board",
+      "surfaceVersion": "1.0.0",
+      "actorRoles": [
+        "institution_admin"
+      ],
+      "workspaceScope": "institution",
+      "primaryMode": "class_first_read_only_aggregate",
+      "contentFamily": "board",
+      "writeBoundary": "none",
+      "targetSelection": "none",
+      "stateWhenDependenciesMissing": "unavailable",
+      "presenterBinding": "present_institution_board",
+      "orderedContentKinds": [
+        "support_signal_summary",
+        "institution_class_overview",
+        "institution_business_communication",
+        "institution_workflow_projection"
+      ],
+      "dependencyGates": [
+        "t002_owner_integration",
+        "t005_admin_business_read",
+        "t007_institution_board",
+        "my_chat_authenticated_principal"
+      ]
+    },
+    {
+      "surfaceKey": "institution_workbench",
+      "surfaceVersion": "1.0.0",
+      "actorRoles": [
+        "institution_admin"
+      ],
+      "workspaceScope": "institution",
+      "primaryMode": "institution_workflow_operations",
+      "contentFamily": "workbench",
+      "writeBoundary": "explicit_institution_admin_capability",
+      "targetSelection": "exact_bound",
+      "stateWhenDependenciesMissing": "unavailable",
+      "presenterBinding": "present_institution_workbench",
+      "orderedContentKinds": [
+        "hub",
+        "institution_workflow_queue",
+        "grant_request_management",
+        "people_operations",
+        "daily_operations",
+        "communication_review",
+        "knowledge_management",
+        "insight"
+      ],
+      "dependencyGates": [
+        "t002_owner_integration",
+        "t007_institution_workbench",
+        "my_chat_authenticated_principal"
+      ]
+    }
+  ]
+}

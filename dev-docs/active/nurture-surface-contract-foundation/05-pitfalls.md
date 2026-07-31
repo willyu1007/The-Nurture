@@ -74,4 +74,100 @@
 
 ## Resolved Pitfalls
 
-当前尚未进入实现阶段。发生并解决实际问题后，按 symptom、root cause、attempts、fix、prevention 的结构补充。
+### 2026-07-31 — Relative schema refs under an opaque URN base
+
+- Symptom: Phase 1 schemas used relative `$ref` paths while their `$id` values
+  were opaque `urn:` identifiers.
+- Root cause: relative URI resolution requires a hierarchical base; an opaque
+  URN cannot reliably resolve `../interface/...`.
+- What was tried: initial structural tests proved the JSON shape but did not
+  exercise URI resolution.
+- Fix: assign stable hierarchical HTTPS schema IDs that mirror the normative
+  source paths.
+- Prevention: every schema using a relative `$ref` must have a hierarchical
+  canonical `$id`, and Phase 2 strict admission must resolve the complete graph.
+
+### 2026-07-31 — Runtime availability leaked into semantic handler binding
+
+- Symptom: `handlerBinding` initially required
+  `absent | default_off | contract_parallel` availability.
+- Root cause: current rollout state was mixed with stable interface semantics;
+  toggling an environment gate would have changed the interface digest without
+  changing a handler contract.
+- What was tried: dependency gates were present but did not eliminate the
+  duplicated runtime field.
+- Fix: replace availability with stable
+  `query | action | institution_workflow | publish_process` binding kind.
+  Runtime/default-off state remains outside the semantic artifact.
+- Prevention: semantic digest inputs may describe required qualification
+  dependencies, but never current deployment, activation or environment state.
+
+### 2026-07-31 — Presenter requirements accidentally exposed system capability
+
+- Symptom: the descriptor schema required at least one presenter binding for
+  every capability.
+- Root cause: user-discoverable and internal policy capabilities were treated
+  as one presentation class.
+- What was tried: an optional supported role did not solve the forced UI
+  binding.
+- Fix: allow an empty presenter list while keeping every listed presenter
+  strictly typed. Internal system capabilities can remain absent from user
+  discovery.
+- Prevention: discovery/presentation requirements must be capability-specific;
+  do not force internal safety operations into a user surface.
+
+### 2026-07-31 — Stale test population after adding a contract suite
+
+- Symptom: the new Phase 1 test file passed, but the CI unit population still
+  expected 187 tests.
+- Root cause: the direct test and TypeScript checks did not run the JSON
+  reporter's separate population assertion.
+- What was tried: focused and full human-readable Vitest runs both passed.
+- Fix: update the exact population to 197 and run
+  `test:unit:ci` together with `verify:unit-population`.
+- Prevention: every test addition must renew both file routing and result-count
+  gates.
+
+### 2026-07-31 — Partial visibility rows and missing owners left implicit defaults
+
+- Symptom: initial surface rows listed some allowed and denied data classes but
+  omitted others, leaving their default visibility open to interpretation; the
+  data classes also lacked a machine-readable canonical owner.
+- Root cause: the matrix tests checked that referenced classes were declared,
+  but did not require every surface to classify the complete data-class set or
+  trace every class to My-Chat/Nurture ownership.
+- What was tried: disjoint read/deny checks caught contradictions but not
+  omissions.
+- Fix: make every row a total classification and require the union of
+  read/write/explicitly-denied classes to equal the declared data-class set.
+  Require an exact owner map for the same set.
+  Guardian surfaces explicitly retain cross-Institution provenance; all
+  Institution/Caregiver surfaces explicitly deny other-Institution presence.
+- Prevention: authorization and visibility matrices must be total, not sparse;
+  absence is never an implicit allow or deny rule.
+
+### 2026-07-31 — Contract primitives were duplicated across schemas
+
+- Symptom: descriptor and envelope schemas each carried their own stable-key,
+  SemVer and opaque-ref definitions.
+- Root cause: the initial files were authored independently before the schema
+  graph was reviewed as one canonical artifact set.
+- What was tried: individual schema tests proved each copy was internally
+  valid but could not prevent later semantic drift between copies.
+- Fix: add one `contract-primitives.schema.json`, replace local copies with
+  relative references and test that every local reference resolves.
+- Prevention: shared wire primitives have one normative schema definition;
+  consumers reference it instead of copying regexes or enums.
+
+### 2026-07-31 — Shared actor-role primitive widened surface admission
+
+- Symptom: after primitive deduplication, `SurfaceEnvelopeV1.actorContext`
+  inherited the internal `system_policy` capability role.
+- Root cause: capability discovery roles and user-facing surface roles were
+  modeled as one shared enum.
+- What was tried: registry tests kept the six configured surfaces human-bound,
+  but the envelope schema itself still admitted a system actor.
+- Fix: split `capabilityActorRole` from `surfaceActorRole`; only the former
+  includes `system_policy`.
+- Prevention: shared primitives must not erase trust-boundary distinctions;
+  schema-level admission is reviewed independently from current registry data.

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/interface/contract-primitives.schema.json",
+  "title": "SurfaceContractPrimitivesV1",
+  "$defs": {
+    "stableKey": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+    },
+    "semver": {
+      "type": "string",
+      "description": "Release SemVer without prerelease or build metadata.",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "schemaRef": {
+      "type": "string",
+      "pattern": "^schema:nurture\\.[a-z0-9]+(?:-[a-z0-9]+)*@[1-9][0-9]*$"
+    },
+    "opaqueRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "surfaceActorRole": {
+      "enum": [
+        "guardian",
+        "caregiver",
+        "lead_caregiver",
+        "institution_admin"
+      ]
+    },
+    "capabilityActorRole": {
+      "enum": [
+        "guardian",
+        "caregiver",
+        "lead_caregiver",
+        "institution_admin",
+        "system_policy"
+      ]
+    },
+    "versionedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "version"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/stableKey"
+        },
+        "version": {
+          "$ref": "#/$defs/semver"
+        }
+      }
+    }
+  }
+}

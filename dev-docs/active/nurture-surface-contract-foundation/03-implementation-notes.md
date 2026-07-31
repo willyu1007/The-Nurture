@@ -102,9 +102,11 @@
 - T-002 到 family-care 落地合同的事实/schema 差距已由 T-005
   `06-t002-fact-schema-gap.md` 盘点；T-004 Phase 0 只需验证实际公共接口是否满足
   exact interface contract，不再重复推断数据库事实。
-- V1 descriptor/envelope/invocation schemas、artifact registry、schema validator 与
-  digest builder 的 repo 边界和 root command 已由 Phase 0 固定；Phase 1-2 仍需创建
-  实际文件、冻结精确 artifact 清单并验证 deterministic rebuild。
+- Phase 1 已创建 interface-ref/descriptor/envelope schemas、六-surface registry、
+  visibility matrix、readiness/snapshot rules 和 source parity tests。Phase 2 仍需
+  创建 concrete descriptor registry、invocation/result/error/cursor artifacts、
+  loader、canonical digest/slice builder、generated manifest 与 deterministic
+  build/verify commands。
 - 每条 Journey 的详细步骤、最小 fixture 和 negative branch 在对应 capability discovery 后细化，不重新打开 Portfolio 结构。
 
 ## 2026-07-29 — Business input and concurrency precondition separated (historical)
@@ -227,3 +229,43 @@
    `node .ai/scripts/ctl-project-governance.mjs resume --task T-004 --json`，按
    `06-phase-0-discovery-and-gate-matrix.md` 的落点实施 Phase 1-2 contract source、
    generated manifest、loader 与 deterministic build/verify tooling。
+
+## 2026-07-31 — Phase 1 capability/surface/visibility source completed
+
+- Created the scenario-owned normative source under
+  `packages/nurture-scenario/contracts/surfaces/v1/source/` without copying
+  My-Chat runtime or assigning a placeholder interface digest.
+- Froze the exact `InterfaceContractRefV1` shape, engine-ready
+  `CapabilityDescriptorV1` axes and policies, atomic `SurfaceEnvelopeV1`, three
+  closed content families, six role-bound surface records and the visibility
+  matrix.
+- Separated four readiness axes, current authority from discovery, Guardian
+  multi-Institution provenance from Institution isolation, Admin protected
+  business read from CareGroup action authority, GrantRequest from Grant and
+  writable `InstitutionWorkflow` from its read-only projection.
+- Quality review repaired seven contract defects before acceptance:
+  resolvable HTTPS schema IDs replaced non-resolvable relative references from
+  `urn:` bases; runtime handler availability was removed from the semantic
+  digest inputs; and internal system capabilities may have zero presenter
+  bindings. The visibility matrix is also total: every data class is explicitly
+  read/writable or denied for every surface. Shared keys, versions, schema refs,
+  opaque refs and actor roles now come from one primitive schema instead of
+  duplicated definitions, while system-policy capability roles remain excluded
+  from surface actor contexts. Every visibility data class now also names its
+  canonical My-Chat or Nurture owner.
+- Added ten contract-source tests for closed keys, descriptor axes, content
+  union parity, readiness/snapshot/cursor rules, Admin and multi-Institution
+  negatives, primitive/ref resolution, private/runtime-shape exclusion and
+  kebab-case source paths.
+- The complete unit population is now 22 files / 197 tests, with the JSON CI
+  reporter and population gate renewed. Phase 1 changes no runtime
+  manifest/capability, schema/migration, database, environment, secret,
+  deployment, activation or traffic.
+
+### Handoff to Phase 2
+
+Phase 2 must add the concrete descriptor registry and typed
+query/prepare/execute/readResult, result/error/cursor artifacts before assigning
+the first exact interface version/digest. Canonicalization, per-capability and
+per-surface slice hashes, loader/admission and generated-manifest verification
+must land together; no placeholder `generated/` artifact is permitted.

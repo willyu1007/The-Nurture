@@ -1,0 +1,446 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/surfaces/surface-envelope.schema.json",
+  "title": "SurfaceEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "surfaceKey",
+    "surfaceVersion",
+    "state",
+    "snapshotRef",
+    "snapshotVersion",
+    "generatedAt",
+    "actorContext",
+    "contentFamily",
+    "content",
+    "actions",
+    "dependencyNoGos"
+  ],
+  "properties": {
+    "contract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "surfaceKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "surfaceVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "state": {
+      "enum": [
+        "ready",
+        "limited",
+        "needs_setup",
+        "unavailable"
+      ]
+    },
+    "snapshotRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "snapshotVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actorContext": {
+      "$ref": "#/$defs/actorContext"
+    },
+    "contentFamily": {
+      "enum": [
+        "conversation",
+        "board",
+        "workbench"
+      ]
+    },
+    "content": {
+      "type": "array"
+    },
+    "actions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/actionRef"
+      }
+    },
+    "pageInfo": {
+      "$ref": "#/$defs/pageInfo"
+    },
+    "dependencyNoGos": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/dependencyNoGo"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "contentFamily": {
+            "const": "conversation"
+          }
+        },
+        "required": [
+          "contentFamily"
+        ]
+      },
+      "then": {
+        "properties": {
+          "content": {
+            "items": {
+              "$ref": "#/$defs/conversationItem"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "contentFamily": {
+            "const": "board"
+          }
+        },
+        "required": [
+          "contentFamily"
+        ]
+      },
+      "then": {
+        "properties": {
+          "content": {
+            "items": {
+              "$ref": "#/$defs/boardModule"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "contentFamily": {
+            "const": "workbench"
+          }
+        },
+        "required": [
+          "contentFamily"
+        ]
+      },
+      "then": {
+        "properties": {
+          "content": {
+            "items": {
+              "$ref": "#/$defs/workbenchModule"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "actorContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "scopeRef",
+        "scopeLabel"
+      ],
+      "properties": {
+        "role": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/surfaceActorRole"
+        },
+        "scopeRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "scopeLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "subjectRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "subjectLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "actionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityKey",
+        "capabilityVersion",
+        "availability"
+      ],
+      "properties": {
+        "capabilityKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "targetOptionRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "already_satisfied",
+            "needs_input"
+          ]
+        }
+      }
+    },
+    "pageInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hasMore"
+      ],
+      "properties": {
+        "nextCursor": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "hasMore": {
+          "type": "boolean"
+        }
+      }
+    },
+    "dependencyNoGo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dependencyKey",
+        "requiredVersion",
+        "reason",
+        "retryHint"
+      ],
+      "properties": {
+        "dependencyKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "requiredVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "reason": {
+          "enum": [
+            "missing",
+            "unqualified",
+            "unavailable",
+            "contract_mismatch"
+          ]
+        },
+        "retryHint": {
+          "enum": [
+            "retry",
+            "setup",
+            "required_upgrade",
+            "contact_admin",
+            "none"
+          ]
+        }
+      }
+    },
+    "conversationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "itemKey",
+        "kind",
+        "required"
+      ],
+      "properties": {
+        "itemKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "kind": {
+          "enum": [
+            "human_message",
+            "ai_structured_response",
+            "boundary_preview",
+            "clarification",
+            "confirmation",
+            "receipt",
+            "correction_notice",
+            "withdrawal_notice",
+            "redaction_tombstone",
+            "pending_send"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "receiptState": {
+          "enum": [
+            "pending",
+            "delivered",
+            "read",
+            "acknowledged",
+            "failed",
+            "blocked",
+            "revoked_after_delivery"
+          ]
+        },
+        "actionRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/actionRef"
+          }
+        }
+      }
+    },
+    "boardModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleKey",
+        "kind",
+        "required",
+        "actionRefs"
+      ],
+      "properties": {
+        "moduleKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "kind": {
+          "enum": [
+            "guardian_current_focus",
+            "guardian_enrollment_activity",
+            "caregiver_child_today",
+            "caregiver_family_care_work",
+            "teacher_publish_queue",
+            "institution_class_overview",
+            "institution_business_communication",
+            "institution_workflow_projection",
+            "support_signal_summary"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sourceLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "itemRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+          }
+        },
+        "actionRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/actionRef"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/$defs/pageInfo"
+        }
+      }
+    },
+    "workbenchModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleKey",
+        "kind",
+        "required",
+        "actionRefs"
+      ],
+      "properties": {
+        "moduleKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "kind": {
+          "enum": [
+            "hub",
+            "list",
+            "insight",
+            "institution_workflow_queue",
+            "grant_request_management",
+            "people_operations",
+            "daily_operations",
+            "communication_review",
+            "knowledge_management"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "collectionRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "itemRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+          }
+        },
+        "actionRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/actionRef"
+          }
+        },
+        "pageInfo": {
+          "$ref": "#/$defs/pageInfo"
+        }
+      }
+    }
+  }
+}

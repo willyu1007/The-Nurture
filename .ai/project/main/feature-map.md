@@ -28,7 +28,7 @@ Project: `main`
 - Risks: confusing `DR-*` design findings with `TR-*` traffic blockers, treating green CI/design completion/X5 PASS or superseded exact-claimant evidence as source/deployment authority, issuing a receipt after its authority source changed, exposing stable anchors through Host clients, widening CareGroup responsibility to same-Institution access, bypassing the opaque My-Chat Child/Family binding chain, publishing mutable artifacts, or weakening owner-reread/revoke/privacy fences for pilot convenience.
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
-- Next Checkpoint: complete T-004 Phase 1-2 Contract Boundary, then regenerate
+- Next Checkpoint: complete the remaining T-004 Phase 2 Contract Boundary, then regenerate
   the exact M5 Owner Integration Handoff and remove or
   hard-disable the transitional Fastify P7 route; close remaining C30-I0-C/D exact-pin and
   false/empty evidence, and meet T-004 at the separate Joint Conformance gate.
@@ -329,9 +329,10 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 (`in-progress`); T-005 through T-008 (`planned`).
-- Next Checkpoint: T-004 Phase 0 与 T-002 NestJS ingress M0-M4
-  已完成；当前单主线返回 T-004 Phase 1-2，形成可重建的
-  Surface Contract Artifact Set。
+- Next Checkpoint: T-004 Phase 0/Phase 1 与 T-002 NestJS ingress M0-M4
+  已完成；当前单主线执行 T-004 Phase 2，补齐 concrete descriptor/invocation
+  artifacts、exact digest/slice hashes、loader 与 deterministic build/verify，
+  形成可重建的 Surface Contract Artifact Set。
   真实 owner integration 只在精确 T-002 pins/evidence 就绪后通过 Joint Conformance。
   T-003 是非阻塞设计输入。T-005～T-007 从 G1 start
   即可并行做设计、纯领域逻辑与 synthetic work；Contract Boundary、Owner Readiness

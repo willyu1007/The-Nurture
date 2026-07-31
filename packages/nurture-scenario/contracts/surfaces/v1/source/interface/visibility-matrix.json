@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "dataClasses": [
+    "family_private_ai",
+    "caregiver_unsent_publish_draft",
+    "family_care_business_communication",
+    "daily_care",
+    "child_growth_record",
+    "grant_request",
+    "grant",
+    "publish_process",
+    "institution_workflow",
+    "institution_workflow_projection",
+    "institution_support_signal",
+    "cross_institution_presence"
+  ],
+  "dataClassOwners": {
+    "family_private_ai": "my_chat",
+    "caregiver_unsent_publish_draft": "nurture",
+    "family_care_business_communication": "nurture",
+    "daily_care": "nurture",
+    "child_growth_record": "nurture",
+    "grant_request": "nurture",
+    "grant": "nurture",
+    "publish_process": "nurture",
+    "institution_workflow": "nurture",
+    "institution_workflow_projection": "nurture",
+    "institution_support_signal": "nurture",
+    "cross_institution_presence": "nurture"
+  },
+  "surfaces": [
+    {
+      "surfaceKey": "guardian_nurture_chat",
+      "read": [
+        "family_private_ai",
+        "family_care_business_communication",
+        "daily_care",
+        "child_growth_record",
+        "grant_request",
+        "grant",
+        "institution_workflow_projection",
+        "cross_institution_presence"
+      ],
+      "write": [
+        "family_private_ai",
+        "family_care_business_communication",
+        "grant"
+      ],
+      "explicitlyDenied": [
+        "caregiver_unsent_publish_draft",
+        "publish_process",
+        "institution_workflow",
+        "institution_support_signal"
+      ],
+      "authorityRules": [
+        "current_family_guardian",
+        "current_family_side_policy",
+        "per_enrollment_grant_and_source_lifecycle",
+        "preserve_cross_institution_provenance"
+      ]
+    },
+    {
+      "surfaceKey": "guardian_family_board",
+      "read": [
+        "family_care_business_communication",
+        "daily_care",
+        "child_growth_record",
+        "grant_request",
+        "grant",
+        "institution_workflow_projection",
+        "cross_institution_presence"
+      ],
+      "write": [
+        "family_care_business_communication",
+        "grant"
+      ],
+      "explicitlyDenied": [
+        "family_private_ai",
+        "caregiver_unsent_publish_draft",
+        "publish_process",
+        "institution_workflow",
+        "institution_support_signal"
+      ],
+      "authorityRules": [
+        "current_family_guardian",
+        "exact_enrollment_target",
+        "owner_option_required_for_multiple_enrollments",
+        "grant_owner_and_current_family_policy"
+      ]
+    },
+    {
+      "surfaceKey": "caregiver_nurture_chat",
+      "read": [
+        "family_care_business_communication",
+        "daily_care"
+      ],
+      "write": [
+        "family_care_business_communication"
+      ],
+      "explicitlyDenied": [
+        "family_private_ai",
+        "caregiver_unsent_publish_draft",
+        "child_growth_record",
+        "grant_request",
+        "grant",
+        "publish_process",
+        "institution_workflow",
+        "institution_workflow_projection",
+        "institution_support_signal",
+        "cross_institution_presence"
+      ],
+      "authorityRules": [
+        "current_operational_caregiver",
+        "exact_care_group",
+        "exact_child_scope",
+        "current_enrollment_grant_and_policy"
+      ]
+    },
+    {
+      "surfaceKey": "caregiver_teacher_board",
+      "read": [
+        "caregiver_unsent_publish_draft",
+        "family_care_business_communication",
+        "daily_care",
+        "child_growth_record",
+        "publish_process"
+      ],
+      "write": [
+        "family_care_business_communication",
+        "daily_care",
+        "publish_process"
+      ],
+      "explicitlyDenied": [
+        "family_private_ai",
+        "grant_request",
+        "grant",
+        "institution_workflow",
+        "institution_workflow_projection",
+        "institution_support_signal",
+        "cross_institution_presence"
+      ],
+      "authorityRules": [
+        "current_operational_caregiver",
+        "exact_care_group",
+        "exact_child_scope",
+        "current_enrollment_grant_and_policy",
+        "publish_process_is_separate_from_care_interaction"
+      ]
+    },
+    {
+      "surfaceKey": "institution_board",
+      "read": [
+        "family_care_business_communication",
+        "daily_care",
+        "grant_request",
+        "institution_workflow_projection",
+        "institution_support_signal"
+      ],
+      "write": [],
+      "explicitlyDenied": [
+        "family_private_ai",
+        "caregiver_unsent_publish_draft",
+        "child_growth_record",
+        "grant",
+        "publish_process",
+        "institution_workflow",
+        "cross_institution_presence"
+      ],
+      "authorityRules": [
+        "current_institution_admin",
+        "exact_institution_and_class_scope",
+        "business_channel_disclosed_before_send",
+        "original_grant_data_class_direction_purpose",
+        "current_source_lifecycle",
+        "admin_read_never_grants_care_group_action"
+      ]
+    },
+    {
+      "surfaceKey": "institution_workbench",
+      "read": [
+        "family_care_business_communication",
+        "daily_care",
+        "grant_request",
+        "institution_workflow_projection",
+        "institution_support_signal"
+      ],
+      "write": [
+        "grant_request",
+        "institution_workflow"
+      ],
+      "explicitlyDenied": [
+        "family_private_ai",
+        "caregiver_unsent_publish_draft",
+        "child_growth_record",
+        "grant",
+        "publish_process",
+        "cross_institution_presence"
+      ],
+      "authorityRules": [
+        "current_institution_admin",
+        "exact_institution_scope",
+        "business_channel_disclosed_before_send",
+        "original_grant_data_class_direction_purpose",
+        "current_source_lifecycle",
+        "grant_request_is_not_grant",
+        "institution_workflow_actions_are_explicit"
+      ]
+    }
+  ]
+}

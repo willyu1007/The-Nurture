@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "readinessAxes": [
+    {
+      "axisKey": "platform_identity_binding",
+      "owner": "my_chat_and_nurture",
+      "requiredCurrentFacts": [
+        "authenticated_principal",
+        "canonical_subject",
+        "current_scenario_binding",
+        "typed_anchor",
+        "workspace_local_association"
+      ],
+      "doesNotGrant": "nurture_fact_access"
+    },
+    {
+      "axisKey": "family_relationship",
+      "owner": "nurture",
+      "requiredCurrentFacts": [
+        "family_association",
+        "guardian_role",
+        "family_side_policy"
+      ],
+      "doesNotGrant": "institution_data_flow"
+    },
+    {
+      "axisKey": "institution_relationship",
+      "owner": "nurture",
+      "requiredCurrentFacts": [
+        "exact_enrollment",
+        "exact_care_group",
+        "current_operational_role"
+      ],
+      "doesNotGrant": "family_content_access"
+    },
+    {
+      "axisKey": "data_authorization",
+      "owner": "nurture",
+      "requiredCurrentFacts": [
+        "exact_enrollment_grant",
+        "data_class",
+        "direction",
+        "purpose",
+        "source_lifecycle"
+      ],
+      "doesNotGrant": "unrelated_capability_access"
+    }
+  ],
+  "surfaceStates": [
+    "ready",
+    "limited",
+    "needs_setup",
+    "unavailable"
+  ],
+  "responseSemantics": {
+    "loading": "host_request_state_not_surface_fact",
+    "empty": "authorized_zero_result_same_snapshot",
+    "failure": "safe_error_without_protected_state",
+    "permissionDenied": "omit_or_unavailable_without_object_existence",
+    "withdrawn": "typed_notice_preserves_history",
+    "corrected": "typed_notice_points_to_current_interpretation"
+  },
+  "projectionRules": [
+    "canonical_owner_query_before_projection",
+    "role_specific_source_query",
+    "current_authority_reread",
+    "preserve_source_provenance",
+    "no_cross_role_super_dto",
+    "no_other_institution_disclosure"
+  ],
+  "snapshotContract": {
+    "initialRequiredContent": "single_snapshot",
+    "cursorBindings": [
+      "contract_digest",
+      "actor",
+      "scope",
+      "query",
+      "sort",
+      "snapshot",
+      "expiry"
+    ],
+    "driftOutcomes": [
+      "refresh",
+      "rebase"
+    ],
+    "crossSnapshotAppend": "forbidden"
+  },
+  "actionRules": [
+    "target_option_is_not_authority",
+    "descriptor_eligibility_is_not_authority",
+    "surface_state_does_not_imply_capability_eligibility",
+    "execute_rereads_current_business_authority",
+    "multiple_enrollment_write_requires_owner_option",
+    "admin_read_never_grants_care_group_action",
+    "write_boundary_none_requires_empty_actions",
+    "mutation_returns_result_and_invalidation_not_ui_patch"
+  ],
+  "contentRules": {
+    "pendingSendCanonicalSources": [
+      "publish_process",
+      "action_delivery"
+    ],
+    "prepareActionCreatesBusinessFact": false,
+    "arbitraryComponentTreeAllowed": false,
+    "hostNavigationOwnedByNurture": false
+  },
+  "dependencyNoGoRules": [
+    "machine_readable_only",
+    "no_hidden_object_existence",
+    "no_cross_institution_reason",
+    "no_synthetic_runtime_fallback"
+  ]
+}
