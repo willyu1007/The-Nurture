@@ -124,6 +124,13 @@ export type SurfaceContractManifestV1 = {
   };
 };
 
+export type SurfaceContractArtifactPinV1 = {
+  schemaVersion: 1;
+  artifactKind: "surface_contract_manifest";
+  interfaceContract: InterfaceContractRefV1;
+  manifestDigest: `sha256:${string}`;
+};
+
 export type ContractAdmissionV1 =
   | {
       admitted: true;

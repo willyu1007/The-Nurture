@@ -322,6 +322,29 @@ must land together; no placeholder `generated/` artifact is permitted.
   deployment or traffic. Synthetic fixtures/conformance remain Phase 3-4;
   Owner Integration remains NO-GO.
 
+## 2026-07-31 — Phase 2 quality closure step 1
+
+- Hardened dependency readiness so every supplied state is validated before
+  comparison. Malformed SemVer, unknown gates, unknown fields and duplicate
+  dependency keys now throw `invalid_surface_contract` instead of reaching the
+  eligible path through JavaScript `NaN`/`undefined` comparison behavior.
+- Added generated `surface-contract.artifact-pin.json`. The pin contains the
+  exact interface ref plus a canonical manifest digest and must be obtained
+  from a separately trusted release/source/configuration boundary.
+- Changed manifest loading to require that trusted pin. A valid-looking
+  semantic edit that retains the old self-declared interface ref now fails
+  content-integrity validation.
+- Aligned nested loader checks with generator rules for conditional head
+  bindings, schema refs, handler/presenter keys, dependency records, roles,
+  invalidation scopes and array uniqueness.
+- Added negative tests for malformed/duplicate dependency evidence, semantic
+  tampering and missing condition refs. Focused Phase 2 tests pass 19/19;
+  full unit population is 216/216; scenario typecheck, tooling 5/5 and
+  deterministic manifest/pin verification pass.
+- No source contract, interface version/digest, capability activation,
+  schema/migration, database, environment, secret, deployment or traffic
+  changed in this step. Strict schema/CI closure remains the next step.
+
 ### Handoff to Phase 3
 
 Create the versioned PII-free synthetic world and independent GJ-1～GJ-5/RJ-1

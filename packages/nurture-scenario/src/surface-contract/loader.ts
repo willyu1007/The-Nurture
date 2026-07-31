@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type {
   CapabilityDescriptorV1,
   ContractAdmissionV1,
@@ -5,6 +6,7 @@ import type {
   DependencyReadinessV1,
   DependencyStateV1,
   InterfaceContractRefV1,
+  SurfaceContractArtifactPinV1,
   SurfaceContractManifestV1,
 } from "./types.js";
 
@@ -12,6 +14,33 @@ const digestPattern = /^sha256:[0-9a-f]{64}$/;
 const semverPattern =
   /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
 const stableKeyPattern = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
+const schemaRefPattern =
+  /^schema:nurture\.[a-z0-9]+(?:-[a-z0-9]+)*@[1-9][0-9]*$/;
+const sourceArtifactPathPattern =
+  /^[a-z0-9]+(?:[/-][a-z0-9]+)*(?:\.schema)?\.json$/;
+const dependencyGateStages = [
+  "contract_boundary",
+  "owner_integration",
+  "joint_conformance",
+  "activation",
+] as const;
+const invalidationScopeKinds = [
+  "capability",
+  "surface",
+  "target",
+  "collection",
+  "subject",
+  "care_group",
+  "enrollment",
+  "institution",
+] as const;
+const capabilityActorRoles = [
+  "guardian",
+  "caregiver",
+  "lead_caregiver",
+  "institution_admin",
+  "system_policy",
+] as const;
 
 const descriptorKeys = [
   "capabilityKey",
@@ -48,6 +77,7 @@ export class SurfaceContractValidationError extends Error {
 
 export function loadSurfaceContractManifest(
   input: unknown,
+  trustedArtifactPin: unknown,
 ): SurfaceContractManifestV1 {
   const manifest = asRecord(input, "manifest");
   assertExactKeys(
@@ -78,6 +108,7 @@ export function loadSurfaceContractManifest(
   validateCapabilities(manifest.capabilities, contract);
   validateSurfaces(manifest.surfaces);
   validateAdmission(manifest.admission);
+  validateTrustedArtifactPin(trustedArtifactPin, contract, input);
   deepFreeze(input);
   return input as SurfaceContractManifestV1;
 }
@@ -119,9 +150,7 @@ export function evaluateDependencyReadiness(
   descriptor: CapabilityDescriptorV1,
   dependencyStates: readonly DependencyStateV1[],
 ): DependencyReadinessV1 {
-  const states = new Map(
-    dependencyStates.map((state) => [state.dependencyKey, state]),
-  );
+  const states = validateDependencyStates(dependencyStates);
   const reasons: Array<{
     code: "dependency_no_go";
     dependencyKey: string;
@@ -220,6 +249,7 @@ function validateSourceSet(value: unknown): string {
   assertDigest(sourceSet.sourceDigest, "sourceSet.sourceDigest");
   const sourceDigest = sourceSet.sourceDigest;
   const inventory = asArray(sourceSet.inventory, "sourceSet.inventory");
+  if (inventory.length === 0) fail("sourceSet.inventory must not be empty");
   let priorPath = "";
   const seen = new Set<string>();
   for (const [index, entryValue] of inventory.entries()) {
@@ -233,6 +263,9 @@ function validateSourceSet(value: unknown): string {
       entry.path,
       `sourceSet.inventory[${index}].path`,
     );
+    if (!sourceArtifactPathPattern.test(artifactPath)) {
+      fail(`sourceSet.inventory[${index}].path is not canonical`);
+    }
     if (seen.has(artifactPath) || artifactPath.localeCompare(priorPath) < 0) {
       fail("sourceSet.inventory must be unique and path-sorted");
     }
@@ -335,6 +368,10 @@ function validateDescriptorStructure(
       targetPolicy.optionSchemaRef,
       `${identity}.targetPolicy.optionSchemaRef`,
     );
+    assertSchemaRef(
+      targetPolicy.optionSchemaRef,
+      `${identity}.targetPolicy.optionSchemaRef`,
+    );
   }
   const concurrency = asRecord(
     descriptor.concurrencyPolicy,
@@ -350,10 +387,12 @@ function validateDescriptorStructure(
     ["class", "headBindings"],
     `${identity}.concurrencyPolicy`,
   );
-  for (const [index, bindingValue] of asArray(
+  const headBindings = asArray(
     concurrency.headBindings,
     `${identity}.headBindings`,
-  ).entries()) {
+  );
+  assertUniqueCanonical(headBindings, `${identity}.headBindings`);
+  for (const [index, bindingValue] of headBindings.entries()) {
     const binding = asRecord(bindingValue, `${identity}.headBindings[${index}]`);
     const expectedKeys = ["headKey", "mode"];
     if ("predicateRef" in binding) expectedKeys.push("predicateRef");
@@ -381,17 +420,24 @@ function validateDescriptorStructure(
       ],
       `${identity}.headBindings[${index}].mode`,
     );
-    if ("predicateRef" in binding) {
+    if (mode === "must_satisfy") {
+      if (!("predicateRef" in binding) || "postconditionRef" in binding) {
+        fail(`${identity}.headBindings[${index}] requires predicateRef only`);
+      }
       validateVersionedRef(
         binding.predicateRef,
         `${identity}.headBindings[${index}].predicateRef`,
       );
-    }
-    if ("postconditionRef" in binding) {
+    } else if (mode === "convergent_postcondition") {
+      if (!("postconditionRef" in binding) || "predicateRef" in binding) {
+        fail(`${identity}.headBindings[${index}] requires postconditionRef only`);
+      }
       validateVersionedRef(
         binding.postconditionRef,
         `${identity}.headBindings[${index}].postconditionRef`,
       );
+    } else if ("predicateRef" in binding || "postconditionRef" in binding) {
+      fail(`${identity}.headBindings[${index}] cannot carry a condition ref`);
     }
   }
   validateVersionedRef(
@@ -407,16 +453,21 @@ function validateDescriptorStructure(
     ["bindingKey", "bindingKind"],
     `${identity}.handlerBinding`,
   );
-  asString(handler.bindingKey, `${identity}.handlerBinding.bindingKey`);
+  assertStableKey(
+    asString(handler.bindingKey, `${identity}.handlerBinding.bindingKey`),
+    `${identity}.handlerBinding.bindingKey`,
+  );
   assertOneOf(
     asString(handler.bindingKind, `${identity}.handlerBinding.bindingKind`),
     ["query", "action", "institution_workflow", "publish_process"],
     `${identity}.handlerBinding.bindingKind`,
   );
-  for (const [index, presenterValue] of asArray(
+  const presenterBindings = asArray(
     descriptor.presenterBindings,
     `${identity}.presenterBindings`,
-  ).entries()) {
+  );
+  assertUniqueCanonical(presenterBindings, `${identity}.presenterBindings`);
+  for (const [index, presenterValue] of presenterBindings.entries()) {
     const presenter = asRecord(
       presenterValue,
       `${identity}.presenterBindings[${index}]`,
@@ -435,10 +486,12 @@ function validateDescriptorStructure(
       `${identity}.presenter.presenterKey`,
     );
   }
-  for (const [index, gateValue] of asArray(
+  const dependencyGates = asArray(
     descriptor.dependencyGates,
     `${identity}.dependencyGates`,
-  ).entries()) {
+  );
+  assertUniqueCanonical(dependencyGates, `${identity}.dependencyGates`);
+  for (const [index, gateValue] of dependencyGates.entries()) {
     const gate = asRecord(gateValue, `${identity}.dependencyGates[${index}]`);
     assertExactKeys(
       gate,
@@ -452,28 +505,40 @@ function validateDescriptorStructure(
     assertSemver(gate.minimumVersion, `${identity}.minimumVersion`);
     assertOneOf(
       asString(gate.requiredGate, `${identity}.requiredGate`),
-      ["contract_boundary", "owner_integration", "joint_conformance", "activation"],
+      dependencyGateStages,
       `${identity}.requiredGate`,
     );
   }
-  for (const field of ["intentKeys", "invalidationScopeKinds"]) {
-    for (const item of asArray(descriptor[field], `${identity}.${field}`)) {
-      assertStableKey(
-        asString(item, `${identity}.${field}[]`),
-        `${identity}.${field}[]`,
-      );
-    }
+  const intentKeys = validateUniqueStableKeyArray(
+    descriptor.intentKeys,
+    `${identity}.intentKeys`,
+  );
+  if (intentKeys.length === 0) fail(`${identity}.intentKeys must not be empty`);
+  const invalidationScopes = validateUniqueStableKeyArray(
+    descriptor.invalidationScopeKinds,
+    `${identity}.invalidationScopeKinds`,
+  );
+  if (invalidationScopes.length === 0) {
+    fail(`${identity}.invalidationScopeKinds must not be empty`);
+  }
+  for (const scopeKind of invalidationScopes) {
+    assertOneOf(
+      scopeKind,
+      invalidationScopeKinds,
+      `${identity}.invalidationScopeKinds[]`,
+    );
   }
   if ("supportedRoles" in descriptor) {
-    for (const role of asArray(
+    const roles = validateUniqueStableKeyArray(
       descriptor.supportedRoles,
       `${identity}.supportedRoles`,
-    )) {
-      assertStableKey(asString(role, `${identity}.supportedRole`), `${identity}.supportedRole`);
+    );
+    for (const role of roles) {
+      assertOneOf(role, capabilityActorRoles, `${identity}.supportedRoles[]`);
     }
   }
   for (const field of ["inputSchemaRef", "resultSchemaRef", "errorSchemaRef"]) {
-    asString(descriptor[field], `${identity}.${field}`);
+    assertSchemaRef(descriptor[field], `${identity}.${field}`);
   }
   assertOneOf(
     asString(descriptor.domainClass, `${identity}.domainClass`),
@@ -532,7 +597,10 @@ function validateSurfaces(value: unknown): void {
     }
     identities.add(identity);
     priorKey = key;
-    asString(entry.presenterKey, `${identity}.presenterKey`);
+    assertStableKey(
+      asString(entry.presenterKey, `${identity}.presenterKey`),
+      `${identity}.presenterKey`,
+    );
     assertDigest(entry.sliceHash, `${identity}.sliceHash`);
   }
 }
@@ -550,6 +618,78 @@ function validateAdmission(value: unknown): void {
   assertEqual(admission.fallback, "forbidden", "admission.fallback");
 }
 
+function validateTrustedArtifactPin(
+  value: unknown,
+  contract: InterfaceContractRefV1,
+  manifest: unknown,
+): SurfaceContractArtifactPinV1 {
+  const pin = asRecord(value, "trustedArtifactPin");
+  assertExactKeys(
+    pin,
+    [
+      "schemaVersion",
+      "artifactKind",
+      "interfaceContract",
+      "manifestDigest",
+    ],
+    "trustedArtifactPin",
+  );
+  assertEqual(pin.schemaVersion, 1, "trustedArtifactPin.schemaVersion");
+  assertEqual(
+    pin.artifactKind,
+    "surface_contract_manifest",
+    "trustedArtifactPin.artifactKind",
+  );
+  const pinnedContract = validateContractRef(
+    pin.interfaceContract,
+    "trustedArtifactPin.interfaceContract",
+  );
+  if (!admitSurfaceContract(pinnedContract, contract).admitted) {
+    fail("trusted artifact pin contract does not match manifest");
+  }
+  assertDigest(pin.manifestDigest, "trustedArtifactPin.manifestDigest");
+  if (pin.manifestDigest !== digestCanonical(manifest)) {
+    fail("manifest content does not match the trusted artifact pin");
+  }
+  return pin as SurfaceContractArtifactPinV1;
+}
+
+function validateDependencyStates(
+  values: readonly DependencyStateV1[],
+): Map<string, DependencyStateV1> {
+  const states = new Map<string, DependencyStateV1>();
+  for (const [index, value] of (values as readonly unknown[]).entries()) {
+    const state = asRecord(value, `dependencyStates[${index}]`);
+    assertExactKeys(
+      state,
+      ["dependencyKey", "version", "achievedGate"],
+      `dependencyStates[${index}]`,
+    );
+    const dependencyKey = asString(
+      state.dependencyKey,
+      `dependencyStates[${index}].dependencyKey`,
+    );
+    assertStableKey(
+      dependencyKey,
+      `dependencyStates[${index}].dependencyKey`,
+    );
+    assertSemver(state.version, `dependencyStates[${index}].version`);
+    assertOneOf(
+      asString(
+        state.achievedGate,
+        `dependencyStates[${index}].achievedGate`,
+      ),
+      dependencyGateStages,
+      `dependencyStates[${index}].achievedGate`,
+    );
+    if (states.has(dependencyKey)) {
+      fail(`dependencyStates contains duplicate ${dependencyKey}`);
+    }
+    states.set(dependencyKey, state as DependencyStateV1);
+  }
+  return states;
+}
+
 function compareSemver(left: string, right: string): number {
   const leftParts = left.split(".").map(Number);
   const rightParts = right.split(".").map(Number);
@@ -558,6 +698,35 @@ function compareSemver(left: string, right: string): number {
     if (difference !== 0) return difference;
   }
   return 0;
+}
+
+function validateUniqueStableKeyArray(
+  value: unknown,
+  label: string,
+): string[] {
+  const items = asArray(value, label).map((item, index) => {
+    const key = asString(item, `${label}[${index}]`);
+    assertStableKey(key, `${label}[${index}]`);
+    return key;
+  });
+  if (new Set(items).size !== items.length) {
+    fail(`${label} must contain unique values`);
+  }
+  return items;
+}
+
+function assertUniqueCanonical(values: readonly unknown[], label: string): void {
+  const canonical = values
+    .map(sortObjectKeys)
+    .map((value) => JSON.stringify(value));
+  if (new Set(canonical).size !== canonical.length) {
+    fail(`${label} must contain unique values`);
+  }
+}
+
+function assertSchemaRef(value: unknown, label: string): void {
+  const candidate = asString(value, label);
+  if (!schemaRefPattern.test(candidate)) fail(`${label} must be a schema ref`);
 }
 
 function assertExactKeys(
@@ -628,6 +797,25 @@ function assertOneOf(
   if (!allowed.includes(value)) {
     fail(`${label} must be one of ${allowed.join(", ")}`);
   }
+}
+
+function digestCanonical(value: unknown): string {
+  return `sha256:${createHash("sha256")
+    .update(JSON.stringify(sortObjectKeys(value)), "utf8")
+    .digest("hex")}`;
+}
+
+function sortObjectKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortObjectKeys);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.keys(value)
+      .sort()
+      .map((key) => [
+        key,
+        sortObjectKeys((value as Record<string, unknown>)[key]),
+      ]),
+  );
 }
 
 function deepFreeze(value: unknown): void {

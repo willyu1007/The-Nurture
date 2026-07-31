@@ -300,6 +300,34 @@ Integration Readiness, Joint Conformance or activation.
   Phase 4 conformance suite 尚未实现。全量失效
   后的恢复成本是机器时间，不是一轮人工联合验证。
 
+## Phase 2 Quality Closure
+
+**Result:** IN PROGRESS on 2026-07-31. Runtime fail-closed and trusted-artifact
+loading are complete; strict schema compilation, permanent CI wiring and exact
+contract rotation remain before Phase 3.
+
+- [x] dependency state 在 SemVer/gate 比较前验证 exact fields、stable key、release
+  SemVer、closed gate enum 和唯一 dependency key；非法或重复 evidence 失败关闭。
+- [x] generated manifest 增加独立 artifact pin；loader 必须同时获得可信 pin，
+  canonical manifest hash 不匹配时拒绝，不能把 self-declared interface ref 当作
+  artifact integrity。
+- [x] loader 与 generator 对 concurrency condition refs、schema refs、handler/
+  presenter stable keys、roles、invalidation scopes 和数组唯一性保持一致。
+- [ ] 全部 JSON Schema 通过 Ajv 2020 strict compilation，并验证 generated manifest
+  与 artifact pin。
+- [ ] tooling tests、schema compilation 和 deterministic manifest/pin rebuild 进入
+  GitHub Actions permanent gate。
+- [ ] 规范 schema 变化旋转 interface version/digest，更新 exact handoff 文档并完成
+  全量 regression。
+
+验收：
+
+- 非法版本、未知 gate、重复 dependency state 不得产生 `eligible`。
+- semantic manifest tamper 即使保留原 contract ref 也不得通过 trusted loading。
+- compatibility admission 只判断 exact interface ref；artifact integrity 由独立可信
+  pin 提供，二者不得互相替代。
+- quality closure PASS 前不得进入 Phase 3。
+
 ## Phase 3 — Fixtures and Cross-role Journey
 
 - 建立最小合成家庭、孩子、照护者、班级和机构数据集；至少包含一个 bound ChildCareProcess 的两个隔离 Institution Enrollment，以及单机构试点 profile。

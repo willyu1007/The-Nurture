@@ -231,3 +231,30 @@
   remains separate qualification provenance.
 - Prevention: deterministic generation requires strictness at parse, semantic
   binding, output-path and consumer-load boundaries, not only byte comparison.
+
+### 2026-07-31 — Invalid dependency evidence passed comparison fail-open
+
+- Symptom: a dependency state with `version: "not-semver"` or an unknown gate
+  reached `compareSemver`/`gateRank` and returned `eligible`.
+- Root cause: TypeScript input types were treated as runtime validation.
+  JavaScript `NaN < 0` and `undefined < rank` are both false.
+- Impact: malformed owner/dependency evidence could bypass the default-off
+  readiness decision once the helper was integrated.
+- Fix: validate exact state fields, stable key, release SemVer, closed gate
+  enum and unique dependency keys before constructing the comparison map.
+- Prevention: every policy/evidence input crossing a runtime boundary must be
+  parsed before comparison; static types are never authority evidence.
+
+### 2026-07-31 — Self-declared interface ref was mistaken for manifest integrity
+
+- Symptom: a manifest could retain the original key/version/digest while
+  changing a structurally valid semantic field, and loader plus compatibility
+  admission would accept it.
+- Root cause: compatibility identity and artifact-content authenticity were
+  represented by the same self-declared ref.
+- Fix: generate a separate canonical manifest artifact pin, require it during
+  loading and align nested loader validation with generator semantics.
+- Prevention: callers must acquire the artifact pin from an independently
+  trusted source revision, Service Candidate or deployment configuration.
+  A pin delivered beside a manifest in the same untrusted payload is not a
+  trust root; exact interface admission remains a separate compatibility test.

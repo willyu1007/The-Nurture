@@ -16,6 +16,10 @@ export const generatedManifestPath = path.join(
   repoRoot,
   "packages/nurture-scenario/contracts/surfaces/v1/generated/surface-contract.manifest.json",
 );
+export const generatedArtifactPinPath = path.join(
+  path.dirname(generatedManifestPath),
+  "surface-contract.artifact-pin.json",
+);
 
 const descriptorKeys = new Set([
   "capabilityKey",
@@ -130,10 +134,35 @@ export async function buildSurfaceContract(outputPath = generatedManifestPath) {
   };
 
   const output = `${JSON.stringify(sortObjectKeys(manifest), null, 2)}\n`;
+  const artifactPin = {
+    schemaVersion: 1,
+    artifactKind: "surface_contract_manifest",
+    interfaceContract,
+    manifestDigest: digest(manifest),
+  };
+  const artifactPinOutput = `${JSON.stringify(
+    sortObjectKeys(artifactPin),
+    null,
+    2,
+  )}\n`;
+  const artifactPinPath = path.join(
+    path.dirname(outputPath),
+    "surface-contract.artifact-pin.json",
+  );
   await assertVersionRotation(outputPath, interfaceContract);
   await mkdir(path.dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, output, "utf8");
-  return { manifest, output, outputPath };
+  await Promise.all([
+    writeFile(outputPath, output, "utf8"),
+    writeFile(artifactPinPath, artifactPinOutput, "utf8"),
+  ]);
+  return {
+    manifest,
+    output,
+    outputPath,
+    artifactPin,
+    artifactPinOutput,
+    artifactPinPath,
+  };
 }
 
 export function parseStrictJson(source, label = "JSON") {

@@ -158,6 +158,15 @@ InterfaceContractRefV1
 - 不允许 version range、mutable `latest`、服务器静默协商另一个 digest，或让 API、
   descriptor、presenter、fixture 各自浮动。
 
+generated manifest 的内容完整性与 compatibility admission 是两个独立边界。
+`InterfaceContractRefV1` 只说明 consumer/server 声明采用的 exact interface identity；
+它不是对收到的 manifest bytes 的自证。加载 generated manifest 时，caller 必须从
+独立可信的 source revision、Service Candidate 或部署配置取得
+`SurfaceContractArtifactPinV1`，再以 canonical manifest hash 校验内容。manifest 与
+artifact pin 若来自同一个不可信 payload，则该 pin 不构成信任根。loader 还必须在
+pin 校验前执行与 generator 一致的 nested semantic validation，避免 malformed
+concurrency/dependency metadata 被完整性错误掩盖。
+
 digest 输入是一个有序 artifact set：descriptor registry、surface schemas、
 invocation/result/error schemas、policy/schema refs、fixture manifest 和 conformance
 manifest。每个 artifact 先解析为严格数据模型，拒绝 unknown/duplicate keys，再按 UTF-8

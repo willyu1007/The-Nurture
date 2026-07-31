@@ -164,3 +164,17 @@
 | Test routing and whitespace | PASS | `node scripts/assert-test-routing.mjs`: 48 files total, 23 unit; `git diff --check` passes. |
 | Application build boundary | NOT RUN | Only the dedicated deterministic contract artifact generator ran. No application/service/frontend build or dev server was run. |
 | Effect boundary | PASS | No runtime scenario manifest/capability activation, schema/migration, database, sibling repository, environment, secret, deployment or traffic changed. Owner Integration, Synthetic Qualification and Joint Conformance remain unclaimed. |
+
+## Phase 2 Quality Closure Verification — Step 1
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Dependency evidence fail-closed | PASS AFTER REPAIR | Focused negative tests prove malformed SemVer, unknown gate values and duplicate dependency keys throw before comparison; none can produce `eligible`. |
+| Trusted artifact integrity | PASS AFTER REPAIR | A generated artifact pin binds the canonical manifest hash and exact interface ref. Loader tests prove valid-looking confirmation-policy tampering with the original ref fails. |
+| Nested loader parity | PASS AFTER REPAIR | A `must_satisfy` head without its exact predicate ref fails before pin comparison; stable keys, schema refs, roles, scopes and unique arrays are closed. |
+| `pnpm --filter @the-nurture/scenario typecheck` | PASS | Public loader/type changes compile without `any`. |
+| `pnpm test:surface-contract-tooling` | PASS | 5/5 tooling checks. |
+| Focused Phase 2 suite | PASS | 1 file / 19 tests. |
+| Full unit regression and population | PASS | 23 files / 216 tests. |
+| `pnpm verify:surface-contract` | PASS | Manifest and artifact pin rebuild to exact checked bytes; interface remains `1.0.0` in this non-semantic runtime-hardening step. |
+| Effect boundary | PASS | No normative source schema, interface identity, activation, DB, environment, secret, deployment or traffic changed. |

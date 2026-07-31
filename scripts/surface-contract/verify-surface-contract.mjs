@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import {
   buildSurfaceContract,
+  generatedArtifactPinPath,
   generatedManifestPath,
   repoRoot,
 } from "./contract-core.mjs";
@@ -20,15 +21,28 @@ try {
     verificationDirectory,
     "surface-contract.manifest.json",
   );
-  const [{ output, manifest }, checkedOutput] = await Promise.all([
+  const [
+    { output, manifest, artifactPinOutput },
+    checkedOutput,
+    checkedArtifactPinOutput,
+  ] = await Promise.all([
     buildSurfaceContract(rebuiltPath),
     readFile(generatedManifestPath, "utf8"),
+    readFile(generatedArtifactPinPath, "utf8"),
   ]);
   if (output !== checkedOutput) {
     throw new Error(
       `Generated surface contract drifted; run pnpm build:surface-contract (${path.relative(
         repoRoot,
         generatedManifestPath,
+      )})`,
+    );
+  }
+  if (artifactPinOutput !== checkedArtifactPinOutput) {
+    throw new Error(
+      `Generated surface contract artifact pin drifted; run pnpm build:surface-contract (${path.relative(
+        repoRoot,
+        generatedArtifactPinPath,
       )})`,
     );
   }

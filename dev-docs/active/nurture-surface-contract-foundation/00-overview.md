@@ -6,18 +6,19 @@
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
 - Phase: Phase 0 discovery/gate reconciliation, Phase 1 normative surface
-  source and Phase 2 exact typed contract/interface identity complete; Phase 3
-  deterministic fixtures and cross-role journeys next.
+  source and Phase 2 exact typed contract/interface identity complete; Phase 2
+  quality closure is in progress before Phase 3.
 - Updated: 2026-07-31
-- Next step: 实施 Phase 3 deterministic synthetic world、GJ-1～GJ-5/RJ-1
-  独立初始状态与 capability selection fixtures；随后进入 Phase 4 synthetic
-  qualification。不得把 synthetic PASS 写成 owner-integration PASS。
+- Next step: 完成 Phase 2 quality closure 的 strict schema compilation、CI
+  deterministic artifact gate 和 exact contract rotation；复核并提交后再实施
+  Phase 3 deterministic synthetic world、GJ-1～GJ-5/RJ-1。
 - Current gate: T-002 ingress M0-M4 已完成；exact owner pin 仍为 My-Chat
   `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO。
   Phase 2 exact interface 为
   `nurture.surface-contract@1.0.0` /
   `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`。
-  所有 protected capability 继续 default-off。
+  dependency evidence 现已在比较前严格校验；generated manifest 必须匹配独立可信
+  artifact pin。所有 protected capability 继续 default-off。
 
 ## Goal
 
@@ -130,6 +131,7 @@ core hash、10 个 capability slice、6 个 surface slice、strict loader/admiss
 deterministic build/verify。Phase 0
 结论见
 [`06-phase-0-discovery-and-gate-matrix.md`](./06-phase-0-discovery-and-gate-matrix.md)。
-当前进入 Phase 3 fixtures/Journey；随后再与 T-002 M5 Owner Integration Handoff
-汇合执行 Joint Conformance。不得用当前 Phase 2 artifact 或后续 synthetic
-evidence 替代真实 owner gate。
+当前先完成 Phase 2 quality closure 的 schema/CI/identity rotation，再进入
+Phase 3 fixtures/Journey；随后与 T-002 M5 Owner Integration Handoff 汇合执行
+Joint Conformance。不得用当前 Phase 2 artifact 或后续 synthetic evidence 替代
+真实 owner gate。

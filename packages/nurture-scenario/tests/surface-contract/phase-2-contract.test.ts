@@ -23,6 +23,10 @@ const generatedManifestPath = path.join(
   packageRoot,
   "contracts/surfaces/v1/generated/surface-contract.manifest.json",
 );
+const generatedArtifactPinPath = path.join(
+  packageRoot,
+  "contracts/surfaces/v1/generated/surface-contract.artifact-pin.json",
+);
 
 const expectedCapabilityKeys = [
   "acknowledge_family_care_item",
@@ -46,7 +50,11 @@ const expectedSurfaceKeys = [
   "institution_workbench",
 ];
 
-const manifest = loadSurfaceContractManifest(readJson(generatedManifestPath));
+const artifactPin = readJson(generatedArtifactPinPath);
+const manifest = loadSurfaceContractManifest(
+  readJson(generatedManifestPath),
+  artifactPin,
+);
 
 describe("Phase 2 exact surface contract", () => {
   it("loads one exact, closed manifest with ten capabilities and six surfaces", () => {
@@ -77,7 +85,7 @@ describe("Phase 2 exact surface contract", () => {
   it("rejects unknown manifest and descriptor fields", () => {
     const withUnknownRoot = structuredClone(manifest) as Record<string, unknown>;
     withUnknownRoot.latest = true;
-    expect(() => loadSurfaceContractManifest(withUnknownRoot)).toThrow(
+    expect(() => loadSurfaceContractManifest(withUnknownRoot, artifactPin)).toThrow(
       SurfaceContractValidationError,
     );
 
@@ -86,16 +94,51 @@ describe("Phase 2 exact surface contract", () => {
     expect(descriptor).toBeDefined();
     (descriptor as unknown as Record<string, unknown>).authorizationGrant =
       "forbidden";
-    expect(() => loadSurfaceContractManifest(withUnknownDescriptor)).toThrow(
+    expect(() =>
+      loadSurfaceContractManifest(withUnknownDescriptor, artifactPin),
+    ).toThrow(
       SurfaceContractValidationError,
     );
 
     const withMismatchedRevision = structuredClone(manifest);
     withMismatchedRevision.sourceSet.sourceDigest =
       `sha256:${"0".repeat(64)}`;
-    expect(() => loadSurfaceContractManifest(withMismatchedRevision)).toThrow(
+    expect(() =>
+      loadSurfaceContractManifest(withMismatchedRevision, artifactPin),
+    ).toThrow(
       SurfaceContractValidationError,
     );
+  });
+
+  it("requires a trusted artifact pin and rejects valid-looking semantic tampering", () => {
+    expect(() =>
+      loadSurfaceContractManifest(structuredClone(manifest), undefined),
+    ).toThrow(/trustedArtifactPin/);
+
+    const withChangedConfirmation = structuredClone(manifest);
+    const descriptor = withChangedConfirmation.capabilities.find(
+      (entry) => entry.capabilityKey === "submit_family_care_question",
+    )?.descriptor;
+    expect(descriptor).toBeDefined();
+    if (descriptor) descriptor.confirmationPolicy = "none";
+    expect(() =>
+      loadSurfaceContractManifest(withChangedConfirmation, artifactPin),
+    ).toThrow(/trusted artifact pin/);
+
+    const withMalformedHeadBinding = structuredClone(manifest);
+    const reply = withMalformedHeadBinding.capabilities.find(
+      (entry) => entry.capabilityKey === "reply_family_care_item",
+    )?.descriptor;
+    expect(reply).toBeDefined();
+    if (reply) {
+      reply.concurrencyPolicy.headBindings[0] = {
+        headKey: "grant_authority",
+        mode: "must_satisfy",
+      };
+    }
+    expect(() =>
+      loadSurfaceContractManifest(withMalformedHeadBinding, artifactPin),
+    ).toThrow(/requires predicateRef only/);
   });
 
   it("admits only exact key, version and digest without negotiation", () => {
@@ -298,6 +341,56 @@ describe("Phase 2 exact surface contract", () => {
         },
       ]),
     ).toEqual({ status: "eligible", reasons: [] });
+  });
+
+  it("rejects malformed or ambiguous dependency evidence before gate comparison", () => {
+    const submit = requireCapability(
+      manifest,
+      "submit_family_care_question",
+    );
+    for (const invalidState of [
+      {
+        dependencyKey: "t002_owner_integration",
+        version: "not-semver",
+        achievedGate: "owner_integration",
+      },
+      {
+        dependencyKey: "t002_owner_integration",
+        version: "1.0.0",
+        achievedGate: "not-a-gate",
+      },
+      {
+        dependencyKey: "t002_owner_integration",
+        version: "1.0.0",
+        achievedGate: "owner_integration",
+        trusted: true,
+      },
+    ]) {
+      expect(() =>
+        evaluateDependencyReadiness(submit, [
+          invalidState as never,
+          {
+            dependencyKey: "t005_family_care",
+            version: "1.0.0",
+            achievedGate: "contract_boundary",
+          },
+        ]),
+      ).toThrow(SurfaceContractValidationError);
+    }
+    expect(() =>
+      evaluateDependencyReadiness(submit, [
+        {
+          dependencyKey: "t002_owner_integration",
+          version: "1.0.0",
+          achievedGate: "owner_integration",
+        },
+        {
+          dependencyKey: "t002_owner_integration",
+          version: "1.0.1",
+          achievedGate: "owner_integration",
+        },
+      ]),
+    ).toThrow(/duplicate t002_owner_integration/);
   });
 
   it("requires exact versioned ports and never supplies a fallback", () => {

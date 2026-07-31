@@ -15,6 +15,10 @@ six-surface interface contract.
 - `generated/surface-contract.manifest.json` is deterministic output. It
   records the exact `nurture.surface-contract@1.0.0` digest, shared-core hash,
   canonical source inventory and per-capability/per-surface slice hashes.
+  `generated/surface-contract.artifact-pin.json` is the separately trusted
+  byte-independent canonical hash required before loading that manifest.
+  Compatibility admission never treats a self-declared interface ref as
+  artifact-integrity evidence.
   Git/source revision and build time are qualification provenance and are not
   stored as semantic digest inputs.
 - `pnpm build:surface-contract` regenerates the checked artifact.
@@ -31,6 +35,7 @@ owner integration and Joint Conformance.
 - Reject unknown fields in schemas and parity tests.
 - Do not add Prisma, My-Chat runtime, host navigation, component trees, raw
   platform identity or authorization outcomes.
-- Do not hand-create a generated manifest or a mutable `latest` alias.
+- Do not hand-create a generated manifest, artifact pin or mutable `latest`
+  alias.
 - Change normative source first, rotate the interface version for every
   semantic or additive change, rebuild, then review the generated diff.
