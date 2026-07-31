@@ -1536,3 +1536,20 @@
 - The request accepts bounded canonical refs, ignores foreign namespaces, and only accepts `nurture/metric_observation`; absent or mismatched Nurture refs stop with `invalid_contribution_ref`. The production Nurture Prisma query selects only display-safe fields.
 - An observation is shareable only when it is `active`, user-confirmed, child-bound, and has a contributing parent actor. The response exposes only the fixed observation contribution envelope, including a normalized semantic summary; it never selects or returns raw metric values, payloads, or scales.
 - Added dev-host database-gated E2E coverage for disabled/short configuration, bad bearer, malformed body, invalid refs, missing/non-shareable rows (including inactive status and a missing parent actor), summary omission, exact response key sets, and raw-value non-leakage. The dev-host census is 11 -> 12 files.
+
+## 2026-08-01 M5 Owner Integration Handoff regeneration
+
+- ING-D4 executed: the dev-host P7 binding-owner route, registration
+  and both transitional e2e tests removed (`78144cc`); the formal
+  NestJS scenario-service is the only live owner ingress. Dev-host
+  census 12 -> 10; scenario self-pin recomputed (41 paths / 54 files,
+  `76f9d966…`).
+- Census-flagged wave4 coverage gap closed (`a95ec90`): resolver, R2a
+  registry and ST-5 controller pinned; old population byte-reproduced
+  at exact `a019566` before extension; new hash `960afb2c…` (16 paths /
+  20 files) computed at the same revision.
+- Renewed handoff: `16-owner-integration-handoff-m5.md` —
+  `M5_COMPLETE / OWNER_HANDOFF_RENEWED / JOINT_CONFORMANCE_PENDING`.
+  Fastify-era owner evidence is superseded history. Local evidence:
+  scenario-service db e2e 4/4, suite 42/42, dev-host 25/25, unit
+  249/249; trunk CI at exact pins is authoritative for cross-repo legs.

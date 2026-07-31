@@ -16,9 +16,11 @@ Project: `main`
   JOINT_CONFORMANCE_NOT_RUN` at exact `nurture.surface-contract@1.7.0`.
   T-002 ingress M0-M4 is complete and the owner pin has advanced to the
   declared My-Chat `a019566` / Base `06303e9` R3 cut with requalified
-  hashes. The current critical lane is T-002 M5 Owner Integration Handoff
-  regeneration (including the census-flagged wave4 population coverage
-  gap), followed by exact G1 Joint Conformance.
+  hashes. T-002 M5 is complete: the renewed Owner Integration Handoff
+  (`16-owner-integration-handoff-m5.md`) cites the formal-only NestJS
+  ingress (dev-host P7 route removed), exact pins with the wave4 coverage
+  gap closed, and superseded Fastify-era evidence. The current critical
+  lane is exact G1 Joint Conformance.
   Runtime/environment activation and external traffic remain gated.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
@@ -29,8 +31,9 @@ Project: `main`
   private owner endpoint plus exact consumer, one atomic
   reservation/authority/Receipt transaction, replay/revoke/privacy and
   lock-concurrency evidence. M4 governance is complete. Protected use still
-  requires M5 Owner Integration Handoff regeneration and Joint Conformance with T-004; the
-  remaining Fastify route is transitional only.
+  requires Joint Conformance with T-004. M5 is complete: the handoff is
+  regenerated (`16-owner-integration-handoff-m5.md`) and the Fastify P7
+  route is removed — the formal service is the only owner ingress.
 - T-004 Phase 0-4: the reuse/extend/gate matrix is
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
   Phase 1 freezes six surfaces, descriptor/envelope schemas, visibility, four
@@ -88,7 +91,7 @@ Project: `main`
   T-004 Phase 0 → T-002 ingress M0-M4 (complete; see
   `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 (complete) →
   T-002 pin advance to the R3 cut (complete) → T-004 Phase 3-4 (complete;
-  synthetic qualification at `1.7.0`) → T-002 M5 handoff regeneration →
+  synthetic qualification at `1.7.0`) → T-002 M5 handoff regeneration (complete) →
   G1 Joint Conformance → early T-007 G4-0A/0B
   publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →
   T-006 G3-0 through G3-E → remaining T-007 G4 branches → T-008 G5.

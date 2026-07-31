@@ -1318,3 +1318,13 @@ the rejected checkpoint and are historical.
 | Focused dev-host Vitest | OWNER-ENVIRONMENT GATED | The command started Vitest but collected zero tests because the generated Prisma client is absent (`Cannot find module '.prisma/client/default'`); the required rebuild is blocked above. |
 | `pnpm lint` | OWNER-ENVIRONMENT GATED | The required pin-preparation step invokes the workflow-pin verifier, which expects unavailable `/Volumes/DataDisk/Project/_tmp/My-Workflow-Base`; frontend lint did not begin. |
 | Workflow-contract pin verifier | SKIPPED | The required My-Workflow-Base sibling checkout is unavailable; the endpoint changes only `apps/backend`, outside the pinned `packages/nurture-scenario` source set. |
+
+## 2026-08-01 — M5 Owner Integration Handoff regeneration
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Single live owner ingress | PASS | Dev-host P7 route/tests removed; dev-host suite 25/25 green post-removal; backend typecheck clean; formal scenario-service remains the only owner path. |
+| Formal-ingress DB journey | PASS | scenario-service `test:db` binding-owner e2e 4/4 on the real disposable PostgreSQL (service auth, locked authority reread, deterministic reservation, exact replay, revoke fail-closed). |
+| Pin integrity | PASS | wave4 old population byte-reproduced at exact `a019566` before extension; new 16-path hash `960afb2c…` computed at the same revision; self-pin recomputed via the verifier's own algorithm (41 paths / 54 files). Local sibling drift noted; trunk CI at exact pins is authoritative. |
+| Census/routing | PASS | `verify:test-routing` dev-host 12 -> 10; scenario-service suite 42/42; unit 249/249. |
+| Effect boundary | PASS | No schema/migration, database mutation, capability, secret, deployment, activation or traffic change; default-off posture unchanged. |
