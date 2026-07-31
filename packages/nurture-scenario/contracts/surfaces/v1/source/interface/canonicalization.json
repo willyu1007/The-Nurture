@@ -76,6 +76,18 @@
     "invocation/target-option.schema.json",
     "surfaces/surface-envelope.schema.json"
   ],
+  "fixtureSlices": {
+    "worldPathPrefix": "fixtures/world/",
+    "journeysPathPrefix": "fixtures/journeys/",
+    "selectionPathPrefix": "fixtures/selection/",
+    "worldSchemaFile": "fixtures/world/synthetic-world.schema.json",
+    "sharedSchemaFiles": [
+      "fixtures/journeys/journey-expected-view.schema.json",
+      "fixtures/journeys/journey-initial-state.schema.json",
+      "fixtures/journeys/journey-script.schema.json"
+    ],
+    "order": "fixture_key_lexicographic"
+  },
   "capabilitySlices": {
     "registryPath": "capabilities/capability-registry.json",
     "schemaRegistryPath": "interface/schema-registry.json",

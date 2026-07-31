@@ -22,8 +22,9 @@ six-surface interface contract.
   files join the canonical inventory and root digest without entering the
   shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.5.0` digest, shared-core hash,
-  canonical source inventory and per-capability/per-surface slice hashes.
+  records the exact `nurture.surface-contract@1.6.0` digest, shared-core hash,
+  canonical source inventory and per-capability/per-surface/per-fixture slice
+  hashes (fixture slices: `world`, `journey:<key>`, `selection`).
   `generated/surface-contract.artifact-pin.json` is the separately trusted
   byte-independent canonical hash required before loading that manifest.
   Compatibility admission never treats a self-declared interface ref as

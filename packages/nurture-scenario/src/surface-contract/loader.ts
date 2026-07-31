@@ -90,6 +90,7 @@ export function loadSurfaceContractManifest(
       "sharedCoreHash",
       "capabilities",
       "surfaces",
+      "fixtures",
       "admission",
     ],
     "manifest",
@@ -107,6 +108,7 @@ export function loadSurfaceContractManifest(
   assertDigest(manifest.sharedCoreHash, "manifest.sharedCoreHash");
   validateCapabilities(manifest.capabilities, contract);
   validateSurfaces(manifest.surfaces);
+  validateFixtures(manifest.fixtures);
   validateAdmission(manifest.admission);
   validateTrustedArtifactPin(trustedArtifactPin, contract, input);
   deepFreeze(input);
@@ -602,6 +604,38 @@ function validateSurfaces(value: unknown): void {
       `${identity}.presenterKey`,
     );
     assertDigest(entry.sliceHash, `${identity}.sliceHash`);
+  }
+}
+
+function validateFixtures(value: unknown): void {
+  const fixtures = asArray(value, "manifest.fixtures");
+  if (fixtures.length === 0) fail("manifest.fixtures must not be empty");
+  const keys = new Set<string>();
+  let priorKey = "";
+  for (const [index, entryValue] of fixtures.entries()) {
+    const entry = asRecord(entryValue, `fixtures[${index}]`);
+    assertExactKeys(
+      entry,
+      ["fixtureKey", "fixtureKind", "sliceHash"],
+      `fixtures[${index}]`,
+    );
+    const key = asString(entry.fixtureKey, `fixtures[${index}].fixtureKey`);
+    if (!/^[a-z0-9]+(?:[:-][a-z0-9]+)*$/.test(key) || key.length > 64) {
+      fail(`fixtures[${index}].fixtureKey is not a valid fixture key`);
+    }
+    if (keys.has(key) || key.localeCompare(priorKey) < 0) {
+      fail("manifest.fixtures must be unique and key-sorted");
+    }
+    keys.add(key);
+    priorKey = key;
+    const kind = asString(entry.fixtureKind, `${key}.fixtureKind`);
+    if (kind !== "world" && kind !== "journey" && kind !== "selection") {
+      fail(`${key}.fixtureKind is not a known fixture kind`);
+    }
+    if ((kind === "journey") !== key.startsWith("journey:")) {
+      fail(`${key} fixtureKind does not match its key namespace`);
+    }
+    assertDigest(entry.sliceHash, `${key}.sliceHash`);
   }
 }
 

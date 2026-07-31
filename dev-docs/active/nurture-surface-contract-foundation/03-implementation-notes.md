@@ -534,3 +534,29 @@ the new root ref still requires exact consumer adoption.
   that had lagged at 1.3.0 since the P3-2 batch.
 - No schema/migration, database, capability, activation, owner-claim or
   traffic change.
+
+## 2026-08-01 P3-4 fixture slices, canonicalization and Phase 3 closure
+
+- `canonicalization.json` gains `fixtureSlices` (world/journeys/selection
+  path prefixes, the world schema file and the three shared journey
+  schemas); the generator classifies every `fixtures/` source file into
+  exactly one primary slice and fails closed on unclassifiable paths.
+  The manifest now records eight fixture slices (`journey:gj-1…rj-1`,
+  `selection`, `world`); non-world slices include the world/journey
+  schema files in their payload so a schema change mechanically
+  invalidates dependent fixture evidence. Loader/types/manifest schema
+  validate the new `fixtures` section strictly (unique, key-sorted,
+  kind/namespace parity).
+- Planned shared-core rotation: canonicalization and the manifest
+  schema are shared-core artifacts, so `sharedCoreHash` rotated once
+  (`be3da7b9… -> 04227264…`) exactly as the decomposition scheduled —
+  before any Joint Conformance exists. The invocation/confirmation/
+  error envelope layer is untouched; the only extant evidence (this
+  repository's synthetic suites) was fully rerun green in the same
+  unit, which is the single-command recovery the invalidation rules
+  require. All 16 capability/surface slice hashes remain byte-equal to
+  the 1.0.1 baseline; the frozen-hash guard now pins the new shared
+  core alongside them.
+- Identity `1.5.0 -> 1.6.0` (`sha256:973be185…`). Phase 3 is complete;
+  Phase 4 synthetic qualification is next. No schema/migration,
+  database, capability, activation, owner-claim or traffic change.

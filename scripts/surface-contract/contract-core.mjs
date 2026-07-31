@@ -105,6 +105,7 @@ export async function buildSurfaceContract(outputPath = generatedManifestPath) {
     interfaceContract,
   );
   const surfaces = buildSurfaceSlices(normalizedByPath, canonicalization);
+  const fixtures = buildFixtureSlices(normalizedByPath, canonicalization);
 
   const manifest = {
     schemaVersion: 1,
@@ -125,6 +126,7 @@ export async function buildSurfaceContract(outputPath = generatedManifestPath) {
     sharedCoreHash,
     capabilities,
     surfaces,
+    fixtures,
     admission: {
       mode: "exact_key_version_digest",
       versionRanges: "forbidden",
@@ -370,6 +372,7 @@ function validateSource(artifacts, canonicalization) {
       "rootDigest",
       "registryOrdering",
       "sharedCorePaths",
+      "fixtureSlices",
       "capabilitySlices",
       "surfaceSlices",
     ],
@@ -872,6 +875,79 @@ function buildCapabilitySlices(artifacts, canonicalization, contract) {
     .sort((left, right) =>
       left.capabilityKey.localeCompare(right.capabilityKey),
     );
+}
+
+function buildFixtureSlices(artifacts, canonicalization) {
+  const sliceConfig = record(
+    canonicalization.fixtureSlices,
+    "canonicalization.fixtureSlices",
+  );
+  const worldPrefix = text(sliceConfig.worldPathPrefix, "worldPathPrefix");
+  const journeysPrefix = text(
+    sliceConfig.journeysPathPrefix,
+    "journeysPathPrefix",
+  );
+  const selectionPrefix = text(
+    sliceConfig.selectionPathPrefix,
+    "selectionPathPrefix",
+  );
+  const worldSchemaFile = text(sliceConfig.worldSchemaFile, "worldSchemaFile");
+  const sharedSchemaFiles = strings(
+    sliceConfig.sharedSchemaFiles,
+    "fixtureSlices.sharedSchemaFiles",
+  );
+  for (const requiredPath of [worldSchemaFile, ...sharedSchemaFiles]) {
+    if (!artifacts.has(requiredPath)) {
+      throw new Error(`Fixture slice artifact is missing: ${requiredPath}`);
+    }
+  }
+
+  const memberPaths = new Map();
+  const addMember = (fixtureKey, artifactPath) => {
+    if (!memberPaths.has(fixtureKey)) memberPaths.set(fixtureKey, new Set());
+    memberPaths.get(fixtureKey).add(artifactPath);
+  };
+  for (const artifactPath of [...artifacts.keys()].sort()) {
+    if (!artifactPath.startsWith("fixtures/")) continue;
+    if (artifactPath.startsWith(worldPrefix)) {
+      addMember("world", artifactPath);
+    } else if (artifactPath.startsWith(selectionPrefix)) {
+      addMember("selection", artifactPath);
+    } else if (sharedSchemaFiles.includes(artifactPath)) {
+      continue;
+    } else if (artifactPath.startsWith(journeysPrefix)) {
+      const remainder = artifactPath.slice(journeysPrefix.length);
+      const journeyKey = remainder.split("/", 1)[0];
+      if (!/^(?:gj|rj)-[1-9]$/.test(journeyKey) || !remainder.includes("/")) {
+        throw new Error(`Unclassifiable journey fixture path: ${artifactPath}`);
+      }
+      addMember(`journey:${journeyKey}`, artifactPath);
+    } else {
+      throw new Error(`Unclassifiable fixture path: ${artifactPath}`);
+    }
+  }
+
+  return [...memberPaths.keys()].sort().map((fixtureKey) => {
+    const dependencyPaths =
+      fixtureKey === "world" ? [] : [worldSchemaFile, ...sharedSchemaFiles];
+    const slicePaths = [
+      ...new Set([...memberPaths.get(fixtureKey), ...dependencyPaths]),
+    ].sort();
+    return {
+      fixtureKey,
+      fixtureKind: fixtureKey === "world"
+        ? "world"
+        : fixtureKey === "selection"
+          ? "selection"
+          : "journey",
+      sliceHash: digest(
+        slicePaths.map((artifactPath) => ({
+          path: artifactPath,
+          value: artifacts.get(artifactPath),
+        })),
+      ),
+    };
+  });
 }
 
 function buildSurfaceSlices(artifacts, canonicalization) {

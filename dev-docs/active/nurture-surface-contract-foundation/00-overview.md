@@ -7,12 +7,13 @@
 - Milestone / Feature: M-002 / F-003
 - Phase: Phase 0 discovery/gate reconciliation, Phase 1 normative surface
   source, Phase 2 exact typed contract/interface identity and Phase 2 quality
-  closure complete; Phase 3 in progress — P3-0～P3-3 complete; P3-4 fixture
-  manifest/canonicalization is the final Phase 3 increment.
+  closure complete; Phase 3 complete (P3-0～P3-4: synthetic world, per-journey
+  initial states, six journey scripts, selection fixtures, fixture slices in
+  the conformance manifest); Phase 4 synthetic qualification next.
 - Updated: 2026-08-01
-- Next step: 实施 P3-4 fixture manifest/canonicalization（fixture slices 进
-  conformance manifest，保持既有 slice 证据有效）；随后进入 Phase 4 synthetic
-  qualification。不得把
+- Next step: 实施 Phase 4 synthetic qualification：conformance suite、
+  determinism 检查、breaking-change policy、consumer adoption checklist 与给
+  T-008 的 identity/compatibility handoff。不得把
   synthetic PASS 写成 owner-integration PASS。执行拆解（P3-0～P3-4 与边界规
   则）见
   [`07-phase-3-fixture-journey-decomposition.md`](./07-phase-3-fixture-journey-decomposition.md)。
@@ -20,11 +21,13 @@
   `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO；
   pin-advance decision input 见 T-002
   `15-mychat-drift-census-pin-advance-input.md`。
-  P3-3 完成后 current exact interface 为
-  `nurture.surface-contract@1.5.0` /
-  `sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270`；
-  shared core 与全部既有 capability/surface slice hash 与 1.0.1 基线字节一致
-  （由 `phase-3-world.test.ts` 机械守卫）。dependency evidence 仍在比较前严格
+  Phase 3 完成后 current exact interface 为
+  `nurture.surface-contract@1.6.0` /
+  `sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354`。
+  全部 16 个既有 capability/surface slice hash 与 1.0.1 基线字节一致；shared
+  core 按计划在 P3-4 旋转一次（canonicalization/manifest schema 引入 8 个
+  fixture slice），当时唯一存续证据即本仓库 synthetic 套件并已单命令全量重跑
+  通过；新旧值均由 `phase-3-world.test.ts` 机械守卫。dependency evidence 仍在比较前严格
   校验；generated manifest 必须匹配独立可信 artifact pin。所有 protected
   capability 继续 default-off。
 

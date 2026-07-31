@@ -116,6 +116,11 @@ export type SurfaceContractManifestV1 = {
     presenterKey: string;
     sliceHash: `sha256:${string}`;
   }>;
+  fixtures: Array<{
+    fixtureKey: string;
+    fixtureKind: "world" | "journey" | "selection";
+    sliceHash: `sha256:${string}`;
+  }>;
   admission: {
     mode: "exact_key_version_digest";
     versionRanges: "forbidden";

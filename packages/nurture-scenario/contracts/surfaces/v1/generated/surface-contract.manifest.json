@@ -52,9 +52,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -146,9 +146,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -242,9 +242,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -323,9 +323,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -412,9 +412,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -512,9 +512,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -604,9 +604,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -708,9 +708,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -806,9 +806,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -893,9 +893,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+          "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
           "key": "nurture.surface-contract",
-          "version": "1.5.0"
+          "version": "1.6.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -955,13 +955,55 @@
       "sliceHash": "sha256:c833a0e07149472232d7a314f731953ad83ce6d6aa05ef1ee846635e4ac38134"
     }
   ],
+  "fixtures": [
+    {
+      "fixtureKey": "journey:gj-1",
+      "fixtureKind": "journey",
+      "sliceHash": "sha256:4f526bfa81532aff3f2f4c6650b4263e1bb8636079f43303d8a883e849e6731a"
+    },
+    {
+      "fixtureKey": "journey:gj-2",
+      "fixtureKind": "journey",
+      "sliceHash": "sha256:ca44d466719307a92889c7af4b0cd059471b4e987a1287506a2c8a37e820b51f"
+    },
+    {
+      "fixtureKey": "journey:gj-3",
+      "fixtureKind": "journey",
+      "sliceHash": "sha256:eeb660319ba8c9e8feb0865d679909fd8c6a51e64293c5c3b9ccac53411864a0"
+    },
+    {
+      "fixtureKey": "journey:gj-4",
+      "fixtureKind": "journey",
+      "sliceHash": "sha256:7d0add04f3200a55711c03d558949aa400c6c0ca3311c276bc6040d1bb43741d"
+    },
+    {
+      "fixtureKey": "journey:gj-5",
+      "fixtureKind": "journey",
+      "sliceHash": "sha256:26b92574b85500659bed813d842e2a9cf5025bb22ef2cfef2c2000f472b4f7b5"
+    },
+    {
+      "fixtureKey": "journey:rj-1",
+      "fixtureKind": "journey",
+      "sliceHash": "sha256:5ef210e5921281df40991af552c110e5994867e52ceb0c36668087765f792c15"
+    },
+    {
+      "fixtureKey": "selection",
+      "fixtureKind": "selection",
+      "sliceHash": "sha256:8e370d0e799a17d17d8ccc97e45c505159db26cc093edfd0423b775b502d9741"
+    },
+    {
+      "fixtureKey": "world",
+      "fixtureKind": "world",
+      "sliceHash": "sha256:a8e39acfab3d4e0a2d6f5f93b98342db10ff2eb3a238bef8b37d24b8fe86ec6c"
+    }
+  ],
   "interfaceContract": {
-    "digest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270",
+    "digest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354",
     "key": "nurture.surface-contract",
-    "version": "1.5.0"
+    "version": "1.6.0"
   },
   "schemaVersion": 1,
-  "sharedCoreHash": "sha256:be3da7b93e812f3a648adbb251525ef0f75d0c09988377c9e1904633f98c6312",
+  "sharedCoreHash": "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2",
   "sourceSet": {
     "inventory": [
       {
@@ -969,7 +1011,7 @@
         "path": "capabilities/capability-descriptor.schema.json"
       },
       {
-        "artifactHash": "sha256:40e8529db93ddde55c226ec00dee19a52de9b70583e31e82a01ff4cbe416658f",
+        "artifactHash": "sha256:660f6c912354c5e61e9940b75d10bf9666d4d773e21ce71c38208733c5c48257",
         "path": "capabilities/capability-registry.json"
       },
       {
@@ -1173,7 +1215,7 @@
         "path": "fixtures/world/world-v1.json"
       },
       {
-        "artifactHash": "sha256:c47eae7e73f4392b49f8c130e05e6962696e20d4e518fa6fa1d93c243f1d69ca",
+        "artifactHash": "sha256:639cd5c4a5c30e7caabb12afce88696bd30ad67650fb340c7fa1861f54a75f1f",
         "path": "interface/canonicalization.json"
       },
       {
@@ -1201,7 +1243,7 @@
         "path": "interface/surface-contract-artifact-pin.schema.json"
       },
       {
-        "artifactHash": "sha256:8c8fd5d4af78f970ece3635c9e58b8998c5e65aef081f5a9ce94ce95a43e318c",
+        "artifactHash": "sha256:ab558e25c58f9876c876dc6d094548fad126b40ca7445adec162ad3432e7a1c0",
         "path": "interface/surface-contract-manifest.schema.json"
       },
       {
@@ -1281,7 +1323,7 @@
         "path": "surfaces/surface-registry.json"
       }
     ],
-    "sourceDigest": "sha256:edff6e10c01db20d767c5fdca3fd6c385d4970d5f1baa31f74e12df443931270"
+    "sourceDigest": "sha256:973be185543553b3d7fc0045b7cfc739582e42ae834638796db6fd5c96fdd354"
   },
   "surfaces": [
     {

@@ -26,10 +26,12 @@ const manifest = record(
   JSON.parse(readFileSync(generatedManifestPath, "utf8")) as unknown,
 );
 
-// Frozen at the exact 1.0.1 quality-closed baseline. Adding fixture slices
-// must never move the shared envelope layer or any existing slice.
+// Capability/surface slices are frozen at the exact 1.0.1 quality-closed
+// baseline: fixture increments must never move them. The shared core was
+// rotated exactly once, by the planned P3-4 canonicalization/manifest-schema
+// extension that introduced fixture slices; any further drift fails here.
 const frozenSharedCoreHash =
-  "sha256:be3da7b93e812f3a648adbb251525ef0f75d0c09988377c9e1904633f98c6312";
+  "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2";
 const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["acknowledge_family_care_item", "sha256:b9c4ca09071121b04404ba88db3939cffa213a88848f79cd65dad936f6138037"],
   ["correct_family_care_message", "sha256:0680749bafda1f619d38b352e73f6e7338f92282bdc0d286da97468f2abea759"],
@@ -242,7 +244,7 @@ describe("Phase 3 synthetic world", () => {
   it("rotates the root identity while preserving every existing slice", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.5.0");
+    expect(contract.version).toBe("1.6.0");
     expect(contract.digest).not.toBe(
       "sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59",
     );
@@ -269,6 +271,32 @@ describe("Phase 3 synthetic world", () => {
     expect(inventoryPaths).toContain(
       "fixtures/world/profile-single-institution.json",
     );
+  });
+
+  it("records one slice per fixture family covering every fixture file", () => {
+    const fixtures = records(manifest.fixtures);
+    expect(
+      fixtures.map((entry) => [text(entry.fixtureKey), text(entry.fixtureKind)]),
+    ).toEqual([
+      ["journey:gj-1", "journey"],
+      ["journey:gj-2", "journey"],
+      ["journey:gj-3", "journey"],
+      ["journey:gj-4", "journey"],
+      ["journey:gj-5", "journey"],
+      ["journey:rj-1", "journey"],
+      ["selection", "selection"],
+      ["world", "world"],
+    ]);
+    for (const entry of fixtures) {
+      expect(text(entry.sliceHash)).toMatch(/^sha256:[0-9a-f]{64}$/);
+    }
+    // Every fixture source file resolves to a primary slice: the generator
+    // fails closed on unclassifiable fixture paths, so inventory membership
+    // plus the fixed key list above proves complete coverage.
+    const fixturePaths = records(record(manifest.sourceSet).inventory)
+      .map((entry) => text(entry.path))
+      .filter((path) => path.startsWith("fixtures/"));
+    expect(fixturePaths.length).toBeGreaterThanOrEqual(30);
   });
 });
 

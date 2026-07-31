@@ -253,3 +253,14 @@
 | Slice invariance | PASS | Shared-core and all 16 capability/surface slice hashes remain byte-equal to the frozen baseline while the root digest rotated. |
 | Unit suite and census | PASS | `pnpm test:unit` 248/248 over 28 files; `pnpm verify:test-routing` unit census 28; tooling tests 5/5; package `tsc --noEmit` clean. |
 | Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
+
+## 2026-08-01 — P3-4 fixture slices and Phase 3 closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Deterministic build/rotation | PASS | `pnpm build:surface-contract` rotated to `nurture.surface-contract@1.6.0` / `sha256:973be185…`; `pnpm verify:surface-contract` rebuilds byte-identically. |
+| Fixture slice integrity | PASS | Manifest records exactly eight key-sorted fixture slices with kind/namespace parity; generator fails closed on unclassifiable fixture paths; strict loader validates the new section; Ajv validates the extended manifest schema (`fixtures=34 negatives=6`). |
+| Planned shared-core rotation | PASS | `sharedCoreHash` `be3da7b9… -> 04227264…` from the scheduled canonicalization/manifest-schema extension only; envelope layer untouched; full synthetic suite rerun green in the same unit satisfies the single-command recovery rule. |
+| Slice invariance | PASS | All 16 capability/surface slice hashes byte-equal the frozen 1.0.1 baseline under the updated frozen-hash guard. |
+| Unit suite and census | PASS | `pnpm test:unit` 249/249 over 28 files; `pnpm verify:test-routing` census unchanged; tooling tests 5/5; package `tsc --noEmit` clean. |
+| Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
