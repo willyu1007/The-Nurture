@@ -129,7 +129,7 @@ default-disabled and is now implementation-open.
 - [x] M3-A: establish a compiled runtime package boundary; relocate the
   authorizer factory and Guardian authority reader out of `apps/backend`;
   compose the formal service from the production Prisma client only.
-- [ ] M3-B: implement the allowlisted controller/request adapter, centralize
+- [x] M3-B: implement the allowlisted controller/request adapter, centralize
   `ERROR_STATUS`, derive guard readiness from the actual optional authorizer,
   and run table-driven Fastify/Nest application-parity fixtures.
 - [ ] M3-C: rerun child/family lifecycle, revoke, concurrency, exact replay,

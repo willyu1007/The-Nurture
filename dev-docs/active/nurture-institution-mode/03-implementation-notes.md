@@ -1329,3 +1329,27 @@
   test commands do the same.
 - M3-A changes no route body/status, schema/migration, persistent database,
   environment value, secret, capability, deployment, activation or traffic.
+
+## 2026-07-31 — NestJS ingress M3-B controller/parity completed
+
+- Added a Nurture-owned, framework-independent P7 HTTP adapter with the frozen
+  path, request parser, success formatter and complete domain error/status map.
+  Both Fastify and Nest now use this single implementation.
+- Replaced the Nest disabled stub with a thin controller that reads the exact
+  authorizer guarded by M3-A, delegates domain/persistence work and maps unknown
+  failures to logged, body-safe
+  `500 owner_authorization_unavailable`.
+- Explicitly set POST success to `200`; Nest's default `201` is not permitted
+  to drift the pinned Host contract.
+- Preserved the existing two-layer validation contract: unknown request fields
+  are ignored, HTTP identity text keeps its wider 512 limit, optional
+  correlation/trace values are forwarded only when truthy, and canonical
+  trimming/128 limits remain domain checks. No implicit coercion or blanket DTO
+  rejection was introduced.
+- Added 11 controller HTTP tests and 22 table-driven Fastify/Nest parity tests.
+  The matrix covers child/family success, optional organization, unknown
+  fields, whitespace/diagnostic forwarding, adapter negatives, all eight
+  domain errors, unknown failure, `text/plain` and the separate malformed-JSON
+  framework bands.
+- M3-B changes no schema/migration, persistent database, environment value,
+  secret, capability, deployment, activation or traffic.

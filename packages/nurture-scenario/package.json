@@ -10,6 +10,11 @@
       "types": "./src/binding-owner.ts",
       "import": "./dist/binding-owner.js",
       "default": "./dist/binding-owner.js"
+    },
+    "./binding-owner-http": {
+      "types": "./src/binding-owner-http.ts",
+      "import": "./dist/binding-owner-http.js",
+      "default": "./dist/binding-owner-http.js"
     }
   },
   "scripts": {

@@ -32,12 +32,12 @@ if (routes.unclassified.length > 0) throw new Error(`Unclassified tests: ${route
 if (
   routes.unit.length !== 21 ||
   routes.productionDb.length !== 5 ||
-  routes.devHost.length !== 9 ||
-  routes.scenarioService.length !== 5 ||
+  routes.devHost.length !== 10 ||
+  routes.scenarioService.length !== 7 ||
   routes.x5Joint.length !== 1
 ) {
   throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/21 productionDb=${routes.productionDb.length}/5 devHost=${routes.devHost.length}/9 scenarioService=${routes.scenarioService.length}/5 x5Joint=${routes.x5Joint.length}/1`,
+    `Test file census changed: unit=${routes.unit.length}/21 productionDb=${routes.productionDb.length}/5 devHost=${routes.devHost.length}/10 scenarioService=${routes.scenarioService.length}/7 x5Joint=${routes.x5Joint.length}/1`,
   );
 }
 process.stdout.write(

@@ -3,16 +3,16 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0/M1/M2 + M3 baseline/M3-A（complete；M3-B open）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0/M1/M2 + M3 baseline/M3-A/M3-B（complete；M3-C open）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-31
 - **Owner:** willyu1007
-- Next step: Implement NestJS ingress M3-B in
+- Next step: Implement NestJS ingress M3-C in
   [`12-nestjs-ingress-migration-plan.md`](./12-nestjs-ingress-migration-plan.md):
-  replace the disabled stub with the allowlisted P7 controller and prove the
-  Fastify/Nest application-parity matrix. Then complete M3-C
-  disposable-PostgreSQL and exact pinned-consumer qualification; M4 governance
-  alignment may proceed in parallel.
+  run child/family lifecycle, replay, response-loss, revoke and deterministic
+  authority-lock concurrency through NestJS on isolated PostgreSQL, execute the
+  exact pinned My-Chat consumer, and add the repeatable CI evidence lane; M4
+  governance alignment may proceed in parallel.
 - Current gate: The current handoff pins My-Chat `f00b868` and the 31-path
   Nurture source set; all consumers remain default-disabled. Protected
   T-005～T-007 integration stays NO-GO until the exact owner path and T-004

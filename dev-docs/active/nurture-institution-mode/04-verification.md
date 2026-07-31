@@ -1225,3 +1225,16 @@ the rejected checkpoint and are historical.
 | Persistence/schema boundaries | PASS | Persistence-boundary and N1 schema-contract checks remain green. |
 | Dev-host standalone typecheck | OWNER-ENVIRONMENT GATED | The current floating My-Chat worktree lacks resolvable internal package dependencies; errors originate from its `scenario-integrations` source. Exact pinned CI materialization remains the authoritative M3-C check; no floating re-pin or sibling mutation was performed. |
 | Effect boundary | PASS | No route response, schema/migration, persistent database, environment value, secret, capability, deployment, activation or traffic changed. |
+
+## 2026-07-31 — NestJS ingress M3-B controller/parity
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Scenario-service typecheck | PASS | Controller, shared wire adapter and runtime dependency types compile. |
+| Scenario-service HTTP suite | PASS | 7 files / 41 tests, including success, validation, eight domain error mappings and safe unknown failure. |
+| Fastify/Nest application parity | PASS | 1 file / 22 cases compare exact status and JSON for both transports. |
+| Parser safety split | PASS | The parity suite explicitly proves Fastify's framework-specific malformed-JSON body is not copied; Nest remains `400 {"error":"invalid_request"}`. |
+| Built service smoke | PASS | `dist/main.js` starts, serves health, stays disabled without full owner config and keeps legacy routes absent. |
+| Existing unit/repository regression | PASS | 21 files / 187 scenario tests and 1 file / 9 fake repository tests. |
+| Test routing | PASS | 44 files: 21 unit, 5 production DB, 10 dev-host, 7 scenario-service and 1 X5. |
+| Effect boundary | PASS | No schema/migration, persistent database, environment value, secret, capability, deployment, activation or traffic changed. |

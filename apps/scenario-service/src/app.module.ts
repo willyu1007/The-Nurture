@@ -1,5 +1,5 @@
 import { type DynamicModule, Module } from "@nestjs/common";
-import { BindingOwnerDisabledController } from "./binding-owner-disabled.controller.js";
+import { BindingOwnerController } from "./binding-owner.controller.js";
 import {
   BINDING_OWNER_GUARD_CONFIG,
   type BindingOwnerGuardConfig,
@@ -9,7 +9,7 @@ import { BindingOwnerRuntime } from "./binding-owner-runtime.js";
 import { HealthController } from "./health.controller.js";
 
 @Module({
-  controllers: [HealthController, BindingOwnerDisabledController],
+  controllers: [HealthController, BindingOwnerController],
 })
 export class AppModule {
   static register(
