@@ -52,9 +52,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -146,9 +146,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -242,9 +242,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -323,9 +323,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -412,9 +412,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -512,9 +512,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -604,9 +604,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -708,9 +708,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -806,9 +806,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -893,9 +893,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+          "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
           "key": "nurture.surface-contract",
-          "version": "1.3.0"
+          "version": "1.4.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -956,9 +956,9 @@
     }
   ],
   "interfaceContract": {
-    "digest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2",
+    "digest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69",
     "key": "nurture.surface-contract",
-    "version": "1.3.0"
+    "version": "1.4.0"
   },
   "schemaVersion": 1,
   "sharedCoreHash": "sha256:be3da7b93e812f3a648adbb251525ef0f75d0c09988377c9e1904633f98c6312",
@@ -969,7 +969,7 @@
         "path": "capabilities/capability-descriptor.schema.json"
       },
       {
-        "artifactHash": "sha256:3ad885dac5bca5e3ea12962bbe99b91d11082ec2df5cc08b6cf5180974887380",
+        "artifactHash": "sha256:8682d895a728c6da2341cc7e8e32b5e42ad1cebb5c1937a4cdab5a96abc017dc",
         "path": "capabilities/capability-registry.json"
       },
       {
@@ -1037,20 +1037,88 @@
         "path": "fixtures/journeys/gj-1/script.json"
       },
       {
+        "artifactHash": "sha256:8bdb23b246b26a4b11649973f3af69e4f6ade060f366337628e7530d05dba19a",
+        "path": "fixtures/journeys/gj-2/expected/view-guardian-board.json"
+      },
+      {
+        "artifactHash": "sha256:f542fbf70481d8e0ca7dea542ffd27049ce1514da956b4d8e421fa905d6f8771",
+        "path": "fixtures/journeys/gj-2/expected/view-guardian-timeline.json"
+      },
+      {
+        "artifactHash": "sha256:fc92aab539477bb5df05f1f62df76b3f62470796a83a25580f3d34fc6888908f",
+        "path": "fixtures/journeys/gj-2/expected/view-refusal-unchanged.json"
+      },
+      {
         "artifactHash": "sha256:d430825661c58b5bf7d271c5411fa818136c544d7dcd1aa5d878ed4b5414ec27",
         "path": "fixtures/journeys/gj-2/initial-state.json"
+      },
+      {
+        "artifactHash": "sha256:be34cbccc777d1a0b6f5afc446c574dcb84424b0d30ea9ed70db5f6bc97bf8ef",
+        "path": "fixtures/journeys/gj-2/script.json"
+      },
+      {
+        "artifactHash": "sha256:44fdb3d6ea20bcb7bb23446a2962f41caac94499f94a7864a6e855ac63e282ce",
+        "path": "fixtures/journeys/gj-3/expected/view-aster-work.json"
+      },
+      {
+        "artifactHash": "sha256:91016f64558721d4e5d6d366d8734adc3b29211cd61cc5dc0615d8b709a45161",
+        "path": "fixtures/journeys/gj-3/expected/view-birch-work.json"
+      },
+      {
+        "artifactHash": "sha256:e576f9d62ce3f44ad7c0db4676a0dc2f07034cb125f94ab9f65e4e691cc235d8",
+        "path": "fixtures/journeys/gj-3/expected/view-guardian-continuity.json"
       },
       {
         "artifactHash": "sha256:faf09b85875175854f79aa7e53f9fa010ee0aa5855c7554fbcfc7626409991be",
         "path": "fixtures/journeys/gj-3/initial-state.json"
       },
       {
+        "artifactHash": "sha256:ede9ae27745152e7644869a9a89efe482e6047e185d42425264908b031c456a4",
+        "path": "fixtures/journeys/gj-3/script.json"
+      },
+      {
+        "artifactHash": "sha256:55ccbfc7eaecd0191e7eca996b95c388c6c5fbb715e9d3de8647572c5840af77",
+        "path": "fixtures/journeys/gj-4/expected/view-board-granted.json"
+      },
+      {
+        "artifactHash": "sha256:e70448af054a99c01a64d7ee126c39025b65d0ec2a518e01a19f8150a0050d13",
+        "path": "fixtures/journeys/gj-4/expected/view-board-pregrant.json"
+      },
+      {
+        "artifactHash": "sha256:d8330c10bf8a10f64268bbc7823700af1e9834e504d5b723cb0d94ef8461b99d",
+        "path": "fixtures/journeys/gj-4/expected/view-guardian-timeline.json"
+      },
+      {
+        "artifactHash": "sha256:8a8f8cfbbb194f1fd17fe33ea0bc08343ca9c7b430097c02407ee76a4d0d4175",
+        "path": "fixtures/journeys/gj-4/expected/view-refusal-workspace.json"
+      },
+      {
         "artifactHash": "sha256:0a52ea08ad35a5f19e5ee9e1de0414c0f8218a0ee8284ba06a2e9593dd0fca5c",
         "path": "fixtures/journeys/gj-4/initial-state.json"
       },
       {
+        "artifactHash": "sha256:0e6a1b3606a9bbf91ec0cabe15fb6ac6cb96f477f89addd345dc310d685469c8",
+        "path": "fixtures/journeys/gj-4/script.json"
+      },
+      {
+        "artifactHash": "sha256:9fbbb619dc2d9ed0638aca8a22d3e0c94931945353580d9a6749104f34912307",
+        "path": "fixtures/journeys/gj-5/expected/view-admin-board-no-authority.json"
+      },
+      {
+        "artifactHash": "sha256:5fa4d1caae239ea12ffcc985d4491ca5fe3ba3898ceee56b783260a6e615ecef",
+        "path": "fixtures/journeys/gj-5/expected/view-admin-workbench.json"
+      },
+      {
+        "artifactHash": "sha256:b6a397ca96c820de7fa4043fb1da2a7166b18b5994b245302e86cde727ba0f6b",
+        "path": "fixtures/journeys/gj-5/expected/view-caregiver-board.json"
+      },
+      {
         "artifactHash": "sha256:e682f161f045596d50bcaa11ed5af5cb62662dd9c508e4a920116ad2f4ec5da8",
         "path": "fixtures/journeys/gj-5/initial-state.json"
+      },
+      {
+        "artifactHash": "sha256:5518549b2097ae42257a80b1e56f9816488be99624617ba795c92d2388af61ac",
+        "path": "fixtures/journeys/gj-5/script.json"
       },
       {
         "artifactHash": "sha256:51411d4e316401cef0143c3a582fecce0ce4d2ccd603c332461dd16341f3b2b1",
@@ -1061,12 +1129,28 @@
         "path": "fixtures/journeys/journey-initial-state.schema.json"
       },
       {
-        "artifactHash": "sha256:ff39c4ad86941d30e3430769f152ba528874a737cf614d9518c0bb7acd86f975",
+        "artifactHash": "sha256:9f01979601a8a602f03bf2619ea2d4311f4d0f6c623f79fb5613ad981fa85e33",
         "path": "fixtures/journeys/journey-script.schema.json"
+      },
+      {
+        "artifactHash": "sha256:a2c822f69a3eb6ec548d869d0e53dd19a7906565c8633a315fdefb901eaab7dd",
+        "path": "fixtures/journeys/rj-1/expected/view-timeline-after-withdraw.json"
+      },
+      {
+        "artifactHash": "sha256:aee7ac989f0281009be043c243245fbcbc83467b303efbde27ea682997a48202",
+        "path": "fixtures/journeys/rj-1/expected/view-timeline-lineage.json"
+      },
+      {
+        "artifactHash": "sha256:9233267efb5c1ea51afc7c511675bd5e4ba356ce02195d0ba91599df95ca5f13",
+        "path": "fixtures/journeys/rj-1/expected/view-timeline-recovered.json"
       },
       {
         "artifactHash": "sha256:0dc48cd1e486972c3e2ca40544543d2dfbf86cccae443376bc1d8ed8127dc2ef",
         "path": "fixtures/journeys/rj-1/initial-state.json"
+      },
+      {
+        "artifactHash": "sha256:5e96b408eae048566ce0c92df5c7b3d8fb5817fd52bd4ad31a6b3aefd899018f",
+        "path": "fixtures/journeys/rj-1/script.json"
       },
       {
         "artifactHash": "sha256:ac700cca4f9400a8a300f10cfb9573c24c67822347e8a7835186ac689eea903c",
@@ -1189,7 +1273,7 @@
         "path": "surfaces/surface-registry.json"
       }
     ],
-    "sourceDigest": "sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2"
+    "sourceDigest": "sha256:075b03dee80d87df33ca471452a2f1ca4d4f9f74e82f7d7c08afd3e746503e69"
   },
   "surfaces": [
     {

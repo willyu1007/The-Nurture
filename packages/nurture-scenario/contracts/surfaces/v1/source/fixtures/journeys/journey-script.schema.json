@@ -263,6 +263,7 @@
       "properties": {
         "stepKey": { "$ref": "#/$defs/stepKey" },
         "kind": { "const": "invocation_refused" },
+        "afterStepKey": { "$ref": "#/$defs/stepKey" },
         "actor": { "$ref": "#/$defs/actor" },
         "capabilityKey": {
           "oneOf": [

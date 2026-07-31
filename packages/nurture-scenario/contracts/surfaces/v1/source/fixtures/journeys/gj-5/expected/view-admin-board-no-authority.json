@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-5",
+  "stepKey": "refuse-admin-care-authority",
+  "surfaceKey": "institution_board",
+  "actor": {
+    "participantId": "syn-gj5-admin-aster",
+    "actorRole": "institution_admin"
+  },
+  "surfaceState": "ready",
+  "careItems": [],
+  "writeActionKeys": []
+}

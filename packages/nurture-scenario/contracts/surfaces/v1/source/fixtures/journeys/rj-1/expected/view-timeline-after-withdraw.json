@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "rj-1",
+  "stepKey": "view-timeline-after-withdraw",
+  "surfaceKey": "guardian_nurture_chat",
+  "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+  "surfaceState": "ready",
+  "careItems": [
+    {
+      "itemRef": "syn-rj1-item-history",
+      "enrollmentRef": "syn-enrollment-c1-ia",
+      "acknowledgementState": "acknowledged",
+      "responseState": "responded",
+      "lifecycle": "active",
+      "attentionState": "resolved",
+      "messages": [{ "kind": "source_question" }, { "kind": "caregiver_reply" }]
+    },
+    {
+      "itemRef": "syn-rj1-item-open",
+      "enrollmentRef": "syn-enrollment-c1-ia",
+      "acknowledgementState": "pending",
+      "responseState": "awaiting_reply",
+      "lifecycle": "closed",
+      "attentionState": "suppressed",
+      "messages": [{ "kind": "source_question" }]
+    }
+  ],
+  "writeActionKeys": [
+    "submit_family_care_question",
+    "withdraw_family_care_request",
+    "correct_family_care_message",
+    "redact_family_care_message"
+  ]
+}

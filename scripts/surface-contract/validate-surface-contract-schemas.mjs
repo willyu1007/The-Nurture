@@ -24,7 +24,7 @@ const journeyScriptSchemaId =
 const journeyExpectedViewSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-expected-view.schema.json";
 const journeyKeys = ["gj-1", "gj-2", "gj-3", "gj-4", "gj-5", "rj-1"];
-const scriptedJourneyKeys = ["gj-1"];
+const scriptedJourneyKeys = journeyKeys;
 
 const schemaPaths = await collectSchemaPaths(sourceRoot);
 const schemas = await Promise.all(

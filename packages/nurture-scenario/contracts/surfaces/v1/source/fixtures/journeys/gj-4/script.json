@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-4",
+  "valueLoop": [
+    {
+      "stepKey": "view-board-pregrant",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_family_board",
+      "expectedViewRef": "expected/view-board-pregrant.json"
+    },
+    {
+      "stepKey": "establish-grant",
+      "kind": "world_transition",
+      "transitionKey": "establish_family_care_grant",
+      "grant": {
+        "grantId": "syn-gj4-grant-c1-ib",
+        "enrollmentId": "syn-enrollment-c1-ib",
+        "familyId": "syn-family-f1",
+        "purposeKey": "family_care_interaction",
+        "state": "current"
+      }
+    },
+    {
+      "stepKey": "view-board-granted",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_family_board",
+      "expectedViewRef": "expected/view-board-granted.json"
+    },
+    {
+      "stepKey": "submit-first-question",
+      "kind": "action",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "capabilityKey": "submit_family_care_question",
+      "target": { "enrollmentId": "syn-enrollment-c1-ib" },
+      "input": { "body": "Syn Question About Settling" },
+      "expected": { "effect": "question_created" },
+      "createsAliases": {
+        "careItemRef": "syn-gj4-item-question",
+        "messageRef": "syn-gj4-msg-question",
+        "receiptRef": "syn-gj4-receipt-submit"
+      }
+    },
+    {
+      "stepKey": "view-guardian-timeline",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-guardian-timeline.json"
+    }
+  ],
+  "refusal": {
+    "stepKey": "refuse-pregrant-write",
+    "kind": "invocation_refused",
+    "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+    "capabilityKey": "submit_family_care_question",
+    "target": { "enrollmentId": "syn-enrollment-c1-ib" },
+    "input": { "body": "Syn Question About Settling" },
+    "expectedError": { "code": "not_authorized", "retryHint": "setup" },
+    "postConditionViewRef": "expected/view-refusal-workspace.json"
+  }
+}

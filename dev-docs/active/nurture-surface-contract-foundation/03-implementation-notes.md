@@ -480,3 +480,30 @@ the new root ref still requires exact consumer adoption.
   (`sha256:dd6140be…`); slices/shared core remain byte-stable. Unit
   census 26 -> 27; validate script now checks scripts/views for the
   scripted journey list (`fixtures=12 negatives=5`).
+
+## 2026-08-01 P3-2 remaining five journey scripts
+
+- GJ-2～GJ-5 and RJ-1 land on the frozen GJ-1 conventions in one batch
+  (mechanical application; consolidating them avoids three further
+  identity rotations). Highlights per the frozen mapping: GJ-2 proves
+  multi-surface consistency of one replied fact plus the
+  foreign-care-group reply refusal with an unchanged post-condition
+  view; GJ-3 proves dual-source timeline aggregation with per-caregiver
+  scope views and a non-inferring `target_unavailable` cross-institution
+  read refusal; GJ-4 walks `needs_setup -> ready` through an
+  establish-grant world transition and the first eligible write; GJ-5
+  asserts the D-04 separation as read-side views (admin surfaces expose
+  zero CareGroup write affordances; the executable denial matrix stays
+  in Phase 4 conformance scope); RJ-1 exercises withdraw/correct/
+  redact/policy-redact with append-only lineage
+  (`redaction_tombstone`×2 + `correction_notice`), grant revoke, the
+  post-revoke submit refusal and renewed-grant recovery.
+- Schema addition: refusal steps accept optional `afterStepKey` so
+  RJ-1's refusal anchors after `revoke-grant` (default remains
+  initial-state execution); the scripts test verifies the anchor
+  resolves to a value-loop step and skips actorless world transitions.
+- Identity `1.3.0 -> 1.4.0` (`sha256:075b03de…`); shared core and all
+  16 existing slices stay byte-identical. Validate script now requires
+  scripts/views for all six journeys (`fixtures=33 negatives=5`).
+- No schema/migration, database, capability, activation, owner-claim or
+  traffic change.

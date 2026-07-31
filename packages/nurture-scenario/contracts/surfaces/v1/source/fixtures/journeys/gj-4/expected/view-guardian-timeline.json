@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-4",
+  "stepKey": "view-guardian-timeline",
+  "surfaceKey": "guardian_nurture_chat",
+  "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+  "surfaceState": "ready",
+  "careItems": [
+    {
+      "itemRef": "syn-gj4-item-question",
+      "enrollmentRef": "syn-enrollment-c1-ib",
+      "acknowledgementState": "pending",
+      "responseState": "awaiting_reply",
+      "lifecycle": "active",
+      "messages": [{ "kind": "source_question" }]
+    }
+  ],
+  "writeActionKeys": [
+    "submit_family_care_question",
+    "withdraw_family_care_request",
+    "correct_family_care_message",
+    "redact_family_care_message"
+  ]
+}

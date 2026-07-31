@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-5",
+  "stepKey": "view-caregiver-board",
+  "surfaceKey": "caregiver_teacher_board",
+  "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+  "surfaceState": "ready",
+  "careItems": [],
+  "writeActionKeys": []
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-5",
+  "valueLoop": [
+    {
+      "stepKey": "view-admin-workbench",
+      "kind": "view",
+      "actor": {
+        "participantId": "syn-gj5-admin-aster",
+        "actorRole": "institution_admin"
+      },
+      "surfaceKey": "institution_workbench",
+      "expectedViewRef": "expected/view-admin-workbench.json"
+    },
+    {
+      "stepKey": "view-caregiver-board",
+      "kind": "view",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "surfaceKey": "caregiver_teacher_board",
+      "expectedViewRef": "expected/view-caregiver-board.json"
+    }
+  ],
+  "refusal": {
+    "stepKey": "refuse-admin-care-authority",
+    "kind": "affordance_absent",
+    "actor": {
+      "participantId": "syn-gj5-admin-aster",
+      "actorRole": "institution_admin"
+    },
+    "surfaceKey": "institution_board",
+    "expectedViewRef": "expected/view-admin-board-no-authority.json"
+  }
+}

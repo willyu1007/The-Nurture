@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-4",
+  "stepKey": "view-board-granted",
+  "surfaceKey": "guardian_family_board",
+  "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+  "surfaceState": "ready",
+  "careItems": [],
+  "writeActionKeys": ["submit_family_care_question"]
+}

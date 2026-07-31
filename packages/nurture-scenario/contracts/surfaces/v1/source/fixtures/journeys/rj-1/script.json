@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "rj-1",
+  "valueLoop": [
+    {
+      "stepKey": "withdraw-open-item",
+      "kind": "action",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "capabilityKey": "withdraw_family_care_request",
+      "target": { "careItemRef": "syn-rj1-item-open" },
+      "input": {},
+      "expected": { "effect": "request_withdrawn" },
+      "createsAliases": { "receiptRef": "syn-rj1-receipt-withdraw" }
+    },
+    {
+      "stepKey": "view-timeline-after-withdraw",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-timeline-after-withdraw.json"
+    },
+    {
+      "stepKey": "correct-question-message",
+      "kind": "action",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "capabilityKey": "correct_family_care_message",
+      "target": { "messageRef": "syn-rj1-item-history-msg-question" },
+      "input": { "body": "Syn Corrected Question About Sleep" },
+      "expected": { "effect": "correction_appended" },
+      "createsAliases": {
+        "correctionRef": "syn-rj1-correction-question",
+        "receiptRef": "syn-rj1-receipt-correct"
+      }
+    },
+    {
+      "stepKey": "redact-reply-message",
+      "kind": "action",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "capabilityKey": "redact_family_care_message",
+      "target": { "messageRef": "syn-rj1-item-history-msg-reply" },
+      "input": {},
+      "expected": { "effect": "content_redacted" },
+      "createsAliases": { "tombstoneRef": "syn-rj1-tombstone-reply" }
+    },
+    {
+      "stepKey": "policy-redact-question",
+      "kind": "action",
+      "actor": { "actorRole": "system_policy" },
+      "capabilityKey": "policy_redact_family_care_message",
+      "target": { "messageRef": "syn-rj1-item-history-msg-question" },
+      "input": { "policyDecisionRef": "syn-rj1-policy-decision" },
+      "expected": { "effect": "policy_content_redacted" },
+      "createsAliases": {
+        "tombstoneRef": "syn-rj1-tombstone-question",
+        "auditEventRef": "syn-rj1-audit-policy-redact"
+      }
+    },
+    {
+      "stepKey": "view-timeline-lineage",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-timeline-lineage.json"
+    },
+    {
+      "stepKey": "revoke-grant",
+      "kind": "world_transition",
+      "transitionKey": "revoke_family_care_grant",
+      "revokedGrantId": "syn-grant-c1-ia"
+    },
+    {
+      "stepKey": "renew-grant",
+      "kind": "world_transition",
+      "transitionKey": "establish_family_care_grant",
+      "grant": {
+        "grantId": "syn-rj1-grant-renewed",
+        "enrollmentId": "syn-enrollment-c1-ia",
+        "familyId": "syn-family-f1",
+        "purposeKey": "family_care_interaction",
+        "state": "current"
+      }
+    },
+    {
+      "stepKey": "submit-after-recovery",
+      "kind": "action",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "capabilityKey": "submit_family_care_question",
+      "target": { "enrollmentId": "syn-enrollment-c1-ia" },
+      "input": { "body": "Syn Question After Recovery" },
+      "expected": { "effect": "question_created" },
+      "createsAliases": {
+        "careItemRef": "syn-rj1-item-recovered",
+        "messageRef": "syn-rj1-msg-recovered",
+        "receiptRef": "syn-rj1-receipt-recovered"
+      }
+    },
+    {
+      "stepKey": "view-timeline-recovered",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-timeline-recovered.json"
+    }
+  ],
+  "refusal": {
+    "stepKey": "refuse-post-revoke-submit",
+    "kind": "invocation_refused",
+    "afterStepKey": "revoke-grant",
+    "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+    "capabilityKey": "submit_family_care_question",
+    "target": { "enrollmentId": "syn-enrollment-c1-ia" },
+    "input": { "body": "Syn Question After Recovery" },
+    "expectedError": { "code": "not_authorized", "retryHint": "setup" }
+  }
+}

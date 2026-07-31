@@ -242,7 +242,7 @@ describe("Phase 3 synthetic world", () => {
   it("rotates the root identity while preserving every existing slice", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.3.0");
+    expect(contract.version).toBe("1.4.0");
     expect(contract.digest).not.toBe(
       "sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59",
     );

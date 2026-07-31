@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-2",
+  "valueLoop": [
+    {
+      "stepKey": "reply-daily-item",
+      "kind": "action",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "capabilityKey": "reply_family_care_item",
+      "target": { "careItemRef": "syn-gj2-item-daily" },
+      "input": { "body": "Syn Reply About Meals" },
+      "expected": { "effect": "reply_appended" },
+      "createsAliases": {
+        "messageRef": "syn-gj2-msg-reply",
+        "receiptRef": "syn-gj2-receipt-reply"
+      }
+    },
+    {
+      "stepKey": "view-guardian-timeline",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-guardian-timeline.json"
+    },
+    {
+      "stepKey": "view-guardian-board",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_family_board",
+      "expectedViewRef": "expected/view-guardian-board.json"
+    }
+  ],
+  "refusal": {
+    "stepKey": "refuse-foreign-group-reply",
+    "kind": "invocation_refused",
+    "afterStepKey": "reply-daily-item",
+    "actor": { "participantId": "syn-caregiver-elio", "actorRole": "caregiver" },
+    "capabilityKey": "reply_family_care_item",
+    "target": { "careItemRef": "syn-gj2-item-daily" },
+    "input": { "body": "Syn Reply About Meals" },
+    "expectedError": { "code": "not_authorized", "retryHint": "none" },
+    "postConditionViewRef": "expected/view-refusal-unchanged.json"
+  }
+}

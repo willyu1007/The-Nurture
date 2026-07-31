@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-2",
+  "stepKey": "view-guardian-board",
+  "surfaceKey": "guardian_family_board",
+  "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+  "surfaceState": "ready",
+  "careItems": [
+    {
+      "itemRef": "syn-gj2-item-daily",
+      "enrollmentRef": "syn-enrollment-c1-ia",
+      "acknowledgementState": "acknowledged",
+      "responseState": "responded",
+      "lifecycle": "active",
+      "attentionState": "resolved",
+      "messages": [{ "kind": "source_question" }, { "kind": "caregiver_reply" }]
+    }
+  ],
+  "writeActionKeys": [
+    "submit_family_care_question",
+    "withdraw_family_care_request",
+    "correct_family_care_message",
+    "redact_family_care_message"
+  ]
+}

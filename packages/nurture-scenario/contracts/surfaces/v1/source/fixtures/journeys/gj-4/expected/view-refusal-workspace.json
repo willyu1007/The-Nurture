@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-4",
+  "stepKey": "refuse-pregrant-write",
+  "surfaceKey": "guardian_family_board",
+  "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+  "surfaceState": "needs_setup",
+  "careItems": [],
+  "writeActionKeys": []
+}

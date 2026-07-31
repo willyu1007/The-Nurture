@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-3",
+  "stepKey": "view-birch-work",
+  "surfaceKey": "caregiver_teacher_board",
+  "actor": { "participantId": "syn-caregiver-elio", "actorRole": "caregiver" },
+  "surfaceState": "ready",
+  "careItems": [
+    {
+      "itemRef": "syn-gj3-item-birch",
+      "enrollmentRef": "syn-enrollment-c1-ib",
+      "acknowledgementState": "acknowledged",
+      "responseState": "responded",
+      "lifecycle": "active",
+      "attentionState": "resolved",
+      "messages": [{ "kind": "source_question" }, { "kind": "caregiver_reply" }]
+    }
+  ],
+  "writeActionKeys": [
+    "acknowledge_family_care_item",
+    "reply_family_care_item"
+  ]
+}

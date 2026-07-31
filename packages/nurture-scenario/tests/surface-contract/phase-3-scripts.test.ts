@@ -189,7 +189,15 @@ describe("Phase 3 journey scripts", () => {
         ),
       );
       expect(text(entry.script.journeyKey)).toBe(entry.journeyKey);
+      const refusal = record(entry.script.refusal);
+      if (typeof refusal.afterStepKey === "string") {
+        expect(
+          records(entry.script.valueLoop).map((step) => text(step.stepKey)),
+          `${entry.journeyKey} afterStepKey`,
+        ).toContain(refusal.afterStepKey);
+      }
       for (const step of allSteps(entry.script)) {
+        if (step.kind === "world_transition") continue;
         const actor = record(step.actor);
         if (actor.actorRole === "system_policy") {
           expect(step.capabilityKey).toBe("policy_redact_family_care_message");

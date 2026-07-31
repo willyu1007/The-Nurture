@@ -60,7 +60,7 @@ describe("Phase 2 exact surface contract", () => {
   it("loads one exact, closed manifest with ten capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.3.0",
+      version: "1.4.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({

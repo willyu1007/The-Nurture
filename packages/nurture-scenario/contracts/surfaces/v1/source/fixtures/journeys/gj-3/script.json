@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-3",
+  "valueLoop": [
+    {
+      "stepKey": "view-guardian-continuity",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-guardian-continuity.json"
+    },
+    {
+      "stepKey": "view-aster-work",
+      "kind": "view",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "surfaceKey": "caregiver_teacher_board",
+      "capabilityKey": "query_caregiver_family_care_work",
+      "expectedViewRef": "expected/view-aster-work.json"
+    },
+    {
+      "stepKey": "view-birch-work",
+      "kind": "view",
+      "actor": { "participantId": "syn-caregiver-elio", "actorRole": "caregiver" },
+      "surfaceKey": "caregiver_teacher_board",
+      "capabilityKey": "query_caregiver_family_care_work",
+      "expectedViewRef": "expected/view-birch-work.json"
+    }
+  ],
+  "refusal": {
+    "stepKey": "refuse-cross-institution-read",
+    "kind": "invocation_refused",
+    "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+    "capabilityKey": "query_family_care_item",
+    "target": { "careItemRef": "syn-gj3-item-birch" },
+    "input": {},
+    "expectedError": { "code": "target_unavailable", "retryHint": "none" }
+  }
+}

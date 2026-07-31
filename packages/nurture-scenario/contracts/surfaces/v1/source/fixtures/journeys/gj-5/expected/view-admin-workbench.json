@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-5",
+  "stepKey": "view-admin-workbench",
+  "surfaceKey": "institution_workbench",
+  "actor": {
+    "participantId": "syn-gj5-admin-aster",
+    "actorRole": "institution_admin"
+  },
+  "surfaceState": "ready",
+  "careItems": [],
+  "writeActionKeys": []
+}
