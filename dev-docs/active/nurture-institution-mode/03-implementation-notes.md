@@ -1475,3 +1475,18 @@
   Branch CI `30626241230` success at `674e96c`; merge to main is
   deliberately deferred to coordinate with the active ingress lane
   (local main carries unpushed commits).
+
+## 2026-07-31 ST-5 consumption merged and published
+
+- `codex/t002-derived-consumption` rebased onto the pin-fixed main
+  (conflicts resolved by union: env contract entry, notes chronology,
+  unit census 23+1=24, manifest 42 paths / 55 files with a fresh
+  hash), rebased branch CI `30637256388` success at `0b2561b`, merged
+  --no-ff as `0077264`, trunk CI `30637427080` success. Branch and
+  temporary worktrees disposed.
+- Cross-owner state: both scenario consumers of the host derived
+  age/stage envelope are now published (Education `75edab5`); the first
+  joint live read plus the denial matrix are recorded in the entries
+  above and in My-Chat/T-030. Remaining for the joint journey:
+  cross-owner side-channel suite at pinned revisions, qualification
+  lock v4, then the record-through stage.
