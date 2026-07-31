@@ -386,3 +386,18 @@ initial states under `source/fixtures/`, plus capability selection cases.
 Adding those normative artifacts must rotate the interface version/digest;
 existing capability/surface evidence scope is compared by slice hash, while
 the new root ref still requires exact consumer adoption.
+
+## 2026-07-31 Phase 3 execution decomposition
+
+- Phase 3 is decomposed into five verified units `P3-0…P3-4` in
+  `07-phase-3-fixture-journey-decomposition.md`: world source freeze,
+  per-journey initial states, journey scripts (one value loop plus one
+  highest-risk refusal each), selection fixtures, then fixture-manifest
+  canonicalization with exact rotation from `1.0.1` and a
+  slice-invariance guard.
+- Six boundary rules are frozen before implementation, including the
+  journey/conformance-matrix split, per-journey state independence and
+  a hard stop on shared-envelope edits (`changedSharedCore`).
+- Phase 3 is My-Chat-independent; the parallel T-002 pin-advance input
+  (`../nurture-institution-mode/15-mychat-drift-census-pin-advance-input.md`)
+  gates M5/Joint Conformance sequencing only, not these increments.

@@ -12,6 +12,8 @@
 - Next step: 实施 Phase 3 deterministic synthetic world、GJ-1～GJ-5/RJ-1
   独立初始状态与 capability selection fixtures；随后进入 Phase 4 synthetic
   qualification。不得把 synthetic PASS 写成 owner-integration PASS。
+  执行拆解（P3-0～P3-4 与边界规则）见
+  [`07-phase-3-fixture-journey-decomposition.md`](./07-phase-3-fixture-journey-decomposition.md)。
 - Current gate: T-002 ingress M0-M4 已完成；exact owner pin 仍为 My-Chat
   `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO。
   Phase 2 quality-closed exact interface 为
