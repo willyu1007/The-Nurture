@@ -144,6 +144,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "94a964435852bce080871586fe3a9e86393db1d622d86b5ee64ac2fc20a5d860"
+    "contractSha256": "45f8c0c68cbfcb9af9701c867c262fc9a7c2b16d8e2442dfd48497987902380b"
   }
 }

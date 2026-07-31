@@ -1427,3 +1427,15 @@
 - Updated the workflow context and task handoff to the implemented M3 truth
   while keeping M4 governance, M5 handoff regeneration, Joint Conformance,
   activation and traffic explicitly closed.
+
+## 2026-07-31 main pin fix-forward (owner-directed)
+
+- The five T-004 ingress/contract commits published at `0847e10`
+  carried scenario-set changes without re-pinning
+  `my-chat-workflow-contract.json`; trunk CI `30626938866` failed on
+  exactly that mismatch. Fix-forward recomputes
+  nurtureScenario.contractSha256 via the verifier's own
+  `computeContractHash` to
+  `45f8c0c68cbfcb9af9701c867c262fc9a7c2b16d8e2442dfd48497987902380b`
+  (53 expanded files) - byte-identical to the value CI computed, so the
+  repair is provably exact.
