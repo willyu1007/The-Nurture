@@ -1463,3 +1463,15 @@
   recomputed via the verifier's own `computeContractHash` to
   `e9346e2d5fd90d5664a83237ee5c23dac457d21a972e9ceafc09000285bcf8d7`.
   Historical hashes in earlier entries remain historical evidence.
+- Joint live verification (2026-07-31, host api on :8000 against the
+  migrated `my_chat` dev database, seeded active nurture binding): the
+  real client issued `{age_band_key: y_2_3, stage_key: nursery_junior,
+  source_version: 1}` for the shared e2e child - the same band the
+  Education client resolved to its own `pre_primary` vocabulary,
+  proving per-scenario stage projection from one protected fact. An
+  education-token attempt on the nurture channel denied with
+  `service_auth_required` (token isolation); an active-but-unbound
+  child denied with `binding_required`. No raw date crossed the wire.
+  Branch CI `30626241230` success at `674e96c`; merge to main is
+  deliberately deferred to coordinate with the active ingress lane
+  (local main carries unpushed commits).
