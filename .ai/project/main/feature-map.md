@@ -329,10 +329,12 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 (`in-progress`); T-005 through T-008 (`planned`).
-- Next Checkpoint: T-004 Phase 0/Phase 1 与 T-002 NestJS ingress M0-M4
-  已完成；当前单主线执行 T-004 Phase 2，补齐 concrete descriptor/invocation
-  artifacts、exact digest/slice hashes、loader 与 deterministic build/verify，
-  形成可重建的 Surface Contract Artifact Set。
+- Next Checkpoint: T-004 Phase 0-2 与 T-002 NestJS ingress M0-M4
+  已完成；exact Surface Contract Artifact Set 当前为
+  `nurture.surface-contract@1.0.0` /
+  `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`。
+  当前单主线执行 T-004 Phase 3 deterministic fixtures/cross-role Journeys，
+  随后进入 Phase 4 synthetic qualification，并与 T-002 M5 汇合。
   真实 owner integration 只在精确 T-002 pins/evidence 就绪后通过 Joint Conformance。
   T-003 是非阻塞设计输入。T-005～T-007 从 G1 start
   即可并行做设计、纯领域逻辑与 synthetic work；Contract Boundary、Owner Readiness

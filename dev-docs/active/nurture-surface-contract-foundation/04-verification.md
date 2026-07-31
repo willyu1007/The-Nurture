@@ -144,3 +144,23 @@
 | Test routing and whitespace | PASS | `node scripts/assert-test-routing.mjs` reports 47 files with 22 unit files; `git diff --check` passes. |
 | Build boundary | NOT RUN / NOT YET APPLICABLE | Phase 1 intentionally assigns no exact digest and has no generated manifest. Phase 2 lands canonicalization and deterministic build/verify together; no application build was run. |
 | Effect boundary | PASS | No runtime capability/manifest, schema/migration, database, external repository, environment, secret, deployment, activation or traffic changed. |
+
+## Phase 2 Verification — 2026-07-31
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact generated identity | PASS | `pnpm build:surface-contract` produced `nurture.surface-contract@1.0.0` / `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`, 10 capability slices and 6 surface slices. |
+| Deterministic rebuild | PASS | `pnpm verify:surface-contract` rebuilt under `.ai/.tmp/`, compared exact bytes and reported shared core `sha256:934db320e11ccdfb073cb1182b809e8076bd38d064bb8ed1b298ec20c7843cbd`. |
+| Generator strictness | PASS AFTER REPAIR | `pnpm test:surface-contract-tooling`: 5/5. Duplicate keys, non-finite numbers, non-canonical output names and semantic drift without a version rotation reject; canonical JSON sorts object keys while preserving semantic array order. |
+| Source graph and binding closure | PASS | Build validates complete local `$ref` resolution, logical schema refs, descriptor keys/nested bindings, presenter parity, policy/repository refs, unique registries and forbidden port fallback before writing. |
+| Focused Phase 2 contract suite | PASS | `pnpm exec vitest run -c vitest.config.ts packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts`: 1 file / 17 tests. |
+| Exact admission and loader | PASS AFTER REPAIR | Tests reject unknown root/nested fields, mismatched canonical source-set/root digest, version/digest mismatch and missing/mismatched ports; loaded manifests are recursively frozen. Git/source revision provenance is recorded later in qualification evidence and is not mislabeled as the semantic digest. |
+| Invocation/business-input separation | PASS AFTER REPAIR | Query/prepare/execute/readResult carry exact contract, trusted context, scope, purpose, nonce and expiry. Target/idempotency/confirmation stay generic; capability input schemas contain only business fields. |
+| Confirmation/concurrency/replay | PASS AFTER REPAIR | Private typed confirmation binds target, actor/scope, integrity, heads and expiry; protected low-entropy input requires keyed integrity. Acknowledge declares convergent exact-state semantics, reply declares compatible append, and CommandExecution replay remains separate. |
+| Cursor/error/presenter safety | PASS | Private cursor binds digest/actor/scope/query/sort/snapshot/expiry; public errors are closed and actor-safe; six presenter records freeze required/optional fields and Institution board has no action projection. |
+| Dependency/default-off boundary | PASS | Missing T-002 Owner Integration returns deterministic dependency NO-GO. G2-C and Admin protected-read capability keys remain absent until separately frozen; no synthetic runtime fallback exists. |
+| Scenario TypeScript | PASS | `pnpm --filter @the-nurture/scenario typecheck`. |
+| Full unit regression and population | PASS | `pnpm test:unit:ci && pnpm verify:unit-population`: 23 files / 214 tests, all passing. |
+| Test routing and whitespace | PASS | `node scripts/assert-test-routing.mjs`: 48 files total, 23 unit; `git diff --check` passes. |
+| Application build boundary | NOT RUN | Only the dedicated deterministic contract artifact generator ran. No application/service/frontend build or dev server was run. |
+| Effect boundary | PASS | No runtime scenario manifest/capability activation, schema/migration, database, sibling repository, environment, secret, deployment or traffic changed. Owner Integration, Synthetic Qualification and Joint Conformance remain unclaimed. |

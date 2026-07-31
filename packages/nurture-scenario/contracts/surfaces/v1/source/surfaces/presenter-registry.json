@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "compatibilityStrategy": "exact_contract_ref_and_version_rotation",
+  "presenters": [
+    {
+      "surfaceKey": "guardian_nurture_chat",
+      "surfaceVersion": "1.0.0",
+      "presenterKey": "present_guardian_nurture_chat",
+      "contentFamily": "conversation",
+      "stableRequiredFields": [
+        "contract",
+        "surfaceKey",
+        "surfaceVersion",
+        "state",
+        "snapshotRef",
+        "snapshotVersion",
+        "generatedAt",
+        "actorContext",
+        "contentFamily",
+        "content",
+        "actions",
+        "dependencyNoGos"
+      ],
+      "stableOptionalFields": [
+        "pageInfo"
+      ],
+      "semanticOrderSource": "surface_registry",
+      "actionProjection": "current_eligibility_only"
+    },
+    {
+      "surfaceKey": "guardian_family_board",
+      "surfaceVersion": "1.0.0",
+      "presenterKey": "present_guardian_family_board",
+      "contentFamily": "board",
+      "stableRequiredFields": [
+        "contract",
+        "surfaceKey",
+        "surfaceVersion",
+        "state",
+        "snapshotRef",
+        "snapshotVersion",
+        "generatedAt",
+        "actorContext",
+        "contentFamily",
+        "content",
+        "actions",
+        "dependencyNoGos"
+      ],
+      "stableOptionalFields": [
+        "pageInfo"
+      ],
+      "semanticOrderSource": "surface_registry",
+      "actionProjection": "current_eligibility_only"
+    },
+    {
+      "surfaceKey": "caregiver_nurture_chat",
+      "surfaceVersion": "1.0.0",
+      "presenterKey": "present_caregiver_nurture_chat",
+      "contentFamily": "conversation",
+      "stableRequiredFields": [
+        "contract",
+        "surfaceKey",
+        "surfaceVersion",
+        "state",
+        "snapshotRef",
+        "snapshotVersion",
+        "generatedAt",
+        "actorContext",
+        "contentFamily",
+        "content",
+        "actions",
+        "dependencyNoGos"
+      ],
+      "stableOptionalFields": [
+        "pageInfo"
+      ],
+      "semanticOrderSource": "surface_registry",
+      "actionProjection": "current_eligibility_only"
+    },
+    {
+      "surfaceKey": "caregiver_teacher_board",
+      "surfaceVersion": "1.0.0",
+      "presenterKey": "present_caregiver_teacher_board",
+      "contentFamily": "board",
+      "stableRequiredFields": [
+        "contract",
+        "surfaceKey",
+        "surfaceVersion",
+        "state",
+        "snapshotRef",
+        "snapshotVersion",
+        "generatedAt",
+        "actorContext",
+        "contentFamily",
+        "content",
+        "actions",
+        "dependencyNoGos"
+      ],
+      "stableOptionalFields": [
+        "pageInfo"
+      ],
+      "semanticOrderSource": "surface_registry",
+      "actionProjection": "current_eligibility_only"
+    },
+    {
+      "surfaceKey": "institution_board",
+      "surfaceVersion": "1.0.0",
+      "presenterKey": "present_institution_board",
+      "contentFamily": "board",
+      "stableRequiredFields": [
+        "contract",
+        "surfaceKey",
+        "surfaceVersion",
+        "state",
+        "snapshotRef",
+        "snapshotVersion",
+        "generatedAt",
+        "actorContext",
+        "contentFamily",
+        "content",
+        "actions",
+        "dependencyNoGos"
+      ],
+      "stableOptionalFields": [
+        "pageInfo"
+      ],
+      "semanticOrderSource": "surface_registry",
+      "actionProjection": "none"
+    },
+    {
+      "surfaceKey": "institution_workbench",
+      "surfaceVersion": "1.0.0",
+      "presenterKey": "present_institution_workbench",
+      "contentFamily": "workbench",
+      "stableRequiredFields": [
+        "contract",
+        "surfaceKey",
+        "surfaceVersion",
+        "state",
+        "snapshotRef",
+        "snapshotVersion",
+        "generatedAt",
+        "actorContext",
+        "contentFamily",
+        "content",
+        "actions",
+        "dependencyNoGos"
+      ],
+      "stableOptionalFields": [
+        "pageInfo"
+      ],
+      "semanticOrderSource": "surface_registry",
+      "actionProjection": "current_eligibility_only"
+    }
+  ]
+}

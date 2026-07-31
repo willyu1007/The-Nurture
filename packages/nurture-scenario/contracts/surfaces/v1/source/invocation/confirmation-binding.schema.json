@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/confirmation-binding.schema.json",
+  "title": "PrivateConfirmationBindingV1",
+  "description": "Private server-side binding. Public callers receive only confirmationRef.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "capabilityKey",
+    "capabilityVersion",
+    "commandIdentity",
+    "targetBindingTag",
+    "actorScopeBindingTag",
+    "inputIntegrity",
+    "headBindings",
+    "expiresAt",
+    "status"
+  ],
+  "properties": {
+    "contract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "capabilityKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "capabilityVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "commandIdentity": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 200
+    },
+    "targetBindingTag": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "actorScopeBindingTag": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "inputIntegrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "value"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "canonical_hash",
+            "protected_keyed_integrity_tag"
+          ]
+        },
+        "value": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "headBindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "headKey",
+          "mode",
+          "opaquePreparedValue"
+        ],
+        "properties": {
+          "headKey": {
+            "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+          },
+          "mode": {
+            "enum": [
+              "must_equal",
+              "must_satisfy",
+              "compatible_append",
+              "convergent_postcondition"
+            ]
+          },
+          "opaquePreparedValue": {
+            "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+          }
+        }
+      }
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "prepared",
+        "consumed"
+      ]
+    }
+  }
+}

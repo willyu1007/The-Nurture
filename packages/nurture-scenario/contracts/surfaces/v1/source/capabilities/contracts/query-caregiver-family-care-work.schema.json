@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-caregiver-family-care-work.schema.json",
+  "title": "QueryCaregiverFamilyCareWorkV1",
+  "$defs": {
+    "input": {
+      "$ref": "family-care-types.schema.json#/$defs/emptyInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "careGroupRef",
+        "items"
+      ],
+      "properties": {
+        "careGroupRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "careItemRef",
+        "childSafeLabel",
+        "sourceSafeSummary",
+        "acknowledgementState",
+        "responseState",
+        "lifecycle",
+        "attentionState",
+        "createdAt",
+        "lastActivityAt",
+        "actions"
+      ],
+      "properties": {
+        "careItemRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "childSafeLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sourceSafeSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "acknowledgementState": {
+          "enum": [
+            "pending",
+            "acknowledged"
+          ]
+        },
+        "responseState": {
+          "enum": [
+            "awaiting_reply",
+            "responded"
+          ]
+        },
+        "lifecycle": {
+          "enum": [
+            "active",
+            "closed",
+            "suppressed"
+          ]
+        },
+        "attentionState": {
+          "enum": [
+            "active",
+            "resolved",
+            "suppressed"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastActivityAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "family-care-types.schema.json#/$defs/actionRef"
+          }
+        }
+      }
+    }
+  }
+}

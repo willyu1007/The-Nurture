@@ -1,0 +1,1164 @@
+{
+  "admission": {
+    "fallback": "forbidden",
+    "latestAlias": "forbidden",
+    "mode": "exact_key_version_digest",
+    "versionRanges": "forbidden"
+  },
+  "canonicalization": {
+    "algorithm": "sha256",
+    "arrayOrder": "semantic_except_declared_registries",
+    "duplicateObjectKeys": "reject",
+    "encoding": "utf-8",
+    "inventoryOrder": "path_lexicographic",
+    "objectKeys": "lexicographic",
+    "schemaVersion": 1
+  },
+  "capabilities": [
+    {
+      "capabilityKey": "acknowledge_family_care_item",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "acknowledge_family_care_item",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "acknowledgement_head",
+              "mode": "convergent_postcondition",
+              "postconditionRef": {
+                "key": "family_care_item_acknowledged",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "care_item_lifecycle",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "acknowledgeable_care_item",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "care_group_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_exact_care_group_actor",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "acknowledge_family_care_item_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "acknowledge_family_care_item",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.acknowledge-family-care-item-input@1",
+        "intentKeys": [
+          "acknowledge_family_care_item"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.acknowledge-family-care-item-result@1",
+        "supportedRoles": [
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:b9c4ca09071121b04404ba88db3939cffa213a88848f79cd65dad936f6138037"
+    },
+    {
+      "capabilityKey": "correct_family_care_message",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "correct_family_care_message",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "message_content_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "message_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_exact_message_author",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "message_lifecycle",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "correctable_family_care_message",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "correct_family_care_message_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "correct_family_care_message",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.correct-family-care-message-input@1",
+        "intentKeys": [
+          "correct_family_care_message"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          },
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.correct-family-care-message-result@1",
+        "supportedRoles": [
+          "guardian",
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:0680749bafda1f619d38b352e73f6e7338f92282bdc0d286da97468f2abea759"
+    },
+    {
+      "capabilityKey": "policy_redact_family_care_message",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "policy_redact_family_care_message",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "message_content_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "policy_decision",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_policy_redaction_decision",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "direct_commit",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "policy_redact_family_care_message_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "policy_redact_family_care_message",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.policy-redact-family-care-message-input@1",
+        "intentKeys": [
+          "apply_policy_redaction"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [],
+        "resultSchemaRef": "schema:nurture.policy-redact-family-care-message-result@1",
+        "supportedRoles": [
+          "system_policy"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"
+    },
+    {
+      "capabilityKey": "query_caregiver_family_care_work",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "query_caregiver_family_care_work",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "care_group_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_care_group_role",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "source_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_care_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "none",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "none",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "read_model",
+        "eligibilityPolicyRef": {
+          "key": "query_caregiver_family_care_work_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "query",
+        "handlerBinding": {
+          "bindingKey": "query_caregiver_family_care_work",
+          "bindingKind": "query"
+        },
+        "inputSchemaRef": "schema:nurture.query-caregiver-family-care-work-input@1",
+        "intentKeys": [
+          "view_family_care_work"
+        ],
+        "invalidationScopeKinds": [
+          "capability",
+          "surface",
+          "collection",
+          "care_group"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.query-caregiver-family-care-work-result@1",
+        "supportedRoles": [
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:a1cf57465ed3cf92f20b4ccb6f4fdd84ecf1184af3f3191b6916a8ab8c5baed1"
+    },
+    {
+      "capabilityKey": "query_family_care_item",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "query_family_care_item",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "actor_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_role_safe_item_read",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "source_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_care_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "none",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "none",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "read_model",
+        "eligibilityPolicyRef": {
+          "key": "query_family_care_item_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "query",
+        "handlerBinding": {
+          "bindingKey": "query_family_care_item",
+          "bindingKind": "query"
+        },
+        "inputSchemaRef": "schema:nurture.query-family-care-item-input@1",
+        "intentKeys": [
+          "view_family_care_item"
+        ],
+        "invalidationScopeKinds": [
+          "capability",
+          "surface",
+          "target",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          },
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.query-family-care-item-result@1",
+        "supportedRoles": [
+          "guardian",
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:5342ff415c90502ec7bbb8180e2e98e16c6d51b68d8a1c6aefd84d579b479383"
+    },
+    {
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "query_guardian_family_care_timeline",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "family_relationship",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_guardian",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "source_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_care_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "none",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "none",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "read_model",
+        "eligibilityPolicyRef": {
+          "key": "query_guardian_family_care_timeline_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "query",
+        "handlerBinding": {
+          "bindingKey": "query_guardian_family_care_timeline",
+          "bindingKind": "query"
+        },
+        "inputSchemaRef": "schema:nurture.query-guardian-family-care-timeline-input@1",
+        "intentKeys": [
+          "view_family_care_timeline"
+        ],
+        "invalidationScopeKinds": [
+          "capability",
+          "surface",
+          "subject",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.query-guardian-family-care-timeline-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "none",
+          "optionSchemaRef": null
+        }
+      },
+      "sliceHash": "sha256:a7134a4edbd03564fbe2e100964b4e1a4cbbb204de3a6f83bf74aa647c490a95"
+    },
+    {
+      "capabilityKey": "redact_family_care_message",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "redact_family_care_message",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "message_content_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "message_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_exact_message_author",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "message_retention",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "redactable_family_care_message",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "redact_family_care_message_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "redact_family_care_message",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.redact-family-care-message-input@1",
+        "intentKeys": [
+          "redact_family_care_message"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          },
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.redact-family-care-message-result@1",
+        "supportedRoles": [
+          "guardian",
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:4ee6651d7fea6484c26b91f4267225b8e7e08f903209ac9a9bd842132edd3e59"
+    },
+    {
+      "capabilityKey": "reply_family_care_item",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "reply_family_care_item",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "append_compatible",
+          "headBindings": [
+            {
+              "headKey": "reply_collection",
+              "mode": "compatible_append"
+            },
+            {
+              "headKey": "care_item_lifecycle",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "replyable_care_item",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "care_group_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_exact_care_group_actor",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "reply_family_care_item_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "reply_family_care_item",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.reply-family-care-item-input@1",
+        "intentKeys": [
+          "reply_family_care_item"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.reply-family-care-item-result@1",
+        "supportedRoles": [
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:1ecf2e934a61b4ffeefa84fafe26175e163ade011e38271437960073f851eb69"
+    },
+    {
+      "capabilityKey": "submit_family_care_question",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "submit_family_care_question",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "enrollment_lifecycle",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "active_enrollment",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "family_grant",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_care_grant",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "family_relationship",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_guardian",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "submit_family_care_question_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "submit_family_care_question",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.submit-family-care-question-input@1",
+        "intentKeys": [
+          "ask_care_group",
+          "send_family_care_question"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.submit-family-care-question-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:f27fda9fcab235488e2a54528f6ef07128fb5195d0a0ff7683bbc424d41b2746"
+    },
+    {
+      "capabilityKey": "withdraw_family_care_request",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "withdraw_family_care_request",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "care_item_lifecycle",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "source_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_family_request_author",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+          "key": "nurture.surface-contract",
+          "version": "1.0.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "withdraw_family_care_request_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "withdraw_family_care_request",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.withdraw-family-care-request-input@1",
+        "intentKeys": [
+          "withdraw_family_care_request"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.withdraw-family-care-request-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "exact_bound",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:c833a0e07149472232d7a314f731953ad83ce6d6aa05ef1ee846635e4ac38134"
+    }
+  ],
+  "interfaceContract": {
+    "digest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129",
+    "key": "nurture.surface-contract",
+    "version": "1.0.0"
+  },
+  "schemaVersion": 1,
+  "sharedCoreHash": "sha256:934db320e11ccdfb073cb1182b809e8076bd38d064bb8ed1b298ec20c7843cbd",
+  "sourceSet": {
+    "inventory": [
+      {
+        "artifactHash": "sha256:13af603223f54f2eee81904d815cbaeeb591a6dc04770c3544da4764d218c4d2",
+        "path": "capabilities/capability-descriptor.schema.json"
+      },
+      {
+        "artifactHash": "sha256:34e3cac0118ba9596b1a70478686bee67d007c9c5b77cb8e498b0d758e6c4a8d",
+        "path": "capabilities/capability-registry.json"
+      },
+      {
+        "artifactHash": "sha256:634e91edbe0ee8f5611021fc6bfee2f4d874d7102e637813364c920b262fd234",
+        "path": "capabilities/contracts/acknowledge-family-care-item.schema.json"
+      },
+      {
+        "artifactHash": "sha256:48600cec82779320587c5cdd94347983dd88fd2ea6eee4cca3abe4043d4699a7",
+        "path": "capabilities/contracts/correct-family-care-message.schema.json"
+      },
+      {
+        "artifactHash": "sha256:ec3ae3d5db9738b09a79570fd958da27fcf5378517513a787f19882da33cc53e",
+        "path": "capabilities/contracts/family-care-types.schema.json"
+      },
+      {
+        "artifactHash": "sha256:ea794959440cf832d73cd45be9edcbadf2c1112d0bd586ec36122471c454591e",
+        "path": "capabilities/contracts/policy-redact-family-care-message.schema.json"
+      },
+      {
+        "artifactHash": "sha256:a5064b129384a748d4a874a0503372c7c3540fcace7b1f2ce251fb0a7fe3008a",
+        "path": "capabilities/contracts/query-caregiver-family-care-work.schema.json"
+      },
+      {
+        "artifactHash": "sha256:0211691c6a74c8fc4ad9b2ca9fa838ea9e7e2dcf7dbeac08fa79cbea8279b5ee",
+        "path": "capabilities/contracts/query-family-care-item.schema.json"
+      },
+      {
+        "artifactHash": "sha256:5045b63a71692b488337690c447baff748b70a69fcb457823edc7416ead8d761",
+        "path": "capabilities/contracts/query-guardian-family-care-timeline.schema.json"
+      },
+      {
+        "artifactHash": "sha256:6adbaabc41c255626189a93aec517c2bdbfcd79e21064219a94c58978f2c35d7",
+        "path": "capabilities/contracts/redact-family-care-message.schema.json"
+      },
+      {
+        "artifactHash": "sha256:ee4c8c14e039c935a79812cdbbd5fd4aa9420c9c2b69d944ee73419b6b313a67",
+        "path": "capabilities/contracts/reply-family-care-item.schema.json"
+      },
+      {
+        "artifactHash": "sha256:6df7389a0f450ba6599500ae61c70aa628ceaa2f9e780f8fce910883bcc94411",
+        "path": "capabilities/contracts/submit-family-care-question.schema.json"
+      },
+      {
+        "artifactHash": "sha256:4cff2c6ec1889580408f80804ebbe7d186d72878f8a92a09ccc90210d2c2198c",
+        "path": "capabilities/contracts/withdraw-family-care-request.schema.json"
+      },
+      {
+        "artifactHash": "sha256:e1a48440eb316b4b368c4ac1cf05960f71240a160090d781899aa6a90da25cb8",
+        "path": "interface/canonicalization.json"
+      },
+      {
+        "artifactHash": "sha256:53942faea77c0f5d85fdc08cf24d3ad5a101eaf8d67058cabf701ee5ea4d37b7",
+        "path": "interface/compatibility-policy.json"
+      },
+      {
+        "artifactHash": "sha256:f20c2dc0732aa569827d591260840f335f5718c4e97bd39dc1d29aabaae5ad65",
+        "path": "interface/contract-primitives.schema.json"
+      },
+      {
+        "artifactHash": "sha256:4d8a77d530cec86b1386c9f196fb51d48996cad4a5cac55cb0c9464eb6e61701",
+        "path": "interface/interface-contract-ref.schema.json"
+      },
+      {
+        "artifactHash": "sha256:af8644e79c006cba9e5ff31c8e829f26a36005935873af752b412d2e71d33746",
+        "path": "interface/port-registry.json"
+      },
+      {
+        "artifactHash": "sha256:c1c3a77f8b4997cdf9c7c5324c0f51c956046b0e452aaca5211d638c5ef43e15",
+        "path": "interface/schema-registry.json"
+      },
+      {
+        "artifactHash": "sha256:8c8fd5d4af78f970ece3635c9e58b8998c5e65aef081f5a9ce94ce95a43e318c",
+        "path": "interface/surface-contract-manifest.schema.json"
+      },
+      {
+        "artifactHash": "sha256:26ab29574e04cb07f7c7948ebf4869d677d400d47205401798a32d01e2af48d7",
+        "path": "interface/surface-rules.json"
+      },
+      {
+        "artifactHash": "sha256:dc0a3a18d9127eade26b21db7eb5f40bf2458ae95aba0aeffa2f3e2a23e9d0e4",
+        "path": "interface/visibility-matrix.json"
+      },
+      {
+        "artifactHash": "sha256:2556d180abd30afc74b73c7cba9adc100e178efc8262e29f3464ce5fcea8c00f",
+        "path": "invocation/confirmation-binding.schema.json"
+      },
+      {
+        "artifactHash": "sha256:7420644c5123fb50b11726edd957367782a8e84b38af45aea9702395134ca53f",
+        "path": "invocation/cursor-binding.schema.json"
+      },
+      {
+        "artifactHash": "sha256:bd1262eb5f4c861f66b42a12c3938eb53a4d8c66187a239af840f82b64a43013",
+        "path": "invocation/eligibility-result.schema.json"
+      },
+      {
+        "artifactHash": "sha256:01df25437a6fd101acbf475f263a5a290635634a3cbe5f68a7f38472895e12ac",
+        "path": "invocation/execute-action-invocation.schema.json"
+      },
+      {
+        "artifactHash": "sha256:40c20da822f89072390ebe1fd3a793ddc610fce8747bf17abb0151c899455aa6",
+        "path": "invocation/execute-action-result.schema.json"
+      },
+      {
+        "artifactHash": "sha256:425ba038f40a92793a05bd5d5646740130a2ceef319de8c2c083fd4797266c2a",
+        "path": "invocation/operation-error.schema.json"
+      },
+      {
+        "artifactHash": "sha256:17c55e6e4f7a6a58ac363f292416b6d8c0bda9c9c0d2013f3b7e9be02c79d0f7",
+        "path": "invocation/pagination.schema.json"
+      },
+      {
+        "artifactHash": "sha256:8a0210ba34cd9dcb674ced4a99f87c9c7a6350abaff7b051ec82a80342102fd5",
+        "path": "invocation/prepare-action-invocation.schema.json"
+      },
+      {
+        "artifactHash": "sha256:dfb86c062156788d7f6e79f1e0521a5b9714be69da94a2d76afeda02f9f7641b",
+        "path": "invocation/prepare-action-result.schema.json"
+      },
+      {
+        "artifactHash": "sha256:981bff2f8c12cb89f706e97df2b3788083ed04231717e55646e1f48a301609cc",
+        "path": "invocation/query-invocation.schema.json"
+      },
+      {
+        "artifactHash": "sha256:057ba2da93538119a6faed5be491248bf19a9fa6daf52fe90a7f9fac23eb70e5",
+        "path": "invocation/query-result.schema.json"
+      },
+      {
+        "artifactHash": "sha256:45f82740f044a46d13e5ef153383f3e27f88b97bb63c7d3cb95c44888b34e88e",
+        "path": "invocation/read-result-invocation.schema.json"
+      },
+      {
+        "artifactHash": "sha256:6e79f1a0e9807eff5b31cf313288a528df2b41325143659e36fd1cf0df6e4d6b",
+        "path": "invocation/read-result.schema.json"
+      },
+      {
+        "artifactHash": "sha256:770d57342511d032c7ab9679a70ffa1b9ca12147e01ae1dcdd4689415f565d45",
+        "path": "invocation/target-option.schema.json"
+      },
+      {
+        "artifactHash": "sha256:306fb73bb9bcd74ad4ab5e5ed7413ca0fbf254a45d21cdd033cb3fd9b64b9ff1",
+        "path": "surfaces/presenter-registry.json"
+      },
+      {
+        "artifactHash": "sha256:869a6b62cd1f3b8d1cafba0f7b27c401470a52f9dc612249c5a887bc1b24c776",
+        "path": "surfaces/surface-envelope.schema.json"
+      },
+      {
+        "artifactHash": "sha256:b803b84ca74142ac932020296a57793046c3a2afe749efdfbe19abe911770f0c",
+        "path": "surfaces/surface-registry.json"
+      }
+    ],
+    "sourceDigest": "sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129"
+  },
+  "surfaces": [
+    {
+      "presenterKey": "present_caregiver_nurture_chat",
+      "sliceHash": "sha256:34abcdaa268463807750ea5a8b4b6b6c73547aa644153db43a19271569247f4d",
+      "surfaceKey": "caregiver_nurture_chat",
+      "surfaceVersion": "1.0.0"
+    },
+    {
+      "presenterKey": "present_caregiver_teacher_board",
+      "sliceHash": "sha256:f0b87088fcd2fcfc7569faefbbe6833c04269c009501f6f81f426ce47c8d1b61",
+      "surfaceKey": "caregiver_teacher_board",
+      "surfaceVersion": "1.0.0"
+    },
+    {
+      "presenterKey": "present_guardian_family_board",
+      "sliceHash": "sha256:cf8dcc935baac9510ccd5aedfe5a3fbc32e0dde28a6168efbebacaa52e4caff8",
+      "surfaceKey": "guardian_family_board",
+      "surfaceVersion": "1.0.0"
+    },
+    {
+      "presenterKey": "present_guardian_nurture_chat",
+      "sliceHash": "sha256:9350a5ae228f3844ce5d03e11722012480ee8e2b6813ae676c6ead00a5248256",
+      "surfaceKey": "guardian_nurture_chat",
+      "surfaceVersion": "1.0.0"
+    },
+    {
+      "presenterKey": "present_institution_board",
+      "sliceHash": "sha256:c2d5c98223fb399bf0e3b86fdf005106b88902e55cd307c0550a9481ce677cdc",
+      "surfaceKey": "institution_board",
+      "surfaceVersion": "1.0.0"
+    },
+    {
+      "presenterKey": "present_institution_workbench",
+      "sliceHash": "sha256:ed2ad109da46672fb394eb77ceb818b14d6f318ce7af55797a25d500120b220d",
+      "surfaceKey": "institution_workbench",
+      "surfaceVersion": "1.0.0"
+    }
+  ]
+}

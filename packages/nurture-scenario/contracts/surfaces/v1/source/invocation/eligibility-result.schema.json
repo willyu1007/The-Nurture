@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/eligibility-result.schema.json",
+  "title": "EligibilityResultV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "capabilityKey",
+    "capabilityVersion",
+    "status",
+    "reasons",
+    "targetOptions"
+  ],
+  "properties": {
+    "contract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "capabilityKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "capabilityVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "status": {
+      "enum": [
+        "eligible",
+        "ineligible",
+        "needs_setup",
+        "unavailable"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/reason"
+      }
+    },
+    "targetOptions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "target-option.schema.json"
+      }
+    }
+  },
+  "$defs": {
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "enum": [
+            "actor_not_supported",
+            "scope_not_current",
+            "target_required",
+            "dependency_no_go",
+            "policy_denied",
+            "contract_mismatch"
+          ]
+        },
+        "dependencyKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "retryHint": {
+          "enum": [
+            "retry",
+            "setup",
+            "required_upgrade",
+            "contact_admin",
+            "none"
+          ]
+        }
+      }
+    }
+  }
+}

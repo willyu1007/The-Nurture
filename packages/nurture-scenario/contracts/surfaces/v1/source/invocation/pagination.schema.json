@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/pagination.schema.json",
+  "title": "SnapshotPaginationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hasMore",
+    "snapshotRef",
+    "snapshotVersion"
+  ],
+  "properties": {
+    "nextCursor": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "hasMore": {
+      "type": "boolean"
+    },
+    "snapshotRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "snapshotVersion": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

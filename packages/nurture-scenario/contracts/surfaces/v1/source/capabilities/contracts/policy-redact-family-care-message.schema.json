@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/policy-redact-family-care-message.schema.json",
+  "title": "PolicyRedactFamilyCareMessageV1",
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyDecisionRef"
+      ],
+      "properties": {
+        "policyDecisionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect",
+        "messageRef",
+        "tombstoneRef",
+        "auditEventRef"
+      ],
+      "properties": {
+        "effect": {
+          "const": "policy_content_redacted"
+        },
+        "messageRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "tombstoneRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "auditEventRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    }
+  }
+}

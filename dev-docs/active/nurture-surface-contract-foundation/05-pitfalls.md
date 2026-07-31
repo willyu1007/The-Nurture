@@ -171,3 +171,63 @@
   includes `system_policy`.
 - Prevention: shared primitives must not erase trust-boundary distinctions;
   schema-level admission is reviewed independently from current registry data.
+
+### 2026-07-31 — Root interface version leaked into capability slice hashes
+
+- Symptom: the first generator draft included interface key/version in every
+  capability slice payload.
+- Root cause: exact admission identity and evidence invalidation identity were
+  treated as the same hash boundary.
+- Impact: adding one new capability would rotate the root version and
+  mechanically change every existing capability slice, defeating the accepted
+  additive-slice rule.
+- Fix: root admission still uses exact key/version/digest, while a capability
+  slice hashes only its descriptor source, referenced schema closure and exact
+  policy/repository bindings. The generated descriptor receives the root ref
+  after slice computation.
+- Prevention: never include root digest/version in a local slice; shared-core
+  changes invalidate globally through `sharedCoreHash`, not by accidental
+  coupling.
+
+### 2026-07-31 — Prepare failure union matched two identical branches
+
+- Symptom: `denied` and `unavailable` both referenced the same safe-failure
+  schema as separate `oneOf` alternatives.
+- Root cause: semantic labels were modeled as branch names while the actual
+  discriminator remained a two-value enum inside one shared schema.
+- Impact: a valid safe failure matched both alternatives and therefore failed
+  `oneOf`.
+- Fix: keep one safe-failure branch with the closed `denied | unavailable`
+  discriminator.
+- Prevention: each `oneOf` alternative must be mutually exclusive by schema,
+  not merely by its local definition name.
+
+### 2026-07-31 — Private invocation omitted replay-protection context
+
+- Symptom: the initial generic invocation schemas carried trusted-context and
+  scope refs but omitted purpose, nonce and request expiry.
+- Root cause: T-002 private-ingress validation was assumed to remain implicit
+  behind `trustedContextRef`.
+- Impact: the T-004 public contract did not fully state the G1-03 invocation
+  preconditions that the adapter must preserve.
+- Fix: query, prepare, execute and readResult now require purpose, nonce and
+  expiry; action operations additionally carry generic command identity,
+  idempotency and confirmation metadata as applicable.
+- Prevention: an opaque principal/context ref may hide identity values, but it
+  must not erase explicit freshness, purpose or replay semantics.
+
+### 2026-07-31 — Generator and loader strictness stopped at top-level shape
+
+- Symptom: early validation rejected missing source refs but did not reject
+  nested descriptor drift, non-finite JSON numbers, unsafe generated filenames
+  or a manifest whose canonical source-set digest disagreed with its root
+  digest.
+- Root cause: structural checks were added incrementally around the happy path.
+- Fix: strict JSON parsing rejects duplicate/non-finite input; source
+  validation closes nested bindings and complete reference graphs; generated
+  output is constrained to the canonical in-repo filename; loader admission
+  checks nested fields, source-set/root parity and recursively freezes the
+  result. The semantic field is named `sourceDigest`; Git/source revision
+  remains separate qualification provenance.
+- Prevention: deterministic generation requires strictness at parse, semantic
+  binding, output-path and consumer-load boundaries, not only byte comparison.

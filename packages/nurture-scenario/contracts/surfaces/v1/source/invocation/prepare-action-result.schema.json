@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/prepare-action-result.schema.json",
+  "title": "PrepareActionResultV1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/readyToConfirm"
+    },
+    {
+      "$ref": "#/$defs/needsInput"
+    },
+    {
+      "$ref": "#/$defs/safeFailure"
+    }
+  ],
+  "$defs": {
+    "base": {
+      "type": "object",
+      "required": [
+        "contract",
+        "capabilityKey",
+        "capabilityVersion",
+        "status"
+      ],
+      "properties": {
+        "contract": {
+          "$ref": "../interface/interface-contract-ref.schema.json"
+        },
+        "capabilityKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "readyToConfirm": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/base"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contract",
+            "capabilityKey",
+            "capabilityVersion",
+            "status",
+            "confirmationRef",
+            "expiresAt",
+            "preview"
+          ],
+          "properties": {
+            "contract": {
+              "$ref": "../interface/interface-contract-ref.schema.json"
+            },
+            "capabilityKey": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+            },
+            "capabilityVersion": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+            },
+            "status": {
+              "const": "ready_to_confirm"
+            },
+            "confirmationRef": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "preview": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "summary"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "targetLabel": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "needsInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "capabilityKey",
+        "capabilityVersion",
+        "status",
+        "missingInputKeys",
+        "targetOptions"
+      ],
+      "properties": {
+        "contract": {
+          "$ref": "../interface/interface-contract-ref.schema.json"
+        },
+        "capabilityKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "status": {
+          "const": "needs_input"
+        },
+        "missingInputKeys": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+          }
+        },
+        "targetOptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "target-option.schema.json"
+          }
+        }
+      }
+    },
+    "safeFailure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "capabilityKey",
+        "capabilityVersion",
+        "status",
+        "reasonCode"
+      ],
+      "properties": {
+        "contract": {
+          "$ref": "../interface/interface-contract-ref.schema.json"
+        },
+        "capabilityKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "status": {
+          "enum": [
+            "denied",
+            "unavailable"
+          ]
+        },
+        "reasonCode": {
+          "enum": [
+            "not_authorized",
+            "target_unavailable",
+            "dependency_no_go",
+            "contract_mismatch"
+          ]
+        }
+      }
+    }
+  }
+}

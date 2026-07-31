@@ -8,8 +8,8 @@
 - Completed: 2026-07-31
 - Result: **PASS for discovery and gate classification**
 - Next critical lane at Phase 0 close: T-002 NestJS ingress M0→M4 before
-  T-004 Phase 1-2 implementation. T-002 M0-M4 and T-004 Phase 1 are now
-  complete; Phase 2 is the current lane.
+  T-004 Phase 1-2 implementation. T-002 M0-M4 and T-004 Phase 1-2 are now
+  complete; Phase 3 is the current lane.
 
 This result means the current source boundaries, reusable foundations, required
 extensions and owner/activation gates are explicit enough to begin the accepted
@@ -214,7 +214,7 @@ packages/nurture-scenario/
   tests/surface-contract/
 ```
 
-Phase 2 adds `source/invocation/`, concrete capability registry inputs,
+Phase 2 has added `source/invocation/`, concrete capability registry inputs,
 `generated/surface-contract.manifest.json`, `src/surface-contract/` and
 `scripts/surface-contract/`. Phase 3 adds fixture inputs; Phase 4 adds the
 conformance manifest and qualification cases.
@@ -231,7 +231,7 @@ Rules:
   model provider.
 - `tests/surface-contract/` owns schema, binding, determinism, negative and
   fixture tests.
-- `scripts/surface-contract/` will own ESM build/verify commands. Phase 2 adds
+- `scripts/surface-contract/` owns ESM build/verify commands. Phase 2 added
   root commands `build:surface-contract` and `verify:surface-contract` together
   with the exact canonicalization/digest rules; this avoids creating a
   placeholder generated identity in Phase 1. The verifier MUST rebuild in a
@@ -253,12 +253,13 @@ The initial normative source set will cover:
 6. versioned synthetic-world and Journey fixture manifests;
 7. conformance manifest entries with optional downstream acceptance-item refs.
 
-Phase 1 now provides the interface-ref and descriptor schemas, six-surface
+Phase 1 provides the interface-ref and descriptor schemas, six-surface
 registry, atomic envelope/content unions, visibility matrix and shared
-readiness/snapshot rules. Phase 2 owns concrete descriptors, typed
+readiness/snapshot rules. Phase 2 now provides concrete descriptors, typed
 invocation/result/error/cursor artifacts, canonicalization, slice boundaries,
-exact root digest and generated manifest. Phase 1 does not assign an interface
-identity or create a published artifact.
+exact root digest and generated manifest. Phase 3-4 still own fixtures and
+qualification; the current artifact is not an owner-integration or published
+runtime result.
 
 ## Work Release Map
 

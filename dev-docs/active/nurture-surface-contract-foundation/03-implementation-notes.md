@@ -269,3 +269,63 @@ query/prepare/execute/readResult, result/error/cursor artifacts before assigning
 the first exact interface version/digest. Canonicalization, per-capability and
 per-surface slice hashes, loader/admission and generated-manifest verification
 must land together; no placeholder `generated/` artifact is permitted.
+
+## 2026-07-31 — Phase 2 exact typed contract completed
+
+- Added the closed T-005 V1 capability registry: three queries, six
+  author/caregiver actions and one internal policy-redaction action. The
+  not-yet-frozen G2-C caregiver-initiated and Admin protected-read capabilities
+  remain absent rather than receiving guessed placeholder keys.
+- Added capability-specific business input/result schemas plus shared typed
+  query, prepare, execute, read-result, eligibility, receipt/event,
+  pagination, safe-error, private confirmation-binding and private
+  cursor-binding contracts.
+- Generic invocation now carries the exact expected interface ref,
+  trusted-context/scope refs, purpose, nonce, expiry and operation-specific
+  target/idempotency/confirmation metadata. Capability business inputs contain
+  only their own fields; acknowledge is empty and protected text is bounded.
+- Added six stable presenter records and versioned policy/repository port
+  bindings. Missing or mismatched ports and dependency gates fail closed; no
+  synthetic owner or version fallback exists.
+- Froze canonical JSON, registry sorting, source inventory, root digest,
+  shared-core boundary and capability/surface slice boundaries. The generated
+  baseline is `nurture.surface-contract@1.0.0` with digest
+  `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`;
+  its shared-core hash is
+  `sha256:934db320e11ccdfb073cb1182b809e8076bd38d064bb8ed1b298ec20c7843cbd`.
+- Added a strict loader, exact admission, dependency-readiness evaluation and
+  exact versioned-port binding helpers under `src/surface-contract/`. Loaded
+  manifests reject unknown/malformed structures, require canonical
+  source-set/root digest parity
+  and are recursively frozen.
+- Added ESM `build:surface-contract` and `verify:surface-contract` commands.
+  Verification rebuilds under `.ai/.tmp/`, compares exact bytes and removes
+  the temporary directory. Generated output is accepted only at the canonical
+  kebab-case artifact filename inside the repository, and an existing artifact
+  cannot be replaced by changed semantics without a strictly increased
+  interface version.
+- Quality review repaired six issues before acceptance:
+  1. two identical prepare failure branches made `oneOf` ambiguous;
+  2. capability slice hashes initially included interface version, which
+     would have invalidated every existing slice after an additive root
+     version rotation;
+  3. private invocation omitted purpose/nonce/expiry;
+  4. confirmation/cursor server bindings and protected keyed-integrity rules
+     were descriptive rather than typed;
+  5. generator/loader strictness did not yet reject non-finite JSON,
+     unsafe output names, nested unknown fields or source/digest drift.
+  6. the canonical source-set digest was initially mislabeled
+     `sourceRevision`, which conflicted with the rule that Git/source revision
+     is non-semantic qualification provenance.
+- Phase 2 changes no runtime scenario manifest, handler activation,
+  schema/migration, database, owner repository, environment, secret,
+  deployment or traffic. Synthetic fixtures/conformance remain Phase 3-4;
+  Owner Integration remains NO-GO.
+
+### Handoff to Phase 3
+
+Create the versioned PII-free synthetic world and independent GJ-1～GJ-5/RJ-1
+initial states under `source/fixtures/`, plus capability selection cases.
+Adding those normative artifacts must rotate the interface version/digest;
+existing capability/surface evidence scope is compared by slice hash, while
+the new root ref still requires exact consumer adoption.

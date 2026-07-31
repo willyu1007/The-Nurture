@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/read-result-invocation.schema.json",
+  "title": "ReadResultInvocationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "expectedContract",
+    "capabilityKey",
+    "capabilityVersion",
+    "trustedContextRef",
+    "scopeRef",
+    "purposeKey",
+    "requestNonce",
+    "expiresAt",
+    "commandExecutionRef"
+  ],
+  "properties": {
+    "expectedContract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "capabilityKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "capabilityVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "trustedContextRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "scopeRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "purposeKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "requestNonce": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 200
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "commandExecutionRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    }
+  }
+}

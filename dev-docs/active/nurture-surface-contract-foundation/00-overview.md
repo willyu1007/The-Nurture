@@ -5,17 +5,19 @@
 - State: in-progress
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
-- Phase: Phase 0 discovery/gate reconciliation and Phase 1
-  capability/surface/visibility source complete; Phase 2 exact typed contract
-  and interface identity next.
+- Phase: Phase 0 discovery/gate reconciliation, Phase 1 normative surface
+  source and Phase 2 exact typed contract/interface identity complete; Phase 3
+  deterministic fixtures and cross-role journeys next.
 - Updated: 2026-07-31
-- Next step: 实施 Phase 2 typed capability/presenter contract：补齐
-  invocation/result/error/cursor schemas 与 concrete descriptor registry，冻结
-  canonicalization、slice boundaries 和 exact `InterfaceContractRefV1`，再生成并验证
-  `surface-contract.manifest.json`。
+- Next step: 实施 Phase 3 deterministic synthetic world、GJ-1～GJ-5/RJ-1
+  独立初始状态与 capability selection fixtures；随后进入 Phase 4 synthetic
+  qualification。不得把 synthetic PASS 写成 owner-integration PASS。
 - Current gate: T-002 ingress M0-M4 已完成；exact owner pin 仍为 My-Chat
   `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO。
-  所有六 surface 能力继续 absent/default-off。
+  Phase 2 exact interface 为
+  `nurture.surface-contract@1.0.0` /
+  `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`。
+  所有 protected capability 继续 default-off。
 
 ## Goal
 
@@ -122,10 +124,12 @@ envelope、contract identity/digest、组合式 concurrency heads 与 exact-stat
 G1-01～G1-07 进一步锁定渐进并行、四层 identity/authority、transactional Receipt/
 Execution、exact public contract、formal NestJS ingress、三层资格化与三类交付/
 失效规则。Phase 0 已完成现有 manifest/module/presenter/repository port 的复用/
-扩展/门禁矩阵和 artifact-set 落点；T-002 ingress M0-M4 与 T-004 Phase 1
-normative source 已随后落地。Phase 2 现在负责 concrete descriptor/invocation
-artifacts、exact digest、slice hashes、loader 和 deterministic build/verify。Phase 0
+扩展/门禁矩阵和 artifact-set 落点；T-002 ingress M0-M4 与 T-004 Phase 1-2
+normative/exact contract 已随后落地。Phase 2 已生成可重建的 exact digest、shared
+core hash、10 个 capability slice、6 个 surface slice、strict loader/admission 和
+deterministic build/verify。Phase 0
 结论见
 [`06-phase-0-discovery-and-gate-matrix.md`](./06-phase-0-discovery-and-gate-matrix.md)。
-Phase 2 完成后再与 T-002 M5 Owner Integration Handoff 汇合执行 Joint
-Conformance；不得用当前 Phase 1 source 或 synthetic evidence 替代真实 owner gate。
+当前进入 Phase 3 fixtures/Journey；随后再与 T-002 M5 Owner Integration Handoff
+汇合执行 Joint Conformance。不得用当前 Phase 2 artifact 或后续 synthetic
+evidence 替代真实 owner gate。

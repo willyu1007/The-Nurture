@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "fallbackPolicy": "forbidden",
+  "repositories": [
+    {
+      "key": "binding_owner_repository",
+      "version": "1.0.0",
+      "owner": "my_chat",
+      "requiredGate": "owner_integration"
+    },
+    {
+      "key": "family_care_command_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "contract_boundary"
+    },
+    {
+      "key": "family_care_query_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "contract_boundary"
+    }
+  ],
+  "policies": [
+    {
+      "key": "acknowledge_family_care_item_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "correct_family_care_message_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "policy_redact_family_care_message_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_caregiver_family_care_work_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_query_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_family_care_item_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_query_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_guardian_family_care_timeline_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_query_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "redact_family_care_message_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "reply_family_care_item_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "submit_family_care_question_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "withdraw_family_care_request_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    }
+  ]
+}

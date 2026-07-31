@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "schemas": [
+    {
+      "schemaRef": "schema:nurture.acknowledge-family-care-item-input@1",
+      "artifactPath": "capabilities/contracts/acknowledge-family-care-item.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.acknowledge-family-care-item-result@1",
+      "artifactPath": "capabilities/contracts/acknowledge-family-care-item.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.correct-family-care-message-input@1",
+      "artifactPath": "capabilities/contracts/correct-family-care-message.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.correct-family-care-message-result@1",
+      "artifactPath": "capabilities/contracts/correct-family-care-message.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.owner-target-option@1",
+      "artifactPath": "invocation/target-option.schema.json",
+      "jsonPointer": ""
+    },
+    {
+      "schemaRef": "schema:nurture.policy-redact-family-care-message-input@1",
+      "artifactPath": "capabilities/contracts/policy-redact-family-care-message.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.policy-redact-family-care-message-result@1",
+      "artifactPath": "capabilities/contracts/policy-redact-family-care-message.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.query-caregiver-family-care-work-input@1",
+      "artifactPath": "capabilities/contracts/query-caregiver-family-care-work.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-caregiver-family-care-work-result@1",
+      "artifactPath": "capabilities/contracts/query-caregiver-family-care-work.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.query-family-care-item-input@1",
+      "artifactPath": "capabilities/contracts/query-family-care-item.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-family-care-item-result@1",
+      "artifactPath": "capabilities/contracts/query-family-care-item.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-family-care-timeline-input@1",
+      "artifactPath": "capabilities/contracts/query-guardian-family-care-timeline.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-family-care-timeline-result@1",
+      "artifactPath": "capabilities/contracts/query-guardian-family-care-timeline.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.redact-family-care-message-input@1",
+      "artifactPath": "capabilities/contracts/redact-family-care-message.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.redact-family-care-message-result@1",
+      "artifactPath": "capabilities/contracts/redact-family-care-message.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.reply-family-care-item-input@1",
+      "artifactPath": "capabilities/contracts/reply-family-care-item.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.reply-family-care-item-result@1",
+      "artifactPath": "capabilities/contracts/reply-family-care-item.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.submit-family-care-question-input@1",
+      "artifactPath": "capabilities/contracts/submit-family-care-question.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.submit-family-care-question-result@1",
+      "artifactPath": "capabilities/contracts/submit-family-care-question.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.surface-operation-error@1",
+      "artifactPath": "invocation/operation-error.schema.json",
+      "jsonPointer": ""
+    },
+    {
+      "schemaRef": "schema:nurture.withdraw-family-care-request-input@1",
+      "artifactPath": "capabilities/contracts/withdraw-family-care-request.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.withdraw-family-care-request-result@1",
+      "artifactPath": "capabilities/contracts/withdraw-family-care-request.schema.json",
+      "jsonPointer": "/$defs/result"
+    }
+  ]
+}

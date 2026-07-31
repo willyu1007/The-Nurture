@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/operation-error.schema.json",
+  "title": "SurfaceOperationErrorV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "code",
+    "retryHint"
+  ],
+  "properties": {
+    "contract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "code": {
+      "enum": [
+        "contract_mismatch",
+        "invalid_request",
+        "not_authorized",
+        "dependency_no_go",
+        "target_unavailable",
+        "stale",
+        "idempotency_conflict",
+        "confirmation_expired",
+        "outcome_unknown",
+        "refresh_required",
+        "rebase_required"
+      ]
+    },
+    "retryHint": {
+      "enum": [
+        "retry",
+        "reprepare",
+        "refresh",
+        "rebase",
+        "setup",
+        "required_upgrade",
+        "contact_admin",
+        "reconcile",
+        "none"
+      ]
+    },
+    "safeCurrentState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stateKey"
+      ],
+      "properties": {
+        "stateKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

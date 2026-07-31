@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/prepare-action-invocation.schema.json",
+  "title": "PrepareActionInvocationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "expectedContract",
+    "surfaceKey",
+    "surfaceVersion",
+    "capabilityKey",
+    "capabilityVersion",
+    "trustedContextRef",
+    "scopeRef",
+    "purposeKey",
+    "requestNonce",
+    "expiresAt",
+    "commandIdentity",
+    "idempotencyKey",
+    "typedInput"
+  ],
+  "properties": {
+    "expectedContract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "surfaceKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "surfaceVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "capabilityKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "capabilityVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "trustedContextRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "scopeRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "purposeKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "requestNonce": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 200
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "targetOptionRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "commandIdentity": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 200
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 200
+    },
+    "typedInput": {
+      "type": "object"
+    }
+  }
+}

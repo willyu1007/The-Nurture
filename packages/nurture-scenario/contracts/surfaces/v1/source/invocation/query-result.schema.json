@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/query-result.schema.json",
+  "title": "QueryResultV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "capabilityKey",
+    "capabilityVersion",
+    "snapshotRef",
+    "snapshotVersion",
+    "output"
+  ],
+  "properties": {
+    "contract": {
+      "$ref": "../interface/interface-contract-ref.schema.json"
+    },
+    "capabilityKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "capabilityVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "snapshotRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "snapshotVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "output": {
+      "type": "object"
+    },
+    "pageInfo": {
+      "$ref": "pagination.schema.json"
+    }
+  }
+}

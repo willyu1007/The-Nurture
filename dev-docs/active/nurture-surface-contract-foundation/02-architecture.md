@@ -562,8 +562,9 @@ version/digest 并通过 owner-read/revoke/redaction/cross-Institution qualifica
 
 ## Compatibility Model
 
-- 每个 interface contract registry record 必须声明 source revision 作为 provenance，
-  并关联 descriptor/surface/API schema、policy refs 和 fixture/conformance manifest；
+- deterministic generated manifest 记录 canonical `sourceDigest` 并关联
+  descriptor/surface/API schema、policy refs 和 fixture/conformance manifest；
+  Git/source revision 作为 provenance 由 qualification/handoff evidence 另行记录，
   exact version/digest 只由规范 artifact contents 生成，不把 revision/build metadata
   混入 semantic digest。
 - capability descriptor 的 intent、domain/execution/delivery、schema refs、

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/cursor-binding.schema.json",
+  "title": "PrivateCursorBindingV1",
+  "description": "Private server-side binding. Public callers receive only an opaque cursor.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractDigest",
+    "actorBindingTag",
+    "scopeBindingTag",
+    "queryKey",
+    "queryVersion",
+    "sortKey",
+    "snapshotRef",
+    "snapshotVersion",
+    "expiresAt"
+  ],
+  "properties": {
+    "contractDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "actorBindingTag": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "scopeBindingTag": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "queryKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "queryVersion": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+    },
+    "sortKey": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+    },
+    "snapshotRef": {
+      "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "snapshotVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

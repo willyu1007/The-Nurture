@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/interface/surface-contract-manifest.schema.json",
+  "title": "SurfaceContractManifestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "interfaceContract",
+    "canonicalization",
+    "sourceSet",
+    "sharedCoreHash",
+    "capabilities",
+    "surfaces",
+    "admission"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "interfaceContract": {
+      "$ref": "interface-contract-ref.schema.json"
+    },
+    "canonicalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "algorithm",
+        "encoding",
+        "inventoryOrder",
+        "objectKeys",
+        "arrayOrder",
+        "duplicateObjectKeys"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "algorithm": {
+          "const": "sha256"
+        },
+        "encoding": {
+          "const": "utf-8"
+        },
+        "inventoryOrder": {
+          "const": "path_lexicographic"
+        },
+        "objectKeys": {
+          "const": "lexicographic"
+        },
+        "arrayOrder": {
+          "const": "semantic_except_declared_registries"
+        },
+        "duplicateObjectKeys": {
+          "const": "reject"
+        }
+      }
+    },
+    "sourceSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceDigest",
+        "inventory"
+      ],
+      "properties": {
+        "sourceDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "inventory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "artifactHash"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:[/-][a-z0-9]+)*(?:\\.schema)?\\.json$"
+              },
+              "artifactHash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sharedCoreHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "capabilityKey",
+          "capabilityVersion",
+          "sliceHash",
+          "descriptor"
+        ],
+        "properties": {
+          "capabilityKey": {
+            "$ref": "contract-primitives.schema.json#/$defs/stableKey"
+          },
+          "capabilityVersion": {
+            "$ref": "contract-primitives.schema.json#/$defs/semver"
+          },
+          "sliceHash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "descriptor": {
+            "$ref": "../capabilities/capability-descriptor.schema.json"
+          }
+        }
+      }
+    },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "surfaceKey",
+          "surfaceVersion",
+          "presenterKey",
+          "sliceHash"
+        ],
+        "properties": {
+          "surfaceKey": {
+            "$ref": "contract-primitives.schema.json#/$defs/stableKey"
+          },
+          "surfaceVersion": {
+            "$ref": "contract-primitives.schema.json#/$defs/semver"
+          },
+          "presenterKey": {
+            "$ref": "contract-primitives.schema.json#/$defs/stableKey"
+          },
+          "sliceHash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "versionRanges",
+        "latestAlias",
+        "fallback"
+      ],
+      "properties": {
+        "mode": {
+          "const": "exact_key_version_digest"
+        },
+        "versionRanges": {
+          "const": "forbidden"
+        },
+        "latestAlias": {
+          "const": "forbidden"
+        },
+        "fallback": {
+          "const": "forbidden"
+        }
+      }
+    }
+  }
+}

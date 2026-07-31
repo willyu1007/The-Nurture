@@ -211,9 +211,9 @@ reuse/extend/gate matrix are in
 - [x] synthetic owner fixture 与真实 owner contract 的来源、可用范围和禁止路径可以机械区分。
 
 Phase 0 PASS 只开放既定执行主线，不开放 protected implementation。T-002 ingress
-M0-M4 与 T-004 Phase 1 现已完成；Phase 2 仍只可准备 contract-parallel exact
-artifact source、loader 和 deterministic qualification。T-002 M5 Owner Integration
-Handoff 完成前，不得宣称真实 owner readiness。
+M0-M4 与 T-004 Phase 1-2 现已完成；Phase 3-4 仍只可准备
+contract-parallel fixtures、Journey 和 synthetic qualification。T-002 M5 Owner
+Integration Handoff 完成前，不得宣称真实 owner readiness。
 
 ## Phase 1 — Capability, Surface and Visibility Contract
 
@@ -256,43 +256,48 @@ capability activation or Owner Integration PASS.
 
 ## Phase 2 — Typed Capability and Presenter Contract
 
-- 版本化 capability-first queries、commands、events/receipts、errors 与 pagination。
-- 冻结 `InterfaceContractRefV1` 的 wire 形状、artifact-set canonicalization 与 digest：
+**Result:** PASS on 2026-07-31 for the exact Phase 2 contract baseline and
+deterministic build/verify. This is not Synthetic Qualification, Owner
+Integration Readiness, Joint Conformance or activation.
+
+- [x] 版本化 capability-first queries、commands、events/receipts、errors 与 pagination。
+- [x] 冻结 `InterfaceContractRefV1` 的 wire 形状、artifact-set canonicalization 与 digest：
   discovery、surface/query/action response 必须返回 exact key/version/digest，invocation
   必须声明 expected exact ref。
-- 2026-07-31 已接受的分片哈希决策：artifact set 除 root digest 外，必须在
+- [x] 2026-07-31 已接受的分片哈希决策：artifact set 除 root digest 外，必须在
   conformance manifest 中逐 capability、逐 surface 记录 canonical slice hash；slice
   边界定义与哈希顺序属于 canonicalization 规则本身，一并冻结。admission 仍然只
   使用 exact root digest，不因分片放宽为 version range 或 partial admission。
-- 定义 presenter 输出的稳定字段、可选字段和兼容性策略。
-- 定义 Nurture-owned semantic order、module/item kinds、actions 与 invalidation scopes；My-Chat 保留响应式布局和组件实现权。
-- 定义 deterministic eligibility result 与通用 invocation envelope；不实现 LLM provider、语义检索或跨 Scenario router。
-- 将 capability-specific business input 与 generic target/concurrency/idempotency
+- [x] 定义 presenter 输出的稳定字段、可选字段和兼容性策略。
+- [x] 定义 Nurture-owned semantic order、module/item kinds、actions 与 invalidation scopes；My-Chat 保留响应式布局和组件实现权。
+- [x] 定义 deterministic eligibility result 与通用 invocation envelope；不实现 LLM provider、语义检索或跨 Scenario router。
+- [x] 将 capability-specific business input 与 generic target/concurrency/idempotency
   metadata 分离；concurrency heads 不进入业务 schema。
-- capability descriptor 声明 `exact_state | lifecycle_authority | append_compatible`
+- [x] capability descriptor 声明 `exact_state | lifecycle_authority | append_compatible`
   summary class，并用 `headBindings[]` 逐项声明 `must_equal | must_satisfy |
   compatible_append | convergent_postcondition`；prepare 把相应 heads、精确 target、
   actor/scope、受保护输入所需的 keyed integrity tag、expiry 与 stable command identity
   绑定进 opaque confirmation。
-- 通过 versioned policy/repository ports 隔离未完成的 T-002 owner runtime；不实现 identity、Grant 或 authenticated principal fallback。
-- 把宿主展示需求翻译为协议，不在本仓库实现宿主 UI。
+- [x] 通过 versioned policy/repository ports 隔离未完成的 T-002 owner runtime；不实现 identity、Grant 或 authenticated principal fallback。
+- [x] 把宿主展示需求翻译为协议，不在本仓库实现宿主 UI。
 
 验收：
 
-- 黑盒客户端不依赖 Prisma、内部表名或私有 runtime。
-- 写操作均有 authority source、idempotency 与 receipt 语义。
-- 参考呈现可以替换为 My-Chat renderer，而不修改 capability 或领域契约。
-- 缺少真实 owner adapter 时，capability 保持 default-off，并返回明确 dependency NO-GO，而不是退化为 synthetic runtime。
-- exact-state action 只有在 descriptor 声明的 convergent postcondition 已满足且其他
+- [x] 黑盒客户端不依赖 Prisma、内部表名或私有 runtime。
+- [x] 写操作均有 authority source、idempotency 与 receipt 语义。
+- [x] 参考呈现可以替换为 My-Chat renderer，而不修改 capability 或领域契约。
+- [x] 缺少真实 owner adapter 时，capability 保持 default-off，并返回明确 dependency NO-GO，而不是退化为 synthetic runtime。
+- [x] exact-state action 只有在 descriptor 声明的 convergent postcondition 已满足且其他
   lifecycle/authority heads 仍有效时，才可返回 `already_satisfied`；其他 version
   漂移必须 stale。
-- compatibility 检查以 exact digest 为 admission，optional additive change 仍生成新
+- [x] compatibility 检查以 exact digest 为 admission，optional additive change 仍生成新
   digest/version；consumer 不使用版本范围或 `latest`。
-- 证据失效范围可由 slice hash 机械判定：某 slice hash 变化只失效引用该 slice 的
+- [x] 证据失效范围可由 slice hash 机械判定：某 slice hash 变化只失效引用该 slice 的
   synthetic/joint 证据；additive 新增 slice 不失效任何既有证据，只要求新 slice
   自身完成资格化；共享 invocation envelope、confirmation/concurrency 与 error
   信封层变化仍使全部受影响证据失效。
-- conformance suite 必须可在 clean checkout 用单条命令确定性全量重跑；全量失效
+- [ ] contract artifact build/verify 已可在 clean checkout 用单条命令确定性重跑；
+  Phase 4 conformance suite 尚未实现。全量失效
   后的恢复成本是机器时间，不是一轮人工联合验证。
 
 ## Phase 3 — Fixtures and Cross-role Journey

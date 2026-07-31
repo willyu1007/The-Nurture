@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/family-care-types.schema.json",
+  "title": "FamilyCareContractTypesV1",
+  "$defs": {
+    "emptyInput": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "protectedPlainText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "protectedTextInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "body"
+      ],
+      "properties": {
+        "body": {
+          "$ref": "#/$defs/protectedPlainText"
+        }
+      }
+    },
+    "authorizedProtectedContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "body"
+      ],
+      "properties": {
+        "body": {
+          "$ref": "#/$defs/protectedPlainText"
+        }
+      }
+    },
+    "roleSafeState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledgementState",
+        "responseState",
+        "lifecycle"
+      ],
+      "properties": {
+        "acknowledgementState": {
+          "enum": [
+            "pending",
+            "acknowledged"
+          ]
+        },
+        "responseState": {
+          "enum": [
+            "awaiting_reply",
+            "responded"
+          ]
+        },
+        "lifecycle": {
+          "enum": [
+            "active",
+            "closed",
+            "suppressed"
+          ]
+        }
+      }
+    },
+    "roleSafeReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptRef",
+        "direction",
+        "logicalStatus",
+        "occurredAt"
+      ],
+      "properties": {
+        "receiptRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "direction": {
+          "enum": [
+            "family_to_org",
+            "org_to_family"
+          ]
+        },
+        "logicalStatus": {
+          "enum": [
+            "pending",
+            "delivered",
+            "read",
+            "acknowledged",
+            "failed",
+            "blocked",
+            "revoked_after_delivery"
+          ]
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enrollmentRef",
+        "sourceLabel",
+        "direction"
+      ],
+      "properties": {
+        "enrollmentRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "sourceLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "direction": {
+          "enum": [
+            "family_to_org",
+            "org_to_family"
+          ]
+        }
+      }
+    },
+    "roleSafeMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "messageRef",
+        "authoredAs",
+        "occurredAt"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "source_question",
+            "caregiver_reply",
+            "correction_notice",
+            "redaction_tombstone"
+          ]
+        },
+        "messageRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "authoredAs": {
+          "enum": [
+            "family",
+            "care_group"
+          ]
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "content": {
+          "$ref": "#/$defs/authorizedProtectedContent"
+        }
+      }
+    },
+    "attention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "active",
+            "resolved",
+            "suppressed"
+          ]
+        },
+        "reasonLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceItemRef",
+        "label"
+      ],
+      "properties": {
+        "sourceItemRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "actionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityKey",
+        "capabilityVersion",
+        "targetOptionRef",
+        "availability"
+      ],
+      "properties": {
+        "capabilityKey": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "targetOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "already_satisfied"
+          ]
+        }
+      }
+    },
+    "actionOutputBase": {
+      "type": "object",
+      "properties": {
+        "effect": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        }
+      }
+    }
+  }
+}

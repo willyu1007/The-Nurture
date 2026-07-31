@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-family-care-item.schema.json",
+  "title": "QueryFamilyCareItemV1",
+  "$defs": {
+    "input": {
+      "$ref": "family-care-types.schema.json#/$defs/emptyInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectionRole",
+        "careItemRef",
+        "provenance",
+        "progress",
+        "messages",
+        "receipts",
+        "actions"
+      ],
+      "properties": {
+        "projectionRole": {
+          "enum": [
+            "guardian",
+            "caregiver"
+          ]
+        },
+        "careItemRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "provenance": {
+          "$ref": "family-care-types.schema.json#/$defs/provenance"
+        },
+        "progress": {
+          "$ref": "family-care-types.schema.json#/$defs/roleSafeState"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "family-care-types.schema.json#/$defs/roleSafeMessage"
+          }
+        },
+        "receipts": {
+          "type": "array",
+          "items": {
+            "$ref": "family-care-types.schema.json#/$defs/roleSafeReceipt"
+          }
+        },
+        "attention": {
+          "$ref": "family-care-types.schema.json#/$defs/attention"
+        },
+        "contextContinuation": {
+          "$ref": "family-care-types.schema.json#/$defs/continuation"
+        },
+        "actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "family-care-types.schema.json#/$defs/actionRef"
+          }
+        }
+      }
+    }
+  }
+}

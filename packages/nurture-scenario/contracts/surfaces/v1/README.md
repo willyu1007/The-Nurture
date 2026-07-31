@@ -9,11 +9,17 @@ six-surface interface contract.
 - Phase 1 defines the interface-ref shape, capability-descriptor shape,
   six-surface registry, atomic surface envelope, visibility matrix and shared
   readiness/snapshot rules.
-- Phase 2 will add typed invocation/result/error sources, concrete capability
-  descriptors, canonicalization, exact interface version/digest, generated
-  manifest and deterministic build/verify tooling.
-- `generated/` is intentionally absent until Phase 2 can produce a
-  non-placeholder exact contract identity.
+- Phase 2 defines typed query/prepare/execute/read-result, error, pagination,
+  private confirmation/cursor bindings, the closed ten-capability V1 registry,
+  stable presenter contracts and versioned policy/repository ports.
+- `generated/surface-contract.manifest.json` is deterministic output. It
+  records the exact `nurture.surface-contract@1.0.0` digest, shared-core hash,
+  canonical source inventory and per-capability/per-surface slice hashes.
+  Git/source revision and build time are qualification provenance and are not
+  stored as semantic digest inputs.
+- `pnpm build:surface-contract` regenerates the checked artifact.
+  `pnpm verify:surface-contract` rebuilds it under `.ai/.tmp/`, compares exact
+  bytes and removes the temporary directory.
 
 These artifacts do not activate a capability, grant authority, publish a
 package or authorize My-Chat adoption. Protected use still requires exact
@@ -26,3 +32,5 @@ owner integration and Joint Conformance.
 - Do not add Prisma, My-Chat runtime, host navigation, component trees, raw
   platform identity or authorization outcomes.
 - Do not hand-create a generated manifest or a mutable `latest` alias.
+- Change normative source first, rotate the interface version for every
+  semantic or additive change, rebuild, then review the generated diff.

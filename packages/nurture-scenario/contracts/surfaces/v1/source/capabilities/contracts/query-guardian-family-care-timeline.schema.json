@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-guardian-family-care-timeline.schema.json",
+  "title": "QueryGuardianFamilyCareTimelineV1",
+  "$defs": {
+    "input": {
+      "$ref": "family-care-types.schema.json#/$defs/emptyInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "itemRef",
+        "careItemRef",
+        "enrollmentRef",
+        "sourceLabel",
+        "occurredAt",
+        "state"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "source_question",
+            "caregiver_reply",
+            "correction_notice",
+            "withdrawal_notice",
+            "redaction_tombstone",
+            "receipt_status"
+          ]
+        },
+        "itemRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "careItemRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "enrollmentRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "sourceLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "content": {
+          "$ref": "family-care-types.schema.json#/$defs/authorizedProtectedContent"
+        },
+        "state": {
+          "$ref": "family-care-types.schema.json#/$defs/roleSafeState"
+        },
+        "receipt": {
+          "$ref": "family-care-types.schema.json#/$defs/roleSafeReceipt"
+        },
+        "contextContinuation": {
+          "$ref": "family-care-types.schema.json#/$defs/continuation"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "admission": "exact_key_version_digest",
+  "versionRange": "forbidden",
+  "latestAlias": "forbidden",
+  "fallback": "forbidden",
+  "semanticChange": "new_version_and_digest",
+  "optionalAdditiveChange": "new_version_and_digest",
+  "sourceRevisionOnlyChange": "preserve_digest_when_canonical_artifacts_unchanged",
+  "sliceInvalidation": {
+    "changedCapabilitySlice": "invalidate_referencing_evidence",
+    "changedSurfaceSlice": "invalidate_referencing_evidence",
+    "additiveNewSlice": "preserve_existing_slice_evidence",
+    "changedSharedCore": "invalidate_all_surface_contract_evidence"
+  },
+  "confirmationIntegrity": {
+    "ordinaryInput": "canonical_hash_allowed",
+    "protectedLowEntropyInput": "secret_keyed_integrity_tag_required",
+    "bareProtectedBodyHash": "forbidden"
+  },
+  "confirmationLifecycle": {
+    "maximumLifetimeSeconds": 300,
+    "extendable": false,
+    "consumption": "single_new_effect",
+    "successfulRetry": "exact_command_execution_replay"
+  }
+}

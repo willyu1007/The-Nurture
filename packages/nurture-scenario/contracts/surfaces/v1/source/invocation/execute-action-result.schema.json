@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/invocation/execute-action-result.schema.json",
+  "title": "ExecuteActionResultV1",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/committed"
+    },
+    {
+      "$ref": "#/$defs/alreadySatisfied"
+    },
+    {
+      "$ref": "#/$defs/outcomeUnknown"
+    }
+  ],
+  "$defs": {
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptRef",
+        "logicalStatus",
+        "occurredAt"
+      ],
+      "properties": {
+        "receiptRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "logicalStatus": {
+          "enum": [
+            "pending",
+            "delivered",
+            "read",
+            "acknowledged",
+            "failed",
+            "blocked",
+            "revoked_after_delivery"
+          ]
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventRef",
+        "eventKey",
+        "eventVersion"
+      ],
+      "properties": {
+        "eventRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "eventKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "eventVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        }
+      }
+    },
+    "invalidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scopeKind",
+        "scopeRef"
+      ],
+      "properties": {
+        "scopeKind": {
+          "enum": [
+            "capability",
+            "surface",
+            "target",
+            "collection",
+            "subject",
+            "care_group",
+            "enrollment",
+            "institution"
+          ]
+        },
+        "scopeRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "completed": {
+      "type": "object",
+      "required": [
+        "contract",
+        "capabilityKey",
+        "capabilityVersion",
+        "status",
+        "commandExecutionRef",
+        "output",
+        "receipts",
+        "events",
+        "invalidations",
+        "replay"
+      ],
+      "properties": {
+        "contract": {
+          "$ref": "../interface/interface-contract-ref.schema.json"
+        },
+        "capabilityKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "status": {
+          "type": "string"
+        },
+        "commandExecutionRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "output": {
+          "type": "object"
+        },
+        "receipts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/receipt"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          }
+        },
+        "invalidations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/invalidation"
+          }
+        },
+        "replay": {
+          "type": "boolean"
+        }
+      }
+    },
+    "committed": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/completed"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contract",
+            "capabilityKey",
+            "capabilityVersion",
+            "status",
+            "commandExecutionRef",
+            "output",
+            "receipts",
+            "events",
+            "invalidations",
+            "replay"
+          ],
+          "properties": {
+            "contract": {
+              "$ref": "../interface/interface-contract-ref.schema.json"
+            },
+            "capabilityKey": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+            },
+            "capabilityVersion": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+            },
+            "status": {
+              "const": "committed"
+            },
+            "commandExecutionRef": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+            },
+            "output": {
+              "type": "object"
+            },
+            "receipts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/receipt"
+              }
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/event"
+              }
+            },
+            "invalidations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/invalidation"
+              }
+            },
+            "replay": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    },
+    "alreadySatisfied": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/completed"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contract",
+            "capabilityKey",
+            "capabilityVersion",
+            "status",
+            "commandExecutionRef",
+            "output",
+            "receipts",
+            "events",
+            "invalidations",
+            "replay"
+          ],
+          "properties": {
+            "contract": {
+              "$ref": "../interface/interface-contract-ref.schema.json"
+            },
+            "capabilityKey": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+            },
+            "capabilityVersion": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+            },
+            "status": {
+              "const": "already_satisfied"
+            },
+            "commandExecutionRef": {
+              "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+            },
+            "output": {
+              "type": "object"
+            },
+            "receipts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/receipt"
+              }
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/event"
+              }
+            },
+            "invalidations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/invalidation"
+              }
+            },
+            "replay": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    },
+    "outcomeUnknown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "capabilityKey",
+        "capabilityVersion",
+        "status",
+        "recoveryRef"
+      ],
+      "properties": {
+        "contract": {
+          "$ref": "../interface/interface-contract-ref.schema.json"
+        },
+        "capabilityKey": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "status": {
+          "const": "outcome_unknown"
+        },
+        "recoveryRef": {
+          "$ref": "../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "canonicalJson": {
+    "encoding": "utf-8",
+    "objectKeys": "lexicographic",
+    "arrayOrder": "semantic",
+    "numbers": "json",
+    "duplicateObjectKeys": "reject"
+  },
+  "rootDigest": {
+    "algorithm": "sha256",
+    "prefix": "sha256:",
+    "inventoryOrder": "path_lexicographic",
+    "generatedManifestIncluded": false,
+    "provenanceIncluded": false
+  },
+  "registryOrdering": [
+    {
+      "path": "capabilities/capability-registry.json",
+      "arrayPointer": "/capabilities",
+      "stableKey": "capabilityKey"
+    },
+    {
+      "path": "interface/port-registry.json",
+      "arrayPointer": "/policies",
+      "stableKey": "key"
+    },
+    {
+      "path": "interface/port-registry.json",
+      "arrayPointer": "/repositories",
+      "stableKey": "key"
+    },
+    {
+      "path": "interface/schema-registry.json",
+      "arrayPointer": "/schemas",
+      "stableKey": "schemaRef"
+    },
+    {
+      "path": "interface/visibility-matrix.json",
+      "arrayPointer": "/surfaces",
+      "stableKey": "surfaceKey"
+    },
+    {
+      "path": "surfaces/presenter-registry.json",
+      "arrayPointer": "/presenters",
+      "stableKey": "surfaceKey"
+    },
+    {
+      "path": "surfaces/surface-registry.json",
+      "arrayPointer": "/surfaces",
+      "stableKey": "surfaceKey"
+    }
+  ],
+  "sharedCorePaths": [
+    "capabilities/capability-descriptor.schema.json",
+    "interface/canonicalization.json",
+    "interface/compatibility-policy.json",
+    "interface/contract-primitives.schema.json",
+    "interface/interface-contract-ref.schema.json",
+    "interface/surface-contract-manifest.schema.json",
+    "interface/surface-rules.json",
+    "invocation/eligibility-result.schema.json",
+    "invocation/confirmation-binding.schema.json",
+    "invocation/cursor-binding.schema.json",
+    "invocation/execute-action-invocation.schema.json",
+    "invocation/execute-action-result.schema.json",
+    "invocation/operation-error.schema.json",
+    "invocation/pagination.schema.json",
+    "invocation/prepare-action-invocation.schema.json",
+    "invocation/prepare-action-result.schema.json",
+    "invocation/query-invocation.schema.json",
+    "invocation/query-result.schema.json",
+    "invocation/read-result-invocation.schema.json",
+    "invocation/read-result.schema.json",
+    "invocation/target-option.schema.json",
+    "surfaces/surface-envelope.schema.json"
+  ],
+  "capabilitySlices": {
+    "registryPath": "capabilities/capability-registry.json",
+    "schemaRegistryPath": "interface/schema-registry.json",
+    "portRegistryPath": "interface/port-registry.json",
+    "schemaRefFields": [
+      "inputSchemaRef",
+      "resultSchemaRef",
+      "errorSchemaRef",
+      "targetPolicy.optionSchemaRef"
+    ],
+    "order": "capability_key_lexicographic"
+  },
+  "surfaceSlices": {
+    "surfaceRegistryPath": "surfaces/surface-registry.json",
+    "presenterRegistryPath": "surfaces/presenter-registry.json",
+    "visibilityMatrixPath": "interface/visibility-matrix.json",
+    "includeAllDataClassOwners": true,
+    "order": "surface_key_lexicographic"
+  }
+}
