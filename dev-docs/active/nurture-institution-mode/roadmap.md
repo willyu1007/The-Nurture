@@ -24,6 +24,135 @@ dependency/source cleanup -> joint conformance sequence is complete for the
 Nurture dependency leg. The overlay does not replace the stricter C30/Pilot
 gates below.
 
+## NestJS ingress M3 execution overlay（2026-07-31）
+
+### Goal and planning context
+
+- Goal: move the bounded P7 binding-owner application path into the compiled,
+  production-intended NestJS scenario service and renew deterministic
+  HTTP/persistence/consumer evidence without changing the owner contract.
+- Runtime mode signal: Default. The user explicitly requested both planning
+  and immediate implementation, so no separate Plan-mode artifact or
+  confirmation turn is required.
+- Repository SSOT: this roadmap plus
+  `12-nestjs-ingress-migration-plan.md` and
+  `14-nestjs-ingress-m3-baseline-inventory.md`.
+- Merge method: set-union. Conflict precedence is latest user instruction,
+  existing T-002 decisions, M3 baseline, then implementation inference.
+- Open questions: none. M3 method/path/body/status compatibility, production
+  Prisma-only composition, exact My-Chat pin and default-off boundaries are
+  already frozen.
+
+### Input trace and merge decisions
+
+| Source | Used for | Decision |
+| --- | --- | --- |
+| User instruction | authorization to plan and implement the complete M3 loop | Execute M3-A → M3-B → M3-C and update evidence in this task. |
+| `12-nestjs-ingress-migration-plan.md` | phase order and migration boundary | Preserve M0–M2 decisions; M4 may interleave only where M3 needs env/CI alignment. |
+| `14-nestjs-ingress-m3-baseline-inventory.md` | blockers, parity bands and test gaps | Close every Must item before marking M3 complete. |
+| Workflow/context contracts | ownership and activation fences | My-Chat identity/runtime stays external; Nurture owns authorizer/repository; no capability or traffic change. |
+
+The only apparent conflict is “field-identical negative cases” versus the M1
+body-safe parser contract. The baseline resolution remains authoritative:
+P7 application outcomes are equivalent, while failures produced before the
+adapter retain the formal shell's safe error bodies.
+
+### Scope and project-structure preview
+
+- Modify:
+  - `packages/nurture-scenario/` for the HTTP-free authorizer port;
+  - `packages/nurture-db/` for the Prisma composition and Guardian reader;
+  - `apps/backend/` to consume the shared composition during the transition;
+  - `apps/scenario-service/` for production composition, controller and tests;
+  - `.github/workflows/ci.yml` and package scripts for deterministic M3-C
+    evidence;
+  - the existing T-002 task documentation and project focus.
+- Add:
+  - shared binding-owner composition modules and explicit runtime build
+    outputs;
+  - table-driven Fastify/Nest application-parity fixtures;
+  - a disposable-PostgreSQL Nest integration population.
+- Delete/rename: only the M2 disabled stub may be replaced; Fastify P7 remains
+  until M5 removes or hard-disables it.
+- Data/storage impact: no schema change. Tests may create only disposable
+  PostgreSQL state and must clean it through the existing test lifecycle.
+- Backward compatibility: unchanged P7 path, request/response fields, status
+  map and exact pinned My-Chat consumer behavior.
+
+### Execution phases
+
+1. **M3-A — runtime and composition seam**
+   - Deliverable: compiled scenario/DB runtime exports, shared authorizer
+     factory/Guardian reader, production Prisma lifecycle and one real optional
+     dependency used by both Guard and Controller.
+   - Exit: typecheck/build/built-process smoke pass; missing token/evidence key
+     stays disabled; no dev-host or My-Chat ORM/runtime import enters the
+     service.
+   - Rollback: revert the M3-A commit; the M2 disabled stub remains the known
+     green state.
+2. **M3-B — controller and application parity**
+   - Deliverable: thin Nest controller, allowlisted request/response adapter,
+     centralized error mapping and shared table-driven Fastify/Nest fixtures.
+   - Exit: every success/domain/unexpected/validation application outcome is
+     status/body equivalent; M1 parser, limit, timeout and log-safety tests
+     remain green.
+   - Rollback: remove the controller wiring and restore the disabled stub while
+     retaining the shared composition code.
+3. **M3-C — real persistence and exact consumer**
+   - Deliverable: disposable-PostgreSQL HTTP journey covering child/family,
+     replay, response loss, conflict, revoke and concurrency, plus exact pinned
+     My-Chat consumer execution and a CI job that preserves sanitized evidence.
+   - Exit: local disposable DB or equivalent isolated runner is green, CI YAML
+     is valid, exact pin checks pass and M3 documentation records commands and
+     counts. If the local Docker daemon remains unavailable, a non-Docker
+     disposable PostgreSQL mechanism or remote CI result is required; the gate
+     is not waived.
+   - Rollback: remove the M3-C test/CI wiring; no persistent environment or
+     migration rollback is involved.
+
+### Verification and acceptance
+
+- Package builds/typechecks: scenario, DB and scenario-service.
+- Unit/application tests: domain/repository tests, complete parity matrix,
+  M1/M2 security regressions and built-process smoke.
+- Persistence tests: production migrations on isolated PostgreSQL, exact
+  replay, divergent replay, response-loss recovery, revoke and authority-lock
+  concurrency through NestJS.
+- Consumer test: My-Chat
+  `f00b86861cf0b751d747c7e0bc5cb86a952900de` HTTP source against the formal
+  ingress.
+- Repository gates: test routing/population, persistence boundaries, schema
+  contract, docs/governance/context lint and `git diff --check`.
+- M3 completion does not itself create Owner Integration Handoff, Joint
+  Conformance, activation, deployment or traffic authority.
+
+### Risks and mitigations
+
+| Risk | Impact | Mitigation / detection | Rollback |
+| --- | --- | --- | --- |
+| Source-only workspace exports fail from built Node | high | Compile explicit runtime outputs and smoke `dist/main.js` before controller work. | Revert M3-A. |
+| DTO/framework defaults change P7 wire behavior | high | Use explicit adapter plus Fastify/Nest table fixtures; keep parser failures in the M1 band. | Restore disabled stub. |
+| Token/evidence-key states partially enable the route | high | Construct one optional authorizer only from valid complete config; guard reads object presence. | Omit composition inputs; route fails closed. |
+| Authority reader accepts soft-deleted rows | high | Add explicit predicates and PostgreSQL regression coverage in the shared reader. | Revert predicate change with M3 unqualified. |
+| DB/consumer test depends on mutable sibling state | high | Checkout/use exact pinned revision and disposable DB only. | Reject evidence; no floating re-pin. |
+
+### Optional detailed documentation layout
+
+The existing T-002 bundle already supplies the full convention:
+
+```text
+dev-docs/active/nurture-institution-mode/
+  roadmap.md
+  00-overview.md
+  01-plan.md
+  02-architecture.md
+  03-implementation-notes.md
+  04-verification.md
+  05-pitfalls.md
+  12-nestjs-ingress-migration-plan.md
+  14-nestjs-ingress-m3-baseline-inventory.md
+```
+
 ## 已确认的关键决策
 
 | 决策点 | 结论 |
