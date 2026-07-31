@@ -207,3 +207,15 @@
 | PII hygiene | PASS | Whitelist walk over every string value plus forbidden-vocabulary scan (`child_id`, `family_id`, `binding_anchor`, `role_assignment`, `prisma`, `workflow_step`, `birth`, component/props). |
 | Unit suite and census | PASS | `pnpm test:unit` 231/231 over 25 files; `pnpm verify:test-routing` unit census 25; `pnpm test:surface-contract-tooling` 0 failures; package `tsc --noEmit` clean. |
 | Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
+
+## 2026-07-31 — P3-1 per-journey initial states
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Deterministic build/rotation | PASS | `pnpm build:surface-contract` rotated to `nurture.surface-contract@1.2.0` / `sha256:2bdbd0be…`; `pnpm verify:surface-contract` rebuilds byte-identically (shared core `sha256:be3da7b9…` unchanged). |
+| Schema compilation and fixture validation | PASS | `pnpm verify:surface-contract-schemas`: 33 schemas compile strictly; world + profile + six journey documents validate; directory/journeyKey parity enforced; closed-item negative rejected (`fixtures=8 negatives=4`). |
+| Journey independence | PASS | `phase-3-journeys.test.ts`: overlay ids journey-prefixed, all `syn-` references resolve to world or own overlay, no cross-journey prefix appears; per-journey narrative preconditions asserted. |
+| Actor/world consistency | PASS | Guardians resolve to family guardianship, caregivers/leads to exact world assignments with matching role, the GJ-5 admin to its overlay assignment on a world institution. |
+| Slice invariance | PASS | Shared-core and all 16 capability/surface slice hashes byte-equal the frozen 1.0.1 baseline while the root digest rotated. |
+| Unit suite and census | PASS | `pnpm test:unit` 237/237 over 26 files; `pnpm verify:test-routing` unit census 26; `pnpm test:surface-contract-tooling` 0 failures; package `tsc --noEmit` clean. |
+| Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |

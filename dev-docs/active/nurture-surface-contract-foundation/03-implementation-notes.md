@@ -426,3 +426,28 @@ the new root ref still requires exact consumer adoption.
   `assert-test-routing.mjs`, contract README.
 - No schema/migration, database, capability, activation, owner-claim or
   traffic change; fixtures are synthetic and contract-local.
+
+## 2026-07-31 P3-1 per-journey initial states
+
+- Added `source/fixtures/journeys/`: `journey-initial-state.schema.json`
+  (strict, cross-referencing the world schema `$defs`) plus six
+  `<gj-1…gj-5|rj-1>/initial-state.json` documents. Each binds the exact
+  `world-v1@1.0.0` ref, declares its actor set and an explicit-empty or
+  journey-scoped overlay (additional participants, institution-admin
+  assignments, additional grants, pre-existing care items).
+- Independence is mechanical: overlay-defined ids must carry the
+  journey prefix (`syn-gj3-…`), every `syn-` reference must resolve to
+  the world or the journey's own overlay, and no document may contain
+  another journey's prefix (`phase-3-journeys.test.ts`). Narrative
+  preconditions are asserted per journey: GJ-1 keeps `c1-ib` ungranted
+  for the refusal leg, GJ-2 holds one acknowledged item, GJ-3 grants
+  the second enrollment for dual-source aggregation, GJ-4 starts from
+  the pre-grant axis, GJ-5 binds exactly one institution admin, RJ-1
+  holds a responded history item plus an open item.
+- The care-item state enum has no `closed` state (care items never
+  close); the validate script's fourth negative proves `closed` fails
+  admission. Interface identity rotated `1.1.0 -> 1.2.0`
+  (`sha256:2bdbd0be…`); shared core and all 16 existing slices remain
+  byte-identical under the frozen-hash guard. Unit census 25 -> 26.
+- No schema/migration, database, capability, activation, owner-claim or
+  traffic change.

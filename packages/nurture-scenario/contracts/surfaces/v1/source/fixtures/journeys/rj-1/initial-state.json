@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "rj-1",
+  "worldRef": { "worldKey": "world-v1", "worldVersion": "1.0.0" },
+  "actorSet": [
+    { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+    { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" }
+  ],
+  "overlay": {
+    "additionalParticipants": [],
+    "institutionAdminAssignments": [],
+    "additionalFamilyCareGrants": [],
+    "preexistingCareItems": [
+      {
+        "itemId": "syn-rj1-item-history",
+        "enrollmentId": "syn-enrollment-c1-ia",
+        "submittedByParticipantId": "syn-guardian-ada",
+        "state": "responded"
+      },
+      {
+        "itemId": "syn-rj1-item-open",
+        "enrollmentId": "syn-enrollment-c1-ia",
+        "submittedByParticipantId": "syn-guardian-ada",
+        "state": "submitted"
+      }
+    ]
+  }
+}

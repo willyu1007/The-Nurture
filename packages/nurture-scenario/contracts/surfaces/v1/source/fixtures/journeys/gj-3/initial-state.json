@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-3",
+  "worldRef": { "worldKey": "world-v1", "worldVersion": "1.0.0" },
+  "actorSet": [
+    { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+    { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+    { "participantId": "syn-caregiver-elio", "actorRole": "caregiver" }
+  ],
+  "overlay": {
+    "additionalParticipants": [],
+    "institutionAdminAssignments": [],
+    "additionalFamilyCareGrants": [
+      {
+        "grantId": "syn-gj3-grant-c1-ib",
+        "enrollmentId": "syn-enrollment-c1-ib",
+        "familyId": "syn-family-f1",
+        "purposeKey": "family_care_interaction",
+        "state": "current"
+      }
+    ],
+    "preexistingCareItems": [
+      {
+        "itemId": "syn-gj3-item-aster",
+        "enrollmentId": "syn-enrollment-c1-ia",
+        "submittedByParticipantId": "syn-guardian-ada",
+        "state": "responded"
+      },
+      {
+        "itemId": "syn-gj3-item-birch",
+        "enrollmentId": "syn-enrollment-c1-ib",
+        "submittedByParticipantId": "syn-guardian-ada",
+        "state": "responded"
+      }
+    ]
+  }
+}

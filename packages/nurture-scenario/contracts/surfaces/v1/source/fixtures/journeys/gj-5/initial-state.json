@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-5",
+  "worldRef": { "worldKey": "world-v1", "worldVersion": "1.0.0" },
+  "actorSet": [
+    { "participantId": "syn-gj5-admin-aster", "actorRole": "institution_admin" },
+    { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+    { "participantId": "syn-caregiver-dana", "actorRole": "lead_caregiver" }
+  ],
+  "overlay": {
+    "additionalParticipants": [
+      {
+        "participantId": "syn-gj5-admin-aster",
+        "displayLabel": "Syn Admin Aster"
+      }
+    ],
+    "institutionAdminAssignments": [
+      {
+        "assignmentId": "syn-gj5-assignment-admin-aster",
+        "participantId": "syn-gj5-admin-aster",
+        "institutionId": "syn-institution-ia"
+      }
+    ],
+    "additionalFamilyCareGrants": [],
+    "preexistingCareItems": []
+  }
+}

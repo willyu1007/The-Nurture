@@ -17,6 +17,9 @@ const artifactPinSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/interface/surface-contract-artifact-pin.schema.json";
 const syntheticWorldSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/world/synthetic-world.schema.json";
+const journeyInitialStateSchemaId =
+  "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-initial-state.schema.json";
+const journeyKeys = ["gj-1", "gj-2", "gj-3", "gj-4", "gj-5", "rj-1"];
 
 const schemaPaths = await collectSchemaPaths(sourceRoot);
 const schemas = await Promise.all(
@@ -71,9 +74,24 @@ await validateSourceDocument(
   path.join(sourceRoot, "fixtures/world/profile-single-institution.json"),
 );
 assertWorldRejectsNonSyntheticLabel(validator, world);
+const initialStates = [];
+for (const journeyKey of journeyKeys) {
+  const initialState = await validateSourceDocument(
+    validator,
+    journeyInitialStateSchemaId,
+    path.join(sourceRoot, `fixtures/journeys/${journeyKey}/initial-state.json`),
+  );
+  if (initialState.journeyKey !== journeyKey) {
+    throw new Error(
+      `fixtures/journeys/${journeyKey}/initial-state.json declares journeyKey ${initialState.journeyKey}`,
+    );
+  }
+  initialStates.push(initialState);
+}
+assertInitialStateRejectsClosedItem(validator, initialStates);
 
 process.stdout.write(
-  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=2 negatives=3\n`,
+  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=8 negatives=4\n`,
 );
 
 async function collectSchemaPaths(directory) {
@@ -147,6 +165,28 @@ function assertWorldRejectsNonSyntheticLabel(ajv, world) {
   if (validate(malformed)) {
     throw new Error(
       "Synthetic world schema accepted a realistic display label",
+    );
+  }
+}
+
+function assertInitialStateRejectsClosedItem(ajv, initialStates) {
+  const validate = ajv.getSchema(journeyInitialStateSchemaId);
+  if (!validate) {
+    throw new Error(`Missing compiled schema ${journeyInitialStateSchemaId}`);
+  }
+  const withItems = initialStates.find(
+    (state) => state.overlay.preexistingCareItems.length > 0,
+  );
+  if (!withItems) {
+    throw new Error("Missing an initial state with pre-existing care items");
+  }
+  const malformed = structuredClone(withItems);
+  // Care items never close; a terminal "closed" lifecycle is not a valid
+  // pre-existing state and must fail schema admission.
+  malformed.overlay.preexistingCareItems[0].state = "closed";
+  if (validate(malformed)) {
+    throw new Error(
+      "Journey initial-state schema accepted a closed care item",
     );
   }
 }

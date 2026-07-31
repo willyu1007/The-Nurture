@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-4",
+  "worldRef": { "worldKey": "world-v1", "worldVersion": "1.0.0" },
+  "actorSet": [
+    { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+    { "participantId": "syn-guardian-bo", "actorRole": "guardian" },
+    { "participantId": "syn-caregiver-dana", "actorRole": "lead_caregiver" }
+  ],
+  "overlay": {
+    "additionalParticipants": [],
+    "institutionAdminAssignments": [],
+    "additionalFamilyCareGrants": [],
+    "preexistingCareItems": []
+  }
+}
