@@ -15,11 +15,14 @@ six-surface interface contract.
 - Phase 3 adds `source/fixtures/` — the versioned PII-free synthetic world
   (`fixtures/world/`) plus one independent, repeatable initial state per
   journey (`fixtures/journeys/<gj-1…gj-5|rj-1>/initial-state.json`), each
-  binding the exact world ref with a journey-prefixed overlay. Fixture files
-  join the canonical inventory and root digest without entering the shared
-  core or any existing capability/surface slice.
+  binding the exact world ref with a journey-prefixed overlay. Journey
+  scripts (`script.json` + `expected/<step>.json`) express one value loop
+  plus one highest-risk refusal per journey using only registry
+  capabilities, contract effects/error codes and role-safe states. Fixture
+  files join the canonical inventory and root digest without entering the
+  shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.2.0` digest, shared-core hash,
+  records the exact `nurture.surface-contract@1.3.0` digest, shared-core hash,
   canonical source inventory and per-capability/per-surface slice hashes.
   `generated/surface-contract.artifact-pin.json` is the separately trusted
   byte-independent canonical hash required before loading that manifest.

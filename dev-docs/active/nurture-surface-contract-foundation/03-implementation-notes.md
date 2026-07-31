@@ -451,3 +451,32 @@ the new root ref still requires exact consumer adoption.
   byte-identical under the frozen-hash guard. Unit census 25 -> 26.
 - No schema/migration, database, capability, activation, owner-claim or
   traffic change.
+
+## 2026-08-01 P3-2 GJ-1 script and frozen snapshot conventions
+
+- Added `journey-script.schema.json` and `journey-expected-view.schema.json`:
+  a script is one value loop (action/view/world-transition steps) plus
+  exactly one refusal (invocation_refused or affordance_absent). Steps
+  carry only registry capability keys, business inputs (`body` /
+  empty / `policyDecisionRef`), contract result effects and the closed
+  operation-error code/retryHint enums; expected views use the
+  role-safe three-axis item state, message kinds and envelope surface
+  states. Grant establish/revoke are `world_transition` steps because
+  Grant lifecycle is not a V1 capability — Phase 3 mints none.
+- Convention freeze (GJ-1): created refs are declared as
+  journey-prefixed `createsAliases`; pre-existing items imply
+  `<itemId>-msg-question` / `-msg-reply` aliases; every
+  `expected/<step>.json` must be referenced by exactly one step and
+  carries journeyKey/stepKey parity; refusal proves fail-closed with a
+  post-condition view (`needs_setup`, zero affordances, no partial
+  write).
+- GJ-1 lands the full loop: submit → caregiver work view → acknowledge
+  → reply → guardian timeline (messages `source_question` +
+  `caregiver_reply`, attention resolved), refusal on the pre-grant
+  enrollment (`not_authorized`/`setup`). `phase-3-scripts.test.ts`
+  auto-discovers scripted journeys and enforces actor/capability/
+  target/input/effect/alias/view consistency, so the remaining five
+  journeys reuse it unchanged. Identity `1.2.0 -> 1.3.0`
+  (`sha256:dd6140be…`); slices/shared core remain byte-stable. Unit
+  census 26 -> 27; validate script now checks scripts/views for the
+  scripted journey list (`fixtures=12 negatives=5`).

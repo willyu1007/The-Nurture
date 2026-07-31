@@ -219,3 +219,14 @@
 | Slice invariance | PASS | Shared-core and all 16 capability/surface slice hashes byte-equal the frozen 1.0.1 baseline while the root digest rotated. |
 | Unit suite and census | PASS | `pnpm test:unit` 237/237 over 26 files; `pnpm verify:test-routing` unit census 26; `pnpm test:surface-contract-tooling` 0 failures; package `tsc --noEmit` clean. |
 | Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
+
+## 2026-08-01 — P3-2 GJ-1 script conventions
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Deterministic build/rotation | PASS | `pnpm build:surface-contract` rotated to `nurture.surface-contract@1.3.0` / `sha256:dd6140be…`; `pnpm verify:surface-contract` rebuilds byte-identically; shared core `sha256:be3da7b9…` unchanged. |
+| Schema compilation and fixture validation | PASS | `pnpm verify:surface-contract-schemas`: 35 schemas strict-compile; GJ-1 script + 3 expected views validate with reference-set parity (no missing/orphan views); unknown-error-code negative rejected (`fixtures=12 negatives=5`). |
+| Script consistency | PASS | `phase-3-scripts.test.ts`: actors resolve to the journey actor set (policy actor only for policy redaction), capability/target/input/effect shapes match the contract, aliases journey-prefixed and resolvable, views bound to steps with surface/role consistency, whitelist + forbidden-vocabulary scans. |
+| Slice invariance | PASS | Shared-core and all 16 capability/surface slice hashes remain byte-equal to the frozen baseline while the root digest rotated. |
+| Unit suite and census | PASS | `pnpm test:unit` 242/242 over 27 files; `pnpm verify:test-routing` unit census 27; tooling tests 0 failures; package `tsc --noEmit` clean. |
+| Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |

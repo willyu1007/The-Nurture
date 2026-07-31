@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-1",
+  "valueLoop": [
+    {
+      "stepKey": "submit-question",
+      "kind": "action",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "capabilityKey": "submit_family_care_question",
+      "target": { "enrollmentId": "syn-enrollment-c1-ia" },
+      "input": { "body": "Syn Question About Rest" },
+      "expected": { "effect": "question_created" },
+      "createsAliases": {
+        "careItemRef": "syn-gj1-item-question",
+        "messageRef": "syn-gj1-msg-question",
+        "receiptRef": "syn-gj1-receipt-submit"
+      }
+    },
+    {
+      "stepKey": "view-caregiver-work",
+      "kind": "view",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "surfaceKey": "caregiver_teacher_board",
+      "capabilityKey": "query_caregiver_family_care_work",
+      "expectedViewRef": "expected/view-caregiver-work.json"
+    },
+    {
+      "stepKey": "acknowledge-question",
+      "kind": "action",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "capabilityKey": "acknowledge_family_care_item",
+      "target": { "careItemRef": "syn-gj1-item-question" },
+      "input": {},
+      "expected": { "effect": "acknowledged" },
+      "createsAliases": { "receiptRef": "syn-gj1-receipt-acknowledge" }
+    },
+    {
+      "stepKey": "reply-question",
+      "kind": "action",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "capabilityKey": "reply_family_care_item",
+      "target": { "careItemRef": "syn-gj1-item-question" },
+      "input": { "body": "Syn Reply About Rest" },
+      "expected": { "effect": "reply_appended" },
+      "createsAliases": {
+        "messageRef": "syn-gj1-msg-reply",
+        "receiptRef": "syn-gj1-receipt-reply"
+      }
+    },
+    {
+      "stepKey": "view-guardian-timeline",
+      "kind": "view",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "capabilityKey": "query_guardian_family_care_timeline",
+      "expectedViewRef": "expected/view-guardian-timeline.json"
+    }
+  ],
+  "refusal": {
+    "stepKey": "refuse-pregrant-submit",
+    "kind": "invocation_refused",
+    "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+    "capabilityKey": "submit_family_care_question",
+    "target": { "enrollmentId": "syn-enrollment-c1-ib" },
+    "input": { "body": "Syn Question About Rest" },
+    "expectedError": { "code": "not_authorized", "retryHint": "setup" },
+    "postConditionViewRef": "expected/view-refusal-workspace.json"
+  }
+}

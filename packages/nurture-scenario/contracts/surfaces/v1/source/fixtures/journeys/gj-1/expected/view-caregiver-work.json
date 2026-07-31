@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "journeyKey": "gj-1",
+  "stepKey": "view-caregiver-work",
+  "surfaceKey": "caregiver_teacher_board",
+  "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+  "surfaceState": "ready",
+  "careItems": [
+    {
+      "itemRef": "syn-gj1-item-question",
+      "enrollmentRef": "syn-enrollment-c1-ia",
+      "acknowledgementState": "pending",
+      "responseState": "awaiting_reply",
+      "lifecycle": "active",
+      "attentionState": "active",
+      "messages": [{ "kind": "source_question" }]
+    }
+  ],
+  "writeActionKeys": [
+    "acknowledge_family_care_item",
+    "reply_family_care_item"
+  ]
+}

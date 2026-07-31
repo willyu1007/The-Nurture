@@ -7,11 +7,11 @@
 - Milestone / Feature: M-002 / F-003
 - Phase: Phase 0 discovery/gate reconciliation, Phase 1 normative surface
   source, Phase 2 exact typed contract/interface identity and Phase 2 quality
-  closure complete; Phase 3 in progress — P3-0 world source freeze and P3-1
-  per-journey initial states complete, P3-2 journey scripts next.
-- Updated: 2026-07-31
-- Next step: 实施 P3-2 Journey scripts（每条一个价值闭环 + 一条最高风险拒绝，
-  GJ-1 先落地并冻结快照约定），随后 P3-3 selection fixtures、P3-4 fixture
+  closure complete; Phase 3 in progress — P3-0/P3-1 complete, P3-2 GJ-1
+  script conventions frozen; the remaining five journey scripts are next.
+- Updated: 2026-08-01
+- Next step: 完成 P3-2 其余五条 Journey scripts（GJ-2～GJ-5、RJ-1，复用已冻结
+  的 GJ-1 快照约定），随后 P3-3 selection fixtures、P3-4 fixture
   manifest/canonicalization；随后进入 Phase 4 synthetic qualification。不得把
   synthetic PASS 写成 owner-integration PASS。执行拆解（P3-0～P3-4 与边界规
   则）见
@@ -20,9 +20,9 @@
   `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO；
   pin-advance decision input 见 T-002
   `15-mychat-drift-census-pin-advance-input.md`。
-  P3-1 后 current exact interface 为
-  `nurture.surface-contract@1.2.0` /
-  `sha256:2bdbd0bec6a4d4637607de0316633141f6d7889a32398f1520768b5c292b4cfa`；
+  GJ-1 落地后 current exact interface 为
+  `nurture.surface-contract@1.3.0` /
+  `sha256:dd6140bec965ca360cc039887e62288308febf94b3f6ed4f74bb99a1395842f2`；
   shared core 与全部既有 capability/surface slice hash 与 1.0.1 基线字节一致
   （由 `phase-3-world.test.ts` 机械守卫）。dependency evidence 仍在比较前严格
   校验；generated manifest 必须匹配独立可信 artifact pin。所有 protected

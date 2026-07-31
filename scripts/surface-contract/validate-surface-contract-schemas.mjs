@@ -19,7 +19,12 @@ const syntheticWorldSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/world/synthetic-world.schema.json";
 const journeyInitialStateSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-initial-state.schema.json";
+const journeyScriptSchemaId =
+  "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-script.schema.json";
+const journeyExpectedViewSchemaId =
+  "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-expected-view.schema.json";
 const journeyKeys = ["gj-1", "gj-2", "gj-3", "gj-4", "gj-5", "rj-1"];
+const scriptedJourneyKeys = ["gj-1"];
 
 const schemaPaths = await collectSchemaPaths(sourceRoot);
 const schemas = await Promise.all(
@@ -89,9 +94,63 @@ for (const journeyKey of journeyKeys) {
   initialStates.push(initialState);
 }
 assertInitialStateRejectsClosedItem(validator, initialStates);
+let scriptCount = 0;
+let expectedViewCount = 0;
+let firstScript;
+for (const journeyKey of scriptedJourneyKeys) {
+  const journeyRoot = path.join(sourceRoot, `fixtures/journeys/${journeyKey}`);
+  const script = await validateSourceDocument(
+    validator,
+    journeyScriptSchemaId,
+    path.join(journeyRoot, "script.json"),
+  );
+  if (script.journeyKey !== journeyKey) {
+    throw new Error(
+      `fixtures/journeys/${journeyKey}/script.json declares journeyKey ${script.journeyKey}`,
+    );
+  }
+  firstScript ??= script;
+  scriptCount += 1;
+  const referencedViews = new Set(
+    [
+      ...script.valueLoop.map((step) => step.expectedViewRef),
+      script.refusal.expectedViewRef,
+      script.refusal.postConditionViewRef,
+    ].filter((ref) => typeof ref === "string"),
+  );
+  const expectedDirectory = path.join(journeyRoot, "expected");
+  const expectedEntries = (await readdir(expectedDirectory)).sort();
+  const presentViews = new Set(
+    expectedEntries.map((name) => `expected/${name}`),
+  );
+  for (const ref of referencedViews) {
+    if (!presentViews.has(ref)) {
+      throw new Error(`${journeyKey} script references missing ${ref}`);
+    }
+  }
+  for (const present of presentViews) {
+    if (!referencedViews.has(present)) {
+      throw new Error(`${journeyKey} has an unreferenced ${present}`);
+    }
+  }
+  for (const entry of expectedEntries) {
+    const view = await validateSourceDocument(
+      validator,
+      journeyExpectedViewSchemaId,
+      path.join(expectedDirectory, entry),
+    );
+    if (view.journeyKey !== journeyKey) {
+      throw new Error(
+        `fixtures/journeys/${journeyKey}/expected/${entry} declares journeyKey ${view.journeyKey}`,
+      );
+    }
+    expectedViewCount += 1;
+  }
+}
+assertScriptRejectsUnknownErrorCode(validator, firstScript);
 
 process.stdout.write(
-  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=8 negatives=4\n`,
+  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=${8 + scriptCount + expectedViewCount} negatives=5\n`,
 );
 
 async function collectSchemaPaths(directory) {
@@ -188,6 +247,23 @@ function assertInitialStateRejectsClosedItem(ajv, initialStates) {
     throw new Error(
       "Journey initial-state schema accepted a closed care item",
     );
+  }
+}
+
+function assertScriptRejectsUnknownErrorCode(ajv, script) {
+  if (!script) throw new Error("Missing a journey script for the negative check");
+  const validate = ajv.getSchema(journeyScriptSchemaId);
+  if (!validate) {
+    throw new Error(`Missing compiled schema ${journeyScriptSchemaId}`);
+  }
+  const malformed = structuredClone(script);
+  if (malformed.refusal.kind !== "invocation_refused") {
+    throw new Error("Negative check expects an invocation refusal");
+  }
+  // Refusal outcomes must stay inside the closed operation-error code enum.
+  malformed.refusal.expectedError.code = "granted";
+  if (validate(malformed)) {
+    throw new Error("Journey script schema accepted an unknown error code");
   }
 }
 

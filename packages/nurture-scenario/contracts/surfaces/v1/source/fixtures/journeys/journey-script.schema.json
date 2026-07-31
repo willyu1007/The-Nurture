@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-script.schema.json",
+  "title": "JourneyScriptV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "journeyKey", "valueLoop", "refusal"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "journeyKey": {
+      "$ref": "journey-initial-state.schema.json#/$defs/journeyKey"
+    },
+    "valueLoop": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/actionStep" },
+          { "$ref": "#/$defs/viewStep" },
+          { "$ref": "#/$defs/transitionStep" }
+        ]
+      }
+    },
+    "refusal": {
+      "oneOf": [
+        { "$ref": "#/$defs/invocationRefusal" },
+        { "$ref": "#/$defs/affordanceAbsentRefusal" }
+      ]
+    }
+  },
+  "$defs": {
+    "stepKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "principalActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["participantId", "actorRole"],
+      "properties": {
+        "participantId": {
+          "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+        },
+        "actorRole": {
+          "enum": ["guardian", "caregiver", "lead_caregiver", "institution_admin"]
+        }
+      }
+    },
+    "policyActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actorRole"],
+      "properties": {
+        "actorRole": { "const": "system_policy" }
+      }
+    },
+    "actor": {
+      "oneOf": [
+        { "$ref": "#/$defs/principalActor" },
+        { "$ref": "#/$defs/policyActor" }
+      ]
+    },
+    "target": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enrollmentId"],
+          "properties": {
+            "enrollmentId": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["careItemRef"],
+          "properties": {
+            "careItemRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["messageRef"],
+          "properties": {
+            "messageRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            }
+          }
+        }
+      ]
+    },
+    "actionCapabilityKey": {
+      "enum": [
+        "submit_family_care_question",
+        "acknowledge_family_care_item",
+        "reply_family_care_item",
+        "correct_family_care_message",
+        "withdraw_family_care_request",
+        "redact_family_care_message",
+        "policy_redact_family_care_message"
+      ]
+    },
+    "queryCapabilityKey": {
+      "enum": [
+        "query_guardian_family_care_timeline",
+        "query_caregiver_family_care_work",
+        "query_family_care_item"
+      ]
+    },
+    "surfaceKey": {
+      "enum": [
+        "guardian_nurture_chat",
+        "guardian_family_board",
+        "caregiver_nurture_chat",
+        "caregiver_teacher_board",
+        "institution_board",
+        "institution_workbench"
+      ]
+    },
+    "effect": {
+      "enum": [
+        "question_created",
+        "acknowledged",
+        "already_satisfied",
+        "reply_appended",
+        "request_withdrawn",
+        "correction_appended",
+        "content_redacted",
+        "policy_content_redacted"
+      ]
+    },
+    "errorCode": {
+      "enum": [
+        "contract_mismatch",
+        "invalid_request",
+        "not_authorized",
+        "dependency_no_go",
+        "target_unavailable",
+        "stale",
+        "idempotency_conflict",
+        "confirmation_expired",
+        "outcome_unknown",
+        "refresh_required",
+        "rebase_required"
+      ]
+    },
+    "retryHint": {
+      "enum": [
+        "retry",
+        "reprepare",
+        "refresh",
+        "rebase",
+        "setup",
+        "required_upgrade",
+        "contact_admin",
+        "reconcile",
+        "none"
+      ]
+    },
+    "expectedViewRef": {
+      "type": "string",
+      "pattern": "^expected/[a-z0-9]+(?:-[a-z0-9]+)*\\.json$"
+    },
+    "actionStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepKey", "kind", "actor", "capabilityKey", "target", "input", "expected"],
+      "properties": {
+        "stepKey": { "$ref": "#/$defs/stepKey" },
+        "kind": { "const": "action" },
+        "actor": { "$ref": "#/$defs/actor" },
+        "capabilityKey": { "$ref": "#/$defs/actionCapabilityKey" },
+        "target": { "$ref": "#/$defs/target" },
+        "input": { "type": "object" },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["effect"],
+          "properties": {
+            "effect": { "$ref": "#/$defs/effect" }
+          }
+        },
+        "createsAliases": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "careItemRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            },
+            "messageRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            },
+            "receiptRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            },
+            "correctionRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            },
+            "tombstoneRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            },
+            "auditEventRef": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            }
+          }
+        }
+      }
+    },
+    "viewStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepKey", "kind", "actor", "surfaceKey", "expectedViewRef"],
+      "properties": {
+        "stepKey": { "$ref": "#/$defs/stepKey" },
+        "kind": { "const": "view" },
+        "actor": { "$ref": "#/$defs/principalActor" },
+        "surfaceKey": { "$ref": "#/$defs/surfaceKey" },
+        "capabilityKey": { "$ref": "#/$defs/queryCapabilityKey" },
+        "expectedViewRef": { "$ref": "#/$defs/expectedViewRef" }
+      }
+    },
+    "transitionStep": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stepKey", "kind", "transitionKey", "grant"],
+          "properties": {
+            "stepKey": { "$ref": "#/$defs/stepKey" },
+            "kind": { "const": "world_transition" },
+            "transitionKey": { "const": "establish_family_care_grant" },
+            "grant": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/familyCareGrant"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stepKey", "kind", "transitionKey", "revokedGrantId"],
+          "properties": {
+            "stepKey": { "$ref": "#/$defs/stepKey" },
+            "kind": { "const": "world_transition" },
+            "transitionKey": { "const": "revoke_family_care_grant" },
+            "revokedGrantId": {
+              "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
+            }
+          }
+        }
+      ]
+    },
+    "invocationRefusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepKey", "kind", "actor", "capabilityKey", "target", "input", "expectedError"],
+      "properties": {
+        "stepKey": { "$ref": "#/$defs/stepKey" },
+        "kind": { "const": "invocation_refused" },
+        "actor": { "$ref": "#/$defs/actor" },
+        "capabilityKey": {
+          "oneOf": [
+            { "$ref": "#/$defs/actionCapabilityKey" },
+            { "$ref": "#/$defs/queryCapabilityKey" }
+          ]
+        },
+        "target": { "$ref": "#/$defs/target" },
+        "input": { "type": "object" },
+        "expectedError": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "retryHint"],
+          "properties": {
+            "code": { "$ref": "#/$defs/errorCode" },
+            "retryHint": { "$ref": "#/$defs/retryHint" }
+          }
+        },
+        "postConditionViewRef": { "$ref": "#/$defs/expectedViewRef" }
+      }
+    },
+    "affordanceAbsentRefusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepKey", "kind", "actor", "surfaceKey", "expectedViewRef"],
+      "properties": {
+        "stepKey": { "$ref": "#/$defs/stepKey" },
+        "kind": { "const": "affordance_absent" },
+        "actor": { "$ref": "#/$defs/principalActor" },
+        "surfaceKey": { "$ref": "#/$defs/surfaceKey" },
+        "expectedViewRef": { "$ref": "#/$defs/expectedViewRef" }
+      }
+    }
+  }
+}
