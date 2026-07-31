@@ -3,15 +3,15 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0/M1/M2/M3（complete；M4 governance alignment next）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0/M1/M2/M3/M4（complete；M5 handoff regeneration pending）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-31
 - **Owner:** willyu1007
-- Next step: Execute NestJS ingress M4 governance alignment in
-  [`12-nestjs-ingress-migration-plan.md`](./12-nestjs-ingress-migration-plan.md):
-  publish the implemented owner route into the API context, reconcile the env
-  contract and M0 port decision, then close the remaining governance hygiene
-  before M5 regenerates the Owner Integration Handoff.
+- Next step: Hold T-002 at the M4-complete boundary while the controlled
+  single mainline returns to T-004 Phase 1-2 and creates the exact Surface
+  Contract Artifact Set. Then resume T-002 M5 to regenerate the Owner
+  Integration Handoff, renew its exact source/privacy/false-empty evidence and
+  remove or hard-disable the Fastify P7 route.
 - Current gate: The current dependency pin remains My-Chat `f00b868`; the
   Nurture self-pin now covers the 40-path / 53-file formal-ingress source
   population at `94a96443...a5d860`. All consumers remain default-disabled.

@@ -582,9 +582,9 @@ revision `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
 | Replace Base web-workbench local link | Complete | Frontend consumes published exact `@willyu1007/web-workbench@0.7.0`; the Base template build/install steps are removed; frozen install, typecheck, lint, unit tests, and strict scan pass. |
 | Remove direct sibling-source import | Complete | X5 imports only My-Chat public package exports, including the new worker subpath; the exact X5 source set is revision- and content-pinned; `ECO-CONSUMER-004` is absent. |
 | Re-pin and migrate My-Chat workflow packages | Base public-SSOT re-pin verifying | T-002 pins My-Chat `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336` and Base `63d47d2ebc6f5062181b721a25182710f7974b17`, migrates all shared references to canonical-ref schema v1, adds the forward data/constraint migration, builds the pinned contract package in clean CI jobs, and passes native pin, typecheck, 175-unit, migration-replay, persistence, and strict consumer-boundary gates. Historical coordinator run `30343562287` passed the prior exact Base/Nurture revisions; renewed native and four-repository cloud evidence is required for the public publishing SSOT revision. |
-| Resolve service-framework timing | In progress — M0/M1/M2/M3 complete | The formal NestJS scenario-service builds, starts and executes the frozen P7 controller through shared compiled composition, disabled-first service auth and production Prisma. Application parity, exact consumer, replay/recovery/revoke/privacy and lock-concurrency evidence are green on disposable PostgreSQL. M4 governance alignment and M5 handoff regeneration remain; the Fastify harness is not promoted. |
-| Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. Owned by M0/M4 of `12-nestjs-ingress-migration-plan.md`. |
-| Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. Owned by M4 of `12-nestjs-ingress-migration-plan.md`. |
+| Resolve service-framework timing | In progress — M0/M1/M2/M3/M4 complete | The formal NestJS scenario-service builds, starts and executes the frozen P7 controller through shared compiled composition, disabled-first service auth and production Prisma. Application parity, exact consumer, replay/recovery/revoke/privacy and lock-concurrency evidence are green on disposable PostgreSQL. API/env/port governance is aligned; M5 handoff regeneration and Fastify route disposition remain. |
+| Adopt Nurture ports | Complete | `PORT=8000` is scenario-service-only, the dev-host uses dev-only `DEV_HOST_PORT=3001`, the Base-assigned local backend/frontend pair is `3200/3201`, and code/env/docs/tests share one mechanical topology check. |
+| Repair API/governance drift | Complete | OpenAPI and generated API index now describe exactly the formal health plus binding-owner routes; CI verifies OpenAPI quality, index freshness, source parity, env validation and topology. |
 
 Ordering through dependency/source cleanup and native consumer verification is
 complete. Four-repository qualification closed the N3 federated gate for the
@@ -592,9 +592,10 @@ prior exact revisions. A subsequent native-cloud run proved public package
 resolution, and run `30347782865` closed all functional and action-runtime
 findings with zero annotations. Base then aligned its hashed publishing
 manifest to the irreversible public visibility; Nurture has adopted that exact
-revision/hash and awaits renewed native/federated cloud evidence. The next
-accepted work remains the independently
-reviewable framework, port, API-index, and governance items. No
+revision/hash and awaits renewed native/federated cloud evidence. The bounded
+framework and M4 governance work is complete. The controlled mainline now
+returns to T-004 Phase 1-2 before T-002 M5 regenerates the exact Owner
+Integration Handoff. No
 shared/staging/production database apply, artifact publication, environment
 mutation, activation, provider, or traffic is authorized by the 2026-07-28
 increment.

@@ -65,8 +65,9 @@ binding-owner Receipt 与 persistent business Execution/Receipt 不得合并。
 当前 Fastify dev-host 只可产生 provisional Owner Integration Readiness evidence。
 最终 G1 Joint Conformance 必须经 production-intended NestJS scenario-service
 ingress，完成 formal route/API index、service-auth middleware、size/timeout/error
-boundary、env/default-off contract、no-secret denial、`PORT=8000`、backend `3001`
-和 Base `3200/3201` 端口对齐，以及 clean install/build/start/health/contract tests。
+boundary、env/default-off contract、no-secret denial、scenario-service
+`PORT=8000`、dev-host `DEV_HOST_PORT=3001` 和 Base `3200/3201` 端口对齐，
+以及 clean install/build/start/health/contract tests。
 Owner Integration Handoff 还必须包含 exact pins、disposable PostgreSQL
 binding/revoke/concurrency/replay/response-loss、privacy scan 和 final false/empty。
 任何 owner pin/source/ingress drift 使该 handoff 与下游 Joint Conformance 失效。
@@ -291,11 +292,12 @@ T-002 adopts the ecosystem boundary published by My-Workflow-Base revision
 - The current Fastify application remains a local/test harness. The repository
   requirement is still a NestJS scenario service; `RB-6` and `DB-4(b)` own the
   replacement decision and timing before any pilot-runtime claim.
-- Base allocates Nurture backend/frontend ports `3200/3201`. `ST-2` must align
-  the env contract, backend listener, frontend default, documentation, and
-  tests; no compatibility alias is assumed.
-- `ST-4(c)` must make the API index describe the implemented owner surface
-  without turning the index into a second contract or authorization source.
+- Base allocates Nurture backend/frontend ports `3200/3201`. `ST-2` is closed:
+  the env contract, listeners, frontend defaults, documentation and dedicated
+  topology test now agree; no compatibility alias is assumed.
+- `ST-4(c)` is closed: the generated API index describes exactly the
+  implemented health and binding-owner surface, while source/OpenAPI/index
+  parity is checked in CI and the index remains non-authoritative.
 
 M0 resolves the port roles without adding an application alias:
 
@@ -312,6 +314,22 @@ The formal ingress v1 route set is only `/health` plus
 `user_attention` resolver and T-001 workflow harness routes remain outside
 that service. Full rationale and the G1-03 satisfied/deferred census live in
 `13-nestjs-ingress-m0-decision-record.md`.
+
+M4 materializes the topology and API governance without changing the frozen
+wire behavior:
+
+- `env/contract.yaml` keeps `PORT=8000` for scenario-service and adds dev-only
+  `DEV_HOST_PORT=3001` plus
+  `NURTURE_BACKEND_URL=http://localhost:3200`;
+- the Fastify harness reads only `DEV_HOST_PORT`, the frontend listens on
+  `3201` and targets the Base-assigned `3200` endpoint;
+- `docs/context/api/openapi.yaml` is the formal API contract and generated
+  API-index artifacts expose exactly two routes;
+- `assert-port-topology.mjs` and
+  `assert-formal-ingress-contract.mjs` mechanically fence future drift.
+
+These values describe local topology only. They are not contract fields,
+additional listeners, deployment bindings or activation authority.
 
 M1 materializes that boundary as a new `apps/scenario-service` NestJS
 application without importing My-Chat runtime or ORM source:
@@ -402,9 +420,12 @@ identity:
   fails the boundary job.
 
 The accepted subset closes the Nurture leg of `X-2`, `RB-2`, and `RB-3(a)`.
-The accepted subset does not close `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, or
-`ST-6(b)`, and the accepted subset does not authorize a
-pilot runtime or release.
+At that historical acceptance checkpoint, the subset did not close `RB-6`,
+`DB-4(b)`, `ST-2`, `ST-4(c)`, or `ST-6(b)`. M3 later closes the formal-service
+implementation portion of `RB-6`/`DB-4(b)`, and M4 closes
+`ST-2`/`ST-4(c)`/`ST-6(b)`. The complete ingress migration remains open through
+M5 handoff regeneration and Fastify route disposition; none of these
+checkpoints authorizes a pilot runtime or release.
 
 ## 0.2 Pilot-0-D deployment projection
 

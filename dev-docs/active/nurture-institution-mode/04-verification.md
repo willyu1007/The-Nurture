@@ -11,10 +11,10 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-31
-- Current phase: NestJS ingress M0-M3 and the post-implementation quality audit
-  are complete and default-deny. M4 API/env/port governance is the next serial
-  slice; M5 Owner Integration Handoff regeneration and Joint Conformance remain
-  later gates. Cross-repository implementation readiness is still held on the
+- Current phase: NestJS ingress M0-M4 and the post-implementation quality audit
+  are complete and default-deny. The controlled mainline returns to T-004
+  Phase 1-2; M5 Owner Integration Handoff regeneration and Joint Conformance
+  remain later gates. Cross-repository implementation readiness is still held on the
   remaining Base/My-Chat owner inputs. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
@@ -1280,3 +1280,19 @@ the rejected checkpoint and are historical.
 | Exact Nurture self-pin | PASS | The 40-path / 53-file formal-ingress population verifies at `94a964435852bce080871586fe3a9e86393db1d622d86b5ee64ac2fc20a5d860`. |
 | Documentation consistency | PASS | Current status no longer claims that production authority wiring is absent; historical `OPEN`/environment-gated rows are explicitly point-in-time, and current M4/M5/Joint Conformance gates remain unchanged. |
 | Cleanup/effect boundary | PASS | The uniquely named quality-review database was removed. No schema/migration, persistent database, external repository, secret, capability, deployment, activation or traffic changed. |
+
+## 2026-07-31 — NestJS ingress M4 API/env/port governance closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Env SSOT and evidence | PASS | `env/contract.yaml` owns the formal-service, dev-host and local backend URL keys; generated example, environment documentation, context contract and the five required change artifacts are synchronized. |
+| Env contract validation/generation | PASS | `ctl-env-contract validate`, generated-artifact refresh and context verification complete without drift. |
+| Formal API quality and generated index | PASS | Strict OpenAPI quality and API-index freshness pass for exactly two routes. The OpenAPI checksum begins `cf613e19`. |
+| Formal ingress source/contract parity | PASS AFTER REPAIR | The permanent assertion proves exact method/path parity and all eight required binding-owner request fields while preserving P7-compatible unknown-field handling. |
+| Port topology | PASS AFTER REPAIR | The permanent assertion proves scenario `8000`, dev host `3001`, local backend `3200` and frontend `3201`; the development template now consumes the declared `NURTURE_BACKEND_URL` instead of the stale undeclared key. |
+| Dev-host startup guard | PASS AFTER REPAIR | The pure startup-guard file passes 3/3 cases for loopback, environment restrictions and port validation; test routing reports 46 files with 11 dev-host files. |
+| Static verification | PASS | Scenario-service direct TypeScript check plus frontend typecheck and lint pass. |
+| Public contract suites | PASS | Environment and API-index public suites pass. |
+| Context/governance/whitespace | PASS | Strict context verification, governance lint and `git diff --check` pass. |
+| Build-aware full regression | NOT RUN / UNCHANGED | Direct package Vitest was intentionally not accepted as evidence because it bypasses the official compiled-runtime dependency hook. The build-aware CI jobs remain authoritative; this M4 slice does not alter runtime package composition. |
+| Effect boundary | PASS | No build, schema/migration, persistent database, external repository, secret value, capability, deployment, activation or traffic action was performed. |

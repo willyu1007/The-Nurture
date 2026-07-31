@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const BACKEND = process.env.NURTURE_BACKEND_URL ?? "http://localhost:3001";
+const BACKEND = process.env.NURTURE_BACKEND_URL ?? "http://localhost:3200";
 const WORKSPACE_PARENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
 const config: NextConfig = {

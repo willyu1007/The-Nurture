@@ -1,6 +1,7 @@
-// Typed client for the dev host (apps/backend). Server components call BACKEND
-// directly; client code uses relative paths proxied by next.config rewrites.
-const BACKEND = process.env.NURTURE_BACKEND_URL ?? "http://localhost:3001";
+// Typed client for the Base-assigned local Nurture backend endpoint. Server
+// components call BACKEND directly; client code uses relative paths proxied by
+// next.config rewrites.
+const BACKEND = process.env.NURTURE_BACKEND_URL ?? "http://localhost:3200";
 
 export const DEFAULT_WORKSPACE = "ws-dev";
 

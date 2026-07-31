@@ -1862,3 +1862,30 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: runtime builds must start from an empty package-local output
   directory, and smoke/packaging review must inspect the emitted file set rather
   than assuming source deletion removes old artifacts.
+
+### 2026-07-31 — Direct Vitest bypassed compiled workspace prerequisites
+
+- Symptom: a direct scenario-service Vitest invocation passed three files but
+  failed to load four suites whose workspace subpaths are compiled by the
+  package's official pre-test hook. A filtered dev-host startup test also
+  loaded unrelated database/parity dependencies because it shared their file.
+- Root cause: invoking Vitest directly bypassed the build-aware package script,
+  while colocating pure startup guards with integration tests widened the
+  module graph.
+- Fix: move loopback/environment/port startup guards into a dependency-light
+  file and verify it independently; retain the full build-aware populations in
+  their official CI jobs.
+- Prevention: do not claim a direct Vitest command as full regression evidence
+  when package scripts own prerequisite compilation. Keep pure configuration
+  tests separate from database or cross-package integration modules.
+
+### 2026-07-31 — Env validation did not inspect a separate runtime template
+
+- Symptom: the env contract declared `NURTURE_BACKEND_URL`, but the development
+  runtime template initially still expanded the old undeclared `API_BASE_URL`.
+- Root cause: env SSOT validation covers contract values and generated
+  artifacts, not every independently maintained consumer template.
+- Fix: update the template to the declared key and add a repository assertion
+  covering the complete `8000/3001/3200/3201` topology and consumer variables.
+- Prevention: every port or URL-key change must run both env-contract
+  validation and the consumer-level topology assertion.

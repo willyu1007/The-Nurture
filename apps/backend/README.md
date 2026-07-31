@@ -10,3 +10,8 @@ Persistence is deliberately split:
 The dev-host schema is never a production deployment target and must not be copied into the root Prisma schema. Real host runtime ownership remains in My-Chat.
 
 The executable is intentionally local-only: it binds to `127.0.0.1` and refuses to start unless `APP_ENV` is `dev` or `test`. It has no production authentication boundary and must never be exposed through a shared ingress or deployed as a service.
+
+The harness listens on `DEV_HOST_PORT` with a default of `3001`. It deliberately
+does not consume `PORT`; that key belongs exclusively to the formal NestJS
+scenario service on `8000`. The Base-assigned local backend/frontend endpoints
+remain `3200/3201` and may proxy to the appropriate local process.

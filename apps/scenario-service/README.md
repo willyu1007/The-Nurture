@@ -1,25 +1,27 @@
 # Scenario service
 
 `@the-nurture/scenario-service` is the production-intended NestJS ingress for
-Nurture-owned APIs. M2 exposes health and a fail-closed binding-owner route
-with the frozen P7 service-auth guard. It does not replace My-Chat auth/runtime
-ownership and does not enable any scenario capability.
+Nurture-owned APIs. M3 exposes health and the fail-closed binding-owner route
+through the frozen P7 service-auth guard and production Prisma composition. It
+does not replace My-Chat auth/runtime ownership and does not enable any scenario
+capability.
 
 ## Current routes
 
 | Method | Path | Current behavior |
 | --- | --- | --- |
 | `GET` | `/health` | `200 {"ok":true}` |
-| `POST` | `/internal/nurture/scenario-binding/authorize` | Disabled-first M2 guard; the M3 owner controller is not connected |
+| `POST` | `/internal/nurture/scenario-binding/authorize` | Disabled-first service auth; when fully configured, runs the M3 owner authorizer and returns the frozen P7 receipt |
 
 All other paths return a body-safe `404`. The legacy Fastify workflow harness
 and `user_attention` route do not run in this service.
 
 The owner route returns `503 {"error":"binding_owner_disabled"}` when either
-the M3 authorizer composition or the service token is absent. Only when both
-are supplied does a missing/wrong bearer return
-`401 {"error":"service_auth_required"}`. The exact bearer passes the M2 guard,
-but the current M3 placeholder still returns the disabled response.
+the authorizer composition or the service token is absent. Only when both are
+supplied does a missing/wrong bearer return
+`401 {"error":"service_auth_required"}`. The exact bearer reaches the M3 owner
+authorizer; domain denial, replay and current-authority errors retain the frozen
+P7 HTTP/error mapping.
 
 ## Configuration
 
@@ -30,12 +32,14 @@ The service reads configuration only through `src/config.ts`.
 | `APP_ENV` | `dev` | `dev`, `staging` or `prod` |
 | `SERVICE_NAME` | `the-nurture` | lower-case service identifier |
 | `PORT` | `8000` | integer from 1 through 65535 |
+| `DATABASE_URL` | none | Nurture-owned production Prisma connection |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | unset | optional secret; absence disables the owner guard |
+| `NURTURE_BINDING_EVIDENCE_KEY` | unset | optional secret of at least 32 characters; absence disables production owner composition |
 
 The service token is loaded into a dedicated timing-safe authenticator rather
-than the printable non-secret configuration object. The evidence key and real
-owner authorizer remain M3 inputs. Configuration errors fail startup without
-printing environment values.
+than the printable non-secret configuration object. The evidence key is loaded
+only by the production owner composition. Configuration errors fail startup
+without printing environment values.
 
 ## Local verification
 

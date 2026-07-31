@@ -1,11 +1,99 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-28T09:16:20.581Z",
+  "generatedAt": "2026-07-31T07:01:25.171Z",
   "sourceOpenapi": "docs/context/api/openapi.yaml",
-  "sourceChecksumSha256": "ed8b0640efd49b9a12d81bc01a2d4fed4d8fa3d2235fc8be20b5c05080322c68",
+  "sourceChecksumSha256": "cf613e1988ebab1689e141fa29ed25c5156023295cc45c4116b738eb329cbd55",
   "stats": {
-    "totalEndpoints": 0,
-    "byTag": {}
+    "totalEndpoints": 2,
+    "byTag": {
+      "service": 1,
+      "binding-owner": 1
+    }
   },
-  "endpoints": []
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "operationId": "getScenarioServiceHealth",
+      "summary": "Check scenario-service liveness",
+      "tag": "service",
+      "auth": "none",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": null
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "ok"
+        ]
+      },
+      "errors": [],
+      "example": {
+        "curl": "curl -X GET '/health'"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/internal/nurture/scenario-binding/authorize",
+      "operationId": "authorizeScenarioBindingOwner",
+      "summary": "Authorize one current scenario-binding owner operation",
+      "tag": "binding-owner",
+      "auth": "bearer",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": {
+          "required": [
+            "workspace_id",
+            "acting_user_id",
+            "idempotency_key",
+            "subject_type",
+            "subject_id",
+            "scenario_key",
+            "acting_actor_id",
+            "purpose"
+          ],
+          "optional": [
+            "represented_organization_id",
+            "correlation_id",
+            "trace_id"
+          ]
+        }
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "status",
+          "authorization_ref",
+          "workspace_id",
+          "subject_type",
+          "subject_id",
+          "scenario_key",
+          "owner_ref",
+          "owner_version",
+          "authorized_actor_id",
+          "purpose",
+          "verified_at",
+          "expires_at",
+          "represented_organization_id"
+        ]
+      },
+      "errors": [
+        400,
+        401,
+        403,
+        408,
+        409,
+        413,
+        415,
+        500,
+        503
+      ],
+      "example": {
+        "curl": "curl -X POST '/internal/nurture/scenario-binding/authorize' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"acting_user_id\":\"<acting_user_id>\",\"idempotency_key\":\"<idempotency_key>\",\"subject_type\":\"<subject_type>\",\"subject_id\":\"<subject_id>\",\"scenario_key\":\"<scenario_key>\",\"acting_actor_id\":\"<acting_actor_id>\",\"purpose\":\"<purpose>\"}'"
+      }
+    }
+  ]
 }

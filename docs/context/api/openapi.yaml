@@ -1,59 +1,247 @@
 openapi: 3.1.0
 info:
-  title: Project API
-  version: 0.1.0
+  title: The Nurture Scenario Service API
+  version: 1.0.0
   description: |
-    Canonical API contract for this repository.
-    After edits run:
-      node .ai/skills/features/context-awareness/scripts/ctl-context.mjs touch
-      node .ai/scripts/ctl-api-index.mjs generate --touch
-  # x-source-mapping:
-  #   routes: src/routes/
-  #   controllers: src/controllers/
-  #   schemas: src/schemas/
-  #   middleware: src/middleware/
+    Canonical contract for the formal NestJS ingress owned by The Nurture.
+    My-Chat remains the authenticated consumer and owns product-shell routing.
+    Host, port and base URL are environment topology and are not part of the
+    wire contract.
+  x-source-mapping:
+    controllers: apps/scenario-service/src
+    transportSchemas: packages/nurture-scenario/src/adapters/binding-owner-http.ts
 servers: []
-  # - url: http://localhost:3000
-  #   description: Local development
-paths: {}
-  # /api/example:
-  #   get:
-  #     operationId: getExample
-  #     summary: Get example resource
-  #     tags: [example]
-  #     security:
-  #       - bearerAuth: []
-  #     parameters:
-  #       - name: id
-  #         in: path
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Success
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ExampleResponse'
-  #       '401':
-  #         description: Unauthorized
-  #       '404':
-  #         description: Not found
+paths:
+  /health:
+    get:
+      operationId: getScenarioServiceHealth
+      summary: Check scenario-service liveness
+      tags: [service]
+      security: []
+      responses:
+        '200':
+          description: The process is accepting HTTP requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /internal/nurture/scenario-binding/authorize:
+    post:
+      operationId: authorizeScenarioBindingOwner
+      summary: Authorize one current scenario-binding owner operation
+      description: |
+        Private My-Chat-to-Nurture owner call. The service credential proves
+        caller possession only; the owner authorizer separately rereads current
+        Nurture authority. Missing owner composition or either required secret
+        keeps the endpoint disabled.
+      tags: [binding-owner]
+      security:
+        - serviceBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioBindingAuthorizeRequest'
+      responses:
+        '200':
+          description: Current owner authority was verified and a short-lived receipt was issued or exactly replayed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioBindingAuthorizeResponse'
+        '400':
+          description: The JSON shell or binding request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '401':
+          description: The service bearer is missing or invalid while the owner composition is enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '403':
+          description: Current Nurture authority denied the operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '408':
+          description: The bounded request handler timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '409':
+          description: The anchor or exact-replay state is not current.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '413':
+          description: The JSON body exceeds the 64 KiB limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '415':
+          description: The request body encoding or media type is unsupported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '500':
+          description: The owner adapter failed without exposing internal details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
+        '503':
+          description: The owner path is disabled or current authorization is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindingOwnerError'
 components:
-  schemas: {}
-    # ExampleResponse:
-    #   type: object
-    #   required: [id, name]
-    #   properties:
-    #     id:
-    #       type: string
-    #     name:
-    #       type: string
-    #     createdAt:
-    #       type: string
-    #       format: date-time
-  # securitySchemes:
-  #   bearerAuth:
-  #     type: http
-  #     scheme: bearer
+  securitySchemes:
+    serviceBearerAuth:
+      type: http
+      scheme: bearer
+      description: Private service credential; never an adult or business-authority grant.
+  schemas:
+    BoundedIdentifier:
+      type: string
+      minLength: 1
+      maxLength: 512
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          const: true
+    ScenarioBindingAuthorizeRequest:
+      type: object
+      description: |
+        Frozen P7 request. Unknown top-level fields remain ignored for current
+        wire compatibility; they do not become trusted inputs.
+      additionalProperties: true
+      required:
+        - workspace_id
+        - acting_user_id
+        - idempotency_key
+        - subject_type
+        - subject_id
+        - scenario_key
+        - acting_actor_id
+        - purpose
+      properties:
+        workspace_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        acting_user_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        idempotency_key:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        subject_type:
+          type: string
+          enum: [child, family]
+        subject_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        scenario_key:
+          type: string
+          const: nurture
+        acting_actor_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        represented_organization_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        purpose:
+          type: string
+          const: scenario_binding_write
+        correlation_id:
+          type: string
+        trace_id:
+          type: string
+    ScenarioBindingAuthorizeResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - authorization_ref
+        - workspace_id
+        - subject_type
+        - subject_id
+        - scenario_key
+        - owner_ref
+        - owner_version
+        - authorized_actor_id
+        - purpose
+        - verified_at
+        - expires_at
+      properties:
+        status:
+          type: string
+          const: authorized
+        authorization_ref:
+          type: string
+          pattern: '^nurture_scenario_binding_authorization_v1:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        workspace_id:
+          type: string
+          minLength: 1
+        subject_type:
+          type: string
+          enum: [child, family]
+        subject_id:
+          type: string
+          minLength: 1
+        scenario_key:
+          type: string
+          const: nurture
+        owner_ref:
+          type: string
+          pattern: '^nurture_(child|family)_binding_anchor_v1:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        owner_version:
+          type: integer
+          minimum: 1
+        authorized_actor_id:
+          type: string
+          minLength: 1
+        represented_organization_id:
+          type: string
+          minLength: 1
+        purpose:
+          type: string
+          const: scenario_binding_write
+        verified_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+    BindingOwnerError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum:
+            - invalid_request
+            - invalid_binding_request
+            - invalid_owner_ref
+            - service_auth_required
+            - forbidden
+            - owner_authorization_denied
+            - request_timeout
+            - anchor_not_found
+            - anchor_not_current
+            - authorization_replay_conflict
+            - authorization_receipt_inactive
+            - payload_too_large
+            - unsupported_media_type
+            - owner_authorization_unavailable
+            - binding_owner_disabled
+            - service_unavailable
+            - internal_error

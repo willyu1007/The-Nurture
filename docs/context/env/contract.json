@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-07-26T22:20:58Z",
+  "generated_at_utc": "2026-07-31T07:00:36Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -60,6 +60,44 @@
       "state": "active",
       "type": "url"
     },
+    "DEV_HOST_PORT": {
+      "default": 3001,
+      "deprecate_after": null,
+      "description": "Loopback-only Fastify workflow dev-host listen port; never used by the formal scenario service.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": [
+        "dev"
+      ],
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "int"
+    },
+    "NURTURE_BACKEND_URL": {
+      "default": "http://localhost:3200",
+      "deprecate_after": null,
+      "description": "Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": [
+        "dev"
+      ],
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "url"
+    },
     "NURTURE_BINDING_EVIDENCE_KEY": {
       "default": null,
       "deprecate_after": null,
@@ -80,7 +118,7 @@
     "NURTURE_INTERNAL_SERVICE_TOKEN": {
       "default": null,
       "deprecate_after": null,
-      "description": "Shared service-auth token for refs-only activation owner reads; never persisted or logged.",
+      "description": "Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null
@@ -97,7 +135,7 @@
     "PORT": {
       "default": 8000,
       "deprecate_after": null,
-      "description": "Service listen port.",
+      "description": "Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately.",
       "legacy": {
         "deprecated": false,
         "replaced_by": null

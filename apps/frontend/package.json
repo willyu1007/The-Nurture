@@ -5,9 +5,9 @@
   "type": "module",
   "description": "The Nurture web run workbench console. Consumes the @willyu1007/web-workbench UI kit as the UI/UX source of truth; renders run/artifact/action views via scenario adapters. UI implementation lands in P4.",
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3201",
     "build": "next build",
-    "start": "next start -p 3000",
+    "start": "next start -p 3201",
     "typecheck": "tsc --noEmit",
     "lint": "pnpm lint:es && pnpm lint:css",
     "lint:es": "eslint src",

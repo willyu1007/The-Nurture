@@ -7,6 +7,18 @@
 
 ## What changed
 
+- 2026-07-31: Completed NestJS ingress M4 governance alignment. The formal
+  OpenAPI and generated API index now describe exactly `GET /health` and
+  `POST /internal/nurture/scenario-binding/authorize`; CI verifies OpenAPI
+  quality, index freshness and source/contract parity. The env contract now
+  reserves `PORT=8000` for the scenario service, gives the development-only
+  Fastify harness `DEV_HOST_PORT=3001`, and defines the Base-assigned local
+  backend/frontend pair as `3200/3201`. Generated env context and evidence were
+  refreshed through the repo-env-contract workflow. Review split pure dev-host
+  startup tests away from database-heavy imports and added permanent ingress
+  and port-topology assertions. No database, schema/migration, sibling source,
+  secret value, capability, deployment, activation or traffic was changed.
+
 - 2026-07-31: Accepted the bounded NestJS ingress migration decomposition in
   `12-nestjs-ingress-migration-plan.md`. Key decisions: a new
   `apps/scenario-service` NestJS application is created while `apps/backend`

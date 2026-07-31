@@ -97,7 +97,15 @@ jobs:
           node-version: "20"
 
       - name: Validate environment contract
-        run: python3 .ai/skills/features/environment/env-contractctl/scripts/env_contractctl.py validate --root .
+        run: |
+          python3 .ai/skills/features/environment/env-contractctl/scripts/env_contractctl.py validate --root .
+          node scripts/assert-port-topology.mjs
+
+      - name: Verify OpenAPI quality and API index
+        run: |
+          node .ai/scripts/ctl-openapi-quality.mjs verify --source docs/context/api/openapi.yaml --repo-root . --strict
+          node .ai/scripts/ctl-api-index.mjs verify --source docs/context/api/openapi.yaml --index docs/context/api/api-index.json --repo-root . --strict
+          node scripts/assert-formal-ingress-contract.mjs
 
       - name: Verify context layer
         run: node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict

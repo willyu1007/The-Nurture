@@ -15,7 +15,19 @@ variables:
     type: int
     required: true
     default: 8000
-    description: Service listen port.
+    description: Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately.
+  DEV_HOST_PORT:
+    type: int
+    required: false
+    default: 3001
+    scopes: [dev]
+    description: Loopback-only Fastify workflow dev-host listen port; never used by the formal scenario service.
+  NURTURE_BACKEND_URL:
+    type: url
+    required: false
+    default: http://localhost:3200
+    scopes: [dev]
+    description: Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field.
   DATABASE_URL:
     type: url
     required: true
@@ -40,4 +52,4 @@ variables:
     required: false
     secret: true
     secret_ref: nurture_internal_service_token
-    description: Shared service-auth token for refs-only activation owner reads; never persisted or logged.
+    description: Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged.

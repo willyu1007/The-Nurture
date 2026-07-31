@@ -16,7 +16,7 @@ My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、st
 | Coordination baseline | My-Chat/T-030 baseline `33264981515d75dd9768b720a1d1127cba70cbbe`; N3 dependency revision `533cbf715315bc724ddeb82174c0a981e667d77b` | N3 adopted | Preserve exact revision/source verification. |
 | Nurture dependency boundary | T-002: Nurture leg of `X-2`, `RB-2`, `RB-3(a)` | Complete | Registry UI package, public My-Chat exports, exact source pin, strict scanner and X5 remain green. |
 | Wave 4 P1/P2/P3 repair and adoption | My-Chat/T-028 + The-Nurture/T-002 | Complete, default-deny | My-Chat `a4768fe`, Base `5c04dce`, and Nurture main `ab92fde` are adopted. Exact two-database X5 and Nurture main CI `30412303062` pass; Nurture source hash remains `354bb2...c83f`. |
-| Nurture remaining scope | T-002: `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Implementation open | Resolve framework, ports, API index, and governance drift in independently reviewable increments. |
+| Nurture remaining scope | T-002: `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Framework/governance complete; handoff open | Preserve the M4 API/env/port gates, complete T-004 Contract Boundary, then regenerate the exact M5 handoff. |
 | Enablement | Cross-repo | Closed | No staging, production, capability, provider, or external traffic activation from this overlay. |
 
 The Base publication -> My-Chat exact adoption/re-pin -> Nurture
@@ -24,15 +24,17 @@ dependency/source cleanup -> joint conformance sequence is complete for the
 Nurture dependency leg. The overlay does not replace the stricter C30/Pilot
 gates below.
 
-## NestJS ingress M3 execution overlay（2026-07-31）
+## NestJS ingress M3-M4 execution overlay（2026-07-31）
 
 Execution result:
 `M3_A_COMPLETE / M3_B_COMPLETE / M3_C_COMPLETE /
-OWNER_INTEGRATION_NO_GO`. The next serial slice is M4 governance alignment;
-M5 still owns handoff regeneration and removal/hard-disable of the temporary
+M4_GOVERNANCE_COMPLETE / OWNER_INTEGRATION_NO_GO`. Formal OpenAPI, generated
+API index, env SSOT and the `8000/3001/3200/3201` port topology now have
+mechanical CI gates. The controlled mainline returns to T-004 Phase 1-2; M5
+still owns handoff regeneration and removal/hard-disable of the temporary
 Fastify route. The post-implementation audit is also complete: reservation and
-Receipt now share one owner transaction, non-UTC SQL behavior is deterministic
-in CI, and package-local builds cannot retain deleted output.
+Receipt share one owner transaction, non-UTC SQL behavior is deterministic in
+CI, and package-local builds cannot retain deleted output.
 
 ### Goal and planning context
 

@@ -10,9 +10,9 @@ Project: `main`
 - Primary feature: F-002 Institution ecology
 - Supporting feature: F-003 Six-surface store-beta readiness
 - Goal this cycle: T-004 Phase 0 discovery/gate reconciliation is complete.
-  T-002 ingress M0-M3 is complete with exact-consumer and disposable-PostgreSQL
-  evidence. The current critical lane is M4 API/env/port governance alignment;
-  then T-004 returns for Phase 1-2 Contract Boundary, followed by T-002 M5
+  T-002 ingress M0-M4 is complete with exact-consumer,
+  disposable-PostgreSQL and API/env/port governance evidence. The current
+  critical lane is T-004 Phase 1-2 Contract Boundary, followed by T-002 M5
   handoff regeneration and exact Joint Conformance.
   Runtime/environment activation and external traffic remain gated.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
@@ -23,20 +23,20 @@ Project: `main`
 - Six-surface owner gate: formal NestJS M3 now supplies the default-disabled
   private owner endpoint plus exact consumer, one atomic
   reservation/authority/Receipt transaction, replay/revoke/privacy and
-  lock-concurrency evidence. Protected use still requires M4 governance, M5
-  Owner Integration Handoff regeneration and Joint Conformance with T-004; the
+  lock-concurrency evidence. M4 governance is complete. Protected use still
+  requires M5 Owner Integration Handoff regeneration and Joint Conformance with T-004; the
   remaining Fastify route is transitional only.
 - T-004 Phase 0: the current manifest/module/handler/presenter/repository/API/DB
   foundations are classified in
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
   Contract-parallel inputs are clear; My-Chat checkout drift from exact `f00b868`
   to `2573635` keeps Owner Integration NO-GO and is not a floating-repin request.
-- T-002 ingress M0-M3: port semantics, the two-route formal v1 surface, G1-03
+- T-002 ingress M0-M4: port semantics, the two-route formal v1 surface, G1-03
   satisfied/deferred census and zero-wire-change fence are fixed in
   `dev-docs/active/nurture-institution-mode/13-nestjs-ingress-m0-decision-record.md`.
   The compiled shared composition, real controller, application parity, exact
-  pinned consumer and isolated PostgreSQL journeys are green; M4 must now
-  publish this implementation into API/env/port governance before M5.
+  pinned consumer and isolated PostgreSQL journeys are green. M4 publishes the
+  implementation into API/env/port governance with mechanical CI gates.
 - Parallelism: G1 start opens T-005～T-007 design/pure-domain/synthetic work;
   Contract Boundary opens exact public-contract implementation, Owner Readiness
   opens isolated real-adapter integration, and Joint Conformance alone opens
@@ -66,7 +66,7 @@ Project: `main`
   audit is PASS; G5-0 details are the next discussion, while tooling remains
   just-in-time and does not enter the current upstream critical path.
 - Execution backbone (2026-07-31): the recommended single-mainline order is
-  T-004 Phase 0 → T-002 ingress M0-M3 (complete) → T-002 M4 (see
+  T-004 Phase 0 → T-002 ingress M0-M4 (complete; see
   `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 → T-002 M5 plus
   T-004 Phase 3-4 → G1 Joint Conformance → early T-007 G4-0A/0B
   publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →

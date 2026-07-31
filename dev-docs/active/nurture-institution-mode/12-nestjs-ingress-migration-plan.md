@@ -6,8 +6,9 @@
 - Scope: move the qualified six-surface owner path from the provisional Fastify
   dev-host into the formal, production-intended NestJS scenario-service ingress
   required by G1-05.
-- State: M0 decision freeze, M1 skeleton, M2 service auth and M3-A/B/C endpoint
-  migration completed 2026-07-31; M4 governance alignment is next.
+- State: M0 decision freeze, M1 skeleton, M2 service auth, M3-A/B/C endpoint
+  migration and M4 governance alignment completed 2026-07-31; M5 handoff
+  regeneration remains.
 - This document records planning truth only. It is not an Owner Integration
   Handoff, a Joint Conformance record, activation, deployment or traffic
   authority.
@@ -156,20 +157,25 @@ PII-free persistence and participant/role lock concurrency. CI now performs
 the exact checkouts, Prisma generation, dedicated DB typecheck/test and
 sanitized artifact upload. All disposable databases were removed.
 
-### M4 — Governance Alignment (may run parallel to M3)
+### M4 — Governance Alignment (complete 2026-07-31)
 
-- Populate `docs/context/api/openapi.yaml` with the implemented owner surface;
+- [x] Populate `docs/context/api/openapi.yaml` with the implemented owner surface;
   regenerate the API index; run `ctl-context.mjs touch` and
   `verify --strict` (`ST-4(c)`).
-- Land env-contract key additions/changes via `env-contractctl`; refresh
+- [x] Land env-contract key additions/changes via `env-contractctl`; refresh
   `env/.env.example`.
-- Land the M0 port decision across env contract, listeners, frontend defaults,
+- [x] Land the M0 port decision across env contract, listeners, frontend defaults,
   docs and tests (`ST-2`).
-- Close `ST-6(b)` governance hygiene without mixing unrelated tooling changes.
+- [x] Close `ST-6(b)` governance hygiene without mixing unrelated tooling changes.
 
-Acceptance: API index describes the implemented owner surface; strict context
-verification passes; port references are consistent across code, env, docs and
-tests.
+Acceptance: PASS after quality repair. The generated API index contains exactly
+health plus binding-owner; source/OpenAPI/index parity and the
+`8000/3001/3200/3201` topology now have dedicated CI checks. `env-contractctl`
+validation/generation, environment/API public suites, scenario-service
+typecheck, frontend typecheck/lint, the isolated three-test dev-host guard,
+strict context, governance and diff checks pass. M4 changes no wire behavior,
+schema/migration, database, secret value, capability, deployment, activation
+or traffic.
 
 ### M5 — Owner Integration Handoff Regeneration
 
