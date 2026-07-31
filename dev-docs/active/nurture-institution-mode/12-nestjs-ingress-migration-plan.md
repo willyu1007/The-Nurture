@@ -143,10 +143,13 @@ unchanged path. Malformed JSON, payload limit, timeout and other failures
 produced before the adapter retain the M1 body-safe formal-shell contract and
 must not copy Fastify framework error names or messages.
 
-Acceptance: PASS locally. The exact public My-Chat consumer implementation runs
-through NestJS; the exact Base/My-Chat revisions and expanded 53-file Nurture
-self-pin verify. Production migrations plus 37 existing DB tests and four
-Nest/PostgreSQL journeys pass on disposable databases. The journeys cover
+Acceptance: PASS locally after post-implementation quality repair. The exact
+public My-Chat consumer implementation runs through NestJS; the exact
+Base/My-Chat revisions and expanded 53-file Nurture self-pin verify. Production
+migrations plus 38 existing DB tests and four Nest/PostgreSQL journeys pass on
+disposable databases. Reservation and receipt issuance now share one rollback
+boundary, clean builds cannot retain deleted controllers, and the non-UTC
+effective-window regression is explicit. The journeys cover
 child/family, exact and divergent replay, response-loss recovery, revoked and
 inactive authority, future/ended/soft-deleted roles, missing/stale anchors,
 PII-free persistence and participant/role lock concurrency. CI now performs

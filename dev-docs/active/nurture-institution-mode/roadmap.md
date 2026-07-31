@@ -30,7 +30,9 @@ Execution result:
 `M3_A_COMPLETE / M3_B_COMPLETE / M3_C_COMPLETE /
 OWNER_INTEGRATION_NO_GO`. The next serial slice is M4 governance alignment;
 M5 still owns handoff regeneration and removal/hard-disable of the temporary
-Fastify route.
+Fastify route. The post-implementation audit is also complete: reservation and
+Receipt now share one owner transaction, non-UTC SQL behavior is deterministic
+in CI, and package-local builds cannot retain deleted output.
 
 ### Goal and planning context
 

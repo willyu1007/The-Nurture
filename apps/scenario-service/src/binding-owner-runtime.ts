@@ -10,11 +10,14 @@ import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
 export class BindingOwnerRuntime implements OnApplicationShutdown {
   constructor(
     readonly authorizer: ScenarioBindingOwnerAuthorizer | undefined,
-    private readonly nurturePrisma?: NurturePrismaClient,
+    private readonly ownedDatabaseClient?: Pick<
+      NurturePrismaClient,
+      "$disconnect"
+    >,
   ) {}
 
   async onApplicationShutdown(): Promise<void> {
-    await this.nurturePrisma?.$disconnect();
+    await this.ownedDatabaseClient?.$disconnect();
   }
 }
 

@@ -142,12 +142,17 @@ describe("M3 Nest binding-owner PostgreSQL journey", () => {
   it("fails closed for unknown, soft-deleted, ended, future, revoked, and inactive authority", async () => {
     const source = ownerSource(baseUrl);
     const unknownWorkspace = `ws-${randomUUID()}`;
+    const childAnchorsBeforeUnknown =
+      await adminPrisma.nurtureChildBindingAnchor.count();
     await expect(
       source.resolve(request(unknownWorkspace, `user-${randomUUID()}`, "child")),
     ).resolves.toEqual({
       status: "denied",
       reason_code: "owner_authorization_denied",
     });
+    await expect(
+      adminPrisma.nurtureChildBindingAnchor.count(),
+    ).resolves.toBe(childAnchorsBeforeUnknown);
 
     const softDeletedWorkspace = `ws-${randomUUID()}`;
     const softDeleted = await seedGuardian(adminPrisma, softDeletedWorkspace);
@@ -187,6 +192,25 @@ describe("M3 Nest binding-owner PostgreSQL journey", () => {
       startsAt: futureStartsAt,
     });
     expect(future.role.startsAt).toEqual(futureStartsAt);
+    await expect(
+      adminPrisma.$transaction(async (transaction) => {
+        await transaction.$executeRaw(
+          Prisma.sql`SET LOCAL TIME ZONE 'Asia/Shanghai'`,
+        );
+        return createGuardianRoleAuthorityReader(
+          () => new Date(futureStartsAt.getTime() - 60_000),
+        ).verifyCurrent(transaction, {
+          workspaceId: futureWorkspace,
+          actingUserId: future.participant.myChatUserId,
+          actingActorId: `actor-${randomUUID()}`,
+          subjectType: "child",
+          ownerRef: `nurture_child_binding_anchor_v1:${randomUUID()}`,
+          ownerVersion: 1,
+          purpose: "scenario_binding_write",
+          anchorId: randomUUID(),
+        });
+      }),
+    ).rejects.toMatchObject({ code: "owner_authorization_denied" });
     await expect(
       source.resolve(
         request(futureWorkspace, future.participant.myChatUserId, "child"),

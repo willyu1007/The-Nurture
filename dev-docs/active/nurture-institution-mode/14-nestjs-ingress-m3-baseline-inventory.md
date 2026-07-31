@@ -357,7 +357,7 @@ blocked until the disposable-PostgreSQL evidence recorded below succeeded.
 | `M3-BLD-01` compiled runtime seam | CLOSED — narrow compiled scenario/DB subpaths are built before service typecheck/test/build/start. |
 | `M3-PAR-02` parity ambiguity | CLOSED — 22 shared Fastify/Nest application cases plus separate formal-shell parser safety. |
 | `M3-CMP-03` readiness drift | CLOSED — guard/controller share one actual optional `BindingOwnerRuntime`. |
-| `M3-TST-04` negative matrix | CLOSED — 41 scenario-service tests and complete domain/application error coverage. |
+| `M3-TST-04` negative matrix | CLOSED — 42 scenario-service tests and complete domain/application error coverage. |
 | `M3-CI-05` persistence lane | CLOSED — exact dependency checkouts, Prisma generation, DB typecheck/test and sanitized artifacts in CI. |
 | `M3-ARC-06` dev-host composition | CLOSED — composition is owned by `@the-nurture/db/binding-owner`. |
 | `M3-AUT-07` implicit current-row rules | CLOSED — soft-delete/effective-window checks, UTC-safe time comparison and participant/role locks have real PostgreSQL coverage. |
@@ -368,5 +368,9 @@ Local PostgreSQL on a unique empty database replaced the unavailable Docker
 daemon and was deleted after each run. The exact external pin verifier passed
 against detached worktrees at Base `5c04dce...` and My-Chat `f00b868...`; no
 sibling tracked file was changed. The Nurture self-pin expands to 40 paths / 53
-files at `0c031f99...5242c4`. M3 is complete, but this record is still not an
-Owner Integration Handoff, deployment, activation or traffic authority.
+files at `0c031f99...5242c4` at M3-C close. The later quality audit additionally
+made reservation/receipt persistence one owner transaction, added explicit
+non-UTC regression evidence and removed stale build outputs; its renewed
+self-pin is recorded in the current overview and verification ledger. M3 is
+complete, but this record is still not an Owner Integration Handoff,
+deployment, activation or traffic authority.

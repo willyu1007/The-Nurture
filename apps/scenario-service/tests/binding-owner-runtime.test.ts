@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { ScenarioBindingOwnerAuthorizer } from "@the-nurture/scenario/binding-owner";
-import { createBindingOwnerRuntime } from "../src/binding-owner-runtime.js";
+import {
+  BindingOwnerRuntime,
+  createBindingOwnerRuntime,
+} from "../src/binding-owner-runtime.js";
 import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
 
 const fakeAuthorizer: ScenarioBindingOwnerAuthorizer = {
@@ -18,6 +21,22 @@ describe("BindingOwnerRuntime", () => {
     });
 
     expect(runtime.authorizer).toBe(fakeAuthorizer);
+  });
+
+  it("disconnects the production Prisma client during application shutdown", async () => {
+    let disconnects = 0;
+    const runtime = new BindingOwnerRuntime(
+      fakeAuthorizer,
+      {
+        $disconnect: async () => {
+          disconnects += 1;
+        },
+      },
+    );
+
+    await runtime.onApplicationShutdown();
+
+    expect(disconnects).toBe(1);
   });
 
   it.each([

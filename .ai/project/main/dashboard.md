@@ -21,10 +21,11 @@ Project: `main`
 ### Coordination Signals
 - Blocking dependency: six `TR-P0` plus three `TR-P1` traffic-readiness blockers, strict C30-C35 then C40-C45 qualification, D implementation/complete-candidate assembly, and Pilot-0-E are required before any Pilot-1 decision. The locked ECS/Compose path makes private Alibaba ACR a Pilot-1 prerequisite, not a current action.
 - Six-surface owner gate: formal NestJS M3 now supplies the default-disabled
-  private owner endpoint plus exact consumer, transaction/replay/revoke/privacy
-  and lock-concurrency evidence. Protected use still requires M4 governance,
-  M5 Owner Integration Handoff regeneration and Joint Conformance with T-004;
-  the remaining Fastify route is transitional only.
+  private owner endpoint plus exact consumer, one atomic
+  reservation/authority/Receipt transaction, replay/revoke/privacy and
+  lock-concurrency evidence. Protected use still requires M4 governance, M5
+  Owner Integration Handoff regeneration and Joint Conformance with T-004; the
+  remaining Fastify route is transitional only.
 - T-004 Phase 0: the current manifest/module/handler/presenter/repository/API/DB
   foundations are classified in
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.

@@ -11,16 +11,25 @@
 ## Current Verification Status
 
 - Last updated: 2026-07-31
-- Current phase: Wave 4 P3 joint requalification and Nurture consolidation are
-  complete and default-deny. Exact two-database X5 and Nurture main CI pass;
-  local/remote Nurture retain only clean `main`. Cross-repository
-  implementation readiness remains held on the Base/My-Chat portion of
-  `C30-I0-C` and all of `C30-I0-D`. Pilot-0-C decision
-  complete; Pilot-0-D
+- Current phase: NestJS ingress M0-M3 and the post-implementation quality audit
+  are complete and default-deny. M4 API/env/port governance is the next serial
+  slice; M5 Owner Integration Handoff regeneration and Joint Conformance remain
+  later gates. Cross-repository implementation readiness is still held on the
+  remaining Base/My-Chat owner inputs. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: P2 adds Nurture domain/DB adapter source, tests, Prisma target schema, one unapplied additive migration, exact My-Chat source pins, and generated DB-context changes. The P2 increment does not apply a database migration, delete or inspect birth-date values, wire a production authority reader, change Base/My-Chat source bytes, publish an artifact, change secrets/KMS/environment, activate a capability/Scenario row, configure a provider, or send traffic.
-- Supersession: all earlier unqualified P0/P1/P2 and `DESIGN COMPLETE` rows remain historical evidence but do not define the current status vocabulary. Current status uses `DR-*`, traffic readiness uses `TR-*`, future candidate qualification uses `QR-*`, and operations incidents use `POPS-SEV*`. `10-pilot0-c-current-decision-index.md` controls C; `11-pilot0-d-topology-operations-contract.md` controls D.
+- Code/config/schema impact: the current source includes the formal NestJS
+  binding-owner route, compiled shared runtime boundaries and production
+  Prisma/Guardian authority composition. The quality repair makes anchor
+  reservation and receipt issuance one owner transaction and cleans build
+  outputs before compilation. No schema/migration, persistent database,
+  Base/My-Chat source, secret/KMS/environment value, capability, deployment or
+  traffic is changed.
+- Evidence convention: this file is an append-only chronological ledger.
+  Earlier P0/P1/P2/M1/M2/M3-baseline `OPEN`, `BLOCKED`, counts and hashes remain
+  point-in-time evidence, not current status. The latest matching closure row
+  controls. `10-pilot0-c-current-decision-index.md` controls C;
+  `11-pilot0-d-topology-operations-contract.md` controls D.
 
 ## Documentation warning remediation — 2026-07-31
 
@@ -1256,3 +1265,18 @@ the rejected checkpoint and are historical.
 | Test routing and persistence boundary | PASS | 45 files: 21 unit, 5 production DB, 10 dev-host, 8 scenario-service and 1 X5; persistence source boundary remains isolated. |
 | CI workflow | PASS | YAML parses; CI feature verifier passes; exact checkout/Prisma generation, DB typecheck/test and always-uploaded sanitized artifacts are present. Remote execution awaits the next push and is not substituted for the completed local isolated evidence. |
 | Cleanup/effect boundary | PASS | Every uniquely named PostgreSQL database and temporary exact-pin worktree was removed. No schema/migration, persistent DB, sibling tracked source, environment value, secret, capability, deployment, activation or traffic changed. |
+
+## 2026-07-31 — NestJS ingress M3 post-implementation quality closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture and authority boundary | PASS AFTER REPAIR | Anchor reservation and receipt issuance now reuse one repository-scoped Prisma transaction. A denied unknown-workspace request rolls back the attempted anchor; current Participant and Guardian locks still fence concurrent mutation until commit. |
+| Non-UTC effective-window regression | PASS | The real PostgreSQL suite explicitly sets one transaction to `Asia/Shanghai` and proves a future Guardian role remains denied. CI no longer depends on the database session happening to be UTC. |
+| Build artifact hygiene | PASS AFTER REPAIR | Scenario, DB and formal service builds delete only their own `dist` directory before TypeScript emission. The removed M2 disabled controller no longer survives as a stale compiled artifact. |
+| Scenario-service regression | PASS | 7 files / 42 tests; production shutdown owns Prisma disconnect, controller/guard/shell safety remain green. |
+| Production DB regression | PASS | Five files / 38 tests pass with the exact JSON population threshold, followed by the four Nest/PostgreSQL owner journeys. |
+| Dev-host and DB ownership regression | PASS | Ten files / 43 tests pass against separate disposable production/dev-host databases; ownership boundaries remain 48 tables / 75 enums and 6 tables / 2 enums. |
+| Contract and wire compatibility | PASS | The route, request/response fields, error map and pinned My-Chat consumer are unchanged. No My-Chat ORM/runtime enters Nurture. |
+| Exact Nurture self-pin | PASS | The 40-path / 53-file formal-ingress population verifies at `94a964435852bce080871586fe3a9e86393db1d622d86b5ee64ac2fc20a5d860`. |
+| Documentation consistency | PASS | Current status no longer claims that production authority wiring is absent; historical `OPEN`/environment-gated rows are explicitly point-in-time, and current M4/M5/Joint Conformance gates remain unchanged. |
+| Cleanup/effect boundary | PASS | The uniquely named quality-review database was removed. No schema/migration, persistent database, external repository, secret, capability, deployment, activation or traffic changed. |

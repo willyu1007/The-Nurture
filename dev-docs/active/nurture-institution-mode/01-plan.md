@@ -28,7 +28,9 @@ The 2026-07-31 M3 closure moves that unchanged P7 wire/application contract into
 the formal NestJS scenario service, renews the exact-consumer and disposable
 PostgreSQL evidence, and preserves the Fastify route only as a temporary M5
 transition seam. This completes the implementation portion of formal ingress;
-M4 governance alignment and M5 handoff regeneration remain before any Owner
+the quality audit additionally proves one reservation/Receipt transaction,
+non-UTC effective-window behavior and clean emitted runtime outputs. M4
+governance alignment and M5 handoff regeneration remain before any Owner
 Integration Readiness claim.
 
 G1 starts as soon as both tracks are owned. At G1 start, T-005～T-007 MAY proceed

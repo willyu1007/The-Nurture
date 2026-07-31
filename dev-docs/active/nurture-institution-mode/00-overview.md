@@ -14,7 +14,7 @@
   before M5 regenerates the Owner Integration Handoff.
 - Current gate: The current dependency pin remains My-Chat `f00b868`; the
   Nurture self-pin now covers the 40-path / 53-file formal-ingress source
-  population at `0c031f99...5242c4`. All consumers remain default-disabled.
+  population at `94a96443...a5d860`. All consumers remain default-disabled.
   Protected
   T-005～T-007 integration stays NO-GO until the exact owner path and T-004
   contract pass Joint Conformance through the formal ingress. The current

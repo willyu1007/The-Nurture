@@ -103,38 +103,42 @@ export function createScenarioBindingOwnerAuthorizer(input: {
     async authorize(request) {
       const at = clock();
       const frozenNow = () => at;
-      const verifier = new NurtureScenarioBindingOwnerVerifier(
+      const repository =
         new PrismaNurtureScenarioBindingAuthorizationRepository(
           input.nurturePrisma,
           authorityReaderFactory(frozenNow),
-        ),
-        hasher,
-        frozenNow,
-      );
-      const reserved = await verifier.reserveAnchor(
-        request.subjectType,
-        [request.workspaceId, request.subjectType, request.subjectId].join(
-          "\u0000",
-        ),
-      );
-      return verifier.verify({
-        workspaceId: request.workspaceId,
-        actingUserId: request.actingUserId,
-        idempotencyKey: request.idempotencyKey,
-        subjectType: request.subjectType,
-        subjectId: request.subjectId,
-        scenarioKey: request.scenarioKey,
-        ownerRef: reserved.ownerRef,
-        ownerVersion: reserved.ownerVersion,
-        actingActorId: request.actingActorId,
-        ...(request.representedOrganizationId
-          ? { representedOrganizationId: request.representedOrganizationId }
-          : {}),
-        purpose: request.purpose,
-        ...(request.correlationId
-          ? { correlationId: request.correlationId }
-          : {}),
-        ...(request.traceId ? { traceId: request.traceId } : {}),
+        );
+      return repository.runInTransaction(async (atomicRepository) => {
+        const verifier = new NurtureScenarioBindingOwnerVerifier(
+          atomicRepository,
+          hasher,
+          frozenNow,
+        );
+        const reserved = await verifier.reserveAnchor(
+          request.subjectType,
+          [request.workspaceId, request.subjectType, request.subjectId].join(
+            "\u0000",
+          ),
+        );
+        return verifier.verify({
+          workspaceId: request.workspaceId,
+          actingUserId: request.actingUserId,
+          idempotencyKey: request.idempotencyKey,
+          subjectType: request.subjectType,
+          subjectId: request.subjectId,
+          scenarioKey: request.scenarioKey,
+          ownerRef: reserved.ownerRef,
+          ownerVersion: reserved.ownerVersion,
+          actingActorId: request.actingActorId,
+          ...(request.representedOrganizationId
+            ? { representedOrganizationId: request.representedOrganizationId }
+            : {}),
+          purpose: request.purpose,
+          ...(request.correlationId
+            ? { correlationId: request.correlationId }
+            : {}),
+          ...(request.traceId ? { traceId: request.traceId } : {}),
+        });
       });
     },
   };

@@ -1835,3 +1835,30 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: any test-population change must update and run both file-routing
   and result-count gates; a green direct Vitest invocation is insufficient CI
   evidence.
+
+### 2026-07-31 — Reserving an anchor before entering the authority transaction
+
+- Symptom: an authenticated but unauthorized binding request returned the
+  correct denial while leaving a deterministic `reserved` anchor committed.
+- Root cause: the application composition called `reserveAnchor` and
+  `verify` through two independent repository transactions. Receipt issuance
+  reread authority atomically, but reservation did not share that rollback
+  boundary.
+- Fix: add a repository-scoped transaction composition and run reservation,
+  anchor lock, current Participant/Guardian locks, authority validation and
+  receipt insert/replay through it.
+- Prevention: fail-closed response tests must also assert zero durable effect.
+  For owner commands, verify transaction membership, rollback and mutation
+  counts instead of inferring atomicity from the final HTTP status.
+
+### 2026-07-31 — Compiling over an existing `dist` directory
+
+- Symptom: the deleted M2 disabled controller still existed under the ignored
+  scenario-service `dist` directory after later builds.
+- Root cause: plain `tsc` emits current files but does not remove outputs whose
+  source files were deleted or renamed.
+- Fix: each runtime package now removes only its own `dist` directory before
+  compilation.
+- Prevention: runtime builds must start from an empty package-local output
+  directory, and smoke/packaging review must inspect the emitted file set rather
+  than assuming source deletion removes old artifacts.

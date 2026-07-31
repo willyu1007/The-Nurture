@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PrismaClient } from "@prisma/client";
 import {
   formatNurtureBindingOwnerRef,
+  parseNurtureBindingOwnerRef,
   type IssueNurtureBindingAuthorizationInput,
 } from "@the-nurture/scenario";
 import { HmacNurtureBindingEvidenceHasher } from "../src/binding-evidence-hasher.js";
@@ -113,6 +114,34 @@ describe("PrismaNurtureScenarioBindingAuthorizationRepository", () => {
     ).not.toContain("platform-actor-1");
   });
 
+  it("shares one transaction across reservation and authorization", async () => {
+    const prisma = new FakePrismaClient();
+    const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
+      prisma as unknown as PrismaClient,
+      allowAuthority(prisma),
+    );
+
+    await repository.runInTransaction(async (atomicRepository) => {
+      const reserved = await atomicRepository.reserveAnchor({
+        subjectType: "child",
+        reservationKeyHash: digest("reservation"),
+      });
+      const ownerRef = parseNurtureBindingOwnerRef(reserved.ownerRef);
+      await atomicRepository.issueAuthorization(
+        issueInput({
+          anchorId: ownerRef.anchorId,
+          ownerRef: reserved.ownerRef,
+          ownerVersion: reserved.ownerVersion,
+        }),
+      );
+    });
+
+    expect(prisma.transactionCalls).toBe(1);
+    expect(prisma.transaction.childAnchorsCreated).toBe(1);
+    expect(prisma.transaction.authorizationsCreated).toBe(1);
+    expect(prisma.transaction.authorityReads).toBe(1);
+  });
+
   it("rejects divergent payload replay under the same idempotency digest", async () => {
     const prisma = new FakePrismaClient({ childAnchor: anchor() });
     const repository = new PrismaNurtureScenarioBindingAuthorizationRepository(
@@ -198,6 +227,7 @@ type FakeOptions = {
 
 class FakePrismaClient {
   readonly transaction: FakeTransaction;
+  transactionCalls = 0;
 
   constructor(options: FakeOptions = {}) {
     this.transaction = new FakeTransaction(options);
@@ -206,6 +236,7 @@ class FakePrismaClient {
   $transaction<TResult>(
     callback: (transaction: FakeTransaction) => Promise<TResult>,
   ): Promise<TResult> {
+    this.transactionCalls += 1;
     return callback(this.transaction);
   }
 }

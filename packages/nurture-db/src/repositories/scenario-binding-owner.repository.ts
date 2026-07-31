@@ -58,18 +58,42 @@ export class DenyTransactionalNurtureBindingAuthorityReader
 export class PrismaNurtureScenarioBindingAuthorizationRepository
   implements NurtureScenarioBindingAuthorizationRepository
 {
+  private transaction?: TransactionClient;
+
   constructor(
     private readonly prisma: PrismaClient,
     private readonly authorityReader: TransactionalNurtureBindingAuthorityReader =
       new DenyTransactionalNurtureBindingAuthorityReader(),
   ) {}
 
+  /**
+   * Keep anchor reservation and receipt issuance inside one owner transaction.
+   * Repository methods invoked by the callback reuse the scoped transaction
+   * instead of opening independent transactions.
+   */
+  runInTransaction<TResult>(
+    work: (
+      repository: PrismaNurtureScenarioBindingAuthorizationRepository,
+    ) => Promise<TResult>,
+  ): Promise<TResult> {
+    if (this.transaction) return work(this);
+    return this.prisma.$transaction(async (transaction) => {
+      const scoped =
+        new PrismaNurtureScenarioBindingAuthorizationRepository(
+          this.prisma,
+          this.authorityReader,
+        );
+      scoped.transaction = transaction;
+      return work(scoped);
+    });
+  }
+
   reserveAnchor(
     input: ReserveNurtureBindingAnchorInput,
   ): Promise<ReservedNurtureBindingAnchor> {
     requireSubjectType(input.subjectType);
     requireDigest(input.reservationKeyHash, "reservation key hash");
-    return this.prisma.$transaction(async (transaction) => {
+    return this.withTransaction(async (transaction) => {
       const existing = await findAnchorByReservationKey(transaction, input);
       if (existing) {
         assertAnchorReservable(existing);
@@ -90,7 +114,7 @@ export class PrismaNurtureScenarioBindingAuthorizationRepository
     input: IssueNurtureBindingAuthorizationInput,
   ): Promise<IssuedNurtureBindingAuthorization> {
     validateIssueInput(input);
-    return this.prisma.$transaction(async (transaction) => {
+    return this.withTransaction(async (transaction) => {
       const anchor = await findAndLockAnchor(transaction, input);
       if (!anchor) {
         throw new NurtureScenarioBindingError(
@@ -157,6 +181,14 @@ export class PrismaNurtureScenarioBindingAuthorizationRepository
         ? mapAuthorization(issued, false)
         : replayAuthorization(issued, input);
     });
+  }
+
+  private withTransaction<TResult>(
+    work: (transaction: TransactionClient) => Promise<TResult>,
+  ): Promise<TResult> {
+    return this.transaction
+      ? work(this.transaction)
+      : this.prisma.$transaction(work);
   }
 }
 

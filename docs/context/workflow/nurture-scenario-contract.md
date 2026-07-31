@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: repaired source and native CI green; formal adoption pending; migration not activated
+Status: formal NestJS owner ingress implemented and locally qualified; adoption and activation pending
 
 ## Product Terminology Compatibility
 
@@ -25,15 +25,17 @@ and MUST stay default-off until the owner contract is reconciled with the produc
 
 The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
 
-The repaired Wave 4 P2 implementation is an additive, default-deny source
-candidate against My-Chat host-binding revision
-`30792cd48e35cce3720bfa8fb9a1094a59b0ccd7`. It adds typed local anchors,
-workspace-local association schema, a transaction-scoped owner-authorization
-receipt adapter, and strict derived age/stage parsing. The repaired Host and
-Nurture source sets pass their native CI gates; formal cross-owner adoption
-review is still required. The migration is not applied, no authority-reader
-production wiring exists, and no manifest, capability, Scenario row,
-environment, database, or traffic path is activated.
+The Wave 4 P7 plus NestJS M3 implementation is an additive, default-deny source
+candidate against exact My-Chat consumer revision
+`f00b86861cf0b751d747c7e0bc5cb86a952900de`. It includes typed local anchors,
+workspace-local association schema, the formal service-authenticated owner
+route, production Prisma composition, transaction-scoped Guardian authority
+reread and owner-authorization receipt persistence. Exact-consumer,
+application-parity and disposable-PostgreSQL evidence pass locally. M4
+API/env/port governance, M5 handoff regeneration and cross-owner Joint
+Conformance remain required. Repository migrations are not applied to a
+persistent environment, and no manifest capability, Scenario row, secret,
+deployment or traffic path is activated.
 
 My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, InstitutionWorkflows, and data.
 
@@ -574,7 +576,7 @@ The live handler receives two explicit ports. A host-injected bridge derives `Sc
 
 The `user_attention` owner endpoint is service-authenticated and returns only current My-Chat recipient IDs plus fixed generic display text. Before send and again on open, My-Chat rereads the current Child binding, Family binding, exact `FamilyChildMembership`, and exact adult Family membership; Nurture resolves both current workspace associations and rereads message, receipt, item, Grant, Enrollment, thread membership, CareGroup, Institution, Participant, and exact recipient RoleAssignment. My-Chat owns the Handoff Ledger, notification idempotency, Outbox, and deep-link shell. Opening a deep link first authenticates the exact recipient/workspace/Notification and eligible Ledger row, then repeats both owner reads; stale notification content is never treated as authorization. Child-binding, Family-binding, pair-membership, adult-membership, or association loss follows the exact revocation scope above and returns generic unavailable without cross-child existence leakage.
 
-The `scenario_binding_write` owner endpoint (`POST /internal/nurture/scenario-binding/authorize`) is service-authenticated with the same bearer token and issues the private binding-owner receipt to the Host resolver. Authorization rereads and row-locks a current active guardian care role of the acting platform user's active Participant inside the same transaction that persists the receipt, so a concurrent revocation cannot overtake issuance; the role id and aggregate version become the authorization-source evidence with a five-minute expiry. Anchor reservation is deterministic per exact platform subject (workspace, subject type, subject id), the reservation key and all request identities are persisted only as HMAC evidence hashes, exact replay returns the identical receipt, and the anchor value never leaves the private server-to-server carrier. `NURTURE_BINDING_EVIDENCE_KEY` (at least 32 characters) enables the endpoint; absence keeps it disabled with `binding_owner_disabled` and never degrades to an unauthenticated or unhashed path.
+The `scenario_binding_write` owner endpoint (`POST /internal/nurture/scenario-binding/authorize`) is service-authenticated with the same bearer token and issues the private binding-owner receipt to the Host resolver. Deterministic anchor reservation, active Participant/Guardian row locks, current authority validation, receipt insert or exact replay, and commit share one Nurture owner transaction; denial rolls back a newly attempted reservation, and concurrent suspension or revocation cannot overtake issuance. The role id and aggregate version become authorization-source evidence with a five-minute expiry. Reservation is deterministic per exact platform subject (workspace, subject type, subject id), the reservation key and all request identities are persisted only as HMAC evidence hashes, exact replay returns the identical receipt, and the anchor value never leaves the private server-to-server carrier. `NURTURE_BINDING_EVIDENCE_KEY` (at least 32 characters) enables the endpoint; absence keeps it disabled with `binding_owner_disabled` and never degrades to an unauthenticated or unhashed path.
 
 - `public_draft` -> `my_chat.forum`
 - `knowledge_candidate` -> `my_chat.knowledge_base`

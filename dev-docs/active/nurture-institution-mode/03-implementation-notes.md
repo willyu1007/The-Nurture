@@ -1391,3 +1391,27 @@
   environment value, secret, capability, deployment, activation or traffic.
   M4 governance alignment is next; M5 still owns handoff regeneration and
   removal/hard-disable of the Fastify P7 route.
+
+## 2026-07-31 — NestJS ingress M3 quality audit completed
+
+- Closed a transaction-boundary defect in the production authorizer
+  composition. Anchor reservation previously committed before current
+  Guardian authority was checked; the authorizer now scopes reservation,
+  anchor lock, Participant/Guardian locks, authority validation and receipt
+  insert/replay to one Prisma transaction. A denied unknown-workspace request
+  proves the attempted anchor rolls back.
+- Made the timezone regression deterministic in UTC-based CI by setting a real
+  PostgreSQL transaction to `Asia/Shanghai` before checking a future Guardian
+  role. The explicit UTC conversion is now tested independently of host
+  timezone.
+- Added package-local clean builds for scenario, DB and scenario-service
+  outputs. Deleted source such as the M2 disabled controller can no longer
+  remain in `dist` after a successful build.
+- Added repository transaction-scope and runtime Prisma-shutdown regression
+  tests. Current populations are 7 files / 42 scenario-service tests, 5 files /
+  38 production DB tests and 1 file / 4 Nest/PostgreSQL journeys.
+- Renewed the 40-path / 53-file Nurture formal-ingress self-pin to
+  `94a964435852bce080871586fe3a9e86393db1d622d86b5ee64ac2fc20a5d860`.
+- Updated the workflow context and task handoff to the implemented M3 truth
+  while keeping M4 governance, M5 handoff regeneration, Joint Conformance,
+  activation and traffic explicitly closed.
