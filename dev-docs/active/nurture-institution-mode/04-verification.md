@@ -1238,3 +1238,21 @@ the rejected checkpoint and are historical.
 | Existing unit/repository regression | PASS | 21 files / 187 scenario tests and 1 file / 9 fake repository tests. |
 | Test routing | PASS | 44 files: 21 unit, 5 production DB, 10 dev-host, 7 scenario-service and 1 X5. |
 | Effect boundary | PASS | No schema/migration, persistent database, environment value, secret, capability, deployment, activation or traffic changed. |
+
+## 2026-07-31 — NestJS ingress M3-C persistence/consumer closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact dependency/source pins | PASS | Detached Base `5c04dce...` and My-Chat `f00b868...` worktrees pass contract/source hashes. The expanded Nurture formal-ingress population is 40 paths / 53 files at `0c031f99...5242c4`. |
+| Exact public consumer execution | PASS | `@my-chat/scenario-integrations` public binding-owner source executes against Nest. The consumed implementation and package metadata are byte-identical to the exact pin; the floating index has only an unrelated additive Education export. |
+| Scenario-service DB typecheck | PASS | Dedicated `tsconfig.db.json` checks the production service, public consumer and four PostgreSQL cases after building runtime dependencies. |
+| Nest/PostgreSQL journey | PASS | 1 file / 4 tests: child/family, exact/divergent replay, response-loss recovery, inactive/revoked/unknown/soft-deleted/ended/future authority, missing/stale anchors, privacy and lock concurrency. |
+| Production DB regression | PASS | Production migrations apply to a unique empty database; the existing 5 files / 37 tests pass before the four Nest cases. |
+| Timezone and mutable-prerequisite repair | PASS | Future roles fail closed with explicit UTC timestamp conversion. Concurrent Participant suspension and exact role revocation both block while the receipt transaction holds `FOR SHARE` / `FOR UPDATE`. |
+| Scenario-service regression | PASS | 7 files / 41 tests; built process health/default-disabled/legacy-route smoke passes. |
+| Application parity | PASS | 1 file / 22 Fastify/Nest cases. |
+| Unit and full typecheck | PASS | 21 files / 187 unit tests and repository-wide TypeScript pass after generating the ignored Prisma client in the floating My-Chat worktree; sibling tracked status is unchanged. |
+| Dev-host regression/population | PASS | 10 files / 43 tests; JSON population verifier passes at exactly 43 after repairing the stale 21-test threshold. |
+| Test routing and persistence boundary | PASS | 45 files: 21 unit, 5 production DB, 10 dev-host, 8 scenario-service and 1 X5; persistence source boundary remains isolated. |
+| CI workflow | PASS | YAML parses; CI feature verifier passes; exact checkout/Prisma generation, DB typecheck/test and always-uploaded sanitized artifacts are present. Remote execution awaits the next push and is not substituted for the completed local isolated evidence. |
+| Cleanup/effect boundary | PASS | Every uniquely named PostgreSQL database and temporary exact-pin worktree was removed. No schema/migration, persistent DB, sibling tracked source, environment value, secret, capability, deployment, activation or traffic changed. |

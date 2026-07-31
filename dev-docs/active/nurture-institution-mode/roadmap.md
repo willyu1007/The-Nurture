@@ -26,6 +26,12 @@ gates below.
 
 ## NestJS ingress M3 execution overlay（2026-07-31）
 
+Execution result:
+`M3_A_COMPLETE / M3_B_COMPLETE / M3_C_COMPLETE /
+OWNER_INTEGRATION_NO_GO`. The next serial slice is M4 governance alignment;
+M5 still owns handoff regeneration and removal/hard-disable of the temporary
+Fastify route.
+
 ### Goal and planning context
 
 - Goal: move the bounded P7 binding-owner application path into the compiled,
@@ -81,7 +87,7 @@ adapter retain the formal shell's safe error bodies.
 
 ### Execution phases
 
-1. **M3-A — runtime and composition seam**
+1. **M3-A — runtime and composition seam (complete)**
    - Deliverable: compiled scenario/DB runtime exports, shared authorizer
      factory/Guardian reader, production Prisma lifecycle and one real optional
      dependency used by both Guard and Controller.
@@ -90,7 +96,7 @@ adapter retain the formal shell's safe error bodies.
      service.
    - Rollback: revert the M3-A commit; the M2 disabled stub remains the known
      green state.
-2. **M3-B — controller and application parity**
+2. **M3-B — controller and application parity (complete)**
    - Deliverable: thin Nest controller, allowlisted request/response adapter,
      centralized error mapping and shared table-driven Fastify/Nest fixtures.
    - Exit: every success/domain/unexpected/validation application outcome is
@@ -98,7 +104,7 @@ adapter retain the formal shell's safe error bodies.
      remain green.
    - Rollback: remove the controller wiring and restore the disabled stub while
      retaining the shared composition code.
-3. **M3-C — real persistence and exact consumer**
+3. **M3-C — real persistence and exact consumer (complete)**
    - Deliverable: disposable-PostgreSQL HTTP journey covering child/family,
      replay, response loss, conflict, revoke and concurrency, plus exact pinned
      My-Chat consumer execution and a CI job that preserves sanitized evidence.

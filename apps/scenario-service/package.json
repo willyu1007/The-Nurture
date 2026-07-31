@@ -13,8 +13,12 @@
     "pretest": "pnpm run build:runtime-deps",
     "start": "node dist/main.js",
     "test": "vitest run -c vitest.config.ts",
+    "pretest:db": "pnpm run build:runtime-deps",
+    "test:db": "vitest run -c vitest.db.config.ts",
     "pretypecheck": "pnpm run build:runtime-deps",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pretypecheck:db": "pnpm run build:runtime-deps",
+    "typecheck:db": "tsc --noEmit -p tsconfig.db.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.28",
@@ -26,6 +30,7 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@my-chat/scenario-integrations": "0.1.0",
     "@types/node": "^20.12.0",
     "tsx": "^4.19.0",
     "typescript": "^5.4.0",

@@ -32,6 +32,7 @@ export function createGuardianRoleAuthorityReader(
           AND "deleted_at" IS NULL
         ORDER BY "id"
         LIMIT 1
+        FOR SHARE
       `;
       const participant = participants[0];
       if (!participant) {
@@ -51,8 +52,14 @@ export function createGuardianRoleAuthorityReader(
           AND "role" = 'guardian'
           AND "status" = 'active'
           AND "deleted_at" IS NULL
-          AND ("starts_at" IS NULL OR "starts_at" <= ${at})
-          AND ("ends_at" IS NULL OR "ends_at" > ${at})
+          AND (
+            "starts_at" IS NULL
+            OR "starts_at" <= (${at}::timestamptz AT TIME ZONE 'UTC')
+          )
+          AND (
+            "ends_at" IS NULL
+            OR "ends_at" > (${at}::timestamptz AT TIME ZONE 'UTC')
+          )
         ORDER BY "id"
         LIMIT 1
         FOR UPDATE

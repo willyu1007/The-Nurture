@@ -351,16 +351,37 @@ non-secret service configuration. The guard preserves the Fastify P7 order:
 3. an exact bearer passes only after length equality plus
    `timingSafeEqual`.
 
-No environment value can assert owner-authorizer availability: the application
-composition seam defaults it to false, and M3 must supply it together with the
-real authorizer. Therefore a token alone never enables the endpoint. The
-current controller remains the M3-disabled stub after successful guard
-evaluation. Health remains public, the guard is not global, and no My-Chat ORM,
-runtime, principal or business-authorization concern enters the service-auth
-object.
+No environment value can assert owner-authorizer availability. M3 replaces the
+old availability boolean with one immutable `BindingOwnerRuntime`: only a
+configured service credential, a UTF-8 evidence key of at least 32 bytes and a
+production `DATABASE_URL` create the Prisma-backed authorizer. Guard and
+controller read that same object, and Nest owns its Prisma shutdown lifecycle.
+A token alone therefore never enables the endpoint.
 
-The coordination record is an architectural acceptance only and changes no package, source,
-schema, migration, runtime, environment, gate, or traffic state.
+M3 keeps transport, application and persistence responsibilities separate:
+
+1. `@the-nurture/scenario/binding-owner-http` owns the fixed path, allowlisted
+   request reconstruction, explicit success DTO and complete domain-error
+   status map. Fastify and Nest use the same adapter during the transition.
+2. The Nest controller performs no policy or database work. After the
+   route-scoped guard, it invokes the injected authorizer and returns explicit
+   `200`; unknown failures become observable, body-safe
+   `500 owner_authorization_unavailable`.
+3. `@the-nurture/db/binding-owner` owns production composition. One receipt
+   transaction locks the typed anchor, takes a shared lock on the selected
+   active participant and an update lock on the exact current Guardian role,
+   then writes or exactly replays the authorization row.
+4. Participant/role soft deletes and role effective windows are explicit.
+   Raw-SQL comparisons convert the frozen JavaScript instant to UTC
+   `timestamp without time zone`, avoiding PostgreSQL session-timezone
+   authorization drift.
+
+The formal source boundary is compiled JavaScript, not workspace TypeScript
+source at runtime. Exact My-Chat/Base dependency revisions remain external
+owner inputs; the Nurture self-pin now covers the formal service, shared
+adapter and DB composition. M3 changes no schema/migration, persistent
+environment, capability, deployment, activation or traffic state. M4/M5 remain
+required before Owner Integration Handoff.
 
 ## 0.1b N3 dependency/source boundary (2026-07-28)
 

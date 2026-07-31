@@ -107,15 +107,24 @@
       "apps/backend/src/binding-owner.ts",
       "apps/backend/src/main.ts",
       "apps/backend/src/server.ts",
+      "apps/scenario-service/package.json",
+      "apps/scenario-service/src",
       "docs/context/workflow/nurture-scenario-contract.md",
+      "packages/nurture-db/package.json",
       "packages/nurture-db/src/binding-evidence-hasher.ts",
+      "packages/nurture-db/src/binding-owner.ts",
       "packages/nurture-db/src/index.ts",
       "packages/nurture-db/src/repositories/family-care-command.transaction.ts",
       "packages/nurture-db/src/repositories/institution-core.repositories.ts",
       "packages/nurture-db/src/repositories/port-repositories.ts",
       "packages/nurture-db/src/repositories/scenario-binding-owner.repository.ts",
       "packages/nurture-db/src/repositories/user-attention.repository.ts",
+      "packages/nurture-db/src/scenario-binding-owner.composition.ts",
+      "packages/nurture-scenario/package.json",
       "packages/nurture-scenario/scenario.manifest.yaml",
+      "packages/nurture-scenario/src/adapters/binding-owner-http.ts",
+      "packages/nurture-scenario/src/binding-owner-http.ts",
+      "packages/nurture-scenario/src/binding-owner.ts",
       "packages/nurture-scenario/src/deps.ts",
       "packages/nurture-scenario/src/domain/commands/command-kernel.ts",
       "packages/nurture-scenario/src/domain/commands/handoff-replay.ts",
@@ -135,6 +144,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "cf0a47233f6c3c5645ecee40ee5c4b57090b4d48a6d9e20de7b172d9e37e074d"
+    "contractSha256": "0c031f9962562bfea89937c2dd7227365ea34a374cfc01383a8ecfb4195242c4"
   }
 }

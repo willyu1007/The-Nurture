@@ -120,6 +120,9 @@ importers:
         specifier: ^7.8.2
         version: 7.8.2
     devDependencies:
+      '@my-chat/scenario-integrations':
+        specifier: link:../../../My-Chat/packages/scenario-integrations
+        version: link:../../../My-Chat/packages/scenario-integrations
       '@types/node':
         specifier: ^20.12.0
         version: 20.19.43

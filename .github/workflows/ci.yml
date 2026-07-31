@@ -103,11 +103,34 @@ jobs:
         run: node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
 
   scenario-service:
-    name: Scenario Service Skeleton
+    name: Scenario Service
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout The-Nurture
+        uses: actions/checkout@v6
+        with:
+          path: The-Nurture
+
+      - name: Read pinned source dependencies
+        id: pin
+        working-directory: The-Nurture
+        run: |
+          node -e "const fs=require('node:fs'); const pin=require('./docs/project/integrations/my-chat-workflow-contract.json'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'my_chat_repository='+pin.myChat.repository+'\\nmy_chat_revision='+pin.myChat.revision+'\\nworkflow_base_repository='+pin.myWorkflowBase.repository+'\\nworkflow_base_revision='+pin.myWorkflowBase.revision+'\\n')"
+
+      - name: Checkout My-Chat source dependency
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.pin.outputs.my_chat_repository }}
+          ref: ${{ steps.pin.outputs.my_chat_revision }}
+          path: My-Chat
+
+      - name: Checkout My-Workflow-Base source dependency
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.pin.outputs.workflow_base_repository }}
+          ref: ${{ steps.pin.outputs.workflow_base_revision }}
+          path: My-Workflow-Base
 
       - uses: pnpm/action-setup@v6
         with:
@@ -117,14 +140,31 @@ jobs:
         with:
           node-version: "24"
           cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          cache-dependency-path: The-Nurture/pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+          scope: "@willyu1007"
 
-      - name: Install scenario-service dependencies
-        run: pnpm install --frozen-lockfile --filter @the-nurture/scenario-service...
+      - name: Prepare pinned My-Chat source dependency
+        working-directory: My-Chat
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/my_chat?schema=public
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm prisma generate
+
+      - name: Install
+        working-directory: The-Nurture
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck, test, build, and smoke
+        working-directory: The-Nurture
+        env:
+          DATABASE_URL: postgresql://nurture:nurture@127.0.0.1:5432/nurture?schema=public
         run: |
           mkdir -p artifacts/scenario-service
+          pnpm db:generate 2>&1 | tee artifacts/scenario-service/prisma-generate.log
           pnpm --filter @the-nurture/scenario-service typecheck 2>&1 | tee artifacts/scenario-service/typecheck.log
           pnpm --filter @the-nurture/scenario-service test 2>&1 | tee artifacts/scenario-service/test.log
           pnpm --filter @the-nurture/scenario-service build 2>&1 | tee artifacts/scenario-service/build.log
@@ -135,7 +175,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: scenario-service-verification
-          path: artifacts/scenario-service/
+          path: The-Nurture/artifacts/scenario-service/
           if-no-files-found: warn
           retention-days: 7
 
@@ -281,6 +321,12 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: "@willyu1007"
 
+      - name: Prepare pinned My-Chat source dependency
+        working-directory: My-Chat
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm prisma generate
+
       - name: Install
         working-directory: The-Nurture
         env:
@@ -307,6 +353,22 @@ jobs:
         run: |
           pnpm test:db:ci
           pnpm verify:db-population
+
+      - name: Run M3 Nest binding-owner integration
+        working-directory: The-Nurture
+        run: |
+          mkdir -p artifacts/scenario-service-m3
+          pnpm typecheck:scenario-service:db 2>&1 | tee artifacts/scenario-service-m3/typecheck.log
+          pnpm test:scenario-service:db 2>&1 | tee artifacts/scenario-service-m3/postgres.log
+
+      - name: Upload M3 binding-owner evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: scenario-service-m3-postgres
+          path: The-Nurture/artifacts/scenario-service-m3/
+          if-no-files-found: warn
+          retention-days: 7
 
   dev-host-db:
     name: Backend Dev-Host DB and E2E

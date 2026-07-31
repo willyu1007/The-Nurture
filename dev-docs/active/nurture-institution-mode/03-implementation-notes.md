@@ -1353,3 +1353,41 @@
   framework bands.
 - M3-B changes no schema/migration, persistent database, environment value,
   secret, capability, deployment, activation or traffic.
+
+## 2026-07-31 — NestJS ingress M3-C persistence/consumer closure completed
+
+- Added a dedicated scenario-service DB test configuration and TypeScript
+  project. The ordinary seven-file service population remains database-free;
+  the new four-case suite runs only when explicitly selected with
+  `DATABASE_URL`.
+- Executed the public `@my-chat/scenario-integrations` binding-owner source
+  through the formal Nest controller. Its implementation and package metadata
+  are byte-identical to exact My-Chat `f00b868...`; the floating worktree has
+  only an unrelated additive index export. Detached exact Base/My-Chat
+  worktrees pass the complete dependency/source verifier.
+- Renewed real PostgreSQL evidence for child/family issuance, exact replay,
+  divergent replay, response-loss recovery, inactive receipt, current
+  authority loss, missing/stale anchors and raw-identity-free persistence.
+- The real database run exposed a session-timezone defect in the Guardian
+  effective-window raw SQL: Prisma `DateTime` columns are UTC values stored as
+  `timestamp without time zone`, while a direct JavaScript `Date` parameter can
+  be interpreted through the PostgreSQL session timezone. The shared reader
+  now converts the frozen instant to UTC before both start/end comparisons; a
+  future role in the Shanghai test environment now correctly fails closed.
+- Strengthened transaction admission by locking the selected active
+  Participant `FOR SHARE` before locking the exact Guardian role `FOR UPDATE`.
+  The Nest/PostgreSQL interleaving proves concurrent Participant suspension
+  and role revocation both time out until receipt commit.
+- Added exact My-Chat/Base checkouts, dependency generation, scenario DB
+  typecheck/test and always-uploaded sanitized evidence to CI. Review also
+  repaired the dev-host population assertion from 21 to the actual 43 tests,
+  then proved the JSON reporter and verifier together.
+- Expanded the Nurture scenario self-pin from the legacy Fastify-focused set to
+  40 paths / 53 files covering the formal Nest service, shared HTTP adapter and
+  DB composition. The new hash is
+  `0c031f9962562bfea89937c2dd7227365ea34a374cfc01383a8ecfb4195242c4`.
+- All uniquely named local test databases and detached verification worktrees
+  were removed. M3 changes no schema/migration, persistent database,
+  environment value, secret, capability, deployment, activation or traffic.
+  M4 governance alignment is next; M5 still owns handoff regeneration and
+  removal/hard-disable of the Fastify P7 route.

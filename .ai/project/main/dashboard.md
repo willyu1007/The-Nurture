@@ -10,33 +10,32 @@ Project: `main`
 - Primary feature: F-002 Institution ecology
 - Supporting feature: F-003 Six-surface store-beta readiness
 - Goal this cycle: T-004 Phase 0 discovery/gate reconciliation is complete.
-  T-002 ingress M0/M1/M2 and the M3 baseline are complete; the current critical
-  lane is M3-A build/composition, followed by M3-B application parity and M3-C
-  disposable-PostgreSQL evidence, with M4 interleaved. Then T-004 returns for
-  Phase 1-2 Contract Boundary,
-  followed by the remaining owner handoff and exact Joint Conformance.
+  T-002 ingress M0-M3 is complete with exact-consumer and disposable-PostgreSQL
+  evidence. The current critical lane is M4 API/env/port governance alignment;
+  then T-004 returns for Phase 1-2 Contract Boundary, followed by T-002 M5
+  handoff regeneration and exact Joint Conformance.
   Runtime/environment activation and external traffic remain gated.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
 
 ### Coordination Signals
 - Blocking dependency: six `TR-P0` plus three `TR-P1` traffic-readiness blockers, strict C30-C35 then C40-C45 qualification, D implementation/complete-candidate assembly, and Pilot-0-E are required before any Pilot-1 decision. The locked ECS/Compose path makes private Alibaba ACR a Pilot-1 prerequisite, not a current action.
-- Six-surface owner gate: merged P7 supplies the default-disabled private owner
-  endpoint and transaction-local authority/Receipt path, but protected use still
-  requires exact owner-integration evidence through the formal NestJS ingress plus
-  Joint Conformance with T-004; Fastify-only evidence is provisional.
+- Six-surface owner gate: formal NestJS M3 now supplies the default-disabled
+  private owner endpoint plus exact consumer, transaction/replay/revoke/privacy
+  and lock-concurrency evidence. Protected use still requires M4 governance,
+  M5 Owner Integration Handoff regeneration and Joint Conformance with T-004;
+  the remaining Fastify route is transitional only.
 - T-004 Phase 0: the current manifest/module/handler/presenter/repository/API/DB
   foundations are classified in
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
   Contract-parallel inputs are clear; My-Chat checkout drift from exact `f00b868`
   to `2573635` keeps Owner Integration NO-GO and is not a floating-repin request.
-- T-002 ingress M0/M1/M2 + M3 baseline: port semantics, the two-route formal v1 surface, G1-03
+- T-002 ingress M0-M3: port semantics, the two-route formal v1 surface, G1-03
   satisfied/deferred census and zero-wire-change fence are fixed in
   `dev-docs/active/nurture-institution-mode/13-nestjs-ingress-m0-decision-record.md`.
-  The fail-closed NestJS skeleton and P7-equivalent disabled/unauthorized/
-  authorized service-auth guard are landed locally with tests and smoke. The
-  baseline freezes application parity separately from M1 parser safety and
-  identifies the compiled shared-package seam as the first M3-A blocker.
+  The compiled shared composition, real controller, application parity, exact
+  pinned consumer and isolated PostgreSQL journeys are green; M4 must now
+  publish this implementation into API/env/port governance before M5.
 - Parallelism: G1 start opens T-005～T-007 design/pure-domain/synthetic work;
   Contract Boundary opens exact public-contract implementation, Owner Readiness
   opens isolated real-adapter integration, and Joint Conformance alone opens
@@ -66,8 +65,7 @@ Project: `main`
   audit is PASS; G5-0 details are the next discussion, while tooling remains
   just-in-time and does not enter the current upstream critical path.
 - Execution backbone (2026-07-31): the recommended single-mainline order is
-  T-004 Phase 0 → T-002 ingress M0/M1/M2 + M3 baseline (complete) →
-  M3-A/B/C with M4 interleaved (see T-002
+  T-004 Phase 0 → T-002 ingress M0-M3 (complete) → T-002 M4 (see
   `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 → T-002 M5 plus
   T-004 Phase 3-4 → G1 Joint Conformance → early T-007 G4-0A/0B
   publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →

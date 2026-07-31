@@ -6,8 +6,8 @@
 - Scope: move the qualified six-surface owner path from the provisional Fastify
   dev-host into the formal, production-intended NestJS scenario-service ingress
   required by G1-05.
-- State: M0 decision freeze, M1 skeleton, M2 service auth and M3 baseline
-  inventory completed 2026-07-31; M3-A build/composition implementation open.
+- State: M0 decision freeze, M1 skeleton, M2 service auth and M3-A/B/C endpoint
+  migration completed 2026-07-31; M4 governance alignment is next.
 - This document records planning truth only. It is not an Owner Integration
   Handoff, a Joint Conformance record, activation, deployment or traffic
   authority.
@@ -121,7 +121,7 @@ built-process smoke pass. The smoke configures the exact bearer while leaving
 the authorizer absent and proves disabled state still wins. M3 remains
 default-disabled and is now implementation-open.
 
-### M3 — P7 Endpoint Migration
+### M3 — P7 Endpoint Migration (complete 2026-07-31)
 
 - [x] Capture the M3 request/response/error/composition/test baseline and
   prioritize implementation findings in
@@ -132,7 +132,7 @@ default-disabled and is now implementation-open.
 - [x] M3-B: implement the allowlisted controller/request adapter, centralize
   `ERROR_STATUS`, derive guard readiness from the actual optional authorizer,
   and run table-driven Fastify/Nest application-parity fixtures.
-- [ ] M3-C: rerun child/family lifecycle, revoke, concurrency, exact replay,
+- [x] M3-C: rerun child/family lifecycle, revoke, concurrency, exact replay,
   divergent replay and response-loss suites on disposable PostgreSQL through
   NestJS; execute the exact pinned My-Chat consumer against that ingress.
 
@@ -142,6 +142,16 @@ field-identical status, error and response bodies versus Fastify on the
 unchanged path. Malformed JSON, payload limit, timeout and other failures
 produced before the adapter retain the M1 body-safe formal-shell contract and
 must not copy Fastify framework error names or messages.
+
+Acceptance: PASS locally. The exact public My-Chat consumer implementation runs
+through NestJS; the exact Base/My-Chat revisions and expanded 53-file Nurture
+self-pin verify. Production migrations plus 37 existing DB tests and four
+Nest/PostgreSQL journeys pass on disposable databases. The journeys cover
+child/family, exact and divergent replay, response-loss recovery, revoked and
+inactive authority, future/ended/soft-deleted roles, missing/stale anchors,
+PII-free persistence and participant/role lock concurrency. CI now performs
+the exact checkouts, Prisma generation, dedicated DB typecheck/test and
+sanitized artifact upload. All disposable databases were removed.
 
 ### M4 — Governance Alignment (may run parallel to M3)
 

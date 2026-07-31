@@ -6,6 +6,11 @@
 - Captured: 2026-07-31
 - Decision:
   `M3_BASELINE_COMPLETE / M3_IMPLEMENTATION_OPEN / OWNER_INTEGRATION_NO_GO`
+- Closure disposition (2026-07-31):
+  `M3_A_COMPLETE / M3_B_COMPLETE / M3_C_COMPLETE /
+  OWNER_INTEGRATION_NO_GO`. This supersedes only the implementation-open part
+  of the captured baseline; M4 governance alignment, M5 handoff regeneration
+  and Joint Conformance remain separate gates.
 - Scope: freeze the existing P7 HTTP/application behavior, composition boundary,
   persistence evidence and test gaps before moving the binding-owner endpoint
   from the provisional Fastify dev-host to the formal NestJS scenario service.
@@ -341,6 +346,27 @@ separate later gates.
 | Read-only Fastify/Nest parser probes | PASS — differences recorded above |
 | Disposable PostgreSQL rerun | NOT RUN — local Docker daemon unavailable |
 
-No persistent database or sibling repository was modified. The Docker
-limitation is an execution-environment gap, not a waiver: M3-C remains blocked
-until the disposable-PostgreSQL evidence runs successfully.
+At baseline capture, no persistent database or sibling repository was
+modified. The Docker limitation was not treated as a waiver: M3-C remained
+blocked until the disposable-PostgreSQL evidence recorded below succeeded.
+
+## M3 closure disposition (2026-07-31)
+
+| Baseline finding | Disposition |
+| --- | --- |
+| `M3-BLD-01` compiled runtime seam | CLOSED — narrow compiled scenario/DB subpaths are built before service typecheck/test/build/start. |
+| `M3-PAR-02` parity ambiguity | CLOSED — 22 shared Fastify/Nest application cases plus separate formal-shell parser safety. |
+| `M3-CMP-03` readiness drift | CLOSED — guard/controller share one actual optional `BindingOwnerRuntime`. |
+| `M3-TST-04` negative matrix | CLOSED — 41 scenario-service tests and complete domain/application error coverage. |
+| `M3-CI-05` persistence lane | CLOSED — exact dependency checkouts, Prisma generation, DB typecheck/test and sanitized artifacts in CI. |
+| `M3-ARC-06` dev-host composition | CLOSED — composition is owned by `@the-nurture/db/binding-owner`. |
+| `M3-AUT-07` implicit current-row rules | CLOSED — soft-delete/effective-window checks, UTC-safe time comparison and participant/role locks have real PostgreSQL coverage. |
+| `M3-VAL-08` DTO drift | CLOSED — explicit shared allowlist adapter; no implicit coercion/trimming/unknown rejection. |
+| `M3-CFG-09` fail-closed enablement | CLOSED — incomplete token/evidence/database configuration creates no authorizer or Prisma connection. |
+
+Local PostgreSQL on a unique empty database replaced the unavailable Docker
+daemon and was deleted after each run. The exact external pin verifier passed
+against detached worktrees at Base `5c04dce...` and My-Chat `f00b868...`; no
+sibling tracked file was changed. The Nurture self-pin expands to 40 paths / 53
+files at `0c031f99...5242c4`. M3 is complete, but this record is still not an
+Owner Integration Handoff, deployment, activation or traffic authority.

@@ -1803,3 +1803,35 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: after adding a workspace dependency, use lockfile-only mode only
   for resolution, then perform an actual frozen install before package-local
   typecheck/test.
+
+### 2026-07-31 — Comparing Prisma `DateTime` to raw JavaScript dates without UTC normalization
+
+- Symptom: a Guardian role with `starts_at` 60 seconds in the future was
+  authorized by the real PostgreSQL Nest journey in an Asia/Shanghai session.
+- What we tried: first asserted the created Prisma row retained the exact future
+  instant, then reran the production reader against a fresh database; storage
+  was correct and only the raw comparison was wrong.
+- Root cause: Prisma stores these `DateTime` values in PostgreSQL
+  `timestamp without time zone` columns. The raw SQL parameter for a JavaScript
+  `Date` carries timezone semantics, so PostgreSQL applied the session timezone
+  during a mixed-type comparison.
+- Fix: compare both effective-window columns against
+  `date_parameter::timestamptz AT TIME ZONE 'UTC'`.
+- Prevention: every raw-SQL comparison between Prisma `DateTime` columns and
+  JavaScript instants needs a non-UTC-session regression with future and ended
+  rows; do not infer correctness from UTC-only tests.
+
+### 2026-07-31 — Adding parity tests without renewing CI population thresholds
+
+- Symptom: all 43 dev-host tests passed, but the CI population verifier still
+  required exactly 21 and would have rejected the job after the test command.
+- What we tried: direct Vitest and file-routing checks were green, which showed
+  that classification was correct but did not exercise the JSON result-count
+  contract used by CI.
+- Root cause: the 22-case Fastify/Nest parity file was classified correctly,
+  but the separate JSON result-count contract was not updated with it.
+- Fix: move the threshold to 43 and execute `test:dev-host:ci` together with
+  `verify:dev-host-population`.
+- Prevention: any test-population change must update and run both file-routing
+  and result-count gates; a green direct Vitest invocation is insufficient CI
+  evidence.

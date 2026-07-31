@@ -16,13 +16,20 @@ The six-surface program MUST run two bounded workstreams in parallel:
    synthetic conformance and interface identity without implementing or faking the
    owner runtime.
 
-Wave 4 P7 is the current Nurture-side input to the controlled-parallel decision. Nurture commit
+Wave 4 P7 was the initial Nurture-side input to the controlled-parallel decision. Nurture commit
 `e9868c5` and merge `993e0c9` expose the default-disabled private binding-owner
 endpoint and pin My-Chat `f00b868`. The endpoint rereads and locks the exact
 Guardian-role authority source in the Receipt transaction and passes the real
 My-Chat resolver journey. P7 is classified as a bounded prerequisite owner-source
 repair; it MUST NOT be used to claim broad C30 functional implementation,
 Candidate readiness, activation or traffic authority while C30-I0-C/D remain open.
+
+The 2026-07-31 M3 closure moves that unchanged P7 wire/application contract into
+the formal NestJS scenario service, renews the exact-consumer and disposable
+PostgreSQL evidence, and preserves the Fastify route only as a temporary M5
+transition seam. This completes the implementation portion of formal ingress;
+M4 governance alignment and M5 handoff regeneration remain before any Owner
+Integration Readiness claim.
 
 G1 starts as soon as both tracks are owned. At G1 start, T-005～T-007 MAY proceed
 with product-state design, pure domain/policy logic, presenter design and clearly
@@ -573,7 +580,7 @@ revision `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336`.
 | Replace Base web-workbench local link | Complete | Frontend consumes published exact `@willyu1007/web-workbench@0.7.0`; the Base template build/install steps are removed; frozen install, typecheck, lint, unit tests, and strict scan pass. |
 | Remove direct sibling-source import | Complete | X5 imports only My-Chat public package exports, including the new worker subpath; the exact X5 source set is revision- and content-pinned; `ECO-CONSUMER-004` is absent. |
 | Re-pin and migrate My-Chat workflow packages | Base public-SSOT re-pin verifying | T-002 pins My-Chat `53bf92b5c2d2c1d2e7835e34b1ac50337d64f336` and Base `63d47d2ebc6f5062181b721a25182710f7974b17`, migrates all shared references to canonical-ref schema v1, adds the forward data/constraint migration, builds the pinned contract package in clean CI jobs, and passes native pin, typecheck, 175-unit, migration-replay, persistence, and strict consumer-boundary gates. Historical coordinator run `30343562287` passed the prior exact Base/Nurture revisions; renewed native and four-repository cloud evidence is required for the public publishing SSOT revision. |
-| Resolve service-framework timing | In progress — M0/M1/M2 and M3 baseline complete | The formal NestJS scenario-service builds, starts and applies the frozen P7 disabled-first/timing-safe bearer guard while keeping the owner controller default-disabled. The M3 baseline freezes the application-vs-framework parity boundary and identifies the compiled runtime seam as M3-A's first prerequisite. M3-A/B/C implementation, M4 governance alignment and M5 handoff regeneration remain; the Fastify harness is not promoted. |
+| Resolve service-framework timing | In progress — M0/M1/M2/M3 complete | The formal NestJS scenario-service builds, starts and executes the frozen P7 controller through shared compiled composition, disabled-first service auth and production Prisma. Application parity, exact consumer, replay/recovery/revoke/privacy and lock-concurrency evidence are green on disposable PostgreSQL. M4 governance alignment and M5 handoff regeneration remain; the Fastify harness is not promoted. |
 | Adopt Nurture ports | Pending | Reconcile `PORT=8000`, backend `3001`, and the Base-assigned `3200/3201` pair across env contract, code, docs, and tests. Owned by M0/M4 of `12-nestjs-ingress-migration-plan.md`. |
 | Repair API/governance drift | Pending | Reconcile the API index and close `ST-6(b)` governance hygiene without mixing unrelated user-owned tooling changes. Owned by M4 of `12-nestjs-ingress-migration-plan.md`. |
 
