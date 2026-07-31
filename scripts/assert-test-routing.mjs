@@ -18,12 +18,13 @@ async function collect(directory) {
 }
 
 const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await collect(path.join(repoRoot, 'apps')))];
-const routes = { unit: [], productionDb: [], devHost: [], x5Joint: [], unclassified: [] };
+const routes = { unit: [], productionDb: [], devHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
   else if (file === 'packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts') routes.x5Joint.push(file);
   else if (file.startsWith('packages/nurture-db/')) routes.productionDb.push(file);
   else if (file.startsWith('apps/backend/') && file.endsWith('.e2e.test.ts')) routes.devHost.push(file);
+  else if (file.startsWith('apps/scenario-service/')) routes.scenarioService.push(file);
   else routes.unclassified.push(file);
 }
 
@@ -32,12 +33,13 @@ if (
   routes.unit.length !== 21 ||
   routes.productionDb.length !== 5 ||
   routes.devHost.length !== 9 ||
+  routes.scenarioService.length !== 3 ||
   routes.x5Joint.length !== 1
 ) {
   throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/21 productionDb=${routes.productionDb.length}/5 devHost=${routes.devHost.length}/9 x5Joint=${routes.x5Joint.length}/1`,
+    `Test file census changed: unit=${routes.unit.length}/21 productionDb=${routes.productionDb.length}/5 devHost=${routes.devHost.length}/9 scenarioService=${routes.scenarioService.length}/3 x5Joint=${routes.x5Joint.length}/1`,
   );
 }
 process.stdout.write(
-  `[ok] test routing files=${files.length} unit=${routes.unit.length} production-db=${routes.productionDb.length} dev-host=${routes.devHost.length} x5-joint=${routes.x5Joint.length}\n`,
+  `[ok] test routing files=${files.length} unit=${routes.unit.length} production-db=${routes.productionDb.length} dev-host=${routes.devHost.length} scenario-service=${routes.scenarioService.length} x5-joint=${routes.x5Joint.length}\n`,
 );

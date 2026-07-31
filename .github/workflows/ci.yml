@@ -102,6 +102,43 @@ jobs:
       - name: Verify context layer
         run: node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
 
+  scenario-service:
+    name: Scenario Service Skeleton
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install scenario-service dependencies
+        run: pnpm install --frozen-lockfile --filter @the-nurture/scenario-service...
+
+      - name: Typecheck, test, build, and smoke
+        run: |
+          mkdir -p artifacts/scenario-service
+          pnpm --filter @the-nurture/scenario-service typecheck 2>&1 | tee artifacts/scenario-service/typecheck.log
+          pnpm --filter @the-nurture/scenario-service test 2>&1 | tee artifacts/scenario-service/test.log
+          pnpm --filter @the-nurture/scenario-service build 2>&1 | tee artifacts/scenario-service/build.log
+          node scripts/smoke-scenario-service.mjs 2>&1 | tee artifacts/scenario-service/smoke.log
+
+      - name: Upload scenario-service verification
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: scenario-service-verification
+          path: artifacts/scenario-service/
+          if-no-files-found: warn
+          retention-days: 7
+
   typecheck-unit:
     name: Typecheck and Unit Tests
     runs-on: ubuntu-latest

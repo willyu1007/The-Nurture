@@ -6,7 +6,8 @@
 - Scope: move the qualified six-surface owner path from the provisional Fastify
   dev-host into the formal, production-intended NestJS scenario-service ingress
   required by G1-05.
-- State: M0 decision freeze completed 2026-07-31; M1 implementation open.
+- State: M0 decision freeze and M1 skeleton completed 2026-07-31; M2 service
+  auth implementation open.
 - This document records planning truth only. It is not an Owner Integration
   Handoff, a Joint Conformance record, activation, deployment or traffic
   authority.
@@ -88,16 +89,22 @@
 Acceptance: PASS. See `13-nestjs-ingress-m0-decision-record.md`; no code, schema
 or environment change.
 
-### M1 — NestJS Skeleton and Startup Safety
+### M1 — NestJS Skeleton and Startup Safety (complete 2026-07-31)
 
-- Bootstrap `apps/scenario-service`: env-contract-bound fail-fast configuration
-  validation, `/health`, global error boundary that leaks no internal error
-  detail, body-size and timeout limits, default-disabled startup (missing
-  secret → safe refusal, never weak auth), zero-PII structured logging.
-- CI job: clean install/build/start/health.
+- [x] Bootstrap `apps/scenario-service` with centralized fail-fast
+  configuration validation and `PORT=8000` default.
+- [x] Add `/health`, body-safe global error handling, 64 KiB body limits,
+  five-second handler timeout and allowlisted zero-body structured logging.
+- [x] Keep P7 unconditionally default-disabled in M1; missing or present
+  secret-shaped environment values cannot select weak/partial auth.
+- [x] Prove the legacy `user_attention` and T-001 harness routes are absent.
+- [x] Add frozen-install/typecheck/test/build/start/health CI coverage and
+  diagnostic artifact capture.
 
-Acceptance: clean checkout passes install/build/start/health; startup with no
-secrets exposes only `/health` plus disabled responses.
+Acceptance: PASS locally. Package typecheck, 3 files / 11 tests, build and
+built-process smoke are green; the bounded frozen install is reproducible.
+Remote CI execution awaits the next pushed source. M2 must preserve the
+disabled state while adding unauthorized/authorized behavior.
 
 ### M2 — Service-auth Guard
 

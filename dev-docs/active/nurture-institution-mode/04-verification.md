@@ -1150,3 +1150,20 @@ the rejected checkpoint and are historical.
 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS | Registered context and built-in schema validation pass; no context artifact changed. |
 | `git diff --check` | PASS | No whitespace errors in the M0 documentation change set. |
 | Effect boundary | PASS | M0 changes documentation/governance only; no code, dependency, lockfile, schema/migration, database, environment, secret, API artifact, capability, deployment, activation or traffic effect. |
+
+## 2026-07-31 — NestJS ingress M1 skeleton
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `pnpm install --frozen-lockfile --filter @the-nurture/scenario-service...` | PASS | Lockfile is current and the bounded workspace dependency install succeeds. |
+| Scenario-service typecheck/test | PASS | Package typecheck passes; 3 files / 11 tests pass across configuration, timeout and HTTP security-boundary suites. |
+| Scenario-service build/smoke | PASS | Built `dist/main.js` starts on an isolated port; `/health` is `200`, P7 is `503 binding_owner_disabled`, and the legacy resolver is `404`. |
+| M1 privacy/fail-closed probes | PASS | A 64 KiB overflow returns body-safe `413 payload_too_large`; auth header, query and body secret markers are absent from captured structured logs; only fixed route classes are logged. |
+| `pnpm test:unit` | PASS | Existing Nurture suite remains 21 files / 187 tests green. |
+| `pnpm verify:test-routing` | PASS | 39 test files are classified: 21 unit, 5 production DB, 9 dev-host, 3 scenario-service and 1 X5. |
+| Persistence/schema boundaries | PASS | `verify:persistence-boundaries` and `verify:n1-schema-contract` (21 tables, 7 partial unique indexes, 7 checks) pass; M1 adds no persistence import or schema change. |
+| Governance/context | PASS | Project governance lint and strict context verification pass; M1 changes no registered context artifact. |
+| Root TypeScript contribution | CONDITIONAL PASS / OWNER GATE | After both Prisma clients are generated, repository `tsc` reports zero `apps/scenario-service` errors. The overall command remains NO-GO because linked My-Chat source/Prisma types come from sibling `2573635`, not the pinned `f00b868`. |
+| `pnpm verify:workflow-contract-pin` | EXPECTED FAIL / OWNER GATE | Exact verifier rejects current sibling My-Chat `25736351428e0d5a3d6c8e28e637d1414e1bb1e2`; no floating repin or sibling mutation was performed. |
+| CI workflow syntax | PASS | Repository CI YAML parses and the new Node 24 job runs frozen install, typecheck, tests, build, smoke, and always uploads diagnostic logs. Remote execution awaits the next pushed source. |
+| Effect boundary | PASS | No schema/migration, database, secret, env-contract/API artifact, My-Chat runtime, capability, deployment, activation or traffic effect; P7 remains unconditionally disabled. |

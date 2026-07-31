@@ -3,11 +3,14 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0（complete；M1 open）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0/M1（complete；M2 open）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-07-31
 - **Owner:** willyu1007
-- Next step: Implement NestJS ingress M1 from [`13-nestjs-ingress-m0-decision-record.md`](./13-nestjs-ingress-m0-decision-record.md): create `apps/scenario-service`, retain `PORT=8000`, expose `/health` plus fail-closed binding-owner disabled responses, and verify clean build/start/health before M2 service auth.
+- Next step: Implement NestJS ingress M2 in
+  [`12-nestjs-ingress-migration-plan.md`](./12-nestjs-ingress-migration-plan.md):
+  promote the existing timing-safe P7 bearer check into a NestJS guard and
+  prove disabled/unauthorized/authorized state parity without widening G1-03.
 - Current gate: The current handoff pins My-Chat `f00b868` and the 31-path
   Nurture source set; all consumers remain default-disabled. Protected
   T-005～T-007 integration stays NO-GO until the exact owner path and T-004

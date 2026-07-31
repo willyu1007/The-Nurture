@@ -1714,3 +1714,26 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: Exact X5 harnesses must mirror CI generation order and assert
   both generated client entrypoints exist before starting disposable
   databases.
+
+### 2026-07-31 — Reading a drifting sibling checkout as a local regression
+
+- Symptom: The repository-wide TypeScript command reports hundreds of missing
+  My-Chat workspace modules and Prisma fields while the new scenario-service
+  package itself typechecks, tests and builds cleanly.
+- Context: Root package overrides deliberately link bounded My-Chat packages
+  from `../My-Chat`; the current sibling is a dirty `2573635` checkout while
+  T-002 pins `f00b868`.
+- What we tried: Regenerating both Nurture Prisma clients and running the root
+  compiler separately from the pinned-contract build to isolate generated
+  state from source identity.
+- Root cause: TypeScript follows linked My-Chat source whose current workspace
+  packages and generated Prisma client do not represent the exact pinned
+  qualification source.
+- Fix / workaround: Treat the exact pin verifier as the source-identity gate,
+  retain the full typecheck result as an expected owner NO-GO, and verify the
+  scenario-service through its independent package compiler. Do not repin,
+  regenerate or clean the user-owned My-Chat worktree from Nurture.
+- Prevention: Cross-repository verification must start from the exact pinned
+  clean checkout. When that precondition fails, report sibling drift
+  separately and prove whether the current change contributes any compiler
+  diagnostics before classifying it as a regression.

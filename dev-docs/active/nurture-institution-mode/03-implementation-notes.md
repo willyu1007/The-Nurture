@@ -1193,3 +1193,33 @@
 - M1 is now implementation-open. M0 changed no source, dependency, lockfile,
   schema/migration, database, environment value, secret, API artifact,
   capability, deployment, activation or traffic.
+
+## 2026-07-31 — NestJS ingress M1 skeleton completed
+
+- Added `apps/scenario-service` on NestJS 11 with independent build,
+  typecheck, test and start scripts. The process owns `PORT` (default `8000`)
+  and is production-intended, while `apps/backend` remains unchanged as the
+  loopback development harness.
+- Added centralized fail-fast configuration, explicit 64 KiB request-body
+  limits, a five-second handler timeout, a body-safe global exception filter,
+  shutdown hooks and allowlisted JSON request/lifecycle logging.
+- Added only `GET /health` and the frozen P7 path. Until M2/M3, P7 is
+  unconditionally fail-closed with `503 binding_owner_disabled`; providing
+  secret-shaped environment variables cannot enable it. Legacy
+  `user_attention` and T-001 workflow routes return `404`.
+- Added 11 tests covering configuration validation, timeout translation,
+  health, disabled/absent routes, request ids, payload limits and a
+  secret-marker log-leak probe, plus a built-process smoke script.
+- Added a dedicated Node 24 CI job with frozen filtered install,
+  typecheck/test/build/smoke and always-uploaded seven-day diagnostic logs.
+  Root test routing now classifies three scenario-service test files and
+  `test:all` includes the new suite.
+- Root TypeScript enables decorator metadata so the NestJS package introduces
+  no repository-level parser errors. The current full root typecheck remains
+  owner-gated by the deliberately unpinned sibling My-Chat checkout; the
+  scenario-service package typecheck is green and contributes zero errors to
+  that failed cross-repository run.
+- No P7 request DTO, authentication, authorizer/database composition, schema,
+  migration, API/context artifact, environment contract, secret, capability,
+  deployment, activation or traffic behavior was added. M2 service auth is the
+  next serial slice.

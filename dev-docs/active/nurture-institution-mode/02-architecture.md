@@ -313,6 +313,28 @@ The formal ingress v1 route set is only `/health` plus
 that service. Full rationale and the G1-03 satisfied/deferred census live in
 `13-nestjs-ingress-m0-decision-record.md`.
 
+M1 materializes that boundary as a new `apps/scenario-service` NestJS
+application without importing My-Chat runtime or ORM source:
+
+- one centralized configuration loader validates `APP_ENV`, `SERVICE_NAME`
+  and `PORT` before listen; service defaults remain `dev`, `the-nurture` and
+  `8000`;
+- explicit Express body parsers cap JSON/urlencoded input at 64 KiB, a global
+  interceptor caps handler execution at five seconds, and a catch-all filter
+  exposes only allowlisted protocol errors or body-safe generic errors;
+- request logs contain generated request id, method, fixed route class, status
+  and duration only. Raw URL/query, headers, request/response body, tokens,
+  anchors and actor/subject identifiers are not log fields;
+- the P7 path is an unconditional `503 binding_owner_disabled` stub in M1.
+  Even present environment secrets cannot activate it before the M2 guard and
+  M3 owner composition are implemented and tested;
+- the service does not register the legacy `user_attention` or T-001 harness
+  routes. `apps/backend` remains a separate loopback-only development harness.
+
+The root TypeScript configuration enables legacy decorator metadata solely so
+the repository-wide compiler can parse the NestJS application; the
+scenario-service retains its own bounded build/typecheck configuration.
+
 The coordination record is an architectural acceptance only and changes no package, source,
 schema, migration, runtime, environment, gate, or traffic state.
 
