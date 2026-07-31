@@ -232,7 +232,82 @@
               "postconditionRef": {
                 "$ref": "../interface/contract-primitives.schema.json#/$defs/versionedRef"
               }
-            }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "const": "must_satisfy"
+                    }
+                  },
+                  "required": [
+                    "mode"
+                  ]
+                },
+                "then": {
+                  "type": "object",
+                  "required": [
+                    "predicateRef"
+                  ],
+                  "properties": {
+                    "predicateRef": {
+                      "$ref": "../interface/contract-primitives.schema.json#/$defs/versionedRef"
+                    },
+                    "postconditionRef": false
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "const": "convergent_postcondition"
+                    }
+                  },
+                  "required": [
+                    "mode"
+                  ]
+                },
+                "then": {
+                  "type": "object",
+                  "required": [
+                    "postconditionRef"
+                  ],
+                  "properties": {
+                    "predicateRef": false,
+                    "postconditionRef": {
+                      "$ref": "../interface/contract-primitives.schema.json#/$defs/versionedRef"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "enum": [
+                        "must_equal",
+                        "compatible_append"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "mode"
+                  ]
+                },
+                "then": {
+                  "type": "object",
+                  "properties": {
+                    "predicateRef": false,
+                    "postconditionRef": false
+                  }
+                }
+              }
+            ]
           }
         }
       }

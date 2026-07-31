@@ -93,6 +93,7 @@
       "then": {
         "properties": {
           "content": {
+            "type": "array",
             "items": {
               "$ref": "#/$defs/conversationItem"
             }
@@ -114,6 +115,7 @@
       "then": {
         "properties": {
           "content": {
+            "type": "array",
             "items": {
               "$ref": "#/$defs/boardModule"
             }
@@ -135,6 +137,7 @@
       "then": {
         "properties": {
           "content": {
+            "type": "array",
             "items": {
               "$ref": "#/$defs/workbenchModule"
             }

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/interface/surface-contract-artifact-pin.schema.json",
+  "title": "SurfaceContractArtifactPinV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "interfaceContract",
+    "manifestDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "artifactKind": {
+      "const": "surface_contract_manifest"
+    },
+    "interfaceContract": {
+      "$ref": "interface-contract-ref.schema.json"
+    },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

@@ -57,6 +57,7 @@
     "verify:formal-ingress-contract": "node scripts/assert-formal-ingress-contract.mjs",
     "verify:port-topology": "node scripts/assert-port-topology.mjs",
     "verify:surface-contract": "node scripts/surface-contract/verify-surface-contract.mjs",
+    "verify:surface-contract-schemas": "node scripts/surface-contract/validate-surface-contract-schemas.mjs",
     "verify:n1-schema-contract": "node scripts/assert-n1-schema-contract.mjs",
     "verify:x4-handoff-replay-contract": "node scripts/assert-x4-handoff-replay-contract.mjs",
     "test:workflow-contract-pin": "node --test scripts/verify-workflow-contract-pin.test.mjs",
@@ -70,6 +71,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "dotenv": "^16.4.0",
     "prisma": "^5.22.0",
     "tsx": "^4.19.0",

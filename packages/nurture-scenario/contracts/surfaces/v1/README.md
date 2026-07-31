@@ -13,7 +13,7 @@ six-surface interface contract.
   private confirmation/cursor bindings, the closed ten-capability V1 registry,
   stable presenter contracts and versioned policy/repository ports.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.0.0` digest, shared-core hash,
+  records the exact `nurture.surface-contract@1.0.1` digest, shared-core hash,
   canonical source inventory and per-capability/per-surface slice hashes.
   `generated/surface-contract.artifact-pin.json` is the separately trusted
   byte-independent canonical hash required before loading that manifest.

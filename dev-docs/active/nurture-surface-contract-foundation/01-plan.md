@@ -302,9 +302,10 @@ Integration Readiness, Joint Conformance or activation.
 
 ## Phase 2 Quality Closure
 
-**Result:** IN PROGRESS on 2026-07-31. Runtime fail-closed and trusted-artifact
-loading are complete; strict schema compilation, permanent CI wiring and exact
-contract rotation remain before Phase 3.
+**Result:** PASS on 2026-07-31. Runtime fail-closed, trusted-artifact loading,
+strict schema compilation, permanent CI wiring and exact contract rotation are
+complete. This remains a contract baseline, not Synthetic Qualification, Owner
+Integration Readiness, Joint Conformance or activation.
 
 - [x] dependency state 在 SemVer/gate 比较前验证 exact fields、stable key、release
   SemVer、closed gate enum 和唯一 dependency key；非法或重复 evidence 失败关闭。
@@ -313,11 +314,11 @@ contract rotation remain before Phase 3.
   artifact integrity。
 - [x] loader 与 generator 对 concurrency condition refs、schema refs、handler/
   presenter stable keys、roles、invalidation scopes 和数组唯一性保持一致。
-- [ ] 全部 JSON Schema 通过 Ajv 2020 strict compilation，并验证 generated manifest
+- [x] 全部 JSON Schema 通过 Ajv 2020 strict compilation，并验证 generated manifest
   与 artifact pin。
-- [ ] tooling tests、schema compilation 和 deterministic manifest/pin rebuild 进入
+- [x] tooling tests、schema compilation 和 deterministic manifest/pin rebuild 进入
   GitHub Actions permanent gate。
-- [ ] 规范 schema 变化旋转 interface version/digest，更新 exact handoff 文档并完成
+- [x] 规范 schema 变化旋转 interface version/digest，更新 exact handoff 文档并完成
   全量 regression。
 
 验收：
@@ -326,7 +327,9 @@ contract rotation remain before Phase 3.
 - semantic manifest tamper 即使保留原 contract ref 也不得通过 trusted loading。
 - compatibility admission 只判断 exact interface ref；artifact integrity 由独立可信
   pin 提供，二者不得互相替代。
-- quality closure PASS 前不得进入 Phase 3。
+- quality-closed baseline 为 `nurture.surface-contract@1.0.1` /
+  `sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59`；
+  Phase 3 必须从该 exact identity 继续旋转。
 
 ## Phase 3 — Fixtures and Cross-role Journey
 

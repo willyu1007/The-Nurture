@@ -345,6 +345,40 @@ must land together; no placeholder `generated/` artifact is permitted.
   schema/migration, database, environment, secret, deployment or traffic
   changed in this step. Strict schema/CI closure remains the next step.
 
+## 2026-07-31 — Phase 2 quality closure completed
+
+- Added direct, lockfile-pinned Ajv 2020 and formats development dependencies
+  plus `verify:surface-contract-schemas`. The command compiles all 31 normative
+  schemas with `strict: true`, validates the generated manifest/artifact pin
+  and proves two representative malformed artifacts reject.
+- Repaired all three `SurfaceEnvelopeV1` conditional content branches by
+  explicitly declaring their array type. The envelope now compiles under
+  strict JSON Schema consumers instead of relying on type knowledge from a
+  sibling subschema.
+- Froze conditional head-binding requirements in the descriptor schema:
+  `must_satisfy` requires only `predicateRef`,
+  `convergent_postcondition` requires only `postconditionRef`, and equality/
+  compatible-append modes forbid both.
+- Added a normative artifact-pin schema, registered it and included it in the
+  shared-core boundary.
+- Added a permanent GitHub Actions step that runs tooling tests, strict schema
+  validation and exact manifest/pin rebuild verification.
+- Rotated the exact interface to `nurture.surface-contract@1.0.1` /
+  `sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59`.
+  The shared-core hash is
+  `sha256:be3da7b93e812f3a648adbb251525ef0f75d0c09988377c9e1904633f98c6312`;
+  the canonical manifest pin is
+  `sha256:961c6b45806cd065daec271cf8981a05bedc3f0af0ec774d3099dbbaf217ca59`.
+- All ten capability slice hashes and six surface slice hashes remain stable;
+  only shared core rotated. The compatibility policy therefore invalidates all
+  surface-contract evidence, but no Synthetic or Joint PASS exists yet, so
+  there is no historical qualification record to migrate.
+- The first strict compile exposed a nested `strictRequired` formulation in
+  the new conditional-head schema. It was repaired with boolean property
+  schemas rather than weakening Ajv strictness.
+- No capability was activated and no My-Chat pin, owner path, schema/migration,
+  database, environment, secret, deployment or traffic state changed.
+
 ### Handoff to Phase 3
 
 Create the versioned PII-free synthetic world and independent GJ-1～GJ-5/RJ-1

@@ -25,6 +25,12 @@ importers:
       '@types/node':
         specifier: ^20.12.0
         version: 20.19.43
+      ajv:
+        specifier: 8.20.0
+        version: 8.20.0
+      ajv-formats:
+        specifier: 3.0.1
+        version: 3.0.1(ajv@8.20.0)
       dotenv:
         specifier: ^16.4.0
         version: 16.6.1

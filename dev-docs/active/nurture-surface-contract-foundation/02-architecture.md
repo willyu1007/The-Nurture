@@ -167,6 +167,12 @@ artifact pin 若来自同一个不可信 payload，则该 pin 不构成信任根
 pin 校验前执行与 generator 一致的 nested semantic validation，避免 malformed
 concurrency/dependency metadata 被完整性错误掩盖。
 
+所有 normative JSON Schema 必须以仓库直接声明并锁定的 Ajv 2020 + formats 在
+`strict: true` 下编译。generated manifest 和 artifact pin 必须分别通过其规范 schema，
+并至少保留 malformed conditional head 与 unknown pin field 的负向检查。tooling、
+strict schema compilation 和 deterministic manifest/pin rebuild 是同一个 CI gate；
+任何一项失败都禁止采用新的 exact interface identity。
+
 digest 输入是一个有序 artifact set：descriptor registry、surface schemas、
 invocation/result/error schemas、policy/schema refs、fixture manifest 和 conformance
 manifest。每个 artifact 先解析为严格数据模型，拒绝 unknown/duplicate keys，再按 UTF-8

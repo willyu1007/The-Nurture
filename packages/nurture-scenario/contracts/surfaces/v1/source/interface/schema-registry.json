@@ -97,6 +97,11 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.surface-contract-artifact-pin@1",
+      "artifactPath": "interface/surface-contract-artifact-pin.schema.json",
+      "jsonPointer": ""
+    },
+    {
       "schemaRef": "schema:nurture.surface-operation-error@1",
       "artifactPath": "invocation/operation-error.schema.json",
       "jsonPointer": ""

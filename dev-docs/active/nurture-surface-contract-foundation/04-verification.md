@@ -178,3 +178,20 @@
 | Full unit regression and population | PASS | 23 files / 216 tests. |
 | `pnpm verify:surface-contract` | PASS | Manifest and artifact pin rebuild to exact checked bytes; interface remains `1.0.0` in this non-semantic runtime-hardening step. |
 | Effect boundary | PASS | No normative source schema, interface identity, activation, DB, environment, secret, deployment or traffic changed. |
+
+## Phase 2 Quality Closure Verification — Final
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Strict schema compilation | PASS AFTER REPAIR | `pnpm verify:surface-contract-schemas` compiles 31/31 schemas with Ajv 2020 `strict: true`, validates generated manifest/pin and passes two negative artifacts. |
+| Surface envelope strictness | PASS AFTER REPAIR | Conversation, board and workbench conditional content branches explicitly declare `type: array`; the prior strict-types error is gone. |
+| Descriptor conditional heads | PASS AFTER REPAIR | Schema, generator and loader agree on predicate/postcondition requirements; malformed `must_satisfy` rejects. |
+| Exact identity rotation | PASS | `nurture.surface-contract@1.0.1` / `sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59`; shared core `sha256:be3da7b93e812f3a648adbb251525ef0f75d0c09988377c9e1904633f98c6312`; artifact pin `sha256:961c6b45806cd065daec271cf8981a05bedc3f0af0ec774d3099dbbaf217ca59`. |
+| Slice invalidation | PASS | All 10 capability and 6 surface slice hashes are unchanged from `1.0.0`; shared core changed and therefore globally invalidates contract evidence. No Synthetic/Joint PASS exists to migrate. |
+| Permanent CI gate | PASS | GitHub Actions unit job runs tooling 5/5, strict schema validation and deterministic manifest/pin verification. |
+| Focused contract regression | PASS | Phase 1/2 suites: 2 files / 29 tests. |
+| Full unit regression and population | PASS | 23 files / 216 tests. |
+| Scenario TypeScript | PASS | `pnpm --filter @the-nurture/scenario typecheck`. |
+| Test routing and persistence boundaries | PASS | 48 routed files; persistence isolation check passes. |
+| Docs/governance/context/diff | PASS | Strict task-doc lint, project governance lint, strict context verification and `git diff --check` pass. |
+| Effect boundary | PASS | No activation, owner integration, My-Chat pin, DB/schema/migration, environment, secret, deployment or traffic action occurred. |

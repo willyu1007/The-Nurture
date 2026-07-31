@@ -57,6 +57,7 @@
     "interface/compatibility-policy.json",
     "interface/contract-primitives.schema.json",
     "interface/interface-contract-ref.schema.json",
+    "interface/surface-contract-artifact-pin.schema.json",
     "interface/surface-contract-manifest.schema.json",
     "interface/surface-rules.json",
     "invocation/eligibility-result.schema.json",
