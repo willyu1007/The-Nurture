@@ -1457,3 +1457,9 @@
   expiry rejection, 403/503/transport mapping, pre-network child-id
   validation); unit census 21 -> 22 in `assert-test-routing.mjs`;
   unit population 194/194 over minimum 187.
+- Pin follow-up: the scenario contract source set grew by the two
+  derived-read client files (census 40 -> 42 paths, 55 expanded files);
+  `my-chat-workflow-contract.json` nurtureScenario.contractSha256
+  recomputed via the verifier's own `computeContractHash` to
+  `e9346e2d5fd90d5664a83237ee5c23dac457d21a972e9ceafc09000285bcf8d7`.
+  Historical hashes in earlier entries remain historical evidence.

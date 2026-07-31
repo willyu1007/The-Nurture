@@ -123,9 +123,11 @@
       "packages/nurture-scenario/package.json",
       "packages/nurture-scenario/scenario.manifest.yaml",
       "packages/nurture-scenario/src/adapters/binding-owner-http.ts",
+      "packages/nurture-scenario/src/adapters/derived-age-stage-http.ts",
       "packages/nurture-scenario/src/binding-owner-http.ts",
       "packages/nurture-scenario/src/binding-owner.ts",
       "packages/nurture-scenario/src/deps.ts",
+      "packages/nurture-scenario/src/derived-age-stage-http.ts",
       "packages/nurture-scenario/src/domain/commands/command-kernel.ts",
       "packages/nurture-scenario/src/domain/commands/handoff-replay.ts",
       "packages/nurture-scenario/src/domain/identity",
@@ -144,6 +146,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "45f8c0c68cbfcb9af9701c867c262fc9a7c2b16d8e2442dfd48497987902380b"
+    "contractSha256": "6ba5ce8ac589d681ecf1b01d368c3c0507ec4c7e4b0da46e931562f0e526ae71"
   }
 }
