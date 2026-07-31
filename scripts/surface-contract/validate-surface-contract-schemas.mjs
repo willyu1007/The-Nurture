@@ -5,6 +5,7 @@ import path from "node:path";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import {
+  checkConformanceRegistry,
   generatedArtifactPinPath,
   generatedManifestPath,
   repoRoot,
@@ -25,6 +26,8 @@ const journeyExpectedViewSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-expected-view.schema.json";
 const selectionCasesSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/selection/selection-cases.schema.json";
+const conformanceCasesSchemaId =
+  "https://contracts.the-nurture.local/surfaces/v1/source/conformance/conformance-cases.schema.json";
 const journeyKeys = ["gj-1", "gj-2", "gj-3", "gj-4", "gj-5", "rj-1"];
 const scriptedJourneyKeys = journeyKeys;
 const selectionFamilies = [
@@ -171,9 +174,19 @@ for (const family of selectionFamilies) {
   }
 }
 assertSelectionRejectsUnknownFamily(validator, selectionCases);
+const conformanceRegistry = await validateSourceDocument(
+  validator,
+  conformanceCasesSchemaId,
+  path.join(sourceRoot, "conformance/conformance-cases.json"),
+);
+const conformanceCoverage = checkConformanceRegistry(
+  conformanceRegistry,
+  manifest,
+);
+assertConformanceRejectsUnknownSlice(conformanceRegistry, manifest);
 
 process.stdout.write(
-  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=${9 + scriptCount + expectedViewCount} negatives=6\n`,
+  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=${10 + scriptCount + expectedViewCount} conformance-cases=${conformanceRegistry.cases.length} slices=${conformanceCoverage.covered}/${conformanceCoverage.universe} negatives=7\n`,
 );
 
 async function collectSchemaPaths(directory) {
@@ -287,6 +300,24 @@ function assertScriptRejectsUnknownErrorCode(ajv, script) {
   malformed.refusal.expectedError.code = "granted";
   if (validate(malformed)) {
     throw new Error("Journey script schema accepted an unknown error code");
+  }
+}
+
+function assertConformanceRejectsUnknownSlice(registry, manifestValue) {
+  const malformed = structuredClone(registry);
+  // Evidence scope must stay mechanical: a case may only cover slices that
+  // exist in the generated manifest.
+  malformed.cases[0].covers = ["capability:not_a_capability"];
+  let rejected = false;
+  try {
+    checkConformanceRegistry(malformed, manifestValue);
+  } catch {
+    rejected = true;
+  }
+  if (!rejected) {
+    throw new Error(
+      "Conformance registry accepted a case covering an unknown slice",
+    );
   }
 }
 

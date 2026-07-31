@@ -56,6 +56,7 @@
     "verify:persistence-boundaries": "node scripts/assert-persistence-boundaries.mjs",
     "verify:formal-ingress-contract": "node scripts/assert-formal-ingress-contract.mjs",
     "verify:port-topology": "node scripts/assert-port-topology.mjs",
+    "verify:surface-conformance": "node scripts/surface-contract/run-surface-conformance.mjs",
     "verify:surface-contract": "node scripts/surface-contract/verify-surface-contract.mjs",
     "verify:surface-contract-schemas": "node scripts/surface-contract/validate-surface-contract-schemas.mjs",
     "verify:n1-schema-contract": "node scripts/assert-n1-schema-contract.mjs",

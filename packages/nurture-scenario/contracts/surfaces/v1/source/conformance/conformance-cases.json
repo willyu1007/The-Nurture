@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "qualificationLayer": "synthetic_contract_qualification",
+  "cases": [
+    {
+      "caseKey": "digest-rebuild-determinism",
+      "kind": "digest_rebuild",
+      "covers": ["all_slices"],
+      "suiteRef": {
+        "runner": "script",
+        "target": "scripts/surface-contract/verify-surface-contract.mjs"
+      }
+    },
+    {
+      "caseKey": "schema-strict-compilation-and-negatives",
+      "kind": "schema_compilation",
+      "covers": ["all_slices"],
+      "suiteRef": {
+        "runner": "script",
+        "target": "scripts/surface-contract/validate-surface-contract-schemas.mjs"
+      }
+    },
+    {
+      "caseKey": "generator-rotation-and-output-guards",
+      "kind": "tooling_guard",
+      "covers": ["shared_core"],
+      "suiteRef": {
+        "runner": "node_test",
+        "target": "scripts/surface-contract/contract-core.test.mjs"
+      }
+    },
+    {
+      "caseKey": "surface-visibility-and-source-hygiene",
+      "kind": "visibility",
+      "covers": [
+        "shared_core",
+        "surface:caregiver_nurture_chat",
+        "surface:caregiver_teacher_board",
+        "surface:guardian_family_board",
+        "surface:guardian_nurture_chat",
+        "surface:institution_board",
+        "surface:institution_workbench"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-1-source.test.ts"
+      }
+    },
+    {
+      "caseKey": "descriptor-handler-presenter-consistency",
+      "kind": "descriptor_handler_presenter_consistency",
+      "covers": ["all_slices"],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
+      }
+    },
+    {
+      "caseKey": "exact-admission-and-trusted-pin",
+      "kind": "contract_admission",
+      "covers": ["shared_core"],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
+      }
+    },
+    {
+      "caseKey": "dependency-fail-closed",
+      "kind": "dependency_fail_closed",
+      "covers": [
+        "capability:acknowledge_family_care_item",
+        "capability:correct_family_care_message",
+        "capability:policy_redact_family_care_message",
+        "capability:query_caregiver_family_care_work",
+        "capability:query_family_care_item",
+        "capability:query_guardian_family_care_timeline",
+        "capability:redact_family_care_message",
+        "capability:reply_family_care_item",
+        "capability:submit_family_care_question",
+        "capability:withdraw_family_care_request"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
+      }
+    },
+    {
+      "caseKey": "fixture-world-determinism",
+      "kind": "deterministic_fixtures",
+      "covers": ["fixture:world"],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-world.test.ts"
+      }
+    },
+    {
+      "caseKey": "fixture-journey-independence",
+      "kind": "deterministic_fixtures",
+      "covers": [
+        "fixture:journey:gj-1",
+        "fixture:journey:gj-2",
+        "fixture:journey:gj-3",
+        "fixture:journey:gj-4",
+        "fixture:journey:gj-5",
+        "fixture:journey:rj-1"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-journeys.test.ts"
+      }
+    },
+    {
+      "caseKey": "fixture-journey-script-consistency",
+      "kind": "deterministic_fixtures",
+      "covers": [
+        "fixture:journey:gj-1",
+        "fixture:journey:gj-2",
+        "fixture:journey:gj-3",
+        "fixture:journey:gj-4",
+        "fixture:journey:gj-5",
+        "fixture:journey:rj-1"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-scripts.test.ts"
+      }
+    },
+    {
+      "caseKey": "fixture-selection-determinism",
+      "kind": "deterministic_fixtures",
+      "covers": ["fixture:selection"],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-selection.test.ts"
+      }
+    }
+  ]
+}

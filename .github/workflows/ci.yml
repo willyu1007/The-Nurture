@@ -271,12 +271,9 @@ jobs:
           pnpm test:unit:ci
           pnpm verify:unit-population
 
-      - name: Verify surface contract artifact
+      - name: Run synthetic surface-contract conformance suite
         working-directory: The-Nurture
-        run: |
-          pnpm test:surface-contract-tooling
-          pnpm verify:surface-contract-schemas
-          pnpm verify:surface-contract
+        run: pnpm verify:surface-conformance
 
   production-db:
     name: Nurture Production DB

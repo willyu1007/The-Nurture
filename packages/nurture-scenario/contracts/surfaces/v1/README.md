@@ -22,7 +22,7 @@ six-surface interface contract.
   files join the canonical inventory and root digest without entering the
   shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.6.0` digest, shared-core hash,
+  records the exact `nurture.surface-contract@1.7.0` digest, shared-core hash,
   canonical source inventory and per-capability/per-surface/per-fixture slice
   hashes (fixture slices: `world`, `journey:<key>`, `selection`).
   `generated/surface-contract.artifact-pin.json` is the separately trusted
@@ -38,6 +38,29 @@ six-surface interface contract.
 These artifacts do not activate a capability, grant authority, publish a
 package or authorize My-Chat adoption. Protected use still requires exact
 owner integration and Joint Conformance.
+
+## Consumer adoption checklist
+
+- Pin the exact interface ref — `key` + `version` + `digest` — taken from
+  `generated/surface-contract.manifest.json`. Admission never accepts
+  version ranges, a mutable `latest`, major-only pins or digest-free
+  fallbacks (`interface/compatibility-policy.json` is normative).
+- Load the manifest only together with the separately obtained trusted
+  `surface-contract.artifact-pin.json` and reject on canonical-hash
+  mismatch; a self-declared interface ref is never integrity evidence.
+- Declare the expected exact ref in every invocation. The only
+  renegotiation path is a `contract_mismatch` error with
+  `required_upgrade`; consumers then adopt a new exact ref explicitly.
+- Every semantic or additive change rotates version and digest. Evidence
+  scope is judged mechanically per capability/surface/fixture slice hash:
+  an unchanged slice keeps its evidence, a changed slice invalidates only
+  referencing evidence, shared-core drift invalidates everything.
+- `source/conformance/conformance-cases.json` enumerates the synthetic
+  qualification cases (optionally back-linked via `T###-AC-###` refs);
+  `pnpm verify:surface-conformance` reruns the whole suite in one
+  deterministic command. Synthetic PASS qualifies the contract layer
+  only — Owner Integration Readiness and Joint Conformance are separate
+  gates that bind the real pinned owner path.
 
 ## Editing rules
 

@@ -560,3 +560,31 @@ the new root ref still requires exact consumer adoption.
 - Identity `1.5.0 -> 1.6.0` (`sha256:973be185…`). Phase 3 is complete;
   Phase 4 synthetic qualification is next. No schema/migration,
   database, capability, activation, owner-claim or traffic change.
+
+## 2026-08-01 Phase 4 synthetic qualification and handoff
+
+- Added `source/conformance/conformance-cases.json` (+ schema): 11 cases
+  over the closed kind set, each binding `covers` slice refs; the
+  validator expands `all_slices` against the generated manifest, fails
+  on unknown slices, missing suite targets or any uncovered slice
+  (25/25 covered), and negatively proves unknown-slice rejection
+  (`negatives=7`). The optional `acceptanceRefs` field carries
+  `T###-AC-###` back-links for consuming tasks.
+- Added the single-command suite `pnpm verify:surface-conformance`
+  (`run-surface-conformance.mjs`): digest rebuild, strict schema
+  validation, tooling guards and all six surface-contract vitest files,
+  then the coverage recheck and a qualification summary that explicitly
+  prints `owner-integration=NO-GO joint-conformance=NOT-RUN`. CI's
+  surface-contract gate now runs exactly this command.
+  `checkConformanceRegistry` lives in side-effect-free
+  `contract-core.mjs` so the runner and validator share it.
+- README gains the consumer adoption checklist (exact pin method,
+  trusted-pin loading, contract_mismatch/required_upgrade renegotiation,
+  slice-scoped evidence rules, synthetic-vs-owner layer separation).
+  Identity `1.6.0 -> 1.7.0` (`sha256:b7691a81…`); shared core and all 16
+  capability/surface slices remain byte-stable.
+- Qualification record and T-008 handoff:
+  `08-phase-4-synthetic-qualification-and-handoff.md` —
+  `SYNTHETIC_CONTRACT_QUALIFICATION_PASS / OWNER_INTEGRATION_NO_GO /
+  JOINT_CONFORMANCE_NOT_RUN`. Every T-002 NO-GO stays NO-GO; no
+  activation, Candidate, DB, secret or traffic effect.

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/conformance/conformance-cases.schema.json",
+  "title": "SurfaceContractConformanceCasesV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "qualificationLayer", "cases"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "qualificationLayer": { "const": "synthetic_contract_qualification" },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/conformanceCase" }
+    }
+  },
+  "$defs": {
+    "caseKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "sliceRef": {
+      "type": "string",
+      "pattern": "^(?:all_slices|shared_core|capability:[a-z][a-z0-9_]*|surface:[a-z][a-z0-9_]*|fixture:[a-z0-9]+(?:[:-][a-z0-9]+)*)$",
+      "maxLength": 96
+    },
+    "acceptanceRef": {
+      "type": "string",
+      "pattern": "^T[0-9]{3}-AC-[0-9]{3}$"
+    },
+    "conformanceCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseKey", "kind", "covers", "suiteRef"],
+      "properties": {
+        "caseKey": { "$ref": "#/$defs/caseKey" },
+        "kind": {
+          "enum": [
+            "schema_compilation",
+            "digest_rebuild",
+            "tooling_guard",
+            "descriptor_handler_presenter_consistency",
+            "contract_admission",
+            "dependency_fail_closed",
+            "visibility",
+            "deterministic_fixtures"
+          ]
+        },
+        "covers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sliceRef" }
+        },
+        "suiteRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["runner", "target"],
+          "properties": {
+            "runner": { "enum": ["script", "node_test", "vitest"] },
+            "target": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        },
+        "acceptanceRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/acceptanceRef" }
+        }
+      }
+    }
+  }
+}

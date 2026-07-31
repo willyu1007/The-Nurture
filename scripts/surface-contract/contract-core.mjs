@@ -1,6 +1,7 @@
 /** @reference .ai/skills/standards/naming-conventions/SKILL.md */
 
 import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -1279,4 +1280,47 @@ function sortObjectKeys(value) {
 
 function toPosix(value) {
   return value.split(path.sep).join("/");
+}
+
+export function checkConformanceRegistry(registry, manifestValue) {
+  const universe = new Set([
+    "shared_core",
+    ...manifestValue.capabilities.map(
+      (entry) => `capability:${entry.capabilityKey}`,
+    ),
+    ...manifestValue.surfaces.map((entry) => `surface:${entry.surfaceKey}`),
+    ...manifestValue.fixtures.map((entry) => `fixture:${entry.fixtureKey}`),
+  ]);
+  const covered = new Set();
+  const caseKeys = new Set();
+  for (const conformanceCase of registry.cases) {
+    if (caseKeys.has(conformanceCase.caseKey)) {
+      throw new Error(`Duplicate conformance case ${conformanceCase.caseKey}`);
+    }
+    caseKeys.add(conformanceCase.caseKey);
+    const target = path.join(repoRoot, conformanceCase.suiteRef.target);
+    if (!existsSync(target)) {
+      throw new Error(
+        `${conformanceCase.caseKey} suite target is missing: ${conformanceCase.suiteRef.target}`,
+      );
+    }
+    for (const sliceRef of conformanceCase.covers) {
+      if (sliceRef === "all_slices") {
+        for (const member of universe) covered.add(member);
+        continue;
+      }
+      if (!universe.has(sliceRef)) {
+        throw new Error(
+          `${conformanceCase.caseKey} covers unknown slice ${sliceRef}`,
+        );
+      }
+      covered.add(sliceRef);
+    }
+  }
+  for (const member of universe) {
+    if (!covered.has(member)) {
+      throw new Error(`Slice ${member} is not covered by any conformance case`);
+    }
+  }
+  return { covered: covered.size, universe: universe.size };
 }

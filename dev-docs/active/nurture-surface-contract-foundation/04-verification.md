@@ -264,3 +264,14 @@
 | Slice invariance | PASS | All 16 capability/surface slice hashes byte-equal the frozen 1.0.1 baseline under the updated frozen-hash guard. |
 | Unit suite and census | PASS | `pnpm test:unit` 249/249 over 28 files; `pnpm verify:test-routing` census unchanged; tooling tests 5/5; package `tsc --noEmit` clean. |
 | Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
+
+## 2026-08-01 — Phase 4 synthetic contract qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Single-command suite | PASS | `pnpm verify:surface-conformance`: digest rebuild, strict schema validation (36 schemas, 7 negatives), tooling guards (5/5), six vitest files (55/55), conformance coverage 25/25 slices over 11 cases; summary prints the explicit owner-integration NO-GO line. |
+| Deterministic build/rotation | PASS | Rotated to `nurture.surface-contract@1.7.0` / `sha256:b7691a81…`; byte-identical rebuild; shared core `sha256:04227264…` unchanged; all 16 capability/surface slices byte-equal the frozen baseline. |
+| Conformance registry integrity | PASS | Unique case keys, resolvable suite targets, slice-ref expansion against the generated manifest, completeness over capabilities/surfaces/fixtures/shared core, unknown-slice negative rejected. |
+| CI wiring | PASS (static) | The surface-contract CI step now runs `pnpm verify:surface-conformance` as the permanent single-command gate. |
+| Full unit suite | PASS | `pnpm test:unit` 249/249 over 28 files; test routing census unchanged; package `tsc --noEmit` clean; strict context verification green. |
+| Layer separation | PASS | Result recorded as `SYNTHETIC_CONTRACT_QUALIFICATION_PASS / OWNER_INTEGRATION_NO_GO / JOINT_CONFORMANCE_NOT_RUN`; no owner-path, activation, Candidate, DB, secret or traffic claim. |
