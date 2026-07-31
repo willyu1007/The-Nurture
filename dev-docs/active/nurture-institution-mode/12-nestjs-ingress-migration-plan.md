@@ -6,8 +6,8 @@
 - Scope: move the qualified six-surface owner path from the provisional Fastify
   dev-host into the formal, production-intended NestJS scenario-service ingress
   required by G1-05.
-- State: M0 decision freeze, M1 skeleton and M2 service auth completed
-  2026-07-31; M3 P7 endpoint migration open.
+- State: M0 decision freeze, M1 skeleton, M2 service auth and M3 baseline
+  inventory completed 2026-07-31; M3-A build/composition implementation open.
 - This document records planning truth only. It is not an Owner Integration
   Handoff, a Joint Conformance record, activation, deployment or traffic
   authority.
@@ -123,17 +123,25 @@ default-disabled and is now implementation-open.
 
 ### M3 — P7 Endpoint Migration
 
-- Controller + DTO validation equivalent to the current bounded-text rules;
-  reuse the `ERROR_STATUS` mapping and the
-  `createScenarioBindingOwnerAuthorizer` composition root (relocating the
-  factory out of `apps/backend` as needed).
-- Rerun the existing binding lifecycle, revoke, concurrency, exact-replay and
-  response-loss suites on disposable PostgreSQL with the NestJS ingress as the
-  target.
+- [x] Capture the M3 request/response/error/composition/test baseline and
+  prioritize implementation findings in
+  [`14-nestjs-ingress-m3-baseline-inventory.md`](./14-nestjs-ingress-m3-baseline-inventory.md).
+- [ ] M3-A: establish a compiled runtime package boundary; relocate the
+  authorizer factory and Guardian authority reader out of `apps/backend`;
+  compose the formal service from the production Prisma client only.
+- [ ] M3-B: implement the allowlisted controller/request adapter, centralize
+  `ERROR_STATUS`, derive guard readiness from the actual optional authorizer,
+  and run table-driven Fastify/Nest application-parity fixtures.
+- [ ] M3-C: rerun child/family lifecycle, revoke, concurrency, exact replay,
+  divergent replay and response-loss suites on disposable PostgreSQL through
+  NestJS; execute the exact pinned My-Chat consumer against that ingress.
 
-Acceptance: for identical requests — including every negative case — the new
-ingress returns field-identical status codes, error codes and response bodies
-versus the Fastify route, on the unchanged path.
+Acceptance has two bands. Authenticated requests reaching the P7 adapter —
+including every route/domain/unknown-authorizer negative — must have
+field-identical status, error and response bodies versus Fastify on the
+unchanged path. Malformed JSON, payload limit, timeout and other failures
+produced before the adapter retain the M1 body-safe formal-shell contract and
+must not copy Fastify framework error names or messages.
 
 ### M4 — Governance Alignment (may run parallel to M3)
 
@@ -163,7 +171,8 @@ ingress, exact pins and final census; no second live owner ingress remains.
 
 ## Ordering and Estimate
 
-- M0 → M1 → M2 → M3 are serial; M4 may run in parallel with M3; M5 is last.
+- M0 → M1 → M2 → M3 baseline → M3-A → M3-B → M3-C are serial; M4 may
+  run in parallel with M3 implementation; M5 is last.
 - Rough effort: 4–6 working days of implementation, excluding the downstream
   Joint Conformance run with T-004 (which consumes this migration but is not
   part of it).

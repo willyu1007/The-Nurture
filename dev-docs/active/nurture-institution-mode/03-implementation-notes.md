@@ -1272,3 +1272,34 @@
   API/context artifact, env-contract key, secret value, capability,
   deployment, activation or traffic. M3 P7 endpoint migration is the next
   serial slice; M4 governance alignment may run alongside it.
+
+## 2026-07-31 — NestJS ingress M3 baseline inventory completed
+
+- Added `14-nestjs-ingress-m3-baseline-inventory.md` after tracing the current
+  Fastify route, Nurture verifier/repository/Prisma path, formal NestJS shell,
+  CI topology and exact pinned My-Chat `f00b868...` HTTP consumer.
+- Froze the P7 request, success receipt and complete application error outcomes.
+  Unknown request fields remain ignored by the current adapter; HTTP
+  identifiers retain their current wider bounds and the existing domain
+  validator remains the stricter second layer.
+- Split acceptance into P7 application parity and formal-shell safety. The
+  NestJS service retains M1's body-safe malformed-JSON, payload, timeout and
+  media behavior rather than reproducing Fastify framework error names and
+  parser messages.
+- Identified the first implementation blocker: scenario/db workspace packages
+  export TypeScript source while the formal service executes compiled
+  `dist/main.js`. M3-A must establish a runtime-safe package/bundle seam before
+  importing the authorizer.
+- Identified the M2 boolean-availability drift risk. M3-A must inject one
+  optional authorizer object and use its presence for both guard readiness and
+  controller execution.
+- The current Guardian reader must move out of `apps/backend`; its missing
+  `deleted_at IS NULL` predicates require regression coverage and closure.
+  Subject-specific Guardian scope remains a declared G1-03 gap and is not
+  silently invented by this ingress migration.
+- Existing focused domain (6), fake repository (9) and NestJS M2 (25) tests
+  pass. Local Docker is unavailable, so the existing real PostgreSQL tests were
+  not rerun; disposable-PostgreSQL Nest evidence remains a mandatory M3-C gate.
+- This baseline changes documentation/governance only. It changes no source,
+  dependency, schema/migration, database, environment, secret, capability,
+  deployment, activation or traffic.

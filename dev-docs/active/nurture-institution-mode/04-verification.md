@@ -1192,3 +1192,21 @@ the rejected checkpoint and are historical.
 | Scenario-service build/smoke | PASS | Built process starts and serves health; with a configured token and exact bearer but no authorizer it still returns `503`; legacy route remains `404`. |
 | Test routing | PASS | 41 test files are classified: 21 unit, 5 production DB, 9 dev-host, 5 scenario-service and 1 X5. |
 | Effect boundary | PASS | No schema/migration, database, API/context artifact, env-contract key/value, My-Chat source, capability, deployment, activation or traffic change. |
+
+## 2026-07-31 — NestJS ingress M3 baseline inventory
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Task continuity and routing | PASS | Governance resume selected existing `T-002 nurture-institution-mode`; no duplicate task or bundle was created. |
+| Workflow/ownership contract review | PASS | Workflow context, scenario manifest and module confirm My-Chat-owned canonical identity/runtime and Nurture-owned scenario policy, typed anchors, current authority and receipt persistence. |
+| Fastify P7 application census | PASS | Method/path, disabled-first service auth, eleven request fields, explicit success mapping, eight domain error mappings and unknown-exception behavior are frozen in `14-nestjs-ingress-m3-baseline-inventory.md`. |
+| Exact Host consumer review | PASS | My-Chat `f00b86861cf0b751d747c7e0bc5cb86a952900de` sends the frozen JSON shape and strictly validates the allowlisted receipt; the floating sibling checkout was not used as adoption authority or modified. |
+| Parser differential probes | PASS / ACCEPTANCE CLARIFIED | Malformed JSON returns Fastify's framework-specific body but NestJS's safe `invalid_request`; JSON `null` also differs. M3 now separates P7 application parity from the already accepted M1 formal-shell safety contract. |
+| Runtime dependency census | OPEN / M3-A BLOCKER | Scenario and DB packages export TypeScript source with no runtime build contract, while scenario-service starts compiled `dist/main.js`; M3-A must establish a compiled-package or bundling seam. |
+| Composition review | OPEN / M3-A | The authorizer/Guardian reader still live in `apps/backend`, and M2 guard readiness is an independent boolean. They must become a shared Nurture composition and one actual optional dependency. |
+| Domain binding-owner test | PASS | Focused suite passes 6/6. |
+| Fake repository binding-owner test | PASS | Focused suite passes 9/9. |
+| Scenario-service test | PASS | Existing M2 suite passes 5 files / 25 tests. |
+| Persistence/schema boundaries | PASS | Persistence-boundary and N1 schema-contract checks pass. |
+| Real PostgreSQL rerun | NOT RUN / REQUIRED IN M3-C | Docker client is present, but the local daemon is unavailable. No persistent database was contacted; the disposable-PostgreSQL gate is not waived. |
+| Effect boundary | PASS | Baseline changes documentation/governance only; no source/package/lockfile, schema/migration, database, environment value, secret, API artifact, capability, deployment, activation or traffic changed. |
