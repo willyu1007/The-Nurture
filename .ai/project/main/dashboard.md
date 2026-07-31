@@ -9,14 +9,16 @@ Project: `main`
 ### Current Focus
 - Primary feature: F-002 Institution ecology
 - Supporting feature: F-003 Six-surface store-beta readiness
-- Goal this cycle: T-004 Phase 0 discovery/gate reconciliation is complete.
-  T-002 ingress M0-M4 is complete with exact-consumer,
-  disposable-PostgreSQL and API/env/port governance evidence. T-004 Phase 1
-  normative capability/surface/visibility source and Phase 2 exact typed
-  contract/interface identity are complete. The current critical lane is
-  T-004 Phase 3 deterministic fixtures and cross-role journeys, followed by
-  Phase 4 synthetic qualification, T-002 M5 handoff regeneration and exact
-  Joint Conformance.
+- Goal this cycle: T-004 Phase 0-4 is complete — the contract baseline
+  (synthetic world, six journey scripts, selection fixtures, fixture slices
+  and the single-command conformance suite) is qualified as
+  `SYNTHETIC_CONTRACT_QUALIFICATION_PASS / OWNER_INTEGRATION_NO_GO /
+  JOINT_CONFORMANCE_NOT_RUN` at exact `nurture.surface-contract@1.7.0`.
+  T-002 ingress M0-M4 is complete and the owner pin has advanced to the
+  declared My-Chat `a019566` / Base `06303e9` R3 cut with requalified
+  hashes. The current critical lane is T-002 M5 Owner Integration Handoff
+  regeneration (including the census-flagged wave4 population coverage
+  gap), followed by exact G1 Joint Conformance.
   Runtime/environment activation and external traffic remain gated.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
@@ -29,17 +31,25 @@ Project: `main`
   lock-concurrency evidence. M4 governance is complete. Protected use still
   requires M5 Owner Integration Handoff regeneration and Joint Conformance with T-004; the
   remaining Fastify route is transitional only.
-- T-004 Phase 0-2: the current manifest/module/handler/presenter/repository/API/DB
-  foundations are classified in
+- T-004 Phase 0-4: the reuse/extend/gate matrix is
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
   Phase 1 freezes six surfaces, descriptor/envelope schemas, visibility, four
   readiness axes and atomic snapshot/cursor rules. Phase 2 adds the closed
-  ten-capability V1 registry, typed invocation/result/error/private bindings,
-  strict loader/admission and deterministic exact artifact
-  `nurture.surface-contract@1.0.0` /
-  `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`.
-  My-Chat checkout drift from exact `f00b868` keeps Owner Integration NO-GO
-  and is not a floating-repin request.
+  ten-capability V1 registry, typed invocation/result/error/private bindings
+  and strict loader/admission. Phase 3 adds the PII-free synthetic world,
+  six independent journey scripts (one value loop plus one highest-risk
+  refusal each), five selection-fixture families and eight fixture slices in
+  the conformance manifest. Phase 4 adds the conformance-case registry
+  (25/25 slice coverage, optional `T###-AC-###` back-links) and the
+  single-command suite `pnpm verify:surface-conformance`, now CI's permanent
+  gate. Qualified exact identity: `nurture.surface-contract@1.7.0` /
+  `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`
+  (record and T-008 handoff:
+  `08-phase-4-synthetic-qualification-and-handoff.md`). Synthetic PASS never
+  substitutes the owner gate: Owner Integration stays NO-GO until the M5
+  handoff regenerates against the advanced pin and Joint Conformance passes.
+  The drift census and pin-advance evidence are
+  `dev-docs/active/nurture-institution-mode/15-mychat-drift-census-pin-advance-input.md`.
 - T-002 ingress M0-M4: port semantics, the two-route formal v1 surface, G1-03
   satisfied/deferred census and zero-wire-change fence are fixed in
   `dev-docs/active/nurture-institution-mode/13-nestjs-ingress-m0-decision-record.md`.
@@ -74,10 +84,12 @@ Project: `main`
   internal validation and G5-E composite decision/evidence lifecycle. The structure
   audit is PASS; G5-0 details are the next discussion, while tooling remains
   just-in-time and does not enter the current upstream critical path.
-- Execution backbone (2026-07-31): the recommended single-mainline order is
+- Execution backbone (2026-08-01): the recommended single-mainline order is
   T-004 Phase 0 → T-002 ingress M0-M4 (complete; see
   `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 (complete) →
-  T-004 Phase 3-4 plus T-002 M5 → G1 Joint Conformance → early T-007 G4-0A/0B
+  T-002 pin advance to the R3 cut (complete) → T-004 Phase 3-4 (complete;
+  synthetic qualification at `1.7.0`) → T-002 M5 handoff regeneration →
+  G1 Joint Conformance → early T-007 G4-0A/0B
   publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →
   T-006 G3-0 through G3-E → remaining T-007 G4 branches → T-008 G5.
   Beta Profile v0 freezes near G1 Joint Conformance (see T-008 plan).
