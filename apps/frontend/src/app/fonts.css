@@ -1,0 +1,29 @@
+/* Host-provided webfonts for @willyu1007/web-workbench.
+ *
+ * The kit ships the family *stacks* but stopped loading the faces in 0.7.0
+ * (its Google Fonts @import was render-blocking and blocked behind the GFW).
+ * Loading is the host's job; this file points the kit's --font-* tokens at
+ * the self-hosted next/font faces declared in app/layout.tsx.
+ *
+ * Must be imported AFTER the kit styles so this :root block wins.
+ *
+ * Scope: only the faces actually rendered here. Manrope drives --font-sans
+ * and --font-display (26 kit call sites). JetBrains Mono drives --font-mono,
+ * which the kit uses for count badges such as .wb-nav__count — rendered by
+ * the AppShell sidebar this app mounts — even though no host file names a
+ * mono class. --font-serif and --font-hand stay on the kit's stacks:
+ * nothing renders .mt-serif or .mt-hand, and loading unused faces is pure
+ * payload. Chinese resolves to the platform Han font rather than a heavy CJK
+ * webfont.
+ *
+ * Redeclaring --font-* is the one sanctioned host override of a kit token
+ * (see the kit's TYPOGRAPHY.md); do not restyle size/weight here.
+ */
+:root {
+  --font-sans: var(--f-sans), "Noto Sans SC", "PingFang SC", "HarmonyOS Sans",
+    "Source Han Sans SC", system-ui, sans-serif;
+  --font-display: var(--f-sans), "Noto Sans SC", "PingFang SC", system-ui,
+    sans-serif;
+  --font-mono: var(--f-mono), "SF Mono", ui-monospace, Menlo, Consolas,
+    monospace;
+}
