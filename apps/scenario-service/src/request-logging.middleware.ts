@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NestMiddleware } from "@nestjs/common";
 import {
+  type ScenarioHttpMethod,
   type ScenarioRouteClass,
   ScenarioStructuredLogger,
 } from "./structured-logger.js";
@@ -35,7 +36,7 @@ export class RequestLoggingMiddleware implements NestMiddleware {
     response.once("finish", () => {
       this.logger.requestCompleted({
         requestId: context.requestId,
-        method: request.method ?? "UNKNOWN",
+        method: normalizeHttpMethod(request.method),
         routeClass: context.routeClass,
         statusCode: response.statusCode,
         durationMs: Math.max(0, Math.round(performance.now() - startedAt)),
@@ -54,6 +55,21 @@ export function readScenarioRequestContext(
       routeClass: "unknown",
     }
   );
+}
+
+function normalizeHttpMethod(method: string | undefined): ScenarioHttpMethod {
+  switch (method) {
+    case "GET":
+    case "POST":
+    case "PUT":
+    case "PATCH":
+    case "DELETE":
+    case "HEAD":
+    case "OPTIONS":
+      return method;
+    default:
+      return "UNKNOWN";
+  }
 }
 
 function classifyRoute(url: string | undefined): ScenarioRouteClass {

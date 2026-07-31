@@ -1,4 +1,5 @@
 import type { AddressInfo } from "node:net";
+import type { Server } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
 import { createScenarioServiceApplication } from "../src/application.js";
 import type { ScenarioStructuredLogRecord } from "../src/structured-logger.js";
@@ -26,6 +27,7 @@ describe("scenario-service M1 HTTP boundary", () => {
     });
     expect(health.status).toBe(200);
     expect(await health.json()).toEqual({ ok: true });
+    expect(health.headers.get("x-powered-by")).toBeNull();
     expect(health.headers.get("x-request-id")).toMatch(
       /^[0-9a-f-]{36}$/,
     );
@@ -55,6 +57,12 @@ describe("scenario-service M1 HTTP boundary", () => {
       expect(await absent.json()).toEqual({ error: "not_found" });
     }
 
+    const unknownMethod = await fetch(`${baseUrl}/not-registered`, {
+      method: "PROPFIND",
+    });
+    expect(unknownMethod.status).toBe(404);
+    expect(await unknownMethod.json()).toEqual({ error: "not_found" });
+
     expect(JSON.stringify(records)).not.toContain("secret-marker");
     expect(records).toEqual(
       expect.arrayContaining([
@@ -68,8 +76,25 @@ describe("scenario-service M1 HTTP boundary", () => {
           route_class: "binding_owner",
           status_code: 503,
         }),
+        expect.objectContaining({
+          event: "request_completed",
+          method: "UNKNOWN",
+          route_class: "unknown",
+          status_code: 404,
+        }),
       ]),
     );
+  });
+
+  it("applies Node HTTP receive deadlines as well as the handler deadline", async () => {
+    const { app, config } = await createScenarioServiceApplication({
+      logSink: () => undefined,
+    });
+    close = () => app.close();
+    const server = app.getHttpServer() as Server;
+
+    expect(server.requestTimeout).toBe(config.requestTimeoutMs);
+    expect(server.headersTimeout).toBe(config.requestTimeoutMs);
   });
 
   it("returns a body-safe error when the JSON body exceeds 64 KiB", async () => {

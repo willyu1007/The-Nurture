@@ -33,11 +33,11 @@ if (
   routes.unit.length !== 21 ||
   routes.productionDb.length !== 5 ||
   routes.devHost.length !== 9 ||
-  routes.scenarioService.length !== 3 ||
+  routes.scenarioService.length !== 4 ||
   routes.x5Joint.length !== 1
 ) {
   throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/21 productionDb=${routes.productionDb.length}/5 devHost=${routes.devHost.length}/9 scenarioService=${routes.scenarioService.length}/3 x5Joint=${routes.x5Joint.length}/1`,
+    `Test file census changed: unit=${routes.unit.length}/21 productionDb=${routes.productionDb.length}/5 devHost=${routes.devHost.length}/9 scenarioService=${routes.scenarioService.length}/4 x5Joint=${routes.x5Joint.length}/1`,
   );
 }
 process.stdout.write(

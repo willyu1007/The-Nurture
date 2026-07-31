@@ -1737,3 +1737,37 @@ This file exists to prevent repeating mistakes within this task.
   clean checkout. When that precondition fails, report sibling drift
   separately and prove whether the current change contributes any compiler
   diagnostics before classifying it as a regression.
+
+### 2026-07-31 — Treating framework defaults as an ingress security boundary
+
+- Symptom: M1 claimed bounded, allowlisted behavior while Express still parsed
+  URL-encoded bodies, exposed `X-Powered-By`, Node accepted headers/request
+  bodies for up to its much longer default, raw method strings reached logs,
+  and arbitrary thrown objects could select a non-500 status.
+- Context: The controller timeout and safe response body were correct in
+  isolation, but the full HTTP path includes the Node parser, Express defaults,
+  Nest exception classification and post-response logging.
+- What we tried: Reviewing only registered routes and positive HTTP responses.
+- Root cause: Framework defaults and untyped third-party exception metadata
+  were implicitly trusted as if they were part of the frozen P7 contract.
+- Fix / workaround: Parse JSON only, set Node header/request deadlines, disable
+  framework fingerprinting, normalize methods and accept status only from Nest
+  HTTP exceptions or an explicit body-parser error map.
+- Prevention: Every formal ingress review must enumerate the complete chain
+  from socket/header/body parsing through auth/controller/error/logging and
+  test both wire behavior and server configuration.
+
+### 2026-07-31 — Leaving a losing timeout alive after `Promise.race`
+
+- Symptom: The scenario-service smoke reported success but took about 5.6
+  seconds even though the child process had already stopped.
+- Context: Child cleanup raced the `exit` event against a five-second timeout.
+- What we tried: Checking both `exitCode` and `signalCode`, adding graceful
+  Nest shutdown and closing HTTP keep-alive connections.
+- Root cause: `Promise.race` does not cancel its losing timeout; that timer
+  remained referenced and kept the parent Node event loop alive.
+- Fix / workaround: Replace the race with one exit waiter that removes its
+  listener and clears its timer on either outcome, then escalate only if the
+  child is still live.
+- Prevention: Process-control tests must measure green-path wall time and
+  explicitly dispose every listener/timer created for timeout races.

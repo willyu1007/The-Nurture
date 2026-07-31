@@ -44,11 +44,14 @@ routes, then terminates it.
 
 ## Security boundary
 
-- JSON and form bodies are limited to 64 KiB.
-- Requests time out after five seconds.
+- Only JSON bodies are parsed, with a 64 KiB limit.
+- Node header/request receipt and handler execution are each bounded to five
+  seconds.
 - Unknown errors return `{"error":"internal_error"}`.
 - Structured logs contain only generated request id, method, allowlisted route
   class, status and duration. URL, query, headers, body, identity and secret
   values are never logged.
+- Unknown HTTP methods are normalized to `UNKNOWN`, and the Express
+  `X-Powered-By` header is disabled.
 - M2 adds the timing-safe service-auth guard. M3 composes the existing P7
   authorizer without changing the wire contract.

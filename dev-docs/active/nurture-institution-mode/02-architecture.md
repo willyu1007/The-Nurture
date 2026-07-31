@@ -319,12 +319,15 @@ application without importing My-Chat runtime or ORM source:
 - one centralized configuration loader validates `APP_ENV`, `SERVICE_NAME`
   and `PORT` before listen; service defaults remain `dev`, `the-nurture` and
   `8000`;
-- explicit Express body parsers cap JSON/urlencoded input at 64 KiB, a global
-  interceptor caps handler execution at five seconds, and a catch-all filter
-  exposes only allowlisted protocol errors or body-safe generic errors;
+- the only body parser accepts JSON and caps it at 64 KiB; Node header/request
+  receipt and a global handler interceptor each use a five-second deadline;
+  the catch-all filter trusts only Nest HTTP exceptions and recognized
+  body-parser error types before exposing allowlisted or generic safe errors;
 - request logs contain generated request id, method, fixed route class, status
   and duration only. Raw URL/query, headers, request/response body, tokens,
-  anchors and actor/subject identifiers are not log fields;
+  anchors and actor/subject identifiers are not log fields. HTTP methods
+  outside the service allowlist become `UNKNOWN`;
+- Express framework fingerprinting is reduced by disabling `X-Powered-By`;
 - the P7 path is an unconditional `503 binding_owner_disabled` stub in M1.
   Even present environment secrets cannot activate it before the M2 guard and
   M3 owner composition are implemented and tested;

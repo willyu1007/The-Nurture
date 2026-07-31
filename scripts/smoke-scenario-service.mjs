@@ -42,12 +42,14 @@ child.stderr.on("data", (chunk) => {
 try {
   const baseUrl = `http://127.0.0.1:${port}`;
   await waitForHealth(baseUrl, child);
-  const health = await fetch(`${baseUrl}/health`);
+  const health = await fetch(`${baseUrl}/health`, {
+    headers: { connection: "close" },
+  });
   await assertResponse(health, 200, { ok: true });
 
   const disabled = await fetch(
     `${baseUrl}/internal/nurture/scenario-binding/authorize`,
-    { method: "POST" },
+    { method: "POST", headers: { connection: "close" } },
   );
   await assertResponse(disabled, 503, {
     error: "binding_owner_disabled",
@@ -55,7 +57,7 @@ try {
 
   const legacy = await fetch(
     `${baseUrl}/internal/nurture/activation/user-attention/resolve`,
-    { method: "POST" },
+    { method: "POST", headers: { connection: "close" } },
   );
   await assertResponse(legacy, 404, { error: "not_found" });
 
@@ -66,12 +68,7 @@ try {
   process.stderr.write(`${String(error)}\n${stdout}${stderr}`);
   process.exitCode = 1;
 } finally {
-  if (child.exitCode === null) child.kill("SIGTERM");
-  await Promise.race([
-    once(child, "exit"),
-    new Promise((resolve) => setTimeout(resolve, 5_000)),
-  ]);
-  if (child.exitCode === null) child.kill("SIGKILL");
+  await stopProcess(child);
 }
 
 async function reservePort() {
@@ -92,13 +89,15 @@ async function reservePort() {
 async function waitForHealth(baseUrl, processHandle) {
   const deadline = Date.now() + 10_000;
   while (Date.now() < deadline) {
-    if (processHandle.exitCode !== null) {
+    if (!processRunning(processHandle)) {
       throw new Error(
-        `Scenario service exited before health check: ${processHandle.exitCode}`,
+        `Scenario service exited before health check: ${processHandle.exitCode ?? processHandle.signalCode}`,
       );
     }
     try {
-      const response = await fetch(`${baseUrl}/health`);
+      const response = await fetch(`${baseUrl}/health`, {
+        headers: { connection: "close" },
+      });
       if (response.status === 200) return;
     } catch {
       // The listener may not be ready yet.
@@ -106,6 +105,38 @@ async function waitForHealth(baseUrl, processHandle) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error("Timed out waiting for scenario-service health.");
+}
+
+async function stopProcess(processHandle) {
+  if (!processRunning(processHandle)) return;
+  const terminated = waitForProcessExit(processHandle, 5_000);
+  processHandle.kill("SIGTERM");
+  const exited = await terminated;
+  if (exited || !processRunning(processHandle)) return;
+
+  const killed = waitForProcessExit(processHandle, 1_000);
+  processHandle.kill("SIGKILL");
+  await killed;
+  if (processRunning(processHandle)) {
+    throw new Error("Unable to terminate scenario-service smoke process.");
+  }
+}
+
+function waitForProcessExit(processHandle, timeoutMs) {
+  return new Promise((resolve) => {
+    const finish = (exited) => {
+      clearTimeout(timer);
+      processHandle.removeListener("exit", onExit);
+      resolve(exited);
+    };
+    const onExit = () => finish(true);
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    processHandle.once("exit", onExit);
+  });
+}
+
+function processRunning(processHandle) {
+  return processHandle.exitCode === null && processHandle.signalCode === null;
 }
 
 async function assertResponse(response, expectedStatus, expectedBody) {

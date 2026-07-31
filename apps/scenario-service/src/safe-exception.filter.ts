@@ -22,6 +22,18 @@ const allowedErrors = new Set([
   "owner_authorization_unavailable",
 ]);
 
+const bodyParserErrorStatuses = new Map<string, number>([
+  ["encoding.unsupported", HttpStatus.UNSUPPORTED_MEDIA_TYPE],
+  ["charset.unsupported", HttpStatus.UNSUPPORTED_MEDIA_TYPE],
+  ["entity.parse.failed", HttpStatus.BAD_REQUEST],
+  ["entity.verify.failed", HttpStatus.FORBIDDEN],
+  ["request.aborted", HttpStatus.BAD_REQUEST],
+  ["request.size.invalid", HttpStatus.BAD_REQUEST],
+  ["entity.too.large", HttpStatus.PAYLOAD_TOO_LARGE],
+  ["stream.encoding.set", HttpStatus.INTERNAL_SERVER_ERROR],
+  ["stream.not.readable", HttpStatus.INTERNAL_SERVER_ERROR],
+]);
+
 type HttpResponse = {
   headersSent?: boolean;
   status(code: number): HttpResponse;
@@ -41,7 +53,10 @@ export class SafeExceptionFilter implements ExceptionFilter {
     const requestContext = readScenarioRequestContext(request);
     const status = exceptionStatus(exception);
     const error = safeError(exception, status);
-    if (status >= 500 && error !== "binding_owner_disabled") {
+    if (
+      (!isOperationalException(exception) || status >= 500) &&
+      error !== "binding_owner_disabled"
+    ) {
       this.logger.unhandledException(requestContext);
     }
     response.status(status).json({ error });
@@ -50,20 +65,24 @@ export class SafeExceptionFilter implements ExceptionFilter {
 
 function exceptionStatus(exception: unknown): number {
   if (exception instanceof HttpException) return exception.getStatus();
+  return bodyParserStatus(exception) ?? HttpStatus.INTERNAL_SERVER_ERROR;
+}
+
+function isOperationalException(exception: unknown): boolean {
+  return (
+    exception instanceof HttpException ||
+    bodyParserStatus(exception) !== undefined
+  );
+}
+
+function bodyParserStatus(exception: unknown): number | undefined {
   if (exception && typeof exception === "object") {
-    const candidate = exception as { status?: unknown; statusCode?: unknown };
-    for (const value of [candidate.status, candidate.statusCode]) {
-      if (
-        typeof value === "number" &&
-        Number.isSafeInteger(value) &&
-        value >= 400 &&
-        value <= 599
-      ) {
-        return value;
-      }
+    const type = (exception as { type?: unknown }).type;
+    if (typeof type === "string") {
+      return bodyParserErrorStatuses.get(type);
     }
   }
-  return HttpStatus.INTERNAL_SERVER_ERROR;
+  return undefined;
 }
 
 function safeError(exception: unknown, status: number): string {
@@ -92,6 +111,8 @@ function safeError(exception: unknown, status: number): string {
       return "conflict";
     case HttpStatus.PAYLOAD_TOO_LARGE:
       return "payload_too_large";
+    case HttpStatus.UNSUPPORTED_MEDIA_TYPE:
+      return "unsupported_media_type";
     case HttpStatus.SERVICE_UNAVAILABLE:
       return "service_unavailable";
     default:

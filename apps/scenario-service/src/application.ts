@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import type { Server } from "node:http";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module.js";
@@ -32,18 +33,19 @@ export async function createScenarioServiceApplication(input?: {
     logger: false,
   });
 
+  app.disable("x-powered-by");
   const requestLogging = new RequestLoggingMiddleware(logger);
   app.use(requestLogging.use.bind(requestLogging));
   app.useBodyParser("json", { limit: config.bodyLimitBytes });
-  app.useBodyParser("urlencoded", {
-    extended: false,
-    limit: config.bodyLimitBytes,
-  });
   app.useGlobalInterceptors(
     new RequestTimeoutInterceptor(config.requestTimeoutMs),
   );
   app.useGlobalFilters(new SafeExceptionFilter(logger));
   await app.init();
+
+  const server = app.getHttpServer() as Server;
+  server.requestTimeout = config.requestTimeoutMs;
+  server.headersTimeout = config.requestTimeoutMs;
 
   return { app, config, logger };
 }

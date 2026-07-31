@@ -101,7 +101,8 @@ or environment change.
 - [x] Add frozen-install/typecheck/test/build/start/health CI coverage and
   diagnostic artifact capture.
 
-Acceptance: PASS locally. Package typecheck, 3 files / 11 tests, build and
+Acceptance: PASS locally after implementation-quality repair. Package
+typecheck, 4 files / 14 tests, build and
 built-process smoke are green; the bounded frozen install is reproducible.
 Remote CI execution awaits the next pushed source. M2 must preserve the
 disabled state while adding unauthorized/authorized behavior.

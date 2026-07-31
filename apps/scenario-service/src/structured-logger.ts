@@ -1,11 +1,20 @@
 export type ScenarioRouteClass = "health" | "binding_owner" | "unknown";
+export type ScenarioHttpMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "PATCH"
+  | "DELETE"
+  | "HEAD"
+  | "OPTIONS"
+  | "UNKNOWN";
 
 export type ScenarioStructuredLogRecord =
   | Readonly<{
       schema: "nurture_scenario_service_log_v1";
       event: "request_completed";
       request_id: string;
-      method: string;
+      method: ScenarioHttpMethod;
       route_class: ScenarioRouteClass;
       status_code: number;
       duration_ms: number;
@@ -37,7 +46,7 @@ export class ScenarioStructuredLogger {
 
   requestCompleted(input: {
     requestId: string;
-    method: string;
+    method: ScenarioHttpMethod;
     routeClass: ScenarioRouteClass;
     statusCode: number;
     durationMs: number;

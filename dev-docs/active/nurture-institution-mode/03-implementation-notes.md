@@ -1207,12 +1207,12 @@
   unconditionally fail-closed with `503 binding_owner_disabled`; providing
   secret-shaped environment variables cannot enable it. Legacy
   `user_attention` and T-001 workflow routes return `404`.
-- Added 11 tests covering configuration validation, timeout translation,
+- Added 14 tests covering configuration validation, timeout translation,
   health, disabled/absent routes, request ids, payload limits and a
   secret-marker log-leak probe, plus a built-process smoke script.
 - Added a dedicated Node 24 CI job with frozen filtered install,
   typecheck/test/build/smoke and always-uploaded seven-day diagnostic logs.
-  Root test routing now classifies three scenario-service test files and
+  Root test routing now classifies four scenario-service test files and
   `test:all` includes the new suite.
 - Root TypeScript enables decorator metadata so the NestJS package introduces
   no repository-level parser errors. The current full root typecheck remains
@@ -1223,3 +1223,27 @@
   migration, API/context artifact, environment contract, secret, capability,
   deployment, activation or traffic behavior was added. M2 service auth is the
   next serial slice.
+
+## 2026-07-31 — NestJS ingress M1 quality review closed
+
+- Architecture/security self-review classified five important hardening gaps:
+  arbitrary status-like exception fields could suppress unknown-error
+  classification; Node header/body receipt retained its 300-second default;
+  URL-encoded parsing widened the future P7 input surface; raw method tokens
+  entered logs; and Express exposed `X-Powered-By`.
+- The exception filter now accepts status from Nest `HttpException` or an
+  explicit body-parser type map only. Unknown exceptions always become logged
+  `500 internal_error`; recognized parser failures remain body-safe.
+- The service now parses JSON only, applies the same five-second bound to Node
+  header/request receipt and handler response, normalizes log methods to a
+  finite allowlist and disables framework fingerprint headers.
+- Smoke-process review found a separate fixed five-second delay: the uncancelled
+  timeout branch of `Promise.race` kept the parent event loop alive after child
+  exit. Cleanup now clears its timer, distinguishes `exitCode` from
+  `signalCode`, escalates only a truly live child and finishes in under one
+  second on the green path.
+- Scenario-service verification is now 4 files / 14 tests plus build/smoke.
+  Existing 21 files / 187 Nurture units, persistence boundaries and N1 schema
+  contract remain green. Production dependency audit reports no advisory path
+  through `apps/scenario-service`; unrelated existing Fastify/frontend
+  advisories remain outside this ingress work unit.
