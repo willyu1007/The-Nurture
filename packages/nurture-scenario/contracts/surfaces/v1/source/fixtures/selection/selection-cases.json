@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "worldRef": { "worldKey": "world-v1", "worldVersion": "1.0.0" },
+  "cases": [
+    {
+      "caseKey": "filter-guardian-chat",
+      "family": "candidate_filtering",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "intentKey": "ask_care_group",
+      "context": {
+        "profile": "world",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": []
+      },
+      "expected": {
+        "eligibleCapabilityKeys": [
+          "query_guardian_family_care_timeline",
+          "submit_family_care_question"
+        ],
+        "filteredOut": [
+          { "capabilityKey": "query_caregiver_family_care_work", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "query_family_care_item", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "acknowledge_family_care_item", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "reply_family_care_item", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "correct_family_care_message", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "withdraw_family_care_request", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "redact_family_care_message", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "policy_redact_family_care_message", "reasonKind": "role_unsupported" }
+        ]
+      }
+    },
+    {
+      "caseKey": "filter-caregiver-board-item",
+      "family": "candidate_filtering",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "surfaceKey": "caregiver_teacher_board",
+      "intentKey": "view_family_care_item",
+      "context": {
+        "profile": "world",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": [
+          {
+            "itemId": "syn-sel-item-focus",
+            "enrollmentId": "syn-enrollment-c1-ia",
+            "submittedByParticipantId": "syn-guardian-ada",
+            "state": "submitted"
+          }
+        ],
+        "focusedItemRef": "syn-sel-item-focus"
+      },
+      "expected": {
+        "eligibleCapabilityKeys": [
+          "query_caregiver_family_care_work",
+          "query_family_care_item",
+          "acknowledge_family_care_item",
+          "reply_family_care_item"
+        ],
+        "filteredOut": [
+          { "capabilityKey": "query_guardian_family_care_timeline", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "submit_family_care_question", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "correct_family_care_message", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "withdraw_family_care_request", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "redact_family_care_message", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "policy_redact_family_care_message", "reasonKind": "role_unsupported" }
+        ]
+      }
+    },
+    {
+      "caseKey": "select-single-institution-submit",
+      "family": "correct_selection",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_family_board",
+      "intentKey": "ask_care_group",
+      "context": {
+        "profile": "single-institution-pilot",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": []
+      },
+      "expected": {
+        "selectedCapabilityKey": "submit_family_care_question",
+        "target": { "enrollmentId": "syn-enrollment-c1-ia" }
+      }
+    },
+    {
+      "caseKey": "clarify-dual-enrollment-target",
+      "family": "clarification_needed",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_family_board",
+      "intentKey": "ask_care_group",
+      "context": {
+        "profile": "world",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [
+          {
+            "grantId": "syn-sel-grant-c1-ib",
+            "enrollmentId": "syn-enrollment-c1-ib",
+            "familyId": "syn-family-f1",
+            "purposeKey": "family_care_interaction",
+            "state": "current"
+          }
+        ],
+        "additionalCareItems": []
+      },
+      "expected": {
+        "clarificationKind": "ambiguous_write_target",
+        "options": ["syn-enrollment-c1-ia", "syn-enrollment-c1-ib"]
+      }
+    },
+    {
+      "caseKey": "confirm-reviewable-submit",
+      "family": "confirmation_needed",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_family_board",
+      "intentKey": "send_family_care_question",
+      "context": {
+        "profile": "single-institution-pilot",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": []
+      },
+      "expected": {
+        "selectedCapabilityKey": "submit_family_care_question",
+        "target": { "enrollmentId": "syn-enrollment-c1-ia" },
+        "confirmationPolicy": "reviewable_commit"
+      }
+    },
+    {
+      "caseKey": "confirm-strong-withdraw",
+      "family": "confirmation_needed",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "intentKey": "withdraw_family_care_request",
+      "context": {
+        "profile": "world",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": [
+          {
+            "itemId": "syn-sel-item-withdraw",
+            "enrollmentId": "syn-enrollment-c1-ia",
+            "submittedByParticipantId": "syn-guardian-ada",
+            "state": "submitted"
+          }
+        ],
+        "focusedItemRef": "syn-sel-item-withdraw"
+      },
+      "expected": {
+        "selectedCapabilityKey": "withdraw_family_care_request",
+        "target": { "careItemRef": "syn-sel-item-withdraw" },
+        "confirmationPolicy": "strong_confirmation"
+      }
+    },
+    {
+      "caseKey": "unavailable-owner-dependency",
+      "family": "unavailable",
+      "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+      "surfaceKey": "guardian_nurture_chat",
+      "intentKey": "ask_care_group",
+      "context": {
+        "profile": "world",
+        "dependencyEvidence": "none",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": []
+      },
+      "expected": {
+        "errorCode": "dependency_no_go",
+        "missingDependencyKey": "t002_owner_integration"
+      }
+    }
+  ]
+}

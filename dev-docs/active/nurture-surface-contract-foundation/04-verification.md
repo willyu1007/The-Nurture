@@ -241,3 +241,15 @@
 | Slice invariance | PASS | Shared-core and all 16 capability/surface slice hashes remain byte-equal to the frozen baseline while the root digest rotated. |
 | Unit suite and census | PASS | `pnpm test:unit` 242/242 over 27 files; `pnpm verify:test-routing` census unchanged; tooling tests 5/5; package `tsc --noEmit` clean. |
 | Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
+
+## 2026-08-01 — P3-3 capability selection fixtures
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Deterministic build/rotation | PASS | `pnpm build:surface-contract` rotated to `nurture.surface-contract@1.5.0` / `sha256:edff6e10…`; `pnpm verify:surface-contract` rebuilds byte-identically; shared core `sha256:be3da7b9…` unchanged. |
+| Schema compilation and fixture validation | PASS | `pnpm verify:surface-contract-schemas`: 36 schemas strict-compile; selection cases validate with all five families present; auto-execute family negative rejected (`fixtures=34 negatives=6`). |
+| Selection determinism | PASS | `phase-3-selection.test.ts`: complete filtering partitions with role-consistent reasons, unique-target selection via the pilot profile, clarification options recomputed from granted enrollments (≥2, no silent pick), confirmation policies byte-equal to the registry, dependency gate membership for the NO-GO case. |
+| Namespace independence | PASS | Overlay ids under `syn-sel-`; all `syn-` references resolve to world or case overlay; no journey prefix appears in the selection document. |
+| Slice invariance | PASS | Shared-core and all 16 capability/surface slice hashes remain byte-equal to the frozen baseline while the root digest rotated. |
+| Unit suite and census | PASS | `pnpm test:unit` 248/248 over 28 files; `pnpm verify:test-routing` unit census 28; tooling tests 5/5; package `tsc --noEmit` clean. |
+| Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |

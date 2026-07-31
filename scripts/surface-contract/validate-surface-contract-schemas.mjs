@@ -23,8 +23,17 @@ const journeyScriptSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-script.schema.json";
 const journeyExpectedViewSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/journeys/journey-expected-view.schema.json";
+const selectionCasesSchemaId =
+  "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/selection/selection-cases.schema.json";
 const journeyKeys = ["gj-1", "gj-2", "gj-3", "gj-4", "gj-5", "rj-1"];
 const scriptedJourneyKeys = journeyKeys;
+const selectionFamilies = [
+  "candidate_filtering",
+  "correct_selection",
+  "clarification_needed",
+  "confirmation_needed",
+  "unavailable",
+];
 
 const schemaPaths = await collectSchemaPaths(sourceRoot);
 const schemas = await Promise.all(
@@ -148,9 +157,23 @@ for (const journeyKey of scriptedJourneyKeys) {
   }
 }
 assertScriptRejectsUnknownErrorCode(validator, firstScript);
+const selectionCases = await validateSourceDocument(
+  validator,
+  selectionCasesSchemaId,
+  path.join(sourceRoot, "fixtures/selection/selection-cases.json"),
+);
+const presentFamilies = new Set(
+  selectionCases.cases.map((entry) => entry.family),
+);
+for (const family of selectionFamilies) {
+  if (!presentFamilies.has(family)) {
+    throw new Error(`selection-cases.json misses the ${family} family`);
+  }
+}
+assertSelectionRejectsUnknownFamily(validator, selectionCases);
 
 process.stdout.write(
-  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=${8 + scriptCount + expectedViewCount} negatives=5\n`,
+  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=${9 + scriptCount + expectedViewCount} negatives=6\n`,
 );
 
 async function collectSchemaPaths(directory) {
@@ -264,6 +287,20 @@ function assertScriptRejectsUnknownErrorCode(ajv, script) {
   malformed.refusal.expectedError.code = "granted";
   if (validate(malformed)) {
     throw new Error("Journey script schema accepted an unknown error code");
+  }
+}
+
+function assertSelectionRejectsUnknownFamily(ajv, selectionCases) {
+  const validate = ajv.getSchema(selectionCasesSchemaId);
+  if (!validate) {
+    throw new Error(`Missing compiled schema ${selectionCasesSchemaId}`);
+  }
+  const malformed = structuredClone(selectionCases);
+  // Selection outcomes form a closed set; an auto-execute family that skips
+  // filtering/confirmation must fail admission.
+  malformed.cases[0].family = "auto_execute";
+  if (validate(malformed)) {
+    throw new Error("Selection schema accepted an unknown case family");
   }
 }
 

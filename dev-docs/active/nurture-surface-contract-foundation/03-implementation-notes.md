@@ -507,3 +507,30 @@ the new root ref still requires exact consumer adoption.
   scripts/views for all six journeys (`fixtures=33 negatives=5`).
 - No schema/migration, database, capability, activation, owner-claim or
   traffic change.
+
+## 2026-08-01 P3-3 capability selection fixtures
+
+- Added `source/fixtures/selection/`: `selection-cases.schema.json` and
+  seven cases covering the five deterministic families. Filtering cases
+  are complete partitions of the ten-capability registry into eligible
+  vs filtered-out with closed reason kinds (`role_unsupported` /
+  `no_current_grant` / `missing_target_context`); correct selection
+  converges through the single-institution profile's unique
+  write-target resolution; the dual-enrollment clarification case
+  returns `ambiguous_write_target` options equal to the family's
+  granted enrollments — never a silent LLM pick; confirmation cases pin
+  the registry's own `reviewable_commit`/`strong_confirmation`
+  policies; the unavailable case evaluates under
+  `dependencyEvidence=none` and yields `dependency_no_go` on
+  `t002_owner_integration`.
+- `phase-3-selection.test.ts` recomputes partitions, profile
+  resolution, clarification option sets, confirmation-policy parity and
+  gate membership from the world/profile/registry sources; overlay ids
+  use the `syn-sel-` namespace and journey prefixes may not appear.
+  Identity `1.4.0 -> 1.5.0` (`sha256:edff6e10…`); shared core and all
+  16 existing slices remain byte-identical. Unit census 27 -> 28;
+  validate script gains family-coverage plus the auto-execute negative
+  (`fixtures=34 negatives=6`). Also repaired the README identity line
+  that had lagged at 1.3.0 since the P3-2 batch.
+- No schema/migration, database, capability, activation, owner-claim or
+  traffic change.
