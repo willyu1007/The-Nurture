@@ -1513,3 +1513,19 @@
   coverage gap and recomputes hashes, then M5 runs exactly once against
   the advanced pin. No pin, code, capability or environment changed;
   everything stays default-off and NO-GO until Joint Conformance.
+
+## 2026-07-31 re-pin to the current published Base/My-Chat set (R3 lock-v4 prep)
+
+- Pin advanced: My-Chat `f00b868` -> `a0195662228a` (ST-5 issuing
+  surface + education leg + side-channel suite) and My-Workflow-Base
+  `5c04dce` -> `06303e94` (web-workbench 0.8.0 line). All hashes
+  recomputed with the verifier's `computeContractHash` against real
+  detached checkouts at the exact revisions: contract parity holds
+  (`8dd53be4..` both sides), `web_workbench` source pin `d4642808..`,
+  `x5_joint_api` `89a61355..` (169 files - absorbs the new host
+  surfaces), `wave4_binding_host` `33ebe5d9..`. Full local verifier
+  green on every leg.
+- Substantive re-qualification: the X5 joint acceptance suite passed on
+  two freshly created and migrated databases (`x5_my_chat` 21
+  migrations from the pinned checkout, `x5_nurture` 5 migrations)
+  against the pinned My-Chat sources.
