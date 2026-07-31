@@ -5,16 +5,23 @@
   "type": "module",
   "description": "Production-intended NestJS ingress for Nurture-owned scenario APIs.",
   "scripts": {
+    "build:runtime-deps": "pnpm --filter @the-nurture/scenario build && pnpm --filter @the-nurture/db build",
+    "prebuild": "pnpm run build:runtime-deps",
     "build": "tsc -p tsconfig.build.json",
+    "predev": "pnpm run build:runtime-deps",
     "dev": "tsx watch src/main.ts",
+    "pretest": "pnpm run build:runtime-deps",
     "start": "node dist/main.js",
     "test": "vitest run -c vitest.config.ts",
+    "pretypecheck": "pnpm run build:runtime-deps",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.28",
     "@nestjs/core": "^11.1.28",
     "@nestjs/platform-express": "^11.1.28",
+    "@the-nurture/db": "workspace:*",
+    "@the-nurture/scenario": "workspace:*",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },

@@ -9,6 +9,8 @@ import {
   BindingOwnerServiceAuthGuard,
 } from "../src/binding-owner-service-auth.guard.js";
 import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
+import { BindingOwnerRuntime } from "../src/binding-owner-runtime.js";
+import type { ScenarioBindingOwnerAuthorizer } from "@the-nurture/scenario/binding-owner";
 
 const TOKEN = "m2-service-token-marker";
 const SAME_LENGTH_WRONG_TOKEN = `${TOKEN.slice(0, -1)}x`;
@@ -72,10 +74,18 @@ function guardConfig(
   token: string | undefined,
 ): BindingOwnerGuardConfig {
   return {
-    authorizerAvailable,
+    runtime: new BindingOwnerRuntime(
+      authorizerAvailable ? fakeAuthorizer : undefined,
+    ),
     serviceAuth: createBindingOwnerServiceAuth(token),
   };
 }
+
+const fakeAuthorizer: ScenarioBindingOwnerAuthorizer = {
+  authorize: async () => {
+    throw new Error("The guard test must not invoke the authorizer.");
+  },
+};
 
 function context(authorization: string | undefined): ExecutionContext {
   return {

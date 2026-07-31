@@ -14,7 +14,8 @@ import {
   type NurtureUserAttentionResolution,
 } from "@the-nurture/scenario";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
-import { createScenarioBindingOwnerAuthorizer, type ScenarioBindingOwnerAuthorizer } from "./binding-owner.js";
+import { createScenarioBindingOwnerAuthorizer } from "@the-nurture/db/binding-owner";
+import type { ScenarioBindingOwnerAuthorizer } from "@the-nurture/scenario/binding-owner";
 import { createDevHostPrismaClient, type DevHostPrismaClient } from "./db/dev-host-client.js";
 import { MockCanonicalObjectResolver, PgArtifactPreviewPort, PgRunContextPort } from "./deps/mock-deps.js";
 import { PgWorkflowRuntimePort } from "./runtime/pg-workflow-runtime.port.js";

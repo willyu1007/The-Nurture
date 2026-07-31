@@ -49,6 +49,31 @@ export type NurtureScenarioOwnerAuthorizationReceipt = {
   expiresAt: Date;
 };
 
+/**
+ * HTTP-free application input for reserving a typed Nurture anchor and issuing
+ * one current owner-authorization receipt. Transport adapters own snake_case
+ * parsing; the authorizer owns no request/response framework concepts.
+ */
+export type ScenarioBindingAuthorizeInput = {
+  workspaceId: string;
+  actingUserId: string;
+  idempotencyKey: string;
+  subjectType: NurtureBindingSubjectType;
+  subjectId: string;
+  scenarioKey: "nurture";
+  actingActorId: string;
+  representedOrganizationId?: string;
+  purpose: "scenario_binding_write";
+  correlationId?: string;
+  traceId?: string;
+};
+
+export type ScenarioBindingOwnerAuthorizer = {
+  authorize(
+    input: ScenarioBindingAuthorizeInput,
+  ): Promise<NurtureScenarioOwnerAuthorizationReceipt>;
+};
+
 export type NurtureBindingAuthorityEvidence = {
   authorizationSourceRef: string;
   authorizationSourceVersion: number;

@@ -13,7 +13,7 @@ import {
   type ReservedNurtureBindingAnchor,
   type ReserveNurtureBindingAnchorInput,
   type VerifyCurrentNurtureBindingAuthorityInput,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/binding-owner";
 
 type TransactionClient = Prisma.TransactionClient;
 

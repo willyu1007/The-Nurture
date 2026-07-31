@@ -1210,3 +1210,18 @@ the rejected checkpoint and are historical.
 | Persistence/schema boundaries | PASS | Persistence-boundary and N1 schema-contract checks pass. |
 | Real PostgreSQL rerun | NOT RUN / REQUIRED IN M3-C | Docker client is present, but the local daemon is unavailable. No persistent database was contacted; the disposable-PostgreSQL gate is not waived. |
 | Effect boundary | PASS | Baseline changes documentation/governance only; no source/package/lockfile, schema/migration, database, environment value, secret, API artifact, capability, deployment, activation or traffic changed. |
+
+## 2026-07-31 — NestJS ingress M3-A runtime/composition seam
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Scenario/DB runtime build | PASS | `pnpm build:binding-owner-runtime` compiles both narrow package entrypoints to JavaScript. |
+| Scenario and DB package typecheck | PASS | Both package-local TypeScript checks pass. |
+| Scenario-service typecheck | PASS | The formal service resolves only the compiled binding-owner runtime subpaths. |
+| Scenario-service test | PASS | 6 files / 30 tests, including five new complete/partial runtime-configuration cases. |
+| Scenario-service build/smoke | PASS | `dist/main.js` loads the compiled shared composition, serves health, remains binding-owner disabled without complete configuration and omits the legacy route. |
+| Existing unit population | PASS | 21 files / 187 tests. |
+| Binding repository fake | PASS | 1 file / 9 tests. |
+| Persistence/schema boundaries | PASS | Persistence-boundary and N1 schema-contract checks remain green. |
+| Dev-host standalone typecheck | OWNER-ENVIRONMENT GATED | The current floating My-Chat worktree lacks resolvable internal package dependencies; errors originate from its `scenario-integrations` source. Exact pinned CI materialization remains the authoritative M3-C check; no floating re-pin or sibling mutation was performed. |
+| Effect boundary | PASS | No route response, schema/migration, persistent database, environment value, secret, capability, deployment, activation or traffic changed. |

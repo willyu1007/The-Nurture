@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import type { NurtureBindingEvidenceHasher } from "@the-nurture/scenario";
+import type { NurtureBindingEvidenceHasher } from "@the-nurture/scenario/binding-owner";
 
 export class HmacNurtureBindingEvidenceHasher implements NurtureBindingEvidenceHasher {
   private readonly key: Buffer;

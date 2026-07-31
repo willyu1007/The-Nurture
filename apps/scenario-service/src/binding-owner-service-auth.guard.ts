@@ -8,13 +8,14 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
+import type { BindingOwnerRuntime } from "./binding-owner-runtime.js";
 
 export const BINDING_OWNER_GUARD_CONFIG = Symbol(
   "BINDING_OWNER_GUARD_CONFIG",
 );
 
 export type BindingOwnerGuardConfig = Readonly<{
-  authorizerAvailable: boolean;
+  runtime: BindingOwnerRuntime;
   serviceAuth: BindingOwnerServiceAuth;
 }>;
 
@@ -27,7 +28,7 @@ export class BindingOwnerServiceAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     if (
-      !this.config.authorizerAvailable ||
+      !this.config.runtime.authorizer ||
       !this.config.serviceAuth.configured
     ) {
       throw new ServiceUnavailableException({

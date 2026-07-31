@@ -3,6 +3,7 @@ import type { Server } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
 import { createScenarioServiceApplication } from "../src/application.js";
 import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
+import type { ScenarioBindingOwnerAuthorizer } from "@the-nurture/scenario/binding-owner";
 import type { ScenarioStructuredLogRecord } from "../src/structured-logger.js";
 
 describe("scenario-service M1/M2 HTTP boundary", () => {
@@ -127,7 +128,7 @@ describe("scenario-service M1/M2 HTTP boundary", () => {
     "returns 401 when owner composition is available but the bearer is $condition",
     async ({ authorization }) => {
       const { app } = await createScenarioServiceApplication({
-        bindingOwnerAuthorizerAvailable: true,
+        bindingOwnerAuthorizer: fakeAuthorizer,
         bindingOwnerServiceAuth:
           createBindingOwnerServiceAuth("expected-token"),
         logSink: () => undefined,
@@ -149,3 +150,9 @@ describe("scenario-service M1/M2 HTTP boundary", () => {
     },
   );
 });
+
+const fakeAuthorizer: ScenarioBindingOwnerAuthorizer = {
+  authorize: async () => {
+    throw new Error("The M2 disabled controller must not invoke the authorizer.");
+  },
+};

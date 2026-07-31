@@ -126,7 +126,7 @@ default-disabled and is now implementation-open.
 - [x] Capture the M3 request/response/error/composition/test baseline and
   prioritize implementation findings in
   [`14-nestjs-ingress-m3-baseline-inventory.md`](./14-nestjs-ingress-m3-baseline-inventory.md).
-- [ ] M3-A: establish a compiled runtime package boundary; relocate the
+- [x] M3-A: establish a compiled runtime package boundary; relocate the
   authorizer factory and Guardian authority reader out of `apps/backend`;
   compose the formal service from the production Prisma client only.
 - [ ] M3-B: implement the allowlisted controller/request adapter, centralize

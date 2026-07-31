@@ -1303,3 +1303,29 @@
 - This baseline changes documentation/governance only. It changes no source,
   dependency, schema/migration, database, environment, secret, capability,
   deployment, activation or traffic.
+
+## 2026-07-31 — NestJS ingress M3-A runtime/composition seam completed
+
+- Added compiled, narrow `binding-owner` runtime subpaths for
+  `@the-nurture/scenario` and `@the-nurture/db`. The rest of each workspace
+  package keeps its existing source-oriented development export, while the
+  formal service imports only built JavaScript entrypoints.
+- Moved `createScenarioBindingOwnerAuthorizer` and the transaction-local
+  Guardian authority reader from `apps/backend` into the Nurture DB
+  composition boundary. The Fastify harness now consumes that shared
+  composition instead of owning it.
+- Hardened current-authority SQL with explicit participant/role
+  `deleted_at IS NULL` predicates and role `starts_at`/`ends_at` checks while
+  retaining the existing workspace-Guardian P7 policy.
+- Added `BindingOwnerRuntime` to the formal service. It creates the production
+  Prisma client only when service auth, a UTF-8 evidence key of at least 32
+  bytes and `DATABASE_URL` are all present; partial configuration remains
+  disabled without opening a connection.
+- Replaced the M2 `bindingOwnerAuthorizerAvailable` boolean with one actual
+  optional authorizer object. The route Guard reads the same runtime object the
+  M3-B Controller will invoke, closing availability drift.
+- Added package-local build hooks so scenario-service typecheck, test, dev and
+  build materialize their runtime dependencies before use. Root DB/dev-host
+  test commands do the same.
+- M3-A changes no route body/status, schema/migration, persistent database,
+  environment value, secret, capability, deployment, activation or traffic.

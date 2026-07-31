@@ -1790,3 +1790,16 @@ This file exists to prevent repeating mistakes within this task.
   `503 binding_owner_disabled`.
 - Prevention: Every M3 composition change must rerun all three guard states and
   prove that token presence alone cannot enable owner behavior.
+## 2026-07-31 — Lockfile-only install did not materialize new workspace links
+
+- Symptom: the scenario and DB runtime builds passed, but scenario-service
+  TypeScript/Vitest could not resolve their new `binding-owner` subpaths.
+- Root cause: `pnpm install --lockfile-only` updated `pnpm-lock.yaml` without
+  creating the newly declared workspace symlinks under the service package.
+- Attempt: rerunning the runtime builds could not repair dependency
+  materialization because the package links were still absent.
+- Fix: run `pnpm install --offline --frozen-lockfile` after the lockfile update;
+  no package download or source change was required.
+- Prevention: after adding a workspace dependency, use lockfile-only mode only
+  for resolution, then perform an actual frozen install before package-local
+  typecheck/test.

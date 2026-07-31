@@ -5,6 +5,11 @@ import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module.js";
 import type { BindingOwnerServiceAuth } from "./binding-owner-service-auth.js";
 import {
+  createBindingOwnerRuntime,
+  type BindingOwnerRuntime,
+} from "./binding-owner-runtime.js";
+import type { ScenarioBindingOwnerAuthorizer } from "@the-nurture/scenario/binding-owner";
+import {
   loadBindingOwnerServiceAuth,
   loadScenarioServiceConfig,
   type ScenarioServiceConfig,
@@ -26,16 +31,25 @@ export type ScenarioServiceApplication = Readonly<{
 export async function createScenarioServiceApplication(input?: {
   config?: ScenarioServiceConfig;
   logSink?: ScenarioStructuredLogSink;
-  bindingOwnerAuthorizerAvailable?: boolean;
+  bindingOwnerAuthorizer?: ScenarioBindingOwnerAuthorizer;
+  bindingOwnerRuntime?: BindingOwnerRuntime;
   bindingOwnerServiceAuth?: BindingOwnerServiceAuth;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
   const bindingOwnerServiceAuth =
     input?.bindingOwnerServiceAuth ?? loadBindingOwnerServiceAuth();
+  const bindingOwnerRuntime =
+    input?.bindingOwnerRuntime ??
+    createBindingOwnerRuntime({
+      serviceAuth: bindingOwnerServiceAuth,
+      ...(input?.bindingOwnerAuthorizer
+        ? { authorizer: input.bindingOwnerAuthorizer }
+        : {}),
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
-      authorizerAvailable: input?.bindingOwnerAuthorizerAvailable ?? false,
+      runtime: bindingOwnerRuntime,
       serviceAuth: bindingOwnerServiceAuth,
     }),
     {
