@@ -1439,3 +1439,21 @@
   `45f8c0c68cbfcb9af9701c867c262fc9a7c2b16d8e2442dfd48497987902380b`
   (53 expanded files) - byte-identical to the value CI computed, so the
   repair is provably exact.
+
+## 2026-07-31 ST-5 derived age/stage consumption client (My-Chat/T-030 R3)
+
+- `packages/nurture-scenario/src/adapters/derived-age-stage-http.ts`:
+  host-ward read client for `POST /internal/child/derived-age-stage` -
+  bearer = the existing shared internal service token, fixed
+  `scenario_key=nurture` + literal purpose `derived_age_stage_read`,
+  five-second timeout, typed issued/denied/unavailable resolutions.
+  Every 200 body passes the existing strict domain parser, so extra
+  fields (raw-date smuggling), expired envelopes, or malformed keys
+  resolve to `invalid_envelope` and never enter Nurture state.
+- Env contract adds `MY_CHAT_INTERNAL_BASE_URL` (optional; absence
+  keeps derived reads disabled). No schema changes; no runtime wiring
+  is activated by this slice.
+- Tests: seven client tests (contract shape, extra-field rejection,
+  expiry rejection, 403/503/transport mapping, pre-network child-id
+  validation); unit census 21 -> 22 in `assert-test-routing.mjs`;
+  unit population 194/194 over minimum 187.

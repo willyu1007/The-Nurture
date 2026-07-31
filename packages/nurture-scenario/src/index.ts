@@ -25,6 +25,7 @@ export * from "./domain/commands/family-strategy.command.js";
 export * from "./domain/interactions/interaction-context.js";
 export * from "./domain/identity/scenario-binding-owner.js";
 export * from "./domain/identity/derived-age-stage.js";
+export * from "./adapters/derived-age-stage-http.js";
 export * from "./domain/resolution/candidate-kernel.js";
 export * from "./domain/institution/institution-context.js";
 export * from "./domain/institution/institution-policy.js";

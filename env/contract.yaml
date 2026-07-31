@@ -53,3 +53,7 @@ variables:
     secret: true
     secret_ref: nurture_internal_service_token
     description: Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged.
+  MY_CHAT_INTERNAL_BASE_URL:
+    type: url
+    required: false
+    description: My-Chat host base URL for host-ward internal reads (ST-5 derived age/stage); the shared internal service token authenticates the call. Absence keeps derived reads disabled.
