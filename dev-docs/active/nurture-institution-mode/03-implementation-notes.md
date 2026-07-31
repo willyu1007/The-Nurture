@@ -1529,3 +1529,10 @@
   two freshly created and migrated databases (`x5_my_chat` 21
   migrations from the pinned checkout, `x5_nurture` 5 migrations)
   against the pinned My-Chat sources.
+
+## 2026-08-01 — T-002 growth-record contribution resolver
+
+- Added the Fastify-only private endpoint `POST /internal/nurture/growth-record/contribution/resolve`, registered with the existing dev-host internal routes and authenticated by the shared `NURTURE_INTERNAL_SERVICE_TOKEN` bearer value. Missing or shorter-than-16-character configuration stays disabled; bearer comparison uses `timingSafeEqual`.
+- The request accepts bounded canonical refs, ignores foreign namespaces, and only accepts `nurture/metric_observation`; absent or mismatched Nurture refs stop with `invalid_contribution_ref`. The production Nurture Prisma query selects only display-safe fields.
+- An observation is shareable only when it is `active`, user-confirmed, child-bound, and has a contributing parent actor. The response exposes only the fixed observation contribution envelope, including a normalized semantic summary; it never selects or returns raw metric values, payloads, or scales.
+- Added dev-host database-gated E2E coverage for disabled/short configuration, bad bearer, malformed body, invalid refs, missing/non-shareable rows (including inactive status and a missing parent actor), summary omission, exact response key sets, and raw-value non-leakage. The dev-host census is 11 -> 12 files.
