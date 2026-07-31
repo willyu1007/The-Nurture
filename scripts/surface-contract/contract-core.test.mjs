@@ -62,7 +62,7 @@ test("generator rejects semantic drift without an interface version rotation", a
       JSON.stringify({
         interfaceContract: {
           key: "nurture.surface-contract",
-          version: "1.0.1",
+          version: "1.1.0",
           digest: `sha256:${"0".repeat(64)}`,
         },
       }),
@@ -70,7 +70,7 @@ test("generator rejects semantic drift without an interface version rotation", a
     );
     await assert.rejects(
       buildSurfaceContract(outputPath),
-      /content changed without a version rotation from 1\.0\.1/,
+      /content changed without a version rotation from 1\.1\.0/,
     );
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });

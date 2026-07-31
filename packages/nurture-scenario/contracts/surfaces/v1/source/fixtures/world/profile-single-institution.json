@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "profileKey": "single-institution-pilot",
+  "worldKey": "world-v1",
+  "selectedInstitutionId": "syn-institution-ia",
+  "writeTargetResolution": [
+    {
+      "processId": "syn-process-c1",
+      "enrollmentId": "syn-enrollment-c1-ia"
+    },
+    {
+      "processId": "syn-process-c2",
+      "enrollmentId": "syn-enrollment-c2-ia"
+    }
+  ]
+}

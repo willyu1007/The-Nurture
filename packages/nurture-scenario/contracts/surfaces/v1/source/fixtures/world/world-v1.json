@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "worldKey": "world-v1",
+  "worldVersion": "1.0.0",
+  "participants": [
+    { "participantId": "syn-guardian-ada", "displayLabel": "Syn Guardian Ada" },
+    { "participantId": "syn-guardian-bo", "displayLabel": "Syn Guardian Bo" },
+    { "participantId": "syn-guardian-fay", "displayLabel": "Syn Guardian Fay" },
+    { "participantId": "syn-caregiver-cara", "displayLabel": "Syn Caregiver Cara" },
+    { "participantId": "syn-caregiver-dana", "displayLabel": "Syn Caregiver Dana" },
+    { "participantId": "syn-caregiver-elio", "displayLabel": "Syn Caregiver Elio" }
+  ],
+  "families": [
+    {
+      "familyId": "syn-family-f1",
+      "guardianParticipantIds": ["syn-guardian-ada", "syn-guardian-bo"]
+    },
+    {
+      "familyId": "syn-family-f2",
+      "guardianParticipantIds": ["syn-guardian-fay"]
+    }
+  ],
+  "children": [
+    {
+      "childId": "syn-child-c1",
+      "familyId": "syn-family-f1",
+      "displayLabel": "Syn Child One",
+      "identityBindingState": "bound"
+    },
+    {
+      "childId": "syn-child-c2",
+      "familyId": "syn-family-f2",
+      "displayLabel": "Syn Child Two",
+      "identityBindingState": "bound"
+    }
+  ],
+  "childCareProcesses": [
+    { "processId": "syn-process-c1", "childId": "syn-child-c1" },
+    { "processId": "syn-process-c2", "childId": "syn-child-c2" }
+  ],
+  "institutions": [
+    { "institutionId": "syn-institution-ia", "displayLabel": "Syn Institution Aster" },
+    { "institutionId": "syn-institution-ib", "displayLabel": "Syn Institution Birch" }
+  ],
+  "careGroups": [
+    {
+      "careGroupId": "syn-care-group-ia-g1",
+      "institutionId": "syn-institution-ia",
+      "displayLabel": "Syn Group Aster One"
+    },
+    {
+      "careGroupId": "syn-care-group-ib-g1",
+      "institutionId": "syn-institution-ib",
+      "displayLabel": "Syn Group Birch One"
+    }
+  ],
+  "caregiverAssignments": [
+    {
+      "assignmentId": "syn-assignment-cara-ia-g1",
+      "participantId": "syn-caregiver-cara",
+      "careGroupId": "syn-care-group-ia-g1",
+      "actorRole": "caregiver",
+      "state": "active"
+    },
+    {
+      "assignmentId": "syn-assignment-dana-ia-g1",
+      "participantId": "syn-caregiver-dana",
+      "careGroupId": "syn-care-group-ia-g1",
+      "actorRole": "lead_caregiver",
+      "state": "active"
+    },
+    {
+      "assignmentId": "syn-assignment-elio-ib-g1",
+      "participantId": "syn-caregiver-elio",
+      "careGroupId": "syn-care-group-ib-g1",
+      "actorRole": "caregiver",
+      "state": "active"
+    }
+  ],
+  "enrollments": [
+    {
+      "enrollmentId": "syn-enrollment-c1-ia",
+      "processId": "syn-process-c1",
+      "institutionId": "syn-institution-ia",
+      "careGroupId": "syn-care-group-ia-g1",
+      "state": "active"
+    },
+    {
+      "enrollmentId": "syn-enrollment-c1-ib",
+      "processId": "syn-process-c1",
+      "institutionId": "syn-institution-ib",
+      "careGroupId": "syn-care-group-ib-g1",
+      "state": "active"
+    },
+    {
+      "enrollmentId": "syn-enrollment-c2-ia",
+      "processId": "syn-process-c2",
+      "institutionId": "syn-institution-ia",
+      "careGroupId": "syn-care-group-ia-g1",
+      "state": "active"
+    }
+  ],
+  "familyCareGrants": [
+    {
+      "grantId": "syn-grant-c1-ia",
+      "enrollmentId": "syn-enrollment-c1-ia",
+      "familyId": "syn-family-f1",
+      "purposeKey": "family_care_interaction",
+      "state": "current"
+    },
+    {
+      "grantId": "syn-grant-c2-ia",
+      "enrollmentId": "syn-enrollment-c2-ia",
+      "familyId": "syn-family-f2",
+      "purposeKey": "family_care_interaction",
+      "state": "current"
+    }
+  ]
+}

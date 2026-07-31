@@ -7,20 +7,25 @@
 - Milestone / Feature: M-002 / F-003
 - Phase: Phase 0 discovery/gate reconciliation, Phase 1 normative surface
   source, Phase 2 exact typed contract/interface identity and Phase 2 quality
-  closure complete; Phase 3 deterministic fixtures and cross-role journeys next.
+  closure complete; Phase 3 in progress — P3-0 synthetic world source freeze
+  complete, P3-1 per-journey initial states next.
 - Updated: 2026-07-31
-- Next step: 实施 Phase 3 deterministic synthetic world、GJ-1～GJ-5/RJ-1
-  独立初始状态与 capability selection fixtures；随后进入 Phase 4 synthetic
-  qualification。不得把 synthetic PASS 写成 owner-integration PASS。
-  执行拆解（P3-0～P3-4 与边界规则）见
+- Next step: 实施 P3-1 per-journey 独立初始状态，随后 P3-2 Journey scripts、
+  P3-3 selection fixtures、P3-4 fixture manifest/canonicalization；随后进入
+  Phase 4 synthetic qualification。不得把 synthetic PASS 写成
+  owner-integration PASS。执行拆解（P3-0～P3-4 与边界规则）见
   [`07-phase-3-fixture-journey-decomposition.md`](./07-phase-3-fixture-journey-decomposition.md)。
 - Current gate: T-002 ingress M0-M4 已完成；exact owner pin 仍为 My-Chat
-  `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO。
-  Phase 2 quality-closed exact interface 为
-  `nurture.surface-contract@1.0.1` /
-  `sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59`。
-  dependency evidence 现已在比较前严格校验；generated manifest 必须匹配独立可信
-  artifact pin。所有 protected capability 继续 default-off。
+  `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO；
+  pin-advance decision input 见 T-002
+  `15-mychat-drift-census-pin-advance-input.md`。
+  P3-0 后 current exact interface 为
+  `nurture.surface-contract@1.1.0` /
+  `sha256:8fb13498ca7c925a369f03fb103e6728e2f3b07b6039e2c9e5604f1d7bcefbcb`；
+  shared core 与全部既有 capability/surface slice hash 与 1.0.1 基线字节一致
+  （由 `phase-3-world.test.ts` 机械守卫）。dependency evidence 仍在比较前严格
+  校验；generated manifest 必须匹配独立可信 artifact pin。所有 protected
+  capability 继续 default-off。
 
 ## Goal
 

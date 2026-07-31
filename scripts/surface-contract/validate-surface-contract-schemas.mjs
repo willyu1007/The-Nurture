@@ -15,6 +15,8 @@ const manifestSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/interface/surface-contract-manifest.schema.json";
 const artifactPinSchemaId =
   "https://contracts.the-nurture.local/surfaces/v1/source/interface/surface-contract-artifact-pin.schema.json";
+const syntheticWorldSchemaId =
+  "https://contracts.the-nurture.local/surfaces/v1/source/fixtures/world/synthetic-world.schema.json";
 
 const schemaPaths = await collectSchemaPaths(sourceRoot);
 const schemas = await Promise.all(
@@ -58,9 +60,20 @@ const artifactPin = await validateGeneratedArtifact(
 );
 assertManifestRejectsMalformedHeadBinding(validator, manifest);
 assertArtifactPinRejectsUnknownFields(validator, artifactPin);
+const world = await validateSourceDocument(
+  validator,
+  syntheticWorldSchemaId,
+  path.join(sourceRoot, "fixtures/world/world-v1.json"),
+);
+await validateSourceDocument(
+  validator,
+  `${syntheticWorldSchemaId}#/$defs/pilotProfile`,
+  path.join(sourceRoot, "fixtures/world/profile-single-institution.json"),
+);
+assertWorldRejectsNonSyntheticLabel(validator, world);
 
 process.stdout.write(
-  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid negatives=2\n`,
+  `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=2 negatives=3\n`,
 );
 
 async function collectSchemaPaths(directory) {
@@ -107,6 +120,34 @@ function assertManifestRejectsMalformedHeadBinding(ajv, manifest) {
   };
   if (validate(malformed)) {
     throw new Error("Manifest schema accepted a condition head without its ref");
+  }
+}
+
+async function validateSourceDocument(ajv, schemaId, documentPath) {
+  const validate = ajv.getSchema(schemaId);
+  if (!validate) throw new Error(`Missing compiled schema ${schemaId}`);
+  const value = JSON.parse(await readFile(documentPath, "utf8"));
+  if (!validate(value)) {
+    throw new Error(
+      `${path.relative(repoRoot, documentPath)} failed ${schemaId}: ${JSON.stringify(
+        validate.errors,
+      )}`,
+    );
+  }
+  return value;
+}
+
+function assertWorldRejectsNonSyntheticLabel(ajv, world) {
+  const validate = ajv.getSchema(syntheticWorldSchemaId);
+  if (!validate) {
+    throw new Error(`Missing compiled schema ${syntheticWorldSchemaId}`);
+  }
+  const malformed = structuredClone(world);
+  malformed.participants[0].displayLabel = "Alice Johnson-Smith";
+  if (validate(malformed)) {
+    throw new Error(
+      "Synthetic world schema accepted a realistic display label",
+    );
   }
 }
 

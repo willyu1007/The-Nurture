@@ -12,8 +12,12 @@ six-surface interface contract.
 - Phase 2 defines typed query/prepare/execute/read-result, error, pagination,
   private confirmation/cursor bindings, the closed ten-capability V1 registry,
   stable presenter contracts and versioned policy/repository ports.
+- Phase 3 adds `source/fixtures/` — the versioned PII-free synthetic world
+  (`fixtures/world/`) consumed by journey and selection fixtures. Fixture
+  files join the canonical inventory and root digest without entering the
+  shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.0.1` digest, shared-core hash,
+  records the exact `nurture.surface-contract@1.1.0` digest, shared-core hash,
   canonical source inventory and per-capability/per-surface slice hashes.
   `generated/surface-contract.artifact-pin.json` is the separately trusted
   byte-independent canonical hash required before loading that manifest.

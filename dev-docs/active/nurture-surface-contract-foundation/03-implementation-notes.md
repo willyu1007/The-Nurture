@@ -401,3 +401,28 @@ the new root ref still requires exact consumer adoption.
 - Phase 3 is My-Chat-independent; the parallel T-002 pin-advance input
   (`../nurture-institution-mode/15-mychat-drift-census-pin-advance-input.md`)
   gates M5/Joint Conformance sequencing only, not these increments.
+
+## 2026-07-31 P3-0 synthetic world source freeze
+
+- Added `contracts/surfaces/v1/source/fixtures/world/`:
+  `synthetic-world.schema.json` (strict 2020-12, whitelisted `syn-` ids
+  and `Syn …` labels, closed enums, pilot-profile `$defs`),
+  `world-v1.json` (F1 two-guardian family, child C1 with one bound
+  care process and two isolated enrollments at institutions Aster/Birch,
+  F2/C2 as the cross-family isolation control, grant present for
+  `c1-ia` and deliberately absent for `c1-ib` as the readiness-axis
+  variants) and `profile-single-institution.json` (deterministic
+  unique-enrollment write-target resolution for institution Aster).
+- Rotated the interface identity `1.0.1 -> 1.1.0`
+  (`sha256:8fb13498…`); the builder's rotation guard enforced the bump.
+  Shared-core hash and all 16 existing capability/surface slice hashes
+  are byte-identical to the 1.0.1 baseline, mechanically guarded by the
+  new `tests/surface-contract/phase-3-world.test.ts` (frozen-hash
+  table), so no Phase 2 evidence is invalidated by the additive slices.
+- `validate-surface-contract-schemas.mjs` now validates both fixture
+  documents against the world schema and rejects a realistic display
+  label as the third negative. Peripheral pins updated: phase-2 version
+  expectation, tooling-test rotation fixture, unit census 24 -> 25 in
+  `assert-test-routing.mjs`, contract README.
+- No schema/migration, database, capability, activation, owner-claim or
+  traffic change; fixtures are synthetic and contract-local.

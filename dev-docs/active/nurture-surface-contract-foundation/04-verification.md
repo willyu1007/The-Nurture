@@ -195,3 +195,15 @@
 | Test routing and persistence boundaries | PASS | 48 routed files; persistence isolation check passes. |
 | Docs/governance/context/diff | PASS | Strict task-doc lint, project governance lint, strict context verification and `git diff --check` pass. |
 | Effect boundary | PASS | No activation, owner integration, My-Chat pin, DB/schema/migration, environment, secret, deployment or traffic action occurred. |
+
+## 2026-07-31 — P3-0 synthetic world source freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Deterministic build/rotation | PASS | `pnpm build:surface-contract` rotated to `nurture.surface-contract@1.1.0` / `sha256:8fb13498…`; `pnpm verify:surface-contract` rebuilds byte-identically (shared core `sha256:be3da7b9…` unchanged). |
+| Strict schema compilation and fixture validation | PASS | `pnpm verify:surface-contract-schemas`: 32 schemas compile strictly; world + profile documents validate; realistic-label negative rejected (`fixtures=2 negatives=3`). |
+| Slice invariance | PASS | `phase-3-world.test.ts` asserts shared-core and all 16 capability/surface slice hashes byte-equal the frozen 1.0.1 baseline while the root digest rotated. |
+| World structure | PASS | Referential integrity, global `syn-` id uniqueness, two-institution isolation (only `syn-process-c1` shared, via separate enrollments), readiness-axis variants, single-institution profile unique-target convergence. |
+| PII hygiene | PASS | Whitelist walk over every string value plus forbidden-vocabulary scan (`child_id`, `family_id`, `binding_anchor`, `role_assignment`, `prisma`, `workflow_step`, `birth`, component/props). |
+| Unit suite and census | PASS | `pnpm test:unit` 231/231 over 25 files; `pnpm verify:test-routing` unit census 25; `pnpm test:surface-contract-tooling` 0 failures; package `tsc --noEmit` clean. |
+| Effect boundary | PASS | No schema/migration, database, capability, environment, secret, deployment, activation or traffic change. |
