@@ -1307,3 +1307,14 @@ the rejected checkpoint and are historical.
 | Nurture-side reference scan | PASS | Zero Nurture references to the moved env factory or its env keys; the formal-ingress journey imports only the unchanged HTTP source. |
 | Census-head currency | PASS | `96d96d0..5ce8d51` shows zero drift inside either pinned population (docs plus root dependency-override housekeeping only). |
 | Effect boundary | PASS | Read-only git-object inspection; census script confined to the session scratchpad; no pin, code, schema, capability, environment, secret, deployment or traffic change. |
+
+## 2026-08-01 — T-002 growth-record contribution resolver
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `node scripts/assert-test-routing.mjs` | PASS | 54 files: 28 unit, 5 production DB, 12 dev-host, 8 scenario-service, 1 X5. |
+| `pnpm typecheck` | OWNER-ENVIRONMENT GATED | The script expects `../My-Chat/packages/workflow-contracts`, but the provided sibling is `/Volumes/DataDisk/Project/My-Chat`; compilation did not begin. |
+| `pnpm db:generate:all` | OWNER-ENVIRONMENT GATED | Generation does not connect to the dummy URLs but Prisma cannot update its protected `/Users/yurui/.cache/prisma` engine cache. |
+| Focused dev-host Vitest | OWNER-ENVIRONMENT GATED | The command started Vitest but collected zero tests because the generated Prisma client is absent (`Cannot find module '.prisma/client/default'`); the required rebuild is blocked above. |
+| `pnpm lint` | OWNER-ENVIRONMENT GATED | The required pin-preparation step invokes the workflow-pin verifier, which expects unavailable `/Volumes/DataDisk/Project/_tmp/My-Workflow-Base`; frontend lint did not begin. |
+| Workflow-contract pin verifier | SKIPPED | The required My-Workflow-Base sibling checkout is unavailable; the endpoint changes only `apps/backend`, outside the pinned `packages/nurture-scenario` source set. |

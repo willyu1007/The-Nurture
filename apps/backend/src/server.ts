@@ -10,6 +10,7 @@ import {
 import { WorkflowApprovalStatus } from "./db/dev-host-client.js";
 import type { NurtureApp } from "./app.js";
 import { registerScenarioBindingOwnerRoute } from "./binding-owner.js";
+import { registerGrowthRecordContributionRoute } from "./growth-record-contribution.js";
 
 type DomainContextRef = CanonicalRef;
 
@@ -35,6 +36,13 @@ export const buildServer = (
     ...(app.scenarioBindingOwner
       ? { authorizer: app.scenarioBindingOwner }
       : {}),
+    ...(options.internalServiceToken
+      ? { internalServiceToken: options.internalServiceToken }
+      : {}),
+  });
+
+  registerGrowthRecordContributionRoute(fastify, {
+    nurturePrisma: app.nurturePrisma,
     ...(options.internalServiceToken
       ? { internalServiceToken: options.internalServiceToken }
       : {}),
