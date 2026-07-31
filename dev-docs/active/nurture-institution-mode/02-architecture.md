@@ -297,6 +297,22 @@ T-002 adopts the ecosystem boundary published by My-Workflow-Base revision
 - `ST-4(c)` must make the API index describe the implemented owner surface
   without turning the index into a second contract or authorization source.
 
+M0 resolves the port roles without adding an application alias:
+
+- `apps/scenario-service` is the only process that consumes `PORT`, default
+  `8000`;
+- Base-local `3200` is the host-visible backend endpoint and maps to the
+  scenario-service `8000` listener in local composition;
+- the Nurture frontend listens on Base-local `3201` and targets `3200`;
+- the local-only Fastify workflow dev host remains on `127.0.0.1:3001` through
+  a dev-only port setting and never listens on `8000` or `3200`.
+
+The formal ingress v1 route set is only `/health` plus
+`POST /internal/nurture/scenario-binding/authorize`. The legacy
+`user_attention` resolver and T-001 workflow harness routes remain outside
+that service. Full rationale and the G1-03 satisfied/deferred census live in
+`13-nestjs-ingress-m0-decision-record.md`.
+
 The coordination record is an architectural acceptance only and changes no package, source,
 schema, migration, runtime, environment, gate, or traffic state.
 

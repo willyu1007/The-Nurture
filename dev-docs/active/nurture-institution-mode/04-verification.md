@@ -1135,3 +1135,18 @@ the rejected checkpoint and are historical.
 | N1 / X4 contracts | PASS | `verify:n1-schema-contract` (21 tables), `verify:x4-handoff-replay-contract` (batch=32) |
 | Routing / boundaries | PASS | `verify:test-routing` (35 files), `verify:persistence-boundaries` |
 | Real two-database X5 | PASS | disposable `x5_mychat_p3` (all 21 My-Chat migrations replayed clean) + `x5_nurture_p3` (all Nurture production migrations); committed-result recovery, single materialization, post-revoke fail-closed, and completion/replay deep-equality green with the version-0 `command_execution` ref |
+
+## 2026-07-31 — NestJS ingress M0 decision freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Port census | PASS | Existing facts are env `PORT=8000`, Fastify fallback `3001`, frontend backend target `3001`, and Base assignment `3200/3201`; `13-nestjs-ingress-m0-decision-record.md` assigns one non-overlapping role to each. |
+| Route census | PASS | Current source contains P7 binding-owner and legacy `user_attention`; formal v1 includes only `/health` plus P7 because G1 binding/association Joint Conformance does not consume the legacy activation route. |
+| G1-03 census | PASS | Every requirement is classified `SATISFIED_BY_P7`, provisional, partial, deferred or outside P7 scope; missing workload binding, trusted principal carrier, invocation expiry/nonce/signature and subject-specific chain are explicit NO-GO inputs. |
+| Wire-stability review | PASS | Method/path, request/response fields, HTTP/error mapping and JSON bodies remain frozen; only the target base URL changes at Joint Conformance. |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --strict --check-anchors` | PASS | 33 files checked; 0 errors and 0 warnings. |
+| `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main` | PASS | Derived project views remain synchronized after M0. |
+| `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Governance artifacts and the updated semantic focus are consistent. |
+| `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS | Registered context and built-in schema validation pass; no context artifact changed. |
+| `git diff --check` | PASS | No whitespace errors in the M0 documentation change set. |
+| Effect boundary | PASS | M0 changes documentation/governance only; no code, dependency, lockfile, schema/migration, database, environment, secret, API artifact, capability, deployment, activation or traffic effect. |

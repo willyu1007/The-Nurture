@@ -10,7 +10,7 @@ Project: `main`
 - Primary feature: F-002 Institution ecology
 - Supporting feature: F-003 Six-surface store-beta readiness
 - Goal this cycle: T-004 Phase 0 discovery/gate reconciliation is complete.
-  The current critical lane is T-002 ingress M0→M3 with M4 interleaved,
+  T-002 ingress M0 is complete; the current critical lane is M1→M3 with M4 interleaved,
   including migration from provisional Fastify evidence to the formal NestJS
   scenario-service ingress. Then T-004 returns for Phase 1-2 Contract Boundary,
   followed by the remaining owner handoff and exact Joint Conformance.
@@ -29,6 +29,10 @@ Project: `main`
   `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
   Contract-parallel inputs are clear; My-Chat checkout drift from exact `f00b868`
   to `e1a5cdd` keeps Owner Integration NO-GO and is not a floating-repin request.
+- T-002 ingress M0: port semantics, the two-route formal v1 surface, G1-03
+  satisfied/deferred census and zero-wire-change fence are fixed in
+  `dev-docs/active/nurture-institution-mode/13-nestjs-ingress-m0-decision-record.md`.
+  M1 skeleton implementation is open; M2 auth and M3 P7 migration remain serial.
 - Parallelism: G1 start opens T-005～T-007 design/pure-domain/synthetic work;
   Contract Boundary opens exact public-contract implementation, Owner Readiness
   opens isolated real-adapter integration, and Joint Conformance alone opens
@@ -58,7 +62,7 @@ Project: `main`
   audit is PASS; G5-0 details are the next discussion, while tooling remains
   just-in-time and does not enter the current upstream critical path.
 - Execution backbone (2026-07-31): the recommended single-mainline order is
-  T-004 Phase 0 → T-002 ingress M0→M3 with M4 interleaved (see T-002
+  T-004 Phase 0 → T-002 ingress M0 (complete) → M1→M3 with M4 interleaved (see T-002
   `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 → T-002 M5 plus
   T-004 Phase 3-4 → G1 Joint Conformance → early T-007 G4-0A/0B
   publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →
@@ -69,7 +73,7 @@ Project: `main`
   only read-only/design work or disjoint-ownership work without pending shared
   freeze inputs, and never co-write one contract artifact; every work unit
   lands as a verified unit (lint/tests plus docs plus a commit point) or is
-  rolled back; human decisions occur only at gates (ingress M0, Contract
+  rolled back; human decisions occur only at gates (ingress M0 is closed, Contract
   Boundary, Joint Conformance, each G*-0 freeze, Beta Profile v0).
 - Decision deadline: before any DB apply, artifact publication, secret configuration, capability/manifest change, external pilot traffic, staging, production, or GA action.
 

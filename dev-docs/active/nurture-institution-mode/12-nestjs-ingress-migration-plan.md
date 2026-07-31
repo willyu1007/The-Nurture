@@ -6,8 +6,7 @@
 - Scope: move the qualified six-surface owner path from the provisional Fastify
   dev-host into the formal, production-intended NestJS scenario-service ingress
   required by G1-05.
-- State: decomposition and decisions accepted 2026-07-31; implementation not
-  started.
+- State: M0 decision freeze completed 2026-07-31; M1 implementation open.
 - This document records planning truth only. It is not an Owner Integration
   Handoff, a Joint Conformance record, activation, deployment or traffic
   authority.
@@ -57,10 +56,11 @@
 - **ING-D4 Dev-host P7 route disposition.** After the NestJS path qualifies
   (M5), the dev-host binding-owner route is removed or hard-disabled so a dual
   ingress cannot create owner-evidence drift.
-- **ING-D5 v1 route scope.** `/health` and the P7 binding-owner route are
-  required. Whether `/internal/nurture/activation/user-attention/resolve`
-  (the second service-token route on the dev host) joins the formal ingress v1
-  is decided at M0 from Joint Conformance fixture needs.
+- **ING-D5 v1 route scope.** `/health` and the P7 binding-owner route are the
+  complete formal v1 route set. The legacy
+  `/internal/nurture/activation/user-attention/resolve` route is not required
+  by G1 binding/association Joint Conformance and stays on the default-off
+  compatibility path pending a separately versioned T-004/T-005 contract.
 - **ING-D6 Scope fence.** This migration does not implement the full G1-03
   private invocation contract (nonce, expiry or canonical-request-hash
   verification beyond current P7 behavior) and does not create any C-3 named
@@ -75,17 +75,18 @@
 
 ## Work Breakdown
 
-### M0 — Decision Freeze (documentation only)
+### M0 — Decision Freeze (complete 2026-07-31)
 
-- Produce one port-semantics decision record: which process listens on `8000`,
+- [x] Produce one port-semantics decision record: which process listens on `8000`,
   the role of the Base-assigned `3200/3201` pair, what the frontend targets,
   and which port the dev-host keeps.
-- Close ING-D5: fix the v1 route set from Joint Conformance fixture needs.
-- Produce the ING-D6 G1-03 gap census (satisfied vs deferred items).
-- Confirm ING-D3: verify the migration plan implies zero wire-contract change
+- [x] Close ING-D5: fix the v1 route set from Joint Conformance fixture needs.
+- [x] Produce the ING-D6 G1-03 gap census (satisfied vs deferred items).
+- [x] Confirm ING-D3: verify the migration plan implies zero wire-contract change
   for the pinned My-Chat Host binding source.
 
-Acceptance: one decision record exists; no code, schema or environment change.
+Acceptance: PASS. See `13-nestjs-ingress-m0-decision-record.md`; no code, schema
+or environment change.
 
 ### M1 — NestJS Skeleton and Startup Safety
 

@@ -1172,3 +1172,24 @@
   exact whole-Item version winner and derived terminal-claimant C-4 rules are
   superseded. Source/schema/evidence remain unchanged, default-off and
   unqualified until redesigned.
+
+## 2026-07-31 — NestJS ingress M0 decision freeze completed
+
+- Reused T-002 and completed the documentation-only M0 gate before creating
+  the formal NestJS application.
+- Added `13-nestjs-ingress-m0-decision-record.md`.
+- Fixed port semantics: scenario-service listens on `PORT=8000`; Base-local
+  backend/frontend endpoints are `3200/3201`; local composition maps `3200`
+  to service `8000`; Fastify dev-host stays loopback-only on `3001`.
+- Closed ING-D5: formal v1 contains only `/health` and
+  `/internal/nurture/scenario-binding/authorize`. Legacy `user_attention` and
+  T-001 workflow harness routes do not migrate in this slice.
+- Classified every G1-03 requirement as satisfied, partial, deferred or
+  outside P7 scope. The current static bearer, body-carried principal fields,
+  absent invocation nonce/expiry/signature and subject-chain gap cannot be
+  reported as a complete private-invocation contract.
+- Confirmed zero P7 wire change: method/path, snake_case fields, status/error
+  mapping and JSON body shapes stay frozen; host/port/base URL is configuration.
+- M1 is now implementation-open. M0 changed no source, dependency, lockfile,
+  schema/migration, database, environment value, secret, API artifact,
+  capability, deployment, activation or traffic.
