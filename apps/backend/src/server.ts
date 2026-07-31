@@ -9,7 +9,6 @@ import {
 } from "@the-nurture/db";
 import { WorkflowApprovalStatus } from "./db/dev-host-client.js";
 import type { NurtureApp } from "./app.js";
-import { registerScenarioBindingOwnerRoute } from "./binding-owner.js";
 import { registerGrowthRecordContributionRoute } from "./growth-record-contribution.js";
 
 type DomainContextRef = CanonicalRef;
@@ -32,14 +31,8 @@ export const buildServer = (
 
   fastify.get("/health", async () => ({ ok: true }));
 
-  registerScenarioBindingOwnerRoute(fastify, {
-    ...(app.scenarioBindingOwner
-      ? { authorizer: app.scenarioBindingOwner }
-      : {}),
-    ...(options.internalServiceToken
-      ? { internalServiceToken: options.internalServiceToken }
-      : {}),
-  });
+  // ING-D4 (M5): the dev-host P7 binding-owner route was removed; the formal
+  // NestJS scenario-service is the only live owner ingress.
 
   registerGrowthRecordContributionRoute(fastify, {
     nurturePrisma: app.nurturePrisma,

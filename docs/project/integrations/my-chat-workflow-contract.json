@@ -104,7 +104,6 @@
     "contractRoot": ".",
     "contractPaths": [
       "apps/backend/src/app.ts",
-      "apps/backend/src/binding-owner.ts",
       "apps/backend/src/main.ts",
       "apps/backend/src/server.ts",
       "apps/scenario-service/package.json",
@@ -146,6 +145,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "be6a58e3cb721e042181d461d0060226f3cab0b4340cccb212647eeef6828eba"
+    "contractSha256": "76f9d9661edca2b987b4b11967fe7a71ab706087bf1d906b51e2ba375fd2639a"
   }
 }
