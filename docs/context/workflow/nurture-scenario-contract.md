@@ -32,8 +32,9 @@ workspace-local association schema, the formal service-authenticated owner
 route, production Prisma composition, transaction-scoped Guardian authority
 reread and owner-authorization receipt persistence. Exact-consumer,
 application-parity and disposable-PostgreSQL evidence pass locally. M4
-API/env/port governance, M5 handoff regeneration and cross-owner Joint
-Conformance remain required. Repository migrations are not applied to a
+API/env/port governance is complete with exact OpenAPI/index/source parity,
+env SSOT and mechanical topology checks. M5 handoff regeneration and
+cross-owner Joint Conformance remain required. Repository migrations are not applied to a
 persistent environment, and no manifest capability, Scenario row, secret,
 deployment or traffic path is activated.
 
