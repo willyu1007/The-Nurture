@@ -82,21 +82,24 @@
         "key": "wave4_binding_host",
         "root": ".",
         "paths": [
-          "packages/domain/child-identity",
-          "packages/domain/package.json",
-          "packages/domain/index.ts",
+          "apps/api/src/child-identity/child-birth-date.controller.ts",
           "apps/api/src/child-identity/child-identity.controller.ts",
           "apps/api/src/child-identity/child-identity.dto.ts",
           "apps/api/src/child-identity/child-identity.module.ts",
           "apps/api/src/child-identity/child-identity.service.ts",
           "apps/api/src/child-identity/child-identity.validation.ts",
+          "apps/api/src/child-identity/nurture-owner.resolver.ts",
+          "apps/api/src/child-identity/scenario-owner-resolver.registry.ts",
           "apps/api/src/child-identity/tokens.ts",
           "packages/db/src/scenario-binding-repository.ts",
-          "prisma/schema.prisma",
+          "packages/domain/child-identity",
+          "packages/domain/index.ts",
+          "packages/domain/package.json",
           "prisma/migrations/20260728190000_wave4_binding_owner_evidence/migration.sql",
-          "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql"
+          "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql",
+          "prisma/schema.prisma"
         ],
-        "sha256": "33ebe5d9517e2d5ba38b780e1a055c6aa055fb7898ed78f6897cc96535273a04"
+        "sha256": "960afb2c429ba4cfc946fd002706ebaf1e5745ae234eaef0616676b27fd8f4f1"
       }
     ]
   },
