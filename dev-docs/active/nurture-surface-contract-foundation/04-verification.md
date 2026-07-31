@@ -102,6 +102,27 @@
 | 2026-07-29 | Full contract-coherence revision: governance sync/lint, strict context verification, relative-link/heading checks and `git diff --check` | PASS |
 | 2026-07-30 | T-007 D-04 protected Institution Admin read addendum: governance lint, strict context verification and `git diff --check` | PASS |
 
+## Phase 0 Verification — 2026-07-31
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| T-004 recovery and clean baseline | PASS | Explicit `resume --task T-004 --json` resolved T-004 at `13efdb4`; initial worktree was clean and governance lint passed. |
+| Registered context census | PASS | Context registry was read first; workflow/product/DB/API artifacts were then inspected according to `docs/context/AGENTS.md`. |
+| Current implementation census | PASS | Manifest/module, 13-handler registry, policies, presenters, internal API handlers, repository ports, generated DB context, tests and Fastify dev-host boundaries were mapped in `06-phase-0-discovery-and-gate-matrix.md`. |
+| Six-surface authority mapping | PASS | Every surface has a current reusable input, missing contract, downstream owner and safe unavailable/default-off behavior. |
+| Synthetic/real-owner separation | PASS | `defaultNurtureDeps` and in-memory ports are classified `CONTRACT_PARALLEL`; formal NestJS ingress plus exact T-002 handoff is required for `OWNER_INTEGRATION`. |
+| `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS | Registered context checksums and built-in schema validation pass. |
+| `node scripts/assert-test-routing.mjs` | PASS | 36 files: 21 unit, 5 production DB, 9 dev-host and 1 X5 joint. |
+| `node scripts/assert-persistence-boundaries.mjs` | PASS | Scenario business layer and production/dev-host persistence boundaries remain isolated. |
+| `node scripts/assert-n1-schema-contract.mjs` | PASS | N1 contract reports 21 tables, 7 partial-unique constraints and 7 checks. |
+| `pnpm verify:workflow-contract-pin` | EXPECTED OWNER-GATE NO-GO | Expected My-Chat `f00b868`; actual sibling checkout `e1a5cdd`. No pin or sibling checkout was changed. |
+| `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main --changelog` | PASS | Registry, task index, dashboard, feature map and changelog now agree that T-004 is `in-progress`. |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-surface-contract-foundation --strict --check-anchors` | PASS | 7 task files checked with 0 errors and 0 warnings. |
+| `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS | Project governance artifacts are internally consistent after sync. |
+| `node .ai/scripts/ctl-project-governance.mjs query --task T-004 --json` and explicit resume | PASS | Both resolve T-004 as `in-progress`, updated `2026-07-31`; resume reports only this task's pending documentation changes. |
+| `git diff --check` | PASS | No whitespace errors in the Phase 0 documentation/governance change set. |
+| Effect census | PASS | Task/governance documentation only; no product source, schema/migration, DB, artifact, secret, capability, environment, deployment, activation or traffic effect. |
+
 ## Evidence Policy
 
 每次运行需记录命令、精确 source revision、结果和失败原因。只接受通过公共契约获得的黑盒证据；直接读取数据库不能作为 consumer 验收证据。

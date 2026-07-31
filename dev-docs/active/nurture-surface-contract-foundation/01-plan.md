@@ -195,16 +195,25 @@ Candidate Freeze、persistent DB apply、internal-store testing、activation 或
 
 ## Phase 0 — Discovery and Gate Reconciliation
 
-- 读取 workflow、product、DB context contract，以及 scenario manifest/module 的当前公共边界。
-- 盘点现有 `capability_key`、entrypoint、handler registry、typed command 与 surface presenter，确认可复用的 discovery/dispatch 基础。
-- 将 T-002 的已完成能力、未完成 blocker 和不可越过的授权条件映射到六个 surface。
-- 输出“复用 / 扩展 / 待上游解锁”差距表，并把工作项分为 contract-parallel、owner-integration-gated、activation-gated。
+**Result:** PASS on 2026-07-31. Detailed evidence and the authoritative
+reuse/extend/gate matrix are in
+[`06-phase-0-discovery-and-gate-matrix.md`](./06-phase-0-discovery-and-gate-matrix.md).
+
+- [x] 读取 workflow、product、DB context contract，以及 scenario manifest/module 的当前公共边界。
+- [x] 盘点现有 `capability_key`、entrypoint、handler registry、typed command 与 surface presenter，确认可复用的 discovery/dispatch 基础。
+- [x] 将 T-002 的已完成能力、未完成 blocker 和不可越过的授权条件映射到六个 surface。
+- [x] 输出“复用 / 扩展 / 待上游解锁”差距表，并把工作项分为 contract-parallel、owner-integration-gated、activation-gated。
 
 验收：
 
-- 不以设计稿或路由存在推断权限。
-- 每个待实现项都有 owner、source of truth 与 gate。
-- synthetic owner fixture 与真实 owner contract 的来源、可用范围和禁止路径可以机械区分。
+- [x] 不以设计稿或路由存在推断权限。
+- [x] 每个待实现项都有 owner、source of truth 与 gate。
+- [x] synthetic owner fixture 与真实 owner contract 的来源、可用范围和禁止路径可以机械区分。
+
+Phase 0 PASS 只开放既定执行主线，不开放 protected implementation。下一关键
+lane 是 T-002 ingress M0→M3/M4；其决策和 Owner Integration Handoff 未完成前，
+T-004 Phase 1-2 只可准备 contract-parallel artifact source、schema、pure policy
+和 synthetic conformance，不得宣称真实 owner readiness。
 
 ## Phase 1 — Capability, Surface and Visibility Contract
 

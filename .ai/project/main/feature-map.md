@@ -101,6 +101,12 @@ Project: `main`
   and joint evidence, owner/pin/ingress drift invalidates owner and joint evidence, and
   security/privacy risk invalidates immediately. G1 PASS still grants no Candidate Freeze,
   persistent DB apply, internal-store testing, activation or traffic.
+  T-004 Phase 0 discovery/gate reconciliation is complete: the current
+  manifest/module/handler/presenter/repository/API/DB foundations are classified,
+  legacy family-care business semantics are marked for replacement rather than reuse,
+  and the framework-neutral artifact-set landing is fixed. This opens the accepted
+  execution backbone only; no Surface Contract Artifact Set or Contract Boundary PASS
+  exists yet. Current My-Chat checkout drift keeps Owner Integration NO-GO.
 - Stage G2: reuse T-005 for the first Nurture-side family/CareGroup CareInteraction
   delivery. G2-A qualifies the Guardian submit → CareGroup acknowledge → one-or-more
   caregiver reply Core Loop; G2-B completes correction/withdrawal/redaction and the
@@ -321,11 +327,11 @@ Project: `main`
   canonical attendance, letting Admin substitute for class-teacher confirmation, or presenting
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
-- Related Tasks: T-004 through T-008 (`planned`).
-- Next Checkpoint: T-004～T-008 顶层决策已完成对齐。T-002 被六 surface 使用的
-  owner/source repair 与 T-004 shared contract baseline 立即受控并行：T-004 可先
-  完成 synthetic qualification，真实 owner integration 只在精确 T-002 pins/evidence
-  就绪后通过 Joint Conformance。T-003 是非阻塞设计输入。T-005～T-007 从 G1 start
+- Related Tasks: T-004 (`in-progress`); T-005 through T-008 (`planned`).
+- Next Checkpoint: T-004 Phase 0 已完成；当前单主线转入 T-002 formal NestJS ingress
+  M0→M3/M4，随后返回 T-004 Phase 1-2 形成可重建的 Surface Contract Artifact Set。
+  真实 owner integration 只在精确 T-002 pins/evidence 就绪后通过 Joint Conformance。
+  T-003 是非阻塞设计输入。T-005～T-007 从 G1 start
   即可并行做设计、纯领域逻辑与 synthetic work；Contract Boundary、Owner Readiness
   和 Joint Conformance 依次开放公共合同实现、真实 adapter 与 protected
   qualification。T-008 Candidate/evidence tooling 等上游 Exit Gates 接近完成时再
@@ -363,7 +369,7 @@ Project: `main`
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-004 nurture-surface-contract-foundation | planned | dev-docs/active/nurture-surface-contract-foundation |
+| T-004 nurture-surface-contract-foundation | in-progress | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | planned | dev-docs/active/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | dev-docs/active/nurture-institution-surfaces |

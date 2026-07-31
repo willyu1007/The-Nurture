@@ -9,11 +9,12 @@ Project: `main`
 ### Current Focus
 - Primary feature: F-002 Institution ecology
 - Supporting feature: F-003 Six-surface store-beta readiness
-- Goal this cycle: complete G1 Contract Boundary and the bounded T-002
-  Owner Integration Handoff, including migration from provisional Fastify
-  evidence to the formal NestJS scenario-service ingress, then run one exact
-  Joint Conformance. Runtime/environment activation and external traffic remain
-  gated.
+- Goal this cycle: T-004 Phase 0 discovery/gate reconciliation is complete.
+  The current critical lane is T-002 ingress M0→M3 with M4 interleaved,
+  including migration from provisional Fastify evidence to the formal NestJS
+  scenario-service ingress. Then T-004 returns for Phase 1-2 Contract Boundary,
+  followed by the remaining owner handoff and exact Joint Conformance.
+  Runtime/environment activation and external traffic remain gated.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
 
@@ -23,6 +24,11 @@ Project: `main`
   endpoint and transaction-local authority/Receipt path, but protected use still
   requires exact owner-integration evidence through the formal NestJS ingress plus
   Joint Conformance with T-004; Fastify-only evidence is provisional.
+- T-004 Phase 0: the current manifest/module/handler/presenter/repository/API/DB
+  foundations are classified in
+  `dev-docs/active/nurture-surface-contract-foundation/06-phase-0-discovery-and-gate-matrix.md`.
+  Contract-parallel inputs are clear; My-Chat checkout drift from exact `f00b868`
+  to `e1a5cdd` keeps Owner Integration NO-GO and is not a floating-repin request.
 - Parallelism: G1 start opens T-005～T-007 design/pure-domain/synthetic work;
   Contract Boundary opens exact public-contract implementation, Owner Readiness
   opens isolated real-adapter integration, and Joint Conformance alone opens
@@ -82,14 +88,14 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 8 (planned: 5, in-progress: 2, blocked: 0, done: 1, archived: 0)
+- Tasks: 8 (planned: 4, in-progress: 3, blocked: 0, done: 1, archived: 0)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
+| T-004 nurture-surface-contract-foundation | in-progress | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
-| T-004 nurture-surface-contract-foundation | planned | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | planned | F-003 | dev-docs/active/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |

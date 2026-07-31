@@ -102,10 +102,9 @@
 - T-002 到 family-care 落地合同的事实/schema 差距已由 T-005
   `06-t002-fact-schema-gap.md` 盘点；T-004 Phase 0 只需验证实际公共接口是否满足
   exact interface contract，不再重复推断数据库事实。
-- V1 descriptor/envelope/invocation schemas 的最终 repo 落点和生成器命令，需在
-  Phase 0 盘点后确定；本任务已固定逻辑字段和依赖方向。
-- interface artifact registry 的精确文件集合、schema validator 与 digest builder
-  落点，需在实现时固定；wire ref 和 canonicalization 规则已收敛。
+- V1 descriptor/envelope/invocation schemas、artifact registry、schema validator 与
+  digest builder 的 repo 边界和 root command 已由 Phase 0 固定；Phase 1-2 仍需创建
+  实际文件、冻结精确 artifact 清单并验证 deterministic rebuild。
 - 每条 Journey 的详细步骤、最小 fixture 和 negative branch 在对应 capability discovery 后细化，不重新打开 Portfolio 结构。
 
 ## 2026-07-29 — Business input and concurrency precondition separated (historical)
@@ -191,3 +190,40 @@
   （如 `T005-AC-###`），使消费任务能把验收条目机械回链到具体检查。
 - 该字段属于 manifest schema；缺失引用不影响 T-004 自身资格化。落点为
   `01-plan.md` Phase 4。本次只更新规划文档，无代码、manifest 或 schema 变更。
+
+## 2026-07-31 — Phase 0 discovery and gate reconciliation completed
+
+- T-004 从 `planned` 转为 `in-progress`；复用现有任务和 M-002/F-003 映射，
+  未创建新任务或扩大 scope。
+- 新增 `06-phase-0-discovery-and-gate-matrix.md`，完成 context、manifest/module、
+  handler/policy/presenter、repository/DB、API/ingress、fixture/test 的当前事实盘点。
+- 固定 source decision 为 `REUSE | EXTEND | REPLACE_SEMANTICS | ADD |
+  DEFER_SAFE`，execution gate 为 `CONTRACT_PARALLEL | OWNER_INTEGRATION |
+  JOINT_CONFORMANCE | ACTIVATION`。
+- 确认当前 vNext manifest 为 7 capabilities / 8 entrypoints，默认 module 使用移除
+  legacy family-input activation seam 的 pre-activation manifest；当前
+  `WorkflowPresenters`、两个 institution safe collection 和 Fastify routes 均不等于
+  六 surface contract。
+- 确认 CommandExecution/InteractionContext/institution resolver/repository-port
+  边界可复用，但 legacy raw-id、whole-Item version、single-reply family-care
+  semantics 必须由 T-005 replacement/cutover，不能成为 T-004 public contract。
+- 为 Phase 1 预留单一 artifact source、generated manifest、loader、tests 与 ESM
+  build/verify 脚本落点；没有创建 interface identity、contract artifact 或发布包。
+- Context/test-routing/persistence/N1 checks 通过；exact pin verifier 明确报告
+  My-Chat expected `f00b868` / actual `e1a5cdd` drift。该差异保持为
+  Owner Integration NO-GO，不通过浮动 repin 或 live-checkout fallback 处理。
+- Phase 0 PASS 后，项目主线先进入 T-002 ingress M0→M3/M4，再返回 T-004
+  Phase 1-2。无应用代码、schema/migration、数据库、manifest/capability、secret、
+  environment、deployment、activation 或 traffic effect。
+
+### Handoff / next three actions
+
+1. 恢复 T-002：运行
+   `node .ai/scripts/ctl-project-governance.mjs resume --task T-002 --json`。
+2. 以 T-002 的 `12-nestjs-ingress-migration-plan.md` 为入口完成 M0 决策记录，再推进
+   M1-M3 与 M4：固定 NestJS port/route、G1-03 route census、wire stability 和
+   owner-integration verification；不得用 Fastify dev-host 证据替代正式 ingress。
+3. T-002 M0-M3/M4 达到其 gate 后，重新运行
+   `node .ai/scripts/ctl-project-governance.mjs resume --task T-004 --json`，按
+   `06-phase-0-discovery-and-gate-matrix.md` 的落点实施 Phase 1-2 contract source、
+   generated manifest、loader 与 deterministic build/verify tooling。

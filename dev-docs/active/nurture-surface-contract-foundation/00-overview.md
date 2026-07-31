@@ -2,15 +2,15 @@
 
 ## Status
 
-- State: planned
+- State: in-progress
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-30
-- Next step: 先完成 G1 Contract Boundary：输出 Phase 0 复用/门禁矩阵与可重建的
-  `Surface Contract Artifact Set`，并将 T-007 D-04 的 Institution Admin 园区业务
-  沟通只读投影纳入 `SurfaceContractV1` visibility/versioning。随后使用同一 fixtures
-  经正式 NestJS Nurture ingress 与 T-002 exact owner path 执行 Joint Conformance；
-  当前能力保持未实现、default-off。
+- Phase: Phase 0 discovery/gate reconciliation complete; Contract Boundary
+  implementation not started.
+- Updated: 2026-07-31
+- Next step: 先执行 T-002 ingress M0→M3（M4 交错），固定正式 NestJS port/route、G1-03 census 与 wire stability；随后按 [`06-phase-0-discovery-and-gate-matrix.md`](./06-phase-0-discovery-and-gate-matrix.md) 返回 T-004 Phase 1-2 实现 `Surface Contract Artifact Set`。
+- Current gate: My-Chat checkout 与 exact owner pin 漂移，Owner Integration 保持
+  NO-GO；所有六 surface 能力继续 absent/default-off。
 
 ## Goal
 
@@ -116,6 +116,8 @@ identity ownership 均已锁定。本轮合同审阅进一步固定了 descripto
 envelope、contract identity/digest、组合式 concurrency heads 与 exact-state convergence。
 G1-01～G1-07 进一步锁定渐进并行、四层 identity/authority、transactional Receipt/
 Execution、exact public contract、formal NestJS ingress、三层资格化与三类交付/
-失效规则。下一步完成现有 manifest/module/presenter/repository port 的复用/扩展/
-门禁矩阵，产出可重建的 Surface Contract Artifact Set，并与 T-002 Owner Integration
-Handoff 汇合执行 Joint Conformance。
+失效规则。Phase 0 已完成现有 manifest/module/presenter/repository port 的复用/
+扩展/门禁矩阵和 artifact-set 落点，结论见
+[`06-phase-0-discovery-and-gate-matrix.md`](./06-phase-0-discovery-and-gate-matrix.md)。
+下一步先完成 T-002 ingress M0→M3/M4，再返回本任务实现 Phase 1-2，并最终与
+Owner Integration Handoff 汇合执行 Joint Conformance。

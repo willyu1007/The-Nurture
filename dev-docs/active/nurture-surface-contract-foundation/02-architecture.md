@@ -173,6 +173,38 @@ descriptor/schema/policy ref/fixture/conformance 内容变化仍必须生成新 
 T-008 只 pin 该 exact ref；Service Candidate identity 和 composite validation binding
 仍由 T-008/companion 定义，不进入普通业务 authorization。
 
+### Phase 0 repository boundary decision
+
+Phase 0 固定一个 contract source of truth 和一个 generated manifest，避免 descriptor、
+surface schema、fixture 与 conformance identity 分散到既有 runtime 目录：
+
+```text
+packages/nurture-scenario/
+  contracts/surfaces/v1/
+    source/
+      interface/
+      capabilities/
+      surfaces/
+      invocation/
+      fixtures/
+      conformance/
+    generated/surface-contract.manifest.json
+  src/surface-contract/
+  tests/surface-contract/
+scripts/surface-contract/
+```
+
+- `contracts/surfaces/v1/source/` 是 human-reviewed source；generated manifest 不接受手工编辑。
+- `src/surface-contract/` 只提供 loader、strict admission、typed application binding 和
+  public exports，不复制 My-Chat host runtime。
+- `tests/surface-contract/` 保存 deterministic、negative 与 parity checks；
+  `scripts/surface-contract/` 保存 ESM build/verify tooling。
+- root commands 预留为 `build:surface-contract` 与 `verify:surface-contract`。Phase 1-2
+  实现时必须让相同 source 重建相同 manifest/digest，并让 source/generated drift
+  fail closed。
+- 该目录决策不创建 interface identity，也不等于 My-Chat adoption、joint conformance
+  或 activation；这些 gate 继续独立。
+
 ## Runtime Ownership and Evolution
 
 - T-004（当前）：engine-ready descriptors、eligibility contract、typed handlers 和 fixtures。
