@@ -358,3 +358,19 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - 未映射条目不得勾选；package DoD 与 G4-F PASS 依据是映射检查通过。回链使用
   T-004 conformance manifest 的 AC 引用字段。详见 `01-plan.md`
   Acceptance-to-Check Mapping 小节。本次只更新规划文档，无代码或 schema 变更。
+
+## 2026-08-01 — G4-0A inventory and G4-0B policy freeze
+
+- Reconciled the 0A ledger with the exact G1 PASS: T-002 Owner Integration and
+  T-004 Surface Contract inputs are now `PRESENT_PINNED` with exact refs rather
+  than stale `DEFINED_UNQUALIFIED` prose.
+- Added `07-g4-0a-inventory-record.md` with verdict
+  `G4_0A_INVENTORY_PASS`; unresolved T-005/T-006/T-007/My-Chat Workflow/RAG
+  inputs remain explicitly unqualified or gaps and route to one 0B～0F owner.
+- Added `08-g4-0b-publication-policy-freeze.md`, freezing
+  `nurture.institution-publication-policy@1.0.0`: IANA timezone, default
+  release/cutoff, organize idle/fallback/quiescence, activity lease, policy
+  version/head, new-process resolution and existing-process freeze semantics.
+- 0B is a planning/contract freeze only. No policy repository, admin command,
+  schema/migration, capability, database, activation or traffic effect exists;
+  provider/consumer implementation and qualification remain pending.

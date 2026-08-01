@@ -245,6 +245,16 @@
 - Same-role negative tests for wrong Workspace/Institution/scope/assignment.
 - Negative tests for raw Run/Step/token/internal-note leakage and mobile mutation.
 
+## 2026-08-01 — W0 G4-0A/0B governance freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| G4-0A inventory | PASS | Exact T-002/T-004 pins, T-005/T-006 qualification gaps, fact ownership, schema-delta classes, branch routing and default-safe census are recorded; verdict is `G4_0A_INVENTORY_PASS`. |
+| G4-0B policy freeze | PASS (CONTRACT ONLY) | `nurture.institution-publication-policy@1.0.0` freezes pilot release/cutoff/idle/fallback/quiescence/lease and failure semantics. Provider implementation, exact pin and qualification remain pending. |
+| Governance/context | PASS | Project sync applied, governance lint passed, and the repository-documented strict context verifier passed. |
+| Documentation and whitespace | PASS | Scoped docs/anchor lint checks 9 files with 0 errors and 0 warnings; `git diff --check` passes. |
+| Effect boundary | PASS | Planning/freeze artifacts only. No schema, migration, database, provider, route, capability, secret, environment, activation or traffic effect occurred. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

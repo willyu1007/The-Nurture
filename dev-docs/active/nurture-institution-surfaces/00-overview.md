@@ -5,9 +5,13 @@
 - State: planned
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-30
-- Next step: Stage G4 顶层结构、实施门和总体验收已收口；项目级规划转入 G5/T-008
-  讨论。若开始 T-007 实施，首个动作仍是执行 G4-0A exact inventory。
+- Updated: 2026-08-01
+- Next step: G4-0A exact inventory 已完成并记录为
+  `G4_0A_INVENTORY_PASS`；G4-0B publication-policy contract 已冻结为
+  `nurture.institution-publication-policy@1.0.0`，实现与 provider/consumer
+  qualification 仍待后续 T-007/T-006 交付。下一步在 T-005 G2-B 主线之外进入
+  G4-0C Authority/Surface freeze；本任务仍保持 `planned`，未产生 capability、
+  schema apply、activation 或 traffic。
 
 ## Goal
 
@@ -387,7 +391,7 @@ T-006 依赖；0C 是 G4 自身公共基础，0D/0E/0F 按域并行，0G 滚动�
 
 ## Next Step
 
-按 `02-architecture.md` 的 Pre-implementation Contract Freeze Register 进入 Phase 0：
-先盘点现有 Enrollment/Grant/CareGroup/capacity、冻结 `status + participationPhase`
-与 trial cancellation/formalization transaction，再定义
-`EnrollmentJourneyWorkflowV1` public contract；在资格验证前保持 default-off。
+继续执行 G4-0C Authority/Surface freeze；随后 0D/0E/0F dependency-aware 推进。
+0B 已向 T-006 提供 exact publication-policy planning contract，但只有 provider/
+consumer implementation 与 qualification 通过后才可满足 G3-D/E。所有分支在各自
+qualification 前保持 absent/default-off。

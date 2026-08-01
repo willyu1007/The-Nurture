@@ -4,7 +4,8 @@
 
 - Task: T-007
 - Stage: G4-0A Freeze Protocol & Fact Inventory
-- State: structure accepted; inventory pending
+- State: `G4_0A_INVENTORY_PASS` on 2026-08-01; branch implementation and
+  qualification remain pending
 - This ledger records planning/readiness truth only. It is not an Owner Integration
   Handoff, Joint Conformance record, Beta Profile Handoff or activation authority.
 
@@ -24,16 +25,17 @@ Documentation acceptance alone cannot produce `PRESENT_PINNED`.
 
 | Input | Owner | Required artifact/ref | Current state | Consumer | Drift/invalidation |
 | --- | --- | --- | --- | --- | --- |
-| Owner/source path | T-002 | `Owner Integration Handoff` with exact pins, formal ingress and final false/empty evidence | `DEFINED_UNQUALIFIED` | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
-| Public Surface baseline | T-004 | `Surface Contract Artifact Set` with exact interface ref, schemas, registry, fixtures, manifest and digest | `DEFINED_UNQUALIFIED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
+| Owner/source path | T-002 | M5 `16-owner-integration-handoff-m5.md` + G1 `18-g1-joint-conformance-record.md`; My-Chat `a019566`, Base `06303e9`, Nurture self-pin `b2c53eb7…` | `PRESENT_PINNED` | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
+| Public Surface baseline | T-004 | `nurture.surface-contract@1.7.0` / `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`; Phase 4 handoff + G1 record | `PRESENT_PINNED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
 | Care interaction | T-005 | exact `CareInteraction`/owner-read/direct-interaction contracts used by Institution consumers | `DEFINED_UNQUALIFIED` | 0C/0D, G4-C/F | provider/version/source lifecycle drift invalidates affected consumer qualification |
 | Care/media/publication | T-006 | exact care facts, activity attribution, Board and `PublishProcess` contracts | `DEFINED_UNQUALIFIED` | 0B/0D, G4-B/C/F | fact/schema/policy/source-head drift invalidates affected projections and release evidence |
 | Generic Workflow runtime | My-Workflow-Base / My-Chat | pinned Run/Step/worker/ledger/private-carrier contract | `DEFINED_UNQUALIFIED` | 0E, G4-D/F | carrier/runtime/interface drift invalidates Workflow integration evidence |
 | Host identity/contact/RAG | My-Chat | pinned auth/session/active-role, Child/Family/contact and generic RAG owner contracts | `DEFINED_UNQUALIFIED` | 0C/0E/0F, G4-A/D/E/F | identity/contact/RAG owner drift invalidates affected owner and joint evidence |
-| Institution capability set | T-007 | exact G4 freeze records and branch outputs | `GAP` | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
+| Institution capability set | T-007 | 0A inventory current; 0B policy contract frozen; 0C～0F exact branch records/outputs missing | `GAP` | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
 
-Exact revisions, versions and digests remain TODOs for 0A implementation. They must not
-be inferred from task prose.
+0A may cite only exact artifacts already qualified by their owner. T-005/T-006 and
+the T-007 branch set remain non-pinned until their own implementation/qualification;
+My-Chat Workflow/contact/RAG inputs require branch-specific source pins in 0E/0F.
 
 ## 0A-2 Fact Ownership Matrix
 
@@ -57,6 +59,7 @@ themselves.
 | Concept | Initial classification | Freeze owner |
 | --- | --- | --- |
 | Existing Institution/CareGroup/RoleAssignment/Enrollment/Grant ecology | `REUSE` pending exact field/index verification | 0C/0E |
+| Institution publication timing/policy/head | `NEW`; contract frozen at `nurture.institution-publication-policy@1.0.0`, implementation/schema placement pending | 0B |
 | Enrollment `participationPhase=trial|formal` | `EXTEND`; do not add a `trial` main status | 0E |
 | Admin/mobile aggregate, support and Workflow views | `PROJECTION_ONLY` unless a later record proves a canonical lifecycle requirement | 0C/0D/0E |
 | AI attention | `DEFER`; absent/default-off | 0D |
@@ -82,9 +85,12 @@ One exact schema gap cannot be independently designed by multiple branches.
 
 Current baseline:
 
-- T-002/T-004 delivery roles are defined, but exact handoffs must not be marked
-  `PRESENT_PINNED` until their own gates pass.
-- The workflow Context contract reports formal adoption pending and migration not activated.
+- T-002/T-004 exact handoffs are `PRESENT_PINNED` because M5, Phase 4 and G1
+  Joint Conformance passed at the exact refs above. Later drift invalidates only
+  according to their recorded rules.
+- T-005 G2-A is implemented, but G2-B owner-read and G2-C direct interaction remain
+  `DEFINED_UNQUALIFIED`; T-006 and T-007 implementations remain absent/default-off.
+- The workflow Context contract reports formal T-007 adoption pending and migration not activated.
 - T-007 public capabilities remain absent/default-off.
 - `NurtureEnrollmentStatus` has no `trial`; 0E must preserve the accepted
   `status + participationPhase` separation.
@@ -95,10 +101,10 @@ Current baseline:
 
 ## G4-0A Exit Checklist
 
-- [ ] Every required input has an exact owner, SSOT, state and consuming branch.
-- [ ] Every critical fact has one canonical owner and a fact/projection/candidate class.
-- [ ] Every schema need is classified as `REUSE | EXTEND | NEW | PROJECTION_ONLY | DEFER`.
-- [ ] Every gap routes to exactly one 0B～0F branch.
-- [ ] Every unavailable/deferred capability has an explicit default-safe behavior.
-- [ ] Planned/defined artifacts are not reported as qualified or pinned.
-- [ ] The final census records zero code, migration apply, activation or traffic effect.
+- [x] Every required input has an exact owner, SSOT, state and consuming branch.
+- [x] Every critical fact has one canonical owner and a fact/projection/candidate class.
+- [x] Every schema need is classified as `REUSE | EXTEND | NEW | PROJECTION_ONLY | DEFER`.
+- [x] Every gap routes to exactly one 0B～0F branch.
+- [x] Every unavailable/deferred capability has an explicit default-safe behavior.
+- [x] Planned/defined artifacts are not reported as qualified or pinned.
+- [x] The final census records zero code, migration apply, activation or traffic effect.

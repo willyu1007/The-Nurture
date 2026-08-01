@@ -67,7 +67,11 @@ G4-0、G4-A～F 都是 T-007 Exit 的必选交付。可选能力只存在于包�
 
 The working ledger for 0A is
 [`06-g4-0-freeze-ledger.md`](./06-g4-0-freeze-ledger.md). Its structure is accepted;
-exact inventory rows remain pending until their cited artifacts and pins are verified.
+the current exact inventory is closed by
+[`07-g4-0a-inventory-record.md`](./07-g4-0a-inventory-record.md) with
+`G4_0A_INVENTORY_PASS`. The publication-policy fast-lane contract is frozen in
+[`08-g4-0b-publication-policy-freeze.md`](./08-g4-0b-publication-policy-freeze.md);
+its implementation/qualification remains pending.
 
 ### Freeze record contract
 
