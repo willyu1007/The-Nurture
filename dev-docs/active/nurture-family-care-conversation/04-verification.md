@@ -334,3 +334,17 @@
 | 2026-08-01 | `pnpm verify:surface-conformance`;root typecheck | PASS;digest 不变 `1.7.0`/`b7691a81…` |
 | 2026-08-01 | checkpoint 记录 | `11-g2a-checkpoint-record.md`:清单逐项映射、AC 续编 `T005-AC-023..035`、边界(非 final Exit)明示 |
 | 2026-08-01 | 效果边界 | PASS:仅测试/守卫/文档;self-pin 未动;无 DB/secret/digest/激活/流量 |
+
+## 实施质量自查修复 — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | legacy 单写入面隔离(T005-AC-007):legacy ack/reply/redact 打 G2 行全部 not_committed 零写入;legacy 行仍可驱动;grant revoke 对 G2 行推进 lifecycle 轴 | PASS 5/5(新增套件) |
+| 2026-08-01 | grant revoke 级联改为循环至闭包(超界整笔失败),消除 `take:100` 部分提交(冻结 D5) | PASS(既有 x5/family-care 套件不回归) |
+| 2026-08-01 | `readResult` 改按 command identity + actor 归属校验,不再接受 raw id;跨 actor / 未知 command 均 denied | PASS(HTTP e2e 8/8) |
+| 2026-08-01 | 分页改用扫描源记录:不可投影行被跳过但 hasMore/cursor 不受影响 | PASS(新增"孤儿行"用例) |
+| 2026-08-01 | query lane 零写入零 CommandExecution(六表前后计数比对) | PASS(此前仅构造保证,现有断言) |
+| 2026-08-01 | acknowledge 证据缺失 fail closed;crypto 具名导入;并发/双击测试重试上限断言 | PASS |
+| 2026-08-01 | production-db 85/85(floor 78→85,文件 12→13);unit 265/265;scenario-service 46/46 + db 8/8;dev-host 26/26;routing 64 files | PASS |
+| 2026-08-01 | OpenAPI strict + api-index + ingress 守卫 `routes=6`;digest 不变 `1.7.0`/`b7691a81…`;typecheck;smoke 三重 disabled | PASS |
+| 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `05f449da…`(57 files) |

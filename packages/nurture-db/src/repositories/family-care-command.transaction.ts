@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Prisma, type PrismaClient } from "@prisma/client";
 import type {
   FamilyCareCancelRouteFacts,
@@ -40,6 +41,13 @@ const domainRef = (objectType: string, objectId: string, version = 1): DomainCon
   object_id: objectId,
   version,
 });
+
+// Cascades must reach closure inside the command transaction or fail as a
+// whole (10-g2-schema-freeze.md D5): a fixed page cap that silently commits a
+// partial cascade is an atomicity failure, not a bounded cost. Each page
+// updates the rows out of its own filter, so re-querying converges.
+const CASCADE_PAGE_SIZE = 100;
+const CASCADE_MAX_PAGES = 100;
 
 const roleCurrent = (row: {
   status: string;
@@ -214,107 +222,134 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
     });
     if (grantUpdated.count !== 1) throw new Error("grant revoke conflict");
 
-    const receipts = await this.transaction.nurtureChildLinkReceipt.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        grantId: input.grant_id,
-        status: { in: ["pending", "delivered", "read", "acknowledged"] },
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-      take: 100,
-    });
-    for (const receipt of receipts) {
-      const visible = ["delivered", "read", "acknowledged"].includes(receipt.status);
-      const updated = await this.transaction.nurtureChildLinkReceipt.updateMany({
+    const affectedItemRefs: DomainContextRef[] = [];
+    const affectedReceiptRefs: DomainContextRef[] = [];
+
+    for (let page = 0; ; page += 1) {
+      if (page >= CASCADE_MAX_PAGES) {
+        throw new Error("grant receipt cascade exceeded its closure bound");
+      }
+      const receipts = await this.transaction.nurtureChildLinkReceipt.findMany({
         where: {
-          id: receipt.id,
           workspaceId: input.workspace_id,
-          version: receipt.version,
-          status: receipt.status,
+          grantId: input.grant_id,
+          status: { in: ["pending", "delivered", "read", "acknowledged"] },
         },
-        data: {
-          status: visible ? "revoked_after_delivery" : "blocked",
-          reasonCode: "grant_revoked",
-          version: { increment: 1 },
-        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        take: CASCADE_PAGE_SIZE,
       });
-      if (updated.count !== 1) throw new Error("grant receipt fence conflict");
+      if (receipts.length === 0) break;
+      for (const receipt of receipts) {
+        const visible = ["delivered", "read", "acknowledged"].includes(receipt.status);
+        const updated = await this.transaction.nurtureChildLinkReceipt.updateMany({
+          where: {
+            id: receipt.id,
+            workspaceId: input.workspace_id,
+            version: receipt.version,
+            status: receipt.status,
+          },
+          data: {
+            status: visible ? "revoked_after_delivery" : "blocked",
+            reasonCode: "grant_revoked",
+            version: { increment: 1 },
+          },
+        });
+        if (updated.count !== 1) throw new Error("grant receipt fence conflict");
+        affectedReceiptRefs.push(
+          domainRef("child_link_receipt", receipt.id, receipt.version + 1),
+        );
+      }
     }
 
-    const items = await this.transaction.nurtureFamilyCareItem.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        grantId: input.grant_id,
-        status: { in: ["open", "acknowledged", "waiting_for_family", "replied", "followed_up"] },
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-      take: 100,
-    });
-    for (const item of items) {
-      if (item.status === "waiting_for_family") {
+    for (let page = 0; ; page += 1) {
+      if (page >= CASCADE_MAX_PAGES) {
+        throw new Error("grant item cascade exceeded its closure bound");
+      }
+      const items = await this.transaction.nurtureFamilyCareItem.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          grantId: input.grant_id,
+          status: { in: ["open", "acknowledged", "waiting_for_family", "replied", "followed_up"] },
+        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        take: CASCADE_PAGE_SIZE,
+      });
+      if (items.length === 0) break;
+      for (const item of items) {
+        if (item.status === "waiting_for_family") {
+          await this.transaction.nurtureFamilyCareItemEvent.create({
+            data: {
+              workspaceId: input.workspace_id,
+              itemId: item.id,
+              actorParticipantId: input.participant_id,
+              actorRoleAssignmentId: input.role_assignment_id,
+              eventType: "clarification_cancelled",
+              fromStatus: "waiting_for_family",
+              toStatus: "waiting_for_family",
+              correlationEventId: item.activeClarificationRequestEventId,
+              eventPayload: { reason_code: "grant_revoked" },
+            },
+          });
+        }
+        const updated = await this.transaction.nurtureFamilyCareItem.updateMany({
+          where: {
+            id: item.id,
+            workspaceId: input.workspace_id,
+            version: item.version,
+            status: item.status,
+          },
+          data: {
+            status: "suppressed",
+            activeClarificationRequestEventId: null,
+            waitingForFamilySince: null,
+            waitingForFamilyUntil: null,
+            clarificationExpiryDriverRef: Prisma.DbNull,
+            suppressedAt: now,
+            suppressionReason: "grant_revoked",
+            version: { increment: 1 },
+            // Grant revoke is a cross-cutting authorization action rather than
+            // a legacy loop handler, so it also moves the canonical lifecycle
+            // axis on harness-managed rows instead of desynchronising them.
+            ...(item.writerContract === "legacy_v1"
+              ? {}
+              : {
+                  lifecycleState: "suppressed" as const,
+                  lifecycleReason: "grant_revoked" as const,
+                  lifecycleHead: { increment: 1 },
+                }),
+          },
+        });
+        if (updated.count !== 1) throw new Error("grant item fence conflict");
         await this.transaction.nurtureFamilyCareItemEvent.create({
           data: {
             workspaceId: input.workspace_id,
             itemId: item.id,
             actorParticipantId: input.participant_id,
             actorRoleAssignmentId: input.role_assignment_id,
-            eventType: "clarification_cancelled",
-            fromStatus: "waiting_for_family",
-            toStatus: "waiting_for_family",
-            correlationEventId: item.activeClarificationRequestEventId,
+            eventType: "suppressed",
+            fromStatus: item.status,
+            toStatus: "suppressed",
             eventPayload: { reason_code: "grant_revoked" },
           },
         });
+        await this.transaction.nurtureTeacherAttentionItem.updateMany({
+          where: {
+            workspaceId: input.workspace_id,
+            sourceType: "family_care_item",
+            sourceId: item.id,
+            status: "active",
+          },
+          data: { status: "suppressed", aggregateVersion: { increment: 1 } },
+        });
+        affectedItemRefs.push(domainRef("family_care_item", item.id, item.version + 1));
       }
-      const updated = await this.transaction.nurtureFamilyCareItem.updateMany({
-        where: {
-          id: item.id,
-          workspaceId: input.workspace_id,
-          version: item.version,
-          status: item.status,
-        },
-        data: {
-          status: "suppressed",
-          activeClarificationRequestEventId: null,
-          waitingForFamilySince: null,
-          waitingForFamilyUntil: null,
-          clarificationExpiryDriverRef: Prisma.DbNull,
-          suppressedAt: now,
-          suppressionReason: "grant_revoked",
-          version: { increment: 1 },
-        },
-      });
-      if (updated.count !== 1) throw new Error("grant item fence conflict");
-      await this.transaction.nurtureFamilyCareItemEvent.create({
-        data: {
-          workspaceId: input.workspace_id,
-          itemId: item.id,
-          actorParticipantId: input.participant_id,
-          actorRoleAssignmentId: input.role_assignment_id,
-          eventType: "suppressed",
-          fromStatus: item.status,
-          toStatus: "suppressed",
-          eventPayload: { reason_code: "grant_revoked" },
-        },
-      });
-      await this.transaction.nurtureTeacherAttentionItem.updateMany({
-        where: {
-          workspaceId: input.workspace_id,
-          sourceType: "family_care_item",
-          sourceId: item.id,
-          status: "active",
-        },
-        data: { status: "suppressed", aggregateVersion: { increment: 1 } },
-      });
     }
     return {
       grant_ref: domainRef("child_link_grant", input.grant_id, input.expected_version + 1),
-      affected_item_refs: items.slice(0, 15).map((item) =>
-        domainRef("family_care_item", item.id, item.version + 1),
-      ),
-      affected_receipt_refs: receipts.slice(0, 15).map((receipt) =>
-        domainRef("child_link_receipt", receipt.id, receipt.version + 1),
-      ),
+      // Output refs stay bounded for the command result; the cascade itself
+      // always runs to closure above.
+      affected_item_refs: affectedItemRefs.slice(0, 15),
+      affected_receipt_refs: affectedReceiptRefs.slice(0, 15),
     };
   }
 
@@ -919,7 +954,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       where: { id: input.item_id, workspaceId: input.workspace_id },
     });
     if (!item.enrollmentId) throw new Error("G2 reply enrollment missing");
-    const messageId = crypto.randomUUID();
+    const messageId = randomUUID();
     const clockRows = await this.transaction.$queryRaw<Array<{ micros: bigint }>>(
       Prisma.sql`SELECT (extract(epoch FROM clock_timestamp()) * 1000000)::bigint AS micros`,
     );
@@ -1181,6 +1216,10 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         workspaceId: input.workspace_id,
         version: input.expected_version,
         status: "open",
+        // Single-writer cutover (10-g2-schema-freeze.md C6/C8): legacy
+        // handlers must never mutate a harness-managed row, whose canonical
+        // state lives on the three axes rather than this status column.
+        writerContract: "legacy_v1",
       },
       data: {
         status: "acknowledged",
@@ -1238,6 +1277,11 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       include: { enrollment: true },
     });
     if (!item.enrollment) throw new Error("reply enrollment missing");
+    // Single-writer cutover (C6/C8): the legacy reply path is read/migration
+    // compatibility only and must fail closed on harness-managed rows.
+    if (item.writerContract !== "legacy_v1") {
+      throw new Error("legacy reply cannot write a harness-managed item");
+    }
     const grant = await this.currentGrant({
       workspace_id: input.workspace_id,
       child_care_process_id: item.childCareProcessId,
@@ -1273,6 +1317,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         workspaceId: input.workspace_id,
         version: input.expected_version,
         status: { in: ["open", "acknowledged", "waiting_for_family"] },
+        writerContract: "legacy_v1",
       },
       data: {
         status: "replied",
@@ -1389,6 +1434,9 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         workspaceId: input.workspace_id,
         aggregateVersion: input.expected_version,
         status: "sent",
+        // Single-writer cutover (C6/C8): harness-managed messages are
+        // redacted only by the Increment 2 author capability.
+        writerContract: "legacy_v1",
       },
       data: {
         status: "redacted",

@@ -348,10 +348,28 @@ describe("G2-A loop through the formal Harness ingress", () => {
       workspace_id: scope.workspaceId,
       actor_participant_id: scope.guardian.id,
       surface: "chat",
-      output_refs: executed.json.output_refs,
+      command_request_id: submitCommand,
     });
     expect(readResult.json.status).toBe("ok");
     expect(readResult.json.output).toMatchObject({ projectionRole: "guardian" });
+
+    // read-result is bound to the committed execution's own actor: another
+    // participant cannot read a command they did not run, and an unknown
+    // command identity is never an id oracle.
+    const foreignRead = await post(HARNESS_READ_RESULT_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      command_request_id: submitCommand,
+    });
+    expect(foreignRead.json).toEqual({ status: "denied", reason_code: "not_authorized" });
+    const unknownRead = await post(HARNESS_READ_RESULT_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      command_request_id: `command:${randomUUID()}`,
+    });
+    expect(unknownRead.json).toEqual({ status: "denied", reason_code: "not_authorized" });
   });
 
   it("maps a consumed confirmation to a refresh recovery over HTTP", async () => {

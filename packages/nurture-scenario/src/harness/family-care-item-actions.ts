@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import type {
   NurtureCommandSpec,
 } from "../domain/commands/command-kernel.js";
@@ -176,7 +176,7 @@ export const prepareAcknowledgeFamilyCareItem = async (
   if (gate.status === "refused") return gate.decision;
   const { facts, item_id } = gate;
 
-  const commandRequestId = (deps.create_command_id ?? (() => `command:${crypto.randomUUID()}`))();
+  const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
   const command: AcknowledgeFamilyCareItemCommandV1 = {
     item_id,
     expected_acknowledgement_head: facts.acknowledgement_head ?? 0,
@@ -258,10 +258,14 @@ export const createAcknowledgeFamilyCareItemSpec =
         return { status: "blocked", reason_code: "grant_unavailable" };
       }
       if (facts.acknowledgement_state === "acknowledged") {
-        return {
-          status: "already_satisfied",
-          output_refs: facts.existing_acknowledgement_refs ?? [],
-        };
+        // Convergence needs provable evidence of the existing acknowledgement;
+        // an unprovable postcondition fails closed rather than committing an
+        // already_satisfied execution with no output refs.
+        const existing = facts.existing_acknowledgement_refs ?? [];
+        if (existing.length === 0) {
+          return { status: "conflict", reason_code: "acknowledgement_evidence_unavailable" };
+        }
+        return { status: "already_satisfied", output_refs: existing };
       }
       if (facts.acknowledgement_head !== input.expected_acknowledgement_head) {
         return { status: "conflict", reason_code: "stale_confirmation" };
@@ -352,7 +356,7 @@ export const prepareReplyFamilyCareItem = async (
   if (gate.status === "refused") return gate.decision;
   const { facts, item_id } = gate;
 
-  const commandRequestId = (deps.create_command_id ?? (() => `command:${crypto.randomUUID()}`))();
+  const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
   const command: ReplyFamilyCareItemCommandV1 = {
     body: parsed.input.body,
     item_id,

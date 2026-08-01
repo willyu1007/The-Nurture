@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { classifySafetyIntent } from "../domain/safety-classifier.js";
 import {
   NurtureInteractionContextService,
@@ -248,7 +248,7 @@ export const prepareSubmitFamilyCareQuestion = async (
     if (!continuation.eligible) return { status: "denied", reason_code: "invalid_continuation" };
   }
 
-  const commandRequestId = (deps.create_command_id ?? (() => `command:${crypto.randomUUID()}`))();
+  const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
   const command: SubmitFamilyCareQuestionCommandV1 = {
     body: parsed.input.body,
     enrollment_id: target.enrollment_id,

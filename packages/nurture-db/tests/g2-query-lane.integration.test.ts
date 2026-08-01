@@ -209,6 +209,97 @@ describe("G2 query lane guards", () => {
     expect(crossActor).toEqual({ status: "refresh_required" });
   });
 
+  it("performs zero writes and creates no CommandExecution", async () => {
+    const scope = await seedScope();
+    await seedQuestion(scope, "只读查询", new Date());
+    const before = await Promise.all([
+      prisma.nurtureCommandExecution.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureFamilyCareMessage.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureFamilyCareItem.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureFamilyCareItemEvent.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureInteractionContext.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureChildLinkReceipt.count({ where: { workspaceId: scope.workspaceId } }),
+    ]);
+    const item = await prisma.nurtureFamilyCareItem.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId },
+    });
+    await queryGuardianFamilyCareTimeline(deps, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.guardian.id,
+    });
+    await queryCaregiverFamilyCareWork(deps, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.caregiver.id,
+    });
+    await queryFamilyCareItemDetail(deps, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.caregiver.id,
+      item_id: item.id,
+    });
+    const after = await Promise.all([
+      prisma.nurtureCommandExecution.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureFamilyCareMessage.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureFamilyCareItem.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureFamilyCareItemEvent.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureInteractionContext.count({ where: { workspaceId: scope.workspaceId } }),
+      prisma.nurtureChildLinkReceipt.count({ where: { workspaceId: scope.workspaceId } }),
+    ]);
+    expect(after).toEqual(before);
+    expect(after[0]).toBe(0);
+  });
+
+  it("keeps paging correct when a scanned record cannot be projected", async () => {
+    const scope = await seedScope();
+    const base = Date.now() - 60_000;
+    await seedQuestion(scope, "可投影一", new Date(base));
+    // An orphan harness reply (no resolvable source item) is skipped by the
+    // presenter; it must not shorten the page or end pagination early.
+    await prisma.nurtureFamilyCareMessage.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        threadId: scope.thread.id,
+        childCareProcessId: scope.process.id,
+        senderParticipantId: scope.caregiver.id,
+        senderRoleAssignmentId: scope.caregiverRole.id,
+        messageKind: "caregiver_reply",
+        authorshipKind: "caregiver_confirmed",
+        bodyFormat: "plain_text",
+        bodyStorageMode: "encrypted",
+        bodyProtectionPayload: protectedContent.seal("孤儿回复") as never,
+        sourceSurface: "mobile",
+        grantId: scope.grant.id,
+        status: "sent",
+        writerContract: "harness_g2_v1",
+        enrollmentId: scope.enrollment.id,
+        careGroupId: scope.group.id,
+        direction: "org_to_family",
+        replyOrderKey: `${base + 1_000}-orphan`,
+        createdAt: new Date(base + 1_000),
+      },
+    });
+    await seedQuestion(scope, "可投影二", new Date(base + 2_000));
+
+    const first = await queryGuardianFamilyCareTimeline(deps, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.guardian.id,
+      page_size: 2,
+    });
+    if (first.status !== "ok") throw new Error("expected ok");
+    expect(first.output.pageInfo.hasMore).toBe(true);
+    const second = await queryGuardianFamilyCareTimeline(deps, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.guardian.id,
+      page_size: 2,
+      cursor: first.output.pageInfo.nextCursor!,
+    });
+    if (second.status !== "ok") throw new Error("expected ok");
+    const seen = [...first.output.items, ...second.output.items]
+      .map((entry) => entry.content?.body)
+      .filter(Boolean);
+    expect(seen).toContain("可投影一");
+    expect(seen).toContain("可投影二");
+  });
+
   it("refuses an expired cursor with refresh_required", async () => {
     const scope = await seedScope();
     const stale = issueQueryCursor(

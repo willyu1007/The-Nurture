@@ -317,18 +317,23 @@ describe("G2-A checkpoint gap closure", () => {
       await prepareReply(scope, scope.caregiverB.id, item.id, "并发回复B"),
     );
 
+    // Serializable SSI can surface a retryable no-commit under true
+    // concurrency; at most one retry per command is allowed to converge, so
+    // the assertion cannot be satisfied by unbounded retrying.
+    let retries = 0;
     const run = (actorId: string, ready: typeof readyA, body: string) =>
-      executeReply(scope, actorId, item.id, ready, body).then(async (result) =>
-        // Serializable SSI can surface a retryable no-commit under true
-        // concurrency; one retry with the same command must converge.
-        result.status === "not_committed" && result.decision === "technical_error"
-          ? executeReply(scope, actorId, item.id, ready, body, ":retry")
-          : result,
-      );
+      executeReply(scope, actorId, item.id, ready, body).then(async (result) => {
+        if (result.status === "not_committed" && result.decision === "technical_error") {
+          retries += 1;
+          return executeReply(scope, actorId, item.id, ready, body, ":retry");
+        }
+        return result;
+      });
     const [resultA, resultB] = await Promise.all([
       run(scope.caregiverA.id, readyA, "并发回复A"),
       run(scope.caregiverB.id, readyB, "并发回复B"),
     ]);
+    expect(retries).toBeLessThanOrEqual(1);
     expect(resultA).toMatchObject({ status: "ok", business_outcome: "applied" });
     expect(resultB).toMatchObject({ status: "ok", business_outcome: "applied" });
 
@@ -358,15 +363,22 @@ describe("G2-A checkpoint gap closure", () => {
     const attempt = () => executeReply(scope, scope.caregiverA.id, item.id, ready, "双击回复");
     const settled = await Promise.all([attempt(), attempt()]);
 
+    // A duplicate click may lose the advisory lock or the SSI race once; a
+    // single bounded retry per attempt must then converge.
+    let duplicateRetries = 0;
     const outcomes = await Promise.all(
-      settled.map(async (result) =>
-        result.status === "not_committed" &&
-        (result.reason_code === "command_busy" ||
-          result.decision === "technical_error")
-          ? attempt()
-          : result,
-      ),
+      settled.map(async (result) => {
+        if (
+          result.status === "not_committed" &&
+          (result.reason_code === "command_busy" || result.decision === "technical_error")
+        ) {
+          duplicateRetries += 1;
+          return attempt();
+        }
+        return result;
+      }),
     );
+    expect(duplicateRetries).toBeLessThanOrEqual(1);
     const okDispositions = outcomes
       .filter(
         (result): result is Extract<NurtureCommandResult, { status: "ok" }> =>

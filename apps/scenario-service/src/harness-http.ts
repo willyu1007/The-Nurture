@@ -170,7 +170,7 @@ export type HarnessReadResultRequestV1 = {
   workspace_id: string;
   actor_participant_id: string;
   surface: "chat" | "board";
-  output_refs: Array<Record<string, unknown>>;
+  command_request_id: string;
 };
 
 const QUERY_KEYS = new Set([
@@ -188,7 +188,7 @@ const READ_RESULT_KEYS = new Set([
   "workspace_id",
   "actor_participant_id",
   "surface",
-  "output_refs",
+  "command_request_id",
 ]);
 
 export const parseHarnessQueryRequestV1 = (body: unknown): HarnessQueryRequestV1 => {
@@ -220,10 +220,8 @@ export const parseHarnessReadResultRequestV1 = (
     !ID_PATTERN.test(record.actor_participant_id) ||
     typeof record.surface !== "string" ||
     !SURFACES.has(record.surface) ||
-    !Array.isArray(record.output_refs) ||
-    record.output_refs.length === 0 ||
-    record.output_refs.length > 32 ||
-    record.output_refs.some((ref) => !isRecord(ref))
+    typeof record.command_request_id !== "string" ||
+    !ID_PATTERN.test(record.command_request_id)
   ) {
     throw new HarnessRequestParseError("invalid_harness_request");
   }

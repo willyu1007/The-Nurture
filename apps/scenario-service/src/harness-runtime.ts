@@ -5,6 +5,7 @@ import {
   createAcknowledgeFamilyCareItemSpec,
   createReplyFamilyCareItemSpec,
   createSubmitFamilyCareQuestionSpec,
+  hashCommandRequestId,
   hashScenarioToken,
   parseHarnessConfirmationPayloadV2,
   parseReplyFamilyCareItemInputV1,
@@ -105,9 +106,8 @@ export function createHarnessEngine(input: {
   integrityKey: string;
   contentKey: string;
 }): HarnessEngine {
-  const runner = new NurtureCommandRunner(
-    new PrismaNurtureCommandRepository(input.prisma),
-  );
+  const commands = new PrismaNurtureCommandRepository(input.prisma);
+  const runner = new NurtureCommandRunner(commands);
   const confirmations = new PrismaInteractionContextRepository(input.prisma);
   const contexts = new NurtureInteractionContextService(confirmations);
   const submitEligibility = new PrismaSubmitEligibilityReadPort(input.prisma);
@@ -282,13 +282,21 @@ export function createHarnessEngine(input: {
 
     async readResult(request) {
       // readResult regenerates the role-safe projection from the committed
-      // command's canonical output refs plus current owner state; it never
-      // rehydrates historical business results from the caller.
-      const itemRef = request.output_refs.find(
-        (ref) =>
-          ref.namespace === "nurture" &&
-          ref.object_type === "family_care_item" &&
-          typeof ref.object_id === "string",
+      // command's OWN stored output refs plus current owner state. Canonical
+      // refs are never accepted from the caller: raw ids would bypass the
+      // owner-issued ref discipline and turn this lane into an id oracle.
+      const execution = await commands.findCommitted({
+        workspace_id: request.workspace_id,
+        command_request_id_hash: hashCommandRequestId(
+          request.workspace_id,
+          request.command_request_id,
+        ),
+      });
+      if (!execution || execution.business_actor_ref !== request.actor_participant_id) {
+        return { status: "denied", reason_code: "not_authorized" };
+      }
+      const itemRef = execution.output_refs.find(
+        (ref) => ref.namespace === "nurture" && ref.object_type === "family_care_item",
       );
       if (!itemRef) return { status: "denied", reason_code: "invalid_query_input" };
       return queryFamilyCareItemDetail(
@@ -300,7 +308,7 @@ export function createHarnessEngine(input: {
         {
           workspace_id: request.workspace_id,
           participant_id: request.actor_participant_id,
-          item_id: itemRef.object_id as string,
+          item_id: itemRef.object_id,
         },
       );
     },

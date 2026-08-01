@@ -582,3 +582,47 @@
 - 全套:production-db 78/78(floor 72→78,文件 11→12);unit 265/265;
   scenario-service 46/46 + db 8/8;dev-host 26/26;digest 不变;typecheck
   clean;self-pin 维持 `197618fb…`(pin 集未动)。
+
+## 2026-08-01 — 实施质量自查修复(高危 legacy 隔离 + 中低项)
+
+自查(opus-5)对 `f167079..f343eb1` 八个单元逐条复核,发现并修复:
+
+- **高危:legacy 写入面未被机械隔离(违反冻结 C6/C8)。** legacy
+  `acknowledgeFamilyCareItem` / `replyToFamilyCareItem` /
+  `redactFamilyCareMessage` 的 where 子句没有 `writerContract` 过滤,
+  legacy acknowledge 在 `status:"open" + version` 匹配时会写 G2 行——
+  改 legacy status 与 ackedBy* 而三轴纹丝不动,行进入自相矛盾状态。现在
+  三个 legacy 变更器都以 `writerContract: "legacy_v1"` 为前置(reply 另加
+  显式 guard),并新增 `g2-legacy-cutover.integration.test.ts` 5/5 兑现
+  `T005-AC-007`:三条 legacy 路径打 G2 行全部 not_committed 零写入、
+  legacy 行仍可正常驱动、grant revoke 对 G2 行同步推进 lifecycle 轴。
+- **grant revoke 级联**:原先只写 legacy status,G2 行的 lifecycle 轴会
+  被落下;现在对 harness 行同时置 `lifecycleState=suppressed /
+  lifecycleReason=grant_revoked / lifecycleHead+1`。同时把两处
+  `take:100` 改为分页循环至闭包(超界整笔失败),消除冻结 D5 点名的
+  "固定 take 上限后部分提交"原子性缺陷;affected refs 跨页累积后再截断。
+- **中:`readResult` 曾接受调用方给的 raw item UUID**(与 09 契约
+  "不接受 raw CareItem id"及自身 commit 声明冲突,且是 id 探测口)。
+  改为按 stable business command identity 查已提交执行、校验
+  `business_actor_ref` 属于调用者,再用该执行**自己存储的** output refs
+  投影;OpenAPI 请求体同步改为 `command_request_id`。HTTP e2e 补跨 actor
+  与未知 command 两条 denied。
+- **中:分页可能提前终止(静默丢数据)。** 读端口过滤不可投影行后,域层
+  用过滤后的行数判 `hasMore`。改为读端口按扫描源记录分页(扫 take+1、
+  hasMore/cursor tail 均取自源记录),并新增"孤儿行被跳过但翻页不中断"
+  的测试。
+- **中:query lane「零 CommandExecution」此前只有构造保证、无断言。**
+  补前后计数比对(含 execution/message/item/event/context/receipt 六表)。
+- **低:** `crypto.randomUUID()` 全局用法改为 `node:crypto` 具名导入(4 处);
+  acknowledge 收敛在证据 refs 缺失时改为 fail closed
+  (`acknowledgement_evidence_unavailable`)而非提交空 refs 的
+  already_satisfied;并发与 duplicate-click 测试加重试次数上限断言,
+  防止"无限重试也能变绿"的掩盖。
+- **契约轮转债务(记账,非缺陷):** 六个 capability 与 09 号 shared
+  referenced types 仍未进 T-004 interface digest。当前 default-off、未
+  发布 discovery,状态自洽;但这是 G2 Exit 前置,冻结文档此前只记了
+  G2-C 的 rotation,现补记全量。
+- 回归:production-db 85/85(floor 78→85,文件 12→13);unit 265/265;
+  scenario-service 46/46 + db 8/8;dev-host 26/26;routing 64 files;
+  digest 不变;typecheck clean;smoke 三重 disabled;self-pin →
+  `05f449da…`。

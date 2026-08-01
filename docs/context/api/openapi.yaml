@@ -260,11 +260,12 @@ paths:
       operationId: readHarnessResult
       summary: Re-read the role-safe projection for a committed action
       description: |
-        Private My-Chat-to-Nurture Harness read. Regenerates the role-safe
-        item projection from a committed command's canonical output refs plus
-        current owner state; historical business results are never rehydrated
-        from the caller and current mutable state never enters the immutable
-        committed result.
+        Private My-Chat-to-Nurture Harness read. Looks up the committed
+        execution by its stable business command identity, verifies the
+        caller owns it, and regenerates the role-safe item projection from
+        that execution's own stored output refs plus current owner state.
+        Historical business results are never rehydrated from the caller and
+        current mutable state never enters the immutable committed result.
       tags: [harness]
       security:
         - serviceBearerAuth: []
@@ -614,14 +615,16 @@ components:
     HarnessReadResultRequest:
       type: object
       description: |
-        Regenerates the role-safe projection for a committed action from its
-        canonical output refs plus current owner state.
+        Regenerates the role-safe projection for a committed action. The
+        action is named by its stable business command identity; the service
+        reads that execution's own stored output refs, so canonical refs and
+        raw ids are never accepted from the caller.
       additionalProperties: false
       required:
         - workspace_id
         - actor_participant_id
         - surface
-        - output_refs
+        - command_request_id
       properties:
         workspace_id:
           $ref: '#/components/schemas/BoundedIdentifier'
@@ -630,13 +633,8 @@ components:
         surface:
           type: string
           enum: [chat, board]
-        output_refs:
-          type: array
-          minItems: 1
-          maxItems: 32
-          items:
-            type: object
-            additionalProperties: true
+        command_request_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
     HarnessQueryResponse:
       type: object
       description: Closed query decision union discriminated by status.

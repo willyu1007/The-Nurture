@@ -86,3 +86,24 @@
   `07-increment-2-change-contract.md` 为 normative)→ G2-B(含
   `InstitutionBusinessCommunicationProjectionV1` owner-read)→ G2-C
   (Message-only 契约已冻结,digest rotation 随下一 pin action)。
+
+## Follow-ups Found After This Record (2026-08-01 自查)
+
+本记录发布后的实施质量自查(opus-5,覆盖 `f167079..f343eb1`)发现并已修复
+下列问题;checkpoint 结论不变,但这些修复是其证据基础的一部分:
+
+- 冻结 C6/C8 的 single-writer 属性此前**没有机械保证**:三个 legacy 变更器
+  可写 harness 行。已加 `writerContract` 前置并以新套件兑现
+  `T005-AC-007`(此前该 AC 有检查类别、无实现)。
+- grant revoke 级联对 harness 行漏推 lifecycle 轴,且两处固定 `take:100`
+  存在冻结 D5 点名的部分提交风险。已改为闭包循环 + 三轴同步。
+- `readResult` 曾接受调用方 raw item id;已改为按 command identity 解析并
+  校验执行归属。
+- 分页在过滤不可投影行时可能提前终止;已改为按扫描源记录分页。
+- query lane「零 CommandExecution」此前无断言(记录与 commit 均已声明),
+  现已补齐。
+
+结论层面的补记:六个 G2 capability 与 09 号 shared referenced types 尚未
+进入 T-004 interface digest。这不影响 G2-A checkpoint(default-off、未发布
+discovery),但属 **G2 Exit 前置债务**,与 G2-C 的 digest rotation 同批在
+下一个 pin action 处理。

@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type {
+  FamilyCareQueryPage,
   FamilyCareQueryReadPort,
   RawItemDetail,
   RawTimelineMessageRow,
@@ -123,16 +124,19 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     participant_id: string;
     take: number;
     before?: { occurred_at: string; id: string };
-  }): Promise<{ authorized: boolean; rows: RawTimelineMessageRow[] }> {
+  }): Promise<FamilyCareQueryPage<RawTimelineMessageRow>> {
     const processIds = await currentGuardianProcessIds(
       this.prisma,
       input.workspace_id,
       input.participant_id,
     );
-    if (!processIds) return { authorized: false, rows: [] };
-    if (processIds.size === 0) return { authorized: true, rows: [] };
+    if (!processIds) return { authorized: false, rows: [], has_more: false };
+    if (processIds.size === 0) return { authorized: true, rows: [], has_more: false };
 
-    const messages = await this.prisma.nurtureFamilyCareMessage.findMany({
+    // Scan take+1 source records: paging state comes from the scanned window,
+    // never from the projected rows, so an unresolvable row can be skipped
+    // without shortening the page or ending pagination early.
+    const scanned = await this.prisma.nurtureFamilyCareMessage.findMany({
       where: {
         workspaceId: input.workspace_id,
         childCareProcessId: { in: [...processIds] },
@@ -141,9 +145,13 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         ...(beforeFilter(input.before) as Prisma.NurtureFamilyCareMessageWhereInput),
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      take: input.take,
+      take: input.take + 1,
     });
-    if (messages.length === 0) return { authorized: true, rows: [] };
+    const hasMore = scanned.length > input.take;
+    const messages = scanned.slice(0, input.take);
+    if (messages.length === 0) return { authorized: true, rows: [], has_more: false };
+    const tailRecord = messages[messages.length - 1]!;
+    const tail = { occurred_at: tailRecord.createdAt.toISOString(), id: tailRecord.id };
 
     const sourceMessageIds = messages
       .filter((message) => message.messageKind === "family_message")
@@ -230,7 +238,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
           : {}),
       });
     }
-    return { authorized: true, rows };
+    return { authorized: true, rows, has_more: hasMore, tail };
   }
 
   async listCaregiverWork(input: {
@@ -238,16 +246,16 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     participant_id: string;
     take: number;
     before?: { occurred_at: string; id: string };
-  }): Promise<{ authorized: boolean; rows: RawWorkItemRow[] }> {
+  }): Promise<FamilyCareQueryPage<RawWorkItemRow>> {
     const groupIds = await currentCaregiverGroupIds(
       this.prisma,
       input.workspace_id,
       input.participant_id,
     );
-    if (!groupIds) return { authorized: false, rows: [] };
-    if (groupIds.size === 0) return { authorized: true, rows: [] };
+    if (!groupIds) return { authorized: false, rows: [], has_more: false };
+    if (groupIds.size === 0) return { authorized: true, rows: [], has_more: false };
 
-    const items = await this.prisma.nurtureFamilyCareItem.findMany({
+    const scanned = await this.prisma.nurtureFamilyCareItem.findMany({
       where: {
         workspaceId: input.workspace_id,
         careGroupId: { in: [...groupIds] },
@@ -255,10 +263,14 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         ...(beforeFilter(input.before) as Prisma.NurtureFamilyCareItemWhereInput),
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      take: input.take,
+      take: input.take + 1,
       include: { childCareProcess: { include: { child: true } } },
     });
-    if (items.length === 0) return { authorized: true, rows: [] };
+    const hasMore = scanned.length > input.take;
+    const items = scanned.slice(0, input.take);
+    if (items.length === 0) return { authorized: true, rows: [], has_more: false };
+    const tailRecord = items[items.length - 1]!;
+    const tail = { occurred_at: tailRecord.createdAt.toISOString(), id: tailRecord.id };
     const attentions = await this.prisma.nurtureTeacherAttentionItem.findMany({
       where: {
         workspaceId: input.workspace_id,
@@ -270,6 +282,8 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
 
     return {
       authorized: true,
+      has_more: hasMore,
+      tail,
       rows: items.map((item) => ({
         item_id: item.id,
         child_safe_label: item.childCareProcess.child?.displayName ?? "Child",

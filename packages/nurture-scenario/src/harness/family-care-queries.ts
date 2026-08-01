@@ -158,19 +158,31 @@ export type RawItemDetail = {
   continuation_source_readable?: boolean;
 };
 
+/**
+ * Paging is driven by scanned source records, never by the projected rows: a
+ * row the presenter cannot resolve is skipped, but it must not shorten the
+ * page, hide the cursor tail or terminate paging early.
+ */
+export type FamilyCareQueryPage<Row> = {
+  authorized: boolean;
+  rows: Row[];
+  has_more: boolean;
+  tail?: { occurred_at: string; id: string };
+};
+
 export type FamilyCareQueryReadPort = {
   listGuardianTimeline(input: {
     workspace_id: string;
     participant_id: string;
     take: number;
     before?: { occurred_at: string; id: string };
-  }): Promise<{ authorized: boolean; rows: RawTimelineMessageRow[] }>;
+  }): Promise<FamilyCareQueryPage<RawTimelineMessageRow>>;
   listCaregiverWork(input: {
     workspace_id: string;
     participant_id: string;
     take: number;
     before?: { occurred_at: string; id: string };
-  }): Promise<{ authorized: boolean; rows: RawWorkItemRow[] }>;
+  }): Promise<FamilyCareQueryPage<RawWorkItemRow>>;
   loadItemDetail(input: {
     workspace_id: string;
     participant_id: string;
@@ -329,13 +341,13 @@ export const queryGuardianFamilyCareTimeline = async (
   const result = await deps.reads.listGuardianTimeline({
     workspace_id: request.workspace_id,
     participant_id: request.participant_id,
-    take: page.take + 1,
+    take: page.take,
     ...(before ? { before } : {}),
   });
   if (!result.authorized) return { status: "denied", reason_code: "not_authorized" };
-  const rows = result.rows.slice(0, page.take);
-  const hasMore = result.rows.length > page.take;
-  const last = rows[rows.length - 1];
+  const rows = result.rows;
+  const hasMore = result.has_more;
+  const tail = result.tail;
   return {
     status: "ok",
     output: {
@@ -386,15 +398,15 @@ export const queryGuardianFamilyCareTimeline = async (
       })),
       pageInfo: {
         hasMore,
-        ...(hasMore && last
+        ...(hasMore && tail
           ? {
               nextCursor: issueQueryCursor(
                 deps.integrity_key,
                 request,
                 {
                   query: "guardian_timeline",
-                  before_occurred_at: last.occurred_at,
-                  before_id: last.message_id,
+                  before_occurred_at: tail.occurred_at,
+                  before_id: tail.id,
                 },
                 deps.now,
               ),
@@ -431,13 +443,13 @@ export const queryCaregiverFamilyCareWork = async (
   const result = await deps.reads.listCaregiverWork({
     workspace_id: request.workspace_id,
     participant_id: request.participant_id,
-    take: page.take + 1,
+    take: page.take,
     ...(before ? { before } : {}),
   });
   if (!result.authorized) return { status: "denied", reason_code: "not_authorized" };
-  const rows = result.rows.slice(0, page.take);
-  const hasMore = result.rows.length > page.take;
-  const last = rows[rows.length - 1];
+  const rows = result.rows;
+  const hasMore = result.has_more;
+  const tail = result.tail;
   return {
     status: "ok",
     output: {
@@ -459,15 +471,15 @@ export const queryCaregiverFamilyCareWork = async (
       })),
       pageInfo: {
         hasMore,
-        ...(hasMore && last
+        ...(hasMore && tail
           ? {
               nextCursor: issueQueryCursor(
                 deps.integrity_key,
                 request,
                 {
                   query: "caregiver_work",
-                  before_occurred_at: last.created_at,
-                  before_id: last.item_id,
+                  before_occurred_at: tail.occurred_at,
+                  before_id: tail.id,
                 },
                 deps.now,
               ),

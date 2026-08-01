@@ -1,7 +1,7 @@
 # API Index
 
-> Auto-generated at 2026-08-01T08:11:48.866Z — do NOT hand-edit.
-> Source: `docs/context/api/openapi.yaml` (SHA-256: `b01bb53fbf0a...`)
+> Auto-generated at 2026-08-01T08:53:37.672Z — do NOT hand-edit.
+> Source: `docs/context/api/openapi.yaml` (SHA-256: `da1f6244c32a...`)
 
 Total endpoints: **6**
 
@@ -12,4 +12,4 @@ Total endpoints: **6**
 | POST | /internal/nurture/harness/prepare-action | Prepare one family-care Harness action for confirmation | bearer | workspace_id, actor_participant_id, surface, capability_key, capability_version | status, preview, confirmation_ref, expires_at, command_request_id, fields, choices, reason_code, alternate_process | 400, 401, 408, 503 |
 | POST | /internal/nurture/harness/execute-action | Execute one confirmed family-care Harness action | bearer | workspace_id, actor_participant_id, surface, capability_key, capability_version, invocation_request_id, command_request_id, confirmation_ref | status, execution_disposition, business_outcome, execution_ref, output_refs, decision, reason_code, recovery | 400, 401, 408, 503 |
 | POST | /internal/nurture/harness/query | Read one role-safe family-care query projection | bearer | workspace_id, actor_participant_id, surface, capability_key, capability_version | status, output, reason_code | 400, 401, 408, 503 |
-| POST | /internal/nurture/harness/read-result | Re-read the role-safe projection for a committed action | bearer | workspace_id, actor_participant_id, surface, output_refs | status, output, reason_code | 400, 401, 408, 503 |
+| POST | /internal/nurture/harness/read-result | Re-read the role-safe projection for a committed action | bearer | workspace_id, actor_participant_id, surface, command_request_id | status, output, reason_code | 400, 401, 408, 503 |

@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-01T08:11:48.866Z",
+  "generatedAt": "2026-08-01T08:53:37.672Z",
   "sourceOpenapi": "docs/context/api/openapi.yaml",
-  "sourceChecksumSha256": "b01bb53fbf0abe2e6e058544f0aa90d030818e7e99f426c50b8bfd11511ed2f6",
+  "sourceChecksumSha256": "da1f6244c32a35d8d369231f93da53d750e78a71555fcd3ca6f73abb05a31173",
   "stats": {
     "totalEndpoints": 6,
     "byTag": {
@@ -253,7 +253,7 @@
             "workspace_id",
             "actor_participant_id",
             "surface",
-            "output_refs"
+            "command_request_id"
           ],
           "optional": []
         }
@@ -273,7 +273,7 @@
         503
       ],
       "example": {
-        "curl": "curl -X POST '/internal/nurture/harness/read-result' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"output_refs\":\"<output_refs>\"}'"
+        "curl": "curl -X POST '/internal/nurture/harness/read-result' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"command_request_id\":\"<command_request_id>\"}'"
       }
     }
   ]
