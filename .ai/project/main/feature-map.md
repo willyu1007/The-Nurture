@@ -375,7 +375,7 @@ Project: `main`
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-004 nurture-surface-contract-foundation | in-progress | dev-docs/active/nurture-surface-contract-foundation |
-| T-005 nurture-family-care-conversation | planned | dev-docs/active/nurture-family-care-conversation |
+| T-005 nurture-family-care-conversation | in-progress | dev-docs/active/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |

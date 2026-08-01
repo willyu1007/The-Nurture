@@ -320,3 +320,32 @@
 - 未映射条目不得勾选；资格化 PASS 依据是映射检查通过。映射按 stage 摊销，回链
   使用 T-004 conformance manifest 的 AC 引用字段。详见 `01-plan.md`
   Acceptance-to-Check Mapping 小节。本次只更新规划文档，无代码或 schema 变更。
+
+## 2026-08-01 — G2-0 schema freeze locked
+
+- G1 Joint Conformance PASS(T-002/T-004 联合记录
+  `../nurture-institution-mode/18-g1-joint-conformance-record.md`)开放
+  protected T-005 implementation 后,按 G2-10 第 1–2 步完成冻结,SSOT 为
+  `10-g2-schema-freeze.md`。
+- 采用 T-004 exact pin `nurture.surface-contract@1.7.0` / `b7691a81…` 与
+  T-002 owner pins(My-Chat `a019566` / Base `06303e9`)。
+- 三轴 schema delta 冻结(全部 additive):acknowledgement/response/lifecycle
+  三轴 + 独立 heads、`writerContract` 判别列、`replyOrderKey` partial
+  unique、`NurtureFamilyCareMessageCorrection` append-only 表、
+  `NurtureFamilyCareCascadeAudit` loop-to-closure 表、CommandExecution
+  immutable `committedResultPayload`、InteractionContext payload schema v2、
+  行内 encrypted protected content(不建平行 content 表)、
+  `direct_care_communication` data class。
+- single-writer cutover matrix(C1–C8)与旧行 ambiguity inventory 判定表
+  冻结:legacy `status` 对 G2 行降级为单向派生只读兼容列;
+  assignment/linked-reply/ThreadParticipant/whole-Item CAS/raw DTO/
+  claimed-Step 全部不进入新路径;歧义旧行 quarantine 不猜测。
+- G2-C 载体经 owner 决策冻结为 **Message-only**:
+  `initiate_caregiver_direct_message@1.0.0`,只创建 canonical Message +
+  delivered/read Receipt + CommandExecution;不创建 CareItem/Attention,
+  家庭侧无 ack/reply 义务,回应走新 submit;correction/redaction 适用,
+  withdrawal 不适用。digest rotation 留待下一 pin action,rotation 前
+  T-006 只显示安全阻塞。
+- freeze 范畴验收条目获得稳定 ID `T005-AC-001..022` 并逐条映射机械检查。
+- 本冻结为文档契约动作:无 schema apply、handler、digest、数据库、激活或
+  流量效果;所有 consumer 保持 default-off。

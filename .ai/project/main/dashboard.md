@@ -18,10 +18,18 @@ Project: `main`
   confirmation/heads), the owner-path named negatives (wrong user/purpose,
   `bound_empty` recovery, quarantine), a clean leakage scan and the final
   false/empty census. Protected T-005～T-007 implementation is now open.
-  The critical lane moves to the early T-007 G4-0A/0B publication-policy
-  subset and the T-005 G2 schema freeze, with Beta Profile v0 freezing near
-  this gate. Runtime/environment activation and external traffic remain
-  gated; all consumers stay default-off.
+  T-005 G2-0 schema freeze is locked (2026-08-01,
+  `dev-docs/active/nurture-family-care-conversation/10-g2-schema-freeze.md`:
+  three-axis CareItem delta, single-writer cutover matrix, legacy ambiguity
+  inventory rules, G2-C frozen as Message-only
+  `initiate_caregiver_direct_message@1.0.0`, freeze-scope AC ids
+  `T005-AC-001..022`). The critical lane moves to the T-005 G2 migration +
+  Harness implementation (disposable PostgreSQL, formal NestJS ingress),
+  with the early T-007 G4-0A/0B publication-policy subset still open in
+  parallel and Beta Profile v0 freezing near this gate. The G2-C digest
+  rotation rides the next pin action together with the Wave4 import-closure
+  scoping decision. Runtime/environment activation and external traffic
+  remain gated; all consumers stay default-off.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
 
@@ -128,15 +136,15 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 8 (planned: 4, in-progress: 3, blocked: 0, done: 1, archived: 0)
+- Tasks: 8 (planned: 3, in-progress: 4, blocked: 0, done: 1, archived: 0)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
+| T-005 nurture-family-care-conversation | in-progress | F-003 | dev-docs/active/nurture-family-care-conversation |
 | T-004 nurture-surface-contract-foundation | in-progress | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
-| T-005 nurture-family-care-conversation | planned | F-003 | dev-docs/active/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |

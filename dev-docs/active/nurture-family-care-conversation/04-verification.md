@@ -226,3 +226,18 @@
 ## Required Evidence
 
 记录精确 Nurture/Base/My-Chat pins、命令、测试数据版本和结果。不得用手工数据库修改或 UI mock 代替 receipt、authority 与 replay 证据。
+
+## G2-0 Schema Freeze — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | G1 Joint Conformance PASS 引用有效(`18-g1-joint-conformance-record.md`,T-004 `1.7.0`/`b7691a81…`,My-Chat `a019566`,Base `06303e9`) | PASS |
+| 2026-08-01 | 三轴 delta 与 `06-t002-fact-schema-gap.md` Target Schema Delta 逐项对齐(字段命名冻结,全部 additive) | PASS |
+| 2026-08-01 | cutover matrix 覆盖 06/02 号文档列举的全部 legacy 元素(status/assignment/linked-reply/ThreadParticipant/CAS/raw DTO/claimed-Step/双写) | PASS |
+| 2026-08-01 | 旧行 inventory 判定表对现有 `NurtureFamilyCareItemStatus` 八个枚举值逐一给出迁移或 quarantine 结论 | PASS |
+| 2026-08-01 | G2-C 载体决策(Message-only)经 owner 确认;与 02 号"不反向套用三轴状态机"、06 号"不 fork 平行 aggregate"一致 | PASS |
+| 2026-08-01 | G2-C 冻结满足 09 号约束:rotation 前不发布 key、T-006 只显示安全阻塞、不复用 family-question schema | PASS |
+| 2026-08-01 | freeze 范畴 AC 映射 `T005-AC-001..022` 每条恰好一类机械检查 | PASS |
+| 2026-08-01 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-family-care-conversation --check-anchors --strict` | PASS |
+| 2026-08-01 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS |
+| 2026-08-01 | 效果边界:无 schema apply、migration、handler、digest、数据库、secret、激活或流量变更 | PASS |

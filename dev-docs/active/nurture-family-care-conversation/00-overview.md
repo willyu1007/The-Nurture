@@ -2,15 +2,19 @@
 
 ## Status
 
-- State: planned
+- State: in-progress
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-30
-- Next step: 按 Stage G2 顺序先采用 T-004 exact contract pin，冻结三轴 CareItem、
-  legacy single-writer cutover、encrypted protected content 和 G2-C dedicated
-  caregiver direct-interaction exact contract；随后依次实施/资格化 G2-A Core Loop、
-  G2-B Lifecycle/Admin owner-read 和 G2-C Bridge。所有真实 protected qualification
-  经 formal NestJS ingress + pinned owner path，能力保持 default-off。
+- Updated: 2026-08-01
+- Next step: G2-0 schema freeze 已锁定(`10-g2-schema-freeze.md`：T-004 exact
+  pin 采用、三轴 CareItem delta、single-writer cutover、旧行 ambiguity
+  inventory 规则、G2-C Message-only exact contract、freeze 范畴 AC 映射
+  `T005-AC-001..022`)。下一步按 G2-10 顺序进入第 3 步：在 disposable
+  PostgreSQL author/replay schema migration，并经 formal NestJS ingress 实现
+  Harness 与 protected-content boundary；随后依次实施/资格化 G2-A、G2-B、
+  G2-C。G2-C 进入 T-004 digest 的 rotation 与 Wave4 import-closure scoping
+  同批在下一个 pin action 执行。所有真实 protected qualification 经 formal
+  NestJS ingress + pinned owner path，能力保持 default-off。
 
 ## Goal
 

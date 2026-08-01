@@ -14,7 +14,7 @@ Project: `main`
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
 | T-003 nurture-uiux-pitch | in-progress | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-004 nurture-surface-contract-foundation | in-progress | F-003 | dev-docs/active/nurture-surface-contract-foundation |
-| T-005 nurture-family-care-conversation | planned | F-003 | dev-docs/active/nurture-family-care-conversation |
+| T-005 nurture-family-care-conversation | in-progress | F-003 | dev-docs/active/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
