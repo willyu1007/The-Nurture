@@ -38,6 +38,7 @@ const selectionFamilies = [
   "unavailable",
 ];
 
+const validatedFixtureDocuments = new Set();
 const schemaPaths = await collectSchemaPaths(sourceRoot);
 const schemas = await Promise.all(
   schemaPaths.map(async (schemaPath) => ({
@@ -185,9 +186,34 @@ const conformanceCoverage = checkConformanceRegistry(
 );
 assertConformanceRejectsUnknownSlice(conformanceRegistry, manifest);
 
+await assertNoUnvalidatedFixtureFiles();
+
 process.stdout.write(
   `[ok] surface contract schemas=${schemas.length} manifest=valid artifact-pin=valid fixtures=${10 + scriptCount + expectedViewCount} conformance-cases=${conformanceRegistry.cases.length} slices=${conformanceCoverage.covered}/${conformanceCoverage.universe} negatives=7\n`,
 );
+
+async function assertNoUnvalidatedFixtureFiles() {
+  const fixtureFiles = [];
+  const walk = async (directory) => {
+    for (const entry of (await readdir(directory, { withFileTypes: true })).sort(
+      (left, right) => left.name.localeCompare(right.name),
+    )) {
+      const entryPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) await walk(entryPath);
+      else if (entry.isFile()) fixtureFiles.push(entryPath);
+    }
+  };
+  await walk(path.join(sourceRoot, "fixtures"));
+  for (const filePath of fixtureFiles) {
+    const relative = path.relative(sourceRoot, filePath);
+    if (relative.endsWith(".schema.json")) continue;
+    if (!validatedFixtureDocuments.has(relative)) {
+      throw new Error(
+        `Fixture file is not covered by document validation: ${relative}`,
+      );
+    }
+  }
+}
 
 async function collectSchemaPaths(directory) {
   const result = [];
@@ -237,6 +263,7 @@ function assertManifestRejectsMalformedHeadBinding(ajv, manifest) {
 }
 
 async function validateSourceDocument(ajv, schemaId, documentPath) {
+  validatedFixtureDocuments.add(path.relative(sourceRoot, documentPath));
   const validate = ajv.getSchema(schemaId);
   if (!validate) throw new Error(`Missing compiled schema ${schemaId}`);
   const value = JSON.parse(await readFile(documentPath, "utf8"));

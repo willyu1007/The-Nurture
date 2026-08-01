@@ -189,6 +189,10 @@ describe("Phase 3 journey scripts", () => {
         ),
       );
       expect(text(entry.script.journeyKey)).toBe(entry.journeyKey);
+      const loopKeys = records(entry.script.valueLoop).map((step) =>
+        text(step.stepKey),
+      );
+      expect(new Set(loopKeys).size).toBe(loopKeys.length);
       const refusal = record(entry.script.refusal);
       if (typeof refusal.afterStepKey === "string") {
         expect(
@@ -308,10 +312,64 @@ describe("Phase 3 journey scripts", () => {
           actorRolesBySurface.get(surfaceKey),
           `${entry.journeyKey} ${name} role/surface`,
         ).toContain(actorRole);
+        const owner = record(owningStep);
+        if (typeof owner.surfaceKey === "string") {
+          // View steps and affordance refusals declare the observing surface
+          // and actor; a refusal post-condition may legitimately be another
+          // actor's unchanged view, so only these bind actor identity.
+          expect(surfaceKey).toBe(text(owner.surfaceKey));
+          expect(record(view.actor)).toEqual(record(owner.actor));
+        }
+        for (const actionKey of strings(view.writeActionKeys)) {
+          expect(
+            supportedRolesByCapability.get(actionKey),
+            `${entry.journeyKey} ${name} affordance ${actionKey}`,
+          ).toContain(actorRole);
+        }
         for (const item of records(view.careItems)) {
           expect(known, `${entry.journeyKey} ${name} item`).toContain(
             text(item.itemRef),
           );
+        }
+      }
+    }
+  });
+
+  it("never references an alias before its creating step", () => {
+    for (const entry of scriptedJourneys) {
+      const base = journeyKnownIds(entry);
+      for (const step of allSteps(entry.script)) {
+        const aliases = step.createsAliases;
+        if (aliases) for (const a of Object.values(record(aliases))) base.delete(text(a));
+        if (step.kind === "world_transition" && step.grant) base.delete(text(record(step.grant).grantId));
+      }
+      const available = new Set(base);
+      const loop = records(entry.script.valueLoop);
+      const useSites = (step: Record<string, unknown>) =>
+        [step.target, step.input].flatMap((value) => stringValues(value ?? {}));
+      for (const step of loop) {
+        for (const ref of useSites(step)) {
+          if (!ref.startsWith("syn-")) continue;
+          expect(available, `${entry.journeyKey}/${text(step.stepKey)} early ref ${ref}`).toContain(ref);
+        }
+        const aliases = step.createsAliases;
+        if (aliases) for (const a of Object.values(record(aliases))) available.add(text(a));
+        if (step.kind === "world_transition" && step.grant) available.add(text(record(step.grant).grantId));
+      }
+      const refusal = record(entry.script.refusal);
+      if (refusal.kind === "invocation_refused") {
+        const upTo = typeof refusal.afterStepKey === "string" ? refusal.afterStepKey : undefined;
+        const refusalAvailable = new Set(base);
+        for (const step of loop) {
+          if (upTo === undefined) break;
+          const aliases = step.createsAliases;
+          if (aliases) for (const a of Object.values(record(aliases))) refusalAvailable.add(text(a));
+          if (step.kind === "world_transition" && step.grant) refusalAvailable.add(text(record(step.grant).grantId));
+          if (text(step.stepKey) === upTo) break;
+        }
+        for (const ref of useSites(refusal)) {
+          if (!ref.startsWith("syn-")) continue;
+          expect(refusalAvailable, `${entry.journeyKey} refusal early ref ${ref}`).toContain(ref);
         }
       }
     }
