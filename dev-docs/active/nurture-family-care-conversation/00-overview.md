@@ -6,20 +6,17 @@
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-01
-- Next step: **G2-A checkpoint 已达成**
-  (`11-g2a-checkpoint-record.md`：`G2A_CHECKPOINT_PASS`)，并已完成两轮
-  实施质量评审的全部修复(自查 + gpt-5.6-sol 独立评审；见 03/04/05 与
-  记录末尾的 Follow-ups)。已落地链：G2-0 freeze → 三轴 migration →
-  Harness kernel/protected content → submit/ack/reply 三纵切 → formal
-  ingress 四 lane 六路由 → query lane role-safe presenters → checkpoint
-  缺口套件 → 评审修复(enrollment 作用域越权、grant purpose/data-class
-  谓词、续接 ref、三态结果、immutable committed result、cursor 快照、
-  精确 CareGroup、legacy 单写入面)。AC 映射已编至 `T005-AC-035`。
-  下一主线：Increment 2(correction/withdrawal/redaction，
-  `07-increment-2-change-contract.md` normative)→ G2-B(含 Admin
-  owner-read 投影)→ G2-C(Message-only 契约已冻结，digest rotation 随
-  下一 pin action)→ G2 Exit Qualification(formal ingress + real pinned
-  owner path)。所有能力保持 default-off；T-005 不宣称 final Exit。
+- Next step: **G2-B checkpoint 已达成**
+  (`12-g2b-checkpoint-record.md`：`G2B_CHECKPOINT_PASS`)。在 G2-A 证据链之上
+  已交付 correction / withdrawal / exact-author 与 system-policy redaction、
+  分页闭包 cascade、最新更正/tombstone presenter，以及精确披露的
+  `InstitutionBusinessCommunicationProjectionV1` provider owner-read。正式
+  ingress 现为七路由；Admin read 使用 exact
+  `nurture.institution-business-communication-owner-read@1.0.0` / digest pin、
+  service-auth no-store carrier 和独立默认关闭开关。AC 映射续编至
+  `T005-AC-049`。下一主线：G2-C(Message-only 契约已冻结，digest rotation
+  随下一 pin action)→ G2 Exit Qualification(formal ingress + real pinned
+  owner path)。provider/consumer 均未激活，T-005 不宣称 final Exit。
 - 未清债务：六个 G2 capability 与 09 号 shared referenced types 尚未进入
   T-004 interface digest，与 G2-C rotation 同批在下一个 pin action 处理。
 
@@ -190,10 +187,10 @@ bridge。只有 A/B/C 与 G2 Exit Qualification 全部通过，T-005 才可完�
 
 - [ ] 家庭 AI 房间内容默认仅家庭可见，跨边界必须有明确 preview 和 send 动作。
 - [ ] guardian/caregiver 不进入共享聊天室；同一照护事项只生成各自当前可见的角色投影。
-- [ ] Institution Admin 仅能通过独立、非 canonical、按请求组合的园区业务沟通
+- [x] Institution Admin 仅能通过独立、非 canonical、按请求组合的园区业务沟通
   owner-read 投影查看已披露监督的当前正文、附件与 lifecycle；投影不复制 Message，
   不建立共享 transcript，也不暴露家庭私密上下文。
-- [ ] Institution Admin 的 read authority 与 action authority 分离；仅持 Admin
+- [x] Institution Admin 的 read authority 与 action authority 分离；仅持 Admin
   身份不能 acknowledge/reply/correct/withdraw/redact。多角色用户必须切换到相应
   caregiver/author role，并重新通过原 action 的 exact authority。
 - [ ] ordinary chat、Chat-assisted action 与 board-direct action 有可测试的不同结果；普通聊天不产生业务写入。

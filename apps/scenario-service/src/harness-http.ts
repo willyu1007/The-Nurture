@@ -1,4 +1,8 @@
-import type { NurtureCommandResult } from "@the-nurture/scenario";
+import {
+  INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE,
+  type InstitutionBusinessCommunicationDecisionV1,
+  type NurtureCommandResult,
+} from "@the-nurture/scenario/harness";
 
 /**
  * Private Harness transport layer for the formal ingress. My-Chat provides
@@ -10,11 +14,17 @@ export const HARNESS_PREPARE_PATH = "/internal/nurture/harness/prepare-action";
 export const HARNESS_EXECUTE_PATH = "/internal/nurture/harness/execute-action";
 export const HARNESS_QUERY_PATH = "/internal/nurture/harness/query";
 export const HARNESS_READ_RESULT_PATH = "/internal/nurture/harness/read-result";
+export const INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH =
+  "/internal/nurture/institution/business-communications:read";
 
 export const HARNESS_CAPABILITY_KEYS = [
   "submit_family_care_question",
   "acknowledge_family_care_item",
   "reply_family_care_item",
+  "correct_family_care_message",
+  "withdraw_family_care_request",
+  "redact_family_care_message",
+  "policy_redact_family_care_message",
 ] as const;
 
 export const HARNESS_QUERY_CAPABILITY_KEYS = [
@@ -173,6 +183,17 @@ export type HarnessReadResultRequestV1 = {
   command_request_id: string;
 };
 
+export type InstitutionBusinessCommunicationReadRequestV1 = {
+  workspace_id: string;
+  actor_participant_id: string;
+  surface: "admin";
+  interface_contract: typeof INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE;
+  target_option_ref: string;
+};
+
+export type InstitutionBusinessCommunicationReadResponseV1 =
+  InstitutionBusinessCommunicationDecisionV1;
+
 const QUERY_KEYS = new Set([
   "workspace_id",
   "actor_participant_id",
@@ -226,6 +247,41 @@ export const parseHarnessReadResultRequestV1 = (
     throw new HarnessRequestParseError("invalid_harness_request");
   }
   return record as unknown as HarnessReadResultRequestV1;
+};
+
+const INSTITUTION_BUSINESS_COMMUNICATION_READ_KEYS = new Set([
+  "workspace_id",
+  "actor_participant_id",
+  "surface",
+  "interface_contract",
+  "target_option_ref",
+]);
+
+export const parseInstitutionBusinessCommunicationReadRequestV1 = (
+  body: unknown,
+): InstitutionBusinessCommunicationReadRequestV1 => {
+  if (
+    !isRecord(body) ||
+    Object.keys(body).some(
+      (key) => !INSTITUTION_BUSINESS_COMMUNICATION_READ_KEYS.has(key),
+    ) ||
+    typeof body.workspace_id !== "string" ||
+    !ID_PATTERN.test(body.workspace_id) ||
+    typeof body.actor_participant_id !== "string" ||
+    !ID_PATTERN.test(body.actor_participant_id) ||
+    body.surface !== "admin" ||
+    typeof body.target_option_ref !== "string" ||
+    !REF_PATTERN.test(body.target_option_ref) ||
+    !isRecord(body.interface_contract) ||
+    Object.keys(body.interface_contract).length !== 3 ||
+    body.interface_contract.key !== INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE.key ||
+    body.interface_contract.version !==
+      INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE.version ||
+    body.interface_contract.digest !== INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE.digest
+  ) {
+    throw new HarnessRequestParseError("invalid_harness_request");
+  }
+  return body as InstitutionBusinessCommunicationReadRequestV1;
 };
 
 export type HarnessQueryResponseV1 =

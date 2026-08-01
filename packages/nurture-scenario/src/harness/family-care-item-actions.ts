@@ -234,7 +234,15 @@ export const createAcknowledgeFamilyCareItemSpec =
         if (existing.length === 0) {
           return { status: "conflict", reason_code: "acknowledgement_evidence_unavailable" };
         }
-        return { status: "already_satisfied", output_refs: existing };
+        return {
+          status: "already_satisfied",
+          output_refs: existing,
+          result_schema_version: 1,
+          committed_result: {
+            capability_key: ACKNOWLEDGE_FAMILY_CARE_ITEM_CAPABILITY.key,
+            acknowledgement_effect: "acknowledged",
+          },
+        };
       }
       if (facts.acknowledgement_head !== input.expected_acknowledgement_head) {
         return { status: "conflict", reason_code: "stale_confirmation" };

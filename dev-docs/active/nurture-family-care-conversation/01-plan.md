@@ -390,8 +390,10 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
   exact-author 或独立 system-policy capability。
 - 后续 `InstitutionAttentionCandidate` 只能在同一 owner-read 范围内引用原始材料并
   突出可能需要介入的事项；不自动执行、诊断、归责或评分，也不属于当前增量。
-- 当前 manifest/module/source 尚无该 protected presenter 接口；在新版本 interface、
-  digest、carrier、owner-read 与负向测试齐备前保持 default-off。
+- provider 已实现 exact
+  `nurture.institution-business-communication-owner-read@1.0.0` / digest、
+  service-auth no-store carrier、request-time owner-read 与负向测试；独立环境开关
+  默认 `false`。T-007 consumer composition/adoption 与 joint activation 仍未发生。
 
 ## G2-A — Core CareInteraction Loop Checkpoint
 
@@ -409,6 +411,9 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
   未完成，不宣称 T-005 final Exit。
 
 ## G2-B — Lifecycle and Owner-read Completion Checkpoint
+
+- Checkpoint status: `G2B_CHECKPOINT_PASS`；机械证据见
+  `12-g2b-checkpoint-record.md`，不等于 T-005 final Exit 或 T-007 consumer adoption。
 
 - correction、withdrawal、author/system redaction 全部使用统一 Harness、
   CommandExecution、immutable result、exact replay 和独立 Receipt。
@@ -502,8 +507,8 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
 
 ## Exit Gate
 
-- [ ] G2-A Core CareInteraction Loop 通过。
-- [ ] G2-B Lifecycle and Owner-read Completion 通过。
+- [x] G2-A Core CareInteraction Loop 通过。
+- [x] G2-B Lifecycle and Owner-read Completion 通过。
 - [ ] G2-C Caregiver Direct Interaction Bridge 通过。
 - [ ] 三轴 CareItem、reply collection、protected content、typed result 和 cascade
   schema 可由 clean checkout 重建；legacy cutover 保持 single writer，ambiguous

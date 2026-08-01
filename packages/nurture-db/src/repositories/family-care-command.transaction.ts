@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Prisma, type PrismaClient } from "@prisma/client";
+import { FAMILY_CARE_PURPOSE } from "@the-nurture/scenario/harness";
 import type {
   FamilyCareCancelRouteFacts,
   FamilyCareCancelRoutePayload,
@@ -18,14 +19,25 @@ import type {
   FamilyInputRoutePayload,
   G2AcknowledgeApplied,
   G2AcknowledgeApplyInput,
+  G2CorrectMessageApplied,
+  G2CorrectMessageApplyInput,
   G2ItemActionFacts,
   G2ItemActionPayload,
+  G2MessageChangeFacts,
+  G2MessageChangePayload,
+  G2RedactMessageApplied,
+  G2RedactMessageApplyInput,
+  G2RedactionFinalization,
   G2ReplyApplied,
   G2ReplyApplyInput,
   G2SubmitApplied,
   G2SubmitApplyInput,
   G2SubmitCommandPayload,
   G2SubmitFacts,
+  G2WithdrawalApplied,
+  G2WithdrawalApplyInput,
+  G2WithdrawalFacts,
+  G2WithdrawalPayload,
   NurtureFamilyCareCommandTransaction,
 } from "@the-nurture/scenario/harness";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
@@ -47,6 +59,9 @@ const domainRef = (objectType: string, objectId: string, version = 1): DomainCon
 // partial cascade is an atomicity failure, not a bounded cost. Each page
 // updates the rows out of its own filter, so re-querying converges.
 const CASCADE_PAGE_SIZE = 100;
+// Legacy grant-revoke paths retain a high explicit safety bound, but reaching
+// it throws and rolls back the whole transaction; it can never commit a
+// partial cascade. G2-B redaction loops directly to closure without this cap.
 const CASCADE_MAX_PAGES = 100;
 
 const roleCurrent = (row: {
@@ -1065,6 +1080,765 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       response_effect: responseEffect,
       attention_effect: attentionEffect,
     };
+  }
+
+  async loadG2MessageChangeFacts(
+    input: FamilyCareTransactionInput<G2MessageChangePayload>,
+  ): Promise<G2MessageChangeFacts> {
+    const missingGrant: FamilyCareCurrentGrant = {
+      grant_id: "missing",
+      status: "missing",
+      directions: [],
+      data_classes: [],
+      purposes: [],
+      target_scope_type: "care_group",
+      target_scope_id: "missing",
+    };
+    const [participant, message] = await Promise.all([
+      this.transaction.nurtureParticipant.findFirst({
+        where: {
+          id: input.participant_id,
+          workspaceId: input.workspace_id,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureFamilyCareMessage.findFirst({
+        where: { id: input.message_id, workspaceId: input.workspace_id },
+        include: { grant: true, enrollment: true },
+      }),
+    ]);
+    if (!message) {
+      return {
+        participant_active: Boolean(participant),
+        message_present: false,
+        exact_author: false,
+        same_side_reachable: false,
+        policy_actor_authorized: false,
+        correction_head: 0,
+        grant: missingGrant,
+      };
+    }
+
+    const item = await this.transaction.nurtureFamilyCareItem.findFirst({
+      where:
+        message.messageKind === "family_message"
+          ? { workspaceId: input.workspace_id, sourceMessageId: message.id }
+          : message.sourceItemId
+            ? { workspaceId: input.workspace_id, id: message.sourceItemId }
+            : { workspaceId: input.workspace_id, id: "__no_item__" },
+    });
+    const now = new Date();
+    const exactAuthor = message.senderParticipantId === input.participant_id;
+    const authorScopes: Prisma.NurtureCareRoleAssignmentWhereInput[] = [];
+    let authorRoles: Array<"guardian" | "caregiver" | "lead_caregiver"> = ["guardian"];
+    if (message.authorshipKind === "family_authored") {
+      authorScopes.push({ scopeType: "child_care_process", scopeId: message.childCareProcessId });
+      if (message.enrollmentId) authorScopes.push({ scopeType: "enrollment", scopeId: message.enrollmentId });
+      if (item?.familyId) authorScopes.push({ scopeType: "family", scopeId: item.familyId });
+    } else {
+      authorRoles = ["caregiver", "lead_caregiver"];
+      if (message.careGroupId) authorScopes.push({ scopeType: "care_group", scopeId: message.careGroupId });
+    }
+    const currentAuthorRole =
+      exactAuthor && authorScopes.length > 0
+        ? await this.transaction.nurtureCareRoleAssignment.findFirst({
+            where: {
+              workspaceId: input.workspace_id,
+              participantId: input.participant_id,
+              role: { in: authorRoles },
+              status: "active",
+              deletedAt: null,
+              OR: authorScopes,
+              AND: [
+                { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+                { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+              ],
+            },
+            orderBy: { id: "asc" },
+          })
+        : null;
+    const policyScopes: Prisma.NurtureCareRoleAssignmentWhereInput[] = [
+      { scopeType: "child_care_process", scopeId: message.childCareProcessId },
+      ...(message.enrollmentId
+        ? [{ scopeType: "enrollment" as const, scopeId: message.enrollmentId }]
+        : []),
+      ...(message.enrollment
+        ? [{ scopeType: "institution" as const, scopeId: message.enrollment.institutionId }]
+        : []),
+    ];
+    const policyRole = participant
+      ? await this.transaction.nurtureCareRoleAssignment.findFirst({
+          where: {
+            workspaceId: input.workspace_id,
+            participantId: input.participant_id,
+            role: "system_operator",
+            status: "active",
+            deletedAt: null,
+            OR: policyScopes,
+            AND: [
+              { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+              { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+            ],
+          },
+          orderBy: { id: "asc" },
+        })
+      : null;
+
+    const grantRow = message.grant;
+    const targetMatches = Boolean(
+      grantRow &&
+        message.enrollment &&
+        ((grantRow.grantedToScopeType === "care_group" &&
+          grantRow.grantedToScopeId === message.careGroupId) ||
+          (grantRow.grantedToScopeType === "enrollment" &&
+            grantRow.grantedToScopeId === message.enrollmentId) ||
+          (grantRow.grantedToScopeType === "institution" &&
+            grantRow.grantedToScopeId === message.enrollment.institutionId)),
+    );
+    const grantCurrent = Boolean(
+      grantRow &&
+        grantRow.status === "active" &&
+        !grantRow.revokedAt &&
+        grantRow.deletedAt === null &&
+        (!grantRow.effectiveFrom || grantRow.effectiveFrom <= now) &&
+        (!grantRow.expiresAt || grantRow.expiresAt > now) &&
+        message.direction &&
+        grantRow.directions.includes(message.direction) &&
+        grantRow.dataClasses.includes(item?.dataClass ?? "direct_care_communication") &&
+        grantRow.purposes.includes(FAMILY_CARE_PURPOSE) &&
+        targetMatches,
+    );
+    const grant: FamilyCareCurrentGrant = grantRow
+      ? {
+          grant_id: grantRow.id,
+          status: grantCurrent ? "active" : grantRow.status === "revoked" || grantRow.revokedAt ? "revoked" : "missing",
+          directions: grantRow.directions,
+          data_classes: grantRow.dataClasses,
+          purposes: grantRow.purposes,
+          target_scope_type: grantRow.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
+          target_scope_id: grantRow.grantedToScopeId,
+        }
+      : missingGrant;
+    const correctionHead = await this.transaction.nurtureFamilyCareMessageCorrection.aggregate({
+      where: { workspaceId: input.workspace_id, messageId: message.id },
+      _max: { correctionVersion: true },
+    });
+    const existingAudit =
+      message.status === "redacted"
+        ? await this.transaction.nurtureFamilyCareCascadeAudit.findFirst({
+            where: { workspaceId: input.workspace_id, rootMessageId: message.id, closureState: "complete" },
+            orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          })
+        : null;
+    return {
+      participant_active: Boolean(participant),
+      message_present: true,
+      writer_contract: message.writerContract,
+      ...(message.messageKind === "family_message" ||
+      message.messageKind === "caregiver_reply" ||
+      message.messageKind === "caregiver_direct_message"
+        ? { message_kind: message.messageKind }
+        : {}),
+      message_status: message.status,
+      message_version: message.aggregateVersion,
+      ...(message.direction ? { message_direction: message.direction } : {}),
+      exact_author: exactAuthor,
+      ...(currentAuthorRole ? { current_author_role_assignment_id: currentAuthorRole.id } : {}),
+      same_side_reachable: Boolean(currentAuthorRole),
+      policy_actor_authorized: Boolean(policyRole),
+      ...(policyRole ? { policy_role_assignment_id: policyRole.id } : {}),
+      correction_head: correctionHead._max.correctionVersion ?? 0,
+      ...(item
+        ? {
+            source_item_id: item.id,
+            source_item_response_state: item.responseState,
+            source_item_lifecycle_state: item.lifecycleState,
+            source_item_lifecycle_head: item.lifecycleHead,
+          }
+        : {}),
+      grant,
+      ...(existingAudit
+        ? {
+            existing_redaction_refs: [
+              domainRef("family_care_message", message.id, message.aggregateVersion),
+              domainRef("family_care_cascade_audit", existingAudit.id),
+            ],
+          }
+        : {}),
+    };
+  }
+
+  async applyG2Correction(
+    input: FamilyCareTransactionInput<G2CorrectMessageApplyInput>,
+  ): Promise<G2CorrectMessageApplied> {
+    const message = await this.transaction.nurtureFamilyCareMessage.findFirstOrThrow({
+      where: { id: input.message_id, workspaceId: input.workspace_id },
+    });
+    const item = await this.transaction.nurtureFamilyCareItem.findFirst({
+      where:
+        message.messageKind === "family_message"
+          ? { workspaceId: input.workspace_id, sourceMessageId: message.id }
+          : message.sourceItemId
+            ? { workspaceId: input.workspace_id, id: message.sourceItemId }
+            : { workspaceId: input.workspace_id, id: "__no_item__" },
+    });
+    if (
+      input.expected_lifecycle_head !== undefined &&
+      (!item ||
+        item.lifecycleState !== "active" ||
+        item.lifecycleHead !== input.expected_lifecycle_head)
+    ) {
+      throw new Error("G2 correction lifecycle conflict");
+    }
+    const head = await this.transaction.nurtureFamilyCareMessageCorrection.aggregate({
+      where: { workspaceId: input.workspace_id, messageId: message.id },
+      _max: { correctionVersion: true },
+    });
+    if ((head._max.correctionVersion ?? 0) !== input.expected_correction_head) {
+      throw new Error("G2 correction head conflict");
+    }
+    const updated = await this.transaction.nurtureFamilyCareMessage.updateMany({
+      where: {
+        id: message.id,
+        workspaceId: input.workspace_id,
+        writerContract: "harness_g2_v1",
+        status: "sent",
+        aggregateVersion: input.expected_message_version,
+      },
+      data: { aggregateVersion: { increment: 1 } },
+    });
+    if (updated.count !== 1) throw new Error("G2 correction message conflict");
+
+    const correctionId = randomUUID();
+    const correctionVersion = input.expected_correction_head + 1;
+    await this.transaction.nurtureFamilyCareMessageCorrection.create({
+      data: {
+        id: correctionId,
+        workspaceId: input.workspace_id,
+        messageId: message.id,
+        correctionVersion,
+        authorParticipantId: input.participant_id,
+        authorRoleAssignmentId: input.current_author_role_assignment_id,
+        bodyStorageMode: "encrypted",
+        bodyProtectionPayload: asJson(input.body_envelope),
+        status: "active",
+      },
+    });
+    const receipt = await this.transaction.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: input.workspace_id,
+        grantId: message.grantId,
+        childCareProcessId: message.childCareProcessId,
+        enrollmentId: message.enrollmentId,
+        direction: message.direction ?? "family_to_org",
+        dataClass: item?.dataClass ?? "direct_care_communication",
+        sourceType: "family_care_message",
+        sourceId: message.id,
+        routingAttemptKey: `g2-correction:${correctionId}`,
+        targetScopeType: message.direction === "org_to_family" ? "family" : "care_group",
+        targetScopeId:
+          message.direction === "org_to_family" ? item?.familyId : message.careGroupId,
+        status: "delivered",
+        deliveredAt: new Date(),
+      },
+    });
+    await this.transaction.nurtureFamilyCareMessageCorrection.update({
+      where: { id: correctionId },
+      data: { receiptId: receipt.id },
+    });
+    if (item) {
+      await this.transaction.nurtureFamilyCareItemEvent.create({
+        data: {
+          workspaceId: input.workspace_id,
+          itemId: item.id,
+          actorParticipantId: input.participant_id,
+          actorRoleAssignmentId: input.current_author_role_assignment_id,
+          eventType: "corrected",
+          fromStatus: item.status,
+          toStatus: item.status,
+          relatedMessageId: message.id,
+          eventPayload: { correction_id: correctionId, correction_version: correctionVersion },
+        },
+      });
+    }
+    return {
+      message_ref: domainRef("family_care_message", message.id, message.aggregateVersion + 1),
+      ...(item ? { item_ref: domainRef("family_care_item", item.id, item.version) } : {}),
+      correction_ref: domainRef("family_care_message_correction", correctionId, correctionVersion),
+      correction_version: correctionVersion,
+      receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
+      finalization: { correction_id: correctionId },
+    };
+  }
+
+  async finalizeG2Correction(
+    input: FamilyCareTransactionInput<{ correction_id: string; command_execution_id: string }>,
+  ): Promise<void> {
+    const updated = await this.transaction.nurtureFamilyCareMessageCorrection.updateMany({
+      where: {
+        id: input.correction_id,
+        workspaceId: input.workspace_id,
+        commandExecutionId: null,
+      },
+      data: { commandExecutionId: input.command_execution_id },
+    });
+    if (updated.count !== 1) throw new Error("G2 correction execution binding conflict");
+  }
+
+  async loadG2WithdrawalFacts(
+    input: FamilyCareTransactionInput<G2WithdrawalPayload>,
+  ): Promise<G2WithdrawalFacts> {
+    const missingGrant: FamilyCareCurrentGrant = {
+      grant_id: "missing",
+      status: "missing",
+      directions: [],
+      data_classes: [],
+      purposes: [],
+      target_scope_type: "care_group",
+      target_scope_id: "missing",
+    };
+    const [participant, item] = await Promise.all([
+      this.transaction.nurtureParticipant.findFirst({
+        where: {
+          id: input.participant_id,
+          workspaceId: input.workspace_id,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureFamilyCareItem.findFirst({
+        where: { id: input.item_id, workspaceId: input.workspace_id },
+        include: { grant: true, enrollment: true },
+      }),
+    ]);
+    if (!item) {
+      return {
+        participant_active: Boolean(participant),
+        item_present: false,
+        exact_source_author: false,
+        same_side_reachable: false,
+        grant: missingGrant,
+      };
+    }
+    const source = item.sourceMessageId
+      ? await this.transaction.nurtureFamilyCareMessage.findFirst({
+          where: { id: item.sourceMessageId, workspaceId: input.workspace_id },
+        })
+      : null;
+    const now = new Date();
+    const role = await this.transaction.nurtureCareRoleAssignment.findFirst({
+      where: {
+        workspaceId: input.workspace_id,
+        participantId: input.participant_id,
+        role: "guardian",
+        status: "active",
+        deletedAt: null,
+        OR: [
+          { scopeType: "child_care_process", scopeId: item.childCareProcessId },
+          { scopeType: "family", scopeId: item.familyId },
+          ...(item.enrollmentId
+            ? [{ scopeType: "enrollment" as const, scopeId: item.enrollmentId }]
+            : []),
+        ],
+        AND: [
+          { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+          { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+        ],
+      },
+      orderBy: { id: "asc" },
+    });
+    const grantRow = item.grant;
+    const targetMatches = Boolean(
+      grantRow &&
+        item.enrollment &&
+        ((grantRow.grantedToScopeType === "care_group" &&
+          grantRow.grantedToScopeId === item.careGroupId) ||
+          (grantRow.grantedToScopeType === "enrollment" &&
+            grantRow.grantedToScopeId === item.enrollmentId) ||
+          (grantRow.grantedToScopeType === "institution" &&
+            grantRow.grantedToScopeId === item.enrollment.institutionId)),
+    );
+    const grantCurrent = Boolean(
+      grantRow &&
+        grantRow.status === "active" &&
+        !grantRow.revokedAt &&
+        grantRow.deletedAt === null &&
+        (!grantRow.effectiveFrom || grantRow.effectiveFrom <= now) &&
+        (!grantRow.expiresAt || grantRow.expiresAt > now) &&
+        grantRow.directions.includes("family_to_org") &&
+        grantRow.dataClasses.includes(item.dataClass) &&
+        grantRow.purposes.includes(FAMILY_CARE_PURPOSE) &&
+        targetMatches,
+    );
+    const grant: FamilyCareCurrentGrant = grantRow
+      ? {
+          grant_id: grantRow.id,
+          status: grantCurrent ? "active" : grantRow.status === "revoked" || grantRow.revokedAt ? "revoked" : "missing",
+          directions: grantRow.directions,
+          data_classes: grantRow.dataClasses,
+          purposes: grantRow.purposes,
+          target_scope_type: grantRow.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
+          target_scope_id: grantRow.grantedToScopeId,
+        }
+      : missingGrant;
+    const withdrawalEvent =
+      item.lifecycleState === "closed" && item.lifecycleReason === "family_withdrawn"
+        ? await this.transaction.nurtureFamilyCareItemEvent.findFirst({
+            where: {
+              workspaceId: input.workspace_id,
+              itemId: item.id,
+              eventType: "closed",
+            },
+            orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          })
+        : null;
+    const withdrawalReceipt = withdrawalEvent
+      ? await this.transaction.nurtureChildLinkReceipt.findFirst({
+          where: {
+            workspaceId: input.workspace_id,
+            sourceType: "family_care_item",
+            sourceId: item.id,
+            routingAttemptKey: { startsWith: "g2-withdraw:" },
+          },
+          orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        })
+      : null;
+    return {
+      participant_active: Boolean(participant),
+      item_present: true,
+      writer_contract: item.writerContract,
+      exact_source_author: source?.senderParticipantId === input.participant_id,
+      ...(role ? { current_guardian_role_assignment_id: role.id } : {}),
+      same_side_reachable: Boolean(role),
+      lifecycle_state: item.lifecycleState,
+      ...(item.lifecycleReason ? { lifecycle_reason: item.lifecycleReason } : {}),
+      lifecycle_head: item.lifecycleHead,
+      grant,
+      ...(withdrawalEvent
+        ? {
+            existing_withdrawal_refs: [
+              domainRef("family_care_item", item.id, item.version),
+              domainRef("family_care_item_event", withdrawalEvent.id),
+              ...(withdrawalReceipt
+                ? [domainRef("child_link_receipt", withdrawalReceipt.id, withdrawalReceipt.version)]
+                : []),
+            ],
+          }
+        : {}),
+    };
+  }
+
+  async applyG2Withdrawal(
+    input: FamilyCareTransactionInput<G2WithdrawalApplyInput>,
+  ): Promise<G2WithdrawalApplied> {
+    const item = await this.transaction.nurtureFamilyCareItem.findFirstOrThrow({
+      where: { id: input.item_id, workspaceId: input.workspace_id },
+    });
+    const updated = await this.transaction.nurtureFamilyCareItem.updateMany({
+      where: {
+        id: item.id,
+        workspaceId: input.workspace_id,
+        writerContract: "harness_g2_v1",
+        lifecycleState: "active",
+        lifecycleHead: input.expected_lifecycle_head,
+      },
+      data: {
+        lifecycleState: "closed",
+        lifecycleReason: "family_withdrawn",
+        lifecycleHead: { increment: 1 },
+        status: "closed",
+        closedAt: new Date(),
+        version: { increment: 1 },
+      },
+    });
+    if (updated.count !== 1) throw new Error("G2 withdrawal lifecycle conflict");
+    const event = await this.transaction.nurtureFamilyCareItemEvent.create({
+      data: {
+        workspaceId: input.workspace_id,
+        itemId: item.id,
+        actorParticipantId: input.participant_id,
+        actorRoleAssignmentId: input.current_guardian_role_assignment_id,
+        eventType: "closed",
+        fromStatus: item.status,
+        toStatus: "closed",
+        relatedMessageId: item.sourceMessageId,
+        eventPayload: { lifecycle_reason: "family_withdrawn" },
+      },
+    });
+    const attention = await this.transaction.nurtureTeacherAttentionItem.updateMany({
+      where: {
+        workspaceId: input.workspace_id,
+        sourceType: "family_care_item",
+        sourceId: item.id,
+        status: "active",
+      },
+      data: { status: "resolved", aggregateVersion: { increment: 1 } },
+    });
+    const relatedMessages = await this.transaction.nurtureFamilyCareMessage.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        OR: [
+          ...(item.sourceMessageId ? [{ id: item.sourceMessageId }] : []),
+          { sourceItemId: item.id },
+        ],
+      },
+      select: { id: true },
+    });
+    await this.transaction.nurtureChildLinkReceipt.updateMany({
+      where: {
+        workspaceId: input.workspace_id,
+        sourceType: "family_care_message",
+        sourceId: { in: relatedMessages.map((message) => message.id) },
+        status: "pending",
+      },
+      data: { status: "blocked", reasonCode: "family_withdrawn", version: { increment: 1 } },
+    });
+    const receipt = await this.transaction.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: input.workspace_id,
+        grantId: item.grantId,
+        childCareProcessId: item.childCareProcessId,
+        enrollmentId: item.enrollmentId,
+        direction: "family_to_org",
+        dataClass: item.dataClass,
+        sourceType: "family_care_item",
+        sourceId: item.id,
+        routingAttemptKey: `g2-withdraw:${item.id}:${input.expected_lifecycle_head}`,
+        targetScopeType: "care_group",
+        targetScopeId: item.careGroupId,
+        status: "delivered",
+        deliveredAt: new Date(),
+      },
+    });
+    return {
+      item_ref: domainRef("family_care_item", item.id, item.version + 1),
+      withdrawal_event_ref: domainRef("family_care_item_event", event.id),
+      receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
+      attention_effect: attention.count > 0 ? "resolved" : "unchanged",
+    };
+  }
+
+  async applyG2Redaction(
+    input: FamilyCareTransactionInput<G2RedactMessageApplyInput>,
+  ): Promise<G2RedactMessageApplied> {
+    const message = await this.transaction.nurtureFamilyCareMessage.findFirstOrThrow({
+      where: { id: input.message_id, workspaceId: input.workspace_id },
+    });
+    const sourceItem = await this.transaction.nurtureFamilyCareItem.findFirst({
+      where:
+        message.messageKind === "family_message"
+          ? { workspaceId: input.workspace_id, sourceMessageId: message.id }
+          : message.sourceItemId
+            ? { workspaceId: input.workspace_id, id: message.sourceItemId }
+            : { workspaceId: input.workspace_id, id: "__no_item__" },
+    });
+    const expectedScope = message.messageKind === "family_message" ? "source_question" : "reply_local";
+    if (input.cascade_scope !== expectedScope) throw new Error("G2 redaction scope mismatch");
+    const updated = await this.transaction.nurtureFamilyCareMessage.updateMany({
+      where: {
+        id: message.id,
+        workspaceId: input.workspace_id,
+        writerContract: "harness_g2_v1",
+        status: "sent",
+        aggregateVersion: input.expected_message_version,
+      },
+      data: {
+        status: "redacted",
+        body: null,
+        bodyStorageMode: "redacted",
+        bodyProtectionPayload: Prisma.DbNull,
+        attachmentsPayload: Prisma.DbNull,
+        redactedAt: new Date(),
+        redactedByParticipantId: input.participant_id,
+        redactionReason: input.reason_code,
+        redactionPayload: { reason_code: input.reason_code },
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    if (updated.count !== 1) throw new Error("G2 redaction message conflict");
+
+    const affectedRefs: DomainContextRef[] = [
+      domainRef("family_care_message", message.id, message.aggregateVersion + 1),
+    ];
+    for (;;) {
+      const corrections = await this.transaction.nurtureFamilyCareMessageCorrection.findMany({
+        where: { workspaceId: input.workspace_id, messageId: message.id, status: "active" },
+        orderBy: [{ correctionVersion: "asc" }, { id: "asc" }],
+        take: CASCADE_PAGE_SIZE,
+      });
+      if (corrections.length === 0) break;
+      for (const correction of corrections) {
+        const correctionUpdated = await this.transaction.nurtureFamilyCareMessageCorrection.updateMany({
+          where: { id: correction.id, workspaceId: input.workspace_id, status: "active" },
+          data: { status: "redacted", bodyProtectionPayload: Prisma.DbNull },
+        });
+        if (correctionUpdated.count !== 1) throw new Error("G2 correction redaction conflict");
+        affectedRefs.push(
+          domainRef("family_care_message_correction", correction.id, correction.correctionVersion),
+        );
+      }
+    }
+
+    if (input.cascade_scope === "source_question") {
+      for (;;) {
+        const items = await this.transaction.nurtureFamilyCareItem.findMany({
+          where: {
+            workspaceId: input.workspace_id,
+            sourceMessageId: message.id,
+            writerContract: "harness_g2_v1",
+            lifecycleState: { not: "suppressed" },
+          },
+          orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+          take: CASCADE_PAGE_SIZE,
+        });
+        if (items.length === 0) break;
+        for (const item of items) {
+          const itemUpdated = await this.transaction.nurtureFamilyCareItem.updateMany({
+            where: {
+              id: item.id,
+              workspaceId: input.workspace_id,
+              version: item.version,
+              lifecycleState: item.lifecycleState,
+            },
+            data: {
+              lifecycleState: "suppressed",
+              lifecycleReason: "source_redacted",
+              lifecycleHead: { increment: 1 },
+              status: "suppressed",
+              summary: "Content no longer available.",
+              detail: null,
+              suppressedAt: new Date(),
+              suppressionReason: "source_redacted",
+              version: { increment: 1 },
+            },
+          });
+          if (itemUpdated.count !== 1) throw new Error("G2 redaction item conflict");
+          const event = await this.transaction.nurtureFamilyCareItemEvent.create({
+            data: {
+              workspaceId: input.workspace_id,
+              itemId: item.id,
+              actorParticipantId: input.participant_id,
+              actorRoleAssignmentId: input.actor_role_assignment_id,
+              eventType: "suppressed",
+              fromStatus: item.status,
+              toStatus: "suppressed",
+              relatedMessageId: message.id,
+              eventPayload: { reason_code: input.reason_code },
+            },
+          });
+          affectedRefs.push(
+            domainRef("family_care_item", item.id, item.version + 1),
+            domainRef("family_care_item_event", event.id),
+          );
+          const attentionRows = await this.transaction.nurtureTeacherAttentionItem.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              sourceType: "family_care_item",
+              sourceId: item.id,
+              status: "active",
+            },
+          });
+          for (const attention of attentionRows) {
+            const attentionUpdated = await this.transaction.nurtureTeacherAttentionItem.updateMany({
+              where: {
+                id: attention.id,
+                workspaceId: input.workspace_id,
+                aggregateVersion: attention.aggregateVersion,
+                status: "active",
+              },
+              data: {
+                status: "suppressed",
+                title: "Content no longer available",
+                summary: null,
+                aggregateVersion: { increment: 1 },
+              },
+            });
+            if (attentionUpdated.count !== 1) throw new Error("G2 redaction attention conflict");
+            affectedRefs.push(
+              domainRef("teacher_attention_item", attention.id, attention.aggregateVersion + 1),
+            );
+          }
+        }
+      }
+    }
+
+    for (;;) {
+      const receipts = await this.transaction.nurtureChildLinkReceipt.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          sourceType: "family_care_message",
+          sourceId: message.id,
+          status: { in: ["pending", "delivered", "read", "acknowledged"] },
+        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        take: CASCADE_PAGE_SIZE,
+      });
+      if (receipts.length === 0) break;
+      for (const receipt of receipts) {
+        const visible = receipt.status !== "pending";
+        const receiptUpdated = await this.transaction.nurtureChildLinkReceipt.updateMany({
+          where: {
+            id: receipt.id,
+            workspaceId: input.workspace_id,
+            version: receipt.version,
+            status: receipt.status,
+          },
+          data: {
+            status: visible ? "revoked_after_delivery" : "blocked",
+            reasonCode: "source_redacted",
+            version: { increment: 1 },
+          },
+        });
+        if (receiptUpdated.count !== 1) throw new Error("G2 redaction receipt conflict");
+        affectedRefs.push(domainRef("child_link_receipt", receipt.id, receipt.version + 1));
+      }
+    }
+
+    const finalization: G2RedactionFinalization = {
+      cascade_audit_id: input.cascade_audit_id,
+      root_message_id: message.id,
+      cascade_scope: input.cascade_scope,
+      affected_refs: affectedRefs,
+    };
+    const finalSourceItem = sourceItem
+      ? await this.transaction.nurtureFamilyCareItem.findFirstOrThrow({
+          where: { id: sourceItem.id, workspaceId: input.workspace_id },
+        })
+      : null;
+    return {
+      message_ref: domainRef("family_care_message", message.id, message.aggregateVersion + 1),
+      ...(finalSourceItem
+        ? {
+            item_ref: domainRef(
+              "family_care_item",
+              finalSourceItem.id,
+              finalSourceItem.version,
+            ),
+          }
+        : {}),
+      cascade_audit_ref: domainRef("family_care_cascade_audit", input.cascade_audit_id),
+      affected_refs: affectedRefs,
+      finalization,
+    };
+  }
+
+  async finalizeG2Redaction(
+    input: FamilyCareTransactionInput<G2RedactionFinalization> & {
+      command_execution_id: string;
+    },
+  ): Promise<void> {
+    await this.transaction.nurtureFamilyCareCascadeAudit.create({
+      data: {
+        id: input.cascade_audit_id,
+        workspaceId: input.workspace_id,
+        rootMessageId: input.root_message_id,
+        cascadeScope: input.cascade_scope,
+        closureState: "complete",
+        affectedRefsPayload: asJson({ schema_version: 1, affected_refs: input.affected_refs }),
+        commandExecutionId: input.command_execution_id,
+      },
+    });
   }
 
   async loadFamilyCareItemActionFacts(input: FamilyCareTransactionInput<FamilyCareItemActionPayload>): Promise<FamilyCareItemActionFacts> {

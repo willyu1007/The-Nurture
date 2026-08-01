@@ -1,6 +1,9 @@
 import { createHmac } from "node:crypto";
 import type { ProtectedContentEnvelopeV1, ProtectedContentWritePort } from "./protected-content.js";
-import { issueCareItemTargetRef } from "./keyed-refs.js";
+import {
+  issueCareItemTargetRef,
+  issueFamilyCareMessageTargetRef,
+} from "./keyed-refs.js";
 
 /**
  * G2 query lane (09-capability-query-contract.md): role-safe read-only
@@ -113,12 +116,15 @@ export type RawTimelineMessageRow = {
   enrollment_id: string;
   message_kind: "family_message" | "caregiver_reply";
   redacted: boolean;
+  corrected: boolean;
   occurred_at: string;
   body_envelope?: unknown;
+  correction_body_envelope?: unknown;
   source_label: string;
   acknowledgement_state: "pending" | "acknowledged";
   response_state: "awaiting_reply" | "responded" | "not_applicable";
   lifecycle_state: "active" | "closed" | "suppressed";
+  lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
   receipt?: { receipt_id: string; direction: "family_to_org" | "org_to_family"; logical_status: string; occurred_at: string };
   continuation_source_item_id?: string;
   continuation_source_readable?: boolean;
@@ -145,14 +151,19 @@ export type RawItemDetail = {
   acknowledgement_state: "pending" | "acknowledged";
   response_state: "awaiting_reply" | "responded" | "not_applicable";
   lifecycle_state: "active" | "closed" | "suppressed";
+  lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
   reply_count: number;
   content_readable: boolean;
   messages: Array<{
     message_id: string;
     message_kind: "family_message" | "caregiver_reply";
     redacted: boolean;
+    corrected: boolean;
+    exact_author: boolean;
+    correction_allowed: boolean;
     occurred_at: string;
     body_envelope?: unknown;
+    correction_body_envelope?: unknown;
   }>;
   receipts: Array<{
     receipt_id: string;
@@ -214,7 +225,7 @@ export type RoleSafeFamilyCareStateV1 = {
 };
 
 export type GuardianFamilyCareTimelineItemV1 = {
-  kind: "source_question" | "caregiver_reply" | "redaction_tombstone";
+  kind: "source_question" | "caregiver_reply" | "correction_notice" | "redaction_tombstone";
   itemRef: string;
   careItemRef: string;
   enrollmentRef: string;
@@ -268,7 +279,7 @@ export type FamilyCareItemDetailOutputV1 = {
   provenance: { enrollmentRef: string; sourceLabel: string; direction: "family_to_org" };
   progress: RoleSafeFamilyCareStateV1 & { replyCount: number };
   messages: Array<{
-    kind: "source_question" | "caregiver_reply" | "redaction_tombstone";
+    kind: "source_question" | "caregiver_reply" | "correction_notice" | "redaction_tombstone";
     messageRef: string;
     authoredAs: "family" | "care_group";
     occurredAt: string;
@@ -320,10 +331,12 @@ const parsePage = (
 };
 
 const timelineKind = (
-  row: Pick<RawTimelineMessageRow, "message_kind" | "redacted">,
+  row: Pick<RawTimelineMessageRow, "message_kind" | "redacted" | "corrected">,
 ): GuardianFamilyCareTimelineItemV1["kind"] =>
   row.redacted
     ? "redaction_tombstone"
+    : row.corrected
+      ? "correction_notice"
     : row.message_kind === "family_message"
       ? "source_question"
       : "caregiver_reply";
@@ -382,7 +395,10 @@ export const queryGuardianFamilyCareTimeline = async (
         ...(row.redacted
           ? {}
           : (() => {
-              const content = unsealOrTombstone(deps, row.body_envelope);
+              const content = unsealOrTombstone(
+                deps,
+                row.correction_body_envelope ?? row.body_envelope,
+              );
               return content ? { content } : {};
             })()),
         state: {
@@ -549,6 +565,39 @@ const caregiverActions = (
   ];
 };
 
+const messageLifecycleActions = (
+  deps: FamilyCareQueryDependencies,
+  scope: { workspace_id: string; participant_id: string },
+  message: Pick<
+    RawItemDetail["messages"][number],
+    "message_id" | "redacted" | "exact_author" | "correction_allowed"
+  >,
+): CapabilityActionRefV1[] => {
+  if (message.redacted || !message.exact_author) return [];
+  const targetOptionRef = issueFamilyCareMessageTargetRef(deps.integrity_key, {
+    ...scope,
+    message_id: message.message_id,
+  });
+  return [
+    ...(message.correction_allowed
+      ? [
+          {
+            capabilityKey: "correct_family_care_message",
+            capabilityVersion: "1.0.0",
+            targetOptionRef,
+            availability: "available" as const,
+          },
+        ]
+      : []),
+    {
+      capabilityKey: "redact_family_care_message",
+      capabilityVersion: "1.0.0",
+      targetOptionRef,
+      availability: "available",
+    },
+  ];
+};
+
 export const queryFamilyCareItemDetail = async (
   deps: FamilyCareQueryDependencies,
   request: {
@@ -590,7 +639,10 @@ export const queryFamilyCareItemDetail = async (
         ...(message.redacted || !detail.content_readable
           ? {}
           : (() => {
-              const content = unsealOrTombstone(deps, message.body_envelope);
+              const content = unsealOrTombstone(
+                deps,
+                message.correction_body_envelope ?? message.body_envelope,
+              );
               return content ? { content } : {};
             })()),
       })),
@@ -612,14 +664,36 @@ export const queryFamilyCareItemDetail = async (
             },
           }
         : {}),
-      actions:
-        detail.projection_role === "caregiver"
+      actions: [
+        ...(detail.projection_role === "caregiver"
           ? caregiverActions(deps, scope, {
               item_id: detail.item_id,
               acknowledgement_state: detail.acknowledgement_state,
               lifecycle_state: detail.lifecycle_state,
             })
-          : [],
+          : detail.messages[0]?.exact_author &&
+              (detail.lifecycle_state === "active" ||
+                (detail.lifecycle_state === "closed" &&
+                  detail.lifecycle_reason === "family_withdrawn"))
+            ? [
+                {
+                  capabilityKey: "withdraw_family_care_request",
+                  capabilityVersion: "1.0.0",
+                  targetOptionRef: issueCareItemTargetRef(deps.integrity_key, {
+                    ...scope,
+                    item_id: detail.item_id,
+                  }),
+                  availability:
+                    detail.lifecycle_state === "closed"
+                      ? ("already_satisfied" as const)
+                      : ("available" as const),
+                },
+              ]
+            : []),
+        ...detail.messages.flatMap((message) =>
+          messageLifecycleActions(deps, scope, message),
+        ),
+      ],
     },
   };
 };

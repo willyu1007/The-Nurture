@@ -1,14 +1,15 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-01T08:53:37.672Z",
+  "generatedAt": "2026-08-01T14:42:33.925Z",
   "sourceOpenapi": "docs/context/api/openapi.yaml",
-  "sourceChecksumSha256": "da1f6244c32a35d8d369231f93da53d750e78a71555fcd3ca6f73abb05a31173",
+  "sourceChecksumSha256": "6e80c3402bc0be1e9d9d8ddb0cd6e695a0f15163068732f63f1acf983c66eeda",
   "stats": {
-    "totalEndpoints": 6,
+    "totalEndpoints": 7,
     "byTag": {
       "service": 1,
       "binding-owner": 1,
-      "harness": 4
+      "harness": 4,
+      "institution-owner-read": 1
     }
   },
   "endpoints": [
@@ -180,6 +181,7 @@
           "business_outcome",
           "execution_ref",
           "output_refs",
+          "committed_result",
           "decision",
           "reason_code",
           "recovery"
@@ -274,6 +276,45 @@
       ],
       "example": {
         "curl": "curl -X POST '/internal/nurture/harness/read-result' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"command_request_id\":\"<command_request_id>\"}'"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/internal/nurture/institution/business-communications:read",
+      "operationId": "readInstitutionBusinessCommunication",
+      "summary": "Read one disclosed Institution business communication",
+      "tag": "institution-owner-read",
+      "auth": "bearer",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": {
+          "required": [
+            "workspace_id",
+            "actor_participant_id",
+            "surface",
+            "interface_contract",
+            "target_option_ref"
+          ],
+          "optional": []
+        }
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "status",
+          "output",
+          "reason_code"
+        ]
+      },
+      "errors": [
+        400,
+        401,
+        408,
+        503
+      ],
+      "example": {
+        "curl": "curl -X POST '/internal/nurture/institution/business-communications:read' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"interface_contract\":\"<interface_contract>\",\"target_option_ref\":\"<target_option_ref>\"}'"
       }
     }
   ]

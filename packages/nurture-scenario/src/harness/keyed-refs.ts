@@ -8,6 +8,7 @@ import { createHmac } from "node:crypto";
  */
 const OPTION_REF_VERSION = "1";
 const ITEM_REF_VERSION = "1";
+const MESSAGE_REF_VERSION = "1";
 
 /**
  * Keyed body digest used inside the canonical command payload so neither the
@@ -74,6 +75,35 @@ export const resolveCareItemTargetRef = (
   const parts = ref.split(".");
   if (parts.length !== 3 || parts[0] !== ITEM_REF_VERSION || !parts[1]) return null;
   return issueCareItemTargetRef(integrityKey, { ...scope, item_id: parts[1] }) === ref
+    ? parts[1]
+    : null;
+};
+
+export const issueFamilyCareMessageTargetRef = (
+  integrityKey: string,
+  scope: { workspace_id: string; participant_id: string; message_id: string },
+): string => {
+  const tag = createHmac("sha256", integrityKey)
+    .update(
+      `nurture.family-care-message-target.v${MESSAGE_REF_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${scope.message_id}`,
+      "utf8",
+    )
+    .digest("hex")
+    .slice(0, 32);
+  return `${MESSAGE_REF_VERSION}.${scope.message_id}.${tag}`;
+};
+
+export const resolveFamilyCareMessageTargetRef = (
+  integrityKey: string,
+  scope: { workspace_id: string; participant_id: string },
+  ref: string,
+): string | null => {
+  const parts = ref.split(".");
+  if (parts.length !== 3 || parts[0] !== MESSAGE_REF_VERSION || !parts[1]) return null;
+  return issueFamilyCareMessageTargetRef(integrityKey, {
+    ...scope,
+    message_id: parts[1],
+  }) === ref
     ? parts[1]
     : null;
 };

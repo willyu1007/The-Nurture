@@ -54,7 +54,11 @@ export async function createScenarioServiceApplication(input?: {
     });
   const harnessRuntime =
     input?.harnessRuntime ??
-    createHarnessRuntime({ serviceAuth: bindingOwnerServiceAuth });
+    createHarnessRuntime({
+      serviceAuth: bindingOwnerServiceAuth,
+      institutionBusinessCommunicationReadEnabled:
+        config.institutionBusinessCommunicationReadEnabled,
+    });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       bindingOwner: {

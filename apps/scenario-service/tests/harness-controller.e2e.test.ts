@@ -1,11 +1,13 @@
 import type { AddressInfo } from "node:net";
 import { afterEach, describe, expect, it } from "vitest";
+import { INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE } from "@the-nurture/scenario/harness";
 import { createScenarioServiceApplication } from "../src/application.js";
 import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
 import { HarnessRuntime, type HarnessEngine } from "../src/harness-runtime.js";
 import {
   HARNESS_EXECUTE_PATH,
   HARNESS_PREPARE_PATH,
+  INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH,
 } from "../src/harness-http.js";
 
 const TOKEN = "harness-e2e-service-token-32-characters";
@@ -30,14 +32,24 @@ const fakeEngine = (overrides: Partial<HarnessEngine>): HarnessEngine => ({
   readResult: async () => {
     throw new Error("readResult must not run");
   },
+  readInstitutionBusinessCommunication: async () => {
+    throw new Error("readInstitutionBusinessCommunication must not run");
+  },
   ...overrides,
 });
 
-const start = async (engine?: HarnessEngine) => {
+const start = async (
+  engine?: HarnessEngine,
+  institutionBusinessCommunicationReadEnabled = false,
+) => {
   const serviceAuth = createBindingOwnerServiceAuth(TOKEN);
   const { app } = await createScenarioServiceApplication({
     bindingOwnerServiceAuth: serviceAuth,
-    harnessRuntime: new HarnessRuntime(engine),
+    harnessRuntime: new HarnessRuntime(
+      engine,
+      undefined,
+      institutionBusinessCommunicationReadEnabled,
+    ),
     logSink: () => undefined,
   });
   await app.listen(0, "127.0.0.1");
@@ -67,6 +79,34 @@ const prepareBody = {
 };
 
 describe("Harness controller boundary", () => {
+  it("keeps the protected Institution Admin owner-read default-off", async () => {
+    let calls = 0;
+    const baseUrl = await start(
+      fakeEngine({
+        readInstitutionBusinessCommunication: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+      }),
+    );
+    const response = await post(
+      baseUrl,
+      INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH,
+      {
+        workspace_id: "ws-1",
+        actor_participant_id: "participant-1",
+        surface: "admin",
+        interface_contract: INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE,
+        target_option_ref: `1.${Buffer.from("message-id").toString("base64url")}.${"0".repeat(32)}`,
+      },
+    );
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({
+      error: "institution_business_communication_read_disabled",
+    });
+    expect(calls).toBe(0);
+  });
+
   it("stays disabled without an engine", async () => {
     const baseUrl = await start(undefined);
     const response = await post(baseUrl, HARNESS_PREPARE_PATH, prepareBody);

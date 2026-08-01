@@ -371,3 +371,33 @@
 | 2026-08-01 | `verify-workflow-contract-pin`:parity `8dd53be4…`、`x5_joint_api` `89a61355…`(169 files)、`wave4_binding_host` `960afb2c…`(20 files)、self-pin `b2c53eb7…`(57 files) | PASS(与已推 pin 一致) |
 | 2026-08-01 | disposable pgvector PG(127.0.0.1:5437,tmpfs):`x5_my_chat` 走 pinned My-Chat 迁移、`x5_nurture` 与 `nurture_dev_host` 走 Nurture 迁移;运行后连同 worktree 一并销毁 | PASS |
 | 2026-08-01 | `pnpm test:x5` | PASS 4/4(M5 acceptance + 三条 G1 joint negatives);覆盖本轮改动的 revoke 级联(闭包循环 + 三轴同步)与 kernel 三态,无回归 |
+
+## G2-B lifecycle + Institution Admin owner-read — 2026-08-01
+
+| Check | Result |
+| --- | --- |
+| first scenario/DB/service typecheck | Initial FAIL: local generated Prisma client was stale and did not contain already-migrated G2 fields; `pnpm exec prisma generate --schema prisma/schema.prisma` refreshed only generated client code (no DB connection/apply), then all three package checks passed |
+| `pnpm test:unit` | PASS 29 files / 266 tests |
+| `pnpm test:db` on clean disposable migrated PostgreSQL | PASS 13 files / 86 tests |
+| `pnpm --filter @the-nurture/scenario-service test` | PASS 8 files / 49 tests; includes exact boolean config, protected route default-off, bearer/parser/controller boundary |
+| `pnpm test:scenario-service:db` final run | PASS 2 files / 17 tests; `harness.db.e2e` 11/11 includes correction race/replay, withdrawal convergence/history, author/policy redaction, 105+105 closure, reply-local behavior and Admin exact owner-read matrix |
+| `pnpm test:dev-host` | PASS 11 files / 26 tests |
+| package typechecks: scenario / DB / scenario-service / scenario-service DB | PASS |
+| root `pnpm typecheck` | EXTERNAL BLOCK: sibling My-Chat current worktree fails its own `AuditAction` union at `packages/db/src/growth-record-repository.ts:646`; no Nurture package diagnostic remains |
+| `pnpm verify:surface-conformance` | PASS; exact shared interface remains `nurture.surface-contract@1.7.0` / `sha256:b7691a81…`, schemas 37, slices 25/25, negatives 7, synthetic qualification 56/56 |
+| `pnpm verify:formal-ingress-contract` | PASS `routes=7 owner-fields=8 harness-actions=7 harness-execute-fields=8 institution-owner-read-fields=5` |
+| OpenAPI/API index generate + strict verify; context touch + strict verify | PASS; API index 7 endpoints, checksum `6e80c340…`; context checksums current |
+| env-contract validate/generate + environment suite | PASS; additive bool default `false`, no values/secret change, generated example/docs/context refreshed |
+| `verify:test-routing` / `verify:persistence-boundaries` / `verify:port-topology` | PASS; 64 files = 29 unit / 13 production DB / 11 dev-host / 10 scenario-service / 1 x5; persistence isolation and ports unchanged |
+| `pnpm verify:workflow-contract-pin` on live siblings | EXTERNAL BLOCK: current Base checkout is `8649e0e`, not frozen `06303e9`; W0 exact-pin evidence remains authoritative and no sibling checkout was changed |
+| built scenario-service smoke | Initial FAIL after source passed because `harness-http` imported the package root whose runtime export points to TS; fixed to the built `@the-nurture/scenario/harness` subpath. Final PASS: health, binding-owner disabled, Harness disabled, legacy route absent |
+| env/governance/diff | PASS: environment suite, `sync --apply`, governance lint and `git diff --check` |
+| documentation lint | PASS strict + anchor checks: task bundle 18/18, context 8/8, docs 16/16; 0 errors / 0 warnings |
+| disposable database effect boundary | PASS: no persistent DB apply; every temporary PostgreSQL was stopped and moved to Trash after the run |
+
+Checkpoint evidence and stable AC IDs `T005-AC-036..049` are recorded in
+`12-g2b-checkpoint-record.md`. Provider interface pin:
+`nurture.institution-business-communication-owner-read@1.0.0` /
+`sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921`.
+The environment gate remains default `false`; no consumer adoption,
+activation or traffic is claimed.

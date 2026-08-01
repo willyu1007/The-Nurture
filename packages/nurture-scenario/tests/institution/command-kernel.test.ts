@@ -141,6 +141,41 @@ describe("NurtureCommandRunner", () => {
     });
   });
 
+  it("returns the immutable committed result on exact replay", async () => {
+    const repository = createInMemoryNurtureCommandRepository();
+    const commandSpec: NurtureCommandSpec<{ value: number }> = {
+      ...spec(() => undefined),
+      apply: async () => ({
+        output_refs: [outputRef()],
+        result_schema_version: 1,
+        committed_result: {
+          capability_key: "test.apply",
+          historical_effect: "original",
+        },
+      }),
+    };
+
+    const first = await command(repository, commandSpec);
+    const replay = await command(repository, commandSpec);
+
+    expect(first).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      committed_result: {
+        capability_key: "test.apply",
+        historical_effect: "original",
+      },
+    });
+    expect(replay).toMatchObject({
+      status: "ok",
+      disposition: "replayed",
+      committed_result: {
+        capability_key: "test.apply",
+        historical_effect: "original",
+      },
+    });
+  });
+
   it("requires a valid claimed Step before activation without consuming command identity", async () => {
     let effects = 0;
     const repository = createInMemoryNurtureCommandRepository();

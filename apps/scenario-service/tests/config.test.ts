@@ -12,6 +12,7 @@ describe("scenario-service configuration", () => {
       port: 8000,
       bodyLimitBytes: 65_536,
       requestTimeoutMs: 5_000,
+      institutionBusinessCommunicationReadEnabled: false,
     });
   });
 
@@ -21,10 +22,22 @@ describe("scenario-service configuration", () => {
     [{ PORT: "0" }, "PORT"],
     [{ PORT: "65536" }, "PORT"],
     [{ PORT: "not-a-port" }, "PORT"],
+    [
+      { NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED: "TRUE" },
+      "NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED",
+    ],
   ])("fails fast for invalid non-secret config", (env, field) => {
     expect(() => loadScenarioServiceConfig(env)).toThrow(
       `Invalid scenario-service configuration: ${field}`,
     );
+  });
+
+  it("loads the protected Admin owner-read gate only from an exact true literal", () => {
+    expect(
+      loadScenarioServiceConfig({
+        NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED: "true",
+      }).institutionBusinessCommunicationReadEnabled,
+    ).toBe(true);
   });
 
   it("does not expose optional owner secrets through the config object", () => {

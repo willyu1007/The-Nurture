@@ -548,9 +548,12 @@ Enrollment 始终排除。投影不复制受保护正文到 My-Chat 或园区本
 原有 exact authority。后续 AI attention candidate 也只能在同一读取范围内引用来源，
 不能自动执行、诊断、归责或评分。
 
-这是对当前 presenter/owner-read 的 additive、security-sensitive interface change。
-当前 manifest/module/source 仅提供 display-safe item / opaque ref，尚未实现本投影；
-必须使用新的 versioned interface/digest、受保护 carrier 与完整负向测试后才能启用。
+这是对 presenter/owner-read 的 additive、security-sensitive interface change。
+G2-B provider 已通过 formal private ingress 实现 exact
+`nurture.institution-business-communication-owner-read@1.0.0` / digest、
+service-auth no-store carrier、request-time source policy 与完整负向测试；它不进入
+shared manifest/surface registry，也不授予 action。独立环境 gate 仍默认 `false`，
+只有 T-007 consumer composition/adoption 与 joint qualification 完成后才可启用。
 
 ## Authorization
 

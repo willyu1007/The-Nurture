@@ -4,7 +4,7 @@
     "prod",
     "staging"
   ],
-  "generated_at_utc": "2026-08-01T06:21:53Z",
+  "generated_at_utc": "2026-08-01T14:25:08Z",
   "ssot_mode": "repo-env-contract",
   "variables": {
     "APP_ENV": {
@@ -148,6 +148,23 @@
       "secret_ref": "nurture_harness_integrity_key",
       "state": "active",
       "type": "string"
+    },
+    "NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED": {
+      "default": false,
+      "deprecate_after": null,
+      "description": "Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption.",
+      "legacy": {
+        "deprecated": false,
+        "replaced_by": null
+      },
+      "migration": null,
+      "replacement": null,
+      "required": false,
+      "scopes": null,
+      "secret": false,
+      "secret_ref": null,
+      "state": "active",
+      "type": "bool"
     },
     "NURTURE_INTERNAL_SERVICE_TOKEN": {
       "default": null,

@@ -700,3 +700,40 @@
   sibling 仓库 status 干净。
 - 本轮教训已归档到 `05-pitfalls.md`(冻结≠约束、作用域放大、测试自我掩盖、
   错误分类不能一刀切、schema 列无 writer、声明需有证据、固定 take 级联)。
+
+## 2026-08-01 — G2-B lifecycle and owner-read completion
+
+- 在既有 Harness kernel 上增加 transaction-local `afterExecutionCreated` hook：
+  correction 与 cascade audit 的强 FK 必须指向本次 immutable
+  `CommandExecution`，因此 domain effect、Execution create 与 finalizer 保持在
+  同一 transaction；finalizer 失败整笔回滚，不引入事后补写窗口。
+- 修复 exact replay：kernel 现在把已持久化的 `committedResultPayload` 原样返回；
+  `already_satisfied` precondition 也可提供 schema/versioned body-free result，
+  withdrawal/redaction/ack convergence 不再产生无 typed result 的 Execution。
+- `correct_family_care_message` 使用 exact sender + current same-side role、active
+  original Grant/lifecycle、strict Message/correction head；追加 encrypted correction、
+  独立 Receipt/Event，原 Message 正文与历史不覆盖，presenter 默认显示最新有效解释。
+- `withdraw_family_care_request` 使用 exact family source author；提交
+  `closed(family_withdrawn)`、resolve active Attention、block pending related
+  receipts，并使后续 ack/reply 在 current owner reread 时 `target_unavailable`；
+  新 command 与 exact retry 都收敛到同一证据。
+- author redaction 与 system-policy redaction 使用不同 capability/actor kind；author
+  只需 exact author + current same-side reach，不借 original Grant 拒绝作者移除自身
+  内容。source cascade 抹除 source correction chain、suppresses Item/Attention、
+  terminalizes receipts；reply cascade 只影响该 reply/correction/receipt，不回退
+  response、不重开 Attention。所有分页以 100 行扫描并循环至无残留；任一步冲突
+  即 rollback，完成后写 `CascadeAudit(complete, CommandExecution FK)`。
+- role-safe timeline/detail 增加 latest correction、correction notice、redaction
+  tombstone 与 action refs；author/withdraw/correction/redaction refs 均 actor-bound，
+  runtime execute 只从 consumed confirmation 重建 target/heads。
+- 新增 provider-only
+  `nurture.institution-business-communication-owner-read@1.0.0`，digest
+  `sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921`。
+  每次读取重验 current exact Institution Admin、Institution/Enrollment/CareGroup、
+  original current Grant、direction/data class/purpose、closed pre-send disclosure 与
+  current correction/withdrawal/redaction lifecycle；输出只有 opaque display refs、
+  当前 protected body/tombstone、空附件和 `actions: []`。carrier 使用 service bearer
+  与 `private, no-store`，且独立 env gate 默认 `false`；T-007 consumer adoption 未做。
+- 正式 API 增至七路由，OpenAPI/API index/ingress census 同步。环境开关通过
+  `env/contract.yaml` SSOT、typed config、生成文档与 environment suite 管理；无
+  secret、无 committed env value、无 activation/traffic。

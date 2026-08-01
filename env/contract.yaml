@@ -65,6 +65,11 @@ variables:
     secret: true
     secret_ref: nurture_protected_content_key
     description: AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext.
+  NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED:
+    type: bool
+    required: false
+    default: false
+    description: Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption.
   MY_CHAT_INTERNAL_BASE_URL:
     type: url
     required: false

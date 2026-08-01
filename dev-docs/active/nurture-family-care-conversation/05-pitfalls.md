@@ -135,7 +135,7 @@
 
 ## Resolved Pitfalls
 
-当前尚未进入实现阶段。实际问题解决后按完整历史结构记录。
+以下按实现阶段持续追加已解决问题；这里不是当前 blocker 清单。
 
 ## G2 实施期的已解决教训(2026-08-01)
 
@@ -170,3 +170,34 @@
 - **固定 `take` 上限的级联是原子性缺陷,不是性能取舍。** revoke 级联沿用
   T-002 的 `take:100`,超出部分静默不处理却照常提交(冻结 D5 早已点名)。
   已改为分页循环至闭包、超界整笔失败。
+
+## G2-B 实施期的已解决教训(2026-08-01)
+
+- **生成 client 也会形成“假类型错误”。** 症状：G2-B 首次类型检查声称 Prisma
+  中连既有 G2-A 字段都不存在。根因：migration/schema 已落地，但本地 generated
+  client 仍是旧快照。尝试直接改业务类型会扩大错误；实际只运行
+  `prisma generate`（无 DB 连接/apply）即恢复。预防：schema/migration 已存在而
+  generated types 大面积缺旧字段时，先校验 client 生成时间与 schema hash。
+- **FK 指向本次 Execution 时，不能把审计补写放到事务后。** 症状：correction /
+  cascade audit 需要 non-null Execution FK，但 domain effect 发生时 Execution 尚未
+  create。根因是 kernel 缺少 transaction-local finalization seam。尝试允许 nullable
+  或事后 patch 都会制造部分提交窗口；修复为 `afterExecutionCreated`，在同一事务内
+  create Execution 后绑定 correction/audit，失败则整笔回滚。预防：遇到“本次
+  Execution FK”先画清事务内写入顺序，不用最终一致性代替原子性。
+- **清理看似未使用的 cascade 常量会破坏旧路径。** 症状：全套构建报
+  `CASCADE_MAX_PAGES` 未定义。根因是只检查了新 redaction 循环，漏看同文件旧
+  grant-revoke 两处仍用该上限作为“达到即抛错回滚”的安全界。修复是恢复常量并
+  区分注释：旧路径有高上限但绝不部分提交；G2-B redaction 无固定页数、直接闭包。
+  预防：机械删除常量前必须 `rg` 全文件引用，尤其同仓库多代路径共存时。
+- **源码测试通过不代表 built export 能启动。** 症状：TS/Vitest 全绿，正式
+  scenario-service smoke 却因 Node 尝试加载 package root 的 `src/index.ts` 报未知
+  `.ts` 扩展。根因：新 HTTP 模块从 package root 导入运行时常量，而该 package 的
+  built runtime contract 是 `./harness` 条件导出。修复为统一从
+  `@the-nurture/scenario/harness` 导入并重建产物。预防：新增跨 package runtime
+  import 后必须跑 built-artifact smoke，不只跑源码测试。
+- **live sibling 不是 frozen pin。** 症状：Nurture 包级检查全部通过，但 aggregate
+  typecheck 被 My-Chat 当前分支自己的 `AuditAction` 漂移阻断，live pin verifier 也
+  看到 Base 已从 `06303e9` 移到 `8649e0e`。根因是本地 sibling 工作副本继续开发，
+  不是 W0 固定物化。未修改/重置 sibling；本 checkpoint 使用包级检查、surface
+  exact digest 和 W0 pinned evidence。预防：联合资格化必须物化 pinned detached
+  checkout，live sibling 只能作便利开发输入，不能冒充 adoption evidence。

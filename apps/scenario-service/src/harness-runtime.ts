@@ -3,23 +3,33 @@ import {
   NurtureCommandRunner,
   NurtureInteractionContextService,
   createAcknowledgeFamilyCareItemSpec,
+  createCorrectFamilyCareMessageSpec,
+  createRedactFamilyCareMessageSpec,
   createReplyFamilyCareItemSpec,
   createSubmitFamilyCareQuestionSpec,
+  createWithdrawFamilyCareRequestSpec,
   hashCommandRequestId,
   hashScenarioToken,
   parseHarnessConfirmationPayloadV2,
+  parseCorrectFamilyCareMessageInputV1,
   parseReplyFamilyCareItemInputV1,
   parseSubmitFamilyCareQuestionInputV1,
   prepareAcknowledgeFamilyCareItem,
+  prepareCorrectFamilyCareMessage,
+  preparePolicyRedactFamilyCareMessage,
+  prepareRedactFamilyCareMessage,
   prepareReplyFamilyCareItem,
   prepareSubmitFamilyCareQuestion,
+  prepareWithdrawFamilyCareRequest,
   queryCaregiverFamilyCareWork,
   queryFamilyCareItemDetail,
   queryGuardianFamilyCareTimeline,
+  readInstitutionBusinessCommunication,
   resolveCareItemTargetRef,
   withHarnessConfirmation,
   type HarnessConfirmationPayloadV2,
   type ItemActionPrepareDecision,
+  type LifecyclePrepareDecision,
   type NurtureCommandSpec,
   type SubmitPrepareDecision,
 } from "@the-nurture/scenario/harness";
@@ -27,6 +37,7 @@ import {
   PrismaFamilyCareCommandTransaction,
   PrismaFamilyCareHarnessQueryReadPort,
   PrismaInteractionContextRepository,
+  PrismaInstitutionBusinessCommunicationReadPort,
   PrismaNurtureCommandRepository,
   PrismaSubmitEligibilityReadPort,
   createAesGcmProtectedContentPort,
@@ -44,6 +55,8 @@ import {
   type HarnessQueryRequestV1,
   type HarnessQueryResponseV1,
   type HarnessReadResultRequestV1,
+  type InstitutionBusinessCommunicationReadRequestV1,
+  type InstitutionBusinessCommunicationReadResponseV1,
 } from "./harness-http.js";
 
 const PROTECTED_CONTENT_KEY_REF = "nurture-protected-content-v1";
@@ -53,12 +66,16 @@ export type HarnessEngine = {
   execute(request: HarnessExecuteRequestV1): Promise<HarnessExecuteResponseV1>;
   query(request: HarnessQueryRequestV1): Promise<HarnessQueryResponseV1>;
   readResult(request: HarnessReadResultRequestV1): Promise<HarnessQueryResponseV1>;
+  readInstitutionBusinessCommunication(
+    request: InstitutionBusinessCommunicationReadRequestV1,
+  ): Promise<InstitutionBusinessCommunicationReadResponseV1>;
 };
 
 export class HarnessRuntime implements OnApplicationShutdown {
   constructor(
     readonly engine: HarnessEngine | undefined,
     private readonly ownedDatabaseClient?: Pick<NurturePrismaClient, "$disconnect">,
+    readonly institutionBusinessCommunicationReadEnabled = false,
   ) {}
 
   async onApplicationShutdown(): Promise<void> {
@@ -76,8 +93,15 @@ export function createHarnessRuntime(input: {
   env?: NodeJS.ProcessEnv;
   serviceAuth: BindingOwnerServiceAuth;
   engine?: HarnessEngine;
+  institutionBusinessCommunicationReadEnabled?: boolean;
 }): HarnessRuntime {
-  if (input.engine) return new HarnessRuntime(input.engine);
+  if (input.engine) {
+    return new HarnessRuntime(
+      input.engine,
+      undefined,
+      input.institutionBusinessCommunicationReadEnabled ?? false,
+    );
+  }
 
   const env = input.env ?? process.env;
   const integrityKey = env.NURTURE_HARNESS_INTEGRITY_KEY;
@@ -98,6 +122,7 @@ export function createHarnessRuntime(input: {
   return new HarnessRuntime(
     createHarnessEngine({ prisma, integrityKey, contentKey }),
     prisma,
+    input.institutionBusinessCommunicationReadEnabled ?? false,
   );
 }
 
@@ -113,6 +138,8 @@ export function createHarnessEngine(input: {
   const submitEligibility = new PrismaSubmitEligibilityReadPort(input.prisma);
   const factsPort = new PrismaFamilyCareCommandTransaction(input.prisma);
   const queryReads = new PrismaFamilyCareHarnessQueryReadPort(input.prisma);
+  const institutionBusinessCommunicationReads =
+    new PrismaInstitutionBusinessCommunicationReadPort(input.prisma);
   const protectedContent = createAesGcmProtectedContentPort({
     keyRef: PROTECTED_CONTENT_KEY_REF,
     keyMaterial: input.contentKey,
@@ -126,9 +153,16 @@ export function createHarnessEngine(input: {
     protected_content: protectedContent,
     integrity_key: input.integrityKey,
   });
+  const correctSpec = createCorrectFamilyCareMessageSpec({
+    protected_content: protectedContent,
+    integrity_key: input.integrityKey,
+  });
+  const withdrawSpec = createWithdrawFamilyCareRequestSpec();
+  const redactSpec = createRedactFamilyCareMessageSpec("author");
+  const policyRedactSpec = createRedactFamilyCareMessageSpec("policy");
 
   const toPrepareResponse = (
-    decision: SubmitPrepareDecision | ItemActionPrepareDecision,
+    decision: SubmitPrepareDecision | ItemActionPrepareDecision | LifecyclePrepareDecision,
   ): HarnessPrepareResponseV1 => {
     // Internal raw target ids (enrollment_id / item_id) never leave the
     // service; execute recovers the exact target from the confirmation.
@@ -171,22 +205,42 @@ export function createHarnessEngine(input: {
       if (!request.target_option_ref) {
         return { status: "needs_input", fields: ["target_option_ref"] };
       }
-      const itemRequest = {
+      const targetRequest = {
         ...shared,
         target_option_ref: request.target_option_ref,
         operation_input: request.operation_input,
       };
-      return toPrepareResponse(
-        request.capability_key === "acknowledge_family_care_item"
-          ? await prepareAcknowledgeFamilyCareItem(
-              { facts: factsPort, contexts, integrity_key: input.integrityKey },
-              itemRequest,
-            )
-          : await prepareReplyFamilyCareItem(
-              { facts: factsPort, contexts, integrity_key: input.integrityKey },
-              itemRequest,
-            ),
-      );
+      const lifecycleDeps = {
+        facts: factsPort,
+        contexts,
+        integrity_key: input.integrityKey,
+      };
+      switch (request.capability_key) {
+        case "acknowledge_family_care_item":
+          return toPrepareResponse(
+            await prepareAcknowledgeFamilyCareItem(lifecycleDeps, targetRequest),
+          );
+        case "reply_family_care_item":
+          return toPrepareResponse(
+            await prepareReplyFamilyCareItem(lifecycleDeps, targetRequest),
+          );
+        case "correct_family_care_message":
+          return toPrepareResponse(
+            await prepareCorrectFamilyCareMessage(lifecycleDeps, targetRequest),
+          );
+        case "withdraw_family_care_request":
+          return toPrepareResponse(
+            await prepareWithdrawFamilyCareRequest(lifecycleDeps, targetRequest),
+          );
+        case "redact_family_care_message":
+          return toPrepareResponse(
+            await prepareRedactFamilyCareMessage(lifecycleDeps, targetRequest),
+          );
+        case "policy_redact_family_care_message":
+          return toPrepareResponse(
+            await preparePolicyRedactFamilyCareMessage(lifecycleDeps, targetRequest),
+          );
+      }
     },
 
     async execute(request) {
@@ -321,6 +375,21 @@ export function createHarnessEngine(input: {
         },
       );
     },
+
+    async readInstitutionBusinessCommunication(request) {
+      return readInstitutionBusinessCommunication(
+        {
+          reads: institutionBusinessCommunicationReads,
+          protected_content: protectedContent,
+          integrity_key: input.integrityKey,
+        },
+        {
+          workspace_id: request.workspace_id,
+          participant_id: request.actor_participant_id,
+          target_option_ref: request.target_option_ref,
+        },
+      );
+    },
   };
 
   type BuiltCommand =
@@ -348,8 +417,84 @@ export function createHarnessEngine(input: {
         spec: submitSpec as NurtureCommandSpec<never>,
       };
     }
+    if (request.capability_key === "correct_family_care_message") {
+      const parsed = parseCorrectFamilyCareMessageInputV1(request.operation_input);
+      const messageId = payload.target_refs.family_care_message;
+      if (parsed.status !== "ok" || !messageId) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      return {
+        status: "ok",
+        payload: {
+          body: parsed.input.body,
+          message_id: messageId,
+          expected_message_version: payload.expected_heads.message ?? 0,
+          expected_correction_head: payload.expected_heads.correction ?? 0,
+          ...(payload.expected_heads.lifecycle !== undefined
+            ? { expected_lifecycle_head: payload.expected_heads.lifecycle }
+            : {}),
+        },
+        spec: correctSpec as NurtureCommandSpec<never>,
+      };
+    }
+    if (
+      request.capability_key === "redact_family_care_message" ||
+      request.capability_key === "policy_redact_family_care_message"
+    ) {
+      if (
+        request.operation_input !== undefined &&
+        (typeof request.operation_input !== "object" ||
+          request.operation_input === null ||
+          Array.isArray(request.operation_input) ||
+          Object.keys(request.operation_input).length > 0)
+      ) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      const messageId = payload.target_refs.family_care_message;
+      const cascadeAuditId = payload.target_refs.cascade_audit;
+      const cascadeScope = payload.target_refs.redaction_scope;
+      if (
+        !messageId ||
+        !cascadeAuditId ||
+        (cascadeScope !== "source_question" && cascadeScope !== "reply_local")
+      ) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      const actorKind =
+        request.capability_key === "redact_family_care_message" ? "author" : "policy";
+      return {
+        status: "ok",
+        payload: {
+          message_id: messageId,
+          expected_message_version: payload.expected_heads.message ?? 0,
+          cascade_audit_id: cascadeAuditId,
+          cascade_scope: cascadeScope,
+          actor_kind: actorKind,
+        },
+        spec: (actorKind === "author" ? redactSpec : policyRedactSpec) as NurtureCommandSpec<never>,
+      };
+    }
     const itemId = payload.target_refs.care_item;
     if (!itemId) return { status: "invalid", reason_code: "invalid_operation_input" };
+    if (request.capability_key === "withdraw_family_care_request") {
+      if (
+        request.operation_input !== undefined &&
+        (typeof request.operation_input !== "object" ||
+          request.operation_input === null ||
+          Array.isArray(request.operation_input) ||
+          Object.keys(request.operation_input).length > 0)
+      ) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      return {
+        status: "ok",
+        payload: {
+          item_id: itemId,
+          expected_lifecycle_head: payload.expected_heads.lifecycle ?? 0,
+        },
+        spec: withdrawSpec as NurtureCommandSpec<never>,
+      };
+    }
     if (request.capability_key === "acknowledge_family_care_item") {
       if (
         request.operation_input !== undefined &&

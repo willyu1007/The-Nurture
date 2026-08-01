@@ -217,6 +217,23 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         sourceId: { in: messages.map((message) => message.id) },
       },
     });
+    const corrections = await this.prisma.nurtureFamilyCareMessageCorrection.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        messageId: { in: messages.map((message) => message.id) },
+        status: "active",
+      },
+      orderBy: [{ correctionVersion: "desc" }, { id: "asc" }],
+    });
+    const latestCorrectionByMessage = new Map<
+      string,
+      (typeof corrections)[number]
+    >();
+    for (const correction of corrections) {
+      if (!latestCorrectionByMessage.has(correction.messageId)) {
+        latestCorrectionByMessage.set(correction.messageId, correction);
+      }
+    }
     const receiptBySource = new Map(receipts.map((receipt) => [receipt.sourceId, receipt]));
     const labels = await enrollmentLabels(
       this.prisma,
@@ -234,18 +251,24 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
             : undefined;
       if (!item?.enrollmentId) continue;
       const receipt = receiptBySource.get(message.id);
+      const correction = latestCorrectionByMessage.get(message.id);
       rows.push({
         message_id: message.id,
         item_id: item.id,
         enrollment_id: item.enrollmentId,
         message_kind: message.messageKind as "family_message" | "caregiver_reply",
         redacted: message.status === "redacted",
+        corrected: Boolean(correction),
         occurred_at: message.createdAt.toISOString(),
         ...(message.status === "redacted" ? {} : { body_envelope: message.bodyProtectionPayload }),
+        ...(message.status !== "redacted" && correction
+          ? { correction_body_envelope: correction.bodyProtectionPayload }
+          : {}),
         source_label: labels.get(item.enrollmentId) ?? "Care group",
         acknowledgement_state: item.acknowledgementState,
         response_state: item.responseState,
         lifecycle_state: item.lifecycleState,
+        ...(item.lifecycleReason ? { lifecycle_reason: item.lifecycleReason } : {}),
         ...(receipt
           ? {
               receipt: {
@@ -406,6 +429,23 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     ]);
     if (!sourceMessage) return { authorized: false };
     const messageIds = new Set([sourceMessage.id, ...replies.map((reply) => reply.id)]);
+    const corrections = await this.prisma.nurtureFamilyCareMessageCorrection.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        messageId: { in: [...messageIds] },
+        status: "active",
+      },
+      orderBy: [{ correctionVersion: "desc" }, { id: "asc" }],
+    });
+    const latestCorrectionByMessage = new Map<
+      string,
+      (typeof corrections)[number]
+    >();
+    for (const correction of corrections) {
+      if (!latestCorrectionByMessage.has(correction.messageId)) {
+        latestCorrectionByMessage.set(correction.messageId, correction);
+      }
+    }
 
     let continuationReadable = false;
     if (item.contextContinuationOfItemId) {
@@ -435,15 +475,31 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         acknowledgement_state: item.acknowledgementState,
         response_state: item.responseState,
         lifecycle_state: item.lifecycleState,
+        ...(item.lifecycleReason ? { lifecycle_reason: item.lifecycleReason } : {}),
         reply_count: replies.length,
         content_readable: projectionRole === "guardian" ? true : grantActive,
-        messages: [sourceMessage, ...replies].map((message) => ({
-          message_id: message.id,
-          message_kind: message.messageKind as "family_message" | "caregiver_reply",
-          redacted: message.status === "redacted",
-          occurred_at: message.createdAt.toISOString(),
-          ...(message.status === "redacted" ? {} : { body_envelope: message.bodyProtectionPayload }),
-        })),
+        messages: [sourceMessage, ...replies].map((message) => {
+          const correction = latestCorrectionByMessage.get(message.id);
+          return {
+            message_id: message.id,
+            message_kind: message.messageKind as "family_message" | "caregiver_reply",
+            redacted: message.status === "redacted",
+            corrected: Boolean(correction),
+            exact_author: message.senderParticipantId === input.participant_id,
+            correction_allowed:
+              message.status === "sent" &&
+              item.lifecycleState === "active" &&
+              (message.messageKind !== "family_message" ||
+                item.responseState === "awaiting_reply"),
+            occurred_at: message.createdAt.toISOString(),
+            ...(message.status === "redacted"
+              ? {}
+              : { body_envelope: message.bodyProtectionPayload }),
+            ...(message.status !== "redacted" && correction
+              ? { correction_body_envelope: correction.bodyProtectionPayload }
+              : {}),
+          };
+        }),
         receipts: receipts
           .filter((receipt) => messageIds.has(receipt.sourceId))
           .map((receipt) => ({

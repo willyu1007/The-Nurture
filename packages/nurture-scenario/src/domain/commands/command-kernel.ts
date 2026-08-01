@@ -98,13 +98,33 @@ export type NurtureCommandRepository = {
 
 export type NurtureCommandPreconditionDecision =
   | { status: "ready" }
-  | { status: "already_satisfied"; output_refs: DomainContextRef[] }
+  | {
+      status: "already_satisfied";
+      output_refs: DomainContextRef[];
+      result_schema_version?: number;
+      committed_result?: unknown;
+    }
   | { status: "invalid" | "blocked" | "conflict"; reason_code: string };
 
 export type NurtureCommandExecutionContext = {
   workspace_id: string;
   business_actor_ref: string;
   child_care_process_id?: string;
+};
+
+export type NurtureCommandApplyResult = {
+  output_refs: DomainContextRef[];
+  /**
+   * Body-free typed result persisted with the execution so an exact replay
+   * returns the original business outcome rather than recomputing it.
+   */
+  result_schema_version?: number;
+  committed_result?: unknown;
+  /**
+   * Transaction-local data for a narrow post-execution finalizer. It is never
+   * persisted in CommandExecution and must not contain protected content.
+   */
+  finalization_payload?: unknown;
 };
 
 export type NurtureCommandSpec<Input> = {
@@ -121,15 +141,22 @@ export type NurtureCommandSpec<Input> = {
     transaction: NurtureCommandTransaction,
     input: Input,
     context: NurtureCommandExecutionContext,
-  ): Promise<{
-    output_refs: DomainContextRef[];
-    /**
-     * Body-free typed result persisted with the execution so an exact replay
-     * returns the original business outcome rather than recomputing it.
-     */
-    result_schema_version?: number;
-    committed_result?: unknown;
-  }>;
+  ): Promise<NurtureCommandApplyResult>;
+  /**
+   * Runs after CommandExecution exists but before the owning transaction can
+   * commit. This supports facts whose FK must point at the immutable execution
+   * (for example a completed redaction cascade audit) without weakening the
+   * all-or-nothing command transaction.
+   */
+  afterExecutionCreated?(
+    transaction: NurtureCommandTransaction,
+    input: Input,
+    context: NurtureCommandExecutionContext,
+    applied: NurtureCommandApplyResult & {
+      business_outcome: NurtureCommandBusinessOutcome;
+      execution: NurtureCommandExecutionRecord;
+    },
+  ): Promise<void>;
   handoff?: NurtureCommandHandoffPolicy<Input>;
 };
 
@@ -322,6 +349,9 @@ const compareReplay = (input: {
     execution_ref: executionRef(input.existing),
     output_refs: input.existing.output_refs,
     handoff_request_snapshots: handoffState.snapshots,
+    ...(input.existing.committed_result_payload !== undefined
+      ? { committed_result: input.existing.committed_result_payload }
+      : {}),
   };
 };
 
@@ -491,8 +521,8 @@ export class NurtureCommandRunner {
               ? {
                   business_outcome: "already_satisfied" as const,
                   output_refs: decision.output_refs,
-                  result_schema_version: undefined as number | undefined,
-                  committed_result: undefined as unknown,
+                  result_schema_version: decision.result_schema_version,
+                  committed_result: decision.committed_result,
                 }
               : {
                   business_outcome: "applied" as const,
@@ -544,6 +574,14 @@ export class NurtureCommandRunner {
               ? { committed_result_payload: applied.committed_result }
               : {}),
           });
+          if (input.spec.afterExecutionCreated) {
+            await input.spec.afterExecutionCreated(
+              transaction,
+              input.payload,
+              executionContext,
+              { ...applied, execution: record },
+            );
+          }
           return {
             status: "ok" as const,
             disposition: "executed" as const,

@@ -7,6 +7,7 @@ import {
   type ExecutionContext,
   HttpCode,
   HttpStatus,
+  Header,
   Inject,
   Injectable,
   Post,
@@ -21,14 +22,17 @@ import {
   HARNESS_PREPARE_PATH,
   HARNESS_QUERY_PATH,
   HARNESS_READ_RESULT_PATH,
+  INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH,
   HarnessRequestParseError,
   parseHarnessExecuteRequestV1,
   parseHarnessPrepareRequestV1,
   parseHarnessQueryRequestV1,
   parseHarnessReadResultRequestV1,
+  parseInstitutionBusinessCommunicationReadRequestV1,
   type HarnessExecuteResponseV1,
   type HarnessPrepareResponseV1,
   type HarnessQueryResponseV1,
+  type InstitutionBusinessCommunicationReadResponseV1,
 } from "./harness-http.js";
 
 export const HARNESS_GUARD_CONFIG = Symbol("HARNESS_GUARD_CONFIG");
@@ -98,6 +102,26 @@ export class HarnessController {
     const engine = this.config.runtime.engine;
     if (!engine) throw new ServiceUnavailableException({ error: "harness_disabled" });
     return engine.readResult(this.parse(() => parseHarnessReadResultRequestV1(body)));
+  }
+
+  @Post(INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH)
+  @HttpCode(HttpStatus.OK)
+  @Header("Cache-Control", "private, no-store")
+  @Header("Pragma", "no-cache")
+  @UseGuards(HarnessServiceAuthGuard)
+  async readInstitutionBusinessCommunication(
+    @Body() body: unknown,
+  ): Promise<InstitutionBusinessCommunicationReadResponseV1> {
+    const engine = this.config.runtime.engine;
+    if (!engine) throw new ServiceUnavailableException({ error: "harness_disabled" });
+    if (!this.config.runtime.institutionBusinessCommunicationReadEnabled) {
+      throw new ServiceUnavailableException({
+        error: "institution_business_communication_read_disabled",
+      });
+    }
+    return engine.readInstitutionBusinessCommunication(
+      this.parse(() => parseInstitutionBusinessCommunicationReadRequestV1(body)),
+    );
   }
 
   private parse<T>(run: () => T): T {

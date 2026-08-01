@@ -306,6 +306,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HarnessError'
+  /internal/nurture/institution/business-communications:read:
+    post:
+      operationId: readInstitutionBusinessCommunication
+      summary: Read one disclosed Institution business communication
+      description: |
+        Protected, noncanonical, request-composed Nurture owner-read for a
+        current exact Institution Admin. The service rereads the exact
+        Institution, Enrollment, CareGroup, original Grant, disclosure and
+        message lifecycle. The response is no-store and grants no action
+        authority. This provider route is default-off until consumer adoption
+        pins the exact interface key, version and digest.
+      tags: [institution-owner-read]
+      security:
+        - serviceBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstitutionBusinessCommunicationReadRequest'
+      responses:
+        '200':
+          description: Current exact owner-read decision.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionBusinessCommunicationReadResponse'
+        '400':
+          description: The request shell or exact interface pin is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '401':
+          description: The private service bearer is missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '408':
+          description: The bounded request handler timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '503':
+          description: The provider interface or Harness composition is disabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
 components:
   securitySchemes:
     serviceBearerAuth:
@@ -450,6 +506,10 @@ components:
             - submit_family_care_question
             - acknowledge_family_care_item
             - reply_family_care_item
+            - correct_family_care_message
+            - withdraw_family_care_request
+            - redact_family_care_message
+            - policy_redact_family_care_message
         capability_version:
           type: string
           const: 1.0.0
@@ -528,6 +588,10 @@ components:
             - submit_family_care_question
             - acknowledge_family_care_item
             - reply_family_care_item
+            - correct_family_care_message
+            - withdraw_family_care_request
+            - redact_family_care_message
+            - policy_redact_family_care_message
         capability_version:
           type: string
           const: 1.0.0
@@ -551,7 +615,7 @@ components:
       properties:
         status:
           type: string
-          enum: [committed, not_committed]
+          enum: [committed, not_committed, outcome_unknown]
         execution_disposition:
           type: string
           enum: [executed, replayed]
@@ -566,13 +630,15 @@ components:
           items:
             type: object
             additionalProperties: true
+        committed_result:
+          description: Capability-specific body-free immutable result persisted with the CommandExecution and returned unchanged on exact replay.
         decision:
           type: string
         reason_code:
           type: string
         recovery:
           type: string
-          enum: [none, refresh, reprepare, retry_same_command]
+          enum: [none, refresh, reprepare, retry_same_command, reconcile_same_command]
     HarnessQueryRequest:
       type: object
       description: |
@@ -648,6 +714,153 @@ components:
           description: Capability-specific closed role-safe projection.
         reason_code:
           type: string
+    InstitutionBusinessCommunicationReadRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - workspace_id
+        - actor_participant_id
+        - surface
+        - interface_contract
+        - target_option_ref
+      properties:
+        workspace_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        actor_participant_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        surface:
+          type: string
+          const: admin
+        interface_contract:
+          $ref: '#/components/schemas/InstitutionBusinessCommunicationInterfaceContract'
+        target_option_ref:
+          $ref: '#/components/schemas/BoundedIdentifier'
+    InstitutionBusinessCommunicationInterfaceContract:
+      type: object
+      additionalProperties: false
+      required: [key, version, digest]
+      properties:
+        key:
+          type: string
+          const: nurture.institution-business-communication-owner-read
+        version:
+          type: string
+          const: 1.0.0
+        digest:
+          type: string
+          const: sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921
+    InstitutionBusinessCommunicationReadResponse:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, denied, unavailable]
+        output:
+          $ref: '#/components/schemas/InstitutionBusinessCommunicationProjectionV1'
+        reason_code:
+          type: string
+          enum: [not_authorized, protected_content_unavailable]
+    InstitutionBusinessCommunicationProjectionV1:
+      type: object
+      additionalProperties: false
+      required:
+        - interfaceContract
+        - projectionRole
+        - messageRef
+        - occurredAt
+        - businessScope
+        - author
+        - changeState
+        - attachments
+        - actions
+      properties:
+        interfaceContract:
+          $ref: '#/components/schemas/InstitutionBusinessCommunicationInterfaceContract'
+        projectionRole:
+          type: string
+          const: institution_admin
+        messageRef:
+          type: string
+          pattern: '^[0-9a-f]{32}$'
+        occurredAt:
+          type: string
+          format: date-time
+        businessScope:
+          type: object
+          additionalProperties: false
+          required:
+            - enrollmentRef
+            - careGroupRef
+            - institutionRef
+            - dataClass
+            - direction
+            - purpose
+            - adminSupervision
+          properties:
+            enrollmentRef:
+              type: string
+              pattern: '^[0-9a-f]{32}$'
+            careGroupRef:
+              type: string
+              pattern: '^[0-9a-f]{32}$'
+            institutionRef:
+              type: string
+              pattern: '^[0-9a-f]{32}$'
+            dataClass:
+              type: string
+              enum: [family_care_question, direct_care_communication]
+            direction:
+              type: string
+              enum: [family_to_org, org_to_family]
+            purpose:
+              type: string
+              const: family_care_workflow
+            adminSupervision:
+              type: string
+              const: pre_send_disclosed
+        author:
+          type: object
+          additionalProperties: false
+          required: [side, role]
+          properties:
+            side:
+              type: string
+              enum: [family, care_group]
+            role:
+              type: string
+              enum: [guardian, caregiver, lead_caregiver]
+        changeState:
+          type: object
+          additionalProperties: false
+          required: [content, lifecycle]
+          properties:
+            content:
+              type: string
+              enum: [original, corrected, redacted]
+            lifecycle:
+              type: string
+              enum: [active, closed, suppressed]
+            lifecycleReason:
+              type: string
+              enum: [family_withdrawn, grant_revoked, source_redacted, expired]
+        content:
+          type: object
+          additionalProperties: false
+          required: [body]
+          properties:
+            body:
+              type: string
+              minLength: 1
+              maxLength: 2000
+        attachments:
+          type: array
+          description: G2-B plain-text messages do not support attachments; a future interface rotation is required before exposing any protected attachment carrier.
+          maxItems: 0
+        actions:
+          type: array
+          maxItems: 0
     HarnessError:
       type: object
       additionalProperties: false
@@ -663,6 +876,7 @@ components:
             - payload_too_large
             - unsupported_media_type
             - harness_disabled
+            - institution_business_communication_read_disabled
             - service_unavailable
             - internal_error
     BindingOwnerError:

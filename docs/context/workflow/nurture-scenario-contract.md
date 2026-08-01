@@ -463,7 +463,7 @@ to `responded` and resolves waiting-for-reply attention; later replies do not
 close the Item or resolve attention again. Individual Participant and
 RoleAssignment remain internal audit and optional secondary attribution.
 
-## Planned Institution Business Communication Read (T-007 D-04)
+## Provider-qualified Institution Business Communication Read (T-005 G2-B / T-007 D-04)
 
 `InstitutionBusinessCommunicationProjectionV1` is a protected, noncanonical,
 request-composed owner-read projection for a current `institution_admin`. It is
@@ -489,10 +489,15 @@ policy. A later `InstitutionAttentionCandidate` may only cite sources within
 the same authorized projection and may not auto-act, diagnose, assign blame, or
 score a child, teacher, class, or Institution.
 
-The current scenario manifest, module and source do not expose this protected
-interface. Activation requires an additive versioned interface/digest,
-body-safe private carrier, current-owner policy implementation, correction /
-redaction / revoke invalidation, and positive plus negative contract tests.
+The Nurture provider now exposes the default-off protected interface
+`nurture.institution-business-communication-owner-read@1.0.0` with exact digest
+`sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921`.
+Its private service-authenticated no-store carrier and request-time owner policy
+are provider-qualified against correction, withdrawal, redaction, role loss,
+Grant loss, disclosure loss and scope drift. It is not part of the shared
+surface registry and grants no actions. T-007 still owns consumer composition
+and adoption; the environment gate remains `false`, so this provider result is
+not activation or traffic evidence.
 
 ## Planned Enrollment Journey Workflow (T-007 D-07)
 
@@ -614,10 +619,10 @@ Nurture MAY use an independent database or a dedicated `nurture_*` schema/table 
   handlers and receive only safe labels, generic badges, aggregate versions,
   and opaque item refs; My-Chat must not branch on Nurture business lifecycle
   values.
-- The T-007 D-04 protected Admin business-communication read remains disabled
-  until a new exact interface version/digest, private carrier, per-request
-  owner-read policy, lifecycle invalidation, no-copy controls and negative
-  privacy/action-authority tests are adopted by both owners.
+- The T-007 D-04 protected Admin business-communication provider interface is
+  qualified at exact version/digest but remains disabled until T-007 consumer
+  composition adopts that pin and joint tests confirm private carrier,
+  lifecycle invalidation, no-copy controls and action-authority separation.
 - The T-007 D-07 `EnrollmentJourneyWorkflowV1` remains absent/default-off until
   the existing Enrollment status plus `participationPhase` mapping,
   trial-start/preparation-cancel/formalization/exit transactions, waitlist and

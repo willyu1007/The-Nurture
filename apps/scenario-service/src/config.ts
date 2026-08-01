@@ -11,6 +11,7 @@ export type ScenarioServiceConfig = Readonly<{
   port: number;
   bodyLimitBytes: number;
   requestTimeoutMs: number;
+  institutionBusinessCommunicationReadEnabled: boolean;
 }>;
 
 const DEFAULT_SERVICE_NAME = "the-nurture";
@@ -34,6 +35,10 @@ export function loadScenarioServiceConfig(
     port: parsePort(env.PORT),
     bodyLimitBytes: BODY_LIMIT_BYTES,
     requestTimeoutMs: REQUEST_TIMEOUT_MS,
+    institutionBusinessCommunicationReadEnabled: parseBoolean(
+      env.NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED,
+      "NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED",
+    ),
   });
 }
 
@@ -63,6 +68,12 @@ function parsePort(value: string | undefined): number {
     throw invalidConfiguration("PORT");
   }
   return parsed;
+}
+
+function parseBoolean(value: string | undefined, field: string): boolean {
+  if (value === undefined || value === "false") return false;
+  if (value === "true") return true;
+  throw invalidConfiguration(field);
 }
 
 function invalidConfiguration(field: string): Error {

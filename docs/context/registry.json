@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-01T08:58:27.472Z",
+  "updatedAt": "2026-08-01T14:42:33.951Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -11,8 +11,8 @@
       "tags": [
         "api"
       ],
-      "checksumSha256": "da1f6244c32a35d8d369231f93da53d750e78a71555fcd3ca6f73abb05a31173",
-      "lastUpdated": "2026-08-01T08:58:27.469Z",
+      "checksumSha256": "6e80c3402bc0be1e9d9d8ddb0cd6e695a0f15163068732f63f1acf983c66eeda",
+      "lastUpdated": "2026-08-01T14:42:33.950Z",
       "source": {
         "kind": "manual",
         "notes": "Edit the contract file; then run ctl-context touch."
@@ -29,8 +29,8 @@
         "index",
         "llm"
       ],
-      "checksumSha256": "b262bc0a5efe8a29d262c301b8dfaf1430c8b3cb6dfd836ad7bc829be3e21ae8",
-      "lastUpdated": "2026-08-01T08:58:27.470Z",
+      "checksumSha256": "2bc0de5e16111cb7dbd129e598a843d9ac82d92982a7d8e7efe3f9391bf04131",
+      "lastUpdated": "2026-08-01T14:42:33.951Z",
       "source": {
         "kind": "command",
         "command": "node .ai/scripts/ctl-api-index.mjs generate --touch",
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "55223a50fadeef9678b8dfd2aca80df17346179cafa52f21f78115ca267fd77e",
-      "lastUpdated": "2026-07-31T07:04:07.817Z",
+      "checksumSha256": "a0c8a150785cca58581620c1401c87302b7d38d9c3bf284f2d829f9dbceeb130",
+      "lastUpdated": "2026-08-01T14:35:07.312Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",
@@ -136,8 +136,8 @@
         "config",
         "llm"
       ],
-      "checksumSha256": "91ba7d1bf785d8db2ae16a87bf9b45d420998a31d421b6f56eee515717cfde73",
-      "lastUpdated": "2026-08-01T06:31:30.059Z",
+      "checksumSha256": "34058ba402c89103a922d24400f80518e79158330a1f78ef1bff082e97867e7a",
+      "lastUpdated": "2026-08-01T14:26:53.029Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

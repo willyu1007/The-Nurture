@@ -274,6 +274,106 @@ export type G2ReplyApplied = {
   attention_effect: "resolved" | "unchanged";
 };
 
+// G2-B message lifecycle actions. The historical sender role is audit only;
+// facts resolve the same Participant's current same-side role at request time.
+export type G2MessageChangePayload = {
+  participant_id: string;
+  message_id: string;
+};
+
+export type G2MessageChangeFacts = {
+  participant_active: boolean;
+  message_present: boolean;
+  writer_contract?: "legacy_v1" | "legacy_migrated_v1" | "harness_g2_v1";
+  message_kind?: "family_message" | "caregiver_reply" | "caregiver_direct_message";
+  message_status?: "sent" | "redacted" | "failed";
+  message_version?: number;
+  message_direction?: NurtureGrantDirection;
+  exact_author: boolean;
+  current_author_role_assignment_id?: string;
+  same_side_reachable: boolean;
+  policy_actor_authorized: boolean;
+  policy_role_assignment_id?: string;
+  correction_head: number;
+  source_item_id?: string;
+  source_item_response_state?: "awaiting_reply" | "responded" | "not_applicable";
+  source_item_lifecycle_state?: "active" | "closed" | "suppressed";
+  source_item_lifecycle_head?: number;
+  grant: FamilyCareCurrentGrant;
+  existing_redaction_refs?: DomainContextRef[];
+};
+
+export type G2CorrectMessageApplyInput = G2MessageChangePayload & {
+  current_author_role_assignment_id: string;
+  expected_message_version: number;
+  expected_correction_head: number;
+  expected_lifecycle_head?: number;
+  body_envelope: unknown;
+};
+
+export type G2CorrectMessageApplied = {
+  message_ref: DomainContextRef;
+  item_ref?: DomainContextRef;
+  correction_ref: DomainContextRef;
+  correction_version: number;
+  receipt_ref: DomainContextRef;
+  finalization: { correction_id: string };
+};
+
+export type G2WithdrawalPayload = {
+  participant_id: string;
+  item_id: string;
+};
+
+export type G2WithdrawalFacts = {
+  participant_active: boolean;
+  item_present: boolean;
+  writer_contract?: "legacy_v1" | "legacy_migrated_v1" | "harness_g2_v1";
+  exact_source_author: boolean;
+  current_guardian_role_assignment_id?: string;
+  same_side_reachable: boolean;
+  lifecycle_state?: "active" | "closed" | "suppressed";
+  lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
+  lifecycle_head?: number;
+  grant: FamilyCareCurrentGrant;
+  existing_withdrawal_refs?: DomainContextRef[];
+};
+
+export type G2WithdrawalApplyInput = G2WithdrawalPayload & {
+  current_guardian_role_assignment_id: string;
+  expected_lifecycle_head: number;
+};
+
+export type G2WithdrawalApplied = {
+  item_ref: DomainContextRef;
+  withdrawal_event_ref: DomainContextRef;
+  receipt_ref: DomainContextRef;
+  attention_effect: "resolved" | "unchanged";
+};
+
+export type G2RedactMessageApplyInput = G2MessageChangePayload & {
+  actor_role_assignment_id: string;
+  expected_message_version: number;
+  cascade_audit_id: string;
+  cascade_scope: "source_question" | "reply_local";
+  reason_code: "author_redaction" | "policy_redaction";
+};
+
+export type G2RedactionFinalization = {
+  cascade_audit_id: string;
+  root_message_id: string;
+  cascade_scope: "source_question" | "reply_local";
+  affected_refs: DomainContextRef[];
+};
+
+export type G2RedactMessageApplied = {
+  message_ref: DomainContextRef;
+  item_ref?: DomainContextRef;
+  cascade_audit_ref: DomainContextRef;
+  affected_refs: DomainContextRef[];
+  finalization: G2RedactionFinalization;
+};
+
 export type NurtureFamilyCareCommandTransaction = {
   loadFamilyCareGrantRevokeFacts(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<FamilyCareGrantRevokeFacts>;
   revokeFamilyCareGrant(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<{
@@ -306,4 +406,27 @@ export type NurtureFamilyCareCommandTransaction = {
   loadG2ItemActionFacts?(input: FamilyCareTransactionInput<G2ItemActionPayload>): Promise<G2ItemActionFacts>;
   applyG2Acknowledge?(input: FamilyCareTransactionInput<G2AcknowledgeApplyInput>): Promise<G2AcknowledgeApplied>;
   applyG2Reply?(input: FamilyCareTransactionInput<G2ReplyApplyInput>): Promise<G2ReplyApplied>;
+  loadG2MessageChangeFacts?(
+    input: FamilyCareTransactionInput<G2MessageChangePayload>,
+  ): Promise<G2MessageChangeFacts>;
+  applyG2Correction?(
+    input: FamilyCareTransactionInput<G2CorrectMessageApplyInput>,
+  ): Promise<G2CorrectMessageApplied>;
+  finalizeG2Correction?(
+    input: FamilyCareTransactionInput<{ correction_id: string; command_execution_id: string }>,
+  ): Promise<void>;
+  loadG2WithdrawalFacts?(
+    input: FamilyCareTransactionInput<G2WithdrawalPayload>,
+  ): Promise<G2WithdrawalFacts>;
+  applyG2Withdrawal?(
+    input: FamilyCareTransactionInput<G2WithdrawalApplyInput>,
+  ): Promise<G2WithdrawalApplied>;
+  applyG2Redaction?(
+    input: FamilyCareTransactionInput<G2RedactMessageApplyInput>,
+  ): Promise<G2RedactMessageApplied>;
+  finalizeG2Redaction?(
+    input: FamilyCareTransactionInput<G2RedactionFinalization> & {
+      command_execution_id: string;
+    },
+  ): Promise<void>;
 };

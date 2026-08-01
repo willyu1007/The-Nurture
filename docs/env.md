@@ -2,7 +2,7 @@
 
 This document is generated from `env/contract.yaml`. Do not hand-edit.
 
-Generated at (UTC): `2026-08-01T06:21:53Z`
+Generated at (UTC): `2026-08-01T14:25:08Z`
 
 ## Environments
 - `dev`, `prod`, `staging`
@@ -19,6 +19,7 @@ Generated at (UTC): `2026-08-01T06:21:53Z`
 | `NURTURE_BACKEND_URL` | `active` | `url` | no | no | `http://localhost:3200` | `` | `dev` | `` | `` | `` | Local Base-assigned Nurture backend endpoint consumed by the frontend workbench; topology only, not an API-contract field. |
 | `NURTURE_BINDING_EVIDENCE_KEY` | `active` | `string` | no | yes | `` | `nurture_binding_evidence_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) enabling the scenario-binding owner endpoint; absence keeps the endpoint disabled and never degrades to an unhashed path. |
 | `NURTURE_HARNESS_INTEGRITY_KEY` | `active` | `string` | no | yes | `` | `nurture_harness_integrity_key` | `*` | `` | `` | `` | HMAC key (at least 32 characters) for Harness confirmation input-integrity tags and owner-issued target refs; absence keeps both Harness routes disabled. |
+| `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `active` | `bool` | no | no | `False` | `` | `*` | `` | `` | `` | Default-off provider gate for the protected Institution Admin business-communication owner-read; true only after exact interface pin and consumer adoption. |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | `active` | `string` | no | yes | `` | `nurture_internal_service_token` | `*` | `` | `` | `` | Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged. |
 | `NURTURE_PROTECTED_CONTENT_KEY` | `active` | `string` | no | yes | `` | `nurture_protected_content_key` | `*` | `` | `` | `` | AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext. |
 | `PORT` | `active` | `int` | yes | no | `8000` | `` | `*` | `` | `` | `` | Formal NestJS scenario-service listen port; local ecosystem routing maps the Base-assigned backend endpoint separately. |

@@ -23,6 +23,7 @@ const allowedErrors = new Set([
   "harness_disabled",
   "invalid_harness_request",
   "unknown_capability",
+  "institution_business_communication_read_disabled",
 ]);
 
 const bodyParserErrorStatuses = new Map<string, number>([
@@ -59,7 +60,8 @@ export class SafeExceptionFilter implements ExceptionFilter {
     if (
       (!isOperationalException(exception) || status >= 500) &&
       error !== "binding_owner_disabled" &&
-      error !== "harness_disabled"
+      error !== "harness_disabled" &&
+      error !== "institution_business_communication_read_disabled"
     ) {
       this.logger.unhandledException(requestContext);
     }

@@ -16,6 +16,8 @@ const harnessPreparePath = "/internal/nurture/harness/prepare-action";
 const harnessExecutePath = "/internal/nurture/harness/execute-action";
 const harnessQueryPath = "/internal/nurture/harness/query";
 const harnessReadResultPath = "/internal/nurture/harness/read-result";
+const institutionBusinessCommunicationReadPath =
+  "/internal/nurture/institution/business-communications:read";
 const expectedPaths = [
   healthPath,
   ownerPath,
@@ -23,6 +25,7 @@ const expectedPaths = [
   harnessExecutePath,
   harnessQueryPath,
   harnessReadResultPath,
+  institutionBusinessCommunicationReadPath,
 ];
 const expectedHarnessSharedRequiredFields = [
   "workspace_id",
@@ -36,6 +39,15 @@ const expectedHarnessExecuteRequiredFields = [
   "invocation_request_id",
   "command_request_id",
   "confirmation_ref",
+];
+const expectedHarnessActionKeys = [
+  "submit_family_care_question",
+  "acknowledge_family_care_item",
+  "reply_family_care_item",
+  "correct_family_care_message",
+  "withdraw_family_care_request",
+  "redact_family_care_message",
+  "policy_redact_family_care_message",
 ];
 const expectedOwnerRequiredFields = [
   "workspace_id",
@@ -52,6 +64,18 @@ const expectedOwnerOptionalFields = [
   "correlation_id",
   "trace_id",
 ];
+const expectedInstitutionBusinessCommunicationReadFields = [
+  "workspace_id",
+  "actor_participant_id",
+  "surface",
+  "interface_contract",
+  "target_option_ref",
+];
+const expectedInstitutionBusinessCommunicationInterface = {
+  key: "nurture.institution-business-communication-owner-read",
+  version: "1.0.0",
+  digest: "sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921",
+};
 
 const openApi = parseYaml(read("docs/context/api/openapi.yaml"));
 assertArrayEqual(
@@ -118,6 +142,35 @@ for (const harnessPath of [
     `OpenAPI harness operation set ${harnessPath}`,
   );
 }
+assertTruthy(
+  openApi.paths?.[institutionBusinessCommunicationReadPath]?.post,
+  "OpenAPI Institution business-communication owner-read POST",
+);
+assertArrayEqual(
+  Object.keys(openApi.paths?.[institutionBusinessCommunicationReadPath] ?? {}).sort(),
+  ["post"],
+  "OpenAPI Institution business-communication owner-read operation set",
+);
+assertArrayEqual(
+  openApi.components?.schemas?.InstitutionBusinessCommunicationReadRequest?.required ?? [],
+  expectedInstitutionBusinessCommunicationReadFields,
+  "OpenAPI Institution business-communication owner-read required fields",
+);
+const institutionInterfaceSchema =
+  openApi.components?.schemas?.InstitutionBusinessCommunicationInterfaceContract?.properties ?? {};
+assertArrayEqual(
+  [
+    institutionInterfaceSchema.key?.const,
+    institutionInterfaceSchema.version?.const,
+    institutionInterfaceSchema.digest?.const,
+  ],
+  [
+    expectedInstitutionBusinessCommunicationInterface.key,
+    expectedInstitutionBusinessCommunicationInterface.version,
+    expectedInstitutionBusinessCommunicationInterface.digest,
+  ],
+  "OpenAPI Institution business-communication exact interface pin",
+);
 assertArrayEqual(
   openApi.components?.schemas?.HarnessPrepareRequest?.required ?? [],
   expectedHarnessSharedRequiredFields,
@@ -128,10 +181,32 @@ assertArrayEqual(
   expectedHarnessExecuteRequiredFields,
   "OpenAPI harness execute required fields",
 );
+assertArrayEqual(
+  openApi.components?.schemas?.HarnessPrepareRequest?.properties?.capability_key?.enum ?? [],
+  expectedHarnessActionKeys,
+  "OpenAPI Harness action key set",
+);
 
 const harnessTransportSource = read(
   "apps/scenario-service/src/harness-http.ts",
 );
+const institutionBusinessCommunicationSource = read(
+  "packages/nurture-scenario/src/harness/institution-business-communication.ts",
+);
+for (const identityPart of Object.values(expectedInstitutionBusinessCommunicationInterface)) {
+  assertIncludes(
+    institutionBusinessCommunicationSource,
+    identityPart,
+    "Institution business-communication source exact interface pin",
+  );
+}
+for (const actionKey of expectedHarnessActionKeys) {
+  assertIncludes(
+    harnessTransportSource,
+    `"${actionKey}"`,
+    `Harness transport action ${actionKey}`,
+  );
+}
 assertIncludes(
   harnessTransportSource,
   `"${harnessPreparePath}"`,
@@ -141,6 +216,11 @@ assertIncludes(
   harnessTransportSource,
   `"${harnessExecutePath}"`,
   "harness transport execute path",
+);
+assertIncludes(
+  harnessTransportSource,
+  `"${institutionBusinessCommunicationReadPath}"`,
+  "Institution business-communication owner-read transport path",
 );
 const harnessControllerSource = read(
   "apps/scenario-service/src/harness.controller.ts",
@@ -166,6 +246,11 @@ assertIncludes(
   "@Post(HARNESS_READ_RESULT_PATH)",
   "harness controller read-result route",
 );
+assertIncludes(
+  harnessControllerSource,
+  "@Post(INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH)",
+  "Institution business-communication owner-read controller route",
+);
 
 const apiIndex = JSON.parse(read("docs/context/api/api-index.json"));
 assertArrayEqual(
@@ -179,8 +264,23 @@ assertArrayEqual(
     `POST ${harnessExecutePath}`,
     `POST ${harnessQueryPath}`,
     `POST ${harnessReadResultPath}`,
+    `POST ${institutionBusinessCommunicationReadPath}`,
   ].sort(),
   "API index formal route set",
+);
+const institutionBusinessCommunicationReadIndex = apiIndex.endpoints.find(
+  (endpoint) =>
+    endpoint.method === "POST" &&
+    endpoint.path === institutionBusinessCommunicationReadPath,
+);
+assertTruthy(
+  institutionBusinessCommunicationReadIndex,
+  "API index Institution business-communication owner-read operation",
+);
+assertArrayEqual(
+  institutionBusinessCommunicationReadIndex.input?.body?.required ?? [],
+  expectedInstitutionBusinessCommunicationReadFields,
+  "API index Institution business-communication owner-read required fields",
 );
 const ownerIndex = apiIndex.endpoints.find(
   (endpoint) => endpoint.method === "POST" && endpoint.path === ownerPath,
@@ -198,7 +298,7 @@ assertArrayEqual(
 );
 
 process.stdout.write(
-  "[ok] formal ingress contract routes=6 owner-fields=8 harness-execute-fields=8\n",
+  "[ok] formal ingress contract routes=7 owner-fields=8 harness-actions=7 harness-execute-fields=8 institution-owner-read-fields=5\n",
 );
 
 function assertTruthy(value, label) {
