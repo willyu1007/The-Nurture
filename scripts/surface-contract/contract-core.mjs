@@ -43,6 +43,9 @@ const descriptorKeys = new Set([
   "supportedRoles",
 ]);
 
+const compareCodeUnits = (left, right) =>
+  left < right ? -1 : left > right ? 1 : 0;
+
 const stableKeyPattern = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 const semverPattern = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
 
@@ -64,7 +67,7 @@ export async function buildSurfaceContract(outputPath = generatedManifestPath) {
   validateSource(normalizedByPath, canonicalization);
 
   const sourceArtifacts = [...normalizedByPath.entries()]
-    .sort(([left], [right]) => left.localeCompare(right))
+    .sort(([left], [right]) => compareCodeUnits(left, right))
     .map(([artifactPath, value]) => ({
       path: artifactPath,
       value,
@@ -312,8 +315,7 @@ function digest(value) {
 async function collectJsonFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
-  for (const entry of entries.sort((left, right) =>
-    left.name.localeCompare(right.name),
+  for (const entry of entries.sort((left, right) => compareCodeUnits(left.name, right.name),
   )) {
     const absolutePath = path.join(directory, entry.name);
     if (entry.isDirectory()) files.push(...(await collectJsonFiles(absolutePath)));
@@ -358,7 +360,7 @@ function normalizeArtifacts(parsedByPath, canonicalization) {
         rightRecord[stableKey],
         `${artifactPath}${pointer}.${stableKey}`,
       );
-      return left.localeCompare(right);
+      return compareCodeUnits(left, right);
     });
   }
   return result;
@@ -845,7 +847,8 @@ function buildCapabilitySlices(artifacts, canonicalization, contract) {
           return repository;
         })
         .sort((left, right) =>
-          text(left.key, "repository.key").localeCompare(
+          compareCodeUnits(
+            text(left.key, "repository.key"),
             text(right.key, "repository.key"),
           ),
         );
@@ -874,7 +877,7 @@ function buildCapabilitySlices(artifacts, canonicalization, contract) {
       };
     })
     .sort((left, right) =>
-      left.capabilityKey.localeCompare(right.capabilityKey),
+      compareCodeUnits(left.capabilityKey, right.capabilityKey),
     );
 }
 
@@ -1010,7 +1013,7 @@ function buildSurfaceSlices(artifacts, canonicalization) {
         sliceHash: digest(slicePayload),
       };
     })
-    .sort((left, right) => left.surfaceKey.localeCompare(right.surfaceKey));
+    .sort((left, right) => compareCodeUnits(left.surfaceKey, right.surfaceKey));
 }
 
 function collectSchemaArtifactClosure(artifacts, entryPaths) {
@@ -1298,7 +1301,11 @@ export function checkConformanceRegistry(registry, manifestValue) {
       throw new Error(`Duplicate conformance case ${conformanceCase.caseKey}`);
     }
     caseKeys.add(conformanceCase.caseKey);
-    const target = path.join(repoRoot, conformanceCase.suiteRef.target);
+    const targetRef = conformanceCase.suiteRef.target;
+    if (path.isAbsolute(targetRef) || targetRef.split("/").includes("..")) {
+      throw new Error(`${conformanceCase.caseKey} suite target escapes the repository: ${targetRef}`);
+    }
+    const target = path.join(repoRoot, targetRef);
     if (!existsSync(target)) {
       throw new Error(
         `${conformanceCase.caseKey} suite target is missing: ${conformanceCase.suiteRef.target}`,
@@ -1306,7 +1313,17 @@ export function checkConformanceRegistry(registry, manifestValue) {
     }
     for (const sliceRef of conformanceCase.covers) {
       if (sliceRef === "all_slices") {
-        for (const member of universe) covered.add(member);
+        // The sentinel marks whole-artifact integrity checks only; it never
+        // substitutes for behavioral per-slice coverage.
+        if (
+          conformanceCase.kind !== "digest_rebuild" &&
+          conformanceCase.kind !== "schema_compilation" &&
+          conformanceCase.kind !== "descriptor_handler_presenter_consistency"
+        ) {
+          throw new Error(
+            `${conformanceCase.caseKey} (${conformanceCase.kind}) must list explicit slices`,
+          );
+        }
         continue;
       }
       if (!universe.has(sliceRef)) {
@@ -1319,7 +1336,9 @@ export function checkConformanceRegistry(registry, manifestValue) {
   }
   for (const member of universe) {
     if (!covered.has(member)) {
-      throw new Error(`Slice ${member} is not covered by any conformance case`);
+      throw new Error(
+        `Slice ${member} has no explicit (non-sentinel) conformance case`,
+      );
     }
   }
   return { covered: covered.size, universe: universe.size };

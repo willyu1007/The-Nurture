@@ -268,7 +268,7 @@ function validateSourceSet(value: unknown): string {
     if (!sourceArtifactPathPattern.test(artifactPath)) {
       fail(`sourceSet.inventory[${index}].path is not canonical`);
     }
-    if (seen.has(artifactPath) || artifactPath.localeCompare(priorPath) < 0) {
+    if (seen.has(artifactPath) || (artifactPath < priorPath ? -1 : artifactPath > priorPath ? 1 : 0) < 0) {
       fail("sourceSet.inventory must be unique and path-sorted");
     }
     seen.add(artifactPath);
@@ -302,7 +302,7 @@ function validateCapabilities(
       `capabilities[${index}].version`,
     );
     const identity = `${key}@${version}`;
-    if (identities.has(identity) || key.localeCompare(priorKey) < 0) {
+    if (identities.has(identity) || (key < priorKey ? -1 : key > priorKey ? 1 : 0) < 0) {
       fail("manifest.capabilities must be unique and key-sorted");
     }
     identities.add(identity);
@@ -594,7 +594,7 @@ function validateSurfaces(value: unknown): void {
       `surfaces[${index}].surfaceVersion`,
     );
     const identity = `${key}@${version}`;
-    if (identities.has(identity) || key.localeCompare(priorKey) < 0) {
+    if (identities.has(identity) || (key < priorKey ? -1 : key > priorKey ? 1 : 0) < 0) {
       fail("manifest.surfaces must be unique and key-sorted");
     }
     identities.add(identity);
@@ -623,7 +623,7 @@ function validateFixtures(value: unknown): void {
     if (!/^[a-z0-9]+(?:[:-][a-z0-9]+)*$/.test(key) || key.length > 64) {
       fail(`fixtures[${index}].fixtureKey is not a valid fixture key`);
     }
-    if (keys.has(key) || key.localeCompare(priorKey) < 0) {
+    if (keys.has(key) || (key < priorKey ? -1 : key > priorKey ? 1 : 0) < 0) {
       fail("manifest.fixtures must be unique and key-sorted");
     }
     keys.add(key);

@@ -17,27 +17,6 @@ import {
   sourceRoot,
 } from "./contract-core.mjs";
 
-const steps = [
-  ["node", ["scripts/surface-contract/verify-surface-contract.mjs"]],
-  ["node", ["scripts/surface-contract/validate-surface-contract-schemas.mjs"]],
-  ["node", ["--test", "scripts/surface-contract/contract-core.test.mjs"]],
-  [
-    "pnpm",
-    [
-      "exec",
-      "vitest",
-      "run",
-      "-c",
-      "vitest.config.ts",
-      "packages/nurture-scenario/tests/surface-contract",
-    ],
-  ],
-];
-
-for (const [command, args] of steps) {
-  execFileSync(command, args, { cwd: repoRoot, stdio: "inherit" });
-}
-
 const manifest = JSON.parse(readFileSync(generatedManifestPath, "utf8"));
 const registry = JSON.parse(
   readFileSync(
@@ -46,6 +25,32 @@ const registry = JSON.parse(
   ),
 );
 const coverage = checkConformanceRegistry(registry, manifest);
+
+// Execution derives from the case registry, so the declared suite targets and
+// the commands that actually run cannot drift apart. Vitest targets share one
+// invocation; script/node_test targets run in declaration order.
+const scriptTargets = [];
+const nodeTestTargets = [];
+const vitestTargets = [];
+for (const conformanceCase of registry.cases) {
+  const { runner, target } = conformanceCase.suiteRef;
+  const bucket =
+    runner === "script"
+      ? scriptTargets
+      : runner === "node_test"
+        ? nodeTestTargets
+        : vitestTargets;
+  if (!bucket.includes(target)) bucket.push(target);
+}
+const steps = [
+  ...scriptTargets.map((target) => ["node", [target]]),
+  ...nodeTestTargets.map((target) => ["node", ["--test", target]]),
+  ["pnpm", ["exec", "vitest", "run", "-c", "vitest.config.ts", ...vitestTargets]],
+];
+
+for (const [command, args] of steps) {
+  execFileSync(command, args, { cwd: repoRoot, stdio: "inherit" });
+}
 const contract = manifest.interfaceContract;
 
 process.stdout.write(
