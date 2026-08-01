@@ -362,3 +362,12 @@
 | 2026-08-01 | production-db 86/86(floor 85→86);unit 265/265;scenario-service 46/46 + db 8/8;dev-host 26/26;routing 64 files | PASS |
 | 2026-08-01 | digest 不变 `1.7.0`/`b7691a81…`;ingress 守卫 `routes=6`;typecheck;smoke 三重 disabled;self-pin → `b2c53eb7…` | PASS |
 | 2026-08-01 | x5 联合套件 | NOT RUN(需 pinned My-Chat + pgvector 物化);受影响的 revoke 路径由 family-care 与 legacy-cutover 套件覆盖,CI 权威 |
+
+## x5 联合套件复跑(评审修复后)— 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | pinned 物化:My-Chat `a019566` / Base `06303e9` detached worktree(sibling working copy 未触碰,用后移除) | PASS |
+| 2026-08-01 | `verify-workflow-contract-pin`:parity `8dd53be4…`、`x5_joint_api` `89a61355…`(169 files)、`wave4_binding_host` `960afb2c…`(20 files)、self-pin `b2c53eb7…`(57 files) | PASS(与已推 pin 一致) |
+| 2026-08-01 | disposable pgvector PG(127.0.0.1:5437,tmpfs):`x5_my_chat` 走 pinned My-Chat 迁移、`x5_nurture` 与 `nurture_dev_host` 走 Nurture 迁移;运行后连同 worktree 一并销毁 | PASS |
+| 2026-08-01 | `pnpm test:x5` | PASS 4/4(M5 acceptance + 三条 G1 joint negatives);覆盖本轮改动的 revoke 级联(闭包循环 + 三轴同步)与 kernel 三态,无回归 |

@@ -1618,3 +1618,26 @@
   `18-g1-joint-conformance-record.md` — protected T-005～T-007
   implementation opens; every consumer stays default-off and activation/
   deployment/traffic remain separately unauthorized.
+
+## 2026-08-01 T-002 债务偿还:grant revoke 级联的闭包与三轴同步
+
+- 2026-07-18 的 Pilot-0-C2e-4b 记录把 `take: 100` 的部分级联列为
+  implementation debt(C-2e-4d 拥有 exhaustive cascade closure)。T-005 的
+  G2 实施质量评审重新暴露了它:固定页上限之外的行静默不处理却照常提交,
+  属原子性缺陷而非性能取舍(T-005 冻结文档 D5 同样点名)。
+- 已在 `revokeFamilyCareGrant` 中修复:receipt 与 item 两处级联改为分页
+  循环至闭包(每页更新后行自动移出过滤条件,再查即收敛),超出硬上限则
+  整笔失败;affected refs 跨页累积后再按输出上限截断,不再依赖"恰好在第
+  一页内"。
+- 同一函数补上三轴同步:对 `writerContract != legacy_v1` 的 harness 行,
+  revoke 除写 legacy `status` 外还推进 canonical lifecycle 轴
+  (`suppressed` / `grant_revoked` / `lifecycleHead+1`),避免 T-005 三轴
+  与 T-002 兼容列失步。legacy 行行为不变。
+- 另按 T-005 cutover C6/C8 给三个 legacy family-care 变更器
+  (acknowledge / reply / redact)加了 `writerContract: "legacy_v1"` 前置,
+  legacy 路径不再能写 harness 行。这些都在 T-002 拥有的
+  `family-care-command.transaction.ts` 内,故一并记于本任务包。
+- 验证:x5 联合套件在 pinned 物化(My-Chat `a019566` / Base `06303e9`)+
+  disposable pgvector PG 上 4/4 通过,含 revoke 路径;production-db 86/86;
+  详见 `../nurture-family-care-conversation/04-verification.md`。无 schema
+  变更、无持久化 apply、无激活或流量效果。

@@ -31,7 +31,15 @@ Project: `main`
   lane with role-safe presenters, and the checkpoint gap suite — authority
   matrix, true concurrency, duplicate click, execute-time grant staleness,
   chat/board equivalence, leakage census; AC ids through `T005-AC-035`).
-  The critical lane moves to T-005 Increment 2
+  Two review rounds then closed real defects on that implementation — a
+  self-check and an independent gpt-5.6-sol review — most importantly an
+  enrollment-scoped guardian reaching another Institution's content, grant
+  purpose/data-class never being enforced, a broken continuation ref flow,
+  dishonest not-committed reporting (now a tri-state), the unwritten
+  immutable committed result, and the unenforced legacy single-writer
+  cutover; the T-002 `take:100` partial-cascade debt from 2026-07-18 is
+  repaid in the same pass and re-verified by the x5 joint suite on the
+  pinned materialization. The critical lane moves to T-005 Increment 2
   (correction/withdrawal/redaction) then G2-B/G2-C, with the early T-007
   G4-0A/0B publication-policy subset still open in parallel and Beta
   Profile v0 freezing near this gate. The G2-C digest rotation rides the

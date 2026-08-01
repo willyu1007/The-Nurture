@@ -1348,3 +1348,13 @@ the rejected checkpoint and are historical.
 | Leakage scan (joint harness) | PASS | Whole-table dumps: host DB 7 handoffs/31 outbox/5 notifications/18 steps — zero protected-content/safe-summary/claim sentinels; Nurture binding tables 30 auth/33 anchors — zero raw identity sentinels; 35 executions — zero claim/driver sentinels. |
 | Final false/empty census | PASS | Default-disabled service startup without owner secrets; no dev-host owner enablement path; all consumers/capability gates default-off; only disposable DBs, destroyed; no secret/deployment/activation/traffic. |
 | Verdict | **PASS** | `18-g1-joint-conformance-record.md` (G1-07). Protected T-005～T-007 implementation opens; everything else stays gated. |
+
+## 2026-08-01 — grant revoke 级联债务偿还(T-005 评审触发)
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| 级联闭包 | PASS | receipt/item 两处改为分页循环至闭包,超硬上限整笔失败;不再有 `take:100` 之外的静默未处理行(2026-07-18 记录的 implementation debt 关闭) |
+| 三轴同步 | PASS | harness 行 revoke 同时推进 `lifecycleState=suppressed / lifecycleReason=grant_revoked / lifecycleHead+1`;legacy 行行为不变(新增 legacy-cutover 套件覆盖两侧) |
+| legacy 单写入面 | PASS | acknowledge/reply/redact 三个 legacy 变更器加 `writerContract` 前置,打 harness 行零写入 |
+| x5 联合套件(pinned 物化) | PASS 4/4 | My-Chat `a019566` / Base `06303e9` detached worktree + disposable pgvector PG;pin 全部核对一致;运行后销毁 |
+| 效果边界 | PASS | 无 schema/migration、无持久化 DB apply、无 capability/secret/激活/流量变更 |

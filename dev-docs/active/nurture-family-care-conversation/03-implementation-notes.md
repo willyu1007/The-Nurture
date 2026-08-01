@@ -685,3 +685,18 @@
 - 未在本轮重跑:x5 联合套件(需 pinned My-Chat + pgvector 物化)。受影响的
   revoke 路径由 `family-care.integration` 与新 legacy-cutover 套件覆盖,
   CI 会跑 x5。
+
+## 2026-08-01 — x5 联合套件在 pinned 物化上复跑
+
+- 上一条记录里标注为 NOT RUN 的 x5 缺口已补:按 G1 先例做 pinned detached
+  worktree(My-Chat `a019566` / Base `06303e9` / The-Nurture `eb97d08`,
+  sibling working copy 全程未触碰),配 disposable pgvector PG(5437,tmpfs),
+  `x5_my_chat` 用 pinned My-Chat 迁移、`x5_nurture`/`nurture_dev_host` 用
+  Nurture 迁移。
+- `pnpm test:x5` **4/4 通过**,覆盖本轮改动实际触及的两处:revoke 级联
+  (闭包循环 + harness 行三轴同步)与 command kernel 三态结果。pin 验证在同
+  一物化上重跑,self-pin `b2c53eb7…` 与已推值一致。
+- 环境按纪律销毁:容器 `down -v`、三个 worktree `worktree remove --force`,
+  sibling 仓库 status 干净。
+- 本轮教训已归档到 `05-pitfalls.md`(冻结≠约束、作用域放大、测试自我掩盖、
+  错误分类不能一刀切、schema 列无 writer、声明需有证据、固定 take 级联)。

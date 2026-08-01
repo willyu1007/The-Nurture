@@ -136,3 +136,37 @@
 ## Resolved Pitfalls
 
 当前尚未进入实现阶段。实际问题解决后按完整历史结构记录。
+
+## G2 实施期的已解决教训(2026-08-01)
+
+以下都是 G2-A 实施中真实发生并已修复的问题,记录成因以免重犯。
+
+- **冻结文档写了约束不等于代码有约束。** cutover C6/C8 明确"新 G2 行唯一
+  writer 是三轴 Harness",但三个 legacy 变更器的 where 子句里根本没有
+  `writerContract` 过滤,legacy acknowledge 可以写 harness 行(改 legacy
+  status 而三轴不动,行自相矛盾)。凡是冻结文档里的安全属性,必须同时落成
+  **机械约束 + 负向测试**,并把对应 AC 的"检查类别"真正实现——只分配类别
+  不实现,等于没有。
+- **作用域放大是最隐蔽的越权。** guardian 的 `scopeType=enrollment` 角色被
+  当成"整个 child-care process"来解析,导致同一孩子在另一机构的内容进入
+  timeline。教训:把角色 scope 归一化成更粗的键(process/family)之前,先
+  确认那是**收窄**还是**放大**;测试要覆盖每一种 scopeType,而不是只用最
+  常见的一种。
+- **自己写的测试会掩盖自己的 bug。** 续接流程在 query 侧发签名 ref、在
+  submit 侧按裸 id 解析,照文档走必然失败;但集成测试直接传
+  `sourceItem.id`,于是一路绿。教训:测试要走**对外契约给出的那个值**,不
+  要图省事从内部状态取 id。
+- **"诚实的错误分类"不能一刀切。** 为实现 `outcome_unknown` 而把所有事务
+  异常都改成不可知,反而让确定性守卫失败(必定回滚)也变成"结果不明",比
+  原状更糟——测试立刻暴露了它。正确切分:**operation 内部抛错 = 确定回滚**,
+  **事务外壳失败 = 不可知**,驱动明确报告的写冲突(P2034/40001)算确定回滚。
+- **加了 schema 列不等于有 writer。** D7 的 `resultSchemaVersion` /
+  `committedResultPayload` 在 migration 里建好后长期无人写入,reply 算出的
+  `replyOrderKey` / first-vs-additional / attention 结果被直接丢弃。schema
+  delta 落地后要立刻回头确认"谁写、谁读",否则冻结契约只剩形状。
+- **commit message 与记录里的断言也要有证据。** 声称"query 零
+  CommandExecution""raw id 不出"时,前者当时无断言、后者与 keyed ref 的实
+  现不符。写进记录的每一句保证,要么有机械检查,要么改成实话。
+- **固定 `take` 上限的级联是原子性缺陷,不是性能取舍。** revoke 级联沿用
+  T-002 的 `take:100`,超出部分静默不处理却照常提交(冻结 D5 早已点名)。
+  已改为分页循环至闭包、超界整笔失败。

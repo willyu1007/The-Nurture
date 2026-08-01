@@ -7,16 +7,21 @@
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-01
 - Next step: **G2-A checkpoint 已达成**
-  (`11-g2a-checkpoint-record.md`：`G2A_CHECKPOINT_PASS`)。已落地链：
-  G2-0 freeze → 三轴 migration → Harness kernel/protected content →
-  submit/ack/reply 三纵切 → formal ingress 四 lane 六路由 → query lane
-  role-safe presenters → checkpoint 缺口套件(authority matrix/并发/
-  duplicate click/stale grant/surface 等价/泄漏 census)。AC 映射已编至
-  `T005-AC-035`。下一主线：Increment 2(correction/withdrawal/redaction，
+  (`11-g2a-checkpoint-record.md`：`G2A_CHECKPOINT_PASS`)，并已完成两轮
+  实施质量评审的全部修复(自查 + gpt-5.6-sol 独立评审；见 03/04/05 与
+  记录末尾的 Follow-ups)。已落地链：G2-0 freeze → 三轴 migration →
+  Harness kernel/protected content → submit/ack/reply 三纵切 → formal
+  ingress 四 lane 六路由 → query lane role-safe presenters → checkpoint
+  缺口套件 → 评审修复(enrollment 作用域越权、grant purpose/data-class
+  谓词、续接 ref、三态结果、immutable committed result、cursor 快照、
+  精确 CareGroup、legacy 单写入面)。AC 映射已编至 `T005-AC-035`。
+  下一主线：Increment 2(correction/withdrawal/redaction，
   `07-increment-2-change-contract.md` normative)→ G2-B(含 Admin
   owner-read 投影)→ G2-C(Message-only 契约已冻结，digest rotation 随
   下一 pin action)→ G2 Exit Qualification(formal ingress + real pinned
   owner path)。所有能力保持 default-off；T-005 不宣称 final Exit。
+- 未清债务：六个 G2 capability 与 09 号 shared referenced types 尚未进入
+  T-004 interface digest，与 G2-C rotation 同批在下一个 pin action 处理。
 
 ## Goal
 
