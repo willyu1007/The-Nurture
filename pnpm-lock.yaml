@@ -74,8 +74,8 @@ importers:
   apps/frontend:
     dependencies:
       '@willyu1007/web-workbench':
-        specifier: 0.11.0
-        version: 0.11.0(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: 0.12.0
+        version: 0.12.0(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next:
         specifier: ^16
         version: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1101,8 +1101,8 @@ packages:
   '@vitest/utils@2.1.9':
     resolution: {integrity: sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ==}
 
-  '@willyu1007/web-workbench@0.11.0':
-    resolution: {integrity: sha512-pZzS+Oe5zKjRfl64iB6IWjyUmNFrHxFSpBHW0NXxKsgAxZ9IpeYjLm1ZYsjoW/Ndc/PzwKl7Gg+t0l9NkTgvtg==, tarball: https://npm.pkg.github.com/download/@willyu1007/web-workbench/0.11.0/2f8910f003d96ce9a5cc382f173fe6153c25c97b}
+  '@willyu1007/web-workbench@0.12.0':
+    resolution: {integrity: sha512-F3lM6D1gwQPiws4wt4hjh1v5USouYty2B0mV5CDBtqDaDD26BLR14oWTMJvaUiXCTcGwOZKcu7VG4+aorb275Q==, tarball: https://npm.pkg.github.com/download/@willyu1007/web-workbench/0.12.0/49ea2190c3a6bcd3e0927d339362444ed926ac1d}
     peerDependencies:
       next: '>=15'
       react: '>=19'
@@ -3140,7 +3140,7 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 1.2.0
 
-  '@willyu1007/web-workbench@0.11.0(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@willyu1007/web-workbench@0.12.0(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       next: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
