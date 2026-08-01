@@ -7,45 +7,20 @@ Project: `main`
 - Do not place semantic extraction body here; semantic details live in `feature-map.md` `Semantic Feature Briefs`.
 
 ### Current Focus
-- Primary feature: F-002 Institution ecology
-- Supporting feature: F-003 Six-surface store-beta readiness
-- Goal this cycle: G1 Joint Conformance is **PASS** (2026-08-01,
-  `dev-docs/active/nurture-institution-mode/18-g1-joint-conformance-record.md`):
-  the exact T-004 `nurture.surface-contract@1.7.0` fixtures ran against the
-  M5-pinned owner path (My-Chat `a019566` / Base `06303e9`) through the
-  formal NestJS ingress on disposable databases, with the full G1-06 matrix,
-  the three joint negatives (owner unavailable, contract mismatch, stale
-  confirmation/heads), the owner-path named negatives (wrong user/purpose,
-  `bound_empty` recovery, quarantine), a clean leakage scan and the final
-  false/empty census. Protected T-005～T-007 implementation is now open.
-  T-005 G2-0 schema freeze is locked (2026-08-01,
-  `dev-docs/active/nurture-family-care-conversation/10-g2-schema-freeze.md`:
-  three-axis CareItem delta, single-writer cutover matrix, legacy ambiguity
-  inventory rules, G2-C frozen as Message-only
-  `initiate_caregiver_direct_message@1.0.0`, freeze-scope AC ids
-  `T005-AC-001..022`). The T-005 G2-A Core CareInteraction Loop checkpoint
-  is achieved (2026-08-01,
-  `dev-docs/active/nurture-family-care-conversation/11-g2a-checkpoint-record.md`:
-  three-axis migration, Harness kernel + protected content, the three
-  action verticals, the four-lane formal ingress at routes=6, the query
-  lane with role-safe presenters, and the checkpoint gap suite — authority
-  matrix, true concurrency, duplicate click, execute-time grant staleness,
-  chat/board equivalence, leakage census; AC ids through `T005-AC-035`).
-  Two review rounds then closed real defects on that implementation — a
-  self-check and an independent gpt-5.6-sol review — most importantly an
-  enrollment-scoped guardian reaching another Institution's content, grant
-  purpose/data-class never being enforced, a broken continuation ref flow,
-  dishonest not-committed reporting (now a tri-state), the unwritten
-  immutable committed result, and the unenforced legacy single-writer
-  cutover; the T-002 `take:100` partial-cascade debt from 2026-07-18 is
-  repaid in the same pass and re-verified by the x5 joint suite on the
-  pinned materialization. The critical lane moves to T-005 Increment 2
-  (correction/withdrawal/redaction) then G2-B/G2-C, with the early T-007
-  G4-0A/0B publication-policy subset still open in parallel and Beta
-  Profile v0 freezing near this gate. The G2-C digest rotation rides the
-  next pin action together with the Wave4 import-closure scoping decision.
-  Runtime/environment activation and external traffic remain gated; all
-  consumers stay default-off and T-005 claims no final Exit.
+- Primary feature: F-003 Six-surface store-beta readiness
+- Supporting feature: F-002 Institution ecology
+- W0 governance (2026-08-01): T-004 is done at exact
+  `nurture.surface-contract@1.7.0` /
+  `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`;
+  T-007 G4-0A inventory is PASS and G4-0B freezes
+  `nurture.institution-publication-policy@1.0.0`; T-008 freezes Beta Profile v0
+  as `nurture.six-surface-beta-profile@0.1.0`.
+- Implementation mainline: T-005 G2-A is PASS. Execute G2-B lifecycle
+  (correction/withdrawal/redaction) plus Institution Admin source-side owner-read,
+  then G2-C and the T-005 Exit Gate. All paths use the G1-qualified formal NestJS
+  owner ingress and preserve the single-writer/default-off fences.
+- Boundary: G1 PASS opens protected implementation only. Candidate Freeze,
+  persistent deployment, activation and external traffic remain unauthorized.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
 
@@ -75,9 +50,8 @@ Project: `main`
   gate. Qualified exact identity: `nurture.surface-contract@1.7.0` /
   `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`
   (record and T-008 handoff:
-  `08-phase-4-synthetic-qualification-and-handoff.md`). Synthetic PASS never
-  substitutes the owner gate: Owner Integration stays NO-GO until the M5
-  handoff regenerates against the advanced pin and Joint Conformance passes.
+  `08-phase-4-synthetic-qualification-and-handoff.md`). T-004 is now done; any
+  additive rotation is owned and requalified by the consuming T-005～T-007 task.
   The drift census and pin-advance evidence are
   `dev-docs/active/nurture-institution-mode/15-mychat-drift-census-pin-advance-input.md`.
 - T-002 ingress M0-M4: port semantics, the two-route formal v1 surface, G1-03
@@ -107,20 +81,21 @@ Project: `main`
   ships first for G3; after branch-specific freezes and G4-A, B/C/D/E may proceed
   in parallel and F is the final join. G4-0A～0G scope/order is accepted; next
   checkpoint moves to G5/T-008. G4 implementation uses I0～I4 gates, package DoD,
-  six acceptance dimensions and PASS/limited-pass/NO_GO; exact 0A inventory remains
-  the first T-007 implementation action.
+  six acceptance dimensions and PASS/limited-pass/NO_GO. Exact G4-0A inventory is
+  PASS, G4-0B freezes the publication-policy contract, and G4-0C is next; provider
+  implementation and qualification are still pending.
 - Stage G5: T-008 uses G5-0 readiness/profile, G5-A Candidate Freeze, G5-B
   deployment/local qualification, G5-C consumer handoff, G5-D parallel iOS/Android
-  internal validation and G5-E composite decision/evidence lifecycle. The structure
-  audit is PASS; G5-0 details are the next discussion, while tooling remains
-  just-in-time and does not enter the current upstream critical path.
+  internal validation and G5-E composite decision/evidence lifecycle. Beta Profile v0
+  is frozen at `nurture.six-surface-beta-profile@0.1.0`; tooling remains just-in-time
+  and does not enter the current upstream critical path.
 - Execution backbone (2026-08-01): the recommended single-mainline order is
   T-004 Phase 0 → T-002 ingress M0-M4 (complete; see
   `12-nestjs-ingress-migration-plan.md`) → T-004 Phase 1-2 (complete) →
   T-002 pin advance to the R3 cut (complete) → T-004 Phase 3-4 (complete;
   synthetic qualification at `1.7.0`) → T-002 M5 handoff regeneration (complete) →
-  G1 Joint Conformance → early T-007 G4-0A/0B
-  publication-policy subset → T-005 G2 (schema → Harness → A → B → C) →
+  G1 Joint Conformance → W0 governance (T-004 closure + T-007 G4-0A/0B +
+  T-008 Beta Profile v0) → T-005 G2-B → G2-C/Exit →
   T-006 G3-0 through G3-E → remaining T-007 G4 branches → T-008 G5.
   Beta Profile v0 freezes near G1 Joint Conformance (see T-008 plan).
 - Controlled-progress rules (2026-07-31): exactly one lane sits on the critical
@@ -133,18 +108,13 @@ Project: `main`
 - Decision deadline: before any DB apply, artifact publication, secret configuration, capability/manifest change, external pilot traffic, staging, production, or GA action.
 
 ### Next Governance Checkpoint
-- Date: at the next G*-0 freeze gates now that G1 Joint Conformance is PASS —
-  the T-007 G4-0A/0B publication-policy freeze and the T-005 G2 schema
-  freeze, plus the Beta Profile v0 freeze near this gate.
-- Delivered at the last checkpoint: the Joint Conformance result
-  (`dev-docs/active/nurture-institution-mode/18-g1-joint-conformance-record.md`,
-  verdict PASS) binding exact `nurture.surface-contract@1.7.0` to the
-  M5-pinned owner path through the formal NestJS ingress with the negative
-  matrix and final false/empty census.
-- Expected output: frozen G4-0A/0B and G2 entry contracts; the Wave4
-  import-closure scoping decision at the next pin action; no DB, Candidate,
-  secret, persistent environment, activation or traffic effect unless
-  separately approved.
+- Date: T-005 G2-B checkpoint.
+- Delivered at W0: T-004 closure, G4-0A inventory PASS, G4-0B publication-policy
+  contract freeze, and Beta Profile v0 freeze.
+- Expected output: qualified correction/withdrawal/redaction lifecycle plus
+  Institution Admin source-side owner-read, with exact authority, audit, presenter,
+  ingress and negative-test evidence. No Candidate, secret, persistent environment,
+  activation or traffic effect.
 
 ## Notes (manual)
 - Keep human notes here. Everything below the AUTO section is generated by sync.
@@ -152,14 +122,14 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 8 (planned: 3, in-progress: 4, blocked: 0, done: 1, archived: 0)
+- Tasks: 8 (planned: 3, in-progress: 3, blocked: 0, done: 2, archived: 0)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
+| T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | in-progress | F-003 | dev-docs/active/nurture-family-care-conversation |
-| T-004 nurture-surface-contract-foundation | in-progress | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
 | T-006 nurture-child-care-boards | planned | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |

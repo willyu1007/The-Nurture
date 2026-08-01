@@ -69,11 +69,11 @@ tasks:
     updated: 2026-07-21
   - id: T-004
     slug: nurture-surface-contract-foundation
-    status: in-progress
+    status: done
     milestone_id: M-002
     feature_id: F-003
     dev_docs_path: dev-docs/active/nurture-surface-contract-foundation
-    updated: 2026-07-31
+    updated: 2026-08-01
   - id: T-005
     slug: nurture-family-care-conversation
     status: in-progress

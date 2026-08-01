@@ -23,17 +23,14 @@ Project: `main`
 - Intent: deliver child-scope-first family/institution care coordination with Nurture-owned business facts and My-Chat-owned account, shell, and durable runtime.
 - Scope In: participants/roles, child care process, institution/group/enrollment/grant, family-care messages/items/receipts, class inbox, teacher attention, daily care, and media attribution.
 - Scope Out: institution ranking, marketplace behavior, competitive caregiver scoring, My-Chat identity duplication, and ambient access to family-private data.
-- Decision: X0-X5 and N1/X4-N2 are complete with exact cross-repository pins and default-off boundaries. The bounded Wave 4 P7 Nurture owner endpoint is merged and remains default-disabled; T-002 owner/source repair proceeds in controlled parallel with T-004 contract qualification rather than blocking synthetic contract work. NestJS ingress M0-M4 is now implementation-complete: scenario-service owns `PORT=8000`, Base-local backend/frontend endpoints remain the M0 `3200/3201` decision, Fastify remains a transitional `DEV_HOST_PORT=3001` harness, and formal v1 contains only health plus binding-owner. The service uses one fail-closed runtime for guard/controller, shared compiled transport/composition boundaries, production Prisma, one atomic reservation/current-authority/Receipt transaction, explicit Participant/Guardian locks and UTC-safe effective windows. P7 application parity, the formal shell's safe parser contract, the exact My-Chat consumer, replay/recovery/revoke/privacy, rollback-on-denial, missing/stale anchors and real PostgreSQL concurrency are green; clean builds prevent deleted ingress code from surviving in `dist`, and the Nurture self-pin covers the 53-file formal-ingress population. OpenAPI/index/source parity, env SSOT and the port topology now have mechanical CI gates. M5 Owner Integration Handoff regeneration remains, so M4 does not itself open protected six-surface use. Incomplete G1-03 invocation properties remain explicit deferred gates. G1 uses progressive entry: start opens downstream design/pure-domain/synthetic work, Contract Boundary opens exact public-contract implementation, Owner Integration Readiness opens isolated real-adapter integration, and Joint Conformance alone opens protected qualification/Beta handoff. Pilot-0-B/C and Pilot-0-D historical decisions remain traceable, but the 2026-07-29 CareGroup shared-responsibility decision supersedes C-3-3/C-4-4 exact-claimant reply and terminal-claimant staffing-blocked semantics. Those slices require redesign and requalification; C-3/C-4/D implementation remains unauthorized, and external traffic stays NO-GO.
+- Decision: X0-X5、N1/X4-N2、formal NestJS ingress M0-M5、T-004 Surface Contract `1.7.0` 和 G1 Joint Conformance 已在 exact My-Chat `a019566` / Base `06303e9` pins 上完成。受保护的 T-005～T-007 实现已开放，但所有能力仍 default-off；这不创建 Service Candidate、部署、激活或流量授权。T-002 继续负责 C30-C35、C40-C45、D 与 Pilot gates。2026-07-29 CareGroup shared-responsibility decision 继续取代旧 exact-claimant/terminal-claimant 语义；当前 G2-A 已按共享责任支持多 caregiver reply，后续生命周期与 owner-read 仍须保持 child/purpose/data-class/request-time authority fences。
 - Dependencies: the current Pilot-0-C index, Pilot-0-D topology/operations contract and workflow context contract; pinned Base/My-Chat/Nurture revisions/hashes; strict C30-C35 then C40-C45 implementation/qualification; D implementation and immutable complete-candidate/evidence assembly; then Pilot-0-E before any Pilot-1 decision.
 - Risks: confusing `DR-*` design findings with `TR-*` traffic blockers, treating green CI/design completion/X5 PASS or superseded exact-claimant evidence as source/deployment authority, issuing a receipt after its authority source changed, exposing stable anchors through Host clients, widening CareGroup responsibility to same-Institution access, bypassing the opaque My-Chat Child/Family binding chain, publishing mutable artifacts, or weakening owner-reread/revoke/privacy fences for pilot convenience.
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
-- Next Checkpoint: complete the remaining T-004 Phase 2 Contract Boundary, then regenerate
-  the exact M5 Owner Integration Handoff and remove or
-  hard-disable the transitional Fastify P7 route; close remaining C30-I0-C/D exact-pin and
-  false/empty evidence, and meet T-004 at the separate Joint Conformance gate.
-  Broader C30-C35, C40-C45 and D readiness, Pilot-0-E and Pilot-1 remain
-  separately blocked.
+- Next Checkpoint: support T-005 G2-B/G2-C through the exact owner path while T-002
+  keeps broader C30-C35, C40-C45, D, Pilot-0-E and Pilot-1 readiness as separate
+  gates. No downstream task may reinterpret G1 PASS as deployment or traffic authority.
 
 ### F-003 Six-surface store-beta readiness
 - Intent: turn the six-surface T-003 design into a qualified, default-off Nurture Service Candidate and versioned interface that My-Chat can integrate through authenticated API calls and validate on iOS and Android internal-testing channels.
@@ -102,17 +99,19 @@ Project: `main`
   and joint evidence, owner/pin/ingress drift invalidates owner and joint evidence, and
   security/privacy risk invalidates immediately. G1 PASS still grants no Candidate Freeze,
   persistent DB apply, internal-store testing, activation or traffic.
-  T-004 Phase 0 discovery/gate reconciliation is complete: the current
-  manifest/module/handler/presenter/repository/API/DB foundations are classified,
-  legacy family-care business semantics are marked for replacement rather than reuse,
-  and the framework-neutral artifact-set landing is fixed. This opens the accepted
-  execution backbone only; no Surface Contract Artifact Set or Contract Boundary PASS
-  exists yet. Current My-Chat checkout drift keeps Owner Integration NO-GO.
+  T-004 Phase 0～4、T-002 M5 and G1 Joint Conformance are complete. The exact qualified
+  identity is `nurture.surface-contract@1.7.0` /
+  `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`
+  at My-Chat `a019566` / Base `06303e9`. T-004 is done; any additive contract or pin
+  rotation is owned by the consuming T-005～T-007 work and must requalify its exact path.
 - Stage G2: reuse T-005 for the first Nurture-side family/CareGroup CareInteraction
   delivery. G2-A qualifies the Guardian submit → CareGroup acknowledge → one-or-more
   caregiver reply Core Loop; G2-B completes correction/withdrawal/redaction and the
   Institution Admin source-side owner-read projection; G2-C supplies T-006 with a
   dedicated caregiver-initiated, exact-target protected direct-interaction capability.
+  G2-A is PASS with the three-axis CareItem schema, Harness kernel, submit/acknowledge/
+  reply actions, four formal ingress lanes, role-safe queries and negative/concurrency/
+  leakage coverage. The active checkpoint is G2-B lifecycle plus Admin owner-read.
   G2-A is only a checkpoint. T-005 Exit requires A/B/C, formal NestJS ingress + real
   owner-path qualification, and a single-writer cutover in which legacy status,
   assignment, single-reply and claimed-Step paths are read-only/default-off and never
@@ -149,9 +148,10 @@ Project: `main`
   Surface, class activity/revision/attribution and generic InstitutionWorkflow
   carrier/projection records. A Branch Freeze PASS opens only its implementation
   inputs; it is not Owner Readiness, Joint Conformance, Beta Handoff or activation.
-  G4-0A now has a dedicated freeze ledger structure for dependency pins, fact
-  ownership, schema-delta classification, branch routing and a default-safe census;
-  exact inventory/pins remain pending rather than being inferred from planning docs.
+  G4-0A exact dependency/fact/schema/census inventory is PASS. G4-0B freezes
+  `nurture.institution-publication-policy@1.0.0` as a contract-only publication-policy
+  input; implementation/provider qualification remains pending. G4-0C authority and
+  surface freeze is next.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
   has its own DoD; overall acceptance covers contract/ownership, required product
@@ -170,8 +170,10 @@ Project: `main`
   enablement is a separate scoped/revocable gate that Binding observes but does not
   authorize. T-002 production/external traffic gates are not Freeze prerequisites.
   Defects route to the smallest owning version layer; rollback creates a new observed
-  Binding and reruns local, both platforms, Composite and Decision. Tooling remains
-  just-in-time/minimal and does not block T-004～T-007 implementation.
+  Binding and reruns local, both platforms, Composite and Decision. Beta Profile v0 is
+  frozen as `nurture.six-surface-beta-profile@0.1.0`: deterministic/manual G3 paths and
+  source-cited G4 knowledge are required, while AI copy, face match and other explicitly
+  listed enhancements remain optional/default-off. Tooling remains just-in-time/minimal.
 - Stage G6: top-level planning is accepted as G6-0 Candidate/Evidence
   Reconciliation, G6-A C3/C4/D Implementation Closure, G6-B Pilot-0-E,
   G6-C Pilot-1 Private Publication/Default-off Deployment, and G6-D Default-off
@@ -328,24 +330,12 @@ Project: `main`
   canonical attendance, letting Admin substitute for class-teacher confirmation, or presenting
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
-- Related Tasks: T-004 (`in-progress`); T-005 through T-008 (`planned`).
-- Next Checkpoint: T-004 Phase 0-2 与 T-002 NestJS ingress M0-M4
-  已完成；exact Surface Contract Artifact Set 当前为
-  `nurture.surface-contract@1.0.0` /
-  `sha256:2edc462f3fd2c2c272355dc7a25d7738e4390bc596feda55280a4599ac1c3129`。
-  当前单主线执行 T-004 Phase 3 deterministic fixtures/cross-role Journeys，
-  随后进入 Phase 4 synthetic qualification，并与 T-002 M5 汇合。
-  真实 owner integration 只在精确 T-002 pins/evidence 就绪后通过 Joint Conformance。
-  T-003 是非阻塞设计输入。T-005～T-007 从 G1 start
-  即可并行做设计、纯领域逻辑与 synthetic work；Contract Boundary、Owner Readiness
-  和 Joint Conformance 依次开放公共合同实现、真实 adapter 与 protected
-  qualification。T-008 Candidate/evidence tooling 等上游 Exit Gates 接近完成时再
-  按需实现，不进入当前关键路径。所有新增能力保持 default-off，external traffic
-  继续 NO-GO。Stage G2 已确认复用 T-005；G2-A/B/C 可按 G1 progressive gates
-  dependency-aware 并行推进，T-006 的其他 board work 不等待 G2-C，但
-  `direct_interaction_required` 在 G2-C exact contract/qualification 前保持安全不可用。
-  Stage G3 已确认复用 T-006；下一步先执行 G3-0 freeze，再从 G3-A 开始逐组确认/
-  实施，G3-B/C 可依赖感知并行。
+- Related Tasks: T-004 (`done`); T-005 (`in-progress`); T-006～T-008 (`planned`).
+- Next Checkpoint: W0 governance is complete: T-004 is closed, G4-0A inventory passes,
+  G4-0B publication policy and Beta Profile v0 are frozen. The single critical lane is
+  T-005 G2-B, followed by G2-C and the T-005 Exit Gate; then execution advances to
+  T-006 G3-0. T-007 continues from G4-0C when it becomes the critical lane. All new
+  capabilities remain default-off and external traffic remains NO-GO.
 
 ## Notes (manual)
 - Keep human notes here. Everything below the AUTO section is generated by sync.
@@ -374,7 +364,7 @@ Project: `main`
 
 | Task | Status | Dev Docs |
 | --- | --- | --- |
-| T-004 nurture-surface-contract-foundation | in-progress | dev-docs/active/nurture-surface-contract-foundation |
+| T-004 nurture-surface-contract-foundation | done | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | in-progress | dev-docs/active/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | dev-docs/active/nurture-institution-surfaces |
