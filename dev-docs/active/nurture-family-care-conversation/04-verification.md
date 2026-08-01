@@ -257,3 +257,17 @@
 | 2026-08-01 | `verify:test-routing` / `verify:persistence-boundaries` / `db:assert-boundary` | PASS;54 files(production-db 6);boundary 50 tables / 83 enums;`docs/context/db/schema.json` 已刷新 |
 | 2026-08-01 | self-pin 重算(schema.prisma + 两个领域文件在 pin 集内) | `nurtureScenario.contractSha256` → `07f1aeb0…`(54 files,验证器自身算法);完整 pin verify 由 pinned-checkout CI 权威执行 |
 | 2026-08-01 | 效果边界 | PASS:无持久化 DB apply、无 handler/digest/capability/secret/激活/流量变更;wave4 约束名漂移已从 migration 剔除并记录 |
+
+## Harness kernel 与 protected-content boundary — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | unit 全套(新增 harness 组合器/payload/integrity/envelope 套件) | PASS 265/265(文件 28→29) |
+| 2026-08-01 | 事务集成:同事务单次消费、exact replay 不再消费、consumed 拒新 effect、integrity 漂移零消费后原 ref 可恢复、过期 reprepare conflict、跨 actor blocked | PASS 5/5(disposable PostgreSQL 5435,tmpfs,运行后销毁) |
+| 2026-08-01 | AES-256-GCM port:round-trip、随机 iv、防篡改/错 key/错 keyRef fail closed、弱 key/超长明文拒绝 | PASS 4/4 |
+| 2026-08-01 | production-db 全套 + population | PASS 55/55(floor 46→55;`vitest.db.config` 关闭文件并行修复 Serializable SSI 假冲突) |
+| 2026-08-01 | scenario-service 42/42;dev-host 26/26;boundary 50 tables/83 enums | PASS |
+| 2026-08-01 | `pnpm verify:surface-conformance` | PASS;digest 不变 `1.7.0`/`b7691a81…` |
+| 2026-08-01 | root `pnpm typecheck` / `verify:test-routing`(57 files:29/8/11/8/1) | PASS |
+| 2026-08-01 | self-pin 重算(kernel/repositories/index 在 pin 集) | `nurtureScenario.contractSha256` → `2902efd5…`(54 files);pinned-checkout CI 权威 |
+| 2026-08-01 | 效果边界 | PASS:无路由/OpenAPI/env 契约变更(留 ingress 单元)、无持久化 DB、无 capability/digest/secret/激活/流量;key material 注入式,缺失即 default-off |

@@ -14,6 +14,7 @@ import type {
   NurtureCommandTransaction,
   NurtureInteractionContextRecord,
   NurtureInteractionContextRepository,
+  NurtureInteractionContextTransactionPort,
   NurtureWorkflowProject,
 } from "@the-nurture/scenario";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
@@ -105,9 +106,11 @@ const toInteraction = (row: PrismaInteractionContext): NurtureInteractionContext
 
 class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly familyCare: PrismaFamilyCareCommandTransaction;
+  readonly interactionContexts: NurtureInteractionContextTransactionPort;
 
   constructor(private readonly transaction: Prisma.TransactionClient) {
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
+    this.interactionContexts = new PrismaInteractionContextRepository(transaction);
   }
 
   async findCommitted(input: {
@@ -256,7 +259,7 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
 }
 
 export class PrismaInteractionContextRepository implements NurtureInteractionContextRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient | Prisma.TransactionClient) {}
 
   async create(
     input: Omit<NurtureInteractionContextRecord, "id" | "created_at" | "updated_at">,

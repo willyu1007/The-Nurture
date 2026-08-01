@@ -5,6 +5,7 @@ import type {
 } from "@my-chat/workflow-contracts";
 import type { NurtureWorkflowProject } from "../../repositories.js";
 import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
+import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
   buildNurtureHandoffRequestSnapshots,
   normalizeExecutionHandoffState,
@@ -54,6 +55,8 @@ export type NurtureCommandExecutionDraft = Omit<NurtureCommandExecutionRecord, "
 export type NurtureCommandTransaction = {
   /** Present when the N1 institution command adapter is wired. */
   familyCare?: NurtureFamilyCareCommandTransaction;
+  /** Present when the G2 Harness confirmation consumer is wired. */
+  interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {
     workspace_id: string;
     command_request_id_hash: string;

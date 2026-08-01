@@ -27,6 +27,15 @@ export type NurtureInteractionContextRecord = {
   updated_at: string;
 };
 
+/**
+ * Transaction-scoped subset used to consume a confirmation inside the same
+ * Nurture command transaction as the business effect (G2 Harness).
+ */
+export type NurtureInteractionContextTransactionPort = Pick<
+  NurtureInteractionContextRepository,
+  "findByTokenHash" | "consume"
+>;
+
 export type NurtureInteractionContextRepository = {
   create(input: Omit<NurtureInteractionContextRecord, "id" | "created_at" | "updated_at">): Promise<NurtureInteractionContextRecord>;
   findByTokenHash(input: { workspace_id: string; token_hash: string }): Promise<NurtureInteractionContextRecord | null>;
@@ -97,6 +106,44 @@ const FORBIDDEN_STATE_KEYS = new Set([
 ]);
 
 const sha256 = (value: string): string => createHash("sha256").update(value, "utf8").digest("hex");
+
+/**
+ * Pure row classification shared by the repository-backed service and the
+ * transaction-scoped Harness confirmation consumer.
+ */
+export const classifyInteractionContextRow = (
+  row: NurtureInteractionContextRecord | null,
+  expected: {
+    workspace_id: string;
+    participant_id: string;
+    purpose: NurtureInteractionPurpose;
+    surface: string;
+    host_conversation_ref?: string;
+  },
+  at: Date,
+): InteractionTokenClassification => {
+  if (!row || !TOKEN_HASH_PATTERN.test(row.token_hash)) {
+    return { status: "blocked", reason_code: "token_mismatch" };
+  }
+  if (row.status === "consumed") return { status: "blocked", reason_code: "token_replayed" };
+  if (row.status === "revoked") return { status: "blocked", reason_code: "token_revoked" };
+  const expectedConversationHash = expected.host_conversation_ref
+    ? hashHostConversationRef(expected.workspace_id, expected.host_conversation_ref)
+    : undefined;
+  if (
+    row.workspace_id !== expected.workspace_id ||
+    row.participant_id !== expected.participant_id ||
+    row.purpose !== expected.purpose ||
+    row.surface !== expected.surface ||
+    row.host_conversation_ref_hash !== expectedConversationHash
+  ) {
+    return { status: "blocked", reason_code: "token_mismatch" };
+  }
+  if (new Date(row.expires_at).getTime() <= at.getTime()) {
+    return { status: "expired", reason_code: "token_expired" };
+  }
+  return { status: "current", context: row };
+};
 
 export const hashScenarioToken = (workspaceId: string, token: string): string =>
   sha256(`nurture.scenario-token.v1\0${workspaceId}\0${token}`);
@@ -189,31 +236,11 @@ export class NurtureInteractionContextService {
     surface: string;
     host_conversation_ref?: string;
   }): Promise<InteractionTokenClassification> {
-    const tokenHash = hashScenarioToken(input.workspace_id, input.token);
     const row = await this.repository.findByTokenHash({
       workspace_id: input.workspace_id,
-      token_hash: tokenHash,
+      token_hash: hashScenarioToken(input.workspace_id, input.token),
     });
-    if (!row || !TOKEN_HASH_PATTERN.test(row.token_hash)) {
-      return { status: "blocked", reason_code: "token_mismatch" };
-    }
-    if (row.status === "consumed") return { status: "blocked", reason_code: "token_replayed" };
-    if (row.status === "revoked") return { status: "blocked", reason_code: "token_revoked" };
-    const expectedConversationHash = input.host_conversation_ref
-      ? hashHostConversationRef(input.workspace_id, input.host_conversation_ref)
-      : undefined;
-    if (
-      row.participant_id !== input.participant_id ||
-      row.purpose !== input.purpose ||
-      row.surface !== input.surface ||
-      row.host_conversation_ref_hash !== expectedConversationHash
-    ) {
-      return { status: "blocked", reason_code: "token_mismatch" };
-    }
-    if (new Date(row.expires_at).getTime() <= this.now().getTime()) {
-      return { status: "expired", reason_code: "token_expired" };
-    }
-    return { status: "current", context: row };
+    return classifyInteractionContextRow(row, input, this.now());
   }
 
   async consume(input: {

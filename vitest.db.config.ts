@@ -13,6 +13,9 @@ export default defineConfig({
       "**/dist/**",
       "**/x5-joint-acceptance.integration.test.ts",
     ],
+    // The suite shares one disposable database and the command kernel runs
+    // Serializable transactions; parallel files trigger SSI false conflicts.
+    fileParallelism: false,
     testTimeout: 20000,
     setupFiles: ["dotenv/config"],
   },

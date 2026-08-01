@@ -380,3 +380,43 @@
 - 下一步:G2-10 第 3 步余下部分——经 formal NestJS ingress 实现 Harness
   (query/prepareAction/executeAction/readResult)与 protected-content
   boundary(`ProtectedContentWritePort`)。
+
+## 2026-08-01 — Harness kernel 与 protected-content boundary 落地
+
+- 按 `10-g2-schema-freeze.md` D6/D8 与 G2-03 实现 Harness 内核层
+  (`packages/nurture-scenario/src/harness/`):
+  - `confirmation.ts`:payload-schema-v2 封闭 confirmation payload
+    (capability key/version、stable command identity、target refs、
+    expected heads、secret-keyed input integrity tag)、五分钟 TTL 常量、
+    `issueHarnessConfirmation`(purpose=`prepare_action`)与
+    `computeHarnessInputIntegrityTag`(HMAC-SHA256,低熵正文不存可枚举
+    bare hash)。
+  - `execute-confirmation.ts`:`withHarnessConfirmation` spec 组合器——在
+    同一 command 事务内完成 confirmation 查找、绑定/schema/身份/完整性
+    校验与 CAS 单次消费,然后委托原 capability spec;committed replay 由
+    runner 在事务外短路,天然不再消费。拒绝分类:expired/replayed/
+    integrity-mismatch → conflict,revoked/绑定漂移 → blocked,端口缺失
+    → invalid(fail closed)。
+  - `protected-content.ts`:封闭 `ProtectedContentEnvelopeV1` 与
+    `ProtectedContentWritePort` 域接口;db 层
+    `createAesGcmProtectedContentPort`(AES-256-GCM,iv 前缀进
+    ciphertext,GCM tag 即 integrityTag,key material 注入、缺失即
+    default-off)。
+- 事务组合:`NurtureCommandTransaction` 新增 optional
+  `interactionContexts` 子端口(与既有 `familyCare` 同模式);
+  `PrismaNurtureCommandTransaction` 以事务客户端组装
+  `PrismaInteractionContextRepository`(构造放宽为
+  `PrismaClient | TransactionClient`)。`classify` 抽出纯函数
+  `classifyInteractionContextRow` 供服务与事务消费共用。
+- 测试:unit 新增 harness 套件(payload/integrity/envelope/组合器全分支,
+  unit 265/265,文件 28→29);db 侧新增 AES port 套件与事务集成套件
+  (单次消费、exact replay 不再消费、consumed 拒新 effect、integrity
+  漂移零消费后可恢复、过期 reprepare、跨 actor 拒绝;production-db
+  55/55,floor 46→55,文件 6→8)。`vitest.db.config.ts` 关闭文件并行:
+  共享库上的 Serializable 命令事务在并行文件下会产生 SSI 假冲突。
+- self-pin 重算(command-kernel/institution-core/nurture-db index 在 pin
+  集):`nurtureScenario.contractSha256` → `2902efd5…`(54 files)。
+  T-004 digest 不变(`1.7.0`/`b7691a81…` conformance 通过)。
+- 下一步:NestJS Harness 路由(query/prepare/execute/readResult)+
+  OpenAPI/api-index/ingress 守卫治理 + env 契约登记(integrity/content
+  key),与 submit capability 纵切同单元。
