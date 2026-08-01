@@ -15,6 +15,11 @@
       "types": "./src/binding-owner-http.ts",
       "import": "./dist/binding-owner-http.js",
       "default": "./dist/binding-owner-http.js"
+    },
+    "./harness": {
+      "types": "./src/harness-entry.ts",
+      "import": "./dist/harness-entry.js",
+      "default": "./dist/harness-entry.js"
     }
   },
   "scripts": {

@@ -2,7 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import type {
   NurtureUserAttentionFacts,
   NurtureUserAttentionRepository,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
 
 const currentGrant = (
   grant: {

@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
-import type { SubmitEligibilityReadPort } from "@the-nurture/scenario";
+import type { SubmitEligibilityReadPort } from "@the-nurture/scenario/harness";
 
 /**
  * Read-only guardian submit eligibility for the Harness prepare step

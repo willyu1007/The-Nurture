@@ -20,6 +20,9 @@ const allowedErrors = new Set([
   "authorization_receipt_inactive",
   "owner_authorization_denied",
   "owner_authorization_unavailable",
+  "harness_disabled",
+  "invalid_harness_request",
+  "unknown_capability",
 ]);
 
 const bodyParserErrorStatuses = new Map<string, number>([
@@ -55,7 +58,8 @@ export class SafeExceptionFilter implements ExceptionFilter {
     const error = safeError(exception, status);
     if (
       (!isOperationalException(exception) || status >= 500) &&
-      error !== "binding_owner_disabled"
+      error !== "binding_owner_disabled" &&
+      error !== "harness_disabled"
     ) {
       this.logger.unhandledException(requestContext);
     }

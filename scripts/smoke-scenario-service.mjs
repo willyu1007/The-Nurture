@@ -61,6 +61,18 @@ try {
     error: "binding_owner_disabled",
   });
 
+  const harnessDisabled = await fetch(
+    `${baseUrl}/internal/nurture/harness/prepare-action`,
+    {
+      method: "POST",
+      headers: {
+        authorization: "Bearer smoke-service-token",
+        connection: "close",
+      },
+    },
+  );
+  await assertResponse(harnessDisabled, 503, { error: "harness_disabled" });
+
   const legacy = await fetch(
     `${baseUrl}/internal/nurture/activation/user-attention/resolve`,
     { method: "POST", headers: { connection: "close" } },
@@ -68,7 +80,7 @@ try {
   await assertResponse(legacy, 404, { error: "not_found" });
 
   process.stdout.write(
-    `[ok] scenario-service build/start/health port=${port} binding-owner=disabled legacy-route=absent\n`,
+    `[ok] scenario-service build/start/health port=${port} binding-owner=disabled harness=disabled legacy-route=absent\n`,
   );
 } catch (error) {
   process.stderr.write(`${String(error)}\n${stdout}${stderr}`);

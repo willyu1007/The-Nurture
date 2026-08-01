@@ -9,7 +9,7 @@ import type {
   NurtureRepositories,
   NurtureWorkflowProject,
   NurtureWorkflowProjectRepository,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
 import {
   PrismaInteractionContextRepository,
   PrismaNurtureCommandRepository,

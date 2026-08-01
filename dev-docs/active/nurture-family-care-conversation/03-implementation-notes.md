@@ -490,3 +490,36 @@
 - G2-A 三个 action 域层齐;下一单元:NestJS Harness 路由 + OpenAPI/
   api-index/ingress 守卫 + env 契约登记,把三个 capability 挂上 formal
   ingress。
+
+## 2026-08-01 — Harness formal ingress 落地(prepare/execute 路由 + 治理)
+
+- scenario-service 新增两条私有路由并挂上三个 G2-A capability:
+  `POST /internal/nurture/harness/prepare-action`、
+  `POST /internal/nurture/harness/execute-action`(service bearer 认证;
+  `NURTURE_HARNESS_INTEGRITY_KEY`/`NURTURE_PROTECTED_CONTENT_KEY`/service
+  token/DATABASE_URL 任缺即整路 503 `harness_disabled`,无部分降级)。
+  query/readResult lane 留待 query/presenter 单元。
+- engine 语义:prepare 按 capability 分发,响应剔除内部 raw id(target 只
+  以 confirmation/option ref 往返);execute 只定位 confirmation 行并恢复
+  payload(target/heads/command identity),全部状态语义(expired/consumed/
+  revoked/binding drift)由事务内组合器裁决——修复了 ingress 层预拦
+  consumed ref 会破坏"已提交命令 exact replay 恢复"的缺口;capability
+  身份保留在 engine(spec 选择依据),command 身份下放组合器,使 consumed
+  ref 复用一致映射为 `confirmation_replayed`/refresh。
+- not_committed 响应带 machine-readable `recovery`
+  (reprepare/refresh/retry_same_command/none)。
+- 运行时解析:两包新增 `./harness` dist 条件子路径导出(主入口保持
+  src-only 供 vitest);nurture-db 全部运行时 `@the-nurture/scenario` 导入
+  改走子路径,修复编译产物在 Node 下解析 src 的启动失败。
+  SafeExceptionFilter allowlist 登记三个 harness 错误码。
+- 治理同步:OpenAPI 新增 2 路由 + 5 schema(quality strict PASS)、
+  api-index 再生成、formal-ingress 守卫升级为
+  `routes=4 owner-fields=8 harness-execute-fields=8`、env 契约登记两个
+  optional secret key 并刷新生成物(validate PASS)、smoke 增加
+  `harness=disabled` default-off 证据。
+- 测试:进程内 e2e(disabled 503/auth 401/shell 400/unknown capability/
+  engine 分发)+ 真实 PG HTTP 全链路(submit→ack→reply、exact replay、
+  明文零泄漏、consumed→refresh);scenario-service 46/46 + db 8/8
+  (routing 61 files:29/10/11/10/1)。
+- self-pin 重算 → `e221e1cf…`(54→57 files,scenario-service src 新文件
+  计入);T-004 digest 不变。

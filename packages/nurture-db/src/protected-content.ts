@@ -5,7 +5,7 @@ import {
   PROTECTED_CONTENT_ALG_VERSION,
   type ProtectedContentEnvelopeV1,
   type ProtectedContentWritePort,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
 
 /**
  * AES-256-GCM implementation of the G2 no-store protected-content boundary

@@ -8,6 +8,10 @@ import {
   createBindingOwnerRuntime,
   type BindingOwnerRuntime,
 } from "./binding-owner-runtime.js";
+import {
+  createHarnessRuntime,
+  type HarnessRuntime,
+} from "./harness-runtime.js";
 import type { ScenarioBindingOwnerAuthorizer } from "@the-nurture/scenario/binding-owner";
 import {
   loadBindingOwnerServiceAuth,
@@ -34,6 +38,7 @@ export async function createScenarioServiceApplication(input?: {
   bindingOwnerAuthorizer?: ScenarioBindingOwnerAuthorizer;
   bindingOwnerRuntime?: BindingOwnerRuntime;
   bindingOwnerServiceAuth?: BindingOwnerServiceAuth;
+  harnessRuntime?: HarnessRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
@@ -47,10 +52,19 @@ export async function createScenarioServiceApplication(input?: {
         ? { authorizer: input.bindingOwnerAuthorizer }
         : {}),
     });
+  const harnessRuntime =
+    input?.harnessRuntime ??
+    createHarnessRuntime({ serviceAuth: bindingOwnerServiceAuth });
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
-      runtime: bindingOwnerRuntime,
-      serviceAuth: bindingOwnerServiceAuth,
+      bindingOwner: {
+        runtime: bindingOwnerRuntime,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
+      harness: {
+        runtime: harnessRuntime,
+        serviceAuth: bindingOwnerServiceAuth,
+      },
     }),
     {
       abortOnError: false,

@@ -295,3 +295,19 @@
 | 2026-08-01 | root `pnpm typecheck` | PASS |
 | 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `d11792bf…`(54 files) |
 | 2026-08-01 | 效果边界 | PASS:无路由/OpenAPI/env 变更、无持久化 DB、无 discovery 发布、无 capability/secret/激活/流量 |
+
+## Harness formal ingress — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | 进程内 e2e:disabled 503、bearer 401、封闭 shell 400、unknown capability 400、prepare/execute 引擎分发 | PASS 4/4(scenario-service 套件 46/46) |
+| 2026-08-01 | 真实 PG HTTP 全链路:submit→acknowledge→reply committed、exact replay(consumed ref 仍返回原结果)、响应无 raw id、密文落库明文零泄漏、consumed 复用 → `confirmation_replayed`/refresh | PASS 2/2(scenario-service db 8/8;disposable PG,运行后销毁) |
+| 2026-08-01 | `pnpm verify:formal-ingress-contract` | PASS `routes=4 owner-fields=8 harness-execute-fields=8` |
+| 2026-08-01 | OpenAPI quality strict + api-index generate/verify | PASS(checksum 33e7dce5…) |
+| 2026-08-01 | env 契约 validate + 生成物刷新(两个 optional secret key) | PASS |
+| 2026-08-01 | smoke(built artifact) | PASS `binding-owner=disabled harness=disabled legacy-route=absent` |
+| 2026-08-01 | production-db 67/67;unit 265/265;dev-host 26/26;routing 61 files(29/10/11/10/1);port topology | PASS |
+| 2026-08-01 | `pnpm verify:surface-conformance` | PASS;digest 不变 `1.7.0`/`b7691a81…` |
+| 2026-08-01 | root `pnpm typecheck` | PASS |
+| 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `e221e1cf…`(57 files) |
+| 2026-08-01 | 效果边界 | PASS:additive 路由,default-off(keys 缺失即 503);无持久化 DB、无 discovery 发布、无 secret 值、无激活/流量 |

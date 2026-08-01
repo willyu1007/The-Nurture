@@ -1,13 +1,14 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-31T07:01:25.171Z",
+  "generatedAt": "2026-08-01T06:21:14.157Z",
   "sourceOpenapi": "docs/context/api/openapi.yaml",
-  "sourceChecksumSha256": "cf613e1988ebab1689e141fa29ed25c5156023295cc45c4116b738eb329cbd55",
+  "sourceChecksumSha256": "33e7dce5928150ee0cb85382cf206660e65887dbd682119a3b4a6f7ed3b6c86f",
   "stats": {
-    "totalEndpoints": 2,
+    "totalEndpoints": 4,
     "byTag": {
       "service": 1,
-      "binding-owner": 1
+      "binding-owner": 1,
+      "harness": 2
     }
   },
   "endpoints": [
@@ -93,6 +94,105 @@
       ],
       "example": {
         "curl": "curl -X POST '/internal/nurture/scenario-binding/authorize' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"acting_user_id\":\"<acting_user_id>\",\"idempotency_key\":\"<idempotency_key>\",\"subject_type\":\"<subject_type>\",\"subject_id\":\"<subject_id>\",\"scenario_key\":\"<scenario_key>\",\"acting_actor_id\":\"<acting_actor_id>\",\"purpose\":\"<purpose>\"}'"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/internal/nurture/harness/prepare-action",
+      "operationId": "prepareHarnessAction",
+      "summary": "Prepare one family-care Harness action for confirmation",
+      "tag": "harness",
+      "auth": "bearer",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": {
+          "required": [
+            "workspace_id",
+            "actor_participant_id",
+            "surface",
+            "capability_key",
+            "capability_version"
+          ],
+          "optional": [
+            "operation_input",
+            "target_option_ref",
+            "host_conversation_ref"
+          ]
+        }
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "status",
+          "preview",
+          "confirmation_ref",
+          "expires_at",
+          "command_request_id",
+          "fields",
+          "choices",
+          "reason_code",
+          "alternate_process"
+        ]
+      },
+      "errors": [
+        400,
+        401,
+        408,
+        503
+      ],
+      "example": {
+        "curl": "curl -X POST '/internal/nurture/harness/prepare-action' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"capability_key\":\"<capability_key>\",\"capability_version\":\"<capability_version>\"}'"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/internal/nurture/harness/execute-action",
+      "operationId": "executeHarnessAction",
+      "summary": "Execute one confirmed family-care Harness action",
+      "tag": "harness",
+      "auth": "bearer",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": {
+          "required": [
+            "workspace_id",
+            "actor_participant_id",
+            "surface",
+            "capability_key",
+            "capability_version",
+            "invocation_request_id",
+            "command_request_id",
+            "confirmation_ref"
+          ],
+          "optional": [
+            "operation_input",
+            "host_conversation_ref"
+          ]
+        }
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "status",
+          "execution_disposition",
+          "business_outcome",
+          "execution_ref",
+          "output_refs",
+          "decision",
+          "reason_code",
+          "recovery"
+        ]
+      },
+      "errors": [
+        400,
+        401,
+        408,
+        503
+      ],
+      "example": {
+        "curl": "curl -X POST '/internal/nurture/harness/execute-action' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"capability_key\":\"<capability_key>\",\"capability_version\":\"<capability_version>\",\"invocation_request_id\":\"<invocation_request_id>\",\"command_request_id\":\"<command_request_id>\",\"confirmation_ref\":\"<confirmation_ref>\"}'"
       }
     }
   ]

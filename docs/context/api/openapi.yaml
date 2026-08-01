@@ -104,6 +104,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BindingOwnerError'
+  /internal/nurture/harness/prepare-action:
+    post:
+      operationId: prepareHarnessAction
+      summary: Prepare one family-care Harness action for confirmation
+      description: |
+        Private My-Chat-to-Nurture Harness call. Resolves current eligibility
+        and targets for one closed family-care capability and returns
+        ready_to_confirm with a five-minute single-consume confirmation, or
+        needs_input, denied or unavailable. No business fact is created;
+        missing Harness key material keeps both routes disabled.
+      tags: [harness]
+      security:
+        - serviceBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HarnessPrepareRequest'
+      responses:
+        '200':
+          description: The closed prepare decision for the requested capability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessPrepareResponse'
+        '400':
+          description: The request shell is invalid or the capability key is unknown.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '401':
+          description: The service bearer is missing or invalid while the Harness is enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '408':
+          description: The bounded request handler timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '503':
+          description: The Harness path is disabled by missing key material or service auth.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+  /internal/nurture/harness/execute-action:
+    post:
+      operationId: executeHarnessAction
+      summary: Execute one confirmed family-care Harness action
+      description: |
+        Private My-Chat-to-Nurture Harness call. Verifies and consumes the
+        confirmation inside the same Nurture transaction as the business
+        effect, re-reads current authority and returns committed with the
+        exact replay-stable result, or not_committed with a machine-readable
+        recovery. Committed replays of the same command return the original
+        result without a second effect.
+      tags: [harness]
+      security:
+        - serviceBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HarnessExecuteRequest'
+      responses:
+        '200':
+          description: The execute outcome for the confirmed action.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessExecuteResponse'
+        '400':
+          description: The request shell is invalid or the capability key is unknown.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '401':
+          description: The service bearer is missing or invalid while the Harness is enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '408':
+          description: The bounded request handler timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '503':
+          description: The Harness path is disabled by missing key material or service auth.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
 components:
   securitySchemes:
     serviceBearerAuth:
@@ -220,6 +321,174 @@ components:
         expires_at:
           type: string
           format: date-time
+    HarnessPrepareRequest:
+      type: object
+      description: |
+        Trusted context comes from the authenticated My-Chat caller; typed
+        operation input stays capability-specific. Raw targets, grants and
+        internal route fields are never accepted — targets travel only as
+        owner-issued opaque option refs.
+      additionalProperties: false
+      required:
+        - workspace_id
+        - actor_participant_id
+        - surface
+        - capability_key
+        - capability_version
+      properties:
+        workspace_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        actor_participant_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        surface:
+          type: string
+          enum: [chat, board]
+        capability_key:
+          type: string
+          enum:
+            - submit_family_care_question
+            - acknowledge_family_care_item
+            - reply_family_care_item
+        capability_version:
+          type: string
+          const: 1.0.0
+        operation_input:
+          description: Capability-specific closed typed input; empty for acknowledge.
+        target_option_ref:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        host_conversation_ref:
+          $ref: '#/components/schemas/BoundedIdentifier'
+    HarnessPrepareResponse:
+      type: object
+      description: Closed prepare decision union discriminated by status.
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ready_to_confirm, needs_input, denied, unavailable]
+        preview:
+          type: object
+          additionalProperties:
+            type: string
+        confirmation_ref:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        command_request_id:
+          type: string
+        fields:
+          type: array
+          items:
+            type: string
+        choices:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [target_option_ref, display_label]
+            properties:
+              target_option_ref:
+                type: string
+              display_label:
+                type: string
+        reason_code:
+          type: string
+        alternate_process:
+          type: string
+    HarnessExecuteRequest:
+      type: object
+      description: |
+        Resubmits the exact typed input together with the confirmation the
+        user gesture consumed. The exact target and expected heads are
+        recovered from the confirmation, never from the caller.
+      additionalProperties: false
+      required:
+        - workspace_id
+        - actor_participant_id
+        - surface
+        - capability_key
+        - capability_version
+        - invocation_request_id
+        - command_request_id
+        - confirmation_ref
+      properties:
+        workspace_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        actor_participant_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        surface:
+          type: string
+          enum: [chat, board]
+        capability_key:
+          type: string
+          enum:
+            - submit_family_care_question
+            - acknowledge_family_care_item
+            - reply_family_care_item
+        capability_version:
+          type: string
+          const: 1.0.0
+        invocation_request_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        command_request_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        confirmation_ref:
+          type: string
+          minLength: 32
+          maxLength: 256
+        operation_input:
+          description: Capability-specific closed typed input; empty for acknowledge.
+        host_conversation_ref:
+          $ref: '#/components/schemas/BoundedIdentifier'
+    HarnessExecuteResponse:
+      type: object
+      description: Closed execute outcome union discriminated by status.
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [committed, not_committed]
+        execution_disposition:
+          type: string
+          enum: [executed, replayed]
+        business_outcome:
+          type: string
+          enum: [applied, already_satisfied]
+        execution_ref:
+          type: object
+          additionalProperties: true
+        output_refs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        decision:
+          type: string
+        reason_code:
+          type: string
+        recovery:
+          type: string
+          enum: [none, refresh, reprepare, retry_same_command]
+    HarnessError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum:
+            - invalid_harness_request
+            - unknown_capability
+            - service_auth_required
+            - request_timeout
+            - payload_too_large
+            - unsupported_media_type
+            - harness_disabled
+            - service_unavailable
+            - internal_error
     BindingOwnerError:
       type: object
       additionalProperties: false

@@ -12,7 +12,22 @@ const read = (relativePath) =>
 
 const healthPath = "/health";
 const ownerPath = "/internal/nurture/scenario-binding/authorize";
-const expectedPaths = [healthPath, ownerPath];
+const harnessPreparePath = "/internal/nurture/harness/prepare-action";
+const harnessExecutePath = "/internal/nurture/harness/execute-action";
+const expectedPaths = [healthPath, ownerPath, harnessPreparePath, harnessExecutePath];
+const expectedHarnessSharedRequiredFields = [
+  "workspace_id",
+  "actor_participant_id",
+  "surface",
+  "capability_key",
+  "capability_version",
+];
+const expectedHarnessExecuteRequiredFields = [
+  ...expectedHarnessSharedRequiredFields,
+  "invocation_request_id",
+  "command_request_id",
+  "confirmation_ref",
+];
 const expectedOwnerRequiredFields = [
   "workspace_id",
   "acting_user_id",
@@ -81,12 +96,63 @@ assertIncludes(
   "binding-owner controller route",
 );
 
+for (const harnessPath of [harnessPreparePath, harnessExecutePath]) {
+  assertTruthy(openApi.paths?.[harnessPath]?.post, `OpenAPI harness POST ${harnessPath}`);
+  assertArrayEqual(
+    Object.keys(openApi.paths?.[harnessPath] ?? {}).sort(),
+    ["post"],
+    `OpenAPI harness operation set ${harnessPath}`,
+  );
+}
+assertArrayEqual(
+  openApi.components?.schemas?.HarnessPrepareRequest?.required ?? [],
+  expectedHarnessSharedRequiredFields,
+  "OpenAPI harness prepare required fields",
+);
+assertArrayEqual(
+  openApi.components?.schemas?.HarnessExecuteRequest?.required ?? [],
+  expectedHarnessExecuteRequiredFields,
+  "OpenAPI harness execute required fields",
+);
+
+const harnessTransportSource = read(
+  "apps/scenario-service/src/harness-http.ts",
+);
+assertIncludes(
+  harnessTransportSource,
+  `"${harnessPreparePath}"`,
+  "harness transport prepare path",
+);
+assertIncludes(
+  harnessTransportSource,
+  `"${harnessExecutePath}"`,
+  "harness transport execute path",
+);
+const harnessControllerSource = read(
+  "apps/scenario-service/src/harness.controller.ts",
+);
+assertIncludes(
+  harnessControllerSource,
+  "@Post(HARNESS_PREPARE_PATH)",
+  "harness controller prepare route",
+);
+assertIncludes(
+  harnessControllerSource,
+  "@Post(HARNESS_EXECUTE_PATH)",
+  "harness controller execute route",
+);
+
 const apiIndex = JSON.parse(read("docs/context/api/api-index.json"));
 assertArrayEqual(
   apiIndex.endpoints
     .map((endpoint) => `${endpoint.method} ${endpoint.path}`)
     .sort(),
-  [`GET ${healthPath}`, `POST ${ownerPath}`].sort(),
+  [
+    `GET ${healthPath}`,
+    `POST ${ownerPath}`,
+    `POST ${harnessPreparePath}`,
+    `POST ${harnessExecutePath}`,
+  ].sort(),
   "API index formal route set",
 );
 const ownerIndex = apiIndex.endpoints.find(
@@ -105,7 +171,7 @@ assertArrayEqual(
 );
 
 process.stdout.write(
-  "[ok] formal ingress contract routes=2 owner-fields=8\n",
+  "[ok] formal ingress contract routes=4 owner-fields=8 harness-execute-fields=8\n",
 );
 
 function assertTruthy(value, label) {

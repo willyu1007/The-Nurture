@@ -7,7 +7,7 @@ import type {
   NurturePolicyFactRequest,
   NurtureWorkScope,
   ResolutionCandidate,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
 
 type RoleRow = Awaited<ReturnType<PrismaClient["nurtureCareRoleAssignment"]["findFirst"]>>;
 

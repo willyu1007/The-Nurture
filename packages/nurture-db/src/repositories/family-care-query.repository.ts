@@ -3,8 +3,8 @@ import type {
   ClassFamilyInboxItem,
   NurtureFamilyCareQueryRepository,
   TeacherAttentionCard,
-} from "@the-nurture/scenario";
-import { NurtureFamilyCareQueryAccessError } from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
+import { NurtureFamilyCareQueryAccessError } from "@the-nurture/scenario/harness";
 
 const currentRole = (row: {
   status: string;

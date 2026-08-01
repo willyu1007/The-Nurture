@@ -6,7 +6,7 @@ import {
   type NurtureWorkflowProject as PrismaWorkflowProject,
   type PrismaClient,
 } from "@prisma/client";
-import { normalizeExecutionHandoffState } from "@the-nurture/scenario";
+import { normalizeExecutionHandoffState } from "@the-nurture/scenario/harness";
 import type {
   NurtureCommandExecutionDraft,
   NurtureCommandExecutionRecord,
@@ -16,7 +16,7 @@ import type {
   NurtureInteractionContextRepository,
   NurtureInteractionContextTransactionPort,
   NurtureWorkflowProject,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;

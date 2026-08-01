@@ -26,7 +26,7 @@ import type {
   G2SubmitCommandPayload,
   G2SubmitFacts,
   NurtureFamilyCareCommandTransaction,
-} from "@the-nurture/scenario";
+} from "@the-nurture/scenario/harness";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 
 type DomainContextRef = CanonicalRef;

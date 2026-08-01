@@ -53,6 +53,18 @@ variables:
     secret: true
     secret_ref: nurture_internal_service_token
     description: Private My-Chat-to-Nurture service-auth token for owner endpoints; never persisted or logged.
+  NURTURE_HARNESS_INTEGRITY_KEY:
+    type: string
+    required: false
+    secret: true
+    secret_ref: nurture_harness_integrity_key
+    description: HMAC key (at least 32 characters) for Harness confirmation input-integrity tags and owner-issued target refs; absence keeps both Harness routes disabled.
+  NURTURE_PROTECTED_CONTENT_KEY:
+    type: string
+    required: false
+    secret: true
+    secret_ref: nurture_protected_content_key
+    description: AES-256-GCM key material (at least 32 characters) sealing protected family-care bodies at rest; absence keeps both Harness routes disabled and never degrades to plaintext.
   MY_CHAT_INTERNAL_BASE_URL:
     type: url
     required: false
