@@ -23,13 +23,21 @@ Project: `main`
   three-axis CareItem delta, single-writer cutover matrix, legacy ambiguity
   inventory rules, G2-C frozen as Message-only
   `initiate_caregiver_direct_message@1.0.0`, freeze-scope AC ids
-  `T005-AC-001..022`). The critical lane moves to the T-005 G2 migration +
-  Harness implementation (disposable PostgreSQL, formal NestJS ingress),
-  with the early T-007 G4-0A/0B publication-policy subset still open in
-  parallel and Beta Profile v0 freezing near this gate. The G2-C digest
-  rotation rides the next pin action together with the Wave4 import-closure
-  scoping decision. Runtime/environment activation and external traffic
-  remain gated; all consumers stay default-off.
+  `T005-AC-001..022`). The T-005 G2-A Core CareInteraction Loop checkpoint
+  is achieved (2026-08-01,
+  `dev-docs/active/nurture-family-care-conversation/11-g2a-checkpoint-record.md`:
+  three-axis migration, Harness kernel + protected content, the three
+  action verticals, the four-lane formal ingress at routes=6, the query
+  lane with role-safe presenters, and the checkpoint gap suite — authority
+  matrix, true concurrency, duplicate click, execute-time grant staleness,
+  chat/board equivalence, leakage census; AC ids through `T005-AC-035`).
+  The critical lane moves to T-005 Increment 2
+  (correction/withdrawal/redaction) then G2-B/G2-C, with the early T-007
+  G4-0A/0B publication-policy subset still open in parallel and Beta
+  Profile v0 freezing near this gate. The G2-C digest rotation rides the
+  next pin action together with the Wave4 import-closure scoping decision.
+  Runtime/environment activation and external traffic remain gated; all
+  consumers stay default-off and T-005 claims no final Exit.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
   `F-003 Six-surface store-beta readiness`
 

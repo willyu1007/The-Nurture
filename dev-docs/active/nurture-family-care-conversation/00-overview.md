@@ -6,15 +6,17 @@
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-01
-- Next step: G2-0 schema freeze 已锁定(`10-g2-schema-freeze.md`)且三轴
-  schema migration 已落地(`20260801021044_g2_three_axis_care_interaction`，
-  disposable replay + 8 条约束测试 + 守卫/self-pin 同步；无持久化 apply)。
-  下一步完成 G2-10 第 3 步余下部分：经 formal NestJS ingress 实现 Harness
-  (query/prepareAction/executeAction/readResult)与 protected-content
-  boundary(`ProtectedContentWritePort`)；随后依次实施/资格化 G2-A、G2-B、
-  G2-C。G2-C 进入 T-004 digest 的 rotation 与 Wave4 import-closure scoping
-  同批在下一个 pin action 执行。所有真实 protected qualification 经 formal
-  NestJS ingress + pinned owner path，能力保持 default-off。
+- Next step: **G2-A checkpoint 已达成**
+  (`11-g2a-checkpoint-record.md`：`G2A_CHECKPOINT_PASS`)。已落地链：
+  G2-0 freeze → 三轴 migration → Harness kernel/protected content →
+  submit/ack/reply 三纵切 → formal ingress 四 lane 六路由 → query lane
+  role-safe presenters → checkpoint 缺口套件(authority matrix/并发/
+  duplicate click/stale grant/surface 等价/泄漏 census)。AC 映射已编至
+  `T005-AC-035`。下一主线：Increment 2(correction/withdrawal/redaction，
+  `07-increment-2-change-contract.md` normative)→ G2-B(含 Admin
+  owner-read 投影)→ G2-C(Message-only 契约已冻结，digest rotation 随
+  下一 pin action)→ G2 Exit Qualification(formal ingress + real pinned
+  owner path)。所有能力保持 default-off；T-005 不宣称 final Exit。
 
 ## Goal
 

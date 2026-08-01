@@ -324,3 +324,13 @@
 | 2026-08-01 | `pnpm verify:surface-conformance`;root typecheck;smoke | PASS;digest 不变 `1.7.0`/`b7691a81…`;smoke 三重 disabled 不变 |
 | 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `197618fb…`(57 files) |
 | 2026-08-01 | 效果边界 | PASS:additive 只读路由;query 零写入零 CommandExecution;无持久化 DB/secret/激活/流量 |
+
+## G2-A checkpoint 资格化 — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | checkpoint 缺口套件:authority matrix(跨组/过期/guardian 冒充)、真并发双 reply(order/attention/response 轴)、duplicate click 收敛、execute 时点 grant 撤销 fail closed、Chat/Board canonical+拒绝等价、workspace 泄漏 census | PASS 6/6(disposable PG,运行后销毁) |
+| 2026-08-01 | production-db 78/78(floor 72→78,文件 11→12);unit 265/265;scenario-service 46/46 + db 8/8;dev-host 26/26;routing 63 files(29/12/11/10/1) | PASS |
+| 2026-08-01 | `pnpm verify:surface-conformance`;root typecheck | PASS;digest 不变 `1.7.0`/`b7691a81…` |
+| 2026-08-01 | checkpoint 记录 | `11-g2a-checkpoint-record.md`:清单逐项映射、AC 续编 `T005-AC-023..035`、边界(非 final Exit)明示 |
+| 2026-08-01 | 效果边界 | PASS:仅测试/守卫/文档;self-pin 未动;无 DB/secret/digest/激活/流量 |

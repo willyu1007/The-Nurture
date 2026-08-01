@@ -557,3 +557,28 @@
   + ingress + query 面齐;下一步是 G2-A checkpoint 资格化(AC 映射续编、
   等价/并发/泄漏 suite 汇总)或 Increment 2(correction/withdrawal/
   redaction)实现。
+
+## 2026-08-01 — G2-A checkpoint 资格化(缺口套件 + 记录)
+
+- 按 01-plan G2-A 清单补齐缺口测试(`g2a-checkpoint.integration.test.ts`
+  6/6):
+  - authority matrix:跨 CareGroup caregiver、endsAt 过期角色、guardian
+    冒充 caregiver 对 ack/reply 全部 prepare 层 denied 零写入;
+  - 真并发独立 reply(`Promise.all`,SSI 可重试收敛)→ 双 applied、
+    `replyOrderKey` 严格有序、response 轴恰一次翻转、Attention 恰一次
+    resolve;
+  - duplicate click(同 confirmation/command 并发双 execute)→
+    {executed, replayed} 收敛,恰一条 reply;
+  - prepare 后 Grant 撤销 → execute `grant_unavailable` fail closed 零写入;
+  - Chat/Board 等价:两 surface 全流程 canonical 效果字段级同构 + 拒绝
+    类别一致;
+  - workspace 级泄漏 census:七表 dump 对两侧明文、confirmation token、
+    `protected_content_ref` 零命中。
+- `11-g2a-checkpoint-record.md` 落地 checkpoint 记录:
+  `G2A_CHECKPOINT_PASS / INCREMENT2_PENDING / G2C_PENDING /
+  T005_EXIT_NOT_CLAIMED`;清单逐项映射到套件/提交链;AC 续编
+  `T005-AC-023..035`。G2-A 明确不是 final Exit;Increment 2、G2-B
+  owner-read、G2-C 与最终 Exit Qualification 保持未完成。
+- 全套:production-db 78/78(floor 72→78,文件 11→12);unit 265/265;
+  scenario-service 46/46 + db 8/8;dev-host 26/26;digest 不变;typecheck
+  clean;self-pin 维持 `197618fb…`(pin 集未动)。
