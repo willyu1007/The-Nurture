@@ -10,11 +10,7 @@ import { buildServer } from "./server.js";
 async function main(): Promise<void> {
   assertDevHostEnvironment(process.env.APP_ENV);
   const port = loadDevHostPort(process.env.DEV_HOST_PORT);
-  const app = createNurtureApp({
-    ...(process.env.NURTURE_BINDING_EVIDENCE_KEY
-      ? { bindingEvidenceKey: process.env.NURTURE_BINDING_EVIDENCE_KEY }
-      : {}),
-  });
+  const app = createNurtureApp({});
   const server = buildServer(app, {
     internalServiceToken: process.env.NURTURE_INTERNAL_SERVICE_TOKEN,
   });
