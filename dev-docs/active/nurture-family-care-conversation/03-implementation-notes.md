@@ -452,3 +452,41 @@
 - 下一步:NestJS Harness 路由 + OpenAPI/api-index/ingress 守卫 + env
   契约登记,把该 capability 挂上 formal ingress;acknowledge/reply 两个
   action 复用同一模式。
+
+## 2026-08-01 — acknowledge/reply 域层纵切落地(G2-A 核心闭环补齐)
+
+- `harness/family-care-item-actions.ts` 按 submit 模式补齐 G2-A 另两个
+  action(`acknowledge_family_care_item@1.0.0`、
+  `reply_family_care_item@1.0.0`):
+  - target 使用 owner-issued keyed CareItem ref(伪造 tag 无效;execute
+    仍重读 current authority)。
+  - acknowledge:typed input 空对象;prepare 冻结 exact acknowledgement +
+    lifecycle heads;execute 收敛语义——仅当 acknowledged postcondition
+    已达成且 lifecycle/grant fence 仍有效时 `already_satisfied`(引用既有
+    ack event refs,不造第二条 event、不伪造确认者);其余漂移
+    stale/denied。班级共同承接:actor 只进 `ackedBy*` 审计,
+    `assignedToRoleAssignmentId` 恒 NULL。
+  - reply:typed input 仅受保护正文;prepare 只冻结 replyable lifecycle
+    head——response 轴自由,其他合法班级回复永不使 confirmation stale
+    (append-compatible)。execute 写 encrypted reply Message
+    (`replyOrderKey = <db-clock micros>-<messageId>`,partial unique)+
+    Event + org_to_family delivered Receipt;first-response transition 条件
+    更新 response 轴并 resolve waiting Attention,additional reply 不重复
+    处理;Item 保持 active/appendable;legacy `status` 按 C1 单向派生。
+  - authority:仅 exact CareGroup current `caregiver|lead_caregiver`;
+    Admin-only/跨组/伪造 ref 在 prepare 即 denied;original Grant 按
+    item.grantId 重读,replacement Grant 不接管旧 Item。
+- 事务端口扩展(optional):`loadG2ItemActionFacts` /
+  `applyG2Acknowledge` / `applyG2Reply`;
+  `PrismaFamilyCareCommandTransaction` 构造放宽为
+  `PrismaClient | TransactionClient`,prepare 直接复用同一 facts 实现,
+  避免读写两份漂移。
+- 集成测试 6/6(production-db 67/67,floor 61→67,文件 9→10):class
+  收敛 ack、非 caregiver/伪造 ref 拒绝、双 caregiver append(首条
+  resolve Attention/次条 unchanged、replyOrderKey 有序、密文可 unseal)、
+  同 command exact replay 不追加、lifecycle head 漂移 stale 零写入、
+  response 轴移动不失效 ack confirmation。
+- self-pin 重算 → `d11792bf…`(54 files);T-004 digest 不变。
+- G2-A 三个 action 域层齐;下一单元:NestJS Harness 路由 + OpenAPI/
+  api-index/ingress 守卫 + env 契约登记,把三个 capability 挂上 formal
+  ingress。

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 import type {
   FamilyCareCancelRouteFacts,
   FamilyCareCancelRoutePayload,
@@ -15,6 +15,12 @@ import type {
   FamilyInputRouteApplied,
   FamilyInputRouteFacts,
   FamilyInputRoutePayload,
+  G2AcknowledgeApplied,
+  G2AcknowledgeApplyInput,
+  G2ItemActionFacts,
+  G2ItemActionPayload,
+  G2ReplyApplied,
+  G2ReplyApplyInput,
   G2SubmitApplied,
   G2SubmitApplyInput,
   G2SubmitCommandPayload,
@@ -48,7 +54,7 @@ const roleCurrent = (row: {
   );
 
 export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareCommandTransaction {
-  constructor(private readonly transaction: Prisma.TransactionClient) {}
+  constructor(private readonly transaction: Prisma.TransactionClient | PrismaClient) {}
 
   private async currentGrant(input: {
     workspace_id: string;
@@ -753,6 +759,274 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       item_event_ref: domainRef("family_care_item_event", event.id),
       receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
       attention_ref: domainRef("teacher_attention_item", attention.id, attention.aggregateVersion),
+    };
+  }
+
+  async loadG2ItemActionFacts(input: FamilyCareTransactionInput<G2ItemActionPayload>): Promise<G2ItemActionFacts> {
+    const missingGrant: FamilyCareCurrentGrant = {
+      grant_id: "missing",
+      status: "missing",
+      directions: [],
+      data_classes: [],
+      target_scope_type: "care_group",
+      target_scope_id: "missing",
+    };
+    const [participant, item] = await Promise.all([
+      this.transaction.nurtureParticipant.findFirst({
+        where: { id: input.participant_id, workspaceId: input.workspace_id, status: "active", deletedAt: null },
+      }),
+      this.transaction.nurtureFamilyCareItem.findFirst({
+        where: { id: input.item_id, workspaceId: input.workspace_id },
+      }),
+    ]);
+    if (!item) {
+      return { participant_active: Boolean(participant), item_present: false, grant: missingGrant };
+    }
+    const now = new Date();
+    const role = await this.transaction.nurtureCareRoleAssignment.findFirst({
+      where: {
+        workspaceId: input.workspace_id,
+        participantId: input.participant_id,
+        role: { in: ["caregiver", "lead_caregiver"] },
+        scopeType: "care_group",
+        scopeId: item.careGroupId,
+        status: "active",
+        deletedAt: null,
+        OR: [{ startsAt: null }, { startsAt: { lte: now } }],
+        AND: [{ OR: [{ endsAt: null }, { endsAt: { gt: now } }] }],
+      },
+      orderBy: { id: "asc" },
+    });
+    const grantRow = item.grantId
+      ? await this.transaction.nurtureChildLinkGrant.findFirst({
+          where: { id: item.grantId, workspaceId: input.workspace_id, deletedAt: null },
+        })
+      : null;
+    const grantCurrent = Boolean(
+      grantRow &&
+        grantRow.status === "active" &&
+        !grantRow.revokedAt &&
+        (!grantRow.effectiveFrom || grantRow.effectiveFrom <= now) &&
+        (!grantRow.expiresAt || grantRow.expiresAt > now),
+    );
+    const grant: FamilyCareCurrentGrant = grantRow
+      ? {
+          grant_id: grantRow.id,
+          status: grantCurrent ? "active" : "revoked",
+          directions: grantRow.directions,
+          data_classes: grantRow.dataClasses,
+          target_scope_type: grantRow.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
+          target_scope_id: grantRow.grantedToScopeId,
+        }
+      : missingGrant;
+    let existingAckRefs: DomainContextRef[] | undefined;
+    if (item.acknowledgementState === "acknowledged") {
+      const ackEvent = await this.transaction.nurtureFamilyCareItemEvent.findFirst({
+        where: { workspaceId: input.workspace_id, itemId: item.id, eventType: "acknowledged" },
+        orderBy: { createdAt: "desc" },
+      });
+      existingAckRefs = [
+        domainRef("family_care_item", item.id, item.version),
+        ...(ackEvent ? [domainRef("family_care_item_event", ackEvent.id)] : []),
+      ];
+    }
+    return {
+      participant_active: Boolean(participant),
+      ...(role ? { caregiver_role_assignment_id: role.id } : {}),
+      item_present: true,
+      writer_contract: item.writerContract,
+      acknowledgement_state: item.acknowledgementState,
+      acknowledgement_head: item.acknowledgementHead,
+      response_state: item.responseState,
+      lifecycle_state: item.lifecycleState,
+      lifecycle_head: item.lifecycleHead,
+      item_safe_summary: item.summary,
+      grant,
+      ...(existingAckRefs ? { existing_acknowledgement_refs: existingAckRefs } : {}),
+    };
+  }
+
+  async applyG2Acknowledge(
+    input: FamilyCareTransactionInput<G2AcknowledgeApplyInput>,
+  ): Promise<G2AcknowledgeApplied> {
+    const before = await this.transaction.nurtureFamilyCareItem.findFirstOrThrow({
+      where: { id: input.item_id, workspaceId: input.workspace_id },
+    });
+    const derivedStatus = before.responseState === "responded" ? "replied" : "acknowledged";
+    const updated = await this.transaction.nurtureFamilyCareItem.updateMany({
+      where: {
+        id: input.item_id,
+        workspaceId: input.workspace_id,
+        writerContract: { in: ["legacy_migrated_v1", "harness_g2_v1"] },
+        acknowledgementState: "pending",
+        acknowledgementHead: input.expected_acknowledgement_head,
+        lifecycleState: "active",
+      },
+      data: {
+        acknowledgementState: "acknowledged",
+        acknowledgementHead: { increment: 1 },
+        ackedByParticipantId: input.participant_id,
+        ackedByRoleAssignmentId: input.caregiver_role_assignment_id,
+        ackedAt: new Date(),
+        // Legacy status stays the one-way derived compatibility value (C1).
+        status: derivedStatus,
+        version: { increment: 1 },
+      },
+    });
+    if (updated.count !== 1) throw new Error("G2 acknowledge head conflict");
+    const item = await this.transaction.nurtureFamilyCareItem.findFirstOrThrow({
+      where: { id: input.item_id, workspaceId: input.workspace_id },
+    });
+    const event = await this.transaction.nurtureFamilyCareItemEvent.create({
+      data: {
+        workspaceId: input.workspace_id,
+        itemId: item.id,
+        actorParticipantId: input.participant_id,
+        actorRoleAssignmentId: input.caregiver_role_assignment_id,
+        eventType: "acknowledged",
+        fromStatus: before.status,
+        toStatus: derivedStatus,
+      },
+    });
+    let receiptRef: DomainContextRef | undefined;
+    if (item.sourceMessageId) {
+      const receipt = await this.transaction.nurtureChildLinkReceipt.findFirst({
+        where: {
+          workspaceId: input.workspace_id,
+          direction: "family_to_org",
+          sourceType: "family_care_message",
+          sourceId: item.sourceMessageId,
+        },
+      });
+      if (receipt && ["delivered", "read"].includes(receipt.status)) {
+        const receiptUpdated = await this.transaction.nurtureChildLinkReceipt.updateMany({
+          where: { id: receipt.id, workspaceId: input.workspace_id, version: receipt.version },
+          data: { status: "acknowledged", acknowledgedAt: new Date(), version: { increment: 1 } },
+        });
+        if (receiptUpdated.count !== 1) throw new Error("G2 acknowledge receipt conflict");
+        receiptRef = domainRef("child_link_receipt", receipt.id, receipt.version + 1);
+      }
+    }
+    return {
+      item_ref: domainRef("family_care_item", item.id, item.version),
+      item_event_ref: domainRef("family_care_item_event", event.id),
+      ...(receiptRef ? { receipt_ref: receiptRef } : {}),
+    };
+  }
+
+  async applyG2Reply(input: FamilyCareTransactionInput<G2ReplyApplyInput>): Promise<G2ReplyApplied> {
+    const item = await this.transaction.nurtureFamilyCareItem.findFirstOrThrow({
+      where: { id: input.item_id, workspaceId: input.workspace_id },
+    });
+    if (!item.enrollmentId) throw new Error("G2 reply enrollment missing");
+    const messageId = crypto.randomUUID();
+    const clockRows = await this.transaction.$queryRaw<Array<{ micros: bigint }>>(
+      Prisma.sql`SELECT (extract(epoch FROM clock_timestamp()) * 1000000)::bigint AS micros`,
+    );
+    const replyOrderKey = `${clockRows[0]!.micros.toString().padStart(16, "0")}-${messageId}`;
+    const message = await this.transaction.nurtureFamilyCareMessage.create({
+      data: {
+        id: messageId,
+        workspaceId: input.workspace_id,
+        threadId: item.threadId,
+        childCareProcessId: item.childCareProcessId,
+        senderParticipantId: input.participant_id,
+        senderRoleAssignmentId: input.caregiver_role_assignment_id,
+        messageKind: "caregiver_reply",
+        authorshipKind: "caregiver_confirmed",
+        sourceItemId: item.id,
+        bodyFormat: "plain_text",
+        bodyStorageMode: "encrypted",
+        bodyProtectionPayload: asJson(input.body_envelope),
+        sourceSurface: "mobile",
+        grantId: input.grant_id,
+        status: "sent",
+        writerContract: "harness_g2_v1",
+        enrollmentId: item.enrollmentId,
+        careGroupId: item.careGroupId,
+        direction: "org_to_family",
+        replyOrderKey,
+      },
+    });
+    // Append-compatible: only the first response transition is conditional;
+    // additional legitimate replies never conflict on the response axis.
+    const firstTransition = await this.transaction.nurtureFamilyCareItem.updateMany({
+      where: {
+        id: item.id,
+        workspaceId: input.workspace_id,
+        responseState: "awaiting_reply",
+        lifecycleState: "active",
+      },
+      data: {
+        responseState: "responded",
+        responseHead: { increment: 1 },
+        // C1 derivation: active + responded maps to legacy "replied".
+        status: "replied",
+        version: { increment: 1 },
+      },
+    });
+    const responseEffect = firstTransition.count === 1 ? "first_response" : "additional_response";
+    const event = await this.transaction.nurtureFamilyCareItemEvent.create({
+      data: {
+        workspaceId: input.workspace_id,
+        itemId: item.id,
+        actorParticipantId: input.participant_id,
+        actorRoleAssignmentId: input.caregiver_role_assignment_id,
+        eventType: "replied",
+        fromStatus: item.status,
+        toStatus: "replied",
+        relatedMessageId: message.id,
+      },
+    });
+    await this.transaction.nurtureFamilyCareMessage.update({
+      where: { id: message.id },
+      data: { sourceItemEventId: event.id },
+    });
+    const receipt = await this.transaction.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: input.workspace_id,
+        grantId: input.grant_id,
+        childCareProcessId: item.childCareProcessId,
+        enrollmentId: item.enrollmentId,
+        direction: "org_to_family",
+        dataClass: item.dataClass,
+        sourceType: "family_care_message",
+        sourceId: message.id,
+        routingAttemptKey: `g2-reply:${message.id}`,
+        targetScopeType: "family",
+        targetScopeId: item.familyId,
+        status: "delivered",
+        deliveredAt: new Date(),
+      },
+    });
+    await this.transaction.nurtureFamilyCareThread.updateMany({
+      where: { id: item.threadId, workspaceId: input.workspace_id, status: "active", deletedAt: null },
+      data: { latestMessageAt: message.createdAt, aggregateVersion: { increment: 1 } },
+    });
+    let attentionEffect: "resolved" | "unchanged" = "unchanged";
+    if (responseEffect === "first_response") {
+      const resolved = await this.transaction.nurtureTeacherAttentionItem.updateMany({
+        where: {
+          workspaceId: input.workspace_id,
+          sourceType: "family_care_item",
+          sourceId: item.id,
+          status: "active",
+        },
+        data: { status: "resolved", aggregateVersion: { increment: 1 } },
+      });
+      attentionEffect = resolved.count > 0 ? "resolved" : "unchanged";
+    }
+    const updatedItem = await this.transaction.nurtureFamilyCareItem.findFirstOrThrow({
+      where: { id: item.id, workspaceId: input.workspace_id },
+    });
+    return {
+      message_ref: domainRef("family_care_message", message.id, message.aggregateVersion),
+      item_ref: domainRef("family_care_item", updatedItem.id, updatedItem.version),
+      item_event_ref: domainRef("family_care_item_event", event.id),
+      receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
+      reply_order_key: replyOrderKey,
+      response_effect: responseEffect,
+      attention_effect: attentionEffect,
     };
   }
 

@@ -205,6 +205,56 @@ export type G2SubmitApplied = {
   attention_ref: DomainContextRef;
 };
 
+// G2 caregiver item actions (acknowledge / reply). Facts are read from the
+// item's own frozen original scope; the item's original Grant is re-read by
+// id — a replacement Grant never takes over an existing Item.
+export type G2ItemActionPayload = {
+  participant_id: string;
+  item_id: string;
+};
+
+export type G2ItemActionFacts = {
+  participant_active: boolean;
+  caregiver_role_assignment_id?: string;
+  item_present: boolean;
+  writer_contract?: "legacy_v1" | "legacy_migrated_v1" | "harness_g2_v1";
+  acknowledgement_state?: "pending" | "acknowledged";
+  acknowledgement_head?: number;
+  response_state?: "awaiting_reply" | "responded" | "not_applicable";
+  lifecycle_state?: "active" | "closed" | "suppressed";
+  lifecycle_head?: number;
+  item_safe_summary?: string;
+  grant: FamilyCareCurrentGrant;
+  existing_acknowledgement_refs?: DomainContextRef[];
+};
+
+export type G2AcknowledgeApplyInput = G2ItemActionPayload & {
+  caregiver_role_assignment_id: string;
+  expected_acknowledgement_head: number;
+};
+
+export type G2AcknowledgeApplied = {
+  item_ref: DomainContextRef;
+  item_event_ref: DomainContextRef;
+  receipt_ref?: DomainContextRef;
+};
+
+export type G2ReplyApplyInput = G2ItemActionPayload & {
+  caregiver_role_assignment_id: string;
+  grant_id: string;
+  body_envelope: unknown;
+};
+
+export type G2ReplyApplied = {
+  message_ref: DomainContextRef;
+  item_ref: DomainContextRef;
+  item_event_ref: DomainContextRef;
+  receipt_ref: DomainContextRef;
+  reply_order_key: string;
+  response_effect: "first_response" | "additional_response";
+  attention_effect: "resolved" | "unchanged";
+};
+
 export type NurtureFamilyCareCommandTransaction = {
   loadFamilyCareGrantRevokeFacts(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<FamilyCareGrantRevokeFacts>;
   revokeFamilyCareGrant(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<{
@@ -234,4 +284,7 @@ export type NurtureFamilyCareCommandTransaction = {
   /** Present when the G2 three-axis Harness writer is wired. */
   loadG2SubmitFacts?(input: FamilyCareTransactionInput<G2SubmitCommandPayload>): Promise<G2SubmitFacts>;
   applyG2Submit?(input: FamilyCareTransactionInput<G2SubmitApplyInput>): Promise<G2SubmitApplied>;
+  loadG2ItemActionFacts?(input: FamilyCareTransactionInput<G2ItemActionPayload>): Promise<G2ItemActionFacts>;
+  applyG2Acknowledge?(input: FamilyCareTransactionInput<G2AcknowledgeApplyInput>): Promise<G2AcknowledgeApplied>;
+  applyG2Reply?(input: FamilyCareTransactionInput<G2ReplyApplyInput>): Promise<G2ReplyApplied>;
 };
