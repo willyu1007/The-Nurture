@@ -588,3 +588,17 @@ the new root ref still requires exact consumer adoption.
   `SYNTHETIC_CONTRACT_QUALIFICATION_PASS / OWNER_INTEGRATION_NO_GO /
   JOINT_CONFORMANCE_NOT_RUN`. Every T-002 NO-GO stays NO-GO; no
   activation, Candidate, DB, secret or traffic effect.
+
+## 2026-08-01 — G1 closure and task completion
+
+- T-002 M5 Owner Integration Handoff and the exact T-004
+  `nurture.surface-contract@1.7.0` artifact were joined by the formal NestJS
+  G1 conformance run recorded in T-002 `18-g1-joint-conformance-record.md`.
+- The run passed the full positive/negative matrix, disposable PostgreSQL,
+  leakage scan and final false/empty census at My-Chat `a019566` / Base
+  `06303e9`; this satisfies the G1 completion checklist without granting
+  Candidate Freeze, activation or traffic.
+- T-004 is now `done`. Later additive interface rotations are owned by the
+  consuming T-005～T-007 task and must preserve this task's exact admission,
+  slice-scoped invalidation and deterministic rerun rules. Archival remains
+  pending explicit approval.

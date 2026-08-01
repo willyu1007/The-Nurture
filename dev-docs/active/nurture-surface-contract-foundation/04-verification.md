@@ -275,3 +275,13 @@
 | CI wiring | PASS (static) | The surface-contract CI step now runs `pnpm verify:surface-conformance` as the permanent single-command gate. |
 | Full unit suite | PASS | `pnpm test:unit` 249/249 over 28 files; test routing census unchanged; package `tsc --noEmit` clean; strict context verification green. |
 | Layer separation | PASS | Result recorded as `SYNTHETIC_CONTRACT_QUALIFICATION_PASS / OWNER_INTEGRATION_NO_GO / JOINT_CONFORMANCE_NOT_RUN`; no owner-path, activation, Candidate, DB, secret or traffic claim. |
+
+## 2026-08-01 — G1 closure and W0 governance sync
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Closure evidence | PASS | T-002 M5 and Joint Conformance already bind `nurture.surface-contract@1.7.0` / `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641` to My-Chat `a019566` / Base `06303e9`; all T-004 acceptance criteria are complete. |
+| Governance sync | PASS AFTER APPLY | The initial default dry-run correctly reported the registry's stale `in-progress` value; `sync --apply --project main --init-if-missing` propagated T-004 `done`, then governance lint passed. |
+| Context verification | PASS AFTER COMMAND CORRECTION | An obsolete `.ai/scripts/ctl-context-for-agents.mjs` path failed with `MODULE_NOT_FOUND`; the repository-documented `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` passed. |
+| Documentation and whitespace | PASS | Scoped docs/anchor lint checks 9 files with 0 errors and 0 warnings; `git diff --check` passes. |
+| Effect boundary | PASS | Closure changes task/governance documentation only. No archive, schema, database, runtime, capability, secret, environment, Candidate, activation or traffic effect occurred. |

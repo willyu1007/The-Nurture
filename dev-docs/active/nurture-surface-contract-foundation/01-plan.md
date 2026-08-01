@@ -174,23 +174,23 @@ Candidate Freeze、persistent DB apply、internal-store testing、activation 或
 
 ## G1 Completion Checklist
 
-- [ ] 四层 principal → canonical identity/binding → typed anchor/association →
+- [x] 四层 principal → canonical identity/binding → typed anchor/association →
   current business authority 链路已实现并验证全部 normal/fail-closed 分支。
-- [ ] transaction boundary 在真实 disposable PostgreSQL 上通过 revoke、CAS、
+- [x] transaction boundary 在真实 disposable PostgreSQL 上通过 revoke、CAS、
   concurrency、exact replay 和 response-loss tests。
-- [ ] T-004 Surface Contract Artifact Set 可由 clean checkout 确定性重建，并且
+- [x] T-004 Surface Contract Artifact Set 可由 clean checkout 确定性重建，并且
   exact key/version/digest 双向一致。
-- [ ] formal NestJS ingress、env contract、route/API index 和
+- [x] formal NestJS ingress、env contract、route/API index 和
   `8000/3001/3200/3201` 端口分工在 clean install/build/start/health/contract tests
   中通过。
-- [ ] Synthetic、Owner Integration Readiness、Joint Conformance 三层资格化分别
+- [x] Synthetic、Owner Integration Readiness、Joint Conformance 三层资格化分别
   形成独立 PASS，不互相替代。
-- [ ] wrong workspace/user/actor/purpose、cross-Institution、revoked、
+- [x] wrong workspace/user/actor/purpose、cross-Institution、revoked、
   quarantined/ambiguous、owner unavailable、stale heads、contract mismatch 和
   leakage negatives 全部 fail closed。
-- [ ] 最终 environment/default capability gates 为 false，active rows 为空，未留下
+- [x] 最终 environment/default capability gates 为 false，active rows 为空，未留下
   persistent environment、PII、secret 或外部 effect。
-- [ ] 三类 delivery/evidence role 精确互链，任一 currentness drift 能机械失效受影响
+- [x] 三类 delivery/evidence role 精确互链，任一 currentness drift 能机械失效受影响
   结果，历史记录 append-only 保留。
 
 ## Phase 0 — Discovery and Gate Reconciliation

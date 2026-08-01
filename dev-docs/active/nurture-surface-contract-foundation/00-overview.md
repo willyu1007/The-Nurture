@@ -2,33 +2,23 @@
 
 ## Status
 
-- State: in-progress
+- State: done
 - Task: T-004
 - Milestone / Feature: M-002 / F-003
-- Phase: Phase 0 discovery/gate reconciliation, Phase 1 normative surface
-  source, Phase 2 exact typed contract/interface identity and Phase 2 quality
-  closure complete; Phase 3 complete; Phase 4 synthetic contract
-  qualification complete — the T-004 contract baseline is ready for Joint
-  Conformance convergence with T-002.
+- Phase: Phase 0～4 complete; G1 Joint Conformance PASS through the formal
+  NestJS ingress against the exact T-002 owner path.
 - Updated: 2026-08-01
-- Next step: 与 T-002 汇合执行 G1 Joint Conformance——前置为 T-002 pin
-  advance（`a019566` 线）与 M5 Owner Integration Handoff 重生成；随后同一
-  fixtures/suite 经 formal NestJS ingress 跑真实 pinned owner path。Phase 4
-  结论与 T-008 handoff 见
-  [`08-phase-4-synthetic-qualification-and-handoff.md`](./08-phase-4-synthetic-qualification-and-handoff.md)。不得把
-  synthetic PASS 写成 owner-integration PASS。执行拆解（P3-0～P3-4 与边界规
-  则）见
-  [`07-phase-3-fixture-journey-decomposition.md`](./07-phase-3-fixture-journey-decomposition.md)。
-- Current gate: T-002 ingress M0-M4 已完成；exact owner pin 仍为 My-Chat
-  `f00b868`，浮动 checkout 与该 pin 不同，因此 Owner Integration 保持 NO-GO；
-  pin-advance decision input 见 T-002
-  `15-mychat-drift-census-pin-advance-input.md`。
-  Phase 4 完成后 qualified exact interface 为
+- Next step: T-004 无剩余 G1 实施。后续 G2～G4 additive capability/schema
+  rotation 由对应消费任务拥有，并遵守本任务冻结的 slice-scoped invalidation、
+  deterministic rebuild 与 affected conformance rerun 规则；T-004 暂不归档，等待
+  明确归档批准。
+- Current gate: qualified exact interface 为
   `nurture.surface-contract@1.7.0` /
   `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`，
-  synthetic qualification 结论为 `SYNTHETIC_CONTRACT_QUALIFICATION_PASS /
-  OWNER_INTEGRATION_NO_GO / JOINT_CONFORMANCE_NOT_RUN`，单命令重跑入口为
-  `pnpm verify:surface-conformance`。
+  synthetic qualification 与 T-002 M5 Owner Integration Handoff 已由
+  `dev-docs/active/nurture-institution-mode/18-g1-joint-conformance-record.md`
+  精确汇合为 `PASS`（My-Chat `a019566` / Base `06303e9`）。单命令 synthetic
+  重跑入口为 `pnpm verify:surface-conformance`。
   全部 16 个既有 capability/surface slice hash 与 1.0.1 基线字节一致；shared
   core 按计划在 P3-4 旋转一次（canonicalization/manifest schema 引入 8 个
   fixture slice），当时唯一存续证据即本仓库 synthetic 套件并已单命令全量重跑
@@ -98,37 +88,37 @@
 
 ## Acceptance Criteria
 
-- [ ] 六个 surface 均有明确的 actor、workspace、read/write、child scope 和数据敏感度定义。
-- [ ] Institution Admin 园区业务沟通 read 与 CareGroup action authority 分离：
+- [x] 六个 surface 均有明确的 actor、workspace、read/write、child scope 和数据敏感度定义。
+- [x] Institution Admin 园区业务沟通 read 与 CareGroup action authority 分离：
   Admin 可在披露且精确授权的渠道读取，不因读取获得 acknowledge/reply/correction/
   redaction；家庭私密 AI、草稿、私人聊天和其他 Institution 保持不可见。
-- [ ] 所有跨家庭/机构边界的动作均显式授权、可审计，并明确其
+- [x] 所有跨家庭/机构边界的动作均显式授权、可审计，并明确其
   correction/withdrawal/redaction/irreversible 边界；任何动作都不得静默覆盖或删除历史。
-- [ ] public API 与 presenter/view-model 契约可由 My-Chat 在不访问 Nurture 数据库的前提下消费。
-- [ ] capability catalog 可由未来共享 discovery/invocation protocol 消费，但 T-004 不依赖该共享引擎落地。
-- [ ] LLM 选择只发生在 deterministic policy 过滤后的候选集中，执行端仍重新验证所有业务前置条件。
-- [ ] 三类 surface content family 均有稳定 envelope、强类型 item/module 和兼容性规则。
-- [ ] 当前参考呈现能够验证产品语义，但不绑定 My-Chat 的组件、布局或 shell。
-- [ ] 合成 fixture 和跨角色旅程能稳定复现六个 surface 的核心状态。
-- [ ] 六条 Journey 共用版本化 synthetic world，但每条从独立可重复的初始状态运行，不依赖上一条 Journey 的可变结果。
-- [ ] 每条产品 Journey 同时证明一个用户价值闭环和最高风险拒绝路径；RJ-1 证明跨 surface 的 revoke/correction/recovery。
-- [ ] 契约明确默认关闭、失败关闭、兼容性 pin 和非诊断健康表达。
-- [ ] 未引入 My-Chat ORM、宿主 runtime、shell 或 canonical identity 的本地副本。
-- [ ] capability catalog 用独立的 domain、execution 和 delivery 字段区分
+- [x] public API 与 presenter/view-model 契约可由 My-Chat 在不访问 Nurture 数据库的前提下消费。
+- [x] capability catalog 可由未来共享 discovery/invocation protocol 消费，但 T-004 不依赖该共享引擎落地。
+- [x] LLM 选择只发生在 deterministic policy 过滤后的候选集中，执行端仍重新验证所有业务前置条件。
+- [x] 三类 surface content family 均有稳定 envelope、强类型 item/module 和兼容性规则。
+- [x] 当前参考呈现能够验证产品语义，但不绑定 My-Chat 的组件、布局或 shell。
+- [x] 合成 fixture 和跨角色旅程能稳定复现六个 surface 的核心状态。
+- [x] 六条 Journey 共用版本化 synthetic world，但每条从独立可重复的初始状态运行，不依赖上一条 Journey 的可变结果。
+- [x] 每条产品 Journey 同时证明一个用户价值闭环和最高风险拒绝路径；RJ-1 证明跨 surface 的 revoke/correction/recovery。
+- [x] 契约明确默认关闭、失败关闭、兼容性 pin 和非诊断健康表达。
+- [x] 未引入 My-Chat ORM、宿主 runtime、shell 或 canonical identity 的本地副本。
+- [x] capability catalog 用独立的 domain、execution 和 delivery 字段区分
   `CareInteraction`、`ActionExecution`、`ActionDelivery`、`PublishProcess` 与
   `InstitutionWorkflow`；不得把 domain/process/transport 混进一个枚举，也不以
   异步/跨 owner 作为 Workflow 分类条件。
-- [ ] capability-specific typed input 只包含业务字段；target、typed concurrency
+- [x] capability-specific typed input 只包含业务字段；target、typed concurrency
   heads、actor/scope 与 idempotency 分别属于通用 invocation/confirmation contract。
-- [ ] capability descriptor 声明 concurrency summary class 和逐项 head bindings；
+- [x] capability descriptor 声明 concurrency summary class 和逐项 head bindings；
   exact-state transition 可冻结版本并显式声明 already-satisfied convergence，
   append-compatible action 冻结 lifecycle/authority heads，不能一律使用
   whole-aggregate strict CAS。
-- [ ] Board envelope 可以承载 Workflow projection，但不包含 raw Run/Step 或
+- [x] Board envelope 可以承载 Workflow projection，但不包含 raw Run/Step 或
   绕过 current authority 的 action payload。
-- [ ] discovery、surface response 与 invocation 均携带 exact interface contract
+- [x] discovery、surface response 与 invocation 均携带 exact interface contract
   key/version/digest；不存在 version range、mutable `latest` 或 digest 缺失时的 fallback。
-- [ ] conformance manifest 逐 capability/surface 记录 canonical slice hash；证据
+- [x] conformance manifest 逐 capability/surface 记录 canonical slice hash；证据
   失效范围由 slice hash 机械判定，additive 新增不失效既有证据；conformance suite
   可单命令确定性全量重跑。
 
@@ -147,6 +137,6 @@ core hash、10 个 capability slice、6 个 surface slice、strict loader/admiss
 deterministic build/verify。Phase 0
 结论见
 [`06-phase-0-discovery-and-gate-matrix.md`](./06-phase-0-discovery-and-gate-matrix.md)。
-当前进入 Phase 3 fixtures/Journey；随后与 T-002 M5 Owner Integration Handoff
-汇合执行 Joint Conformance。不得用当前 Phase 2 artifact 或后续 synthetic
-evidence 替代真实 owner gate。
+Phase 3/4、T-002 M5 handoff 与 G1 Joint Conformance 已全部完成。后续新增或变更
+capability/schema 不重开 T-004；由对应消费任务生成新 exact interface identity，
+并按 slice/shared-core 失效规则执行必要的 synthetic/joint rerun。
