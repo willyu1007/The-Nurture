@@ -1,14 +1,21 @@
-import { createHmac, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { classifySafetyIntent } from "../domain/safety-classifier.js";
 import {
   NurtureInteractionContextService,
 } from "../domain/interactions/interaction-context.js";
 import type { NurtureCommandSpec } from "../domain/commands/command-kernel.js";
+import { grantAuthorizesFamilyCare } from "../domain/institution/family-care-transaction.js";
 import {
   computeHarnessInputIntegrityTag,
   issueHarnessConfirmation,
 } from "./confirmation.js";
 import type { ProtectedContentWritePort } from "./protected-content.js";
+import {
+  computeProtectedBodyTag,
+  issueTargetOptionRef,
+  resolveCareItemTargetRef,
+  resolveTargetOptionRef,
+} from "./keyed-refs.js";
 
 /**
  * G2-A first action: guardian-initiated family-care question through the
@@ -23,7 +30,6 @@ export const SUBMIT_FAMILY_CARE_QUESTION_CAPABILITY = {
 const MIN_BODY_CHARS = 1;
 const MAX_BODY_CHARS = 2_000;
 const INPUT_KEYS = new Set(["body", "context_continuation_of_item_ref"]);
-const OPTION_REF_VERSION = "1";
 
 export type SubmitFamilyCareQuestionInputV1 = {
   body: string;
@@ -72,51 +78,6 @@ export const parseSubmitFamilyCareQuestionInputV1 = (
     status: "ok",
     input: { body, ...(continuation ? { context_continuation_of_item_ref: continuation } : {}) },
   };
-};
-
-/**
- * Keyed body digest used inside the canonical command payload so neither the
- * CommandExecution payload hash nor the confirmation stores an enumerable
- * bare hash of a low-entropy protected body.
- */
-export const computeProtectedBodyTag = (integrityKey: string, body: string): string => {
-  if (typeof integrityKey !== "string" || integrityKey.length < 32) {
-    throw new Error("harness integrity key must contain at least 32 characters");
-  }
-  return createHmac("sha256", integrityKey)
-    .update("nurture.protected-body.v1\0", "utf8")
-    .update(body, "utf8")
-    .digest("hex");
-};
-
-// Owner-issued, actor-bound target option. The embedded id is unusable
-// without the keyed tag, and execute re-resolves current authority anyway.
-export const issueTargetOptionRef = (
-  integrityKey: string,
-  scope: { workspace_id: string; participant_id: string; enrollment_id: string },
-): string => {
-  const tag = createHmac("sha256", integrityKey)
-    .update(
-      `nurture.target-option.v${OPTION_REF_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${scope.enrollment_id}`,
-      "utf8",
-    )
-    .digest("hex")
-    .slice(0, 32);
-  return `${OPTION_REF_VERSION}.${scope.enrollment_id}.${tag}`;
-};
-
-export const resolveTargetOptionRef = (
-  integrityKey: string,
-  scope: { workspace_id: string; participant_id: string },
-  ref: string,
-): string | null => {
-  const parts = ref.split(".");
-  if (parts.length !== 3 || parts[0] !== OPTION_REF_VERSION) return null;
-  const [, enrollmentId] = parts;
-  if (!enrollmentId) return null;
-  return issueTargetOptionRef(integrityKey, { ...scope, enrollment_id: enrollmentId }) === ref
-    ? enrollmentId
-    : null;
 };
 
 export type GuardianSubmitTarget = {
@@ -238,7 +199,16 @@ export const prepareSubmitFamilyCareQuestion = async (
 
   let continuationItemId: string | undefined;
   if (parsed.input.context_continuation_of_item_ref) {
-    continuationItemId = parsed.input.context_continuation_of_item_ref;
+    // Queries hand out signed care-item refs, so the continuation input is
+    // resolved through the same keyed scheme. Accepting a raw id here would
+    // both break the documented flow and reopen an id-probing surface.
+    continuationItemId =
+      resolveCareItemTargetRef(
+        deps.integrity_key,
+        { workspace_id: request.workspace_id, participant_id: request.participant_id },
+        parsed.input.context_continuation_of_item_ref,
+      ) ?? undefined;
+    if (!continuationItemId) return { status: "denied", reason_code: "invalid_continuation" };
     const continuation = await deps.eligibility.resolveContinuationSource({
       workspace_id: request.workspace_id,
       participant_id: request.participant_id,
@@ -347,9 +317,8 @@ export const createSubmitFamilyCareQuestionSpec = (deps: {
       return { status: "conflict", reason_code: "target_unavailable" };
     }
     if (
-      facts.grant.status !== "active" ||
-      !facts.grant.directions.includes("family_to_org") ||
-      !facts.grant.directions.includes("org_to_family")
+      !grantAuthorizesFamilyCare(facts.grant, "family_to_org") ||
+      !grantAuthorizesFamilyCare(facts.grant, "org_to_family")
     ) {
       return { status: "blocked", reason_code: "grant_unavailable" };
     }
@@ -377,7 +346,7 @@ export const createSubmitFamilyCareQuestionSpec = (deps: {
       !facts.family_id ||
       !facts.care_group_id ||
       !facts.thread_id ||
-      facts.grant.status !== "active"
+      !grantAuthorizesFamilyCare(facts.grant, "family_to_org")
     ) {
       throw new Error("G2 submit facts changed inside the transaction");
     }
@@ -405,6 +374,11 @@ export const createSubmitFamilyCareQuestionSpec = (deps: {
         applied.receipt_ref,
         applied.attention_ref,
       ],
+      result_schema_version: 1,
+      committed_result: {
+        capability_key: SUBMIT_FAMILY_CARE_QUESTION_CAPABILITY.key,
+        content_state: "sent",
+      },
     };
   },
 });

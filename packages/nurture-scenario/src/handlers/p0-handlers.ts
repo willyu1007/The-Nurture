@@ -226,6 +226,16 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
     },
     spec: calibrateFamilyStrategyCommand,
   });
+  if (command.status === "outcome_unknown") {
+    // Reconcile the SAME command identity: a retry exact-replays a commit that
+    // did land instead of creating a second effect.
+    return {
+      status: "retry_requested",
+      output_refs: [workflowRunRef(input)],
+      reason_code: command.reason_code,
+      event_drafts: [eventDraft(input, "workflow.step.retry_requested")],
+    };
+  }
   if (command.status === "not_committed") {
     if (command.decision === "command_busy" || command.decision === "technical_error") {
       return {

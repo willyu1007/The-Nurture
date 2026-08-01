@@ -256,12 +256,18 @@ export type HarnessExecuteResponseV1 =
       business_outcome: "applied" | "already_satisfied";
       execution_ref: unknown;
       output_refs: unknown[];
+      committed_result?: unknown;
     }
   | {
       status: "not_committed";
       decision: string;
       reason_code: string;
       recovery: "none" | "refresh" | "reprepare" | "retry_same_command";
+    }
+  | {
+      status: "outcome_unknown";
+      reason_code: string;
+      recovery: "reconcile_same_command";
     };
 
 type HarnessRecovery = "none" | "refresh" | "reprepare" | "retry_same_command";
@@ -288,13 +294,24 @@ export const notCommitted = (
 
 export const mapHarnessCommandResult = (
   result: NurtureCommandResult,
-): HarnessExecuteResponseV1 =>
-  result.status === "ok"
-    ? {
-        status: "committed",
-        execution_disposition: result.disposition,
-        business_outcome: result.business_outcome,
-        execution_ref: result.execution_ref,
-        output_refs: result.output_refs,
-      }
-    : notCommitted(result.decision, result.reason_code);
+): HarnessExecuteResponseV1 => {
+  if (result.status === "ok") {
+    return {
+      status: "committed",
+      execution_disposition: result.disposition,
+      business_outcome: result.business_outcome,
+      execution_ref: result.execution_ref,
+      output_refs: result.output_refs,
+      ...(result.committed_result ? { committed_result: result.committed_result } : {}),
+    };
+  }
+  if (result.status === "outcome_unknown") {
+    // Never a substitute command: the caller reconciles this exact identity.
+    return {
+      status: "outcome_unknown",
+      reason_code: result.reason_code,
+      recovery: "reconcile_same_command",
+    };
+  }
+  return notCommitted(result.decision, result.reason_code);
+};

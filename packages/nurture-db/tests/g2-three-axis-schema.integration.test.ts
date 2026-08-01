@@ -338,7 +338,10 @@ describe("G2 three-axis schema guards", () => {
     ).resolves.toMatchObject({ replyOrderKey: "0003-b" });
   });
 
-  it("enforces the strict correction head per message", async () => {
+  // The unique index guarantees one row per (message, version) — it does not
+  // by itself enforce the frozen "max + 1" successor rule, which the Increment
+  // 2 correction command owns and must prove separately.
+  it("rejects a duplicate correction version per message", async () => {
     const scope = await seedScope();
     const first = await prisma.nurtureFamilyCareMessageCorrection.create({
       data: {

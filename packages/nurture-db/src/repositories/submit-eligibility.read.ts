@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
-import type { SubmitEligibilityReadPort } from "@the-nurture/scenario/harness";
+import { FAMILY_CARE_PURPOSE, type SubmitEligibilityReadPort } from "@the-nurture/scenario/harness";
 
 /**
  * Read-only guardian submit eligibility for the Harness prepare step
@@ -48,7 +48,11 @@ export class PrismaSubmitEligibilityReadPort implements SubmitEligibilityReadPor
     });
     if (roles.length === 0) return { participant_active: true, targets: [] };
 
+    // An enrollment-scoped guardian role reaches only that enrollment; only
+    // process- and family-scoped roles reach the whole child-care process.
+    // Widening would offer another Institution's enrollment as a target.
     const processIds = new Set<string>();
+    const enrollmentIds = new Set<string>();
     for (const role of roles) {
       if (role.scopeType === "child_care_process") processIds.add(role.scopeId);
       else if (role.scopeType === "family") {
@@ -57,18 +61,26 @@ export class PrismaSubmitEligibilityReadPort implements SubmitEligibilityReadPor
         });
         if (family) processIds.add(family.childCareProcessId);
       } else if (role.scopeType === "enrollment") {
-        const enrollment = await this.prisma.nurtureEnrollment.findFirst({
-          where: { id: role.scopeId, workspaceId: input.workspace_id, deletedAt: null },
-        });
-        if (enrollment) processIds.add(enrollment.childCareProcessId);
+        enrollmentIds.add(role.scopeId);
       }
     }
-    if (processIds.size === 0) return { participant_active: true, targets: [] };
+    if (processIds.size === 0 && enrollmentIds.size === 0) {
+      return { participant_active: true, targets: [] };
+    }
 
     const enrollments = await this.prisma.nurtureEnrollment.findMany({
       where: {
         workspaceId: input.workspace_id,
-        childCareProcessId: { in: [...processIds] },
+        AND: [
+          {
+            OR: [
+              ...(processIds.size > 0
+                ? [{ childCareProcessId: { in: [...processIds] } }]
+                : []),
+              ...(enrollmentIds.size > 0 ? [{ id: { in: [...enrollmentIds] } }] : []),
+            ],
+          },
+        ],
         status: "active",
         deletedAt: null,
         OR: [{ leftAt: null }, { leftAt: { gt: now } }],
@@ -117,6 +129,7 @@ export class PrismaSubmitEligibilityReadPort implements SubmitEligibilityReadPor
             deletedAt: null,
             directions: { hasEvery: ["family_to_org", "org_to_family"] },
             dataClasses: { has: "family_care_question" },
+            purposes: { has: FAMILY_CARE_PURPOSE },
             OR: [
               { grantedToScopeType: "care_group", grantedToScopeId: enrollment.careGroupId },
               { grantedToScopeType: "institution", grantedToScopeId: enrollment.institutionId },
@@ -147,6 +160,7 @@ export class PrismaSubmitEligibilityReadPort implements SubmitEligibilityReadPor
     item_id: string;
     enrollment_id: string;
   }): Promise<{ eligible: boolean }> {
+    const now = new Date();
     const enrollment = await this.prisma.nurtureEnrollment.findFirst({
       where: { id: input.enrollment_id, workspaceId: input.workspace_id, deletedAt: null },
     });
@@ -169,8 +183,25 @@ export class PrismaSubmitEligibilityReadPort implements SubmitEligibilityReadPor
         enrollmentId: input.enrollment_id,
         familyId: family.id,
         responseState: "responded",
+        // A suppressed/closed source is no longer readable, so it must not be
+        // referenceable either; its own original grant must also still stand.
+        lifecycleState: "active",
       },
     });
-    return { eligible: Boolean(source) };
+    if (!source?.grantId) return { eligible: false };
+    const sourceGrant = await this.prisma.nurtureChildLinkGrant.findFirst({
+      where: {
+        id: source.grantId,
+        workspaceId: input.workspace_id,
+        status: "active",
+        revokedAt: null,
+        deletedAt: null,
+        AND: [
+          { OR: [{ effectiveFrom: null }, { effectiveFrom: { lte: now } }] },
+          { OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] },
+        ],
+      },
+    });
+    return { eligible: Boolean(sourceGrant) };
   }
 }

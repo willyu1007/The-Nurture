@@ -6,14 +6,33 @@ import type {
 
 type DomainContextRef = CanonicalRef;
 
+/** The purpose every G2 family-care grant must carry to authorize the loop. */
+export const FAMILY_CARE_PURPOSE = "family_care_workflow";
+
 export type FamilyCareCurrentGrant = {
   grant_id: string;
   status: "active" | "revoked" | "missing";
   directions: NurtureGrantDirection[];
   data_classes: NurtureGrantDataClass[];
+  /** Present for G2 reads; legacy callers may omit it. */
+  purposes?: string[];
   target_scope_type: "care_group" | "enrollment" | "institution";
   target_scope_id: string;
 };
+
+/**
+ * A grant only authorizes the family-care loop when it is current AND
+ * actually covers this data class, direction and purpose. Status alone is not
+ * enough: an unrelated active grant must never stand in for the real one.
+ */
+export const grantAuthorizesFamilyCare = (
+  grant: FamilyCareCurrentGrant,
+  direction: NurtureGrantDirection,
+): boolean =>
+  grant.status === "active" &&
+  grant.directions.includes(direction) &&
+  grant.data_classes.includes("family_care_question") &&
+  (grant.purposes ?? []).includes(FAMILY_CARE_PURPOSE);
 
 export type FamilyCareGrantRevokePayload = {
   participant_id: string;

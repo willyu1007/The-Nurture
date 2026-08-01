@@ -300,6 +300,142 @@ describe("G2 query lane guards", () => {
     expect(seen).toContain("可投影二");
   });
 
+  it("keeps an enrollment-scoped guardian out of the child's other enrollments", async () => {
+    const scope = await seedScope();
+    // A second Institution enrolment for the same child.
+    const otherInstitution = await prisma.nurtureCareInstitution.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        displayName: "Second Center",
+        status: "active",
+        createdByParticipantId: scope.caregiver.id,
+      },
+    });
+    const otherGroup = await prisma.nurtureCareGroup.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: otherInstitution.id,
+        name: "Class Z",
+        status: "active",
+      },
+    });
+    const otherEnrollment = await prisma.nurtureEnrollment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        institutionId: otherInstitution.id,
+        careGroupId: otherGroup.id,
+        status: "active",
+      },
+    });
+    const otherThread = await prisma.nurtureFamilyCareThread.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        familyId: scope.family.id,
+        enrollmentId: otherEnrollment.id,
+        careGroupId: otherGroup.id,
+        visibilityScope: "family_private",
+        status: "active",
+      },
+    });
+    const otherGrant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        enrollmentId: otherEnrollment.id,
+        grantedByParticipantId: scope.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: otherGroup.id,
+        directions: ["family_to_org", "org_to_family"],
+        dataClasses: ["family_care_question"],
+        purposes: ["family_care_workflow"],
+        status: "active",
+      },
+    });
+    const otherMessage = await prisma.nurtureFamilyCareMessage.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        threadId: otherThread.id,
+        childCareProcessId: scope.process.id,
+        senderParticipantId: scope.guardian.id,
+        senderRoleAssignmentId: scope.guardianRole.id,
+        messageKind: "family_message",
+        authorshipKind: "family_authored",
+        bodyFormat: "plain_text",
+        bodyStorageMode: "encrypted",
+        bodyProtectionPayload: protectedContent.seal("另一机构的私密内容") as never,
+        sourceSurface: "mobile",
+        grantId: otherGrant.id,
+        status: "sent",
+        writerContract: "harness_g2_v1",
+        enrollmentId: otherEnrollment.id,
+        careGroupId: otherGroup.id,
+        direction: "family_to_org",
+      },
+    });
+    const otherItem = await prisma.nurtureFamilyCareItem.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        sourceMessageId: otherMessage.id,
+        threadId: otherThread.id,
+        childCareProcessId: scope.process.id,
+        familyId: scope.family.id,
+        enrollmentId: otherEnrollment.id,
+        careGroupId: otherGroup.id,
+        dataClass: "family_care_question",
+        category: "question",
+        summary: "New family care question",
+        urgency: "today_attention",
+        requiresAck: true,
+        requiresReply: true,
+        status: "open",
+        classificationSource: "system",
+        grantId: otherGrant.id,
+        writerContract: "harness_g2_v1",
+      },
+    });
+    await seedQuestion(scope, "本机构内容", new Date());
+
+    // A guardian scoped to the FIRST enrollment only must not reach the
+    // second one, even though both belong to the same child-care process.
+    const scopedGuardian = await prisma.nurtureParticipant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        myChatUserId: `scoped:${scope.workspaceId}`,
+        status: "active",
+      },
+    });
+    await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        participantId: scopedGuardian.id,
+        role: "guardian",
+        scopeType: "enrollment",
+        scopeId: scope.enrollment.id,
+        status: "active",
+      },
+    });
+
+    const timeline = await queryGuardianFamilyCareTimeline(deps, {
+      workspace_id: scope.workspaceId,
+      participant_id: scopedGuardian.id,
+    });
+    if (timeline.status !== "ok") throw new Error("expected ok");
+    const bodies = timeline.output.items.map((entry) => entry.content?.body);
+    expect(bodies).toContain("本机构内容");
+    expect(bodies).not.toContain("另一机构的私密内容");
+    expect(JSON.stringify(timeline.output)).not.toContain("另一机构");
+
+    await expect(
+      queryFamilyCareItemDetail(deps, {
+        workspace_id: scope.workspaceId,
+        participant_id: scopedGuardian.id,
+        item_id: otherItem.id,
+      }),
+    ).resolves.toEqual({ status: "denied", reason_code: "not_authorized" });
+  });
+
   it("refuses an expired cursor with refresh_required", async () => {
     const scope = await seedScope();
     const stale = issueQueryCursor(
@@ -309,6 +445,7 @@ describe("G2 query lane guards", () => {
         query: "guardian_timeline",
         before_occurred_at: new Date().toISOString(),
         before_id: randomUUID(),
+        snapshot_at: new Date().toISOString(),
       },
       () => new Date(Date.now() - 11 * 60_000),
     );

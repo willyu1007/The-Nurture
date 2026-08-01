@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import type { ProtectedContentEnvelopeV1, ProtectedContentWritePort } from "./protected-content.js";
-import { issueCareItemTargetRef } from "./family-care-item-actions.js";
+import { issueCareItemTargetRef } from "./keyed-refs.js";
 
 /**
  * G2 query lane (09-capability-query-contract.md): role-safe read-only
@@ -40,10 +40,16 @@ export const issueDisplayRef = (
     .digest("hex")
     .slice(0, 32);
 
+/**
+ * The cursor pins the snapshot the page set was opened against (09): later
+ * pages are read as of that instant, so a concurrent state change cannot make
+ * one concatenated list show mutually inconsistent state for the same item.
+ */
 export type FamilyCareQueryCursorV1 = {
   query: "guardian_timeline" | "caregiver_work";
   before_occurred_at: string;
   before_id: string;
+  snapshot_at: string;
   issued_at: string;
 };
 
@@ -89,6 +95,7 @@ export const resolveQueryCursor = (
     cursor.query !== expectedQuery ||
     typeof cursor.before_occurred_at !== "string" ||
     typeof cursor.before_id !== "string" ||
+    typeof cursor.snapshot_at !== "string" ||
     typeof cursor.issued_at !== "string" ||
     new Date(cursor.issued_at).getTime() + CURSOR_TTL_MS <= now().getTime()
   ) {
@@ -168,6 +175,8 @@ export type FamilyCareQueryPage<Row> = {
   rows: Row[];
   has_more: boolean;
   tail?: { occurred_at: string; id: string };
+  /** The exact CareGroup a caregiver work page is scoped to. */
+  care_group_id?: string;
 };
 
 export type FamilyCareQueryReadPort = {
@@ -175,12 +184,15 @@ export type FamilyCareQueryReadPort = {
     workspace_id: string;
     participant_id: string;
     take: number;
+    snapshot_at: string;
     before?: { occurred_at: string; id: string };
   }): Promise<FamilyCareQueryPage<RawTimelineMessageRow>>;
   listCaregiverWork(input: {
     workspace_id: string;
     participant_id: string;
     take: number;
+    snapshot_at: string;
+    care_group_id?: string;
     before?: { occurred_at: string; id: string };
   }): Promise<FamilyCareQueryPage<RawWorkItemRow>>;
   loadItemDetail(input: {
@@ -245,6 +257,7 @@ export type CaregiverFamilyCareWorkItemV1 = {
 };
 
 export type CaregiverFamilyCareWorkOutputV1 = {
+  careGroupRef: string;
   items: CaregiverFamilyCareWorkItemV1[];
   pageInfo: SnapshotPageInfoV1;
 };
@@ -326,7 +339,9 @@ export const queryGuardianFamilyCareTimeline = async (
 ): Promise<FamilyCareQueryDecision<GuardianFamilyCareTimelineOutputV1>> => {
   const page = parsePage(request.page_size);
   if (!page) return { status: "denied", reason_code: "invalid_query_input" };
+  const now = (deps.now ?? (() => new Date()))();
   let before: { occurred_at: string; id: string } | undefined;
+  let snapshotAt = now.toISOString();
   if (request.cursor !== undefined) {
     const cursor = resolveQueryCursor(
       deps.integrity_key,
@@ -337,11 +352,13 @@ export const queryGuardianFamilyCareTimeline = async (
     );
     if (!cursor) return { status: "refresh_required" };
     before = { occurred_at: cursor.before_occurred_at, id: cursor.before_id };
+    snapshotAt = cursor.snapshot_at;
   }
   const result = await deps.reads.listGuardianTimeline({
     workspace_id: request.workspace_id,
     participant_id: request.participant_id,
     take: page.take,
+    snapshot_at: snapshotAt,
     ...(before ? { before } : {}),
   });
   if (!result.authorized) return { status: "denied", reason_code: "not_authorized" };
@@ -407,6 +424,7 @@ export const queryGuardianFamilyCareTimeline = async (
                   query: "guardian_timeline",
                   before_occurred_at: tail.occurred_at,
                   before_id: tail.id,
+                  snapshot_at: snapshotAt,
                 },
                 deps.now,
               ),
@@ -424,11 +442,14 @@ export const queryCaregiverFamilyCareWork = async (
     participant_id: string;
     page_size?: unknown;
     cursor?: string;
+    care_group_id?: string;
   },
 ): Promise<FamilyCareQueryDecision<CaregiverFamilyCareWorkOutputV1>> => {
   const page = parsePage(request.page_size);
   if (!page) return { status: "denied", reason_code: "invalid_query_input" };
+  const now = (deps.now ?? (() => new Date()))();
   let before: { occurred_at: string; id: string } | undefined;
+  let snapshotAt = now.toISOString();
   if (request.cursor !== undefined) {
     const cursor = resolveQueryCursor(
       deps.integrity_key,
@@ -439,11 +460,14 @@ export const queryCaregiverFamilyCareWork = async (
     );
     if (!cursor) return { status: "refresh_required" };
     before = { occurred_at: cursor.before_occurred_at, id: cursor.before_id };
+    snapshotAt = cursor.snapshot_at;
   }
   const result = await deps.reads.listCaregiverWork({
     workspace_id: request.workspace_id,
     participant_id: request.participant_id,
     take: page.take,
+    snapshot_at: snapshotAt,
+    ...(request.care_group_id ? { care_group_id: request.care_group_id } : {}),
     ...(before ? { before } : {}),
   });
   if (!result.authorized) return { status: "denied", reason_code: "not_authorized" };
@@ -453,6 +477,12 @@ export const queryCaregiverFamilyCareWork = async (
   return {
     status: "ok",
     output: {
+      careGroupRef: issueDisplayRef(
+        deps.integrity_key,
+        request,
+        "care_group",
+        result.care_group_id ?? "",
+      ),
       items: rows.map((row) => ({
         careItemRef: issueCareItemTargetRef(deps.integrity_key, {
           workspace_id: request.workspace_id,
@@ -480,6 +510,7 @@ export const queryCaregiverFamilyCareWork = async (
                   query: "caregiver_work",
                   before_occurred_at: tail.occurred_at,
                   before_id: tail.id,
+                  snapshot_at: snapshotAt,
                 },
                 deps.now,
               ),

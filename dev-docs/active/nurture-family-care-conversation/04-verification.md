@@ -348,3 +348,17 @@
 | 2026-08-01 | production-db 85/85(floor 78→85,文件 12→13);unit 265/265;scenario-service 46/46 + db 8/8;dev-host 26/26;routing 64 files | PASS |
 | 2026-08-01 | OpenAPI strict + api-index + ingress 守卫 `routes=6`;digest 不变 `1.7.0`/`b7691a81…`;typecheck;smoke 三重 disabled | PASS |
 | 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `05f449da…`(57 files) |
+
+## Codex 独立评审修复 — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | enrollment 作用域 guardian 不得读到同一孩子在其他机构的内容(timeline 无泄漏 + detail denied) | PASS(新增回归;修复前会泄漏) |
+| 2026-08-01 | grant 谓词:status + direction + data class + purpose 四项齐备才授权(submit/ack/reply/内容 fence) | PASS(既有负向套件全绿) |
+| 2026-08-01 | 续接 ref 走签名解析:裸 id 被拒、签名 ref 可用 | PASS(g2-submit 套件) |
+| 2026-08-01 | 三态结果:operation 内抛错/驱动写冲突 → 确定 not_committed;事务外壳失败 → outcome_unknown + reconcile_same_command | PASS(kernel 单测新增两例) |
+| 2026-08-01 | committed result 落库并在 replay 原样返回(三个 capability 均填充) | PASS |
+| 2026-08-01 | cursor 绑定 snapshot;caregiver work 精确 CareGroup + `careGroupRef`;续接可读性实算 | PASS |
+| 2026-08-01 | production-db 86/86(floor 85→86);unit 265/265;scenario-service 46/46 + db 8/8;dev-host 26/26;routing 64 files | PASS |
+| 2026-08-01 | digest 不变 `1.7.0`/`b7691a81…`;ingress 守卫 `routes=6`;typecheck;smoke 三重 disabled;self-pin → `b2c53eb7…` | PASS |
+| 2026-08-01 | x5 联合套件 | NOT RUN(需 pinned My-Chat + pgvector 物化);受影响的 revoke 路径由 family-care 与 legacy-cutover 套件覆盖,CI 权威 |

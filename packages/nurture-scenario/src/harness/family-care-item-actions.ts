@@ -1,11 +1,12 @@
-import { createHmac, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type {
   NurtureCommandSpec,
 } from "../domain/commands/command-kernel.js";
-import type {
-  FamilyCareTransactionInput,
-  G2ItemActionFacts,
-  G2ItemActionPayload,
+import {
+  grantAuthorizesFamilyCare,
+  type FamilyCareTransactionInput,
+  type G2ItemActionFacts,
+  type G2ItemActionPayload,
 } from "../domain/institution/family-care-transaction.js";
 import {
   NurtureInteractionContextService,
@@ -15,7 +16,7 @@ import {
   issueHarnessConfirmation,
 } from "./confirmation.js";
 import type { ProtectedContentWritePort } from "./protected-content.js";
-import { computeProtectedBodyTag } from "./submit-family-care-question.js";
+import { computeProtectedBodyTag, resolveCareItemTargetRef } from "./keyed-refs.js";
 
 /**
  * G2-A caregiver-side actions on one exact CareItem: the convergent class
@@ -35,35 +36,6 @@ export const REPLY_FAMILY_CARE_ITEM_CAPABILITY = {
 
 const MIN_BODY_CHARS = 1;
 const MAX_BODY_CHARS = 2_000;
-const ITEM_REF_VERSION = "1";
-
-// Owner-issued, actor-bound CareItem target ref: raw ids are unusable
-// without the keyed tag, and execute re-reads current authority anyway.
-export const issueCareItemTargetRef = (
-  integrityKey: string,
-  scope: { workspace_id: string; participant_id: string; item_id: string },
-): string => {
-  const tag = createHmac("sha256", integrityKey)
-    .update(
-      `nurture.care-item-target.v${ITEM_REF_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${scope.item_id}`,
-      "utf8",
-    )
-    .digest("hex")
-    .slice(0, 32);
-  return `${ITEM_REF_VERSION}.${scope.item_id}.${tag}`;
-};
-
-export const resolveCareItemTargetRef = (
-  integrityKey: string,
-  scope: { workspace_id: string; participant_id: string },
-  ref: string,
-): string | null => {
-  const parts = ref.split(".");
-  if (parts.length !== 3 || parts[0] !== ITEM_REF_VERSION || !parts[1]) return null;
-  return issueCareItemTargetRef(integrityKey, { ...scope, item_id: parts[1] }) === ref
-    ? parts[1]
-    : null;
-};
 
 export type ItemActionFactsReadPort = {
   loadG2ItemActionFacts(
@@ -134,7 +106,7 @@ const gateItemAction = async (
   if (facts.lifecycle_state !== "active") {
     return { status: "refused", decision: { status: "denied", reason_code: "target_unavailable" } };
   }
-  if (facts.grant.status !== "active" || !facts.grant.directions.includes(requiredDirection)) {
+  if (!grantAuthorizesFamilyCare(facts.grant, requiredDirection)) {
     return { status: "refused", decision: { status: "denied", reason_code: "grant_unavailable" } };
   }
   return { status: "ok", facts, item_id: itemId };
@@ -251,10 +223,7 @@ export const createAcknowledgeFamilyCareItemSpec =
       if (facts.lifecycle_head !== input.expected_lifecycle_head) {
         return { status: "conflict", reason_code: "stale_confirmation" };
       }
-      if (
-        facts.grant.status !== "active" ||
-        !facts.grant.directions.includes("family_to_org")
-      ) {
+      if (!grantAuthorizesFamilyCare(facts.grant, "family_to_org")) {
         return { status: "blocked", reason_code: "grant_unavailable" };
       }
       if (facts.acknowledgement_state === "acknowledged") {
@@ -298,6 +267,11 @@ export const createAcknowledgeFamilyCareItemSpec =
           applied.item_event_ref,
           ...(applied.receipt_ref ? [applied.receipt_ref] : []),
         ],
+        result_schema_version: 1,
+        committed_result: {
+          capability_key: ACKNOWLEDGE_FAMILY_CARE_ITEM_CAPABILITY.key,
+          acknowledgement_effect: "acknowledged",
+        },
       };
     },
   });
@@ -438,10 +412,7 @@ export const createReplyFamilyCareItemSpec = (deps: {
     if (facts.lifecycle_head !== input.expected_lifecycle_head) {
       return { status: "conflict", reason_code: "stale_confirmation" };
     }
-    if (
-      facts.grant.status !== "active" ||
-      !facts.grant.directions.includes("org_to_family")
-    ) {
+    if (!grantAuthorizesFamilyCare(facts.grant, "org_to_family")) {
       return { status: "blocked", reason_code: "grant_unavailable" };
     }
     return { status: "ready" };
@@ -456,7 +427,10 @@ export const createReplyFamilyCareItemSpec = (deps: {
       participant_id: context.business_actor_ref,
       item_id: input.item_id,
     });
-    if (!facts.caregiver_role_assignment_id || facts.grant.status !== "active") {
+    if (
+      !facts.caregiver_role_assignment_id ||
+      !grantAuthorizesFamilyCare(facts.grant, "org_to_family")
+    ) {
       throw new Error("G2 reply facts changed inside the transaction");
     }
     const applied = await familyCare.applyG2Reply({
@@ -467,6 +441,9 @@ export const createReplyFamilyCareItemSpec = (deps: {
       grant_id: facts.grant.grant_id,
       body_envelope: deps.protected_content.seal(input.body),
     });
+    // The frozen CareReplyV1 projection (09) needs these effects to be part of
+    // the immutable committed result: an exact replay must return the original
+    // first/additional and attention decision, never recompute it.
     return {
       output_refs: [
         applied.message_ref,
@@ -474,6 +451,13 @@ export const createReplyFamilyCareItemSpec = (deps: {
         applied.item_event_ref,
         applied.receipt_ref,
       ],
+      result_schema_version: 1,
+      committed_result: {
+        capability_key: REPLY_FAMILY_CARE_ITEM_CAPABILITY.key,
+        reply_order_key: applied.reply_order_key,
+        response_effect: applied.response_effect,
+        attention_effect: applied.attention_effect,
+      },
     };
   },
 });

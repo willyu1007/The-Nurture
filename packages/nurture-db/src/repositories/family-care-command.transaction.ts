@@ -129,6 +129,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
           status: active || activeMismatch === fallback ? "active" : "revoked",
           directions: fallback.directions,
           data_classes: fallback.dataClasses,
+          purposes: fallback.purposes,
           target_scope_type: fallback.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
           target_scope_id: fallback.grantedToScopeId,
         }
@@ -850,6 +851,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
           status: grantCurrent ? "active" : "revoked",
           directions: grantRow.directions,
           data_classes: grantRow.dataClasses,
+          purposes: grantRow.purposes,
           target_scope_type: grantRow.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
           target_scope_id: grantRow.grantedToScopeId,
         }

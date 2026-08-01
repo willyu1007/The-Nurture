@@ -16,11 +16,27 @@ const attentionState = (
 ): "active" | "resolved" | "suppressed" =>
   status === "active" ? "active" : status === "suppressed" || status === "expired" ? "suppressed" : "resolved";
 
-const currentGuardianProcessIds = async (
+/**
+ * A guardian's reach is NOT uniformly the child-care process: an
+ * enrollment-scoped role reaches only that enrollment. Widening it to the
+ * whole process would expose every other Institution enrollment of the same
+ * child, which the contract forbids. Process- and family-scoped roles do
+ * reach the whole process.
+ */
+export type GuardianReach = {
+  processIds: Set<string>;
+  enrollmentIds: Set<string>;
+};
+
+const reaches = (reach: GuardianReach, row: { childCareProcessId: string; enrollmentId: string | null }): boolean =>
+  reach.processIds.has(row.childCareProcessId) ||
+  (row.enrollmentId !== null && reach.enrollmentIds.has(row.enrollmentId));
+
+const currentGuardianReach = async (
   prisma: Client,
   workspaceId: string,
   participantId: string,
-): Promise<Set<string> | null> => {
+): Promise<GuardianReach | null> => {
   const now = new Date();
   const participant = await prisma.nurtureParticipant.findFirst({
     where: { id: participantId, workspaceId, status: "active", deletedAt: null },
@@ -38,6 +54,7 @@ const currentGuardianProcessIds = async (
     },
   });
   const processIds = new Set<string>();
+  const enrollmentIds = new Set<string>();
   for (const role of roles) {
     if (role.scopeType === "child_care_process") processIds.add(role.scopeId);
     else if (role.scopeType === "family") {
@@ -46,13 +63,10 @@ const currentGuardianProcessIds = async (
       });
       if (family) processIds.add(family.childCareProcessId);
     } else if (role.scopeType === "enrollment") {
-      const enrollment = await prisma.nurtureEnrollment.findFirst({
-        where: { id: role.scopeId, workspaceId, deletedAt: null },
-      });
-      if (enrollment) processIds.add(enrollment.childCareProcessId);
+      enrollmentIds.add(role.scopeId);
     }
   }
-  return processIds;
+  return { processIds, enrollmentIds };
 };
 
 const currentCaregiverGroupIds = async (
@@ -123,15 +137,28 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     workspace_id: string;
     participant_id: string;
     take: number;
+    snapshot_at: string;
     before?: { occurred_at: string; id: string };
   }): Promise<FamilyCareQueryPage<RawTimelineMessageRow>> {
-    const processIds = await currentGuardianProcessIds(
+    const reach = await currentGuardianReach(
       this.prisma,
       input.workspace_id,
       input.participant_id,
     );
-    if (!processIds) return { authorized: false, rows: [], has_more: false };
-    if (processIds.size === 0) return { authorized: true, rows: [], has_more: false };
+    if (!reach) return { authorized: false, rows: [], has_more: false };
+    if (reach.processIds.size === 0 && reach.enrollmentIds.size === 0) {
+      return { authorized: true, rows: [], has_more: false };
+    }
+    const reachFilter = {
+      OR: [
+        ...(reach.processIds.size > 0
+          ? [{ childCareProcessId: { in: [...reach.processIds] } }]
+          : []),
+        ...(reach.enrollmentIds.size > 0
+          ? [{ enrollmentId: { in: [...reach.enrollmentIds] } }]
+          : []),
+      ],
+    };
 
     // Scan take+1 source records: paging state comes from the scanned window,
     // never from the projected rows, so an unresolvable row can be skipped
@@ -139,9 +166,10 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     const scanned = await this.prisma.nurtureFamilyCareMessage.findMany({
       where: {
         workspaceId: input.workspace_id,
-        childCareProcessId: { in: [...processIds] },
+        AND: [reachFilter],
         messageKind: { in: ["family_message", "caregiver_reply"] },
         writerContract: { in: [...G2_WRITERS] },
+        createdAt: { lte: new Date(input.snapshot_at) },
         ...(beforeFilter(input.before) as Prisma.NurtureFamilyCareMessageWhereInput),
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -179,7 +207,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
           where: { workspaceId: input.workspace_id, id: { in: continuationIds } },
         })
       )
-        .filter((item) => processIds.has(item.childCareProcessId))
+        .filter((item) => reaches(reach, item))
         .map((item) => item.id),
     );
     const receipts = await this.prisma.nurtureChildLinkReceipt.findMany({
@@ -245,6 +273,8 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     workspace_id: string;
     participant_id: string;
     take: number;
+    snapshot_at: string;
+    care_group_id?: string;
     before?: { occurred_at: string; id: string };
   }): Promise<FamilyCareQueryPage<RawWorkItemRow>> {
     const groupIds = await currentCaregiverGroupIds(
@@ -254,12 +284,20 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     );
     if (!groupIds) return { authorized: false, rows: [], has_more: false };
     if (groupIds.size === 0) return { authorized: true, rows: [], has_more: false };
+    // The work list is scoped to one exact CareGroup: a caregiver assigned to
+    // several groups must ask per group rather than receive one merged,
+    // provenance-free list.
+    const careGroupId = input.care_group_id ?? [...groupIds].sort()[0]!;
+    if (!groupIds.has(careGroupId)) {
+      return { authorized: false, rows: [], has_more: false };
+    }
 
     const scanned = await this.prisma.nurtureFamilyCareItem.findMany({
       where: {
         workspaceId: input.workspace_id,
-        careGroupId: { in: [...groupIds] },
+        careGroupId,
         writerContract: { in: [...G2_WRITERS] },
+        createdAt: { lte: new Date(input.snapshot_at) },
         ...(beforeFilter(input.before) as Prisma.NurtureFamilyCareItemWhereInput),
       },
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -284,6 +322,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
       authorized: true,
       has_more: hasMore,
       tail,
+      care_group_id: careGroupId,
       rows: items.map((item) => ({
         item_id: item.id,
         child_safe_label: item.childCareProcess.child?.displayName ?? "Child",
@@ -312,11 +351,11 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     });
     if (!item?.enrollmentId || !item.sourceMessageId) return { authorized: false };
 
-    const [guardianProcessIds, caregiverGroupIds] = await Promise.all([
-      currentGuardianProcessIds(this.prisma, input.workspace_id, input.participant_id),
+    const [guardianReach, caregiverGroupIds] = await Promise.all([
+      currentGuardianReach(this.prisma, input.workspace_id, input.participant_id),
       currentCaregiverGroupIds(this.prisma, input.workspace_id, input.participant_id),
     ]);
-    const isGuardian = Boolean(guardianProcessIds?.has(item.childCareProcessId));
+    const isGuardian = Boolean(guardianReach && reaches(guardianReach, item));
     const isCaregiver = Boolean(caregiverGroupIds?.has(item.careGroupId));
     if (!isGuardian && !isCaregiver) return { authorized: false };
     const projectionRole = isGuardian ? "guardian" : "caregiver";
@@ -368,6 +407,23 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     if (!sourceMessage) return { authorized: false };
     const messageIds = new Set([sourceMessage.id, ...replies.map((reply) => reply.id)]);
 
+    let continuationReadable = false;
+    if (item.contextContinuationOfItemId) {
+      const source = await this.prisma.nurtureFamilyCareItem.findFirst({
+        where: {
+          id: item.contextContinuationOfItemId,
+          workspaceId: input.workspace_id,
+          lifecycleState: "active",
+        },
+      });
+      continuationReadable = Boolean(
+        source &&
+          (projectionRole === "guardian"
+            ? guardianReach && reaches(guardianReach, source)
+            : caregiverGroupIds?.has(source.careGroupId)),
+      );
+    }
+
     return {
       authorized: true,
       detail: {
@@ -400,7 +456,9 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         ...(item.contextContinuationOfItemId
           ? {
               continuation_source_item_id: item.contextContinuationOfItemId,
-              continuation_source_readable: true,
+              // A source the caller can no longer read must not surface even
+              // as a relation; readability is recomputed, never assumed.
+              continuation_source_readable: continuationReadable,
             }
           : {}),
       },

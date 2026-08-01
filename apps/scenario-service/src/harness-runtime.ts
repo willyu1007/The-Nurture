@@ -262,9 +262,18 @@ export function createHarnessEngine(input: {
         });
       }
       if (request.capability_key === "query_caregiver_family_care_work") {
+        // The work list is per exact CareGroup; the selector is an
+        // owner-issued option ref, never a raw group id.
+        const careGroupId = request.target_option_ref
+          ? resolveCareItemTargetRef(input.integrityKey, scope, request.target_option_ref)
+          : undefined;
+        if (request.target_option_ref && !careGroupId) {
+          return { status: "denied", reason_code: "not_authorized" };
+        }
         return queryCaregiverFamilyCareWork(queryDeps, {
           ...scope,
           page_size: request.page_size,
+          ...(careGroupId ? { care_group_id: careGroupId } : {}),
           ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
         });
       }

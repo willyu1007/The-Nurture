@@ -47,6 +47,9 @@ export type NurtureCommandExecutionRecord = {
   handoff_snapshot_schema_version: 1;
   handoff_request_snapshots_payload: ScenarioHandoffRequestSnapshot[];
   handoff_driver_ref?: DomainContextRef;
+  /** Frozen immutable committed result (10-g2-schema-freeze.md D7). */
+  result_schema_version?: number;
+  committed_result_payload?: unknown;
   committed_at: string;
 };
 
@@ -118,7 +121,15 @@ export type NurtureCommandSpec<Input> = {
     transaction: NurtureCommandTransaction,
     input: Input,
     context: NurtureCommandExecutionContext,
-  ): Promise<{ output_refs: DomainContextRef[] }>;
+  ): Promise<{
+    output_refs: DomainContextRef[];
+    /**
+     * Body-free typed result persisted with the execution so an exact replay
+     * returns the original business outcome rather than recomputing it.
+     */
+    result_schema_version?: number;
+    committed_result?: unknown;
+  }>;
   handoff?: NurtureCommandHandoffPolicy<Input>;
 };
 
@@ -145,6 +156,8 @@ export type NurtureCommandSuccess = {
   execution_ref: DomainContextRef;
   output_refs: DomainContextRef[];
   handoff_request_snapshots: ScenarioHandoffRequestSnapshot[];
+  /** Replay-stable typed result; absent for capabilities that publish none. */
+  committed_result?: unknown;
 };
 
 export type NurtureCommandNotCommitted = {
@@ -159,7 +172,34 @@ export type NurtureCommandNotCommitted = {
   reason_code: string;
 };
 
-export type NurtureCommandResult = NurtureCommandSuccess | NurtureCommandNotCommitted;
+/**
+ * A transaction that failed indeterminately (for example a lost connection
+ * after PostgreSQL committed) must not be reported as definitely
+ * not-committed: the caller has to reconcile with the same command identity
+ * rather than substitute a new one (01-plan / 02-architecture).
+ */
+export type NurtureCommandOutcomeUnknown = {
+  status: "outcome_unknown";
+  reason_code: string;
+};
+
+export type NurtureCommandResult =
+  | NurtureCommandSuccess
+  | NurtureCommandNotCommitted
+  | NurtureCommandOutcomeUnknown;
+
+/**
+ * A failure that is known to have rolled back: a guard inside the operation,
+ * or a write conflict the driver reports as a rollback. It is thrown so the
+ * transaction still aborts, and the runner maps it to a definite
+ * not-committed instead of the honest-but-useless outcome_unknown.
+ */
+export class NurtureDeterministicRollback extends Error {
+  constructor(readonly reason_code: string) {
+    super(`nurture deterministic rollback: ${reason_code}`);
+    this.name = "NurtureDeterministicRollback";
+  }
+}
 
 const sha256 = (value: string): string => createHash("sha256").update(value, "utf8").digest("hex");
 
@@ -444,13 +484,27 @@ export class NurtureCommandRunner {
             };
           }
 
-          const applied =
+          let applied;
+          try {
+            applied =
             decision.status === "already_satisfied"
-              ? { business_outcome: "already_satisfied" as const, output_refs: decision.output_refs }
+              ? {
+                  business_outcome: "already_satisfied" as const,
+                  output_refs: decision.output_refs,
+                  result_schema_version: undefined as number | undefined,
+                  committed_result: undefined as unknown,
+                }
               : {
                   business_outcome: "applied" as const,
                   ...(await input.spec.apply(transaction, input.payload, executionContext)),
                 };
+          } catch (error) {
+            // The operation body threw, so this transaction definitely rolls
+            // back; rethrow tagged so the outcome is reported as certain.
+            throw error instanceof NurtureDeterministicRollback
+              ? error
+              : new NurtureDeterministicRollback("command_execution_failed");
+          }
           validateRefs(applied.output_refs, "output_refs");
           const handoffRequestSnapshots = activation
             ? buildNurtureHandoffRequestSnapshots({
@@ -483,6 +537,12 @@ export class NurtureCommandRunner {
             handoff_snapshot_schema_version: 1,
             handoff_request_snapshots_payload: handoffRequestSnapshots,
             ...(activation ? { handoff_driver_ref: activation.driver_ref } : {}),
+            ...(applied.result_schema_version !== undefined
+              ? { result_schema_version: applied.result_schema_version }
+              : {}),
+            ...(applied.committed_result !== undefined
+              ? { committed_result_payload: applied.committed_result }
+              : {}),
           });
           return {
             status: "ok" as const,
@@ -491,15 +551,24 @@ export class NurtureCommandRunner {
             execution_ref: executionRef(record),
             output_refs: record.output_refs,
             handoff_request_snapshots: record.handoff_request_snapshots_payload,
+            ...(record.committed_result_payload !== undefined
+              ? { committed_result: record.committed_result_payload }
+              : {}),
           };
         },
       });
-    } catch {
-      return {
-        status: "not_committed",
-        decision: "technical_error",
-        reason_code: "command_execution_failed",
-      };
+    } catch (error) {
+      if (error instanceof NurtureDeterministicRollback) {
+        return {
+          status: "not_committed",
+          decision: "technical_error",
+          reason_code: error.reason_code,
+        };
+      }
+      // The transaction wrapper itself failed, so whether the COMMIT reached
+      // the database is not observable from here. Reconcile by the same
+      // command identity rather than substituting a new one.
+      return { status: "outcome_unknown", reason_code: "command_execution_failed" };
     }
     if (!locked.acquired) {
       return { status: "not_committed", decision: "command_busy", reason_code: "command_busy" };

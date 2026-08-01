@@ -6,7 +6,10 @@ import {
   type NurtureWorkflowProject as PrismaWorkflowProject,
   type PrismaClient,
 } from "@prisma/client";
-import { normalizeExecutionHandoffState } from "@the-nurture/scenario/harness";
+import {
+  NurtureDeterministicRollback,
+  normalizeExecutionHandoffState,
+} from "@the-nurture/scenario/harness";
 import type {
   NurtureCommandExecutionDraft,
   NurtureCommandExecutionRecord,
@@ -80,6 +83,12 @@ const toExecution = (row: PrismaCommandExecution): NurtureCommandExecutionRecord
     handoff_snapshot_schema_version: 1,
     handoff_request_snapshots_payload: handoffState.snapshots,
     ...(handoffState.driver_ref ? { handoff_driver_ref: handoffState.driver_ref } : {}),
+    ...(row.resultSchemaVersion !== null
+      ? { result_schema_version: row.resultSchemaVersion }
+      : {}),
+    ...(row.committedResultPayload !== null
+      ? { committed_result_payload: row.committedResultPayload }
+      : {}),
     committed_at: row.committedAt.toISOString(),
   };
 };
@@ -151,6 +160,12 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
         handoffRequestSnapshotsPayload: asJson(input.handoff_request_snapshots_payload),
         ...(input.handoff_driver_ref
           ? { handoffDriverRef: asJson(input.handoff_driver_ref) }
+          : {}),
+        ...(input.result_schema_version !== undefined
+          ? { resultSchemaVersion: input.result_schema_version }
+          : {}),
+        ...(input.committed_result_payload !== undefined
+          ? { committedResultPayload: asJson(input.committed_result_payload) }
           : {}),
       },
     });
@@ -236,7 +251,25 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
     return row ? toExecution(row) : null;
   }
 
-  executeLocked<T>(input: {
+  async executeLocked<T>(input: {
+    workspace_id: string;
+    command_request_id_hash: string;
+    operation: (transaction: NurtureCommandTransaction) => Promise<T>;
+  }): Promise<{ acquired: true; value: T } | { acquired: false }> {
+    try {
+      return await this.runLocked(input);
+    } catch (error) {
+      // P2034 / 40001: the driver aborted the transaction, so no effect
+      // landed. Report it as a certain rollback rather than an unknown one.
+      const code = (error as { code?: string } | null)?.code;
+      if (code === "P2034" || code === "40001") {
+        throw new NurtureDeterministicRollback("command_write_conflict");
+      }
+      throw error;
+    }
+  }
+
+  private runLocked<T>(input: {
     workspace_id: string;
     command_request_id_hash: string;
     operation: (transaction: NurtureCommandTransaction) => Promise<T>;

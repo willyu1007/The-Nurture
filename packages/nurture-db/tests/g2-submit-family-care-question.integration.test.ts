@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import {
+  issueCareItemTargetRef,
   NurtureCommandRunner,
   NurtureInteractionContextService,
   createSubmitFamilyCareQuestionSpec,
@@ -372,8 +373,19 @@ describe("G2-A submit_family_care_question vertical", () => {
       where: { workspaceId: scope.workspaceId },
     });
 
+    // Clients receive a signed care-item ref from the query lane, so the
+    // continuation input is that same signed ref — a raw id is refused.
+    const continuationRef = issueCareItemTargetRef(INTEGRITY_KEY, {
+      workspace_id: scope.workspaceId,
+      participant_id: scope.guardian.id,
+      item_id: sourceItem.id,
+    });
+    await expect(
+      prepare(scope, "继续沟通", { continuation_ref: sourceItem.id }),
+    ).resolves.toEqual({ status: "denied", reason_code: "invalid_continuation" });
+
     const notResponded = await prepare(scope, "继续沟通", {
-      continuation_ref: sourceItem.id,
+      continuation_ref: continuationRef,
     });
     expect(notResponded).toEqual({ status: "denied", reason_code: "invalid_continuation" });
 
@@ -382,7 +394,7 @@ describe("G2-A submit_family_care_question vertical", () => {
       data: { responseState: "responded" },
     });
     const ready = requireReady(
-      await prepare(scope, "继续沟通", { continuation_ref: sourceItem.id }),
+      await prepare(scope, "继续沟通", { continuation_ref: continuationRef }),
     );
     const committed = await execute(scope, ready, "继续沟通", sourceItem.id);
     expect(committed).toMatchObject({ status: "ok", disposition: "executed" });

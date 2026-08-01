@@ -357,7 +357,7 @@ describe("NurtureCommandRunner", () => {
     ]);
   });
 
-  it("returns retryable non-committed outcomes for lock busy and transaction failure", async () => {
+  it("separates lock busy, indeterminate transactions and pre-transaction lookup failure", async () => {
     const busyRepository: NurtureCommandRepository = {
       findCommitted: async () => null,
       executeLocked: async () => ({ acquired: false }),
@@ -371,8 +371,28 @@ describe("NurtureCommandRunner", () => {
         throw new Error("database unavailable");
       },
     };
+    // The transaction wrapper itself failed, so whether COMMIT landed is not
+    // observable: the honest answer is outcome_unknown, reconciled by the same
+    // command identity — never a definite "no effect".
     const broken = await command(brokenRepository, spec(() => undefined));
-    expect(broken.status === "not_committed" && broken.decision).toBe("technical_error");
+    expect(broken).toEqual({
+      status: "outcome_unknown",
+      reason_code: "command_execution_failed",
+    });
+
+    // A guard that throws INSIDE the operation aborts before COMMIT, so the
+    // outcome is certain: definite not_committed, not outcome_unknown.
+    const guarded = await command(
+      createInMemoryNurtureCommandRepository(),
+      spec(() => {
+        throw new Error("deterministic guard");
+      }),
+    );
+    expect(guarded).toEqual({
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "command_execution_failed",
+    });
 
     const lookupFailure: NurtureCommandRepository = {
       findCommitted: async () => {

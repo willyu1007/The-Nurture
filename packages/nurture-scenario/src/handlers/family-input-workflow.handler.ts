@@ -152,6 +152,16 @@ export const makeCaptureFamilyInput = (deps: NurtureHandlerDeps): WorkflowStepHa
         spec: familyInputRouteSpec,
       });
 
+      if (result.status === "outcome_unknown") {
+        // The command identity is stable per Step, so reconciling is a retry
+        // of the SAME identity: if it did commit, the retry exact-replays it
+        // instead of creating a second effect.
+        return finish(
+          workflowResult("retry_requested", result.reason_code),
+          "retry_requested",
+        );
+      }
+
       if (result.status === "not_committed") {
         const retryable =
           result.decision === "command_busy" ||

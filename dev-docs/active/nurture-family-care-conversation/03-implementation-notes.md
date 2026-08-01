@@ -626,3 +626,62 @@
   scenario-service 46/46 + db 8/8;dev-host 26/26;routing 64 files;
   digest 不变;typecheck clean;smoke 三重 disabled;self-pin →
   `05f449da…`。
+
+## 2026-08-01 — Codex 独立评审发现的修复(gpt-5.6-sol)
+
+对 `f167079..f343eb1` 的独立对抗式评审给出 10 条(5 高)。逐条裁定与处置:
+
+- **高 #1 enrollment 作用域越权(采纳,最严重)。** guardian 的
+  `scopeType=enrollment` 角色此前被放大为整个 child-care process:同一孩子
+  在**另一机构**的问题/回复会进入 timeline 并被解密,submit 也会把另一机构
+  的目标列为可选。已引入 `GuardianReach{processIds, enrollmentIds}`——只有
+  process/family 作用域才覆盖整个 process,enrollment 作用域只达该
+  enrollment;timeline/detail/submit-eligibility 三处统一按此判定。新增跨机构
+  越权回归测试(修复前会泄漏)。
+- **高 #2 grant 的 purpose/data-class 未强制(采纳)。** `purposes` 全链路
+  从未校验;且 `currentGrant` 的 `activeMismatch` 兜底会把一个 data-class
+  不匹配的 active grant 当作 active 返回,而 submit 只查 directions。已加
+  `grantAuthorizesFamilyCare(grant, direction)` 统一谓词(status + direction
+  + `family_care_question` + `family_care_workflow` purpose),submit/ack/
+  reply/内容 fence 全部改用;grant 读取补 `purposes` 字段。
+- **高 #3 raw id 与续接 ref(部分采纳)。** readResult 吃 raw id 已在上一轮
+  自查修掉。**续接流程断裂**属实且已修:query 发出的是签名 care-item ref,
+  而 submit prepare 此前当作裸 DB id 解析,照文档流程走必然失败(旧测试直接
+  传 `sourceItem.id` 掩盖了它);现在统一走 keyed 解析,并补了「裸 id 被拒」
+  断言。keyed ref 内含 id 这一点保留:它是**防伪造**设计,调用方本就持有
+  自己 item 的身份;已在记录中修正措辞,不再声称「raw id 不出」。
+- **高 #4 缺 `outcome_unknown`(采纳)。** 此前任何事务异常都报
+  `not_committed`,在「COMMIT 后连接中断」时是不诚实的。现为三态,并做了
+  Codex 未提的关键区分:**operation 内部抛错 = 确定回滚 → not_committed**
+  (新增 `NurtureDeterministicRollback`),**事务外壳失败 = outcome_unknown**;
+  驱动明确报告的写冲突(P2034/40001)也归为确定回滚。HTTP 侧新增
+  `outcome_unknown` + `recovery: reconcile_same_command`;两个 workflow
+  handler 补分支(同 command identity 重试→exact replay,不产生第二效果)。
+- **高 #5 immutable committed result 未实现(采纳)。** D7 的两列此前只有
+  schema 没有 writer,reply 算出的 `replyOrderKey`/`response_effect`/
+  `attention_effect` 被丢弃,调用方无从得知首条/追加与 Attention 结果。现在
+  spec 可返回 `result_schema_version` + `committed_result`,kernel 持久化并在
+  replay 时原样返回,三个 capability 均已填充。
+- **中 #6 replay 绕过 surface/conversation 绑定(不采纳,附理由)。**
+  冻结契约明确要求 `surface_origin` **不得**进入 authority 或 replay
+  identity(01-plan G2-03 / `T005-AC-032`),因此 surface 不在 payload hash
+  内是按契约设计;actor 已在 hash 内,跨 actor 会 idempotency_conflict 而非
+  replay。已记录该分歧与依据。
+- **中 #7 cursor 未绑定快照(采纳)。** cursor 增加 `snapshot_at`,读端口按
+  该时刻上界扫描,避免同一列表跨页拼出互相矛盾的状态。
+- **中 #8 caregiver work 混合多个 CareGroup(采纳)。** 改为按**确切**
+  CareGroup 查询(默认取确定性首个,可用 owner-issued ref 指定),输出补上
+  契约要求的顶层 `careGroupRef`。
+- **中 #9 续接可读性未校验(采纳)。** prepare 侧要求源 Item lifecycle
+  active 且其 original Grant 当前有效;detail 侧的 `continuation_source_readable`
+  由硬编码 `true` 改为按当前角色可达性实算。
+- **低 #10 correction head 测试名过度声明(采纳)。** 唯一索引只保证
+  (message, version) 唯一,不保证冻结的 `max+1`;测试更名为其真正证明的内容,
+  并注明 max+1 由 Increment 2 的 correction 命令负责。
+- 回归:production-db 86/86(floor 85→86,新增越权回归);unit 265/265
+  (kernel 三态测试更新为诚实断言 + 新增确定性回滚用例);scenario-service
+  46/46 + db 8/8;dev-host 26/26;digest 不变;typecheck clean;smoke 三重
+  disabled;self-pin → `b2c53eb7…`。
+- 未在本轮重跑:x5 联合套件(需 pinned My-Chat + pgvector 物化)。受影响的
+  revoke 路径由 `family-care.integration` 与新 legacy-cutover 套件覆盖,
+  CI 会跑 x5。
