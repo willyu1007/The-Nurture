@@ -2,6 +2,8 @@
 
 The Nurture is a My-Chat scenario module. Preserve My-Chat ownership boundaries and My-Workflow-Base contracts.
 
+Ecosystem development model / scenario taxonomy (SSOT in Base; never copied into this repo): `My-Workflow-Base:docs/context/ecosystem/development-model.md`.
+
 ## Global Strategy
 
 - Do not treat The Nurture as an independent product shell.

@@ -1574,3 +1574,17 @@
   to `apps/scenario-service`. Until that trigger fires, the guarded
   harness remains acceptable for dev-host use only. Tracking lives on
   the My-Chat T-030 conflict register (rows RB-6 / DB-4).
+
+## 2026-08-01 R5 hygiene riders (T-030): shared stub removed, AGENTS pointer
+
+- `packages/shared` deleted: an unregistered directory (no package.json,
+  `export {};` only, zero references in workspace/tsconfig/app code) -
+  the ST-6 placeholder-disposition sweep found nothing to keep.
+- AGENTS.md gains the one-line ecosystem-model pointer (SSOT in Base,
+  mirroring the My-Chat rider); no local copy of the model.
+- ST-4(c) API-index reconciliation recorded as already closed by this
+  lane's own machinery: `docs/context/api/API-INDEX.md` is
+  auto-generated from `openapi.yaml` and trunk CI verifies it with
+  `ctl-api-index.mjs verify --strict`; dev-host harness endpoints stay
+  outside the formal-ingress spec by design and ride the DB-4(b)
+  trigger recorded above.
