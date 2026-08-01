@@ -3,22 +3,23 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0/M1/M2/M3/M4（complete；M5 handoff regeneration pending）/ controlled-parallel owner-source repair + T-004 contract baseline / C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-07-31
+- **Updated:** 2026-08-01
 - **Owner:** willyu1007
-- Next step: Hold T-002 at the M4-complete boundary while the controlled
-  single mainline returns to T-004 Phase 1-2 and creates the exact Surface
-  Contract Artifact Set. Then resume T-002 M5 to regenerate the Owner
-  Integration Handoff, renew its exact source/privacy/false-empty evidence and
-  remove or hard-disable the Fastify P7 route.
-- Current gate: The current dependency pin remains My-Chat `f00b868`; the
-  Nurture self-pin now covers the 40-path / 53-file formal-ingress source
-  population at `94a96443...a5d860`. All consumers remain default-disabled.
-  Protected
-  T-005～T-007 integration stays NO-GO until the exact owner path and T-004
-  contract pass Joint Conformance through the formal ingress. The current
-  sibling My-Chat checkout is not adoption authority.
+- Next step: G1 Joint Conformance is PASS, so protected T-005～T-007
+  implementation is open. Per the execution backbone, the next mainline
+  actions are the early T-007 G4-0A/0B publication-policy subset and the
+  T-005 G2 schema freeze, plus the Beta Profile v0 freeze near this gate.
+  The Wave4 import-closure scoping decision is taken at the next pin action.
+- Current gate: The current dependency pin is My-Chat `a019566` / Base
+  `06303e9` (workflow-contract parity `8dd53be4…a34d`, `x5_joint_api`
+  `89a61355…`, `wave4_binding_host` `960afb2c…`); the Nurture self-pin is
+  `ec763a27…f152` (41 paths / 54 files). G1 Joint Conformance passed on
+  2026-08-01 through the formal NestJS ingress against these exact pins
+  (`18-g1-joint-conformance-record.md`), opening protected T-005～T-007
+  implementation only. All consumers remain default-disabled; the drifting
+  sibling My-Chat checkout is still not adoption authority.
   C31, C4, D implementation, Pilot-0-E, Pilot-1, persistent database apply,
   artifact publication, capability activation, and external traffic remain
   separately unauthorized.

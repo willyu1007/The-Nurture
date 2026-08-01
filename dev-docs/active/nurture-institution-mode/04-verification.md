@@ -10,12 +10,14 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-07-31
-- Current phase: NestJS ingress M0-M4 and the post-implementation quality audit
-  are complete and default-deny. The controlled mainline returns to T-004
-  Phase 1-2; M5 Owner Integration Handoff regeneration and Joint Conformance
-  remain later gates. Cross-repository implementation readiness is still held on the
-  remaining Base/My-Chat owner inputs. Pilot-0-C decision complete; Pilot-0-D
+- Last updated: 2026-08-01
+- Current phase: NestJS ingress M0-M5 is complete and G1 Joint Conformance is
+  **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
+  `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
+  path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
+  ingress with the full negative matrix, leakage scan and false/empty
+  census. Protected T-005～T-007 implementation is open; all consumers stay
+  default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
 - Code/config/schema impact: the current source includes the formal NestJS
@@ -1328,3 +1330,21 @@ the rejected checkpoint and are historical.
 | Pin integrity | PASS | wave4 old population byte-reproduced at exact `a019566` before extension; new 16-path hash `960afb2c…` computed at the same revision; self-pin recomputed via the verifier's own algorithm (41 paths / 54 files). Local sibling drift noted; trunk CI at exact pins is authoritative. |
 | Census/routing | PASS | `verify:test-routing` dev-host 12 -> 10; scenario-service suite 42/42; unit 249/249. |
 | Effect boundary | PASS | No schema/migration, database mutation, capability, secret, deployment, activation or traffic change; default-off posture unchanged. |
+
+## 2026-08-01 — G1 Joint Conformance (G1-06 matrix, joint run)
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Pin verification at exact worktrees | PASS | Detached My-Chat `a019566` / Base `06303e9` materializations; parity `8dd53be4…a34d`, `x5_joint_api` `89a61355…` (169 files), `wave4_binding_host` `960afb2c…` (20 files), self-pin `ec763a27…f152` (54 files); verifier unit tests and strict Base consumer-boundary scanner green. Re-run green at the final revision. |
+| Disposable databases | PASS | pgvector pg16 on `127.0.0.1:5434` (tmpfs): `x5_my_chat` pinned migrations, `x5_nurture` 48 tables/75 enums, `nurture_dev_host` 6 tables/2 enums; both boundary asserts green; instance destroyed inside the run. |
+| Root typecheck/routing/persistence | PASS | `test:local-env-runner`, `pnpm typecheck`, routing census 53 files (28/5/11/8/1), persistence boundaries isolated. |
+| Unit population | PASS | 250/250 (floor 216). |
+| T-004 surface conformance | PASS | Exact `nurture.surface-contract@1.7.0` / `b7691a81…` byte-verified; 11 registry-derived cases, 25/25 slices, 56 tests. |
+| Formal scenario-service | PASS | typecheck clean; suite 42/42; build ok; built-artifact smoke `binding-owner=disabled legacy-route=absent`. |
+| Production-db population | PASS | 38/38 (floor 38). |
+| Formal-ingress DB journey + named negatives | PASS | 6/6: four M5 journeys plus new wrong-user/wrong-purpose and `bound_empty`-recovery/quarantine negatives (`bad4523`). |
+| Dev-host population (single ingress) | PASS | 26/26 (floor 25); no owner route; formal-ingress contract routes=2 owner-fields=8; ports 8000/3001/3200/3201. |
+| X5 joint acceptance + joint negatives | PASS | 4/4 on two real databases: M5 acceptance plus new owner-unavailable, contract-mismatch and stale confirmation/heads negatives (`bad4523`). |
+| Leakage scan (joint harness) | PASS | Whole-table dumps: host DB 7 handoffs/31 outbox/5 notifications/18 steps — zero protected-content/safe-summary/claim sentinels; Nurture binding tables 30 auth/33 anchors — zero raw identity sentinels; 35 executions — zero claim/driver sentinels. |
+| Final false/empty census | PASS | Default-disabled service startup without owner secrets; no dev-host owner enablement path; all consumers/capability gates default-off; only disposable DBs, destroyed; no secret/deployment/activation/traffic. |
+| Verdict | **PASS** | `18-g1-joint-conformance-record.md` (G1-07). Protected T-005～T-007 implementation opens; everything else stays gated. |

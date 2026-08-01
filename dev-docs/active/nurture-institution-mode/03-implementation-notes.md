@@ -3,7 +3,7 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-07-31
+- Last updated: 2026-08-01
 
 ## What changed
 
@@ -1588,3 +1588,33 @@
   `ctl-api-index.mjs verify --strict`; dev-host harness endpoints stay
   outside the formal-ingress spec by design and ride the DB-4(b)
   trigger recorded above.
+
+## 2026-08-01 G1 Joint Conformance execution (G1-06 run, G1-07 record)
+
+- Executed the joint run per `17-g1-joint-conformance-execution-plan.md`:
+  detached verification worktrees at exact My-Chat `a019566` / Base
+  `06303e9` plus a The-Nurture worktree at the run head, CI-style sibling
+  layout so the pinned checkouts are the real link targets; pin verifier,
+  its unit tests and the strict Base consumer-boundary scanner green before
+  any suite. Disposable pgvector PostgreSQL on `127.0.0.1:5434` (tmpfs)
+  carried `x5_my_chat` (pinned migrations), `x5_nurture` and
+  `nurture_dev_host`; instance destroyed inside the run. Sibling working
+  copies were never touched.
+- Closed the G1-06 named-negative gaps before declaring PASS (`bad4523`):
+  the x5 joint layer gains owner-unavailable (fail closed, exact recovery on
+  next dispatch), contract-mismatch (`workflow_handoff_contract_unavailable`,
+  `manual_review_required`, zero materialized handoffs, deterministic defect
+  replay) and stale confirmation/heads (`workflow_step_claim_invalid` /
+  `workflow_step_version_conflict`, step uncorrupted); the formal-ingress DB
+  journey gains wrong-user, wrong-purpose, `bound_empty` recovery and
+  quarantined-anchor negatives.
+- Full matrix green: unit 250/250, surface conformance exact
+  `1.7.0`/`b7691a81…` (11 cases, 25/25 slices, 56 tests), scenario-service
+  42/42 + build + default-off smoke, production-db 38/38, scenario-service
+  db 6/6, dev-host 26/26 (no owner route), x5 joint 4/4, ingress/port/
+  boundary asserts green. Whole-table leakage scans over both run databases
+  found zero raw-identity/claim/protected-content hits; the false/empty
+  census is intact. Verdict `PASS` recorded in
+  `18-g1-joint-conformance-record.md` — protected T-005～T-007
+  implementation opens; every consumer stays default-off and activation/
+  deployment/traffic remain separately unauthorized.
