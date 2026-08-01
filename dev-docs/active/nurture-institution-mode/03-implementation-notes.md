@@ -1553,3 +1553,24 @@
   Fastify-era owner evidence is superseded history. Local evidence:
   scenario-service db e2e 4/4, suite 42/42, dev-host 25/25, unit
   249/249; trunk CI at exact pins is authoritative for cross-repo legs.
+
+## 2026-08-01 RB-6 / DB-4(b) decision records (T-030 R5, owner-confirmed)
+
+- RB-6 closed as CONVERGED: the requirements' backend line ("NestJS for
+  The Nurture scenario service; do not inherit the old Fastify
+  direction") is now satisfied by the implementation itself - the
+  formal NestJS `apps/scenario-service` is the only live owner ingress
+  (ING-D4 removed the dev-host P7 route; Fastify-era owner evidence is
+  superseded history). No requirements amendment is needed. Fastify 5
+  survives ONLY as the guarded temporary dev-host harness
+  (`apps/backend`), and its remaining production-shaped surface - the
+  R4 growth-record contribution resolve endpoint - explicitly rides the
+  DB-4(b) trigger below rather than granting the harness any standing.
+- DB-4(b) recorded as accepted-with-trigger (owner, 2026-08-01):
+  before ANY Nurture leg activates in Wave 0 (staging or prod), the
+  dev-host `workflow_*` temporary tables must be replaced by
+  consumption of the My-Chat-owned ledger, and the growth-record
+  contribution resolve endpoint must migrate from the Fastify dev-host
+  to `apps/scenario-service`. Until that trigger fires, the guarded
+  harness remains acceptable for dev-host use only. Tracking lives on
+  the My-Chat T-030 conflict register (rows RB-6 / DB-4).
