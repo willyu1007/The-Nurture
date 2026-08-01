@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { createServer } from "node:net";
+import type { AddressInfo } from "node:net";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type {
   HandoffManifest,
@@ -92,18 +94,7 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
     const repositories = createNurtureRepositories(nurture);
     const runner = new NurtureCommandRunner(repositories.commands);
     const host = await seedMyChatFixture(myChat, workspaceId);
-    const runtime = new PrismaWorkflowRuntimePort(myChat, {
-      claimSigningKey: CLAIM_SIGNING_KEY,
-      leaseDurationMs: 60_000,
-      resolvePinnedHandoffContract: ({ scenario_key, contract_hash }) =>
-        scenario_key === "nurture" && contract_hash === CONTRACT_HASH
-          ? {
-              scenario_key: "nurture",
-              contract_hash: CONTRACT_HASH,
-              handoffs: [handoffDeclaration()],
-            }
-          : undefined,
-    });
+    const runtime = createPinnedRuntime(myChat);
 
     const firstLease = await runtime.claim_step({
       run_id: host.runId,
@@ -358,6 +349,219 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
     expect(persistedHost).not.toContain(firstLease.claim_token);
     expect(persistedHost).not.toContain(reclaimed.claim_token);
   });
+
+  it("fails closed while the user-attention owner is unreachable and recovers on the next dispatch", async () => {
+    const workspaceId = `x5-owner-down-${randomUUID()}`;
+    const { fixture, host, runtime, lease, executed } =
+      await seedAndExecuteFamilyInput({ nurture, myChat, workspaceId });
+    const completion = await runtime.complete_step(
+      completionInput(host, executed, lease),
+    );
+    expect(completion.data.materialized_handoffs).toHaveLength(1);
+    const handoffId =
+      completion.data.materialized_handoffs[0]!.handoff_ref.object_id;
+
+    const outbox = new PrismaOutboxRepository(myChat);
+    const claimed = await outbox.claimPending({
+      limit: 1_000,
+      workerId: "x5-owner-down-worker",
+      processingLeaseMs: 60_000,
+    });
+    const requested = claimed.find(
+      (event) =>
+        event.eventType === "workflow.handoff.requested" &&
+        event.workspaceId === workspaceId,
+    );
+    expect(requested).toBeDefined();
+
+    const ledger = new PrismaWorkflowHandoffRepository(myChat);
+    const notificationRepository = new PrismaNotificationRepository(myChat);
+    const unreachableSource = createNurtureUserAttentionHttpSource({
+      baseUrl: await closedPortBaseUrl(),
+      serviceToken: SERVICE_TOKEN,
+      timeoutMs: 1_000,
+    });
+    const unreachableHandler = createWorkflowHandoffOwnerHandler({
+      ledger,
+      owners: [
+        createNurtureUserAttentionOwner({
+          source: unreachableSource,
+          notificationRepository,
+        }),
+      ],
+    });
+    await expect(unreachableHandler.handle(requested!)).rejects.toThrow();
+    await expect(
+      ledger.get({ workspace_id: workspaceId, handoff_id: handoffId }),
+    ).resolves.toMatchObject({ status: "requested", aggregate_version: 1 });
+    await expect(
+      myChat.notification.count({ where: { workspaceId } }),
+    ).resolves.toBe(0);
+    await expect(
+      resolveNurtureAttentionOpen({
+        ledger,
+        source: unreachableSource,
+        workspace_id: workspaceId,
+        handoff_id: handoffId,
+        actor_user_id: fixture.caregiver.myChatUserId,
+      }),
+    ).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "handoff_unavailable",
+    });
+
+    const liveSource = createNurtureUserAttentionHttpSource({
+      baseUrl: ownerBaseUrl,
+      serviceToken: SERVICE_TOKEN,
+    });
+    const liveHandler = createWorkflowHandoffOwnerHandler({
+      ledger,
+      owners: [
+        createNurtureUserAttentionOwner({
+          source: liveSource,
+          notificationRepository,
+        }),
+      ],
+    });
+    await liveHandler.handle(requested!);
+    await expect(
+      ledger.get({ workspace_id: workspaceId, handoff_id: handoffId }),
+    ).resolves.toMatchObject({ status: "completed", aggregate_version: 2 });
+    await expect(
+      myChat.notification.count({ where: { workspaceId } }),
+    ).resolves.toBe(1);
+    await expect(
+      resolveNurtureAttentionOpen({
+        ledger,
+        source: liveSource,
+        workspace_id: workspaceId,
+        handoff_id: handoffId,
+        actor_user_id: fixture.caregiver.myChatUserId,
+      }),
+    ).resolves.toEqual({
+      status: "ready",
+      route_key: "teacher_attention_board",
+      handoff_id: handoffId,
+    });
+  });
+
+  it("fails closed at materialization when the run contract hash is not pinned", async () => {
+    const workspaceId = `x5-contract-mismatch-${randomUUID()}`;
+    const mismatchedContractHash = "c".repeat(64);
+    const { host, runtime, lease, executed } = await seedAndExecuteFamilyInput({
+      nurture,
+      myChat,
+      workspaceId,
+      contractHash: mismatchedContractHash,
+    });
+
+    const completion = await runtime.complete_step(
+      completionInput(host, executed, lease),
+    );
+    expect(completion.data).toMatchObject({
+      status: "manual_review_required",
+      materialized_handoffs: [],
+    });
+    const replayed = await runtime.complete_step(
+      completionInput(host, executed, lease),
+    );
+    expect(replayed).toEqual(completion);
+
+    const stepEvent = await myChat.outboxEvent.findFirstOrThrow({
+      where: { workspaceId, aggregateType: "workflow_step" },
+    });
+    expect(stepEvent.payload).toMatchObject({
+      reason_code: "workflow_handoff_contract_unavailable",
+    });
+    await expect(
+      myChat.outboxEvent.count({
+        where: { workspaceId, eventType: "workflow.handoff.requested" },
+      }),
+    ).resolves.toBe(0);
+    await expect(
+      myChat.workflowHandoff.count({ where: { workspaceId } }),
+    ).resolves.toBe(0);
+    await expect(
+      myChat.notification.count({ where: { workspaceId } }),
+    ).resolves.toBe(0);
+    await expect(
+      nurture.nurtureFamilyCareMessage.count({ where: { workspaceId } }),
+    ).resolves.toBe(1);
+  });
+
+  it("rejects stale claim confirmations and stale step heads without corrupting the step", async () => {
+    const workspaceId = `x5-stale-${randomUUID()}`;
+    const { host, runtime, lease, executed } = await seedAndExecuteFamilyInput({
+      nurture,
+      myChat,
+      workspaceId,
+    });
+
+    const unknown = await runtime.fail_step({
+      run_id: host.runId,
+      step_id: host.stepId,
+      expected_version: lease.aggregate_version,
+      reason_code: "workflow_handler_outcome_unknown",
+      retryable: true,
+      meta: commandMeta(host),
+    });
+    const admin = new PrismaAdminWorkflowRecoveryRepository(myChat);
+    const reconciliation = await admin.reconcileWorkflowStep({
+      workspaceId,
+      actorId: "admin-actor",
+      runId: host.runId,
+      stepId: host.stepId,
+      expectedVersion: unknown.data.aggregate_version,
+      idempotencyKey: `reconcile:${host.stepId}`,
+      correlationId: `correlation:${host.stepId}`,
+    });
+
+    await expect(
+      runtime.claim_step({
+        run_id: host.runId,
+        step_id: host.stepId,
+        expected_version: lease.aggregate_version,
+        worker_id: "x5-worker-stale-head",
+        meta: commandMeta(host),
+      }),
+    ).rejects.toMatchObject({ code: "workflow_step_version_conflict" });
+
+    const reclaimed = await runtime.claim_step({
+      run_id: host.runId,
+      step_id: host.stepId,
+      expected_version: reconciliation.aggregateVersion,
+      worker_id: "x5-worker-current",
+      meta: commandMeta(host),
+    });
+
+    await expect(
+      runtime.complete_step({
+        ...completionInput(host, executed, lease),
+        expected_version: reclaimed.aggregate_version,
+      }),
+    ).rejects.toMatchObject({ code: "workflow_step_claim_invalid" });
+    await expect(
+      runtime.complete_step(completionInput(host, executed, lease)),
+    ).rejects.toMatchObject({ code: "workflow_step_version_conflict" });
+
+    await expect(
+      myChat.workflowStep.findUniqueOrThrow({ where: { id: host.stepId } }),
+    ).resolves.toMatchObject({
+      status: "claimed",
+      aggregateVersion: reclaimed.aggregate_version,
+    });
+    await expect(
+      myChat.outboxEvent.count({
+        where: { workspaceId, eventType: "workflow.handoff.requested" },
+      }),
+    ).resolves.toBe(0);
+
+    const completion = await runtime.complete_step(
+      completionInput(host, executed, reclaimed),
+    );
+    expect(completion.data).toMatchObject({ status: "completed" });
+    expect(completion.data.materialized_handoffs).toHaveLength(1);
+  });
 });
 
 type NurtureClient = ReturnType<typeof createNurturePrismaClient>;
@@ -512,6 +716,7 @@ async function seedNurtureFixture(
 async function seedMyChatFixture(
   prisma: ReturnType<typeof createMyChatPrismaClient>,
   workspaceId: string,
+  contractHash: string = CONTRACT_HASH,
 ) {
   const suffix = randomUUID();
   const runId = `x5-joint-run-${suffix}`;
@@ -522,7 +727,7 @@ async function seedMyChatFixture(
       id: runId,
       workspaceId,
       scenarioKey: "nurture",
-      contractHash: CONTRACT_HASH,
+      contractHash,
       capabilityKey: "class_family_inbox",
       entrypointKey: "capture_family_input",
       registryWorkflowVersionId: "nurture-class-family-inbox-v2",
@@ -587,6 +792,7 @@ function activation(
   stepId: string,
   claimToken: string,
   expectedStepVersion: number,
+  contractHash: string = CONTRACT_HASH,
 ): NurtureCommandHandoffActivation {
   return {
     request_id: "x5-user-attention-request",
@@ -597,7 +803,7 @@ function activation(
         object_type: "workflow_step",
         object_id: stepId,
       },
-      contractHash: CONTRACT_HASH,
+      contractHash,
       capabilityKey: "class_family_inbox",
       entrypointKey: "capture_family_input",
       claimToken,
@@ -617,6 +823,117 @@ function commandMeta(input: {
     correlation_id: `correlation:${input.stepId}`,
     client_surface: "worker_runtime",
   };
+}
+
+function createPinnedRuntime(
+  client: ReturnType<typeof createMyChatPrismaClient>,
+): PrismaWorkflowRuntimePort {
+  return new PrismaWorkflowRuntimePort(client, {
+    claimSigningKey: CLAIM_SIGNING_KEY,
+    leaseDurationMs: 60_000,
+    resolvePinnedHandoffContract: ({ scenario_key, contract_hash }) =>
+      scenario_key === "nurture" && contract_hash === CONTRACT_HASH
+        ? {
+            scenario_key: "nurture",
+            contract_hash: CONTRACT_HASH,
+            handoffs: [handoffDeclaration()],
+          }
+        : undefined,
+  });
+}
+
+type JointLease = Awaited<ReturnType<PrismaWorkflowRuntimePort["claim_step"]>>;
+
+async function seedAndExecuteFamilyInput(input: {
+  nurture: NurtureClient;
+  myChat: ReturnType<typeof createMyChatPrismaClient>;
+  workspaceId: string;
+  contractHash?: string;
+}) {
+  const contractHash = input.contractHash ?? CONTRACT_HASH;
+  const fixture = await seedNurtureFixture(input.nurture, input.workspaceId);
+  const host = await seedMyChatFixture(
+    input.myChat,
+    input.workspaceId,
+    contractHash,
+  );
+  const runtime = createPinnedRuntime(input.myChat);
+  const runner = new NurtureCommandRunner(
+    createNurtureRepositories(input.nurture).commands,
+  );
+  const lease = await runtime.claim_step({
+    run_id: host.runId,
+    step_id: host.stepId,
+    expected_version: 1,
+    worker_id: `x5-worker-${input.workspaceId}`,
+    meta: commandMeta(host),
+  });
+  const result = await runner.execute({
+    workspace_id: input.workspaceId,
+    invocation_request_id: `invocation:${host.stepId}`,
+    command_request_id: `command:${host.stepId}`,
+    business_actor_ref: fixture.guardian.id,
+    child_care_process_id: fixture.process.id,
+    handoff_activation: activation(
+      host.stepId,
+      lease.claim_token,
+      lease.aggregate_version,
+      contractHash,
+    ),
+    payload: familyInputPayload(fixture),
+    spec: familyInputRouteSpec,
+  });
+  if (result.status !== "ok") {
+    throw new Error(
+      `Nurture command did not commit: ${JSON.stringify(result)}`,
+    );
+  }
+  return { fixture, host, runtime, runner, lease, executed: result };
+}
+
+type ExecutedFamilyInput = Awaited<
+  ReturnType<typeof seedAndExecuteFamilyInput>
+>["executed"];
+
+function completionInput(
+  host: { workspaceId: string; runId: string; stepId: string },
+  executed: ExecutedFamilyInput,
+  lease: JointLease,
+) {
+  return {
+    completion_contract_version: 1 as const,
+    run_id: host.runId,
+    step_id: host.stepId,
+    expected_version: lease.aggregate_version,
+    claim_token: lease.claim_token,
+    status: "completed" as const,
+    output_refs: [
+      {
+        schema_version: 1 as const,
+        namespace: "nurture",
+        object_type: "command_execution",
+        object_id: executed.execution_ref.object_id,
+        version: executed.execution_ref.version,
+      },
+    ],
+    handoff_drafts: createWorkflowHandoffDraftsFromScenarioSnapshots(
+      executed.handoff_request_snapshots,
+    ),
+    meta: commandMeta(host),
+  };
+}
+
+async function closedPortBaseUrl(): Promise<string> {
+  const probe = createServer();
+  await new Promise<void>((resolve, reject) => {
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", resolve);
+  });
+  const { port } = probe.address() as AddressInfo;
+  await new Promise<void>((resolve, reject) => {
+    probe.close((error) => (error ? reject(error) : resolve()));
+  });
+  return `http://127.0.0.1:${port}`;
 }
 
 function handoffDeclaration(): HandoffManifest {

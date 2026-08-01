@@ -16,6 +16,7 @@ import {
   ScenarioBindingAuthorizeInput,
   type ScenarioBindingOwnerAuthorizer,
 } from "@the-nurture/scenario/binding-owner";
+import { SCENARIO_BINDING_OWNER_PATH } from "@the-nurture/scenario/binding-owner-http";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createScenarioServiceApplication } from "../src/application.js";
 import { createBindingOwnerRuntime } from "../src/binding-owner-runtime.js";
@@ -322,6 +323,90 @@ describe("M3 Nest binding-owner PostgreSQL journey", () => {
       releaseAuthority.resolve();
       await isolated.close();
     }
+  });
+
+  it("denies a wrong user and a wrong purpose inside a valid workspace", async () => {
+    const workspaceId = `ws-${randomUUID()}`;
+    const { participant } = await seedGuardian(adminPrisma, workspaceId);
+    const source = ownerSource(baseUrl);
+
+    const anchorsBeforeDenial =
+      await adminPrisma.nurtureChildBindingAnchor.count();
+    await expect(
+      source.resolve(request(workspaceId, `user-${randomUUID()}`, "child")),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "owner_authorization_denied",
+    });
+    await expect(
+      adminPrisma.nurtureChildBindingAnchor.count(),
+    ).resolves.toBe(anchorsBeforeDenial);
+
+    const wrongPurpose = await fetch(
+      `${baseUrl}${SCENARIO_BINDING_OWNER_PATH}`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${TOKEN}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          workspace_id: workspaceId,
+          acting_user_id: participant.myChatUserId,
+          idempotency_key: randomUUID(),
+          subject_type: "child",
+          subject_id: `child-${randomUUID()}`,
+          scenario_key: "nurture",
+          acting_actor_id: `actor-${randomUUID()}`,
+          purpose: "family_care_workflow",
+        }),
+      },
+    );
+    expect(wrongPurpose.status).toBe(400);
+    await expect(wrongPurpose.json()).resolves.toEqual({
+      error: "invalid_binding_request",
+    });
+  });
+
+  it("reuses a bound_empty anchor and fails closed on a quarantined anchor", async () => {
+    const workspaceId = `ws-${randomUUID()}`;
+    const { participant } = await seedGuardian(adminPrisma, workspaceId);
+    const source = ownerSource(baseUrl);
+    const subjectId = `child-${randomUUID()}`;
+    const base = request(workspaceId, participant.myChatUserId, "child");
+
+    const first = await requireAuthorized(
+      source.resolve({ ...base, subjectId }),
+    );
+    const { anchorId } = parseNurtureBindingOwnerRef(first.receipt.ownerRef);
+    await adminPrisma.nurtureChildBindingAnchor.update({
+      where: { id: anchorId },
+      data: { status: "bound_empty", aggregateVersion: { increment: 1 } },
+    });
+
+    const recovered = await requireAuthorized(
+      source.resolve({ ...base, subjectId, idempotencyKey: randomUUID() }),
+    );
+    expect(recovered.receipt.ownerRef).toBe(first.receipt.ownerRef);
+    expect(recovered.receipt.authorizationRef).not.toBe(
+      first.receipt.authorizationRef,
+    );
+
+    await adminPrisma.nurtureChildBindingAnchor.update({
+      where: { id: anchorId },
+      data: {
+        status: "quarantined",
+        quarantinedAt: new Date(),
+        quarantineReason: "joint_negative_fixture",
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    await expect(
+      source.resolve({ ...base, subjectId, idempotencyKey: randomUUID() }),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "anchor_not_current",
+    });
   });
 
   it("returns pinned-consumer denial for missing and stale production anchors", async () => {
