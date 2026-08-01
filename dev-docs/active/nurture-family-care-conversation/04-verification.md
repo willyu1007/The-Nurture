@@ -241,3 +241,19 @@
 | 2026-08-01 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-family-care-conversation --check-anchors --strict` | PASS |
 | 2026-08-01 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS |
 | 2026-08-01 | 效果边界:无 schema apply、migration、handler、digest、数据库、secret、激活或流量变更 | PASS |
+
+## G2 三轴 schema migration — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | `prisma validate` + migration replay(disposable PostgreSQL 5435,tmpfs,运行后销毁) | PASS |
+| 2026-08-01 | 新三轴约束集成测试 `g2-three-axis-schema.integration.test.ts` | PASS 8/8(complete-graph、lifecycle-reason、protected-body、scope、reply-order CHECK;reply-order partial unique;correction strict head;legacy 默认不可信) |
+| 2026-08-01 | production-db 全套 + population | PASS 46/46(floor 收紧 38→46) |
+| 2026-08-01 | unit 全套 | PASS 250/250 |
+| 2026-08-01 | scenario-service 套件 + DB journey + typecheck:db | PASS 42/42 + 6/6 |
+| 2026-08-01 | dev-host 全套(独立库 deploy 后) | PASS 26/26 |
+| 2026-08-01 | `pnpm verify:surface-conformance` | PASS;digest 不变 `1.7.0`/`b7691a81…`(领域 union 扩值不在 T-004 artifact 集内) |
+| 2026-08-01 | root `pnpm typecheck` | PASS 0 errors(本地 sibling 编译;pinned CI 仍是权威) |
+| 2026-08-01 | `verify:test-routing` / `verify:persistence-boundaries` / `db:assert-boundary` | PASS;54 files(production-db 6);boundary 50 tables / 83 enums;`docs/context/db/schema.json` 已刷新 |
+| 2026-08-01 | self-pin 重算(schema.prisma + 两个领域文件在 pin 集内) | `nurtureScenario.contractSha256` → `07f1aeb0…`(54 files,验证器自身算法);完整 pin verify 由 pinned-checkout CI 权威执行 |
+| 2026-08-01 | 效果边界 | PASS:无持久化 DB apply、无 handler/digest/capability/secret/激活/流量变更;wave4 约束名漂移已从 migration 剔除并记录 |

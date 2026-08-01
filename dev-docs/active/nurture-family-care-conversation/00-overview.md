@@ -6,12 +6,12 @@
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-01
-- Next step: G2-0 schema freeze 已锁定(`10-g2-schema-freeze.md`：T-004 exact
-  pin 采用、三轴 CareItem delta、single-writer cutover、旧行 ambiguity
-  inventory 规则、G2-C Message-only exact contract、freeze 范畴 AC 映射
-  `T005-AC-001..022`)。下一步按 G2-10 顺序进入第 3 步：在 disposable
-  PostgreSQL author/replay schema migration，并经 formal NestJS ingress 实现
-  Harness 与 protected-content boundary；随后依次实施/资格化 G2-A、G2-B、
+- Next step: G2-0 schema freeze 已锁定(`10-g2-schema-freeze.md`)且三轴
+  schema migration 已落地(`20260801021044_g2_three_axis_care_interaction`，
+  disposable replay + 8 条约束测试 + 守卫/self-pin 同步；无持久化 apply)。
+  下一步完成 G2-10 第 3 步余下部分：经 formal NestJS ingress 实现 Harness
+  (query/prepareAction/executeAction/readResult)与 protected-content
+  boundary(`ProtectedContentWritePort`)；随后依次实施/资格化 G2-A、G2-B、
   G2-C。G2-C 进入 T-004 digest 的 rotation 与 Wave4 import-closure scoping
   同批在下一个 pin action 执行。所有真实 protected qualification 经 formal
   NestJS ingress + pinned owner path，能力保持 default-off。

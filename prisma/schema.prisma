@@ -388,6 +388,7 @@ enum NurtureGrantDataClass {
   care_constraint_update
   family_care_question
   family_follow_up_request
+  direct_care_communication
 }
 
 enum NurtureChildLinkReceiptStatus {
@@ -463,6 +464,7 @@ enum NurtureFamilyCareMessageKind {
   system_notice
   care_summary
   redaction_notice
+  caregiver_direct_message
 }
 
 enum NurtureFamilyCareMessageAuthorshipKind {
@@ -550,6 +552,53 @@ enum NurtureFamilyCareItemEventType {
   reopened
 }
 
+// G2 three-axis CareInteraction enums — frozen in
+// dev-docs/active/nurture-family-care-conversation/10-g2-schema-freeze.md (D1).
+enum NurtureFamilyCareAcknowledgementState {
+  pending
+  acknowledged
+}
+
+enum NurtureFamilyCareResponseState {
+  awaiting_reply
+  responded
+  not_applicable
+}
+
+enum NurtureFamilyCareLifecycleState {
+  active
+  closed
+  suppressed
+}
+
+enum NurtureFamilyCareLifecycleReason {
+  family_withdrawn
+  grant_revoked
+  source_redacted
+  expired
+}
+
+enum NurtureFamilyCareWriterContract {
+  legacy_v1
+  legacy_migrated_v1
+  harness_g2_v1
+}
+
+enum NurtureFamilyCareCorrectionStatus {
+  active
+  redacted
+}
+
+enum NurtureFamilyCareCascadeScope {
+  source_question
+  reply_local
+}
+
+enum NurtureFamilyCareCascadeClosureState {
+  complete
+  failed
+}
+
 enum NurtureDailyCareLogStatus {
   draft
   recorded
@@ -613,6 +662,7 @@ enum NurtureInteractionPurpose {
   clarify
   submit_action
   open_notification
+  prepare_action
 }
 
 enum NurtureInteractionContextStatus {
@@ -1485,6 +1535,7 @@ model NurtureParticipant {
   roleAssignments     NurtureCareRoleAssignment[]
   threadMemberships   NurtureFamilyCareThreadParticipant[]
   messages            NurtureFamilyCareMessage[]
+  messageCorrections  NurtureFamilyCareMessageCorrection[]
   itemEvents          NurtureFamilyCareItemEvent[]
   interactionContexts NurtureInteractionContext[]
 
@@ -1609,6 +1660,7 @@ model NurtureCareGroup {
   enrollments    NurtureEnrollment[]
   threads        NurtureFamilyCareThread[]
   items          NurtureFamilyCareItem[]
+  messages       NurtureFamilyCareMessage[]
   dailyCareLogs  NurtureDailyCareLog[]
   attentionItems NurtureTeacherAttentionItem[]
   mediaAssets    NurtureMediaAssetRef[]
@@ -1639,6 +1691,7 @@ model NurtureEnrollment {
   receipts         NurtureChildLinkReceipt[]
   threads          NurtureFamilyCareThread[]
   items            NurtureFamilyCareItem[]
+  messages         NurtureFamilyCareMessage[]
   dailyCareLogs    NurtureDailyCareLog[]
 
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
@@ -1667,7 +1720,9 @@ model NurtureCareRoleAssignment {
   participant           NurtureParticipant                   @relation(fields: [participantId], references: [id], onDelete: Restrict)
   threadMemberships     NurtureFamilyCareThreadParticipant[]
   messages              NurtureFamilyCareMessage[]
-  assignedItems         NurtureFamilyCareItem[]
+  assignedItems         NurtureFamilyCareItem[]              @relation("ItemAssignedRole")
+  ackedItems            NurtureFamilyCareItem[]              @relation("ItemAckedRole")
+  authoredCorrections   NurtureFamilyCareMessageCorrection[]
   dailyCareLogs         NurtureDailyCareLog[]
   uploadedAssets        NurtureMediaAssetRef[]
   confirmedAttributions NurtureChildMediaAttribution[]
@@ -1742,11 +1797,12 @@ model NurtureChildLinkReceipt {
   createdAt          DateTime                                @default(now()) @map("created_at")
   updatedAt          DateTime                                @updatedAt @map("updated_at")
 
-  grant            NurtureChildLinkGrant?    @relation(fields: [grantId], references: [id], onDelete: Restrict)
-  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  enrollment       NurtureEnrollment?        @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
-  retryOfReceipt   NurtureChildLinkReceipt?  @relation("ReceiptRetry", fields: [retryOfReceiptId], references: [id], onDelete: Restrict)
-  retryReceipts    NurtureChildLinkReceipt[] @relation("ReceiptRetry")
+  grant            NurtureChildLinkGrant?               @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment?                   @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  retryOfReceipt   NurtureChildLinkReceipt?             @relation("ReceiptRetry", fields: [retryOfReceiptId], references: [id], onDelete: Restrict)
+  retryReceipts    NurtureChildLinkReceipt[]            @relation("ReceiptRetry")
+  corrections      NurtureFamilyCareMessageCorrection[]
 
   @@unique([workspaceId, direction, sourceType, sourceId, routingAttemptKey], map: "uq_nurture_receipt_route")
   @@index([workspaceId, grantId, status], map: "ix_nurture_receipt_grant")
@@ -1835,15 +1891,26 @@ model NurtureFamilyCareMessage {
   redactionReason         String?                                 @map("redaction_reason")
   redactionPayload        Json?                                   @map("redaction_payload")
   safetyFlagsPayload      Json?                                   @map("safety_flags_payload")
+  // G2 columns — 10-g2-schema-freeze.md (D3). Direct original-scope trace and
+  // the immutable server-issued reply order for the append-only reply set.
+  writerContract          NurtureFamilyCareWriterContract         @default(legacy_v1) @map("writer_contract")
+  enrollmentId            String?                                 @map("enrollment_id")
+  careGroupId             String?                                 @map("care_group_id")
+  direction               NurtureGrantDirection?
+  replyOrderKey           String?                                 @map("reply_order_key")
   aggregateVersion        Int                                     @default(0) @map("aggregate_version")
   createdAt               DateTime                                @default(now()) @map("created_at")
   updatedAt               DateTime                                @updatedAt @map("updated_at")
 
-  thread               NurtureFamilyCareThread   @relation(fields: [threadId], references: [id], onDelete: Restrict)
-  childCareProcess     NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  senderParticipant    NurtureParticipant        @relation(fields: [senderParticipantId], references: [id], onDelete: Restrict)
-  senderRoleAssignment NurtureCareRoleAssignment @relation(fields: [senderRoleAssignmentId], references: [id], onDelete: Restrict)
-  grant                NurtureChildLinkGrant?    @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  thread               NurtureFamilyCareThread              @relation(fields: [threadId], references: [id], onDelete: Restrict)
+  childCareProcess     NurtureChildCareProcess              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  senderParticipant    NurtureParticipant                   @relation(fields: [senderParticipantId], references: [id], onDelete: Restrict)
+  senderRoleAssignment NurtureCareRoleAssignment            @relation(fields: [senderRoleAssignmentId], references: [id], onDelete: Restrict)
+  enrollment           NurtureEnrollment?                   @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  careGroup            NurtureCareGroup?                    @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  grant                NurtureChildLinkGrant?               @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  corrections          NurtureFamilyCareMessageCorrection[]
+  cascadeAudits        NurtureFamilyCareCascadeAudit[]
 
   @@index([workspaceId, threadId, createdAt], map: "ix_nurture_message_thread")
   @@index([workspaceId, childCareProcessId, createdAt], map: "ix_nurture_message_process")
@@ -1887,18 +1954,33 @@ model NurtureFamilyCareItem {
   classificationConfidence          Decimal?                                  @map("classification_confidence") @db.Decimal(5, 4)
   grantId                           String?                                   @map("grant_id")
   safetyFlagsPayload                Json?                                     @map("safety_flags_payload")
+  // G2 three-axis columns — 10-g2-schema-freeze.md (D2). New harness rows are
+  // discriminated by writerContract; legacy rows keep defaults untrusted.
+  writerContract                    NurtureFamilyCareWriterContract           @default(legacy_v1) @map("writer_contract")
+  acknowledgementState              NurtureFamilyCareAcknowledgementState     @default(pending) @map("acknowledgement_state")
+  acknowledgementHead               Int                                       @default(0) @map("acknowledgement_head")
+  responseState                     NurtureFamilyCareResponseState            @default(awaiting_reply) @map("response_state")
+  responseHead                      Int                                       @default(0) @map("response_head")
+  lifecycleState                    NurtureFamilyCareLifecycleState           @default(active) @map("lifecycle_state")
+  lifecycleReason                   NurtureFamilyCareLifecycleReason?         @map("lifecycle_reason")
+  lifecycleHead                     Int                                       @default(0) @map("lifecycle_head")
+  ackedByRoleAssignmentId           String?                                   @map("acked_by_role_assignment_id")
+  contextContinuationOfItemId       String?                                   @map("context_continuation_of_item_id")
   createdAt                         DateTime                                  @default(now()) @map("created_at")
   updatedAt                         DateTime                                  @updatedAt @map("updated_at")
 
-  thread           NurtureFamilyCareThread      @relation(fields: [threadId], references: [id], onDelete: Restrict)
-  childCareProcess NurtureChildCareProcess      @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  family           NurtureFamily                @relation(fields: [familyId], references: [id], onDelete: Restrict)
-  enrollment       NurtureEnrollment?           @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
-  careGroup        NurtureCareGroup             @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  assignedToRole   NurtureCareRoleAssignment?   @relation(fields: [assignedToRoleAssignmentId], references: [id], onDelete: Restrict)
-  grant            NurtureChildLinkGrant?       @relation(fields: [grantId], references: [id], onDelete: Restrict)
-  events           NurtureFamilyCareItemEvent[]
-  dailyCareLogs    NurtureDailyCareLog[]
+  thread                NurtureFamilyCareThread      @relation(fields: [threadId], references: [id], onDelete: Restrict)
+  childCareProcess      NurtureChildCareProcess      @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  family                NurtureFamily                @relation(fields: [familyId], references: [id], onDelete: Restrict)
+  enrollment            NurtureEnrollment?           @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  careGroup             NurtureCareGroup             @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  assignedToRole        NurtureCareRoleAssignment?   @relation("ItemAssignedRole", fields: [assignedToRoleAssignmentId], references: [id], onDelete: Restrict)
+  ackedByRole           NurtureCareRoleAssignment?   @relation("ItemAckedRole", fields: [ackedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  contextContinuationOf NurtureFamilyCareItem?       @relation("ItemContextContinuation", fields: [contextContinuationOfItemId], references: [id], onDelete: Restrict)
+  contextContinuations  NurtureFamilyCareItem[]      @relation("ItemContextContinuation")
+  grant                 NurtureChildLinkGrant?       @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  events                NurtureFamilyCareItemEvent[]
+  dailyCareLogs         NurtureDailyCareLog[]
 
   @@index([workspaceId, careGroupId, status, urgency, dueAt], map: "ix_nurture_item_group")
   @@index([workspaceId, childCareProcessId, status, createdAt], map: "ix_nurture_item_process")
@@ -2039,6 +2121,52 @@ model NurtureChildMediaAttribution {
   @@map("nurture_child_media_attribution")
 }
 
+// Append-only exact-author correction versions — 10-g2-schema-freeze.md (D4).
+// History is immutable; redaction tombstones the version without deleting it.
+model NurtureFamilyCareMessageCorrection {
+  id                     String                                  @id @default(uuid())
+  workspaceId            String                                  @map("workspace_id")
+  messageId              String                                  @map("message_id")
+  correctionVersion      Int                                     @map("correction_version")
+  authorParticipantId    String                                  @map("author_participant_id")
+  authorRoleAssignmentId String                                  @map("author_role_assignment_id")
+  bodyStorageMode        NurtureFamilyCareMessageBodyStorageMode @map("body_storage_mode")
+  bodyProtectionPayload  Json?                                   @map("body_protection_payload")
+  status                 NurtureFamilyCareCorrectionStatus
+  commandExecutionId     String?                                 @map("command_execution_id")
+  receiptId              String?                                 @map("receipt_id")
+  createdAt              DateTime                                @default(now()) @map("created_at")
+
+  message              NurtureFamilyCareMessage  @relation(fields: [messageId], references: [id], onDelete: Restrict)
+  authorParticipant    NurtureParticipant        @relation(fields: [authorParticipantId], references: [id], onDelete: Restrict)
+  authorRoleAssignment NurtureCareRoleAssignment @relation(fields: [authorRoleAssignmentId], references: [id], onDelete: Restrict)
+  commandExecution     NurtureCommandExecution?  @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict)
+  receipt              NurtureChildLinkReceipt?  @relation(fields: [receiptId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, messageId, correctionVersion], map: "uq_nurture_correction_head")
+  @@index([workspaceId, messageId, createdAt], map: "ix_nurture_correction_message")
+  @@map("nurture_family_care_message_correction")
+}
+
+// Redaction/revoke cascade closure audit — 10-g2-schema-freeze.md (D5).
+// closureState has no partial-success value: complete or failed only.
+model NurtureFamilyCareCascadeAudit {
+  id                  String                               @id @default(uuid())
+  workspaceId         String                               @map("workspace_id")
+  rootMessageId       String                               @map("root_message_id")
+  cascadeScope        NurtureFamilyCareCascadeScope        @map("cascade_scope")
+  closureState        NurtureFamilyCareCascadeClosureState @map("closure_state")
+  affectedRefsPayload Json                                 @map("affected_refs_payload")
+  commandExecutionId  String                               @map("command_execution_id")
+  createdAt           DateTime                             @default(now()) @map("created_at")
+
+  rootMessage      NurtureFamilyCareMessage @relation(fields: [rootMessageId], references: [id], onDelete: Restrict)
+  commandExecution NurtureCommandExecution  @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, rootMessageId, createdAt], map: "ix_nurture_cascade_audit_root")
+  @@map("nurture_family_care_cascade_audit")
+}
+
 model NurtureInteractionContext {
   id                      String                          @id @default(uuid())
   workspaceId             String                          @map("workspace_id")
@@ -2087,9 +2215,15 @@ model NurtureCommandExecution {
   handoffSnapshotSchemaVersion   Int                           @default(1) @map("handoff_snapshot_schema_version")
   handoffRequestSnapshotsPayload Json                          @map("handoff_request_snapshots_payload")
   handoffDriverRef               Json?                         @map("handoff_driver_ref")
+  // G2 immutable committed result — 10-g2-schema-freeze.md (D7). Required for
+  // harness_g2_v1 writes; commandExecutionRef stays the only result authority.
+  resultSchemaVersion            Int?                          @map("result_schema_version")
+  committedResultPayload         Json?                         @map("committed_result_payload")
   committedAt                    DateTime                      @default(now()) @map("committed_at")
 
-  childCareProcess NurtureChildCareProcess? @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess?             @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  corrections      NurtureFamilyCareMessageCorrection[]
+  cascadeAudits    NurtureFamilyCareCascadeAudit[]
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")

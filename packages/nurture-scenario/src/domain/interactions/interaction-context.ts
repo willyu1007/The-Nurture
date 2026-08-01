@@ -1,6 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
 
-export type NurtureInteractionPurpose = "clarify" | "submit_action" | "open_notification";
+export type NurtureInteractionPurpose =
+  | "clarify"
+  | "submit_action"
+  | "open_notification"
+  | "prepare_action";
 export type NurtureInteractionContextStatus = "active" | "consumed" | "revoked";
 
 export type NurtureInteractionContextRecord = {

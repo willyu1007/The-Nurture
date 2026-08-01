@@ -349,3 +349,34 @@
 - freeze 范畴验收条目获得稳定 ID `T005-AC-001..022` 并逐条映射机械检查。
 - 本冻结为文档契约动作:无 schema apply、handler、digest、数据库、激活或
   流量效果;所有 consumer 保持 default-off。
+
+## 2026-08-01 — G2 三轴 schema migration 落地(D1–D9)
+
+- 按 `10-g2-schema-freeze.md` 实施 migration
+  `20260801021044_g2_three_axis_care_interaction`(additive):八个新枚举、
+  Item 三轴列 + heads + `writerContract` + `ackedByRoleAssignmentId` +
+  `contextContinuationOfItemId`(self-FK)、Message 的 original-scope trace
+  (enrollment/careGroup/direction)+ `replyOrderKey`、
+  `NurtureFamilyCareMessageCorrection`(strict head unique)、
+  `NurtureFamilyCareCascadeAudit`、CommandExecution
+  `resultSchemaVersion`/`committedResultPayload`、
+  `caregiver_direct_message`/`direct_care_communication`/`prepare_action`
+  枚举扩值,以及冻结的五条 CHECK 约束与 reply-order partial unique index。
+- migration 在 disposable PostgreSQL(127.0.0.1:5435,tmpfs)author/replay,
+  运行后即销毁;无持久化 apply。prisma migrate dev 生成物中混入的 wave4
+  手写约束名 vs Prisma 默认名的 RENAME 漂移已剔除,不属于 G2 范畴,留待
+  独立决策。
+- 领域层同步:`NurtureGrantDataClass`、`NurtureInteractionPurpose` 字面量
+  union 扩值(institution-context.ts / interaction-context.ts);二者在
+  self-pin 集内,`nurtureScenario.contractSha256` 用验证器自身算法重算为
+  `07f1aeb0…`(54 files)。T-004 surface-contract digest 未受影响,
+  `1.7.0`/`b7691a81…` 原样通过 conformance。
+- 新增 production-db 集成测试 `g2-three-axis-schema.integration.test.ts`
+  (8 cases):legacy 默认不可信、complete-graph/lifecycle-reason/
+  protected-body/scope/reply-order CHECK、reply-order partial unique、
+  correction strict head。test-routing census production-db 5→6,
+  db-population floor 38→46;`docs/context/db/schema.json` 刷新
+  (boundary 50 tables / 83 enums)。
+- 下一步:G2-10 第 3 步余下部分——经 formal NestJS ingress 实现 Harness
+  (query/prepareAction/executeAction/readResult)与 protected-content
+  boundary(`ProtectedContentWritePort`)。

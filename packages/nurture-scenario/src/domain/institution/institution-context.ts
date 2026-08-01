@@ -76,7 +76,8 @@ export type NurtureGrantDataClass =
   | "care_day_note"
   | "care_constraint_update"
   | "family_care_question"
-  | "family_follow_up_request";
+  | "family_follow_up_request"
+  | "direct_care_communication";
 
 export type NurtureResolutionSourceKey =
   | "family_care_item"

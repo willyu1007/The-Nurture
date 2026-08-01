@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-07-28T13:47:58.745Z",
+  "updatedAt": "2026-08-01T02:12:15.595Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -262,6 +262,34 @@
       ]
     },
     {
+      "name": "NurtureFamilyCareAcknowledgementState",
+      "values": [
+        "pending",
+        "acknowledged"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareCascadeClosureState",
+      "values": [
+        "complete",
+        "failed"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareCascadeScope",
+      "values": [
+        "source_question",
+        "reply_local"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareCorrectionStatus",
+      "values": [
+        "active",
+        "redacted"
+      ]
+    },
+    {
       "name": "NurtureFamilyCareItemCategory",
       "values": [
         "today_attention",
@@ -325,6 +353,23 @@
       ]
     },
     {
+      "name": "NurtureFamilyCareLifecycleReason",
+      "values": [
+        "family_withdrawn",
+        "grant_revoked",
+        "source_redacted",
+        "expired"
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareLifecycleState",
+      "values": [
+        "active",
+        "closed",
+        "suppressed"
+      ]
+    },
+    {
       "name": "NurtureFamilyCareMessageAuthorshipKind",
       "values": [
         "family_authored",
@@ -356,7 +401,8 @@
         "caregiver_reply",
         "system_notice",
         "care_summary",
-        "redaction_notice"
+        "redaction_notice",
+        "caregiver_direct_message"
       ]
     },
     {
@@ -387,6 +433,14 @@
       ]
     },
     {
+      "name": "NurtureFamilyCareResponseState",
+      "values": [
+        "awaiting_reply",
+        "responded",
+        "not_applicable"
+      ]
+    },
+    {
       "name": "NurtureFamilyCareThreadParticipantVisibilityStatus",
       "values": [
         "active",
@@ -414,6 +468,14 @@
       ]
     },
     {
+      "name": "NurtureFamilyCareWriterContract",
+      "values": [
+        "legacy_v1",
+        "legacy_migrated_v1",
+        "harness_g2_v1"
+      ]
+    },
+    {
       "name": "NurtureFamilyStatus",
       "values": [
         "active",
@@ -437,7 +499,8 @@
         "care_day_note",
         "care_constraint_update",
         "family_care_question",
-        "family_follow_up_request"
+        "family_follow_up_request",
+        "direct_care_communication"
       ]
     },
     {
@@ -460,7 +523,8 @@
       "values": [
         "clarify",
         "submit_action",
-        "open_notification"
+        "open_notification",
+        "prepare_action"
       ]
     },
     {
@@ -1200,6 +1264,15 @@
           "references": []
         },
         {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "threads",
           "to": "NurtureFamilyCareThread",
           "optional": false,
@@ -1597,8 +1670,26 @@
       ],
       "relations": [
         {
+          "field": "ackedItems",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": "ItemAckedRole",
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "assignedItems",
           "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": "ItemAssignedRole",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "authoredCorrections",
+          "to": "NurtureFamilyCareMessageCorrection",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -3179,6 +3270,15 @@
           ]
         },
         {
+          "field": "corrections",
+          "to": "NurtureFamilyCareMessageCorrection",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "enrollment",
           "to": "NurtureEnrollment",
           "optional": true,
@@ -3767,6 +3867,17 @@
           "unique": false
         },
         {
+          "name": "committedResultPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "committed_result_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "handoffDriverRef",
           "type": "Json",
           "nullable": true,
@@ -3888,6 +3999,17 @@
           "unique": false
         },
         {
+          "name": "resultSchemaVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "result_schema_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "targetRefs",
           "type": "Json",
           "nullable": true,
@@ -3912,6 +4034,15 @@
       ],
       "relations": [
         {
+          "field": "cascadeAudits",
+          "to": "NurtureFamilyCareCascadeAudit",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "childCareProcess",
           "to": "NurtureChildCareProcess",
           "optional": true,
@@ -3923,6 +4054,15 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "corrections",
+          "to": "NurtureFamilyCareMessageCorrection",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         }
       ],
       "indexes": [
@@ -5160,6 +5300,15 @@
           "references": []
         },
         {
+          "field": "messages",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "receipts",
           "to": "NurtureChildLinkReceipt",
           "optional": false,
@@ -6107,6 +6256,141 @@
       ]
     },
     {
+      "name": "NurtureFamilyCareCascadeAudit",
+      "dbName": "nurture_family_care_cascade_audit",
+      "schema": null,
+      "columns": [
+        {
+          "name": "affectedRefsPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "affected_refs_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "cascadeScope",
+          "type": "NurtureFamilyCareCascadeScope",
+          "nullable": false,
+          "list": false,
+          "dbName": "cascade_scope",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "closureState",
+          "type": "NurtureFamilyCareCascadeClosureState",
+          "nullable": false,
+          "list": false,
+          "dbName": "closure_state",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "rootMessageId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "root_message_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "rootMessage",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "rootMessageId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "rootMessageId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_cascade_audit_root"
+        }
+      ]
+    },
+    {
       "name": "NurtureFamilyCareItem",
       "dbName": "nurture_family_care_item",
       "schema": null,
@@ -6130,6 +6414,39 @@
           "dbName": "acked_by_participant_id",
           "dbType": null,
           "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ackedByRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "acked_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "acknowledgementHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "acknowledgement_head",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "acknowledgementState",
+          "type": "NurtureFamilyCareAcknowledgementState",
+          "nullable": false,
+          "list": false,
+          "dbName": "acknowledgement_state",
+          "dbType": null,
+          "default": "pending",
           "primaryKey": false,
           "unique": false
         },
@@ -6227,6 +6544,17 @@
           "nullable": true,
           "list": false,
           "dbName": "closed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contextContinuationOfItemId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "context_continuation_of_item_id",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -6332,6 +6660,39 @@
           "unique": false
         },
         {
+          "name": "lifecycleHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "lifecycle_head",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycleReason",
+          "type": "NurtureFamilyCareLifecycleReason",
+          "nullable": true,
+          "list": false,
+          "dbName": "lifecycle_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycleState",
+          "type": "NurtureFamilyCareLifecycleState",
+          "nullable": false,
+          "list": false,
+          "dbName": "lifecycle_state",
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "linkedReplyMessageId",
           "type": "String",
           "nullable": true,
@@ -6361,6 +6722,28 @@
           "dbName": "requires_reply",
           "dbType": null,
           "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "responseHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "response_head",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "responseState",
+          "type": "NurtureFamilyCareResponseState",
+          "nullable": false,
+          "list": false,
+          "dbName": "response_state",
+          "dbType": null,
+          "default": "awaiting_reply",
           "primaryKey": false,
           "unique": false
         },
@@ -6506,15 +6889,39 @@
           "default": null,
           "primaryKey": false,
           "unique": false
+        },
+        {
+          "name": "writerContract",
+          "type": "NurtureFamilyCareWriterContract",
+          "nullable": false,
+          "list": false,
+          "dbName": "writer_contract",
+          "dbType": null,
+          "default": "legacy_v1",
+          "primaryKey": false,
+          "unique": false
         }
       ],
       "relations": [
+        {
+          "field": "ackedByRole",
+          "to": "NurtureCareRoleAssignment",
+          "optional": true,
+          "list": false,
+          "relationName": "ItemAckedRole",
+          "fields": [
+            "ackedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
         {
           "field": "assignedToRole",
           "to": "NurtureCareRoleAssignment",
           "optional": true,
           "list": false,
-          "relationName": null,
+          "relationName": "ItemAssignedRole",
           "fields": [
             "assignedToRoleAssignmentId"
           ],
@@ -6547,6 +6954,28 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "contextContinuationOf",
+          "to": "NurtureFamilyCareItem",
+          "optional": true,
+          "list": false,
+          "relationName": "ItemContextContinuation",
+          "fields": [
+            "contextContinuationOfItemId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "contextContinuations",
+          "to": "NurtureFamilyCareItem",
+          "optional": false,
+          "list": true,
+          "relationName": "ItemContextContinuation",
+          "fields": [],
+          "references": []
         },
         {
           "field": "dailyCareLogs",
@@ -6939,6 +7368,17 @@
           "unique": false
         },
         {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "childCareProcessId",
           "type": "String",
           "nullable": false,
@@ -6957,6 +7397,28 @@
           "dbName": "created_at",
           "dbType": null,
           "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "direction",
+          "type": "NurtureGrantDirection",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
           "primaryKey": false,
           "unique": false
         },
@@ -7032,6 +7494,17 @@
           "nullable": true,
           "list": false,
           "dbName": "redaction_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "replyOrderKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "reply_order_key",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -7157,9 +7630,42 @@
           "default": null,
           "primaryKey": false,
           "unique": false
+        },
+        {
+          "name": "writerContract",
+          "type": "NurtureFamilyCareWriterContract",
+          "nullable": false,
+          "list": false,
+          "dbName": "writer_contract",
+          "dbType": null,
+          "default": "legacy_v1",
+          "primaryKey": false,
+          "unique": false
         }
       ],
       "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "cascadeAudits",
+          "to": "NurtureFamilyCareCascadeAudit",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
         {
           "field": "childCareProcess",
           "to": "NurtureChildCareProcess",
@@ -7168,6 +7674,28 @@
           "relationName": null,
           "fields": [
             "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "corrections",
+          "to": "NurtureFamilyCareMessageCorrection",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
           ],
           "references": [
             "id"
@@ -7266,6 +7794,234 @@
           ],
           "name": null,
           "map": "ix_nurture_message_thread"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyCareMessageCorrection",
+      "dbName": "nurture_family_care_message_correction",
+      "schema": null,
+      "columns": [
+        {
+          "name": "authorParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "author_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "author_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "body_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyStorageMode",
+          "type": "NurtureFamilyCareMessageBodyStorageMode",
+          "nullable": false,
+          "list": false,
+          "dbName": "body_storage_mode",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correctionVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "correction_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "messageId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "message_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "receiptId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "receipt_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilyCareCorrectionStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "authorParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "authorParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "authorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "authorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "message",
+          "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "messageId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "receipt",
+          "to": "NurtureChildLinkReceipt",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "receiptId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "messageId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_correction_message"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "messageId",
+            "correctionVersion"
+          ],
+          "name": null,
+          "map": "uq_nurture_correction_head"
         }
       ]
     },
@@ -10579,6 +11335,15 @@
         {
           "field": "itemEvents",
           "to": "NurtureFamilyCareItemEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "messageCorrections",
+          "to": "NurtureFamilyCareMessageCorrection",
           "optional": false,
           "list": true,
           "relationName": null,
