@@ -555,6 +555,26 @@ service-auth no-store carrier、request-time source policy 与完整负向测试
 shared manifest/surface registry，也不授予 action。独立环境 gate 仍默认 `false`，
 只有 T-007 consumer composition/adoption 与 joint qualification 完成后才可启用。
 
+## G2-B Exact Result and Policy-evidence Boundary
+
+`CommandExecution.output_refs` 保存 canonical、versioned、server-internal refs；
+`committedResult` 是 T-004 public exact schema，不得直接序列化前者。result adapter
+从 canonical ref 生成 workspace-bound、purpose-separated、display-only HMAC refs，
+因此 Message 与其 tombstone 可基于同一 canonical object 获得不同公开 identity，
+又不能被反向当作 locator/authority。correction/withdrawal 的 Receipt 与 policy
+redaction 的 CascadeAudit 必须来自真实持久化对象。
+
+system-policy redaction 的 `policyDecisionRef` 是 owner-issued evidence，不是
+confirmation 中缓存的 authorization decision。它签名绑定 workspace、system
+Participant、Message 与 current head；confirmation 只保存 keyed input-integrity tag
+与数值 `expected_heads.policy_decision`。execute transaction 内依次重验签名 binding、
+current Message head 和 current `system_operator`，三者任一漂移即 fail closed。
+
+transaction-local `afterExecutionCreated` 属于 domain effect 的同一原子边界：它把
+correction/cascade audit 绑定到本次 Execution。callback 返回前的 finalizer 异常明确
+表示 rollback；只有 transaction wrapper/commit acknowledgement 失败才可返回
+`outcome_unknown`。
+
 ## Authorization
 
 - 发送前与持久化事务内均需校验 authority source。

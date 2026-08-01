@@ -401,3 +401,26 @@ Checkpoint evidence and stable AC IDs `T005-AC-036..049` are recorded in
 `sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921`.
 The environment gate remains default `false`; no consumer adoption,
 activation or traffic is claimed.
+
+## G2-B quality remediation and requalification — 2026-08-02
+
+| Check | Result |
+| --- | --- |
+| `pnpm test:unit` | PASS 29 files / 268 tests; includes finalizer rollback/no-Execution and policy-head-only confirmation-state guards |
+| `pnpm --filter @the-nurture/scenario-service test` | PASS 8 files / 49 tests |
+| production DB suite on freshly migrated temporary PostgreSQL | PASS 13 files / 86 tests |
+| scenario-service DB suite on the same disposable schema | PASS 2 files / 17 tests; Harness lifecycle file 11/11 validates exact G2-B result shapes, policy input/current-head binding, correction Receipt FK projection and withdrawal notice |
+| `pnpm test:dev-host` equivalent with isolated production + dev-host temporary DBs | Initial invocation had no `.env` and failed only on missing `DATABASE_URL`; rerun with explicit temporary URLs PASS 11 files / 26 tests |
+| scenario / DB / scenario-service / DB-aware typechecks | PASS |
+| root `pnpm typecheck` | EXTERNAL BLOCK unchanged: live sibling My-Chat rejects its own `growth_record_family_chat_reference_set` `AuditAction`; no Nurture diagnostic |
+| `pnpm verify:surface-conformance` | PASS; exact `nurture.surface-contract@1.7.0` remains `sha256:b7691a81…`; 37 schemas, 25/25 slices, 7 negatives, 56/56 synthetic tests |
+| formal ingress / persistence / port topology / test routing | PASS; routes 7, persistence isolated, ports unchanged, 64 routed test files |
+| built scenario-service smoke | PASS; health available, binding owner/Harness disabled, legacy route absent |
+| docs strict anchors + governance lint | PASS; task bundle 18/18, 0 errors / 0 warnings; project lint PASS |
+| Nurture self-pin | PASS local recomputation with verifier algorithm: 57 files, `f7d618bdc09acd203b3350a616fe0565a6ac17ae9d4dd3f64c77bae7b35e9bb8` |
+| temporary DB effect boundary | PASS; every explicitly named `nurture_codex_t005_*` database was dropped on exit; final census empty |
+
+No Prisma schema/migration, T-004 artifact, environment value, secret, activation or
+traffic changed. The two initial missing-environment runs executed no valid DB suite and
+are retained here as command-entry lessons; all authoritative reruns used isolated,
+freshly materialized schemas and passed.

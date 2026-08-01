@@ -412,7 +412,7 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
 
 ## G2-B — Lifecycle and Owner-read Completion Checkpoint
 
-- Checkpoint status: `G2B_CHECKPOINT_PASS`；机械证据见
+- Checkpoint status: `G2B_CHECKPOINT_PASS`（2026-08-02 质量复核后 requalified）；机械证据见
   `12-g2b-checkpoint-record.md`，不等于 T-005 final Exit 或 T-007 consumer adoption。
 
 - correction、withdrawal、author/system redaction 全部使用统一 Harness、
@@ -424,6 +424,11 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
   分离。
 - G2-B 不改变 G2-A submit/ack/reply 的 original Grant、CareGroup responsibility、
   append-compatible reply 或 role-safe projection 语义。
+- 四个 G2-B action 的 immutable public result 必须逐字段符合 T-004 exact schemas；
+  policy redaction 必须提交并重验 current-head-bound `policyDecisionRef`；correction
+  timeline 必须选择 correction 自己的 Receipt，withdrawal 以
+  `withdrawal_notice + lifecycle=closed` 呈现。transaction-local finalizer 失败是
+  确定回滚，不得报告 `outcome_unknown`。
 
 ## G2-C — Caregiver Direct Interaction Bridge Checkpoint
 

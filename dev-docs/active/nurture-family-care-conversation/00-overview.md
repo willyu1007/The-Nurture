@@ -5,12 +5,15 @@
 - State: in-progress
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-01
+- Updated: 2026-08-02
 - Next step: **G2-B checkpoint 已达成**
   (`12-g2b-checkpoint-record.md`：`G2B_CHECKPOINT_PASS`)。在 G2-A 证据链之上
   已交付 correction / withdrawal / exact-author 与 system-policy redaction、
   分页闭包 cascade、最新更正/tombstone presenter，以及精确披露的
-  `InstitutionBusinessCommunicationProjectionV1` provider owner-read。正式
+  `InstitutionBusinessCommunicationProjectionV1` provider owner-read。2026-08-02
+  质量复核发现的 result-schema 漂移、policy-decision fence、finalizer 错误分类、
+  correction Receipt 非确定投影与 withdrawal notice 缺失已修复并重新通过真实 DB
+  E2E；冻结 T-004 `1.7.0` digest 未改。正式
   ingress 现为七路由；Admin read 使用 exact
   `nurture.institution-business-communication-owner-read@1.0.0` / digest pin、
   service-auth no-store carrier 和独立默认关闭开关。AC 映射续编至

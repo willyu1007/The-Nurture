@@ -5,7 +5,7 @@
 - Task: T-005
 - Slice: Stage G2-B checkpoint (`01-plan.md` G2-B checklist; Increment 2
   normative contract in `07-increment-2-change-contract.md`)
-- Executed: 2026-08-01 on disposable PostgreSQL instances
+- Executed: 2026-08-01; quality requalification 2026-08-02 on disposable PostgreSQL
 - Result: `G2B_CHECKPOINT_PASS / G2C_PENDING / T005_EXIT_NOT_CLAIMED`
 - Scope of claim: Nurture provider implementation and formal private ingress.
   T-007 consumer composition/adoption, shared discovery publication, G2-C and
@@ -14,6 +14,15 @@
 No persistent database was changed. No secret, committed environment enablement,
 activation or traffic was introduced. Every temporary PostgreSQL cluster was
 stopped and moved to the local Trash after verification.
+
+The 2026-08-02 quality review temporarily reopened this checkpoint after finding
+five implementation/contract defects. All were repaired before retaining PASS:
+the four G2-B immutable results now match the exact T-004 schemas; policy
+redaction requires current-head-bound `policyDecisionRef`; a finalizer failure is
+classified as a definite transaction rollback; guardian timeline selects a
+correction's exact Receipt deterministically; withdrawal is projected as the
+frozen `withdrawal_notice + lifecycle=closed` shape. No T-004 source/artifact or
+digest was changed.
 
 ## Bound Contracts
 
@@ -33,16 +42,17 @@ stopped and moved to the local Trash after verification.
 
 | G2-B checklist item | Mechanical evidence |
 | --- | --- |
-| correction uses unified Harness, Execution, typed immutable result, exact replay and Receipt | formal HTTP test prepares two heads, commits one, exact-replays the persisted result and rejects the other as `stale_confirmation`; DB proves encrypted append-only correction, original Message preservation, Receipt and Execution FK |
-| withdrawal closes only exact family work, preserves history and converges | exact source author closes `active → closed(family_withdrawn)`, resolves Attention, blocks pending Receipt and future reply; new command returns `already_satisfied` with typed result; a pre-existing caregiver reply stays readable/persisted |
-| exact-author and system-policy redaction are separate | Admin/coworker negatives; exact caregiver author may erase own reply even after original Grant loss; only current `system_operator` can use the policy capability and its reason is server-owned |
+| correction uses unified Harness, Execution, typed immutable result, exact replay and Receipt | formal HTTP test validates the complete exact `{effect,messageRef,correctionRef,receiptRef}` result, exact-replays it, rejects a stale head, and proves timeline receipt equality with correction `receiptId`; DB proves encrypted append-only correction, original Message preservation and Execution FK |
+| withdrawal closes only exact family work, preserves history and converges | exact source author closes `active → closed(family_withdrawn)`, resolves Attention, blocks pending Receipt/future reply, projects `withdrawal_notice + lifecycle=closed`, and exact-replays `{effect,careItemRef,receiptRef}`; a pre-existing caregiver reply stays persisted |
+| exact-author and system-policy redaction are separate | Admin/coworker negatives; exact caregiver author may erase own reply after Grant loss; policy input is closed `{policyDecisionRef}`, missing/wrong-message refs deny, and only current `system_operator` with actor/workspace/Message/head-bound evidence can commit exact policy result |
 | source cascade reaches closure | disposable DB fixture creates 105 active corrections and 105 pending receipts; one transaction erases every correction payload, suppresses Item/Attention, terminalizes every Receipt and writes `CascadeAudit(complete)` bound to the same Execution |
 | reply cascade stays local | first of two caregiver replies becomes a tombstone; sibling reply, active Item, responded axis and resolved Attention remain unchanged |
 | latest correction/tombstone owner-reread | guardian/detail presenters return latest correction; source/reply redaction returns body-free tombstones; `readResult` reconstructs current state from committed refs |
 | Institution Admin exact disclosed owner-read | positive route requires exact interface pin, current exact Institution Admin, Institution/Enrollment/CareGroup, current original Grant, direction/data class/purpose and pre-send disclosure; negative suite covers pin drift, missing disclosure, role loss, Institution scope drift and Grant loss |
 | Admin read/action separation and no-copy carrier | output contains only opaque display refs, current protected body/tombstone, empty attachments and `actions: []`; internal IDs are absent; Admin-only action prepares deny; HTTP response is service-authenticated `private, no-store` |
 | provider remains default-off | typed env contract default is `false`; missing/false gate returns generic 503 before owner read; no `env/values/*` enablement or shared surface discovery change |
-| G2-A semantics do not regress | full 266 unit, 86 production-DB, 49 scenario-service, 17 scenario-service-DB and 26 dev-host tests pass; surface contract remains exact 1.7.0 digest |
+| G2-A semantics do not regress | full 268 unit, 86 production-DB, 49 scenario-service, 17 scenario-service-DB and 26 dev-host tests pass; surface contract remains exact 1.7.0 digest |
+| transaction finalizer failures remain definite rollbacks | command-kernel unit injects `afterExecutionCreated` failure and proves `not_committed/technical_error/command_execution_failed` plus no persisted Execution; only wrapper/commit ambiguity remains `outcome_unknown` |
 
 ## Acceptance-to-Check Mapping (continued; IDs are stable)
 
@@ -76,6 +86,11 @@ stopped and moved to the local Trash after verification.
   checks PASS; scenario-service built artifact smoke PASS.
 - surface conformance PASS with unchanged `nurture.surface-contract@1.7.0`
   digest and 25/25 slices.
+- 2026-08-02 focused remediation evidence: command-kernel + interaction-context
+  23/23 PASS; formal Harness PostgreSQL E2E 11/11 PASS on a freshly migrated
+  temporary database, which was dropped on exit; package and DB-aware typechecks
+  PASS. The 57-file Nurture self-pin was recomputed with the verifier algorithm as
+  `f7d618bd…`; pinned My-Chat/Base inputs were not changed.
 - Root aggregate `pnpm typecheck` and live `verify:workflow-contract-pin` are
   externally blocked by sibling worktree drift: My-Chat currently has an
   unrelated `AuditAction` compile mismatch and Base is at `8649e0e` rather than

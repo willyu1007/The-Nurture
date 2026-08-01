@@ -99,6 +99,10 @@ CapabilityActionRefV1
   为 target 存在或不存在的证明。
 - `sourceLabel`、`reasonLabel` 是服务端生成的 display-safe 文案，不包含 raw identity、
   Grant、policy 或另一 Institution 信息。
+- 冻结的 `RoleSafeFamilyCareStateV1` 不含 `lifecycleReason` 扩展字段；家庭撤回由
+  guardian timeline 的 `kind=withdrawal_notice` 与 `state.lifecycle=closed` 共同
+  表达。内部 `family_withdrawn` 仍保存在 canonical Item/Event，并可供精确 owner
+  policy 与 Admin provider projection 使用，不能静默塞进 public exact schema。
 - Receipt 只表达 Nurture logical state；provider/device delivery/read 不进入
   `logicalStatus`。
 - `targetOptionRef` 是短期 owner-issued locator，不是 authority，也不是 raw object id。

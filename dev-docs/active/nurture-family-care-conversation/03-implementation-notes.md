@@ -737,3 +737,36 @@
 - 正式 API 增至七路由，OpenAPI/API index/ingress census 同步。环境开关通过
   `env/contract.yaml` SSOT、typed config、生成文档与 environment suite 管理；无
   secret、无 committed env value、无 activation/traffic。
+
+## 2026-08-02 — G2-B checkpoint 质量修复与重新资格化
+
+- G2-B 四个 action 的 `committed_result` 由内部 snake_case/debug projection 改为
+  T-004 `additionalProperties=false` exact result：correction
+  `{effect,messageRef,correctionRef,receiptRef}`、withdrawal
+  `{effect,careItemRef,receiptRef}`、author redaction
+  `{effect,messageRef,tombstoneRef}`、policy redaction
+  `{effect,messageRef,tombstoneRef,auditEventRef}`。公开 refs 由 canonical ref 生成
+  workspace-bound、purpose-separated、display-only HMAC identity；内部完整 refs 仍只
+  留在 `output_refs`/owner reread。
+- 删除了伪造的 `redaction_event_ref=message_ref`。author tombstone 使用同一 canonical
+  Message 的独立 tombstone display ref；policy `auditEventRef` 指向实际
+  `NurtureFamilyCareCascadeAudit`，因此所有公开结果字段都有真实持久化事实支撑。
+- `policy_redact_family_care_message` 现在严格解析闭合
+  `{policyDecisionRef}`。owner-issued ref 绑定 workspace、system Participant、Message
+  和 Message/policy head；prepare、execute precondition 与 transaction apply 前都重验
+  binding/current head/current `system_operator`。body-free confirmation 只保存数值
+  `expected_heads.policy_decision` 与 keyed input integrity，不缓存 policy decision。
+- command kernel 把 `afterExecutionCreated` 异常标记为
+  `NurtureDeterministicRollback`；finalizer 与 effect/Execution 同事务，失败明确返回
+  `not_committed/technical_error`。in-memory transaction adapter 同步改为成功后才发布
+  staged Execution，使该回滚保证可被单测机械验证。
+- guardian timeline 不再用 unordered `Map(sourceId → Receipt)` 折叠 original 与
+  correction receipts。读取按 `(createdAt,id)` 排序；有 active correction 时严格按
+  correction `receiptId` 外键选择其 Receipt，否则选择确定排序的原始 Receipt。
+- withdrawal canonical reason 继续保存在 Item/Event；冻结 public schema 不新增字段，
+  guardian timeline 改投影为 `kind=withdrawal_notice` 且 `state.lifecycle=closed`。
+  redaction 仍优先显示 tombstone，避免泄漏已删除内容。
+- 无 Prisma schema/migration、T-004 artifact/digest、环境值、activation 或 traffic
+  变化；验证仅使用显式临时 PostgreSQL 数据库并在退出时删除。因 command kernel
+  与 scenario-service runtime 属于 Nurture self-pin population，使用 verifier 自身
+  path-content 算法重算 57-file self-pin 为 `f7d618bd…`；My-Chat/Base revision/pin 未改。

@@ -201,3 +201,32 @@
   不是 W0 固定物化。未修改/重置 sibling；本 checkpoint 使用包级检查、surface
   exact digest 和 W0 pinned evidence。预防：联合资格化必须物化 pinned detached
   checkout，live sibling 只能作便利开发输入，不能冒充 adoption evidence。
+
+## G2-B 质量复核的已解决教训(2026-08-02)
+
+- **“typed result”必须以共享 JSON Schema 为准，不以内存对象名为准。** 四个 G2-B
+  action 原先持久化了结构完整但命名/字段都属于内部实现的 snake_case result，HTTP
+  又原样返回，无法通过 T-004 exact schema。修复后 E2E 对完整对象做 `toEqual`，防止
+  少字段、旧字段或 `additionalProperties` 漂移。以后 action 实现落地时必须把真实
+  ingress output 与冻结 schema 一起作为验收，而不是只检查“有 committed result”。
+- **不要为契约字段伪造不存在的领域对象。** `redaction_event_ref` 曾直接复用 Message
+  ref，但数据库没有该 Event。公开 `tombstoneRef` 现在使用 tombstone Message 的独立
+  display identity；policy `auditEventRef` 指向真实 CascadeAudit。若 schema 要求一种
+  新事实，应先建立真实模型或采用契约允许的真实既有事实，不能靠重命名凑 shape。
+- **transaction callback 内的 finalizer 仍属于确定回滚区。** `apply` 已有 rollback
+  标签，但 `afterExecutionCreated` 在标签边界之外，导致确定失败被误报
+  `outcome_unknown`。凡是在 transaction operation 返回之前抛出的异常，都应保留
+  “未提交”确定性；只有 transaction wrapper/commit acknowledgement 本身失败才是
+  outcome unknown。
+- **同一 source 的多个 Receipt 不能用无序 Map 折叠。** correction 是独立投递
+  effect，和 original message 共用 sourceId；无 order 的 `findMany` 加
+  `Map(sourceId,receipt)` 会随机选中一个。投影必须先识别语义 fact，再按 correction
+  的 exact Receipt FK 选择；fallback 也必须有明确排序。
+- **冻结 public schema 与内部 reason 需要显式投影规则。** `family_withdrawn` 是
+  canonical lifecycle reason，但 T-004 `roleSafeState` 不允许额外字段。正确做法是用
+  已冻结的 `withdrawal_notice + lifecycle=closed` 表达，而不是静默丢语义或偷偷改变
+  `1.7.0` artifact。需要新增字段时必须走版本/digest rotation。
+- **policy input 不能退化为空对象，也不能把授权决定缓存进 confirmation。** current
+  policy evidence 由 actor/workspace/Message/head-bound opaque ref 表达；confirmation
+  只保存数字 head 与 keyed input tag，execute 重新解析 evidence 和 current system
+  role。允许 `expected_heads.policy_decision` 不等于允许持久化 decision payload。

@@ -55,12 +55,15 @@ active，只要求 exact author、current same-side reach 与 target 尚可解�
 
 ```text
 CorrectFamilyCareMessageOutputV1
+  effect: correction_appended
   messageRef
   correctionRef
-  correctionVersion
-  correctionReceiptRef
-  contentState: corrected
+  receiptRef
 ```
+
+`correctionVersion`、canonical Event 与内部 Receipt/Message refs 留在
+`CommandExecution.output_refs` 和 current owner-read，不得扩进 T-004
+`additionalProperties=false` 的 immutable public result。
 
 ## Withdrawal
 
@@ -81,12 +84,14 @@ CorrectFamilyCareMessageOutputV1
 
 ```text
 WithdrawFamilyCareRequestOutputV1
+  effect: request_withdrawn
   careItemRef
-  withdrawalEventRef
-  lifecycle: closed
-  lifecycleReason: family_withdrawn
-  attentionEffect: resolved | unchanged
+  receiptRef
 ```
+
+`closed(family_withdrawn)`、withdrawal Event 与 Attention effect 是 canonical
+state/audit facts；public timeline 通过 `withdrawal_notice + lifecycle=closed` 呈现，
+不把这些内部字段追加到冻结 result schema。
 
 ## Redaction
 
@@ -95,6 +100,11 @@ WithdrawFamilyCareRequestOutputV1
 - author redaction 只允许 exact sender Participant + current same-side relationship；
   typed business input 为空，reason 由服务端产生。policy/safety/admin redaction 使用
   独立 system actor/capability 和 server-owned reason，不能伪装成作者操作。
+  `policy_redact_family_care_message` 的 typed input 必须是闭合对象
+  `{ policyDecisionRef }`；该 owner-issued opaque evidence 绑定 workspace、system
+  Participant、Message 与 current Message/policy head。prepare/execute 均重新验证
+  当前 system role、evidence binding 和 head；confirmation 只保存数值
+  `policy_decision` concurrency head 与 keyed input-integrity tag，不缓存授权决定。
 - commit 使正文、附件和该 Message 的 correction versions 对普通 reader 不可恢复，
   保留 Message tombstone、redaction reason、Receipt、Event、Execution 与审计 refs。
   `deleted` 不是领域状态，物理删除属于 retention/legal mechanism。
@@ -110,13 +120,21 @@ WithdrawFamilyCareRequestOutputV1
   responseState 改回 awaiting_reply，也不重开原 waiting Attention；班级可追加新 reply。
 
 ```text
-RedactFamilyCareMessageOutputV1
+RedactFamilyCareMessageOutputV1(author)
+  effect: content_redacted
   messageRef
-  redactionEventRef
-  contentState: redacted
-  cascadeScope: source_question | reply_local
-  cascadeAuditRef
+  tombstoneRef
+
+PolicyRedactFamilyCareMessageOutputV1(system policy)
+  effect: policy_content_redacted
+  messageRef
+  tombstoneRef
+  auditEventRef
 ```
+
+`tombstoneRef` 指向已转成 tombstone 的 canonical Message 的独立 display-only
+opaque identity；`auditEventRef` 指向真实完成的 cascade audit。不得伪造不存在的
+redaction Event，cascade scope/affected refs 继续由内部 audit 与 owner-read 提供。
 
 ## Delivery and Low-interruption Projection
 
