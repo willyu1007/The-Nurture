@@ -367,7 +367,7 @@ Nurture local qualification 和 My-Chat 双平台 internal-store real-device evi
    部署旧 Candidate 后生成新 Binding，并完整重跑 local、iOS、Android、Composite
    与 Decision；destructive DB down migration 默认禁止。
 
-### Beta Profile v0 Early Freeze — Accepted (2026-07-31)
+### Beta Profile v0 Early Freeze — Frozen (2026-08-01)
 
 - beta profile 所有权保持在 T-008，但其首个版本化草案（Beta Profile v0）提前到
   G1 Joint Conformance 前后、G2 实施开始之前冻结，不等待 G5-0。
@@ -379,9 +379,16 @@ Nurture local qualification 和 My-Chat 双平台 internal-store real-device evi
 - v0 是 versioned planning input，不是资格化证据，不改变任何门禁语义。修订按
   drift 对待：optional→required 翻转必须触发受影响 stage 的显式影响分析，禁止
   静默扩 scope。G5-0 的职责相应从"定义 profile"变为"确认并终版化 profile"。
-- required 面的具体裁剪（例如 G4-D Enrollment Journey、G4-E Knowledge/RAG 是否
-  进入首个 internal beta）在 v0 起草时逐项决定，当前未定；"缺失 required 路径
-  阻塞 Freeze 而非降级为占位"的规则不变。
+- Exact planning artifact:
+  [`06-beta-profile-v0.md`](./06-beta-profile-v0.md), identity
+  `nurture.six-surface-beta-profile@0.1.0`.
+- v0 要求六个 surface 的核心正向路径完整；T-005 G2-A/B/C、T-006 deterministic/
+  manual/publish 主路径、T-007 G4-D Enrollment Journey 与 G4-E source-cited RAG
+  均为 required。G3-B2 AI copy、G3-C2 `ClassScopedFaceMatch`、T-006 Workflow
+  board module、AI attention、bulk roster/invite 与未批准 family-share 保持
+  `optional_absent/default-off`。
+- 缺失 required 路径阻塞 Freeze，不能降级为 placeholder、default-off 或 limited
+  pass；任何 optional→required 变化都必须产生新 profile version 与影响分析。
 
 ### Critical path
 

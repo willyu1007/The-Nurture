@@ -60,3 +60,17 @@
   Next step 同步。
 - required 面的逐项裁剪（Enrollment Journey、Knowledge/RAG 等）留待 v0 起草时
   决定。本次只更新规划文档，无代码、配置、schema、数据库或部署变更。
+
+## 2026-08-01 — Beta Profile v0 frozen
+
+- Added `06-beta-profile-v0.md` with planning identity
+  `nurture.six-surface-beta-profile@0.1.0`.
+- Required paths are the six surface core, T-005 G2-A/B/C, T-006 deterministic
+  capture/manual attribution/publish/integration, and T-007 authority/mobile/Web/
+  Enrollment Journey/source-cited RAG/qualification.
+- AI copy, class-scoped face matching, the T-006 Workflow board module, AI
+  attention, bulk roster/invite and unapproved family-share are explicitly
+  optional-absent/default-off with qualified manual or empty-state fallbacks.
+- This is a versioned planning input only. No Candidate, schema/migration,
+  database, secret, deployment, store build, activation or traffic effect was
+  created.

@@ -5,11 +5,12 @@
 - State: planned
 - Task: T-008
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-30
-- Next step: Stage G5 整体结构和实施顺序已确认。Beta Profile v0 草案已决定提前
-  到 G1 Joint Conformance 前后、G2 实施开始之前冻结（见 `01-plan.md` 的
-  Beta Profile v0 Early Freeze 小节）；G5-0 届时确认并终版化该 profile，再展开
-  Freeze Readiness 输入与 pre-candidate inventory。
+- Updated: 2026-08-01
+- Next step: Beta Profile v0 已冻结为
+  `nurture.six-surface-beta-profile@0.1.0`（见
+  [`06-beta-profile-v0.md`](./06-beta-profile-v0.md)）。上游按该 profile 实施；
+  G5-0 仅在 T-004～T-007 exact handoff 就绪后确认/终版化 profile 并展开
+  pre-candidate inventory，不提前分配 Candidate identity。
 
 ## Goal
 
@@ -84,5 +85,6 @@ D08-07 defect routing/invalidation/rollback 是 A～E 的横切规则，不建�
 
 ## Next Step
 
-展开 G5-0 Freeze Readiness inputs、versioned six-surface beta profile 和
-pre-candidate inventory；上游 handoff 未通过前不分配正式 Candidate identity。
+维护 Beta Profile v0 的显式 drift ledger；等待 T-005 G2、T-006 G3、T-007 G4
+exact handoff 后进入 G5-0 Readiness。上游 handoff 未通过前不分配正式 Candidate
+identity，也不实现无必要的 release-control runtime。
