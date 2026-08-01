@@ -9,6 +9,8 @@ import { createHarnessRuntime } from "../src/harness-runtime.js";
 import {
   HARNESS_EXECUTE_PATH,
   HARNESS_PREPARE_PATH,
+  HARNESS_QUERY_PATH,
+  HARNESS_READ_RESULT_PATH,
 } from "../src/harness-http.js";
 
 // Full G2-A loop through the formal NestJS ingress on the real disposable
@@ -275,6 +277,81 @@ describe("G2-A loop through the formal Harness ingress", () => {
     }
     expect(JSON.stringify(persisted)).not.toContain("请假");
     expect(JSON.stringify(persisted)).not.toContain("已安排好");
+
+    // Query lane over the same ingress: role-safe projections with
+    // owner-issued opaque refs, decrypted only through the owner read.
+    const timeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.0.0",
+    });
+    expect(timeline.status).toBe(200);
+    expect(timeline.json.status).toBe("ok");
+    expect(timeline.json.output.items).toHaveLength(2);
+    const timelineBodies = timeline.json.output.items.map(
+      (entry: { content?: { body: string } }) => entry.content?.body,
+    );
+    expect(timelineBodies).toContain("老师好,今天想请假半天");
+    expect(timelineBodies).toContain("收到,已安排好");
+    // Display refs are irreversible 32-hex opaque tokens; the actionable
+    // careItemRef is the keyed target ref whose embedded id is unusable
+    // without its signature tag.
+    for (const entry of timeline.json.output.items) {
+      expect(entry.itemRef).toMatch(/^[0-9a-f]{32}$/);
+      expect(entry.enrollmentRef).toMatch(/^[0-9a-f]{32}$/);
+      expect(entry.receipt.receiptRef).toMatch(/^[0-9a-f]{32}$/);
+      expect(entry.careItemRef).toMatch(/^1\..+\.[0-9a-f]{32}$/);
+    }
+
+    const work = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "query_caregiver_family_care_work",
+      capability_version: "1.0.0",
+    });
+    expect(work.json.status).toBe("ok");
+    expect(work.json.output.items).toHaveLength(1);
+    const workItem = work.json.output.items[0];
+    expect(workItem).toMatchObject({
+      acknowledgementState: "acknowledged",
+      responseState: "responded",
+      lifecycle: "active",
+      attentionState: "resolved",
+    });
+    expect(workItem.sourceSafeSummary).toBe("New family care question");
+    const ackAction = workItem.actions.find(
+      (action: { capabilityKey: string }) =>
+        action.capabilityKey === "acknowledge_family_care_item",
+    );
+    expect(ackAction.availability).toBe("already_satisfied");
+
+    const detail = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "query_family_care_item",
+      capability_version: "1.0.0",
+      target_option_ref: workItem.careItemRef,
+    });
+    expect(detail.json.status).toBe("ok");
+    expect(detail.json.output).toMatchObject({
+      projectionRole: "caregiver",
+      progress: { responseState: "responded", replyCount: 1 },
+    });
+    expect(detail.json.output.messages).toHaveLength(2);
+    expect(detail.json.output.messages[0].content.body).toBe("老师好,今天想请假半天");
+
+    const readResult = await post(HARNESS_READ_RESULT_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      output_refs: executed.json.output_refs,
+    });
+    expect(readResult.json.status).toBe("ok");
+    expect(readResult.json.output).toMatchObject({ projectionRole: "guardian" });
   });
 
   it("maps a consumed confirmation to a refresh recovery over HTTP", async () => {

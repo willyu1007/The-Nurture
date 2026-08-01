@@ -311,3 +311,16 @@
 | 2026-08-01 | root `pnpm typecheck` | PASS |
 | 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `e221e1cf…`(57 files) |
 | 2026-08-01 | 效果边界 | PASS:additive 路由,default-off(keys 缺失即 503);无持久化 DB、无 discovery 发布、无 secret 值、无激活/流量 |
+
+## Query lane 与 role-safe presenters — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | query-lane 域层集成:keyed cursor 分页 + 伪造/跨 actor/过期 `refresh_required`、role-reach 拒绝(detail denied、陌生 caregiver 空列表)、revoke 后 caregiver content 遮蔽而 guardian 恒可读、redaction tombstone 无 content | PASS 5/5(disposable PG,运行后销毁) |
+| 2026-08-01 | HTTP e2e 扩展:timeline 双向 body owner-read、work actions availability(ack already_satisfied)、detail(caregiver,replyCount)、readResult(guardian projection)、display refs 32-hex 不可逆 + careItemRef keyed 格式 | PASS(scenario-service db 8/8) |
+| 2026-08-01 | `pnpm verify:formal-ingress-contract` | PASS `routes=6 owner-fields=8 harness-execute-fields=8` |
+| 2026-08-01 | OpenAPI quality strict + api-index generate;context touch 后 strict verify | PASS |
+| 2026-08-01 | production-db 72/72(floor 67→72,文件 10→11);unit 265/265;dev-host 26/26;routing 62 files(29/11/11/10/1);scenario-service 46/46 | PASS |
+| 2026-08-01 | `pnpm verify:surface-conformance`;root typecheck;smoke | PASS;digest 不变 `1.7.0`/`b7691a81…`;smoke 三重 disabled 不变 |
+| 2026-08-01 | self-pin 重算 | `nurtureScenario.contractSha256` → `197618fb…`(57 files) |
+| 2026-08-01 | 效果边界 | PASS:additive 只读路由;query 零写入零 CommandExecution;无持久化 DB/secret/激活/流量 |

@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-01T06:21:14.157Z",
+  "generatedAt": "2026-08-01T08:11:48.866Z",
   "sourceOpenapi": "docs/context/api/openapi.yaml",
-  "sourceChecksumSha256": "33e7dce5928150ee0cb85382cf206660e65887dbd682119a3b4a6f7ed3b6c86f",
+  "sourceChecksumSha256": "b01bb53fbf0abe2e6e058544f0aa90d030818e7e99f426c50b8bfd11511ed2f6",
   "stats": {
-    "totalEndpoints": 4,
+    "totalEndpoints": 6,
     "byTag": {
       "service": 1,
       "binding-owner": 1,
-      "harness": 2
+      "harness": 4
     }
   },
   "endpoints": [
@@ -193,6 +193,87 @@
       ],
       "example": {
         "curl": "curl -X POST '/internal/nurture/harness/execute-action' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"capability_key\":\"<capability_key>\",\"capability_version\":\"<capability_version>\",\"invocation_request_id\":\"<invocation_request_id>\",\"command_request_id\":\"<command_request_id>\",\"confirmation_ref\":\"<confirmation_ref>\"}'"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/internal/nurture/harness/query",
+      "operationId": "queryHarnessCapability",
+      "summary": "Read one role-safe family-care query projection",
+      "tag": "harness",
+      "auth": "bearer",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": {
+          "required": [
+            "workspace_id",
+            "actor_participant_id",
+            "surface",
+            "capability_key",
+            "capability_version"
+          ],
+          "optional": [
+            "page_size",
+            "cursor",
+            "target_option_ref"
+          ]
+        }
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "status",
+          "output",
+          "reason_code"
+        ]
+      },
+      "errors": [
+        400,
+        401,
+        408,
+        503
+      ],
+      "example": {
+        "curl": "curl -X POST '/internal/nurture/harness/query' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"capability_key\":\"<capability_key>\",\"capability_version\":\"<capability_version>\"}'"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/internal/nurture/harness/read-result",
+      "operationId": "readHarnessResult",
+      "summary": "Re-read the role-safe projection for a committed action",
+      "tag": "harness",
+      "auth": "bearer",
+      "input": {
+        "params": [],
+        "query": [],
+        "body": {
+          "required": [
+            "workspace_id",
+            "actor_participant_id",
+            "surface",
+            "output_refs"
+          ],
+          "optional": []
+        }
+      },
+      "output": {
+        "successStatus": 200,
+        "coreFields": [
+          "status",
+          "output",
+          "reason_code"
+        ]
+      },
+      "errors": [
+        400,
+        401,
+        408,
+        503
+      ],
+      "example": {
+        "curl": "curl -X POST '/internal/nurture/harness/read-result' -H 'Authorization: Bearer <token>' -H 'Content-Type: application/json' -d '{\"workspace_id\":\"<workspace_id>\",\"actor_participant_id\":\"<actor_participant_id>\",\"surface\":\"<surface>\",\"output_refs\":\"<output_refs>\"}'"
       }
     }
   ]

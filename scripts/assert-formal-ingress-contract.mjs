@@ -14,7 +14,16 @@ const healthPath = "/health";
 const ownerPath = "/internal/nurture/scenario-binding/authorize";
 const harnessPreparePath = "/internal/nurture/harness/prepare-action";
 const harnessExecutePath = "/internal/nurture/harness/execute-action";
-const expectedPaths = [healthPath, ownerPath, harnessPreparePath, harnessExecutePath];
+const harnessQueryPath = "/internal/nurture/harness/query";
+const harnessReadResultPath = "/internal/nurture/harness/read-result";
+const expectedPaths = [
+  healthPath,
+  ownerPath,
+  harnessPreparePath,
+  harnessExecutePath,
+  harnessQueryPath,
+  harnessReadResultPath,
+];
 const expectedHarnessSharedRequiredFields = [
   "workspace_id",
   "actor_participant_id",
@@ -96,7 +105,12 @@ assertIncludes(
   "binding-owner controller route",
 );
 
-for (const harnessPath of [harnessPreparePath, harnessExecutePath]) {
+for (const harnessPath of [
+  harnessPreparePath,
+  harnessExecutePath,
+  harnessQueryPath,
+  harnessReadResultPath,
+]) {
   assertTruthy(openApi.paths?.[harnessPath]?.post, `OpenAPI harness POST ${harnessPath}`);
   assertArrayEqual(
     Object.keys(openApi.paths?.[harnessPath] ?? {}).sort(),
@@ -142,6 +156,17 @@ assertIncludes(
   "harness controller execute route",
 );
 
+assertIncludes(
+  harnessControllerSource,
+  "@Post(HARNESS_QUERY_PATH)",
+  "harness controller query route",
+);
+assertIncludes(
+  harnessControllerSource,
+  "@Post(HARNESS_READ_RESULT_PATH)",
+  "harness controller read-result route",
+);
+
 const apiIndex = JSON.parse(read("docs/context/api/api-index.json"));
 assertArrayEqual(
   apiIndex.endpoints
@@ -152,6 +177,8 @@ assertArrayEqual(
     `POST ${ownerPath}`,
     `POST ${harnessPreparePath}`,
     `POST ${harnessExecutePath}`,
+    `POST ${harnessQueryPath}`,
+    `POST ${harnessReadResultPath}`,
   ].sort(),
   "API index formal route set",
 );
@@ -171,7 +198,7 @@ assertArrayEqual(
 );
 
 process.stdout.write(
-  "[ok] formal ingress contract routes=4 owner-fields=8 harness-execute-fields=8\n",
+  "[ok] formal ingress contract routes=6 owner-fields=8 harness-execute-fields=8\n",
 );
 
 function assertTruthy(value, label) {

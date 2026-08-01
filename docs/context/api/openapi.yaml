@@ -205,6 +205,106 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HarnessError'
+  /internal/nurture/harness/query:
+    post:
+      operationId: queryHarnessCapability
+      summary: Read one role-safe family-care query projection
+      description: |
+        Private My-Chat-to-Nurture Harness read. Resolves the caller's current
+        role reach and returns the requested closed query projection (guardian
+        timeline, caregiver work list, or role-specific item detail) with
+        owner-issued opaque refs and keyed snapshot cursors. Queries never
+        write and never create a CommandExecution.
+      tags: [harness]
+      security:
+        - serviceBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HarnessQueryRequest'
+      responses:
+        '200':
+          description: The closed query decision for the requested capability.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessQueryResponse'
+        '400':
+          description: The request shell is invalid or the capability key is unknown.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '401':
+          description: The service bearer is missing or invalid while the Harness is enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '408':
+          description: The bounded request handler timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '503':
+          description: The Harness path is disabled by missing key material or service auth.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+  /internal/nurture/harness/read-result:
+    post:
+      operationId: readHarnessResult
+      summary: Re-read the role-safe projection for a committed action
+      description: |
+        Private My-Chat-to-Nurture Harness read. Regenerates the role-safe
+        item projection from a committed command's canonical output refs plus
+        current owner state; historical business results are never rehydrated
+        from the caller and current mutable state never enters the immutable
+        committed result.
+      tags: [harness]
+      security:
+        - serviceBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HarnessReadResultRequest'
+      responses:
+        '200':
+          description: The closed read-result decision.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessQueryResponse'
+        '400':
+          description: The request shell is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '401':
+          description: The service bearer is missing or invalid while the Harness is enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '408':
+          description: The bounded request handler timed out.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
+        '503':
+          description: The Harness path is disabled by missing key material or service auth.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HarnessError'
 components:
   securitySchemes:
     serviceBearerAuth:
@@ -472,6 +572,84 @@ components:
         recovery:
           type: string
           enum: [none, refresh, reprepare, retry_same_command]
+    HarnessQueryRequest:
+      type: object
+      description: |
+        Trusted context comes from the authenticated My-Chat caller. The item
+        detail query targets only an owner-issued opaque care-item ref; raw
+        ids are never accepted.
+      additionalProperties: false
+      required:
+        - workspace_id
+        - actor_participant_id
+        - surface
+        - capability_key
+        - capability_version
+      properties:
+        workspace_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        actor_participant_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        surface:
+          type: string
+          enum: [chat, board]
+        capability_key:
+          type: string
+          enum:
+            - query_guardian_family_care_timeline
+            - query_caregiver_family_care_work
+            - query_family_care_item
+        capability_version:
+          type: string
+          const: 1.0.0
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        cursor:
+          type: string
+          maxLength: 2048
+        target_option_ref:
+          $ref: '#/components/schemas/BoundedIdentifier'
+    HarnessReadResultRequest:
+      type: object
+      description: |
+        Regenerates the role-safe projection for a committed action from its
+        canonical output refs plus current owner state.
+      additionalProperties: false
+      required:
+        - workspace_id
+        - actor_participant_id
+        - surface
+        - output_refs
+      properties:
+        workspace_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        actor_participant_id:
+          $ref: '#/components/schemas/BoundedIdentifier'
+        surface:
+          type: string
+          enum: [chat, board]
+        output_refs:
+          type: array
+          minItems: 1
+          maxItems: 32
+          items:
+            type: object
+            additionalProperties: true
+    HarnessQueryResponse:
+      type: object
+      description: Closed query decision union discriminated by status.
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, refresh_required, denied]
+        output:
+          description: Capability-specific closed role-safe projection.
+        reason_code:
+          type: string
     HarnessError:
       type: object
       additionalProperties: false

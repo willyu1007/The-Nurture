@@ -12,6 +12,10 @@ import {
   prepareAcknowledgeFamilyCareItem,
   prepareReplyFamilyCareItem,
   prepareSubmitFamilyCareQuestion,
+  queryCaregiverFamilyCareWork,
+  queryFamilyCareItemDetail,
+  queryGuardianFamilyCareTimeline,
+  resolveCareItemTargetRef,
   withHarnessConfirmation,
   type HarnessConfirmationPayloadV2,
   type ItemActionPrepareDecision,
@@ -20,6 +24,7 @@ import {
 } from "@the-nurture/scenario/harness";
 import {
   PrismaFamilyCareCommandTransaction,
+  PrismaFamilyCareHarnessQueryReadPort,
   PrismaInteractionContextRepository,
   PrismaNurtureCommandRepository,
   PrismaSubmitEligibilityReadPort,
@@ -35,6 +40,9 @@ import {
   type HarnessExecuteResponseV1,
   type HarnessPrepareRequestV1,
   type HarnessPrepareResponseV1,
+  type HarnessQueryRequestV1,
+  type HarnessQueryResponseV1,
+  type HarnessReadResultRequestV1,
 } from "./harness-http.js";
 
 const PROTECTED_CONTENT_KEY_REF = "nurture-protected-content-v1";
@@ -42,6 +50,8 @@ const PROTECTED_CONTENT_KEY_REF = "nurture-protected-content-v1";
 export type HarnessEngine = {
   prepare(request: HarnessPrepareRequestV1): Promise<HarnessPrepareResponseV1>;
   execute(request: HarnessExecuteRequestV1): Promise<HarnessExecuteResponseV1>;
+  query(request: HarnessQueryRequestV1): Promise<HarnessQueryResponseV1>;
+  readResult(request: HarnessReadResultRequestV1): Promise<HarnessQueryResponseV1>;
 };
 
 export class HarnessRuntime implements OnApplicationShutdown {
@@ -102,6 +112,7 @@ export function createHarnessEngine(input: {
   const contexts = new NurtureInteractionContextService(confirmations);
   const submitEligibility = new PrismaSubmitEligibilityReadPort(input.prisma);
   const factsPort = new PrismaFamilyCareCommandTransaction(input.prisma);
+  const queryReads = new PrismaFamilyCareHarnessQueryReadPort(input.prisma);
   const protectedContent = createAesGcmProtectedContentPort({
     keyRef: PROTECTED_CONTENT_KEY_REF,
     keyMaterial: input.contentKey,
@@ -231,6 +242,67 @@ export function createHarnessEngine(input: {
         }),
       });
       return mapHarnessCommandResult(result);
+    },
+
+    async query(request) {
+      const queryDeps = {
+        reads: queryReads,
+        protected_content: protectedContent,
+        integrity_key: input.integrityKey,
+      };
+      const scope = {
+        workspace_id: request.workspace_id,
+        participant_id: request.actor_participant_id,
+      };
+      if (request.capability_key === "query_guardian_family_care_timeline") {
+        return queryGuardianFamilyCareTimeline(queryDeps, {
+          ...scope,
+          page_size: request.page_size,
+          ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
+        });
+      }
+      if (request.capability_key === "query_caregiver_family_care_work") {
+        return queryCaregiverFamilyCareWork(queryDeps, {
+          ...scope,
+          page_size: request.page_size,
+          ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
+        });
+      }
+      if (!request.target_option_ref) {
+        return { status: "denied", reason_code: "invalid_query_input" };
+      }
+      const itemId = resolveCareItemTargetRef(
+        input.integrityKey,
+        scope,
+        request.target_option_ref,
+      );
+      if (!itemId) return { status: "denied", reason_code: "not_authorized" };
+      return queryFamilyCareItemDetail(queryDeps, { ...scope, item_id: itemId });
+    },
+
+    async readResult(request) {
+      // readResult regenerates the role-safe projection from the committed
+      // command's canonical output refs plus current owner state; it never
+      // rehydrates historical business results from the caller.
+      const itemRef = request.output_refs.find(
+        (ref) =>
+          ref.namespace === "nurture" &&
+          ref.object_type === "family_care_item" &&
+          typeof ref.object_id === "string",
+      );
+      if (!itemRef) return { status: "denied", reason_code: "invalid_query_input" };
+      return queryFamilyCareItemDetail(
+        {
+          reads: queryReads,
+          protected_content: protectedContent,
+          integrity_key: input.integrityKey,
+        },
+        {
+          workspace_id: request.workspace_id,
+          participant_id: request.actor_participant_id,
+          item_id: itemRef.object_id as string,
+        },
+      );
     },
   };
 

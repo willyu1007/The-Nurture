@@ -8,6 +8,8 @@ import type { NurtureCommandResult } from "@the-nurture/scenario";
  */
 export const HARNESS_PREPARE_PATH = "/internal/nurture/harness/prepare-action";
 export const HARNESS_EXECUTE_PATH = "/internal/nurture/harness/execute-action";
+export const HARNESS_QUERY_PATH = "/internal/nurture/harness/query";
+export const HARNESS_READ_RESULT_PATH = "/internal/nurture/harness/read-result";
 
 export const HARNESS_CAPABILITY_KEYS = [
   "submit_family_care_question",
@@ -15,9 +17,17 @@ export const HARNESS_CAPABILITY_KEYS = [
   "reply_family_care_item",
 ] as const;
 
+export const HARNESS_QUERY_CAPABILITY_KEYS = [
+  "query_guardian_family_care_timeline",
+  "query_caregiver_family_care_work",
+  "query_family_care_item",
+] as const;
+
 export type HarnessCapabilityKey = (typeof HARNESS_CAPABILITY_KEYS)[number];
+export type HarnessQueryCapabilityKey = (typeof HARNESS_QUERY_CAPABILITY_KEYS)[number];
 
 const CAPABILITY_KEY_SET = new Set<string>(HARNESS_CAPABILITY_KEYS);
+const QUERY_CAPABILITY_KEY_SET = new Set<string>(HARNESS_QUERY_CAPABILITY_KEYS);
 const SURFACES = new Set(["chat", "board"]);
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,511}$/;
@@ -83,6 +93,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const parseSharedShell = (
   body: unknown,
   allowedKeys: Set<string>,
+  capabilityKeys: Set<string> = CAPABILITY_KEY_SET,
 ): Record<string, unknown> => {
   if (!isRecord(body) || Object.keys(body).some((key) => !allowedKeys.has(key))) {
     throw new HarnessRequestParseError("invalid_harness_request");
@@ -104,7 +115,7 @@ const parseSharedShell = (
   ) {
     throw new HarnessRequestParseError("invalid_harness_request");
   }
-  if (!CAPABILITY_KEY_SET.has(record.capability_key)) {
+  if (!capabilityKeys.has(record.capability_key)) {
     throw new HarnessRequestParseError("unknown_capability");
   }
   if (
@@ -143,6 +154,86 @@ export const parseHarnessExecuteRequestV1 = (body: unknown): HarnessExecuteReque
   }
   return record as unknown as HarnessExecuteRequestV1;
 };
+
+export type HarnessQueryRequestV1 = {
+  workspace_id: string;
+  actor_participant_id: string;
+  surface: "chat" | "board";
+  capability_key: HarnessQueryCapabilityKey;
+  capability_version: "1.0.0";
+  page_size?: number;
+  cursor?: string;
+  target_option_ref?: string;
+};
+
+export type HarnessReadResultRequestV1 = {
+  workspace_id: string;
+  actor_participant_id: string;
+  surface: "chat" | "board";
+  output_refs: Array<Record<string, unknown>>;
+};
+
+const QUERY_KEYS = new Set([
+  "workspace_id",
+  "actor_participant_id",
+  "surface",
+  "capability_key",
+  "capability_version",
+  "page_size",
+  "cursor",
+  "target_option_ref",
+]);
+
+const READ_RESULT_KEYS = new Set([
+  "workspace_id",
+  "actor_participant_id",
+  "surface",
+  "output_refs",
+]);
+
+export const parseHarnessQueryRequestV1 = (body: unknown): HarnessQueryRequestV1 => {
+  const record = parseSharedShell(body, QUERY_KEYS, QUERY_CAPABILITY_KEY_SET);
+  if (
+    (record.page_size !== undefined && typeof record.page_size !== "number") ||
+    (record.cursor !== undefined &&
+      (typeof record.cursor !== "string" || record.cursor.length > 2_048)) ||
+    (record.target_option_ref !== undefined &&
+      (typeof record.target_option_ref !== "string" ||
+        !REF_PATTERN.test(record.target_option_ref)))
+  ) {
+    throw new HarnessRequestParseError("invalid_harness_request");
+  }
+  return record as unknown as HarnessQueryRequestV1;
+};
+
+export const parseHarnessReadResultRequestV1 = (
+  body: unknown,
+): HarnessReadResultRequestV1 => {
+  if (!isRecord(body) || Object.keys(body).some((key) => !READ_RESULT_KEYS.has(key))) {
+    throw new HarnessRequestParseError("invalid_harness_request");
+  }
+  const record = body;
+  if (
+    typeof record.workspace_id !== "string" ||
+    !ID_PATTERN.test(record.workspace_id) ||
+    typeof record.actor_participant_id !== "string" ||
+    !ID_PATTERN.test(record.actor_participant_id) ||
+    typeof record.surface !== "string" ||
+    !SURFACES.has(record.surface) ||
+    !Array.isArray(record.output_refs) ||
+    record.output_refs.length === 0 ||
+    record.output_refs.length > 32 ||
+    record.output_refs.some((ref) => !isRecord(ref))
+  ) {
+    throw new HarnessRequestParseError("invalid_harness_request");
+  }
+  return record as unknown as HarnessReadResultRequestV1;
+};
+
+export type HarnessQueryResponseV1 =
+  | { status: "ok"; output: unknown }
+  | { status: "refresh_required" }
+  | { status: "denied"; reason_code: string };
 
 export type HarnessPrepareResponseV1 =
   | {

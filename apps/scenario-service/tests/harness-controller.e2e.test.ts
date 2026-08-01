@@ -17,6 +17,22 @@ afterEach(async () => {
   close = undefined;
 });
 
+const fakeEngine = (overrides: Partial<HarnessEngine>): HarnessEngine => ({
+  prepare: async () => {
+    throw new Error("prepare must not run");
+  },
+  execute: async () => {
+    throw new Error("execute must not run");
+  },
+  query: async () => {
+    throw new Error("query must not run");
+  },
+  readResult: async () => {
+    throw new Error("readResult must not run");
+  },
+  ...overrides,
+});
+
 const start = async (engine?: HarnessEngine) => {
   const serviceAuth = createBindingOwnerServiceAuth(TOKEN);
   const { app } = await createScenarioServiceApplication({
@@ -60,15 +76,14 @@ describe("Harness controller boundary", () => {
 
   it("requires the service bearer before touching the engine", async () => {
     let calls = 0;
-    const baseUrl = await start({
-      prepare: async () => {
-        calls += 1;
-        throw new Error("must not run");
-      },
-      execute: async () => {
-        throw new Error("must not run");
-      },
-    });
+    const baseUrl = await start(
+      fakeEngine({
+        prepare: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+      }),
+    );
     const response = await post(baseUrl, HARNESS_PREPARE_PATH, prepareBody, "wrong-token");
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({ error: "service_auth_required" });
@@ -77,16 +92,18 @@ describe("Harness controller boundary", () => {
 
   it("rejects invalid shells and unknown capabilities without engine calls", async () => {
     let calls = 0;
-    const baseUrl = await start({
-      prepare: async () => {
-        calls += 1;
-        throw new Error("must not run");
-      },
-      execute: async () => {
-        calls += 1;
-        throw new Error("must not run");
-      },
-    });
+    const baseUrl = await start(
+      fakeEngine({
+        prepare: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+        execute: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+      }),
+    );
     const invalid = await post(baseUrl, HARNESS_PREPARE_PATH, {
       ...prepareBody,
       unexpected: true,
@@ -105,21 +122,23 @@ describe("Harness controller boundary", () => {
 
   it("routes parsed prepare and execute requests to the engine", async () => {
     const seen: string[] = [];
-    const baseUrl = await start({
-      prepare: async (request) => {
-        seen.push(`prepare:${request.capability_key}`);
-        return { status: "denied", reason_code: "not_authorized" };
-      },
-      execute: async (request) => {
-        seen.push(`execute:${request.command_request_id}`);
-        return {
-          status: "not_committed",
-          decision: "conflict",
-          reason_code: "confirmation_expired",
-          recovery: "reprepare",
-        };
-      },
-    });
+    const baseUrl = await start(
+      fakeEngine({
+        prepare: async (request) => {
+          seen.push(`prepare:${request.capability_key}`);
+          return { status: "denied", reason_code: "not_authorized" };
+        },
+        execute: async (request) => {
+          seen.push(`execute:${request.command_request_id}`);
+          return {
+            status: "not_committed",
+            decision: "conflict",
+            reason_code: "confirmation_expired",
+            recovery: "reprepare",
+          };
+        },
+      }),
+    );
     const prepared = await post(baseUrl, HARNESS_PREPARE_PATH, prepareBody);
     expect(prepared.status).toBe(200);
     await expect(prepared.json()).resolves.toEqual({

@@ -19,11 +19,16 @@ import type { HarnessRuntime } from "./harness-runtime.js";
 import {
   HARNESS_EXECUTE_PATH,
   HARNESS_PREPARE_PATH,
+  HARNESS_QUERY_PATH,
+  HARNESS_READ_RESULT_PATH,
   HarnessRequestParseError,
   parseHarnessExecuteRequestV1,
   parseHarnessPrepareRequestV1,
+  parseHarnessQueryRequestV1,
+  parseHarnessReadResultRequestV1,
   type HarnessExecuteResponseV1,
   type HarnessPrepareResponseV1,
+  type HarnessQueryResponseV1,
 } from "./harness-http.js";
 
 export const HARNESS_GUARD_CONFIG = Symbol("HARNESS_GUARD_CONFIG");
@@ -75,6 +80,24 @@ export class HarnessController {
     const engine = this.config.runtime.engine;
     if (!engine) throw new ServiceUnavailableException({ error: "harness_disabled" });
     return engine.execute(this.parse(() => parseHarnessExecuteRequestV1(body)));
+  }
+
+  @Post(HARNESS_QUERY_PATH)
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(HarnessServiceAuthGuard)
+  async query(@Body() body: unknown): Promise<HarnessQueryResponseV1> {
+    const engine = this.config.runtime.engine;
+    if (!engine) throw new ServiceUnavailableException({ error: "harness_disabled" });
+    return engine.query(this.parse(() => parseHarnessQueryRequestV1(body)));
+  }
+
+  @Post(HARNESS_READ_RESULT_PATH)
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(HarnessServiceAuthGuard)
+  async readResult(@Body() body: unknown): Promise<HarnessQueryResponseV1> {
+    const engine = this.config.runtime.engine;
+    if (!engine) throw new ServiceUnavailableException({ error: "harness_disabled" });
+    return engine.readResult(this.parse(() => parseHarnessReadResultRequestV1(body)));
   }
 
   private parse<T>(run: () => T): T {

@@ -523,3 +523,37 @@
   (routing 61 files:29/10/11/10/1)。
 - self-pin 重算 → `e221e1cf…`(54→57 files,scenario-service src 新文件
   计入);T-004 digest 不变。
+
+## 2026-08-01 — Query lane 与 role-safe presenters 落地(09 号契约)
+
+- 域层 `harness/family-care-queries.ts` 实现三个 V1 query capability
+  (`query_guardian_family_care_timeline` / `query_caregiver_family_care_work` /
+  `query_family_care_item`,均 1.0.0)与 09 号冻结的输出 shape:
+  guardian timeline(消息级条目,kind 含 redaction_tombstone)、caregiver
+  work(childSafeLabel/safe summary/三轴/attention/actions availability)、
+  role-specific item detail(provenance/progress+replyCount/messages/
+  receipts/attention/continuation/actions)。
+- Ref 纪律:可回传的 careItemRef/targetOptionRef 用 keyed target ref;
+  display refs(itemRef/enrollmentRef/messageRef/receiptRef)为不可逆
+  32-hex opaque token;raw id 永不出现在响应。分页用 keyed keyset cursor
+  (actor 绑定、10 分钟 TTL、伪造/跨 actor/过期 → `refresh_required`)。
+- Content owner-read:body 仅经 AES port unseal 内联;caregiver detail 的
+  content 以 item original Grant 当前有效为 fence(revoke 后 state 可读、
+  正文遮蔽);guardian 恒可读自家 body;redacted → tombstone 无 content。
+- db 读端口 `PrismaFamilyCareHarnessQueryReadPort`:所有列表按当前 role
+  reach 限定,仅投影 harness 管理行(`harness_g2_v1`/`legacy_migrated_v1`),
+  raw 行不出 presenter。
+- ingress 新增 `POST /internal/nurture/harness/query` 与
+  `/internal/nurture/harness/read-result`(readResult 从 committed 命令的
+  canonical output refs + 当前 owner state 重建投影);OpenAPI +2 路由
+  +3 schema(quality strict PASS)、api-index 再生成、formal-ingress 守卫
+  升级 `routes=6`、context registry touch。
+- 测试:query-lane 域层集成 5/5(keyed cursor 分页/伪造/跨 actor/过期、
+  role-reach 拒绝、revoke content fence、redaction tombstone);HTTP e2e
+  扩至含 timeline/work/detail/readResult 断言(scenario-service db 8/8,
+  ref 格式断言);production-db 72/72(floor 67→72,文件 10→11);unit
+  265/265;dev-host 26/26;smoke 不变三重 disabled。
+- self-pin 重算 → `197618fb…`(57 files);T-004 digest 不变。G2-A 域层
+  + ingress + query 面齐;下一步是 G2-A checkpoint 资格化(AC 映射续编、
+  等价/并发/泄漏 suite 汇总)或 Increment 2(correction/withdrawal/
+  redaction)实现。
