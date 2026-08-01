@@ -216,6 +216,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         sourceType: "family_care_message",
         sourceId: { in: messages.map((message) => message.id) },
       },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
     const corrections = await this.prisma.nurtureFamilyCareMessageCorrection.findMany({
       where: {
@@ -234,7 +235,16 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         latestCorrectionByMessage.set(correction.messageId, correction);
       }
     }
-    const receiptBySource = new Map(receipts.map((receipt) => [receipt.sourceId, receipt]));
+    const receiptById = new Map(receipts.map((receipt) => [receipt.id, receipt]));
+    const originalReceiptBySource = new Map<string, (typeof receipts)[number]>();
+    for (const receipt of receipts) {
+      if (
+        !receipt.routingAttemptKey.startsWith("g2-correction:") &&
+        !originalReceiptBySource.has(receipt.sourceId)
+      ) {
+        originalReceiptBySource.set(receipt.sourceId, receipt);
+      }
+    }
     const labels = await enrollmentLabels(
       this.prisma,
       input.workspace_id,
@@ -250,8 +260,14 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
             ? itemById.get(message.sourceItemId)
             : undefined;
       if (!item?.enrollmentId) continue;
-      const receipt = receiptBySource.get(message.id);
       const correction = latestCorrectionByMessage.get(message.id);
+      // A correction is a new cross-boundary content effect with its own
+      // Receipt. Select it by the correction's exact FK; otherwise select the
+      // deterministically ordered original delivery receipt. Never collapse
+      // multiple semantic receipts through an unordered source-id map.
+      const receipt = correction?.receiptId
+        ? receiptById.get(correction.receiptId)
+        : originalReceiptBySource.get(message.id);
       rows.push({
         message_id: message.id,
         item_id: item.id,

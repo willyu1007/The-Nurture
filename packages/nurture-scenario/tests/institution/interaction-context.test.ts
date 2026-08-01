@@ -192,4 +192,19 @@ describe("NurtureInteractionContextService", () => {
       "forbidden key grant_status",
     );
   });
+
+  it("allows only a numeric policy-decision concurrency head, not a cached decision", async () => {
+    const { service } = createHarness();
+    await expect(
+      issue(service, {
+        state_payload: { expected_heads: { message: 2, policy_decision: 2 } },
+      }),
+    ).resolves.toMatchObject({ purpose: "clarify" });
+    const invalid = createHarness();
+    await expect(
+      issue(invalid.service, {
+        state_payload: { expected_heads: { policy_decision: { allowed: true } } },
+      }),
+    ).rejects.toThrow("forbidden key policy_decision");
+  });
 });

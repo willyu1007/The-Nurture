@@ -4,7 +4,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE,
   issueCareItemTargetRef,
+  issueDisplayRef,
   issueFamilyCareMessageTargetRef,
+  issuePolicyRedactionDecisionRef,
 } from "@the-nurture/scenario/harness";
 import { createPrismaClient, Prisma } from "@the-nurture/db";
 import { createScenarioServiceApplication } from "../src/application.js";
@@ -684,11 +686,12 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       status: "committed",
       execution_disposition: "executed",
       business_outcome: "applied",
-      committed_result: {
-        capability_key: "correct_family_care_message",
-        correction_version: 1,
-        content_state: "corrected",
-      },
+    });
+    expect(corrected.json.committed_result).toEqual({
+      effect: "correction_appended",
+      messageRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      correctionRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      receiptRef: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
 
     const replay = await executePrepared({
@@ -758,6 +761,24 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       kind: "correction_notice",
       content: { body: "第一次更正" },
     });
+    const timeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.0.0",
+    });
+    expect(timeline.json.output.items[0]).toMatchObject({
+      kind: "correction_notice",
+      receipt: {
+        receiptRef: issueDisplayRef(
+          INTEGRITY_KEY,
+          { workspace_id: scope.workspaceId },
+          "receipt",
+          correction.receipt!.id,
+        ),
+      },
+    });
     expect(
       detail.json.output.actions.map((action: { capabilityKey: string }) => action.capabilityKey),
     ).toEqual(
@@ -802,10 +823,11 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     expect(withdrawn.executed?.json).toMatchObject({
       status: "committed",
       business_outcome: "applied",
-      committed_result: {
-        lifecycle: "closed",
-        lifecycle_reason: "family_withdrawn",
-      },
+    });
+    expect(withdrawn.executed?.json.committed_result).toEqual({
+      effect: "request_withdrawn",
+      careItemRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      receiptRef: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
 
     await expect(
@@ -824,6 +846,18 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     await expect(
       prisma.nurtureChildLinkReceipt.findFirstOrThrow({ where: { id: pendingReceipt.id } }),
     ).resolves.toMatchObject({ status: "blocked", reasonCode: "family_withdrawn" });
+
+    const timeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.0.0",
+    });
+    expect(timeline.json.output.items[0]).toMatchObject({
+      kind: "withdrawal_notice",
+      state: { lifecycle: "closed" },
+    });
 
     const adminRead = await readInstitutionBusinessCommunication(
       scope,
@@ -854,12 +888,10 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     expect(converged.executed?.json).toMatchObject({
       status: "committed",
       business_outcome: "already_satisfied",
-      committed_result: {
-        capability_key: "withdraw_family_care_request",
-        lifecycle: "closed",
-        lifecycle_reason: "family_withdrawn",
-      },
     });
+    expect(converged.executed?.json.committed_result).toEqual(
+      withdrawn.executed?.json.committed_result,
+    );
 
     const replyDenied = await prepareAction({
       scope,
@@ -921,10 +953,11 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     expect(redacted.executed?.json).toMatchObject({
       status: "committed",
       business_outcome: "applied",
-      committed_result: {
-        content_state: "redacted",
-        cascade_scope: "source_question",
-      },
+    });
+    expect(redacted.executed?.json.committed_result).toEqual({
+      effect: "content_redacted",
+      messageRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      tombstoneRef: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
 
     await expect(
@@ -1034,12 +1067,10 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     expect(converged.executed?.json).toMatchObject({
       status: "committed",
       business_outcome: "already_satisfied",
-      committed_result: {
-        capability_key: "redact_family_care_message",
-        content_state: "redacted",
-        cascade_scope: "source_question",
-      },
     });
+    expect(converged.executed?.json.committed_result).toEqual(
+      redacted.executed?.json.committed_result,
+    );
   });
 
   it("keeps reply redaction local and preserves sibling replies and item progress", async () => {
@@ -1067,7 +1098,11 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     });
     expect(redacted.executed?.json).toMatchObject({
       status: "committed",
-      committed_result: { cascade_scope: "reply_local" },
+    });
+    expect(redacted.executed?.json.committed_result).toEqual({
+      effect: "content_redacted",
+      messageRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      tombstoneRef: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
     await expect(
       prisma.nurtureFamilyCareMessage.findFirstOrThrow({ where: { id: firstReply.id } }),
@@ -1191,7 +1226,11 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
     expect(authorApplied.executed?.json).toMatchObject({
       status: "committed",
       business_outcome: "applied",
-      committed_result: { cascade_scope: "reply_local" },
+    });
+    expect(authorApplied.executed?.json.committed_result).toEqual({
+      effect: "content_redacted",
+      messageRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      tombstoneRef: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
     await expect(
       prisma.nurtureFamilyCareMessage.findFirstOrThrow({ where: { id: reply.id } }),
@@ -1205,6 +1244,22 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
   it("separates exact-author and server-owned policy redaction authority", async () => {
     const scope = await seedScope();
     const { message } = await submitQuestion(scope, "策略执行者权限测试");
+    const adminPolicyInput = {
+      policyDecisionRef: issuePolicyRedactionDecisionRef(INTEGRITY_KEY, {
+        workspace_id: scope.workspaceId,
+        participant_id: scope.admin.id,
+        message_id: message.id,
+        message_version: message.aggregateVersion,
+      }),
+    };
+    const systemPolicyInput = {
+      policyDecisionRef: issuePolicyRedactionDecisionRef(INTEGRITY_KEY, {
+        workspace_id: scope.workspaceId,
+        participant_id: scope.system.id,
+        message_id: message.id,
+        message_version: message.aggregateVersion,
+      }),
+    };
 
     const authorDenied = await prepareAction({
       scope,
@@ -1221,8 +1276,40 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       surface: "board",
       capabilityKey: "policy_redact_family_care_message",
       targetOptionRef: messageTargetRef(scope, scope.admin.id, message.id),
+      operationInput: adminPolicyInput,
     });
     expect(policyDenied.json).toEqual({ status: "denied", reason_code: "not_authorized" });
+
+    const policyInputRequired = await prepareAction({
+      scope,
+      actorId: scope.system.id,
+      surface: "board",
+      capabilityKey: "policy_redact_family_care_message",
+      targetOptionRef: messageTargetRef(scope, scope.system.id, message.id),
+    });
+    expect(policyInputRequired.json).toEqual({
+      status: "needs_input",
+      fields: ["policyDecisionRef"],
+    });
+    const wrongPolicyDecision = await prepareAction({
+      scope,
+      actorId: scope.system.id,
+      surface: "board",
+      capabilityKey: "policy_redact_family_care_message",
+      targetOptionRef: messageTargetRef(scope, scope.system.id, message.id),
+      operationInput: {
+        policyDecisionRef: issuePolicyRedactionDecisionRef(INTEGRITY_KEY, {
+          workspace_id: scope.workspaceId,
+          participant_id: scope.system.id,
+          message_id: randomUUID(),
+          message_version: message.aggregateVersion,
+        }),
+      },
+    });
+    expect(wrongPolicyDecision.json).toEqual({
+      status: "denied",
+      reason_code: "not_authorized",
+    });
 
     const policyApplied = await prepareAndExecute({
       scope,
@@ -1230,13 +1317,17 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       surface: "board",
       capabilityKey: "policy_redact_family_care_message",
       targetOptionRef: messageTargetRef(scope, scope.system.id, message.id),
+      operationInput: systemPolicyInput,
     });
+    expect(policyApplied.prepared.json).toMatchObject({ status: "ready_to_confirm" });
     expect(policyApplied.executed?.json).toMatchObject({
       status: "committed",
-      committed_result: {
-        capability_key: "policy_redact_family_care_message",
-        content_state: "redacted",
-      },
+    });
+    expect(policyApplied.executed?.json.committed_result).toEqual({
+      effect: "policy_content_redacted",
+      messageRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      tombstoneRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+      auditEventRef: expect.stringMatching(/^[0-9a-f]{32}$/),
     });
     await expect(
       prisma.nurtureFamilyCareMessage.findFirstOrThrow({ where: { id: message.id } }),

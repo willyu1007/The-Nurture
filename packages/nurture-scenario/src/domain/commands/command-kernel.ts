@@ -575,12 +575,21 @@ export class NurtureCommandRunner {
               : {}),
           });
           if (input.spec.afterExecutionCreated) {
-            await input.spec.afterExecutionCreated(
-              transaction,
-              input.payload,
-              executionContext,
-              { ...applied, execution: record },
-            );
+            try {
+              await input.spec.afterExecutionCreated(
+                transaction,
+                input.payload,
+                executionContext,
+                { ...applied, execution: record },
+              );
+            } catch (error) {
+              // The finalizer is part of the same database transaction as the
+              // business writes and CommandExecution. A throw here therefore
+              // proves rollback just as surely as a throw from apply().
+              throw error instanceof NurtureDeterministicRollback
+                ? error
+                : new NurtureDeterministicRollback("command_execution_failed");
+            }
           }
           return {
             status: "ok" as const,

@@ -392,6 +392,28 @@ describe("NurtureCommandRunner", () => {
     ]);
   });
 
+  it("classifies finalizer failure as a definite rollback and leaves no execution", async () => {
+    const repository = createInMemoryNurtureCommandRepository();
+    const commandSpec: NurtureCommandSpec<{ value: number }> = {
+      ...spec(() => undefined),
+      afterExecutionCreated: async () => {
+        throw new Error("finalizer failed before transaction commit");
+      },
+    };
+
+    expect(await command(repository, commandSpec)).toEqual({
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "command_execution_failed",
+    });
+    await expect(
+      repository.findCommitted({
+        workspace_id: workspaceId,
+        command_request_id_hash: hashCommandRequestId(workspaceId, "command-1"),
+      }),
+    ).resolves.toBeNull();
+  });
+
   it("separates lock busy, indeterminate transactions and pre-transaction lookup failure", async () => {
     const busyRepository: NurtureCommandRepository = {
       findCommitted: async () => null,

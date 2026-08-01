@@ -225,7 +225,12 @@ export type RoleSafeFamilyCareStateV1 = {
 };
 
 export type GuardianFamilyCareTimelineItemV1 = {
-  kind: "source_question" | "caregiver_reply" | "correction_notice" | "redaction_tombstone";
+  kind:
+    | "source_question"
+    | "caregiver_reply"
+    | "correction_notice"
+    | "withdrawal_notice"
+    | "redaction_tombstone";
   itemRef: string;
   careItemRef: string;
   enrollmentRef: string;
@@ -330,16 +335,28 @@ const parsePage = (
   return { take: value };
 };
 
-const timelineKind = (
+const messageProjectionKind = (
   row: Pick<RawTimelineMessageRow, "message_kind" | "redacted" | "corrected">,
-): GuardianFamilyCareTimelineItemV1["kind"] =>
+): FamilyCareItemDetailOutputV1["messages"][number]["kind"] =>
   row.redacted
     ? "redaction_tombstone"
     : row.corrected
       ? "correction_notice"
-    : row.message_kind === "family_message"
-      ? "source_question"
-      : "caregiver_reply";
+      : row.message_kind === "family_message"
+        ? "source_question"
+        : "caregiver_reply";
+
+const timelineKind = (
+  row: Pick<
+    RawTimelineMessageRow,
+    "message_kind" | "redacted" | "corrected" | "lifecycle_reason"
+  >,
+): GuardianFamilyCareTimelineItemV1["kind"] =>
+  row.redacted
+    ? "redaction_tombstone"
+    : row.message_kind === "family_message" && row.lifecycle_reason === "family_withdrawn"
+      ? "withdrawal_notice"
+      : messageProjectionKind(row);
 
 export const queryGuardianFamilyCareTimeline = async (
   deps: FamilyCareQueryDependencies,
@@ -632,7 +649,7 @@ export const queryFamilyCareItemDetail = async (
         replyCount: detail.reply_count,
       },
       messages: detail.messages.map((message) => ({
-        kind: timelineKind(message),
+        kind: messageProjectionKind(message),
         messageRef: issueDisplayRef(deps.integrity_key, scope, "message", message.message_id),
         authoredAs: message.message_kind === "family_message" ? "family" : "care_group",
         occurredAt: message.occurred_at,

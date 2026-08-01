@@ -32,19 +32,6 @@ export const createInMemoryNurtureCommandRepository = (
 
   const findCommitted: NurtureCommandTransaction["findCommitted"] = async (input) =>
     executions.get(key(input.workspace_id, input.command_request_id_hash)) ?? null;
-  const createExecution: NurtureCommandTransaction["createExecution"] = async (
-    input: NurtureCommandExecutionDraft,
-  ) => {
-    const execution: NurtureCommandExecutionRecord = {
-      ...input,
-      id: randomUUID(),
-      committed_at: new Date().toISOString(),
-    };
-    const identityKey = key(input.workspace_id, input.command_request_id_hash);
-    if (executions.has(identityKey)) throw new Error("duplicate command execution");
-    executions.set(identityKey, execution);
-    return execution;
-  };
 
   return {
     findCommitted,
@@ -53,10 +40,33 @@ export const createInMemoryNurtureCommandRepository = (
       if (locks.has(lockKey)) return { acquired: false };
       locks.add(lockKey);
       try {
+        // Stage executions until the operation resolves so this test adapter
+        // models the production transaction boundary closely enough to catch
+        // finalizer/after-write rollback regressions.
+        const stagedExecutions = new Map<string, NurtureCommandExecutionRecord>();
+        const transactionalFind: NurtureCommandTransaction["findCommitted"] = async (query) =>
+          stagedExecutions.get(key(query.workspace_id, query.command_request_id_hash)) ??
+          executions.get(key(query.workspace_id, query.command_request_id_hash)) ??
+          null;
+        const transactionalCreate: NurtureCommandTransaction["createExecution"] = async (
+          draft: NurtureCommandExecutionDraft,
+        ) => {
+          const identityKey = key(draft.workspace_id, draft.command_request_id_hash);
+          if (executions.has(identityKey) || stagedExecutions.has(identityKey)) {
+            throw new Error("duplicate command execution");
+          }
+          const execution: NurtureCommandExecutionRecord = {
+            ...draft,
+            id: randomUUID(),
+            committed_at: new Date().toISOString(),
+          };
+          stagedExecutions.set(identityKey, execution);
+          return execution;
+        };
         const transaction: NurtureCommandTransaction = {
           ...(overrides.familyCare ? { familyCare: overrides.familyCare } : {}),
-          findCommitted,
-          createExecution,
+          findCommitted: transactionalFind,
+          createExecution: transactionalCreate,
           getWorkflowProjectById:
             overrides.getWorkflowProjectById ?? (async () => null),
           updateWorkflowProjectStrategy:
@@ -66,7 +76,11 @@ export const createInMemoryNurtureCommandRepository = (
             }),
           appendEvidenceRef: overrides.appendEvidenceRef ?? (async () => undefined),
         };
-        return { acquired: true, value: await input.operation(transaction) };
+        const value = await input.operation(transaction);
+        for (const [identityKey, execution] of stagedExecutions) {
+          executions.set(identityKey, execution);
+        }
+        return { acquired: true, value };
       } finally {
         locks.delete(lockKey);
       }

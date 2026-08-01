@@ -156,17 +156,28 @@ const assertStatePayload = (value: unknown): void => {
   if (serialized === undefined || Buffer.byteLength(serialized, "utf8") > MAX_STATE_PAYLOAD_BYTES) {
     throw new Error("interaction state payload is invalid or too large");
   }
-  const walk = (current: unknown): void => {
+  const walk = (current: unknown, path: string[] = []): void => {
     if (Array.isArray(current)) {
-      for (const entry of current) walk(entry);
+      for (const entry of current) walk(entry, path);
       return;
     }
     if (!current || typeof current !== "object") return;
     for (const [key, nested] of Object.entries(current as Record<string, unknown>)) {
-      if (FORBIDDEN_STATE_KEYS.has(key.replace(/[_-]/g, "").toLowerCase())) {
+      const normalizedKey = key.replace(/[_-]/g, "").toLowerCase();
+      // A numeric head is concurrency metadata, not a cached authorization
+      // decision. The policy capability re-resolves the signed evidence and
+      // current system role during execute; no decision payload is stored.
+      const allowedPolicyDecisionHead =
+        normalizedKey === "policydecision" &&
+        path.length === 1 &&
+        path[0] === "expected_heads" &&
+        typeof nested === "number" &&
+        Number.isSafeInteger(nested) &&
+        nested >= 0;
+      if (FORBIDDEN_STATE_KEYS.has(normalizedKey) && !allowedPolicyDecisionHead) {
         throw new Error(`interaction state payload contains forbidden key ${key}`);
       }
-      walk(nested);
+      walk(nested, [...path, key]);
     }
   };
   walk(value);

@@ -17,8 +17,10 @@ import { computeHarnessInputIntegrityTag, issueHarnessConfirmation } from "./con
 import type { ProtectedContentWritePort } from "./protected-content.js";
 import {
   computeProtectedBodyTag,
+  issueCapabilityResultRef,
   resolveCareItemTargetRef,
   resolveFamilyCareMessageTargetRef,
+  resolvePolicyRedactionDecisionRef,
 } from "./keyed-refs.js";
 
 /** G2-B lifecycle capabilities frozen by 07-increment-2-change-contract.md. */
@@ -91,6 +93,24 @@ const emptyInput = (value: unknown): boolean =>
     Object.keys(value).length === 0);
 
 export type CorrectFamilyCareMessageInputV1 = { body: string };
+
+export type PolicyRedactFamilyCareMessageInputV1 = { policyDecisionRef: string };
+
+export const parsePolicyRedactFamilyCareMessageInputV1 = (
+  value: unknown,
+):
+  | { status: "ok"; input: PolicyRedactFamilyCareMessageInputV1 }
+  | { status: "invalid"; fields: string[] } => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { status: "invalid", fields: ["policyDecisionRef"] };
+  }
+  const record = value as Record<string, unknown>;
+  const unknown = Object.keys(record).filter((key) => key !== "policyDecisionRef");
+  if (unknown.length > 0) return { status: "invalid", fields: unknown };
+  return typeof record.policyDecisionRef === "string" && record.policyDecisionRef.length > 0
+    ? { status: "ok", input: { policyDecisionRef: record.policyDecisionRef } }
+    : { status: "invalid", fields: ["policyDecisionRef"] };
+};
 
 export const parseCorrectFamilyCareMessageInputV1 = (
   value: unknown,
@@ -296,12 +316,25 @@ export const createCorrectFamilyCareMessageSpec = (deps: {
       ],
       result_schema_version: 1,
       committed_result: {
-        capability_key: CORRECT_FAMILY_CARE_MESSAGE_CAPABILITY.key,
-        message_ref: applied.message_ref,
-        correction_ref: applied.correction_ref,
-        correction_version: applied.correction_version,
-        correction_receipt_ref: applied.receipt_ref,
-        content_state: "corrected",
+        effect: "correction_appended",
+        messageRef: issueCapabilityResultRef(
+          deps.integrity_key,
+          context,
+          "message",
+          applied.message_ref,
+        ),
+        correctionRef: issueCapabilityResultRef(
+          deps.integrity_key,
+          context,
+          "correction",
+          applied.correction_ref,
+        ),
+        receiptRef: issueCapabilityResultRef(
+          deps.integrity_key,
+          context,
+          "receipt",
+          applied.receipt_ref,
+        ),
       },
       finalization_payload: applied.finalization,
     };
@@ -402,8 +435,9 @@ export const prepareWithdrawFamilyCareRequest = async (
   };
 };
 
-export const createWithdrawFamilyCareRequestSpec =
-  (): NurtureCommandSpec<WithdrawFamilyCareRequestCommandV1> => ({
+export const createWithdrawFamilyCareRequestSpec = (deps: {
+  integrity_key: string;
+}): NurtureCommandSpec<WithdrawFamilyCareRequestCommandV1> => ({
     command_key: WITHDRAW_FAMILY_CARE_REQUEST_CAPABILITY.key,
     command_scope: "family_care",
     contract_version: 1,
@@ -429,12 +463,19 @@ export const createWithdrawFamilyCareRequestSpec =
               output_refs: refs,
               result_schema_version: 1,
               committed_result: {
-                capability_key: WITHDRAW_FAMILY_CARE_REQUEST_CAPABILITY.key,
-                care_item_ref: refs[0],
-                withdrawal_event_ref: refs[1],
-                lifecycle: "closed",
-                lifecycle_reason: "family_withdrawn",
-                attention_effect: "unchanged",
+                effect: "request_withdrawn",
+                careItemRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "care_item",
+                  refs[0]!,
+                ),
+                receiptRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "receipt",
+                  refs[2]!,
+                ),
               },
             }
           : { status: "conflict", reason_code: "withdrawal_evidence_unavailable" };
@@ -475,12 +516,19 @@ export const createWithdrawFamilyCareRequestSpec =
         ],
         result_schema_version: 1,
         committed_result: {
-          capability_key: WITHDRAW_FAMILY_CARE_REQUEST_CAPABILITY.key,
-          care_item_ref: applied.item_ref,
-          withdrawal_event_ref: applied.withdrawal_event_ref,
-          lifecycle: "closed",
-          lifecycle_reason: "family_withdrawn",
-          attention_effect: applied.attention_effect,
+          effect: "request_withdrawn",
+          careItemRef: issueCapabilityResultRef(
+            deps.integrity_key,
+            context,
+            "care_item",
+            applied.item_ref,
+          ),
+          receiptRef: issueCapabilityResultRef(
+            deps.integrity_key,
+            context,
+            "receipt",
+            applied.receipt_ref,
+          ),
         },
       };
     },
@@ -492,6 +540,8 @@ export type RedactFamilyCareMessageCommandV1 = {
   cascade_audit_id: string;
   cascade_scope: "source_question" | "reply_local";
   actor_kind: "author" | "policy";
+  policy_decision_ref?: string;
+  expected_policy_decision_head?: number;
 };
 
 export const canonicalizeRedactFamilyCareMessageCommand = (
@@ -517,7 +567,14 @@ const prepareRedaction = async (
   request: LifecyclePrepareRequest,
   actorKind: RedactFamilyCareMessageCommandV1["actor_kind"],
 ): Promise<LifecyclePrepareDecision> => {
-  if (!emptyInput(request.operation_input)) {
+  const policyInput =
+    actorKind === "policy"
+      ? parsePolicyRedactFamilyCareMessageInputV1(request.operation_input)
+      : undefined;
+  if (policyInput?.status === "invalid") {
+    return { status: "needs_input", fields: policyInput.fields };
+  }
+  if (actorKind === "author" && !emptyInput(request.operation_input)) {
     return { status: "needs_input", fields: ["operation_input"] };
   }
   const messageId = resolveFamilyCareMessageTargetRef(
@@ -534,6 +591,22 @@ const prepareRedaction = async (
   if (!redactionAuthority(facts, actorKind)) {
     return { status: "denied", reason_code: "not_authorized" };
   }
+  const policyDecision =
+    actorKind === "policy" && policyInput?.status === "ok"
+      ? resolvePolicyRedactionDecisionRef(
+          deps.integrity_key,
+          { workspace_id: request.workspace_id, participant_id: request.participant_id },
+          policyInput.input.policyDecisionRef,
+        )
+      : undefined;
+  if (
+    actorKind === "policy" &&
+    (!policyDecision ||
+      policyDecision.message_id !== messageId ||
+      policyDecision.message_version !== facts.message_version)
+  ) {
+    return { status: "denied", reason_code: "not_authorized" };
+  }
   if (facts.message_status !== "sent" && facts.message_status !== "redacted") {
     return { status: "denied", reason_code: "target_unavailable" };
   }
@@ -544,6 +617,12 @@ const prepareRedaction = async (
     cascade_audit_id: (deps.create_cascade_audit_id ?? randomUUID)(),
     cascade_scope: facts.message_kind === "family_message" ? "source_question" : "reply_local",
     actor_kind: actorKind,
+    ...(actorKind === "policy" && policyInput?.status === "ok" && policyDecision
+      ? {
+          policy_decision_ref: policyInput.input.policyDecisionRef,
+          expected_policy_decision_head: policyDecision.message_version,
+        }
+      : {}),
   };
   const capability =
     actorKind === "author"
@@ -566,7 +645,12 @@ const prepareRedaction = async (
         ...(facts.source_item_id ? { care_item: facts.source_item_id } : {}),
         redaction_scope: command.cascade_scope,
       },
-      expected_heads: { message: command.expected_message_version },
+      expected_heads: {
+        message: command.expected_message_version,
+        ...(command.expected_policy_decision_head !== undefined
+          ? { policy_decision: command.expected_policy_decision_head }
+          : {}),
+      },
       input_integrity_tag: computeHarnessInputIntegrityTag(
         deps.integrity_key,
         canonicalizeRedactFamilyCareMessageCommand(command),
@@ -615,6 +699,7 @@ const parseRedactionFinalization = (value: unknown): G2RedactionFinalization | n
 
 export const createRedactFamilyCareMessageSpec = (
   actorKind: RedactFamilyCareMessageCommandV1["actor_kind"],
+  deps: { integrity_key: string },
 ): NurtureCommandSpec<RedactFamilyCareMessageCommandV1> => {
   const capability =
     actorKind === "author"
@@ -633,6 +718,16 @@ export const createRedactFamilyCareMessageSpec = (
       if (input.actor_kind !== actorKind) {
         return { status: "invalid", reason_code: "invalid_redaction_actor" };
       }
+      if (
+        (actorKind === "policy" &&
+          (typeof input.policy_decision_ref !== "string" ||
+            input.expected_policy_decision_head === undefined)) ||
+        (actorKind === "author" &&
+          (input.policy_decision_ref !== undefined ||
+            input.expected_policy_decision_head !== undefined))
+      ) {
+        return { status: "invalid", reason_code: "invalid_policy_decision" };
+      }
       const facts = await familyCare.loadG2MessageChangeFacts({
         workspace_id: context.workspace_id,
         participant_id: context.business_actor_ref,
@@ -641,6 +736,21 @@ export const createRedactFamilyCareMessageSpec = (
       if (!redactionAuthority(facts, actorKind)) {
         return { status: "blocked", reason_code: "not_authorized" };
       }
+      if (actorKind === "policy") {
+        const policyDecision = resolvePolicyRedactionDecisionRef(
+          deps.integrity_key,
+          { workspace_id: context.workspace_id, participant_id: context.business_actor_ref },
+          input.policy_decision_ref!,
+        );
+        if (
+          !policyDecision ||
+          policyDecision.message_id !== input.message_id ||
+          policyDecision.message_version !== input.expected_policy_decision_head ||
+          facts.message_version !== policyDecision.message_version
+        ) {
+          return { status: "conflict", reason_code: "stale_confirmation" };
+        }
+      }
       if (facts.message_status === "redacted") {
         const refs = facts.existing_redaction_refs ?? [];
         return refs.length >= 2
@@ -648,14 +758,44 @@ export const createRedactFamilyCareMessageSpec = (
               status: "already_satisfied",
               output_refs: refs,
               result_schema_version: 1,
-              committed_result: {
-                capability_key: capability.key,
-                message_ref: refs[0],
-                redaction_event_ref: refs[0],
-                content_state: "redacted",
-                cascade_scope: input.cascade_scope,
-                cascade_audit_ref: refs[1],
-              },
+              committed_result:
+                actorKind === "author"
+                  ? {
+                      effect: "content_redacted",
+                      messageRef: issueCapabilityResultRef(
+                        deps.integrity_key,
+                        context,
+                        "message",
+                        refs[0]!,
+                      ),
+                      tombstoneRef: issueCapabilityResultRef(
+                        deps.integrity_key,
+                        context,
+                        "redaction_tombstone",
+                        refs[0]!,
+                      ),
+                    }
+                  : {
+                      effect: "policy_content_redacted",
+                      messageRef: issueCapabilityResultRef(
+                        deps.integrity_key,
+                        context,
+                        "message",
+                        refs[0]!,
+                      ),
+                      tombstoneRef: issueCapabilityResultRef(
+                        deps.integrity_key,
+                        context,
+                        "redaction_tombstone",
+                        refs[0]!,
+                      ),
+                      auditEventRef: issueCapabilityResultRef(
+                        deps.integrity_key,
+                        context,
+                        "policy_audit_event",
+                        refs[1]!,
+                      ),
+                    },
             }
           : { status: "conflict", reason_code: "redaction_evidence_unavailable" };
       }
@@ -689,6 +829,21 @@ export const createRedactFamilyCareMessageSpec = (
       if (!actorRoleAssignmentId || !redactionAuthority(facts, actorKind)) {
         throw new Error("G2 redaction facts changed inside the transaction");
       }
+      if (actorKind === "policy") {
+        const policyDecision = resolvePolicyRedactionDecisionRef(
+          deps.integrity_key,
+          { workspace_id: context.workspace_id, participant_id: context.business_actor_ref },
+          input.policy_decision_ref!,
+        );
+        if (
+          !policyDecision ||
+          policyDecision.message_id !== input.message_id ||
+          policyDecision.message_version !== input.expected_policy_decision_head ||
+          facts.message_version !== policyDecision.message_version
+        ) {
+          throw new Error("G2 policy redaction decision changed inside the transaction");
+        }
+      }
       const applied = await familyCare.applyG2Redaction({
         workspace_id: context.workspace_id,
         participant_id: context.business_actor_ref,
@@ -706,14 +861,44 @@ export const createRedactFamilyCareMessageSpec = (
           applied.cascade_audit_ref,
         ],
         result_schema_version: 1,
-        committed_result: {
-          capability_key: capability.key,
-          message_ref: applied.message_ref,
-          redaction_event_ref: applied.message_ref,
-          content_state: "redacted",
-          cascade_scope: input.cascade_scope,
-          cascade_audit_ref: applied.cascade_audit_ref,
-        },
+        committed_result:
+          actorKind === "author"
+            ? {
+                effect: "content_redacted",
+                messageRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "message",
+                  applied.message_ref,
+                ),
+                tombstoneRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "redaction_tombstone",
+                  applied.message_ref,
+                ),
+              }
+            : {
+                effect: "policy_content_redacted",
+                messageRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "message",
+                  applied.message_ref,
+                ),
+                tombstoneRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "redaction_tombstone",
+                  applied.message_ref,
+                ),
+                auditEventRef: issueCapabilityResultRef(
+                  deps.integrity_key,
+                  context,
+                  "policy_audit_event",
+                  applied.cascade_audit_ref,
+                ),
+              },
         finalization_payload: applied.finalization,
       };
     },

@@ -12,6 +12,7 @@ import {
   hashScenarioToken,
   parseHarnessConfirmationPayloadV2,
   parseCorrectFamilyCareMessageInputV1,
+  parsePolicyRedactFamilyCareMessageInputV1,
   parseReplyFamilyCareItemInputV1,
   parseSubmitFamilyCareQuestionInputV1,
   prepareAcknowledgeFamilyCareItem,
@@ -157,9 +158,15 @@ export function createHarnessEngine(input: {
     protected_content: protectedContent,
     integrity_key: input.integrityKey,
   });
-  const withdrawSpec = createWithdrawFamilyCareRequestSpec();
-  const redactSpec = createRedactFamilyCareMessageSpec("author");
-  const policyRedactSpec = createRedactFamilyCareMessageSpec("policy");
+  const withdrawSpec = createWithdrawFamilyCareRequestSpec({
+    integrity_key: input.integrityKey,
+  });
+  const redactSpec = createRedactFamilyCareMessageSpec("author", {
+    integrity_key: input.integrityKey,
+  });
+  const policyRedactSpec = createRedactFamilyCareMessageSpec("policy", {
+    integrity_key: input.integrityKey,
+  });
 
   const toPrepareResponse = (
     decision: SubmitPrepareDecision | ItemActionPrepareDecision | LifecyclePrepareDecision,
@@ -441,13 +448,20 @@ export function createHarnessEngine(input: {
       request.capability_key === "redact_family_care_message" ||
       request.capability_key === "policy_redact_family_care_message"
     ) {
-      if (
+      const actorKind =
+        request.capability_key === "redact_family_care_message" ? "author" : "policy";
+      const policyInput =
+        actorKind === "policy"
+          ? parsePolicyRedactFamilyCareMessageInputV1(request.operation_input)
+          : undefined;
+      const authorInputInvalid =
+        actorKind === "author" &&
         request.operation_input !== undefined &&
         (typeof request.operation_input !== "object" ||
           request.operation_input === null ||
           Array.isArray(request.operation_input) ||
-          Object.keys(request.operation_input).length > 0)
-      ) {
+          Object.keys(request.operation_input).length > 0);
+      if (authorInputInvalid || policyInput?.status === "invalid") {
         return { status: "invalid", reason_code: "invalid_operation_input" };
       }
       const messageId = payload.target_refs.family_care_message;
@@ -456,12 +470,13 @@ export function createHarnessEngine(input: {
       if (
         !messageId ||
         !cascadeAuditId ||
-        (cascadeScope !== "source_question" && cascadeScope !== "reply_local")
+        (cascadeScope !== "source_question" && cascadeScope !== "reply_local") ||
+        (actorKind === "policy" &&
+          (policyInput?.status !== "ok" ||
+            payload.expected_heads.policy_decision === undefined))
       ) {
         return { status: "invalid", reason_code: "invalid_operation_input" };
       }
-      const actorKind =
-        request.capability_key === "redact_family_care_message" ? "author" : "policy";
       return {
         status: "ok",
         payload: {
@@ -470,6 +485,12 @@ export function createHarnessEngine(input: {
           cascade_audit_id: cascadeAuditId,
           cascade_scope: cascadeScope,
           actor_kind: actorKind,
+          ...(actorKind === "policy" && policyInput?.status === "ok"
+            ? {
+                policy_decision_ref: policyInput.input.policyDecisionRef,
+                expected_policy_decision_head: payload.expected_heads.policy_decision,
+              }
+            : {}),
         },
         spec: (actorKind === "author" ? redactSpec : policyRedactSpec) as NurtureCommandSpec<never>,
       };
