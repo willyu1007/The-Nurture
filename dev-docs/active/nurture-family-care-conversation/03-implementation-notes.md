@@ -420,3 +420,35 @@
 - 下一步:NestJS Harness 路由(query/prepare/execute/readResult)+
   OpenAPI/api-index/ingress 守卫治理 + env 契约登记(integrity/content
   key),与 submit capability 纵切同单元。
+
+## 2026-08-01 — submit_family_care_question 域层纵切落地(G2-A 第一个 action)
+
+- 按 `08-increment-1-submit-ux-contract.md` 与冻结实现完整 prepare→execute
+  纵切(`harness/submit-family-care-question.ts`):
+  - 封闭 operation input parse(trim、1–2000、拒绝未知字段/内部 ref);
+    keyed protected-body tag 进入 canonical payload,CommandExecution
+    payloadHash 与 confirmation 均不含可枚举裸正文 hash。
+  - `prepareSubmitFamilyCareQuestion`:safety gate(classifier restricted →
+    `unavailable` + alternate process,先于任何业务事实)、guardian
+    eligibility/complete-graph 解析、唯一 target 确定性绑定、多 Enrollment
+    返回 owner-issued keyed `targetOptionRef`(伪造 tag 无效)、
+    continuation 资格校验(同 process/enrollment + responded)、
+    confirmationRef 签发(target/command identity/integrity 冻结)。
+  - `createSubmitFamilyCareQuestionSpec`:execute 事务内重读 facts
+    (guardian reach、enrollment/thread、bidirectional original Grant)、
+    safety recheck、`ProtectedContentWritePort.seal` 后经新
+    `applyG2Submit` 原子写入。
+- 事务端口扩展(optional,单写入面):`loadG2SubmitFacts`/`applyG2Submit`
+  ——encrypted Message(`harness_g2_v1`、original-scope trace、明文列恒
+  NULL)+ 三轴 Item(legacy `status` 单向派生 `open`,cutover C1)+
+  created Event + delivered Receipt + Teacher Attention + Thread bump;
+  server 派生 body-free safe summary。读侧新增
+  `PrismaSubmitEligibilityReadPort`(prepare 专用,只读)。
+- 集成测试 6/6(production-db 61/61,floor 55→61,文件 8→9):happy path
+  (密文可 unseal、明文零泄漏、三轴+派生 status、replay 同 refs)、多
+  Enrollment needs_input/选择/伪造 ref 拒绝、safety-gated 零事实、无
+  grant denied、integrity 漂移零消费后恢复、continuation 资格与关联。
+- self-pin 重算 → `28f25d38…`(54 files);T-004 digest 不变。
+- 下一步:NestJS Harness 路由 + OpenAPI/api-index/ingress 守卫 + env
+  契约登记,把该 capability 挂上 formal ingress;acknowledge/reply 两个
+  action 复用同一模式。

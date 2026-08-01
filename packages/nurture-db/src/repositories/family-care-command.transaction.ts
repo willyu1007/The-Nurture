@@ -15,6 +15,10 @@ import type {
   FamilyInputRouteApplied,
   FamilyInputRouteFacts,
   FamilyInputRoutePayload,
+  G2SubmitApplied,
+  G2SubmitApplyInput,
+  G2SubmitCommandPayload,
+  G2SubmitFacts,
   NurtureFamilyCareCommandTransaction,
 } from "@the-nurture/scenario";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
@@ -532,6 +536,222 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
       message_ref: domainRef("family_care_message", message.id, message.aggregateVersion),
       receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
       item_ref: domainRef("family_care_item", item.id, item.version),
+      attention_ref: domainRef("teacher_attention_item", attention.id, attention.aggregateVersion),
+    };
+  }
+
+  async loadG2SubmitFacts(input: FamilyCareTransactionInput<G2SubmitCommandPayload>): Promise<G2SubmitFacts> {
+    const missingGrant: FamilyCareCurrentGrant = {
+      grant_id: "missing",
+      status: "missing",
+      directions: [],
+      data_classes: [],
+      target_scope_type: "care_group",
+      target_scope_id: "missing",
+    };
+    const [participant, enrollment] = await Promise.all([
+      this.transaction.nurtureParticipant.findFirst({
+        where: { id: input.participant_id, workspaceId: input.workspace_id, status: "active", deletedAt: null },
+      }),
+      this.transaction.nurtureEnrollment.findFirst({
+        where: {
+          id: input.enrollment_id,
+          workspaceId: input.workspace_id,
+          status: "active",
+          deletedAt: null,
+          OR: [{ leftAt: null }, { leftAt: { gt: new Date() } }],
+          institution: { status: "active", deletedAt: null },
+          careGroup: { status: "active", deletedAt: null },
+        },
+      }),
+    ]);
+    if (!enrollment) {
+      return {
+        participant_active: Boolean(participant),
+        enrollment_active: false,
+        grant: missingGrant,
+      };
+    }
+    const now = new Date();
+    const [family, role, thread] = await Promise.all([
+      this.transaction.nurtureFamily.findFirst({
+        where: {
+          workspaceId: input.workspace_id,
+          childCareProcessId: enrollment.childCareProcessId,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureCareRoleAssignment.findFirst({
+        where: {
+          workspaceId: input.workspace_id,
+          participantId: input.participant_id,
+          role: "guardian",
+          status: "active",
+          deletedAt: null,
+          OR: [{ startsAt: null }, { startsAt: { lte: now } }],
+          AND: [{ OR: [{ endsAt: null }, { endsAt: { gt: now } }] }],
+        },
+        orderBy: { id: "asc" },
+      }),
+      this.transaction.nurtureFamilyCareThread.findFirst({
+        where: {
+          workspaceId: input.workspace_id,
+          childCareProcessId: enrollment.childCareProcessId,
+          enrollmentId: input.enrollment_id,
+          visibilityScope: { in: ["family_private", "enrollment_private"] },
+          status: "active",
+          deletedAt: null,
+        },
+        orderBy: { id: "asc" },
+      }),
+    ]);
+    const roleReaches = Boolean(
+      role &&
+        ((role.scopeType === "family" && family && role.scopeId === family.id) ||
+          (role.scopeType === "child_care_process" && role.scopeId === enrollment.childCareProcessId) ||
+          (role.scopeType === "enrollment" && role.scopeId === input.enrollment_id)),
+    );
+    const grant = await this.currentGrant({
+      workspace_id: input.workspace_id,
+      child_care_process_id: enrollment.childCareProcessId,
+      enrollment_id: input.enrollment_id,
+      care_group_id: enrollment.careGroupId,
+      institution_id: enrollment.institutionId,
+      data_class: "family_care_question",
+      direction: "family_to_org",
+    });
+    let continuationEligible: boolean | undefined;
+    if (input.context_continuation_of_item_id) {
+      const source = family
+        ? await this.transaction.nurtureFamilyCareItem.findFirst({
+            where: {
+              id: input.context_continuation_of_item_id,
+              workspaceId: input.workspace_id,
+              childCareProcessId: enrollment.childCareProcessId,
+              enrollmentId: input.enrollment_id,
+              familyId: family.id,
+              responseState: "responded",
+            },
+          })
+        : null;
+      continuationEligible = Boolean(source);
+    }
+    return {
+      participant_active: Boolean(participant),
+      ...(role && roleReaches ? { guardian_role_assignment_id: role.id } : {}),
+      enrollment_active: true,
+      child_care_process_id: enrollment.childCareProcessId,
+      ...(family ? { family_id: family.id } : {}),
+      care_group_id: enrollment.careGroupId,
+      ...(thread ? { thread_id: thread.id } : {}),
+      grant,
+      ...(continuationEligible === undefined ? {} : { continuation_eligible: continuationEligible }),
+    };
+  }
+
+  async applyG2Submit(input: FamilyCareTransactionInput<G2SubmitApplyInput>): Promise<G2SubmitApplied> {
+    const message = await this.transaction.nurtureFamilyCareMessage.create({
+      data: {
+        workspaceId: input.workspace_id,
+        threadId: input.thread_id,
+        childCareProcessId: input.child_care_process_id,
+        senderParticipantId: input.participant_id,
+        senderRoleAssignmentId: input.guardian_role_assignment_id,
+        messageKind: "family_message",
+        authorshipKind: "family_authored",
+        bodyFormat: "plain_text",
+        bodyStorageMode: "encrypted",
+        bodyProtectionPayload: asJson(input.body_envelope),
+        sourceSurface: "mobile",
+        grantId: input.grant_id,
+        status: "sent",
+        writerContract: "harness_g2_v1",
+        enrollmentId: input.enrollment_id,
+        careGroupId: input.care_group_id,
+        direction: "family_to_org",
+      },
+    });
+    const receipt = await this.transaction.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: input.workspace_id,
+        grantId: input.grant_id,
+        childCareProcessId: input.child_care_process_id,
+        enrollmentId: input.enrollment_id,
+        direction: "family_to_org",
+        dataClass: "family_care_question",
+        sourceType: "family_care_message",
+        sourceId: message.id,
+        routingAttemptKey: `g2-submit:${message.id}`,
+        targetScopeType: "care_group",
+        targetScopeId: input.care_group_id,
+        status: "delivered",
+        deliveredAt: new Date(),
+      },
+    });
+    await this.transaction.nurtureFamilyCareThread.updateMany({
+      where: { id: input.thread_id, workspaceId: input.workspace_id, status: "active" },
+      data: { latestMessageAt: message.createdAt, aggregateVersion: { increment: 1 } },
+    });
+    const item = await this.transaction.nurtureFamilyCareItem.create({
+      data: {
+        workspaceId: input.workspace_id,
+        sourceMessageId: message.id,
+        threadId: input.thread_id,
+        childCareProcessId: input.child_care_process_id,
+        familyId: input.family_id,
+        enrollmentId: input.enrollment_id,
+        careGroupId: input.care_group_id,
+        dataClass: "family_care_question",
+        category: "question",
+        summary: input.safe_summary,
+        urgency: "today_attention",
+        requiresAck: true,
+        requiresReply: true,
+        // Legacy status is the read-only derived compatibility column
+        // (cutover C1); the three axes below are the canonical state.
+        status: "open",
+        classificationSource: "system",
+        grantId: input.grant_id,
+        writerContract: "harness_g2_v1",
+        acknowledgementState: "pending",
+        responseState: "awaiting_reply",
+        lifecycleState: "active",
+        ...(input.context_continuation_of_item_id
+          ? { contextContinuationOfItemId: input.context_continuation_of_item_id }
+          : {}),
+      },
+    });
+    const event = await this.transaction.nurtureFamilyCareItemEvent.create({
+      data: {
+        workspaceId: input.workspace_id,
+        itemId: item.id,
+        actorParticipantId: input.participant_id,
+        actorRoleAssignmentId: input.guardian_role_assignment_id,
+        eventType: "created",
+        toStatus: "open",
+        relatedMessageId: message.id,
+      },
+    });
+    const attention = await this.transaction.nurtureTeacherAttentionItem.create({
+      data: {
+        workspaceId: input.workspace_id,
+        careGroupId: input.care_group_id,
+        childCareProcessId: input.child_care_process_id,
+        sourceType: "family_care_item",
+        sourceId: item.id,
+        title: input.safe_summary.slice(0, 160),
+        summary: input.safe_summary,
+        priority: "attention",
+        status: "active",
+        effectiveDate: new Date(),
+      },
+    });
+    return {
+      message_ref: domainRef("family_care_message", message.id, message.aggregateVersion),
+      item_ref: domainRef("family_care_item", item.id, item.version),
+      item_event_ref: domainRef("family_care_item_event", event.id),
+      receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
       attention_ref: domainRef("teacher_attention_item", attention.id, attention.aggregateVersion),
     };
   }

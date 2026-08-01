@@ -26,6 +26,7 @@ export * from "./domain/interactions/interaction-context.js";
 export * from "./harness/confirmation.js";
 export * from "./harness/execute-confirmation.js";
 export * from "./harness/protected-content.js";
+export * from "./harness/submit-family-care-question.js";
 export * from "./domain/identity/scenario-binding-owner.js";
 export * from "./domain/identity/derived-age-stage.js";
 export * from "./adapters/derived-age-stage-http.js";

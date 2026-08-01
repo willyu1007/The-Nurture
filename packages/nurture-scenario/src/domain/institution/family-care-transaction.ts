@@ -165,6 +165,46 @@ export type FamilyCareCancelRouteFacts = {
 
 export type FamilyCareTransactionInput<T> = T & { workspace_id: string };
 
+// G2 three-axis submit (10-g2-schema-freeze.md; the Harness path is the only
+// writer of harness_g2_v1 rows). Facts are server-resolved from the exact
+// enrollment; the payload never carries raw scope/authority fields.
+export type G2SubmitCommandPayload = {
+  participant_id: string;
+  enrollment_id: string;
+  context_continuation_of_item_id?: string;
+};
+
+export type G2SubmitFacts = {
+  participant_active: boolean;
+  guardian_role_assignment_id?: string;
+  enrollment_active: boolean;
+  child_care_process_id?: string;
+  family_id?: string;
+  care_group_id?: string;
+  thread_id?: string;
+  grant: FamilyCareCurrentGrant;
+  continuation_eligible?: boolean;
+};
+
+export type G2SubmitApplyInput = G2SubmitCommandPayload & {
+  guardian_role_assignment_id: string;
+  child_care_process_id: string;
+  family_id: string;
+  care_group_id: string;
+  thread_id: string;
+  grant_id: string;
+  body_envelope: unknown;
+  safe_summary: string;
+};
+
+export type G2SubmitApplied = {
+  message_ref: DomainContextRef;
+  item_ref: DomainContextRef;
+  item_event_ref: DomainContextRef;
+  receipt_ref: DomainContextRef;
+  attention_ref: DomainContextRef;
+};
+
 export type NurtureFamilyCareCommandTransaction = {
   loadFamilyCareGrantRevokeFacts(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<FamilyCareGrantRevokeFacts>;
   revokeFamilyCareGrant(input: FamilyCareTransactionInput<FamilyCareGrantRevokePayload>): Promise<{
@@ -191,4 +231,7 @@ export type NurtureFamilyCareCommandTransaction = {
   cancelFamilyCareRoute(input: FamilyCareTransactionInput<FamilyCareCancelRoutePayload>): Promise<{
     receipt_ref: DomainContextRef;
   }>;
+  /** Present when the G2 three-axis Harness writer is wired. */
+  loadG2SubmitFacts?(input: FamilyCareTransactionInput<G2SubmitCommandPayload>): Promise<G2SubmitFacts>;
+  applyG2Submit?(input: FamilyCareTransactionInput<G2SubmitApplyInput>): Promise<G2SubmitApplied>;
 };

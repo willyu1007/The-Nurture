@@ -12,6 +12,7 @@ export * from "./repositories/scenario-repositories.js";
 export * from "./repositories/scenario-binding-owner.repository.js";
 export * from "./binding-evidence-hasher.js";
 export * from "./protected-content.js";
+export * from "./repositories/submit-eligibility.read.js";
 
 // Re-export Prisma-generated model TYPES as the data layer's domain entities,
 // so host consumers depend on @the-nurture/db (not @prisma/client) and the

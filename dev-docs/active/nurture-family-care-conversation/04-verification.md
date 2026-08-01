@@ -271,3 +271,15 @@
 | 2026-08-01 | root `pnpm typecheck` / `verify:test-routing`(57 files:29/8/11/8/1) | PASS |
 | 2026-08-01 | self-pin 重算(kernel/repositories/index 在 pin 集) | `nurtureScenario.contractSha256` → `2902efd5…`(54 files);pinned-checkout CI 权威 |
 | 2026-08-01 | 效果边界 | PASS:无路由/OpenAPI/env 契约变更(留 ingress 单元)、无持久化 DB、无 capability/digest/secret/激活/流量;key material 注入式,缺失即 default-off |
+
+## submit_family_care_question 纵切 — 2026-08-01
+
+| Date | Check | Result |
+| --- | --- | --- |
+| 2026-08-01 | 纵切集成 6/6:happy path(encrypted body round-trip、明文零泄漏、三轴 + 派生 status、Receipt/Attention/Event、exact replay)、多 Enrollment needs_input + owner-issued ref(伪造拒绝)、safety-gated unavailable 零业务事实、revoked grant denied、integrity 漂移零消费后恢复、continuation 资格/关联 | PASS(disposable PostgreSQL 5435,tmpfs,运行后销毁) |
+| 2026-08-01 | production-db 全套 + population | PASS 61/61(floor 55→61,文件 8→9) |
+| 2026-08-01 | unit 265/265;scenario-service 42/42;dev-host 26/26;routing 58 files(29/9/11/8/1) | PASS |
+| 2026-08-01 | `pnpm verify:surface-conformance` | PASS;digest 不变 `1.7.0`/`b7691a81…` |
+| 2026-08-01 | root `pnpm typecheck` | PASS |
+| 2026-08-01 | self-pin 重算(family-care-transaction/command.transaction/index 在 pin 集) | `nurtureScenario.contractSha256` → `28f25d38…`(54 files) |
+| 2026-08-01 | 效果边界 | PASS:无路由/OpenAPI/env 变更、无持久化 DB、无 capability/digest/secret/激活/流量;capability 未进 discovery,keys 注入式 default-off |
