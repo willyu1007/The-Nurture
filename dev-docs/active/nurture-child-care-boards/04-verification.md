@@ -216,3 +216,22 @@
 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` | PASS — registered context remains consistent; no context artifact changed |
 | governance sync + strict lint | PASS — T-006 remains the sole `in-progress` task for this bundle and project views are synchronized |
 | `git diff --check` | PASS — no whitespace errors |
+
+## 2026-08-02 — G3-A Step 1 (Shared Read Pipeline and Role-safe Envelopes)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm test:unit` | PASS — 33 files / 310 tests (42 new G3-A board tests) |
+| `pnpm typecheck` | PASS — no diagnostics |
+| `pnpm verify:test-routing` | PASS — files=68 unit=33 production-db=13 dev-host=11 scenario-service=10 x5-joint=1 |
+| `pnpm verify:surface-conformance` | PASS — `nurture.surface-contract@1.8.0` / `4fe91e…`, cases=11 slices=26/26, artifact unchanged this step |
+| `pnpm verify:formal-ingress-contract` | PASS — routes=7 unchanged |
+| `pnpm verify:persistence-boundaries` | PASS — board projection stays out of the persistence layer |
+| `pnpm verify:port-topology` | PASS — unchanged |
+| `pnpm verify:g3-0-freeze` | PASS — placeholders still absent; no capability key registered ahead of its implementation |
+| negative: raw Enrollment id, another actor's option ref and an unknown target as `query_guardian_enrollment_activity` input | PASS — all three `denied/target_unavailable` before the source is touched |
+| negative: Institution-scoped Lead, Institution Admin, Institution member and other-CareGroup caregiver on the Caregiver lane | PASS — `denied/not_authorized`, read port never invoked |
+| negative: `NurtureFocusGoal` row with child hints but no explicit child-scope fact | PASS — projected as family focus, never child focus |
+| negative: cursor replay after source/authority/correction/redaction/Grant drift or snapshot-version change | PASS — `refresh_required` for all six |
+| negative: Caregiver envelope with an injected `institution_workflow_projection` grant | PASS — absent from content and from the serialized envelope |
+| paging closure: fact-level drops across three source batches with `pageSize=4` | PASS — full page returned over two scan rounds; a fixed `take` would have returned 2 of 4 |

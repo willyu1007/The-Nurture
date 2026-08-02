@@ -366,3 +366,55 @@
   递归 canonicalize；重跑通过。
 - 本阶段没有修改 Prisma schema、migration、surface registry/runtime、环境值、
   capability activation、Candidate、部署或流量。
+
+## 2026-08-02 — G3-A step 1: shared read pipeline and role-safe envelopes
+
+- 新增 `packages/nurture-scenario/src/harness/board-projection.ts`：G3-A 共享
+  source-head 管线。它拥有 opaque ref、source head 投影、snapshot 身份、cursor
+  身份、行级 authority 谓词、owner-eligibility action 构造器与分页扫描，不持有事实、
+  不写入、也不组合跨角色 DTO。
+- 新增 `guardian-board-queries.ts`（`query_guardian_current_focus@1.0.0`、
+  `query_guardian_enrollment_activity@1.0.0`）与 `caregiver-board-queries.ts`
+  （`query_caregiver_child_today@1.0.0`）。两条读路径各自只读本角色可见事实，
+  presenter 之后不需要隐藏任何字段。
+- 新增 `board-envelopes.ts`：`query_guardian_family_board@1.0.0` 与
+  `query_caregiver_teacher_board@1.0.0`。envelope 只输出 module 顺序、counts、
+  opaque item refs、current-eligibility actions 与 dependency NO-GO，不复制模块
+  payload，也不成为写权威。
+- module 顺序不在 presenter 内重新声明：调用方传入已 admit surface 的
+  `orderedContentKinds`，测试断言 envelope 顺序等于 `surface-registry.json`
+  的精确值，避免出现第二份顺序声明。
+- Caregiver envelope 直接调用现有 `query_caregiver_family_care_work@1.1.0`
+  （`queryCaregiverFamilyCareWork`），没有 T-006 兼容副本；module 的 actionRefs
+  直接来自该 T-005 结果，不重新派生或放宽。
+- `teacher_publish_queue` 依赖 G3-B 尚未落地的 publication 事实：module 缺席，
+  并以 `t006_publish_process` dependency NO-GO 解释，surface state 为 `limited`。
+  Guardian 侧 optional Workflow projection 缺席时不产生 NO-GO、不降级 state，
+  避免 optional 成为隐式 gate。
+- Caregiver presenter 没有任何可以输出 `institution_workflow_projection` 的分支，
+  并额外做了一次显式过滤；测试对序列化结果做负向断言。
+- 行级授权是机械的：Guardian 需要 current guardian authority + exact child 关联 +
+  Enrollment/Grant 可见性 + purpose 五项全真；Caregiver 需要 current
+  `caregiver | lead_caregiver` 且 RoleAssignment 自身 scope 恰为源 CareGroup。
+  Institution 级 Lead、Admin、成员或同 Institution 的其他班级角色全部被拒。
+- 公开 typed 输入不接受原始标识符：Guardian enrollment activity 只认
+  owner-issued `issueTargetOptionRef`；Caregiver 的 CareGroup 由 actor 当前
+  RoleAssignment 解析，根本不进入输入。测试同时断言 raw id、他人 ref 与未授权
+  target 被拒。
+- cursor 身份绑定 contract digest、capability key/version、query key、actor、
+  scope ref、order 与 page size，并携带 snapshot ref/version/instant 与 drift head；
+  drift head 由 source/authority/correction/redaction/Grant 五个 scope 级 head 派生
+  （不含逐页 source heads，否则第二页会被误判为漂移）。任一漂移返回
+  `refresh_required`，不拼接两个版本。
+- 分页遍历循环至闭合：`scanBoardPage` 在 fact-level policy 丢行后继续扫描直到填满
+  或源关闭，continuation key 是"最后真正消费的行"，不是最后一批的末尾；固定 `take`
+  会静默返回短页。
+- action ref 只有一个构造器 `projectOwnerActions`，输入必须是 owner eligibility
+  grant。没有 grant 就没有 action，角色名、模块存在性与缓存结果都无法制造。
+- `NurtureFocusGoal` 的 child scope 仍是 06 冻结的 DB delta。本单元通过 port 契约
+  的 `child_scope_explicit` 表达它并机械拒绝猜测（payload 带 child 线索但无显式
+  scope 事实的行只进 family focus），没有修改 `prisma/schema.prisma`：该模型的写入方
+  要到 owner repository 落地时才存在，现在加列会得到一个没有写入方的 schema 列。
+- 本步骤没有修改 surface contract source/artifact、Prisma schema、migration、
+  environment、capability activation、Candidate、部署或流量。capability 注册与
+  conformance fixtures 属于后续步骤。
