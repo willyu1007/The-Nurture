@@ -167,11 +167,16 @@
   attribution key,没有为这两个动作预留身份。
 - **Root cause**：adoption set 是按"能力"枚举的,而 detach/discard 在设计文本里
   是以"产品删除的三个阶段"描述的,枚举时被归进了 media lifecycle 而没有单独成键。
-- **Fix**：实现并测试两者的领域规则(`evaluateMediaDetach` /
-  `evaluateMediaDiscard`),但**不**注册未被冻结件保留的 key,并把缺口显式记进
-  实现说明与 checkpoint 结论,留给 G3-D 或一次 freeze 增补。
+- **Fix**：分两步。先在 G3-C1 实现并测试两者的领域规则
+  (`evaluateMediaDetach` / `evaluateMediaDiscard`),但**不**注册未被冻结件保留的
+  key,把缺口显式记进实现说明与 checkpoint 结论;随后 2026-08-02 的 adoption-set
+  增补把 `detach_publish_process_media` 与 `discard_media_asset` 补入 G3-D,
+  并在冻结件里写明它们是发布前动作、只是与 G3-D 同批交付。
 - **Prevention**：冻结 adoption set 时按"用户能触发的动作"过一遍设计文本,
   而不是按事实模型过。发现缺口时宁可显式记账,也不要顺手发明一个未冻结的身份。
+  更重要的是,这条缺口本身没有机械兜底——`verify:g3-0-freeze` 现在会遍历冻结件
+  adoption set 里的每个身份,要求它要么已注册在 `1.0.0`,要么显式列为未实现,
+  所以"冻结件写了但没人跟踪"这类缺口不会再靠人读文档发现。
 
 ### 2026-08-02 — owner-issued target ref 会把内部标识符原样带出去
 

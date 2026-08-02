@@ -172,11 +172,32 @@ G3 implementation adopts one registry, with all new keys starting at `1.0.0`:
 - G3-C1: `confirm_child_media_attribution`, `reject_child_media_attribution` and
   `supersede_child_media_attribution`.
 - G3-D: `release_publish_process`, `correct_publication`,
-  `remove_publication_target_visibility` and `redact_publication`.
+  `remove_publication_target_visibility`, `redact_publication`,
+  `detach_publish_process_media` and `discard_media_asset`.
 
 This list reserves semantic identities; G3-0 publishes no placeholder descriptors or handlers.
 Each checkpoint adds only implemented keys, rotates the exact surface artifact, and reruns affected
 conformance. T-005 `initiate_caregiver_direct_message` is consumed directly and is not duplicated.
+
+### Amendment 2026-08-02 — media lifecycle identities
+
+The original set enumerated capabilities from the fact model, so the two media
+lifecycle actions the product mapping already required were never given an
+identity: the fact inventory names the `NurtureMediaAssetRef` mutation boundary
+as "G3-C media lifecycle capabilities" without listing them. G3-C1 implemented
+and tested both domain rules and recorded the gap rather than inventing an
+unreserved key. This amendment completes the set:
+
+| Key | Stage boundary |
+| --- | --- |
+| `detach_publish_process_media` | Removes one media reference from one editable `PublishProcess` composition. It never touches the asset lifecycle, another draft or anything published. |
+| `discard_media_asset` | Pre-publication global delete. Legal only while zero `PublicationRelease` has committed anywhere; afterwards the remedy is target visibility removal or redaction. |
+
+Both are pre-publication actions. They are scheduled with G3-D because they
+share its per-target release facts and safety-action review, not because they
+become post-release capabilities: `discard_media_asset` is exactly the action
+that stops being legal once a release commits. The verdict, exact inputs,
+authority predicates, surface topology and DB SSOT delta above are unchanged.
 
 ## DB SSOT Delta
 

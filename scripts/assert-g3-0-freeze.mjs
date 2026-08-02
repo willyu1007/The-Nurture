@@ -251,6 +251,10 @@ const stillUnimplementedCapabilities = [
   "correct_publication",
   "remove_publication_target_visibility",
   "redact_publication",
+  // Pre-publication media lifecycle, scheduled with G3-D by the 2026-08-02
+  // adoption-set amendment.
+  "detach_publish_process_media",
+  "discard_media_asset",
 ];
 const registeredVersions = new Map(
   capabilityRegistry.capabilities.map((capability) => [
@@ -309,6 +313,40 @@ for (const forbiddenName of [
 }
 
 const freeze = read(freezePath);
+
+/**
+ * Every capability identity the freeze reserves must be accounted for: either a
+ * checkpoint already registered it at `1.0.0`, or it is explicitly still
+ * unimplemented. This is what keeps the adoption set from quietly acquiring a
+ * key nobody tracks, or losing one the product mapping needs.
+ */
+const adoptionSet = freeze.slice(
+  freeze.indexOf("## Capability Adoption Set"),
+  freeze.indexOf("## DB SSOT Delta"),
+);
+assertTruthy(adoptionSet.length > 0, "adoption set section present");
+const reservedKeys = [
+  ...new Set(
+    [...adoptionSet.matchAll(/`([a-z][a-z0-9_]*)`/g)].map((match) => match[1]),
+  ),
+].filter((key) => key.includes("_"));
+assertTruthy(reservedKeys.length >= 18, "adoption set reserves capability keys");
+const accountedFor = new Set([
+  ...adoptedInG3A,
+  ...adoptedInG3B1,
+  ...adoptedInG3C1,
+  ...stillUnimplementedCapabilities,
+  // Consumed directly from T-005 rather than adopted as a new T-006 identity.
+  "initiate_caregiver_direct_message",
+]);
+for (const capabilityKey of reservedKeys) {
+  assertEqual(
+    accountedFor.has(capabilityKey),
+    true,
+    `reserved capability ${capabilityKey} is tracked as adopted or unimplemented`,
+  );
+}
+
 for (const requiredText of [
   "G3_0_FREEZE_PASS",
   "query_guardian_family_board",
@@ -321,6 +359,9 @@ for (const requiredText of [
   "G3-B2 AI copy | optional, absent initially",
   "G3-C2 `ClassScopedFaceMatch` | optional/default-off",
   "T006-AC-010",
+  "Amendment 2026-08-02 — media lifecycle identities",
+  "detach_publish_process_media",
+  "discard_media_asset",
 ]) {
   assertTextIncludes(freeze, requiredText, `G3-0 freeze ${requiredText}`);
 }
@@ -353,6 +394,7 @@ process.stdout.write(
     `input=${frozenInputInterface.version} current=${artifactPin.interfaceContract.version} ` +
     `g3a-adopted=${adoptedInG3A.length} g3b1-adopted=${adoptedInG3B1.length} ` +
     `g3c1-adopted=${adoptedInG3C1.length} c2-matcher=absent ` +
+    `reserved-keys=${reservedKeys.length} ` +
     "t005=exact t007=contract-frozen schema_delta=frozen " +
     "caregiver_workflow_denied=true placeholders=absent stage_gates=explicit\n",
 );

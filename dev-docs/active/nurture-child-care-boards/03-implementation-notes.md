@@ -634,3 +634,27 @@
   `ClassScopedFaceMatch` / `face_reference` / `embedding` 字样。
 - 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
   Candidate、部署或流量。media/attribution 的 DB delta 与 owner repository 一起落。
+
+## 2026-08-02 — G3-0 adoption-set amendment: media lifecycle identities
+
+- 按用户决定,把 G3-C1 记录的缺口以增补方式补进 06 冻结件的 Capability
+  Adoption Set:`detach_publish_process_media` 与 `discard_media_asset` 加入
+  G3-D 一行,与 post-release safety 能力同批交付。
+- 增补写成 06 文档里的显式 `Amendment 2026-08-02` 小节而不是静默改列表:
+  记录缺口成因(adoption set 按事实模型枚举,漏掉了产品映射里"删除的三个阶段"
+  这类动作)、两个 key 各自的 stage boundary,并明确声明 verdict、exact inputs、
+  authority predicates、surface topology 与 DB SSOT delta 均未改变。
+- 明确写下它们是**发布前**动作:与 G3-D 同批只是交付排期,因为共用逐目标
+  release 事实与 safety-action 复核。`discard_media_asset` 恰恰是"一旦有
+  release commit 就不再合法"的那个动作,不是 post-release 能力。
+- `assert-g3-0-freeze.mjs` 新增 adoption-set 完整性普查:从冻结件里解析该章节的
+  全部 capability 身份,要求每个要么已按 `1.0.0` 注册,要么显式列在未实现清单里
+  (T-005 直接消费的 `initiate_caregiver_direct_message` 单列)。当前 19 个身份
+  全部有归属。删掉任一跟踪项会让守卫失败——已实测。
+- 这条普查正是原缺口缺少的那层兜底:此前"冻结件写了但没人跟踪"只能靠人读文档
+  发现,现在是机械失败。
+- 两个新 key 同时加入 `verify:g3-0-freeze` 的未实现清单与
+  `phase-3-capture-to-draft.test.ts` 的"后续 checkpoint 拥有、当前必须缺席"断言,
+  所以在 G3-D 真正实现之前它们不可能被提前注册。
+- 本步骤没有注册任何能力、没有旋转 artifact,也没有修改 Prisma schema、
+  migration、environment、capability activation、Candidate、部署或流量。

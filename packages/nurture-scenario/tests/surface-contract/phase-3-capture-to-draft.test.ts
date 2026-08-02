@@ -146,6 +146,8 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
       "correct_publication",
       "remove_publication_target_visibility",
       "redact_publication",
+      "detach_publish_process_media",
+      "discard_media_asset",
     ]) {
       expect(capability(key), key).toBeUndefined();
     }

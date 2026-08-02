@@ -279,9 +279,10 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - G3-C2 `ClassScopedFaceMatch` 保持 default-off 且**完全未注册**;
   `verify:g3-0-freeze` 新增一条普查禁止任何含 `face_match`/`biometric` 的能力身份。
   人工归属主路径在没有 matcher 时完整可用。
-- 冻结件的 adoption set 未为 media detach / global discard 预留能力身份。
-  两者的领域规则已实现并测试,但没有注册未被保留的 key;需要 G3-D 或一次
-  freeze 增补补上。
+- 冻结件的 adoption set 原本未为 media detach / global discard 预留能力身份。
+  两者的领域规则已在 G3-C1 实现并测试,但当时没有注册未被保留的 key。
+  2026-08-02 的 adoption-set 增补已把 `detach_publish_process_media` 与
+  `discard_media_asset` 补入 G3-D,注册与 handler 随 G3-D 一起交付。
 
 #### G3-C1 acceptance-to-check mapping
 
@@ -346,6 +347,17 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
   authority，并原子提交 domain effect、Receipt 与 CommandExecution。相同 command
   exact replay，payload/head drift 明确 conflict/stale。
 - 将已发布事实投影到 guardian board 和必要的 conversation item。
+
+### G3-D adoption-set 增补（2026-08-02）
+
+- `detach_publish_process_media` 与 `discard_media_asset` 已按 06 冻结件的
+  Amendment 补入 G3-D adoption set,与 post-release safety 能力同批交付。
+- 两者是**发布前**动作,与 G3-D 同批只是交付排期:它们共用逐目标 release 事实
+  与 safety-action 复核。`discard_media_asset` 恰恰是"一旦有 release commit
+  就不再合法"的那个动作,不能被当成 post-release 能力。
+- `verify:g3-0-freeze` 现在会遍历冻结件 adoption set 里的每个 capability 身份,
+  要求它要么已按 `1.0.0` 注册,要么显式列在未实现清单里;冻结件再出现无人跟踪的
+  身份会直接失败。
 
 ## G3-E — Integration Qualification
 

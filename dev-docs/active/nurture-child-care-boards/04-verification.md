@@ -351,3 +351,15 @@
 | negative: any capability identity containing `face_match` or `biometric` | PASS — absent from the registry and the manifest |
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
 | governance lint + `ctl-context verify --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |
+
+## 2026-08-02 — G3-0 Adoption-set Amendment (Media Lifecycle Identities)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm verify:g3-0-freeze` | PASS — `reserved-keys=19`, every reserved identity adopted at `1.0.0` or explicitly unimplemented |
+| negative: drop one reserved key from the tracking lists | PASS — the guard throws; verified by temporarily removing `discard_media_asset` and restoring it |
+| `pnpm verify:surface-conformance` | PASS — artifact unchanged at `1.11.0` / `sha256:7da48739…`; no capability registered by this amendment |
+| `phase-3-capture-to-draft.test.ts` later-checkpoint absence census | PASS — both new keys required absent until G3-D implements them |
+| `pnpm test:unit` / `typecheck` / `verify:test-routing` / `verify:g2-exit-contract` | PASS — unchanged |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
+| governance lint + `ctl-context verify --strict` | PASS |
