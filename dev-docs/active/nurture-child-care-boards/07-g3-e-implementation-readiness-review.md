@@ -109,6 +109,24 @@ test.
 > families. A multi-child guardian therefore sees one child's board with no way
 > to select the other. Closing this needs a contract-level family selector, so
 > it belongs to G3-E scope rather than to B2.
+>
+> **The caregiver side has the same shape and is sharper (recorded 2026-08-02).**
+> `resolveCaregiverReach` returns the first active CareGroup-scoped assignment
+> whose group is active, so a teacher who holds two classes reaches only one.
+> Unlike the guardian case this is not a contract limitation: the caregiver
+> lanes already take `care_group_id` as an input.
+> `caregiver-board.read.ts:272` and `publish-lane.read.ts:127` receive the
+> requested group, resolve a reach that ignores it, and then refuse when the two
+> differ — so asking for the second class is actively denied rather than
+> defaulted.
+>
+> The capture lane already does it correctly:
+> `care-capture.read.ts:31` resolves the assignment **for the requested group**
+> (`scopeId: input.care_group_id`). Adopting that shape in the shared helper is
+> a small change, and it also removes the root cause of the prepare/execute
+> divergence fixed under A6. It is recorded here rather than fixed with the
+> review batch because it changes which class a request resolves to, which is a
+> product-visible behaviour change and belongs to a checkpoint that can say so.
 
 Fourteen declared ports have zero implementations in `packages/nurture-db`:
 
