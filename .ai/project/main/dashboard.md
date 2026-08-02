@@ -25,9 +25,11 @@ Project: `main`
   the atomic per-target release) and B3 (capture read port) are closed; B4 is
   partial — the six query capabilities and two board writes are routed on the
   formal ingress, and the ingress now admits each capability at its own exact
-  registered version. B8 is new: the remaining sixteen write capabilities are
-  decision-only functions with no owner write and no command spec, and their
-  four schema prerequisites landed on 2026-08-02.
+  registered version. B8's serial foundation unit landed on 2026-08-03: the
+  shared write-spec factory, a per-capability ingress descriptor table that makes
+  admitting an unservable key a type error, and `cancel_publish_process` end to
+  end on real PostgreSQL. Fifteen decision-only write capabilities remain, each
+  still needing an owner write transaction and a command spec.
   An independent review of the landed work produced 46 findings; 2 did not hold,
   2 held in part, the rest are fixed or recorded. The sharpest were public
   results carrying raw identifiers, a page cursor readable without a key, and a
@@ -97,11 +99,11 @@ Project: `main`
   the beta profile says otherwise. G3-E requires exact G2-C and the T-007
   publication-policy subset without making full T-007 a serial prerequisite.
   Overall audit is PASS. G3-0 froze the contract/fact/schema set and G3-A～G3-D
-  are delivered, so remaining work is the G3-E preparatory checkpoint: B8's
-  sixteen write capabilities need an owner write transaction and a command spec
-  each, then the rest of the ingress routing. The decomposition is one serial
-  foundation unit (a shared write-spec factory and a per-capability dispatch
-  table) followed by three genuinely disjoint owner-aggregate lanes.
+  are delivered, so remaining work is the G3-E preparatory checkpoint. Its serial
+  foundation unit — a shared write-spec factory and a per-capability dispatch
+  table — is landed together with the first write capability; what follows is
+  three genuinely disjoint owner-aggregate lanes over the remaining fifteen,
+  then the rest of the ingress routing.
 - Stage G4: T-007 uses G4-0 rolling contract/fact freeze, G4-A authority/aggregate,
   G4-B role-bound mobile, G4-C Admin Workbench Core, G4-D Enrollment Journey,
   G4-E Knowledge/RAG and G4-F qualification/handoff. The publication-policy subset

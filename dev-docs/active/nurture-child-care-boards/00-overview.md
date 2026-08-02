@@ -5,14 +5,16 @@
 - State: in-progress
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-02
-- Next step: G3-A～G3-D 均已完成并通过一次实施质量复核，surface artifact
-  additive 旋转至 `nurture.surface-contract@1.13.0` /
-  `sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef`，
-  G3 adoption set 已关闭。G3-E readiness review 结论为 `G3_E_NOT_READY`：
-  需要先补一格 owner-integration 准备（DB SSOT delta、owner repositories、
-  capture-lane port、ingress 路由、T-005 direct-interaction consumer action），
-  之后才是 T-007 与 T-005 G2-C 的联合运行。详见
+- Updated: 2026-08-03
+- Next step: G3-E readiness review 的 B1/B2/B3 已关闭，B4 部分完成。
+  **B8 Unit 0 已落地**：写命令工厂 `createBoardWriteSpec`、按能力的 ingress
+  描述表，以及第一条端到端写能力 `cancel_publish_process`（owner 写事务 +
+  spec + 路由 + 真 PostgreSQL 的 DB e2e）。formal ingress 现在准入 11 个 action
+  与 9 个 query，显式未路由的写 key 从 16 降到 15。
+  接下来是 B8 余下 15 个写能力，按 owner 聚合分三条不相交的 lane（编辑 lane /
+  归属 lane / 发布后安全 lane，organize 与几乎所有东西重叠，须排在编辑 lane
+  之后），然后是 B4 余下路由与 B5 的 T-005 consumer action；B6/B7 依赖
+  T-007 provider 与 T-005 G2-C 联合运行，无法提前拉入。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal

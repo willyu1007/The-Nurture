@@ -739,3 +739,32 @@
 | the exact adoption count caught the amendment contaminating the key scraper | FIXED — the declaration is the section body, amendments are appendices |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 510, 180 and 26 tests |
 | all eight contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-03 — B8 Unit 0 (Write-command Factory, Descriptor Table, First Write Capability)
+
+| Command / check | Result |
+| --- | --- |
+| `createBoardWriteSpec` carries the five shared obligations | LANDED — both routed board mutations rebuilt on it, behaviour unchanged |
+| falsified: heads compared on the intersection only | CAUGHT |
+| falsified: `already_satisfied` accepted with no evidence | CAUGHT |
+| falsified: committed effect accepted with no output ref | CAUGHT |
+| falsified: result schema version not stamped | CAUGHT |
+| falsified: typed input not re-parsed inside the transaction | CAUGHT |
+| `apply` can only use values `authorize` produced | STRUCTURAL — not an assertion; the other shape does not compile |
+| `buildHarnessCommand` is a per-capability table, `satisfies Record<HarnessCapabilityKey, …>` | LANDED — prepare and execute both |
+| falsified: admit a routed key with no engine descriptor | CAUGHT — `pnpm typecheck` fails, not a runtime fallthrough |
+| pre-existing hole: `prepare`'s `switch` had no default and could return `undefined` | FIXED by the table |
+| `cancelled_at` migration gate on an undatable cancelled row | CAUGHT — aborts with the row count, and under a single transaction the column does not land |
+| `ck_nurture_publish_process_cancelled` refuses an undated cancel | PASS — verified on the live scratch database |
+| the same CHECK caught two fixtures seeding a state the write lane cannot produce | FIXED |
+| falsified: no compare-and-set on the process head | CAUGHT |
+| falsified: cancel legal from any state | CAUGHT |
+| falsified: owner does not report the recorded cancel instant | CAUGHT |
+| falsified: committed instant taken from the command clock, not the owner | CAUGHT — the fixture clock advances, so the two are distinguishable |
+| DB e2e: cancel commits on the owner row through the real ingress | PASS — state, instant, version, immutable audit row, no raw id in the result |
+| DB e2e: same command identity replays its own committed result | PASS |
+| DB e2e: a second class teacher gets `already_satisfied` at the first teacher's instant | PASS — nothing written twice |
+| DB e2e: guardian refused, stale head refused with `reprepare`, process untouched | PASS |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 527, 184 and 29 tests |
+| `verify:surface-conformance` `test-routing` `formal-ingress-contract` `persistence-boundaries` `port-topology` `g2-exit-contract` `g3-0-freeze` `n1-schema-contract` | PASS — artifact unchanged at `1.13.0`, routed actions 10 → 11, unrouted 16 → 15 |
+| `ctl-project-governance lint` / `lint-docs --check-anchors --strict` | PASS |

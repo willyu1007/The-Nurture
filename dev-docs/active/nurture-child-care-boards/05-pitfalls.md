@@ -419,3 +419,43 @@
   再重建一次，得到唯一一个新版本与新 digest。
 - **Prevention**：一个 checkpoint 只发布一次旋转。中途改 source 就回滚生成件重来，
   不要靠连续抬版本掩盖。
+
+### 2026-08-03 — 幂等的"已经做过了"需要一个它自己的时刻
+
+- **Symptom**:`cancel_publish_process` 的 `already_satisfied` 分支要返回冻结 schema
+  要求的 `cancelledAt`,而 `nurture_publish_process` 根本没有这一列。
+- **Root cause**:能力被设计成幂等的,但承载它的事实只记了**状态**,没记**时刻**。
+  最顺手的替代品是 `updated_at`——任何别的写都会推动它,于是重放会报出一个取消并未
+  发生的时刻。这与"`? :` 的 else 落在具体业务值上就是断言"是同一种错误:一个看起来
+  像默认值的东西,其实在宣称一件没有证据的事。
+- **Fix**:加 `cancelled_at`(可空,只有 cancelled 行有这个事实),迁移带按行普查的
+  `RAISE EXCEPTION`——历史 cancelled 行推不出取消时刻,所以是中止而不是回填——再加
+  一条 CHECK 长期维持。
+- **它立刻抓到了东西**:两个既有 DB fixture 直接 seed 了没有取消时刻的 cancelled
+  process,即在造一个写通道永远产生不出来的状态。
+- **Prevention**:设计一个幂等能力时,先问"重放要回答什么",再问"哪条事实能证明它"。
+  答不上来的字段就是缺一列,不是缺一个默认值。
+
+### 2026-08-03 — 让"引擎接不住的 key"变成编译错误,而不是运行时兜底
+
+- **Symptom**:准入表(transport 的 key→version 字面量)与引擎能服务的能力集合,此前
+  只靠一条脚本普查对齐;而 `prepare` 的 `switch` 连 default 都没有,一个漏网的 key
+  会让它返回 `undefined`。
+- **Root cause**:两个集合的一致性写在**检查**里,不写在**类型**里。检查能被绕过,也
+  只在有人跑它时说话。
+- **Fix**:每个 key 一个 `{prepare, build}` 描述表,整张表
+  `satisfies Record<HarnessCapabilityKey, …>`。两个方向都成为编译错误:多一个 key
+  没有描述、少一个 key 有描述,都过不了 `pnpm typecheck`。
+- **它立刻抓到了我自己**:先写描述表、后改准入表,`cancel_publish_process` 当场报
+  "does not exist in type Record<…>"。
+- **Prevention**:当"A 集合必须等于 B 集合"能用类型表达时,就不要用脚本表达。脚本普查
+  留给类型系统够不着的地方(生成物、文档、数据库)。
+
+### 2026-08-03 — 比 head 只比交集,等于不比
+
+- **Symptom**:写工厂里的 head 比较最初写成"遍历 expected,owner 没报的就跳过"。
+- **Root cause**:看起来像宽容,实际是"owner 不再报这个 head 就不检查它"——而 owner
+  不再报某个 head,正是漂移最该被抓住的形态之一。
+- **Fix**:比键集的并集,任一侧缺失即冲突,两个方向都失败关闭。
+- **Prevention**:凡是"把冻结的值和当前的值对起来"的检查,先问"如果一侧少了一项会
+  怎样"。答案是"就不比了",这条检查就还没写完。

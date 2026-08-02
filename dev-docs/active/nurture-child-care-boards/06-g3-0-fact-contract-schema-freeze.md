@@ -251,6 +251,25 @@ a replay a no-op, so a version would buy a concurrency case that does not exist.
 The capability adoption set, exact inputs, authority predicates and surface
 topology above are unchanged.
 
+### Amendment 2026-08-03 — the instant a pre-release cancel happened
+
+`cancel_publish_process` is idempotent, and its frozen result requires
+`cancelledAt` on both the fresh and the repeated answer. `NurturePublishProcess`
+recorded only the *state*, so the repeat had no fact to answer from. The obvious
+substitute, `updated_at`, is wrong: anything else touching the row moves it, so
+a repeat would report a cancel at a moment it did not happen.
+
+| Column | Required boundary |
+| --- | --- |
+| `NurturePublishProcess.cancelled_at` | the instant the pre-release cancel committed; present exactly while the process is `cancelled` |
+
+Nullable on purpose — only a cancelled process has the fact — and paired with
+`ck_nurture_publish_process_cancelled`, which refuses a cancelled row without
+it. Nothing in a legacy cancelled row, or anything related to it, records the
+instant, so the migration's census aborts on such a row rather than backfilling
+one. The capability adoption set, exact inputs, authority predicates and surface
+topology above are unchanged.
+
 ## DB SSOT Delta
 
 All persisted changes originate in `prisma/schema.prisma` through the DB SSOT workflow. No JSON

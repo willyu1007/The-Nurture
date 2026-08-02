@@ -1401,3 +1401,64 @@ key,精确计数(B8 那条改动)立刻报 `expected 19, received 29`。根因�
 改为**切到第一个 `### Amendment` 之前**:采纳声明是正文,附录不参与;附录若新增身份,
 会像 media lifecycle 那次一样并回正文列表,而反向普查(每个已注册的 T-006 能力都必须
 被预留)从另一侧兜住。
+
+## 2026-08-03 — B8 Unit 0:写命令工厂、按能力的描述表,与第一条端到端写能力
+
+B8 的 16 个写能力有一段共同的形状。**先把这段形状变成一个东西,再用它落一个能力**,
+这一格不做剩下的 15 个。
+
+**`createBoardWriteSpec`**(`packages/nurture-scenario/src/harness/board-write-spec.ts`)。
+它承载五件复制 16 遍必然出错的事:port 为空时的具名拒绝码;事务内重读 owner 并把
+prepare 冻结的 head 与 owner 当下的 head **整套**比较;事务内重新解析 typed input;
+`already_satisfied` 必须给出至少一个可证明的既存 ref;committed result 的 schema
+版本由工厂盖章。已路由的两个 board mutation 改走它,行为不变——除了 `apply` 里的
+漂移从匿名 `Error`(映射成通用的 `command_execution_failed`)变成带
+`stale_confirmation` 的确定性回滚。
+
+有一条不是靠断言、而是靠**结构**保住的:`authorize` 既做判定,又**产出 write 允许
+使用的那些值**,`apply` 只拿得到这个产物。所以"apply 用了一个 authorize 从没看过的
+字段"不是一条需要有人记得写的检查,而是编译不过。
+
+**head 比较必须比键集**。只比交集看起来更宽容,实际上是"owner 不再报的 head 就不比
+了"——那正是漂移。工厂两个方向都失败关闭,并用"只比交集"这一手法证伪过。
+
+**`buildHarnessCommand` 改成按能力的描述表**。原来是 200 行 if 链,16 个能力都要改
+它。现在每个 key 一个 `{prepare, build}`,整张表 `satisfies
+Record<HarnessCapabilityKey, ...>`。于是"在 transport 放行一个引擎接不住的 key"——
+冻结件禁止的占位——**不再是运行时兜底,而是编译错误**。落地时它立刻抓到了我自己:
+先写描述表再改准入表,`cancel_publish_process` 报 "does not exist in type Record<…>"。
+顺带修掉一处真实的洞:原 prepare 的 `switch` 没有 default,一个未被前面 if 拦下的 key
+会让 `prepare` 返回 `undefined`。
+
+**`cancel_publish_process` 端到端**。owner 写事务 + spec + prepare + ingress 路由 +
+真 PostgreSQL 上的 DB e2e。三层防护各司其职:prepare 冻结 `aggregateVersion` →
+事务内重读并比对 → owner 的 `updateMany` 把版本和"可取消的三个状态"都放进 WHERE,
+所以被别人动过的 process 匹配零行,而不是被覆盖。
+
+### 一个绕不过去的事实:取消需要一个"什么时候"
+
+冻结的 result schema 要求 `cancelledAt`,而 `already_satisfied` 分支必须同样满足它。
+`nurture_publish_process` 没有这一列。`updated_at` 是最顺手的替代品,也是错的——任何
+别的写都会推动它,于是重放会报出一个取消**并未发生**的时刻。这正是 05 里那条
+"`? :` 的 else 落在具体业务值上就是断言"的同一种错误,只是换了个形状。
+
+所以加了 `cancelled_at`(可空,只有 cancelled 行有这个事实),迁移带一条按行普查的
+`RAISE EXCEPTION`,再加一条 CHECK 长期维持。**没有 evidence 就中止,不猜**:历史
+cancelled 行没有任何地方能推出取消时刻,所以它们不是"回填",是"中止"。
+
+这条 CHECK 落地当场抓到两个既有测试 fixture 直接 seed 了没有取消时刻的 cancelled
+process——它们在造一个写通道永远产生不出来的状态。
+
+领域侧对应地新增 `evaluatePublishProcessCancel`:一条规则,prepare(走查询端口)与
+execute(走命令事务端口)**调用同一个函数**。为此把两侧的"照护者写授权"四个字段收敛
+成一个声明(`NurtureCaregiverWriteAuthority`,在 domain 侧),`CaregiverFactAuthorityV1`
+继承它。这不是注释级的约定,是类型级的:两侧无法各自养一份同名规则。
+
+`isPublishProcessState` 让 owner 行里一个领域不认识的状态**没有任何合法迁移**,
+而不是被当成五个之一。
+
+### 这一格没有做的
+
+其余 15 个写能力、B4 余下路由、B5 consumer action。以及一处已知的整洁性机会:
+`publish_process` 的 sealed ref 目前由五个模块各自用共享的 kind 常量签发,虽然值一定
+一致(kind 是同一个导出常量),但"一个概念一个发放器"这条规则还没有在这里落实。

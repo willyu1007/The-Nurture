@@ -179,7 +179,37 @@ T-005. The generic query/prepare/execute routes exist, but no T-006 key is
 admitted. G3-E's requirement to run "through the formal NestJS ingress" cannot
 be met until the 24 keys are routed and the ingress guard's census is extended.
 
-### B8 — Sixteen write capabilities have no command or owner write (internal)
+### B8 — Sixteen write capabilities have no command or owner write (internal) — UNIT 0 LANDED 2026-08-03
+
+> Unit 0 is landed: the shape all sixteen share now exists once, and one
+> capability goes through that shape end to end.
+>
+> `createBoardWriteSpec` carries the five obligations that would otherwise be
+> written sixteen times — the named refusal when the owner write port is absent,
+> the in-transaction owner re-read with a whole-key-set head comparison, the
+> in-transaction typed-input re-parse, an `already_satisfied` that must name a
+> ref the owner just returned, and the committed result's schema version. Its
+> `authorize` step produces the exact values the write may use, so "apply used a
+> field authorize never checked" does not compile. Both routed board mutations
+> were rebuilt on the factory, and every one of the five obligations was
+> falsified with the same edit that would introduce the defect.
+>
+> `buildHarnessCommand` is now a per-capability descriptor table checked with
+> `satisfies Record<HarnessCapabilityKey, …>`, so admitting a key the engine
+> cannot serve — the placeholder the freeze forbids — is a type error rather
+> than a runtime fallthrough. The table also closed a real hole: `prepare`'s
+> `switch` had no default and could return `undefined`.
+>
+> `cancel_publish_process` is routed end to end: `PrismaPublishProcessTransaction`
+> (compare-and-set on `aggregateVersion` plus the three cancellable states),
+> `createCancelPublishProcessSpec`, `preparePublishProcessCancel`, ingress
+> admission and a DB e2e on real PostgreSQL. Landing that capability needed one
+> fact the frozen set did not hold — see the amendment in
+> `06-g3-0-fact-contract-schema-freeze.md`.
+>
+> Fifteen write capabilities remain, and the ingress guard's explicit unrouted
+> list is now fifteen.
+
 
 Discovered while routing B4-2, and not visible when this review was written.
 The publish-process, media-attribution and publication-safety capabilities were
