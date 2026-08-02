@@ -1639,5 +1639,5 @@
   `family-care-command.transaction.ts` 内,故一并记于本任务包。
 - 验证:x5 联合套件在 pinned 物化(My-Chat `a019566` / Base `06303e9`)+
   disposable pgvector PG 上 4/4 通过,含 revoke 路径;production-db 86/86;
-  详见 `../nurture-family-care-conversation/04-verification.md`。无 schema
+  详见 `../../archive/nurture-family-care-conversation/04-verification.md`。无 schema
   变更、无持久化 apply、无激活或流量效果。

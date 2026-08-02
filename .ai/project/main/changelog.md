@@ -48,3 +48,4 @@ Project: `main`
 - 2026-07-31 task_id=T-004 slug=nurture-surface-contract-foundation event=status from=planned to=in-progress
 - 2026-08-01 task_id=T-005 slug=nurture-family-care-conversation event=status from=planned to=in-progress
 - 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=in-progress to=done
+- 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=done to=archived

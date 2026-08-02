@@ -553,7 +553,7 @@ enum NurtureFamilyCareItemEventType {
 }
 
 // G2 three-axis CareInteraction enums — frozen in
-// dev-docs/active/nurture-family-care-conversation/10-g2-schema-freeze.md (D1).
+// dev-docs/archive/nurture-family-care-conversation/10-g2-schema-freeze.md (D1).
 enum NurtureFamilyCareAcknowledgementState {
   pending
   acknowledged

@@ -76,10 +76,10 @@ tasks:
     updated: 2026-08-01
   - id: T-005
     slug: nurture-family-care-conversation
-    status: done
+    status: archived
     milestone_id: M-002
     feature_id: F-003
-    dev_docs_path: dev-docs/active/nurture-family-care-conversation
+    dev_docs_path: dev-docs/archive/nurture-family-care-conversation
     updated: 2026-08-02
   - id: T-006
     slug: nurture-child-care-boards

@@ -61,8 +61,9 @@ and Nurture pins were then recomputed from their exact file populations:
 - My-Chat `wave4_binding_host`: `960afb2c…`, 20 files;
 - Nurture scenario self-pin: `0e684436…`, 69 files at the qualified implementation
   checkpoint. Final workflow-context synchronization rotated only this self-pin to
-  `a23f0c06…`; the file population, runtime, owner pins and surface artifact did not
-  change.
+  `a23f0c06…`; archival path-reference synchronization then rotated only the same
+  self-pin to final `4cd8b8b5…`. The file population, runtime, owner pins and surface
+  artifact did not change.
 
 The formal NestJS Harness and binding-owner suites ran through the pinned
 `@my-chat/scenario-integrations` source against freshly migrated disposable
@@ -88,7 +89,7 @@ that reuse and require the full joint suite again.
 
 | Check | Result |
 | --- | --- |
-| `pnpm verify:workflow-contract-pin` in exact detached topology | PASS; both owner revisions/hashes, three source pins and Nurture 69-file implementation self-pin; final docs-only self-pin `a23f0c06…` reverified separately |
+| `pnpm verify:workflow-contract-pin` in exact detached topology | PASS; both owner revisions/hashes, three source pins and Nurture 69-file implementation self-pin; final archive-path-only self-pin `4cd8b8b5…` reverified separately |
 | `pnpm typecheck` after owner/Nurture Prisma generation | PASS |
 | `pnpm test:unit` | PASS; 29 files / 268 tests |
 | `pnpm --filter @the-nurture/scenario-service test` | PASS; 8 files / 49 tests |

@@ -462,7 +462,7 @@ cross-owner G2 Exit evidence, deployment, activation and traffic remain unclaime
 | `verify:g2-exit-db-census` | PASS; items 53 Harness / 11 legacy, messages 73 Harness / 12 legacy, all five violation classes zero |
 | final false/empty | PASS; no committed gate values, no secret/Candidate/activation/traffic; no `the_nurture_g2_exit*` database remains |
 | review | PASS after qualification-command fixes and CI exact-pin enforcement; no product defect remains |
-| final context/self-pin sync | PASS; workflow context semantic drift removed; 69-file self-pin `a23f0c069dbd335c4c0b2befec5443bf9e151595ea0b6dfd8c95ae7f99173141` |
+| final context/self-pin sync | PASS; workflow context semantic drift removed; archival path-reference sync leaves the final 69-file self-pin at `4cd8b8b5e59869af9f5b957845a3daa054e4c3754484371b4f3795d341948d3e` |
 
 Authoritative verdict and bounded G1 evidence reuse are recorded in
 `14-g2-exit-qualification-and-beta-handoff.md`. T-006/T-007 adoption and T-008

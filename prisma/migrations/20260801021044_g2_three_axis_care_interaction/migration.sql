@@ -128,7 +128,7 @@ ALTER TABLE "nurture_family_care_cascade_audit" ADD CONSTRAINT "nurture_family_c
 -- AddForeignKey
 ALTER TABLE "nurture_family_care_cascade_audit" ADD CONSTRAINT "nurture_family_care_cascade_audit_command_execution_id_fkey" FOREIGN KEY ("command_execution_id") REFERENCES "nurture_command_execution"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- G2 frozen guards — dev-docs/active/nurture-family-care-conversation/10-g2-schema-freeze.md (D2/D3/D6).
+-- G2 frozen guards — dev-docs/archive/nurture-family-care-conversation/10-g2-schema-freeze.md (D2/D3/D6).
 -- Harness rows must carry the complete original scope; protected bodies never
 -- persist as plaintext; reply order is immutable and unique per item.
 ALTER TABLE "nurture_family_care_item"

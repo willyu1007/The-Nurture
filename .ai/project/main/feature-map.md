@@ -332,7 +332,7 @@ Project: `main`
   canonical attendance, letting Admin substitute for class-teacher confirmation, or presenting
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
-- Related Tasks: T-004/T-005 (`done`); T-006～T-008 (`planned`).
+- Related Tasks: T-004 (`done`); T-005 (`archived`); T-006～T-008 (`planned`).
 - Next Checkpoint: T-005 G2 Exit is PASS and the exact provider root remains
   `nurture.surface-contract@1.8.0` / `sha256:4fe91e13…`. The single critical lane
   advances to T-006 G3-0 exact contract/fact/schema freeze; T-007 continues from
@@ -367,7 +367,7 @@ Project: `main`
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-004 nurture-surface-contract-foundation | done | dev-docs/active/nurture-surface-contract-foundation |
-| T-005 nurture-family-care-conversation | done | dev-docs/active/nurture-family-care-conversation |
+| T-005 nurture-family-care-conversation | archived | dev-docs/archive/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | planned | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |

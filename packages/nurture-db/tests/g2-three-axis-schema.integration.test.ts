@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 
 // DB-level proof of the frozen G2 guards
-// (dev-docs/active/nurture-family-care-conversation/10-g2-schema-freeze.md):
+// (dev-docs/archive/nurture-family-care-conversation/10-g2-schema-freeze.md):
 // complete-graph and protected-body CHECKs, lifecycle-reason coupling,
 // immutable reply order and the strict correction head.
 const prisma = createPrismaClient();

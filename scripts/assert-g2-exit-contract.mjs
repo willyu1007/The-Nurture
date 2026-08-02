@@ -109,7 +109,7 @@ assertEqual(
 );
 assertEqual(
   workflowPin.nurtureScenario?.contractSha256,
-  "a23f0c069dbd335c4c0b2befec5443bf9e151595ea0b6dfd8c95ae7f99173141",
+  "4cd8b8b5e59869af9f5b957845a3daa054e4c3754484371b4f3795d341948d3e",
   "Nurture scenario self-pin",
 );
 
