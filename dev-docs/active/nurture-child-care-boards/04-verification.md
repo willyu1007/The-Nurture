@@ -271,3 +271,33 @@
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
 | `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS |
 | `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |
+
+## 2026-08-02 — G3-B1 Step 1 (Capture Batch, Deterministic Assembly and Draft Lane)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm test:unit` | PASS — 39 files / 383 tests (56 new G3-B1 tests) |
+| `pnpm typecheck` | PASS — no diagnostics |
+| `pnpm verify:test-routing` | PASS — files=74 unit=39 |
+| `pnpm verify:surface-conformance` | PASS — artifact still `1.9.0` / `d769e496…`; no key registered before its rotation step |
+| `pnpm verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` / `verify:g3-0-freeze` / `verify:g2-exit-contract` | PASS — unchanged |
+| negative: quiescence gate set to 0, 29 or 181 seconds while auto-organize is on | PASS — `invalid_quiescence_gate`; a fully manual policy accepts 0 |
+| negative: idle period configured below its own gate | PASS — `idle_below_quiescence_gate` |
+| negative: background upload/thumbnail/heartbeat progress during the fallback gate | PASS — the cut proceeds; only the user-activity head is observed |
+| negative: live capture-activity lease under idle and fallback triggers | PASS — both wait; manual still cuts |
+| negative: batch with an in-flight upload followed by a settled capture | PASS — watermark stops at the stable prefix, both later captures defer |
+| negative: empty or entirely unstable batch | PASS — `empty_stable_batch`, no organizer job and no candidate |
+| negative: automatic triggers with auto-organize disabled | PASS — `automatic_disabled`; manual organize still works |
+| negative: transcript without its revision, media source without an asset, empty source text | PASS — assembly refuses instead of producing partial content |
+| photo-only assembly | PASS — no body at all; serialized content contains no invented observation |
+| negative: safety route null or provider throwing | PASS — `safety_route_unavailable`, never defaults to ordinary |
+| negative: `review_required` candidate | PASS — `needs_review` with no quick-adjust window attached |
+| negative: `direct_interaction_required` candidate | PASS — no process, no draft, internal source refs only |
+| negative: mixed audience data class or purpose across targets | PASS — `mixed_audience_data_class` |
+| negative: serialized publish targets inspected for content or raw identifiers | PASS — identity only; sealed refs leak no child/Enrollment/Grant id |
+| negative: pending-release admission before the quick-adjust deadline, mid-edit, under a hold, with unsaved work, from needs_review or released | PASS — each blocked with its own reason code |
+| negative: pending-release admission without a resolved institution schedule | PASS — `dependency_no_go` |
+| negative: revision drift, replay with a changed payload, released/cancelled process, unknown source ref | PASS — conflict or denial, never a silent overwrite |
+| negative: `pending_release` edit without an online hold, and a colleague's live hold | PASS — `edit_hold_required` / `held_by_other` |
+| negative: cancel after any committed release | PASS — `already_released`; repeat cancel is `already_satisfied` |
+| negative: sealed process ref used by another actor or after losing access | PASS — `target_unavailable` |

@@ -498,3 +498,53 @@
   仍然缺席"，让"只注册已实现 key"这条冻结声明真正有机械兜底。
 - 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
   Candidate、部署或流量。
+
+## 2026-08-02 — G3-B1 step 1: capture batch, deterministic assembly and draft lane
+
+- 新增 `care-capture-batch.ts`：D-10 的采集批次与整理 trigger。拍照/记录/上传完成/
+  media ready 都不创建家庭发布候选、不启动 30 秒；只有 manual、10 分钟 idle 或
+  `default send window - 30 分钟` 兜底三个 trigger 会切批。模块是纯函数,不写入、
+  不自带时钟。
+- 一分钟 quiescence gate 只作为自动 trigger 的防打断闸门实现:manual 直接绕过;
+  idle 由 policy 校验保证 `idle >= gate`,成熟后不再二次等待;兜底 due 后只等这一
+  分钟。gate 在自动整理开启时不可为 0,可配置区间 30~180 秒;切为全手动后不参与决策。
+- user-activity head 与 machine-progress head 分开存放,`evaluateOrganizeTrigger`
+  只读前者。上传百分比、缩略图、心跳与 provider job 因此在类型层面就无法重置 gate,
+  并有对应负向测试。
+- watermark 取"连续稳定前缀"这个真正的低水位:遇到第一条未稳定采集即停,其后所有
+  内容(包括已经稳定的)一起进入下一批。否则一条仍在上传的素材会被跨过并搁浅。
+  角色已失效的采集同样被排除。
+- trigger evidence 记录 resolved trigger、trigger identity、policy ref/head、
+  timezone、gate 参数、观察到的 user-activity head、lease 状态与 watermark,
+  不持久化原始设备操作流(有序列化负向断言)。相同 trigger identity exact replay。
+- 新增 `content-assembler.ts`：D-15 确定性组装,**没有任何 provider port**。
+  老师原文逐字保留(含否定与不确定表述),转写必须带 revision 才能进入正文并保留
+  provenance,photo-only 不生成正文。标题/标签只由版本化模板从结构化事实
+  (活动名、原图数量、发生日期)组装,不描述情绪或评价。
+- 新增 `publish-process.ts`：D-06 五状态机(draft/needs_review/pending_release/
+  released/cancelled)与合法转换表;scheduled/sending/failed/delivered/
+  partially_released 在类型层面不存在。一次 organize cut 至多产生一个候选,
+  process key 由 `careGroup~triggerRequestId` 派生,exact replay 不会建第二张卡。
+- 安全路由通过 `ContentSafetyRoutePort` 注入,G3-B1 不实现策略本身:
+  `ordinary` → draft 并启动 30 秒;`review_required` → needs_review 且**不**启动
+  快捷窗口(否则超时会把异常内容推进队列);`direct_interaction_required` → 完全不
+  创建发布候选,只保留内部来源。provider 缺失或抛错一律 fail closed,绝不默认 ordinary。
+- 30 秒是交互 posture 不是第六个状态:`evaluateQuickAdjust` 在用户触碰或持有
+  edit hold 时暂停,`admitToPendingRelease` 在自身 deadline 之前拒绝入队。
+  入队还需要 T-007 解析后的 schedule,provider 缺席时返回 `dependency_no_go`
+  fail closed——真正的 schedule 解析与 release 属于 G3-D。
+- 新增 `publish-process-editing.ts`：autosave 与 edit hold。`expectedDraftRevision`
+  精确匹配才进版本;相同 command identity + 相同 canonical payload 返回原 revision;
+  payload 漂移或 revision 漂移一律 conflict,没有 last-write-wins 分支。
+  hold 短期可续、不是 authority/owner/state,过期即释放,同班其他老师随后可取得。
+  `pending_release` 编辑必须在线持有 hold(离线无法可靠暂停服务端发送)。
+- 发现并修掉一个真实泄漏:publish target ref 一开始用 `issueBoardTargetRef`,
+  它会把 id 内嵌进 ref,而 publish target 的复合键包含 child/Enrollment/Grant。
+  新增 `issueBoardSealedRef` / `resolveBoardSealedRef`——纯 HMAC、不可逆,按 owner
+  当前候选集枚举解析,顺带得到"失去访问权的 ref 直接解析不出来"的性质。
+  publish process 与 publish target 都改用它。
+- `reschedule_publish_process` 需要 T-007 解析后的 schedule 才能验证时间窗,
+  provider 缺席时它只能永远 fail closed,那样注册就是占位。该 key 留到
+  schedule 解析落地的 checkpoint。
+- 本步骤没有修改 surface contract source/artifact、Prisma schema、migration、
+  environment、capability activation、Candidate、部署或流量。

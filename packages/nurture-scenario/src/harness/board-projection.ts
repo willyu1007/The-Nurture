@@ -157,6 +157,40 @@ export const issueBoardTargetRef = (
   return `${BOARD_PROJECTION_VERSION}.${kind}.${id}.${tag}`;
 };
 
+/**
+ * Sealed target handle for identifiers that must not appear in a public result
+ * at all — a publication target resolves a child, Enrollment, family and the
+ * original Grant, so the ref carries no part of them. It is resolved by
+ * recomputing over the owner's current candidate set, which also means an
+ * identifier the actor is no longer eligible for simply stops resolving.
+ */
+export const issueBoardSealedRef = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  kind: string,
+  id: string,
+): string =>
+  `${BOARD_PROJECTION_VERSION}.${createHmac("sha256", integrityKey)
+    .update(
+      `nurture.board-sealed-target.v${BOARD_PROJECTION_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${kind}\0${id}`,
+      "utf8",
+    )
+    .digest("hex")
+    .slice(0, 32)}`;
+
+export const resolveBoardSealedRef = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  kind: string,
+  ref: string,
+  candidateIds: Iterable<string>,
+): string | null => {
+  for (const candidate of candidateIds) {
+    if (issueBoardSealedRef(integrityKey, scope, kind, candidate) === ref) return candidate;
+  }
+  return null;
+};
+
 export const resolveBoardTargetRef = (
   integrityKey: string,
   scope: BoardScopeV1,
