@@ -103,7 +103,7 @@ export const assembleDeterministicDraft = (
     (left, right) => left.source_sequence - right.source_sequence,
   );
   if (ordered.length === 0) return { status: "empty" };
-  if (ordered.length > MAX_SEGMENTS + ordered.filter((s) => s.kind === "media").length) {
+  if (ordered.filter((source) => source.kind !== "media").length > MAX_SEGMENTS) {
     return { status: "invalid", reason_code: "organizer_input_too_large" };
   }
 
@@ -140,9 +140,6 @@ export const assembleDeterministicDraft = (
           : {}),
       },
     });
-  }
-  if (segments.length > MAX_SEGMENTS) {
-    return { status: "invalid", reason_code: "organizer_input_too_large" };
   }
 
   const occurredAt = ordered.map((source) => source.occurred_at).sort();

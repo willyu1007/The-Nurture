@@ -704,3 +704,60 @@
   T-006 能力身份。两个方向的检查现在同时存在。
 - 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
   Candidate、部署或流量。T-007 provider 与真实 schedule/release 资格化仍属 G3-E。
+
+## 2026-08-02 — implementation quality pass over G3-A～G3-D
+
+用户要求在 G3-E readiness review 之前先检查已完成实施的质量。发现并修复的问题:
+
+- **公开 target ref 在模块之间不一致(真实缺陷)**。draft 卡片用
+  `issueBoardSealedRef` 发 publish target ref,而 eligibility 与 release 用
+  `issueBoardOpaqueRef` —— 两者 HMAC 命名空间不同,同一个目标得到两个不同的 ref,
+  客户端无法把草稿上的目标与发布结果对应起来。现在统一为
+  `issuePublishTargetRef`(display-only 用 opaque)。
+- **publication ref 发出去就用不回来(真实缺陷)**。release 结果与 safety event
+  发的是 opaque ref,而 `remove_publication_target_visibility` 解析的是 sealed ref
+  —— 客户端拿到的 publicationRef 永远无法回传。现在统一为 `issuePublicationRef`
+  (sealed,因为它确实被当作输入接受),并移到 `publish-process.ts` 以免 release
+  lane 为了给 publication 命名而反向依赖 safety lane。
+- **发布队列的 counts 是"本页计数"而非队列全量**。字段名与 schema 描述都在说
+  队列级摘要,实现却在 `project` 里逐行累加,分页后语义错误。改为由 owner 端口
+  提供 `state_counts` 队列级普查,测试也改成"页只有 1 条但 counts 是 9/2/4/7/1"。
+- **scheduler 拒绝为 released+partial 重试**。release lane 允许 released 状态重试
+  未提交目标,但 `evaluateSchedulerAttempt` 直接 `not_queued` 跳过,两者矛盾。
+  新增 `has_uncommitted_targets`,released 且仍有未提交目标时允许 attempt。
+- **零目标发布会产出违反合同的结果**。schema 要求 `results` 至少一条、
+  `summary.total >= 1`,但 release 未校验空目标集。补上 `no_eligible_target` 守卫。
+- **`admitToPendingRelease` 与 schedule resolver 没有接上**。B1 留的
+  `resolved_schedule_available: boolean` 接缝在 G3-D 之后仍悬空。函数移入
+  `publish-schedule.ts` 并直接消费 `ScheduleResolutionV1`,成功时返回冻结窗口;
+  顺带删掉一个永远不会命中的 `needs_review` 死分支。
+- **`organize_care_capture_batch` 的已注册 result 没有任何生产者**。
+  `evaluateOrganizeTrigger` 返回 trigger 决策,与合同 result 形状不同。新增
+  `projectOrganizeResult`。
+- 清理:删除 `QUIESCENCE_BOUNDS` 死导出;统一 `evaluateMediaDiscard` 与
+  `evaluateMediaDetach` 的签名;简化 assembler 里把 media 与文本混算的尺寸守卫。
+
+补上的两层缺失兜底:
+
+- **运行时 ↔ schema 一致性**。每个 checkpoint 都声称"typed module result",但从来
+  没有任何检查把真实运行时输出喂给已注册的 result schema。新增
+  `phase-3-typed-results.test.ts`:为**每个**已注册 T-006 capability 准备一个
+  运行时生产者,用 Ajv 按 descriptor 的 `resultSchemaRef` 校验实际 payload
+  (`status` 属于 invocation envelope,不进 payload)。没有生产者的 capability
+  直接让普查失败,所以不可能再发布一个运行时无法满足的 result 形状。
+  它已登记为 conformance case `typed-result-runtime-conformance`。
+- **运行时 capability 常量 ↔ 注册表**。19 个 `*_CAPABILITY` 常量此前无人引用,
+  没有任何检查保证它们与注册表的 key/version 一致。同一套件现在断言双向绑定:
+  每个常量必须对应一个同版本 descriptor,每个 T-006 capability 必须有常量命名它。
+
+这次新增的检查立刻抓到一个既有 schema 缺陷:`query-guardian-current-focus` 的
+`focusCard` 用 `if/then` 声明 `required: [childRef, childSafeLabel]` 却没有在该
+子 schema 里声明这两个属性,严格模式编译失败。原验证器只编译它实际校验的文档,
+从未编译到这个指针,所以一直没暴露。已改为两个分支各自声明所约束的属性
+(`then` 声明 + `else` 用 `false` 禁止)。
+
+修复导致 artifact additive 旋转到 `nurture.surface-contract@1.13.0` /
+`sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef`;
+capability 数量与 shared core 不变,全部既有 slice 哈希不变。
+
+新增 `07-g3-e-implementation-readiness-review.md`,结论 `G3_E_NOT_READY`。

@@ -4,7 +4,10 @@ import {
   type ChildAttributionStateV1,
   type MediaAssetLifecycleV1,
 } from "./media-attribution.js";
-import type { PublishProcessStateV1 } from "./publish-process.js";
+import {
+  issuePublishTargetRef,
+  type PublishProcessStateV1,
+} from "./publish-process.js";
 
 /**
  * G3-C1 publish eligibility (02-architecture.md D-12).
@@ -183,7 +186,7 @@ export const derivePublishEligibility = (
   const targets = input.targets.map((target) => {
     const reasons = [...new Set([...mediaReasons, ...targetBlockingReasons(target, input.media)])];
     return {
-      targetRef: issueBoardOpaqueRef(integrityKey, scope, "publish_target", target.target_key),
+      targetRef: issuePublishTargetRef(integrityKey, scope, target.target_key),
       eligible: reasons.length === 0,
       blockingReasons: reasons.sort(),
     };
@@ -254,15 +257,17 @@ export type MediaDiscardDecisionV1 =
  * committed a release; afterwards the remedy is per-target visibility removal
  * or redaction, which preserve the Receipt and audit trail.
  */
-export const evaluateMediaDiscard = (input: {
-  lifecycle: MediaAssetLifecycleV1;
-  committed_release_count: number;
-  referencing_draft_count: number;
-  media_asset_id: string;
-  media_revision: number;
-  integrity_key: string;
-  scope: BoardScopeV1;
-}): MediaDiscardDecisionV1 => {
+export const evaluateMediaDiscard = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  input: {
+    lifecycle: MediaAssetLifecycleV1;
+    committed_release_count: number;
+    referencing_draft_count: number;
+    media_asset_id: string;
+    media_revision: number;
+  },
+): MediaDiscardDecisionV1 => {
   if (input.committed_release_count > 0) {
     return { status: "denied", reason_code: "already_released" };
   }
@@ -271,7 +276,7 @@ export const evaluateMediaDiscard = (input: {
   }
   return {
     status: "discardable",
-    mediaRef: deriveMediaRef(input.integrity_key, input.scope, input),
+    mediaRef: deriveMediaRef(integrityKey, scope, input),
     // The UI states the blast radius before the teacher confirms; those drafts
     // owner-reread as unavailable afterwards.
     affectedDraftCount: input.referencing_draft_count,

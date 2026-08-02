@@ -48,7 +48,7 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["query_caregiver_family_care_work", "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"],
   ["query_caregiver_teacher_board", "sha256:e54fd33fff1ca72ecfec7983a95bad58575d3696d053975f82d811a7e164de19"],
   ["query_family_care_item", "sha256:1bfdbb7f79b68a929799fd8959d20e5c95b6bef7d517780a35f7d076286ef323"],
-  ["query_guardian_current_focus", "sha256:2ac5a7b3736a26d3aa38600edac9f51d4a9e1f41c1d581a95492a5346a8f6e15"],
+  ["query_guardian_current_focus", "sha256:a38a1ec2a279af26295fc867ca8e66d8fda097139955acb247a32524e681947b"],
   ["query_guardian_enrollment_activity", "sha256:bad468244dd328c8efdccade21d9ade6bd7c2342bc777227547fcd1928156516"],
   ["query_guardian_family_board", "sha256:3428ce684cb827ba2b6aa4383a184252338018a059d3d4f6022817a237158080"],
   ["query_guardian_family_care_timeline", "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"],
@@ -269,7 +269,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.12.0");
+    expect(contract.version).toBe("1.13.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

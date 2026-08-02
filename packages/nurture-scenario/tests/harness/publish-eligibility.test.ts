@@ -293,37 +293,31 @@ describe("G3-C1 product delete mapped to its stage", () => {
   });
 
   it("allows a global discard only while nothing has been released", () => {
-    const discardable = evaluateMediaDiscard({
+    const discardable = evaluateMediaDiscard(BOARD_INTEGRITY_KEY, scope, {
       lifecycle: "ready",
       committed_release_count: 0,
       referencing_draft_count: 2,
       media_asset_id: "media-1",
       media_revision: 3,
-      integrity_key: BOARD_INTEGRITY_KEY,
-      scope,
     });
     expect(discardable).toMatchObject({ status: "discardable", affectedDraftCount: 2 });
     expect(
-      evaluateMediaDiscard({
+      evaluateMediaDiscard(BOARD_INTEGRITY_KEY, scope, {
         lifecycle: "ready",
         committed_release_count: 1,
         referencing_draft_count: 0,
         media_asset_id: "media-1",
         media_revision: 3,
-        integrity_key: BOARD_INTEGRITY_KEY,
-        scope,
       }),
     ).toEqual({ status: "denied", reason_code: "already_released" });
     for (const lifecycle of ["discarded", "redacted"] as const) {
       expect(
-        evaluateMediaDiscard({
+        evaluateMediaDiscard(BOARD_INTEGRITY_KEY, scope, {
           lifecycle,
           committed_release_count: 0,
           referencing_draft_count: 0,
           media_asset_id: "media-1",
           media_revision: 3,
-          integrity_key: BOARD_INTEGRITY_KEY,
-          scope,
         }),
         lifecycle,
       ).toEqual({ status: "denied", reason_code: "media_already_terminal" });

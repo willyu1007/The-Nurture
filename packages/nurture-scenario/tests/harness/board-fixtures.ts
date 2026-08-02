@@ -14,6 +14,7 @@ import type {
   RawPublishQueueRow,
   TeacherPublishQueueReadPort,
 } from "../../src/harness/teacher-publish-queue.js";
+import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js";
 import type {
   GuardianBoardReadPort,
   GuardianBoardScopeFacts,
@@ -317,6 +318,8 @@ export const createPublishQueueReadPort = (
     has_more: boolean;
     heads?: RawBoardSourceHead[];
   }> = [{ rows: [], has_more: false }],
+  /** Queue-wide census the owner reports independently of the page. */
+  stateCounts: Partial<Record<PublishProcessStateV1, number>> = {},
 ): TeacherPublishQueueReadPort & { requests: unknown[] } => {
   const requests: unknown[] = [];
   return {
@@ -331,6 +334,14 @@ export const createPublishQueueReadPort = (
         heads: page?.heads ?? [
           sourceHead({ source_kind: "daily_care_log", source_id: "publish-1" }),
         ],
+        state_counts: {
+          draft: 0,
+          needs_review: 0,
+          pending_release: 0,
+          released: 0,
+          cancelled: 0,
+          ...stateCounts,
+        },
       };
     },
   };

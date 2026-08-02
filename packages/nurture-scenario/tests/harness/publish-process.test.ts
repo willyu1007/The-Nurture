@@ -3,7 +3,6 @@ import { assembleDeterministicDraft } from "../../src/harness/content-assembler.
 import {
   DEFAULT_QUICK_ADJUST_SECONDS,
   PUBLISH_PROCESS_STATES,
-  admitToPendingRelease,
   createPublishCandidate,
   evaluateQuickAdjust,
   isLegalPublishProcessTransition,
@@ -15,6 +14,10 @@ import {
   type PublishTargetCandidateV1,
 } from "../../src/harness/publish-process.js";
 import type { OrganizeTriggerEvidenceV1 } from "../../src/harness/care-capture-batch.js";
+import {
+  admitToPendingRelease,
+  type ResolvedPublishScheduleV1,
+} from "../../src/harness/publish-schedule.js";
 import { BOARD_INTEGRITY_KEY, caregiverAuthority } from "./board-fixtures.js";
 
 const scope = { workspace_id: "ws-1", participant_id: "caregiver-1" };
@@ -292,6 +295,15 @@ describe("G3-B1 publication candidate creation", () => {
 
 describe("G3-B1 quick-adjust window", () => {
   const posture = { deadlineAt: "2026-08-01T08:30:30.000Z", seconds: 30 };
+  const resolvedSchedule: ResolvedPublishScheduleV1 = {
+    scheduledAt: "2026-08-01T09:00:00.000Z",
+    notAfter: "2026-08-01T11:00:00.000Z",
+    timeZone: "Asia/Shanghai",
+    policyRef: "syn-publication-policy-1",
+    policyHead: 5,
+    policyVersion: 2,
+    resolvedAt: "2026-08-01T02:00:00.000Z",
+  };
 
   it("counts down, pauses on touch or hold, and only then elapses", () => {
     expect(
@@ -336,14 +348,17 @@ describe("G3-B1 quick-adjust window", () => {
       editing: false,
       edit_hold_active: false,
       has_unsaved_revision: false,
-      resolved_schedule_available: true,
+      schedule: { status: "resolved" as const, schedule: resolvedSchedule },
     };
     expect(admitToPendingRelease(base)).toEqual({
       status: "blocked",
       reason_code: "quick_adjust_active",
     });
     const elapsed = { ...base, now: new Date("2026-08-01T08:31:00.000Z") };
-    expect(admitToPendingRelease(elapsed)).toEqual({ status: "admitted" });
+    expect(admitToPendingRelease(elapsed)).toEqual({
+      status: "admitted",
+      schedule: resolvedSchedule,
+    });
     expect(admitToPendingRelease({ ...elapsed, edit_hold_active: true })).toEqual({
       status: "blocked",
       reason_code: "edit_hold_active",
@@ -371,7 +386,7 @@ describe("G3-B1 quick-adjust window", () => {
         editing: false,
         edit_hold_active: false,
         has_unsaved_revision: false,
-        resolved_schedule_available: false,
+        schedule: { status: "unavailable", reason_code: "policy_unavailable" },
       }),
     ).toEqual({ status: "blocked", reason_code: "dependency_no_go" });
   });

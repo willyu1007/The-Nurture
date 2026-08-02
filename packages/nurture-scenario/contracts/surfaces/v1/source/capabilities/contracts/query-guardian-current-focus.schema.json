@@ -137,22 +137,20 @@
             "required": [
               "childRef",
               "childSafeLabel"
-            ]
+            ],
+            "properties": {
+              "childRef": {
+                "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+              },
+              "childSafeLabel": {
+                "$ref": "board-types.schema.json#/$defs/safeLabel"
+              }
+            }
           },
           "else": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "childRef"
-                  ]
-                },
-                {
-                  "required": [
-                    "childSafeLabel"
-                  ]
-                }
-              ]
+            "properties": {
+              "childRef": false,
+              "childSafeLabel": false
             }
           }
         }

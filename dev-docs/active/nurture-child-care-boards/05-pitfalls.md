@@ -160,6 +160,37 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-02 — "typed result" 说了四个 checkpoint,却从来没有被检查过
+
+- **Symptom**：G3-A～G3-D 每一格都声称能力返回 typed result,合同侧 schema 编译通过、
+  运行时侧单测通过,但没有任何一条检查把二者放在一起跑过。
+- **Root cause**：两侧各自有守卫,交界处没有。schema 校验器只编译它实际用来校验
+  文档的那些指针,运行时测试只断言自己关心的字段,中间那层"运行时输出是否满足
+  已注册 result schema"无人负责。
+- **Fix**：新增 `phase-3-typed-results.test.ts`,为每个已注册 T-006 capability
+  准备运行时生产者,按 descriptor 的 `resultSchemaRef` 用 Ajv 严格校验实际 payload;
+  没有生产者的 capability 让普查失败。同一套件顺带把 19 个此前无人引用的
+  `*_CAPABILITY` 常量双向绑定到注册表。
+- **它立刻抓到了东西**：`query-guardian-current-focus` 的 `focusCard` 条件式在严格
+  模式下根本编译不过(`then` 里 `required` 的属性没在同一子 schema 声明),
+  以及 `organize_care_capture_batch` 的已注册 result 没有任何生产者。
+- **Prevention**：凡是"A 侧声明、B 侧实现"的合同,守卫必须跨过交界。各自侧的检查
+  再多也只是证明各自自洽。写完一个 schema 就问:哪段代码会被喂给它?
+
+### 2026-08-02 — 同一个概念在不同模块发出两种不可互换的 ref
+
+- **Symptom**：publish target 在草稿卡片是 sealed ref、在 eligibility/release 是
+  opaque ref;publication 在结果里是 opaque ref、在输入解析处是 sealed ref。
+  后者更严重——客户端拿到的 `publicationRef` 永远无法回传给
+  `remove_publication_target_visibility`。
+- **Root cause**：ref 发放散落在各模块,每处按当时的直觉选 opaque 还是 sealed,
+  没有"一个概念一个发放器"的约束。跨模块的 ref 相等性没有任何测试覆盖。
+- **Fix**：每个概念一个导出发放器(`issuePublishTargetRef` 用 opaque,
+  `issuePublicationRef` 用 sealed 因为它确实被当输入接受),所有调用点改走它;
+  发放器放在两侧共同依赖的模块里,避免 lane 之间反向依赖。
+- **Prevention**：新增一类公开 ref 时,先决定它是否会被回传;然后只写一个发放器
+  并从共享模块导出。不要在使用点直接调 `issueBoard*Ref` 加字面量 kind。
+
 ### 2026-08-02 — 冻结的 adoption set 漏了两个必需的能力身份
 
 - **Symptom**：G3-C 的计划文本要求"从单张卡片 detach、未发布 asset 全局

@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { issueBoardSealedRef } from "../../src/harness/board-projection.js";
 import { issueMediaAssetTargetRef } from "../../src/harness/media-attribution.js";
-import { PUBLISH_PROCESS_TARGET_KIND } from "../../src/harness/publish-process.js";
+import {
+  PUBLISH_PROCESS_TARGET_KIND,
+  issuePublicationRef,
+} from "../../src/harness/publish-process.js";
 import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js";
 import {
   PUBLICATION_SAFETY_REASONS,
   correctPublication,
   detachPublishProcessMedia,
   discardMediaAsset,
-  issuePublicationTargetRef,
   redactPublication,
   removePublicationTargetVisibility,
   type CommittedPublicationFactV1,
@@ -120,7 +122,7 @@ describe("G3-D post-release safety actions", () => {
       process_ref: processRef(),
       operation_input: {
         reason: "wrong_target",
-        publicationRef: issuePublicationTargetRef(BOARD_INTEGRITY_KEY, scope, "pub-2"),
+        publicationRef: issuePublicationRef(BOARD_INTEGRITY_KEY, scope, "pub-2"),
       },
     });
     expect(decision.status).toBe("appended");

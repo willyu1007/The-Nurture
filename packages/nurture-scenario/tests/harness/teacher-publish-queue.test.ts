@@ -61,35 +61,41 @@ describe("G3-B1 query_teacher_publish_queue", () => {
     expect(result.output.binding.sourceHeads).toHaveLength(1);
   });
 
-  it("summarises the five states without inventing a sixth", async () => {
+  it("reports the owner's queue-wide census, not a count of the returned page", async () => {
     const result = await queryTeacherPublishQueue(
       deps(
-        createPublishQueueReadPort([
-          {
-            rows: [
-              publishQueueRow({ process_key: "p-1", state: "draft" }),
-              publishQueueRow({ process_key: "p-2", state: "needs_review" }),
-              publishQueueRow({ process_key: "p-3", state: "pending_release" }),
-              publishQueueRow({ process_key: "p-4", state: "released" }),
-              publishQueueRow({ process_key: "p-5", state: "cancelled" }),
-            ],
-            has_more: false,
-          },
-        ]),
+        createPublishQueueReadPort(
+          [
+            {
+              rows: [publishQueueRow({ process_key: "p-1", state: "draft" })],
+              has_more: true,
+            },
+          ],
+          // The queue holds far more than this page shows.
+          { draft: 9, needs_review: 2, pending_release: 4, released: 7, cancelled: 1 },
+        ),
       ),
       scopeFacts(),
-      scope,
+      { ...scope, page_size: 1 },
     );
     expect(result.status).toBe("ok");
     if (result.status !== "ok") return;
+    expect(result.output.items).toHaveLength(1);
     expect(result.output.counts).toEqual({
-      draft: 1,
-      needs_review: 1,
-      pending_release: 1,
-      released: 1,
+      draft: 9,
+      needs_review: 2,
+      pending_release: 4,
+      released: 7,
       cancelled: 1,
     });
-    expect(Object.keys(result.output.counts)).toHaveLength(5);
+    // Exactly the five business states, and never a sixth.
+    expect(Object.keys(result.output.counts).sort()).toEqual([
+      "cancelled",
+      "draft",
+      "needs_review",
+      "pending_release",
+      "released",
+    ]);
   });
 
   it("keeps a partial release visible instead of showing a bare published label", async () => {
@@ -188,7 +194,6 @@ describe("G3-B1 query_teacher_publish_queue", () => {
     expect(result.status).toBe("ok");
     if (result.status !== "ok") return;
     expect(result.output.items).toHaveLength(2);
-    expect(result.output.counts.draft).toBe(2);
     expect(port.requests).toHaveLength(2);
   });
 

@@ -12,6 +12,8 @@ import {
 } from "./publish-eligibility.js";
 import {
   PUBLISH_PROCESS_TARGET_KIND,
+  issuePublicationRef,
+  issuePublishTargetRef,
   type PublishProcessStateV1,
 } from "./publish-process.js";
 import type { ResolvedPublishScheduleV1 } from "./publish-schedule.js";
@@ -193,6 +195,10 @@ export const releasePublishProcess = async (
     return { status: "denied", reason_code: "before_scheduled_at" };
   }
 
+  if (facts.targets.length === 0) {
+    return { status: "denied", reason_code: "no_eligible_target" };
+  }
+
   const releaseRevision =
     facts.process_state === "released" ? facts.frozen_revision : facts.current_revision;
   if (releaseRevision === undefined) {
@@ -211,22 +217,16 @@ export const releasePublishProcess = async (
   const results: TargetReleaseResultV1[] = [];
   let committed = 0;
   for (const target of facts.targets) {
-    const targetRef = issueBoardOpaqueRef(
-      deps.integrity_key,
-      scope,
-      "publish_target",
-      target.target_key,
-    );
+    const targetRef = issuePublishTargetRef(deps.integrity_key, scope, target.target_key);
     if (target.already_committed) {
       // Exact replay: a committed target is never published twice.
       committed += 1;
       results.push({
         targetRef,
         outcome: "already_committed",
-        publicationRef: issueBoardOpaqueRef(
+        publicationRef: issuePublicationRef(
           deps.integrity_key,
           scope,
-          "publication_release",
           target.already_committed.publication_ref,
         ),
         receiptRef: issueBoardOpaqueRef(
@@ -260,10 +260,9 @@ export const releasePublishProcess = async (
       results.push({
         targetRef,
         outcome: "committed",
-        publicationRef: issueBoardOpaqueRef(
+        publicationRef: issuePublicationRef(
           deps.integrity_key,
           scope,
-          "publication_release",
           commit.publication_ref,
         ),
         receiptRef: issueBoardOpaqueRef(

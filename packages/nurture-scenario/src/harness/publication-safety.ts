@@ -1,7 +1,6 @@
 import {
   CAREGIVER_BOARD_ROLES,
   issueBoardOpaqueRef,
-  issueBoardSealedRef,
   resolveBoardSealedRef,
   type BoardScopeV1,
   type CaregiverFactAuthorityV1,
@@ -14,7 +13,9 @@ import {
 } from "./publish-eligibility.js";
 import { MEDIA_ASSET_TARGET_KIND, type MediaAssetLifecycleV1 } from "./media-attribution.js";
 import {
+  PUBLICATION_TARGET_KIND,
   PUBLISH_PROCESS_TARGET_KIND,
+  issuePublicationRef,
   type PublishProcessStateV1,
 } from "./publish-process.js";
 
@@ -53,7 +54,7 @@ export const DISCARD_MEDIA_ASSET_CAPABILITY = {
   version: "1.0.0",
 } as const;
 
-export const PUBLICATION_TARGET_KIND = "publication_release";
+
 
 /** Closed reason taxonomy; the audit records a key, never free prose. */
 export const PUBLICATION_SAFETY_REASONS = [
@@ -191,10 +192,9 @@ const buildEvent = (
   kind,
   reason,
   occurredAt,
-  publicationRef: issueBoardOpaqueRef(
+  publicationRef: issuePublicationRef(
     deps.integrity_key,
     scope,
-    "publication_release",
     publication.publication_id,
   ),
   // The Receipt survives every safety action; "delete" never means erase.
@@ -352,11 +352,7 @@ export const redactPublication = async (
   };
 };
 
-export const issuePublicationTargetRef = (
-  integrityKey: string,
-  scope: BoardScopeV1,
-  publicationId: string,
-): string => issueBoardSealedRef(integrityKey, scope, PUBLICATION_TARGET_KIND, publicationId);
+
 
 // ---------------------------------------------------------------------------
 // Media lifecycle capabilities (2026-08-02 adoption-set amendment).
@@ -447,13 +443,11 @@ export const discardMediaAsset = async (
   });
   if (!facts) return { status: "denied", reason_code: "target_unavailable" };
   if (!actorEligible(facts.authority)) return { status: "denied", reason_code: "not_authorized" };
-  return evaluateMediaDiscard({
+  return evaluateMediaDiscard(deps.integrity_key, scope, {
     lifecycle: facts.media_lifecycle,
     committed_release_count: facts.committed_release_count,
     referencing_draft_count: facts.referencing_draft_count,
     media_asset_id: mediaAssetId,
     media_revision: facts.media_revision,
-    integrity_key: deps.integrity_key,
-    scope,
   });
 };

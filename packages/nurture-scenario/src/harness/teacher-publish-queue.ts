@@ -75,6 +75,8 @@ export type TeacherPublishQueueReadPort = {
     rows: RawPublishQueueRow[];
     has_more: boolean;
     heads: RawBoardSourceHead[];
+    /** Queue-wide census for this CareGroup, not a count of the current page. */
+    state_counts: Record<PublishProcessStateV1, number>;
   }>;
 };
 
@@ -102,6 +104,7 @@ export type TeacherPublishQueueItemV1 = {
 export type TeacherPublishQueueOutputV1 = {
   binding: BoardModuleBindingV1;
   careGroupRef: string;
+  /** Queue-wide state census; it never describes only the returned page. */
   counts: Record<PublishProcessStateV1, number>;
   items: TeacherPublishQueueItemV1[];
   pageInfo: BoardPageInfoV1;
@@ -178,7 +181,7 @@ export const queryTeacherPublishQueue = async (
 
   let authorized = true;
   const collectedHeads: RawBoardSourceHead[] = [];
-  const counts = emptyCounts();
+  let counts = emptyCounts();
   const page = await scanBoardPage<RawPublishQueueRow, TeacherPublishQueueItemV1>({
     pageSize,
     ...(before ? { before } : {}),
@@ -193,6 +196,7 @@ export const queryTeacherPublishQueue = async (
       });
       if (!result.authorized) authorized = false;
       collectedHeads.push(...result.heads);
+      if (result.authorized) counts = { ...emptyCounts(), ...result.state_counts };
       return {
         rows: result.authorized ? result.rows : [],
         has_more: result.authorized ? result.has_more : false,
@@ -201,7 +205,6 @@ export const queryTeacherPublishQueue = async (
     sortKey: (row) => ({ occurred_at: row.occurred_at, id: row.process_key }),
     project: (row) => {
       if (!caregiverFactVisible(row.authority)) return null;
-      counts[row.state] += 1;
       return {
         processRef: issueBoardSealedRef(
           deps.integrity_key,

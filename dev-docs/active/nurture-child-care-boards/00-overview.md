@@ -6,11 +6,14 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-02
-- Next step: G3-A、G3-B1、G3-C1 与 G3-D 均已完成，surface artifact additive
-  旋转至 `nurture.surface-contract@1.12.0` /
-  `sha256:a9dcd5c89b0671fc89a0de618375c85b667742bf96ae27a9f66498eb8e3ca29f`，
-  G3 adoption set 已关闭；下一步进入 G3-E integration qualification，
-  它需要 T-005 G2-C 联合运行与 T-007 provider。
+- Next step: G3-A～G3-D 均已完成并通过一次实施质量复核，surface artifact
+  additive 旋转至 `nurture.surface-contract@1.13.0` /
+  `sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef`，
+  G3 adoption set 已关闭。G3-E readiness review 结论为 `G3_E_NOT_READY`：
+  需要先补一格 owner-integration 准备（DB SSOT delta、owner repositories、
+  capture-lane port、ingress 路由、T-005 direct-interaction consumer action），
+  之后才是 T-007 与 T-005 G2-C 的联合运行。详见
+  [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal
 

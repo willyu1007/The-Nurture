@@ -126,6 +126,29 @@ export const DEFAULT_QUICK_ADJUST_SECONDS = 30;
 
 export const PUBLISH_PROCESS_TARGET_KIND = "publish_process";
 export const PUBLISH_TARGET_KIND = "publish_target";
+export const PUBLICATION_TARGET_KIND = "publication_release";
+
+/**
+ * The single issuer for a public publication handle. It is sealed because
+ * `remove_publication_target_visibility` accepts it back as typed input; a
+ * display-only ref would hand clients something they cannot act on.
+ */
+export const issuePublicationRef = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  publicationId: string,
+): string => issueBoardSealedRef(integrityKey, scope, PUBLICATION_TARGET_KIND, publicationId);
+
+/**
+ * The single issuer for a public target handle. Every module that projects a
+ * target — draft card, eligibility, release result — must use this one, or a
+ * client cannot tell that two of them mean the same family.
+ */
+export const issuePublishTargetRef = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  targetKey: string,
+): string => issueBoardOpaqueRef(integrityKey, scope, PUBLISH_TARGET_KIND, targetKey);
 
 /** Owner-internal composite; it never leaves the server in any form. */
 export const publishTargetKey = (
@@ -296,10 +319,9 @@ export const createPublishCandidate = async (
       assembledAt: now.toISOString(),
     },
     targets: input.targets.map((target) => ({
-      targetRef: issueBoardSealedRef(
+      targetRef: issuePublishTargetRef(
         deps.integrity_key,
         scope,
-        PUBLISH_TARGET_KIND,
         publishTargetKey(target),
       ),
       dataClass: target.data_class,
@@ -348,61 +370,4 @@ export const evaluateQuickAdjust = (input: {
   const remainingMs = new Date(input.posture.deadlineAt).getTime() - input.now.getTime();
   if (remainingMs <= 0) return { status: "elapsed" };
   return { status: "running", remainingSeconds: Math.ceil(remainingMs / 1_000) };
-};
-
-export type PendingReleaseAdmissionV1 =
-  | { status: "admitted" }
-  | {
-      status: "blocked";
-      reason_code:
-        | "quick_adjust_active"
-        | "needs_review"
-        | "edit_hold_active"
-        | "unsaved_revision"
-        | "illegal_transition"
-        | "dependency_no_go";
-    };
-
-/**
- * Everything the capture-to-draft lane can decide about entering the
- * send queue. The queue itself still needs a resolved institution schedule, so
- * without the T-007 publication-policy provider this fails closed instead of
- * inventing a send time.
- */
-export const admitToPendingRelease = (input: {
-  now: Date;
-  state: PublishProcessStateV1;
-  posture?: QuickAdjustPostureV1;
-  editing: boolean;
-  edit_hold_active: boolean;
-  has_unsaved_revision: boolean;
-  resolved_schedule_available: boolean;
-}): PendingReleaseAdmissionV1 => {
-  if (!isLegalPublishProcessTransition(input.state, "pending_release")) {
-    return {
-      status: "blocked",
-      reason_code: input.state === "needs_review" ? "needs_review" : "illegal_transition",
-    };
-  }
-  if (input.state === "needs_review") return { status: "blocked", reason_code: "needs_review" };
-  if (input.edit_hold_active) return { status: "blocked", reason_code: "edit_hold_active" };
-  if (input.has_unsaved_revision) {
-    return { status: "blocked", reason_code: "unsaved_revision" };
-  }
-  if (input.posture) {
-    const quickAdjust = evaluateQuickAdjust({
-      now: input.now,
-      posture: input.posture,
-      editing: input.editing,
-      edit_hold_active: input.edit_hold_active,
-    });
-    // A scheduler may never publish before this candidate's own deadline.
-    if (quickAdjust.status !== "elapsed") {
-      return { status: "blocked", reason_code: "quick_adjust_active" };
-    }
-  }
-  if (!input.resolved_schedule_available) {
-    return { status: "blocked", reason_code: "dependency_no_go" };
-  }
-  return { status: "admitted" };
 };

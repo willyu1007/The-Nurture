@@ -1,4 +1,9 @@
-import { CAREGIVER_BOARD_ROLES, type CaregiverFactAuthorityV1 } from "./board-projection.js";
+import {
+  CAREGIVER_BOARD_ROLES,
+  issueBoardOpaqueRef,
+  type BoardScopeV1,
+  type CaregiverFactAuthorityV1,
+} from "./board-projection.js";
 
 /**
  * G3-B1 capture lane (01-plan.md D-10, decision status locked).
@@ -310,5 +315,49 @@ export const evaluateOrganizeTrigger = (
     },
     includedCaptureIds: included.map((capture) => capture.capture_id),
     deferredCaptureIds: deferred.map((capture) => capture.capture_id),
+  };
+};
+
+/**
+ * Projects a trigger decision into the capability's typed result. Without this
+ * the registered `organize_care_capture_batch` result had no producer at all —
+ * a contract nothing in the runtime could actually satisfy.
+ */
+export type OrganizeCareCaptureBatchResultV1 = {
+  batchRef: string;
+  outcome: "organized" | "nothing_to_organize";
+  processRef?: string;
+  watermarkSequence: number;
+  includedCaptureCount: number;
+  deferredCaptureCount: number;
+};
+
+export const projectOrganizeResult = (
+  integrityKey: string,
+  scope: BoardScopeV1,
+  input: { batch_id: string; decision: OrganizeTriggerDecisionV1; process_ref?: string },
+): OrganizeCareCaptureBatchResultV1 => {
+  const batchRef = issueBoardOpaqueRef(
+    integrityKey,
+    scope,
+    "care_capture_batch",
+    input.batch_id,
+  );
+  if (input.decision.status !== "cut") {
+    return {
+      batchRef,
+      outcome: "nothing_to_organize",
+      watermarkSequence: 0,
+      includedCaptureCount: 0,
+      deferredCaptureCount: 0,
+    };
+  }
+  return {
+    batchRef,
+    outcome: "organized",
+    ...(input.process_ref ? { processRef: input.process_ref } : {}),
+    watermarkSequence: input.decision.evidence.watermark.source_sequence,
+    includedCaptureCount: input.decision.includedCaptureIds.length,
+    deferredCaptureCount: input.decision.deferredCaptureIds.length,
   };
 };

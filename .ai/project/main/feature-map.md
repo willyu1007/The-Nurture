@@ -335,8 +335,8 @@ Project: `main`
 - Related Tasks: T-004 (`done`); T-005 (`archived`); T-006～T-008 (`planned`).
 - Next Checkpoint: T-005 G2 Exit is PASS at `nurture.surface-contract@1.8.0` /
   `sha256:4fe91e13…`, and T-006 G3-A through G3-D additively rotated the
-  current provider root to `nurture.surface-contract@1.12.0` /
-  `sha256:a9dcd5c8…` without touching the shared core or any T-005 capability
+  current provider root to `nurture.surface-contract@1.13.0` /
+  `sha256:1919a289…` without touching the shared core or any T-005 capability
   slice. The single critical lane advances to T-006 G3-E integration
   qualification, which needs the T-005 G2-C joint run and the T-007
   provider; T-007 continues from G4-0C when it becomes the critical lane. All

@@ -1,10 +1,13 @@
 import {
-  QUIESCENCE_MAX_SECONDS,
-  QUIESCENCE_MIN_SECONDS,
   validateOrganizeTriggerPolicy,
   type OrganizeTriggerPolicyV1,
 } from "./care-capture-batch.js";
-import type { PublishProcessStateV1 } from "./publish-process.js";
+import {
+  evaluateQuickAdjust,
+  isLegalPublishProcessTransition,
+  type PublishProcessStateV1,
+  type QuickAdjustPostureV1,
+} from "./publish-process.js";
 
 /**
  * G3-D schedule resolution (02-architecture.md D-09).
@@ -324,8 +327,12 @@ export const evaluateSchedulerAttempt = (input: {
   has_unsaved_revision: boolean;
   policy_head_current: number;
   quick_adjust_active: boolean;
+  /** A released process is still attempted while some target has not committed. */
+  has_uncommitted_targets?: boolean;
 }): SchedulerAttemptDecisionV1 => {
-  if (input.state !== "pending_release") {
+  const retryingPartial =
+    input.state === "released" && input.has_uncommitted_targets === true;
+  if (input.state !== "pending_release" && !retryingPartial) {
     return { status: "skip", reason_code: "not_queued" };
   }
   if (input.now.getTime() >= Date.parse(input.schedule.notAfter)) {
@@ -351,7 +358,62 @@ export const evaluateSchedulerAttempt = (input: {
   return { status: "attempt" };
 };
 
-export const QUIESCENCE_BOUNDS = {
-  min: QUIESCENCE_MIN_SECONDS,
-  max: QUIESCENCE_MAX_SECONDS,
-} as const;
+// ---------------------------------------------------------------------------
+// Entering the send queue
+
+export type PendingReleaseAdmissionV1 =
+  | { status: "admitted"; schedule: ResolvedPublishScheduleV1 }
+  | {
+      status: "blocked";
+      reason_code:
+        | "quick_adjust_active"
+        | "needs_review"
+        | "edit_hold_active"
+        | "unsaved_revision"
+        | "illegal_transition"
+        | "dependency_no_go";
+    };
+
+/**
+ * Everything that must hold before content enters the send queue, including the
+ * institution window it will carry from then on. `needs_review` is refused here
+ * even though the state machine allows the transition: the gray-zone lane is
+ * resolved by a class teacher, never advanced by a timeout.
+ */
+export const admitToPendingRelease = (input: {
+  now: Date;
+  state: PublishProcessStateV1;
+  posture?: QuickAdjustPostureV1;
+  editing: boolean;
+  edit_hold_active: boolean;
+  has_unsaved_revision: boolean;
+  schedule: ScheduleResolutionV1;
+}): PendingReleaseAdmissionV1 => {
+  if (input.state === "needs_review") {
+    return { status: "blocked", reason_code: "needs_review" };
+  }
+  if (!isLegalPublishProcessTransition(input.state, "pending_release")) {
+    return { status: "blocked", reason_code: "illegal_transition" };
+  }
+  if (input.edit_hold_active) return { status: "blocked", reason_code: "edit_hold_active" };
+  if (input.has_unsaved_revision) {
+    return { status: "blocked", reason_code: "unsaved_revision" };
+  }
+  if (input.posture) {
+    const quickAdjust = evaluateQuickAdjust({
+      now: input.now,
+      posture: input.posture,
+      editing: input.editing,
+      edit_hold_active: input.edit_hold_active,
+    });
+    // A scheduler may never publish before this candidate's own deadline.
+    if (quickAdjust.status !== "elapsed") {
+      return { status: "blocked", reason_code: "quick_adjust_active" };
+    }
+  }
+  // Without a resolved institution window there is no send time to queue for.
+  if (input.schedule.status !== "resolved") {
+    return { status: "blocked", reason_code: "dependency_no_go" };
+  }
+  return { status: "admitted", schedule: input.schedule.schedule };
+};

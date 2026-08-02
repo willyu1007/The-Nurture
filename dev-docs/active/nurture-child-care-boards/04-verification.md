@@ -396,3 +396,28 @@
 | negative: any registered T-006 capability the freeze never reserved | PASS — inverse census added alongside the freeze-side completeness check |
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
 | governance lint + `ctl-context verify --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |
+
+## 2026-08-02 — Implementation Quality Pass and G3-E Readiness Review
+
+| Command / check | Result |
+| --- | --- |
+| cross-module ref consistency audit (publish target, publication) | FAIL then PASS — two issuers disagreed; unified and re-verified |
+| `pnpm test:unit` | PASS — 50 files / 504 tests |
+| `pnpm typecheck` | PASS — no diagnostics |
+| `pnpm verify:surface-conformance` | PASS — `1.13.0` / `sha256:1919a289…`, cases=16 slices=50/50, 105 contract tests |
+| additive-rotation census | PASS — shared core and every pre-existing slice hash byte-identical |
+| `pnpm verify:g3-0-freeze` / `verify:g2-exit-contract` / `verify:test-routing` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — files=85 unit=50 |
+| new: runtime payload of every registered T-006 capability validated against its `resultSchemaRef` | PASS — 24 capabilities, Ajv strict |
+| new: producer census over registered T-006 capabilities | PASS — a capability without a runtime producer fails the suite |
+| new: runtime `*_CAPABILITY` constants bound to registry key/version, both directions | PASS — 20 constants |
+| defect found by the new suite: `focusCard` conditional not strict-compilable | FIXED — both branches now declare the properties they constrain |
+| defect: publish target ref issued sealed on the draft card and opaque in eligibility/release | FIXED — single `issuePublishTargetRef` |
+| defect: publication ref issued opaque but resolved sealed, so it could never be passed back | FIXED — single `issuePublicationRef` |
+| defect: publish-queue `counts` accumulated from the page, not the queue | FIXED — owner supplies the queue-wide census; test asserts page ≠ census |
+| defect: scheduler refused to attempt a released+partial process the release lane accepts | FIXED — `has_uncommitted_targets` |
+| defect: zero-target release produced a contract-invalid empty result | FIXED — `no_eligible_target` guard |
+| defect: `organize_care_capture_batch` result had no runtime producer | FIXED — `projectOrganizeResult` |
+| seam: `admitToPendingRelease` still took a boolean instead of the resolver | FIXED — consumes `ScheduleResolutionV1`, returns the frozen window |
+| G3-E readiness review | `G3_E_NOT_READY` — 7 blockers recorded in `07-g3-e-implementation-readiness-review.md` |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 8/8 files |
+| governance lint + `ctl-context verify --strict` | PASS |

@@ -215,6 +215,17 @@
         "runner": "vitest",
         "target": "packages/nurture-scenario/tests/surface-contract/phase-3-release-loop.test.ts"
       }
+    },
+    {
+      "caseKey": "typed-result-runtime-conformance",
+      "kind": "descriptor_handler_presenter_consistency",
+      "covers": [
+        "all_slices"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-typed-results.test.ts"
+      }
     }
   ]
 }
