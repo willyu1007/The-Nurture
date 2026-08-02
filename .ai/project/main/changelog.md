@@ -50,3 +50,10 @@ Project: `main`
 - 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=in-progress to=done
 - 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=done to=archived
 - 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=status from=planned to=in-progress
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=checkpoint id=g3e-prep-b1 result=landed scope=db-ssot-delta,fail-closed-legacy-migration schema=10-additive-models,5-extend-in-place migration_gate=falsified-on-scratch-db
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=checkpoint id=g3e-prep-b2-b3 result=landed scope=fourteen-owner-ports,capture-read-port atomic_release=per-target-transaction falsified=audit-write-blocked-mid-transaction
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=checkpoint id=g3e-prep-b4 result=partial scope=six-query-capabilities,two-board-writes versions=per-capability unrouted=16 census=registry-derived
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=review id=independent-adversarial-review findings=46 refuted=2 partial=2 severe=raw-id-in-public-result,unsealed-cursor,silently-dropped-check remediation=complete
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=freeze-amendment id=g3-0-amendment-2 scope=content-safety-marker-facts columns=nullable-on-purpose
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=freeze-amendment id=g3-0-amendment-3 scope=command-identity,safety-route-anchor,frozen-schedule-heads blocker=b8-prerequisites migration_gate=fail-closed
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=blocker id=B8 status=open scope=sixteen-write-capabilities need=owner-write-transaction,command-spec decomposition=unit-0-serial-then-three-parallel

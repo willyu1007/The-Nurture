@@ -19,10 +19,20 @@ Project: `main`
   `nurture.surface-contract@1.8.0` / `sha256:4fe91e13…` is Nurture-provider
   qualified against the pinned owner path, with single-writer/default-off guards.
   T-006 G3-0 is frozen as `G3_0_FREEZE_PASS`; G3-A, G3-B1, G3-C1 and G3-D are
-  delivered. The 2026-08-02 readiness review is `G3_E_NOT_READY` with seven
-  blockers, so the current critical lane is the G3-E preparatory checkpoint
-  rather than G3-E itself; its first item, the DB SSOT delta and its
-  fail-closed legacy migration, is landed and DB-qualified.
+  delivered. The 2026-08-02 readiness review is `G3_E_NOT_READY`, so the current
+  critical lane is the G3-E preparatory checkpoint rather than G3-E itself.
+  Of its blockers, B1 (DB SSOT delta), B2 (all fourteen owner ports including
+  the atomic per-target release) and B3 (capture read port) are closed; B4 is
+  partial — the six query capabilities and two board writes are routed on the
+  formal ingress, and the ingress now admits each capability at its own exact
+  registered version. B8 is new: the remaining sixteen write capabilities are
+  decision-only functions with no owner write and no command spec, and their
+  four schema prerequisites landed on 2026-08-02.
+  An independent review of the landed work produced 46 findings; 2 did not hold,
+  2 held in part, the rest are fixed or recorded. The sharpest were public
+  results carrying raw identifiers, a page cursor readable without a key, and a
+  T-005 CHECK constraint silently dropped with its column — each now has a
+  mechanical check that was falsified before acceptance.
   Every checkpoint rotated the artifact additively, now at
   `nurture.surface-contract@1.13.0` / `sha256:1919a289…` — shared core and every
   T-005 capability slice stay byte-identical, so the G2 Exit evidence is preserved.
@@ -86,8 +96,12 @@ Project: `main`
   Deterministic/manual lanes are required; AI copy and face match are optional unless
   the beta profile says otherwise. G3-E requires exact G2-C and the T-007
   publication-policy subset without making full T-007 a serial prerequisite.
-  Overall audit is PASS; remaining work begins at G3-0 exact contract/fact/schema
-  freeze rather than reopening stage-level product decisions.
+  Overall audit is PASS. G3-0 froze the contract/fact/schema set and G3-A～G3-D
+  are delivered, so remaining work is the G3-E preparatory checkpoint: B8's
+  sixteen write capabilities need an owner write transaction and a command spec
+  each, then the rest of the ingress routing. The decomposition is one serial
+  foundation unit (a shared write-spec factory and a per-capability dispatch
+  table) followed by three genuinely disjoint owner-aggregate lanes.
 - Stage G4: T-007 uses G4-0 rolling contract/fact freeze, G4-A authority/aggregate,
   G4-B role-bound mobile, G4-C Admin Workbench Core, G4-D Enrollment Journey,
   G4-E Knowledge/RAG and G4-F qualification/handoff. The publication-policy subset
