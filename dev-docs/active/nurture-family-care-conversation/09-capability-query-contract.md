@@ -1,9 +1,9 @@
-# Capability Registry and Query Contract V1
+# Capability Registry and Query Contract
 
 ## Capability Identity
 
-capability identity 由 stable `capabilityKey` 与独立 `capabilityVersion=1.0.0` 组成；
-key 不携带 `_v1` 后缀。V1 registry 是封闭集合：
+capability identity 由 stable `capabilityKey` 与独立 `capabilityVersion` 组成；
+key 不携带版本后缀。G2-C qualification 后的 registry 是封闭集合：
 
 - query：`query_guardian_family_care_timeline`、
   `query_caregiver_family_care_work`、`query_family_care_item`。
@@ -11,20 +11,18 @@ key 不携带 `_v1` 后缀。V1 registry 是封闭集合：
   `acknowledge_family_care_item`、`reply_family_care_item`。
 - Increment 2 author action：`correct_family_care_message`、
   `withdraw_family_care_request`、`redact_family_care_message`。
+- G2-C action：`initiate_caregiver_direct_message@1.0.0`。
 - internal system action：`policy_redact_family_care_message`；它不进入普通用户
   discovery candidate。
 
-上列集合是 G2-A/B 已冻结 registry。Stage G2 final Exit 还要求 G2-C dedicated
-caregiver-initiated direct-interaction capability。它不是
-`submit_family_care_question` 的反向 alias；Phase 0 必须先冻结 exact stable key、
-typed input/result、canonical effect、family-side response expectation、Receipt、
-policy/handler/presenter binding，再把它加入新的 capability version 和 T-004 exact
-interface digest。在此之前：
-
-- 当前 V1 discovery 不发布一个占位或可调用的 G2-C key；
-- T-006 只显示 safe unavailable/dependency NO-GO；
-- consumer 不得猜测 capability name、复用 family-question schema 或调用 legacy raw
-  command。
+三个 query capability 因修正 exact result shape 并支持 Message-only timeline，统一
+旋转为 `1.1.0`；其余 action 仍为 `1.0.0`。G2-C 不是
+`submit_family_care_question` 的反向 alias：它使用独立 typed input/result、
+Message-only canonical effect、Receipt、policy/handler/presenter binding。当前 exact
+root 为 `nurture.surface-contract@1.8.0` /
+`sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`。
+T-006 在完成真实 consumer joint qualification 前仍只能显示 safe dependency
+阻塞，不得猜测 raw command 或复用 family-question schema。
 
 新增、删除、改义、改变 typed schema/policy/handler/presenter binding 必须生成新的
 capability version 和 T-004 interface contract digest；客户端不能靠 key 后缀猜版本。
@@ -110,26 +108,29 @@ CapabilityActionRefV1
 ## Guardian Timeline Output
 
 ```text
-GuardianFamilyCareTimelineOutputV1
-  items: GuardianFamilyCareTimelineItemV1[]
+GuardianFamilyCareTimelineOutputV2
+  items: GuardianFamilyCareTimelineItemV2[]
   pageInfo: SnapshotPageInfoV1
 
-GuardianFamilyCareTimelineItemV1
-  kind: source_question | caregiver_reply | correction_notice
-      | withdrawal_notice | redaction_tombstone | receipt_status
+GuardianFamilyCareTimelineItemV2
+  kind: source_question | caregiver_reply | caregiver_direct_message
+      | correction_notice | withdrawal_notice | redaction_tombstone
   itemRef
-  careItemRef
+  messageRef
+  careItemRef?  # 仅 CareItem-backed row
   enrollmentRef
   sourceLabel
   occurredAt
   content?: AuthorizedProtectedContentV1
-  state: RoleSafeFamilyCareStateV1
+  state?: RoleSafeFamilyCareStateV1  # 仅 CareItem-backed row
   receipt?: RoleSafeReceiptV1
   contextContinuation?: RoleSafeContinuationV1
 ```
 
 - timeline 可以聚合多个 current-readable Enrollment，但每个 item 必须保留 opaque
   Enrollment provenance 和 display-safe source label；不能把冲突来源合并为单一权威事实。
+- `caregiver_direct_message` 是 Message-only row：必须有 `messageRef`，不得伪造
+  `careItemRef` 或三轴 `state`；correction/redaction 保持同一 Message lineage。
 - `content` 只在 current family-side owner policy 允许且 item 未 redacted 时出现；
   internal protected-content ref 永不返回。
 - source relation 后续不可读时，`contextContinuation` 整体省略，不泄漏源是否存在。

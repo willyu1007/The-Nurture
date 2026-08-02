@@ -770,3 +770,28 @@
   变化；验证仅使用显式临时 PostgreSQL 数据库并在退出时删除。因 command kernel
   与 scenario-service runtime 属于 Nurture self-pin population，使用 verifier 自身
   path-content 算法重算 57-file self-pin 为 `f7d618bd…`；My-Chat/Base revision/pin 未改。
+
+## 2026-08-02 — G2-C provider 实现与质量收口
+
+- 新增独立 `initiate_caregiver_direct_message@1.0.0`：bounded eligibility read
+  只发放 exact CareGroup caregiver 的 owner target option；confirmation 绑定
+  Enrollment/CareGroup/role/Grant/thread/safety heads；serializable execute 重读全部
+  facts 后只写 encrypted Message + logical Receipt + immutable CommandExecution。
+- target option 由含 raw Enrollment id 的 signed locator 收敛为不可逆 HMAC handle；
+  supplied invalid ref（包括唯一候选场景）不再退回隐式 default 或 clarification，
+  而是 `not_authorized`。
+- guardian timeline 从强制 CareItem 的 V1 shape 旋转到 Message-aware V2 union；
+  direct/correction/redaction row 有 `messageRef`，没有伪造 `careItemRef/state`。
+  original Grant 失效后正文与 direct readResult 都 fail closed。
+- correction 的 org-to-family Receipt 改从 canonical Thread 取 family，不再依赖
+  direct path 不存在的 Item。多 current family/thread 歧义也不再按 row order 猜测。
+- 质量审计同时修复 query exact schema 旧漂移：caregiver work 的 `pageInfo`、item
+  detail 的 `replyCount` 与 `not_applicable` 现在有唯一 result schema `@2`；三个 query
+  capability 一起旋转到 `1.1.0`，不保留旧 runtime/schema 双轨。
+- surface root 旋转为 `nurture.surface-contract@1.8.0` /
+  `sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`。
+  Prisma schema 已有 direct kind/data class 所需列，因此没有新 migration，也没有
+  persistent DB apply、activation 或 traffic。
+- self-pin population 不再只选旧入口依赖；它现在覆盖完整 scenario Harness 与 direct
+  eligibility/query repositories，共 69 files，按 verifier 算法重算为
+  `0e684436322a1865febad9e54dea241f16046b1813b765c876e238a415551e03`。

@@ -424,3 +424,26 @@ No Prisma schema/migration, T-004 artifact, environment value, secret, activatio
 traffic changed. The two initial missing-environment runs executed no valid DB suite and
 are retained here as command-entry lessons; all authoritative reruns used isolated,
 freshly materialized schemas and passed.
+
+## G2-C provider qualification and quality remediation — 2026-08-02
+
+| Check | Result |
+| --- | --- |
+| `pnpm test:unit` | PASS 29 files / 268 tests |
+| `pnpm --filter @the-nurture/scenario-service test` | PASS 8 files / 49 tests |
+| production DB suite on a freshly migrated disposable PostgreSQL | PASS 13 files / 86 tests |
+| scenario-service DB suite on a freshly migrated disposable PostgreSQL | PASS 2 files / 22 tests; Harness 16/16, including direct happy/replay/lifecycle, safety/authority negatives, exact-Grant replacement denial, stale-head rollback and Grant-revoke reread |
+| dual-database dev-host isolation suite | PASS 11 files / 26 tests on separate freshly migrated Nurture and workflow-dev-host databases |
+| scenario / DB / scenario-service typechecks | PASS |
+| `pnpm verify:surface-conformance` | PASS; exact `nurture.surface-contract@1.8.0` / `sha256:4fe91e13…`; 38 schemas, 11 capabilities, 26/26 slices, 7 negatives, 56/56 synthetic tests |
+| `pnpm verify:formal-ingress-contract` | PASS; 7 routes, 8 action keys |
+| OpenAPI/API index/context strict verify | PASS; 7 endpoints; final source checksum `f3995b30…` matches query `1.1.0` contract |
+| Nurture self-pin | PASS; expanded exact implementation population 69 files / `0e684436…`; no floating Base/My-Chat repin |
+| protected persistence / port topology / test routing / diff checks | PASS |
+| temporary DB effect boundary | PASS; every explicit `the_nurture_g2c_*` database was dropped on exit |
+| root aggregate `pnpm typecheck` | EXTERNAL OWNER GATE; local packages pass, but the current sibling My-Chat checkout has an unrelated `growth_record_family_chat_reference_set` / `AuditAction` compile error |
+| live `verify:workflow-contract-pin` | EXTERNAL OWNER GATE; verifier correctly rejects current Base `8649e0e` against frozen `06303e9`; no sibling mutation or floating repin |
+
+Checkpoint evidence and stable AC IDs `T005-AC-050..059` are recorded in
+`13-g2c-checkpoint-record.md`. The provider is qualified but consumer adoption,
+cross-owner G2 Exit evidence, deployment, activation and traffic remain unclaimed.

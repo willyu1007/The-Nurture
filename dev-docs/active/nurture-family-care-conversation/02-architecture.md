@@ -515,12 +515,14 @@ G2-C 的固定边界为：
 - G2-C 必须明确自己的 canonical effect、original-scope relation、family-side
   projection/response expectation、logical Receipt、correction/redaction 和
   ActionDelivery invalidation。不得把 G2-A family-authored CareItem 状态机反向套用；
-- capability 未冻结进 T-004 exact digest、owner/policy unavailable、contract mismatch
-  或 qualification 未通过时，T-006 只显示安全阻塞并保留内部 source。
-
-exact public capability key、typed input/output 与是否创建独立 CareItem/response
-obligation 在 Phase 0 冻结；在该决定完成前不得注册 handler、写 migration、启用
-T-006 action 或把 T-005 标为 done。
+- exact capability 为 `initiate_caregiver_direct_message@1.0.0`，只创建
+  `caregiver_direct_message` + logical Receipt；不创建 CareItem/Attention，也没有
+  ack/reply obligation。guardian timeline 通过 query `1.1.0` 的 Message-only row
+  呈现，不伪造三轴状态。
+- exact key/result/provider 已进入 `nurture.surface-contract@1.8.0` /
+  `sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`；
+  owner/policy unavailable、contract mismatch 或 consumer joint qualification
+  未通过时，T-006 仍只显示安全阻塞并保留内部 source。
 
 G2-C provider qualification 不以 T-006 整体完成为前置。T-005 使用 exact T-004
 digest、owner-issued synthetic consumer fixture 和 provider-side positive/negative

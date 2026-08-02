@@ -297,3 +297,13 @@ qualification 证据;quarantine 行数不阻塞 G2-A,但必须逐类列账。
 capability/digest 变更(G2-C digest rotation 留待下一 pin action)、无
 数据库/secret/deployment/activation/traffic 效果;所有 consumer 保持
 default-off。
+
+## Qualification addendum — 2026-08-02
+
+冻结语义已由 `13-g2c-checkpoint-record.md` 实现并资格化。G2-C pin action 将
+registry 收敛为 `nurture.surface-contract@1.8.0` /
+`sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`；
+三个 query capability 同步旋转为 `1.1.0` 以消除 `pageInfo`、`replyCount` 与
+Message-only timeline 的旧 schema/runtime 漂移。此 addendum 不改写 2026-08-01
+freeze 当时的 non-effects；当前仍无 persistent DB apply、deployment、activation
+或 traffic 效果。

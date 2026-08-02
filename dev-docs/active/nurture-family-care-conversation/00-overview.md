@@ -6,22 +6,18 @@
 - Task: T-005
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-02
-- Next step: **G2-B checkpoint 已达成**
-  (`12-g2b-checkpoint-record.md`：`G2B_CHECKPOINT_PASS`)。在 G2-A 证据链之上
-  已交付 correction / withdrawal / exact-author 与 system-policy redaction、
-  分页闭包 cascade、最新更正/tombstone presenter，以及精确披露的
-  `InstitutionBusinessCommunicationProjectionV1` provider owner-read。2026-08-02
-  质量复核发现的 result-schema 漂移、policy-decision fence、finalizer 错误分类、
-  correction Receipt 非确定投影与 withdrawal notice 缺失已修复并重新通过真实 DB
-  E2E；冻结 T-004 `1.7.0` digest 未改。正式
-  ingress 现为七路由；Admin read 使用 exact
-  `nurture.institution-business-communication-owner-read@1.0.0` / digest pin、
-  service-auth no-store carrier 和独立默认关闭开关。AC 映射续编至
-  `T005-AC-049`。下一主线：G2-C(Message-only 契约已冻结，digest rotation
-  随下一 pin action)→ G2 Exit Qualification(formal ingress + real pinned
-  owner path)。provider/consumer 均未激活，T-005 不宣称 final Exit。
-- 未清债务：六个 G2 capability 与 09 号 shared referenced types 尚未进入
-  T-004 interface digest，与 G2-C rotation 同批在下一个 pin action 处理。
+- Next step: **进入 G2 Exit Qualification；G2-C checkpoint 已达成**
+  (`13-g2c-checkpoint-record.md`：`G2C_CHECKPOINT_PASS`)。独立
+  `initiate_caregiver_direct_message@1.0.0` 已通过 formal NestJS ingress 和
+  disposable PostgreSQL 资格化；它只创建 Message + Receipt + CommandExecution，
+  不创建 CareItem/Attention，也不产生 ack/reply 义务。guardian timeline 的
+  Message-only shape、direct correction/redaction、Grant revoke owner-reread、
+  exact replay、unsafe/diagnostic/prescriptive/raw-source/cross-scope 拒绝均已覆盖。
+  公共 registry 已收敛为 11 capability，三个 query 统一旋转至 `1.1.0`，exact
+  root 为 `nurture.surface-contract@1.8.0` /
+  `sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`。
+  下一主线是 G2 Exit Qualification 与真实 pinned owner-path / consumer adoption；
+  provider/consumer 均未激活，T-005 不宣称 final Exit。
 
 ## Goal
 
@@ -237,11 +233,11 @@ bridge。只有 A/B/C 与 G2 Exit Qualification 全部通过，T-005 才可完�
   Enrollment、CareGroup 或角色权限丧失时不得借错误响应泄漏状态。
 - [ ] success、already-satisfied、replay 与语义不变的 transparent reprepare 均原位、
   低打扰反馈；只有实质可见变化或安全边界变化才增加用户步骤。
-- [ ] Increment 1 只覆盖 submit/acknowledge/reply；第二增量
-  correction/withdrawal/redaction 未实现前不得宣称 T-005 完成，但不阻塞首个
-  Core CareInteraction Loop checkpoint。
-- [ ] G2-A 只作为 Core CareInteraction Loop checkpoint；G2-B lifecycle/Admin
-  owner-read 与 G2-C caregiver direct-interaction 未完成前不得宣称 T-005 final Exit。
+- [x] Increment 1 的 submit/acknowledge/reply 与第二增量
+  correction/withdrawal/redaction 已分别通过 G2-A/G2-B checkpoint；checkpoint 本身
+  不等于 T-005 final Exit。
+- [x] G2-A/B/C 均已通过 checkpoint；仍须完成 real owner-path、consumer/cutover
+  与完整 G2 Exit Qualification 后才能宣称 T-005 final Exit。
 - [ ] correction 是 exact-author、append-only 的 Message 内容版本；严格绑定当前
   correction head，不能原地改写历史或由同班其他老师修改作者事实。
 - [ ] submit/acknowledge/reply/correction/withdrawal/redaction 的 committed output
@@ -285,10 +281,10 @@ bridge。只有 A/B/C 与 G2 Exit Qualification 全部通过，T-005 才可完�
 - [ ] acknowledge 是一次 effect-labeled gesture；过期/状态漂移只能刷新当前状态，不能执行旧动作。
 - [ ] token 过期但可见内容/目标/效果未变时可透明重新 prepare；任一可见语义变化必须重新展示并要求新的手势。
 - [ ] LLM 不能绕过 Harness 的目标解析、授权、确认、版本和幂等校验。
-- [ ] G2-C 使用独立 versioned caregiver-initiated capability；T-006 只传
+- [x] G2-C 使用独立 versioned caregiver-initiated capability；T-006 只传
   body-free owner-issued action/navigation context，不复制 source body，不复用普通
   family-question，也不降级为 PublishProcess。
-- [ ] G2-C 未冻结 exact effect/response/Receipt contract、owner unavailable、
+- [x] G2-C 已冻结并资格化 exact effect/response/Receipt contract；owner unavailable、
   contract mismatch 或资格化未通过时，只返回安全阻塞且不创建 CareInteraction。
 - [ ] 新 G2 Item/Message 只有三轴 Harness writer；legacy handler 对新 rows
   default-off，旧 consumer 只能读取单向 derived compatibility projection，歧义旧行
@@ -304,11 +300,9 @@ bridge。只有 A/B/C 与 G2 Exit Qualification 全部通过，T-005 才可完�
 
 ## Next Step
 
-Stage G2 结构已确认：G2-A Core CareInteraction Loop、G2-B Lifecycle and
-Owner-read Completion、G2-C Caregiver Direct Interaction Bridge 与一个最终
-Nurture-side qualified handoff。结论是复用现有 transaction/CommandExecution、
-Message/Receipt/Event/Attention 骨架，增量迁移三轴 CareItem、多回复、encrypted
-protected content、typed result、continuation 和第二增量事实；legacy paths 对新 rows
-只读兼容、单向派生、禁止 dual-write。下一步采用 T-004 exact contract artifacts，
-冻结 G2-C exact effect 与 cutover matrix，再按 schema → Harness → G2-A → G2-B →
-G2-C → G2 Exit Qualification 顺序实施。
+Stage G2 的 G2-A Core CareInteraction Loop、G2-B Lifecycle and Owner-read
+Completion 与 G2-C Caregiver Direct Interaction Bridge 均已通过 checkpoint。实现
+复用唯一 transaction/CommandExecution、Message/Receipt/Event/Attention 骨架；
+legacy paths 对新 rows 只读兼容、单向派生、禁止 dual-write。下一步只进入 G2 Exit
+Qualification：绑定 exact `1.8.0` artifact 与真实 pinned owner path，补齐 consumer、
+single-writer/cutover 和 task-level handoff 证据；不重开 G2-C 或建立兼容双轨。

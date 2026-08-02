@@ -514,7 +514,8 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
 
 - [x] G2-A Core CareInteraction Loop 通过。
 - [x] G2-B Lifecycle and Owner-read Completion 通过。
-- [ ] G2-C Caregiver Direct Interaction Bridge 通过。
+- [x] G2-C Caregiver Direct Interaction Bridge 通过（见
+  `13-g2c-checkpoint-record.md`）。
 - [ ] 三轴 CareItem、reply collection、protected content、typed result 和 cascade
   schema 可由 clean checkout 重建；legacy cutover 保持 single writer，ambiguous
   old rows 不被猜测迁移。
