@@ -9,12 +9,22 @@ import type {
   MediaLifecycleReadPort,
 } from "@the-nurture/scenario/harness";
 import {
-  activeRoleWindow,
+  caregiverRowAuthority,
   readMediaComposition,
+  resolveCaregiverReach,
   type BoardPrisma,
 } from "./board-read-support.js";
 
-const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
+/**
+ * The owner's capture kinds and the safety policy's fact kinds are separate
+ * vocabularies. The mapping is explicit and total, so a photo can never enter
+ * the assessment as teacher text.
+ */
+const CAPTURE_FACT_KIND = {
+  text: "teacher_text",
+  voice_transcript: "voice_transcript",
+  media: "media_photo",
+} as const satisfies Record<string, ContentSafetySourceSignalV1["fact_kind"]>;
 
 /**
  * The owner's attribution sources and the board's are separate vocabularies.
@@ -27,8 +37,6 @@ const ATTRIBUTION_SOURCE = {
   history_match: "organizer_candidate",
   system: "organizer_candidate",
 } as const satisfies Record<string, AttributionSourceV1>;
-
-type CaregiverReach = { care_group_id: string; role: string };
 
 /**
  * Markers are recorded, not inferred. A `null` payload means the owner never
@@ -51,45 +59,6 @@ export class PrismaMediaSafetyReadPort
   implements ContentSafetySourceReadPort, MediaAttributionReadPort, MediaLifecycleReadPort
 {
   constructor(private readonly prisma: BoardPrisma) {}
-
-  private async resolveReach(
-    workspaceId: string,
-    participantId: string,
-    at: Date,
-  ): Promise<CaregiverReach | null> {
-    const participant = await this.prisma.nurtureParticipant.findFirst({
-      where: { id: participantId, workspaceId, status: "active", deletedAt: null },
-    });
-    if (!participant) return null;
-    const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
-      where: {
-        workspaceId,
-        participantId,
-        role: { in: [...CAREGIVER_ROLES] },
-        scopeType: "care_group",
-        ...activeRoleWindow(at),
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    });
-    for (const role of roles) {
-      const group = await this.prisma.nurtureCareGroup.findFirst({
-        where: { id: role.scopeId, workspaceId, status: "active", deletedAt: null },
-      });
-      if (group) return { care_group_id: group.id, role: role.role };
-    }
-    return null;
-  }
-
-  private authority(reach: CaregiverReach, sourceCareGroupId: string | null): CaregiverFactAuthorityV1 {
-    return {
-      role: reach.role,
-      role_scope_type: "care_group",
-      role_scope_matches_source: sourceCareGroupId === reach.care_group_id,
-      role_assignment_current: true,
-      fact_visible: true,
-      purpose_allowed: true,
-    };
-  }
 
   // -------------------------------------------------------------------------
   // Content safety signals.
@@ -139,7 +108,7 @@ export class PrismaMediaSafetyReadPort
       if (markers === null) return null;
       signals.set(capture.id, {
         source_id: capture.id,
-        fact_kind: capture.kind === "voice_transcript" ? "voice_transcript" : "teacher_text",
+        fact_kind: CAPTURE_FACT_KIND[capture.kind],
         markers,
       });
     }
@@ -177,7 +146,12 @@ export class PrismaMediaSafetyReadPort
     workspace_id: string;
     participant_id: string;
   }): Promise<string[]> {
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, new Date());
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      new Date(),
+    );
     if (!reach) return [];
     const assets = await this.prisma.nurtureMediaAssetRef.findMany({
       where: {
@@ -197,7 +171,12 @@ export class PrismaMediaSafetyReadPort
     media_asset_id: string;
   }): Promise<MediaAttributionFactsV1 | null> {
     const at = new Date();
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach) return null;
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
@@ -222,7 +201,7 @@ export class PrismaMediaSafetyReadPort
     });
 
     return {
-      authority: this.authority(reach, asset.careGroupId),
+      authority: caregiverRowAuthority(reach, asset.careGroupId) as CaregiverFactAuthorityV1,
       media_lifecycle: asset.lifecycle,
       // The decision binds to the exact immutable original, never to "whatever
       // the asset looks like now".
@@ -257,7 +236,12 @@ export class PrismaMediaSafetyReadPort
     process_key?: string;
   }): Promise<MediaLifecycleFactsV1 | null> {
     const at = new Date();
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach) return null;
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
@@ -297,22 +281,31 @@ export class PrismaMediaSafetyReadPort
         .map((revision) => revision.publishProcessId),
     );
 
-    const committed = process
-      ? await this.prisma.nurturePublicationRelease.count({
-          where: { workspaceId: input.workspace_id, publishProcessId: process.id },
-        })
-      : await this.prisma.nurturePublicationRelease.count({
-          where: {
-            workspaceId: input.workspace_id,
-            revision: {
-              is: { publishProcess: { is: { careGroupId: reach.care_group_id } } },
-            },
-            publishProcess: { is: { careGroupId: reach.care_group_id } },
-          },
-        });
+    let committed: number;
+    if (process) {
+      committed = await this.prisma.nurturePublicationRelease.count({
+        where: { workspaceId: input.workspace_id, publishProcessId: process.id },
+      });
+    } else {
+      // Global discard: only a release whose own frozen composition contains
+      // this asset closes the window. Counting every release the class ever
+      // made would make one publication freeze the whole media library.
+      const releases = await this.prisma.nurturePublicationRelease.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          publishProcess: { is: { careGroupId: reach.care_group_id } },
+        },
+        select: { revision: { select: { mediaCompositionPayload: true } } },
+      });
+      committed = releases.filter((release) =>
+        readMediaComposition(release.revision.mediaCompositionPayload).some(
+          (entry) => entry.media_asset_id === asset.id,
+        ),
+      ).length;
+    }
 
     return {
-      authority: this.authority(reach, asset.careGroupId),
+      authority: caregiverRowAuthority(reach, asset.careGroupId) as CaregiverFactAuthorityV1,
       process_state: process?.state ?? "draft",
       composition_media_ids: composition,
       media_revision: asset.mediaRevision,

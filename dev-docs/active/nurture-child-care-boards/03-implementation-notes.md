@@ -979,3 +979,62 @@ schedule 只有在 owner 记全了 T-007 合同固定的每一个字段时才算
 schedule 不是窗口;已提交的目标在 `loadReleaseFacts` 里带 `already_committed`,
 重试因此去对账而不是重复提交;post-release safety 没有有效期窗口,被 redact 的
 publication 仍然可寻址,Receipt 与审计从不删除。
+
+## 2026-08-02 — owner 层实施质量复核:14 项修复与两层跨界检验
+
+B1～B2-4 全部通过闸门,但闸门覆盖不到的地方有 6 处会产生错误行为的缺陷、4 处伪造
+或死掉的事实、4 处结构问题。按顺序修完:
+
+**会产生错误行为**
+
+1. **一次被否决的归属会让该媒体永久不可发布**。`rejected` 时我省略了
+   `child_care_process_id`,而规则对"clearly_visible 但无 id"的判定是
+   `unknown_visible_child`,直接挡掉所有目标。但 `rejected` 的语义是老师说了
+   "这不是那个孩子"——它根本不是可见儿童义务。改为直接从 `visible_children` 里
+   剔除。顺带把 `clearly_visible` 的口径写清楚:owner 只为它识别出的孩子建行,
+   没人归属的人脸根本没有行,所以现存的每一行都是清晰可见的孩子。
+2. **`data_class` 把所有非成长记录折叠成 `daily_care_log`**。改为在查询层就只取
+   两个可发布 data class,其余的既不进队列也不进普查——**排除**而不是贴上一个
+   它没有的类别,后者正是 fallback 分支会干的事。
+3. **media 类型的 capture 被当成 `teacher_text`**。安全策略按 fact kind 路由。
+   改为 `satisfies` 约束的显式全映射。
+4. **两条 lane 的行序与声明的语义序不符**。这条最深:声明的 order 首项
+   (`child_label_asc` / `state_rank_asc`)根本不是 cursor 能续页的键。给
+   `BoardSortKeyV1` 加了可选的 `rank` 首项,两个 lane 的 sortKey 带上它,owner
+   按声明序出行并把"严格晚于此位置"写成展开的字典序比较(方向混合,无法用单个
+   行比较表达)。发布队列的 state rank 直接用枚举声明序——Postgres 的枚举排序就是
+   我们要的优先级。
+5. **全局 discard 统计了无关的 release**。改为只统计"自身冻结 composition 里
+   含这个资产"的 release;否则班级发布过任何东西就再也 discard 不掉任何资产。
+6. **队列对 released / cancelled 照样发 `save_publish_process_draft`**。改为按
+   process state 判定——否则是 **owner 自己**在制造它已经没有的资格。
+
+**伪造或死掉的事实**:删掉 `exposure_allows_child_ids` 那段化简后恒等于
+`[目标自己的孩子]`、却写得像实现了一条规则的死计算;发布队列的 source head 从
+"本页形状"改为 scope 级普查(随页大小变化的 head 不是 source head);删掉
+`nonEmpty` 空操作与无人使用的 `EMPTY_CENSUS`。
+
+**结构**:四份 `resolveCaregiverReach` 合并为一份共享实现(以后修一处只会修到
+一份);scope 普查改用数据库 `aggregate`,不再为算普查把全班日志拉进内存;
+`has_unsaved_revision` 恒为 `false` 并写明 owner 只持有已保存的 revision,
+用 `currentRevisionId === null` 回答的是另一个问题;schedule 未解析时不再返回
+`null`(会被归类成 `target_unavailable`),改为 `schedule: null` 加上 release lane
+新的 `schedule_unavailable` 拒绝码——只有 scheduler 依赖窗口,老师显式发送不受影响。
+
+### 两层跨界检验
+
+现有测试大多在一侧闭环:domain 套件拿手写事实喂规则,owner 套件拿手写期望对仓储。
+两者都抓不到"owner 的答序和它 binding 宣称的 order 不是一回事",也抓不到"每条
+owner 事实单看都合理、合起来让规则得出错误结论"。新增
+`g3-owner-domain-boundary.integration.test.ts`:
+
+- **答序 ↔ 声明序**:比较器**从 binding 发布的 order 字符串解析出来**,不是手写的。
+  手写比较器在常量改掉之后仍然会通过,那正是这层检查要抓的漂移。三条分页 lane
+  各验一遍,caregiver lane 还验了续页不重不漏。
+- **owner 事实 ↔ 消费它的规则**:把真实的 `ReleaseFactsV1` 喂给
+  `derivePublishEligibility`,验证被否决的归属不再挡、他班孩子的合影仍然挡、
+  未确认候选与 media revision 漂移仍然挡、撤销的 Grant 只挡它自己的目标。
+
+第一层检查立刻抓到一处新漂移:三个仓储把 `before` 的形状**内联重写**成
+`{occurred_at,id}`,而接口用的是 `BoardSortKeyV1`——所以接口新加的 `rank` 项在
+仓储侧被静默丢掉了。已改为共用接口类型。

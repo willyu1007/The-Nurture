@@ -32,7 +32,14 @@ export type BoardScopeV1 = {
   participant_id: string;
 };
 
-export type BoardSortKeyV1 = { occurred_at: string; id: string };
+/**
+ * The position a page continues from. Some modules declare an order whose
+ * leading term is not temporal — a class list is ordered by child label, a
+ * publish queue by state — so the key carries that term explicitly. Without it
+ * the advertised order and the order a cursor can actually page over would
+ * differ, and continuation would skip or repeat rows.
+ */
+export type BoardSortKeyV1 = { rank?: string; occurred_at: string; id: string };
 
 /**
  * Canonical source families a board module may explain freshness from. A module
@@ -415,7 +422,8 @@ export const resolveBoardCursor = (
     typeof cursor.drift_head !== "string" ||
     !sortKey ||
     typeof sortKey.occurred_at !== "string" ||
-    typeof sortKey.id !== "string"
+    typeof sortKey.id !== "string" ||
+    (sortKey.rank !== undefined && typeof sortKey.rank !== "string")
   ) {
     return null;
   }
@@ -424,7 +432,11 @@ export const resolveBoardCursor = (
     snapshot_version: cursor.snapshot_version,
     snapshot_at: cursor.snapshot_at,
     drift_head: cursor.drift_head,
-    sort_key: { occurred_at: sortKey.occurred_at, id: sortKey.id },
+    sort_key: {
+      ...(sortKey.rank === undefined ? {} : { rank: sortKey.rank }),
+      occurred_at: sortKey.occurred_at,
+      id: sortKey.id,
+    },
   };
 };
 

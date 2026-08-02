@@ -429,17 +429,22 @@ describe("G3-D owner reads: release facts", () => {
     expect(after?.targets.filter((target) => target.grant_allows)).toHaveLength(1);
   });
 
-  it("treats a partially recorded schedule as no resolved window", async () => {
+  it("reports a partially recorded schedule as unresolved, not as a missing target", async () => {
     const world = await seedWorld();
     const { process } = await seedProcess(world, { schedule: false });
     const port = new PrismaPublicationReleasePort(prisma);
-    expect(
-      await port.loadReleaseFacts({
+    const read = () =>
+      port.loadReleaseFacts({
         workspace_id: world.workspaceId,
         participant_id: world.teacher.id,
         process_key: process.processKey,
-      }),
-    ).toBeNull();
+      });
+
+    // The process exists and the actor may act on it; only the window is
+    // missing. Answering `null` would classify that as "no such target".
+    const unscheduled = await read();
+    expect(unscheduled).not.toBeNull();
+    expect(unscheduled?.schedule).toBeNull();
 
     await prisma.nurturePublishProcess.update({
       where: { id: process.id },
@@ -447,13 +452,13 @@ describe("G3-D owner reads: release facts", () => {
     });
     // Still missing the timezone and policy head: a half-recorded schedule is
     // not a window the release lane may act on.
-    expect(
-      await port.loadReleaseFacts({
-        workspace_id: world.workspaceId,
-        participant_id: world.teacher.id,
-        process_key: process.processKey,
-      }),
-    ).toBeNull();
+    expect((await read())?.schedule).toBeNull();
+
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: SCHEDULE,
+    });
+    expect((await read())?.schedule?.timeZone).toBe("Asia/Shanghai");
   });
 
   it("reports a lapsed authorizing role as no longer current", async () => {

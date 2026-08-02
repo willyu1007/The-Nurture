@@ -1,4 +1,5 @@
 import type {
+  BoardSortKeyV1,
   CaregiverBoardReadPort,
   CaregiverBoardScopeFacts,
   CaregiverFactAuthorityV1,
@@ -9,17 +10,18 @@ import type {
 } from "@the-nurture/scenario/harness";
 import {
   activeRoleWindow,
+  aggregateCensus,
   boardHead,
+  caregiverRowAuthority,
   censusHead,
   censusOf,
   censusOfTimes,
   highestVersion,
+  resolveCaregiverReach,
   sourceHeadPair,
   type BoardCensus,
   type BoardPrisma,
 } from "./board-read-support.js";
-
-const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 
 const UNAUTHORIZED_SCOPE: CaregiverBoardScopeFacts = {
   authorized: false,
@@ -46,16 +48,6 @@ const UNAUTHORIZED_SCOPE: CaregiverBoardScopeFacts = {
   publication_policy_resolved: false,
 };
 
-type CaregiverReach = {
-  care_group_id: string;
-  care_group_label: string;
-  institution_id: string;
-  role_assignment_id: string;
-  role: string;
-  role_version: number;
-  care_group_version: number;
-};
-
 /**
  * The owner's attention priorities and the board's are separate vocabularies.
  * Mapping them explicitly keeps a new owner value a compile error rather than
@@ -76,6 +68,36 @@ const DAILY_CARE_KINDS = [
 ] as const;
 
 /**
+ * "Strictly after this position" in the declared class-list order. The three
+ * branches are the lexicographic comparison written out, because the order
+ * mixes directions and cannot be expressed as a single row comparison.
+ *
+ * A cursor issued before the rank term existed carries no label; it is then
+ * compared on the two terms it does have, which is exactly what it meant.
+ */
+const strictlyAfter = (before: BoardSortKeyV1) => {
+  const sameLabel = before.rank === undefined ? {} : {
+    childCareProcess: { child: { displayName: before.rank } },
+  };
+  const withinLabel = [
+    { ...sameLabel, updatedAt: { lt: new Date(before.occurred_at) } },
+    {
+      ...sameLabel,
+      updatedAt: new Date(before.occurred_at),
+      childCareProcessId: { gt: before.id },
+    },
+  ];
+  return before.rank === undefined
+    ? { OR: withinLabel }
+    : {
+        OR: [
+          { childCareProcess: { child: { displayName: { gt: before.rank } } } },
+          ...withinLabel,
+        ],
+      };
+};
+
+/**
  * Owner-side Caregiver board reads (G3-A). The caregiver lane is bound to the
  * exact source CareGroup: a role assignment scoped anywhere else — the
  * institution, a sibling class — reads nothing, and that judgement travels with
@@ -83,57 +105,6 @@ const DAILY_CARE_KINDS = [
  */
 export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
   constructor(private readonly prisma: BoardPrisma) {}
-
-  private async resolveReach(
-    workspaceId: string,
-    participantId: string,
-    at: Date,
-  ): Promise<CaregiverReach | null> {
-    const participant = await this.prisma.nurtureParticipant.findFirst({
-      where: { id: participantId, workspaceId, status: "active", deletedAt: null },
-    });
-    if (!participant) return null;
-
-    // Only a CareGroup-scoped caregiver role reaches a board. An
-    // institution-scoped assignment is deliberately not widened here.
-    const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
-      where: {
-        workspaceId,
-        participantId,
-        role: { in: [...CAREGIVER_ROLES] },
-        scopeType: "care_group",
-        ...activeRoleWindow(at),
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    });
-    for (const role of roles) {
-      const group = await this.prisma.nurtureCareGroup.findFirst({
-        where: { id: role.scopeId, workspaceId, status: "active", deletedAt: null },
-      });
-      if (!group) continue;
-      return {
-        care_group_id: group.id,
-        care_group_label: group.name,
-        institution_id: group.institutionId,
-        role_assignment_id: role.id,
-        role: role.role,
-        role_version: role.aggregateVersion,
-        care_group_version: group.aggregateVersion,
-      };
-    }
-    return null;
-  }
-
-  private authorityFor(reach: CaregiverReach, sourceCareGroupId: string): CaregiverFactAuthorityV1 {
-    return {
-      role: reach.role,
-      role_scope_type: "care_group",
-      role_scope_matches_source: sourceCareGroupId === reach.care_group_id,
-      role_assignment_current: true,
-      fact_visible: true,
-      purpose_allowed: true,
-    };
-  }
 
   private async grantCensus(workspaceId: string, careGroupId: string): Promise<BoardCensus> {
     const grants = await this.prisma.nurtureChildLinkGrant.findMany({
@@ -155,23 +126,32 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
     snapshot_at: string;
   }): Promise<CaregiverBoardScopeFacts> {
     const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach) return UNAUTHORIZED_SCOPE;
 
     const [logs, attention, roles, enrollments, grants, corrections, redactions, institution] =
       await Promise.all([
-        this.prisma.nurtureDailyCareLog.findMany({
-          where: {
-            workspaceId: input.workspace_id,
-            careGroupId: reach.care_group_id,
-            deletedAt: null,
-          },
-          select: { updatedAt: true, aggregateVersion: true },
-        }),
-        this.prisma.nurtureTeacherAttentionItem.findMany({
-          where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
-          select: { updatedAt: true, aggregateVersion: true },
-        }),
+        aggregateCensus((args) =>
+          this.prisma.nurtureDailyCareLog.aggregate({
+            where: {
+              workspaceId: input.workspace_id,
+              careGroupId: reach.care_group_id,
+              deletedAt: null,
+            },
+            ...args,
+          }),
+        ),
+        aggregateCensus((args) =>
+          this.prisma.nurtureTeacherAttentionItem.aggregate({
+            where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
+            ...args,
+          }),
+        ),
         this.prisma.nurtureCareRoleAssignment.findMany({
           where: {
             workspaceId: input.workspace_id,
@@ -228,15 +208,13 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
           { aggregateVersion: reach.care_group_version },
           { aggregateVersion: reach.role_version },
         ],
-        logs,
-        attention,
         enrollments,
         grants,
       ),
       drift_heads: {
         source_head: boardHead("caregiver.source", [
-          censusHead("daily_care", censusOf(logs)),
-          censusHead("attention", censusOf(attention)),
+          censusHead("daily_care", logs),
+          censusHead("attention", attention),
         ]),
         authority_head: boardHead("caregiver.authority", [
           censusHead("role", censusOf(roles)),
@@ -252,7 +230,7 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
         ),
         grant_head: censusHead("caregiver.grant", censusOf(grants)),
       },
-      authority: this.authorityFor(reach, reach.care_group_id),
+      authority: caregiverRowAuthority(reach, reach.care_group_id) as CaregiverFactAuthorityV1,
       surface_action_grants: [],
       module_action_grants: {
         caregiver_child_today: [
@@ -277,7 +255,7 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
     care_group_id: string;
     snapshot_at: string;
     take: number;
-    before?: { occurred_at: string; id: string };
+    before?: BoardSortKeyV1;
   }): Promise<{
     authorized: boolean;
     rows: RawCaregiverChildToday[];
@@ -285,7 +263,12 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
     heads: RawBoardSourceHead[];
   }> {
     const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach || reach.care_group_id !== input.care_group_id) {
       return { authorized: false, rows: [], has_more: false, heads: [] };
     }
@@ -297,9 +280,17 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
         careGroupId: reach.care_group_id,
         status: "active",
         deletedAt: null,
+        ...(input.before ? strictlyAfter(input.before) : {}),
       },
       include: { childCareProcess: { include: { child: { select: { displayName: true } } } } },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      // Exactly CAREGIVER_CHILD_TODAY_ORDER: the class list is ordered by child
+      // label, and the cursor's leading rank is that same label.
+      orderBy: [
+        { childCareProcess: { child: { displayName: "asc" } } },
+        { updatedAt: "desc" },
+        { childCareProcessId: "asc" },
+      ],
+      take: input.take + 1,
     });
 
     const rows: RawCaregiverChildToday[] = [];
@@ -326,7 +317,7 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
         }),
       ]);
 
-      const authority = this.authorityFor(reach, reach.care_group_id);
+      const authority = caregiverRowAuthority(reach, reach.care_group_id) as CaregiverFactAuthorityV1;
       const dailyCare: RawCaregiverDailyCare[] = logs.flatMap((log) =>
         DAILY_CARE_KINDS.filter(([field]) => log[field] !== null).map(([, kind]) => ({
           log_id: log.id,
@@ -368,20 +359,12 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
       });
     }
 
-    const afterCursor = input.before
-      ? rows.filter(
-          (row) =>
-            row.occurred_at < input.before!.occurred_at ||
-            (row.occurred_at === input.before!.occurred_at &&
-              row.child_care_process_id < input.before!.id),
-        )
-      : rows;
-    const page = afterCursor.slice(0, input.take);
+    const page = rows.slice(0, input.take);
 
     return {
       authorized: true,
       rows: page,
-      has_more: afterCursor.length > page.length,
+      has_more: rows.length > page.length,
       heads: [
         {
           source_kind: "care_group_role",

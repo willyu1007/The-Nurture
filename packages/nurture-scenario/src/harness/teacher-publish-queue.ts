@@ -45,6 +45,14 @@ export const QUERY_TEACHER_PUBLISH_QUEUE_CAPABILITY = {
 
 export const TEACHER_PUBLISH_QUEUE_ORDER = "state_rank_asc,occurred_at_desc,id_desc";
 
+/**
+ * The queue's state rank, as a fixed-width string so it sorts lexicographically
+ * inside a cursor. It follows the five-state lifecycle: work that still needs a
+ * teacher comes before work that is already settled.
+ */
+export const publishStateRank = (state: PublishProcessStateV1): string =>
+  String(PUBLISH_PROCESS_STATES.indexOf(state)).padStart(2, "0");
+
 export type RawPublishQueueRow = {
   process_key: string;
   state: PublishProcessStateV1;
@@ -202,7 +210,12 @@ export const queryTeacherPublishQueue = async (
         has_more: result.authorized ? result.has_more : false,
       };
     },
-    sortKey: (row) => ({ occurred_at: row.occurred_at, id: row.process_key }),
+    sortKey: (row) => ({
+      // The declared order leads with the state rank, so the cursor does too.
+      rank: publishStateRank(row.state),
+      occurred_at: row.occurred_at,
+      id: row.process_key,
+    }),
     project: (row) => {
       if (!caregiverFactVisible(row.authority)) return null;
       return {

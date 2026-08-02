@@ -1,4 +1,5 @@
 import type {
+  BoardSortKeyV1,
   GuardianBoardReadPort,
   GuardianBoardScopeFacts,
   RawBoardSourceHead,
@@ -13,7 +14,6 @@ import {
   censusOf,
   censusOfTimes,
   highestVersion,
-  nonEmpty,
   sourceHeadPair,
   type BoardCensus,
   type BoardPrisma,
@@ -401,7 +401,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     enrollment_id: string;
     snapshot_at: string;
     take: number;
-    before?: { occurred_at: string; id: string };
+    before?: BoardSortKeyV1;
   }): Promise<{
     authorized: boolean;
     rows: RawGuardianActivity[];
@@ -504,17 +504,18 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
       : merged;
     const page = afterCursor.slice(0, input.take);
 
-    const enrollmentIds = nonEmpty([enrollment.id]) ?? [];
-    const heads: RawBoardSourceHead[] = enrollmentIds.map((id) => ({
-      source_kind: "enrollment" as const,
-      source_id: id,
-      fact_version: enrollment.aggregateVersion,
-      ...sourceHeadPair(
-        "enrollment",
-        [enrollment.status, enrollment.updatedAt.toISOString()],
-        grantCensus,
-      ),
-    }));
+    const heads: RawBoardSourceHead[] = [
+      {
+        source_kind: "enrollment",
+        source_id: enrollment.id,
+        fact_version: enrollment.aggregateVersion,
+        ...sourceHeadPair(
+          "enrollment",
+          [enrollment.status, enrollment.updatedAt.toISOString()],
+          grantCensus,
+        ),
+      },
+    ];
 
     return {
       authorized: true,

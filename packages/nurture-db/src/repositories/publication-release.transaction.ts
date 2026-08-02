@@ -11,9 +11,12 @@ import type {
   ReleaseTargetFactsV1,
   ResolvedPublishScheduleV1,
 } from "@the-nurture/scenario/harness";
-import { activeRoleWindow, readMediaComposition } from "./board-read-support.js";
-
-const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
+import {
+  activeRoleWindow,
+  caregiverRowAuthority,
+  readMediaComposition,
+  resolveCaregiverReach,
+} from "./board-read-support.js";
 
 const RELEASE_COMMAND_KEY = "release_publish_process";
 const RELEASE_COMMAND_CONTRACT_VERSION = 1;
@@ -46,13 +49,6 @@ const canonicalRef = (objectType: string, objectId: string) => ({
   version: 1,
 });
 
-type CaregiverReach = {
-  care_group_id: string;
-  role: string;
-  role_assignment_id: string;
-  participant_id: string;
-};
-
 /**
  * The release and post-release safety owner (G3-D).
  *
@@ -73,57 +69,16 @@ export class PrismaPublicationReleasePort
    */
   constructor(private readonly prisma: PrismaClient) {}
 
-  private async resolveReach(
-    workspaceId: string,
-    participantId: string,
-    at: Date,
-  ): Promise<CaregiverReach | null> {
-    const participant = await this.prisma.nurtureParticipant.findFirst({
-      where: { id: participantId, workspaceId, status: "active", deletedAt: null },
-    });
-    if (!participant) return null;
-    const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
-      where: {
-        workspaceId,
-        participantId,
-        role: { in: [...CAREGIVER_ROLES] },
-        scopeType: "care_group",
-        ...activeRoleWindow(at),
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    });
-    for (const role of roles) {
-      const group = await this.prisma.nurtureCareGroup.findFirst({
-        where: { id: role.scopeId, workspaceId, status: "active", deletedAt: null },
-      });
-      if (group) {
-        return {
-          care_group_id: group.id,
-          role: role.role,
-          role_assignment_id: role.id,
-          participant_id: participantId,
-        };
-      }
-    }
-    return null;
-  }
-
-  private authority(reach: CaregiverReach, sourceCareGroupId: string): CaregiverFactAuthorityV1 {
-    return {
-      role: reach.role,
-      role_scope_type: "care_group",
-      role_scope_matches_source: sourceCareGroupId === reach.care_group_id,
-      role_assignment_current: true,
-      fact_visible: true,
-      purpose_allowed: true,
-    };
-  }
-
   private async listProcessKeys(input: {
     workspace_id: string;
     participant_id: string;
   }): Promise<string[]> {
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, new Date());
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      new Date(),
+    );
     if (!reach) return [];
     const processes = await this.prisma.nurturePublishProcess.findMany({
       where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
@@ -153,7 +108,12 @@ export class PrismaPublicationReleasePort
     process_key: string;
   }): Promise<ReleaseFactsV1 | null> {
     const at = new Date();
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
@@ -165,11 +125,6 @@ export class PrismaPublicationReleasePort
             grant: true,
             enrollment: true,
             release: { include: { receipt: { select: { id: true } } } },
-            childCareProcess: {
-              include: {
-                mediaAttributions: { where: { deletedAt: null } },
-              },
-            },
           },
           orderBy: [{ targetKey: "asc" }],
         },
@@ -178,7 +133,6 @@ export class PrismaPublicationReleasePort
     if (!process) return null;
 
     const schedule = readResolvedSchedule(process);
-    if (!schedule) return null;
 
     const frozenRevision = process.frozenRevisionId
       ? await this.prisma.nurturePublishProcessRevision.findFirst({
@@ -205,9 +159,6 @@ export class PrismaPublicationReleasePort
     );
 
     const targets: ReleaseTargetFactsV1[] = process.targets.map((target) => {
-      const confirmedChildren = target.childCareProcess.mediaAttributions
-        .filter((attribution) => attribution.state === "confirmed")
-        .map((attribution) => attribution.childCareProcessId);
       return {
         target_key: target.targetKey,
         child_care_process_id: target.childCareProcessId,
@@ -215,12 +166,9 @@ export class PrismaPublicationReleasePort
         grant_allows: target.grant.status === "active" && target.grant.deletedAt === null,
         data_class_allowed: target.grant.dataClasses.includes(process.dataClass),
         purpose_allowed: target.grant.purposes.includes(process.purposeKey),
-        // This audience may see its own child; a child confirmed in the photo
-        // who is not this audience's child is what blocks the target.
-        exposure_allows_child_ids: [
-          target.childCareProcessId,
-          ...confirmedChildren.filter((id) => id === target.childCareProcessId),
-        ].filter((id, index, all) => all.indexOf(id) === index),
+        // One family may see its own child and no one else's. Any other
+        // clearly visible child in the composed media blocks this target.
+        exposure_allows_child_ids: [target.childCareProcessId],
         ...(target.release
           ? {
               already_committed: {
@@ -233,14 +181,16 @@ export class PrismaPublicationReleasePort
     });
 
     return {
-      authority: this.authority(reach, process.careGroupId),
+      authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
       authorizing_role_current: authorizingRoleCurrent,
       process_state: process.state,
       current_revision: process.currentRevision?.revision ?? 0,
       ...(frozenRevision ? { frozen_revision: frozenRevision.revision } : {}),
-      // The current revision is the saved one by definition; an unsaved buffer
-      // never reaches the owner, so it can never be released by accident.
-      has_unsaved_revision: process.currentRevisionId === null,
+      // The owner only ever holds saved revisions, so it cannot observe an
+      // unsaved buffer. Reporting `currentRevisionId === null` here would
+      // answer a different question — "nothing was ever saved" — under this
+      // field's name. That case is already visible as `current_revision: 0`.
+      has_unsaved_revision: false,
       edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
       schedule,
       media,
@@ -273,13 +223,18 @@ export class PrismaPublicationReleasePort
           media_revision: entry.media_revision,
           current_media_revision: asset.mediaRevision,
           lifecycle: asset.lifecycle,
-          visible_children: asset.attributions.map((attribution) => ({
-            ...(attribution.state === "rejected"
-              ? {}
-              : { child_care_process_id: attribution.childCareProcessId }),
-            attribution_status: attribution.state,
-            clearly_visible: true,
-          })),
+          // A rejected attribution records that this child is NOT in the
+          // asset, so it carries no obligation and is dropped. The owner has a
+          // row only for a child it identified in the asset, so every remaining
+          // row is a clearly visible child; a face nobody attributed produces
+          // no row and therefore no obligation.
+          visible_children: asset.attributions
+            .filter((attribution) => attribution.state !== "rejected")
+            .map((attribution) => ({
+              child_care_process_id: attribution.childCareProcessId,
+              attribution_status: attribution.state,
+              clearly_visible: true,
+            })),
         },
       ];
     });
@@ -294,7 +249,12 @@ export class PrismaPublicationReleasePort
     command_request_id: string;
   }): Promise<CommitTargetReleaseResultV1> {
     const at = new Date();
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach) return { status: "rejected", reason_code: "not_authorized" };
 
     const commandHash = publicationReleaseCommandIdentity(input.command_request_id, input.target_key);
@@ -422,7 +382,12 @@ export class PrismaPublicationReleasePort
     process_key: string;
   }): Promise<PublicationSafetyFactsV1 | null> {
     const at = new Date();
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
@@ -436,7 +401,7 @@ export class PrismaPublicationReleasePort
     if (!process) return null;
 
     return {
-      authority: this.authority(reach, process.careGroupId),
+      authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
       process_state: process.state,
       // Post-release safety has no expiry window: every committed publication
       // stays addressable, whatever its current visibility.

@@ -259,6 +259,79 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
     expect(scheduled.rows[0]?.scheduled_at).toBe("2026-08-03T09:00:00.000Z");
   });
 
+  it("excludes a process whose data class is not publishable, rather than relabelling it", async () => {
+    const world = await seedGroup();
+    await seedProcess(world);
+    const foreign = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: world.workspaceId,
+        careGroupId: world.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "direct_care_communication",
+        purposeKey: "family_care_workflow",
+      },
+    });
+    const reads = new PrismaPublishLaneReadPort(prisma, protectedContent);
+    const page = await reads.listTeacherPublishQueue({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      care_group_id: world.group.id,
+      snapshot_at: SNAPSHOT_AT,
+      take: 10,
+    });
+    expect(page.rows.map((row) => row.process_key)).not.toContain(foreign.processKey);
+    // And it is not counted as queue work either.
+    expect(page.state_counts.draft).toBe(1);
+  });
+
+  it("offers a draft save only while the process can still take one", async () => {
+    const world = await seedGroup();
+    for (const state of ["draft", "released", "cancelled"] as const) {
+      await seedProcess(world, { state });
+    }
+    const reads = new PrismaPublishLaneReadPort(prisma, protectedContent);
+    const page = await reads.listTeacherPublishQueue({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      care_group_id: world.group.id,
+      snapshot_at: SNAPSHOT_AT,
+      take: 10,
+    });
+    const byState = new Map(page.rows.map((row) => [row.state, row.action_grants]));
+    expect(byState.get("draft")?.map((grant) => grant.capability_key)).toEqual([
+      "save_publish_process_draft",
+    ]);
+    // A released or cancelled card is no longer editable; offering the action
+    // would be the owner manufacturing eligibility.
+    expect(byState.get("released")).toEqual([]);
+    expect(byState.get("cancelled")).toEqual([]);
+  });
+
+  it("keeps the queue source head scope-level rather than page-shaped", async () => {
+    const world = await seedGroup();
+    for (const state of ["draft", "draft", "draft"] as const) {
+      await seedProcess(world, { state });
+    }
+    const reads = new PrismaPublishLaneReadPort(prisma, protectedContent);
+    const read = (take: number) =>
+      reads.listTeacherPublishQueue({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        care_group_id: world.group.id,
+        snapshot_at: SNAPSHOT_AT,
+        take,
+      });
+    const small = await read(1);
+    const large = await read(10);
+    // A head that moved with the page size would not be describing the source.
+    expect(small.heads).toEqual(large.heads);
+
+    await seedProcess(world, { state: "draft" });
+    const afterChange = await read(1);
+    expect(afterChange.heads).not.toEqual(small.heads);
+  });
+
   it("refuses a sibling class and an institution-scoped assignment", async () => {
     const world = await seedGroup();
     await seedProcess(world);

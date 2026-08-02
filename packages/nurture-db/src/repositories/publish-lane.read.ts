@@ -1,4 +1,5 @@
 import type {
+  BoardSortKeyV1,
   CaregiverFactAuthorityV1,
   ProtectedContentEnvelopeV1,
   ProtectedContentWritePort,
@@ -15,10 +16,13 @@ import type {
 } from "@the-nurture/scenario/harness";
 import { assertProtectedContentEnvelopeV1 } from "@the-nurture/scenario/harness";
 import {
-  activeRoleWindow,
+  aggregateCensus,
+  caregiverRowAuthority,
   censusOf,
+  resolveCaregiverReach,
   sourceHeadPair,
   type BoardPrisma,
+  type CaregiverReachV1,
 } from "./board-read-support.js";
 
 const PUBLISH_STATES = [
@@ -29,9 +33,47 @@ const PUBLISH_STATES = [
   "cancelled",
 ] as const satisfies readonly PublishProcessStateV1[];
 
-const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
+/**
+ * The two publishable data classes. A process carrying anything else is not
+ * publish-queue work; it is excluded rather than presented under a class it
+ * does not have, which is what a fallback branch would do.
+ */
+const PUBLISHABLE_DATA_CLASSES = ["daily_care_log", "child_growth_record"] as const;
 
-type CaregiverReach = { care_group_id: string; role: string; role_assignment_id: string };
+/**
+ * States that can still accept a draft save. A released or cancelled card must
+ * not carry a save action: the owner would be manufacturing eligibility the
+ * process no longer has.
+ */
+const DRAFT_EDITABLE_STATES: readonly PublishProcessStateV1[] = [
+  "draft",
+  "needs_review",
+  "pending_release",
+];
+
+/**
+ * "Strictly after this position" in the declared queue order. The order mixes
+ * directions, so the lexicographic comparison is written out rather than
+ * expressed as a single row comparison.
+ */
+const strictlyAfter = (before: BoardSortKeyV1) => {
+  const sameState =
+    before.rank === undefined
+      ? {}
+      : { state: PUBLISH_STATES[Number(before.rank)] ?? PUBLISH_STATES[0] };
+  const withinState = [
+    { ...sameState, updatedAt: { lt: new Date(before.occurred_at) } },
+    { ...sameState, updatedAt: new Date(before.occurred_at), processKey: { lt: before.id } },
+  ];
+  return before.rank === undefined
+    ? { OR: withinState }
+    : {
+        OR: [
+          { state: { in: PUBLISH_STATES.slice(Number(before.rank) + 1) } },
+          ...withinState,
+        ],
+      };
+};
 
 /**
  * Reads behind the publish queue and the draft/hold/cancel lane (G3-B1).
@@ -57,47 +99,6 @@ export class PrismaPublishLaneReadPort
     private readonly protectedContent?: ProtectedContentWritePort,
   ) {}
 
-  private async resolveReach(
-    workspaceId: string,
-    participantId: string,
-    at: Date,
-  ): Promise<CaregiverReach | null> {
-    const participant = await this.prisma.nurtureParticipant.findFirst({
-      where: { id: participantId, workspaceId, status: "active", deletedAt: null },
-    });
-    if (!participant) return null;
-    const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
-      where: {
-        workspaceId,
-        participantId,
-        role: { in: [...CAREGIVER_ROLES] },
-        scopeType: "care_group",
-        ...activeRoleWindow(at),
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    });
-    for (const role of roles) {
-      const group = await this.prisma.nurtureCareGroup.findFirst({
-        where: { id: role.scopeId, workspaceId, status: "active", deletedAt: null },
-      });
-      if (group) {
-        return { care_group_id: group.id, role: role.role, role_assignment_id: role.id };
-      }
-    }
-    return null;
-  }
-
-  private authority(reach: CaregiverReach, sourceCareGroupId: string): CaregiverFactAuthorityV1 {
-    return {
-      role: reach.role,
-      role_scope_type: "care_group",
-      role_scope_matches_source: sourceCareGroupId === reach.care_group_id,
-      role_assignment_current: true,
-      fact_visible: true,
-      purpose_allowed: true,
-    };
-  }
-
   private safeTitle(payload: unknown): string {
     if (!this.protectedContent || payload === null || typeof payload !== "object") return "";
     let envelope: ProtectedContentEnvelopeV1;
@@ -116,7 +117,7 @@ export class PrismaPublishLaneReadPort
     care_group_id: string;
     snapshot_at: string;
     take: number;
-    before?: { occurred_at: string; id: string };
+    before?: BoardSortKeyV1;
   }): Promise<{
     authorized: boolean;
     rows: RawPublishQueueRow[];
@@ -128,7 +129,12 @@ export class PrismaPublishLaneReadPort
       PUBLISH_STATES.map((state) => [state, 0]),
     ) as Record<PublishProcessStateV1, number>;
     const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
     if (!reach || reach.care_group_id !== input.care_group_id) {
       return {
         authorized: false,
@@ -139,26 +145,33 @@ export class PrismaPublishLaneReadPort
       };
     }
 
-    const [processes, grouped, grants] = await Promise.all([
+    const [processes, grouped, grants, queueCensus] = await Promise.all([
       this.prisma.nurturePublishProcess.findMany({
         where: {
           workspaceId: input.workspace_id,
           careGroupId: reach.care_group_id,
-          ...(input.before ? { updatedAt: { lte: new Date(input.before.occurred_at) } } : {}),
+          dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] },
+          ...(input.before ? strictlyAfter(input.before) : {}),
         },
         include: {
           currentRevision: true,
           targets: { include: { release: { select: { id: true } } } },
           editHold: true,
         },
-        orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
+        // Exactly TEACHER_PUBLISH_QUEUE_ORDER. The enum's declaration order is
+        // the state rank, so ordering by it is the rank the cursor carries.
+        orderBy: [{ state: "asc" }, { updatedAt: "desc" }, { processKey: "desc" }],
         take: input.take + 1,
       }),
       // The census is queue-wide for this CareGroup: it must not become a count
       // of whatever the current page happened to contain.
       this.prisma.nurturePublishProcess.groupBy({
         by: ["state"],
-        where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
+        where: {
+          workspaceId: input.workspace_id,
+          careGroupId: reach.care_group_id,
+          dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] },
+        },
         _count: { _all: true },
       }),
       this.prisma.nurtureChildLinkGrant.findMany({
@@ -171,6 +184,16 @@ export class PrismaPublishLaneReadPort
         },
         select: { updatedAt: true },
       }),
+      aggregateCensus((args) =>
+        this.prisma.nurturePublishProcess.aggregate({
+          where: {
+            workspaceId: input.workspace_id,
+            careGroupId: reach.care_group_id,
+            dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] },
+          },
+          ...args,
+        }),
+      ),
     ]);
 
     const stateCounts = { ...emptyCounts };
@@ -179,7 +202,7 @@ export class PrismaPublishLaneReadPort
     const rows: RawPublishQueueRow[] = processes.map((process) => ({
       process_key: process.processKey,
       state: process.state,
-      data_class: process.dataClass === "child_growth_record" ? "child_growth_record" : "daily_care_log",
+      data_class: process.dataClass as (typeof PUBLISHABLE_DATA_CLASSES)[number],
       title: this.safeTitle(process.currentRevision?.titleProtectionPayload ?? null),
       current_revision: process.currentRevision?.revision ?? 0,
       target_count: process.targets.length,
@@ -188,40 +211,36 @@ export class PrismaPublishLaneReadPort
       // A schedule is shown only once the institution actually resolved one.
       ...(process.scheduledAt ? { scheduled_at: process.scheduledAt.toISOString() } : {}),
       edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
-      authority: this.authority(reach, process.careGroupId),
-      action_grants: [
-        {
-          capability_key: "save_publish_process_draft",
-          capability_version: "1.0.0",
-          availability: "available" as const,
-          target_option_id: process.processKey,
-          target_kind: "publish_process",
-        },
-      ],
+      authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
+      action_grants: DRAFT_EDITABLE_STATES.includes(process.state)
+        ? [
+            {
+              capability_key: "save_publish_process_draft",
+              capability_version: "1.0.0",
+              availability: "available" as const,
+              target_option_id: process.processKey,
+              target_kind: "publish_process",
+            },
+          ]
+        : [],
     }));
 
-    const afterCursor = input.before
-      ? rows.filter(
-          (row) =>
-            row.occurred_at < input.before!.occurred_at ||
-            (row.occurred_at === input.before!.occurred_at &&
-              row.process_key < input.before!.id),
-        )
-      : rows;
-    const page = afterCursor.slice(0, input.take);
+    const page = rows.slice(0, input.take);
 
     return {
       authorized: true,
       rows: page,
-      has_more: afterCursor.length > page.length,
+      has_more: rows.length > page.length,
       heads: [
         {
           source_kind: "care_group_role",
           source_id: reach.role_assignment_id,
-          fact_version: page.length,
+          fact_version: reach.role_version,
+          // Scope-level: a head built from the page would move whenever the
+          // page size did, which is not a change in the source.
           ...sourceHeadPair(
             "publish_queue",
-            [reach.care_group_id, ...processes.map((process) => process.updatedAt.toISOString())],
+            [reach.care_group_id, queueCensus.count, queueCensus.newest],
             censusOf(grants),
           ),
         },
@@ -234,7 +253,12 @@ export class PrismaPublishLaneReadPort
     workspace_id: string;
     participant_id: string;
   }): Promise<string[]> {
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, new Date());
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      new Date(),
+    );
     if (!reach) return [];
     const processes = await this.prisma.nurturePublishProcess.findMany({
       where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
@@ -250,7 +274,7 @@ export class PrismaPublishLaneReadPort
     processKey: string,
   ) {
     const at = new Date();
-    const reach = await this.resolveReach(workspaceId, participantId, at);
+    const reach = await resolveCaregiverReach(this.prisma, workspaceId, participantId, at);
     if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId, processKey },
@@ -265,7 +289,7 @@ export class PrismaPublishLaneReadPort
 
   private holdFacts(
     at: Date,
-    reach: CaregiverReach,
+    reach: CaregiverReachV1,
     process: {
       state: PublishProcessStateV1;
       careGroupId: string;
@@ -279,7 +303,7 @@ export class PrismaPublishLaneReadPort
     const hold = process.editHold;
     return {
       process_state: process.state,
-      authority: this.authority(reach, process.careGroupId),
+      authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
       // An expired hold is no hold. It is never renewed implicitly by being read.
       ...(hold && hold.expiresAt > at
         ? {

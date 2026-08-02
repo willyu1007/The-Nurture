@@ -541,3 +541,28 @@
 | `pnpm test:unit` / `verify:test-routing` | PASS — 506 tests, files=90 production-db=18 |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — Owner Implementation Quality Pass and Cross-boundary Checks
+
+| Command / check | Result |
+| --- | --- |
+| review of B1–B2-4 owner code | 14 findings: 6 wrong-behaviour, 4 fabricated/dead facts, 4 structural |
+| a rejected attribution blocked its media forever | FIXED — dropped from `visible_children`; proven through the real rule |
+| `data_class` collapsed every other class into `daily_care_log` | FIXED — non-publishable classes excluded from queue and census |
+| a media capture entered safety assessment as teacher text | FIXED — explicit total capture-kind map |
+| two lanes emitted rows out of their advertised order | FIXED — `BoardSortKeyV1.rank`, owner orders by the declared terms, lexicographic strictly-after |
+| global discard counted every release the class ever made | FIXED — only releases whose frozen composition carries the asset |
+| queue offered a draft save on released and cancelled cards | FIXED — gated on process state |
+| dead `exposure_allows_child_ids` computation, page-shaped source head, unused helpers | FIXED |
+| four copies of the caregiver reach predicate | FIXED — one shared `resolveCaregiverReach` |
+| scope censuses loaded every row they counted | FIXED — database `aggregate` |
+| `has_unsaved_revision` answered a different question | FIXED — constant `false` with the reason recorded |
+| unresolved schedule classified as a missing target | FIXED — `schedule: null` plus a `schedule_unavailable` refusal |
+| new: emitted row order vs. the binding's advertised order, comparator parsed from the order string | PASS — 3 lanes, plus gap-free continuation |
+| new: real owner `ReleaseFactsV1` fed to `derivePublishEligibility` | PASS — 5 cases across rejected, group-photo, unconfirmed, drift and revoked-Grant |
+| found by the new boundary check: repositories re-declared `before` inline and dropped the `rank` term | FIXED — all three use `BoardSortKeyV1` |
+| `pnpm typecheck` / `pnpm test:unit` | PASS — 50 files / 506 tests |
+| `pnpm test:db` | PASS — 19 files / 170 tests |
+| `verify:test-routing` | PASS — files=91 production-db=19 |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |

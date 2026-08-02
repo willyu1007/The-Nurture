@@ -246,7 +246,12 @@ export const queryCaregiverChildToday = async (
         has_more: result.authorized ? result.has_more : false,
       };
     },
-    sortKey: (row) => ({ occurred_at: row.occurred_at, id: row.child_care_process_id }),
+    sortKey: (row) => ({
+      // The declared order leads with the child label, so the cursor does too.
+      rank: row.child_safe_label,
+      occurred_at: row.occurred_at,
+      id: row.child_care_process_id,
+    }),
     project: (row) => {
       if (!caregiverFactVisible(row.authority)) return null;
       return {

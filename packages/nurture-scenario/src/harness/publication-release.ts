@@ -88,7 +88,12 @@ export type ReleaseFactsV1 = {
   frozen_revision?: number;
   has_unsaved_revision: boolean;
   edit_hold_active: boolean;
-  schedule: ResolvedPublishScheduleV1;
+  /**
+   * `null` when the institution window has not resolved. That is a different
+   * refusal from a target that does not exist, and it never blocks a teacher
+   * sending explicitly — only the scheduler depends on a window.
+   */
+  schedule: ResolvedPublishScheduleV1 | null;
   media: MediaEligibilityInputV1[];
   targets: ReleaseTargetFactsV1[];
 };
@@ -182,14 +187,19 @@ export const releasePublishProcess = async (
   }
   // An explicit "send now" is the class teacher's own decision and is not bound
   // by the automatic retry cutoff; the scheduler is.
+  if (request.trigger === "scheduler" && !facts.schedule) {
+    return { status: "denied", reason_code: "schedule_unavailable" };
+  }
   if (
     request.trigger === "scheduler" &&
+    facts.schedule !== null &&
     now.getTime() >= Date.parse(facts.schedule.notAfter)
   ) {
     return { status: "denied", reason_code: "past_cutoff" };
   }
   if (
     request.trigger === "scheduler" &&
+    facts.schedule !== null &&
     now.getTime() < Date.parse(facts.schedule.scheduledAt)
   ) {
     return { status: "denied", reason_code: "before_scheduled_at" };
@@ -298,7 +308,9 @@ export const releasePublishProcess = async (
     results,
     summary,
     missedSendAttention:
-      !released && now.getTime() >= Date.parse(facts.schedule.notAfter),
+      !released &&
+        facts.schedule !== null &&
+        now.getTime() >= Date.parse(facts.schedule.notAfter),
   };
 };
 

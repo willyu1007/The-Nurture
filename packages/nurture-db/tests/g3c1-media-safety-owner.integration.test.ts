@@ -221,6 +221,40 @@ describe("G3-C1 owner reads: content safety signals", () => {
     ).toBeNull();
   });
 
+  it("keeps a media capture a media fact rather than teacher text", async () => {
+    const world = await seedWorld();
+    const batch = await prisma.nurtureCareCaptureBatch.create({
+      data: {
+        workspaceId: world.workspaceId,
+        careGroupId: world.group.id,
+        state: "collecting",
+      },
+    });
+    const media = await prisma.nurtureCareCapture.create({
+      data: {
+        workspaceId: world.workspaceId,
+        careGroupId: world.group.id,
+        captureBatchId: batch.id,
+        capturedByRoleAssignmentId: world.teacherRole.id,
+        kind: "media",
+        sourceSequence: 1,
+        stable: true,
+        occurredAt: new Date("2026-08-02T02:00:00.000Z"),
+        safetyMarkersPayload: [],
+      },
+    });
+    const reads = new PrismaMediaSafetyReadPort(prisma);
+    const signals = await reads.loadSafetySignals({
+      workspace_id: world.workspaceId,
+      care_group_id: world.group.id,
+      organizer_input_revision: "organizer:1",
+      source_ids: [media.id],
+    });
+    // The safety policy routes on fact kind; a photo entering as teacher text
+    // would be assessed as the wrong thing.
+    expect(signals?.sources[0]?.fact_kind).toBe("media_photo");
+  });
+
   it("carries an unrecognised marker through to the review tier", async () => {
     const world = await seedWorld();
     const capture = await seedCapture(world, ["rule_key_from_a_newer_policy"]);
@@ -444,6 +478,64 @@ describe("G3-C1 owner reads: media lifecycle", () => {
     });
     expect(facts?.committed_release_count).toBe(1);
     expect(facts?.process_state).toBe("released");
+  });
+
+  it("counts only releases that actually carry this asset toward the global discard window", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    const unrelated = await seedAsset(world);
+    // A published card that never contained this asset must not freeze it.
+    const other = await seedDraftCiting(world, unrelated.id, "released");
+    const grant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: world.process.id,
+        enrollmentId: world.enrollment.id,
+        grantedByParticipantId: world.teacher.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: world.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["child_growth_record"],
+        purposes: ["child_growth_publication"],
+        status: "active",
+      },
+    });
+    const target = await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: other.process.id,
+        targetKey: "target:child-a",
+        childCareProcessId: world.process.id,
+        enrollmentId: world.enrollment.id,
+        familyRefKey: `${world.workspaceId}:${world.process.id}`,
+        grantId: grant.id,
+      },
+    });
+    await prisma.nurturePublicationRelease.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: other.process.id,
+        publishProcessTargetId: target.id,
+        publishProcessRevisionId: other.revision.id,
+        releasedByRoleAssignmentId: world.teacherRole.id,
+        commandRequestIdHash: `sha256:${randomUUID()}`,
+      },
+    });
+
+    const reads = new PrismaMediaSafetyReadPort(prisma);
+    const facts = await reads.loadMediaLifecycleFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+    });
+    expect(facts?.committed_release_count).toBe(0);
+
+    const frozen = await reads.loadMediaLifecycleFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: unrelated.id,
+    });
+    expect(frozen?.committed_release_count).toBe(1);
   });
 
   it("refuses an unknown process key instead of answering about the asset alone", async () => {

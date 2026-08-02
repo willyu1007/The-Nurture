@@ -160,6 +160,48 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-02 — 两侧各自闭环的测试,抓不到交界处的错
+
+- **Symptom**:owner 仓储与 domain 规则各有一套完整测试,全绿;但两条 lane 的答序
+  和它们 binding 宣称的 order 不是一回事,而且一次被否决的归属会让照片永久不可发布。
+  两个都是交界处的错,两侧的测试都看不见。
+- **Root cause**:domain 套件拿**手写事实**喂规则,owner 套件拿**手写期望**对仓储。
+  每一侧都在验证自己对交界的想象,而不是交界本身。
+- **Fix**:两层跨界检查。一层把真实 owner 的输出按 binding 发布的 order 字符串
+  **解析出来的**比较器验单调(手写比较器在常量改掉后仍会通过,那正是要抓的漂移);
+  一层把真实的 `ReleaseFactsV1` 喂给 `derivePublishEligibility` 看结论。
+- **它立刻抓到了东西**:三个仓储把 `before` 的形状内联重写成 `{occurred_at,id}`,
+  接口新加的 `rank` 项在仓储侧被静默丢掉。
+- **Prevention**:凡是"A 侧产出、B 侧消费"的形状,除了各自的测试,必须有一条把 A 的
+  真实输出送进 B 的检查。这和 `phase-3-typed-results`(运行时输出 ↔ 已注册 schema)
+  是同一条规律的第二次应验。
+
+### 2026-08-02 — 声明的排序里有 cursor 无法续页的首项
+
+- **Symptom**:`child_label_asc,occurred_at_desc,id_asc` 与
+  `state_rank_asc,occurred_at_desc,id_desc` 两个 order 常量,首项都不在
+  `BoardSortKeyV1{occurred_at,id}` 里。binding 对外宣称的顺序因此不可能是分页
+  实际走的顺序,续页会跳行或重复。
+- **Root cause**:order 字符串是给人看的产品意图,sort key 是给机器用的续页键,
+  两者从来没有被同一条检查约束过。
+- **Fix**:给 sort key 加可选的 `rank` 首项,owner 按声明序出行,"严格晚于此位置"
+  写成展开的字典序比较(方向混合,单个行比较表达不了)。
+- **Prevention**:声明一个 order 时先问:它的每一项都能放进 cursor 吗?放不进的
+  首项等于没有声明。
+
+### 2026-08-02 — 一刀切的兜底分支会给事实贴上它没有的标签
+
+- **Symptom**:`dataClass === "child_growth_record" ? ... : "daily_care_log"` 把
+  七个 data class 折叠成两个;`kind === "voice_transcript" ? ... : "teacher_text"`
+  把照片当成文本送进安全评估。
+- **Root cause**:两处都是"目标词汇比来源词汇小"时顺手写的三元兜底。同一次实施里
+  我已经用 `satisfies` 显式全映射正确处理过 attention priority 和 attribution
+  source——问题不在不知道怎么做,在于兜底分支写起来太顺手。
+- **Fix**:能映射的用 `satisfies` 约束的全映射;不能映射的(不可发布的 data class)
+  在查询层排除,而不是贴上一个它没有的类别。
+- **Prevention**:看到 `? :` 的 else 分支落在一个**具体的业务值**上就停下来——
+  那不是默认值,那是断言。
+
 ### 2026-08-02 — 生成出来的迁移是草稿,不是证据
 
 - **Symptom**：`prisma migrate diff` 为"退役 legacy 枚举、换成新生命周期枚举"生成的

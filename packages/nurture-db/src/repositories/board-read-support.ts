@@ -26,8 +26,6 @@ export const boardHead = (label: string, parts: Array<string | number | null>): 
  */
 export type BoardCensus = { count: number; newest: string };
 
-export const EMPTY_CENSUS: BoardCensus = { count: 0, newest: "" };
-
 export const censusOfTimes = (times: Date[]): BoardCensus => ({
   count: times.length,
   newest: times.reduce(
@@ -39,11 +37,26 @@ export const censusOfTimes = (times: Date[]): BoardCensus => ({
 export const censusOf = (rows: Array<{ updatedAt: Date }>): BoardCensus =>
   censusOfTimes(rows.map((row) => row.updatedAt));
 
+/**
+ * The same census taken by the database. A scope-level head must not depend on
+ * loading every row it summarises: a busy class would pull its whole daily-care
+ * history on every board read.
+ */
+export const aggregateCensus = async (
+  aggregate: (args: {
+    _count: { _all: true };
+    _max: { updatedAt: true };
+  }) => Promise<{ _count: { _all: number }; _max: { updatedAt: Date | null } }>,
+): Promise<BoardCensus> => {
+  const result = await aggregate({ _count: { _all: true }, _max: { updatedAt: true } });
+  return {
+    count: result._count._all,
+    newest: result._max.updatedAt?.toISOString() ?? "",
+  };
+};
+
 export const censusHead = (label: string, census: BoardCensus): string =>
   boardHead(label, [census.count, census.newest]);
-
-/** `undefined` scope ids would silently widen a `WHERE … IN` to "everything". */
-export const nonEmpty = <T>(values: T[]): T[] | null => (values.length > 0 ? values : null);
 
 /**
  * A role assignment counts only while it is active *and* inside its own
@@ -105,3 +118,72 @@ export const readMediaComposition = (payload: unknown): ComposedMediaV1[] => {
       : [];
   });
 };
+
+/**
+ * The caregiver lanes all answer the same question — which CareGroup does this
+ * participant currently hold — so they answer it in one place. An assignment
+ * scoped to the institution or to a sibling class is deliberately not widened
+ * here; a board that widened it would show one class another class's children.
+ */
+export type CaregiverReachV1 = {
+  care_group_id: string;
+  care_group_label: string;
+  institution_id: string;
+  role: string;
+  role_assignment_id: string;
+  role_version: number;
+  care_group_version: number;
+};
+
+const CAREGIVER_BOARD_ROLES = ["caregiver", "lead_caregiver"] as const;
+
+export const resolveCaregiverReach = async (
+  prisma: BoardPrisma,
+  workspaceId: string,
+  participantId: string,
+  at: Date,
+): Promise<CaregiverReachV1 | null> => {
+  const participant = await prisma.nurtureParticipant.findFirst({
+    where: { id: participantId, workspaceId, status: "active", deletedAt: null },
+  });
+  if (!participant) return null;
+  const roles = await prisma.nurtureCareRoleAssignment.findMany({
+    where: {
+      workspaceId,
+      participantId,
+      role: { in: [...CAREGIVER_BOARD_ROLES] },
+      scopeType: "care_group",
+      ...activeRoleWindow(at),
+    },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+  });
+  for (const role of roles) {
+    const group = await prisma.nurtureCareGroup.findFirst({
+      where: { id: role.scopeId, workspaceId, status: "active", deletedAt: null },
+    });
+    if (!group) continue;
+    return {
+      care_group_id: group.id,
+      care_group_label: group.name,
+      institution_id: group.institutionId,
+      role: role.role,
+      role_assignment_id: role.id,
+      role_version: role.aggregateVersion,
+      care_group_version: group.aggregateVersion,
+    };
+  }
+  return null;
+};
+
+/** The authority every caregiver-lane row carries, measured against its source. */
+export const caregiverRowAuthority = (
+  reach: CaregiverReachV1,
+  sourceCareGroupId: string | null,
+) => ({
+  role: reach.role,
+  role_scope_type: "care_group",
+  role_scope_matches_source: sourceCareGroupId === reach.care_group_id,
+  role_assignment_current: true,
+  fact_visible: true,
+  purpose_allowed: true,
+});
