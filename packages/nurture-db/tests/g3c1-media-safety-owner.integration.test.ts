@@ -364,7 +364,7 @@ describe("G3-C1 owner reads: media lifecycle", () => {
         revision: 1,
         contentDigest: "sha256:content",
         organizerInputRevision: "organizer:1",
-        mediaCompositionPayload: { mediaAssetIds: [assetId] },
+        mediaCompositionPayload: { media: [{ mediaAssetId: assetId, mediaRevision: 1 }] },
       },
     });
     await prisma.nurturePublishProcess.update({

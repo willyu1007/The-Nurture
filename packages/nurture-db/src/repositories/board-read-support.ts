@@ -82,3 +82,26 @@ export const sourceHeadPair = (
   lifecycle_head: boardHead(`${label}.lifecycle`, lifecycle),
   visibility_head: censusHead(`${label}.visibility`, visibility),
 });
+
+/**
+ * The one canonical reading of `mediaCompositionPayload`. Both the media lane
+ * and the release lane consume this column, and a second reader that disagreed
+ * about the shape would let one lane see media the other cannot.
+ *
+ * A malformed payload contributes nothing rather than a partial set: a partial
+ * composition would silently release a card the owner cannot fully account for.
+ */
+export type ComposedMediaV1 = { media_asset_id: string; media_revision: number };
+
+export const readMediaComposition = (payload: unknown): ComposedMediaV1[] => {
+  if (typeof payload !== "object" || payload === null) return [];
+  const entries = (payload as { media?: unknown }).media;
+  if (!Array.isArray(entries)) return [];
+  return entries.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const record = entry as { mediaAssetId?: unknown; mediaRevision?: unknown };
+    return typeof record.mediaAssetId === "string" && Number.isSafeInteger(record.mediaRevision)
+      ? [{ media_asset_id: record.mediaAssetId, media_revision: record.mediaRevision as number }]
+      : [];
+  });
+};

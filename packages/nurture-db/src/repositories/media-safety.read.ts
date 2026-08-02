@@ -8,7 +8,11 @@ import type {
   MediaLifecycleFactsV1,
   MediaLifecycleReadPort,
 } from "@the-nurture/scenario/harness";
-import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
+import {
+  activeRoleWindow,
+  readMediaComposition,
+  type BoardPrisma,
+} from "./board-read-support.js";
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 
@@ -269,7 +273,9 @@ export class PrismaMediaSafetyReadPort
     if (input.process_key && !process) return null;
 
     const composition = process
-      ? readCompositionMediaIds(process.currentRevision?.mediaCompositionPayload ?? null)
+      ? readMediaComposition(process.currentRevision?.mediaCompositionPayload ?? null).map(
+          (entry) => entry.media_asset_id,
+        )
       : [];
 
     // Every unreleased draft that still cites this asset. "Discard globally" is
@@ -284,7 +290,9 @@ export class PrismaMediaSafetyReadPort
     const referencingProcessIds = new Set(
       referencingRevisions
         .filter((revision) =>
-          readCompositionMediaIds(revision.mediaCompositionPayload).includes(asset.id),
+          readMediaComposition(revision.mediaCompositionPayload).some(
+            (entry) => entry.media_asset_id === asset.id,
+          ),
         )
         .map((revision) => revision.publishProcessId),
     );
@@ -336,13 +344,4 @@ const readSafetyPolicy = (
     policy_ref: record.contentSafetyPolicyRef,
     policy_head: record.contentSafetyPolicyHead as number,
   };
-};
-
-/** A malformed composition contributes no media ids rather than a partial set. */
-const readCompositionMediaIds = (payload: unknown): string[] => {
-  if (typeof payload !== "object" || payload === null) return [];
-  const media = (payload as { mediaAssetIds?: unknown }).mediaAssetIds;
-  return Array.isArray(media) && media.every((entry) => typeof entry === "string")
-    ? (media as string[])
-    : [];
 };

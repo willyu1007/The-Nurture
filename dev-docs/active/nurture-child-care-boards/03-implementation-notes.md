@@ -934,3 +934,48 @@ undefined 的 marker 被 `continue` 丢掉了。这意味着更新版 policy 的
 - **全局 discard 能看见所有还在引用该资产的未发布草稿**(按 current revision 的
   `mediaCompositionPayload` 统计),已发布的卡不算"会丢内容的草稿"。payload 形状
   不对时算零引用而不是部分集合。
+
+## 2026-08-02 — G3-E prerequisite B2-4:per-target 原子发布与 post-release safety
+
+B2 的最后两个端口。`commitTargetRelease` 是整个 T-006 里唯一"三件事必须同时落地"
+的位置:目标的 `PublicationRelease`、它的逻辑 Receipt、以及不可变的
+`CommandExecution`。半落地比失败更糟——家庭手里会有一条没有回执的发布,或者一条
+背后什么都没有的审计行——所以三次写共用一个事务。
+
+**per-target 的命令身份**。一次发布尝试要覆盖一个 process 的全部目标,但
+`CommandExecution` 在 `(workspace, commandRequestIdHash)` 上唯一,第二个目标会直接
+撞上第一个。所以提交身份是 per (attempt, target):
+`publicationReleaseCommandIdentity(commandRequestId, targetKey)`;attempt 级的身份
+走 `parentCommandRequestIdHash`——那一列本来就是记这个的。domain 断言的"一次尝试
+的所有目标共享同一 command 身份"仍然成立,成立在 `command_request_id` 这一层。
+
+两个身份函数是导出的,不是内部细节:测试要用它去**真的**制造一次冲突来证明回滚,
+如果测试自己复制一遍哈希字面量,实现改了字面量之后冲突就不再发生,那条原子性断言
+会静默变成空断言。
+
+**原子性是被证伪过的**。测试先占住该目标将要认领的确切提交身份,让事务内的审计
+写在另外两条已经发出之后失败,然后断言 release / receipt 计数都回到 0,且 process
+仍是 `pending_release`、`frozenRevisionId` 仍为 null。
+
+**精确重放**返回原次提交的 refs 且不写任何东西(前后三张表计数完全相同);换一个
+command 打同一个已发布目标则是 `already_released`。捕获到的唯一约束冲突映射成
+`already_released`,其余异常一律 `outcome_unknown`——调用方必须去对账,而不是假定
+已经回滚。
+
+**又撞到两条既有 CHECK**,都不是 T-006 新增的:
+`ck_nurture_command_execution_handoff_v2` / `_n1` 要求 `output_refs` 与
+`target_refs` 是 canonical ref **数组**、`handoff_request_snapshots_payload` 必须
+是数组且为空时 driver ref 为 null。发布不参与任何 Workflow handoff,所以快照列表
+留空、无 driver ref;两个 ref 列写成 canonical ref 数组。
+
+**顺带修掉一处跨 lane 的读法分歧**:`mediaCompositionPayload` 被 media lane 与
+release lane 各读了一遍,一边期望 `{mediaAssetIds:[...]}`、一边期望
+`{media:[{mediaAssetId,mediaRevision}]}`——正是质量复核里"同一概念两个不可互换
+实现"那一类。统一为 `board-read-support.ts` 里的单一 `readMediaComposition`,
+形状带 revision(release lane 确实需要它),两边共用。
+
+其余判定:目标资格按**当前** Grant 判(撤销一个 Grant 只挡它自己的目标);
+schedule 只有在 owner 记全了 T-007 合同固定的每一个字段时才算已解析,半记录的
+schedule 不是窗口;已提交的目标在 `loadReleaseFacts` 里带 `already_committed`,
+重试因此去对账而不是重复提交;post-release safety 没有有效期窗口,被 redact 的
+publication 仍然可寻址,Receipt 与审计从不删除。

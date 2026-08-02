@@ -515,3 +515,29 @@
 | `verify:test-routing` | PASS — files=89 production-db=17 |
 | `verify:surface-conformance` / `g2-exit-contract` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisite B2-4 (Atomic Per-target Release and Post-release Safety)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm typecheck` | PASS — the last two T-006 ports implemented |
+| `pnpm test:db` | PASS — 18 files / 157 tests |
+| release, Receipt and CommandExecution land together | PASS — one transaction, all three present |
+| atomicity falsified: audit row blocked mid-transaction | PASS — release and Receipt counts return to 0, process still `pending_release`, revision unfrozen |
+| exact replay returns the original refs and writes nothing | PASS — all three counts unchanged |
+| a different command on an already-released target | PASS — `already_released`, still one release |
+| one attempt across two targets | PASS — two committed identities, one shared parent identity |
+| first commit freezes the shared revision and moves the process to released | PASS |
+| negative: unknown revision, caregiver of another class | PASS — refused before any write |
+| Receipt satisfies the T-005 lifecycle CHECK for the new source type | PASS — delivered with full routing identity |
+| found: `ck_nurture_command_execution_handoff_v2`/`_n1` require canonical-ref arrays and an empty handoff snapshot list | RECORDED — release carries no Workflow handoff |
+| defect: `mediaCompositionPayload` read two incompatible ways across lanes | FIXED — one `readMediaComposition` in the shared support module |
+| per-target eligibility read from the current Grant | PASS — one revoked Grant blocks only its own target |
+| partially recorded schedule is not a resolved window | PASS — `null` |
+| lapsed authorizing role | PASS |
+| already-committed target surfaced so a retry reconciles | PASS — plus the frozen revision the remaining target binds to |
+| composed media revision reported against the asset's current one | PASS — drift visible, never silently republished |
+| post-release safety lists every publication whatever its visibility | PASS — redacted stays addressable with its Receipt |
+| `pnpm test:unit` / `verify:test-routing` | PASS — 506 tests, files=90 production-db=18 |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |

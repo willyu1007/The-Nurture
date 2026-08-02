@@ -69,7 +69,7 @@ fully-bound delivered Receipt (grant, enrollment, data class, target scope,
 `delivered_at`). Both the accepted and the refused shape are now pinned by a DB
 test.
 
-### B2 — No owner repository implements any T-006 port (internal) — PARTIAL 2026-08-02
+### B2 — No owner repository implements any T-006 port (internal) — RESOLVED 2026-08-02
 
 > The G3-A lane is landed: `PrismaGuardianBoardReadPort`,
 > `PrismaCaregiverBoardReadPort`, `PrismaGuardianFocusEligibilityReadPort`,
@@ -89,8 +89,17 @@ test.
 > of raising the tier. Both are recorded in the freeze and in
 > `03-implementation-notes.md`.
 >
-> Two ports remain: `PublicationReleasePort` and `PublicationSafetyReadPort` —
-> and `commitTargetRelease`, the atomic per-target write, is among them.
+> The G3-D lane closes it: `PrismaPublicationReleasePort` covers the release and
+> post-release safety ports, covered by
+> `packages/nurture-db/tests/g3d-publication-release-owner.integration.test.ts`.
+> All fourteen ports are implemented.
+>
+> `commitTargetRelease` lands the release, its Receipt and the immutable
+> `CommandExecution` in one transaction. Its committed identity is per (attempt,
+> target) — `CommandExecution` is unique per command hash, so the attempt
+> identity alone would make the second target collide with the first — with the
+> attempt hash recorded as the parent. Atomicity was falsified by blocking the
+> audit write mid-transaction and asserting the other two rows do not survive.
 >
 > One limitation surfaced while landing the Guardian lane and is not a defect in
 > the implementation: `NurtureFamily` is one-to-one with
@@ -166,8 +175,9 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
    extend-in-place deltas, generated context, one migration with an
    evidence-backed legacy census that fails closed. Unblocks B1.~~ **Done
    2026-08-02.**
-2. **Owner repositories** — the fourteen ports plus the atomic per-target release
-   transaction, with `test:db` coverage on disposable PostgreSQL. Unblocks B2.
+2. ~~**Owner repositories** — the fourteen ports plus the atomic per-target
+   release transaction, with `test:db` coverage on disposable PostgreSQL.
+   Unblocks B2.~~ **Done 2026-08-02.**
 3. ~~**Capture-lane port** — declare it alongside the repositories so every lane
    has one boundary shape. Unblocks B3.~~ **Done 2026-08-02.**
 4. **Ingress routing** — admit the 24 T-006 keys, extend the ingress census, keep
