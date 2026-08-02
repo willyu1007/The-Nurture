@@ -2,7 +2,7 @@ version: 1
 task_id: T-005
 project: main
 slug: nurture-family-care-conversation
-status: in-progress
+status: done
 updated: "2026-08-02"
 keywords:
   - guardian-chat

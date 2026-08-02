@@ -47,3 +47,4 @@ Project: `main`
 - 2026-07-31 task_id=T-002 event=goal-decision id=G7-scope-order-acceptance result=accepted scope=bounded-internal-pilot-rehearsal,120h-observation packages=g7-0-entry-freeze,g7-a-pilot2-bootstrap,g7-b-pilot3-terminal-rehearsal,g7-c-pilot4-observation,g7-d-terminal-result cohort=one-workspace,three-children,three-families,seven-accounts paths=seven authorizations=pilot2-and-pilot4-distinct old_row=never-restored verdict=pass,no_pass,stopped limited_pass=forbidden external_traffic=no-go development=observed-environment-only-freeze activation=unchanged task=pending
 - 2026-07-31 task_id=T-004 slug=nurture-surface-contract-foundation event=status from=planned to=in-progress
 - 2026-08-01 task_id=T-005 slug=nurture-family-care-conversation event=status from=planned to=in-progress
+- 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=in-progress to=done

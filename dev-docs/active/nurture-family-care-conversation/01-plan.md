@@ -516,19 +516,19 @@ Candidate、persistent DB apply、native/internal-store testing、activation 或
 - [x] G2-B Lifecycle and Owner-read Completion 通过。
 - [x] G2-C Caregiver Direct Interaction Bridge 通过（见
   `13-g2c-checkpoint-record.md`）。
-- [ ] 三轴 CareItem、reply collection、protected content、typed result 和 cascade
+- [x] 三轴 CareItem、reply collection、protected content、typed result 和 cascade
   schema 可由 clean checkout 重建；legacy cutover 保持 single writer，ambiguous
   old rows 不被猜测迁移。
-- [ ] G2 protected qualification 精确引用当前 G1 三类输入，并经 formal NestJS
+- [x] G2 protected qualification 精确引用当前 G1 三类输入，并经 formal NestJS
   ingress + real pinned owner path 在 disposable PostgreSQL 运行。
-- [ ] Chat/Board canonical effect/error 等价；ordinary Chat 无副作用；不存在共享
+- [x] Chat/Board canonical effect/error 等价；ordinary Chat 无副作用；不存在共享
   room/transcript、raw target/authority input 或 protected-body leakage。
-- [ ] transaction/concurrency/replay/response-loss/cascade 与全部 cross-family/
+- [x] transaction/concurrency/replay/response-loss/cascade 与全部 cross-family/
   CareGroup/Institution、Admin-only、stale Grant/role、contract mismatch negatives
   通过。
-- [ ] 最终 capability/environment 为 false、active test rows 为空，无 PII、secret、
+- [x] 最终 capability/environment 为 false、active test rows 为空，无 PII、secret、
   persistent DB apply、Candidate、native/internal-store effect、activation 或 traffic。
-- [ ] 形成 exact G2 Exit Qualification 与 T-005 Beta Profile Handoff；该 handoff
+- [x] 形成 exact G2 Exit Qualification 与 T-005 Beta Profile Handoff；该 handoff
   只声明 Nurture-side qualified capability，不冒充 My-Chat native/device completion。
 
 所有清单项满足后 T-005 才可转为 done。T-002 仍未满足的部署/流量门禁不得被本任务

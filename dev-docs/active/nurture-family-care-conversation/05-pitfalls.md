@@ -230,3 +230,16 @@
   policy evidence 由 actor/workspace/Message/head-bound opaque ref 表达；confirmation
   只保存数字 head 与 keyed input tag，execute 重新解析 evidence 和 current system
   role。允许 `expected_heads.policy_decision` 不等于允许持久化 decision payload。
+
+## G2 Exit 资格化的已解决教训(2026-08-02)
+
+- **测试 PASS 与后置 census 必须分开辨识。** 初次 census 用了复数表名，第二次又对
+  含聚合的拼接表达式 `GROUP BY 1`，两次都是测试全绿后才失败。trap 正确销毁数据库，
+  但整条命令的非零退出不能冒充实现失败。长期检查改为 Prisma 参数化 raw query，
+  直接使用 schema `@@map` 表名，并在输出中分别报告 suite 与 census。
+- **redacted row 不能按 active encrypted row 判违规。** “Harness payload 为空”初看有
+  6 条异常，按 kind/status/storage 分组后全部是正确 tombstone。census 现在分别要求：
+  非 redacted row 必须密文 payload 完整；redacted row 必须正文和 payload 均已擦除。
+- **pin 文件值正确不等于内容仍匹配。** 静态 Exit guard 能阻止常量漂移，却不能代替
+  path-content 重算。CI 必须在 exact checkout 后运行 `verify:workflow-contract-pin`，
+  同时验证 revision、contract parity、owner source populations 和 Nurture self-pin。

@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: formal NestJS owner ingress implemented and locally qualified; adoption and activation pending
+Status: G2 Nurture-side provider qualified; consumer adoption and activation pending
 
 ## Product Terminology Compatibility
 
@@ -25,18 +25,16 @@ and MUST stay default-off until the owner contract is reconciled with the produc
 
 The Nurture is a My-Chat scenario module. My-Chat owns the account identity and scenario shell; The Nurture owns the care ecology graph.
 
-The Wave 4 P7 plus NestJS M3 implementation is an additive, default-deny source
-candidate against exact My-Chat consumer revision
-`f00b86861cf0b751d747c7e0bc5cb86a952900de`. It includes typed local anchors,
-workspace-local association schema, the formal service-authenticated owner
-route, production Prisma composition, transaction-scoped Guardian authority
-reread and owner-authorization receipt persistence. Exact-consumer,
-application-parity and disposable-PostgreSQL evidence pass locally. M4
-API/env/port governance is complete with exact OpenAPI/index/source parity,
-env SSOT and mechanical topology checks. M5 handoff regeneration and
-cross-owner Joint Conformance remain required. Repository migrations are not applied to a
-persistent environment, and no manifest capability, Scenario row, secret,
-deployment or traffic path is activated.
+The Wave 4 P7 plus NestJS M3 owner path is pinned to My-Chat
+`a0195662228a2fc6323b9ea0cd327d3608d8cc17` and My-Workflow-Base
+`06303e9f404e4ccc0ba3054b763675efe81b5b15`. M4 governance, M5 handoff and G1
+Joint Conformance are complete. T-005 G2 Exit binds that unchanged owner/source
+population and shared core to exact `nurture.surface-contract@1.8.0` /
+`sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`
+through the formal service-authenticated NestJS ingress and disposable PostgreSQL.
+The Nurture provider is qualified but default-off. T-006/T-007 real-consumer
+adoption, T-008 Candidate/native/device qualification, persistent migration apply,
+secret configuration, deployment, activation and traffic remain separately required.
 
 My-Chat users are the single login principals across scenarios. A My-Chat user can join many scenarios such as Nurture or Education. Inside Nurture, the same My-Chat user is mapped to Nurture-owned participants, roles, relationships, InstitutionWorkflows, and data.
 

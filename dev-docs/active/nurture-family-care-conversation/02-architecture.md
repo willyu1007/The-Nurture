@@ -613,3 +613,12 @@ presenter 不得输出：
 ## My-Chat Integration
 
 My-Chat 将公共 queries、commands 和 role-safe view-model 分别映射为 Guardian Chat、Caregiver Chat 与相应看板体验。普通 Chat 由 My-Chat 承载；需要 Nurture facts 或动作时通过版本化 Harness contract 调用。My-Chat 不创建共享业务 room，也不把宿主 Chat history 反写为 Nurture canonical 状态。Nurture 不拥有导航、消息总线、推送或设备通知。
+
+## G2 Exit Qualification Guard
+
+G2 Exit 不新增第二套运行时。`verify:g2-exit-contract` 固定 exact surface identity、
+G1 shared-core、owner/self pins、capability population、default-off environment、
+pre-activation manifest 与 schema/cutover guard；`verify:g2-exit-db-census` 在正式
+PostgreSQL 测试人口上验证 writer 分布、完整 original scope、active protected
+storage、redacted erasure 与 reply ordering。CI 仍调用通用 pin verifier 逐文件重算，
+因此静态声明不能替代真实内容哈希。

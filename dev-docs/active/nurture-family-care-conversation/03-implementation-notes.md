@@ -795,3 +795,21 @@
 - self-pin population 不再只选旧入口依赖；它现在覆盖完整 scenario Harness 与 direct
   eligibility/query repositories，共 69 files，按 verifier 算法重算为
   `0e684436322a1865febad9e54dea241f16046b1813b765c876e238a415551e03`。
+
+## 2026-08-02 — G2 Exit Qualification
+
+- 物化 exact detached My-Chat `a019566`、Base `06303e9` 与 Nurture G2-C
+  checkpoint，frozen install 后生成 owner/Nurture Prisma clients；逐文件 pin、aggregate
+  typecheck、surface/formal ingress、unit、production DB、scenario-service DB、双库
+  dev-host 与 built smoke 全部通过。
+- 新增 `assert-g2-exit-contract.mjs` 与 `assert-g2-exit-db-census.mjs`。前者阻止 root、
+  shared-core、capability version、pin、environment、legacy activation 和 migration
+  语义漂移；后者在 CI 的真实测试人口上拒绝 writer/scope/protected/redaction/order
+  违规。
+- CI 的 pinned-source job 开始执行完整 `verify:workflow-contract-pin`；synthetic job
+  执行 Exit contract guard，production DB job 在两个正式 DB 套件后执行 census。
+- G1 owner/X5 只因 shared core 和所有 pinned owner source population 未变而受控复用；
+  1.8.0 新增/旋转的 provider slices 已全部重跑。没有为旧 1.0 query、legacy handler
+  或 consumer 建兼容双轨。
+- exact verdict、失效条件与 T-006/T-007/T-008 后继责任见
+  `14-g2-exit-qualification-and-beta-handoff.md`。

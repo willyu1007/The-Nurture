@@ -447,3 +447,23 @@ freshly materialized schemas and passed.
 Checkpoint evidence and stable AC IDs `T005-AC-050..059` are recorded in
 `13-g2c-checkpoint-record.md`. The provider is qualified but consumer adoption,
 cross-owner G2 Exit evidence, deployment, activation and traffic remain unclaimed.
+
+## G2 Exit Qualification — 2026-08-02
+
+| Check | Result |
+| --- | --- |
+| exact detached owner/self-pin verification | PASS; Base/My-Chat `8dd53be4…`, three owner source pins, Nurture checkpoint 69 files / `0e684436…` |
+| clean frozen install + Prisma generation + aggregate typecheck | PASS; owner client generation requires an explicit test-only `DATABASE_URL`, no apply |
+| unit / scenario-service | PASS; 268 / 49 |
+| production / formal scenario-service DB | PASS; 86 / 22 on fresh disposable PostgreSQL |
+| dev-host dual DB | PASS; 26 tests on isolated fresh schemas |
+| surface/formal/persistence/port/routing/built smoke | PASS; surface 56/56, routes 7/actions 8, smoke default-off |
+| `verify:g2-exit-contract` | PASS; exact `1.8.0`, shared core `042272…`, 11 capabilities, exact pins, gates false, legacy activation absent |
+| `verify:g2-exit-db-census` | PASS; items 53 Harness / 11 legacy, messages 73 Harness / 12 legacy, all five violation classes zero |
+| final false/empty | PASS; no committed gate values, no secret/Candidate/activation/traffic; no `the_nurture_g2_exit*` database remains |
+| review | PASS after qualification-command fixes and CI exact-pin enforcement; no product defect remains |
+| final context/self-pin sync | PASS; workflow context semantic drift removed; 69-file self-pin `a23f0c069dbd335c4c0b2befec5443bf9e151595ea0b6dfd8c95ae7f99173141` |
+
+Authoritative verdict and bounded G1 evidence reuse are recorded in
+`14-g2-exit-qualification-and-beta-handoff.md`. T-006/T-007 adoption and T-008
+Candidate/native/device qualification remain outside this verdict.
