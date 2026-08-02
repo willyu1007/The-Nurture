@@ -293,29 +293,61 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
       take: input.take + 1,
     });
 
+    // "Today" is the snapshot day. The earlier query had no date bound and no
+    // limit, so a child enrolled a year returned a year of logs — a module
+    // named `child_today` answering with something else entirely. The day is
+    // taken in UTC; the institution's local day needs the T-007 timezone, which
+    // is recorded as a G3-E input rather than guessed here.
+    const dayStart = new Date(
+      Date.UTC(at.getUTCFullYear(), at.getUTCMonth(), at.getUTCDate()),
+    );
+    const dayEnd = new Date(dayStart.getTime() + 86_400_000);
+    const processIds = enrollments.map((enrollment) => enrollment.childCareProcessId);
+
+    // One query per fact kind for the whole page, not two per child.
+    const [logs, attention] = await Promise.all([
+      processIds.length === 0
+        ? []
+        : this.prisma.nurtureDailyCareLog.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              careGroupId: reach.care_group_id,
+              childCareProcessId: { in: processIds },
+              logDate: { gte: dayStart, lt: dayEnd },
+              status: { in: ["recorded", "shared"] },
+              deletedAt: null,
+            },
+            orderBy: [{ logDate: "desc" }, { id: "desc" }],
+          }),
+      processIds.length === 0
+        ? []
+        : this.prisma.nurtureTeacherAttentionItem.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              careGroupId: reach.care_group_id,
+              childCareProcessId: { in: processIds },
+              status: "active",
+            },
+            orderBy: [{ effectiveDate: "desc" }, { id: "desc" }],
+          }),
+    ]);
+    const logsByChild = new Map<string, typeof logs>();
+    for (const log of logs) {
+      const bucket = logsByChild.get(log.childCareProcessId) ?? [];
+      bucket.push(log);
+      logsByChild.set(log.childCareProcessId, bucket);
+    }
+    const attentionByChild = new Map<string, typeof attention>();
+    for (const item of attention) {
+      const bucket = attentionByChild.get(item.childCareProcessId) ?? [];
+      bucket.push(item);
+      attentionByChild.set(item.childCareProcessId, bucket);
+    }
+
     const rows: RawCaregiverChildToday[] = [];
     for (const enrollment of enrollments) {
-      const [logs, attention] = await Promise.all([
-        this.prisma.nurtureDailyCareLog.findMany({
-          where: {
-            workspaceId: input.workspace_id,
-            careGroupId: reach.care_group_id,
-            childCareProcessId: enrollment.childCareProcessId,
-            status: { in: ["recorded", "shared"] },
-            deletedAt: null,
-          },
-          orderBy: [{ logDate: "desc" }, { id: "desc" }],
-        }),
-        this.prisma.nurtureTeacherAttentionItem.findMany({
-          where: {
-            workspaceId: input.workspace_id,
-            careGroupId: reach.care_group_id,
-            childCareProcessId: enrollment.childCareProcessId,
-            status: "active",
-          },
-          orderBy: [{ effectiveDate: "desc" }, { id: "desc" }],
-        }),
-      ]);
+      const logs = logsByChild.get(enrollment.childCareProcessId) ?? [];
+      const attention = attentionByChild.get(enrollment.childCareProcessId) ?? [];
 
       const authority = caregiverRowAuthority(reach, reach.care_group_id) as CaregiverFactAuthorityV1;
       const dailyCare: RawCaregiverDailyCare[] = logs.flatMap((log) =>

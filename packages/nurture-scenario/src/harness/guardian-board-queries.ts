@@ -131,6 +131,21 @@ export type GuardianBoardDependencies = {
   now?: () => Date;
 };
 
+/**
+ * A scope already resolved by the caller, at a stated instant.
+ *
+ * A board envelope is one derived result at one snapshot, but each module used
+ * to resolve the scope again on its own clock — so an envelope was assembled
+ * from three reads at three instants, and a Grant revoked between the first and
+ * the last left the envelope and its modules disagreeing about the same scope.
+ * The envelope resolves once and passes the result down; a module called on its
+ * own still resolves for itself.
+ */
+export type ResolvedGuardianScopeV1 = {
+  facts: GuardianBoardScopeFacts;
+  snapshot_at: string;
+};
+
 // ---------------------------------------------------------------------------
 // Public typed results.
 
@@ -185,14 +200,17 @@ const guardianScopeRef = (
 
 export const queryGuardianCurrentFocus = async (
   deps: GuardianBoardDependencies,
-  request: BoardScopeV1,
+  request: BoardScopeV1 & { resolved_scope?: ResolvedGuardianScopeV1 },
 ): Promise<BoardQueryDecision<GuardianCurrentFocusOutputV1>> => {
   const now = (deps.now ?? (() => new Date()))();
-  const snapshotAt = now.toISOString();
-  const scopeFacts = await deps.reads.loadGuardianScope({
-    ...request,
-    snapshot_at: snapshotAt,
-  });
+  const snapshotAt = request.resolved_scope?.snapshot_at ?? now.toISOString();
+  const scopeFacts =
+    request.resolved_scope?.facts ??
+    (await deps.reads.loadGuardianScope({
+      workspace_id: request.workspace_id,
+      participant_id: request.participant_id,
+      snapshot_at: snapshotAt,
+    }));
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
 
   const result = await deps.reads.loadGuardianCurrentFocus({
@@ -297,6 +315,7 @@ export const queryGuardianEnrollmentActivity = async (
     enrollment_target_ref: string;
     page_size?: unknown;
     cursor?: string;
+    resolved_scope?: ResolvedGuardianScopeV1;
   },
 ): Promise<BoardQueryDecision<GuardianEnrollmentActivityOutputV1>> => {
   const pageSize = parseBoardPageSize(request.page_size);
@@ -307,10 +326,9 @@ export const queryGuardianEnrollmentActivity = async (
     participant_id: request.participant_id,
   };
   const now = (deps.now ?? (() => new Date()))();
-  const scopeFacts = await deps.reads.loadGuardianScope({
-    ...scope,
-    snapshot_at: now.toISOString(),
-  });
+  const scopeFacts =
+    request.resolved_scope?.facts ??
+    (await deps.reads.loadGuardianScope({ ...scope, snapshot_at: now.toISOString() }));
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
 
   // Only an owner-issued, actor-bound option ref selects an Enrollment. A raw

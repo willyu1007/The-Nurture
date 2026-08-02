@@ -502,6 +502,38 @@ describe("G3-A owner reads: caregiver lane", () => {
     expect(scope.publication_policy_resolved).toBe(false);
   });
 
+  it("returns the snapshot day only, not the child's whole history", async () => {
+    const world = await seedWorld();
+    for (const day of ["2026-07-30", "2026-08-01", "2026-08-02"]) {
+      await prisma.nurtureDailyCareLog.create({
+        data: {
+          workspaceId: world.workspaceId,
+          childCareProcessId: world.process.id,
+          enrollmentId: world.enrollment.id,
+          careGroupId: world.group.id,
+          recordedByRoleAssignmentId: world.caregiverRole.id,
+          logDate: new Date(`${day}T00:00:00.000Z`),
+          summary: `log ${day}`,
+          status: "recorded",
+          mealPayload: { kind: "meal", day },
+        },
+      });
+    }
+    const reads = new PrismaCaregiverBoardReadPort(prisma);
+    const page = await reads.listCaregiverChildToday({
+      workspace_id: world.workspaceId,
+      participant_id: world.caregiver.id,
+      care_group_id: world.group.id,
+      snapshot_at: SNAPSHOT_AT,
+      take: 10,
+    });
+    // A module named `child_today` that returned three days was answering a
+    // different question from the one it is named for.
+    const entries = page.rows[0]?.daily_care ?? [];
+    expect(entries).toHaveLength(1);
+    expect(entries[0]?.occurred_at).toBe("2026-08-02T00:00:00.000Z");
+  });
+
   it("refuses an institution-scoped assignment and a sibling class", async () => {
     const world = await seedWorld();
     const reads = new PrismaCaregiverBoardReadPort(prisma);

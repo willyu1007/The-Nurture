@@ -152,7 +152,9 @@ export const presentGuardianFamilyBoard = async (
   });
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
 
-  const focus = await queryGuardianCurrentFocus(deps, scope);
+  // One scope, one instant, shared by every module in this envelope.
+  const resolvedScope = { facts: scopeFacts, snapshot_at: generatedAt };
+  const focus = await queryGuardianCurrentFocus(deps, { ...scope, resolved_scope: resolvedScope });
   if (focus.status !== "ok") return focus;
 
   // Owner target selection: an explicit owner-issued option ref, or the unique
@@ -175,6 +177,7 @@ export const presentGuardianFamilyBoard = async (
     ? await queryGuardianEnrollmentActivity(deps, {
         ...scope,
         enrollment_target_ref: enrollmentTargetRef,
+        resolved_scope: resolvedScope,
         ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
       })
     : undefined;
@@ -267,6 +270,8 @@ export const presentCaregiverTeacherBoard = async (
 
   const childToday = await queryCaregiverChildToday(deps, {
     ...scope,
+    // One scope, one instant, shared by every module in this envelope.
+    resolved_scope: { facts: scopeFacts, snapshot_at: generatedAt },
     ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
   });
   if (childToday.status !== "ok") return childToday;

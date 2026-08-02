@@ -696,3 +696,15 @@
 | C11: a composite unique fully implied by a single-column unique | REMOVED — migration `20260802160000` |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 509, 178 and 26 tests |
 | all eight contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — Single-snapshot Envelopes and a Bounded "Today"
+
+| Command / check | Result |
+| --- | --- |
+| D1: the envelope resolved its scope three times, at three instants | FIXED — resolved once and threaded down; modules still resolve for themselves when called alone |
+| new: the guardian envelope reads the scope exactly once | PASS — falsified by letting a module resolve again (`length 1 but got 2`) |
+| A14: `child_today` had no date bound and no limit | FIXED — the snapshot day, in UTC, with the timezone dependency recorded for G3-E |
+| new: three seeded days return only the snapshot day | PASS |
+| D2: two queries per enrollment | FIXED — one query per fact kind for the page, grouped in memory |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 510, 179 and 26 tests |
+| all eight contract/boundary gates | PASS — artifact unchanged at `1.13.0` |

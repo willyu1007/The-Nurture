@@ -68,6 +68,17 @@ const caregiverDeps = (
 });
 
 describe("G3-A guardian_family_board envelope", () => {
+  it("resolves the scope once, so the envelope is one result at one snapshot", async () => {
+    const port = createGuardianReadPort();
+    const result = await presentGuardianFamilyBoard(guardianDeps(port), guardianScope);
+    expect(result.status).toBe("ok");
+    // Each module used to resolve the scope again on its own clock, so an
+    // envelope was assembled from three reads at three instants and its modules
+    // could disagree with it about the same scope.
+    expect(port.scopeReads).toHaveLength(1);
+    expect(new Set(port.scopeReads).size).toBe(1);
+  });
+
   it("emits the exact registry module order and the frozen envelope fields", async () => {
     const result = await presentGuardianFamilyBoard(
       guardianDeps(

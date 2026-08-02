@@ -168,12 +168,15 @@ export type GuardianPortConfig = {
 
 export const createGuardianReadPort = (
   config: GuardianPortConfig = {},
-): GuardianBoardReadPort & { activityRequests: unknown[] } => {
+): GuardianBoardReadPort & { activityRequests: unknown[]; scopeReads: string[] } => {
   const activityRequests: unknown[] = [];
+  const scopeReads: string[] = [];
   const pages = config.activityPages ?? [{ rows: [], has_more: false }];
   return {
     activityRequests,
-    async loadGuardianScope() {
+    scopeReads,
+    async loadGuardianScope(input) {
+      scopeReads.push(input.snapshot_at);
       return {
         authorized: true,
         family_id: "family-1",

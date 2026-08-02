@@ -119,6 +119,12 @@ export type CaregiverBoardDependencies = {
   now?: () => Date;
 };
 
+/** A scope already resolved by the caller — see `ResolvedGuardianScopeV1`. */
+export type ResolvedCaregiverScopeV1 = {
+  facts: CaregiverBoardScopeFacts;
+  snapshot_at: string;
+};
+
 // ---------------------------------------------------------------------------
 // Public typed results.
 
@@ -159,7 +165,11 @@ export type CaregiverChildTodayOutputV1 = {
 
 export const queryCaregiverChildToday = async (
   deps: CaregiverBoardDependencies,
-  request: BoardScopeV1 & { page_size?: unknown; cursor?: string },
+  request: BoardScopeV1 & {
+    page_size?: unknown;
+    cursor?: string;
+    resolved_scope?: ResolvedCaregiverScopeV1;
+  },
 ): Promise<BoardQueryDecision<CaregiverChildTodayOutputV1>> => {
   const pageSize = parseBoardPageSize(request.page_size);
   if (pageSize === null) return { status: "denied", reason_code: "invalid_query_input" };
@@ -169,10 +179,9 @@ export const queryCaregiverChildToday = async (
     participant_id: request.participant_id,
   };
   const now = (deps.now ?? (() => new Date()))();
-  const scopeFacts = await deps.reads.loadCaregiverScope({
-    ...scope,
-    snapshot_at: now.toISOString(),
-  });
+  const scopeFacts =
+    request.resolved_scope?.facts ??
+    (await deps.reads.loadCaregiverScope({ ...scope, snapshot_at: now.toISOString() }));
   // An Institution-scoped Lead designation, an Admin role, Institution
   // membership or a same-Institution role in another CareGroup all fail here.
   if (!scopeFacts.authorized || !caregiverFactVisible(scopeFacts.authority)) {

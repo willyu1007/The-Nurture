@@ -1320,3 +1320,28 @@ T-005 slice hash 自该 digest 起逐字不变。现在两个守卫互相钉住�
 `publish_process_target_id @unique` 完全蕴含,永远不可能是先触发的那条约束,却让人以为
 command hash 在数据库层承担了一部分保证——已随迁移删除,重放检查本就显式写在
 `commitTargetRelease` 里。
+
+## 2026-08-02 — D1/D2/A14:envelope 的单一快照,与一个答非所问的"今天"
+
+**D1 — envelope 的"一个快照下的一个派生结果"是三次读拼出来的。**
+`presentGuardianFamilyBoard` 解析一次 scope,它调用的两个模块查询**各自又解析一次**
+——三次,三个不同时刻。envelope 的 `snapshotVersion` 来自第一次,每个模块的
+`binding.snapshot.snapshotVersion` 来自它自己那次。第一次与第三次之间撤销一个 Grant,
+envelope 与它的模块就会对同一个 scope 各执一词。caregiver envelope 是两次。
+
+这不是性能问题,是契约问题。改为 envelope 解析一次并把
+`{facts, snapshot_at}` 作为可选的预解析上下文传下去;模块被单独调用时仍自己解析,
+所以它们保持可独立使用。读放大顺带从 3× 降到 1×。
+
+**A14 — 一个叫 `child_today` 的模块返回了一整年。** 那条日常照护查询**既没有日期界
+也没有 take**。入园一年、每天 3 条的孩子约 1000 行,再按 `DAILY_CARE_KINDS` 每行最多
+展开成 5 个条目,乘以每页最多 20 个孩子。这不是慢,是**模块返回了它名字之外的东西**。
+
+改为按快照日取。"今天"暂按 **UTC 日**界定并写明理由:机构本地日需要 T-007 的时区,
+现在猜一个不如把这条依赖记成 G3-E 的输入。
+
+**D2 — N+1**:原来每个 enrollment 两条查询,页大小 20 就是 40 次往返。改为每种事实
+对整页发一条 `IN (...)`,再在内存里按孩子分组。与 A14 是同一处改动。
+
+两条检查都用制造该缺陷的手法证伪过:让模块自己再解析一次,单一快照检查立刻报
+`expected [...] to have a length of 1 but got 2`;而"只含当天"那条种了三天的日志。
