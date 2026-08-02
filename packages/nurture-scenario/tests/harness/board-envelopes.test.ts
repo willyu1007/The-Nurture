@@ -68,15 +68,29 @@ const caregiverDeps = (
 });
 
 describe("G3-A guardian_family_board envelope", () => {
-  it("resolves the scope once, so the envelope is one result at one snapshot", async () => {
+  it("resolves the scope once and asks every module for that same instant", async () => {
+    // A clock that advances on every read. Under a fixed clock a module that
+    // stamps its own instant produces the same value as the envelope's, so the
+    // defect is invisible — which is what the first version of this test did.
+    let tick = 0;
+    const advancingNow = () => new Date(Date.parse("2026-08-02T00:00:00.000Z") + (tick += 1));
     const port = createGuardianReadPort();
-    const result = await presentGuardianFamilyBoard(guardianDeps(port), guardianScope);
+    const result = await presentGuardianFamilyBoard(
+      { ...guardianDeps(port), now: advancingNow },
+      guardianScope,
+    );
     expect(result.status).toBe("ok");
+
     // Each module used to resolve the scope again on its own clock, so an
-    // envelope was assembled from three reads at three instants and its modules
-    // could disagree with it about the same scope.
+    // envelope was assembled from three reads at three instants.
     expect(port.scopeReads).toHaveLength(1);
-    expect(new Set(port.scopeReads).size).toBe(1);
+
+    // Counting reads is not enough. A module can take the shared facts and
+    // still stamp its own instant, leaving the envelope claiming to be one
+    // snapshot while its modules read as of another. The first version of this
+    // fix did exactly that, and the first version of this test did not notice.
+    expect(port.snapshotInstants.length).toBeGreaterThan(1);
+    expect(new Set(port.snapshotInstants).size).toBe(1);
   });
 
   it("emits the exact registry module order and the frozen envelope fields", async () => {

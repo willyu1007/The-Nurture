@@ -205,7 +205,10 @@ export const queryCaregiverChildToday = async (
   };
   const driftHead = computeDriftHead(scopeFacts.drift_heads);
 
-  let snapshotAt = now.toISOString();
+  // The envelope's instant when it supplied the scope, so every module of one
+  // envelope stamps the same snapshot. A resumed page then overrides it with
+  // the instant its own page set was opened at.
+  let snapshotAt = request.resolved_scope?.snapshot_at ?? now.toISOString();
   let before: BoardSortKeyV1 | undefined;
   if (request.cursor !== undefined) {
     const resumed = resolveBoardCursor(

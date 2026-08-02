@@ -168,15 +168,23 @@ export type GuardianPortConfig = {
 
 export const createGuardianReadPort = (
   config: GuardianPortConfig = {},
-): GuardianBoardReadPort & { activityRequests: unknown[]; scopeReads: string[] } => {
+): GuardianBoardReadPort & {
+  activityRequests: unknown[];
+  scopeReads: string[];
+  /** Every `snapshot_at` the owner was asked for, across all three methods. */
+  snapshotInstants: string[];
+} => {
   const activityRequests: unknown[] = [];
   const scopeReads: string[] = [];
+  const snapshotInstants: string[] = [];
   const pages = config.activityPages ?? [{ rows: [], has_more: false }];
   return {
     activityRequests,
     scopeReads,
+    snapshotInstants,
     async loadGuardianScope(input) {
       scopeReads.push(input.snapshot_at);
+      snapshotInstants.push(input.snapshot_at);
       return {
         authorized: true,
         family_id: "family-1",
@@ -191,7 +199,8 @@ export const createGuardianReadPort = (
         ...config.scope,
       };
     },
-    async loadGuardianCurrentFocus() {
+    async loadGuardianCurrentFocus(input) {
+      snapshotInstants.push(input.snapshot_at);
       return {
         authorized: config.focusAuthorized ?? true,
         ...(config.charter ? { charter: config.charter } : {}),
@@ -201,6 +210,7 @@ export const createGuardianReadPort = (
     },
     async listGuardianEnrollmentActivity(input) {
       activityRequests.push(input);
+      snapshotInstants.push(input.snapshot_at);
       const page = pages[Math.min(activityRequests.length - 1, pages.length - 1)];
       return {
         authorized: page?.authorized ?? true,

@@ -305,7 +305,7 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
     const processIds = enrollments.map((enrollment) => enrollment.childCareProcessId);
 
     // One query per fact kind for the whole page, not two per child.
-    const [logs, attention] = await Promise.all([
+    const [pageLogs, pageAttention] = await Promise.all([
       processIds.length === 0
         ? []
         : this.prisma.nurtureDailyCareLog.findMany({
@@ -331,14 +331,14 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
             orderBy: [{ effectiveDate: "desc" }, { id: "desc" }],
           }),
     ]);
-    const logsByChild = new Map<string, typeof logs>();
-    for (const log of logs) {
+    const logsByChild = new Map<string, typeof pageLogs>();
+    for (const log of pageLogs) {
       const bucket = logsByChild.get(log.childCareProcessId) ?? [];
       bucket.push(log);
       logsByChild.set(log.childCareProcessId, bucket);
     }
-    const attentionByChild = new Map<string, typeof attention>();
-    for (const item of attention) {
+    const attentionByChild = new Map<string, typeof pageAttention>();
+    for (const item of pageAttention) {
       const bucket = attentionByChild.get(item.childCareProcessId) ?? [];
       bucket.push(item);
       attentionByChild.set(item.childCareProcessId, bucket);

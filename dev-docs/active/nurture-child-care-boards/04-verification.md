@@ -708,3 +708,16 @@
 | D2: two queries per enrollment | FIXED — one query per fact kind for the page, grouped in memory |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 510, 179 and 26 tests |
 | all eight contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — Self-review of the D1/D2 Batch
+
+| Command / check | Result |
+| --- | --- |
+| self-review of the envelope/child-today batch | 2 findings, both mine |
+| D1 was half-fixed: modules took the shared facts but stamped their own instant | FIXED — the envelope's instant is threaded too |
+| the D1 test was vacuous under a fixed clock | FIXED — advancing clock, fixture records every asked `snapshot_at` |
+| falsified after the clock change | PASS — reintroducing the defect fails with `expected 2 to be 1` |
+| shadowed `logs`/`attention` between the page read and the per-child buckets | RENAMED |
+| cursor TTL survived the sealing change | VERIFIED — `issued_at` + `CURSOR_TTL_MS` still enforced |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 510, 179 and 26 tests |
+| contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
