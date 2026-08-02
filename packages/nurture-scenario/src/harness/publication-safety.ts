@@ -360,6 +360,12 @@ export const redactPublication = async (
 export type MediaLifecycleFactsV1 = {
   authority: CaregiverFactAuthorityV1;
   process_state: PublishProcessStateV1;
+  /**
+   * The head `detach_publish_process_media` binds `draft_revision must_equal`
+   * to. Detaching appends a new revision, so it needs the one it is detaching
+   * from — the owner previously reported no revision at all here.
+   */
+  draft_revision: number;
   composition_media_ids: string[];
   media_revision: number;
   media_lifecycle: MediaAssetLifecycleV1;

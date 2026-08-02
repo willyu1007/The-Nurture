@@ -264,6 +264,12 @@ const idleSeconds = (activity: CaptureActivityHeadV1, now: Date): number =>
  */
 export type CaptureOrganizeSourceV1 = {
   batch_id: string;
+  /**
+   * The head the `capture_batch must_equal` binding compares against, so a
+   * capture arriving between the read and the cut fails the cut rather than
+   * letting it land on a stale watermark.
+   */
+  batch_version: number;
   state: CaptureBatchStateV1;
   captures: RawCaptureRow[];
   activity: CaptureActivityHeadV1;

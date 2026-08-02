@@ -72,6 +72,7 @@ export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
 
     return {
       batch_id: batch.id,
+      batch_version: batch.aggregateVersion,
       state: batch.state,
       captures: batch.captures.map((capture) => ({
         capture_id: capture.id,

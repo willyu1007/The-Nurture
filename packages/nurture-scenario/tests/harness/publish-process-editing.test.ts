@@ -82,12 +82,14 @@ const liveHold = (participantId: string) => ({
   holder_participant_id: participantId,
   holder_label: "Syn Colleague",
   expires_at: "2026-08-01T09:01:00.000Z",
+  hold_version: 1,
 });
 
 const expiredHold = (participantId: string) => ({
   holder_participant_id: participantId,
   holder_label: "Syn Colleague",
   expires_at: "2026-08-01T08:59:00.000Z",
+  hold_version: 1,
 });
 
 describe("G3-B1 publish edit hold", () => {

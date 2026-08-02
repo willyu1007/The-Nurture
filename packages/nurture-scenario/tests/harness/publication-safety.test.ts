@@ -63,6 +63,7 @@ const mediaFacts = (
 ): MediaLifecycleFactsV1 => ({
   authority: caregiverAuthority(),
   process_state: "draft",
+  draft_revision: 1,
   composition_media_ids: [MEDIA_ID, "media-2"],
   media_revision: 3,
   media_lifecycle: "ready",

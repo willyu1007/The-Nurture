@@ -1364,3 +1364,40 @@ envelope 与它的模块就会对同一个 scope 各执一词。caregiver envelo
 
 顺带清掉 child-today 里 `logs`/`attention` 的变量遮蔽——批量结果与每个孩子的分桶
 同名,能跑但读起来像同一个东西。
+
+## 2026-08-02 — 六条前置缺口:核实与实施
+
+逐条核实后 **五条成立、第六条被描述错了**。
+
+**1 硬阻塞成立。** `createPublishCandidate` 在 `direct_interaction_required` 分支
+**创建 process 之前就 return**,而 `publish_process_id` 是 NOT NULL 加必填 FK——
+**最需要留痕的那条路由,恰恰是唯一存不下来的**。改为可空,并加
+`care_group_id` + `organizer_input_revision` 作为不依赖 process 的锚点(两者始终有值,
+所以无论走哪条路由,评估行都可寻址)。
+
+**2 比描述更糟。** 不只是"一列两义":`publish-process.ts:318` 写入 assembler 的
+organizer revision,而 `publish-lane.read.ts:338` 按 **command_request_id** 查这一列找
+重放——**这个查找永远找不到它要找的东西**,`replayed_revision` 事实上是死的。新增
+独立的 `command_request_id_hash` 列与唯一约束。
+
+**3、4 成立**:VisibilityEvent 补 `command_execution_id` 与唯一约束(两个最接近的同类
+都有);PublishProcess 补 `schedule_policy_version` 与 `schedule_resolved_at`——此前拿
+`aggregate_version` 与 `updated_at` 顶替,而 reschedule 正好会动这两个。
+
+**5 按建议不做**:release 的可见性迁移是单调的,事件表加了唯一约束之后重放已是无操作。
+
+**6 被描述错了。** 九个 `must_equal` head 逐个对到 facts 类型上,实际是三类:
+**owner 确实没暴露**的只有 `publish_edit_hold`、`capture_batch`、detach 的
+`draft_revision`(已补 `hold_version` / `batch_version` / `draft_revision`);
+`media_asset_revision` 等 owner 早已暴露,缺的是 prepare 层,那就是 B8 本身;
+`focus_cycle` / `focus_goal` / `enrollment_lifecycle` 的闭环已经存在。
+不是"系统性的一整片",是三处字段。
+
+**迁移仍然不猜。** 两列 NOT NULL 从每行已指向的 process 回填,推不出来的行让迁移中止。
+gate 在一次性库里对 19 行测试残留正确触发,随后重建库重放整条链。
+
+**守卫抓到了我自己。** 新 amendment 里的反引号列名被"能力键"抓取器当成了 capability
+key,精确计数(B8 那条改动)立刻报 `expected 19, received 29`。根因是抓取器读整节散文。
+改为**切到第一个 `### Amendment` 之前**:采纳声明是正文,附录不参与;附录若新增身份,
+会像 media lifecycle 那次一样并回正文列表,而反向普查(每个已注册的 T-006 能力都必须
+被预留)从另一侧兜住。

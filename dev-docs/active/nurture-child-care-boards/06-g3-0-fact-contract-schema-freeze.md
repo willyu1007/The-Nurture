@@ -223,6 +223,34 @@ pre-existing row is silently routed as ordinary content. Neither column widens
 what a public result may carry, and the capability adoption set, exact inputs,
 authority predicates and surface topology above are unchanged.
 
+### Amendment 2026-08-02 — command identity and the unanchored safety route
+
+Verifying the B8 prerequisites found four facts the frozen set could not hold.
+Each is an input the write lane needs before a command can be written at all, so
+they are added here rather than discovered during implementation.
+
+| Change | Why the frozen set could not hold it |
+| --- | --- |
+| `NurtureContentSafetyAssessment.publish_process_id` becomes nullable, and the row gains `care_group_id` + `organizer_input_revision` | `direct_interaction_required` deliberately creates no publication candidate, so the one route that most needs an audit trail was the only one that could not have a row |
+| `NurturePublishProcessRevision.command_request_id_hash` + `@@unique([workspace, process, hash])` | the replay lookup searched `organizer_input_revision` — which carries the assembler's input revision — by command id, so it could never match, and no unique made the replay a row-level no-op |
+| `NurturePublicationVisibilityEvent.command_execution_id` + `@@unique([workspace, release, command, kind])` | the append-only lineage could not name the command behind it, unlike both of its closest analogues |
+| `NurturePublishProcess.schedule_policy_version` + `schedule_resolved_at` | the T-007 policy version and the resolution instant were being read off `aggregate_version` and `updated_at`, which a reschedule moves — so rescheduling appeared to change both |
+
+Three owner-side facts are added in the same pass, for `must_equal` head
+bindings the registry declares and no owner exposed: `hold_version` on the edit
+hold, `batch_version` on the capture source, and `draft_revision` on the media
+lifecycle facts. A prepare step cannot freeze a head it is never told.
+
+The migration backfills both new NOT NULL columns from the process each existing
+row already points at, and aborts on a row that cannot supply one — the gate
+fired on 19 rows in a disposable database before the tables were recreated.
+
+`NurturePublicationRelease` deliberately gains **no** version column. Its
+visibility transitions are monotone and the new event-level unique already makes
+a replay a no-op, so a version would buy a concurrency case that does not exist.
+The capability adoption set, exact inputs, authority predicates and surface
+topology above are unchanged.
+
 ## DB SSOT Delta
 
 All persisted changes originate in `prisma/schema.prisma` through the DB SSOT workflow. No JSON

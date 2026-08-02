@@ -420,6 +420,36 @@ describe("G3-0 schema delta: publish process and release", () => {
     );
   });
 
+  it("records the restricted route even though it creates no publish process", async () => {
+    const scope = await seedScope();
+    // `direct_interaction_required` deliberately produces no publication
+    // candidate. While `publishProcessId` was required, the one route that most
+    // needs an audit trail was the only one that could not have a row.
+    const assessment = await prisma.nurtureContentSafetyAssessment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        organizerInputRevision: "organizer:restricted-1",
+        route: "direct_interaction_required",
+        policyRef: "syn-content-safety-1",
+        policyHead: 2,
+        ruleRevision: "rules:1",
+        riskCodesPayload: ["health_symptom"],
+        sourceHeadsPayload: { source_head: "h-1" },
+      },
+    });
+    expect(assessment.publishProcessId).toBeNull();
+    // It stays addressable by the anchor that does not depend on a process.
+    const found = await prisma.nurtureContentSafetyAssessment.findFirst({
+      where: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        organizerInputRevision: "organizer:restricted-1",
+      },
+    });
+    expect(found?.id).toBe(assessment.id);
+  });
+
   it("stores a content safety assessment with the exact rule and policy head it used", async () => {
     const scope = await seedScope();
     const { publishProcess } = await seedPublishProcess(scope);
@@ -427,6 +457,8 @@ describe("G3-0 schema delta: publish process and release", () => {
       data: {
         workspaceId: scope.workspaceId,
         publishProcessId: publishProcess.id,
+        careGroupId: scope.group.id,
+        organizerInputRevision: "organizer:1",
         route: "direct_interaction_required",
         policyRef: "nurture.institution-publication-policy@1.0.0",
         policyHead: 3,

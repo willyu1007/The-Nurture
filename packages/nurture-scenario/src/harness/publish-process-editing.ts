@@ -81,6 +81,12 @@ export type PublishEditHoldFactsV1 = {
     holder_participant_id: string;
     holder_label: string;
     expires_at: string;
+    /**
+     * The head the `publish_edit_hold must_equal` binding compares against.
+     * The owner never exposed one, so the contract required an equality no
+     * prepare step could ever freeze.
+     */
+    hold_version: number;
   };
 };
 

@@ -280,6 +280,7 @@ export class PrismaPublishLaneReadPort
       editHold: {
         holderParticipantId: string;
         expiresAt: Date;
+        aggregateVersion: number;
         holder: { displayLabel: string | null };
       } | null;
     },
@@ -295,6 +296,7 @@ export class PrismaPublishLaneReadPort
               holder_participant_id: hold.holderParticipantId,
               holder_label: hold.holder.displayLabel ?? "",
               expires_at: hold.expiresAt.toISOString(),
+              hold_version: hold.aggregateVersion,
             },
           }
         : {}),

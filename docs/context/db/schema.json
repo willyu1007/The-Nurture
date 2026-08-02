@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-02T22:10:15.589Z",
+  "updatedAt": "2026-08-02T23:05:27.581Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -1796,6 +1796,15 @@
         {
           "field": "captures",
           "to": "NurtureCareCapture",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "contentSafetyAssessments",
+          "to": "NurtureContentSafetyAssessment",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -4789,6 +4798,15 @@
           "relationName": null,
           "fields": [],
           "references": []
+        },
+        {
+          "field": "visibilityEvents",
+          "to": "NurturePublicationVisibilityEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         }
       ],
       "indexes": [
@@ -4840,6 +4858,17 @@
           "unique": false
         },
         {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "id",
           "type": "String",
           "nullable": false,
@@ -4856,6 +4885,17 @@
           "nullable": true,
           "list": false,
           "dbName": "model_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "organizerInputRevision",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "organizer_input_revision",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -4908,7 +4948,7 @@
         {
           "name": "publishProcessId",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "publish_process_id",
           "dbType": null,
@@ -4974,9 +5014,22 @@
       ],
       "relations": [
         {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
           "field": "publishProcess",
           "to": "NurturePublishProcess",
-          "optional": false,
+          "optional": true,
           "list": false,
           "relationName": null,
           "fields": [
@@ -4988,6 +5041,16 @@
         }
       ],
       "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "organizerInputRevision"
+          ],
+          "name": null,
+          "map": "ix_nurture_content_safety_anchor"
+        },
         {
           "type": "index",
           "fields": [
@@ -12912,6 +12975,17 @@
           "unique": false
         },
         {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "id",
           "type": "String",
           "nullable": false,
@@ -12991,6 +13065,19 @@
       ],
       "relations": [
         {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
           "field": "publicationRelease",
           "to": "NurturePublicationRelease",
           "optional": false,
@@ -13014,6 +13101,17 @@
           ],
           "name": null,
           "map": "ix_nurture_publication_visibility_release"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publicationReleaseId",
+            "commandExecutionId",
+            "kind"
+          ],
+          "name": null,
+          "map": "uq_nurture_publication_visibility_command"
         }
       ]
     },
@@ -13333,6 +13431,28 @@
           "unique": false
         },
         {
+          "name": "schedulePolicyVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "schedule_policy_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scheduleResolvedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "schedule_resolved_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "scheduleTimeZone",
           "type": "String",
           "nullable": true,
@@ -13498,6 +13618,17 @@
           "list": false,
           "dbName": "body_protection_payload",
           "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandRequestIdHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "command_request_id_hash",
+          "dbType": "Char",
           "default": null,
           "primaryKey": false,
           "unique": false
@@ -13680,6 +13811,16 @@
         }
       ],
       "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publishProcessId",
+            "commandRequestIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_publish_revision_command"
+        },
         {
           "type": "unique",
           "fields": [

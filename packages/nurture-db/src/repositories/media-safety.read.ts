@@ -322,6 +322,9 @@ export class PrismaMediaSafetyReadPort
       // Answering "draft" invented one; `cancelled` is the one value that can
       // never gate this decision, so it reads as "not a process question".
       process_state: process?.state ?? "cancelled",
+      // The revision a detach would append after. Zero on the global path,
+      // where there is no draft to detach from.
+      draft_revision: process?.currentRevision?.revision ?? 0,
       composition_media_ids: composition,
       media_revision: asset.mediaRevision,
       media_lifecycle: asset.lifecycle,

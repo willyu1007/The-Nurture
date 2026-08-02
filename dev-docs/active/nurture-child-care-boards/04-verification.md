@@ -721,3 +721,21 @@
 | cursor TTL survived the sealing change | VERIFIED — `issued_at` + `CURSOR_TTL_MS` still enforced |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 510, 179 and 26 tests |
 | contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — B8 Prerequisite Gaps: Verification and Delta
+
+| Command / check | Result |
+| --- | --- |
+| six prerequisite gaps verified one by one | 5 confirmed, 1 mischaracterised |
+| gap 1: the restricted route's assessment could not be stored at all | FIXED — nullable process link plus a process-independent anchor |
+| gap 2: the draft replay lookup searched a column that carries another fact | FIXED — `command_request_id_hash` with its own unique |
+| gap 3: the visibility lineage could not name its command | FIXED — `command_execution_id` + unique |
+| gap 4: policy version and resolution instant borrowed columns a reschedule moves | FIXED — both frozen on their own columns |
+| gap 5: no version column on the release | NOT DONE — monotone transitions, and the new event unique already makes a replay a no-op |
+| gap 6: "a systematic set of heads with no producer" | CORRECTED — three owner facts were missing; the rest is B8 itself |
+| three owner heads added | `hold_version`, `batch_version`, `draft_revision` |
+| migration backfills from the linked process and aborts otherwise | PASS — the gate fired on 19 rows before the database was recreated |
+| new: the restricted route stores an assessment with no process and stays addressable | PASS |
+| the exact adoption count caught the amendment contaminating the key scraper | FIXED — the declaration is the section body, amendments are appendices |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 510, 180 and 26 tests |
+| all eight contract/boundary gates | PASS — artifact unchanged at `1.13.0` |

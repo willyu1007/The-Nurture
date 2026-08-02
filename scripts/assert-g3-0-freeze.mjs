@@ -414,6 +414,59 @@ for (const tableName of [
   assertTruthy(tableNames.has(tableName), `additive G3 fact table ${tableName}`);
 }
 
+// The command-identity amendment: the write lane cannot record a command
+// without these, and each was missing in a way that made a check impossible
+// rather than merely inconvenient.
+const assessmentTable = findBy(
+  dbContext.tables,
+  "name",
+  "NurtureContentSafetyAssessment",
+  "content safety assessment table",
+);
+assertEqual(
+  findBy(assessmentTable.columns, "name", "publishProcessId", "assessment process link").nullable,
+  true,
+  "the restricted route creates no process, so its assessment must not require one",
+);
+for (const columnName of ["careGroupId", "organizerInputRevision"]) {
+  assertEqual(
+    findBy(assessmentTable.columns, "name", columnName, `assessment ${columnName}`).nullable,
+    false,
+    `assessment stays anchored by ${columnName} whichever route it took`,
+  );
+}
+assertTruthy(
+  findBy(
+    findBy(dbContext.tables, "name", "NurturePublishProcessRevision", "publish revision table")
+      .columns,
+    "name",
+    "commandRequestIdHash",
+    "publish revision command identity",
+  ),
+  "a draft revision names the command that produced it",
+);
+assertTruthy(
+  findBy(
+    findBy(dbContext.tables, "name", "NurturePublicationVisibilityEvent", "visibility event table")
+      .columns,
+    "name",
+    "commandExecutionId",
+    "visibility event command identity",
+  ),
+  "the visibility lineage names the command behind it",
+);
+for (const columnName of ["schedulePolicyVersion", "scheduleResolvedAt"]) {
+  assertTruthy(
+    findBy(
+      findBy(dbContext.tables, "name", "NurturePublishProcess", "publish process table").columns,
+      "name",
+      columnName,
+      `publish process ${columnName}`,
+    ),
+    `the resolved window freezes ${columnName} instead of borrowing a column a reschedule moves`,
+  );
+}
+
 // The content-safety marker amendment: the input fact must exist on both source
 // tables and must stay nullable, because "never derived" and "derived, none
 // found" are different facts and only the first may fail closed.
@@ -583,9 +636,15 @@ const freeze = read(freezePath);
  * unimplemented. This is what keeps the adoption set from quietly acquiring a
  * key nobody tracks, or losing one the product mapping needs.
  */
+// The adoption declaration is the section body. Amendments follow it as
+// appendices and restate any identity they add into the list above, so reading
+// past them made the reserved-key count depend on prose — an amendment naming a
+// column changed it, which the exact count caught.
+const adoptionSetStart = freeze.indexOf("## Capability Adoption Set");
+const firstAmendment = freeze.indexOf("### Amendment", adoptionSetStart);
 const adoptionSet = freeze.slice(
-  freeze.indexOf("## Capability Adoption Set"),
-  freeze.indexOf("## DB SSOT Delta"),
+  adoptionSetStart,
+  firstAmendment === -1 ? freeze.indexOf("## DB SSOT Delta") : firstAmendment,
 );
 assertTruthy(adoptionSet.length > 0, "adoption set section present");
 const reservedKeys = [

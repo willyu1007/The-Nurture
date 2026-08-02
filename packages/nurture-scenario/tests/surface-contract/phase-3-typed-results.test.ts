@@ -256,6 +256,7 @@ const safetyDeps = () => ({
     loadMediaLifecycleFacts: async () => ({
       authority: caregiverAuthority(),
       process_state: "draft" as const,
+      draft_revision: 1,
       composition_media_ids: ["media-1", "media-2"],
       media_revision: 3,
       media_lifecycle: "ready" as const,

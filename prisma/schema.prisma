@@ -1728,6 +1728,7 @@ model NurtureCareGroup {
   captures       NurtureCareCapture[]
   captureBatches NurtureCareCaptureBatch[]
   publishProcesses NurturePublishProcess[]
+  contentSafetyAssessments NurtureContentSafetyAssessment[]
 
   @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
   @@map("nurture_care_group")
@@ -2309,6 +2310,7 @@ model NurtureCommandExecution {
   childCareProcess NurtureChildCareProcess?             @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
   corrections      NurtureFamilyCareMessageCorrection[]
   cascadeAudits    NurtureFamilyCareCascadeAudit[]
+  visibilityEvents NurturePublicationVisibilityEvent[]
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
@@ -2433,6 +2435,11 @@ model NurturePublishProcess {
   scheduleTimeZone     String?                    @map("schedule_time_zone")
   schedulePolicyRef    String?                    @map("schedule_policy_ref")
   schedulePolicyHead   Int?                       @map("schedule_policy_head")
+  // Frozen at resolution. These were being substituted by `aggregateVersion`
+  // and `updatedAt`, which a reschedule moves — so a reschedule appeared to
+  // change the policy version and the moment the window was resolved.
+  schedulePolicyVersion Int?                      @map("schedule_policy_version")
+  scheduleResolvedAt   DateTime?                  @map("schedule_resolved_at")
   authorizingRoleAssignmentId String?             @map("authorizing_role_assignment_id")
   aggregateVersion     Int                        @default(0) @map("aggregate_version")
   createdAt            DateTime                   @default(now()) @map("created_at")
@@ -2461,6 +2468,10 @@ model NurturePublishProcessRevision {
   revision              Int
   contentDigest         String   @map("content_digest")
   organizerInputRevision String  @map("organizer_input_revision")
+  // The command that produced this revision. `organizerInputRevision` carries
+  // the assembler's input revision and was being searched by command id, so the
+  // replay lookup could never match; this is the identity it needs.
+  commandRequestIdHash   String? @map("command_request_id_hash") @db.Char(64)
   templateKey           String?  @map("template_key")
   templateVersion       String?  @map("template_version")
   titleProtectionPayload Json?   @map("title_protection_payload")
@@ -2475,6 +2486,7 @@ model NurturePublishProcessRevision {
   releases       NurturePublicationRelease[]
 
   @@unique([workspaceId, publishProcessId, revision], map: "uq_nurture_publish_revision")
+  @@unique([workspaceId, publishProcessId, commandRequestIdHash], map: "uq_nurture_publish_revision_command")
   @@map("nurture_publish_process_revision")
 }
 
@@ -2529,7 +2541,14 @@ model NurturePublishEditHold {
 model NurtureContentSafetyAssessment {
   id                    String                   @id @default(uuid())
   workspaceId           String                   @map("workspace_id")
-  publishProcessId      String                   @map("publish_process_id")
+  // NULL for `direct_interaction_required`: that route deliberately creates no
+  // publication candidate, so the most safety-relevant decision of all had
+  // nowhere to be recorded while this column was required.
+  publishProcessId      String?                  @map("publish_process_id")
+  // The anchor that does not depend on a process. Always set, so every
+  // assessment is addressable whichever route it took.
+  careGroupId           String                   @map("care_group_id")
+  organizerInputRevision String                  @map("organizer_input_revision")
   route                 NurtureContentSafetyRoute
   policyRef             String                   @map("policy_ref")
   policyHead            Int                      @map("policy_head")
@@ -2541,9 +2560,11 @@ model NurtureContentSafetyAssessment {
   sourceHeadsPayload    Json                     @map("source_heads_payload")
   assessedAt            DateTime                 @default(now()) @map("assessed_at")
 
-  publishProcess NurturePublishProcess @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
+  publishProcess NurturePublishProcess? @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
+  careGroup      NurtureCareGroup       @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
 
   @@index([workspaceId, publishProcessId, assessedAt], map: "ix_nurture_content_safety_process")
+  @@index([workspaceId, careGroupId, organizerInputRevision], map: "ix_nurture_content_safety_anchor")
   @@map("nurture_content_safety_assessment")
 }
 
@@ -2588,10 +2609,15 @@ model NurturePublicationVisibilityEvent {
   actorRoleAssignmentId  String                                @map("actor_role_assignment_id")
   sourceReleaseRevision  Int                                   @map("source_release_revision")
   bodyProtectionPayload  Json?                                 @map("body_protection_payload")
+  // Both closest analogues carry this; without it the lineage cannot name the
+  // command behind it and a replay has nothing to be a no-op against.
+  commandExecutionId     String?                               @map("command_execution_id")
   occurredAt             DateTime                              @default(now()) @map("occurred_at")
 
   publicationRelease NurturePublicationRelease @relation(fields: [publicationReleaseId], references: [id], onDelete: Restrict)
+  commandExecution   NurtureCommandExecution?  @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict)
 
+  @@unique([workspaceId, publicationReleaseId, commandExecutionId, kind], map: "uq_nurture_publication_visibility_command")
   @@index([workspaceId, publicationReleaseId, occurredAt], map: "ix_nurture_publication_visibility_release")
   @@map("nurture_publication_visibility_event")
 }
