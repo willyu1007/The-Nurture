@@ -1,4 +1,5 @@
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from "node:crypto";
+import type { NurtureCaregiverWriteAuthority } from "../domain/institution/publish-process-transaction.js";
 import type { InterfaceContractRefV1 } from "../surface-contract/types.js";
 
 /**
@@ -477,11 +478,7 @@ export const CAREGIVER_BOARD_ROLES: readonly string[] = ["caregiver", "lead_care
  * Institution-scoped Lead designation, an Admin role, Institution membership or
  * a same-Institution role in another CareGroup is insufficient.
  */
-export type CaregiverFactAuthorityV1 = {
-  role: string;
-  role_scope_type: string;
-  role_scope_matches_source: boolean;
-  role_assignment_current: boolean;
+export type CaregiverFactAuthorityV1 = NurtureCaregiverWriteAuthority & {
   fact_visible: boolean;
   purpose_allowed: boolean;
 };

@@ -63,7 +63,6 @@ const expectedHarnessActionKeys = [
  */
 const expectedUnroutedCapabilityKeys = [
   "acquire_publish_edit_hold",
-  "cancel_publish_process",
   "confirm_child_media_attribution",
   "correct_publication",
   "detach_publish_process_media",

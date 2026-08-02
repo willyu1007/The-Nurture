@@ -229,6 +229,7 @@ const editingDeps = (overrides: Record<string, unknown> = {}) => ({
       process_state: "draft" as const,
       authority: caregiverAuthority(),
       committed_release_count: 0,
+      process_version: 3,
       ...overrides,
     }),
   },

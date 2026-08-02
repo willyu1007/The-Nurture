@@ -9,6 +9,7 @@ import {
   issueBoardSealedRef,
   CHILD_CARE_PROCESS_TARGET_KIND,
   FOCUS_GOAL_TARGET_KIND,
+  PUBLISH_PROCESS_TARGET_KIND,
   issuePolicyRedactionDecisionRef,
 } from "@the-nurture/scenario/harness";
 import { createPrismaClient, Prisma } from "@the-nurture/db";
@@ -2082,5 +2083,192 @@ describe("G3-A board lane through the formal Harness ingress", () => {
       operationInput: { kind: "meal", summary: "ate well" },
     });
     expect(refused.json).toMatchObject({ status: "denied" });
+  });
+});
+
+describe("T-006 pre-release cancel through the formal Harness ingress", () => {
+  const seedPublishProcess = async (scope: SeedScope, state = "draft" as const) => {
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state,
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+      },
+    });
+    return prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: revision.id },
+    });
+  };
+
+  const processTargetRef = (scope: SeedScope, participantId: string, processKey: string) =>
+    issueBoardSealedRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: participantId },
+      PUBLISH_PROCESS_TARGET_KIND,
+      processKey,
+    );
+
+  it("commits the cancel on the owner row and replays the same outcome", async () => {
+    const scope = await seedScope();
+    const process = await seedPublishProcess(scope);
+    const targetOptionRef = processTargetRef(scope, scope.caregiver.id, process.processKey);
+
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      targetOptionRef,
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    expect(prepared.json.preview).toMatchObject({ effect: "cancel_publish_process" });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      prepared,
+    });
+    expect(executed.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "executed",
+      business_outcome: "applied",
+    });
+
+    // The write landed on the process owner row, under its own version.
+    const stored = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(stored.state).toBe("cancelled");
+    expect(stored.cancelledAt).not.toBeNull();
+    expect(stored.aggregateVersion).toBe(process.aggregateVersion + 1);
+    expect(executed.json.committed_result.cancelledAt).toBe(
+      stored.cancelledAt?.toISOString(),
+    );
+    // No raw owner identifier reaches the public result.
+    const serialized = JSON.stringify(executed.json.committed_result);
+    for (const raw of [process.id, process.processKey, scope.group.id]) {
+      expect(serialized).not.toContain(raw);
+    }
+
+    const execution = await prisma.nurtureCommandExecution.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, commandKey: "cancel_publish_process" },
+    });
+    expect(execution.businessOutcome).toBe("applied");
+    expect(execution.commandScope).toBe("publish_process_cancel");
+
+    // The same command identity replays its own committed effect rather than
+    // recomputing it against a process that has since changed state.
+    const replayed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      prepared,
+      invocationSuffix: ":replay",
+    });
+    expect(replayed.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "replayed",
+      business_outcome: "applied",
+    });
+    expect(replayed.json.committed_result).toEqual(executed.json.committed_result);
+  });
+
+  it("answers a second, distinct cancel from the instant the owner recorded", async () => {
+    const scope = await seedScope();
+    const process = await seedPublishProcess(scope);
+    const targetOptionRef = processTargetRef(scope, scope.caregiver.id, process.processKey);
+    const first = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      targetOptionRef,
+    });
+    expect(first.executed?.json.status).toBe("committed");
+
+    // A different class teacher, a fresh command identity, the same process.
+    const repeat = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      targetOptionRef: processTargetRef(scope, scope.caregiverB.id, process.processKey),
+    });
+    expect(repeat.prepared.json.preview).toMatchObject({ effect: "already_cancelled" });
+    expect(repeat.executed?.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "executed",
+      business_outcome: "already_satisfied",
+    });
+    expect(repeat.executed?.json.committed_result.cancelledAt).toBe(
+      first.executed?.json.committed_result.cancelledAt,
+    );
+    // Nothing was written twice: the owner still carries the first instant.
+    const stored = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(stored.aggregateVersion).toBe(process.aggregateVersion + 1);
+  });
+
+  it("refuses a guardian, a stale head and a process that already released", async () => {
+    const scope = await seedScope();
+    const process = await seedPublishProcess(scope);
+
+    // A guardian holds no class role, so the owner offers no cancellable
+    // process and the ref does not resolve.
+    await expect(
+      prepareAction({
+        scope,
+        actorId: scope.guardian.id,
+        surface: "board",
+        capabilityKey: "cancel_publish_process",
+        targetOptionRef: processTargetRef(scope, scope.guardian.id, process.processKey),
+      }).then((response) => response.json),
+    ).resolves.toMatchObject({ status: "denied", reason_code: "target_unavailable" });
+
+    // Prepared, then the process moves under the confirmation.
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      targetOptionRef: processTargetRef(scope, scope.caregiver.id, process.processKey),
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { aggregateVersion: { increment: 1 } },
+    });
+    const stale = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      prepared,
+    });
+    expect(stale.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "stale_confirmation",
+      recovery: "reprepare",
+    });
+    expect(
+      (await prisma.nurturePublishProcess.findUniqueOrThrow({ where: { id: process.id } })).state,
+    ).toBe("draft");
   });
 });

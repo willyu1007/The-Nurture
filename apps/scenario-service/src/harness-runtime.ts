@@ -20,6 +20,7 @@ import {
   parseRecordCaregiverDailyCareInputV1,
   parseSubmitFamilyCareQuestionInputV1,
   parseUpdateGuardianCurrentFocusInputV1,
+  parseCancelPublishProcessInputV1,
   prepareAcknowledgeFamilyCareItem,
   prepareInitiateCaregiverDirectMessage,
   prepareCorrectFamilyCareMessage,
@@ -30,6 +31,8 @@ import {
   prepareSubmitFamilyCareQuestion,
   prepareUpdateGuardianCurrentFocus,
   prepareWithdrawFamilyCareRequest,
+  preparePublishProcessCancel,
+  createCancelPublishProcessSpec,
   createRecordCaregiverDailyCareSpec,
   createUpdateGuardianCurrentFocusSpec,
   loadBoardSurfaceRegistration,
@@ -50,6 +53,7 @@ import {
   type CaregiverDirectMessagePrepareDecision,
   type ItemActionPrepareDecision,
   type BoardMutationPrepareDecision,
+  type CancelPublishProcessPrepareDecision,
   type LifecyclePrepareDecision,
   type NurtureCommandSpec,
   type SubmitPrepareDecision,
@@ -82,6 +86,7 @@ import {
   type HarnessQueryRequestV1,
   type HarnessQueryResponseV1,
   type HarnessReadResultRequestV1,
+  type HarnessCapabilityKey,
   type InstitutionBusinessCommunicationReadRequestV1,
   type InstitutionBusinessCommunicationReadResponseV1,
 } from "./harness-http.js";
@@ -222,13 +227,18 @@ export function createHarnessEngine(input: {
     integrity_key: input.integrityKey,
   });
 
+  const cancelPublishProcessSpec = createCancelPublishProcessSpec({
+    integrity_key: input.integrityKey,
+  });
+
   const toPrepareResponse = (
     decision:
       | SubmitPrepareDecision
       | CaregiverDirectMessagePrepareDecision
       | ItemActionPrepareDecision
       | LifecyclePrepareDecision
-      | BoardMutationPrepareDecision,
+      | BoardMutationPrepareDecision
+      | CancelPublishProcessPrepareDecision,
   ): HarnessPrepareResponseV1 => {
     // Internal raw target ids (enrollment_id / item_id) never leave the
     // service; execute recovers the exact target from the confirmation.
@@ -244,123 +254,332 @@ export function createHarnessEngine(input: {
     return decision;
   };
 
+  const lifecycleDeps = {
+    facts: factsPort,
+    contexts,
+    integrity_key: input.integrityKey,
+  };
+
+  /**
+   * Prepare for a capability whose target is optional at this layer: the
+   * capability's own prepare step decides whether it needs one.
+   */
+  const optionalTarget =
+    <Decision extends Parameters<typeof toPrepareResponse>[0]>(
+      run: (request: PrepareScope & OptionalTargetRequest) => Promise<Decision>,
+    ) =>
+    async (request: HarnessPrepareRequestV1, scope: PrepareScope) =>
+      toPrepareResponse(
+        await run({
+          ...scope,
+          operation_input: request.operation_input,
+          ...(request.target_option_ref
+            ? { target_option_ref: request.target_option_ref }
+            : {}),
+        }),
+      );
+
+  /** Prepare for a capability that cannot be addressed without an owner ref. */
+  const requiredTarget =
+    <Decision extends Parameters<typeof toPrepareResponse>[0]>(
+      run: (request: PrepareScope & RequiredTargetRequest) => Promise<Decision>,
+    ) =>
+    async (
+      request: HarnessPrepareRequestV1,
+      scope: PrepareScope,
+    ): Promise<HarnessPrepareResponseV1> =>
+      request.target_option_ref
+        ? toPrepareResponse(
+            await run({
+              ...scope,
+              target_option_ref: request.target_option_ref,
+              operation_input: request.operation_input,
+            }),
+          )
+        : { status: "needs_input", fields: ["target_option_ref"] };
+
+  const buildRedactCommand =
+    (actorKind: "author" | "policy") =>
+    (built: BuildInput): BuiltPayload | null => {
+      const policyInput =
+        actorKind === "policy"
+          ? parsePolicyRedactFamilyCareMessageInputV1(built.operation_input)
+          : undefined;
+      if (actorKind === "author" && !isEmptyOperationInput(built.operation_input)) return null;
+      const messageId = built.target_refs.family_care_message;
+      const cascadeAuditId = built.target_refs.cascade_audit;
+      const cascadeScope = built.target_refs.redaction_scope;
+      if (
+        !messageId ||
+        !cascadeAuditId ||
+        (cascadeScope !== "source_question" && cascadeScope !== "reply_local") ||
+        (actorKind === "policy" &&
+          (policyInput?.status !== "ok" || built.expected_heads.policy_decision === undefined))
+      ) {
+        return null;
+      }
+      return {
+        payload: {
+          message_id: messageId,
+          expected_message_version: built.expected_heads.message ?? 0,
+          cascade_audit_id: cascadeAuditId,
+          cascade_scope: cascadeScope,
+          actor_kind: actorKind,
+          ...(actorKind === "policy" && policyInput?.status === "ok"
+            ? {
+                policy_decision_ref: policyInput.input.policyDecisionRef,
+                expected_policy_decision_head: built.expected_heads.policy_decision,
+              }
+            : {}),
+        },
+        spec: (actorKind === "author" ? redactSpec : policyRedactSpec) as NurtureCommandSpec<never>,
+      };
+    };
+
+  /**
+   * One descriptor per admitted action key: how it prepares, and how the
+   * confirmation plus the resubmitted typed input become its exact command.
+   *
+   * `satisfies Record<HarnessCapabilityKey, ...>` is the point. Admission is a
+   * literal key-to-version map in the transport; this table is checked against
+   * that same key set, so admitting a key the engine cannot serve — the
+   * placeholder the freeze forbids — stops compiling rather than reaching a
+   * fallthrough at runtime.
+   */
+  const actions = {
+    submit_family_care_question: {
+      prepare: optionalTarget((request) =>
+        prepareSubmitFamilyCareQuestion(
+          { eligibility: submitEligibility, contexts, integrity_key: input.integrityKey },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const parsed = parseSubmitFamilyCareQuestionInputV1(built.operation_input);
+        const enrollmentId = built.target_refs.enrollment;
+        if (parsed.status !== "ok" || !enrollmentId) return null;
+        const continuation = built.target_refs.continuation_item;
+        return {
+          payload: {
+            body: parsed.input.body,
+            enrollment_id: enrollmentId,
+            ...(continuation ? { context_continuation_of_item_id: continuation } : {}),
+          },
+          spec: submitSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    initiate_caregiver_direct_message: {
+      prepare: optionalTarget((request) =>
+        prepareInitiateCaregiverDirectMessage(
+          {
+            eligibility: directMessageEligibility,
+            contexts,
+            integrity_key: input.integrityKey,
+          },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const parsed = parseInitiateCaregiverDirectMessageInputV1(built.operation_input);
+        const enrollmentId = built.target_refs.enrollment;
+        const grantId = built.target_refs.grant;
+        if (parsed.status !== "ok" || !enrollmentId || !grantId) return null;
+        return {
+          payload: {
+            body: parsed.input.body,
+            enrollment_id: enrollmentId,
+            grant_id: grantId,
+            expected_enrollment_version: built.expected_heads.enrollment ?? 0,
+            expected_care_group_version: built.expected_heads.care_group ?? 0,
+            expected_role_version: built.expected_heads.role ?? 0,
+            expected_grant_version: built.expected_heads.grant ?? 0,
+            expected_thread_version: built.expected_heads.thread ?? 0,
+            expected_safety_policy_head: built.expected_heads.safety_policy ?? 0,
+          },
+          spec: directMessageSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    acknowledge_family_care_item: {
+      prepare: requiredTarget((request) =>
+        prepareAcknowledgeFamilyCareItem(lifecycleDeps, request),
+      ),
+      build: (built) => {
+        const itemId = built.target_refs.care_item;
+        if (!itemId || !isEmptyOperationInput(built.operation_input)) return null;
+        return {
+          payload: {
+            item_id: itemId,
+            expected_acknowledgement_head: built.expected_heads.acknowledgement ?? 0,
+            expected_lifecycle_head: built.expected_heads.lifecycle ?? 0,
+          },
+          spec: acknowledgeSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    reply_family_care_item: {
+      prepare: requiredTarget((request) => prepareReplyFamilyCareItem(lifecycleDeps, request)),
+      build: (built) => {
+        const parsed = parseReplyFamilyCareItemInputV1(built.operation_input);
+        const itemId = built.target_refs.care_item;
+        if (parsed.status !== "ok" || !itemId) return null;
+        return {
+          payload: {
+            body: parsed.input.body,
+            item_id: itemId,
+            expected_lifecycle_head: built.expected_heads.lifecycle ?? 0,
+          },
+          spec: replySpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    correct_family_care_message: {
+      prepare: requiredTarget((request) =>
+        prepareCorrectFamilyCareMessage(lifecycleDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseCorrectFamilyCareMessageInputV1(built.operation_input);
+        const messageId = built.target_refs.family_care_message;
+        if (parsed.status !== "ok" || !messageId) return null;
+        return {
+          payload: {
+            body: parsed.input.body,
+            message_id: messageId,
+            expected_message_version: built.expected_heads.message ?? 0,
+            expected_correction_head: built.expected_heads.correction ?? 0,
+            ...(built.expected_heads.lifecycle !== undefined
+              ? { expected_lifecycle_head: built.expected_heads.lifecycle }
+              : {}),
+          },
+          spec: correctSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    withdraw_family_care_request: {
+      prepare: requiredTarget((request) =>
+        prepareWithdrawFamilyCareRequest(lifecycleDeps, request),
+      ),
+      build: (built) => {
+        const itemId = built.target_refs.care_item;
+        if (!itemId || !isEmptyOperationInput(built.operation_input)) return null;
+        return {
+          payload: {
+            item_id: itemId,
+            expected_lifecycle_head: built.expected_heads.lifecycle ?? 0,
+          },
+          spec: withdrawSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    redact_family_care_message: {
+      prepare: requiredTarget((request) =>
+        prepareRedactFamilyCareMessage(lifecycleDeps, request),
+      ),
+      build: buildRedactCommand("author"),
+    },
+    policy_redact_family_care_message: {
+      prepare: requiredTarget((request) =>
+        preparePolicyRedactFamilyCareMessage(lifecycleDeps, request),
+      ),
+      build: buildRedactCommand("policy"),
+    },
+    update_guardian_current_focus: {
+      prepare: optionalTarget((request) =>
+        prepareUpdateGuardianCurrentFocus(
+          {
+            eligibility: guardianFocusEligibility,
+            contexts,
+            integrity_key: input.integrityKey,
+          },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const parsed = parseUpdateGuardianCurrentFocusInputV1(built.operation_input);
+        const focusGoalId = built.target_refs.focus_goal;
+        const focusCycleId = built.target_refs.focus_cycle;
+        if (parsed.status !== "ok" || !focusGoalId || !focusCycleId) return null;
+        return {
+          payload: {
+            label: parsed.input.label,
+            priority: parsed.input.priority,
+            focus_goal_id: focusGoalId,
+            focus_cycle_id: focusCycleId,
+            expected_focus_cycle_version: built.expected_heads.focus_cycle ?? 0,
+            expected_focus_goal_version: built.expected_heads.focus_goal ?? 0,
+          },
+          spec: updateGuardianFocusSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    record_caregiver_daily_care: {
+      prepare: optionalTarget((request) =>
+        prepareRecordCaregiverDailyCare(
+          {
+            eligibility: caregiverDailyCareEligibility,
+            contexts,
+            integrity_key: input.integrityKey,
+          },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const parsed = parseRecordCaregiverDailyCareInputV1(built.operation_input);
+        const childCareProcessId = built.target_refs.child_care_process;
+        if (parsed.status !== "ok" || !childCareProcessId) return null;
+        return {
+          payload: {
+            kind: parsed.input.kind,
+            summary: parsed.input.summary,
+            child_care_process_id: childCareProcessId,
+            expected_care_group_version: built.expected_heads.care_group ?? 0,
+            expected_role_version: built.expected_heads.role ?? 0,
+            expected_enrollment_version: built.expected_heads.enrollment ?? 0,
+          },
+          spec: recordDailyCareSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    cancel_publish_process: {
+      prepare: optionalTarget((request) =>
+        preparePublishProcessCancel(
+          {
+            reads: publishQueueReads,
+            contexts,
+            integrity_key: input.integrityKey,
+          },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const processKey = built.target_refs.publish_process;
+        const expectedVersion = built.expected_heads.publish_process;
+        if (
+          !processKey ||
+          expectedVersion === undefined ||
+          parseCancelPublishProcessInputV1(built.operation_input).status !== "ok"
+        ) {
+          return null;
+        }
+        return {
+          payload: { process_key: processKey, expected_process_version: expectedVersion },
+          spec: cancelPublishProcessSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+  } satisfies Record<HarnessCapabilityKey, HarnessActionDescriptor>;
+
   return {
     async prepare(request) {
-      const shared = {
+      return actions[request.capability_key].prepare(request, {
         workspace_id: request.workspace_id,
         participant_id: request.actor_participant_id,
         surface: request.surface,
         ...(request.host_conversation_ref
           ? { host_conversation_ref: request.host_conversation_ref }
           : {}),
-      };
-      if (request.capability_key === "update_guardian_current_focus") {
-        return toPrepareResponse(
-          await prepareUpdateGuardianCurrentFocus(
-            {
-              eligibility: guardianFocusEligibility,
-              contexts,
-              integrity_key: input.integrityKey,
-            },
-            {
-              ...shared,
-              operation_input: request.operation_input,
-              ...(request.target_option_ref
-                ? { target_option_ref: request.target_option_ref }
-                : {}),
-            },
-          ),
-        );
-      }
-      if (request.capability_key === "record_caregiver_daily_care") {
-        return toPrepareResponse(
-          await prepareRecordCaregiverDailyCare(
-            {
-              eligibility: caregiverDailyCareEligibility,
-              contexts,
-              integrity_key: input.integrityKey,
-            },
-            {
-              ...shared,
-              operation_input: request.operation_input,
-              ...(request.target_option_ref
-                ? { target_option_ref: request.target_option_ref }
-                : {}),
-            },
-          ),
-        );
-      }
-      if (request.capability_key === "submit_family_care_question") {
-        return toPrepareResponse(
-          await prepareSubmitFamilyCareQuestion(
-            { eligibility: submitEligibility, contexts, integrity_key: input.integrityKey },
-            {
-              ...shared,
-              operation_input: request.operation_input,
-              ...(request.target_option_ref
-                ? { target_option_ref: request.target_option_ref }
-                : {}),
-            },
-          ),
-        );
-      }
-      if (request.capability_key === "initiate_caregiver_direct_message") {
-        return toPrepareResponse(
-          await prepareInitiateCaregiverDirectMessage(
-            {
-              eligibility: directMessageEligibility,
-              contexts,
-              integrity_key: input.integrityKey,
-            },
-            {
-              ...shared,
-              operation_input: request.operation_input,
-              ...(request.target_option_ref
-                ? { target_option_ref: request.target_option_ref }
-                : {}),
-            },
-          ),
-        );
-      }
-      if (!request.target_option_ref) {
-        return { status: "needs_input", fields: ["target_option_ref"] };
-      }
-      const targetRequest = {
-        ...shared,
-        target_option_ref: request.target_option_ref,
-        operation_input: request.operation_input,
-      };
-      const lifecycleDeps = {
-        facts: factsPort,
-        contexts,
-        integrity_key: input.integrityKey,
-      };
-      switch (request.capability_key) {
-        case "acknowledge_family_care_item":
-          return toPrepareResponse(
-            await prepareAcknowledgeFamilyCareItem(lifecycleDeps, targetRequest),
-          );
-        case "reply_family_care_item":
-          return toPrepareResponse(
-            await prepareReplyFamilyCareItem(lifecycleDeps, targetRequest),
-          );
-        case "correct_family_care_message":
-          return toPrepareResponse(
-            await prepareCorrectFamilyCareMessage(lifecycleDeps, targetRequest),
-          );
-        case "withdraw_family_care_request":
-          return toPrepareResponse(
-            await prepareWithdrawFamilyCareRequest(lifecycleDeps, targetRequest),
-          );
-        case "redact_family_care_message":
-          return toPrepareResponse(
-            await prepareRedactFamilyCareMessage(lifecycleDeps, targetRequest),
-          );
-        case "policy_redact_family_care_message":
-          return toPrepareResponse(
-            await preparePolicyRedactFamilyCareMessage(lifecycleDeps, targetRequest),
-          );
-      }
+      });
     },
 
     async execute(request) {
@@ -620,212 +839,61 @@ export function createHarnessEngine(input: {
     | { status: "ok"; payload: unknown; spec: NurtureCommandSpec<never> }
     | { status: "invalid"; reason_code: string };
 
+  /**
+   * The confirmation is the only source of targets and frozen heads; the typed
+   * input is the only thing the caller resubmits. Each descriptor turns that
+   * pair into its own exact command, or refuses.
+   */
   function buildHarnessCommand(
     request: HarnessExecuteRequestV1,
     payload: HarnessConfirmationPayloadV2,
   ): BuiltCommand {
-    if (request.capability_key === "update_guardian_current_focus") {
-      const parsed = parseUpdateGuardianCurrentFocusInputV1(request.operation_input);
-      const focusGoalId = payload.target_refs.focus_goal;
-      const focusCycleId = payload.target_refs.focus_cycle;
-      if (parsed.status !== "ok" || !focusGoalId || !focusCycleId) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          label: parsed.input.label,
-          priority: parsed.input.priority,
-          focus_goal_id: focusGoalId,
-          focus_cycle_id: focusCycleId,
-          expected_focus_cycle_version: payload.expected_heads.focus_cycle ?? 0,
-          expected_focus_goal_version: payload.expected_heads.focus_goal ?? 0,
-        },
-        spec: updateGuardianFocusSpec as NurtureCommandSpec<never>,
-      };
-    }
-    if (request.capability_key === "record_caregiver_daily_care") {
-      const parsed = parseRecordCaregiverDailyCareInputV1(request.operation_input);
-      const childCareProcessId = payload.target_refs.child_care_process;
-      if (parsed.status !== "ok" || !childCareProcessId) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          kind: parsed.input.kind,
-          summary: parsed.input.summary,
-          child_care_process_id: childCareProcessId,
-          expected_care_group_version: payload.expected_heads.care_group ?? 0,
-          expected_role_version: payload.expected_heads.role ?? 0,
-          expected_enrollment_version: payload.expected_heads.enrollment ?? 0,
-        },
-        spec: recordDailyCareSpec as NurtureCommandSpec<never>,
-      };
-    }
-    if (request.capability_key === "submit_family_care_question") {
-      const parsed = parseSubmitFamilyCareQuestionInputV1(request.operation_input);
-      const enrollmentId = payload.target_refs.enrollment;
-      if (parsed.status !== "ok" || !enrollmentId) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      const continuation = payload.target_refs.continuation_item;
-      return {
-        status: "ok",
-        payload: {
-          body: parsed.input.body,
-          enrollment_id: enrollmentId,
-          ...(continuation ? { context_continuation_of_item_id: continuation } : {}),
-        },
-        spec: submitSpec as NurtureCommandSpec<never>,
-      };
-    }
-    if (request.capability_key === "initiate_caregiver_direct_message") {
-      const parsed = parseInitiateCaregiverDirectMessageInputV1(request.operation_input);
-      const enrollmentId = payload.target_refs.enrollment;
-      const grantId = payload.target_refs.grant;
-      if (parsed.status !== "ok" || !enrollmentId || !grantId) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          body: parsed.input.body,
-          enrollment_id: enrollmentId,
-          grant_id: grantId,
-          expected_enrollment_version: payload.expected_heads.enrollment ?? 0,
-          expected_care_group_version: payload.expected_heads.care_group ?? 0,
-          expected_role_version: payload.expected_heads.role ?? 0,
-          expected_grant_version: payload.expected_heads.grant ?? 0,
-          expected_thread_version: payload.expected_heads.thread ?? 0,
-          expected_safety_policy_head: payload.expected_heads.safety_policy ?? 0,
-        },
-        spec: directMessageSpec as NurtureCommandSpec<never>,
-      };
-    }
-    if (request.capability_key === "correct_family_care_message") {
-      const parsed = parseCorrectFamilyCareMessageInputV1(request.operation_input);
-      const messageId = payload.target_refs.family_care_message;
-      if (parsed.status !== "ok" || !messageId) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          body: parsed.input.body,
-          message_id: messageId,
-          expected_message_version: payload.expected_heads.message ?? 0,
-          expected_correction_head: payload.expected_heads.correction ?? 0,
-          ...(payload.expected_heads.lifecycle !== undefined
-            ? { expected_lifecycle_head: payload.expected_heads.lifecycle }
-            : {}),
-        },
-        spec: correctSpec as NurtureCommandSpec<never>,
-      };
-    }
-    if (
-      request.capability_key === "redact_family_care_message" ||
-      request.capability_key === "policy_redact_family_care_message"
-    ) {
-      const actorKind =
-        request.capability_key === "redact_family_care_message" ? "author" : "policy";
-      const policyInput =
-        actorKind === "policy"
-          ? parsePolicyRedactFamilyCareMessageInputV1(request.operation_input)
-          : undefined;
-      const authorInputInvalid =
-        actorKind === "author" &&
-        request.operation_input !== undefined &&
-        (typeof request.operation_input !== "object" ||
-          request.operation_input === null ||
-          Array.isArray(request.operation_input) ||
-          Object.keys(request.operation_input).length > 0);
-      if (authorInputInvalid || policyInput?.status === "invalid") {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      const messageId = payload.target_refs.family_care_message;
-      const cascadeAuditId = payload.target_refs.cascade_audit;
-      const cascadeScope = payload.target_refs.redaction_scope;
-      if (
-        !messageId ||
-        !cascadeAuditId ||
-        (cascadeScope !== "source_question" && cascadeScope !== "reply_local") ||
-        (actorKind === "policy" &&
-          (policyInput?.status !== "ok" ||
-            payload.expected_heads.policy_decision === undefined))
-      ) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          message_id: messageId,
-          expected_message_version: payload.expected_heads.message ?? 0,
-          cascade_audit_id: cascadeAuditId,
-          cascade_scope: cascadeScope,
-          actor_kind: actorKind,
-          ...(actorKind === "policy" && policyInput?.status === "ok"
-            ? {
-                policy_decision_ref: policyInput.input.policyDecisionRef,
-                expected_policy_decision_head: payload.expected_heads.policy_decision,
-              }
-            : {}),
-        },
-        spec: (actorKind === "author" ? redactSpec : policyRedactSpec) as NurtureCommandSpec<never>,
-      };
-    }
-    const itemId = payload.target_refs.care_item;
-    if (!itemId) return { status: "invalid", reason_code: "invalid_operation_input" };
-    if (request.capability_key === "withdraw_family_care_request") {
-      if (
-        request.operation_input !== undefined &&
-        (typeof request.operation_input !== "object" ||
-          request.operation_input === null ||
-          Array.isArray(request.operation_input) ||
-          Object.keys(request.operation_input).length > 0)
-      ) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          item_id: itemId,
-          expected_lifecycle_head: payload.expected_heads.lifecycle ?? 0,
-        },
-        spec: withdrawSpec as NurtureCommandSpec<never>,
-      };
-    }
-    if (request.capability_key === "acknowledge_family_care_item") {
-      if (
-        request.operation_input !== undefined &&
-        (typeof request.operation_input !== "object" ||
-          request.operation_input === null ||
-          Object.keys(request.operation_input).length > 0)
-      ) {
-        return { status: "invalid", reason_code: "invalid_operation_input" };
-      }
-      return {
-        status: "ok",
-        payload: {
-          item_id: itemId,
-          expected_acknowledgement_head: payload.expected_heads.acknowledgement ?? 0,
-          expected_lifecycle_head: payload.expected_heads.lifecycle ?? 0,
-        },
-        spec: acknowledgeSpec as NurtureCommandSpec<never>,
-      };
-    }
-    const parsed = parseReplyFamilyCareItemInputV1(request.operation_input);
-    if (parsed.status !== "ok") {
-      return { status: "invalid", reason_code: "invalid_operation_input" };
-    }
-    return {
-      status: "ok",
-      payload: {
-        body: parsed.input.body,
-        item_id: itemId,
-        expected_lifecycle_head: payload.expected_heads.lifecycle ?? 0,
-      },
-      spec: replySpec as NurtureCommandSpec<never>,
-    };
+    const built = actions[request.capability_key].build({
+      operation_input: request.operation_input,
+      target_refs: payload.target_refs,
+      expected_heads: payload.expected_heads,
+    });
+    return built
+      ? { status: "ok", payload: built.payload, spec: built.spec }
+      : { status: "invalid", reason_code: "invalid_operation_input" };
   }
 }
+
+type PrepareScope = {
+  workspace_id: string;
+  participant_id: string;
+  surface: string;
+  host_conversation_ref?: string;
+};
+
+type OptionalTargetRequest = { operation_input: unknown; target_option_ref?: string };
+type RequiredTargetRequest = { operation_input: unknown; target_option_ref: string };
+
+type BuildInput = {
+  operation_input: unknown;
+  target_refs: Record<string, string>;
+  expected_heads: Record<string, number>;
+};
+
+type BuiltPayload = { payload: unknown; spec: NurtureCommandSpec<never> };
+
+type HarnessActionDescriptor = {
+  prepare(
+    request: HarnessPrepareRequestV1,
+    scope: PrepareScope,
+  ): Promise<HarnessPrepareResponseV1>;
+  /** `null` is the single "this confirmation and this input do not compose" answer. */
+  build(built: BuildInput): BuiltPayload | null;
+};
+
+/**
+ * Several capabilities take no typed input at all. Absent and `{}` are the two
+ * shapes their frozen contract admits; anything else is a caller sending a
+ * field the capability never declared.
+ */
+const isEmptyOperationInput = (value: unknown): boolean =>
+  value === undefined ||
+  (Boolean(value) &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    Object.keys(value as object).length === 0);

@@ -2441,6 +2441,10 @@ model NurturePublishProcess {
   schedulePolicyVersion Int?                      @map("schedule_policy_version")
   scheduleResolvedAt   DateTime?                  @map("schedule_resolved_at")
   authorizingRoleAssignmentId String?             @map("authorizing_role_assignment_id")
+  // The instant the pre-release cancel committed. `updatedAt` cannot stand in:
+  // anything else touching the row moves it, so an idempotent repeat of the
+  // cancel would report a moment the cancel did not happen at.
+  cancelledAt          DateTime?                  @map("cancelled_at")
   aggregateVersion     Int                        @default(0) @map("aggregate_version")
   createdAt            DateTime                   @default(now()) @map("created_at")
   updatedAt            DateTime                   @updatedAt @map("updated_at")

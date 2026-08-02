@@ -513,6 +513,7 @@ components:
             - policy_redact_family_care_message
             - update_guardian_current_focus
             - record_caregiver_daily_care
+            - cancel_publish_process
         capability_version:
           type: string
           const: 1.0.0
@@ -601,6 +602,7 @@ components:
             - policy_redact_family_care_message
             - update_guardian_current_focus
             - record_caregiver_daily_care
+            - cancel_publish_process
         capability_version:
           type: string
           const: 1.0.0

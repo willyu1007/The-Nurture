@@ -1,19 +1,35 @@
+import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { issueBoardSealedRef } from "../../src/harness/board-projection.js";
+import {
+  NurtureDeterministicRollback,
+  type NurtureCommandExecutionContext,
+  type NurtureCommandTransaction,
+} from "../../src/domain/commands/command-kernel.js";
+import {
+  NurtureInteractionContextService,
+  type NurtureInteractionContextRepository,
+} from "../../src/domain/interactions/interaction-context.js";
+import type { NurturePublishProcessCancelFacts } from "../../src/domain/institution/publish-process-transaction.js";
+import { issueBoardOpaqueRef, issueBoardSealedRef } from "../../src/harness/board-projection.js";
 import {
   PUBLISH_PROCESS_TARGET_KIND,
   type PublishProcessStateV1,
 } from "../../src/harness/publish-process.js";
 import {
+  CANCEL_PUBLISH_PROCESS_CAPABILITY,
   DEFAULT_EDIT_HOLD_TTL_SECONDS,
   acquirePublishEditHold,
   cancelPublishProcess,
+  createCancelPublishProcessSpec,
+  parseCancelPublishProcessInputV1,
   parseSavePublishProcessDraftInputV1,
+  preparePublishProcessCancel,
   releasePublishEditHold,
   renewPublishEditHold,
   requiresOnlineEditHold,
   savePublishProcessDraft,
   computeDraftContentDigest,
+  type CancelPublishProcessCommandV1,
   type PublishCancelFactsV1,
   type PublishDraftFactsV1,
   type PublishEditHoldFactsV1,
@@ -46,6 +62,7 @@ const draftFacts = (overrides: Partial<PublishDraftFactsV1> = {}): PublishDraftF
 const cancelFacts = (overrides: Partial<PublishCancelFactsV1> = {}): PublishCancelFactsV1 => ({
   ...holdFacts(),
   committed_release_count: 0,
+  process_version: 3,
   ...overrides,
 });
 
@@ -362,13 +379,323 @@ describe("G3-B1 pre-release cancel", () => {
     ).resolves.toEqual({ status: "denied", reason_code: "already_released" });
   });
 
-  it("is idempotent and still refuses a wider identity", async () => {
+  it("is idempotent from the owner's recorded instant, never an invented one", async () => {
+    const repeated = await cancel(
+      cancelFacts({ process_state: "cancelled", cancelled_at: "2026-08-01T08:45:00.000Z" }),
+    );
+    const fresh = await cancel(cancelFacts());
+    if (repeated.status !== "already_satisfied" || fresh.status !== "cancelled") {
+      throw new Error(`unexpected cancel decisions: ${repeated.status}/${fresh.status}`);
+    }
+    // The repeat answers the same process and the same audit handle, at the
+    // instant the owner stored rather than at "now".
+    expect(repeated.processRef).toBe(processRef());
+    expect(repeated.auditRef).toBe(fresh.auditRef);
+    expect(repeated.cancelledAt).toBe("2026-08-01T08:45:00.000Z");
+    expect(fresh.cancelledAt).toBe(now().toISOString());
+
+    // A cancelled process the owner cannot date is refused rather than dated
+    // from the clock, which would report a cancel at a moment it did not happen.
     await expect(cancel(cancelFacts({ process_state: "cancelled" }))).resolves.toEqual({
-      status: "already_satisfied",
-      processRef: processRef(),
+      status: "denied",
+      reason_code: "cancel_evidence_unavailable",
     });
+  });
+
+  it("still refuses a wider identity and an unknown owner state", async () => {
     await expect(
       cancel(cancelFacts({ authority: caregiverAuthority({ role: "institution_admin" }) })),
     ).resolves.toEqual({ status: "denied", reason_code: "not_authorized" });
+    await expect(
+      cancel(cancelFacts({ process_state: "archived" as never })),
+    ).resolves.toEqual({ status: "denied", reason_code: "illegal_transition" });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The cancel command: prepare freezes the owner head, execute re-reads the same
+// owner inside the write transaction and writes under that head.
+
+const commandContext: NurtureCommandExecutionContext = {
+  workspace_id: scope.workspace_id,
+  business_actor_ref: scope.participant_id,
+};
+
+const OWNER_CANCELLED_AT = "2026-08-01T09:07:11.000Z";
+
+const ownerProcessRef = {
+  schema_version: 1 as const,
+  namespace: "nurture",
+  object_type: "publish_process",
+  object_id: "publish-process-1",
+  version: 3,
+};
+
+const contexts = (): NurtureInteractionContextService =>
+  new NurtureInteractionContextService({
+    create: async (input: unknown) =>
+      ({
+        ...(input as object),
+        id: randomUUID(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }) as never,
+    findByTokenHash: async () => null,
+    findLatestActiveByConversationHash: async () => null,
+    consume: async () => null,
+    revoke: async () => null,
+  } satisfies NurtureInteractionContextRepository);
+
+const ownerCancelFacts = (
+  overrides: Partial<NurturePublishProcessCancelFacts> = {},
+): NurturePublishProcessCancelFacts => ({
+  authority: caregiverAuthority(),
+  publish_process_ref: ownerProcessRef,
+  process_state: "draft",
+  process_version: 3,
+  committed_release_count: 0,
+  ...overrides,
+});
+
+const cancelTransaction = (
+  facts: NurturePublishProcessCancelFacts | null = ownerCancelFacts(),
+  applied: { calls: Array<{ expected_process_version: number; cancelled_at: string }> } = {
+    calls: [],
+  },
+): NurtureCommandTransaction =>
+  ({
+    publishProcess: {
+      loadPublishProcessCancelFacts: async () => facts,
+      applyPublishProcessCancel: async (input: {
+        expected_process_version: number;
+        cancelled_at: string;
+      }) => {
+        applied.calls.push({
+          expected_process_version: input.expected_process_version,
+          cancelled_at: input.cancelled_at,
+        });
+        // The owner answers with the instant it stored, which is not the one
+        // the command computed.
+        return { publish_process_ref: ownerProcessRef, cancelled_at: OWNER_CANCELLED_AT };
+      },
+    },
+  }) as unknown as NurtureCommandTransaction;
+
+/**
+ * A clock that moves on every read. A fixed one would make "the result carries
+ * the owner's instant" indistinguishable from "the result carries this
+ * process's instant" — they would simply be equal.
+ */
+const movingClock = (startMs = Date.parse("2026-08-01T09:00:00.000Z")) => {
+  let current = startMs;
+  return () => new Date((current += 1_000));
+};
+
+const cancelCommand = (
+  overrides: Partial<CancelPublishProcessCommandV1> = {},
+): CancelPublishProcessCommandV1 => ({
+  process_key: PROCESS_KEY,
+  expected_process_version: 3,
+  ...overrides,
+});
+
+describe("cancel_publish_process prepare", () => {
+  const prepareDeps = (facts: PublishCancelFactsV1 | null, keys = [PROCESS_KEY]) => ({
+    ...cancelDeps(facts, keys),
+    contexts: contexts(),
+    create_command_id: () => "command:cancel-1",
+  });
+
+  it("accepts only the frozen empty typed input", () => {
+    expect(parseCancelPublishProcessInputV1(undefined).status).toBe("ok");
+    expect(parseCancelPublishProcessInputV1({}).status).toBe("ok");
+    for (const invalid of [{ processRef: "x" }, [], "", 0, null]) {
+      expect(parseCancelPublishProcessInputV1(invalid).status).toBe("invalid");
+    }
+  });
+
+  it("freezes the owner head and previews the effect it actually found", async () => {
+    const ready = await preparePublishProcessCancel(prepareDeps(cancelFacts()), {
+      ...scope,
+      surface: "board",
+      target_option_ref: processRef(),
+    });
+    expect(ready).toMatchObject({
+      status: "ready_to_confirm",
+      command_request_id: "command:cancel-1",
+      preview: { effect: "cancel_publish_process", state: "draft" },
+    });
+
+    // An already-cancelled process still prepares — the repeat is legal — but
+    // it is not presented as a fresh cancel.
+    const repeat = await preparePublishProcessCancel(
+      prepareDeps(
+        cancelFacts({ process_state: "cancelled", cancelled_at: OWNER_CANCELLED_AT }),
+      ),
+      { ...scope, surface: "board", target_option_ref: processRef() },
+    );
+    expect(repeat).toMatchObject({
+      status: "ready_to_confirm",
+      preview: { effect: "already_cancelled", state: "cancelled" },
+    });
+  });
+
+  it("refuses a ref the owner would not accept a cancel for", async () => {
+    for (const badRef of [PROCESS_KEY, processRef(other)]) {
+      await expect(
+        preparePublishProcessCancel(prepareDeps(cancelFacts()), {
+          ...scope,
+          surface: "board",
+          target_option_ref: badRef,
+        }),
+      ).resolves.toEqual({ status: "denied", reason_code: "target_unavailable" });
+    }
+    await expect(
+      preparePublishProcessCancel(prepareDeps(cancelFacts()), {
+        ...scope,
+        surface: "board",
+        target_option_ref: processRef(),
+        operation_input: { processRef: "raw" },
+      }),
+    ).resolves.toEqual({ status: "needs_input", fields: ["operation_input"] });
+    await expect(
+      preparePublishProcessCancel(prepareDeps(cancelFacts()), { ...scope, surface: "board" }),
+    ).resolves.toEqual({ status: "needs_input", fields: ["target"] });
+    await expect(
+      preparePublishProcessCancel(
+        prepareDeps(cancelFacts({ committed_release_count: 1 })),
+        { ...scope, surface: "board", target_option_ref: processRef() },
+      ),
+    ).resolves.toEqual({ status: "denied", reason_code: "already_released" });
+  });
+});
+
+describe("cancel_publish_process command", () => {
+  const spec = (now = movingClock()) =>
+    createCancelPublishProcessSpec({ integrity_key: BOARD_INTEGRITY_KEY, now });
+
+  it("fails closed without the publish-process owner port", async () => {
+    await expect(
+      spec().checkPreconditions({} as NurtureCommandTransaction, cancelCommand(), commandContext),
+    ).resolves.toEqual({
+      status: "invalid",
+      reason_code: "publish_process_port_unavailable",
+    });
+  });
+
+  it("re-runs the same cancel rule against the owner read inside the write", async () => {
+    await expect(
+      spec().checkPreconditions(cancelTransaction(), cancelCommand(), commandContext),
+    ).resolves.toEqual({ status: "ready" });
+    await expect(
+      spec().checkPreconditions(
+        cancelTransaction(
+          ownerCancelFacts({ authority: caregiverAuthority({ role: "institution_admin" }) }),
+        ),
+        cancelCommand(),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "blocked", reason_code: "not_authorized" });
+    await expect(
+      spec().checkPreconditions(
+        cancelTransaction(ownerCancelFacts({ committed_release_count: 1 })),
+        cancelCommand(),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "blocked", reason_code: "already_released" });
+    await expect(
+      spec().checkPreconditions(cancelTransaction(null), cancelCommand(), commandContext),
+    ).resolves.toEqual({ status: "blocked", reason_code: "target_unavailable" });
+  });
+
+  it("conflicts on a head the owner has moved, and never writes against it", async () => {
+    const applied = { calls: [] as Array<{ expected_process_version: number; cancelled_at: string }> };
+    await expect(
+      spec().checkPreconditions(
+        cancelTransaction(ownerCancelFacts({ process_version: 9 }), applied),
+        cancelCommand(),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "conflict", reason_code: "stale_confirmation" });
+    await expect(
+      spec().apply(
+        cancelTransaction(ownerCancelFacts({ process_version: 9 }), applied),
+        cancelCommand(),
+        commandContext,
+      ),
+    ).rejects.toThrow(NurtureDeterministicRollback);
+    expect(applied.calls).toEqual([]);
+  });
+
+  it("answers an already-cancelled process from the ref the owner just returned", async () => {
+    const decision = await spec().checkPreconditions(
+      cancelTransaction(
+        ownerCancelFacts({
+          process_state: "cancelled",
+          // The head has necessarily moved past what prepare froze.
+          process_version: 4,
+          cancelled_at: OWNER_CANCELLED_AT,
+        }),
+      ),
+      cancelCommand(),
+      commandContext,
+    );
+    expect(decision).toEqual({
+      status: "already_satisfied",
+      output_refs: [ownerProcessRef],
+      result_schema_version: 1,
+      committed_result: {
+        processRef: processRef(),
+        cancelledAt: OWNER_CANCELLED_AT,
+        auditRef: issueBoardOpaqueRef(
+          BOARD_INTEGRITY_KEY,
+          scope,
+          "publish_cancel",
+          PROCESS_KEY,
+        ),
+      },
+    });
+  });
+
+  it("writes under the frozen head and reports the instant the owner stored", async () => {
+    const applied = { calls: [] as Array<{ expected_process_version: number; cancelled_at: string }> };
+    const clock = movingClock();
+    const result = await spec(clock).apply(
+      cancelTransaction(ownerCancelFacts(), applied),
+      cancelCommand(),
+      commandContext,
+    );
+    expect(applied.calls).toHaveLength(1);
+    expect(applied.calls[0]?.expected_process_version).toBe(3);
+    expect(result).toEqual({
+      output_refs: [ownerProcessRef],
+      result_schema_version: 1,
+      committed_result: {
+        processRef: processRef(),
+        cancelledAt: OWNER_CANCELLED_AT,
+        auditRef: issueBoardOpaqueRef(
+          BOARD_INTEGRITY_KEY,
+          scope,
+          "publish_cancel",
+          PROCESS_KEY,
+        ),
+      },
+    });
+    // The clock this command carries kept moving, so the committed instant
+    // being the owner's is an observable fact rather than a coincidence.
+    expect(applied.calls[0]?.cancelled_at).not.toBe(OWNER_CANCELLED_AT);
+  });
+
+  it("keeps its own command identity and result-bearing scope", () => {
+    const created = spec();
+    expect(created.command_key).toBe(CANCEL_PUBLISH_PROCESS_CAPABILITY.key);
+    expect(created.command_scope).toBe("publish_process_cancel");
+    expect(created.canonicalize(cancelCommand())).toEqual({
+      process_key: PROCESS_KEY,
+      expected_process_version: 3,
+    });
+    expect(created.canonicalize(cancelCommand())).not.toEqual(
+      created.canonicalize(cancelCommand({ expected_process_version: 4 })),
+    );
   });
 });

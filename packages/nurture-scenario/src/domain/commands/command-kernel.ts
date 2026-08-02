@@ -5,6 +5,7 @@ import type {
 } from "@my-chat/workflow-contracts";
 import type { NurtureWorkflowProject } from "../../repositories.js";
 import type { NurtureBoardMutationTransaction } from "../institution/board-mutation-transaction.js";
+import type { NurturePublishProcessTransaction } from "../institution/publish-process-transaction.js";
 import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
@@ -61,6 +62,8 @@ export type NurtureCommandTransaction = {
   familyCare?: NurtureFamilyCareCommandTransaction;
   /** Present when the G3-A canonical board-mutation owner adapter is wired. */
   boardMutations?: NurtureBoardMutationTransaction;
+  /** Present when the T-006 publish-process owner write adapter is wired. */
+  publishProcess?: NurturePublishProcessTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {

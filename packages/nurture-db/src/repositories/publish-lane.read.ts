@@ -377,6 +377,13 @@ export class PrismaPublishLaneReadPort
     return {
       ...this.holdFacts(loaded.at, loaded.reach, loaded.process),
       committed_release_count: committed,
+      process_version: loaded.process.aggregateVersion,
+      // Only the owner can say when a cancel happened. A cancelled row with no
+      // recorded instant reports none, and the rule refuses rather than
+      // substituting `updatedAt`, which anything else touching the row moves.
+      ...(loaded.process.cancelledAt
+        ? { cancelled_at: loaded.process.cancelledAt.toISOString() }
+        : {}),
     };
   }
 }

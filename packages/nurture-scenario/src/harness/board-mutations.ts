@@ -5,6 +5,7 @@ import type {
   NurtureCaregiverDailyCareFacts,
   NurtureGuardianFocusGoalFacts,
 } from "../domain/institution/board-mutation-transaction.js";
+import { createBoardWriteSpec } from "./board-write-spec.js";
 import {
   computeHarnessInputIntegrityTag,
   issueHarnessConfirmation,
@@ -238,82 +239,74 @@ export const prepareUpdateGuardianCurrentFocus = async (
 
 export const createUpdateGuardianCurrentFocusSpec = (deps: {
   integrity_key: string;
-}): NurtureCommandSpec<UpdateGuardianCurrentFocusCommandV1> => ({
-  command_key: UPDATE_GUARDIAN_CURRENT_FOCUS_CAPABILITY.key,
-  command_scope: "board_focus",
-  contract_version: 1,
-  canonicalize: canonicalizeUpdateGuardianCurrentFocusCommand,
-  async checkPreconditions(transaction, input, context) {
-    const board = transaction.boardMutations;
-    if (!board) return { status: "invalid", reason_code: "board_mutation_port_unavailable" };
-    const parsed = parseUpdateGuardianCurrentFocusInputV1({
-      label: input.label,
-      priority: input.priority,
-    });
-    if (parsed.status === "invalid" || parsed.input.label !== input.label) {
-      return { status: "invalid", reason_code: "invalid_focus_input" };
-    }
-    const facts = await board.loadGuardianFocusGoalFacts({
-      workspace_id: context.workspace_id,
-      participant_id: context.business_actor_ref,
-      focus_goal_id: input.focus_goal_id,
-    });
-    if (!focusGoalWritable(facts) || facts.focus_cycle_id !== input.focus_cycle_id) {
-      return { status: "blocked", reason_code: "not_authorized" };
-    }
-    if (
-      facts.focus_cycle_version !== input.expected_focus_cycle_version ||
-      facts.focus_goal_version !== input.expected_focus_goal_version
-    ) {
-      return { status: "conflict", reason_code: "stale_confirmation" };
-    }
-    return { status: "ready" };
-  },
-  async apply(transaction, input, context) {
-    const board = transaction.boardMutations;
-    if (!board) throw new Error("board mutation owner port is unavailable");
-    // The owner is re-read inside the transaction: a board snapshot, cache or
-    // optimistic client state is never the authority for the committed change.
-    const facts = await board.loadGuardianFocusGoalFacts({
-      workspace_id: context.workspace_id,
-      participant_id: context.business_actor_ref,
-      focus_goal_id: input.focus_goal_id,
-    });
-    if (
-      !focusGoalWritable(facts) ||
-      facts.focus_cycle_id !== input.focus_cycle_id ||
-      facts.focus_cycle_version !== input.expected_focus_cycle_version ||
-      facts.focus_goal_version !== input.expected_focus_goal_version
-    ) {
-      throw new Error("guardian focus facts changed inside the transaction");
-    }
-    const applied = await board.applyGuardianFocusGoalUpdate({
-      workspace_id: context.workspace_id,
-      participant_id: context.business_actor_ref,
-      focus_goal_id: input.focus_goal_id,
-      focus_cycle_id: input.focus_cycle_id,
-      label: input.label,
-      priority: input.priority,
-      expected_focus_goal_version: input.expected_focus_goal_version,
-    });
-    return {
-      output_refs: [applied.focus_goal_ref],
-      result_schema_version: 1,
-      committed_result: {
-        focusGoalRef: issueCapabilityResultRef(
-          deps.integrity_key,
-          context,
-          "focus_goal",
-          applied.focus_goal_ref,
-        ),
-        revision: applied.revision,
-        // Explicit child scope stays an owner fact; this capability never
-        // promotes a family-scope goal into a child-scoped one by writing text.
-        scopeSource: facts.child_scope_explicit ? "explicit_child_scope" : "family_scope",
-      },
-    };
-  },
-});
+}): NurtureCommandSpec<UpdateGuardianCurrentFocusCommandV1> =>
+  createBoardWriteSpec({
+    capability: UPDATE_GUARDIAN_CURRENT_FOCUS_CAPABILITY,
+    command_scope: "board_focus",
+    contract_version: 1,
+    result_schema_version: 1,
+    canonicalize: canonicalizeUpdateGuardianCurrentFocusCommand,
+    port: {
+      select: (transaction) => transaction.boardMutations,
+      unavailable_reason_code: "board_mutation_port_unavailable",
+    },
+    revalidateInput: (input) => {
+      const parsed = parseUpdateGuardianCurrentFocusInputV1({
+        label: input.label,
+        priority: input.priority,
+      });
+      return parsed.status === "invalid" || parsed.input.label !== input.label
+        ? { status: "invalid", reason_code: "invalid_focus_input" }
+        : null;
+    },
+    // The owner is re-read inside the command transaction: a board snapshot,
+    // cache or optimistic client state is never the authority for the change.
+    loadFacts: (board, input, context) =>
+      board.loadGuardianFocusGoalFacts({
+        workspace_id: context.workspace_id,
+        participant_id: context.business_actor_ref,
+        focus_goal_id: input.focus_goal_id,
+      }),
+    facts_absent_reason_code: "not_authorized",
+    authorize: (facts, input) =>
+      focusGoalWritable(facts) && facts.focus_cycle_id === input.focus_cycle_id
+        ? // Explicit child scope stays an owner fact; this capability never
+          // promotes a family-scope goal into a child-scoped one by writing text.
+          { status: "authorized", write: { child_scope_explicit: facts.child_scope_explicit } }
+        : { status: "blocked", reason_code: "not_authorized" },
+    expectedHeads: (input) => ({
+      focus_cycle: input.expected_focus_cycle_version,
+      focus_goal: input.expected_focus_goal_version,
+    }),
+    currentHeads: (facts) => ({
+      focus_cycle: facts.focus_cycle_version,
+      focus_goal: facts.focus_goal_version,
+    }),
+    apply: async (board, input, context, write) => {
+      const applied = await board.applyGuardianFocusGoalUpdate({
+        workspace_id: context.workspace_id,
+        participant_id: context.business_actor_ref,
+        focus_goal_id: input.focus_goal_id,
+        focus_cycle_id: input.focus_cycle_id,
+        label: input.label,
+        priority: input.priority,
+        expected_focus_goal_version: input.expected_focus_goal_version,
+      });
+      return {
+        output_refs: [applied.focus_goal_ref],
+        committed_result: {
+          focusGoalRef: issueCapabilityResultRef(
+            deps.integrity_key,
+            context,
+            "focus_goal",
+            applied.focus_goal_ref,
+          ),
+          revision: applied.revision,
+          scopeSource: write.child_scope_explicit ? "explicit_child_scope" : "family_scope",
+        },
+      };
+    },
+  });
 
 // ---------------------------------------------------------------------------
 // record_caregiver_daily_care
@@ -473,84 +466,88 @@ export const prepareRecordCaregiverDailyCare = async (
 
 export const createRecordCaregiverDailyCareSpec = (deps: {
   integrity_key: string;
-}): NurtureCommandSpec<RecordCaregiverDailyCareCommandV1> => ({
-  command_key: RECORD_CAREGIVER_DAILY_CARE_CAPABILITY.key,
-  command_scope: "board_daily_care",
-  contract_version: 1,
-  canonicalize: canonicalizeRecordCaregiverDailyCareCommand,
-  async checkPreconditions(transaction, input, context) {
-    const board = transaction.boardMutations;
-    if (!board) return { status: "invalid", reason_code: "board_mutation_port_unavailable" };
-    const parsed = parseRecordCaregiverDailyCareInputV1({
-      kind: input.kind,
-      summary: input.summary,
-    });
-    if (parsed.status === "invalid" || parsed.input.summary !== input.summary) {
-      return { status: "invalid", reason_code: "invalid_daily_care_input" };
-    }
-    const facts = await board.loadCaregiverDailyCareFacts({
-      workspace_id: context.workspace_id,
-      participant_id: context.business_actor_ref,
-      child_care_process_id: input.child_care_process_id,
-    });
-    if (!dailyCareWritable(facts)) return { status: "blocked", reason_code: "not_authorized" };
-    if (
-      facts.care_group_version !== input.expected_care_group_version ||
-      facts.caregiver_role_version !== input.expected_role_version ||
-      facts.enrollment_version !== input.expected_enrollment_version
-    ) {
-      return { status: "conflict", reason_code: "stale_confirmation" };
-    }
-    return { status: "ready" };
-  },
-  async apply(transaction, input, context) {
-    const board = transaction.boardMutations;
-    if (!board) throw new Error("board mutation owner port is unavailable");
-    const facts = await board.loadCaregiverDailyCareFacts({
-      workspace_id: context.workspace_id,
-      participant_id: context.business_actor_ref,
-      child_care_process_id: input.child_care_process_id,
-    });
-    if (
-      !dailyCareWritable(facts) ||
-      !facts.caregiver_role_assignment_id ||
-      !facts.care_group_id ||
-      !facts.enrollment_id ||
-      facts.care_group_version !== input.expected_care_group_version ||
-      facts.caregiver_role_version !== input.expected_role_version ||
-      facts.enrollment_version !== input.expected_enrollment_version
-    ) {
-      throw new Error("caregiver daily-care facts changed inside the transaction");
-    }
-    const applied = await board.applyCaregiverDailyCareRecord({
-      workspace_id: context.workspace_id,
-      participant_id: context.business_actor_ref,
-      child_care_process_id: input.child_care_process_id,
-      care_group_id: facts.care_group_id,
-      enrollment_id: facts.enrollment_id,
-      recorded_by_role_assignment_id: facts.caregiver_role_assignment_id,
-      kind: input.kind,
-      summary: input.summary,
-      expected_enrollment_version: input.expected_enrollment_version,
-    });
-    return {
-      output_refs: [applied.daily_care_log_ref],
-      result_schema_version: 1,
-      // An internal class fact only. It is not a publication: no release,
-      // Receipt or family-visibility claim is produced here.
-      committed_result: {
-        dailyCareLogRef: issueCapabilityResultRef(
-          deps.integrity_key,
-          context,
-          "daily_care_log",
-          applied.daily_care_log_ref,
-        ),
+}): NurtureCommandSpec<RecordCaregiverDailyCareCommandV1> =>
+  createBoardWriteSpec({
+    capability: RECORD_CAREGIVER_DAILY_CARE_CAPABILITY,
+    command_scope: "board_daily_care",
+    contract_version: 1,
+    result_schema_version: 1,
+    canonicalize: canonicalizeRecordCaregiverDailyCareCommand,
+    port: {
+      select: (transaction) => transaction.boardMutations,
+      unavailable_reason_code: "board_mutation_port_unavailable",
+    },
+    revalidateInput: (input) => {
+      const parsed = parseRecordCaregiverDailyCareInputV1({
         kind: input.kind,
-        recordedAt: applied.recorded_at,
-      },
-    };
-  },
-});
+        summary: input.summary,
+      });
+      return parsed.status === "invalid" || parsed.input.summary !== input.summary
+        ? { status: "invalid", reason_code: "invalid_daily_care_input" }
+        : null;
+    },
+    loadFacts: (board, input, context) =>
+      board.loadCaregiverDailyCareFacts({
+        workspace_id: context.workspace_id,
+        participant_id: context.business_actor_ref,
+        child_care_process_id: input.child_care_process_id,
+      }),
+    facts_absent_reason_code: "not_authorized",
+    // Authorising produces the exact owner ids the write is allowed to use, so
+    // the write cannot reach for a field this check never looked at.
+    authorize: (facts) =>
+      dailyCareWritable(facts) &&
+      facts.caregiver_role_assignment_id &&
+      facts.care_group_id &&
+      facts.enrollment_id
+        ? {
+            status: "authorized",
+            write: {
+              care_group_id: facts.care_group_id,
+              enrollment_id: facts.enrollment_id,
+              recorded_by_role_assignment_id: facts.caregiver_role_assignment_id,
+            },
+          }
+        : { status: "blocked", reason_code: "not_authorized" },
+    expectedHeads: (input) => ({
+      care_group: input.expected_care_group_version,
+      role: input.expected_role_version,
+      enrollment: input.expected_enrollment_version,
+    }),
+    currentHeads: (facts) => ({
+      care_group: facts.care_group_version,
+      role: facts.caregiver_role_version,
+      enrollment: facts.enrollment_version,
+    }),
+    apply: async (board, input, context, write) => {
+      const applied = await board.applyCaregiverDailyCareRecord({
+        workspace_id: context.workspace_id,
+        participant_id: context.business_actor_ref,
+        child_care_process_id: input.child_care_process_id,
+        care_group_id: write.care_group_id,
+        enrollment_id: write.enrollment_id,
+        recorded_by_role_assignment_id: write.recorded_by_role_assignment_id,
+        kind: input.kind,
+        summary: input.summary,
+        expected_enrollment_version: input.expected_enrollment_version,
+      });
+      return {
+        output_refs: [applied.daily_care_log_ref],
+        // An internal class fact only. It is not a publication: no release,
+        // Receipt or family-visibility claim is produced here.
+        committed_result: {
+          dailyCareLogRef: issueCapabilityResultRef(
+            deps.integrity_key,
+            context,
+            "daily_care_log",
+            applied.daily_care_log_ref,
+          ),
+          kind: input.kind,
+          recordedAt: applied.recorded_at,
+        },
+      };
+    },
+  });
 
 /** Owner-issued target refs the board hands to these two capabilities. */
 export const issueFocusGoalTargetRef = (

@@ -5,6 +5,7 @@ import {
   createAesGcmProtectedContentPort,
   PrismaCareCaptureReadPort,
   PrismaPublishLaneReadPort,
+  PrismaPublishProcessTransaction,
 } from "../src/index.js";
 
 // Owner-side proof for the publish queue, draft/hold/cancel and capture ports
@@ -93,6 +94,10 @@ const seedProcess = async (
       state: state === "released" ? "pending_release" : state,
       dataClass: "child_growth_record",
       purposeKey: "child_growth_publication",
+      // A cancelled process carries the instant it was cancelled; the owner
+      // constraint refuses one that does not, so a fixture cannot seed a state
+      // the write lane can never produce.
+      ...(state === "cancelled" ? { cancelledAt: new Date(SNAPSHOT_AT) } : {}),
     },
   });
   const revision = await prisma.nurturePublishProcessRevision.create({
@@ -624,6 +629,219 @@ describe("G3-B1 owner reads: capture lane", () => {
         participant_id: world.teacher.id,
         care_group_id: world.group.id,
         snapshot_at: SNAPSHOT_AT,
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("T-006 owner write: pre-release publish-process cancel", () => {
+  const CANCELLED_AT = "2026-08-03T02:15:00.000Z";
+
+  it("cancels under the expected head and records the instant it happened", async () => {
+    const world = await seedGroup();
+    const { process } = await seedProcess(world, { state: "draft" });
+    const owner = new PrismaPublishProcessTransaction(prisma);
+
+    const before = await owner.loadPublishProcessCancelFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(before).toMatchObject({
+      process_state: "draft",
+      committed_release_count: 0,
+      authority: { role: "caregiver", role_scope_matches_source: true },
+    });
+    // Not yet cancelled, so the owner reports no instant at all rather than a
+    // stand-in the repeat would later present as the cancel time.
+    expect(before?.cancelled_at).toBeUndefined();
+
+    const applied = await owner.applyPublishProcessCancel({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_process_version: before!.process_version,
+      cancelled_at: CANCELLED_AT,
+    });
+    expect(applied.cancelled_at).toBe(CANCELLED_AT);
+
+    const stored = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(stored.state).toBe("cancelled");
+    expect(stored.cancelledAt?.toISOString()).toBe(CANCELLED_AT);
+    expect(stored.aggregateVersion).toBe(before!.process_version + 1);
+
+    // The reread is what an idempotent repeat answers from.
+    const after = await owner.loadPublishProcessCancelFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(after).toMatchObject({
+      process_state: "cancelled",
+      cancelled_at: CANCELLED_AT,
+      process_version: before!.process_version + 1,
+    });
+  });
+
+  it("matches zero rows on a stale head and on a process someone already cancelled", async () => {
+    const world = await seedGroup();
+    const { process } = await seedProcess(world, { state: "needs_review" });
+    const owner = new PrismaPublishProcessTransaction(prisma);
+    const facts = await owner.loadPublishProcessCancelFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+
+    await expect(
+      owner.applyPublishProcessCancel({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        expected_process_version: facts!.process_version + 1,
+        cancelled_at: CANCELLED_AT,
+      }),
+    ).rejects.toThrow(/cancel version conflict/);
+    expect(
+      (await prisma.nurturePublishProcess.findUniqueOrThrow({ where: { id: process.id } })).state,
+    ).toBe("needs_review");
+
+    await owner.applyPublishProcessCancel({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_process_version: facts!.process_version,
+      cancelled_at: CANCELLED_AT,
+    });
+    // A second cancel finds no cancellable state, so it cannot re-stamp the
+    // instant the first one recorded.
+    await expect(
+      owner.applyPublishProcessCancel({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        expected_process_version: facts!.process_version + 1,
+        cancelled_at: "2026-08-03T09:00:00.000Z",
+      }),
+    ).rejects.toThrow(/cancel version conflict/);
+    expect(
+      (
+        await prisma.nurturePublishProcess.findUniqueOrThrow({ where: { id: process.id } })
+      ).cancelledAt?.toISOString(),
+    ).toBe(CANCELLED_AT);
+  });
+
+  it("reports a released process and its committed releases to the cancel rule", async () => {
+    const world = await seedGroup();
+    const { process, revision } = await seedProcess(world, { state: "pending_release" });
+    const careProcess = await prisma.nurtureChildCareProcess.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childId: (
+          await prisma.nurtureChild.create({
+            data: { workspaceId: world.workspaceId, displayName: "Child", status: "active" },
+          })
+        ).id,
+        status: "active",
+      },
+    });
+    const enrollment = await prisma.nurtureEnrollment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: careProcess.id,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        status: "active",
+      },
+    });
+    const grant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: careProcess.id,
+        enrollmentId: enrollment.id,
+        grantedByParticipantId: world.teacher.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: world.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["child_growth_record"],
+        purposes: ["child_growth_publication"],
+        status: "active",
+      },
+    });
+    const target = await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        targetKey: `target:${randomUUID()}`,
+        childCareProcessId: careProcess.id,
+        enrollmentId: enrollment.id,
+        familyRefKey: `${world.workspaceId}:${careProcess.id}`,
+        grantId: grant.id,
+      },
+    });
+    await prisma.nurturePublicationRelease.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        publishProcessTargetId: target.id,
+        publishProcessRevisionId: revision.id,
+        releasedByRoleAssignmentId: world.teacherRole.id,
+        commandRequestIdHash: "b".repeat(64),
+      },
+    });
+
+    const owner = new PrismaPublishProcessTransaction(prisma);
+    const facts = await owner.loadPublishProcessCancelFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.committed_release_count).toBe(1);
+  });
+
+  it("refuses a caregiver of another class and one whose assignment is revoked", async () => {
+    const world = await seedGroup();
+    const { process } = await seedProcess(world, { state: "draft" });
+    const owner = new PrismaPublishProcessTransaction(prisma);
+
+    const outsider = await prisma.nurtureParticipant.create({
+      data: {
+        workspaceId: world.workspaceId,
+        myChatUserId: `outsider:${randomUUID()}`,
+        status: "active",
+      },
+    });
+    await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: outsider.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: world.otherGroup.id,
+        status: "active",
+      },
+    });
+    // Reachable, but not for this CareGroup: the authority says so rather than
+    // the read hiding the row.
+    expect(
+      await owner.loadPublishProcessCancelFacts({
+        workspace_id: world.workspaceId,
+        participant_id: outsider.id,
+        process_key: process.processKey,
+      }),
+    ).toMatchObject({ authority: { role_scope_matches_source: false } });
+
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: world.teacherRole.id },
+      data: { status: "revoked" },
+    });
+    expect(
+      await owner.loadPublishProcessCancelFacts({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
       }),
     ).toBeNull();
   });

@@ -209,6 +209,7 @@ describe("owner rows arrive in the order their binding advertises", () => {
           state: state === "released" ? "pending_release" : state,
           dataClass: "child_growth_record",
           purposeKey: "child_growth_publication",
+          ...(state === "cancelled" ? { cancelledAt: new Date(SNAPSHOT_AT) } : {}),
         },
       });
       const revision = await prisma.nurturePublishProcessRevision.create({

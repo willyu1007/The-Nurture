@@ -21,6 +21,7 @@ import type {
   NurtureWorkflowProject,
 } from "@the-nurture/scenario/harness";
 import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js";
+import { PrismaPublishProcessTransaction } from "./publish-process.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -123,10 +124,18 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
    */
   readonly boardMutations: PrismaBoardMutationTransaction;
 
+  /**
+   * The T-006 publish-process lifecycle writes its own owner row inside this
+   * same command transaction, so the publish queue never becomes a second
+   * writer of the process state.
+   */
+  readonly publishProcess: PrismaPublishProcessTransaction;
+
   constructor(private readonly transaction: Prisma.TransactionClient) {
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
+    this.publishProcess = new PrismaPublishProcessTransaction(transaction);
   }
 
   async findCommitted(input: {

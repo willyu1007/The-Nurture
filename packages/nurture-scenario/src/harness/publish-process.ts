@@ -46,6 +46,14 @@ export const isLegalPublishProcessTransition = (
   to: PublishProcessStateV1,
 ): boolean => LEGAL_TRANSITIONS[from].includes(to);
 
+/**
+ * Owner rows carry the state as a plain string. A value this state machine does
+ * not know is not a state to pass through — it has no legal transitions, so the
+ * caller must refuse rather than guess which of the five it resembles.
+ */
+export const isPublishProcessState = (value: string): value is PublishProcessStateV1 =>
+  (PUBLISH_PROCESS_STATES as readonly string[]).includes(value);
+
 /** One audience data class per content unit; mixed audiences split the process. */
 export type PublishDataClassV1 = "daily_care_log" | "child_growth_record";
 

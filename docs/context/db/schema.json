@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-02T23:05:27.581Z",
+  "updatedAt": "2026-08-02T23:42:41.473Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -13282,6 +13282,17 @@
           "nullable": true,
           "list": false,
           "dbName": "authorizing_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "cancelledAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "cancelled_at",
           "dbType": null,
           "default": null,
           "primaryKey": false,
