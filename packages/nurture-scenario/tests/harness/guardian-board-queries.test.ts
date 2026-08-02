@@ -178,7 +178,10 @@ describe("G3-A query_guardian_current_focus", () => {
       {
         capabilityKey: "update_guardian_current_focus",
         capabilityVersion: "1.0.0",
-        targetOptionRef: expect.stringMatching(/^1\.focus_goal\.goal-1\.[0-9a-f]{32}$/),
+        // Sealed: the ref carries neither the goal id nor the kind. The earlier
+        // expectation pinned `1.focus_goal.goal-1.<tag>` — it encoded the leak
+        // as the contract.
+        targetOptionRef: expect.stringMatching(/^1\.[0-9a-f]{32}$/),
         availability: "available",
       },
     ]);

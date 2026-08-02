@@ -389,6 +389,9 @@ describe("owner release facts reach the right eligibility verdict", () => {
         childCareProcessId: alpha.process.id,
         source: "manual",
         state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+        exposurePolicyPayload: { audience: "own_family" },
         attributionRevision: 1,
       },
     });
@@ -409,6 +412,9 @@ describe("owner release facts reach the right eligibility verdict", () => {
         childCareProcessId: alpha.process.id,
         source: "manual",
         state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+        exposurePolicyPayload: { audience: "own_family" },
         attributionRevision: 1,
       },
     });
@@ -443,6 +449,9 @@ describe("owner release facts reach the right eligibility verdict", () => {
           childCareProcessId: entry.process.id,
           source: "manual",
           state: "confirmed",
+          confirmedByRoleAssignmentId: world.teacherRole.id,
+          confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+          exposurePolicyPayload: { audience: "own_family" },
           attributionRevision: 1,
         },
       });
@@ -490,6 +499,9 @@ describe("owner release facts reach the right eligibility verdict", () => {
           childCareProcessId: entry.process.id,
           source: "manual",
           state: "confirmed",
+          confirmedByRoleAssignmentId: world.teacherRole.id,
+          confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+          exposurePolicyPayload: { audience: "own_family" },
           attributionRevision: 1,
         },
       });

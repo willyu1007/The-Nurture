@@ -11,8 +11,8 @@ import {
 } from "./confirmation.js";
 import {
   CAREGIVER_BOARD_ROLES,
-  issueBoardTargetRef,
-  resolveBoardTargetRef,
+  issueBoardSealedRef,
+  resolveBoardSealedRef,
   type BoardScopeV1,
 } from "./board-projection.js";
 import { issueCapabilityResultRef } from "./keyed-refs.js";
@@ -175,11 +175,14 @@ export const prepareUpdateGuardianCurrentFocus = async (
   }
   // Only an owner-issued, actor-bound ref selects the goal; a raw FocusGoal id
   // never resolves, so it can never route a write.
-  const focusGoalId = resolveBoardTargetRef(
+  // Resolved against the owner's current eligible set, so a goal the guardian
+  // has lost simply stops resolving. The ref itself carries no goal id.
+  const focusGoalId = resolveBoardSealedRef(
     deps.integrity_key,
     request,
     FOCUS_GOAL_TARGET_KIND,
     request.target_option_ref,
+    eligibility.goals.map((goal) => goal.focus_goal_id),
   );
   const target = eligibility.goals.find((goal) => goal.focus_goal_id === focusGoalId);
   if (!target) return { status: "denied", reason_code: "not_authorized" };
@@ -409,11 +412,12 @@ export const prepareRecordCaregiverDailyCare = async (
   if (!eligibility.participant_active || eligibility.children.length === 0) {
     return { status: "denied", reason_code: "not_authorized" };
   }
-  const childCareProcessId = resolveBoardTargetRef(
+  const childCareProcessId = resolveBoardSealedRef(
     deps.integrity_key,
     request,
     CHILD_CARE_PROCESS_TARGET_KIND,
     request.target_option_ref,
+    eligibility.children.map((child) => child.child_care_process_id),
   );
   const target = eligibility.children.find(
     (child) => child.child_care_process_id === childCareProcessId,
@@ -553,11 +557,11 @@ export const issueFocusGoalTargetRef = (
   integrityKey: string,
   scope: BoardScopeV1,
   focusGoalId: string,
-): string => issueBoardTargetRef(integrityKey, scope, FOCUS_GOAL_TARGET_KIND, focusGoalId);
+): string => issueBoardSealedRef(integrityKey, scope, FOCUS_GOAL_TARGET_KIND, focusGoalId);
 
 export const issueChildCareProcessTargetRef = (
   integrityKey: string,
   scope: BoardScopeV1,
   childCareProcessId: string,
 ): string =>
-  issueBoardTargetRef(integrityKey, scope, CHILD_CARE_PROCESS_TARGET_KIND, childCareProcessId);
+  issueBoardSealedRef(integrityKey, scope, CHILD_CARE_PROCESS_TARGET_KIND, childCareProcessId);

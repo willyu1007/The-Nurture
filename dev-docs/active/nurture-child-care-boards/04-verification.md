@@ -605,3 +605,24 @@
 | `pnpm typecheck` / `test:unit` / `test:db` | PASS — 506 and 170 tests |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `persistence-boundaries` / `port-topology` / `test-routing` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — Independent Review Findings (id leakage, dropped constraint)
+
+| Command / check | Result |
+| --- | --- |
+| three read-only review agents over B1–B4 | 3 severe findings the author and the boundary check both missed |
+| A2: `issueBoardTargetRef` published the raw id beside the opaque ref hiding it | FIXED — plaintext pair deleted, all callers on the sealed issuer |
+| A2 side effect: a ref stops resolving once the actor loses eligibility | PASS — a self-describing ref could not express this |
+| found: a unit test pinned the leaking format as the contract | FIXED — asserts the sealed shape and that no id or kind appears |
+| A3: cursor payload was base64url, decodable with no key | FIXED — AES-256-GCM sealed, key derived from integrity key + actor scope |
+| A3 regression source: the quality pass added the child's name to the sort key | RECORDED |
+| new: public refs and cursors contain no part of the identifier they stand for | PASS — asserted over goal, child process and publish process |
+| A1: `DROP COLUMN "status"` silently dropped `ck_nurture_media_attribution_confirmation` | FIXED — restored over `state` with `NOT VALID` + `VALIDATE` |
+| live census: 14 declared CHECKs, 3 absent | RESOLVED — two superseded by design, one a regression |
+| 71 confirmed attributions in the dev database violated the restored rule | FIXED — tests corrected, database recreated from the full chain |
+| new: every declared CHECK must be alive unless explicitly superseded | PASS — falsified by dropping the constraint by hand |
+| new: a superseded entry that is actually alive also fails | PASS — a stale exemption hides the next regression |
+| new: confirmation completeness and confidence bounds enforced by the database | PASS — 5 refusal cases |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 508, 173 and 26 tests |
+| `verify:test-routing` | PASS — files=92 production-db=20 |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |

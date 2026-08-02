@@ -329,6 +329,9 @@ describe("G3-C1 owner reads: media attribution", () => {
         childCareProcessId: world.process.id,
         source: "manual",
         state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+        exposurePolicyPayload: { audience: "own_family" },
         attributionRevision: 1,
       },
     });
@@ -339,6 +342,9 @@ describe("G3-C1 owner reads: media attribution", () => {
         childCareProcessId: world.process.id,
         source: "manual",
         state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+        exposurePolicyPayload: { audience: "own_family" },
         attributionRevision: 2,
       },
     });

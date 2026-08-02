@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from "node:crypto";
 import type { InterfaceContractRefV1 } from "../surface-contract/types.js";
 
 /**
@@ -144,32 +144,12 @@ export const issueBoardOpaqueRef = (
     .slice(0, 32)}`;
 
 /**
- * Owner-issued, actor-bound target handle for a board mutation. It is the only
- * accepted public locator; execute still re-reads current authority, so the ref
- * is never sufficient permission by itself.
- */
-export const issueBoardTargetRef = (
-  integrityKey: string,
-  scope: BoardScopeV1,
-  kind: string,
-  id: string,
-): string => {
-  const tag = createHmac("sha256", integrityKey)
-    .update(
-      `nurture.board-target.v${BOARD_PROJECTION_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${kind}\0${id}`,
-      "utf8",
-    )
-    .digest("hex")
-    .slice(0, 32);
-  return `${BOARD_PROJECTION_VERSION}.${kind}.${id}.${tag}`;
-};
-
-/**
- * Sealed target handle for identifiers that must not appear in a public result
- * at all — a publication target resolves a child, Enrollment, family and the
- * original Grant, so the ref carries no part of them. It is resolved by
- * recomputing over the owner's current candidate set, which also means an
- * identifier the actor is no longer eligible for simply stops resolving.
+ * The only target handle. It carries no part of the identifier it stands for:
+ * an earlier variant embedded the raw id in the ref and published it beside the
+ * opaque ref that existed to hide the very same id. Resolution recomputes over
+ * the owner's current candidate set, so an identifier the actor is no longer
+ * eligible for simply stops resolving — which a self-describing ref could not
+ * express at all.
  */
 export const issueBoardSealedRef = (
   integrityKey: string,
@@ -196,19 +176,6 @@ export const resolveBoardSealedRef = (
     if (issueBoardSealedRef(integrityKey, scope, kind, candidate) === ref) return candidate;
   }
   return null;
-};
-
-export const resolveBoardTargetRef = (
-  integrityKey: string,
-  scope: BoardScopeV1,
-  kind: string,
-  ref: string,
-): string | null => {
-  const parts = ref.split(".");
-  if (parts.length !== 4) return null;
-  const [version, refKind, id] = parts as [string, string, string, string];
-  if (version !== BOARD_PROJECTION_VERSION || refKind !== kind || !id) return null;
-  return issueBoardTargetRef(integrityKey, scope, kind, id) === ref ? id : null;
 };
 
 // ---------------------------------------------------------------------------
@@ -343,24 +310,40 @@ export type BoardCursorStateV1 = {
 
 export type BoardCursorBindingV1 = BoardCursorIdentityV1 & BoardCursorStateV1;
 
+/**
+ * The cursor is sealed, not merely signed. Its binding carries the position the
+ * next page continues from — which for a class list is the child's own process
+ * id and safe label, and for the publish queue is the process key that the
+ * sealed `processRef` exists to hide. An earlier variant base64url-encoded the
+ * binding, so any holder of a `nextCursor` could read all of it without a key.
+ *
+ * The key is derived from the integrity key and bound to the actor scope, so a
+ * cursor issued for one participant cannot even be decrypted for another.
+ */
+const cursorKey = (integrityKey: string, scope: BoardScopeV1): Buffer =>
+  createHash("sha256")
+    .update(
+      `nurture.board-cursor-key.v${BOARD_PROJECTION_VERSION}\0${integrityKey}\0${scope.workspace_id}\0${scope.participant_id}`,
+      "utf8",
+    )
+    .digest();
+
+const CURSOR_IV_BYTES = 12;
+
 export const issueBoardCursor = (
   integrityKey: string,
   scope: BoardScopeV1,
   binding: BoardCursorBindingV1,
   now: () => Date = () => new Date(),
 ): string => {
-  const payload = Buffer.from(
-    JSON.stringify({ ...binding, issued_at: now().toISOString() }),
-    "utf8",
-  ).toString("base64url");
-  const tag = createHmac("sha256", integrityKey)
-    .update(
-      `nurture.board-cursor.v${BOARD_PROJECTION_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${payload}`,
-      "utf8",
-    )
-    .digest("hex")
-    .slice(0, 32);
-  return `${payload}.${tag}`;
+  const iv = randomBytes(CURSOR_IV_BYTES);
+  const cipher = createCipheriv("aes-256-gcm", cursorKey(integrityKey, scope), iv);
+  const sealed = Buffer.concat([
+    cipher.update(JSON.stringify({ ...binding, issued_at: now().toISOString() }), "utf8"),
+    cipher.final(),
+  ]);
+  const payload = Buffer.concat([iv, sealed]).toString("base64url");
+  return `${payload}.${cipher.getAuthTag().toString("base64url")}`;
 };
 
 /**
@@ -379,19 +362,24 @@ export const resolveBoardCursor = (
 ): BoardCursorStateV1 | null => {
   const separator = token.lastIndexOf(".");
   if (separator <= 0) return null;
-  const payload = token.slice(0, separator);
-  const tag = token.slice(separator + 1);
-  const expectedTag = createHmac("sha256", integrityKey)
-    .update(
-      `nurture.board-cursor.v${BOARD_PROJECTION_VERSION}\0${scope.workspace_id}\0${scope.participant_id}\0${payload}`,
-      "utf8",
-    )
-    .digest("hex")
-    .slice(0, 32);
-  if (tag !== expectedTag) return null;
+  const payload = Buffer.from(token.slice(0, separator), "base64url");
+  if (payload.length <= CURSOR_IV_BYTES) return null;
   let cursor: BoardCursorBindingV1 & { issued_at?: unknown };
   try {
-    cursor = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    // GCM authenticates as it decrypts: a tampered or foreign cursor throws
+    // here rather than yielding a binding the caller then has to distrust.
+    const decipher = createDecipheriv(
+      "aes-256-gcm",
+      cursorKey(integrityKey, scope),
+      payload.subarray(0, CURSOR_IV_BYTES),
+    );
+    decipher.setAuthTag(Buffer.from(token.slice(separator + 1), "base64url"));
+    cursor = JSON.parse(
+      Buffer.concat([
+        decipher.update(payload.subarray(CURSOR_IV_BYTES)),
+        decipher.final(),
+      ]).toString("utf8"),
+    );
   } catch {
     return null;
   }
@@ -520,7 +508,7 @@ export const projectOwnerActions = (
     capabilityVersion: grant.capability_version,
     ...(grant.target_option_id && grant.target_kind
       ? {
-          targetOptionRef: issueBoardTargetRef(
+          targetOptionRef: issueBoardSealedRef(
             integrityKey,
             scope,
             grant.target_kind,

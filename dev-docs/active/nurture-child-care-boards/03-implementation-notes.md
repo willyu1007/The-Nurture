@@ -1113,3 +1113,56 @@ decision,不写任何东西。要经 execute 提交,每个都还缺两层:
 在 transport 放行一个引擎接不住的 key,就是冻结件禁止的占位,所以它们仍在守卫的
 显式"未路由"清单里(现在 16 个)。这层缺口在原始复核里被算进了 B2/B4,实际上是
 独立的一段工作,已记入 07 作为 B8。
+
+## 2026-08-02 — 独立复核抓到的三条:公开结果泄露原始 id,以及一条被静默删除的约束
+
+三个只读子智能体（设计侦察 / 对抗复核 / owner write 枚举）并行审阅了 B1～B4。
+最重的三条都由**对抗复核**发现——我自己没找到,我上一轮加的跨界检查也没覆盖。
+
+**A2 — 每个 board action ref 明文携带它本该藏住的 id。** `issueBoardTargetRef`
+返回 `${version}.${kind}.${id}.${tag}`,而 `caregiver-board.read.ts` 把
+`childCareProcessId` 喂给 action grant。于是同一张卡上同时出现 `childRef`
+(opaque,存在的理由就是藏这个 id)和 `targetOptionRef`(明文含同一个 id)。
+`board-projection.ts` 自己的注释写着"原始 child 标识符绝不进入公开 typed result"。
+
+修法不是给它打补丁,而是**删掉明文那一对**,全部收敛到已有的 sealed 发放器——
+"一个概念一个发放器"是上一轮已经立过的规则,这里是它的第二次应验。sealed 解析要
+对着 owner 当前的候选集重算,顺带得到一个明文 ref 根本表达不了的性质:**actor 失去
+资格后,已签发的 ref 自动停止解析**。
+
+一条既有单测把泄露格式**当成契约钉死了**
+(`expect.stringMatching(/^1\.focus_goal\.goal-1\./)`)。它不是没覆盖到,它是把缺陷
+写进了期望值。
+
+**A3 — cursor 是签名的,不是密封的。** 载荷只是 base64url,**不需要密钥就能解**。
+实测解出 `{ rank: 'Li Ming', id: 'ccp-…RAW-UUID' }`。`pageInfo.nextCursor` 是公开
+结果的一部分。发布队列 lane 同理:`processRef` 是 sealed 的,而 cursor 里带着明文
+`process_key`。
+
+而且**是我把它变严重的**:上一轮为修排序缺陷,我往 sort key 里加了
+`rank = child_safe_label`——把孩子的名字加进了一个明文可解的载荷。
+
+改为 AES-256-GCM 密封,密钥由 integrity key 与 actor scope 派生,所以一个 participant
+的 cursor 连解密都不可能发生在另一个 participant 身上。GCM 边解密边认证,篡改的
+cursor 在解密处就抛错,而不是先解出一个调用方还得去怀疑的 binding。
+
+**A1 — 我在 B1 静默删掉了一条 T-005 的 CHECK。** `DROP COLUMN "status"` 会连带删除
+所有引用该列的约束,`ck_nurture_media_attribution_confirmation` 就此消失,没有任何
+东西按 `state` 重建它。丢掉的保证是:`confirmed` 的归属必须带齐 confirming role、
+时间戳与 exposure policy,且 confidence ∈ [0,1]。
+
+活库普查:迁移史声明过 14 条 CHECK,缺 3 条——两条是有意被取代的(n1 → handoff_v1
+→ v2),**第三条是这次的回归**。而且当时库里 71 条 confirmed 归属**全部违规**,
+全是我的测试写进去的:测试自己也在依赖这个洞。
+
+重建迁移用 `NOT VALID` + `VALIDATE`,所以约束缺席期间写下的任何行会让迁移**响亮
+失败**,而不是被既往不咎。
+
+**补上防住这一类的检查。** 既有守卫 `assert-n1-schema-contract.mjs` 仍断言这条约束
+存在并且通过——因为它 grep 的是冻结的基线 SQL 文本,不是活库。新增
+`schema-constraint-survival.integration.test.ts`:迁移史里声明过的每条 CHECK 都必须
+在**数据库里**活着,除非在一张显式的"已被取代"表里注明继任者;而且**已被取代的
+条目若其实还活着,同样失败**——过期豁免正是下一次真回归被忽略的方式。
+
+用制造这次回归的同样手法证伪过:手工 `DROP CONSTRAINT`,检查立刻报出
+`declared in a migration but absent from the database`。

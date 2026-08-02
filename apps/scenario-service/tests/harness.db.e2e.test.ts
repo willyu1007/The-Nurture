@@ -6,7 +6,7 @@ import {
   issueCareItemTargetRef,
   issueDisplayRef,
   issueFamilyCareMessageTargetRef,
-  issueBoardTargetRef,
+  issueBoardSealedRef,
   CHILD_CARE_PROCESS_TARGET_KIND,
   FOCUS_GOAL_TARGET_KIND,
   issuePolicyRedactionDecisionRef,
@@ -2019,7 +2019,7 @@ describe("G3-A board lane through the formal Harness ingress", () => {
     const goal = await seedFocus(scope);
     // Only an owner-issued, actor-bound ref selects the goal; a raw FocusGoal
     // id never resolves.
-    const targetOptionRef = issueBoardTargetRef(
+    const targetOptionRef = issueBoardSealedRef(
       INTEGRITY_KEY,
       { workspace_id: scope.workspaceId, participant_id: scope.guardian.id },
       FOCUS_GOAL_TARGET_KIND,
@@ -2051,7 +2051,7 @@ describe("G3-A board lane through the formal Harness ingress", () => {
 
   it("commits a daily care record and refuses a caregiver of another class", async () => {
     const scope = await seedScope();
-    const targetOptionRef = issueBoardTargetRef(
+    const targetOptionRef = issueBoardSealedRef(
       INTEGRITY_KEY,
       { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
       CHILD_CARE_PROCESS_TARGET_KIND,

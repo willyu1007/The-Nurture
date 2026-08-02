@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  resolveBoardSealedRef,
+  issueBoardSealedRef,
   buildPageInfo,
   caregiverFactVisible,
   computeDriftHead,
   guardianFactVisible,
   issueBoardCursor,
   issueBoardOpaqueRef,
-  issueBoardTargetRef,
   issueSnapshotRef,
   parseBoardPageSize,
   projectOwnerActions,
   projectSourceHeads,
   resolveBoardCursor,
-  resolveBoardTargetRef,
   scanBoardPage,
   type BoardCursorIdentityV1,
   type BoardScopeV1,
@@ -68,27 +68,82 @@ describe("G3-A shared board projection", () => {
     );
   });
 
-  it("resolves an owner-issued target ref only for the exact actor, kind and key", () => {
-    const ref = issueBoardTargetRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "goal-1");
-    expect(resolveBoardTargetRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", ref)).toBe(
+  it("resolves an owner-issued target ref only for the exact actor, kind and eligible id", () => {
+    const ref = issueBoardSealedRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "goal-1");
+    const eligible = ["goal-1", "goal-2"];
+    expect(resolveBoardSealedRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", ref, eligible)).toBe(
       "goal-1",
     );
     expect(
-      resolveBoardTargetRef(BOARD_INTEGRITY_KEY, otherScope, "focus_goal", ref),
+      resolveBoardSealedRef(BOARD_INTEGRITY_KEY, otherScope, "focus_goal", ref, eligible),
     ).toBeNull();
     expect(
-      resolveBoardTargetRef(BOARD_INTEGRITY_KEY, scope, "daily_care_log", ref),
+      resolveBoardSealedRef(BOARD_INTEGRITY_KEY, scope, "daily_care_log", ref, eligible),
     ).toBeNull();
     expect(
-      resolveBoardTargetRef("another-integrity-key-0123456789abcd", scope, "focus_goal", ref),
+      resolveBoardSealedRef("another-integrity-key-0123456789abcd", scope, "focus_goal", ref, eligible),
     ).toBeNull();
     // A raw canonical identifier is never a locator.
     expect(
-      resolveBoardTargetRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "goal-1"),
+      resolveBoardSealedRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "goal-1", eligible),
     ).toBeNull();
+    // Losing eligibility makes an already-issued ref stop resolving — the whole
+    // point of resolving against a candidate set rather than reading the ref.
     expect(
-      resolveBoardTargetRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "1.focus_goal.goal-1.deadbeef"),
+      resolveBoardSealedRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", ref, ["goal-2"]),
     ).toBeNull();
+  });
+
+  it("seals the cursor so a holder cannot read the position it carries", () => {
+    const raw = {
+      childCareProcessId: "ccp-9f3a-raw-uuid",
+      childName: "Li Ming",
+      processKey: "publish:2026-08-02:class-a",
+    };
+    const sortKey = {
+      rank: raw.childName,
+      occurred_at: state.snapshot_at,
+      id: raw.childCareProcessId,
+    };
+    const token = issueBoardCursor(
+      BOARD_INTEGRITY_KEY,
+      scope,
+      { ...identity, ...state, sort_key: sortKey },
+      at(state.snapshot_at),
+    );
+
+    // The earlier cursor was base64url over the binding, so this decode read the
+    // child's id and name straight out of a public `nextCursor`.
+    const decoded = Buffer.from(token.slice(0, token.lastIndexOf(".")), "base64url").toString(
+      "utf8",
+    );
+    for (const secret of Object.values(raw)) {
+      expect(token, secret).not.toContain(secret);
+      expect(decoded, secret).not.toContain(secret);
+    }
+
+    // It still resolves for its own actor, and for nobody else.
+    expect(
+      resolveBoardCursor(BOARD_INTEGRITY_KEY, scope, identity, token, at(state.snapshot_at)),
+    ).toEqual({ ...state, sort_key: sortKey });
+    expect(
+      resolveBoardCursor(BOARD_INTEGRITY_KEY, otherScope, identity, token, at(state.snapshot_at)),
+    ).toBeNull();
+  });
+
+  it("never lets a target ref carry any part of the identifier it stands for", () => {
+    // The defect this replaced published `1.focus_goal.<raw id>.<tag>` beside the
+    // opaque ref that existed to hide that same id.
+    for (const [kind, id] of [
+      ["focus_goal", "goal-1"],
+      ["child_care_process", "ccp-9f3a-raw-uuid"],
+      ["publish_process", "publish:2026-08-02:class-a"],
+    ] as const) {
+      const ref = issueBoardSealedRef(BOARD_INTEGRITY_KEY, scope, kind, id);
+      expect(ref, kind).not.toContain(id);
+      expect(ref, kind).not.toContain(kind);
+      expect(ref, kind).toMatch(/^[0-9]+\.[0-9a-f]{32}$/);
+    }
   });
 
   it("projects deduplicated, stably ordered source heads at their freshest version", () => {
@@ -240,7 +295,7 @@ describe("G3-A shared board projection", () => {
       },
     ]);
     expect(actions[0]?.targetOptionRef).toBe(
-      issueBoardTargetRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "goal-1"),
+      issueBoardSealedRef(BOARD_INTEGRITY_KEY, scope, "focus_goal", "goal-1"),
     );
     expect(actions[1]).toEqual({
       capabilityKey: "record_caregiver_daily_care",
