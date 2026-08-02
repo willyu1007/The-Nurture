@@ -52,9 +52,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -111,7 +111,7 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:b9c4ca09071121b04404ba88db3939cffa213a88848f79cd65dad936f6138037"
+      "sliceHash": "sha256:6237365e4a1538de56f71abec0b1bf387180d29740c455a4246b5721a2a35cf7"
     },
     {
       "capabilityKey": "correct_family_care_message",
@@ -146,9 +146,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -215,7 +215,116 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:0680749bafda1f619d38b352e73f6e7338f92282bdc0d286da97468f2abea759"
+      "sliceHash": "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3"
+    },
+    {
+      "capabilityKey": "initiate_caregiver_direct_message",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "initiate_caregiver_direct_message",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "enrollment_lifecycle",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "active_enrollment",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "care_group_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_exact_care_group_actor",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "direct_message_grant",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_direct_care_communication_grant",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "direct_message_safety",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_direct_message_safety_policy",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
+          "key": "nurture.surface-contract",
+          "version": "1.8.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_family_care",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          }
+        ],
+        "domainClass": "care_interaction",
+        "eligibilityPolicyRef": {
+          "key": "initiate_caregiver_direct_message_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "action_execution",
+        "handlerBinding": {
+          "bindingKey": "initiate_caregiver_direct_message",
+          "bindingKind": "action"
+        },
+        "inputSchemaRef": "schema:nurture.initiate-caregiver-direct-message-input@1",
+        "intentKeys": [
+          "initiate_caregiver_direct_message",
+          "send_direct_care_communication"
+        ],
+        "invalidationScopeKinds": [
+          "capability",
+          "surface",
+          "target",
+          "collection",
+          "subject",
+          "care_group",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_caregiver_nurture_chat",
+            "surfaceKey": "caregiver_nurture_chat"
+          },
+          {
+            "presenterKey": "present_caregiver_teacher_board",
+            "surfaceKey": "caregiver_teacher_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.initiate-caregiver-direct-message-result@1",
+        "supportedRoles": [
+          "caregiver",
+          "lead_caregiver"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"
     },
     {
       "capabilityKey": "policy_redact_family_care_message",
@@ -242,9 +351,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -296,10 +405,10 @@
     },
     {
       "capabilityKey": "query_caregiver_family_care_work",
-      "capabilityVersion": "1.0.0",
+      "capabilityVersion": "1.1.0",
       "descriptor": {
         "capabilityKey": "query_caregiver_family_care_work",
-        "capabilityVersion": "1.0.0",
+        "capabilityVersion": "1.1.0",
         "concurrencyPolicy": {
           "class": "lifecycle_authority",
           "headBindings": [
@@ -323,9 +432,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -371,7 +480,7 @@
             "surfaceKey": "caregiver_teacher_board"
           }
         ],
-        "resultSchemaRef": "schema:nurture.query-caregiver-family-care-work-result@1",
+        "resultSchemaRef": "schema:nurture.query-caregiver-family-care-work-result@2",
         "supportedRoles": [
           "caregiver",
           "lead_caregiver"
@@ -381,14 +490,14 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:a1cf57465ed3cf92f20b4ccb6f4fdd84ecf1184af3f3191b6916a8ab8c5baed1"
+      "sliceHash": "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"
     },
     {
       "capabilityKey": "query_family_care_item",
-      "capabilityVersion": "1.0.0",
+      "capabilityVersion": "1.1.0",
       "descriptor": {
         "capabilityKey": "query_family_care_item",
-        "capabilityVersion": "1.0.0",
+        "capabilityVersion": "1.1.0",
         "concurrencyPolicy": {
           "class": "lifecycle_authority",
           "headBindings": [
@@ -412,9 +521,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -470,7 +579,7 @@
             "surfaceKey": "caregiver_teacher_board"
           }
         ],
-        "resultSchemaRef": "schema:nurture.query-family-care-item-result@1",
+        "resultSchemaRef": "schema:nurture.query-family-care-item-result@2",
         "supportedRoles": [
           "guardian",
           "caregiver",
@@ -481,14 +590,14 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:5342ff415c90502ec7bbb8180e2e98e16c6d51b68d8a1c6aefd84d579b479383"
+      "sliceHash": "sha256:1bfdbb7f79b68a929799fd8959d20e5c95b6bef7d517780a35f7d076286ef323"
     },
     {
       "capabilityKey": "query_guardian_family_care_timeline",
-      "capabilityVersion": "1.0.0",
+      "capabilityVersion": "1.1.0",
       "descriptor": {
         "capabilityKey": "query_guardian_family_care_timeline",
-        "capabilityVersion": "1.0.0",
+        "capabilityVersion": "1.1.0",
         "concurrencyPolicy": {
           "class": "lifecycle_authority",
           "headBindings": [
@@ -512,9 +621,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -560,7 +669,7 @@
             "surfaceKey": "guardian_family_board"
           }
         ],
-        "resultSchemaRef": "schema:nurture.query-guardian-family-care-timeline-result@1",
+        "resultSchemaRef": "schema:nurture.query-guardian-family-care-timeline-result@2",
         "supportedRoles": [
           "guardian"
         ],
@@ -569,7 +678,7 @@
           "optionSchemaRef": null
         }
       },
-      "sliceHash": "sha256:a7134a4edbd03564fbe2e100964b4e1a4cbbb204de3a6f83bf74aa647c490a95"
+      "sliceHash": "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"
     },
     {
       "capabilityKey": "redact_family_care_message",
@@ -604,9 +713,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -673,7 +782,7 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:4ee6651d7fea6484c26b91f4267225b8e7e08f903209ac9a9bd842132edd3e59"
+      "sliceHash": "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5"
     },
     {
       "capabilityKey": "reply_family_care_item",
@@ -708,9 +817,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -767,7 +876,7 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:1ecf2e934a61b4ffeefa84fafe26175e163ade011e38271437960073f851eb69"
+      "sliceHash": "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6"
     },
     {
       "capabilityKey": "submit_family_care_question",
@@ -806,9 +915,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -866,7 +975,7 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:f27fda9fcab235488e2a54528f6ef07128fb5195d0a0ff7683bbc424d41b2746"
+      "sliceHash": "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"
     },
     {
       "capabilityKey": "withdraw_family_care_request",
@@ -893,9 +1002,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+          "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
           "key": "nurture.surface-contract",
-          "version": "1.7.0"
+          "version": "1.8.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -952,44 +1061,44 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:c833a0e07149472232d7a314f731953ad83ce6d6aa05ef1ee846635e4ac38134"
+      "sliceHash": "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b"
     }
   ],
   "fixtures": [
     {
       "fixtureKey": "journey:gj-1",
       "fixtureKind": "journey",
-      "sliceHash": "sha256:4f526bfa81532aff3f2f4c6650b4263e1bb8636079f43303d8a883e849e6731a"
+      "sliceHash": "sha256:1aacbe03480b50e1b013ba9335402bdfa3e352bc1ec7b083ad65eafb18acae21"
     },
     {
       "fixtureKey": "journey:gj-2",
       "fixtureKind": "journey",
-      "sliceHash": "sha256:ca44d466719307a92889c7af4b0cd059471b4e987a1287506a2c8a37e820b51f"
+      "sliceHash": "sha256:7f1dff6e2f22610624eaf648fe0e8339209698e7f9faec771ea67aafed05afb9"
     },
     {
       "fixtureKey": "journey:gj-3",
       "fixtureKind": "journey",
-      "sliceHash": "sha256:eeb660319ba8c9e8feb0865d679909fd8c6a51e64293c5c3b9ccac53411864a0"
+      "sliceHash": "sha256:879c0d85b074789de09cda715ff348cf032c6d8ab46040aad83b8fac400c6080"
     },
     {
       "fixtureKey": "journey:gj-4",
       "fixtureKind": "journey",
-      "sliceHash": "sha256:7d0add04f3200a55711c03d558949aa400c6c0ca3311c276bc6040d1bb43741d"
+      "sliceHash": "sha256:3ab0c09ad76964c52f80dd9afd875f48bc869a60f6ae0efaf4b7d15204951ff5"
     },
     {
       "fixtureKey": "journey:gj-5",
       "fixtureKind": "journey",
-      "sliceHash": "sha256:26b92574b85500659bed813d842e2a9cf5025bb22ef2cfef2c2000f472b4f7b5"
+      "sliceHash": "sha256:1a0ec8ad222de67a56f07a6b606849c3c075e25f9a19746a686fe7ae8b6956a3"
     },
     {
       "fixtureKey": "journey:rj-1",
       "fixtureKind": "journey",
-      "sliceHash": "sha256:5ef210e5921281df40991af552c110e5994867e52ceb0c36668087765f792c15"
+      "sliceHash": "sha256:5c7fc820306e8755b2945e03f1f4430e803bb0c93bcce8c7f79eb29dcac84da0"
     },
     {
       "fixtureKey": "selection",
       "fixtureKind": "selection",
-      "sliceHash": "sha256:8e370d0e799a17d17d8ccc97e45c505159db26cc093edfd0423b775b502d9741"
+      "sliceHash": "sha256:d1ce3d8899654c4a9396ef9f36bb01d9db194eb5ab9bb2c786118b028f819d9d"
     },
     {
       "fixtureKey": "world",
@@ -998,9 +1107,9 @@
     }
   ],
   "interfaceContract": {
-    "digest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
+    "digest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
     "key": "nurture.surface-contract",
-    "version": "1.7.0"
+    "version": "1.8.0"
   },
   "schemaVersion": 1,
   "sharedCoreHash": "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2",
@@ -1011,7 +1120,7 @@
         "path": "capabilities/capability-descriptor.schema.json"
       },
       {
-        "artifactHash": "sha256:c6daed56f8d34c3110b7b72663138b28aa63c2a817459c5f3b57272fe8116b04",
+        "artifactHash": "sha256:5d29233e6dc6f712a3d7fdcfcce00f5988fd3560bd4af9253657ee49599bd629",
         "path": "capabilities/capability-registry.json"
       },
       {
@@ -1023,23 +1132,27 @@
         "path": "capabilities/contracts/correct-family-care-message.schema.json"
       },
       {
-        "artifactHash": "sha256:ec3ae3d5db9738b09a79570fd958da27fcf5378517513a787f19882da33cc53e",
+        "artifactHash": "sha256:e1537d151d7830a0df85cdbe9f48baeafcae94dfbff625a0b48553b3d7efa5f8",
         "path": "capabilities/contracts/family-care-types.schema.json"
+      },
+      {
+        "artifactHash": "sha256:c20594ed702f5cd76bfdd8faacced2a4e66e96da40cadc6047854a02557800b7",
+        "path": "capabilities/contracts/initiate-caregiver-direct-message.schema.json"
       },
       {
         "artifactHash": "sha256:ea794959440cf832d73cd45be9edcbadf2c1112d0bd586ec36122471c454591e",
         "path": "capabilities/contracts/policy-redact-family-care-message.schema.json"
       },
       {
-        "artifactHash": "sha256:a5064b129384a748d4a874a0503372c7c3540fcace7b1f2ce251fb0a7fe3008a",
+        "artifactHash": "sha256:290c7c1dd99dab5a345868afe6c76d6bab2a64128d8a2299219f8d159d6675cc",
         "path": "capabilities/contracts/query-caregiver-family-care-work.schema.json"
       },
       {
-        "artifactHash": "sha256:0211691c6a74c8fc4ad9b2ca9fa838ea9e7e2dcf7dbeac08fa79cbea8279b5ee",
+        "artifactHash": "sha256:252b8610c8b3c36f6f389bad8338d1d0395b536abe81cbb4b8a2ffaea00caa77",
         "path": "capabilities/contracts/query-family-care-item.schema.json"
       },
       {
-        "artifactHash": "sha256:5045b63a71692b488337690c447baff748b70a69fcb457823edc7416ead8d761",
+        "artifactHash": "sha256:0b5cec9af1a8205d77a854e729990a150e1a7e2b7d73501d799a83630f2d27e3",
         "path": "capabilities/contracts/query-guardian-family-care-timeline.schema.json"
       },
       {
@@ -1059,7 +1172,7 @@
         "path": "capabilities/contracts/withdraw-family-care-request.schema.json"
       },
       {
-        "artifactHash": "sha256:6e4d9063b353e7ca8baeccb9124575c811b9832e0026f13ae9cfb58d41f0d74a",
+        "artifactHash": "sha256:ad5a087a1d624c08eda5bcb5e990ac6bab3c99217583f5f4732d693292be8816",
         "path": "conformance/conformance-cases.json"
       },
       {
@@ -1179,7 +1292,7 @@
         "path": "fixtures/journeys/journey-initial-state.schema.json"
       },
       {
-        "artifactHash": "sha256:9f01979601a8a602f03bf2619ea2d4311f4d0f6c623f79fb5613ad981fa85e33",
+        "artifactHash": "sha256:2a4b8745803a288280b49367bd4001bbff1f699ea78c5a071651de46f8ece3a3",
         "path": "fixtures/journeys/journey-script.schema.json"
       },
       {
@@ -1203,11 +1316,11 @@
         "path": "fixtures/journeys/rj-1/script.json"
       },
       {
-        "artifactHash": "sha256:a1e708dc64b61261d32f1f8f17f2487db15a7c9d99339a696f137fc7b144fd4d",
+        "artifactHash": "sha256:85c35fae9a8b562f14a1fa51f8ed67b11175a32f61c5aa72e2717e1fcc4c8b7c",
         "path": "fixtures/selection/selection-cases.json"
       },
       {
-        "artifactHash": "sha256:50808a7832482f09ddb7b65870034eb930acf2af8c81dc10a246739a5120fc40",
+        "artifactHash": "sha256:bccd03e7cde64dc99088b3c23ed6187c08abf3037ce1067a1835cc15542f0e20",
         "path": "fixtures/selection/selection-cases.schema.json"
       },
       {
@@ -1239,11 +1352,11 @@
         "path": "interface/interface-contract-ref.schema.json"
       },
       {
-        "artifactHash": "sha256:af8644e79c006cba9e5ff31c8e829f26a36005935873af752b412d2e71d33746",
+        "artifactHash": "sha256:cf7631114796367a382eb6e943948d3df239d98662d45d77f3d934c46ce9a1f2",
         "path": "interface/port-registry.json"
       },
       {
-        "artifactHash": "sha256:f9f52a14454b7edb7f7ddaeb7a45ed7adad79e593283507094940ab55b351543",
+        "artifactHash": "sha256:4acb469b2b431d512e5f3711e5d024d4397bd88a9ea3d7791a78a2403a899ab7",
         "path": "interface/schema-registry.json"
       },
       {
@@ -1331,7 +1444,7 @@
         "path": "surfaces/surface-registry.json"
       }
     ],
-    "sourceDigest": "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641"
+    "sourceDigest": "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a"
   },
   "surfaces": [
     {

@@ -1,7 +1,7 @@
 /** @reference .ai/skills/standards/naming-conventions/SKILL.md */
 
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import test from "node:test";
 import path from "node:path";
 import {
@@ -57,12 +57,21 @@ test("generator rejects semantic drift without an interface version rotation", a
     "surface-contract.manifest.json",
   );
   try {
+    const registry = JSON.parse(
+      await readFile(
+        path.join(
+          repoRoot,
+          "packages/nurture-scenario/contracts/surfaces/v1/source/capabilities/capability-registry.json",
+        ),
+        "utf8",
+      ),
+    );
     await writeFile(
       outputPath,
       JSON.stringify({
         interfaceContract: {
           key: "nurture.surface-contract",
-          version: "1.7.0",
+          version: registry.contract.version,
           digest: `sha256:${"0".repeat(64)}`,
         },
       }),
@@ -70,7 +79,7 @@ test("generator rejects semantic drift without an interface version rotation", a
     );
     await assert.rejects(
       buildSurfaceContract(outputPath),
-      /content changed without a version rotation from 1\.7\.0/,
+      /content changed without a version rotation/,
     );
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });

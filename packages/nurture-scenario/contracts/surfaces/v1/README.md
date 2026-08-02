@@ -10,7 +10,9 @@ six-surface interface contract.
   six-surface registry, atomic surface envelope, visibility matrix and shared
   readiness/snapshot rules.
 - Phase 2 defines typed query/prepare/execute/read-result, error, pagination,
-  private confirmation/cursor bindings, the closed ten-capability V1 registry,
+  private confirmation/cursor bindings and the closed registry. G2-C rotates
+  that registry to eleven capabilities; all three query capabilities use
+  `1.1.0`, while the action capabilities remain independently versioned.
   stable presenter contracts and versioned policy/repository ports.
 - Phase 3 adds `source/fixtures/` — the versioned PII-free synthetic world
   (`fixtures/world/`) plus one independent, repeatable initial state per
@@ -22,7 +24,9 @@ six-surface interface contract.
   files join the canonical inventory and root digest without entering the
   shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.7.0` digest, shared-core hash,
+  records the exact `nurture.surface-contract@1.8.0` /
+  `sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`,
+  shared-core hash,
   canonical source inventory and per-capability/per-surface/per-fixture slice
   hashes (fixture slices: `world`, `journey:<key>`, `selection`).
   `generated/surface-contract.artifact-pin.json` is the separately trusted

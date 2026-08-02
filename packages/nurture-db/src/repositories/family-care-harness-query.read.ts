@@ -107,11 +107,13 @@ const beforeFilter = (
   };
 };
 
-const enrollmentLabels = async (
+const enrollmentDetails = async (
   prisma: Client,
   workspaceId: string,
   enrollmentIds: string[],
-): Promise<Map<string, string>> => {
+): Promise<
+  Map<string, { label: string; institution_id: string; care_group_id: string }>
+> => {
   if (enrollmentIds.length === 0) return new Map();
   const enrollments = await prisma.nurtureEnrollment.findMany({
     where: { workspaceId, id: { in: enrollmentIds } },
@@ -120,7 +122,11 @@ const enrollmentLabels = async (
   return new Map(
     enrollments.map((enrollment) => [
       enrollment.id,
-      `${enrollment.institution.displayName} · ${enrollment.careGroup.name}`,
+      {
+        label: `${enrollment.institution.displayName} · ${enrollment.careGroup.name}`,
+        institution_id: enrollment.institutionId,
+        care_group_id: enrollment.careGroupId,
+      },
     ]),
   );
 };
@@ -167,7 +173,9 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
       where: {
         workspaceId: input.workspace_id,
         AND: [reachFilter],
-        messageKind: { in: ["family_message", "caregiver_reply"] },
+        messageKind: {
+          in: ["family_message", "caregiver_reply", "caregiver_direct_message"],
+        },
         writerContract: { in: [...G2_WRITERS] },
         createdAt: { lte: new Date(input.snapshot_at) },
         ...(beforeFilter(input.before) as Prisma.NurtureFamilyCareMessageWhereInput),
@@ -187,15 +195,20 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
     const replyItemIds = messages
       .filter((message) => message.messageKind === "caregiver_reply" && message.sourceItemId)
       .map((message) => message.sourceItemId!) as string[];
-    const items = await this.prisma.nurtureFamilyCareItem.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        OR: [
-          ...(sourceMessageIds.length > 0 ? [{ sourceMessageId: { in: sourceMessageIds } }] : []),
-          ...(replyItemIds.length > 0 ? [{ id: { in: replyItemIds } }] : []),
-        ],
-      },
-    });
+    const items =
+      sourceMessageIds.length > 0 || replyItemIds.length > 0
+        ? await this.prisma.nurtureFamilyCareItem.findMany({
+            where: {
+              workspaceId: input.workspace_id,
+              OR: [
+                ...(sourceMessageIds.length > 0
+                  ? [{ sourceMessageId: { in: sourceMessageIds } }]
+                  : []),
+                ...(replyItemIds.length > 0 ? [{ id: { in: replyItemIds } }] : []),
+              ],
+            },
+          })
+        : [];
     const itemBySource = new Map(items.filter((item) => item.sourceMessageId).map((item) => [item.sourceMessageId!, item]));
     const itemById = new Map(items.map((item) => [item.id, item]));
     const continuationIds = [
@@ -210,14 +223,27 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         .filter((item) => reaches(reach, item))
         .map((item) => item.id),
     );
-    const receipts = await this.prisma.nurtureChildLinkReceipt.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        sourceType: "family_care_message",
-        sourceId: { in: messages.map((message) => message.id) },
-      },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-    });
+    const [receipts, directGrants] = await Promise.all([
+      this.prisma.nurtureChildLinkReceipt.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          sourceType: "family_care_message",
+          sourceId: { in: messages.map((message) => message.id) },
+        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      }),
+      this.prisma.nurtureChildLinkGrant.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          id: {
+            in: messages
+              .filter((message) => message.messageKind === "caregiver_direct_message")
+              .map((message) => message.grantId)
+              .filter((id): id is string => Boolean(id)),
+          },
+        },
+      }),
+    ]);
     const corrections = await this.prisma.nurtureFamilyCareMessageCorrection.findMany({
       where: {
         workspaceId: input.workspace_id,
@@ -236,6 +262,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
       }
     }
     const receiptById = new Map(receipts.map((receipt) => [receipt.id, receipt]));
+    const directGrantById = new Map(directGrants.map((grant) => [grant.id, grant]));
     const originalReceiptBySource = new Map<string, (typeof receipts)[number]>();
     for (const receipt of receipts) {
       if (
@@ -245,13 +272,20 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         originalReceiptBySource.set(receipt.sourceId, receipt);
       }
     }
-    const labels = await enrollmentLabels(
+    const enrollmentById = await enrollmentDetails(
       this.prisma,
       input.workspace_id,
-      [...new Set(items.map((item) => item.enrollmentId).filter(Boolean))] as string[],
+      [
+        ...new Set(
+          messages
+            .map((message) => message.enrollmentId)
+            .filter((id): id is string => Boolean(id)),
+        ),
+      ],
     );
 
     const rows: RawTimelineMessageRow[] = [];
+    const projectionNow = new Date();
     for (const message of messages) {
       const item =
         message.messageKind === "family_message"
@@ -259,8 +293,35 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
           : message.sourceItemId
             ? itemById.get(message.sourceItemId)
             : undefined;
-      if (!item?.enrollmentId) continue;
+      const enrollmentId = item?.enrollmentId ?? message.enrollmentId;
+      if (!enrollmentId) continue;
+      const enrollment = enrollmentById.get(enrollmentId);
       const correction = latestCorrectionByMessage.get(message.id);
+      const directGrant = message.grantId
+        ? directGrantById.get(message.grantId)
+        : undefined;
+      const directContentReadable =
+        message.messageKind !== "caregiver_direct_message" ||
+        Boolean(
+          directGrant &&
+            enrollment &&
+            directGrant.status === "active" &&
+            !directGrant.revokedAt &&
+            directGrant.deletedAt === null &&
+            (!directGrant.effectiveFrom || directGrant.effectiveFrom <= projectionNow) &&
+            (!directGrant.expiresAt || directGrant.expiresAt > projectionNow) &&
+            directGrant.directions.includes("org_to_family") &&
+            directGrant.dataClasses.includes("direct_care_communication") &&
+            directGrant.purposes.includes("family_care_workflow") &&
+            directGrant.childCareProcessId === message.childCareProcessId &&
+            directGrant.enrollmentId === enrollmentId &&
+            ((directGrant.grantedToScopeType === "care_group" &&
+              directGrant.grantedToScopeId === enrollment.care_group_id) ||
+              (directGrant.grantedToScopeType === "enrollment" &&
+                directGrant.grantedToScopeId === enrollmentId) ||
+              (directGrant.grantedToScopeType === "institution" &&
+                directGrant.grantedToScopeId === enrollment.institution_id)),
+        );
       // A correction is a new cross-boundary content effect with its own
       // Receipt. Select it by the correction's exact FK; otherwise select the
       // deterministically ordered original delivery receipt. Never collapse
@@ -270,21 +331,26 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         : originalReceiptBySource.get(message.id);
       rows.push({
         message_id: message.id,
-        item_id: item.id,
-        enrollment_id: item.enrollmentId,
-        message_kind: message.messageKind as "family_message" | "caregiver_reply",
+        ...(item ? { item_id: item.id } : {}),
+        enrollment_id: enrollmentId,
+        message_kind: message.messageKind as RawTimelineMessageRow["message_kind"],
         redacted: message.status === "redacted",
         corrected: Boolean(correction),
+        content_readable: directContentReadable,
         occurred_at: message.createdAt.toISOString(),
         ...(message.status === "redacted" ? {} : { body_envelope: message.bodyProtectionPayload }),
         ...(message.status !== "redacted" && correction
           ? { correction_body_envelope: correction.bodyProtectionPayload }
           : {}),
-        source_label: labels.get(item.enrollmentId) ?? "Care group",
-        acknowledgement_state: item.acknowledgementState,
-        response_state: item.responseState,
-        lifecycle_state: item.lifecycleState,
-        ...(item.lifecycleReason ? { lifecycle_reason: item.lifecycleReason } : {}),
+        source_label: enrollment?.label ?? "Care group",
+        ...(item
+          ? {
+              acknowledgement_state: item.acknowledgementState,
+              response_state: item.responseState,
+              lifecycle_state: item.lifecycleState,
+              ...(item.lifecycleReason ? { lifecycle_reason: item.lifecycleReason } : {}),
+            }
+          : {}),
         ...(receipt
           ? {
               receipt: {
@@ -295,7 +361,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
               },
             }
           : {}),
-        ...(item.contextContinuationOfItemId
+        ...(item?.contextContinuationOfItemId
           ? {
               continuation_source_item_id: item.contextContinuationOfItemId,
               continuation_source_readable: continuationReadable.has(
@@ -413,7 +479,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         (!grant.expiresAt || grant.expiresAt > now),
     );
 
-    const [sourceMessage, replies, receipts, attention, labels] = await Promise.all([
+    const [sourceMessage, replies, receipts, attention, enrollmentById] = await Promise.all([
       this.prisma.nurtureFamilyCareMessage.findFirst({
         where: { id: item.sourceMessageId, workspaceId: input.workspace_id },
       }),
@@ -441,7 +507,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
           sourceId: item.id,
         },
       }),
-      enrollmentLabels(this.prisma, input.workspace_id, [item.enrollmentId]),
+      enrollmentDetails(this.prisma, input.workspace_id, [item.enrollmentId]),
     ]);
     if (!sourceMessage) return { authorized: false };
     const messageIds = new Set([sourceMessage.id, ...replies.map((reply) => reply.id)]);
@@ -486,7 +552,7 @@ export class PrismaFamilyCareHarnessQueryReadPort implements FamilyCareQueryRead
         projection_role: projectionRole,
         item_id: item.id,
         enrollment_id: item.enrollmentId,
-        source_label: labels.get(item.enrollmentId) ?? "Care group",
+        source_label: enrollmentById.get(item.enrollmentId)?.label ?? "Care group",
         direction: "family_to_org",
         acknowledgement_state: item.acknowledgementState,
         response_state: item.responseState,

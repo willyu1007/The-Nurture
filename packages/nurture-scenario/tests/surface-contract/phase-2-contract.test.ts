@@ -31,6 +31,7 @@ const generatedArtifactPinPath = path.join(
 const expectedCapabilityKeys = [
   "acknowledge_family_care_item",
   "correct_family_care_message",
+  "initiate_caregiver_direct_message",
   "policy_redact_family_care_message",
   "query_caregiver_family_care_work",
   "query_family_care_item",
@@ -57,10 +58,10 @@ const manifest = loadSurfaceContractManifest(
 );
 
 describe("Phase 2 exact surface contract", () => {
-  it("loads one exact, closed manifest with ten capabilities and six surfaces", () => {
+  it("loads one exact, closed manifest with eleven capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.7.0",
+      version: "1.8.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -195,18 +196,17 @@ describe("Phase 2 exact surface contract", () => {
     expect(manifest.sharedCoreHash).toMatch(/^sha256:[0-9a-f]{64}$/);
   });
 
-  it("keeps the V1 registry closed and system policy out of user presenters", () => {
+  it("keeps the registry closed and system policy out of user presenters", () => {
     const systemPolicy = requireCapability(
       manifest,
       "policy_redact_family_care_message",
     );
     expect(systemPolicy.supportedRoles).toEqual(["system_policy"]);
     expect(systemPolicy.presenterBindings).toEqual([]);
-    expect(
-      manifest.capabilities.some((entry) =>
-        entry.capabilityKey.includes("caregiver_initiated"),
-      ),
-    ).toBe(false);
+    const direct = requireCapability(manifest, "initiate_caregiver_direct_message");
+    expect(direct.supportedRoles).toEqual(["caregiver", "lead_caregiver"]);
+    expect(direct.targetPolicy.kind).toBe("owner_option_required");
+    expect(direct.confirmationPolicy).toBe("reviewable_commit");
     expect(
       manifest.capabilities.some(
         (entry) => entry.capabilityKey === "query_admin_family_care",
@@ -572,8 +572,9 @@ function requireCapability(
   contractManifest: SurfaceContractManifestV1,
   key: string,
 ): CapabilityDescriptorV1 {
-  const descriptor = findCapabilityExact(contractManifest, key, "1.0.0");
-  expect(descriptor, `missing ${key}@1.0.0`).toBeDefined();
+  const version = key.startsWith("query_") ? "1.1.0" : "1.0.0";
+  const descriptor = findCapabilityExact(contractManifest, key, version);
+  expect(descriptor, `missing ${key}@${version}`).toBeDefined();
   return descriptor as CapabilityDescriptorV1;
 }
 

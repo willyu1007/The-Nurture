@@ -173,15 +173,17 @@ export const prepareSubmitFamilyCareQuestion = async (
   }
 
   let target: GuardianSubmitTarget | undefined;
-  if (eligibility.targets.length === 1) {
-    target = eligibility.targets[0];
-  } else if (request.target_option_ref) {
+  if (request.target_option_ref) {
     const enrollmentId = resolveTargetOptionRef(
       deps.integrity_key,
       { workspace_id: request.workspace_id, participant_id: request.participant_id },
       request.target_option_ref,
+      eligibility.targets.map((entry) => entry.enrollment_id),
     );
     target = eligibility.targets.find((entry) => entry.enrollment_id === enrollmentId);
+    if (!target) return { status: "denied", reason_code: "not_authorized" };
+  } else if (eligibility.targets.length === 1) {
+    target = eligibility.targets[0];
   }
   if (!target) {
     return {

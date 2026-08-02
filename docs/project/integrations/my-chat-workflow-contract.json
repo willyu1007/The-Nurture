@@ -116,7 +116,9 @@
       "packages/nurture-db/src/binding-evidence-hasher.ts",
       "packages/nurture-db/src/binding-owner.ts",
       "packages/nurture-db/src/index.ts",
+      "packages/nurture-db/src/repositories/caregiver-direct-message-eligibility.read.ts",
       "packages/nurture-db/src/repositories/family-care-command.transaction.ts",
+      "packages/nurture-db/src/repositories/family-care-harness-query.read.ts",
       "packages/nurture-db/src/repositories/institution-core.repositories.ts",
       "packages/nurture-db/src/repositories/port-repositories.ts",
       "packages/nurture-db/src/repositories/scenario-binding-owner.repository.ts",
@@ -139,6 +141,7 @@
       "packages/nurture-scenario/src/family-input-workflow-source.ts",
       "packages/nurture-scenario/src/handlers/family-input-workflow.handler.ts",
       "packages/nurture-scenario/src/handlers/p0-handlers.ts",
+      "packages/nurture-scenario/src/harness",
       "packages/nurture-scenario/src/index.ts",
       "packages/nurture-scenario/src/institution-surfaces.ts",
       "packages/nurture-scenario/src/module.ts",
@@ -148,6 +151,6 @@
       "prisma/migrations/20260728210000_wave4_binding_anchors/migration.sql",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "f7d618bdc09acd203b3350a616fe0565a6ac17ae9d4dd3f64c77bae7b35e9bb8"
+    "contractSha256": "0e684436322a1865febad9e54dea241f16046b1813b765c876e238a415551e03"
   }
 }

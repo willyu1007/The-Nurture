@@ -98,6 +98,7 @@
     "actionCapabilityKey": {
       "enum": [
         "submit_family_care_question",
+        "initiate_caregiver_direct_message",
         "acknowledge_family_care_item",
         "reply_family_care_item",
         "correct_family_care_message",
@@ -126,6 +127,7 @@
     "effect": {
       "enum": [
         "question_created",
+        "caregiver_direct_message_sent",
         "acknowledged",
         "already_satisfied",
         "reply_appended",

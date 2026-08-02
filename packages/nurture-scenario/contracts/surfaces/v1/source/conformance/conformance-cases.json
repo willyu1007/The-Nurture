@@ -70,6 +70,7 @@
       "covers": [
         "capability:acknowledge_family_care_item",
         "capability:correct_family_care_message",
+        "capability:initiate_caregiver_direct_message",
         "capability:policy_redact_family_care_message",
         "capability:query_caregiver_family_care_work",
         "capability:query_family_care_item",

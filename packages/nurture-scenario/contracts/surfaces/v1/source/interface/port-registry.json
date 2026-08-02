@@ -51,6 +51,20 @@
       ]
     },
     {
+      "key": "initiate_caregiver_direct_message_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
       "key": "policy_redact_family_care_message_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [

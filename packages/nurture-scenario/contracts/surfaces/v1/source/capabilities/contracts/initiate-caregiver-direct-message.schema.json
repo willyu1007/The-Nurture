@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/initiate-caregiver-direct-message.schema.json",
+  "title": "InitiateCaregiverDirectMessageV1",
+  "$defs": {
+    "input": {
+      "$ref": "family-care-types.schema.json#/$defs/protectedTextInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "messageRef",
+        "receiptRef",
+        "contentState"
+      ],
+      "properties": {
+        "messageRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "receiptRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "contentState": {
+          "const": "sent"
+        }
+      }
+    }
+  }
+}

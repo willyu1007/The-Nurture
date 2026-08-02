@@ -504,6 +504,7 @@ components:
           type: string
           enum:
             - submit_family_care_question
+            - initiate_caregiver_direct_message
             - acknowledge_family_care_item
             - reply_family_care_item
             - correct_family_care_message
@@ -586,6 +587,7 @@ components:
           type: string
           enum:
             - submit_family_care_question
+            - initiate_caregiver_direct_message
             - acknowledge_family_care_item
             - reply_family_care_item
             - correct_family_care_message
@@ -668,7 +670,7 @@ components:
             - query_family_care_item
         capability_version:
           type: string
-          const: 1.0.0
+          const: 1.1.0
         page_size:
           type: integer
           minimum: 1

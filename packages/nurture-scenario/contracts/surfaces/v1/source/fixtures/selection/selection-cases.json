@@ -22,6 +22,7 @@
         "filteredOut": [
           { "capabilityKey": "query_caregiver_family_care_work", "reasonKind": "role_unsupported" },
           { "capabilityKey": "query_family_care_item", "reasonKind": "missing_target_context" },
+          { "capabilityKey": "initiate_caregiver_direct_message", "reasonKind": "role_unsupported" },
           { "capabilityKey": "acknowledge_family_care_item", "reasonKind": "role_unsupported" },
           { "capabilityKey": "reply_family_care_item", "reasonKind": "role_unsupported" },
           { "capabilityKey": "correct_family_care_message", "reasonKind": "missing_target_context" },
@@ -61,6 +62,7 @@
         "filteredOut": [
           { "capabilityKey": "query_guardian_family_care_timeline", "reasonKind": "role_unsupported" },
           { "capabilityKey": "submit_family_care_question", "reasonKind": "role_unsupported" },
+          { "capabilityKey": "initiate_caregiver_direct_message", "reasonKind": "missing_target_context" },
           { "capabilityKey": "correct_family_care_message", "reasonKind": "missing_target_context" },
           { "capabilityKey": "withdraw_family_care_request", "reasonKind": "role_unsupported" },
           { "capabilityKey": "redact_family_care_message", "reasonKind": "missing_target_context" },
@@ -124,6 +126,24 @@
       },
       "expected": {
         "selectedCapabilityKey": "submit_family_care_question",
+        "target": { "enrollmentId": "syn-enrollment-c1-ia" },
+        "confirmationPolicy": "reviewable_commit"
+      }
+    },
+    {
+      "caseKey": "confirm-reviewable-direct-message",
+      "family": "confirmation_needed",
+      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "surfaceKey": "caregiver_teacher_board",
+      "intentKey": "send_direct_care_communication",
+      "context": {
+        "profile": "single-institution-pilot",
+        "dependencyEvidence": "assumed_satisfied",
+        "additionalFamilyCareGrants": [],
+        "additionalCareItems": []
+      },
+      "expected": {
+        "selectedCapabilityKey": "initiate_caregiver_direct_message",
         "target": { "enrollmentId": "syn-enrollment-c1-ia" },
         "confirmationPolicy": "reviewable_commit"
       }

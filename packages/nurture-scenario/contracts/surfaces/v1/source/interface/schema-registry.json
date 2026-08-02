@@ -22,6 +22,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.initiate-caregiver-direct-message-input@1",
+      "artifactPath": "capabilities/contracts/initiate-caregiver-direct-message.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.initiate-caregiver-direct-message-result@1",
+      "artifactPath": "capabilities/contracts/initiate-caregiver-direct-message.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
       "schemaRef": "schema:nurture.owner-target-option@1",
       "artifactPath": "invocation/target-option.schema.json",
       "jsonPointer": ""
@@ -42,7 +52,7 @@
       "jsonPointer": "/$defs/input"
     },
     {
-      "schemaRef": "schema:nurture.query-caregiver-family-care-work-result@1",
+      "schemaRef": "schema:nurture.query-caregiver-family-care-work-result@2",
       "artifactPath": "capabilities/contracts/query-caregiver-family-care-work.schema.json",
       "jsonPointer": "/$defs/result"
     },
@@ -52,7 +62,7 @@
       "jsonPointer": "/$defs/input"
     },
     {
-      "schemaRef": "schema:nurture.query-family-care-item-result@1",
+      "schemaRef": "schema:nurture.query-family-care-item-result@2",
       "artifactPath": "capabilities/contracts/query-family-care-item.schema.json",
       "jsonPointer": "/$defs/result"
     },
@@ -62,7 +72,7 @@
       "jsonPointer": "/$defs/input"
     },
     {
-      "schemaRef": "schema:nurture.query-guardian-family-care-timeline-result@1",
+      "schemaRef": "schema:nurture.query-guardian-family-care-timeline-result@2",
       "artifactPath": "capabilities/contracts/query-guardian-family-care-timeline.schema.json",
       "jsonPointer": "/$defs/result"
     },

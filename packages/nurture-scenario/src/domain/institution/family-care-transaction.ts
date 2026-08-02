@@ -18,6 +18,7 @@ export type FamilyCareCurrentGrant = {
   purposes?: string[];
   target_scope_type: "care_group" | "enrollment" | "institution";
   target_scope_id: string;
+  aggregate_version?: number;
 };
 
 /**
@@ -32,6 +33,15 @@ export const grantAuthorizesFamilyCare = (
   grant.status === "active" &&
   grant.directions.includes(direction) &&
   grant.data_classes.includes("family_care_question") &&
+  (grant.purposes ?? []).includes(FAMILY_CARE_PURPOSE);
+
+/** Direct caregiver communication is a distinct disclosure class. */
+export const grantAuthorizesDirectCareCommunication = (
+  grant: FamilyCareCurrentGrant,
+): boolean =>
+  grant.status === "active" &&
+  grant.directions.includes("org_to_family") &&
+  grant.data_classes.includes("direct_care_communication") &&
   (grant.purposes ?? []).includes(FAMILY_CARE_PURPOSE);
 
 export type FamilyCareGrantRevokePayload = {
@@ -224,6 +234,45 @@ export type G2SubmitApplied = {
   attention_ref: DomainContextRef;
 };
 
+// G2-C caregiver-initiated direct communication. It deliberately creates a
+// Message + logical Receipt only: no CareItem or Attention projection exists.
+export type G2DirectMessagePayload = {
+  participant_id: string;
+  enrollment_id: string;
+  grant_id: string;
+};
+
+export type G2DirectMessageFacts = {
+  participant_active: boolean;
+  caregiver_role_assignment_id?: string;
+  caregiver_role_version?: number;
+  enrollment_active: boolean;
+  enrollment_version?: number;
+  care_group_version?: number;
+  child_care_process_id?: string;
+  family_id?: string;
+  care_group_id?: string;
+  thread_id?: string;
+  thread_version?: number;
+  grant: FamilyCareCurrentGrant;
+};
+
+export type G2DirectMessageApplyInput = G2DirectMessagePayload & {
+  caregiver_role_assignment_id: string;
+  child_care_process_id: string;
+  family_id: string;
+  care_group_id: string;
+  thread_id: string;
+  grant_id: string;
+  expected_thread_version: number;
+  body_envelope: unknown;
+};
+
+export type G2DirectMessageApplied = {
+  message_ref: DomainContextRef;
+  receipt_ref: DomainContextRef;
+};
+
 // G2 caregiver item actions (acknowledge / reply). Facts are read from the
 // item's own frozen original scope; the item's original Grant is re-read by
 // id — a replacement Grant never takes over an existing Item.
@@ -403,6 +452,12 @@ export type NurtureFamilyCareCommandTransaction = {
   /** Present when the G2 three-axis Harness writer is wired. */
   loadG2SubmitFacts?(input: FamilyCareTransactionInput<G2SubmitCommandPayload>): Promise<G2SubmitFacts>;
   applyG2Submit?(input: FamilyCareTransactionInput<G2SubmitApplyInput>): Promise<G2SubmitApplied>;
+  loadG2DirectMessageFacts?(
+    input: FamilyCareTransactionInput<G2DirectMessagePayload>,
+  ): Promise<G2DirectMessageFacts>;
+  applyG2DirectMessage?(
+    input: FamilyCareTransactionInput<G2DirectMessageApplyInput>,
+  ): Promise<G2DirectMessageApplied>;
   loadG2ItemActionFacts?(input: FamilyCareTransactionInput<G2ItemActionPayload>): Promise<G2ItemActionFacts>;
   applyG2Acknowledge?(input: FamilyCareTransactionInput<G2AcknowledgeApplyInput>): Promise<G2AcknowledgeApplied>;
   applyG2Reply?(input: FamilyCareTransactionInput<G2ReplyApplyInput>): Promise<G2ReplyApplied>;

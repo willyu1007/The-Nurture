@@ -2,20 +2,24 @@ import type { OnApplicationShutdown } from "@nestjs/common";
 import {
   NurtureCommandRunner,
   NurtureInteractionContextService,
+  createInitiateCaregiverDirectMessageSpec,
   createAcknowledgeFamilyCareItemSpec,
   createCorrectFamilyCareMessageSpec,
   createRedactFamilyCareMessageSpec,
   createReplyFamilyCareItemSpec,
   createSubmitFamilyCareQuestionSpec,
   createWithdrawFamilyCareRequestSpec,
+  grantAuthorizesDirectCareCommunication,
   hashCommandRequestId,
   hashScenarioToken,
   parseHarnessConfirmationPayloadV2,
+  parseInitiateCaregiverDirectMessageInputV1,
   parseCorrectFamilyCareMessageInputV1,
   parsePolicyRedactFamilyCareMessageInputV1,
   parseReplyFamilyCareItemInputV1,
   parseSubmitFamilyCareQuestionInputV1,
   prepareAcknowledgeFamilyCareItem,
+  prepareInitiateCaregiverDirectMessage,
   prepareCorrectFamilyCareMessage,
   preparePolicyRedactFamilyCareMessage,
   prepareRedactFamilyCareMessage,
@@ -29,6 +33,7 @@ import {
   resolveCareItemTargetRef,
   withHarnessConfirmation,
   type HarnessConfirmationPayloadV2,
+  type CaregiverDirectMessagePrepareDecision,
   type ItemActionPrepareDecision,
   type LifecyclePrepareDecision,
   type NurtureCommandSpec,
@@ -36,6 +41,7 @@ import {
 } from "@the-nurture/scenario/harness";
 import {
   PrismaFamilyCareCommandTransaction,
+  PrismaCaregiverDirectMessageEligibilityReadPort,
   PrismaFamilyCareHarnessQueryReadPort,
   PrismaInteractionContextRepository,
   PrismaInstitutionBusinessCommunicationReadPort,
@@ -137,6 +143,8 @@ export function createHarnessEngine(input: {
   const confirmations = new PrismaInteractionContextRepository(input.prisma);
   const contexts = new NurtureInteractionContextService(confirmations);
   const submitEligibility = new PrismaSubmitEligibilityReadPort(input.prisma);
+  const directMessageEligibility =
+    new PrismaCaregiverDirectMessageEligibilityReadPort(input.prisma);
   const factsPort = new PrismaFamilyCareCommandTransaction(input.prisma);
   const queryReads = new PrismaFamilyCareHarnessQueryReadPort(input.prisma);
   const institutionBusinessCommunicationReads =
@@ -146,6 +154,10 @@ export function createHarnessEngine(input: {
     keyMaterial: input.contentKey,
   });
   const submitSpec = createSubmitFamilyCareQuestionSpec({
+    protected_content: protectedContent,
+    integrity_key: input.integrityKey,
+  });
+  const directMessageSpec = createInitiateCaregiverDirectMessageSpec({
     protected_content: protectedContent,
     integrity_key: input.integrityKey,
   });
@@ -169,7 +181,11 @@ export function createHarnessEngine(input: {
   });
 
   const toPrepareResponse = (
-    decision: SubmitPrepareDecision | ItemActionPrepareDecision | LifecyclePrepareDecision,
+    decision:
+      | SubmitPrepareDecision
+      | CaregiverDirectMessagePrepareDecision
+      | ItemActionPrepareDecision
+      | LifecyclePrepareDecision,
   ): HarnessPrepareResponseV1 => {
     // Internal raw target ids (enrollment_id / item_id) never leave the
     // service; execute recovers the exact target from the confirmation.
@@ -199,6 +215,24 @@ export function createHarnessEngine(input: {
         return toPrepareResponse(
           await prepareSubmitFamilyCareQuestion(
             { eligibility: submitEligibility, contexts, integrity_key: input.integrityKey },
+            {
+              ...shared,
+              operation_input: request.operation_input,
+              ...(request.target_option_ref
+                ? { target_option_ref: request.target_option_ref }
+                : {}),
+            },
+          ),
+        );
+      }
+      if (request.capability_key === "initiate_caregiver_direct_message") {
+        return toPrepareResponse(
+          await prepareInitiateCaregiverDirectMessage(
+            {
+              eligibility: directMessageEligibility,
+              contexts,
+              integrity_key: input.integrityKey,
+            },
             {
               ...shared,
               operation_input: request.operation_input,
@@ -368,6 +402,29 @@ export function createHarnessEngine(input: {
       const itemRef = execution.output_refs.find(
         (ref) => ref.namespace === "nurture" && ref.object_type === "family_care_item",
       );
+      if (!itemRef && execution.command_key === "initiate_caregiver_direct_message") {
+        const messageRef = execution.output_refs.find(
+          (ref) => ref.namespace === "nurture" && ref.object_type === "family_care_message",
+        );
+        if (!messageRef || execution.committed_result_payload === undefined) {
+          return { status: "denied", reason_code: "invalid_query_input" };
+        }
+        const facts = await factsPort.loadG2MessageChangeFacts({
+          workspace_id: request.workspace_id,
+          participant_id: request.actor_participant_id,
+          message_id: messageRef.object_id,
+        });
+        if (
+          !facts.participant_active ||
+          !facts.exact_author ||
+          !facts.same_side_reachable ||
+          facts.message_kind !== "caregiver_direct_message" ||
+          !grantAuthorizesDirectCareCommunication(facts.grant)
+        ) {
+          return { status: "denied", reason_code: "not_authorized" };
+        }
+        return { status: "ok", output: execution.committed_result_payload };
+      }
       if (!itemRef) return { status: "denied", reason_code: "invalid_query_input" };
       return queryFamilyCareItemDetail(
         {
@@ -422,6 +479,29 @@ export function createHarnessEngine(input: {
           ...(continuation ? { context_continuation_of_item_id: continuation } : {}),
         },
         spec: submitSpec as NurtureCommandSpec<never>,
+      };
+    }
+    if (request.capability_key === "initiate_caregiver_direct_message") {
+      const parsed = parseInitiateCaregiverDirectMessageInputV1(request.operation_input);
+      const enrollmentId = payload.target_refs.enrollment;
+      const grantId = payload.target_refs.grant;
+      if (parsed.status !== "ok" || !enrollmentId || !grantId) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      return {
+        status: "ok",
+        payload: {
+          body: parsed.input.body,
+          enrollment_id: enrollmentId,
+          grant_id: grantId,
+          expected_enrollment_version: payload.expected_heads.enrollment ?? 0,
+          expected_care_group_version: payload.expected_heads.care_group ?? 0,
+          expected_role_version: payload.expected_heads.role ?? 0,
+          expected_grant_version: payload.expected_heads.grant ?? 0,
+          expected_thread_version: payload.expected_heads.thread ?? 0,
+          expected_safety_policy_head: payload.expected_heads.safety_policy ?? 0,
+        },
+        spec: directMessageSpec as NurtureCommandSpec<never>,
       };
     }
     if (request.capability_key === "correct_family_care_message") {

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-caregiver-family-care-work.schema.json",
-  "title": "QueryCaregiverFamilyCareWorkV1",
+  "title": "QueryCaregiverFamilyCareWorkV2",
   "$defs": {
     "input": {
       "$ref": "family-care-types.schema.json#/$defs/emptyInput"
@@ -11,7 +11,8 @@
       "additionalProperties": false,
       "required": [
         "careGroupRef",
-        "items"
+        "items",
+        "pageInfo"
       ],
       "properties": {
         "careGroupRef": {
@@ -22,6 +23,9 @@
           "items": {
             "$ref": "#/$defs/item"
           }
+        },
+        "pageInfo": {
+          "$ref": "family-care-types.schema.json#/$defs/snapshotPageInfo"
         }
       }
     },
@@ -63,7 +67,8 @@
         "responseState": {
           "enum": [
             "awaiting_reply",
-            "responded"
+            "responded",
+            "not_applicable"
           ]
         },
         "lifecycle": {

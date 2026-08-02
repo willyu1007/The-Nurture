@@ -54,7 +54,8 @@
         "responseState": {
           "enum": [
             "awaiting_reply",
-            "responded"
+            "responded",
+            "not_applicable"
           ]
         },
         "lifecycle": {
@@ -99,6 +100,42 @@
         "occurredAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "roleSafeProgress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledgementState",
+        "responseState",
+        "lifecycle",
+        "replyCount"
+      ],
+      "properties": {
+        "acknowledgementState": {
+          "enum": [
+            "pending",
+            "acknowledged"
+          ]
+        },
+        "responseState": {
+          "enum": [
+            "awaiting_reply",
+            "responded",
+            "not_applicable"
+          ]
+        },
+        "lifecycle": {
+          "enum": [
+            "active",
+            "closed",
+            "suppressed"
+          ]
+        },
+        "replyCount": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -226,6 +263,21 @@
             "available",
             "already_satisfied"
           ]
+        }
+      }
+    },
+    "snapshotPageInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hasMore"
+      ],
+      "properties": {
+        "nextCursor": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "hasMore": {
+          "type": "boolean"
         }
       }
     },

@@ -42,6 +42,7 @@ const expectedHarnessExecuteRequiredFields = [
 ];
 const expectedHarnessActionKeys = [
   "submit_family_care_question",
+  "initiate_caregiver_direct_message",
   "acknowledge_family_care_item",
   "reply_family_care_item",
   "correct_family_care_message",
@@ -298,7 +299,7 @@ assertArrayEqual(
 );
 
 process.stdout.write(
-  "[ok] formal ingress contract routes=7 owner-fields=8 harness-actions=7 harness-execute-fields=8 institution-owner-read-fields=5\n",
+  "[ok] formal ingress contract routes=7 owner-fields=8 harness-actions=8 harness-execute-fields=8 institution-owner-read-fields=5\n",
 );
 
 function assertTruthy(value, label) {

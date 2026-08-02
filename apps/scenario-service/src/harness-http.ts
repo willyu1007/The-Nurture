@@ -19,6 +19,7 @@ export const INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH =
 
 export const HARNESS_CAPABILITY_KEYS = [
   "submit_family_care_question",
+  "initiate_caregiver_direct_message",
   "acknowledge_family_care_item",
   "reply_family_care_item",
   "correct_family_care_message",
@@ -119,14 +120,15 @@ const parseSharedShell = (
   ) {
     throw new HarnessRequestParseError("invalid_harness_request");
   }
-  if (
-    typeof record.capability_key !== "string" ||
-    record.capability_version !== "1.0.0"
-  ) {
+  if (typeof record.capability_key !== "string") {
     throw new HarnessRequestParseError("invalid_harness_request");
   }
   if (!capabilityKeys.has(record.capability_key)) {
     throw new HarnessRequestParseError("unknown_capability");
+  }
+  const expectedVersion = capabilityKeys === QUERY_CAPABILITY_KEY_SET ? "1.1.0" : "1.0.0";
+  if (record.capability_version !== expectedVersion) {
+    throw new HarnessRequestParseError("invalid_harness_request");
   }
   if (
     record.host_conversation_ref !== undefined &&
@@ -170,7 +172,7 @@ export type HarnessQueryRequestV1 = {
   actor_participant_id: string;
   surface: "chat" | "board";
   capability_key: HarnessQueryCapabilityKey;
-  capability_version: "1.0.0";
+  capability_version: "1.1.0";
   page_size?: number;
   cursor?: string;
   target_option_ref?: string;

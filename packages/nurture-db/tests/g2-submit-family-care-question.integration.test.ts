@@ -313,6 +313,8 @@ describe("G2-A submit_family_care_question vertical", () => {
       throw new Error(`expected needs_input: ${JSON.stringify(ambiguous)}`);
     }
     expect(ambiguous.choices).toHaveLength(2);
+    expect(JSON.stringify(ambiguous.choices)).not.toContain(scope.enrollment.id);
+    expect(JSON.stringify(ambiguous.choices)).not.toContain(otherEnrollment.id);
     const second = ambiguous.choices!.find((choice) =>
       choice.display_label.includes("Second Center"),
     )!;
@@ -323,9 +325,9 @@ describe("G2-A submit_family_care_question vertical", () => {
     expect(ready.enrollment_id).toBe(otherEnrollment.id);
 
     const forged = await prepare(scope, "请问下周活动安排", {
-      target_option_ref: `1.${otherEnrollment.id}.${"0".repeat(32)}`,
+      target_option_ref: `1.${"0".repeat(32)}`,
     });
-    expect(forged.status).toBe("needs_input");
+    expect(forged).toEqual({ status: "denied", reason_code: "not_authorized" });
   });
 
   it("fails safety-gated input before any business fact", async () => {

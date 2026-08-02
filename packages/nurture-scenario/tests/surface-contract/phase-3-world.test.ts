@@ -33,16 +33,17 @@ const manifest = record(
 const frozenSharedCoreHash =
   "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2";
 const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
-  ["acknowledge_family_care_item", "sha256:b9c4ca09071121b04404ba88db3939cffa213a88848f79cd65dad936f6138037"],
-  ["correct_family_care_message", "sha256:0680749bafda1f619d38b352e73f6e7338f92282bdc0d286da97468f2abea759"],
+  ["acknowledge_family_care_item", "sha256:6237365e4a1538de56f71abec0b1bf387180d29740c455a4246b5721a2a35cf7"],
+  ["correct_family_care_message", "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3"],
+  ["initiate_caregiver_direct_message", "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"],
   ["policy_redact_family_care_message", "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"],
-  ["query_caregiver_family_care_work", "sha256:a1cf57465ed3cf92f20b4ccb6f4fdd84ecf1184af3f3191b6916a8ab8c5baed1"],
-  ["query_family_care_item", "sha256:5342ff415c90502ec7bbb8180e2e98e16c6d51b68d8a1c6aefd84d579b479383"],
-  ["query_guardian_family_care_timeline", "sha256:a7134a4edbd03564fbe2e100964b4e1a4cbbb204de3a6f83bf74aa647c490a95"],
-  ["redact_family_care_message", "sha256:4ee6651d7fea6484c26b91f4267225b8e7e08f903209ac9a9bd842132edd3e59"],
-  ["reply_family_care_item", "sha256:1ecf2e934a61b4ffeefa84fafe26175e163ade011e38271437960073f851eb69"],
-  ["submit_family_care_question", "sha256:f27fda9fcab235488e2a54528f6ef07128fb5195d0a0ff7683bbc424d41b2746"],
-  ["withdraw_family_care_request", "sha256:c833a0e07149472232d7a314f731953ad83ce6d6aa05ef1ee846635e4ac38134"],
+  ["query_caregiver_family_care_work", "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"],
+  ["query_family_care_item", "sha256:1bfdbb7f79b68a929799fd8959d20e5c95b6bef7d517780a35f7d076286ef323"],
+  ["query_guardian_family_care_timeline", "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"],
+  ["redact_family_care_message", "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5"],
+  ["reply_family_care_item", "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6"],
+  ["submit_family_care_question", "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"],
+  ["withdraw_family_care_request", "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b"],
 ];
 const frozenSurfaceSliceHashes: readonly (readonly [string, string])[] = [
   ["caregiver_nurture_chat", "sha256:34abcdaa268463807750ea5a8b4b6b6c73547aa644153db43a19271569247f4d"],
@@ -241,12 +242,12 @@ describe("Phase 3 synthetic world", () => {
     }
   });
 
-  it("rotates the root identity while preserving every existing slice", () => {
+  it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.7.0");
+    expect(contract.version).toBe("1.8.0");
     expect(contract.digest).not.toBe(
-      "sha256:ee3f83626f6b948ae3e8791890c0c6fafcb2a2c7c4523500cee7c71cf3837f59",
+      "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );
     expect(manifest.sharedCoreHash).toBe(frozenSharedCoreHash);
     const capabilityHashes = records(manifest.capabilities).map((entry) => [

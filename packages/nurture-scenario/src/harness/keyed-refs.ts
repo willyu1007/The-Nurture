@@ -2,8 +2,8 @@ import { createHmac } from "node:crypto";
 
 /**
  * Keyed, actor-bound handles shared by every G2 capability. They are the only
- * way a target travels to and from a caller: the embedded id is unusable
- * without the signature, and execute still re-reads current authority.
+ * way a target travels to and from a caller. Target-option refs are
+ * non-reversible HMAC handles; execute still re-reads current authority.
  * Keeping them in one module also keeps the capability modules acyclic.
  */
 const OPTION_REF_VERSION = "1";
@@ -63,21 +63,23 @@ export const issueTargetOptionRef = (
     )
     .digest("hex")
     .slice(0, 32);
-  return `${OPTION_REF_VERSION}.${scope.enrollment_id}.${tag}`;
+  return `${OPTION_REF_VERSION}.${tag}`;
 };
 
 export const resolveTargetOptionRef = (
   integrityKey: string,
   scope: { workspace_id: string; participant_id: string },
   ref: string,
+  eligibleEnrollmentIds: Iterable<string>,
 ): string | null => {
   const parts = ref.split(".");
-  if (parts.length !== 3 || parts[0] !== OPTION_REF_VERSION) return null;
-  const [, enrollmentId] = parts;
-  if (!enrollmentId) return null;
-  return issueTargetOptionRef(integrityKey, { ...scope, enrollment_id: enrollmentId }) === ref
-    ? enrollmentId
-    : null;
+  if (parts.length !== 2 || parts[0] !== OPTION_REF_VERSION) return null;
+  for (const enrollmentId of eligibleEnrollmentIds) {
+    if (issueTargetOptionRef(integrityKey, { ...scope, enrollment_id: enrollmentId }) === ref) {
+      return enrollmentId;
+    }
+  }
+  return null;
 };
 
 export const issueCareItemTargetRef = (

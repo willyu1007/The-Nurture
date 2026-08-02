@@ -4,6 +4,7 @@ import type {
   NurtureCommandSpec,
 } from "../domain/commands/command-kernel.js";
 import {
+  grantAuthorizesDirectCareCommunication,
   grantAuthorizesFamilyCare,
   type FamilyCareTransactionInput,
   type G2MessageChangeFacts,
@@ -151,6 +152,12 @@ export const canonicalizeCorrectFamilyCareMessageCommand = (
     : {}),
 });
 
+const messageGrantAuthorizesCorrection = (facts: G2MessageChangeFacts): boolean =>
+  facts.message_kind === "caregiver_direct_message"
+    ? grantAuthorizesDirectCareCommunication(facts.grant)
+    : Boolean(facts.message_direction) &&
+      grantAuthorizesFamilyCare(facts.grant, facts.message_direction!);
+
 const correctionAuthorized = (facts: G2MessageChangeFacts): boolean =>
   facts.participant_active &&
   facts.message_present &&
@@ -159,8 +166,7 @@ const correctionAuthorized = (facts: G2MessageChangeFacts): boolean =>
   facts.exact_author &&
   facts.same_side_reachable &&
   Boolean(facts.current_author_role_assignment_id) &&
-  Boolean(facts.message_direction) &&
-  grantAuthorizesFamilyCare(facts.grant, facts.message_direction!) &&
+  messageGrantAuthorizesCorrection(facts) &&
   (facts.source_item_id === undefined || facts.source_item_lifecycle_state === "active") &&
   (facts.message_kind !== "family_message" ||
     facts.source_item_response_state === "awaiting_reply");

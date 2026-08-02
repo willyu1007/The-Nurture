@@ -13,17 +13,17 @@ import {
  */
 export const QUERY_GUARDIAN_FAMILY_CARE_TIMELINE_CAPABILITY = {
   key: "query_guardian_family_care_timeline",
-  version: "1.0.0",
+  version: "1.1.0",
 } as const;
 
 export const QUERY_CAREGIVER_FAMILY_CARE_WORK_CAPABILITY = {
   key: "query_caregiver_family_care_work",
-  version: "1.0.0",
+  version: "1.1.0",
 } as const;
 
 export const QUERY_FAMILY_CARE_ITEM_CAPABILITY = {
   key: "query_family_care_item",
-  version: "1.0.0",
+  version: "1.1.0",
 } as const;
 
 const CURSOR_TTL_MS = 10 * 60_000;
@@ -112,18 +112,19 @@ export const resolveQueryCursor = (
 
 export type RawTimelineMessageRow = {
   message_id: string;
-  item_id: string;
+  item_id?: string;
   enrollment_id: string;
-  message_kind: "family_message" | "caregiver_reply";
+  message_kind: "family_message" | "caregiver_reply" | "caregiver_direct_message";
   redacted: boolean;
   corrected: boolean;
+  content_readable?: boolean;
   occurred_at: string;
   body_envelope?: unknown;
   correction_body_envelope?: unknown;
   source_label: string;
-  acknowledgement_state: "pending" | "acknowledged";
-  response_state: "awaiting_reply" | "responded" | "not_applicable";
-  lifecycle_state: "active" | "closed" | "suppressed";
+  acknowledgement_state?: "pending" | "acknowledged";
+  response_state?: "awaiting_reply" | "responded" | "not_applicable";
+  lifecycle_state?: "active" | "closed" | "suppressed";
   lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
   receipt?: { receipt_id: string; direction: "family_to_org" | "org_to_family"; logical_status: string; occurred_at: string };
   continuation_source_item_id?: string;
@@ -224,20 +225,22 @@ export type RoleSafeFamilyCareStateV1 = {
   lifecycle: "active" | "closed" | "suppressed";
 };
 
-export type GuardianFamilyCareTimelineItemV1 = {
+export type GuardianFamilyCareTimelineItemV2 = {
   kind:
     | "source_question"
     | "caregiver_reply"
+    | "caregiver_direct_message"
     | "correction_notice"
     | "withdrawal_notice"
     | "redaction_tombstone";
   itemRef: string;
-  careItemRef: string;
+  messageRef: string;
+  careItemRef?: string;
   enrollmentRef: string;
   sourceLabel: string;
   occurredAt: string;
   content?: { body: string };
-  state: RoleSafeFamilyCareStateV1;
+  state?: RoleSafeFamilyCareStateV1;
   receipt?: {
     receiptRef: string;
     direction: "family_to_org" | "org_to_family";
@@ -247,8 +250,8 @@ export type GuardianFamilyCareTimelineItemV1 = {
   contextContinuation?: { sourceItemRef: string; label: string };
 };
 
-export type GuardianFamilyCareTimelineOutputV1 = {
-  items: GuardianFamilyCareTimelineItemV1[];
+export type GuardianFamilyCareTimelineOutputV2 = {
+  items: GuardianFamilyCareTimelineItemV2[];
   pageInfo: SnapshotPageInfoV1;
 };
 
@@ -351,12 +354,18 @@ const timelineKind = (
     RawTimelineMessageRow,
     "message_kind" | "redacted" | "corrected" | "lifecycle_reason"
   >,
-): GuardianFamilyCareTimelineItemV1["kind"] =>
+): GuardianFamilyCareTimelineItemV2["kind"] =>
   row.redacted
     ? "redaction_tombstone"
-    : row.message_kind === "family_message" && row.lifecycle_reason === "family_withdrawn"
-      ? "withdrawal_notice"
-      : messageProjectionKind(row);
+    : row.corrected
+      ? "correction_notice"
+      : row.message_kind === "family_message" && row.lifecycle_reason === "family_withdrawn"
+        ? "withdrawal_notice"
+        : row.message_kind === "caregiver_direct_message"
+          ? "caregiver_direct_message"
+          : row.message_kind === "family_message"
+            ? "source_question"
+            : "caregiver_reply";
 
 export const queryGuardianFamilyCareTimeline = async (
   deps: FamilyCareQueryDependencies,
@@ -366,7 +375,7 @@ export const queryGuardianFamilyCareTimeline = async (
     page_size?: unknown;
     cursor?: string;
   },
-): Promise<FamilyCareQueryDecision<GuardianFamilyCareTimelineOutputV1>> => {
+): Promise<FamilyCareQueryDecision<GuardianFamilyCareTimelineOutputV2>> => {
   const page = parsePage(request.page_size);
   if (!page) return { status: "denied", reason_code: "invalid_query_input" };
   const now = (deps.now ?? (() => new Date()))();
@@ -401,15 +410,24 @@ export const queryGuardianFamilyCareTimeline = async (
       items: rows.map((row) => ({
         kind: timelineKind(row),
         itemRef: issueDisplayRef(deps.integrity_key, request, "timeline_entry", row.message_id),
-        careItemRef: issueCareItemTargetRef(deps.integrity_key, {
+        messageRef: issueFamilyCareMessageTargetRef(deps.integrity_key, {
           workspace_id: request.workspace_id,
           participant_id: request.participant_id,
-          item_id: row.item_id,
+          message_id: row.message_id,
         }),
+        ...(row.item_id
+          ? {
+              careItemRef: issueCareItemTargetRef(deps.integrity_key, {
+                workspace_id: request.workspace_id,
+                participant_id: request.participant_id,
+                item_id: row.item_id,
+              }),
+            }
+          : {}),
         enrollmentRef: issueDisplayRef(deps.integrity_key, request, "enrollment", row.enrollment_id),
         sourceLabel: row.source_label,
         occurredAt: row.occurred_at,
-        ...(row.redacted
+        ...(row.redacted || row.content_readable === false
           ? {}
           : (() => {
               const content = unsealOrTombstone(
@@ -418,11 +436,15 @@ export const queryGuardianFamilyCareTimeline = async (
               );
               return content ? { content } : {};
             })()),
-        state: {
-          acknowledgementState: row.acknowledgement_state,
-          responseState: row.response_state,
-          lifecycle: row.lifecycle_state,
-        },
+        ...(row.acknowledgement_state && row.response_state && row.lifecycle_state
+          ? {
+              state: {
+                acknowledgementState: row.acknowledgement_state,
+                responseState: row.response_state,
+                lifecycle: row.lifecycle_state,
+              },
+            }
+          : {}),
         ...(row.receipt
           ? {
               receipt: {

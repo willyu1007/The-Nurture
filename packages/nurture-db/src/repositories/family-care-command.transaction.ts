@@ -21,6 +21,10 @@ import type {
   G2AcknowledgeApplyInput,
   G2CorrectMessageApplied,
   G2CorrectMessageApplyInput,
+  G2DirectMessageApplied,
+  G2DirectMessageApplyInput,
+  G2DirectMessageFacts,
+  G2DirectMessagePayload,
   G2ItemActionFacts,
   G2ItemActionPayload,
   G2MessageChangeFacts,
@@ -147,6 +151,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
           purposes: fallback.purposes,
           target_scope_type: fallback.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
           target_scope_id: fallback.grantedToScopeId,
+          aggregate_version: fallback.aggregateVersion,
         }
       : {
           grant_id: "missing",
@@ -813,6 +818,224 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
     };
   }
 
+  async loadG2DirectMessageFacts(
+    input: FamilyCareTransactionInput<G2DirectMessagePayload>,
+  ): Promise<G2DirectMessageFacts> {
+    const missingGrant: FamilyCareCurrentGrant = {
+      grant_id: "missing",
+      status: "missing",
+      directions: [],
+      data_classes: [],
+      purposes: [],
+      target_scope_type: "care_group",
+      target_scope_id: "missing",
+    };
+    const now = new Date();
+    const [participant, enrollment] = await Promise.all([
+      this.transaction.nurtureParticipant.findFirst({
+        where: {
+          id: input.participant_id,
+          workspaceId: input.workspace_id,
+          status: "active",
+          deletedAt: null,
+        },
+      }),
+      this.transaction.nurtureEnrollment.findFirst({
+        where: {
+          id: input.enrollment_id,
+          workspaceId: input.workspace_id,
+          status: "active",
+          deletedAt: null,
+          OR: [{ leftAt: null }, { leftAt: { gt: now } }],
+          institution: { status: "active", deletedAt: null },
+          careGroup: { status: "active", deletedAt: null },
+        },
+        include: { careGroup: true },
+      }),
+    ]);
+    if (!enrollment) {
+      return {
+        participant_active: Boolean(participant),
+        enrollment_active: false,
+        grant: missingGrant,
+      };
+    }
+    const [families, roles, grantRow] = await Promise.all([
+      this.transaction.nurtureFamily.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          childCareProcessId: enrollment.childCareProcessId,
+          status: "active",
+          deletedAt: null,
+        },
+        orderBy: { id: "asc" },
+        take: 2,
+      }),
+      this.transaction.nurtureCareRoleAssignment.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          participantId: input.participant_id,
+          role: { in: ["caregiver", "lead_caregiver"] },
+          scopeType: "care_group",
+          scopeId: enrollment.careGroupId,
+          status: "active",
+          deletedAt: null,
+          OR: [{ startsAt: null }, { startsAt: { lte: now } }],
+          AND: [{ OR: [{ endsAt: null }, { endsAt: { gt: now } }] }],
+        },
+        orderBy: { id: "asc" },
+        take: 2,
+      }),
+      this.transaction.nurtureChildLinkGrant.findFirst({
+        where: {
+          id: input.grant_id,
+          workspaceId: input.workspace_id,
+          childCareProcessId: enrollment.childCareProcessId,
+          enrollmentId: enrollment.id,
+        },
+      }),
+    ]);
+    const role = roles.length === 1 ? roles[0] : undefined;
+    const family = families.length === 1 ? families[0] : undefined;
+    const threads = family
+      ? await this.transaction.nurtureFamilyCareThread.findMany({
+          where: {
+            workspaceId: input.workspace_id,
+            childCareProcessId: enrollment.childCareProcessId,
+            familyId: family.id,
+            enrollmentId: enrollment.id,
+            careGroupId: enrollment.careGroupId,
+            visibilityScope: { in: ["family_private", "enrollment_private"] },
+            status: "active",
+            deletedAt: null,
+          },
+          orderBy: { id: "asc" },
+          take: 2,
+        })
+      : [];
+    const exactThread = threads.length === 1 ? threads[0] : undefined;
+    const grantTargetMatches = Boolean(
+      grantRow &&
+        ((grantRow.grantedToScopeType === "care_group" &&
+          grantRow.grantedToScopeId === enrollment.careGroupId) ||
+          (grantRow.grantedToScopeType === "enrollment" &&
+            grantRow.grantedToScopeId === enrollment.id) ||
+          (grantRow.grantedToScopeType === "institution" &&
+            grantRow.grantedToScopeId === enrollment.institutionId)),
+    );
+    const grantActive = Boolean(
+      grantRow &&
+        grantRow.status === "active" &&
+        !grantRow.revokedAt &&
+        grantRow.deletedAt === null &&
+        (!grantRow.effectiveFrom || grantRow.effectiveFrom <= now) &&
+        (!grantRow.expiresAt || grantRow.expiresAt > now) &&
+        grantRow.directions.includes("org_to_family") &&
+        grantRow.dataClasses.includes("direct_care_communication") &&
+        grantRow.purposes.includes(FAMILY_CARE_PURPOSE) &&
+        grantTargetMatches,
+    );
+    const grant: FamilyCareCurrentGrant = grantRow
+      ? {
+          grant_id: grantRow.id,
+          status: grantActive
+            ? "active"
+            : grantRow.status === "revoked" || grantRow.revokedAt
+              ? "revoked"
+              : "missing",
+          directions: grantRow.directions,
+          data_classes: grantRow.dataClasses,
+          purposes: grantRow.purposes,
+          target_scope_type:
+            grantRow.grantedToScopeType as FamilyCareCurrentGrant["target_scope_type"],
+          target_scope_id: grantRow.grantedToScopeId,
+          aggregate_version: grantRow.aggregateVersion,
+        }
+      : missingGrant;
+    return {
+      participant_active: Boolean(participant),
+      ...(role
+        ? {
+            caregiver_role_assignment_id: role.id,
+            caregiver_role_version: role.aggregateVersion,
+          }
+        : {}),
+      enrollment_active: true,
+      enrollment_version: enrollment.aggregateVersion,
+      care_group_version: enrollment.careGroup.aggregateVersion,
+      child_care_process_id: enrollment.childCareProcessId,
+      ...(family ? { family_id: family.id } : {}),
+      care_group_id: enrollment.careGroupId,
+      ...(exactThread
+        ? { thread_id: exactThread.id, thread_version: exactThread.aggregateVersion }
+        : {}),
+      grant,
+    };
+  }
+
+  async applyG2DirectMessage(
+    input: FamilyCareTransactionInput<G2DirectMessageApplyInput>,
+  ): Promise<G2DirectMessageApplied> {
+    const messageId = randomUUID();
+    const updatedThread = await this.transaction.nurtureFamilyCareThread.updateMany({
+      where: {
+        id: input.thread_id,
+        workspaceId: input.workspace_id,
+        childCareProcessId: input.child_care_process_id,
+        familyId: input.family_id,
+        enrollmentId: input.enrollment_id,
+        careGroupId: input.care_group_id,
+        status: "active",
+        aggregateVersion: input.expected_thread_version,
+      },
+      data: { latestMessageAt: new Date(), aggregateVersion: { increment: 1 } },
+    });
+    if (updatedThread.count !== 1) throw new Error("G2 direct message thread conflict");
+    const message = await this.transaction.nurtureFamilyCareMessage.create({
+      data: {
+        id: messageId,
+        workspaceId: input.workspace_id,
+        threadId: input.thread_id,
+        childCareProcessId: input.child_care_process_id,
+        senderParticipantId: input.participant_id,
+        senderRoleAssignmentId: input.caregiver_role_assignment_id,
+        messageKind: "caregiver_direct_message",
+        authorshipKind: "caregiver_confirmed",
+        bodyFormat: "plain_text",
+        bodyStorageMode: "encrypted",
+        bodyProtectionPayload: asJson(input.body_envelope),
+        sourceSurface: "workflow",
+        grantId: input.grant_id,
+        status: "sent",
+        writerContract: "harness_g2_v1",
+        enrollmentId: input.enrollment_id,
+        careGroupId: input.care_group_id,
+        direction: "org_to_family",
+      },
+    });
+    const receipt = await this.transaction.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: input.workspace_id,
+        grantId: input.grant_id,
+        childCareProcessId: input.child_care_process_id,
+        enrollmentId: input.enrollment_id,
+        direction: "org_to_family",
+        dataClass: "direct_care_communication",
+        sourceType: "family_care_message",
+        sourceId: message.id,
+        routingAttemptKey: `g2-direct:${message.id}`,
+        targetScopeType: "family",
+        targetScopeId: input.family_id,
+        status: "delivered",
+        deliveredAt: new Date(),
+      },
+    });
+    return {
+      message_ref: domainRef("family_care_message", message.id, message.aggregateVersion),
+      receipt_ref: domainRef("child_link_receipt", receipt.id, receipt.version),
+    };
+  }
+
   async loadG2ItemActionFacts(input: FamilyCareTransactionInput<G2ItemActionPayload>): Promise<G2ItemActionFacts> {
     const missingGrant: FamilyCareCurrentGrant = {
       grant_id: "missing",
@@ -1274,6 +1497,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
   ): Promise<G2CorrectMessageApplied> {
     const message = await this.transaction.nurtureFamilyCareMessage.findFirstOrThrow({
       where: { id: input.message_id, workspaceId: input.workspace_id },
+      include: { thread: true },
     });
     const item = await this.transaction.nurtureFamilyCareItem.findFirst({
       where:
@@ -1338,7 +1562,7 @@ export class PrismaFamilyCareCommandTransaction implements NurtureFamilyCareComm
         routingAttemptKey: `g2-correction:${correctionId}`,
         targetScopeType: message.direction === "org_to_family" ? "family" : "care_group",
         targetScopeId:
-          message.direction === "org_to_family" ? item?.familyId : message.careGroupId,
+          message.direction === "org_to_family" ? message.thread.familyId : message.careGroupId,
         status: "delivered",
         deliveredAt: new Date(),
       },

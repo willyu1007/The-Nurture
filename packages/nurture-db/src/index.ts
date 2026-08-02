@@ -13,6 +13,7 @@ export * from "./repositories/scenario-binding-owner.repository.js";
 export * from "./binding-evidence-hasher.js";
 export * from "./protected-content.js";
 export * from "./repositories/submit-eligibility.read.js";
+export * from "./repositories/caregiver-direct-message-eligibility.read.js";
 export * from "./repositories/family-care-harness-query.read.js";
 export * from "./repositories/institution-business-communication.read.js";
 

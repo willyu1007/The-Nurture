@@ -188,7 +188,7 @@ const seedScope = async () => {
       grantedToScopeType: "care_group",
       grantedToScopeId: group.id,
       directions: ["family_to_org", "org_to_family"],
-      dataClasses: ["family_care_question"],
+      dataClasses: ["family_care_question", "direct_care_communication"],
       purposes: ["family_care_workflow"],
       policySnapshotPayload: {
         institution_admin_business_communication: {
@@ -523,7 +523,7 @@ describe("G2-A loop through the formal Harness ingress", () => {
       actor_participant_id: scope.guardian.id,
       surface: "chat",
       capability_key: "query_guardian_family_care_timeline",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
     });
     expect(timeline.status).toBe(200);
     expect(timeline.json.status).toBe("ok");
@@ -540,6 +540,7 @@ describe("G2-A loop through the formal Harness ingress", () => {
       expect(entry.itemRef).toMatch(/^[0-9a-f]{32}$/);
       expect(entry.enrollmentRef).toMatch(/^[0-9a-f]{32}$/);
       expect(entry.receipt.receiptRef).toMatch(/^[0-9a-f]{32}$/);
+      expect(entry.messageRef).toMatch(/^1\..+\.[0-9a-f]{32}$/);
       expect(entry.careItemRef).toMatch(/^1\..+\.[0-9a-f]{32}$/);
     }
 
@@ -548,7 +549,7 @@ describe("G2-A loop through the formal Harness ingress", () => {
       actor_participant_id: scope.caregiver.id,
       surface: "board",
       capability_key: "query_caregiver_family_care_work",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
     });
     expect(work.json.status).toBe("ok");
     expect(work.json.output.items).toHaveLength(1);
@@ -571,7 +572,7 @@ describe("G2-A loop through the formal Harness ingress", () => {
       actor_participant_id: scope.caregiver.id,
       surface: "board",
       capability_key: "query_family_care_item",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
       target_option_ref: workItem.careItemRef,
     });
     expect(detail.json.status).toBe("ok");
@@ -754,7 +755,7 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       actor_participant_id: scope.guardian.id,
       surface: "chat",
       capability_key: "query_family_care_item",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
       target_option_ref: itemTargetRef(scope, scope.guardian.id, item.id),
     });
     expect(detail.json.output.messages[0]).toMatchObject({
@@ -766,7 +767,7 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       actor_participant_id: scope.guardian.id,
       surface: "chat",
       capability_key: "query_guardian_family_care_timeline",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
     });
     expect(timeline.json.output.items[0]).toMatchObject({
       kind: "correction_notice",
@@ -852,7 +853,7 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       actor_participant_id: scope.guardian.id,
       surface: "chat",
       capability_key: "query_guardian_family_care_timeline",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
     });
     expect(timeline.json.output.items[0]).toMatchObject({
       kind: "withdrawal_notice",
@@ -1026,7 +1027,7 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       actor_participant_id: scope.guardian.id,
       surface: "chat",
       capability_key: "query_guardian_family_care_timeline",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
     });
     expect(timeline.json.output.items[0]).toMatchObject({ kind: "redaction_tombstone" });
     expect(timeline.json.output.items[0]).not.toHaveProperty("content");
@@ -1129,7 +1130,7 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       actor_participant_id: scope.caregiverB.id,
       surface: "board",
       capability_key: "query_family_care_item",
-      capability_version: "1.0.0",
+      capability_version: "1.1.0",
       target_option_ref: itemTargetRef(scope, scope.caregiverB.id, item.id),
     });
     const replyMessages = detail.json.output.messages.slice(1);
@@ -1335,6 +1336,460 @@ describe("G2-B lifecycle changes through the formal Harness ingress", () => {
       redactedByParticipantId: scope.system.id,
       redactionReason: "policy_redaction",
     });
+  });
+});
+
+describe("G2-C caregiver direct communication through the formal Harness ingress", () => {
+  it("creates only Message + Receipt, replays exactly, and projects lifecycle changes", async () => {
+    const scope = await seedScope();
+    const initial = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "今天午睡比平时短约半小时，请家里留意晚间状态。" },
+    });
+    expect(initial.json).toMatchObject({ status: "needs_input" });
+    expect(initial.json.choices).toHaveLength(1);
+    const targetOptionRef = initial.json.choices[0].target_option_ref as string;
+    expect(targetOptionRef).toMatch(/^1\.[0-9a-f]{32}$/);
+    const choicePayload = JSON.stringify(initial.json);
+    for (const rawId of [scope.enrollment.id, scope.family.id, scope.group.id, scope.grant.id]) {
+      expect(choicePayload).not.toContain(rawId);
+    }
+
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      targetOptionRef,
+      operationInput: { body: "今天午睡比平时短约半小时，请家里留意晚间状态。" },
+    });
+    expect(prepared.json).toMatchObject({
+      status: "ready_to_confirm",
+      preview: { effect: "send_caregiver_direct_message" },
+    });
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      prepared,
+      operationInput: { body: "今天午睡比平时短约半小时，请家里留意晚间状态。" },
+    });
+    expect(executed.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "executed",
+      business_outcome: "applied",
+      committed_result: {
+        messageRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+        receiptRef: expect.stringMatching(/^[0-9a-f]{32}$/),
+        contentState: "sent",
+      },
+    });
+    expect(Object.keys(executed.json.committed_result).sort()).toEqual([
+      "contentState",
+      "messageRef",
+      "receiptRef",
+    ]);
+    const message = await prisma.nurtureFamilyCareMessage.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        messageKind: "caregiver_direct_message",
+      },
+    });
+    expect(message).toMatchObject({
+      senderParticipantId: scope.caregiver.id,
+      senderRoleAssignmentId: scope.caregiverRole.id,
+      threadId: expect.any(String),
+      childCareProcessId: scope.process.id,
+      enrollmentId: scope.enrollment.id,
+      careGroupId: scope.group.id,
+      grantId: scope.grant.id,
+      direction: "org_to_family",
+      writerContract: "harness_g2_v1",
+      body: null,
+      bodyStorageMode: "encrypted",
+      status: "sent",
+    });
+    expect(JSON.stringify(message)).not.toContain("午睡");
+    const receipt = await prisma.nurtureChildLinkReceipt.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        sourceType: "family_care_message",
+        sourceId: message.id,
+      },
+    });
+    expect(receipt).toMatchObject({
+      grantId: scope.grant.id,
+      enrollmentId: scope.enrollment.id,
+      direction: "org_to_family",
+      dataClass: "direct_care_communication",
+      targetScopeType: "family",
+      targetScopeId: scope.family.id,
+      status: "delivered",
+    });
+    await expect(
+      prisma.nurtureFamilyCareItem.count({ where: { workspaceId: scope.workspaceId } }),
+    ).resolves.toBe(0);
+    await expect(
+      prisma.nurtureTeacherAttentionItem.count({ where: { workspaceId: scope.workspaceId } }),
+    ).resolves.toBe(0);
+
+    const replay = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      prepared,
+      operationInput: { body: "今天午睡比平时短约半小时，请家里留意晚间状态。" },
+      invocationSuffix: ":retry",
+    });
+    expect(replay.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "replayed",
+    });
+    expect(replay.json.committed_result).toEqual(executed.json.committed_result);
+    await expect(
+      prisma.nurtureFamilyCareMessage.count({
+        where: { workspaceId: scope.workspaceId, messageKind: "caregiver_direct_message" },
+      }),
+    ).resolves.toBe(1);
+
+    const readResult = await post(HARNESS_READ_RESULT_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      command_request_id: prepared.json.command_request_id,
+    });
+    expect(readResult.json).toEqual({ status: "ok", output: executed.json.committed_result });
+
+    const timeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.1.0",
+    });
+    expect(timeline.json.output.items).toHaveLength(1);
+    expect(timeline.json.output.items[0]).toMatchObject({
+      kind: "caregiver_direct_message",
+      messageRef: expect.stringMatching(/^1\..+\.[0-9a-f]{32}$/),
+      content: { body: "今天午睡比平时短约半小时，请家里留意晚间状态。" },
+      receipt: { direction: "org_to_family", logicalStatus: "delivered" },
+    });
+    expect(timeline.json.output.items[0]).not.toHaveProperty("careItemRef");
+    expect(timeline.json.output.items[0]).not.toHaveProperty("state");
+
+    const corrected = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "correct_family_care_message",
+      targetOptionRef: messageTargetRef(scope, scope.caregiver.id, message.id),
+      operationInput: { body: "更正：今天午睡比平时短约二十分钟，请家里留意晚间状态。" },
+    });
+    expect(corrected.executed?.json.status).toBe("committed");
+    const correctionReceipt = await prisma.nurtureChildLinkReceipt.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        sourceId: message.id,
+        routingAttemptKey: { startsWith: "g2-correction:" },
+      },
+    });
+    expect(correctionReceipt.targetScopeId).toBe(scope.family.id);
+    const correctedTimeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.1.0",
+    });
+    expect(correctedTimeline.json.output.items[0]).toMatchObject({
+      kind: "correction_notice",
+      content: { body: "更正：今天午睡比平时短约二十分钟，请家里留意晚间状态。" },
+    });
+    expect(correctedTimeline.json.output.items[0]).not.toHaveProperty("careItemRef");
+
+    const redacted = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "redact_family_care_message",
+      targetOptionRef: messageTargetRef(scope, scope.caregiver.id, message.id),
+    });
+    expect(redacted.executed?.json.status).toBe("committed");
+    const redactedTimeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.1.0",
+    });
+    expect(redactedTimeline.json.output.items[0]).toMatchObject({
+      kind: "redaction_tombstone",
+    });
+    expect(redactedTimeline.json.output.items[0]).not.toHaveProperty("content");
+    expect(redactedTimeline.json.output.items[0]).not.toHaveProperty("careItemRef");
+  });
+
+  it("fails closed for unsafe content, raw fields, wrong role, and missing disclosure", async () => {
+    const scope = await seedScope();
+    for (const body of [
+      "孩子突然抽搐、无法呼吸怎么办",
+      "他是不是得了自闭症",
+      "what medicine should I give him",
+    ]) {
+      const response = await post(HARNESS_PREPARE_PATH, {
+        workspace_id: scope.workspaceId,
+        actor_participant_id: scope.caregiver.id,
+        surface: "board",
+        capability_key: "initiate_caregiver_direct_message",
+        capability_version: "1.0.0",
+        operation_input: { body },
+      });
+      expect(response.json).toMatchObject({
+        status: "unavailable",
+        alternate_process: "offline_emergency_or_medical_channel",
+      });
+    }
+    const rawFields = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: {
+        body: "普通事实沟通",
+        target_id: scope.enrollment.id,
+        grant_id: scope.grant.id,
+        source: "generated",
+        attachments: [],
+      },
+    });
+    expect(rawFields.json.status).toBe("needs_input");
+    expect(rawFields.json.fields.sort()).toEqual([
+      "attachments",
+      "grant_id",
+      "source",
+      "target_id",
+    ]);
+    const admin = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.admin.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "普通事实沟通" },
+    });
+    expect(admin.json).toEqual({ status: "denied", reason_code: "not_authorized" });
+
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: scope.caregiverBRole.id },
+      data: { scopeId: randomUUID(), aggregateVersion: { increment: 1 } },
+    });
+    const wrongGroup = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiverB.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "普通事实沟通" },
+    });
+    expect(wrongGroup.json).toEqual({ status: "denied", reason_code: "not_authorized" });
+
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: scope.grant.id },
+      data: {
+        dataClasses: ["family_care_question"],
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    const undisclosed = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "普通事实沟通" },
+    });
+    expect(undisclosed.json).toEqual({ status: "denied", reason_code: "not_authorized" });
+    await expect(
+      prisma.nurtureFamilyCareMessage.count({ where: { workspaceId: scope.workspaceId } }),
+    ).resolves.toBe(0);
+  });
+
+  it("rejects a stale prepared Grant head without partial effects", async () => {
+    const scope = await seedScope();
+    const choices = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "普通事实沟通" },
+    });
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      targetOptionRef: choices.json.choices[0].target_option_ref,
+      operationInput: { body: "普通事实沟通" },
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: scope.grant.id },
+      data: { aggregateVersion: { increment: 1 } },
+    });
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      prepared,
+      operationInput: { body: "普通事实沟通" },
+    });
+    expect(executed.json).toEqual({
+      status: "not_committed",
+      decision: "conflict",
+      reason_code: "stale_confirmation",
+      recovery: "reprepare",
+    });
+    await expect(
+      prisma.nurtureFamilyCareMessage.count({ where: { workspaceId: scope.workspaceId } }),
+    ).resolves.toBe(0);
+    await expect(
+      prisma.nurtureChildLinkReceipt.count({ where: { workspaceId: scope.workspaceId } }),
+    ).resolves.toBe(0);
+  });
+
+  it("does not let a same-version replacement Grant take over a prepared command", async () => {
+    const scope = await seedScope();
+    const choices = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "普通事实沟通" },
+    });
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      targetOptionRef: choices.json.choices[0].target_option_ref,
+      operationInput: { body: "普通事实沟通" },
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: scope.grant.id },
+      data: {
+        status: "revoked",
+        revokedAt: new Date(),
+        revokedByParticipantId: scope.guardian.id,
+        revokeReason: "same_version_replacement",
+      },
+    });
+    const replacement = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        grantedByParticipantId: scope.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: scope.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["direct_care_communication"],
+        purposes: ["family_care_workflow"],
+        policySnapshotPayload: {},
+        status: "active",
+      },
+    });
+    expect(replacement.aggregateVersion).toBe(scope.grant.aggregateVersion);
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      prepared,
+      operationInput: { body: "普通事实沟通" },
+    });
+    expect(executed.json).toMatchObject({
+      status: "not_committed",
+      decision: "blocked",
+      reason_code: "not_authorized",
+    });
+    await expect(
+      prisma.nurtureFamilyCareMessage.count({ where: { workspaceId: scope.workspaceId } }),
+    ).resolves.toBe(0);
+  });
+
+  it("removes protected read access after the original Grant is revoked", async () => {
+    const scope = await seedScope();
+    const choices = await post(HARNESS_PREPARE_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "initiate_caregiver_direct_message",
+      capability_version: "1.0.0",
+      operation_input: { body: "离园前体温记录为正常范围。" },
+    });
+    const sent = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      targetOptionRef: choices.json.choices[0].target_option_ref,
+      operationInput: { body: "离园前体温记录为正常范围。" },
+    });
+    expect(sent.executed?.json.status).toBe("committed");
+    const message = await prisma.nurtureFamilyCareMessage.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        messageKind: "caregiver_direct_message",
+      },
+    });
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: scope.grant.id },
+      data: {
+        status: "revoked",
+        revokedAt: new Date(),
+        revokedByParticipantId: scope.guardian.id,
+        revokeReason: "test_revocation",
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    const timeline = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "chat",
+      capability_key: "query_guardian_family_care_timeline",
+      capability_version: "1.1.0",
+    });
+    expect(timeline.json.output.items[0]).toMatchObject({
+      kind: "caregiver_direct_message",
+    });
+    expect(timeline.json.output.items[0]).not.toHaveProperty("content");
+    const readResult = await post(HARNESS_READ_RESULT_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      command_request_id: sent.commandId,
+    });
+    expect(readResult.json).toEqual({ status: "denied", reason_code: "not_authorized" });
+    const correction = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "correct_family_care_message",
+      targetOptionRef: messageTargetRef(scope, scope.caregiver.id, message.id),
+      operationInput: { body: "不应允许的更正" },
+    });
+    expect(correction.json).toEqual({ status: "denied", reason_code: "not_authorized" });
   });
 });
 
