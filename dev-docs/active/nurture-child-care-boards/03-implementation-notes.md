@@ -892,3 +892,45 @@ B3(采集 lane 没有声明读端口)一并关闭:在 `care-capture-batch.ts` �
 不开批次、不推进批次、不碰 activity lease,测试在读之后回查 `state` /
 `watermarkSourceSequence` / `cutAt` 全部未动。owner 只报告它对每条 capture 是否
 真的握有持久 head(`stable`),稳定前缀的切分留在 domain evaluator。
+
+## 2026-08-02 — G3-E prerequisite B2-3:媒体与内容安全端口
+
+三个端口(`ContentSafetySourceReadPort`、`MediaAttributionReadPort`、
+`MediaLifecycleReadPort`)合在 `media-safety.read.ts`,它们读的是同一批媒体聚合。
+
+**落地时撞到一个冻结件的缺口,已按 amendment 流程补上。**
+`ContentSafetySourceReadPort` 要求 owner 返回它"从确切来源推导出的确定性 marker",
+但冻结的事实集里没有地方放这个事实:`NurtureCareCapture` / `NurtureMediaAssetRef`
+存的是受保护内容与生命周期,`NurtureContentSafetyAssessment` 存的是路由**结果**
+而不是每个来源的输入。读时现推意味着在 owner 仓储里解封正文、并把规则词汇搬出
+domain,两者都不能接受。于是新增
+
+- `NurtureCareCapture.safety_markers_payload`
+- `NurtureMediaAssetRef.safety_markers_payload`
+
+两列**故意可空**:`NULL` 是"从未推导过",与"推导过、没有命中"是两个不同的事实。
+端口对前者整体 fail closed,所以任何历史行都不会被静默当作 ordinary 内容。
+迁移 `20260802130000_g3_content_safety_markers` 纯加法;冻结件加了
+`Amendment 2026-08-02 — content safety marker facts`;守卫新增
+`safety_markers=nullable`(同时断言两张表都有该列且保持可空——把列改成 NOT NULL
+会让"未推导"这个事实消失)。
+
+**同时修掉一处 fail-open**。`evaluateContentSafetyRoute` 里 `hardRuleTier` 返回
+undefined 的 marker 被 `continue` 丢掉了。这意味着更新版 policy 的规则键在旧构建里
+会被当成"没有规则",路由静默停在 `ordinary`——正是 `raise` 这套设计要防的降级。
+改为:未识别 marker 抬到 `review_required`(不确定是可纠正的),risk code 记
+`unrecognised_marker` 这个有界词汇,未知键本身绝不进入 risk code 列表。
+
+端口本身的几条:
+
+- **一个读不到的来源让整次推导失败**,而不是只对其余来源出具结论——那等于对
+  没人评估过的内容发了判定。请求的 source id 只要有一个不属于本 CareGroup 或
+  查无此行,直接返回 `null`。
+- **institution 没有固化安全 policy 就没有路由**,不存在默认门槛。
+- **归属只能落在本班孩子**;兄弟班的孩子无论在照片里多显眼都不是归属目标。
+  owner 的 `face_reference/history_match/system` 与 domain 的
+  `manual/organizer_candidate/automatic_face_match` 是两套词汇,用 `satisfies`
+  约束的显式映射转换——`face_reference` 绝不能显示成老师的手动决定。
+- **全局 discard 能看见所有还在引用该资产的未发布草稿**(按 current revision 的
+  `mediaCompositionPayload` 统计),已发布的卡不算"会丢内容的草稿"。payload 形状
+  不对时算零引用而不是部分集合。

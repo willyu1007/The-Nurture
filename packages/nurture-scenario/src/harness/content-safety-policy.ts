@@ -55,6 +55,12 @@ export type DirectInteractionMarkerV1 = (typeof DIRECT_INTERACTION_MARKERS)[numb
 export type ReviewMarkerV1 = (typeof REVIEW_MARKERS)[number];
 export type ContentSafetyMarkerV1 = DirectInteractionMarkerV1 | ReviewMarkerV1;
 
+/**
+ * Recorded when a source carries a marker key outside this build's vocabulary.
+ * Bounded on purpose: an arbitrary key must never reach a risk-code list.
+ */
+export const UNRECOGNISED_MARKER_RISK_CODE = "unrecognised_marker";
+
 const HARD_RULE_TIERS = new Map<string, RaisableTierV1>([
   ...DIRECT_INTERACTION_MARKERS.map(
     (marker) => [marker, "direct_interaction_required"] as const,
@@ -158,7 +164,15 @@ export const evaluateContentSafetyRoute = (
   for (const source of input.sources) {
     for (const marker of source.markers) {
       const tier = hardRuleTier(marker);
-      if (!tier) continue;
+      if (!tier) {
+        // A marker this build does not recognise is uncertainty, not silence.
+        // Dropping it would let a newer policy's rule key downgrade the route
+        // to ordinary, which is exactly the failure `raise` exists to prevent.
+        // The risk code is the bounded vocabulary word, never the unknown key.
+        riskCodes.add(UNRECOGNISED_MARKER_RISK_CODE);
+        hardTier = raise(hardTier, "review_required");
+        continue;
+      }
       riskCodes.add(marker);
       hardTier = raise(hardTier, tier);
     }

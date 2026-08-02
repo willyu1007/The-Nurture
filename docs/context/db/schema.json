@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-02T11:24:22.562Z",
+  "updatedAt": "2026-08-02T12:12:06.165Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -1248,6 +1248,17 @@
           "nullable": false,
           "list": false,
           "dbName": "occurred_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyMarkersPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "safety_markers_payload",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -11514,6 +11525,17 @@
           "nullable": true,
           "list": false,
           "dbName": "safe_title",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyMarkersPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "safety_markers_payload",
           "dbType": null,
           "default": null,
           "primaryKey": false,

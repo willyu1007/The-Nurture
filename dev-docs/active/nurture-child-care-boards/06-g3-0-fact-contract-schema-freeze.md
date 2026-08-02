@@ -199,6 +199,27 @@ become post-release capabilities: `discard_media_asset` is exactly the action
 that stops being legal once a release commits. The verdict, exact inputs,
 authority predicates, surface topology and DB SSOT delta above are unchanged.
 
+### Amendment 2026-08-02 — content safety marker facts
+
+`ContentSafetySourceReadPort` requires the owner to return the deterministic
+markers it derived from each exact source. The frozen fact set gave that fact
+nowhere to live: `NurtureCareCapture` and `NurtureMediaAssetRef` store protected
+content and lifecycle, and `NurtureContentSafetyAssessment` stores the *result*
+of a routing decision, not its per-source input. Deriving markers at read time
+would mean unsealing bodies inside the owner repository and moving the rule
+vocabulary out of the domain, so this amendment adds the missing input fact:
+
+| Column | Required boundary |
+| --- | --- |
+| `NurtureCareCapture.safety_markers_payload` | stable rule keys derived at intake, while the ingesting path still holds the plaintext; never body, never model prose |
+| `NurtureMediaAssetRef.safety_markers_payload` | same vocabulary, derived when the asset is reviewed |
+
+Both are nullable on purpose. `NULL` means "never derived" and is a different
+fact from an empty list; the safety port fails closed on the former, so no
+pre-existing row is silently routed as ordinary content. Neither column widens
+what a public result may carry, and the capability adoption set, exact inputs,
+authority predicates and surface topology above are unchanged.
+
 ## DB SSOT Delta
 
 All persisted changes originate in `prisma/schema.prisma` through the DB SSOT workflow. No JSON

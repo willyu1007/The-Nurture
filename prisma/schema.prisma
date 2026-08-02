@@ -2150,6 +2150,9 @@ model NurtureMediaAssetRef {
   storageRefPayload          Json                        @map("storage_ref_payload")
   safeTitle                  String?                     @map("safe_title")
   capturedAt                 DateTime?                   @map("captured_at")
+  // Same vocabulary and same NULL semantics as `NurtureCareCapture`, derived
+  // when the asset is reviewed.
+  safetyMarkersPayload       Json?                       @map("safety_markers_payload")
   lifecycle                  NurtureMediaAssetLifecycle
   // The exact immutable original revision a draft or release binds to. It never
   // changes in place; a new original is a new revision.
@@ -2357,6 +2360,11 @@ model NurtureCareCapture {
   stable                   Boolean                @default(false)
   bodyProtectionPayload    Json?                  @map("body_protection_payload")
   transcriptRevision       String?                @map("transcript_revision")
+  // Stable deterministic safety rule keys derived at intake, while the
+  // ingesting path still holds the plaintext. Rule keys only: never body,
+  // never model prose. NULL means "never derived" and is not the same fact as
+  // an empty list, so the safety port can fail closed on an unread source.
+  safetyMarkersPayload     Json?                  @map("safety_markers_payload")
   mediaAssetRefId          String?                @map("media_asset_ref_id")
   occurredAt               DateTime               @map("occurred_at")
   aggregateVersion         Int                    @default(0) @map("aggregate_version")

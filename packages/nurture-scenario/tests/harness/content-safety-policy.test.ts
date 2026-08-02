@@ -3,6 +3,7 @@ import {
   CONTENT_SAFETY_RULE_REVISION,
   DIRECT_INTERACTION_MARKERS,
   REVIEW_MARKERS,
+  UNRECOGNISED_MARKER_RISK_CODE,
   createContentSafetyRoutePort,
   evaluateContentSafetyRoute,
   hardRuleTier,
@@ -58,6 +59,26 @@ describe("G3-C1 ContentSafetyPolicy hard rules", () => {
       );
     }
     expect(hardRuleTier("some_unknown_marker")).toBeUndefined();
+  });
+
+  it("raises an unrecognised marker instead of dropping it", () => {
+    // A newer policy's rule key must not read as "no rule" and leave the route
+    // ordinary; unknown is uncertainty, and uncertainty is correctable.
+    const result = evaluate({ sources: [source(["weapon_or_hazard_not_in_this_build"])] });
+    expect(result.assessment.route).toBe("review_required");
+    expect(result.assessment.riskCodes).toEqual([UNRECOGNISED_MARKER_RISK_CODE]);
+    // The unknown key itself never reaches the risk-code list.
+    expect(result.assessment.riskCodes.join()).not.toContain("weapon_or_hazard");
+  });
+
+  it("still lets a known hard rule outrank an unrecognised one", () => {
+    const result = evaluate({
+      sources: [source(["unknown_key", "health_symptom"])],
+    });
+    expect(result.assessment.route).toBe("direct_interaction_required");
+    expect(result.assessment.riskCodes.sort()).toEqual(
+      [UNRECOGNISED_MARKER_RISK_CODE, "health_symptom"].sort(),
+    );
   });
 
   it("leaves neutral deterministic content ordinary with no classifier at all", () => {

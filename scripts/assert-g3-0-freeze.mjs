@@ -276,6 +276,20 @@ for (const tableName of [
   assertTruthy(tableNames.has(tableName), `additive G3 fact table ${tableName}`);
 }
 
+// The content-safety marker amendment: the input fact must exist on both source
+// tables and must stay nullable, because "never derived" and "derived, none
+// found" are different facts and only the first may fail closed.
+for (const tableName of ["NurtureCareCapture", "NurtureMediaAssetRef"]) {
+  const table = findBy(dbContext.tables, "name", tableName, `safety marker table ${tableName}`);
+  const column = findBy(
+    table.columns,
+    "name",
+    "safetyMarkersPayload",
+    `${tableName}.safetyMarkersPayload`,
+  );
+  assertEqual(column.nullable, true, `${tableName}.safetyMarkersPayload stays nullable`);
+}
+
 // The one-time migration must keep its ambiguity gate rather than guessing.
 const g3Migration = read(
   "prisma/migrations/20260802120000_g3_publish_process_and_media_lifecycle/migration.sql",
@@ -477,6 +491,7 @@ process.stdout.write(
     `g3a-adopted=${adoptedInG3A.length} g3b1-adopted=${adoptedInG3B1.length} ` +
     `g3c1-adopted=${adoptedInG3C1.length} g3d-adopted=${adoptedInG3D.length} ` +
     "schema_delta=landed legacy_enums=retired migration_gate=fail_closed " +
+    "safety_markers=nullable " +
     "c2-matcher=absent " +
     `reserved-keys=${reservedKeys.length} ` +
     "t005=exact t007=contract-frozen " +

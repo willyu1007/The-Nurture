@@ -80,10 +80,17 @@ test.
 > hold, draft and cancel ports, covered by
 > `packages/nurture-db/tests/g3b1-publish-lane-owner.integration.test.ts`.
 >
-> Five ports remain: `ContentSafetySourceReadPort`, `MediaAttributionReadPort`,
-> `MediaLifecycleReadPort`, `PublicationReleasePort` and
-> `PublicationSafetyReadPort` — and `commitTargetRelease`, the atomic per-target
-> write, is among them.
+> The G3-C1 lane followed: `PrismaMediaSafetyReadPort` covers the content
+> safety, media attribution and media lifecycle ports, covered by
+> `packages/nurture-db/tests/g3c1-media-safety-owner.integration.test.ts`.
+> Landing it needed a freeze amendment — the fact set had nowhere to record the
+> per-source safety markers the port must return — and exposed a fail-open in
+> `evaluateContentSafetyRoute` where an unrecognised marker was dropped instead
+> of raising the tier. Both are recorded in the freeze and in
+> `03-implementation-notes.md`.
+>
+> Two ports remain: `PublicationReleasePort` and `PublicationSafetyReadPort` —
+> and `commitTargetRelease`, the atomic per-target write, is among them.
 >
 > One limitation surfaced while landing the Guardian lane and is not a defect in
 > the implementation: `NurtureFamily` is one-to-one with

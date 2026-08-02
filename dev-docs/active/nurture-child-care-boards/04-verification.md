@@ -490,3 +490,28 @@
 | `pnpm test:unit` / `verify:test-routing` | PASS — 504 tests, files=88 production-db=16 |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisite B2-3 (Media and Content Safety Ports)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm exec prisma validate` + `migrate deploy` | PASS — additive nullable marker columns on both source tables |
+| `pnpm db:context` | PASS — regenerated SSOT |
+| `pnpm verify:g3-0-freeze` | PASS — now also `safety_markers=nullable`, asserted on both tables |
+| defect: unrecognised marker silently dropped, leaving the route ordinary | FIXED — raises to `review_required` with a bounded `unrecognised_marker` risk code |
+| `pnpm test:unit` | PASS — 50 files / 506 tests, two new cases for the marker fix |
+| `pnpm test:db` | PASS — 17 files / 143 tests |
+| recorded markers returned with the institution's exact policy head | PASS |
+| derived-but-empty routes ordinary; never-derived fails the whole derivation closed | PASS — the two are different facts |
+| negative: source outside this CareGroup, unknown source id | PASS — `null`, never a partial assessment |
+| negative: institution with no safety policy | PASS — no route rather than a default bar |
+| unrecognised marker reaches the review tier through the real owner port | PASS |
+| attribution offers only children of the exact CareGroup | PASS — sibling class excluded |
+| owner attribution source mapped, not passed through | PASS — `face_reference` → `automatic_face_match` |
+| attribution history reported in revision order including superseded rows | PASS |
+| media lifecycle counts every unreleased draft still citing the asset | PASS — released cards excluded |
+| committed releases reported so the global discard window can close | PASS |
+| negative: unknown process key, malformed composition payload | PASS — `null` / empty, never a partial set |
+| `verify:test-routing` | PASS — files=89 production-db=17 |
+| `verify:surface-conformance` / `g2-exit-contract` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
