@@ -41,6 +41,7 @@ export * from "./harness/care-capture-batch.js";
 export * from "./harness/content-assembler.js";
 export * from "./harness/publish-process.js";
 export * from "./harness/publish-process-editing.js";
+export * from "./harness/teacher-publish-queue.js";
 export * from "./harness/institution-business-communication.js";
 export * from "./domain/identity/scenario-binding-owner.js";
 export * from "./domain/identity/derived-age-stage.js";

@@ -18,9 +18,10 @@ Project: `main`
 - Implementation mainline: T-005 G2 Exit is PASS and the task is done. Exact
   `nurture.surface-contract@1.8.0` / `sha256:4fe91e13…` is Nurture-provider
   qualified against the pinned owner path, with single-writer/default-off guards.
-  T-006 G3-0 is frozen as `G3_0_FREEZE_PASS`. The current critical lane is T-006
-  G3-A Shared Board Foundation, which additively rotated the artifact to
-  `nurture.surface-contract@1.9.0` / `sha256:d769e496…` — shared core and every
+  T-006 G3-0 is frozen as `G3_0_FREEZE_PASS`, G3-A Shared Board Foundation is
+  delivered and the current critical lane is G3-B1 capture-to-draft. Both
+  checkpoints rotated the artifact additively, now at
+  `nurture.surface-contract@1.10.0` / `sha256:40fb7446…` — shared core and every
   T-005 capability slice stay byte-identical, so the G2 Exit evidence is preserved.
   T-006 G3-E must still adopt this exact provider on the real owner path and
   cannot infer adoption from T-005 completion.
@@ -115,13 +116,14 @@ Project: `main`
 - Decision deadline: before any DB apply, artifact publication, secret configuration, capability/manifest change, external pilot traffic, staging, production, or GA action.
 
 ### Next Governance Checkpoint
-- Date: T-006 G3-B1 capture-to-draft deterministic main path.
-- Delivered: T-006 G3-0 freeze PASS, then G3-A Shared Board Foundation — the
-  role-safe two-level read topology, the shared source-head pipeline, the two
-  canonical-owner inline mutations and the first synthetic board conformance
-  fixtures, on the additively rotated `1.9.0` artifact.
-- Expected output: CareGroup capture batches and one exact saved draft revision
-  through deterministic assembly, with the optional AI copy lane staying absent.
+- Date: T-006 G3-C1 manual content and media safety path.
+- Delivered: G3-0 freeze PASS, G3-A Shared Board Foundation and G3-B1
+  capture-to-draft — capture batches, the three organize triggers with their
+  quiescence gate, deterministic assembly, the five-state PublishProcess draft
+  lane, autosave/edit hold and the publish queue, on the additively rotated
+  `1.10.0` artifact.
+- Expected output: the manual attribution, group-photo exposure and
+  needs-review path, with the optional face matcher staying default-off.
   No Candidate, secret, persistent environment, activation or traffic effect.
 
 ## Notes (manual)

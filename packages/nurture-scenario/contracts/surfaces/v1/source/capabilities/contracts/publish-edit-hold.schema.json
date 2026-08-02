@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/publish-edit-hold.schema.json",
+  "title": "PublishEditHoldV1",
+  "$defs": {
+    "acquireInput": {
+      "$ref": "publish-process-types.schema.json#/$defs/holdInput"
+    },
+    "acquireResult": {
+      "$ref": "publish-process-types.schema.json#/$defs/holdResult"
+    },
+    "renewInput": {
+      "$ref": "publish-process-types.schema.json#/$defs/holdInput"
+    },
+    "renewResult": {
+      "$ref": "publish-process-types.schema.json#/$defs/holdResult"
+    },
+    "releaseInput": {
+      "$ref": "publish-process-types.schema.json#/$defs/emptyInput"
+    },
+    "releaseResult": {
+      "$ref": "publish-process-types.schema.json#/$defs/holdReleaseResult"
+    }
+  }
+}

@@ -145,7 +145,13 @@
         "redact_family_care_message",
         "policy_redact_family_care_message",
         "update_guardian_current_focus",
-        "record_caregiver_daily_care"
+        "record_caregiver_daily_care",
+        "organize_care_capture_batch",
+        "save_publish_process_draft",
+        "acquire_publish_edit_hold",
+        "renew_publish_edit_hold",
+        "release_publish_edit_hold",
+        "cancel_publish_process"
       ]
     },
     "queryCapabilityKey": {
@@ -157,7 +163,8 @@
         "query_guardian_current_focus",
         "query_guardian_enrollment_activity",
         "query_caregiver_teacher_board",
-        "query_caregiver_child_today"
+        "query_caregiver_child_today",
+        "query_teacher_publish_queue"
       ]
     },
     "surfaceKey": {

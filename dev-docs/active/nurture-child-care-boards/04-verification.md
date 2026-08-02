@@ -301,3 +301,24 @@
 | negative: `pending_release` edit without an online hold, and a colleague's live hold | PASS — `edit_hold_required` / `held_by_other` |
 | negative: cancel after any committed release | PASS — `already_released`; repeat cancel is `already_satisfied` |
 | negative: sealed process ref used by another actor or after losing access | PASS — `target_unavailable` |
+
+## 2026-08-02 — G3-B1 Step 2 (Publish Queue and Additive Rotation to 1.10.0)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm build:surface-contract` / `verify:surface-contract` | PASS — `nurture.surface-contract@1.10.0` / `sha256:40fb7446…`, capabilities=25, deterministic rebuild |
+| additive-rotation census | PASS — `sharedCoreHash` and every pre-existing capability/surface slice hash byte-identical |
+| `pnpm verify:surface-conformance` | PASS — cases=13 slices=40/40, 69 contract tests |
+| `pnpm verify:g3-0-freeze` | PASS — input `1.8.0`, current `1.10.0`, 7 G3-A + 7 G3-B1 keys at `1.0.0`, 8 later-checkpoint keys still absent |
+| `pnpm verify:g2-exit-contract` | PASS — T-005 slices still preserved at `1.10.0` |
+| `pnpm test:unit` | PASS — 41 files / 397 tests |
+| `pnpm typecheck` / `verify:test-routing` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — files=76 unit=41, routes=7 unchanged |
+| negative: publish queue read by an Institution Admin, an Institution-scoped role or another CareGroup | PASS — `not_authorized`, read port never invoked |
+| negative: queue row whose own class scope lapsed | PASS — dropped, page refilled across scan rounds |
+| negative: released process with 2 of 3 targets committed | PASS — `targetSummary` keeps both numbers; no bare published label |
+| negative: queue cursor after redaction drift, and page size 21 | PASS — `refresh_required` / `invalid_query_input` |
+| negative: scheduled time before an institution policy resolves | PASS — `scheduledAt` absent; caregiver board reports `t007_publication_policy` and stays `limited` |
+| end-to-end fixture: capture → manual organize → deterministic assembly → draft | PASS — in-flight upload deferred, teacher text verbatim, quick-adjust deadline set, no generative provider involved |
+| photo-only end-to-end fixture | PASS — draft created with no body at all |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
+| governance lint + `ctl-context verify --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |

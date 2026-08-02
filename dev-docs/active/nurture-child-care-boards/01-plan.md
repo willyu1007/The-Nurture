@@ -212,6 +212,36 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - pending_release 内容只允许在线取得 hold 后编辑；离线只准备尚未进入服务端待发送
   队列的新草稿/media。
 
+### G3-B1 result — PASS (2026-08-02)
+
+- surface artifact additive 旋转为 `nurture.surface-contract@1.10.0` /
+  `sha256:40fb7446de386d30cb0418a545128e7b6d15748efcfda6ef4df1944555e62ef4`;
+  shared core 与全部既有 slice 哈希不变。
+- 新增并实现 7 个 `1.0.0` key:`query_teacher_publish_queue`、
+  `organize_care_capture_batch`、`save_publish_process_draft`、
+  `acquire_publish_edit_hold`、`renew_publish_edit_hold`、
+  `release_publish_edit_hold`、`cancel_publish_process`。
+- `reschedule_publish_process` 未注册:它验证的时间窗来自 T-007 解析结果,
+  provider 缺席时只能永远 fail closed。G3-B2 显式 AI copy 保持 absent,
+  确定性主路径在无任何 provider 时完整可用。
+- pending_release 入队的所有非策略门禁已实现;真正的 schedule 解析与 release
+  属于 G3-D,在 provider 缺席时返回 `dependency_no_go` fail closed。
+
+#### G3-B1 acceptance-to-check mapping
+
+| Acceptance ID | Requirement | Mechanical check |
+| --- | --- | --- |
+| `T006-AC-021` | 单次拍照/记录/上传完成/media ready 不创建发布候选、不启动 30 秒 | `care-capture-batch.test.ts` trigger 矩阵 + `phase-3-capture-to-draft.test.ts` 端到端用例 |
+| `T006-AC-022` | 整理只由 manual、10 分钟 idle 或发送前 30 分钟兜底触发,使用服务端时间与园区 timezone | `care-capture-batch.test.ts` 三个 trigger 与 `fallbackLocalMinutes` 用例 |
+| `T006-AC-023` | 一分钟 gate 只防打断:manual 绕过、idle 不重复等待、兜底 due 后只等一分钟,自动整理开启时不可设为 0 | `care-capture-batch.test.ts` policy 校验与 gate 用例 |
+| `T006-AC-024` | 后台上传/缩略图/心跳/provider 进度不重置 gate;有效 capture lease 会 | `care-capture-batch.test.ts` machine-progress 与 lease 负向用例 |
+| `T006-AC-025` | trigger 按 stable source watermark 原子切批,未稳定与其后内容进入下一批,相同 identity exact replay | `care-capture-batch.test.ts` watermark 与 replay 用例 |
+| `T006-AC-026` | 确定性组装保留老师原文与转写 provenance,photo-only 不生成正文,不调用生成式 provider | `content-assembler.test.ts` 全部用例 + `phase-3-capture-to-draft.test.ts` |
+| `T006-AC-027` | `PublishProcess` 只有五个业务状态与冻结转换,ordinary→draft、review→needs_review、direct-interaction 不建候选 | `publish-process.test.ts` 状态机与路由用例 |
+| `T006-AC-028` | 30 秒是交互 posture:编辑/hold 暂停,超时前不得发布,入队还需已解析 schedule | `publish-process.test.ts` quick-adjust 与 admission 用例 |
+| `T006-AC-029` | autosave 绑定 `expectedDraftRevision`,exact replay 返回原 revision,漂移 conflict,无 last-write-wins | `publish-process-editing.test.ts` autosave 用例 |
+| `T006-AC-030` | edit hold 单一短期可续、不是 authority/owner/state,`pending_release` 编辑必须在线持有;cancel 仅在任何 release commit 前合法 | `publish-process-editing.test.ts` hold 与 cancel 用例 |
+
 ## G3-C — Content and Media Safety
 
 - Nurture `ContentSafetyPolicy` 结合硬规则与可选 classifier signals，最终派生
@@ -375,8 +405,9 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 ## Exit Gate
 
 - [x] G3-A Shared Board Foundation 通过（`T006-AC-011`～`T006-AC-020` 全部映射检查通过）。
-- [ ] G3-B1 Capture-to-Draft deterministic main path 通过；G3-B2 optional AI copy
-  不成为隐式前置条件。
+- [x] G3-B1 Capture-to-Draft deterministic main path 通过（`T006-AC-021`～
+  `T006-AC-030` 全部映射检查通过）；G3-B2 optional AI copy 保持 absent，
+  确定性主路径无 provider 也完整可用。
 - [ ] G3-C1 manual content/media safety path 通过；G3-C2 face match 按 beta profile
   明确 required 或 optional/default-off。
 - [ ] G3-D Publish and Release Loop 通过。

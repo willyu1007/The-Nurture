@@ -21,21 +21,29 @@
       "required": true,
       "capabilityKey": "query_caregiver_family_care_work",
       "capabilityVersion": "1.1.0"
+    },
+    {
+      "kind": "teacher_publish_queue",
+      "required": true,
+      "capabilityKey": "query_teacher_publish_queue",
+      "capabilityVersion": "1.0.0"
     }
   ],
   "absentModuleKinds": [
-    "teacher_publish_queue",
     "institution_workflow_projection"
   ],
   "dependencyNoGos": [
     {
-      "dependencyKey": "t006_teacher_board_projection",
+      "dependencyKey": "t007_publication_policy",
       "requiredVersion": "1.0.0",
       "reason": "missing",
-      "retryHint": "none"
+      "retryHint": "contact_admin"
     }
   ],
   "writeActionKeys": [
-    "record_caregiver_daily_care"
+    "record_caregiver_daily_care",
+    "organize_care_capture_batch",
+    "save_publish_process_draft",
+    "cancel_publish_process"
   ]
 }

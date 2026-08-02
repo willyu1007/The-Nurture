@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/publish-process-types.schema.json",
+  "title": "PublishProcessContractTypesV1",
+  "$defs": {
+    "processState": {
+      "enum": [
+        "draft",
+        "needs_review",
+        "pending_release",
+        "released",
+        "cancelled"
+      ]
+    },
+    "publishDataClass": {
+      "enum": [
+        "daily_care_log",
+        "child_growth_record"
+      ]
+    },
+    "draftRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stateCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft",
+        "needs_review",
+        "pending_release",
+        "released",
+        "cancelled"
+      ],
+      "properties": {
+        "draft": { "type": "integer", "minimum": 0 },
+        "needs_review": { "type": "integer", "minimum": 0 },
+        "pending_release": { "type": "integer", "minimum": 0 },
+        "released": { "type": "integer", "minimum": 0 },
+        "cancelled": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "targetSummary": {
+      "description": "Derived display summary. It never replaces per-target authority, Receipts or an explicit partial result.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "released"
+      ],
+      "properties": {
+        "total": { "type": "integer", "minimum": 1 },
+        "released": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "emptyInput": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "holdInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ttlSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        }
+      }
+    },
+    "holdResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processRef",
+        "expiresAt",
+        "ttlSeconds"
+      ],
+      "properties": {
+        "processRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ttlSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        }
+      }
+    },
+    "holdReleaseResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processRef",
+        "released"
+      ],
+      "properties": {
+        "processRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "released": { "const": true }
+      }
+    }
+  }
+}

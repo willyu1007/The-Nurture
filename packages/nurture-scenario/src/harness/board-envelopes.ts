@@ -23,6 +23,11 @@ import {
   queryCaregiverFamilyCareWork,
   type FamilyCareQueryDependencies,
 } from "./family-care-queries.js";
+import {
+  QUERY_TEACHER_PUBLISH_QUEUE_CAPABILITY,
+  queryTeacherPublishQueue,
+  type TeacherPublishQueueReadPort,
+} from "./teacher-publish-queue.js";
 import { issueTargetOptionRef } from "./keyed-refs.js";
 import type { InterfaceContractRefV1 } from "../surface-contract/types.js";
 
@@ -113,12 +118,16 @@ const GUARDIAN_MODULE_POLICY: Record<string, { required: boolean }> = {
   institution_workflow_projection: { required: false },
 };
 
-/** `teacher_publish_queue` needs G3-B publication facts that do not exist yet. */
-export const TEACHER_PUBLISH_QUEUE_NO_GO: BoardDependencyNoGoV1 = {
-  dependencyKey: "t006_teacher_board_projection",
+/**
+ * The publish queue lists class work as soon as G3-B1 exists, but nothing can
+ * be scheduled until the T-007 publication-policy provider resolves a send
+ * window, so the board reports that dependency rather than implying it can send.
+ */
+export const PUBLICATION_POLICY_NO_GO: BoardDependencyNoGoV1 = {
+  dependencyKey: "t007_publication_policy",
   requiredVersion: "1.0.0",
   reason: "missing",
-  retryHint: "none",
+  retryHint: "contact_admin",
 };
 
 // ---------------------------------------------------------------------------
@@ -237,6 +246,7 @@ export type CaregiverBoardEnvelopeDependencies = CaregiverBoardDependencies & {
   surface: BoardSurfaceRegistrationV1;
   /** The exact existing T-005 query is consumed directly; T-006 keeps no copy. */
   family_care_work: FamilyCareQueryDependencies;
+  publish_queue: TeacherPublishQueueReadPort;
 };
 
 export const presentCaregiverTeacherBoard = async (
@@ -264,6 +274,13 @@ export const presentCaregiverTeacherBoard = async (
   const familyCareWork = await queryCaregiverFamilyCareWork(deps.family_care_work, scope);
   if (familyCareWork.status !== "ok") return familyCareWork;
 
+  const publishQueue = await queryTeacherPublishQueue(
+    { ...deps, reads: deps.publish_queue },
+    scopeFacts,
+    { ...scope, ...(request.page_size !== undefined ? { page_size: request.page_size } : {}) },
+  );
+  if (publishQueue.status !== "ok") return publishQueue;
+
   const modules = new Map<string, BoardModuleV1>();
   modules.set("caregiver_child_today", {
     moduleKey: "caregiver_child_today",
@@ -289,6 +306,21 @@ export const presentCaregiverTeacherBoard = async (
     actionRefs: dedupeActions(familyCareWork.output.items.flatMap((item) => item.actions)),
     pageInfo: familyCareWork.output.pageInfo,
   });
+  modules.set("teacher_publish_queue", {
+    moduleKey: "teacher_publish_queue",
+    kind: "teacher_publish_queue",
+    required: true,
+    count: publishQueue.output.items.length,
+    itemRefs: publishQueue.output.items.map((item) => item.processRef),
+    actionRefs: projectOwnerActions(
+      deps.integrity_key,
+      scope,
+      scopeFacts.module_action_grants.teacher_publish_queue ?? [],
+    ),
+    pageInfo: publishQueue.output.pageInfo,
+  });
+
+  const dependencyNoGos = scopeFacts.publication_policy_resolved ? [] : [PUBLICATION_POLICY_NO_GO];
 
   return {
     status: "ok",
@@ -296,7 +328,7 @@ export const presentCaregiverTeacherBoard = async (
       contract: deps.contract,
       surfaceKey: deps.surface.surfaceKey,
       surfaceVersion: deps.surface.surfaceVersion,
-      state: "limited",
+      state: dependencyNoGos.length > 0 ? "limited" : "ready",
       snapshotRef: issueSnapshotRef(deps.integrity_key, scope, {
         contractDigest: deps.contract.digest,
         capabilityKey: QUERY_CAREGIVER_TEACHER_BOARD_CAPABILITY.key,
@@ -318,7 +350,7 @@ export const presentCaregiverTeacherBoard = async (
         teacher_publish_queue: { required: true },
       }).filter((module) => !CAREGIVER_DENIED_MODULE_KINDS.includes(module.kind)),
       actions: projectOwnerActions(deps.integrity_key, scope, scopeFacts.surface_action_grants),
-      dependencyNoGos: [TEACHER_PUBLISH_QUEUE_NO_GO],
+      dependencyNoGos,
     },
   };
 };
@@ -363,4 +395,5 @@ export const BOARD_MODULE_CAPABILITY_BINDINGS = {
   guardian_enrollment_activity: QUERY_GUARDIAN_ENROLLMENT_ACTIVITY_CAPABILITY,
   caregiver_child_today: QUERY_CAREGIVER_CHILD_TODAY_CAPABILITY,
   caregiver_family_care_work: QUERY_CAREGIVER_FAMILY_CARE_WORK_CAPABILITY,
+  teacher_publish_queue: QUERY_TEACHER_PUBLISH_QUEUE_CAPABILITY,
 } as const;

@@ -11,6 +11,10 @@ import type {
   RawCaregiverChildToday,
 } from "../../src/harness/caregiver-board-queries.js";
 import type {
+  RawPublishQueueRow,
+  TeacherPublishQueueReadPort,
+} from "../../src/harness/teacher-publish-queue.js";
+import type {
   GuardianBoardReadPort,
   GuardianBoardScopeFacts,
   RawGuardianCharter,
@@ -233,6 +237,7 @@ export const createCaregiverReadPort = (
         authority: caregiverAuthority(),
         surface_action_grants: [],
         module_action_grants: {},
+        publication_policy_resolved: false,
         ...config.scope,
       };
     },
@@ -287,3 +292,46 @@ export const createFamilyCareWorkDeps = (
     },
   },
 });
+
+export const publishQueueRow = (
+  overrides: Partial<RawPublishQueueRow> = {},
+): RawPublishQueueRow => ({
+  process_key: "care-group-1~trigger-1",
+  state: "draft",
+  data_class: "daily_care_log",
+  title: "Syn Outdoor Draft",
+  current_revision: 1,
+  target_count: 2,
+  released_target_count: 0,
+  occurred_at: "2026-08-01T09:00:00.000Z",
+  edit_hold_active: false,
+  authority: caregiverAuthority(),
+  action_grants: [],
+  ...overrides,
+});
+
+export const createPublishQueueReadPort = (
+  pages: Array<{
+    authorized?: boolean;
+    rows: RawPublishQueueRow[];
+    has_more: boolean;
+    heads?: RawBoardSourceHead[];
+  }> = [{ rows: [], has_more: false }],
+): TeacherPublishQueueReadPort & { requests: unknown[] } => {
+  const requests: unknown[] = [];
+  return {
+    requests,
+    async listTeacherPublishQueue(input) {
+      requests.push(input);
+      const page = pages[Math.min(requests.length - 1, pages.length - 1)];
+      return {
+        authorized: page?.authorized ?? true,
+        rows: page?.rows ?? [],
+        has_more: page?.has_more ?? false,
+        heads: page?.heads ?? [
+          sourceHead({ source_kind: "daily_care_log", source_id: "publish-1" }),
+        ],
+      };
+    },
+  };
+};

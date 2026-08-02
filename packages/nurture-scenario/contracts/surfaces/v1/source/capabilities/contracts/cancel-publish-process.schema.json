@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/cancel-publish-process.schema.json",
+  "title": "CancelPublishProcessV1",
+  "$defs": {
+    "input": {
+      "$ref": "publish-process-types.schema.json#/$defs/emptyInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processRef",
+        "cancelledAt",
+        "auditRef"
+      ],
+      "properties": {
+        "processRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "cancelledAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "auditRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    }
+  }
+}

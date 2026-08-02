@@ -159,6 +159,7 @@
         "capability:query_guardian_current_focus",
         "capability:query_guardian_enrollment_activity",
         "capability:query_guardian_family_board",
+        "capability:query_teacher_publish_queue",
         "capability:record_caregiver_daily_care",
         "capability:update_guardian_current_focus",
         "surface:caregiver_teacher_board",
@@ -167,6 +168,22 @@
       "suiteRef": {
         "runner": "vitest",
         "target": "packages/nurture-scenario/tests/surface-contract/phase-3-boards.test.ts"
+      }
+    },
+    {
+      "caseKey": "capture-to-draft-deterministic-main-path",
+      "kind": "deterministic_fixtures",
+      "covers": [
+        "capability:acquire_publish_edit_hold",
+        "capability:cancel_publish_process",
+        "capability:organize_care_capture_batch",
+        "capability:release_publish_edit_hold",
+        "capability:renew_publish_edit_hold",
+        "capability:save_publish_process_draft"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-capture-to-draft.test.ts"
       }
     }
   ]

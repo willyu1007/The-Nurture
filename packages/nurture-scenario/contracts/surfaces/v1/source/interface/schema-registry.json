@@ -12,6 +12,26 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.acquire-publish-edit-hold-input@1",
+      "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
+      "jsonPointer": "/$defs/acquireInput"
+    },
+    {
+      "schemaRef": "schema:nurture.acquire-publish-edit-hold-result@1",
+      "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
+      "jsonPointer": "/$defs/acquireResult"
+    },
+    {
+      "schemaRef": "schema:nurture.cancel-publish-process-input@1",
+      "artifactPath": "capabilities/contracts/cancel-publish-process.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.cancel-publish-process-result@1",
+      "artifactPath": "capabilities/contracts/cancel-publish-process.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
       "schemaRef": "schema:nurture.correct-family-care-message-input@1",
       "artifactPath": "capabilities/contracts/correct-family-care-message.schema.json",
       "jsonPointer": "/$defs/input"
@@ -29,6 +49,16 @@
     {
       "schemaRef": "schema:nurture.initiate-caregiver-direct-message-result@1",
       "artifactPath": "capabilities/contracts/initiate-caregiver-direct-message.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.organize-care-capture-batch-input@1",
+      "artifactPath": "capabilities/contracts/organize-care-capture-batch.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.organize-care-capture-batch-result@1",
+      "artifactPath": "capabilities/contracts/organize-care-capture-batch.schema.json",
       "jsonPointer": "/$defs/result"
     },
     {
@@ -127,6 +157,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.query-teacher-publish-queue-input@1",
+      "artifactPath": "capabilities/contracts/query-teacher-publish-queue.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-teacher-publish-queue-result@1",
+      "artifactPath": "capabilities/contracts/query-teacher-publish-queue.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
       "schemaRef": "schema:nurture.record-caregiver-daily-care-input@1",
       "artifactPath": "capabilities/contracts/record-caregiver-daily-care.schema.json",
       "jsonPointer": "/$defs/input"
@@ -147,6 +187,26 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.release-publish-edit-hold-input@1",
+      "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
+      "jsonPointer": "/$defs/releaseInput"
+    },
+    {
+      "schemaRef": "schema:nurture.release-publish-edit-hold-result@1",
+      "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
+      "jsonPointer": "/$defs/releaseResult"
+    },
+    {
+      "schemaRef": "schema:nurture.renew-publish-edit-hold-input@1",
+      "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
+      "jsonPointer": "/$defs/renewInput"
+    },
+    {
+      "schemaRef": "schema:nurture.renew-publish-edit-hold-result@1",
+      "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
+      "jsonPointer": "/$defs/renewResult"
+    },
+    {
       "schemaRef": "schema:nurture.reply-family-care-item-input@1",
       "artifactPath": "capabilities/contracts/reply-family-care-item.schema.json",
       "jsonPointer": "/$defs/input"
@@ -154,6 +214,16 @@
     {
       "schemaRef": "schema:nurture.reply-family-care-item-result@1",
       "artifactPath": "capabilities/contracts/reply-family-care-item.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.save-publish-process-draft-input@1",
+      "artifactPath": "capabilities/contracts/save-publish-process-draft.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.save-publish-process-draft-result@1",
+      "artifactPath": "capabilities/contracts/save-publish-process-draft.schema.json",
       "jsonPointer": "/$defs/result"
     },
     {

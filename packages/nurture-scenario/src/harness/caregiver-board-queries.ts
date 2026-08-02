@@ -50,6 +50,12 @@ export type CaregiverBoardScopeFacts = {
    * presenter has nothing to project, whatever the role says. */
   surface_action_grants: OwnerEligibilityGrantV1[];
   module_action_grants: Record<string, OwnerEligibilityGrantV1[]>;
+  /**
+   * True once the T-007 institution publication policy has actually resolved a
+   * send window for this CareGroup. Without it the publish queue can list work
+   * but nothing can be scheduled, so the board stays limited.
+   */
+  publication_policy_resolved: boolean;
 };
 
 export type RawCaregiverDailyCare = {

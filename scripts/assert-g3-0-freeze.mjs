@@ -230,15 +230,18 @@ const adoptedInG3A = [
   "update_guardian_current_focus",
   "record_caregiver_daily_care",
 ];
-const stillUnimplementedCapabilities = [
+const adoptedInG3B1 = [
   "query_teacher_publish_queue",
   "organize_care_capture_batch",
+  "save_publish_process_draft",
   "acquire_publish_edit_hold",
   "renew_publish_edit_hold",
   "release_publish_edit_hold",
-  "save_publish_process_draft",
-  "reschedule_publish_process",
   "cancel_publish_process",
+];
+const stillUnimplementedCapabilities = [
+  // Needs a T-007-resolved schedule window before it can validate anything.
+  "reschedule_publish_process",
   "confirm_child_media_attribution",
   "reject_child_media_attribution",
   "supersede_child_media_attribution",
@@ -258,6 +261,13 @@ for (const capabilityKey of adoptedInG3A) {
     registeredVersions.get(capabilityKey),
     "1.0.0",
     `G3-A adopted capability ${capabilityKey}`,
+  );
+}
+for (const capabilityKey of adoptedInG3B1) {
+  assertEqual(
+    registeredVersions.get(capabilityKey),
+    "1.0.0",
+    `G3-B1 adopted capability ${capabilityKey}`,
   );
 }
 for (const capabilityKey of stillUnimplementedCapabilities) {
@@ -324,7 +334,7 @@ for (const identityPart of [
 process.stdout.write(
   `[ok] G3-0 freeze facts=${requiredFactTables.length} surfaces=2 ` +
     `input=${frozenInputInterface.version} current=${artifactPin.interfaceContract.version} ` +
-    `g3a-adopted=${adoptedInG3A.length} ` +
+    `g3a-adopted=${adoptedInG3A.length} g3b1-adopted=${adoptedInG3B1.length} ` +
     "t005=exact t007=contract-frozen schema_delta=frozen " +
     "caregiver_workflow_denied=true placeholders=absent stage_gates=explicit\n",
 );

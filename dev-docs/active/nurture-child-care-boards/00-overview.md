@@ -6,10 +6,10 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-02
-- Next step: G3-A Shared Board Foundation 已完成并以
-  `nurture.surface-contract@1.9.0` /
-  `sha256:d769e496692553dd6358eb434f992df09841d3703f968bdf2562b37b9c8ee68c`
-  additive 旋转落地；下一步进入 G3-B1 capture-to-draft deterministic main path。
+- Next step: G3-A 与 G3-B1 均已完成，surface artifact additive 旋转至
+  `nurture.surface-contract@1.10.0` /
+  `sha256:40fb7446de386d30cb0418a545128e7b6d15748efcfda6ef4df1944555e62ef4`；
+  下一步进入 G3-C1 manual content/media safety path。
 
 ## Goal
 
@@ -63,6 +63,14 @@ G2 Exit 证据按 `compatibility-policy.json` 的 `additiveNewSlice` 规则继�
 `teacher_publish_queue` 依赖 G3-B 事实，模块缺席并以 dependency NO-GO 呈现，
 Caregiver teacher board 因此为 `limited`；Guardian optional Workflow projection
 缺席不产生 NO-GO、不降级 state。
+
+2026-08-02 G3-B1 已交付：CareGroup 采集批次与三个整理 trigger（manual /
+10 分钟 idle / 发送前 30 分钟兜底）、一分钟防打断 gate、stable source watermark
+切批、确定性内容组装、五状态 `PublishProcess` 的 draft 通道、30 秒快捷调整
+posture、autosave 与 edit hold，以及 `query_teacher_publish_queue`。
+确定性主路径不含任何生成式 provider；G3-B2 AI copy 保持 absent。
+`teacher_publish_queue` 模块已就位，caregiver board 的 dependency NO-GO 改为
+真实缺席的 `t007_publication_policy`，policy 解析后即转为 `ready`。
 
 ## Scope In
 

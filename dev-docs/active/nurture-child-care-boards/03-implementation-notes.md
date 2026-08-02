@@ -548,3 +548,39 @@
   schedule 解析落地的 checkpoint。
 - 本步骤没有修改 surface contract source/artifact、Prisma schema、migration、
   environment、capability activation、Candidate、部署或流量。
+
+## 2026-08-02 — G3-B1 step 2: publish queue, envelope wiring and rotation to 1.10.0
+
+- 新增 `teacher-publish-queue.ts`：`query_teacher_publish_queue@1.0.0`。counts 是
+  读取时派生的展示汇总,`targetSummary` 始终同时携带 total 与 released,
+  released+partial 因此无法被压成一句"已发布"。`scheduledAt` 只有在真的解析出
+  园区发送窗口后才出现。
+- caregiver envelope 接上第三个模块,`teacher_publish_queue` 不再缺席。
+  dependency NO-GO 从 `t006_teacher_board_projection`(已交付)换成
+  `t007_publication_policy`(provider 仍缺席),surface state 仍是 `limited`,
+  但理由从"模块没实现"变成了真实的"没有发送窗口"。policy 解析后自动变 `ready`。
+- surface artifact additive 旋转到 `nurture.surface-contract@1.10.0` /
+  `sha256:40fb7446de386d30cb0418a545128e7b6d15748efcfda6ef4df1944555e62ef4`,
+  新增 7 个 `1.0.0` key。`sharedCoreHash` 与全部既有 capability/surface slice
+  哈希仍逐字节不变。
+- 6 个写能力用 `publish_process` domainClass 与 `publish_process_transition`
+  executionClass——这是 T-004 冻结枚举里为发布过程准备的那一格,G3-A 的两个 board
+  mutation 当时只能落在 care-domain 那一格。head binding 各自绑定真实依赖:
+  save 绑 `draft_revision`,organize 绑 `capture_batch` 与 `content_safety_route`,
+  cancel 走 `lifecycle_authority` 的 `cancellable_publish_process`。
+- `reschedule_publish_process` 仍未注册:它要验证的时间窗来自 T-007 解析结果,
+  provider 缺席时只能永远 fail closed,注册就等于占位。`verify:g3-0-freeze`
+  现在把它和 G3-C/G3-D 的 7 个 key 一起列在"必须仍然缺席"里。
+- 新增 conformance case `capture-to-draft-deterministic-main-path` 与
+  `phase-3-capture-to-draft.test.ts`,覆盖 6 个新写能力 slice。它同时跑真实领域
+  路径:采集 → manual 整理切批 → 确定性组装 → draft 候选,断言未稳定上传被推到
+  下一批、老师原文逐字保留、photo-only 也能走完,并断言整条路径序列化结果里没有
+  任何 suggestion 痕迹。
+- phase-2 的 typed-input 检查原先假设每个 capability schema 都在 `/$defs/input`。
+  edit hold 的三个能力共用一个文件、指针分别是 `acquireInput`/`renewInput`/
+  `releaseInput`,检查因此漏掉了它们。改为按 schema-registry 的 `jsonPointer`
+  解析,现在无论文件怎么组织都检查到精确定义。
+- phase-3-boards 的 write-action 断言原先只认 `action_execution`;改为接受两种写
+  execution class 并显式排除 query,断言意图不变但覆盖了发布过程能力。
+- 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
+  Candidate、部署或流量。

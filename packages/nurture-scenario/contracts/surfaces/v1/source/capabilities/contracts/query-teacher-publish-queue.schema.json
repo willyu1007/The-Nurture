@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-teacher-publish-queue.schema.json",
+  "title": "QueryTeacherPublishQueueV1",
+  "$defs": {
+    "input": {
+      "$ref": "board-types.schema.json#/$defs/pagedInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "careGroupRef",
+        "counts",
+        "items",
+        "pageInfo"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "board-types.schema.json#/$defs/moduleBinding"
+        },
+        "careGroupRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "counts": {
+          "$ref": "publish-process-types.schema.json#/$defs/stateCounts"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/queueItem"
+          }
+        },
+        "pageInfo": {
+          "$ref": "board-types.schema.json#/$defs/snapshotPageInfo"
+        }
+      }
+    },
+    "queueItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processRef",
+        "state",
+        "dataClass",
+        "title",
+        "revision",
+        "targetSummary",
+        "occurredAt",
+        "editHoldActive",
+        "actions"
+      ],
+      "properties": {
+        "processRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "state": {
+          "$ref": "publish-process-types.schema.json#/$defs/processState"
+        },
+        "dataClass": {
+          "$ref": "publish-process-types.schema.json#/$defs/publishDataClass"
+        },
+        "title": {
+          "$ref": "board-types.schema.json#/$defs/safeLabel"
+        },
+        "revision": {
+          "$ref": "publish-process-types.schema.json#/$defs/draftRevision"
+        },
+        "targetSummary": {
+          "$ref": "publish-process-types.schema.json#/$defs/targetSummary"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "scheduledAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "editHoldActive": {
+          "type": "boolean"
+        },
+        "actions": {
+          "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        }
+      }
+    }
+  }
+}

@@ -1,10 +1,10 @@
 {
   "artifactKind": "surface_contract_manifest",
   "interfaceContract": {
-    "digest": "sha256:d769e496692553dd6358eb434f992df09841d3703f968bdf2562b37b9c8ee68c",
+    "digest": "sha256:40fb7446de386d30cb0418a545128e7b6d15748efcfda6ef4df1944555e62ef4",
     "key": "nurture.surface-contract",
-    "version": "1.9.0"
+    "version": "1.10.0"
   },
-  "manifestDigest": "sha256:49d00add3e94492d7cff6bc089ff59de6e405895e70711ee8aae0935ed2fb4a9",
+  "manifestDigest": "sha256:63a084f2bf822025b9d4f9f47f845569c0c2802633dd4e310751bd4b2825ca08",
   "schemaVersion": 1
 }

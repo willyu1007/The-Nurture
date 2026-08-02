@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  PUBLICATION_POLICY_NO_GO,
   QUERY_CAREGIVER_TEACHER_BOARD_CAPABILITY,
   QUERY_GUARDIAN_FAMILY_BOARD_CAPABILITY,
-  TEACHER_PUBLISH_QUEUE_NO_GO,
   presentCaregiverTeacherBoard,
   presentGuardianFamilyBoard,
   type BoardSurfaceRegistrationV1,
@@ -16,6 +16,8 @@ import {
   createCaregiverReadPort,
   createFamilyCareWorkDeps,
   createGuardianReadPort,
+  createPublishQueueReadPort,
+  publishQueueRow,
   focusGoal,
   guardianActivity,
   surfaceRegistrySource,
@@ -54,6 +56,7 @@ const guardianDeps = (
 const caregiverDeps = (
   port: ReturnType<typeof createCaregiverReadPort>,
   familyCareRows = [workItem()],
+  queuePages = [{ rows: [publishQueueRow()], has_more: false }],
 ) => ({
   contract: BOARD_CONTRACT,
   integrity_key: BOARD_INTEGRITY_KEY,
@@ -61,6 +64,7 @@ const caregiverDeps = (
   now,
   surface: caregiverSurface,
   family_care_work: createFamilyCareWorkDeps(familyCareRows),
+  publish_queue: createPublishQueueReadPort(queuePages),
 });
 
 describe("G3-A guardian_family_board envelope", () => {
@@ -286,13 +290,14 @@ describe("G3-A caregiver_teacher_board envelope", () => {
     expect(envelope.content.map((module) => module.kind)).toEqual([
       "caregiver_child_today",
       "caregiver_family_care_work",
+      "teacher_publish_queue",
     ]);
     expect(caregiverSurface.orderedContentKinds).toEqual([
       "caregiver_child_today",
       "caregiver_family_care_work",
       "teacher_publish_queue",
     ]);
-    expect(envelope.dependencyNoGos).toEqual([TEACHER_PUBLISH_QUEUE_NO_GO]);
+    expect(envelope.dependencyNoGos).toEqual([PUBLICATION_POLICY_NO_GO]);
     expect(envelope.state).toBe("limited");
     expect(envelope.actorContext).toEqual({
       role: "caregiver",

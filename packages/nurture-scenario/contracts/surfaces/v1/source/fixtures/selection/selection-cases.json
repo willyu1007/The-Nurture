@@ -89,6 +89,34 @@
           {
             "capabilityKey": "record_caregiver_daily_care",
             "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "organize_care_capture_batch",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "save_publish_process_draft",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "acquire_publish_edit_hold",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "renew_publish_edit_hold",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "release_publish_edit_hold",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "cancel_publish_process",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "query_teacher_publish_queue",
+            "reasonKind": "role_unsupported"
           }
         ]
       }
@@ -123,7 +151,8 @@
           "acknowledge_family_care_item",
           "reply_family_care_item",
           "query_caregiver_teacher_board",
-          "query_caregiver_child_today"
+          "query_caregiver_child_today",
+          "query_teacher_publish_queue"
         ],
         "filteredOut": [
           {
@@ -173,6 +202,30 @@
           {
             "capabilityKey": "update_guardian_current_focus",
             "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "organize_care_capture_batch",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "save_publish_process_draft",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "acquire_publish_edit_hold",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "renew_publish_edit_hold",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "release_publish_edit_hold",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "cancel_publish_process",
+            "reasonKind": "missing_target_context"
           }
         ]
       }

@@ -160,6 +160,41 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-02 — owner-issued target ref 会把内部标识符原样带出去
+
+- **Symptom**：`publish target` 的公开 ref 里出现了 `child-1`。测试
+  "serialized targets 不含 raw id" 直接抓到。
+- **Root cause**：`issueBoardTargetRef` 为了能反解，把 id 内嵌在
+  `version.kind.id.tag` 里。对 care item 这类单一 id 尚可接受，但 publish target
+  的复合键包含 child/Enrollment/Grant 三个标识符，而冻结件要求 target 必须
+  "behind an opaque public ref"。
+- **Attempts**：一度考虑只对 publish target 做特例哈希，但那样 process ref 里的
+  careGroupId 仍然会泄漏——同一个 board 的 `careGroupRef` 明明已经是哈希过的。
+- **Fix**：新增 `issueBoardSealedRef` / `resolveBoardSealedRef`：纯 HMAC、不可逆，
+  按 owner 当前候选集枚举解析。publish process 与 publish target 都改用它，
+  顺带得到"失去访问权的 ref 直接解析不出来"这个额外性质。
+- **Prevention**：新增一类公开 ref 时先问"它内嵌了什么"。可反解的内嵌式 ref 只用于
+  单一、非关联标识符；一旦是复合键或跨实体键，就用 sealed + 枚举解析。
+
+### 2026-08-02 — 领域常量超出 generic invocation 冻结上限（第二次）
+
+- **Symptom**：board query 的 `MAX_PAGE_SIZE` 一开始沿用 T-005 lane 的 100。
+- **Root cause**：`query-invocation.schema.json` 冻结了 `pageSize` `maximum: 20`。
+  这条在 G3-A 已经踩过一次，G3-B1 的 publish queue 直接复用了修好的 helper 才没
+  再犯。
+- **Prevention**：新 query lane 一律复用 `parseBoardPageSize`，不要各自定义上限。
+
+### 2026-08-02 — 合同检查假设了 schema 文件的组织方式
+
+- **Symptom**：三个 edit-hold 能力共用一个 schema 文件、指针分别是
+  `acquireInput`/`renewInput`/`releaseInput`，phase-2 的 typed-input 检查悄悄
+  漏掉了它们——它硬编码读 `/$defs/input`。
+- **Root cause**：检查绕过了 schema-registry 已经提供的 `jsonPointer`，用文件
+  约定代替了合同声明。
+- **Fix**：改为按 registry 的 `jsonPointer` 解析，并断言指针形状。
+- **Prevention**：合同检查要沿着合同自己的解析路径走。凡是"按文件名/固定位置"
+  取值的地方，都是一个会静默漏检的假设。
+
 ### 2026-08-02 — 归档任务的守卫把"当前 artifact"钉死，任何 checkpoint 旋转都会炸
 
 - **Symptom**：G3-A 按冻结件把 surface artifact additive 旋转到 `1.9.0` 后，

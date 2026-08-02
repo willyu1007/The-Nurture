@@ -13,6 +13,8 @@ import {
   createCaregiverReadPort,
   createFamilyCareWorkDeps,
   createGuardianReadPort,
+  createPublishQueueReadPort,
+  publishQueueRow,
   focusGoal,
   guardianActivity,
   workItem,
@@ -189,7 +191,11 @@ describe("Phase 3 board module topology fixtures", () => {
           (entry) => entry.capabilityKey === actionKey,
         );
         expect(capability, `${fixtureRef} ${actionKey}`).toBeDefined();
-        expect(capability?.descriptor.executionClass).toBe("action_execution");
+        // Either write execution class, never a query.
+        expect(
+          ["action_execution", "publish_process_transition"],
+          `${fixtureRef} ${actionKey}`,
+        ).toContain(capability?.descriptor.executionClass);
       }
     }
     expect(boardViews[0]?.view.writeActionKeys).toContain("update_guardian_current_focus");
@@ -236,6 +242,9 @@ describe("Phase 3 board module topology fixtures", () => {
           pages: [{ rows: [childToday()], has_more: false }],
         }),
         family_care_work: createFamilyCareWorkDeps([workItem()]),
+        publish_queue: createPublishQueueReadPort([
+          { rows: [publishQueueRow()], has_more: false },
+        ]),
       },
       caregiverScope,
     );
