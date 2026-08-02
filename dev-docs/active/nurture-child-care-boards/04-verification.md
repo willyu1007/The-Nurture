@@ -198,3 +198,21 @@
 | 2026-07-30 | Stage G3 cross-task consistency review across T-005/T-006/T-007/T-008 and project hub | PASS |
 | 2026-07-30 | Governance sync/lint, strict context verification, Markdown links/anchors/headings and `git diff --check` | PASS |
 | 2026-07-30 | G3 overall audit landing: governance sync/lint, project-state verify, 6/6 task-doc link/anchor lint, strict context verification and `git diff --check` | PASS |
+
+## 2026-08-02 — G3-0 Freeze Qualification
+
+| Command / check | Result |
+| --- | --- |
+| `node .ai/scripts/ctl-project-governance.mjs resume --task T-006 --json` | PASS — explicit `T-006 nurture-child-care-boards`, clean worktree, state `planned` before transition |
+| `node .ai/scripts/ctl-project-governance.mjs sync --apply --project main --changelog` + strict lint | PASS — T-006 synchronized to `in-progress` |
+| registered DB context census over focus/daily care/attention/media/authority facts | PASS — 15 required landed tables; T-006 process/release facts correctly absent before implementation |
+| exact T-004/T-005 surface, visibility, direct capability/input/result/head/unavailable census | PASS — `1.8.0` / `4fe91e…`; Caregiver Workflow projection denial identified |
+| exact T-007 G4-0B policy freeze census | PASS — `nurture.institution-publication-policy@1.0.0`, required fields/defaults and provider-pending gate present |
+| first `pnpm verify:g3-0-freeze` | FAIL — verifier compared semantically equal JSON objects by insertion order; no contract mismatch |
+| verifier canonicalization repair | PASS — recursive key canonicalization removes order sensitivity without weakening array/value checks |
+| second `pnpm verify:g3-0-freeze` | PASS — facts=15, surfaces=2, exact T-005, frozen T-007, explicit schema delta/profile/stage gates, no placeholders |
+| `node --check scripts/assert-g3-0-freeze.mjs` | PASS — verifier syntax valid |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 Markdown files, zero warnings/errors, links and anchors valid |
+| `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --strict` | PASS — registered context remains consistent; no context artifact changed |
+| governance sync + strict lint | PASS — T-006 remains the sole `in-progress` task for this bundle and project views are synchronized |
+| `git diff --check` | PASS — no whitespace errors |

@@ -2,8 +2,8 @@ version: 1
 task_id: T-006
 project: main
 slug: nurture-child-care-boards
-status: planned
-updated: "2026-07-30"
+status: in-progress
+updated: "2026-08-02"
 keywords:
   - guardian-board
   - caregiver-board

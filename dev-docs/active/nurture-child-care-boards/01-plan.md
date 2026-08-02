@@ -103,6 +103,17 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
   enhancement 成为主路径的隐式 hard dependency。
 - 列出缺失字段、权限来源和待解锁 gate。
 
+### G3-0 result — PASS (2026-08-02)
+
+- 冻结记录：
+  [06-g3-0-fact-contract-schema-freeze.md](06-g3-0-fact-contract-schema-freeze.md)。
+- `T006-AC-001`～`T006-AC-010` 已分别映射到一个机械检查类别；
+  `pnpm verify:g3-0-freeze` 当前通过。
+- G3-A 与 G3-B1/G3-C1 required domain work 已开放；T-007 provider-backed release、
+  G3-C2 activation 与 G3-E 仍按冻结 gate 关闭。
+- exact `1.8.0` 当前拒绝 Caregiver Workflow projection，首个 profile 固定 excluded；
+  未来采用必须旋转 surface/visibility contract，不允许 presenter 暗中兼容。
+
 ## Acceptance-to-Check Mapping — Accepted (2026-07-31)
 
 - 本任务验收条目在 G3-0 freeze 及各组交付（G3-A～G3-E）冻结时获得稳定 ID

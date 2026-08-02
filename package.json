@@ -57,6 +57,7 @@
     "verify:formal-ingress-contract": "node scripts/assert-formal-ingress-contract.mjs",
     "verify:g2-exit-contract": "node scripts/assert-g2-exit-contract.mjs",
     "verify:g2-exit-db-census": "node scripts/assert-g2-exit-db-census.mjs",
+    "verify:g3-0-freeze": "node scripts/assert-g3-0-freeze.mjs",
     "verify:port-topology": "node scripts/assert-port-topology.mjs",
     "verify:surface-conformance": "node scripts/surface-contract/run-surface-conformance.mjs",
     "verify:surface-contract": "node scripts/surface-contract/verify-surface-contract.mjs",

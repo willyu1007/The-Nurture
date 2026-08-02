@@ -746,6 +746,11 @@ canonical fact heads。任何微调完成后，旧 snapshot/cursor 必须失效�
 - 当前产品 Workflow 只指园区管理 `InstitutionWorkflow`；board 不是 Workflow owner。
 - Guardian/Caregiver board MAY 显示与当前角色直接相关的
   `InstitutionWorkflowProjection` 外部切片，例如 GrantRequest 待确认或结果。
+- G3-0 对当前 exact `nurture.surface-contract@1.8.0` 的兼容结论更具体：Guardian
+  family board 可以把该模块保持 optional/absent-empty；Caregiver teacher board 的
+  visibility matrix 当前明确拒绝该 data class，因此首个 G3 profile 排除它。未来
+  Caregiver 侧采用必须先旋转 surface/visibility contract 并重跑 affected
+  conformance，不能由 presenter 暗中注入。
 - 同角色可获得更完整投影，但仍必须验证 Workspace、Institution、scope、assignment、
   Grant/fact visibility 与 purpose。
 - family-care Item 的 action scope 是原始精确 `Enrollment + CareGroup`；同班当前
@@ -755,3 +760,7 @@ canonical fact heads。任何微调完成后，旧 snapshot/cursor 必须失效�
 - projection 只包含安全摘要、阶段、里程碑、下一步和当前可执行 capability；不得输出
   raw Run/Step、claim token、园区内部备注或未授权主体。
 - board action 调用版本化 capability；不得直接修改 projection 或 runtime state。
+
+G3-0 的 exact query topology、source-head/cursor binding、T-005/T-007 dependency
+contract 与 DB SSOT delta 见
+[06-g3-0-fact-contract-schema-freeze.md](06-g3-0-fact-contract-schema-freeze.md)。

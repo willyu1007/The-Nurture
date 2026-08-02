@@ -274,21 +274,24 @@
   canonical capability，避免“同班共同责任”越权修改 T-005 作者事实。
 - 明确 direct-interaction 路由依赖 T-005 后续专用 caregiver-initiated capability；
   现有会拒绝健康/用药等输入的普通 family-question action 不可被静默复用。
-- 决策编号 D-04、D-16 是未使用间隙，不是遗漏项；T-006 顶层决策对齐关闭，任务仍为
-  `planned`，进入 Phase 0 inventory 前不宣称已实现。
+- 决策编号 D-04、D-16 是未使用间隙，不是遗漏项；在 2026-07-30 顶层决策关闭时，
+  任务仍为 `planned`，且尚未进入 Phase 0 inventory。该历史状态已由 2026-08-02
+  G3-0 freeze 记录取代。
 - 当前只更新规划/治理文档，无应用代码、schema、数据库或 presenter 变更。
 
-## Implementation Follow-ups
+## Current Implementation Follow-ups
 
-- D-01 已决定使用共享的请求期 projection pipeline 与角色独立 presenter；Stage G3-0
-  仍需盘点哪些 landed facts 可直接复用、哪些需要 adapter 或局部可重建索引。
-- D-03 已决定 daily care、attention 等领域事实保持独立并由 presenter 组合；精确
-  module/content schemas 留给 contract implementation。
-- D-13 已固定 My-Chat local cache/upload 与 Nurture business media owner 的边界；
-  D-12 状态到现有 T-002 schema 的精确映射或 DB SSOT delta 仍待设计。
-- T-007 `InstitutionWorkflowProjection` 与 T-006 board external-slice 的最小共享 schema。
-- T-005 专用 caregiver-initiated direct-interaction capability 的 contract key、
-  eligibility、protected-content ingress 与 role-safe blocked projection。
+- G3-A 按 G3-0 freeze 实现双层 envelope/module query、共享 source-head pipeline 与
+  Guardian/Caregiver 独立 presenter；不得通过 presenter 私下注入合同未允许的模块。
+- G3-A conformance 先以当前 exact `nurture.surface-contract@1.8.0` 为基线，仅在对应
+  slice 实现并具备可重复证据后轮转合同。届时必须把 G3-0 verifier 从“能力尚未落地”
+  census 更新为 landed-slice validation，不能长期保留必然失败的检查点守卫。
+- G3-0 已冻结 DB delta；实际 Prisma schema/migration 分别随相关 G3-B/G3-C slice
+  实施，并在改动前按 repo-prisma SSOT 流程重新执行 migration census。
+- G3-D/G3-E 仍以 T-007 owner-issued publication-policy provider 和真实联合资格证据为
+  准入门；不得用 pending owner 或 safe-unavailable 占位完成 Exit。
+- G3-B2 explicit AI copy 与 G3-C2 face match 在首个 beta profile 中保持 optional、
+  absent/default-off；只有完成对应合同轮转和隐私/法律 gate 后才能启用。
 
 ## 2026-07-30 — Stage G3 delivery structure accepted
 
@@ -336,3 +339,30 @@
 - 未映射条目不得勾选；各组资格化与 G3-E PASS 依据是映射检查通过。回链使用
   T-004 conformance manifest 的 AC 引用字段。详见 `01-plan.md`
   Acceptance-to-Check Mapping 小节。本次只更新规划文档，无代码或 schema 变更。
+
+## 2026-08-02 — G3-0 fact/contract/schema freeze passed
+
+- T-006 从 `planned` 切为 `in-progress`，编排继续复用 `M-002 > F-003 > T-006`；
+  未创建重复 task 或 bundle。
+- 新增 `06-g3-0-fact-contract-schema-freeze.md`，冻结 T-002 facts/authority reuse、
+  Guardian/Caregiver 两层 envelope/module query topology、source heads/cursor、
+  owner mutation 边界与单次 DB SSOT delta。
+- T-003 的“今日一瞥/当前关注/成长线/今日班级/收件箱/班级流/整理队列”已逐项映射到
+  当前 T-004 module 与 canonical facts；旧群聊、15 秒发布等已 supersede 语义未进入
+  实现合同。
+- exact dependency 固定为 `nurture.surface-contract@1.8.0` / `4fe91e…`、
+  `initiate_caregiver_direct_message@1.0.0` 与
+  `nurture.institution-publication-policy@1.0.0`。T-005 action 直接消费，不创建
+  T-006 wrapper 或普通 family-question fallback。
+- 发现 exact `1.8.0` 的 Caregiver visibility 与规划级 MAY 不一致：当前合同明确
+  deny `institution_workflow_projection`。首个 profile 已固定 Caregiver excluded、
+  Guardian optional/absent-empty；未来采用要求显式 contract rotation，消除双轨。
+- T-002 media/attribution lifecycle 与 G3 语义不等价，冻结为 extend-in-place +
+  evidence-backed migration；禁止新建 G3 平行媒体表或猜测 legacy hidden/deleted。
+- 首个 profile 明确 B1/C1 required，B2 absent、C2 optional/default-off；T-007 provider
+  qualification 与 G3-E 保持 gated。
+- 新增 `scripts/assert-g3-0-freeze.mjs` 与 `pnpm verify:g3-0-freeze`，机械覆盖
+  `T006-AC-001`～`T006-AC-010`。首轮比较器错误地把 JSON 键顺序当语义，已改为
+  递归 canonicalize；重跑通过。
+- 本阶段没有修改 Prisma schema、migration、surface registry/runtime、环境值、
+  capability activation、Candidate、部署或流量。

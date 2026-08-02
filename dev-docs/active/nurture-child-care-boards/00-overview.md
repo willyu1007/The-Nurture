@@ -2,13 +2,13 @@
 
 ## Status
 
-- State: planned
+- State: in-progress
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-07-30
-- Next step: 保持 `planned` 并进入 Stage G3-0 fact/contract/schema freeze；随后按
-  G3-A Shared Board Foundation、G3-B Capture-to-Draft、G3-C Content/Media
-  Safety、G3-D Publish and Release、G3-E Integration Qualification 推进。
+- Updated: 2026-08-02
+- Next step: Stage G3-0 已以 `G3_0_FREEZE_PASS` 完成；进入 G3-A Shared Board
+  Foundation，实现角色独立 envelope/module queries、共享 source-head pipeline、
+  Guardian/Caregiver presenters 与首批合成 conformance fixtures。
 
 ## Goal
 
@@ -46,6 +46,13 @@ projection/process/delivery/Workflow ownership 不混层；T-005/T-006 与 T-006
 无整任务循环依赖；optional enhancement 不成为隐藏 hard dependency。剩余 exact
 keys/schemas/source heads/DB delta/fixtures 属于 G3-0 implementation contract freeze，
 不再重开顶层产品边界。
+
+2026-08-02 G3-0 已冻结 exact `1.8.0` surface/T-005 direct-action 输入、T-007
+`nurture.institution-publication-policy@1.0.0`、两层 board query 拓扑、T-002
+事实复用与单次 DB SSOT delta，并建立 `T006-AC-001`～`T006-AC-010` 机械映射。
+首个 profile 排除 exact `1.8.0` 当前明确拒绝的 Caregiver Workflow projection；
+Guardian 侧保持 optional/absent-empty。详细记录见
+[G3-0 freeze](06-g3-0-fact-contract-schema-freeze.md)。
 
 ## Scope In
 
@@ -272,8 +279,9 @@ keys/schemas/source heads/DB delta/fixtures 属于 G3-0 implementation contract 
 
 ## Next Step
 
-T-006 顶层产品决策和 Stage G3 交付结构均已收口。下一步执行 G3-0
-fact/contract/schema freeze，明确 landed reuse、adapter、DB SSOT delta、T-004
-Harness、T-005 G2-C provider contract 与 T-007 publication-policy owner contract；
-随后从 G3-A 开始逐组实现/资格化。G2-C 不阻塞 G3-A～D，但 G3-E 必须完成真实联合
-资格验证。G3-C2 face match 与 G3-B2 AI copy 是可选并行增强，不进入首个关键路径。
+T-006 顶层产品决策、Stage G3 交付结构和 G3-0 冻结均已收口。下一步进入 G3-A：
+按 `query_guardian_family_board@1.0.0` / `query_caregiver_teacher_board@1.0.0`
+envelope 与各 typed module queries 建立共享 source-head projection pipeline、角色独立
+presenter、current-authority filter 和合成 conformance fixtures。G3-B1/G3-C1 可按冻结
+依赖并行准备；T-007 provider-backed release 和 G3-E 仍保持关闭。G3-C2 face match
+与 G3-B2 AI copy 是可选增强，不进入首个关键路径。

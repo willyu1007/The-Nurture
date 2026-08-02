@@ -49,3 +49,4 @@ Project: `main`
 - 2026-08-01 task_id=T-005 slug=nurture-family-care-conversation event=status from=planned to=in-progress
 - 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=in-progress to=done
 - 2026-08-02 task_id=T-005 slug=nurture-family-care-conversation event=status from=done to=archived
+- 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=status from=planned to=in-progress
