@@ -267,7 +267,15 @@ export class PrismaMediaSafetyReadPort
     const referencingRevisions = await this.prisma.nurturePublishProcessRevision.findMany({
       where: {
         workspaceId: input.workspace_id,
-        currentOf: { is: { state: { in: ["draft", "needs_review", "pending_release"] } } },
+        currentOf: {
+          is: {
+            state: { in: ["draft", "needs_review", "pending_release"] },
+            // Same scope as the committed-release count below. Counting the
+            // whole workspace showed the teacher a number about other classes
+            // while a different number decided whether they were blocked.
+            careGroupId: reach.care_group_id,
+          },
+        },
       },
       select: { id: true, mediaCompositionPayload: true, publishProcessId: true },
     });
@@ -287,9 +295,13 @@ export class PrismaMediaSafetyReadPort
         where: { workspaceId: input.workspace_id, publishProcessId: process.id },
       });
     } else {
-      // Global discard: only a release whose own frozen composition contains
+        // Global discard: only a release whose own frozen composition contains
       // this asset closes the window. Counting every release the class ever
       // made would make one publication freeze the whole media library.
+      //
+      // `referencing_draft_count` is reported, not enforced: the rule allows
+      // the discard and the referencing drafts re-read the asset as
+      // unavailable. An earlier comment here claimed it was a refusal.
       const releases = await this.prisma.nurturePublicationRelease.findMany({
         where: {
           workspaceId: input.workspace_id,
@@ -306,7 +318,10 @@ export class PrismaMediaSafetyReadPort
 
     return {
       authority: caregiverRowAuthority(reach, asset.careGroupId) as CaregiverFactAuthorityV1,
-      process_state: process?.state ?? "draft",
+      // The global path has no process, so there is no process state to report.
+      // Answering "draft" invented one; `cancelled` is the one value that can
+      // never gate this decision, so it reads as "not a process question".
+      process_state: process?.state ?? "cancelled",
       composition_media_ids: composition,
       media_revision: asset.mediaRevision,
       media_lifecycle: asset.lifecycle,

@@ -392,7 +392,7 @@ describe("G3-C1 owner reads: media lifecycle", () => {
         workspaceId: world.workspaceId,
         careGroupId: world.group.id,
         processKey: `publish:${randomUUID()}`,
-        state,
+        state: state === "released" ? "pending_release" : state,
         dataClass: "child_growth_record",
         purposeKey: "child_growth_publication",
       },
@@ -409,7 +409,10 @@ describe("G3-C1 owner reads: media lifecycle", () => {
     });
     await prisma.nurturePublishProcess.update({
       where: { id: process.id },
-      data: { currentRevisionId: revision.id },
+      data: {
+        currentRevisionId: revision.id,
+        ...(state === "released" ? { state, frozenRevisionId: revision.id } : {}),
+      },
     });
     return { process, revision };
   };
@@ -471,7 +474,7 @@ describe("G3-C1 owner reads: media lifecycle", () => {
         publishProcessTargetId: target.id,
         publishProcessRevisionId: revision.id,
         releasedByRoleAssignmentId: world.teacherRole.id,
-        commandRequestIdHash: `sha256:${randomUUID()}`,
+        commandRequestIdHash: randomUUID().replace(/-/g, "").repeat(2),
       },
     });
 
@@ -524,7 +527,7 @@ describe("G3-C1 owner reads: media lifecycle", () => {
         publishProcessTargetId: target.id,
         publishProcessRevisionId: other.revision.id,
         releasedByRoleAssignmentId: world.teacherRole.id,
-        commandRequestIdHash: `sha256:${randomUUID()}`,
+        commandRequestIdHash: randomUUID().replace(/-/g, "").repeat(2),
       },
     });
 

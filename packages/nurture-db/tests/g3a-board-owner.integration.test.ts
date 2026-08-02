@@ -431,7 +431,7 @@ const seedRelease = async (world: World) => {
       workspaceId: world.workspaceId,
       careGroupId: world.group.id,
       processKey: `publish:${randomUUID()}`,
-      state: "released",
+      state: "pending_release",
       dataClass: "child_growth_record",
       purposeKey: "child_growth_publication",
     },
@@ -456,6 +456,10 @@ const seedRelease = async (world: World) => {
       grantId: world.grant.id,
     },
   });
+  await prisma.nurturePublishProcess.update({
+    where: { id: publishProcess.id },
+    data: { state: "released", frozenRevisionId: revision.id },
+  });
   return prisma.nurturePublicationRelease.create({
     data: {
       workspaceId: world.workspaceId,
@@ -463,7 +467,7 @@ const seedRelease = async (world: World) => {
       publishProcessTargetId: target.id,
       publishProcessRevisionId: revision.id,
       releasedByRoleAssignmentId: world.caregiverRole.id,
-      commandRequestIdHash: `sha256:${randomUUID()}`,
+      commandRequestIdHash: randomUUID().replace(/-/g, "").repeat(2),
     },
   });
 };

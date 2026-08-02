@@ -367,7 +367,10 @@ export const savePublishProcessDraft = async (
   if (!processKey) return { status: "denied", reason_code: "target_unavailable" };
   if (
     !Number.isSafeInteger(request.expected_draft_revision) ||
-    request.expected_draft_revision < 1
+    // A process with no saved revision reports `current_revision: 0`, and the
+    // save that creates revision 1 must be able to say so. Rejecting 0 left
+    // that process with no satisfiable input at all.
+    request.expected_draft_revision < 0
   ) {
     return { status: "denied", reason_code: "invalid_expected_revision" };
   }

@@ -318,12 +318,24 @@ describe("G3-B1 draft autosave", () => {
   });
 
   it("refuses a malformed expected revision before reading anything", async () => {
-    for (const expected of [0, -1, 1.5]) {
+    for (const expected of [-1, 1.5]) {
       await expect(save(draftFacts(), { expected_draft_revision: expected })).resolves.toEqual({
         status: "denied",
         reason_code: "invalid_expected_revision",
       });
     }
+  });
+
+  it("lets the first save of a process state that it expects revision zero", async () => {
+    // A process with nothing saved reports `current_revision: 0`. Rejecting 0
+    // as malformed left it with no input it could ever satisfy — the earlier
+    // expectation here treated that dead end as the contract.
+    const result = await save(draftFacts({ current_revision: 0 }), {
+      expected_draft_revision: 0,
+    });
+    expect(result.status).toBe("saved");
+    if (result.status !== "saved") return;
+    expect(result.result.revision).toBe(1);
   });
 });
 

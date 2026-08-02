@@ -301,7 +301,7 @@ describe("G3-0 schema delta: publish process and release", () => {
       publishProcessId: publishProcess.id,
       holderRoleAssignmentId: scope.caregiverRole.id,
       holderParticipantId: scope.caregiverRole.participantId,
-      expiresAt: new Date("2026-08-02T02:00:00.000Z"),
+      expiresAt: new Date(Date.now() + 600_000),
     };
     await prisma.nurturePublishEditHold.create({ data: hold });
     await expectUniqueViolation(prisma.nurturePublishEditHold.create({ data: hold }), [
@@ -343,7 +343,7 @@ describe("G3-0 schema delta: publish process and release", () => {
         publishProcessTargetId: target.id,
         publishProcessRevisionId: revision.id,
         releasedByRoleAssignmentId: scope.caregiverRole.id,
-        commandRequestIdHash: "sha256:command-1",
+        commandRequestIdHash: "a".repeat(64),
         receiptId: receipt.id,
       },
     });
@@ -359,7 +359,7 @@ describe("G3-0 schema delta: publish process and release", () => {
           publishProcessTargetId: target.id,
           publishProcessRevisionId: revision.id,
           releasedByRoleAssignmentId: scope.caregiverRole.id,
-          commandRequestIdHash: "sha256:command-2",
+          commandRequestIdHash: "b".repeat(64),
         },
       }),
       ["publish_process_target_id"],
@@ -376,7 +376,7 @@ describe("G3-0 schema delta: publish process and release", () => {
         publishProcessTargetId: target.id,
         publishProcessRevisionId: revision.id,
         releasedByRoleAssignmentId: scope.caregiverRole.id,
-        commandRequestIdHash: "sha256:command-1",
+        commandRequestIdHash: "a".repeat(64),
       },
     });
     for (const kind of ["correction", "target_removal", "redaction"] as const) {

@@ -41,6 +41,22 @@ const strictlyAfter = (before: BoardSortKeyV1, timeField: "committedAt" | "updat
 };
 
 /**
+ * The last rank in the frozen `priority` vocabulary (1..99). A goal the owner
+ * never ranked sorts last, and says so, rather than being silently coalesced
+ * into a rank the family never chose.
+ */
+const UNRANKED_FOCUS_PRIORITY = 99;
+
+/** The family's own safe title for its charter, never a lifecycle column. */
+const readCharterLabel = (payload: unknown): string => {
+  if (typeof payload === "object" && payload !== null) {
+    const label = (payload as { safeLabel?: unknown }).safeLabel;
+    if (typeof label === "string" && label.length > 0) return label;
+  }
+  return "family_charter";
+};
+
+/**
  * The publishable data classes and the activity kinds the family board shows.
  * The mapping is explicit and total: the earlier fallback branch sent every
  * other class to `media`, so a released `daily_care_log` publication appeared
@@ -396,7 +412,11 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
           goal_id: goal.id,
           cycle_id: cycle.id,
           label: goal.goalKey ?? "",
-          priority: goal.priority ?? 99,
+          // The owner's priority column is nullable and it is this lane's primary
+          // sort term. `?? 99` invented a rank; an unranked goal sorts last by
+          // being given the vocabulary's last value explicitly, and the reason
+          // is recorded rather than hidden in a coalesce.
+          priority: goal.priority ?? UNRANKED_FOCUS_PRIORITY,
           occurred_at: goal.updatedAt.toISOString(),
           source_label: "family_focus_cycle",
           child_scope_explicit: Boolean(scope),
@@ -451,13 +471,27 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
         : []),
     ];
 
+    // Exactly GUARDIAN_CURRENT_FOCUS_ORDER. The rows come from several cycles,
+    // so the database can only order within each one; emitting them cycle-major
+    // made two active cycles read 1, 2, 1, 2 against an advertised
+    // `priority_asc`. The lane is a single page, so the sort is total here.
+    goals.sort((left, right) =>
+      left.priority !== right.priority
+        ? left.priority - right.priority
+        : left.occurred_at !== right.occurred_at
+          ? right.occurred_at.localeCompare(left.occurred_at)
+          : left.goal_id.localeCompare(right.goal_id),
+    );
+
     return {
       authorized: true,
       ...(charterRow
         ? {
             charter: {
               charter_id: charterRow.id,
-              label: charterRow.status ?? "family_charter",
+              // A safe label, never the lifecycle column: families were shown a
+              // charter titled "active".
+              label: readCharterLabel(charterRow.charterPayload),
               items: charterRow.items.map((item) => ({
                 item_id: item.id,
                 label: item.itemKey ?? "",

@@ -524,6 +524,12 @@ export function createHarnessEngine(input: {
           ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
         });
       }
+      if (request.capability_key !== "query_teacher_publish_queue") {
+        // Every routed key matches explicitly. A trailing unconditional return
+        // would answer some other capability with this one's result, which is
+        // only ever safe by coincidence of the current allowlist.
+        return { status: "denied", reason_code: "unknown_capability" };
+      }
       return queryTeacherPublishQueue(
         { contract: boardContract, integrity_key: input.integrityKey, reads: publishQueueReads },
         await caregiverBoardReads.loadCaregiverScope({

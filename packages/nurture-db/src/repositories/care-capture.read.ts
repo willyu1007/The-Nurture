@@ -99,7 +99,10 @@ export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
             }
           : {}),
       },
-      ...(batch.cutAt ? { fallback_due_at: batch.cutAt.toISOString() } : {}),
+      // `fallback_due_at` means the daily fallback point has been reached. The
+      // owner records no such fact, and `cutAt` is when a batch was cut — a
+      // different thing entirely. Absent until there is a fact to report.
+
     };
   }
 }

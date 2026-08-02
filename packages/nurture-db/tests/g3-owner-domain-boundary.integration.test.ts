@@ -206,12 +206,12 @@ describe("owner rows arrive in the order their binding advertises", () => {
           workspaceId: world.workspaceId,
           careGroupId: world.group.id,
           processKey: `publish:${state}:${randomUUID()}`,
-          state,
+          state: state === "released" ? "pending_release" : state,
           dataClass: "child_growth_record",
           purposeKey: "child_growth_publication",
         },
       });
-      await prisma.nurturePublishProcessRevision.create({
+      const revision = await prisma.nurturePublishProcessRevision.create({
         data: {
           workspaceId: world.workspaceId,
           publishProcessId: process.id,
@@ -220,6 +220,12 @@ describe("owner rows arrive in the order their binding advertises", () => {
           organizerInputRevision: "organizer:1",
         },
       });
+      if (state === "released") {
+        await prisma.nurturePublishProcess.update({
+          where: { id: process.id },
+          data: { state, frozenRevisionId: revision.id },
+        });
+      }
     }
     const reads = new PrismaPublishLaneReadPort(prisma);
     const page = await reads.listTeacherPublishQueue({

@@ -293,17 +293,21 @@ export class PrismaBoardMutationTransaction implements NurtureBoardMutationTrans
     });
     if (!participant) return NO_DAILY_CARE_FACTS;
 
+    // Scoped exactly as the prepare-side eligibility port scopes it. Reading
+    // roles of any scope type and taking the earliest made prepare and execute
+    // disagree: a teacher holding an older institution-wide role plus a newer
+    // class role was offered a target and then refused for it.
     const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
       where: {
         workspaceId: input.workspace_id,
         participantId: input.participant_id,
         role: { in: ["caregiver", "lead_caregiver"] },
+        scopeType: "care_group",
         ...activeRoleWindow(now),
       },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
-    const role = roles[0];
-    if (!role) return { ...NO_DAILY_CARE_FACTS, participant_active: true };
+    if (roles.length === 0) return { ...NO_DAILY_CARE_FACTS, participant_active: true };
 
     const enrollment = await this.prisma.nurtureEnrollment.findFirst({
       where: {
@@ -317,20 +321,20 @@ export class PrismaBoardMutationTransaction implements NurtureBoardMutationTrans
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
     if (!enrollment) {
+      const first = roles[0]!;
       return {
         ...NO_DAILY_CARE_FACTS,
         participant_active: true,
-        caregiver_role: role.role,
-        role_scope_type: role.scopeType,
-        caregiver_role_version: role.aggregateVersion,
+        caregiver_role: first.role,
+        role_scope_type: first.scopeType,
+        caregiver_role_version: first.aggregateVersion,
       };
     }
 
-    // The write is admitted only when the actor's own assignment is scoped to
-    // the exact CareGroup that owns the enrollment. An institution-scoped
-    // assignment reaching a class it does not hold is refused here.
-    const matches =
-      role.scopeType === "care_group" && role.scopeId === enrollment.careGroupId;
+    // The write is admitted only through the assignment scoped to the exact
+    // CareGroup that owns the enrollment — the same one prepare matched.
+    const role = roles.find((entry) => entry.scopeId === enrollment.careGroupId) ?? roles[0]!;
+    const matches = role.scopeId === enrollment.careGroupId;
     return {
       participant_active: true,
       caregiver_role: role.role,

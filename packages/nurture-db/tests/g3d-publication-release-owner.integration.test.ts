@@ -496,7 +496,7 @@ describe("G3-D owner reads: release facts", () => {
     expect(after?.targets.filter((target) => target.grant_allows)).toHaveLength(1);
   });
 
-  it("reports a partially recorded schedule as unresolved, not as a missing target", async () => {
+  it("reports an unresolved schedule as unresolved, not as a missing target", async () => {
     const world = await seedWorld();
     const { process } = await seedProcess(world, { schedule: false });
     const port = new PrismaPublicationReleasePort(prisma);
@@ -513,13 +513,16 @@ describe("G3-D owner reads: release facts", () => {
     expect(unscheduled).not.toBeNull();
     expect(unscheduled?.schedule).toBeNull();
 
-    await prisma.nurturePublishProcess.update({
-      where: { id: process.id },
-      data: { scheduledAt: SCHEDULE.scheduledAt, notAfter: SCHEDULE.notAfter },
-    });
-    // Still missing the timezone and policy head: a half-recorded schedule is
-    // not a window the release lane may act on.
-    expect((await read())?.schedule).toBeNull();
+    // A half-recorded window is now impossible rather than merely refused: the
+    // owner cannot store one, so the port's guard is defence in depth behind a
+    // constraint rather than the only thing standing between a partial
+    // resolution and a release.
+    await expect(
+      prisma.nurturePublishProcess.update({
+        where: { id: process.id },
+        data: { scheduledAt: SCHEDULE.scheduledAt, notAfter: SCHEDULE.notAfter },
+      }),
+    ).rejects.toThrow(/ck_nurture_publish_process_state/);
 
     await prisma.nurturePublishProcess.update({
       where: { id: process.id },

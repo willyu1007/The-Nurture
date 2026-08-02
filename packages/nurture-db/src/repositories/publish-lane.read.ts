@@ -41,17 +41,6 @@ const PUBLISH_STATES = [
 const PUBLISHABLE_DATA_CLASSES = ["daily_care_log", "child_growth_record"] as const;
 
 /**
- * States that can still accept a draft save. A released or cancelled card must
- * not carry a save action: the owner would be manufacturing eligibility the
- * process no longer has.
- */
-const DRAFT_EDITABLE_STATES: readonly PublishProcessStateV1[] = [
-  "draft",
-  "needs_review",
-  "pending_release",
-];
-
-/**
  * "Strictly after this position" in the declared queue order. The order mixes
  * directions, so the lexicographic comparison is written out rather than
  * expressed as a single row comparison.
@@ -212,17 +201,12 @@ export class PrismaPublishLaneReadPort
       ...(process.scheduledAt ? { scheduled_at: process.scheduledAt.toISOString() } : {}),
       edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
       authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,
-      action_grants: DRAFT_EDITABLE_STATES.includes(process.state)
-        ? [
-            {
-              capability_key: "save_publish_process_draft",
-              capability_version: "1.0.0",
-              availability: "available" as const,
-              target_option_id: process.processKey,
-              target_kind: "publish_process",
-            },
-          ]
-        : [],
+      // No action is advertised while the publish write lane has no owner write
+      // and no ingress route. A board that offers "Save draft" on a card whose
+      // capability answers `unknown_capability` has made a promise the system
+      // cannot keep — the same placeholder the freeze refuses on the ingress
+      // side, arriving from the read side instead. Restore the grant with B8.
+      action_grants: [],
     }));
 
     const page = rows.slice(0, input.take);

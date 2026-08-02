@@ -645,3 +645,25 @@
 | doc correction: the earlier note claimed the fallback fix was a class, it was one lane | AMENDED in place |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 508, 178 and 26 tests |
 | `verify:test-routing` and the six contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — C/D Verification and Fact-table CHECK Constraints
+
+| Command / check | Result |
+| --- | --- |
+| 22 C/D claims verified one by one | 18 confirmed, 2 refuted, 2 partly — agent output was not taken at face value |
+| refuted: nullable-column unique "no-op" for the batch trigger | correct by design; two agents independently agreed |
+| partly: `caregiverRowAuthority` tautological | 2 of 8 call sites, both already filtered by the query — redundant, not wrong |
+| partly: `snapshot_ref` unused | dead field yes; cursor state IS checked via drift head and snapshot version |
+| C9: release executions were unreadable through read-result | FIXED — `businessActorRef` is the participant, as everywhere else |
+| A6: prepare offered a target execute then refused | FIXED — both sides resolve the same care-group-scoped role |
+| A12: `current_focus` emitted cycle-major against `priority_asc` | FIXED — total sort in the declared order |
+| D3: unmatched query keys fell through to the publish queue | FIXED — explicit refusal |
+| D5: a process with nothing saved had no satisfiable expected revision | FIXED — 0 is valid; the test that pinned the dead end is replaced |
+| D8: draft count workspace-wide, release count care-group-scoped | FIXED — one scope |
+| A9 remainder: the queue advertised an unroutable action | FIXED — no action grant until B8 |
+| D7: ten new fact tables had zero CHECK constraints | FIXED — `20260802150000_g3_fact_check_constraints` |
+| the new constraints caught tests creating impossible states | `released` before a revision exists, `sha256:` command hashes, holds born expired, half-recorded windows |
+| released is now reachable only by the update that freezes the revision | PASS — tests reshaped to the real `commitTargetRelease` flow |
+| C2/C4/C5/C6/C8/C10 small fixes | FIXED — charter label, discard comment, invented process state, `cutAt` as fallback, `?? 99`, raw id in `commandScope` |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 509, 178 and 26 tests |
+| `verify:test-routing` and the six contract/boundary gates | PASS — artifact unchanged at `1.13.0` |

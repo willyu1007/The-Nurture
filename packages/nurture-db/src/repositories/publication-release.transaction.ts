@@ -19,6 +19,7 @@ import {
 } from "./board-read-support.js";
 
 const RELEASE_COMMAND_KEY = "release_publish_process";
+const RELEASE_COMMAND_SCOPE = "board_publication";
 const RELEASE_COMMAND_CONTRACT_VERSION = 1;
 
 const sha256 = (value: string): string =>
@@ -356,12 +357,18 @@ export class PrismaPublicationReleasePort
             originInvocationRequestIdHash: publicationReleaseAttemptIdentity(input.command_request_id),
             parentCommandRequestIdHash: publicationReleaseAttemptIdentity(input.command_request_id),
             commandKey: RELEASE_COMMAND_KEY,
-            commandScope: process.careGroupId,
+            // A lane label, as in every other spec. Writing the raw CareGroup id
+            // here put two meanings under one column name.
+            commandScope: RELEASE_COMMAND_SCOPE,
             commandContractVersion: RELEASE_COMMAND_CONTRACT_VERSION,
             payloadHash: sha256(
               JSON.stringify([process.processKey, target.targetKey, input.revision]),
             ),
-            businessActorRef: reach.role_assignment_id,
+            // The participant, as in every other command. `readResult` gates on
+            // `business_actor_ref === actor_participant_id`, so a role
+            // assignment id here made a release execution unreadable forever.
+            // Which assignment authorized it is already on the release row.
+            businessActorRef: input.participant_id,
             childCareProcessId: target.childCareProcessId,
             // Both ref columns are canonical-ref arrays: the immutable result
             // names what it produced, it does not describe it.

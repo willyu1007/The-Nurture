@@ -1200,3 +1200,63 @@ cursor 在解密处就抛错,而不是先解出一个调用方还得去怀疑的
 一刀切兜底还在,把非成长记录的发布显示成 `media`。现在改成显式全映射,并在查询层
 排除不可发布的 data class。03-notes 里那句读起来像全局修复的话已就地更正——**文档
 声称的修复只做了一半,比没做更糟**。
+
+## 2026-08-02 — C/D 两类逐条核实,以及十张新表的 CHECK
+
+复核给出的 22 条 C/D 断言逐条核实:**2 条不成立、2 条部分成立**,其余成立。不照单
+全收本身就是必要的一步。
+
+**不成立**:`uq_nurture_care_capture_batch_trigger` 在可空列上"失效"——`trigger_request_id`
+只有在触发落定时才写,NULL 行是触发前的 collecting 批次,唯一约束恰好约束了它该约束
+的(owner-write 枚举那个智能体独立得出同样结论)。
+**部分成立**:`caregiverRowAuthority` 恒真只发生在 8 个调用点中的 2 个,且那 2 处的
+查询本就按该 group 过滤,是冗余而非错答;`snapshot_ref` 确实是死字段,但"游标状态
+没被校验"不成立——`drift_head` 与 `snapshot_version` 都在比。
+
+### 功能性的几条
+
+- **C9 一次发布的执行结果永远读不回来**。`readResult` 用
+  `business_actor_ref === actor_participant_id` 把门,而 release 写进去的是
+  role assignment id。改写 participant id;是哪个角色授权的,release 行上本来就有。
+- **A6 prepare 成功、execute 拒绝**。eligibility 端口按 `scopeType: "care_group"`
+  过滤,而 `loadCaregiverDailyCareFacts` 不过滤、取 `roles[0]`。持有较早的机构级角色
+  加较新的班级角色的老师因此被自己 prepare 出来的目标拒绝。改为两侧同一套解析,并按
+  enrollment 所属班级挑那一个角色。
+- **A12 `current_focus` 的答序与声明序不符**。owner 是 cycle-major,两个活跃周期下
+  优先级读作 1,2,1,2。该 lane 只有一页,所以在内存里按声明序做全序排序。
+- **D3 `query()` 没有 default 分支**,任何未匹配的 key 落到发布队列——与我刚修掉的
+  `query_family_care_item` 落空同类。补显式拒绝。
+- **D5 `expected_draft_revision < 1` 让首次保存无解**。没有已保存 revision 的 process
+  报 `current_revision: 0`,却被拒绝提交 0。既有单测把这个死胡同当成了契约。
+- **D8 两个计数作用域不同**:给老师看的 `referencing_draft_count` 是 workspace 全域,
+  决定他被不被挡的 `committed_release_count` 是班级域。统一为班级域。
+- **A9 剩余的一半**:队列把 `save_publish_process_draft` 标为 `available`,而该能力既无
+  owner 写也未路由,点了就是 400。**看板不该承诺系统做不到的事**——这正是冻结件在
+  ingress 侧禁止的占位,只是从读侧来。暂不发放任何 action,B8 落地时恢复。
+
+### D7:十张新表补 CHECK
+
+T-005 每张事实表都有 CHECK,T-006 十张**一条没有**。新增
+`20260802150000_g3_fact_check_constraints`,只写读端口本就假设的不变量:
+released 必有冻结 revision;已解析的发送窗口是**五个字段全有或全无**且
+`not_after > scheduled_at`;cut/organized 的批次必有 `cut_at` 与水位;
+`policy_head >= 1`;`revision >= 1`;edit hold 不会一出生就过期;
+release 的 command hash 必须是 64 位十六进制。
+
+**它立刻抓到一批测试在造不可能的状态**,而且抓法很有教益:
+`state: "released"` 无法在创建时给出——因为那时 revision 还不存在。真实流程里
+`released` 只能由**冻结 revision 的那一次更新**达成,正是 `commitTargetRelease`
+的写法。测试被迫改成同一形状。另有测试用 `sha256:command-1` 当 command hash、
+用固定过去时刻当 hold 到期时间——都是与生产形状不符的数据,此前没有任何东西会说。
+
+那条"半记录的 schedule"测试也随之改写:该状态现在**不可能存在**,所以测试证明
+数据库拒绝它,端口的守卫降为约束之后的纵深防御。
+
+### 小修
+
+家庭章程的公开标题不再是它的生命周期列(家庭曾看到标题写着 `"active"`);
+`priority ?? 99` 改为具名的 `UNRANKED_FOCUS_PRIORITY` 并说明为何未排序的目标排最后;
+全局 discard 路径不再伪造 `process_state: "draft"`;`cutAt` 不再冒充
+`fallback_due_at`(owner 根本没有"每日兜底点已到"这个事实);
+`commandScope` 改回 lane 标签;discard 那条**注释**说的拒绝规则实际不存在——假的是
+注释,已改。

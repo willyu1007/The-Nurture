@@ -81,12 +81,16 @@ const seedProcess = async (
   world: Group,
   overrides: { state?: "draft" | "needs_review" | "pending_release" | "released" | "cancelled" } = {},
 ) => {
+  // A process is created before it has a revision, so it starts in an
+  // unreleased state and reaches `released` only by the same update that
+  // freezes the revision — which is exactly what commitTargetRelease does.
+  const state = overrides.state ?? "draft";
   const process = await prisma.nurturePublishProcess.create({
     data: {
       workspaceId: world.workspaceId,
       careGroupId: world.group.id,
       processKey: `publish:${randomUUID()}`,
-      state: overrides.state ?? "draft",
+      state: state === "released" ? "pending_release" : state,
       dataClass: "child_growth_record",
       purposeKey: "child_growth_publication",
     },
@@ -104,9 +108,12 @@ const seedProcess = async (
   });
   await prisma.nurturePublishProcess.update({
     where: { id: process.id },
-    data: { currentRevisionId: revision.id },
+    data: {
+      currentRevisionId: revision.id,
+      ...(state === "released" ? { state, frozenRevisionId: revision.id } : {}),
+    },
   });
-  return { process, revision };
+  return { process: { ...process, state }, revision };
 };
 
 describe("G3-B1 owner reads: teacher publish queue", () => {
@@ -216,7 +223,7 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
         publishProcessTargetId: targets[0]!.id,
         publishProcessRevisionId: revision.id,
         releasedByRoleAssignmentId: world.teacherRole.id,
-        commandRequestIdHash: "sha256:command-1",
+        commandRequestIdHash: "a".repeat(64),
       },
     });
 
@@ -245,9 +252,17 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
     });
     expect(unscheduled.rows[0]?.scheduled_at).toBeUndefined();
 
+    // A resolved window is all five fields; the database now refuses a partial
+    // one, so this records the whole resolution the way the owner would.
     await prisma.nurturePublishProcess.update({
       where: { id: process.id },
-      data: { scheduledAt: new Date("2026-08-03T09:00:00.000Z") },
+      data: {
+        scheduledAt: new Date("2026-08-03T09:00:00.000Z"),
+        notAfter: new Date("2026-08-03T11:00:00.000Z"),
+        scheduleTimeZone: "Asia/Shanghai",
+        schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
+        schedulePolicyHead: 3,
+      },
     });
     const scheduled = await reads.listTeacherPublishQueue({
       workspace_id: world.workspaceId,
@@ -285,7 +300,7 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
     expect(page.state_counts.draft).toBe(1);
   });
 
-  it("offers a draft save only while the process can still take one", async () => {
+  it("advertises no action while the write lane cannot execute one", async () => {
     const world = await seedGroup();
     for (const state of ["draft", "released", "cancelled"] as const) {
       await seedProcess(world, { state });
@@ -298,14 +313,11 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
       snapshot_at: SNAPSHOT_AT,
       take: 10,
     });
-    const byState = new Map(page.rows.map((row) => [row.state, row.action_grants]));
-    expect(byState.get("draft")?.map((grant) => grant.capability_key)).toEqual([
-      "save_publish_process_draft",
-    ]);
-    // A released or cancelled card is no longer editable; offering the action
-    // would be the owner manufacturing eligibility.
-    expect(byState.get("released")).toEqual([]);
-    expect(byState.get("cancelled")).toEqual([]);
+    expect(page.rows).toHaveLength(3);
+    // `save_publish_process_draft` has no owner write and no ingress route, so
+    // a card offering it would 400 on click. The board must not promise what
+    // the system cannot do — restore this with B8, not before.
+    expect(page.rows.flatMap((row) => row.action_grants)).toEqual([]);
   });
 
   it("keeps the queue source head scope-level rather than page-shaped", async () => {
@@ -388,9 +400,14 @@ describe("G3-B1 owner reads: edit hold, draft and cancel", () => {
     // reader's own authority over the card.
     expect(held?.authority.role_scope_matches_source).toBe(true);
 
+    // A hold lapses; it is never born expired, which is what the new CHECK
+    // says. Move its creation back with it.
     await prisma.nurturePublishEditHold.update({
       where: { id: hold.id },
-      data: { expiresAt: new Date(Date.now() - 60_000) },
+      data: {
+        createdAt: new Date(Date.now() - 3_600_000),
+        expiresAt: new Date(Date.now() - 60_000),
+      },
     });
     const lapsed = await reads.loadEditHoldFacts({
       workspace_id: world.workspaceId,
