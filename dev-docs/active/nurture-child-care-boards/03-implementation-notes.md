@@ -861,3 +861,34 @@ scope。实现绑定到创建时间最早的那个 family,并且**只**取该 fa
 Receipt 带齐 grant/enrollment/data class/target scope/`delivered_at`。两条都不是
 T-006 新增的,但 T-006 的 release 与 drift 路径都要穿过它们,已在 DB 测试里各留
 一条正例。
+
+## 2026-08-02 — G3-E prerequisite B2-2 与 B3:发布队列 lane 与采集读端口
+
+`publish-lane.read.ts` 一次实现四个端口(队列、edit hold、draft、cancel),因为它们
+读的是同一个 `NurturePublishProcess` 聚合,拆开只会重复三遍"actor 是否还够得着
+这个班"的判定。
+
+- **class-shared work**。权限按精确源 CareGroup 判,而不是"谁建的卡"。同班同事
+  持有 edit hold 不会削弱读者对该卡的权限——测试同时断言 `current_hold` 指向同事
+  且读者自己的 `role_scope_matches_source` 仍为真。
+- **队列普查是队列级的**。`state_counts` 用 `groupBy` 对整个 CareGroup 统计,与
+  当前页无关;测试用 `take: 1` 的页配 4 条队列证明二者不同。这是质量复核里修掉的
+  那个缺陷在 owner 侧的对应实现。
+- **protected content 边界保持默认关闭**。队列标题来自已保存 revision 的
+  `titleProtectionPayload`。构造函数里的 `ProtectedContentWritePort` 是可选的:
+  没有密钥时标题为空串,而不是把密文塞进公开结果。
+- **过期的 hold 就是没有 hold**,并且读取它不会隐式续期(测试读后回查 `expiresAt`
+  仍在过去)。
+- **`known_source_refs` 只来自 owner 自己记下的那份**(当前 revision 的
+  `sourceRefsPayload`)。payload 形状不对时返回空数组而不是"部分已知集合"——
+  部分集合会让一个本应被拒的 ref 意外通过。
+- **精确 command 重放**由 owner 按 `organizerInputRevision` 找回那次写下的
+  revision,而不是再写一条。
+
+B3(采集 lane 没有声明读端口)一并关闭:在 `care-capture-batch.ts` 里声明
+`CaptureBatchReadPort` / `CaptureOrganizeSourceV1`,并加 `resolveOrganizeTrigger`
+把"通过 owner 端口取源 → 交给 `evaluateOrganizeTrigger`"这条边界写死;policy 仍是
+调用方输入,它来自 T-007 而不是采集 owner。`care-capture.read.ts` 的实现是纯读:
+不开批次、不推进批次、不碰 activity lease,测试在读之后回查 `state` /
+`watermarkSourceSequence` / `cutAt` 全部未动。owner 只报告它对每条 capture 是否
+真的握有持久 head(`stable`),稳定前缀的切分留在 domain evaluator。

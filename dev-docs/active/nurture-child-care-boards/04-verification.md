@@ -467,3 +467,26 @@
 | `pnpm test:unit` / `verify:test-routing` | PASS — 504 tests, files=87 production-db=15 |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisites B2-2 and B3 (Publish Lane and Capture Port)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm typecheck` | PASS — four publish-lane ports plus the new capture port |
+| `pnpm test:db` | PASS — 16 files / 130 tests |
+| queue census is queue-wide while the page is not | PASS — `take: 1` over a four-card queue |
+| queue title comes from the saved revision; no key material shows no title | PASS — never ciphertext in a public result |
+| released targets counted per target | PASS — 1 of 2, never a bare "published" |
+| scheduled time omitted until the owner resolved one | PASS |
+| negative: sibling class, institution-scoped assignment | PASS — `authorized: false` |
+| a colleague's live hold does not remove the reader's own authority | PASS — class-shared responsibility |
+| an expired hold reads as no hold and is not renewed by being read | PASS |
+| `known_source_refs` only from the owner's recorded payload; malformed reads as empty | PASS — never a partial set |
+| exact command replay answered from the revision that command wrote | PASS |
+| process key stops resolving once the assignment is revoked | PASS |
+| capture read reports intake in sequence order with the owner's stability fact | PASS — unstable capture reported, not filtered |
+| capture read never opens or advances a batch | PASS — state, watermark and `cutAt` unchanged after read |
+| negative: caregiver of another class, revoked assignment | PASS — `null` |
+| `pnpm test:unit` / `verify:test-routing` | PASS — 504 tests, files=88 production-db=16 |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |

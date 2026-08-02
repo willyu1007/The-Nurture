@@ -75,11 +75,15 @@ test.
 > `PrismaCaregiverBoardReadPort`, `PrismaGuardianFocusEligibilityReadPort`,
 > `PrismaCaregiverDailyCareEligibilityReadPort` and
 > `PrismaBoardMutationTransaction`, covered by
-> `packages/nurture-db/tests/g3a-board-owner.integration.test.ts`. The nine
-> remaining ports (publish queue, edit hold, draft, cancel, content safety,
-> media attribution, media lifecycle, release, post-release safety) are still
-> unimplemented, and `commitTargetRelease` — the atomic per-target write — is
-> among them.
+> `packages/nurture-db/tests/g3a-board-owner.integration.test.ts`. The G3-B1
+> lane followed: `PrismaPublishLaneReadPort` covers the publish queue, edit
+> hold, draft and cancel ports, covered by
+> `packages/nurture-db/tests/g3b1-publish-lane-owner.integration.test.ts`.
+>
+> Five ports remain: `ContentSafetySourceReadPort`, `MediaAttributionReadPort`,
+> `MediaLifecycleReadPort`, `PublicationReleasePort` and
+> `PublicationSafetyReadPort` — and `commitTargetRelease`, the atomic per-target
+> write, is among them.
 >
 > One limitation surfaced while landing the Guardian lane and is not a defect in
 > the implementation: `NurtureFamily` is one-to-one with
@@ -103,7 +107,14 @@ Fourteen declared ports have zero implementations in `packages/nurture-db`:
 `PublicationRelease`, its logical Receipt and the immutable `CommandExecution`
 atomically per target. Nothing else in T-006 has that shape.
 
-### B3 — The capture lane has no declared read port (internal, specification)
+### B3 — The capture lane has no declared read port (internal, specification) — RESOLVED 2026-08-02
+
+> Resolved. `CaptureBatchReadPort` / `CaptureOrganizeSourceV1` are declared in
+> `care-capture-batch.ts` alongside `resolveOrganizeTrigger`, which fixes the
+> boundary as "load through the owner port, then evaluate". The policy stays a
+> caller input resolved from T-007, not from the capture owner.
+> `PrismaCareCaptureReadPort` implements it as a pure read that never opens or
+> advances a batch.
 
 `evaluateOrganizeTrigger` takes an assembled `OrganizeTriggerRequestV1`. Every
 other lane declares the exact owner port its facts come from, so the capture
@@ -150,8 +161,8 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
    2026-08-02.**
 2. **Owner repositories** — the fourteen ports plus the atomic per-target release
    transaction, with `test:db` coverage on disposable PostgreSQL. Unblocks B2.
-3. **Capture-lane port** — declare it alongside the repositories so every lane
-   has one boundary shape. Unblocks B3.
+3. ~~**Capture-lane port** — declare it alongside the repositories so every lane
+   has one boundary shape. Unblocks B3.~~ **Done 2026-08-02.**
 4. **Ingress routing** — admit the 24 T-006 keys, extend the ingress census, keep
    every gate default-off. Unblocks B4.
 5. **T-005 consumer action** — owner-issued `initiate_caregiver_direct_message`

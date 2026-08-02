@@ -256,6 +256,78 @@ const idleSeconds = (activity: CaptureActivityHeadV1, now: Date): number =>
  * idle period already satisfies it, so it is only consulted when the daily
  * fallback comes due while someone is still working.
  */
+/**
+ * The capture lane's owner boundary (G3-E prerequisite B3). Every other lane
+ * names the exact owner port its facts come from; without this one the capture
+ * batch would be the single place where the integration boundary is discovered
+ * while wiring the ingress rather than declared here.
+ */
+export type CaptureOrganizeSourceV1 = {
+  batch_id: string;
+  state: CaptureBatchStateV1;
+  captures: RawCaptureRow[];
+  activity: CaptureActivityHeadV1;
+  /** Set by the owner when the daily fallback point has already been reached. */
+  fallback_due_at?: string;
+};
+
+export type CaptureBatchReadPort = {
+  /**
+   * The batch this actor may currently organize for the exact source CareGroup,
+   * or `null` when there is no such batch or no current authority. The owner
+   * never opens a batch as a side effect of being asked about one.
+   */
+  loadOrganizeSource(input: {
+    workspace_id: string;
+    participant_id: string;
+    care_group_id: string;
+    snapshot_at: string;
+  }): Promise<CaptureOrganizeSourceV1 | null>;
+};
+
+/**
+ * Loads the capture source through the owner port and evaluates the trigger
+ * against it. The policy stays a caller input: it is resolved from T-007, not
+ * from the capture owner.
+ */
+export const resolveOrganizeTrigger = async (
+  deps: { reads: CaptureBatchReadPort; now?: () => Date },
+  scope: BoardScopeV1 & { care_group_id: string },
+  request: {
+    trigger: OrganizeTriggerKindV1;
+    trigger_request_id: string;
+    policy: OrganizeTriggerPolicyV1;
+  },
+): Promise<
+  | { status: "no_batch" }
+  | { status: "evaluated"; batch_id: string; decision: OrganizeTriggerDecisionV1 }
+> => {
+  const now = (deps.now ?? (() => new Date()))();
+  const source = await deps.reads.loadOrganizeSource({
+    workspace_id: scope.workspace_id,
+    participant_id: scope.participant_id,
+    care_group_id: scope.care_group_id,
+    snapshot_at: now.toISOString(),
+  });
+  if (!source) return { status: "no_batch" };
+  return {
+    status: "evaluated",
+    batch_id: source.batch_id,
+    decision: evaluateOrganizeTrigger({
+      trigger: request.trigger,
+      trigger_request_id: request.trigger_request_id,
+      now,
+      policy: request.policy,
+      batch: {
+        state: source.state,
+        captures: source.captures,
+        activity: source.activity,
+      },
+      ...(source.fallback_due_at ? { fallback_due_at: source.fallback_due_at } : {}),
+    }),
+  };
+};
+
 export const evaluateOrganizeTrigger = (
   request: OrganizeTriggerRequestV1,
 ): OrganizeTriggerDecisionV1 => {
