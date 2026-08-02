@@ -418,3 +418,35 @@
 - 本步骤没有修改 surface contract source/artifact、Prisma schema、migration、
   environment、capability activation、Candidate、部署或流量。capability 注册与
   conformance fixtures 属于后续步骤。
+
+## 2026-08-02 — G3-A step 2: canonical-owner inline board mutations
+
+- 新增 `src/domain/institution/board-mutation-transaction.ts`：
+  `NurtureBoardMutationTransaction` 声明 focus goal 与 daily care 两个 canonical
+  owner 的事务写端口，并接入 `NurtureCommandTransaction.boardMutations?`
+  （与既有 `familyCare?` 同形）。
+- 新增 `src/harness/board-mutations.ts`：`update_guardian_current_focus@1.0.0`
+  与 `record_caregiver_daily_care@1.0.0`。每个能力提供 typed input parse、
+  owner eligibility、owner-issued target ref 解析、current-head 绑定的 Harness
+  confirmation，以及带 `checkPreconditions` / `apply` 的 `NurtureCommandSpec`。
+- 看板不是写权威：两个 spec 都在事务内重新读取 canonical owner，head 漂移返回
+  `conflict/stale_confirmation`，事务内漂移直接抛错，不会用 board snapshot、
+  cache 或客户端 optimistic state 覆盖事实。
+- 公开 typed input 是封闭业务字段（`{label, priority}` / `{kind, summary}`），
+  不含 target、heads、actor、grant、policy 等 invocation metadata；target 只接受
+  owner 签发的 `issueFocusGoalTargetRef` / `issueChildCareProcessTargetRef`。
+  测试断言 raw id、他人 ref、跨 kind ref 与未授权 target 全部 `not_authorized`。
+- `record_caregiver_daily_care` 的授权谓词与读路径一致：current
+  `caregiver | lead_caregiver` + RoleAssignment scope 恰为源 CareGroup +
+  enrollment active。Institution Admin、Institution 级 scope 与其他班级都被拒。
+- `update_guardian_current_focus` 不会把 family-scope goal 写成 child-scoped：
+  `scopeSource` 从 owner 的 `child_scope_explicit` 事实派生，正文写入不改变 scope。
+- `record_caregiver_daily_care` 的 committed result 只表示园所内部班级事实，
+  不含 receipt/publication/visibility/delivery 字段；测试对序列化结果做负向断言。
+  发布资格是 G3-C/G3-D 的独立轴。
+- owner repository（Prisma 侧 `boardMutations` 实现）与 formal ingress 的 action
+  key 注册属于 owner-integration 阶段，两个 descriptor 因此携带
+  `t002_owner_integration` dependency gate；port 缺席时 `checkPreconditions`
+  返回 `board_mutation_port_unavailable`，fail closed，不产生半成品效果。
+- 本步骤仍未修改 surface contract source/artifact、Prisma schema、migration、
+  environment、capability activation、Candidate、部署或流量。

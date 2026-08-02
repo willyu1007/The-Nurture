@@ -235,3 +235,19 @@
 | negative: cursor replay after source/authority/correction/redaction/Grant drift or snapshot-version change | PASS — `refresh_required` for all six |
 | negative: Caregiver envelope with an injected `institution_workflow_projection` grant | PASS — absent from content and from the serialized envelope |
 | paging closure: fact-level drops across three source batches with `pageSize=4` | PASS — full page returned over two scan rounds; a fixed `take` would have returned 2 of 4 |
+
+## 2026-08-02 — G3-A Step 2 (Canonical-owner Inline Board Mutations)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm test:unit` | PASS — 34 files / 320 tests (10 new mutation tests) |
+| `pnpm typecheck` | PASS — no diagnostics |
+| `pnpm verify:test-routing` | PASS — files=69 unit=34 |
+| `pnpm verify:surface-conformance` | PASS — artifact still `1.8.0` / `4fe91e…`; no key registered before its rotation step |
+| `pnpm verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` / `verify:g3-0-freeze` | PASS — unchanged |
+| negative: raw FocusGoal id, another actor's ref, unknown goal and a cross-kind target ref on `update_guardian_current_focus` | PASS — `denied/not_authorized` for all four |
+| negative: raw ChildCareProcess id, unknown child and a cross-kind ref on `record_caregiver_daily_care` | PASS — `denied/not_authorized`; missing target is `needs_input` |
+| negative: Institution Admin, guardian role, Institution-scoped role, other-CareGroup role and inactive Enrollment on the daily-care write | PASS — `blocked/not_authorized`; exact-CareGroup `lead_caregiver` still `ready` |
+| negative: focus-goal head drift and Enrollment head drift | PASS — `conflict/stale_confirmation` before commit; in-transaction drift throws |
+| negative: absent `boardMutations` owner port | PASS — `invalid/board_mutation_port_unavailable`, fail closed |
+| negative: daily-care committed result inspected for receipt/publication/visibility/delivery claims | PASS — internal class fact only |
