@@ -15,8 +15,12 @@
     {
       "stepKey": "view-caregiver-board",
       "kind": "view",
-      "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
+      "actor": {
+        "participantId": "syn-caregiver-cara",
+        "actorRole": "caregiver"
+      },
       "surfaceKey": "caregiver_teacher_board",
+      "capabilityKey": "query_caregiver_teacher_board",
       "expectedViewRef": "expected/view-caregiver-board.json"
     }
   ],

@@ -4,9 +4,16 @@
   "title": "JourneyScriptV1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "journeyKey", "valueLoop", "refusal"],
+  "required": [
+    "schemaVersion",
+    "journeyKey",
+    "valueLoop",
+    "refusal"
+  ],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "const": 1
+    },
     "journeyKey": {
       "$ref": "journey-initial-state.schema.json#/$defs/journeyKey"
     },
@@ -15,16 +22,26 @@
       "minItems": 1,
       "items": {
         "oneOf": [
-          { "$ref": "#/$defs/actionStep" },
-          { "$ref": "#/$defs/viewStep" },
-          { "$ref": "#/$defs/transitionStep" }
+          {
+            "$ref": "#/$defs/actionStep"
+          },
+          {
+            "$ref": "#/$defs/viewStep"
+          },
+          {
+            "$ref": "#/$defs/transitionStep"
+          }
         ]
       }
     },
     "refusal": {
       "oneOf": [
-        { "$ref": "#/$defs/invocationRefusal" },
-        { "$ref": "#/$defs/affordanceAbsentRefusal" }
+        {
+          "$ref": "#/$defs/invocationRefusal"
+        },
+        {
+          "$ref": "#/$defs/affordanceAbsentRefusal"
+        }
       ]
     }
   },
@@ -37,28 +54,44 @@
     "principalActor": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["participantId", "actorRole"],
+      "required": [
+        "participantId",
+        "actorRole"
+      ],
       "properties": {
         "participantId": {
           "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
         },
         "actorRole": {
-          "enum": ["guardian", "caregiver", "lead_caregiver", "institution_admin"]
+          "enum": [
+            "guardian",
+            "caregiver",
+            "lead_caregiver",
+            "institution_admin"
+          ]
         }
       }
     },
     "policyActor": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["actorRole"],
+      "required": [
+        "actorRole"
+      ],
       "properties": {
-        "actorRole": { "const": "system_policy" }
+        "actorRole": {
+          "const": "system_policy"
+        }
       }
     },
     "actor": {
       "oneOf": [
-        { "$ref": "#/$defs/principalActor" },
-        { "$ref": "#/$defs/policyActor" }
+        {
+          "$ref": "#/$defs/principalActor"
+        },
+        {
+          "$ref": "#/$defs/policyActor"
+        }
       ]
     },
     "target": {
@@ -66,7 +99,9 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["enrollmentId"],
+          "required": [
+            "enrollmentId"
+          ],
           "properties": {
             "enrollmentId": {
               "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
@@ -76,7 +111,9 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["careItemRef"],
+          "required": [
+            "careItemRef"
+          ],
           "properties": {
             "careItemRef": {
               "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
@@ -86,7 +123,9 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["messageRef"],
+          "required": [
+            "messageRef"
+          ],
           "properties": {
             "messageRef": {
               "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
@@ -104,14 +143,21 @@
         "correct_family_care_message",
         "withdraw_family_care_request",
         "redact_family_care_message",
-        "policy_redact_family_care_message"
+        "policy_redact_family_care_message",
+        "update_guardian_current_focus",
+        "record_caregiver_daily_care"
       ]
     },
     "queryCapabilityKey": {
       "enum": [
         "query_guardian_family_care_timeline",
         "query_caregiver_family_care_work",
-        "query_family_care_item"
+        "query_family_care_item",
+        "query_guardian_family_board",
+        "query_guardian_current_focus",
+        "query_guardian_enrollment_activity",
+        "query_caregiver_teacher_board",
+        "query_caregiver_child_today"
       ]
     },
     "surfaceKey": {
@@ -172,20 +218,44 @@
     "actionStep": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stepKey", "kind", "actor", "capabilityKey", "target", "input", "expected"],
+      "required": [
+        "stepKey",
+        "kind",
+        "actor",
+        "capabilityKey",
+        "target",
+        "input",
+        "expected"
+      ],
       "properties": {
-        "stepKey": { "$ref": "#/$defs/stepKey" },
-        "kind": { "const": "action" },
-        "actor": { "$ref": "#/$defs/actor" },
-        "capabilityKey": { "$ref": "#/$defs/actionCapabilityKey" },
-        "target": { "$ref": "#/$defs/target" },
-        "input": { "type": "object" },
+        "stepKey": {
+          "$ref": "#/$defs/stepKey"
+        },
+        "kind": {
+          "const": "action"
+        },
+        "actor": {
+          "$ref": "#/$defs/actor"
+        },
+        "capabilityKey": {
+          "$ref": "#/$defs/actionCapabilityKey"
+        },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "input": {
+          "type": "object"
+        },
         "expected": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["effect"],
+          "required": [
+            "effect"
+          ],
           "properties": {
-            "effect": { "$ref": "#/$defs/effect" }
+            "effect": {
+              "$ref": "#/$defs/effect"
+            }
           }
         },
         "createsAliases": {
@@ -218,14 +288,32 @@
     "viewStep": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stepKey", "kind", "actor", "surfaceKey", "expectedViewRef"],
+      "required": [
+        "stepKey",
+        "kind",
+        "actor",
+        "surfaceKey",
+        "expectedViewRef"
+      ],
       "properties": {
-        "stepKey": { "$ref": "#/$defs/stepKey" },
-        "kind": { "const": "view" },
-        "actor": { "$ref": "#/$defs/principalActor" },
-        "surfaceKey": { "$ref": "#/$defs/surfaceKey" },
-        "capabilityKey": { "$ref": "#/$defs/queryCapabilityKey" },
-        "expectedViewRef": { "$ref": "#/$defs/expectedViewRef" }
+        "stepKey": {
+          "$ref": "#/$defs/stepKey"
+        },
+        "kind": {
+          "const": "view"
+        },
+        "actor": {
+          "$ref": "#/$defs/principalActor"
+        },
+        "surfaceKey": {
+          "$ref": "#/$defs/surfaceKey"
+        },
+        "capabilityKey": {
+          "$ref": "#/$defs/queryCapabilityKey"
+        },
+        "expectedViewRef": {
+          "$ref": "#/$defs/expectedViewRef"
+        }
       }
     },
     "transitionStep": {
@@ -233,11 +321,22 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["stepKey", "kind", "transitionKey", "grant"],
+          "required": [
+            "stepKey",
+            "kind",
+            "transitionKey",
+            "grant"
+          ],
           "properties": {
-            "stepKey": { "$ref": "#/$defs/stepKey" },
-            "kind": { "const": "world_transition" },
-            "transitionKey": { "const": "establish_family_care_grant" },
+            "stepKey": {
+              "$ref": "#/$defs/stepKey"
+            },
+            "kind": {
+              "const": "world_transition"
+            },
+            "transitionKey": {
+              "const": "establish_family_care_grant"
+            },
             "grant": {
               "$ref": "../world/synthetic-world.schema.json#/$defs/familyCareGrant"
             }
@@ -246,11 +345,22 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["stepKey", "kind", "transitionKey", "revokedGrantId"],
+          "required": [
+            "stepKey",
+            "kind",
+            "transitionKey",
+            "revokedGrantId"
+          ],
           "properties": {
-            "stepKey": { "$ref": "#/$defs/stepKey" },
-            "kind": { "const": "world_transition" },
-            "transitionKey": { "const": "revoke_family_care_grant" },
+            "stepKey": {
+              "$ref": "#/$defs/stepKey"
+            },
+            "kind": {
+              "const": "world_transition"
+            },
+            "transitionKey": {
+              "const": "revoke_family_care_grant"
+            },
             "revokedGrantId": {
               "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
             }
@@ -261,42 +371,91 @@
     "invocationRefusal": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stepKey", "kind", "actor", "capabilityKey", "target", "input", "expectedError"],
+      "required": [
+        "stepKey",
+        "kind",
+        "actor",
+        "capabilityKey",
+        "target",
+        "input",
+        "expectedError"
+      ],
       "properties": {
-        "stepKey": { "$ref": "#/$defs/stepKey" },
-        "kind": { "const": "invocation_refused" },
-        "afterStepKey": { "$ref": "#/$defs/stepKey" },
-        "actor": { "$ref": "#/$defs/actor" },
+        "stepKey": {
+          "$ref": "#/$defs/stepKey"
+        },
+        "kind": {
+          "const": "invocation_refused"
+        },
+        "afterStepKey": {
+          "$ref": "#/$defs/stepKey"
+        },
+        "actor": {
+          "$ref": "#/$defs/actor"
+        },
         "capabilityKey": {
           "oneOf": [
-            { "$ref": "#/$defs/actionCapabilityKey" },
-            { "$ref": "#/$defs/queryCapabilityKey" }
+            {
+              "$ref": "#/$defs/actionCapabilityKey"
+            },
+            {
+              "$ref": "#/$defs/queryCapabilityKey"
+            }
           ]
         },
-        "target": { "$ref": "#/$defs/target" },
-        "input": { "type": "object" },
+        "target": {
+          "$ref": "#/$defs/target"
+        },
+        "input": {
+          "type": "object"
+        },
         "expectedError": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["code", "retryHint"],
+          "required": [
+            "code",
+            "retryHint"
+          ],
           "properties": {
-            "code": { "$ref": "#/$defs/errorCode" },
-            "retryHint": { "$ref": "#/$defs/retryHint" }
+            "code": {
+              "$ref": "#/$defs/errorCode"
+            },
+            "retryHint": {
+              "$ref": "#/$defs/retryHint"
+            }
           }
         },
-        "postConditionViewRef": { "$ref": "#/$defs/expectedViewRef" }
+        "postConditionViewRef": {
+          "$ref": "#/$defs/expectedViewRef"
+        }
       }
     },
     "affordanceAbsentRefusal": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stepKey", "kind", "actor", "surfaceKey", "expectedViewRef"],
+      "required": [
+        "stepKey",
+        "kind",
+        "actor",
+        "surfaceKey",
+        "expectedViewRef"
+      ],
       "properties": {
-        "stepKey": { "$ref": "#/$defs/stepKey" },
-        "kind": { "const": "affordance_absent" },
-        "actor": { "$ref": "#/$defs/principalActor" },
-        "surfaceKey": { "$ref": "#/$defs/surfaceKey" },
-        "expectedViewRef": { "$ref": "#/$defs/expectedViewRef" }
+        "stepKey": {
+          "$ref": "#/$defs/stepKey"
+        },
+        "kind": {
+          "const": "affordance_absent"
+        },
+        "actor": {
+          "$ref": "#/$defs/principalActor"
+        },
+        "surfaceKey": {
+          "$ref": "#/$defs/surfaceKey"
+        },
+        "expectedViewRef": {
+          "$ref": "#/$defs/expectedViewRef"
+        }
       }
     }
   }

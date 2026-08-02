@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-guardian-current-focus.schema.json",
+  "title": "QueryGuardianCurrentFocusV1",
+  "$defs": {
+    "input": {
+      "$ref": "board-types.schema.json#/$defs/emptyInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "familyFocus",
+        "childFocus",
+        "pageInfo"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "board-types.schema.json#/$defs/moduleBinding"
+        },
+        "familyDirection": {
+          "$ref": "#/$defs/familyDirection"
+        },
+        "familyFocus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/focusCard"
+          }
+        },
+        "childFocus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/focusCard"
+          }
+        },
+        "pageInfo": {
+          "$ref": "board-types.schema.json#/$defs/snapshotPageInfo"
+        }
+      }
+    },
+    "familyDirection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "charterRef",
+        "label",
+        "items"
+      ],
+      "properties": {
+        "charterRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "label": {
+          "$ref": "board-types.schema.json#/$defs/safeLabel"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "itemRef",
+              "label"
+            ],
+            "properties": {
+              "itemRef": {
+                "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+              },
+              "label": {
+                "$ref": "board-types.schema.json#/$defs/safeLabel"
+              }
+            }
+          }
+        }
+      }
+    },
+    "focusCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "focusRef",
+        "cycleRef",
+        "label",
+        "priority",
+        "scopeSource",
+        "provenance",
+        "actions"
+      ],
+      "properties": {
+        "focusRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "cycleRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "label": {
+          "$ref": "board-types.schema.json#/$defs/safeLabel"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "scopeSource": {
+          "enum": [
+            "family_scope",
+            "explicit_child_scope"
+          ]
+        },
+        "childRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "childSafeLabel": {
+          "$ref": "board-types.schema.json#/$defs/safeLabel"
+        },
+        "provenance": {
+          "$ref": "board-types.schema.json#/$defs/provenance"
+        },
+        "actions": {
+          "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "scopeSource": {
+                "const": "explicit_child_scope"
+              }
+            },
+            "required": [
+              "scopeSource"
+            ]
+          },
+          "then": {
+            "required": [
+              "childRef",
+              "childSafeLabel"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "childRef"
+                  ]
+                },
+                {
+                  "required": [
+                    "childSafeLabel"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

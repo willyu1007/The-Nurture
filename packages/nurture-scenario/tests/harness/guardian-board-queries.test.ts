@@ -335,7 +335,7 @@ describe("G3-A query_guardian_enrollment_activity", () => {
       queryGuardianEnrollmentActivity(deps(port), {
         ...scope,
         enrollment_target_ref: targetRef(),
-        page_size: 101,
+        page_size: 21,
       }),
     ).resolves.toEqual({ status: "denied", reason_code: "invalid_query_input" });
     expect(port.activityRequests).toEqual([]);

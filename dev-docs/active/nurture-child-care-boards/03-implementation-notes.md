@@ -450,3 +450,51 @@
   返回 `board_mutation_port_unavailable`，fail closed，不产生半成品效果。
 - 本步骤仍未修改 surface contract source/artifact、Prisma schema、migration、
   environment、capability activation、Candidate、部署或流量。
+
+## 2026-08-02 — G3-A step 3: additive contract rotation to 1.9.0
+
+- `capability-registry.json` 的 contract 版本升到 `1.9.0`，新增 7 个 `1.0.0`
+  descriptor：`query_guardian_family_board`、`query_guardian_current_focus`、
+  `query_guardian_enrollment_activity`、`query_caregiver_teacher_board`、
+  `query_caregiver_child_today`、`update_guardian_current_focus`、
+  `record_caregiver_daily_care`。生成件为
+  `sha256:d769e496692553dd6358eb434f992df09841d3703f968bdf2562b37b9c8ee68c`。
+- 旋转是严格 additive：`sharedCoreHash` 与 11 个 T-005 capability slice 哈希、
+  6 个 surface slice 哈希全部逐字节不变。按 `compatibility-policy.json` 的
+  `additiveNewSlice: preserve_existing_slice_evidence`，T-005 G2 Exit 证据继续成立。
+- 新增合同 schema：`board-types.schema.json`（source head、module binding、
+  board action ref、paged input 等共享 def）加 7 个 capability schema，全部登记进
+  `schema-registry.json`；两个 envelope 的 result 直接 `$ref` 冻结的
+  `surface-envelope.schema.json`，不复制第二份 envelope 定义。
+- `port-registry.json` 新增 `board_projection_repository`
+  （`contract_boundary`）与 `board_mutation_repository`（`owner_integration`），
+  以及 7 条 eligibility policy。写侧 repository 的 gate 如实标为 owner_integration。
+- 首批合成 board conformance fixtures：扩展
+  `journey-expected-view.schema.json`（可选 `boardModules` /
+  `absentModuleKinds` / `dependencyNoGos`），并给 gj-2 guardian board 与 gj-5
+  caregiver board 两个既有 view 补上模块拓扑。gj-5 的 `surfaceState` 由 `ready`
+  改为 `limited`，因为 `teacher_publish_queue` 依赖尚未落地——这正是旋转应当
+  暴露出来的真实状态。
+- 新增 `phase-3-boards.test.ts` 与 conformance case
+  `board-module-topology-and-role-safety`，覆盖 7 个新 capability slice 与两个
+  board surface slice。它不只静态校验 fixture：还用真实 presenter 在同一批合成
+  事实上重跑，逐项比对模块顺序、required 位、state 与 dependency NO-GO。
+- `domainClass` 是 shared-core 枚举，扩展它会触发
+  `changedSharedCore: invalidate_all_surface_contract_evidence` 并作废 T-005 的
+  归档资格。两个 board mutation 因此使用既有的 care-domain 写入类
+  `care_interaction`；它是粗粒度合同轴，不表示 T-005 `CareInteraction` 生命周期，
+  隔离由独立 command scope（`board_focus` / `board_daily_care`）、独立 head
+  binding 和独立 transaction port 保证，并有 committed-result 负向断言兜底。
+- board query 的 `pageSize` 上限从 100 收敛到 20、默认 10，与
+  `query-invocation.schema.json` 冻结的 `maximum: 20` 一致；否则领域层会接受一个
+  ingress 永远不会放行的页大小。
+- `assert-g2-exit-contract.mjs` 与 `assert-g3-0-freeze.mjs` 原本把"当前 artifact"
+  钉死在 `1.8.0`，任何 checkpoint 旋转都会让归档任务的守卫失败。两者改为：
+  把被资格化的身份当作历史证据（要求归档记录仍然引用它、当前版本不得回退），
+  并改为证明旋转确实是 additive（shared core 不变 + 逐个 capability slice 哈希
+  不变 + T-005 population 仍在）。守卫因此比原来更强，而不是被放宽。
+- `assert-g3-0-freeze.mjs` 的 placeholder 普查也从"全部 proposed key 必须缺席"
+  改为"G3-A 已实现的 7 个 key 必须注册在 `1.0.0`，G3-B～G3-D 的 15 个 key 必须
+  仍然缺席"，让"只注册已实现 key"这条冻结声明真正有机械兜底。
+- 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
+  Candidate、部署或流量。

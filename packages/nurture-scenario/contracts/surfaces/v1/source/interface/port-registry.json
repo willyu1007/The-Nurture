@@ -9,6 +9,18 @@
       "requiredGate": "owner_integration"
     },
     {
+      "key": "board_mutation_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "owner_integration"
+    },
+    {
+      "key": "board_projection_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "contract_boundary"
+    },
+    {
       "key": "family_care_command_repository",
       "version": "1.0.0",
       "owner": "nurture",
@@ -79,6 +91,20 @@
       ]
     },
     {
+      "key": "query_caregiver_child_today_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_projection_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
       "key": "query_caregiver_family_care_work_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [
@@ -88,6 +114,20 @@
         },
         {
           "key": "family_care_query_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_caregiver_teacher_board_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_projection_repository",
           "version": "1.0.0"
         }
       ]
@@ -107,6 +147,48 @@
       ]
     },
     {
+      "key": "query_guardian_current_focus_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_projection_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_guardian_enrollment_activity_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_projection_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_guardian_family_board_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_projection_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
       "key": "query_guardian_family_care_timeline_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [
@@ -116,6 +198,20 @@
         },
         {
           "key": "family_care_query_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "record_caregiver_daily_care_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_mutation_repository",
           "version": "1.0.0"
         }
       ]
@@ -158,6 +254,20 @@
         },
         {
           "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "update_guardian_current_focus_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "board_mutation_repository",
           "version": "1.0.0"
         }
       ]

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/record-caregiver-daily-care.schema.json",
+  "title": "RecordCaregiverDailyCareV1",
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "summary"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "meal",
+            "nap",
+            "mood",
+            "activity",
+            "health_observation"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dailyCareLogRef",
+        "kind",
+        "recordedAt"
+      ],
+      "properties": {
+        "dailyCareLogRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "kind": {
+          "enum": [
+            "meal",
+            "nap",
+            "mood",
+            "activity",
+            "health_observation"
+          ]
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

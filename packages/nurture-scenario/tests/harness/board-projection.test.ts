@@ -35,7 +35,7 @@ const identity: BoardCursorIdentityV1 = {
   query_key: "guardian_enrollment_activity",
   scope_ref: "scope-ref-1",
   order: "occurred_at_desc,id_desc",
-  page_size: 25,
+  page_size: 20,
 };
 
 const state = {
@@ -152,7 +152,7 @@ describe("G3-A shared board projection", () => {
       { ...identity, query_key: "guardian_current_focus" },
       { ...identity, scope_ref: "scope-ref-2" },
       { ...identity, order: "occurred_at_asc,id_asc" },
-      { ...identity, page_size: 26 },
+      { ...identity, page_size: 19 },
     ]) {
       expect(
         resolveBoardCursor(BOARD_INTEGRITY_KEY, scope, drifted, token, at(state.snapshot_at)),
@@ -184,10 +184,11 @@ describe("G3-A shared board projection", () => {
   });
 
   it("bounds page size and defaults without accepting a client-chosen unbounded scan", () => {
-    expect(parseBoardPageSize(undefined)).toBe(25);
+    expect(parseBoardPageSize(undefined)).toBe(10);
     expect(parseBoardPageSize(1)).toBe(1);
-    expect(parseBoardPageSize(100)).toBe(100);
-    for (const invalid of [0, -1, 101, 1.5, "25", null, Number.NaN]) {
+    // The generic query invocation caps pageSize at 20; the board lane matches it.
+    expect(parseBoardPageSize(20)).toBe(20);
+    for (const invalid of [0, -1, 21, 100, 1.5, "20", null, Number.NaN]) {
       expect(parseBoardPageSize(invalid)).toBeNull();
     }
   });

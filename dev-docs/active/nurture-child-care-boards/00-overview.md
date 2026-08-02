@@ -6,9 +6,10 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-02
-- Next step: Stage G3-0 已以 `G3_0_FREEZE_PASS` 完成；进入 G3-A Shared Board
-  Foundation，实现角色独立 envelope/module queries、共享 source-head pipeline、
-  Guardian/Caregiver presenters 与首批合成 conformance fixtures。
+- Next step: G3-A Shared Board Foundation 已完成并以
+  `nurture.surface-contract@1.9.0` /
+  `sha256:d769e496692553dd6358eb434f992df09841d3703f968bdf2562b37b9c8ee68c`
+  additive 旋转落地；下一步进入 G3-B1 capture-to-draft deterministic main path。
 
 ## Goal
 
@@ -53,6 +54,15 @@ keys/schemas/source heads/DB delta/fixtures 属于 G3-0 implementation contract 
 首个 profile 排除 exact `1.8.0` 当前明确拒绝的 Caregiver Workflow projection；
 Guardian 侧保持 optional/absent-empty。详细记录见
 [G3-0 freeze](06-g3-0-fact-contract-schema-freeze.md)。
+
+2026-08-02 G3-A 已交付：共享 source-head projection pipeline、Guardian/Caregiver
+两条角色独立读路径、两个 envelope presenter、两个 canonical owner 内联 mutation，
+以及首批合成 board conformance fixtures。surface artifact 从 `1.8.0` additive 旋转
+到 `1.9.0`：shared core 与全部 T-005 capability slice 哈希逐字节不变，因此 T-005
+G2 Exit 证据按 `compatibility-policy.json` 的 `additiveNewSlice` 规则继续成立。
+`teacher_publish_queue` 依赖 G3-B 事实，模块缺席并以 dependency NO-GO 呈现，
+Caregiver teacher board 因此为 `limited`；Guardian optional Workflow projection
+缺席不产生 NO-GO、不降级 state。
 
 ## Scope In
 
@@ -279,9 +289,11 @@ Guardian 侧保持 optional/absent-empty。详细记录见
 
 ## Next Step
 
-T-006 顶层产品决策、Stage G3 交付结构和 G3-0 冻结均已收口。下一步进入 G3-A：
-按 `query_guardian_family_board@1.0.0` / `query_caregiver_teacher_board@1.0.0`
-envelope 与各 typed module queries 建立共享 source-head projection pipeline、角色独立
-presenter、current-authority filter 和合成 conformance fixtures。G3-B1/G3-C1 可按冻结
-依赖并行准备；T-007 provider-backed release 和 G3-E 仍保持关闭。G3-C2 face match
-与 G3-B2 AI copy 是可选增强，不进入首个关键路径。
+G3-A 已完成：`query_guardian_family_board@1.0.0` /
+`query_caregiver_teacher_board@1.0.0` envelope、三个 typed module query、共享
+source-head projection pipeline、角色独立 presenter、current-authority filter、
+两个 canonical owner 内联 mutation 与首批合成 conformance fixtures 全部落地并
+通过映射检查。下一步进入 G3-B1 capture-to-draft deterministic main path；
+G3-C1 可并行准备。board mutation 的 owner repository 与 formal ingress 注册留给
+owner-integration 阶段，T-007 provider-backed release 和 G3-E 仍保持关闭。
+G3-C2 face match 与 G3-B2 AI copy 是可选增强，不进入首个关键路径。

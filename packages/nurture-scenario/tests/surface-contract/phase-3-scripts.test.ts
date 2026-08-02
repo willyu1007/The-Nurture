@@ -382,7 +382,8 @@ describe("Phase 3 journey scripts", () => {
       /^world-v[0-9]+$/,
       /^expected\/[a-z0-9]+(?:-[a-z0-9]+)*\.json$/,
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      /^[a-z]+(?:_[a-z0-9]+)*$/,
+      /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/,
+      /^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$/,
     ];
     for (const entry of scriptedJourneys) {
       const texts = [entry.scriptText, ...entry.views.map((view) => view.viewText)];

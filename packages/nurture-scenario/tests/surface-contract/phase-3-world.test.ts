@@ -37,12 +37,19 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["correct_family_care_message", "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3"],
   ["initiate_caregiver_direct_message", "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"],
   ["policy_redact_family_care_message", "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"],
+  ["query_caregiver_child_today", "sha256:bf1b9bd160bd6c962d7020cfb46074d902ddd2ec10efff6c9b3c895e2a94a5c0"],
   ["query_caregiver_family_care_work", "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"],
+  ["query_caregiver_teacher_board", "sha256:e54fd33fff1ca72ecfec7983a95bad58575d3696d053975f82d811a7e164de19"],
   ["query_family_care_item", "sha256:1bfdbb7f79b68a929799fd8959d20e5c95b6bef7d517780a35f7d076286ef323"],
+  ["query_guardian_current_focus", "sha256:2ac5a7b3736a26d3aa38600edac9f51d4a9e1f41c1d581a95492a5346a8f6e15"],
+  ["query_guardian_enrollment_activity", "sha256:bad468244dd328c8efdccade21d9ade6bd7c2342bc777227547fcd1928156516"],
+  ["query_guardian_family_board", "sha256:3428ce684cb827ba2b6aa4383a184252338018a059d3d4f6022817a237158080"],
   ["query_guardian_family_care_timeline", "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"],
+  ["record_caregiver_daily_care", "sha256:e49064ae5691abfaae62ddb278ec31c8188f5bf30bde51d8b5b3c0825e0a02c8"],
   ["redact_family_care_message", "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5"],
   ["reply_family_care_item", "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6"],
   ["submit_family_care_question", "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"],
+  ["update_guardian_current_focus", "sha256:b959809c1f0737be5ea71a0b08ce03a77286a409f079406d26573c3e37b9471b"],
   ["withdraw_family_care_request", "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b"],
 ];
 const frozenSurfaceSliceHashes: readonly (readonly [string, string])[] = [
@@ -245,7 +252,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.8.0");
+    expect(contract.version).toBe("1.9.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

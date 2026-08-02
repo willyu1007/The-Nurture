@@ -160,4 +160,69 @@
 
 ## Resolved Pitfalls
 
-当前尚未进入实现阶段。问题解决后记录 symptom、root cause、attempts、fix 和 prevention。
+### 2026-08-02 — 归档任务的守卫把"当前 artifact"钉死，任何 checkpoint 旋转都会炸
+
+- **Symptom**：G3-A 按冻结件把 surface artifact additive 旋转到 `1.9.0` 后，
+  `pnpm verify:g2-exit-contract` 与 `pnpm verify:g3-0-freeze` 立刻失败。
+- **Root cause**：两个守卫都用 `expectedInterface` 直接断言"当前生成件 ==
+  `1.8.0` / `4fe91e…`"。但那是 T-005 被资格化时的身份、以及 G3-0 冻结时的输入身份，
+  是历史证据，不是当前 head。冻结件本身要求"每个 checkpoint 只加已实现的 key
+  并旋转 artifact"，所以这两条断言与冻结规则互相矛盾。
+- **Attempts**：一度考虑不旋转、把 capability 注册推迟到后面的 checkpoint；
+  这会让 G3-A 交付一批没有合同身份的实现，反而制造了"实现与合同不同步"的更大缺口。
+- **Fix**：把被资格化的身份改成历史 pin —— 断言归档记录仍然引用它、当前版本不得
+  回退 —— 并把"当前 artifact 仍然安全"改为**证明旋转确实是 additive**：
+  `sharedCoreHash` 不变、11 个 T-005 capability slice 哈希逐个不变、T-005
+  population 仍在。这正是 `compatibility-policy.json` 的
+  `additiveNewSlice: preserve_existing_slice_evidence` 所承诺的东西。
+- **Prevention**：区分"被资格化的身份"和"当前 head"。前者写进归档记录并只做
+  存在性/不回退检查；后者用 slice 级不变量证明兼容。守卫改动只能让断言更强，
+  改完必须能说清楚新断言覆盖了旧断言的哪一条。
+
+### 2026-08-02 — 冻结的 placeholder 普查会随实现推进变成假阳性
+
+- **Symptom**：`assert-g3-0-freeze.mjs` 断言 11 个 proposed capability key 全部
+  未注册。G3-A 实现其中 7 个之后，这条检查在"正确的进展"上失败。
+- **Root cause**：检查表达的是"未实现的 key 不得出现"，但实现成了"全部 proposed
+  key 不得出现"，把 adoption set 当成了永久禁令。
+- **Fix**：拆成两半 —— G3-A 已实现的 7 个 key 必须注册且版本恰为 `1.0.0`；
+  G3-B～G3-D 的 15 个 key 必须仍然缺席。冻结件里"每个 checkpoint 只加已实现的
+  key、新 key 从 1.0.0 起"这句话第一次有了完整的机械兜底。
+- **Prevention**：写 absence 类检查时先问"这条什么时候应该合法地不再成立"，
+  并在那一刻把它改成 presence + absence 的分区，而不是删掉。
+
+### 2026-08-02 — 领域层页大小超出 generic invocation 的冻结上限
+
+- **Symptom**：board query 最初沿用 T-005 query lane 的 `MAX_PAGE_SIZE = 100`
+  与默认 50。
+- **Root cause**：`invocation/query-invocation.schema.json` 冻结了
+  `pageSize` `maximum: 20`。领域层接受 100 意味着接受一个 ingress 永远不会放行的
+  页大小，负向测试也会测到一条不可达的分支。
+- **Fix**：board lane 收敛到上限 20、默认 10，并在测试里直接断言 21 被拒。
+- **Prevention**：新增 query 时先读 generic invocation schema 的边界，再定领域常量；
+  两者不一致时以合同为准。
+
+### 2026-08-02 — `domainClass` 是 shared core，不能为新领域顺手扩枚举
+
+- **Symptom**：两个 board mutation 在 `care_interaction | institution_management |
+  publish_process | read_model` 里没有精确对应值。
+- **Root cause**：`capability-descriptor.schema.json` 属于 `sharedCorePaths`，
+  改它会触发 `changedSharedCore: invalidate_all_surface_contract_evidence`，
+  直接作废 T-005 已归档的 G2 Exit 资格。
+- **Fix**：使用既有的 care-domain 写入类 `care_interaction`，并把"它不是 T-005
+  `CareInteraction` 生命周期"落到可检查的隔离上：独立 command scope、独立 head
+  binding、独立 transaction port，以及 committed result 不含
+  receipt/publication/visibility 的负向断言。
+- **Prevention**：改合同前先查该文件是否在 `sharedCorePaths`。落在 shared core
+  的改动要按"作废全部证据"的代价评估，而不是按"加一个枚举值"的直觉。
+
+### 2026-08-02 — 旋转时生成器必须从已发布基线重建
+
+- **Symptom**：连续修改合同 source 并重复 `build:surface-contract` 时报
+  `Surface contract content changed without a version rotation from 1.9.0`。
+- **Root cause**：`assertVersionRotation` 拿"工作区里已有的生成件"当基线。
+  第一次构建已经把生成件写成 `1.9.0`，之后任何 source 改动都要求再次抬版本。
+- **Fix**：每次 source 变更后先 `git checkout -- .../generated/` 回到已发布基线，
+  再重建一次，得到唯一一个新版本与新 digest。
+- **Prevention**：一个 checkpoint 只发布一次旋转。中途改 source 就回滚生成件重来，
+  不要靠连续抬版本掩盖。

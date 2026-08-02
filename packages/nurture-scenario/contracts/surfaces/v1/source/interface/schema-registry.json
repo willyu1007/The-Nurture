@@ -47,6 +47,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.query-caregiver-child-today-input@1",
+      "artifactPath": "capabilities/contracts/query-caregiver-child-today.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-caregiver-child-today-result@1",
+      "artifactPath": "capabilities/contracts/query-caregiver-child-today.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
       "schemaRef": "schema:nurture.query-caregiver-family-care-work-input@1",
       "artifactPath": "capabilities/contracts/query-caregiver-family-care-work.schema.json",
       "jsonPointer": "/$defs/input"
@@ -54,6 +64,16 @@
     {
       "schemaRef": "schema:nurture.query-caregiver-family-care-work-result@2",
       "artifactPath": "capabilities/contracts/query-caregiver-family-care-work.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.query-caregiver-teacher-board-input@1",
+      "artifactPath": "capabilities/contracts/query-caregiver-teacher-board.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-caregiver-teacher-board-result@1",
+      "artifactPath": "capabilities/contracts/query-caregiver-teacher-board.schema.json",
       "jsonPointer": "/$defs/result"
     },
     {
@@ -67,6 +87,36 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.query-guardian-current-focus-input@1",
+      "artifactPath": "capabilities/contracts/query-guardian-current-focus.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-current-focus-result@1",
+      "artifactPath": "capabilities/contracts/query-guardian-current-focus.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-enrollment-activity-input@1",
+      "artifactPath": "capabilities/contracts/query-guardian-enrollment-activity.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-enrollment-activity-result@1",
+      "artifactPath": "capabilities/contracts/query-guardian-enrollment-activity.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-family-board-input@1",
+      "artifactPath": "capabilities/contracts/query-guardian-family-board.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-family-board-result@1",
+      "artifactPath": "capabilities/contracts/query-guardian-family-board.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
       "schemaRef": "schema:nurture.query-guardian-family-care-timeline-input@1",
       "artifactPath": "capabilities/contracts/query-guardian-family-care-timeline.schema.json",
       "jsonPointer": "/$defs/input"
@@ -74,6 +124,16 @@
     {
       "schemaRef": "schema:nurture.query-guardian-family-care-timeline-result@2",
       "artifactPath": "capabilities/contracts/query-guardian-family-care-timeline.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.record-caregiver-daily-care-input@1",
+      "artifactPath": "capabilities/contracts/record-caregiver-daily-care.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.record-caregiver-daily-care-result@1",
+      "artifactPath": "capabilities/contracts/record-caregiver-daily-care.schema.json",
       "jsonPointer": "/$defs/result"
     },
     {
@@ -115,6 +175,16 @@
       "schemaRef": "schema:nurture.surface-operation-error@1",
       "artifactPath": "invocation/operation-error.schema.json",
       "jsonPointer": ""
+    },
+    {
+      "schemaRef": "schema:nurture.update-guardian-current-focus-input@1",
+      "artifactPath": "capabilities/contracts/update-guardian-current-focus.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.update-guardian-current-focus-result@1",
+      "artifactPath": "capabilities/contracts/update-guardian-current-focus.schema.json",
+      "jsonPointer": "/$defs/result"
     },
     {
       "schemaRef": "schema:nurture.withdraw-family-care-request-input@1",

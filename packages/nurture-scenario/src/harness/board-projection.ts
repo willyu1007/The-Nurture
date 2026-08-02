@@ -15,8 +15,10 @@ import type { InterfaceContractRefV1 } from "../surface-contract/types.js";
 export const BOARD_PROJECTION_VERSION = "1";
 
 const CURSOR_TTL_MS = 10 * 60_000;
-const MAX_PAGE_SIZE = 100;
-const DEFAULT_PAGE_SIZE = 25;
+/** The generic query invocation bounds `pageSize` to 1..20; the board lane
+ * never accepts a wider page than the contract it travels through. */
+const MAX_PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 10;
 /**
  * Refill rounds end when the source closes; this only stops a port that reports
  * `has_more` while returning nothing from spinning forever.

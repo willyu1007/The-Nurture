@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-guardian-enrollment-activity.schema.json",
+  "title": "QueryGuardianEnrollmentActivityV1",
+  "$defs": {
+    "input": {
+      "$ref": "board-types.schema.json#/$defs/pagedInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "enrollmentRef",
+        "items",
+        "pageInfo"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "board-types.schema.json#/$defs/moduleBinding"
+        },
+        "enrollmentRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/activityItem"
+          }
+        },
+        "pageInfo": {
+          "$ref": "board-types.schema.json#/$defs/snapshotPageInfo"
+        }
+      }
+    },
+    "activityItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activityRef",
+        "kind",
+        "releaseRef",
+        "sourceLabel",
+        "occurredAt",
+        "summary",
+        "actions"
+      ],
+      "properties": {
+        "activityRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "kind": {
+          "enum": [
+            "daily_care",
+            "child_growth_record",
+            "media"
+          ]
+        },
+        "releaseRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "sourceLabel": {
+          "$ref": "board-types.schema.json#/$defs/safeLabel"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "$ref": "board-types.schema.json#/$defs/safeSummary"
+        },
+        "actions": {
+          "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        }
+      }
+    }
+  }
+}

@@ -34,9 +34,69 @@
       "items": {
         "$ref": "journey-script.schema.json#/$defs/actionCapabilityKey"
       }
+    },
+    "boardModules": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/boardModuleView" }
+    },
+    "absentModuleKinds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/boardModuleKind" }
+    },
+    "dependencyNoGos": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/dependencyNoGoView" }
     }
   },
   "$defs": {
+    "boardModuleKind": {
+      "enum": [
+        "guardian_current_focus",
+        "guardian_enrollment_activity",
+        "caregiver_child_today",
+        "caregiver_family_care_work",
+        "teacher_publish_queue",
+        "institution_workflow_projection"
+      ]
+    },
+    "boardModuleView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "required", "capabilityKey", "capabilityVersion"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/boardModuleKind" },
+        "required": { "type": "boolean" },
+        "capabilityKey": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "dependencyNoGoView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dependencyKey", "requiredVersion", "reason", "retryHint"],
+      "properties": {
+        "dependencyKey": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "requiredVersion": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "reason": {
+          "enum": ["missing", "unqualified", "unavailable", "contract_mismatch"]
+        },
+        "retryHint": {
+          "enum": ["retry", "setup", "required_upgrade", "contact_admin", "none"]
+        }
+      }
+    },
     "careItemView": {
       "type": "object",
       "additionalProperties": false,

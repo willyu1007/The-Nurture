@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-caregiver-child-today.schema.json",
+  "title": "QueryCaregiverChildTodayV1",
+  "$defs": {
+    "input": {
+      "$ref": "board-types.schema.json#/$defs/pagedInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "careGroupRef",
+        "children",
+        "pageInfo"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "board-types.schema.json#/$defs/moduleBinding"
+        },
+        "careGroupRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/childCard"
+          }
+        },
+        "pageInfo": {
+          "$ref": "board-types.schema.json#/$defs/snapshotPageInfo"
+        }
+      }
+    },
+    "childCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "childRef",
+        "childSafeLabel",
+        "lastActivityAt",
+        "dailyCare",
+        "attention",
+        "actions"
+      ],
+      "properties": {
+        "childRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "childSafeLabel": {
+          "$ref": "board-types.schema.json#/$defs/safeLabel"
+        },
+        "lastActivityAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dailyCare": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dailyCareEntry"
+          }
+        },
+        "attention": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attentionEntry"
+          }
+        },
+        "actions": {
+          "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        }
+      }
+    },
+    "dailyCareEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logRef",
+        "kind",
+        "summary",
+        "occurredAt",
+        "actions"
+      ],
+      "properties": {
+        "logRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "kind": {
+          "enum": [
+            "meal",
+            "nap",
+            "mood",
+            "activity",
+            "health_observation"
+          ]
+        },
+        "summary": {
+          "$ref": "board-types.schema.json#/$defs/safeSummary"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actions": {
+          "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        }
+      }
+    },
+    "attentionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attentionRef",
+        "priority",
+        "summary",
+        "sourceKind",
+        "actions"
+      ],
+      "properties": {
+        "attentionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "priority": {
+          "enum": [
+            "routine",
+            "attention",
+            "urgent"
+          ]
+        },
+        "summary": {
+          "$ref": "board-types.schema.json#/$defs/safeSummary"
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "sourceKind": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "actions": {
+          "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        }
+      }
+    }
+  }
+}

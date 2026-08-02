@@ -18,8 +18,12 @@ Project: `main`
 - Implementation mainline: T-005 G2 Exit is PASS and the task is done. Exact
   `nurture.surface-contract@1.8.0` / `sha256:4fe91e13…` is Nurture-provider
   qualified against the pinned owner path, with single-writer/default-off guards.
-  The next critical lane is T-006 G3-0 contract/fact/schema freeze; T-006 G3-E must
-  still adopt this exact provider and cannot infer adoption from T-005 completion.
+  T-006 G3-0 is frozen as `G3_0_FREEZE_PASS`. The current critical lane is T-006
+  G3-A Shared Board Foundation, which additively rotated the artifact to
+  `nurture.surface-contract@1.9.0` / `sha256:d769e496…` — shared core and every
+  T-005 capability slice stay byte-identical, so the G2 Exit evidence is preserved.
+  T-006 G3-E must still adopt this exact provider on the real owner path and
+  cannot infer adoption from T-005 completion.
 - Boundary: G1 PASS opens protected implementation only. Candidate Freeze,
   persistent deployment, activation and external traffic remain unauthorized.
 - Brief references: `feature-map.md` → `F-002 Institution ecology` and
@@ -111,11 +115,13 @@ Project: `main`
 - Decision deadline: before any DB apply, artifact publication, secret configuration, capability/manifest change, external pilot traffic, staging, production, or GA action.
 
 ### Next Governance Checkpoint
-- Date: T-006 G3-0 exact contract/fact/schema freeze.
-- Delivered: T-005 G2 Exit PASS binds A/B/C to the real pinned owner path, exact
-  `1.8.0` artifact and single-writer/cutover census.
-- Expected output: start T-006 from its accepted G3 plan and freeze exact board,
-  capture/draft, media/publication and G2-C adoption inputs before implementation.
+- Date: T-006 G3-B1 capture-to-draft deterministic main path.
+- Delivered: T-006 G3-0 freeze PASS, then G3-A Shared Board Foundation — the
+  role-safe two-level read topology, the shared source-head pipeline, the two
+  canonical-owner inline mutations and the first synthetic board conformance
+  fixtures, on the additively rotated `1.9.0` artifact.
+- Expected output: CareGroup capture batches and one exact saved draft revision
+  through deterministic assembly, with the optional AI copy lane staying absent.
   No Candidate, secret, persistent environment, activation or traffic effect.
 
 ## Notes (manual)

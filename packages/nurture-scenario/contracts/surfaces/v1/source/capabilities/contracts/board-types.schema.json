@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/board-types.schema.json",
+  "title": "BoardContractTypesV1",
+  "$defs": {
+    "emptyInput": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "pagedInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "cursor": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "safeLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "safeSummary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "headToken": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "sourceHead": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "sourceRef",
+        "factVersion",
+        "lifecycleHead",
+        "visibilityHead"
+      ],
+      "properties": {
+        "sourceKind": {
+          "enum": [
+            "family_charter",
+            "family_charter_item",
+            "focus_cycle",
+            "focus_goal",
+            "focus_goal_child_scope",
+            "publication_release",
+            "daily_care_log",
+            "teacher_attention_item",
+            "care_interaction_item",
+            "enrollment",
+            "care_group_role",
+            "child_link_grant"
+          ]
+        },
+        "sourceRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "factVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lifecycleHead": {
+          "$ref": "#/$defs/headToken"
+        },
+        "visibilityHead": {
+          "$ref": "#/$defs/headToken"
+        }
+      }
+    },
+    "moduleBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "capability",
+        "actor",
+        "snapshot",
+        "order",
+        "sourceHeads"
+      ],
+      "properties": {
+        "contract": {
+          "$ref": "../../interface/interface-contract-ref.schema.json"
+        },
+        "capability": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/versionedRef"
+        },
+        "actor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "scopeKind",
+            "scopeRef"
+          ],
+          "properties": {
+            "role": {
+              "$ref": "../../interface/contract-primitives.schema.json#/$defs/surfaceActorRole"
+            },
+            "scopeKind": {
+              "enum": [
+                "family",
+                "care_group"
+              ]
+            },
+            "scopeRef": {
+              "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+            }
+          }
+        },
+        "snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "snapshotRef",
+            "snapshotVersion"
+          ],
+          "properties": {
+            "snapshotRef": {
+              "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+            },
+            "snapshotVersion": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "order": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sourceHeads": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sourceHead"
+          }
+        }
+      }
+    },
+    "boardActionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capabilityKey",
+        "capabilityVersion",
+        "availability"
+      ],
+      "properties": {
+        "capabilityKey": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "capabilityVersion": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/semver"
+        },
+        "targetOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "availability": {
+          "enum": [
+            "available",
+            "already_satisfied",
+            "needs_input"
+          ]
+        }
+      }
+    },
+    "boardActionRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/boardActionRef"
+      }
+    },
+    "snapshotPageInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hasMore"
+      ],
+      "properties": {
+        "nextCursor": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "hasMore": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceLabel",
+        "occurredAt"
+      ],
+      "properties": {
+        "sourceLabel": {
+          "$ref": "#/$defs/safeLabel"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

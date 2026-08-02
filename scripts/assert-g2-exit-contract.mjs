@@ -10,7 +10,14 @@ const read = (relativePath) =>
   fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
 const readJson = (relativePath) => JSON.parse(read(relativePath));
 
-const expectedInterface = {
+/**
+ * The exact artifact T-005 was qualified against. It is history, not the
+ * current head: later tasks MAY rotate the artifact, but only additively.
+ * `compatibility-policy.json` states `additiveNewSlice:
+ * preserve_existing_slice_evidence`, so this guard proves the rotation really
+ * was additive instead of re-pinning the head and losing the guarantee.
+ */
+const qualifiedInterface = {
   key: "nurture.surface-contract",
   version: "1.8.0",
   digest:
@@ -18,19 +25,34 @@ const expectedInterface = {
 };
 const expectedSharedCoreHash =
   "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2";
-const expectedCapabilities = [
-  "acknowledge_family_care_item@1.0.0",
-  "correct_family_care_message@1.0.0",
-  "initiate_caregiver_direct_message@1.0.0",
-  "policy_redact_family_care_message@1.0.0",
-  "query_caregiver_family_care_work@1.1.0",
-  "query_family_care_item@1.1.0",
-  "query_guardian_family_care_timeline@1.1.0",
-  "redact_family_care_message@1.0.0",
-  "reply_family_care_item@1.0.0",
-  "submit_family_care_question@1.0.0",
-  "withdraw_family_care_request@1.0.0",
-];
+/** Exact key@version plus the slice hash each one was qualified with. */
+const expectedCapabilitySlices = {
+  "acknowledge_family_care_item@1.0.0":
+    "sha256:6237365e4a1538de56f71abec0b1bf387180d29740c455a4246b5721a2a35cf7",
+  "correct_family_care_message@1.0.0":
+    "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3",
+  "initiate_caregiver_direct_message@1.0.0":
+    "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05",
+  "policy_redact_family_care_message@1.0.0":
+    "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371",
+  "query_caregiver_family_care_work@1.1.0":
+    "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7",
+  "query_family_care_item@1.1.0":
+    "sha256:1bfdbb7f79b68a929799fd8959d20e5c95b6bef7d517780a35f7d076286ef323",
+  "query_guardian_family_care_timeline@1.1.0":
+    "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793",
+  "redact_family_care_message@1.0.0":
+    "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5",
+  "reply_family_care_item@1.0.0":
+    "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6",
+  "submit_family_care_question@1.0.0":
+    "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68",
+  "withdraw_family_care_request@1.0.0":
+    "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b",
+};
+const expectedCapabilities = Object.keys(expectedCapabilitySlices);
+const g2ExitRecordPath =
+  "dev-docs/archive/nurture-family-care-conversation/14-g2-exit-qualification-and-beta-handoff.md";
 const protectedGateVariables = [
   "NURTURE_BINDING_EVIDENCE_KEY",
   "NURTURE_INTERNAL_SERVICE_TOKEN",
@@ -42,47 +64,77 @@ const forbiddenLegacyCapabilityKeys = expectedCapabilities.map((entry) =>
   entry.slice(0, entry.lastIndexOf("@")),
 );
 
+// The qualified identity is recorded evidence and must stay readable in the
+// archived exit record, whatever the current head is.
+const g2ExitRecord = read(g2ExitRecordPath);
+for (const identityPart of [qualifiedInterface.version, qualifiedInterface.digest]) {
+  assertTruthy(
+    g2ExitRecord.includes(identityPart),
+    `G2 Exit record retains ${identityPart}`,
+  );
+}
+
 const artifactPin = readJson(
   "packages/nurture-scenario/contracts/surfaces/v1/generated/surface-contract.artifact-pin.json",
 );
-assertDeepEqual(
-  artifactPin.interfaceContract,
-  expectedInterface,
-  "surface artifact pin",
-);
-
 const generatedManifest = readJson(
   "packages/nurture-scenario/contracts/surfaces/v1/generated/surface-contract.manifest.json",
 );
 assertDeepEqual(
+  artifactPin.interfaceContract,
   generatedManifest.interfaceContract,
-  expectedInterface,
-  "generated surface identity",
+  "artifact pin matches the generated manifest",
 );
+assertEqual(
+  artifactPin.interfaceContract?.key,
+  qualifiedInterface.key,
+  "surface contract key",
+);
+assertTruthy(
+  compareSemver(
+    String(artifactPin.interfaceContract?.version),
+    qualifiedInterface.version,
+  ) >= 0,
+  `current surface version must not regress below ${qualifiedInterface.version}`,
+);
+// Any shared-core change invalidates all surface-contract evidence, so an
+// unchanged shared core is what keeps the G2 Exit qualification valid.
 assertEqual(
   generatedManifest.sharedCoreHash,
   expectedSharedCoreHash,
   "G1 shared-core hash",
 );
-assertDeepEqual(
-  capabilityPairs(generatedManifest.capabilities),
-  expectedCapabilities,
-  "generated capability population",
+const generatedSlices = new Map(
+  (generatedManifest.capabilities ?? []).map((capability) => [
+    `${capability.capabilityKey}@${capability.capabilityVersion}`,
+    capability.sliceHash,
+  ]),
 );
+for (const [pair, sliceHash] of Object.entries(expectedCapabilitySlices)) {
+  assertEqual(
+    generatedSlices.get(pair),
+    sliceHash,
+    `G2 Exit capability slice ${pair}`,
+  );
+}
 
 const sourceRegistry = readJson(
   "packages/nurture-scenario/contracts/surfaces/v1/source/capabilities/capability-registry.json",
 );
-assertDeepEqual(
-  sourceRegistry.contract,
-  { key: expectedInterface.key, version: expectedInterface.version },
+assertEqual(
+  sourceRegistry.contract?.key,
+  qualifiedInterface.key,
   "source registry identity",
 );
-assertDeepEqual(
-  capabilityPairs(sourceRegistry.capabilities),
-  expectedCapabilities,
-  "source capability population",
+assertEqual(
+  sourceRegistry.contract?.version,
+  artifactPin.interfaceContract?.version,
+  "source registry version matches the generated artifact",
 );
+const sourcePairs = new Set(capabilityPairs(sourceRegistry.capabilities));
+for (const pair of expectedCapabilities) {
+  assertTruthy(sourcePairs.has(pair), `source capability population keeps ${pair}`);
+}
 
 const workflowPin = readJson(
   "docs/project/integrations/my-chat-workflow-contract.json",
@@ -230,8 +282,10 @@ for (const behavior of [
 }
 
 process.stdout.write(
-  `[ok] G2 Exit contract ${expectedInterface.key}@${expectedInterface.version} ` +
-    `capabilities=${expectedCapabilities.length} shared-core=${expectedSharedCoreHash} ` +
+  `[ok] G2 Exit contract ${qualifiedInterface.key}@${qualifiedInterface.version} ` +
+    `current=${artifactPin.interfaceContract.version} ` +
+    `capabilities=${expectedCapabilities.length} slices=preserved ` +
+    `shared-core=${expectedSharedCoreHash} ` +
     "pins=exact gates=default-off legacy-activation=absent\n",
 );
 
@@ -283,4 +337,14 @@ function canonicalize(value) {
     );
   }
   return value;
+}
+
+function compareSemver(left, right) {
+  const parse = (value) => String(value).split(".").map((part) => Number(part));
+  const [leftParts, rightParts] = [parse(left), parse(right)];
+  for (let index = 0; index < 3; index += 1) {
+    const difference = (leftParts[index] ?? 0) - (rightParts[index] ?? 0);
+    if (difference !== 0) return difference > 0 ? 1 : -1;
+  }
+  return 0;
 }

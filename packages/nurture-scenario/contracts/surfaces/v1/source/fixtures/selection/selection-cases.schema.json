@@ -4,13 +4,22 @@
   "title": "CapabilitySelectionCasesV1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "worldRef", "cases"],
+  "required": [
+    "schemaVersion",
+    "worldRef",
+    "cases"
+  ],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "const": 1
+    },
     "worldRef": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["worldKey", "worldVersion"],
+      "required": [
+        "worldKey",
+        "worldVersion"
+      ],
       "properties": {
         "worldKey": {
           "$ref": "../world/synthetic-world.schema.json#/$defs/worldKey"
@@ -25,11 +34,21 @@
       "minItems": 5,
       "items": {
         "oneOf": [
-          { "$ref": "#/$defs/candidateFilteringCase" },
-          { "$ref": "#/$defs/correctSelectionCase" },
-          { "$ref": "#/$defs/clarificationCase" },
-          { "$ref": "#/$defs/confirmationCase" },
-          { "$ref": "#/$defs/unavailableCase" }
+          {
+            "$ref": "#/$defs/candidateFilteringCase"
+          },
+          {
+            "$ref": "#/$defs/correctSelectionCase"
+          },
+          {
+            "$ref": "#/$defs/clarificationCase"
+          },
+          {
+            "$ref": "#/$defs/confirmationCase"
+          },
+          {
+            "$ref": "#/$defs/unavailableCase"
+          }
         ]
       }
     }
@@ -69,7 +88,14 @@
         "correct_family_care_message",
         "withdraw_family_care_request",
         "redact_family_care_message",
-        "policy_redact_family_care_message"
+        "policy_redact_family_care_message",
+        "query_guardian_family_board",
+        "query_guardian_current_focus",
+        "query_guardian_enrollment_activity",
+        "query_caregiver_teacher_board",
+        "query_caregiver_child_today",
+        "update_guardian_current_focus",
+        "record_caregiver_daily_care"
       ]
     },
     "context": {
@@ -82,8 +108,18 @@
         "additionalCareItems"
       ],
       "properties": {
-        "profile": { "enum": ["world", "single-institution-pilot"] },
-        "dependencyEvidence": { "enum": ["assumed_satisfied", "none"] },
+        "profile": {
+          "enum": [
+            "world",
+            "single-institution-pilot"
+          ]
+        },
+        "dependencyEvidence": {
+          "enum": [
+            "assumed_satisfied",
+            "none"
+          ]
+        },
         "additionalFamilyCareGrants": {
           "type": "array",
           "items": {
@@ -103,41 +139,75 @@
     },
     "caseBase": {
       "type": "object",
-      "required": ["caseKey", "family", "actor", "surfaceKey", "intentKey", "context"],
+      "required": [
+        "caseKey",
+        "family",
+        "actor",
+        "surfaceKey",
+        "intentKey",
+        "context"
+      ],
       "properties": {
-        "caseKey": { "$ref": "#/$defs/caseKey" },
-        "family": { "type": "string" },
+        "caseKey": {
+          "$ref": "#/$defs/caseKey"
+        },
+        "family": {
+          "type": "string"
+        },
         "actor": {
           "$ref": "../journeys/journey-script.schema.json#/$defs/principalActor"
         },
         "surfaceKey": {
           "$ref": "../journeys/journey-script.schema.json#/$defs/surfaceKey"
         },
-        "intentKey": { "$ref": "#/$defs/intentKey" },
-        "context": { "$ref": "#/$defs/context" }
+        "intentKey": {
+          "$ref": "#/$defs/intentKey"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        }
       }
     },
     "candidateFilteringCase": {
-      "allOf": [{ "$ref": "#/$defs/caseBase" }],
+      "allOf": [
+        {
+          "$ref": "#/$defs/caseBase"
+        }
+      ],
       "type": "object",
       "additionalProperties": false,
-      "required": ["caseKey", "family", "actor", "surfaceKey", "intentKey", "context", "expected"],
+      "required": [
+        "caseKey",
+        "family",
+        "actor",
+        "surfaceKey",
+        "intentKey",
+        "context",
+        "expected"
+      ],
       "properties": {
         "caseKey": true,
         "actor": true,
         "surfaceKey": true,
         "intentKey": true,
         "context": true,
-        "family": { "const": "candidate_filtering" },
+        "family": {
+          "const": "candidate_filtering"
+        },
         "expected": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["eligibleCapabilityKeys", "filteredOut"],
+          "required": [
+            "eligibleCapabilityKeys",
+            "filteredOut"
+          ],
           "properties": {
             "eligibleCapabilityKeys": {
               "type": "array",
               "minItems": 1,
-              "items": { "$ref": "#/$defs/capabilityKey" }
+              "items": {
+                "$ref": "#/$defs/capabilityKey"
+              }
             },
             "filteredOut": {
               "type": "array",
@@ -145,9 +215,14 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["capabilityKey", "reasonKind"],
+                "required": [
+                  "capabilityKey",
+                  "reasonKind"
+                ],
                 "properties": {
-                  "capabilityKey": { "$ref": "#/$defs/capabilityKey" },
+                  "capabilityKey": {
+                    "$ref": "#/$defs/capabilityKey"
+                  },
                   "reasonKind": {
                     "enum": [
                       "role_unsupported",
@@ -163,23 +238,42 @@
       }
     },
     "correctSelectionCase": {
-      "allOf": [{ "$ref": "#/$defs/caseBase" }],
+      "allOf": [
+        {
+          "$ref": "#/$defs/caseBase"
+        }
+      ],
       "type": "object",
       "additionalProperties": false,
-      "required": ["caseKey", "family", "actor", "surfaceKey", "intentKey", "context", "expected"],
+      "required": [
+        "caseKey",
+        "family",
+        "actor",
+        "surfaceKey",
+        "intentKey",
+        "context",
+        "expected"
+      ],
       "properties": {
         "caseKey": true,
         "actor": true,
         "surfaceKey": true,
         "intentKey": true,
         "context": true,
-        "family": { "const": "correct_selection" },
+        "family": {
+          "const": "correct_selection"
+        },
         "expected": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["selectedCapabilityKey", "target"],
+          "required": [
+            "selectedCapabilityKey",
+            "target"
+          ],
           "properties": {
-            "selectedCapabilityKey": { "$ref": "#/$defs/capabilityKey" },
+            "selectedCapabilityKey": {
+              "$ref": "#/$defs/capabilityKey"
+            },
             "target": {
               "$ref": "../journeys/journey-script.schema.json#/$defs/target"
             }
@@ -188,23 +282,42 @@
       }
     },
     "clarificationCase": {
-      "allOf": [{ "$ref": "#/$defs/caseBase" }],
+      "allOf": [
+        {
+          "$ref": "#/$defs/caseBase"
+        }
+      ],
       "type": "object",
       "additionalProperties": false,
-      "required": ["caseKey", "family", "actor", "surfaceKey", "intentKey", "context", "expected"],
+      "required": [
+        "caseKey",
+        "family",
+        "actor",
+        "surfaceKey",
+        "intentKey",
+        "context",
+        "expected"
+      ],
       "properties": {
         "caseKey": true,
         "actor": true,
         "surfaceKey": true,
         "intentKey": true,
         "context": true,
-        "family": { "const": "clarification_needed" },
+        "family": {
+          "const": "clarification_needed"
+        },
         "expected": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["clarificationKind", "options"],
+          "required": [
+            "clarificationKind",
+            "options"
+          ],
           "properties": {
-            "clarificationKind": { "const": "ambiguous_write_target" },
+            "clarificationKind": {
+              "const": "ambiguous_write_target"
+            },
             "options": {
               "type": "array",
               "minItems": 2,
@@ -218,51 +331,93 @@
       }
     },
     "confirmationCase": {
-      "allOf": [{ "$ref": "#/$defs/caseBase" }],
+      "allOf": [
+        {
+          "$ref": "#/$defs/caseBase"
+        }
+      ],
       "type": "object",
       "additionalProperties": false,
-      "required": ["caseKey", "family", "actor", "surfaceKey", "intentKey", "context", "expected"],
+      "required": [
+        "caseKey",
+        "family",
+        "actor",
+        "surfaceKey",
+        "intentKey",
+        "context",
+        "expected"
+      ],
       "properties": {
         "caseKey": true,
         "actor": true,
         "surfaceKey": true,
         "intentKey": true,
         "context": true,
-        "family": { "const": "confirmation_needed" },
+        "family": {
+          "const": "confirmation_needed"
+        },
         "expected": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["selectedCapabilityKey", "target", "confirmationPolicy"],
+          "required": [
+            "selectedCapabilityKey",
+            "target",
+            "confirmationPolicy"
+          ],
           "properties": {
-            "selectedCapabilityKey": { "$ref": "#/$defs/capabilityKey" },
+            "selectedCapabilityKey": {
+              "$ref": "#/$defs/capabilityKey"
+            },
             "target": {
               "$ref": "../journeys/journey-script.schema.json#/$defs/target"
             },
             "confirmationPolicy": {
-              "enum": ["reviewable_commit", "strong_confirmation"]
+              "enum": [
+                "reviewable_commit",
+                "strong_confirmation"
+              ]
             }
           }
         }
       }
     },
     "unavailableCase": {
-      "allOf": [{ "$ref": "#/$defs/caseBase" }],
+      "allOf": [
+        {
+          "$ref": "#/$defs/caseBase"
+        }
+      ],
       "type": "object",
       "additionalProperties": false,
-      "required": ["caseKey", "family", "actor", "surfaceKey", "intentKey", "context", "expected"],
+      "required": [
+        "caseKey",
+        "family",
+        "actor",
+        "surfaceKey",
+        "intentKey",
+        "context",
+        "expected"
+      ],
       "properties": {
         "caseKey": true,
         "actor": true,
         "surfaceKey": true,
         "intentKey": true,
         "context": true,
-        "family": { "const": "unavailable" },
+        "family": {
+          "const": "unavailable"
+        },
         "expected": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["errorCode", "missingDependencyKey"],
+          "required": [
+            "errorCode",
+            "missingDependencyKey"
+          ],
           "properties": {
-            "errorCode": { "const": "dependency_no_go" },
+            "errorCode": {
+              "const": "dependency_no_go"
+            },
             "missingDependencyKey": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_]*$",

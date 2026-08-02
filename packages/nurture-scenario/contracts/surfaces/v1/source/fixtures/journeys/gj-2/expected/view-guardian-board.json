@@ -3,7 +3,10 @@
   "journeyKey": "gj-2",
   "stepKey": "view-guardian-board",
   "surfaceKey": "guardian_family_board",
-  "actor": { "participantId": "syn-guardian-ada", "actorRole": "guardian" },
+  "actor": {
+    "participantId": "syn-guardian-ada",
+    "actorRole": "guardian"
+  },
   "surfaceState": "ready",
   "careItems": [
     {
@@ -13,13 +16,39 @@
       "responseState": "responded",
       "lifecycle": "active",
       "attentionState": "resolved",
-      "messages": [{ "kind": "source_question" }, { "kind": "caregiver_reply" }]
+      "messages": [
+        {
+          "kind": "source_question"
+        },
+        {
+          "kind": "caregiver_reply"
+        }
+      ]
     }
   ],
+  "boardModules": [
+    {
+      "kind": "guardian_current_focus",
+      "required": true,
+      "capabilityKey": "query_guardian_current_focus",
+      "capabilityVersion": "1.0.0"
+    },
+    {
+      "kind": "guardian_enrollment_activity",
+      "required": true,
+      "capabilityKey": "query_guardian_enrollment_activity",
+      "capabilityVersion": "1.0.0"
+    }
+  ],
+  "absentModuleKinds": [
+    "institution_workflow_projection"
+  ],
+  "dependencyNoGos": [],
   "writeActionKeys": [
     "submit_family_care_question",
     "withdraw_family_care_request",
     "correct_family_care_message",
-    "redact_family_care_message"
+    "redact_family_care_message",
+    "update_guardian_current_focus"
   ]
 }

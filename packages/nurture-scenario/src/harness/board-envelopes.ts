@@ -115,7 +115,7 @@ const GUARDIAN_MODULE_POLICY: Record<string, { required: boolean }> = {
 
 /** `teacher_publish_queue` needs G3-B publication facts that do not exist yet. */
 export const TEACHER_PUBLISH_QUEUE_NO_GO: BoardDependencyNoGoV1 = {
-  dependencyKey: "t006_publish_process",
+  dependencyKey: "t006_teacher_board_projection",
   requiredVersion: "1.0.0",
   reason: "missing",
   retryHint: "none",

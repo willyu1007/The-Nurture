@@ -3,8 +3,39 @@
   "journeyKey": "gj-5",
   "stepKey": "view-caregiver-board",
   "surfaceKey": "caregiver_teacher_board",
-  "actor": { "participantId": "syn-caregiver-cara", "actorRole": "caregiver" },
-  "surfaceState": "ready",
+  "actor": {
+    "participantId": "syn-caregiver-cara",
+    "actorRole": "caregiver"
+  },
+  "surfaceState": "limited",
   "careItems": [],
-  "writeActionKeys": []
+  "boardModules": [
+    {
+      "kind": "caregiver_child_today",
+      "required": true,
+      "capabilityKey": "query_caregiver_child_today",
+      "capabilityVersion": "1.0.0"
+    },
+    {
+      "kind": "caregiver_family_care_work",
+      "required": true,
+      "capabilityKey": "query_caregiver_family_care_work",
+      "capabilityVersion": "1.1.0"
+    }
+  ],
+  "absentModuleKinds": [
+    "teacher_publish_queue",
+    "institution_workflow_projection"
+  ],
+  "dependencyNoGos": [
+    {
+      "dependencyKey": "t006_teacher_board_projection",
+      "requiredVersion": "1.0.0",
+      "reason": "missing",
+      "retryHint": "none"
+    }
+  ],
+  "writeActionKeys": [
+    "record_caregiver_daily_care"
+  ]
 }

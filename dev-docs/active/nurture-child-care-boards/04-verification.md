@@ -251,3 +251,23 @@
 | negative: focus-goal head drift and Enrollment head drift | PASS — `conflict/stale_confirmation` before commit; in-transaction drift throws |
 | negative: absent `boardMutations` owner port | PASS — `invalid/board_mutation_port_unavailable`, fail closed |
 | negative: daily-care committed result inspected for receipt/publication/visibility/delivery claims | PASS — internal class fact only |
+
+## 2026-08-02 — G3-A Step 3 (Additive Surface Contract Rotation to 1.9.0)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm build:surface-contract` | PASS — `nurture.surface-contract@1.9.0` / `sha256:d769e496…`, capabilities=18 surfaces=6 |
+| `pnpm verify:surface-contract` | PASS — deterministic rebuild matches byte for byte |
+| `pnpm verify:surface-conformance` | PASS — cases=12 slices=33/33, 63 contract tests, shared-core hash unchanged |
+| additive-rotation census | PASS — `sharedCoreHash` and all 11 T-005 capability slice hashes plus all 6 surface slice hashes are byte-identical to `1.8.0` |
+| `pnpm verify:g2-exit-contract` | PASS — qualified identity `1.8.0` / `4fe91e…` still recorded, current `1.9.0`, every T-005 slice preserved |
+| `pnpm verify:g3-0-freeze` | PASS — input `1.8.0`, current `1.9.0`, 7 G3-A keys registered at `1.0.0`, 15 later-checkpoint keys still absent |
+| `pnpm test:unit` | PASS — 35 files / 327 tests |
+| `pnpm typecheck` / `verify:test-routing` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — files=70 unit=35, routes=7 unchanged |
+| negative: rebuild without a version rotation | PASS — the generator refuses a changed artifact that keeps its version |
+| negative: board fixture declaring a module kind outside the surface registry | PASS — `phase-3-boards.test.ts` order/partition assertions fail closed |
+| negative: caregiver board fixture NO-GO not declared as a surface dependency gate | PASS — caught during this step and corrected to `t006_teacher_board_projection` |
+| fixture reproduction | PASS — the real presenters regenerate both board fixtures' module order, required bits, state and dependency NO-GOs from the same synthetic facts |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
+| `node .ai/scripts/ctl-project-governance.mjs lint --check --project main` | PASS |
+| `node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |

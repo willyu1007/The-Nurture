@@ -143,6 +143,34 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - 同一事实的两种投影保持一致 provenance。
 - 任意 aggregate 均不能绕过 row/fact-level policy。
 
+### G3-A result — PASS (2026-08-02)
+
+- surface artifact additive 旋转为 `nurture.surface-contract@1.9.0` /
+  `sha256:d769e496692553dd6358eb434f992df09841d3703f968bdf2562b37b9c8ee68c`；
+  shared core 与全部 T-005 capability slice 哈希不变，`additiveNewSlice`
+  规则保住 G2 Exit 证据。
+- 新增并实现 7 个 key，全部 `1.0.0`：两个 envelope、三个 module query
+  与两个 canonical owner 内联 mutation。`query_caregiver_family_care_work@1.1.0`
+  直接复用，没有 T-006 兼容副本。
+- `query_teacher_publish_queue` 与 G3-B～G3-D 的其余 adoption-set key 保持未注册；
+  `pnpm verify:g3-0-freeze` 现在同时检查"已实现的必须注册在 1.0.0"和"未实现的
+  必须缺席"。
+
+#### G3-A acceptance-to-check mapping
+
+| Acceptance ID | Requirement | Mechanical check |
+| --- | --- | --- |
+| `T006-AC-011` | 两个角色投影共享 canonical facts 与 provenance，不建持久化统一 child state | `phase-3-boards.test.ts` 的 presenter 复现 + `board-envelopes.test.ts` 角色字段隔离 |
+| `T006-AC-012` | envelope 模块顺序取 `surface-registry.json` 精确值 | `phase-3-boards.test.ts` 顺序断言 + `board-envelopes.test.ts` registry 对齐 |
+| `T006-AC-013` | 每个 typed module result 绑定 contract/capability/actor/scope/snapshot/order/`sourceHeads[]` | `guardian-board-queries.test.ts`、`caregiver-board-queries.test.ts` binding 断言 |
+| `T006-AC-014` | cursor 身份绑定七要素并在 source/authority/correction/redaction/Grant 漂移后失效 | `board-projection.test.ts` cursor 矩阵 + 两条 query 的 `refresh_required` 用例 |
+| `T006-AC-015` | Guardian 读需五项 fact-level authority；Caregiver 读需 exact-CareGroup RoleAssignment | `board-projection.test.ts` 谓词矩阵 + 两条 query 的负向用例 |
+| `T006-AC-016` | 公开 typed 输入不接受原始 child/family/Enrollment/CareGroup/Grant 标识符 | `guardian-board-queries.test.ts` 与 `board-mutations.test.ts` 的 raw-id/他人 ref 拒绝用例 |
+| `T006-AC-017` | action ref 只来自 current owner eligibility | `board-projection.test.ts` `projectOwnerActions` + 两个 presenter 的 no-grant 用例 |
+| `T006-AC-018` | 内联 mutation 路由到 canonical owner，并在事务内 re-read | `board-mutations.test.ts` precondition/apply 用例 |
+| `T006-AC-019` | Caregiver Workflow projection 在 `1.8.0` 及之后保持 excluded | `phase-3-boards.test.ts` visibility 断言 + `board-envelopes.test.ts` 注入负向用例 |
+| `T006-AC-020` | 未实现的 `teacher_publish_queue` 以 dependency NO-GO 呈现且 optional 模块不成为隐式 gate | `phase-3-boards.test.ts` NO-GO/state 断言 + `board-envelopes.test.ts` optional 缺席用例 |
+
 ## G3-B — Capture-to-Draft Pipeline
 
 - 定义快速记录、photo/media attribution、attention 和待办/待确认项目。
@@ -346,7 +374,7 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 
 ## Exit Gate
 
-- [ ] G3-A Shared Board Foundation 通过。
+- [x] G3-A Shared Board Foundation 通过（`T006-AC-011`～`T006-AC-020` 全部映射检查通过）。
 - [ ] G3-B1 Capture-to-Draft deterministic main path 通过；G3-B2 optional AI copy
   不成为隐式前置条件。
 - [ ] G3-C1 manual content/media safety path 通过；G3-C2 face match 按 beta profile

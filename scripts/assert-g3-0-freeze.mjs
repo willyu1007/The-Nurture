@@ -9,7 +9,13 @@ const read = (relativePath) =>
   fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
 const readJson = (relativePath) => JSON.parse(read(relativePath));
 
-const expectedInterface = {
+/**
+ * The exact artifact G3-0 froze as its input. Each G3 checkpoint adds only the
+ * keys it implemented and rotates the artifact, so this stays recorded history:
+ * the freeze document must keep citing it and the current artifact must never
+ * regress below it.
+ */
+const frozenInputInterface = {
   key: "nurture.surface-contract",
   version: "1.8.0",
   digest:
@@ -23,10 +29,17 @@ const t007FreezePath =
 const artifactPin = readJson(
   "packages/nurture-scenario/contracts/surfaces/v1/generated/surface-contract.artifact-pin.json",
 );
-assertDeepEqual(
-  artifactPin.interfaceContract,
-  expectedInterface,
-  "surface artifact pin",
+assertEqual(
+  artifactPin.interfaceContract?.key,
+  frozenInputInterface.key,
+  "surface artifact key",
+);
+assertTruthy(
+  compareSemver(
+    String(artifactPin.interfaceContract?.version),
+    frozenInputInterface.version,
+  ) >= 0,
+  `current surface version must not regress below ${frozenInputInterface.version}`,
 );
 
 const capabilityRegistry = readJson(
@@ -205,25 +218,51 @@ for (const [enumName, expectedValues] of Object.entries(expectedLegacyEnums)) {
   assertDeepEqual(enumEntry.values, expectedValues, `${enumName} G3-0 baseline`);
 }
 
-const proposedCapabilities = [
+// The adoption set reserves semantic identities; a key may only appear in the
+// registry once its checkpoint actually implemented it, and every new key
+// starts at 1.0.0.
+const adoptedInG3A = [
   "query_guardian_family_board",
   "query_guardian_current_focus",
   "query_guardian_enrollment_activity",
   "query_caregiver_teacher_board",
   "query_caregiver_child_today",
-  "query_teacher_publish_queue",
   "update_guardian_current_focus",
   "record_caregiver_daily_care",
-  "organize_care_capture_batch",
-  "save_publish_process_draft",
-  "release_publish_process",
 ];
-const registeredKeys = new Set(
-  capabilityRegistry.capabilities.map((capability) => capability.capabilityKey),
+const stillUnimplementedCapabilities = [
+  "query_teacher_publish_queue",
+  "organize_care_capture_batch",
+  "acquire_publish_edit_hold",
+  "renew_publish_edit_hold",
+  "release_publish_edit_hold",
+  "save_publish_process_draft",
+  "reschedule_publish_process",
+  "cancel_publish_process",
+  "confirm_child_media_attribution",
+  "reject_child_media_attribution",
+  "supersede_child_media_attribution",
+  "release_publish_process",
+  "correct_publication",
+  "remove_publication_target_visibility",
+  "redact_publication",
+];
+const registeredVersions = new Map(
+  capabilityRegistry.capabilities.map((capability) => [
+    capability.capabilityKey,
+    capability.capabilityVersion,
+  ]),
 );
-for (const capabilityKey of proposedCapabilities) {
+for (const capabilityKey of adoptedInG3A) {
   assertEqual(
-    registeredKeys.has(capabilityKey),
+    registeredVersions.get(capabilityKey),
+    "1.0.0",
+    `G3-A adopted capability ${capabilityKey}`,
+  );
+}
+for (const capabilityKey of stillUnimplementedCapabilities) {
+  assertEqual(
+    registeredVersions.has(capabilityKey),
     false,
     `unimplemented capability placeholder ${capabilityKey}`,
   );
@@ -275,8 +314,17 @@ for (const requiredText of [
   assertTextIncludes(t007Freeze, requiredText, `T-007 policy ${requiredText}`);
 }
 
+for (const identityPart of [
+  frozenInputInterface.version,
+  frozenInputInterface.digest,
+]) {
+  assertTextIncludes(freeze, identityPart, `G3-0 frozen input ${identityPart}`);
+}
+
 process.stdout.write(
   `[ok] G3-0 freeze facts=${requiredFactTables.length} surfaces=2 ` +
+    `input=${frozenInputInterface.version} current=${artifactPin.interfaceContract.version} ` +
+    `g3a-adopted=${adoptedInG3A.length} ` +
     "t005=exact t007=contract-frozen schema_delta=frozen " +
     "caregiver_workflow_denied=true placeholders=absent stage_gates=explicit\n",
 );
@@ -331,4 +379,14 @@ function canonicalize(value) {
     );
   }
   return value;
+}
+
+function compareSemver(left, right) {
+  const parse = (value) => String(value).split(".").map((part) => Number(part));
+  const [leftParts, rightParts] = [parse(left), parse(right)];
+  for (let index = 0; index < 3; index += 1) {
+    const difference = (leftParts[index] ?? 0) - (rightParts[index] ?? 0);
+    if (difference !== 0) return difference > 0 ? 1 : -1;
+  }
+  return 0;
 }

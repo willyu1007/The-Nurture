@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.8.0"
+    "version": "1.9.0"
   },
   "capabilities": [
     {
@@ -941,6 +941,526 @@
       ],
       "supportedRoles": [
         "system_policy"
+      ]
+    },
+    {
+      "capabilityKey": "query_guardian_family_board",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "view_guardian_family_board"
+      ],
+      "inputSchemaRef": "schema:nurture.query-guardian-family-board-input@1",
+      "resultSchemaRef": "schema:nurture.query-guardian-family-board-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "unique_eligible_default",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "family_guardian_authority",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_family_guardian_authority",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "enrollment_lifecycle",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_visibility",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "source_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_board_fact_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_guardian_family_board_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_guardian_family_board",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "collection",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t005_family_care",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "query_guardian_current_focus",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "view_guardian_current_focus"
+      ],
+      "inputSchemaRef": "schema:nurture.query-guardian-current-focus-input@1",
+      "resultSchemaRef": "schema:nurture.query-guardian-current-focus-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "none",
+        "optionSchemaRef": null
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "family_guardian_authority",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_family_guardian_authority",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "focus_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "explicit_child_focus_scope",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "source_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_board_fact_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_guardian_current_focus_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_guardian_current_focus",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "collection",
+        "subject"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "query_guardian_enrollment_activity",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "view_guardian_enrollment_activity"
+      ],
+      "inputSchemaRef": "schema:nurture.query-guardian-enrollment-activity-input@1",
+      "resultSchemaRef": "schema:nurture.query-guardian-enrollment-activity-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "family_guardian_authority",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_family_guardian_authority",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "enrollment_lifecycle",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_visibility",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "source_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_board_fact_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_guardian_enrollment_activity_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_guardian_enrollment_activity",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "collection",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "query_caregiver_teacher_board",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "view_caregiver_teacher_board"
+      ],
+      "inputSchemaRef": "schema:nurture.query-caregiver-teacher-board-input@1",
+      "resultSchemaRef": "schema:nurture.query-caregiver-teacher-board-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "exact_bound",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "source_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_board_fact_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_caregiver_teacher_board_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_caregiver_teacher_board",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "collection",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t005_family_care",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "query_caregiver_child_today",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "view_caregiver_child_today"
+      ],
+      "inputSchemaRef": "schema:nurture.query-caregiver-child-today-input@1",
+      "resultSchemaRef": "schema:nurture.query-caregiver-child-today-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "exact_bound",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "source_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_board_fact_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_caregiver_child_today_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_caregiver_child_today",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "collection",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "update_guardian_current_focus",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "care_interaction",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "adjust_guardian_current_focus"
+      ],
+      "inputSchemaRef": "schema:nurture.update-guardian-current-focus-input@1",
+      "resultSchemaRef": "schema:nurture.update-guardian-current-focus-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "focus_cycle",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "focus_goal",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "family_guardian_authority",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_family_guardian_authority",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "update_guardian_current_focus_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "update_guardian_current_focus",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "subject"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "record_caregiver_daily_care",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "care_interaction",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "record_caregiver_daily_care"
+      ],
+      "inputSchemaRef": "schema:nurture.record-caregiver-daily-care-input@1",
+      "resultSchemaRef": "schema:nurture.record-caregiver-daily-care-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "append_compatible",
+        "headBindings": [
+          {
+            "headKey": "daily_care_collection",
+            "mode": "compatible_append"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "enrollment_lifecycle",
+            "mode": "must_equal"
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "record_caregiver_daily_care_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "record_caregiver_daily_care",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
       ]
     }
   ]
