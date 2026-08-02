@@ -300,8 +300,22 @@ const parseRoutedVersions = (constName) => {
   assertTruthy(block, `harness transport ${constName} block`);
   const routed = new Map();
   for (const line of block[1].split("\n")) {
-    const entry = line.match(/^\s*([a-z0-9_]+):\s*"([0-9]+\.[0-9]+\.[0-9]+)",$/);
-    if (entry) routed.set(entry[1], entry[2]);
+    const text = line.trim();
+    if (text === "" || text.startsWith("//") || text.startsWith("*") || text.startsWith("/*")) {
+      continue;
+    }
+    const entry = text.match(/^([a-z0-9_]+):\s*"([0-9]+\.[0-9]+\.[0-9]+)",$/);
+    if (entry) {
+      routed.set(entry[1], entry[2]);
+      continue;
+    }
+    // Anything the parser does not understand — a spread, a computed key, a
+    // conditional — would silently contribute keys this census cannot see, and
+    // the published enum would then be compared against an incomplete set.
+    throw new Error(
+      `${constName} contains an entry this census cannot read: ${text}. ` +
+        "Admission must stay a literal key-to-version map.",
+    );
   }
   return routed;
 };

@@ -1260,3 +1260,39 @@ release 的 command hash 必须是 64 位十六进制。
 `fallback_due_at`(owner 根本没有"每日兜底点已到"这个事实);
 `commandScope` 改回 lane 标签;discard 那条**注释**说的拒绝规则实际不存在——假的是
 注释,已改。
+
+## 2026-08-02 — B 类:守卫本身守不住它声称的东西
+
+复核里最刺眼的一批。**冻结不是执行**这条前车之鉴,这次应验在守卫自己身上。
+
+**B3 — 我那道 fail-closed 迁移门的守卫可以被一行绕过。** 它要求迁移文本包含三个
+字符串,而三个**全在 `RAISE EXCEPTION` 的消息里**。把 `IF ambiguous > 0 THEN` 改成
+`IF false THEN`——门彻底关掉——守卫照样绿。改为解析每个 `DO $$` 块,要求:census 写进
+一个声明过的变量、条件**读的就是那个变量**、并且确实 `RAISE`。用同样的手法证伪过:
+`IF false` 立刻报 `gate 0 aborts on a non-zero ambiguous, not on a constant`。
+
+**B2 — "envelope 绝不被持久化成统一 child-state 行"只是三个模型名的黑名单。** 叫
+`NurtureChildBoardSnapshot` 就能过。白名单式的表普查永远无法反对多出来的表,于是
+冻结件最锋利的结构性主张,建立在猜别人会怎么命名上。改为**钉死整个持久化表集合**
+(60 张):新增一张持久化表从此是一次要对着这条主张接受审阅的显式声明。已证伪。
+
+**B1 — 冻结守卫对两条核心不变量零断言。** "每个 typed module result 绑定
+contract/capability version/actor/scope/snapshot/order/sourceHeads[]"和"cursor 身份
+绑定这七项"——守卫读了十一个文件,两条都不在其中。从冻结 schema 里删掉 `snapshot`
+与 `sourceHeads`,制品旋转一下、semver 下限满足,守卫全绿。现在两条都对着冻结件与
+运行时类型钉死,并顺带钉住"cursor 是密封的而不只是签名的"。两条都证伪过。
+
+**B6 — ingress 路由表用行正则解析,读不懂的行被静默跳过。** 加一个
+`...PUBLISH_WRITE_VERSIONS` 展开,普查看不见,而公布的 enum 又是拿这份普查比的——
+正好是这条断言声称要防的事。改为**遇到读不懂的行就报错**:准入必须保持字面量的
+key→version 映射。已证伪。
+
+**B4 — 一条守卫在为已经不存在的约束背书。** `assert-n1-schema-contract.mjs` 断言
+`ck_nurture_media_attribution_confirmation` 存在并通过,因为它 grep 的是**冻结的基线
+SQL 文本**。那是一条合法的历史钉,问题在于标签读起来像"这些约束存在"。改为如实
+命名(`N1 baseline migration no longer declares check ...`),并写明当前存在性由活库
+检查负责。同一份清单里还有 `ck_nurture_command_execution_n1`——它已被 handoff 链
+合法取代,守卫却仍在断言它。
+
+共同的形状:**守卫检查的是"文本里有没有这句话",而不是"这条规则还成不成立"**。
+四条里有三条可以用一次编辑绕过,而且绕过之后所有闸门仍是绿的。

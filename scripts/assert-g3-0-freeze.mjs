@@ -179,6 +179,63 @@ assertIncludes(
   "Caregiver Workflow projection denial",
 );
 
+/**
+ * The two frozen invariants this guard never asserted.
+ *
+ * "Every typed module result binds contract, capability version, actor/scope,
+ * snapshot ref and version, a stable semantic order and sourceHeads[]" and
+ * "cursor identity binds contract/capability/actor/scope/snapshot/order/page
+ * size" were checked nowhere: the guard read eleven files and neither of these.
+ * Deleting `snapshot` and `sourceHeads` from the frozen schema left it green,
+ * because the artifact would simply rotate and the semver floor was satisfied.
+ */
+const boardTypes = readJson(
+  "packages/nurture-scenario/contracts/surfaces/v1/source/capabilities/contracts/board-types.schema.json",
+);
+assertDeepEqual(
+  boardTypes.$defs?.moduleBinding?.required ?? [],
+  ["contract", "capability", "actor", "snapshot", "order", "sourceHeads"],
+  "frozen module-result binding",
+);
+assertDeepEqual(
+  boardTypes.$defs?.moduleBinding?.properties?.snapshot?.required ?? [],
+  ["snapshotRef", "snapshotVersion"],
+  "frozen module snapshot binding",
+);
+assertDeepEqual(
+  Object.keys(boardTypes.$defs?.sourceHead?.properties ?? {}).sort(),
+  ["factVersion", "lifecycleHead", "sourceKind", "sourceRef", "visibilityHead"],
+  "frozen source-head shape",
+);
+
+/**
+ * Cursor identity, pinned against the runtime that issues it. The contract
+ * schema describes the page info; the terms the cursor actually binds live in
+ * `BoardCursorIdentityV1`, and a term dropped there would silently let a page
+ * resume under a different contract, capability, actor, order or page size.
+ */
+const boardProjection = read("packages/nurture-scenario/src/harness/board-projection.ts");
+const cursorIdentity = boardProjection.match(
+  /export type BoardCursorIdentityV1 = \{([\s\S]*?)\n\};/,
+);
+assertTruthy(cursorIdentity, "cursor identity type");
+assertDeepEqual(
+  [...cursorIdentity[1].matchAll(/^\s{2}([a-z_]+):/gm)].map((match) => match[1]).sort(),
+  [
+    "capability_key",
+    "capability_version",
+    "contract_digest",
+    "order",
+    "page_size",
+    "query_key",
+    "scope_ref",
+  ],
+  "frozen cursor identity terms",
+);
+// A cursor that merely encodes its binding publishes the position it carries;
+// the child's process id and safe label travel in the sort key.
+assertTextIncludes(boardProjection, "aes-256-gcm", "cursor payload is sealed, not just signed");
+
 const dbContext = readJson("docs/context/db/schema.json");
 const requiredFactTables = [
   "NurtureFamilyCharter",
@@ -201,6 +258,87 @@ const tableNames = new Set(dbContext.tables?.map((table) => table.name));
 for (const tableName of requiredFactTables) {
   assertTruthy(tableNames.has(tableName), `landed fact table ${tableName}`);
 }
+
+/**
+ * The exact persisted table set.
+ *
+ * "The board envelope is a derived result and is never persisted as a unified
+ * child-state row" used to be checked as the absence of three specific model
+ * names. Any other name — `NurtureChildBoardSnapshot`, say — passed. An
+ * allow-list census can never object to a new table, so the freeze's sharpest
+ * structural claim rested on guessing what someone would call it.
+ *
+ * Pinning the whole set turns that into a real gate: a new persisted table is a
+ * deliberate declaration here, reviewed against this claim, rather than a
+ * silent addition.
+ */
+const expectedTableCensus = [
+  "NurtureActivityComparisonDraft",
+  "NurtureActivityOption",
+  "NurtureCareCapture",
+  "NurtureCareCaptureBatch",
+  "NurtureCareGroup",
+  "NurtureCareInstitution",
+  "NurtureCareRoleAssignment",
+  "NurtureChild",
+  "NurtureChildAnchorAssociation",
+  "NurtureChildBindingAnchor",
+  "NurtureChildCareProcess",
+  "NurtureChildLinkGrant",
+  "NurtureChildLinkReceipt",
+  "NurtureChildMediaAttribution",
+  "NurtureChildProfileSnapshot",
+  "NurtureCommandExecution",
+  "NurtureContentSafetyAssessment",
+  "NurtureContextMaterial",
+  "NurtureDailyCareLog",
+  "NurtureEnrollment",
+  "NurtureEvidence",
+  "NurtureEvidenceRef",
+  "NurtureFamily",
+  "NurtureFamilyAnchorAssociation",
+  "NurtureFamilyBindingAnchor",
+  "NurtureFamilyCareCascadeAudit",
+  "NurtureFamilyCareItem",
+  "NurtureFamilyCareItemEvent",
+  "NurtureFamilyCareMessage",
+  "NurtureFamilyCareMessageCorrection",
+  "NurtureFamilyCareThread",
+  "NurtureFamilyCareThreadParticipant",
+  "NurtureFamilyCharter",
+  "NurtureFamilyCharterItem",
+  "NurtureFamilyPolicy",
+  "NurtureFamilyProfileSnapshot",
+  "NurtureFamilyQuantificationSnapshot",
+  "NurtureFocusCycle",
+  "NurtureFocusGoal",
+  "NurtureFocusGoalChildScope",
+  "NurtureHealthStateSummary",
+  "NurtureInteractionContext",
+  "NurtureMediaAssetRef",
+  "NurtureMetricDefinition",
+  "NurtureMetricObservation",
+  "NurtureParticipant",
+  "NurtureProfileProjection",
+  "NurturePublicationRelease",
+  "NurturePublicationVisibilityEvent",
+  "NurturePublishEditHold",
+  "NurturePublishProcess",
+  "NurturePublishProcessRevision",
+  "NurturePublishProcessTarget",
+  "NurtureRuntimeContextPack",
+  "NurtureScenarioBindingAuthorization",
+  "NurtureTeacherAttentionItem",
+  "NurtureWorkflowCapture",
+  "NurtureWorkflowCheckpoint",
+  "NurtureWorkflowProject",
+  "NurtureWorkflowReview"
+];
+assertDeepEqual(
+  [...tableNames].sort(),
+  expectedTableCensus,
+  "persisted table census (a new table must be declared against the no-board-row claim)",
+);
 
 /**
  * The legacy media/attribution unions G3-0 recorded as its baseline. They are
@@ -291,13 +429,37 @@ for (const tableName of ["NurtureCareCapture", "NurtureMediaAssetRef"]) {
 }
 
 // The one-time migration must keep its ambiguity gate rather than guessing.
+//
+// This used to require three strings that all lived inside the RAISE EXCEPTION
+// *message*, so changing `IF ambiguous > 0 THEN` to `IF false THEN` — disabling
+// the gate entirely — left the guard green. What has to be pinned is the
+// conditional and the census it reads, which is what actually fails closed.
 const g3Migration = read(
   "prisma/migrations/20260802120000_g3_publish_process_and_media_lifecycle/migration.sql",
 );
+const gateBlocks = [...g3Migration.matchAll(/DO \$\$?([\s\S]*?)END \$\$?;/g)].map(
+  (match) => match[1],
+);
+assertEqual(gateBlocks.length, 2, "one-time migration keeps both ambiguity gates");
+for (const [index, block] of gateBlocks.entries()) {
+  const declared = block.match(/DECLARE\s+([a-z_]+)\s+BIGINT/);
+  assertTruthy(declared, `gate ${index} counts into a declared variable`);
+  const counter = declared[1];
+  assertTruthy(
+    new RegExp(`SELECT\\s+count\\(\\*\\)\\s+INTO\\s+${counter}`, "i").test(block),
+    `gate ${index} censuses the ambiguous rows into ${counter}`,
+  );
+  // The conditional must read the census. A constant, a negation or a different
+  // variable would disable the gate while leaving the message in place.
+  assertTruthy(
+    new RegExp(`IF\\s+${counter}\\s*>\\s*0\\s+THEN`, "i").test(block),
+    `gate ${index} aborts on a non-zero ${counter}, not on a constant`,
+  );
+  assertTruthy(/RAISE EXCEPTION/.test(block), `gate ${index} raises rather than continuing`);
+}
 for (const requiredText of [
   "g3 media lifecycle migration gate",
   "g3 attribution state migration gate",
-  "RAISE EXCEPTION",
 ]) {
   assertTextIncludes(g3Migration, requiredText, `migration gate ${requiredText}`);
 }

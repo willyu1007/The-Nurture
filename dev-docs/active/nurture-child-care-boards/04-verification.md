@@ -667,3 +667,19 @@
 | C2/C4/C5/C6/C8/C10 small fixes | FIXED — charter label, discard comment, invented process state, `cutAt` as fallback, `?? 99`, raw id in `commandScope` |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 509, 178 and 26 tests |
 | `verify:test-routing` and the six contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — Guards That Did Not Guard (B category)
+
+| Command / check | Result |
+| --- | --- |
+| B3: the migration fail-closed gate was pinned by three strings inside its own exception message | FIXED — parses each gate block, requires the conditional to read the census variable |
+| B3 falsified with the same edit that defeated it | PASS — `IF false THEN` now fails `gate 0 aborts on a non-zero ambiguous` |
+| B2: "envelope never persisted" was a three-name blocklist | FIXED — the exact 60-table persisted census is pinned |
+| B2 falsified by adding `NurtureChildBoardSnapshot` | PASS |
+| B1: module-result binding and cursor identity had zero assertions | FIXED — both pinned against the frozen schema and the runtime type |
+| B1 falsified by deleting `snapshot`/`sourceHeads` and by dropping `page_size` | PASS — both fail |
+| B6: the routing census skipped lines it could not parse | FIXED — an unparseable entry is now an error |
+| B6 falsified by inserting a spread into the admission map | PASS |
+| B4: a guard certified a constraint the database no longer had | FIXED — labelled as a baseline-declaration pin; live existence is the DB test's job |
+| `pnpm typecheck` / `test:unit` / `test:db` | PASS — 509 and 178 tests |
+| all seven contract/boundary gates | PASS — artifact unchanged at `1.13.0` |

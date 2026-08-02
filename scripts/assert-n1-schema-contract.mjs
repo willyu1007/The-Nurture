@@ -42,6 +42,15 @@ const expectedPartialIndexes = [
   'uq_nurture_thread_active_private_scope',
 ];
 
+/**
+ * Constraints the N1 baseline migration must still DECLARE. This is a history
+ * pin over a frozen file — it cannot and does not answer whether a constraint
+ * exists in a database today. A later migration silently dropped one of these
+ * with its column while this guard stayed green.
+ *
+ * Current existence is checked against the live database by
+ * `packages/nurture-db/tests/schema-constraint-survival.integration.test.ts`.
+ */
 const expectedChecks = [
   'ck_nurture_grant_scope',
   'ck_nurture_receipt_route_lifecycle',
@@ -71,7 +80,9 @@ for (const index of expectedPartialIndexes) {
   if (!pattern.test(migration)) failures.push(`migration missing partial unique index ${index}`);
 }
 for (const constraint of expectedChecks) {
-  if (!migration.includes(`CONSTRAINT "${constraint}"`)) failures.push(`migration missing check ${constraint}`);
+  if (!migration.includes(`CONSTRAINT "${constraint}"`)) {
+    failures.push(`N1 baseline migration no longer declares check ${constraint}`);
+  }
 }
 
 if (/\b(?:DROP|TRUNCATE)\b/i.test(migration)) failures.push('N1 migration is not additive');
