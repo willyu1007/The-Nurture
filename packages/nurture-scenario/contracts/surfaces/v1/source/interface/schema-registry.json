@@ -52,6 +52,36 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.correct-publication-input@1",
+      "artifactPath": "capabilities/contracts/publication-safety.schema.json",
+      "jsonPointer": "/$defs/correctInput"
+    },
+    {
+      "schemaRef": "schema:nurture.correct-publication-result@1",
+      "artifactPath": "capabilities/contracts/publication-safety.schema.json",
+      "jsonPointer": "/$defs/safetyResult"
+    },
+    {
+      "schemaRef": "schema:nurture.detach-publish-process-media-input@1",
+      "artifactPath": "capabilities/contracts/media-lifecycle.schema.json",
+      "jsonPointer": "/$defs/detachInput"
+    },
+    {
+      "schemaRef": "schema:nurture.detach-publish-process-media-result@1",
+      "artifactPath": "capabilities/contracts/media-lifecycle.schema.json",
+      "jsonPointer": "/$defs/detachResult"
+    },
+    {
+      "schemaRef": "schema:nurture.discard-media-asset-input@1",
+      "artifactPath": "capabilities/contracts/media-lifecycle.schema.json",
+      "jsonPointer": "/$defs/discardInput"
+    },
+    {
+      "schemaRef": "schema:nurture.discard-media-asset-result@1",
+      "artifactPath": "capabilities/contracts/media-lifecycle.schema.json",
+      "jsonPointer": "/$defs/discardResult"
+    },
+    {
       "schemaRef": "schema:nurture.initiate-caregiver-direct-message-input@1",
       "artifactPath": "capabilities/contracts/initiate-caregiver-direct-message.schema.json",
       "jsonPointer": "/$defs/input"
@@ -197,6 +227,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.redact-publication-input@1",
+      "artifactPath": "capabilities/contracts/publication-safety.schema.json",
+      "jsonPointer": "/$defs/redactInput"
+    },
+    {
+      "schemaRef": "schema:nurture.redact-publication-result@1",
+      "artifactPath": "capabilities/contracts/publication-safety.schema.json",
+      "jsonPointer": "/$defs/safetyResult"
+    },
+    {
       "schemaRef": "schema:nurture.reject-child-media-attribution-input@1",
       "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
       "jsonPointer": "/$defs/rejectInput"
@@ -217,6 +257,26 @@
       "jsonPointer": "/$defs/releaseResult"
     },
     {
+      "schemaRef": "schema:nurture.release-publish-process-input@1",
+      "artifactPath": "capabilities/contracts/publication-release.schema.json",
+      "jsonPointer": "/$defs/releaseInput"
+    },
+    {
+      "schemaRef": "schema:nurture.release-publish-process-result@1",
+      "artifactPath": "capabilities/contracts/publication-release.schema.json",
+      "jsonPointer": "/$defs/releaseResult"
+    },
+    {
+      "schemaRef": "schema:nurture.remove-publication-target-visibility-input@1",
+      "artifactPath": "capabilities/contracts/publication-safety.schema.json",
+      "jsonPointer": "/$defs/removeTargetInput"
+    },
+    {
+      "schemaRef": "schema:nurture.remove-publication-target-visibility-result@1",
+      "artifactPath": "capabilities/contracts/publication-safety.schema.json",
+      "jsonPointer": "/$defs/safetyResult"
+    },
+    {
       "schemaRef": "schema:nurture.renew-publish-edit-hold-input@1",
       "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
       "jsonPointer": "/$defs/renewInput"
@@ -235,6 +295,16 @@
       "schemaRef": "schema:nurture.reply-family-care-item-result@1",
       "artifactPath": "capabilities/contracts/reply-family-care-item.schema.json",
       "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.reschedule-publish-process-input@1",
+      "artifactPath": "capabilities/contracts/publication-release.schema.json",
+      "jsonPointer": "/$defs/rescheduleInput"
+    },
+    {
+      "schemaRef": "schema:nurture.reschedule-publish-process-result@1",
+      "artifactPath": "capabilities/contracts/publication-release.schema.json",
+      "jsonPointer": "/$defs/rescheduleResult"
     },
     {
       "schemaRef": "schema:nurture.save-publish-process-draft-input@1",

@@ -363,3 +363,36 @@
 | `pnpm test:unit` / `typecheck` / `verify:test-routing` / `verify:g2-exit-contract` | PASS — unchanged |
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
 | governance lint + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-D (Publish and Release Loop)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm build:surface-contract` / `verify:surface-contract` | PASS — `nurture.surface-contract@1.12.0` / `sha256:a9dcd5c8…`, capabilities=35 |
+| additive-rotation census | PASS — `sharedCoreHash` and every pre-existing slice hash byte-identical |
+| `pnpm verify:surface-conformance` | PASS — cases=15 slices=50/50, 80 contract tests |
+| `pnpm verify:g3-0-freeze` | PASS — 7+7+3+7 adopted at `1.0.0`, adoption set closed, `c2-matcher=absent`, `reserved-keys=19` |
+| `pnpm verify:g2-exit-contract` | PASS — T-005 slices still preserved at `1.12.0` |
+| `pnpm test:unit` | PASS — 49 files / 478 tests |
+| `pnpm typecheck` / `verify:test-routing` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — files=84 unit=49, routes=7 unchanged |
+| schedule resolution against the exact T-007 pilot fixture | PASS — 17:00/19:00 Asia/Shanghai resolve to `09:00Z`/`11:00Z`; UTC institution resolves to `17:00Z` |
+| negative: null policy, cutoff at/before release, bad timezone, bad local time, version 0, not-yet-effective, expired | PASS — `unavailable` with a distinct reason each |
+| negative: policy head change after a window was frozen | PASS — window unmoved, `policyDrift` reported |
+| content queued after the local cutoff | PASS — next day's window, not a silent roll-forward of a missed send |
+| negative: reschedule into the past, past the cutoff, on a released or non-queued process, under a colleague's hold | PASS — distinct reason each |
+| negative: scheduler attempt with hold, unsaved revision, lapsed authorizing role, policy drift, active quick-adjust, non-queued state | PASS — `skip` with its own reason; past the cutoff returns `missed` first |
+| per-target fan-out with one revoked Grant | PASS — committed target keeps its release, blocked target never reaches the commit port, summary reports 1/1 |
+| zero targets committing | PASS — stays `pending_release`, never labelled released, no `frozenRevision` |
+| retry after partial release | PASS — committed target replays as `already_committed`, remaining target binds the frozen revision, not the newer one |
+| `rejected` vs `outcome_unknown` | PASS — separate retry and reconcile lists; shared revision no longer editable |
+| same command identity across every target of one attempt | PASS |
+| negative: release from needs_review, draft, cancelled, under a hold, with unsaved work, wider identity, lapsed authorizing role | PASS — denied before any commit |
+| scheduler past the cutoff vs an explicit send now | PASS — `past_cutoff` for the scheduler; the class teacher may still send explicitly |
+| group photo with an unknown visible child at release time | PASS — target rejected with `unknown_visible_child` |
+| post-release safety a year later | PASS — no expiry window; Receipt and source revision preserved |
+| negative: safety result inspected for recall/unsend/unread/delivered/notification/erase | PASS — none present |
+| negative: open-ended reason text, unknown reason key, extra input field | PASS — `needs_input` |
+| post-release safety without any T-007 policy | PASS — redaction still available; only release/reschedule carry the policy gate |
+| negative: any registered T-006 capability the freeze never reserved | PASS — inverse census added alongside the freeze-side completeness check |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
+| governance lint + `ctl-context verify --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |

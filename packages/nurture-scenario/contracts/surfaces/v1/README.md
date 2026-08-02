@@ -24,8 +24,8 @@ six-surface interface contract.
   files join the canonical inventory and root digest without entering the
   shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.11.0` /
-  `sha256:7da487390ae4278347e64959ae4795b856eeee38a92d3230e4e209a7fc403f8e`,
+  records the exact `nurture.surface-contract@1.12.0` /
+  `sha256:a9dcd5c89b0671fc89a0de618375c85b667742bf96ae27a9f66498eb8e3ca29f`,
   shared-core hash,
   canonical source inventory and per-capability/per-surface/per-fixture slice
   hashes (fixture slices: `world`, `journey:<key>`, `selection`).

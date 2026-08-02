@@ -244,18 +244,21 @@ const adoptedInG3C1 = [
   "reject_child_media_attribution",
   "supersede_child_media_attribution",
 ];
-const stillUnimplementedCapabilities = [
-  // Needs a T-007-resolved schedule window before it can validate anything.
-  "reschedule_publish_process",
+const adoptedInG3D = [
   "release_publish_process",
+  "reschedule_publish_process",
   "correct_publication",
   "remove_publication_target_visibility",
   "redact_publication",
-  // Pre-publication media lifecycle, scheduled with G3-D by the 2026-08-02
-  // adoption-set amendment.
   "detach_publish_process_media",
   "discard_media_asset",
 ];
+/**
+ * G3-D closed the adoption set: every reserved identity is now implemented and
+ * registered. The list stays so a future freeze amendment that reserves a new
+ * identity has somewhere to declare it before its checkpoint lands.
+ */
+const stillUnimplementedCapabilities = [];
 const registeredVersions = new Map(
   capabilityRegistry.capabilities.map((capability) => [
     capability.capabilityKey,
@@ -281,6 +284,13 @@ for (const capabilityKey of adoptedInG3C1) {
     registeredVersions.get(capabilityKey),
     "1.0.0",
     `G3-C1 adopted capability ${capabilityKey}`,
+  );
+}
+for (const capabilityKey of adoptedInG3D) {
+  assertEqual(
+    registeredVersions.get(capabilityKey),
+    "1.0.0",
+    `G3-D adopted capability ${capabilityKey}`,
   );
 }
 // G3-C2 stays default-off: no biometric capability identity may exist at all.
@@ -335,6 +345,7 @@ const accountedFor = new Set([
   ...adoptedInG3A,
   ...adoptedInG3B1,
   ...adoptedInG3C1,
+  ...adoptedInG3D,
   ...stillUnimplementedCapabilities,
   // Consumed directly from T-005 rather than adopted as a new T-006 identity.
   "initiate_caregiver_direct_message",
@@ -393,7 +404,8 @@ process.stdout.write(
   `[ok] G3-0 freeze facts=${requiredFactTables.length} surfaces=2 ` +
     `input=${frozenInputInterface.version} current=${artifactPin.interfaceContract.version} ` +
     `g3a-adopted=${adoptedInG3A.length} g3b1-adopted=${adoptedInG3B1.length} ` +
-    `g3c1-adopted=${adoptedInG3C1.length} c2-matcher=absent ` +
+    `g3c1-adopted=${adoptedInG3C1.length} g3d-adopted=${adoptedInG3D.length} ` +
+    "c2-matcher=absent " +
     `reserved-keys=${reservedKeys.length} ` +
     "t005=exact t007=contract-frozen schema_delta=frozen " +
     "caregiver_workflow_denied=true placeholders=absent stage_gates=explicit\n",

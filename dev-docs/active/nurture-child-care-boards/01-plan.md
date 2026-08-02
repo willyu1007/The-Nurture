@@ -359,6 +359,35 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
   要求它要么已按 `1.0.0` 注册,要么显式列在未实现清单里;冻结件再出现无人跟踪的
   身份会直接失败。
 
+### G3-D result — PASS (2026-08-02)
+
+- surface artifact additive 旋转为 `nurture.surface-contract@1.12.0` /
+  `sha256:a9dcd5c89b0671fc89a0de618375c85b667742bf96ae27a9f66498eb8e3ca29f`;
+  shared core 与全部既有 slice 哈希不变,共 35 个 capability。
+- 新增并实现 7 个 `1.0.0` key:`release_publish_process`、
+  `reschedule_publish_process`、`correct_publication`、
+  `remove_publication_target_visibility`、`redact_publication`、
+  `detach_publish_process_media`、`discard_media_asset`。**G3 adoption set 至此关闭**。
+- release 与 reschedule 携带 `t007_publication_policy@joint_conformance` gate;
+  发布后安全能力不带该 gate,provider 缺席时降低可见性的动作依然可用。
+- 全部为 pure-domain + isolated T-007 fixture。真实 policy-backed schedule/release
+  与 provider/consumer 联合资格化仍属 G3-E。
+
+#### G3-D acceptance-to-check mapping
+
+| Acceptance ID | Requirement | Mechanical check |
+| --- | --- | --- |
+| `T006-AC-041` | scheduledAt/notAfter 由园区 timezone + 服务端时钟解析并冻结 policy head | `publish-schedule.test.ts` 解析用例 |
+| `T006-AC-042` | 后续 policy 变化不静默移动既有 process,只报 drift | `publish-schedule.test.ts` `scheduleAfterPolicyChange` 用例 |
+| `T006-AC-043` | scheduler 在窗口内执行,任一 drift 跳过而非发布旧版本,不静默换授权老师 | `publish-schedule.test.ts` attempt 矩阵 |
+| `T006-AC-044` | 超过 notAfter 留队并呈现 missed-send,不顺延、不深夜发布 | `publish-schedule.test.ts` + `publication-release.test.ts` |
+| `T006-AC-045` | 逐目标 `PublicationRelease` 各自授权/Receipt/重试,一个失败不回滚其他 | `publication-release.test.ts` 扇出用例 |
+| `T006-AC-046` | 首个 commit 冻结 revision 并转 released;零提交保持 pending_release | `publication-release.test.ts` |
+| `T006-AC-047` | released+partial 只按冻结 revision retry/reconcile;内容变化必须新建 process | `publication-release.test.ts` + `derivePartialReleaseFollowUp` |
+| `T006-AC-048` | rejected 与 outcome-unknown 分开,summary 不冒充"已发布" | `publication-release.test.ts` |
+| `T006-AC-049` | 发布后 correction/removal/redaction 无过期窗口、append-only、保留 Receipt,不宣称召回 | `publication-safety.test.ts` |
+| `T006-AC-050` | detach 只影响当前草稿;discard 仅限零 committed release | `publication-safety.test.ts` |
+
 ## G3-E — Integration Qualification
 
 - 跑同一孩子的 caregiver capture → review → family board receipt 旅程。
@@ -452,7 +481,7 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - [x] G3-C1 manual content/media safety path 通过（`T006-AC-031`～`T006-AC-040`
   全部映射检查通过）；G3-C2 face match 明确 optional/default-off，能力身份完全
   未注册，人工归属主路径不依赖它。
-- [ ] G3-D Publish and Release Loop 通过。
+- [x] G3-D Publish and Release Loop 通过（`T006-AC-041`～`T006-AC-050` 全部映射检查通过）；真实 policy-backed schedule/release 资格化留给 G3-E。
 - [ ] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
   PostgreSQL 完成完整黑盒与负向资格验证。
 - [ ] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；

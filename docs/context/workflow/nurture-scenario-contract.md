@@ -32,12 +32,14 @@ Joint Conformance are complete. T-005 G2 Exit binds that unchanged owner/source
 population and shared core to exact `nurture.surface-contract@1.8.0` /
 `sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a`
 through the formal service-authenticated NestJS ingress and disposable PostgreSQL.
-T-006 G3-A, G3-B1 and G3-C1 additively rotated the artifact to
-`nurture.surface-contract@1.11.0` /
-`sha256:7da487390ae4278347e64959ae4795b856eeee38a92d3230e4e209a7fc403f8e`,
-adding the board, capture-to-draft and manual media-attribution capabilities
-while leaving the shared core and every T-005 capability slice byte-identical,
-so the G2 Exit evidence still holds. No biometric matcher capability exists.
+T-006 G3-A through G3-D additively rotated the artifact to
+`nurture.surface-contract@1.12.0` /
+`sha256:a9dcd5c89b0671fc89a0de618375c85b667742bf96ae27a9f66498eb8e3ca29f`,
+adding the board, capture-to-draft, manual media-attribution and
+publish/release capabilities while leaving the shared core and every T-005
+capability slice byte-identical, so the G2 Exit evidence still holds. No
+biometric matcher capability exists, and no real policy-backed schedule or
+release is claimed: the T-007 provider and G3-E joint qualification are open.
 The Nurture provider is qualified but default-off. T-006/T-007 real-consumer
 adoption, T-008 Candidate/native/device qualification, persistent migration apply,
 secret configuration, deployment, activation and traffic remain separately required.

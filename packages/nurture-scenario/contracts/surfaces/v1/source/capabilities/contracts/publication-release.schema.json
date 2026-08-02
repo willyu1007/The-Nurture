@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/publication-release.schema.json",
+  "title": "PublicationReleaseV1",
+  "$defs": {
+    "releaseInput": {
+      "$ref": "publish-process-types.schema.json#/$defs/emptyInput"
+    },
+    "releaseResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "processState",
+        "results",
+        "summary",
+        "missedSendAttention"
+      ],
+      "properties": {
+        "processState": {
+          "$ref": "publish-process-types.schema.json#/$defs/processState"
+        },
+        "frozenRevision": {
+          "$ref": "publish-process-types.schema.json#/$defs/draftRevision"
+        },
+        "results": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/targetResult"
+          }
+        },
+        "summary": {
+          "$ref": "#/$defs/releaseSummary"
+        },
+        "missedSendAttention": {
+          "type": "boolean"
+        }
+      }
+    },
+    "targetResult": {
+      "description": "One target, one authority check, one Receipt, one retry unit.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetRef",
+        "outcome"
+      ],
+      "properties": {
+        "targetRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "outcome": {
+          "enum": [
+            "committed",
+            "already_committed",
+            "rejected",
+            "outcome_unknown"
+          ]
+        },
+        "publicationRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "receiptRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "reasonCode": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "blockingReasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+          }
+        }
+      }
+    },
+    "releaseSummary": {
+      "description": "Derived counts. They never stand in for the per-target results above.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "committed",
+        "rejected",
+        "outcomeUnknown"
+      ],
+      "properties": {
+        "total": { "type": "integer", "minimum": 1 },
+        "committed": { "type": "integer", "minimum": 0 },
+        "rejected": { "type": "integer", "minimum": 0 },
+        "outcomeUnknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "rescheduleInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scheduledAt"
+      ],
+      "properties": {
+        "scheduledAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "rescheduleResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scheduledAt",
+        "notAfter",
+        "timeZone",
+        "policyRef",
+        "policyHead",
+        "policyVersion",
+        "resolvedAt"
+      ],
+      "properties": {
+        "scheduledAt": { "type": "string", "format": "date-time" },
+        "notAfter": { "type": "string", "format": "date-time" },
+        "timeZone": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "policyRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "policyHead": { "type": "integer", "minimum": 1 },
+        "policyVersion": { "type": "integer", "minimum": 1 },
+        "resolvedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

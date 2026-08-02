@@ -198,6 +198,23 @@
         "runner": "vitest",
         "target": "packages/nurture-scenario/tests/surface-contract/phase-3-media-safety.test.ts"
       }
+    },
+    {
+      "caseKey": "publish-and-release-loop",
+      "kind": "deterministic_fixtures",
+      "covers": [
+        "capability:correct_publication",
+        "capability:detach_publish_process_media",
+        "capability:discard_media_asset",
+        "capability:redact_publication",
+        "capability:release_publish_process",
+        "capability:remove_publication_target_visibility",
+        "capability:reschedule_publish_process"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-release-loop.test.ts"
+      }
     }
   ]
 }

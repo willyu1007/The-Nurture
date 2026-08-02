@@ -658,3 +658,49 @@
   所以在 G3-D 真正实现之前它们不可能被提前注册。
 - 本步骤没有注册任何能力、没有旋转 artifact,也没有修改 Prisma schema、
   migration、environment、capability activation、Candidate、部署或流量。
+
+## 2026-08-02 — G3-D publish and release loop
+
+- 新增 `publish-schedule.ts`：按 `nurture.institution-publication-policy@1.0.0`
+  精确消费 T-007 契约。园区当地 17:00/19:00 用服务端时钟 + IANA timezone 解析成
+  UTC instant,offset 应用两次以正确跨 DST。process 进入队列时冻结
+  scheduledAt/notAfter/timezone/policyRef/policyHead/policyVersion。
+- `scheduleAfterPolicyChange` 显式返回 `moved: false`:后续 policy 变化只标记
+  `policyDrift`,永远不移动已冻结的窗口。过了当日 cutoff 才排队的内容取次日窗口
+  ——那是首次解析,不是 D-09 禁止的"错过后静默顺延"。
+- `evaluateSchedulerAttempt` 把每一条 drift 都做成独立 skip 原因:hold、未保存
+  revision、授权老师角色失效、policy 漂移、快捷窗口未结束。超过 notAfter 优先返回
+  `missed`,内容留队并提示 missed-send,不深夜发布也不顺延。
+- 新增 `publication-release.ts`：一个共享 revision 扇出成逐目标
+  `PublicationRelease`。每个目标独立 authority 检查、独立 Receipt、独立重试;
+  一个家庭被拒不回滚已提交的家庭(有专门测试),被拒目标根本不会到达 commit port。
+- 首个 commit 冻结共享 revision 并把 process 置为 released;零提交保持
+  pending_release 且不标 released。已提交目标 exact replay 为
+  `already_committed`,released 状态下重试绑定 `frozen_revision` 而不是更新的
+  `current_revision`。
+- `rejected`(授权/资格)与 `outcome_unknown`(结果未知)严格分开:
+  `derivePartialReleaseFollowUp` 分别给出 retry 与 reconcile 列表,并声明
+  `sharedRevisionEditable=false` / `requiresNewProcessForContentChange=true`。
+  summary 的四个计数始终同时出现,不存在把 partial 说成"已发布"的形状。
+- scheduler 受 `[scheduledAt, notAfter)` 约束;老师的"现在发送"是显式动作,
+  不受 cutoff 约束(D-09 明确允许错过窗口后"现在发送"),但仍要过全部 eligibility。
+- 新增 `publication-safety.ts`：`correct_publication`、
+  `remove_publication_target_visibility`、`redact_publication` 全部 append-only,
+  事件携带 `preservedReceiptRef` 与 `sourceReleaseRevision`;没有任何过期窗口
+  (有一条"一年后仍可执行"的测试),序列化结果里没有 recall/unsend/delivered
+  之类的字样。reason 是封闭 key 集,审计不留自由文本。
+- 同文件实现 adoption-set 增补的两个 key:`detach_publish_process_media`
+  只改当前草稿的组合,`discard_media_asset` 只在零 committed release 时合法。
+- artifact additive 旋转到 `nurture.surface-contract@1.12.0` /
+  `sha256:a9dcd5c89b0671fc89a0de618375c85b667742bf96ae27a9f66498eb8e3ca29f`,
+  35 个 capability。`sharedCoreHash` 与全部既有 slice 哈希仍逐字节不变。
+- `release_publish_process` 是唯一 `action_delivery_candidate` 的能力;
+  其余全部 `none`——发布提交不等于投递。release 与 reschedule 带
+  `t007_publication_policy@joint_conformance` gate,发布后安全能力**不带**该 gate,
+  确保 provider 缺席时降低可见性的动作依然可用(有测试)。
+- G3 adoption set 至此关闭。`verify:g3-0-freeze` 的未实现清单清空,并新增
+  `g3d-adopted=7`;`phase-3-capture-to-draft.test.ts` 原本的"后续 checkpoint
+  拥有、必须缺席"断言改成反方向的更强断言:注册表里不得出现任何冻结件未保留的
+  T-006 能力身份。两个方向的检查现在同时存在。
+- 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
+  Candidate、部署或流量。T-007 provider 与真实 schedule/release 资格化仍属 G3-E。

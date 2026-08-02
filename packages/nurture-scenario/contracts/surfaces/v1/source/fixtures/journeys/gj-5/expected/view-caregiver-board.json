@@ -45,6 +45,8 @@
     "organize_care_capture_batch",
     "save_publish_process_draft",
     "cancel_publish_process",
-    "confirm_child_media_attribution"
+    "confirm_child_media_attribution",
+    "release_publish_process",
+    "redact_publication"
   ]
 }

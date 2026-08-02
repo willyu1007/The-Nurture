@@ -129,6 +129,34 @@
           {
             "capabilityKey": "supersede_child_media_attribution",
             "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "release_publish_process",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "reschedule_publish_process",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "correct_publication",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "remove_publication_target_visibility",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "redact_publication",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "detach_publish_process_media",
+            "reasonKind": "role_unsupported"
+          },
+          {
+            "capabilityKey": "discard_media_asset",
+            "reasonKind": "role_unsupported"
           }
         ]
       }
@@ -249,6 +277,34 @@
           },
           {
             "capabilityKey": "supersede_child_media_attribution",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "release_publish_process",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "reschedule_publish_process",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "correct_publication",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "remove_publication_target_visibility",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "redact_publication",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "detach_publish_process_media",
+            "reasonKind": "missing_target_context"
+          },
+          {
+            "capabilityKey": "discard_media_asset",
             "reasonKind": "missing_target_context"
           }
         ]

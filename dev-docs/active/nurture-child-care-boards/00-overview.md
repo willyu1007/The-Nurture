@@ -6,10 +6,11 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-02
-- Next step: G3-A、G3-B1 与 G3-C1 均已完成，surface artifact additive 旋转至
-  `nurture.surface-contract@1.11.0` /
-  `sha256:7da487390ae4278347e64959ae4795b856eeee38a92d3230e4e209a7fc403f8e`；
-  下一步进入 G3-D publish and release loop。
+- Next step: G3-A、G3-B1、G3-C1 与 G3-D 均已完成，surface artifact additive
+  旋转至 `nurture.surface-contract@1.12.0` /
+  `sha256:a9dcd5c89b0671fc89a0de618375c85b667742bf96ae27a9f66498eb8e3ca29f`，
+  G3 adoption set 已关闭；下一步进入 G3-E integration qualification，
+  它需要 T-005 G2-C 联合运行与 T-007 provider。
 
 ## Goal
 
@@ -77,6 +78,14 @@ classifier，园区只能收紧，老师只能抬 tier，provider 失效不落�
 media asset 与 child attribution 两条独立封闭轴、一次性 legacy 迁移的 fail-closed
 映射、三个手工归属能力，以及实时派生的发布资格与群像 exposure 门禁。
 G3-C2 `ClassScopedFaceMatch` 保持 default-off 且能力身份完全未注册。
+
+2026-08-02 G3-D 已交付：按 T-007 精确契约解析并冻结的发送窗口、scheduler
+attempt 门禁、逐目标 `PublicationRelease` 扇出（首个 commit 冻结共享 revision、
+零提交保持 pending_release、partial 逐目标可解释）、rejected 与 outcome-unknown
+分离的重试/reconcile，以及无过期窗口、append-only、保留 Receipt 的发布后
+correction/target removal/redaction 与两个 media lifecycle 能力。
+G3 adoption set 至此关闭（35 个 capability）；真实 policy-backed schedule/release
+与 provider/consumer 联合资格化仍属 G3-E。
 
 ## Scope In
 

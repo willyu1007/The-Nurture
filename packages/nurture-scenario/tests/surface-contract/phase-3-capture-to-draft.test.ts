@@ -139,17 +139,53 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
     }
   });
 
-  it("leaves every capability a later G3 checkpoint owns unregistered", () => {
+  it("registers no T-006 capability identity the G3-0 freeze never reserved", () => {
+    // The freeze guard checks that every reserved identity is tracked; this is
+    // the other direction — nothing may appear in the registry that the freeze
+    // did not reserve.
+    const freeze = readFileSync(
+      path.join(
+        packageRoot,
+        "../../dev-docs/active/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md",
+      ),
+      "utf8",
+    );
+    const adoptionSet = freeze.slice(
+      freeze.indexOf("## Capability Adoption Set"),
+      freeze.indexOf("## DB SSOT Delta"),
+    );
+    const reserved = new Set(
+      [...adoptionSet.matchAll(/`([a-z][a-z0-9_]*)`/g)]
+        .map((match) => match[1] as string)
+        .filter((key) => key.includes("_")),
+    );
+    // The G3-A topology queries are reserved in the topology table instead.
     for (const key of [
-      "reschedule_publish_process",
-      "release_publish_process",
-      "correct_publication",
-      "remove_publication_target_visibility",
-      "redact_publication",
-      "detach_publish_process_media",
-      "discard_media_asset",
+      "query_guardian_family_board",
+      "query_guardian_current_focus",
+      "query_guardian_enrollment_activity",
+      "query_caregiver_teacher_board",
+      "query_caregiver_child_today",
+      "query_teacher_publish_queue",
     ]) {
-      expect(capability(key), key).toBeUndefined();
+      reserved.add(key);
+    }
+    const preG3Keys = new Set([
+      "acknowledge_family_care_item",
+      "correct_family_care_message",
+      "initiate_caregiver_direct_message",
+      "policy_redact_family_care_message",
+      "query_caregiver_family_care_work",
+      "query_family_care_item",
+      "query_guardian_family_care_timeline",
+      "redact_family_care_message",
+      "reply_family_care_item",
+      "submit_family_care_question",
+      "withdraw_family_care_request",
+    ]);
+    for (const entry of manifest.capabilities) {
+      if (preG3Keys.has(entry.capabilityKey)) continue;
+      expect(reserved.has(entry.capabilityKey), entry.capabilityKey).toBe(true);
     }
   });
 

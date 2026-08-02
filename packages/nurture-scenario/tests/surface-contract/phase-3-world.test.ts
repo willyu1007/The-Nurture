@@ -38,6 +38,9 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["cancel_publish_process", "sha256:4caa1700e16cc7d66f7db822ce2a55769a99a73c2ae4d0e63d95b6af7133a3b0"],
   ["confirm_child_media_attribution", "sha256:d160735c5b03fadd6d738e8026faa9784772dfd035d3a0553d97b0d5077e2a06"],
   ["correct_family_care_message", "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3"],
+  ["correct_publication", "sha256:61c3cdea9d35982ab7da14aa2f968e2d15874374f30fab69abb3830c7434fda8"],
+  ["detach_publish_process_media", "sha256:f520e1987e2e6f2835a219eca3e0dde3544ffa8aa4157284bf3841c5fed97f38"],
+  ["discard_media_asset", "sha256:252c1824e9bd4e48dace40c8446b388edfb38dc4ace1bfe3b9104ad237949da3"],
   ["initiate_caregiver_direct_message", "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"],
   ["organize_care_capture_batch", "sha256:c1fc8655c655641d76998392a2635eb8aa46d744a6b2a060a7d4f233ffcc7bb1"],
   ["policy_redact_family_care_message", "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"],
@@ -52,10 +55,14 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["query_teacher_publish_queue", "sha256:a30ee141327d0ba44098f59a42db612c4fa6ee9e9a3a7a2299db2de8b36a441c"],
   ["record_caregiver_daily_care", "sha256:e49064ae5691abfaae62ddb278ec31c8188f5bf30bde51d8b5b3c0825e0a02c8"],
   ["redact_family_care_message", "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5"],
+  ["redact_publication", "sha256:b5e91547d02b3874b7e94db9a525a921c14848c1104be14500eeecde633bf42f"],
   ["reject_child_media_attribution", "sha256:04cd0965b4115b9531a448e887e214d021380fae20bb08d2d2057a6270d92044"],
   ["release_publish_edit_hold", "sha256:f1a1ae66af280659dd9882db10e2c42e53d5e2560a87dc860201db512995a1b1"],
+  ["release_publish_process", "sha256:7af67a5f71a0ba4e229b27243b51ad7b8aba8043db1a0ee09858614bc192dded"],
+  ["remove_publication_target_visibility", "sha256:2b9a4b35f7061a208a52aa606753b5c75eddc90ea3ad8ec2ac6fad43fc06657c"],
   ["renew_publish_edit_hold", "sha256:4c6071b4fa3b6a6041b0d2a7fa4ac25ed58316ec831a6abe492aa3f66f14d851"],
   ["reply_family_care_item", "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6"],
+  ["reschedule_publish_process", "sha256:de3e89f85b4299321e777749a3953f5d2d5c1f9dfed095fc96cbc554361c2c81"],
   ["save_publish_process_draft", "sha256:8799b360be4a0b30fd12cfd5f8d4669246bb194d3a944d0be4f87dc7e8ac176d"],
   ["submit_family_care_question", "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"],
   ["supersede_child_media_attribution", "sha256:b4b9ea873c8dde19ecfb1a21e7f5524aba2bd02bb84ebd08d885c1e43e5e692f"],
@@ -262,7 +269,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.11.0");
+    expect(contract.version).toBe("1.12.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

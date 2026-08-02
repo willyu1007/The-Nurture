@@ -1,0 +1,343 @@
+import { describe, expect, it } from "vitest";
+import { issueBoardSealedRef } from "../../src/harness/board-projection.js";
+import { PUBLISH_PROCESS_TARGET_KIND } from "../../src/harness/publish-process.js";
+import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js";
+import type { ResolvedPublishScheduleV1 } from "../../src/harness/publish-schedule.js";
+import {
+  derivePartialReleaseFollowUp,
+  releasePublishProcess,
+  type CommitTargetReleaseResultV1,
+  type ReleaseFactsV1,
+  type ReleaseTargetFactsV1,
+} from "../../src/harness/publication-release.js";
+import { BOARD_INTEGRITY_KEY, caregiverAuthority } from "./board-fixtures.js";
+
+const scope = { workspace_id: "ws-1", participant_id: "caregiver-1" };
+const PROCESS_KEY = "care-group-1~trigger-1";
+const processRef = (forScope = scope) =>
+  issueBoardSealedRef(BOARD_INTEGRITY_KEY, forScope, PUBLISH_PROCESS_TARGET_KIND, PROCESS_KEY);
+
+const schedule: ResolvedPublishScheduleV1 = {
+  scheduledAt: "2026-08-01T09:00:00.000Z",
+  notAfter: "2026-08-01T11:00:00.000Z",
+  timeZone: "Asia/Shanghai",
+  policyRef: "syn-publication-policy-1",
+  policyHead: 5,
+  policyVersion: 2,
+  resolvedAt: "2026-08-01T02:00:00.000Z",
+};
+
+const target = (
+  overrides: Partial<ReleaseTargetFactsV1> = {},
+): ReleaseTargetFactsV1 => ({
+  target_key: "child-1~enrollment-1~grant-1",
+  child_care_process_id: "child-1",
+  enrollment_active: true,
+  grant_allows: true,
+  data_class_allowed: true,
+  purpose_allowed: true,
+  exposure_allows_child_ids: ["child-1", "child-2", "child-3"],
+  ...overrides,
+});
+
+const media = () => ({
+  media_asset_id: "media-1",
+  media_revision: 3,
+  current_media_revision: 3,
+  lifecycle: "ready" as const,
+  visible_children: [
+    {
+      child_care_process_id: "child-1",
+      attribution_status: "confirmed" as const,
+      clearly_visible: true,
+    },
+  ],
+});
+
+const facts = (overrides: Partial<ReleaseFactsV1> = {}): ReleaseFactsV1 => ({
+  authority: caregiverAuthority(),
+  authorizing_role_current: true,
+  process_state: "pending_release",
+  current_revision: 4,
+  has_unsaved_revision: false,
+  edit_hold_active: false,
+  schedule,
+  media: [media()],
+  targets: [target()],
+  ...overrides,
+});
+
+const deps = (
+  value: ReleaseFactsV1 | null,
+  commit: (input: { target_key: string; revision: number }) => CommitTargetReleaseResultV1 = (
+    input,
+  ) => ({
+    status: "committed",
+    publication_ref: `pub-${input.target_key}`,
+    receipt_ref: `receipt-${input.target_key}`,
+  }),
+  now = () => new Date("2026-08-01T09:30:00.000Z"),
+) => {
+  const commits: Array<{ target_key: string; revision: number; command_request_id: string }> = [];
+  return {
+    integrity_key: BOARD_INTEGRITY_KEY,
+    now,
+    commits,
+    reads: {
+      listReleasableProcessKeys: async () => [PROCESS_KEY],
+      loadReleaseFacts: async () => value,
+      commitTargetRelease: async (input: {
+        target_key: string;
+        revision: number;
+        command_request_id: string;
+      }) => {
+        commits.push(input);
+        return commit(input);
+      },
+    },
+  };
+};
+
+const release = (
+  value: ReleaseFactsV1 | null,
+  commit?: (input: { target_key: string; revision: number }) => CommitTargetReleaseResultV1,
+  trigger: "immediate" | "scheduler" = "immediate",
+  now?: () => Date,
+) => {
+  const dependencies = deps(value, commit, now);
+  return {
+    dependencies,
+    run: () =>
+      releasePublishProcess(dependencies, scope, {
+        process_ref: processRef(),
+        command_request_id: "command:release-1",
+        trigger,
+      }),
+  };
+};
+
+describe("G3-D release loop", () => {
+  it("commits one release per target and freezes the revision on the first commit", async () => {
+    const { dependencies, run } = release(
+      facts({
+        targets: [
+          target({ target_key: "t-1", child_care_process_id: "child-1" }),
+          target({ target_key: "t-2", child_care_process_id: "child-1" }),
+        ],
+      }),
+    );
+    const decision = await run();
+    expect(decision.status).toBe("released");
+    if (decision.status === "denied") return;
+    expect(decision.processState).toBe("released");
+    expect(decision.frozenRevision).toBe(4);
+    expect(decision.summary).toEqual({
+      total: 2,
+      committed: 2,
+      rejected: 0,
+      outcomeUnknown: 0,
+    });
+    expect(dependencies.commits.map((entry) => entry.revision)).toEqual([4, 4]);
+    // Every target got its own publication and its own Receipt.
+    expect(new Set(decision.results.map((result) => result.publicationRef)).size).toBe(2);
+    expect(new Set(decision.results.map((result) => result.receiptRef)).size).toBe(2);
+    expect(JSON.stringify(decision)).not.toContain("t-1");
+  });
+
+  it("never rolls back a committed family because another one failed", async () => {
+    const { dependencies, run } = release(
+      facts({
+        targets: [
+          target({ target_key: "t-1" }),
+          target({ target_key: "t-2", grant_allows: false }),
+          target({ target_key: "t-3" }),
+        ],
+      }),
+    );
+    const decision = await run();
+    expect(decision.status).toBe("released");
+    if (decision.status === "denied") return;
+    expect(decision.summary).toEqual({
+      total: 3,
+      committed: 2,
+      rejected: 1,
+      outcomeUnknown: 0,
+    });
+    expect(decision.results[1]?.outcome).toBe("rejected");
+    expect(decision.results[1]?.blockingReasons).toContain("grant_not_allowed");
+    // The blocked family was never even attempted at the commit port.
+    expect(dependencies.commits.map((entry) => entry.target_key)).toEqual(["t-1", "t-3"]);
+  });
+
+  it("keeps the process queued when no target commits", async () => {
+    const { run } = release(
+      facts({ targets: [target({ target_key: "t-1", enrollment_active: false })] }),
+    );
+    const decision = await run();
+    expect(decision.status).toBe("still_pending");
+    if (decision.status === "denied") return;
+    expect(decision.processState).toBe("pending_release");
+    expect(decision).not.toHaveProperty("frozenRevision");
+    expect(decision.summary.committed).toBe(0);
+  });
+
+  it("replays an already-committed target instead of publishing it twice", async () => {
+    const { dependencies, run } = release(
+      facts({
+        process_state: "released",
+        frozen_revision: 4,
+        current_revision: 7,
+        targets: [
+          target({
+            target_key: "t-1",
+            already_committed: { publication_ref: "pub-1", receipt_ref: "receipt-1" },
+          }),
+          target({ target_key: "t-2" }),
+        ],
+      }),
+    );
+    const decision = await run();
+    expect(decision.status).toBe("released");
+    if (decision.status === "denied") return;
+    expect(decision.results[0]?.outcome).toBe("already_committed");
+    expect(dependencies.commits.map((entry) => entry.target_key)).toEqual(["t-2"]);
+    // A released process retries against the frozen revision, not the newer one.
+    expect(dependencies.commits[0]?.revision).toBe(4);
+    expect(decision.frozenRevision).toBe(4);
+  });
+
+  it("separates a transient outcome-unknown from an authority rejection", async () => {
+    const { run } = release(
+      facts({
+        targets: [
+          target({ target_key: "t-1" }),
+          target({ target_key: "t-2" }),
+          target({ target_key: "t-3" }),
+        ],
+      }),
+      (input) =>
+        input.target_key === "t-2"
+          ? { status: "outcome_unknown" }
+          : input.target_key === "t-3"
+            ? { status: "rejected", reason_code: "owner_rejected" }
+            : {
+                status: "committed",
+                publication_ref: "pub-1",
+                receipt_ref: "receipt-1",
+              },
+    );
+    const decision = await run();
+    expect(decision.status).toBe("released");
+    if (decision.status === "denied") return;
+    expect(decision.summary).toEqual({
+      total: 3,
+      committed: 1,
+      rejected: 1,
+      outcomeUnknown: 1,
+    });
+    const followUp = derivePartialReleaseFollowUp(decision);
+    expect(followUp.reconcileTargets).toHaveLength(1);
+    expect(followUp.retryableTargets).toHaveLength(1);
+    // The shared revision is frozen the moment one family received it.
+    expect(followUp.sharedRevisionEditable).toBe(false);
+    expect(followUp.requiresNewProcessForContentChange).toBe(true);
+  });
+
+  it("uses the same command identity for every target of one attempt", async () => {
+    const { dependencies, run } = release(
+      facts({ targets: [target({ target_key: "t-1" }), target({ target_key: "t-2" })] }),
+    );
+    await run();
+    expect(dependencies.commits.map((entry) => entry.command_request_id)).toEqual([
+      "command:release-1",
+      "command:release-1",
+    ]);
+  });
+
+  it("refuses to publish anything that is not a saved, eligible, queued revision", async () => {
+    for (const [override, reason] of [
+      [{ process_state: "needs_review" as PublishProcessStateV1 }, "needs_review"],
+      [{ process_state: "draft" as PublishProcessStateV1 }, "process_not_queued"],
+      [{ process_state: "cancelled" as PublishProcessStateV1 }, "process_cancelled"],
+      [{ edit_hold_active: true }, "edit_hold_active"],
+      [{ has_unsaved_revision: true }, "unsaved_revision"],
+      [{ authorizing_role_current: false }, "not_authorized"],
+      [{ authority: caregiverAuthority({ role: "institution_admin" }) }, "not_authorized"],
+      [{ authority: caregiverAuthority({ role_scope_type: "institution" }) }, "not_authorized"],
+    ] as const) {
+      const { dependencies, run } = release(facts(override));
+      await expect(run(), reason).resolves.toEqual({
+        status: "denied",
+        reason_code: reason,
+      });
+      expect(dependencies.commits).toEqual([]);
+    }
+  });
+
+  it("bounds the scheduler by the window but not an explicit send now", async () => {
+    const late = () => new Date("2026-08-01T23:00:00.000Z");
+    await expect(
+      release(facts(), undefined, "scheduler", late).run(),
+    ).resolves.toEqual({ status: "denied", reason_code: "past_cutoff" });
+    await expect(
+      release(facts(), undefined, "scheduler", () => new Date("2026-08-01T08:00:00.000Z")).run(),
+    ).resolves.toEqual({ status: "denied", reason_code: "before_scheduled_at" });
+
+    // The class teacher may still send explicitly after the cutoff.
+    const explicit = await release(facts(), undefined, "immediate", late).run();
+    expect(explicit.status).toBe("released");
+  });
+
+  it("surfaces a missed-send attention when nothing committed past the cutoff", async () => {
+    const decision = await release(
+      facts({ targets: [target({ grant_allows: false })] }),
+      undefined,
+      "immediate",
+      () => new Date("2026-08-01T23:00:00.000Z"),
+    ).run();
+    expect(decision.status).toBe("still_pending");
+    if (decision.status === "denied") return;
+    expect(decision.missedSendAttention).toBe(true);
+  });
+
+  it("blocks a target whose group photo is not fully attributed", async () => {
+    const decision = await release(
+      facts({
+        media: [
+          {
+            ...media(),
+            visible_children: [
+              {
+                child_care_process_id: "child-1",
+                attribution_status: "confirmed",
+                clearly_visible: true,
+              },
+              { clearly_visible: true },
+            ],
+          },
+        ],
+      }),
+    ).run();
+    expect(decision.status).toBe("still_pending");
+    if (decision.status === "denied") return;
+    expect(decision.results[0]?.blockingReasons).toContain("unknown_visible_child");
+  });
+
+  it("resolves only an owner-issued process ref", async () => {
+    const dependencies = deps(facts());
+    await expect(
+      releasePublishProcess(dependencies, scope, {
+        process_ref: PROCESS_KEY,
+        command_request_id: "command:release-1",
+        trigger: "immediate",
+      }),
+    ).resolves.toEqual({ status: "denied", reason_code: "target_unavailable" });
+    await expect(
+      releasePublishProcess(dependencies, scope, {
+        process_ref: processRef({ workspace_id: "ws-1", participant_id: "caregiver-2" }),
+        command_request_id: "command:release-1",
+        trigger: "immediate",
+      }),
+    ).resolves.toEqual({ status: "denied", reason_code: "target_unavailable" });
+  });
+});

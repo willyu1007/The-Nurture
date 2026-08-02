@@ -154,7 +154,14 @@
         "cancel_publish_process",
         "confirm_child_media_attribution",
         "reject_child_media_attribution",
-        "supersede_child_media_attribution"
+        "supersede_child_media_attribution",
+        "release_publish_process",
+        "reschedule_publish_process",
+        "correct_publication",
+        "remove_publication_target_visibility",
+        "redact_publication",
+        "detach_publish_process_media",
+        "discard_media_asset"
       ]
     },
     "queryCapabilityKey": {

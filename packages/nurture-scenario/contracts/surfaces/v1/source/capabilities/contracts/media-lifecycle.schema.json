@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/media-lifecycle.schema.json",
+  "title": "MediaLifecycleV1",
+  "$defs": {
+    "detachInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mediaRef"
+      ],
+      "properties": {
+        "mediaRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "detachResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mediaRef",
+        "remainingMediaCount"
+      ],
+      "properties": {
+        "mediaRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "remainingMediaCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "discardInput": {
+      "$ref": "publish-process-types.schema.json#/$defs/emptyInput"
+    },
+    "discardResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mediaRef",
+        "affectedDraftCount"
+      ],
+      "properties": {
+        "mediaRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "affectedDraftCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

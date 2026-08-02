@@ -39,6 +39,12 @@
       "requiredGate": "owner_integration"
     },
     {
+      "key": "publication_release_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "owner_integration"
+    },
+    {
       "key": "publish_process_repository",
       "version": "1.0.0",
       "owner": "nurture",
@@ -112,6 +118,48 @@
         },
         {
           "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "correct_publication_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "publication_release_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "detach_publish_process_media_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "publish_process_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "discard_media_asset_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "media_attribution_repository",
           "version": "1.0.0"
         }
       ]
@@ -313,6 +361,20 @@
       ]
     },
     {
+      "key": "redact_publication_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "publication_release_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
       "key": "reject_child_media_attribution_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [
@@ -341,6 +403,34 @@
       ]
     },
     {
+      "key": "release_publish_process_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "publication_release_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "remove_publication_target_visibility_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "publication_release_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
       "key": "renew_publish_edit_hold_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [
@@ -364,6 +454,20 @@
         },
         {
           "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "reschedule_publish_process_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "publish_process_repository",
           "version": "1.0.0"
         }
       ]

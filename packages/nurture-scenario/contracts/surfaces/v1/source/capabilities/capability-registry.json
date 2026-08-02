@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.11.0"
+    "version": "1.12.0"
   },
   "capabilities": [
     {
@@ -2127,6 +2127,511 @@
       },
       "handlerBinding": {
         "bindingKey": "supersede_child_media_attribution",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "release_publish_process",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "publish_process",
+      "executionClass": "publish_process_transition",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "release_publish_process"
+      ],
+      "inputSchemaRef": "schema:nurture.release-publish-process-input@1",
+      "resultSchemaRef": "schema:nurture.release-publish-process-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "draft_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "publish_process_lifecycle",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "releasable_publish_process",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "publication_schedule",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_release_window",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "release_publish_process_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "release_publish_process",
+        "bindingKind": "publish_process"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_publication_policy",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "joint_conformance"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "reschedule_publish_process",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "publish_process",
+      "executionClass": "publish_process_transition",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "reschedule_publish_process"
+      ],
+      "inputSchemaRef": "schema:nurture.reschedule-publish-process-input@1",
+      "resultSchemaRef": "schema:nurture.reschedule-publish-process-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "publication_schedule",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "publish_process_lifecycle",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "reschedulable_publish_process",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "reschedule_publish_process_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "reschedule_publish_process",
+        "bindingKind": "publish_process"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_publication_policy",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "joint_conformance"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "correct_publication",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "publish_process",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "correct_publication"
+      ],
+      "inputSchemaRef": "schema:nurture.correct-publication-input@1",
+      "resultSchemaRef": "schema:nurture.correct-publication-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "append_compatible",
+        "headBindings": [
+          {
+            "headKey": "publication_visibility_lineage",
+            "mode": "compatible_append"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "correct_publication_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "correct_publication",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "remove_publication_target_visibility",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "publish_process",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "remove_publication_target_visibility"
+      ],
+      "inputSchemaRef": "schema:nurture.remove-publication-target-visibility-input@1",
+      "resultSchemaRef": "schema:nurture.remove-publication-target-visibility-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "append_compatible",
+        "headBindings": [
+          {
+            "headKey": "publication_visibility_lineage",
+            "mode": "compatible_append"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "remove_publication_target_visibility_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "remove_publication_target_visibility",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "redact_publication",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "publish_process",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "redact_publication"
+      ],
+      "inputSchemaRef": "schema:nurture.redact-publication-input@1",
+      "resultSchemaRef": "schema:nurture.redact-publication-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "append_compatible",
+        "headBindings": [
+          {
+            "headKey": "publication_visibility_lineage",
+            "mode": "compatible_append"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "redact_publication_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "redact_publication",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "detach_publish_process_media",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "publish_process",
+      "executionClass": "publish_process_transition",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "detach_publish_process_media"
+      ],
+      "inputSchemaRef": "schema:nurture.detach-publish-process-media-input@1",
+      "resultSchemaRef": "schema:nurture.detach-publish-process-media-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "draft_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "detach_publish_process_media_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "detach_publish_process_media",
+        "bindingKind": "publish_process"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "discard_media_asset",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "care_interaction",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "discard_media_asset"
+      ],
+      "inputSchemaRef": "schema:nurture.discard-media-asset-input@1",
+      "resultSchemaRef": "schema:nurture.discard-media-asset-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "media_asset_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "publication_release_count",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "no_committed_release",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "discard_media_asset_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "discard_media_asset",
         "bindingKind": "action"
       },
       "presenterBindings": [
