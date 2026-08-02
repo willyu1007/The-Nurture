@@ -160,6 +160,46 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-02 — 生成出来的迁移是草稿,不是证据
+
+- **Symptom**：`prisma migrate diff` 为"退役 legacy 枚举、换成新生命周期枚举"生成的
+  是 `DROP COLUMN status` + `ADD COLUMN lifecycle NOT NULL DEFAULT …`。它跑得通,
+  而且看起来干净——代价是把 legacy `hidden`/`deleted` 行静默塞进某一个新值。
+- **Root cause**：diff 工具只对齐 schema 形状,不知道哪些旧值的语义需要证据才能判定。
+  domain 侧的 `mapLegacyMediaAssetStatus` 早就是 fail-closed 的,但迁移没有调用它,
+  两者从未被放在一起。
+- **Fix**：手改为「加可空列 → 回填无歧义值 → 普查剩余 NULL → 有则 `RAISE EXCEPTION`
+  中止整个迁移」,两条 gate 分别对应两个 legacy 枚举的映射规则。
+- **它被证伪过**：在一次性 scratch 库里插一行 legacy `hidden` media 再重放迁移,
+  确认整体回滚并报出行数。没有这一步,"fail closed" 只是注释。
+- **Prevention**：凡是有 legacy 行的枚举/状态迁移,先问"哪些旧值无法从行内推出新值",
+  再把那批行写成一条会中止的普查。生成的 SQL 一律当草稿读。
+
+### 2026-08-02 — schema delta 落库了,镜像它的手写类型没跟上
+
+- **Symptom**：`NurtureGrantDataClass += child_growth_record` 落库后,
+  `packages/nurture-db` 编译失败——Prisma 生成的枚举不再可赋值给 domain 侧的同名
+  联合类型。
+- **Root cause**：`institution-context.ts` 里手写了一份镜像联合,它是第二个 SSOT,
+  但没有任何检查把它和 Prisma 生成物绑在一起;只有 typecheck 恰好会撞上。
+- **Fix**：扩展 domain 联合。更重要的是记住:schema delta 的完成标准包含"所有镜像
+  该枚举的手写类型"。
+- **Prevention**：改共享枚举时,先 `grep` 该类型名。typecheck 这次抓到了,是因为两侧
+  恰好在同一个赋值点相遇;若某个镜像只被内部使用,它会静默漂移。
+
+### 2026-08-02 — 新事实类型会继承既有表上的 CHECK
+
+- **Symptom**：给 `NurtureChildLinkReceipt` 加了 `publication_release` source type
+  后,第一条测试用的 Receipt 直接被 T-005 的 `ck_nurture_receipt_route_lifecycle`
+  拒了。
+- **Root cause**：把"扩展枚举"当成了纯加法,忘了这张表上还有一条管辖全部 source type
+  的生命周期 CHECK——`delivered` 必须带齐 grant/enrollment/data class/target scope/
+  `delivered_at`。
+- **Fix**：按约束写 Receipt,并把正反两例都固定在 DB 测试里,供 B2 的
+  `commitTargetRelease` 直接照抄形状。
+- **Prevention**：往既有表加枚举值时,先读该表全部 CHECK,而不只看列定义。
+  additive 只对列成立,对约束不成立。
+
 ### 2026-08-02 — "typed result" 说了四个 checkpoint,却从来没有被检查过
 
 - **Symptom**：G3-A～G3-D 每一格都声称能力返回 typed result,合同侧 schema 编译通过、

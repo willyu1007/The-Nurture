@@ -19,7 +19,10 @@ Project: `main`
   `nurture.surface-contract@1.8.0` / `sha256:4fe91e13…` is Nurture-provider
   qualified against the pinned owner path, with single-writer/default-off guards.
   T-006 G3-0 is frozen as `G3_0_FREEZE_PASS`; G3-A, G3-B1, G3-C1 and G3-D are
-  delivered and the current critical lane is G3-E integration qualification.
+  delivered. The 2026-08-02 readiness review is `G3_E_NOT_READY` with seven
+  blockers, so the current critical lane is the G3-E preparatory checkpoint
+  rather than G3-E itself; its first item, the DB SSOT delta and its
+  fail-closed legacy migration, is landed and DB-qualified.
   Every checkpoint rotated the artifact additively, now at
   `nurture.surface-contract@1.13.0` / `sha256:1919a289…` — shared core and every
   T-005 capability slice stay byte-identical, so the G2 Exit evidence is preserved.

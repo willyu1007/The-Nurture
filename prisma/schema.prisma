@@ -389,6 +389,7 @@ enum NurtureGrantDataClass {
   family_care_question
   family_follow_up_request
   direct_care_communication
+  child_growth_record
 }
 
 enum NurtureChildLinkReceiptStatus {
@@ -407,6 +408,7 @@ enum NurtureChildLinkReceiptSourceType {
   daily_care_log
   media_attribution
   system_summary
+  publication_release
 }
 
 enum NurtureChildLinkReceiptTargetScopeType {
@@ -636,10 +638,15 @@ enum NurtureMediaAssetSourceKind {
   admin_upload
 }
 
-enum NurtureMediaAssetStatus {
-  active
-  hidden
-  deleted
+// G3-C1 media availability axis (02-architecture.md D-12). It replaces the
+// legacy active/hidden/deleted union once, through an evidence-backed
+// migration; there is no G3 compatibility branch.
+enum NurtureMediaAssetLifecycle {
+  preparing
+  ready
+  unavailable
+  discarded
+  redacted
 }
 
 enum NurtureMediaAttributionSource {
@@ -649,13 +656,64 @@ enum NurtureMediaAttributionSource {
   system
 }
 
-enum NurtureMediaAttributionStatus {
+// G3-C1 child-attribution axis. `corrected/hidden/deleted` are migrated once
+// with explicit evidence; a confirmed attribution is only ever superseded.
+enum NurtureChildAttributionState {
   candidate
   confirmed
   rejected
-  corrected
-  hidden
-  deleted
+  superseded
+}
+
+// G3-B1 capture batch (01-plan.md D-10).
+enum NurtureCareCaptureBatchState {
+  collecting
+  cut
+  organized
+  cancelled
+}
+
+enum NurtureCareCaptureKind {
+  text
+  voice_transcript
+  media
+}
+
+enum NurtureCareCaptureOrganizeTrigger {
+  manual
+  idle
+  daily_fallback
+}
+
+// G3-D publish process (02-architecture.md D-06). Scheduling, sending,
+// per-target failure and delivery are deliberately absent.
+enum NurturePublishProcessState {
+  draft
+  needs_review
+  pending_release
+  released
+  cancelled
+}
+
+// G3-C1 ContentSafetyPolicy route (D-15). Nurture owns it; a classifier only
+// contributes signals.
+enum NurtureContentSafetyRoute {
+  ordinary
+  review_required
+  direct_interaction_required
+}
+
+// G3-D append-only post-release lineage (D-11).
+enum NurturePublicationVisibilityEventKind {
+  correction
+  target_removal
+  redaction
+}
+
+enum NurturePublicationVisibility {
+  visible
+  removed
+  redacted
 }
 
 enum NurtureInteractionPurpose {
@@ -787,7 +845,8 @@ model NurtureFocusGoal {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  focusCycle NurtureFocusCycle @relation(fields: [focusCycleId], references: [id])
+  focusCycle  NurtureFocusCycle            @relation(fields: [focusCycleId], references: [id])
+  childScopes NurtureFocusGoalChildScope[]
 
   @@index([workspaceId, focusCycleId], map: "ix_6")
   @@map("nurture_focus_goal")
@@ -1588,6 +1647,8 @@ model NurtureChildCareProcess {
   dailyCareLogs            NurtureDailyCareLog[]
   attentionItems           NurtureTeacherAttentionItem[]
   mediaAttributions        NurtureChildMediaAttribution[]
+  focusGoalScopes          NurtureFocusGoalChildScope[]
+  publishTargets           NurturePublishProcessTarget[]
   commandExecutions        NurtureCommandExecution[]
   familyAnchorAssociations NurtureFamilyAnchorAssociation[]
 
@@ -1664,6 +1725,9 @@ model NurtureCareGroup {
   dailyCareLogs  NurtureDailyCareLog[]
   attentionItems NurtureTeacherAttentionItem[]
   mediaAssets    NurtureMediaAssetRef[]
+  captures       NurtureCareCapture[]
+  captureBatches NurtureCareCaptureBatch[]
+  publishProcesses NurturePublishProcess[]
 
   @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
   @@map("nurture_care_group")
@@ -1693,6 +1757,7 @@ model NurtureEnrollment {
   items            NurtureFamilyCareItem[]
   messages         NurtureFamilyCareMessage[]
   dailyCareLogs    NurtureDailyCareLog[]
+  publishTargets   NurturePublishProcessTarget[]
 
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
   @@index([workspaceId, careGroupId, status], map: "ix_nurture_enrollment_group")
@@ -1726,6 +1791,9 @@ model NurtureCareRoleAssignment {
   dailyCareLogs         NurtureDailyCareLog[]
   uploadedAssets        NurtureMediaAssetRef[]
   confirmedAttributions NurtureChildMediaAttribution[]
+  captures              NurtureCareCapture[]
+  publishEditHolds      NurturePublishEditHold[]
+  publicationReleases   NurturePublicationRelease[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -1762,6 +1830,7 @@ model NurtureChildLinkGrant {
   messages         NurtureFamilyCareMessage[]
   items            NurtureFamilyCareItem[]
   dailyCareLogs    NurtureDailyCareLog[]
+  publishTargets   NurturePublishProcessTarget[]
 
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_grant_process")
   @@index([workspaceId, enrollmentId, status], map: "ix_nurture_grant_enrollment")
@@ -1802,6 +1871,7 @@ model NurtureChildLinkReceipt {
   enrollment       NurtureEnrollment?                   @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
   retryOfReceipt   NurtureChildLinkReceipt?             @relation("ReceiptRetry", fields: [retryOfReceiptId], references: [id], onDelete: Restrict)
   retryReceipts    NurtureChildLinkReceipt[]            @relation("ReceiptRetry")
+  publicationReleases NurturePublicationRelease[]
   corrections      NurtureFamilyCareMessageCorrection[]
 
   @@unique([workspaceId, direction, sourceType, sourceId, routingAttemptKey], map: "uq_nurture_receipt_route")
@@ -2080,7 +2150,10 @@ model NurtureMediaAssetRef {
   storageRefPayload          Json                        @map("storage_ref_payload")
   safeTitle                  String?                     @map("safe_title")
   capturedAt                 DateTime?                   @map("captured_at")
-  status                     NurtureMediaAssetStatus
+  lifecycle                  NurtureMediaAssetLifecycle
+  // The exact immutable original revision a draft or release binds to. It never
+  // changes in place; a new original is a new revision.
+  mediaRevision              Int                         @default(1) @map("media_revision")
   aggregateVersion           Int                         @default(0) @map("aggregate_version")
   createdAt                  DateTime                    @default(now()) @map("created_at")
   updatedAt                  DateTime                    @updatedAt @map("updated_at")
@@ -2090,9 +2163,10 @@ model NurtureMediaAssetRef {
   careGroup    NurtureCareGroup?              @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
   uploadedBy   NurtureCareRoleAssignment?     @relation(fields: [uploadedByRoleAssignmentId], references: [id], onDelete: Restrict)
   attributions NurtureChildMediaAttribution[]
+  captures     NurtureCareCapture[]
 
-  @@index([workspaceId, institutionId, status, createdAt], map: "ix_nurture_media_asset_institution")
-  @@index([workspaceId, careGroupId, status, createdAt], map: "ix_nurture_media_asset_group")
+  @@index([workspaceId, institutionId, lifecycle, createdAt], map: "ix_nurture_media_asset_institution")
+  @@index([workspaceId, careGroupId, lifecycle, createdAt], map: "ix_nurture_media_asset_group")
   @@map("nurture_media_asset_ref")
 }
 
@@ -2103,7 +2177,12 @@ model NurtureChildMediaAttribution {
   childCareProcessId          String                        @map("child_care_process_id")
   source                      NurtureMediaAttributionSource
   confidence                  Decimal?                      @db.Decimal(5, 4)
-  status                      NurtureMediaAttributionStatus
+  state                       NurtureChildAttributionState
+  // Append-only: a correction supersedes the prior fact and links to it rather
+  // than overwriting confirmed history.
+  attributionRevision         Int                           @default(1) @map("attribution_revision")
+  supersededByAttributionId   String?                       @map("superseded_by_attribution_id")
+  evidencePayload             Json?                         @map("evidence_payload")
   confirmedByRoleAssignmentId String?                       @map("confirmed_by_role_assignment_id")
   confirmedAt                 DateTime?                     @map("confirmed_at")
   exposurePolicyPayload       Json?                         @map("exposure_policy_payload")
@@ -2115,9 +2194,12 @@ model NurtureChildMediaAttribution {
   mediaAssetRef    NurtureMediaAssetRef       @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
   childCareProcess NurtureChildCareProcess    @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
   confirmedBy      NurtureCareRoleAssignment? @relation(fields: [confirmedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  supersededBy     NurtureChildMediaAttribution?  @relation("AttributionSupersession", fields: [supersededByAttributionId], references: [id], onDelete: Restrict)
+  supersedes       NurtureChildMediaAttribution[] @relation("AttributionSupersession")
 
-  @@index([workspaceId, mediaAssetRefId, status], map: "ix_nurture_media_attribution_asset")
-  @@index([workspaceId, childCareProcessId, status, createdAt], map: "ix_nurture_media_attribution_process")
+  @@unique([workspaceId, mediaAssetRefId, childCareProcessId, attributionRevision], map: "uq_nurture_media_attribution_revision")
+  @@index([workspaceId, mediaAssetRefId, state], map: "ix_nurture_media_attribution_asset")
+  @@index([workspaceId, childCareProcessId, state, createdAt], map: "ix_nurture_media_attribution_process")
   @@map("nurture_child_media_attribution")
 }
 
@@ -2229,4 +2311,276 @@ model NurtureCommandExecution {
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
   @@index([workspaceId, childCareProcessId, committedAt], map: "ix_nurture_command_execution_process")
   @@map("nurture_command_execution")
+}
+
+// ============================================================================
+// T-006 STAGE G3 — CAPTURE, PUBLISH PROCESS AND PUBLICATION
+// 06-g3-0-fact-contract-schema-freeze.md "DB SSOT Delta". Every model here is
+// additive: no existing fact family gains a second source, and the board
+// projection is never persisted as a unified child-state row.
+// ============================================================================
+
+// Explicit Goal <-> ChildCareProcess association. A child hint inside
+// `goalPayload` is never inferred as child scope.
+model NurtureFocusGoalChildScope {
+  id                 String   @id @default(uuid())
+  workspaceId        String   @map("workspace_id")
+  focusGoalId        String   @map("focus_goal_id")
+  childCareProcessId String   @map("child_care_process_id")
+  scopeVersion       Int      @default(1) @map("scope_version")
+  provenancePayload  Json?    @map("provenance_payload")
+  aggregateVersion   Int      @default(0) @map("aggregate_version")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
+
+  focusGoal        NurtureFocusGoal        @relation(fields: [focusGoalId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, focusGoalId, childCareProcessId], map: "uq_nurture_focus_goal_child_scope")
+  @@index([workspaceId, childCareProcessId], map: "ix_nurture_focus_goal_scope_process")
+  @@map("nurture_focus_goal_child_scope")
+}
+
+// CareGroup-internal source material. Existence never implies family
+// visibility, and protected content lives behind the same envelope as T-005.
+model NurtureCareCapture {
+  id                       String                 @id @default(uuid())
+  workspaceId              String                 @map("workspace_id")
+  careGroupId              String                 @map("care_group_id")
+  captureBatchId           String?                @map("capture_batch_id")
+  capturedByRoleAssignmentId String               @map("captured_by_role_assignment_id")
+  kind                     NurtureCareCaptureKind
+  // Monotonic intake order inside the batch; the watermark is expressed in it.
+  sourceSequence           Int                    @map("source_sequence")
+  // False while an upload or save is still in flight. Only a stable prefix is cut.
+  stable                   Boolean                @default(false)
+  bodyProtectionPayload    Json?                  @map("body_protection_payload")
+  transcriptRevision       String?                @map("transcript_revision")
+  mediaAssetRefId          String?                @map("media_asset_ref_id")
+  occurredAt               DateTime               @map("occurred_at")
+  aggregateVersion         Int                    @default(0) @map("aggregate_version")
+  createdAt                DateTime               @default(now()) @map("created_at")
+  updatedAt                DateTime               @updatedAt @map("updated_at")
+  deletedAt                DateTime?              @map("deleted_at")
+
+  careGroup     NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  captureBatch  NurtureCareCaptureBatch?  @relation(fields: [captureBatchId], references: [id], onDelete: Restrict)
+  capturedBy    NurtureCareRoleAssignment @relation(fields: [capturedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  mediaAssetRef NurtureMediaAssetRef?     @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, captureBatchId, sourceSequence], map: "uq_nurture_care_capture_sequence")
+  @@index([workspaceId, careGroupId, occurredAt], map: "ix_nurture_care_capture_group")
+  @@map("nurture_care_capture")
+}
+
+// One organize batch. It records the resolved trigger, the policy head it was
+// decided under and the stable source watermark it cut at — never the raw
+// device operation stream.
+model NurtureCareCaptureBatch {
+  id                    String                             @id @default(uuid())
+  workspaceId           String                             @map("workspace_id")
+  careGroupId           String                             @map("care_group_id")
+  state                 NurtureCareCaptureBatchState
+  resolvedTrigger       NurtureCareCaptureOrganizeTrigger? @map("resolved_trigger")
+  triggerRequestId      String?                            @map("trigger_request_id")
+  policyRef             String?                            @map("policy_ref")
+  policyHead            Int?                               @map("policy_head")
+  timeZone              String?                            @map("time_zone")
+  quiescenceSeconds     Int?                               @map("quiescence_seconds")
+  observedUserActivityAt DateTime?                         @map("observed_user_activity_at")
+  watermarkSourceSequence Int?                             @map("watermark_source_sequence")
+  cutAt                 DateTime?                          @map("cut_at")
+  aggregateVersion      Int                                @default(0) @map("aggregate_version")
+  createdAt             DateTime                           @default(now()) @map("created_at")
+  updatedAt             DateTime                           @updatedAt @map("updated_at")
+
+  careGroup        NurtureCareGroup       @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  captures         NurtureCareCapture[]
+  publishProcesses NurturePublishProcess[]
+
+  // The same trigger identity is an exact replay, never a second batch.
+  @@unique([workspaceId, careGroupId, triggerRequestId], map: "uq_nurture_care_capture_batch_trigger")
+  @@index([workspaceId, careGroupId, state, createdAt], map: "ix_nurture_care_capture_batch_group")
+  @@map("nurture_care_capture_batch")
+}
+
+// The caregiver-side content work unit. It owns no upload, CareInteraction,
+// ActionDelivery or Institution Workflow state.
+model NurturePublishProcess {
+  id                   String                     @id @default(uuid())
+  workspaceId          String                     @map("workspace_id")
+  careGroupId          String                     @map("care_group_id")
+  captureBatchId       String?                    @map("capture_batch_id")
+  processKey           String                     @map("process_key")
+  state                NurturePublishProcessState
+  dataClass            NurtureGrantDataClass      @map("data_class")
+  purposeKey           String                     @map("purpose_key")
+  currentRevisionId    String?                    @unique @map("current_revision_id")
+  // Set by the first committed target release; the shared revision is frozen then.
+  frozenRevisionId     String?                    @map("frozen_revision_id")
+  // Resolved once from the T-007 window and never silently moved afterwards.
+  scheduledAt          DateTime?                  @map("scheduled_at")
+  notAfter             DateTime?                  @map("not_after")
+  scheduleTimeZone     String?                    @map("schedule_time_zone")
+  schedulePolicyRef    String?                    @map("schedule_policy_ref")
+  schedulePolicyHead   Int?                       @map("schedule_policy_head")
+  authorizingRoleAssignmentId String?             @map("authorizing_role_assignment_id")
+  aggregateVersion     Int                        @default(0) @map("aggregate_version")
+  createdAt            DateTime                   @default(now()) @map("created_at")
+  updatedAt            DateTime                   @updatedAt @map("updated_at")
+
+  careGroup          NurtureCareGroup                  @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  captureBatch       NurtureCareCaptureBatch?          @relation(fields: [captureBatchId], references: [id], onDelete: Restrict)
+  currentRevision    NurturePublishProcessRevision?    @relation("PublishProcessCurrentRevision", fields: [currentRevisionId], references: [id], onDelete: Restrict)
+  revisions          NurturePublishProcessRevision[]   @relation("PublishProcessRevisions")
+  targets            NurturePublishProcessTarget[]
+  editHold           NurturePublishEditHold?
+  safetyAssessments  NurtureContentSafetyAssessment[]
+  releases           NurturePublicationRelease[]
+
+  @@unique([workspaceId, processKey], map: "uq_nurture_publish_process_key")
+  @@index([workspaceId, careGroupId, state, createdAt], map: "ix_nurture_publish_process_group")
+  @@map("nurture_publish_process")
+}
+
+// Append-only shared composition. There is no target-specific hidden body:
+// different content for a different family means a different process.
+model NurturePublishProcessRevision {
+  id                    String   @id @default(uuid())
+  workspaceId           String   @map("workspace_id")
+  publishProcessId      String   @map("publish_process_id")
+  revision              Int
+  contentDigest         String   @map("content_digest")
+  organizerInputRevision String  @map("organizer_input_revision")
+  templateKey           String?  @map("template_key")
+  templateVersion       String?  @map("template_version")
+  titleProtectionPayload Json?   @map("title_protection_payload")
+  bodyProtectionPayload Json?    @map("body_protection_payload")
+  mediaCompositionPayload Json?  @map("media_composition_payload")
+  sourceRefsPayload     Json?    @map("source_refs_payload")
+  savedByRoleAssignmentId String? @map("saved_by_role_assignment_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  publishProcess NurturePublishProcess          @relation("PublishProcessRevisions", fields: [publishProcessId], references: [id], onDelete: Restrict)
+  currentOf      NurturePublishProcess?         @relation("PublishProcessCurrentRevision")
+  releases       NurturePublicationRelease[]
+
+  @@unique([workspaceId, publishProcessId, revision], map: "uq_nurture_publish_revision")
+  @@map("nurture_publish_process_revision")
+}
+
+// The internal resolved target behind an opaque public ref. It carries identity
+// only — never content.
+model NurturePublishProcessTarget {
+  id                 String   @id @default(uuid())
+  workspaceId        String   @map("workspace_id")
+  publishProcessId   String   @map("publish_process_id")
+  targetKey          String   @map("target_key")
+  childCareProcessId String   @map("child_care_process_id")
+  enrollmentId       String   @map("enrollment_id")
+  familyRefKey       String   @map("family_ref_key")
+  grantId            String   @map("grant_id")
+  aggregateVersion   Int      @default(0) @map("aggregate_version")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  publishProcess   NurturePublishProcess      @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess    @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment          @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  grant            NurtureChildLinkGrant      @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  release          NurturePublicationRelease?
+
+  @@unique([workspaceId, publishProcessId, targetKey], map: "uq_nurture_publish_target_key")
+  @@index([workspaceId, childCareProcessId], map: "ix_nurture_publish_target_process")
+  @@map("nurture_publish_process_target")
+}
+
+// One expiring coordination hold per process. Not authority, not an owner and
+// not a process state.
+model NurturePublishEditHold {
+  id                     String   @id @default(uuid())
+  workspaceId            String   @map("workspace_id")
+  publishProcessId       String   @unique @map("publish_process_id")
+  holderRoleAssignmentId String   @map("holder_role_assignment_id")
+  holderParticipantId    String   @map("holder_participant_id")
+  expiresAt              DateTime @map("expires_at")
+  aggregateVersion       Int      @default(0) @map("aggregate_version")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  publishProcess NurturePublishProcess     @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
+  holder         NurtureCareRoleAssignment @relation(fields: [holderRoleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, expiresAt], map: "ix_nurture_publish_edit_hold_expiry")
+  @@map("nurture_publish_edit_hold")
+}
+
+// Append-only route decisions. Structured risk codes and heads only: never a
+// sensitive body, an image or model chain-of-thought.
+model NurtureContentSafetyAssessment {
+  id                    String                   @id @default(uuid())
+  workspaceId           String                   @map("workspace_id")
+  publishProcessId      String                   @map("publish_process_id")
+  route                 NurtureContentSafetyRoute
+  policyRef             String                   @map("policy_ref")
+  policyHead            Int                      @map("policy_head")
+  ruleRevision          String                   @map("rule_revision")
+  providerRevision      String?                  @map("provider_revision")
+  modelRevision         String?                  @map("model_revision")
+  promptPolicyRevision  String?                  @map("prompt_policy_revision")
+  riskCodesPayload      Json                     @map("risk_codes_payload")
+  sourceHeadsPayload    Json                     @map("source_heads_payload")
+  assessedAt            DateTime                 @default(now()) @map("assessed_at")
+
+  publishProcess NurturePublishProcess @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, publishProcessId, assessedAt], map: "ix_nurture_content_safety_process")
+  @@map("nurture_content_safety_assessment")
+}
+
+// The immutable per-target committed effect, bound to the frozen revision, the
+// exact authority that released it and its logical Receipt.
+model NurturePublicationRelease {
+  id                          String                       @id @default(uuid())
+  workspaceId                 String                       @map("workspace_id")
+  publishProcessId            String                       @map("publish_process_id")
+  publishProcessTargetId      String                       @unique @map("publish_process_target_id")
+  publishProcessRevisionId    String                       @map("publish_process_revision_id")
+  releasedByRoleAssignmentId  String                       @map("released_by_role_assignment_id")
+  commandRequestIdHash        String                       @map("command_request_id_hash")
+  receiptId                   String?                      @map("receipt_id")
+  visibility                  NurturePublicationVisibility @default(visible)
+  committedAt                 DateTime                     @default(now()) @map("committed_at")
+
+  publishProcess   NurturePublishProcess               @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
+  target           NurturePublishProcessTarget         @relation(fields: [publishProcessTargetId], references: [id], onDelete: Restrict)
+  revision         NurturePublishProcessRevision       @relation(fields: [publishProcessRevisionId], references: [id], onDelete: Restrict)
+  releasedBy       NurtureCareRoleAssignment           @relation(fields: [releasedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  receipt          NurtureChildLinkReceipt?            @relation(fields: [receiptId], references: [id], onDelete: Restrict)
+  visibilityEvents NurturePublicationVisibilityEvent[]
+
+  // One committed release per target; an exact command replay never duplicates it.
+  @@unique([workspaceId, publishProcessId, commandRequestIdHash, publishProcessTargetId], map: "uq_nurture_publication_release_command")
+  @@index([workspaceId, publishProcessId, committedAt], map: "ix_nurture_publication_release_process")
+  @@map("nurture_publication_release")
+}
+
+// Append-only correction/removal/redaction lineage. It never deletes the
+// release, the Receipt or the audit trail.
+model NurturePublicationVisibilityEvent {
+  id                     String                                @id @default(uuid())
+  workspaceId            String                                @map("workspace_id")
+  publicationReleaseId   String                                @map("publication_release_id")
+  kind                   NurturePublicationVisibilityEventKind
+  reasonKey              String                                @map("reason_key")
+  actorRoleAssignmentId  String                                @map("actor_role_assignment_id")
+  sourceReleaseRevision  Int                                   @map("source_release_revision")
+  bodyProtectionPayload  Json?                                 @map("body_protection_payload")
+  occurredAt             DateTime                              @default(now()) @map("occurred_at")
+
+  publicationRelease NurturePublicationRelease @relation(fields: [publicationReleaseId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, publicationReleaseId, occurredAt], map: "ix_nurture_publication_visibility_release")
+  @@map("nurture_publication_visibility_event")
 }

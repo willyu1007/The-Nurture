@@ -421,3 +421,25 @@
 | G3-E readiness review | `G3_E_NOT_READY` — 7 blockers recorded in `07-g3-e-implementation-readiness-review.md` |
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 8/8 files |
 | governance lint + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisite B1 (DB SSOT Delta and Migration)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm exec prisma validate` | PASS — ten additive models, five extend-in-place deltas |
+| `prisma migrate diff` → hand-edited migration → `prisma migrate deploy` | PASS — applied on disposable PostgreSQL |
+| migration ambiguity gate, falsified on a scratch database | PASS — one legacy `hidden` media row aborts the whole migration with `g3 media lifecycle migration gate: 1 …`; scratch databases dropped afterwards |
+| `pnpm db:context` | PASS — 60 tables, both legacy enums absent from the generated SSOT |
+| `pnpm typecheck` | FAIL then PASS — the domain `NurtureGrantDataClass` union lacked `child_growth_record`; extended and re-run |
+| `pnpm test:db` | PASS — 14 files / 98 tests |
+| new: live `pg_enum` labels for the two retired/replaced identities | PASS — exact frozen labels, legacy types gone rather than kept beside them |
+| new: T-005 data-class labels and order after the additive extension | PASS — byte-identical prefix |
+| new: family-scope focus goal stores zero child scope rows | PASS — no row a reader could mistake for a child binding |
+| new: batch trigger replay, capture sequence, single edit hold, one release per target, one revision number, attribution revision | PASS — all refused by unique constraints, asserted on `P2002` column lists |
+| found by the new suite: `ck_nurture_receipt_route_lifecycle` also governs `publication_release` | RECORDED — a delivered publication Receipt must carry grant/enrollment/data class/target scope/`delivered_at`; both the positive and the negative are pinned for B2 |
+| `pnpm test:unit` | PASS — 50 files / 504 tests |
+| `pnpm verify:test-routing` | PASS — files=86 unit=50 production-db=14 |
+| `pnpm verify:g3-0-freeze` | PASS — `schema_delta=landed legacy_enums=retired migration_gate=fail_closed` |
+| `pnpm verify:surface-conformance` / `verify:g2-exit-contract` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — artifact unchanged at `1.13.0` / `sha256:1919a289…` |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS |
+| governance lint + `ctl-context verify --strict` | PASS |

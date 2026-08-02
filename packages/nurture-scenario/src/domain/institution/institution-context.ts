@@ -77,7 +77,9 @@ export type NurtureGrantDataClass =
   | "care_constraint_update"
   | "family_care_question"
   | "family_follow_up_request"
-  | "direct_care_communication";
+  | "direct_care_communication"
+  // T-006 G3 delta: the second publish audience data class.
+  | "child_growth_record";
 
 export type NurtureResolutionSourceKey =
   | "family_care_item"

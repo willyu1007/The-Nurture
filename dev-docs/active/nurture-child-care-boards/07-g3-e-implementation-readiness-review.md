@@ -32,10 +32,19 @@ traffic state.
 
 ## Blockers
 
-### B1 — DB SSOT delta and migration are unlanded (internal, largest)
+### B1 — DB SSOT delta and migration are unlanded (internal, largest) — RESOLVED 2026-08-02
+
+> Resolved. The delta is landed in `prisma/schema.prisma`, applied by
+> `20260802120000_g3_publish_process_and_media_lifecycle`, reflected in
+> `docs/context/db/schema.json` (60 tables), covered by
+> `packages/nurture-db/tests/g3-publish-process-schema.integration.test.ts` and
+> pinned by `verify:g3-0-freeze`
+> (`schema_delta=landed legacy_enums=retired migration_gate=fail_closed`). The
+> migration's ambiguity gate was falsified on a scratch database before being
+> accepted. See `03-implementation-notes.md` and `04-verification.md`.
 
 The G3-0 freeze lists ten additive models and five extend-in-place deltas. None
-exist in `prisma/schema.prisma`:
+existed in `prisma/schema.prisma` at review time:
 
 - Additive: `NurtureFocusGoalChildScope`, `NurtureCareCapture`,
   `NurtureCareCaptureBatch`, `NurturePublishProcess`,
@@ -52,6 +61,13 @@ exist in `prisma/schema.prisma`:
 The mapping evaluators for that migration already exist and fail closed on
 ambiguous rows (`mapLegacyMediaAssetStatus`, `mapLegacyAttributionStatus`), but
 the migration itself, its row census and its DB tests do not.
+
+Landing it surfaced one interaction the review had not predicted: the T-005
+`ck_nurture_receipt_route_lifecycle` CHECK also governs the new
+`publication_release` source type, so B2's `commitTargetRelease` must write a
+fully-bound delivered Receipt (grant, enrollment, data class, target scope,
+`delivered_at`). Both the accepted and the refused shape are now pinned by a DB
+test.
 
 ### B2 — No owner repository implements any T-006 port (internal)
 
@@ -109,9 +125,10 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
 
 ## Ordered prerequisites
 
-1. **DB SSOT delta** — `prisma/schema.prisma` additive models and extend-in-place
-   deltas, generated context, one migration with an evidence-backed legacy
-   census that fails closed. Unblocks B1.
+1. ~~**DB SSOT delta** — `prisma/schema.prisma` additive models and
+   extend-in-place deltas, generated context, one migration with an
+   evidence-backed legacy census that fails closed. Unblocks B1.~~ **Done
+   2026-08-02.**
 2. **Owner repositories** — the fourteen ports plus the atomic per-target release
    transaction, with `test:db` coverage on disposable PostgreSQL. Unblocks B2.
 3. **Capture-lane port** — declare it alongside the repositories so every lane

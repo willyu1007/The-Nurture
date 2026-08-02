@@ -761,3 +761,58 @@
 capability 数量与 shared core 不变,全部既有 slice 哈希不变。
 
 新增 `07-g3-e-implementation-readiness-review.md`,结论 `G3_E_NOT_READY`。
+
+## 2026-08-02 — G3-E prerequisite B1: DB SSOT delta landed
+
+`07-g3-e-implementation-readiness-review.md` 的第一顺位阻塞项。冻结文档列出的十个
+additive fact model 与五个 extend-in-place delta 此前只存在于文档,`prisma/schema.prisma`
+里一个都没有;domain 层的 legacy 映射器早已 fail-closed,但没有迁移可以调用它们。
+
+落地内容:
+
+- **Extend in place**。`NurtureMediaAssetStatus` 退役为
+  `NurtureMediaAssetLifecycle{preparing,ready,unavailable,discarded,redacted}`,
+  `NurtureMediaAttributionStatus` 退役为
+  `NurtureChildAttributionState{candidate,confirmed,rejected,superseded}`;
+  `NurtureMediaAssetRef` 增 `mediaRevision`(不可变原件的确切版本,永不原地更改),
+  `NurtureChildMediaAttribution` 改为 append-only:`attributionRevision` +
+  `supersededByAttributionId` 自引用 + `(workspace,asset,process,revision)` 唯一。
+  `NurtureGrantDataClass += child_growth_record`、
+  `NurtureChildLinkReceiptSourceType += publication_release`。
+- **十个 additive model**。`NurtureFocusGoalChildScope` 是"child focus 必须显式"
+  的存储形态:family-scope 目标存零行,读侧没有任何可以被误读为 child 绑定的东西。
+  其余九个覆盖采集批次、PublishProcess 及其 revision/target/edit hold、
+  ContentSafetyAssessment、per-target release 与 post-release visibility event。
+- **约束而非约定**。业务不变量全部落到唯一索引上:批次 trigger 身份重放不会切出
+  第二个批次;watermark 所依据的 `sourceSequence` 在批次内唯一;一个 PublishProcess
+  只有一个 edit hold;一个 target 只能提交一次 release(`publishProcessTargetId`
+  唯一,换一个 command 身份也不放行);revision 号一次性,已发布的 revision 不会
+  被新草稿覆盖。
+
+**迁移不猜**。`prisma migrate dev` 是交互式的,改用
+`prisma migrate diff --from-migrations --to-schema-datamodel --shadow-database-url`
+生成再手改:生成器给出的 `DROP COLUMN status` + `ADD COLUMN lifecycle NOT NULL`
+会把 legacy `hidden`/`deleted` 静默塞进某个值。替换为「加可空列 → 回填无歧义值 →
+普查剩余 NULL → 有则 `RAISE EXCEPTION` 中止」,两条 gate 分别对应
+`mapLegacyMediaAssetStatus`(`hidden`/`deleted` 需要 committed release 证据才能
+判 `redacted` 还是 `discarded`)与 `mapLegacyAttributionStatus`
+(`corrected` 需要 supersession 链,`hidden`/`deleted` 需要显式 resolution 证据)。
+
+gate 是被证伪过的,不是声明:在一次性 scratch 库 `nurture_gate` 上插入一行 legacy
+`hidden` media 后重放迁移,得到
+`ERROR: g3 media lifecycle migration gate: 1 legacy hidden/deleted media rows lack
+release evidence; resolve the pre-migration census before applying`,迁移整体回滚。
+scratch 库随后销毁。
+
+**副作用一处**:`NurtureGrantDataClass` 的 domain 联合类型(`institution-context.ts`)
+不在 Prisma 生成物里,增枚举后两侧不再可赋值,typecheck 直接抓到并补齐。
+
+DB 覆盖为新增的 `g3-publish-process-schema.integration.test.ts`,断言的是**活库**
+事实而不是 schema 文本:`pg_enum` 里新枚举标签逐字冻结、两个 legacy 类型确实消失
+(不是与新枚举并存)、T-005 既有 data class 的标签与顺序未被扰动,以及上面每一条
+唯一约束的拒绝(按 Prisma `P2002` 的列清单断言,不匹配消息串)。
+
+顺带被这套测试抓到的既有约束交互:T-005 的 `ck_nurture_receipt_route_lifecycle`
+同样管辖新的 `publication_release` source type —— 一条 delivered 的发布 Receipt
+必须带齐 grant/enrollment/data class/target scope/delivered_at,少一项即被拒。
+B2 的 `commitTargetRelease` 必须按这个形状写 Receipt,测试里已同时留下正反两例。

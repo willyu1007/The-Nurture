@@ -202,20 +202,90 @@ for (const tableName of requiredFactTables) {
   assertTruthy(tableNames.has(tableName), `landed fact table ${tableName}`);
 }
 
-const expectedLegacyEnums = {
-  NurtureMediaAssetStatus: ["active", "hidden", "deleted"],
-  NurtureMediaAttributionStatus: [
-    "candidate",
-    "confirmed",
-    "rejected",
-    "corrected",
-    "hidden",
-    "deleted",
+/**
+ * The legacy media/attribution unions G3-0 recorded as its baseline. They are
+ * history: the frozen delta replaces them once through an evidence-backed
+ * migration, so the check is that the freeze still records the baseline and
+ * that no compatibility branch survived in the database.
+ */
+const retiredLegacyEnums = ["NurtureMediaAssetStatus", "NurtureMediaAttributionStatus"];
+const dbEnumNames = new Set(dbContext.enums?.map((entry) => entry.name));
+const frozenLifecycleEnums = {
+  NurtureMediaAssetLifecycle: [
+    "preparing",
+    "ready",
+    "unavailable",
+    "discarded",
+    "redacted",
+  ],
+  NurtureChildAttributionState: ["candidate", "confirmed", "rejected", "superseded"],
+  NurturePublishProcessState: [
+    "draft",
+    "needs_review",
+    "pending_release",
+    "released",
+    "cancelled",
+  ],
+  NurtureCareCaptureBatchState: ["collecting", "cut", "organized", "cancelled"],
+  NurtureContentSafetyRoute: [
+    "ordinary",
+    "review_required",
+    "direct_interaction_required",
   ],
 };
-for (const [enumName, expectedValues] of Object.entries(expectedLegacyEnums)) {
+for (const [enumName, expectedValues] of Object.entries(frozenLifecycleEnums)) {
   const enumEntry = findBy(dbContext.enums, "name", enumName, `DB enum ${enumName}`);
-  assertDeepEqual(enumEntry.values, expectedValues, `${enumName} G3-0 baseline`);
+  assertDeepEqual(enumEntry.values, expectedValues, `${enumName} frozen delta`);
+}
+for (const enumName of retiredLegacyEnums) {
+  assertEqual(
+    dbEnumNames.has(enumName),
+    false,
+    `retired legacy enum ${enumName} left no compatibility branch`,
+  );
+}
+assertIncludes(
+  findBy(dbContext.enums, "name", "NurtureGrantDataClass", "grant data class").values,
+  "child_growth_record",
+  "frozen Grant data-class delta",
+);
+assertIncludes(
+  findBy(
+    dbContext.enums,
+    "name",
+    "NurtureChildLinkReceiptSourceType",
+    "receipt source type",
+  ).values,
+  "publication_release",
+  "frozen Receipt source-type delta",
+);
+
+// The additive T-006 fact models the freeze enumerates must all exist.
+for (const tableName of [
+  "NurtureFocusGoalChildScope",
+  "NurtureCareCapture",
+  "NurtureCareCaptureBatch",
+  "NurturePublishProcess",
+  "NurturePublishProcessRevision",
+  "NurturePublishProcessTarget",
+  "NurturePublishEditHold",
+  "NurtureContentSafetyAssessment",
+  "NurturePublicationRelease",
+  "NurturePublicationVisibilityEvent",
+]) {
+  assertTruthy(tableNames.has(tableName), `additive G3 fact table ${tableName}`);
+}
+
+// The one-time migration must keep its ambiguity gate rather than guessing.
+const g3Migration = read(
+  "prisma/migrations/20260802120000_g3_publish_process_and_media_lifecycle/migration.sql",
+);
+for (const requiredText of [
+  "g3 media lifecycle migration gate",
+  "g3 attribution state migration gate",
+  "RAISE EXCEPTION",
+]) {
+  assertTextIncludes(g3Migration, requiredText, `migration gate ${requiredText}`);
 }
 
 // The adoption set reserves semantic identities; a key may only appear in the
@@ -371,6 +441,7 @@ for (const requiredText of [
   "G3-C2 `ClassScopedFaceMatch` | optional/default-off",
   "T006-AC-010",
   "Amendment 2026-08-02 — media lifecycle identities",
+  "legacy `active/hidden/deleted` must be migrated once with an evidence-backed",
   "detach_publish_process_media",
   "discard_media_asset",
 ]) {
@@ -405,9 +476,10 @@ process.stdout.write(
     `input=${frozenInputInterface.version} current=${artifactPin.interfaceContract.version} ` +
     `g3a-adopted=${adoptedInG3A.length} g3b1-adopted=${adoptedInG3B1.length} ` +
     `g3c1-adopted=${adoptedInG3C1.length} g3d-adopted=${adoptedInG3D.length} ` +
+    "schema_delta=landed legacy_enums=retired migration_gate=fail_closed " +
     "c2-matcher=absent " +
     `reserved-keys=${reservedKeys.length} ` +
-    "t005=exact t007=contract-frozen schema_delta=frozen " +
+    "t005=exact t007=contract-frozen " +
     "caregiver_workflow_denied=true placeholders=absent stage_gates=explicit\n",
 );
 

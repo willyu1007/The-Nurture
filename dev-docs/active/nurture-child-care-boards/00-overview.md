@@ -315,11 +315,18 @@ G3 adoption set 至此关闭（35 个 capability）；真实 policy-backed sched
 
 ## Next Step
 
-G3-A 已完成：`query_guardian_family_board@1.0.0` /
-`query_caregiver_teacher_board@1.0.0` envelope、三个 typed module query、共享
-source-head projection pipeline、角色独立 presenter、current-authority filter、
-两个 canonical owner 内联 mutation 与首批合成 conformance fixtures 全部落地并
-通过映射检查。下一步进入 G3-B1 capture-to-draft deterministic main path；
-G3-C1 可并行准备。board mutation 的 owner repository 与 formal ingress 注册留给
-owner-integration 阶段，T-007 provider-backed release 和 G3-E 仍保持关闭。
-G3-C2 face match 与 G3-B2 AI copy 是可选增强，不进入首个关键路径。
+G3-A、G3-B1、G3-C1、G3-D 的 domain 与合同层已全部落地，artifact additive 旋转至
+`nurture.surface-contract@1.13.0` / `sha256:1919a289…`，shared core 与全部 T-005
+slice 保持逐字不变。2026-08-02 的实施质量复核修掉 7 处缺陷，并补上"运行时输出 ↔
+已注册 result schema"与"运行时 capability 常量 ↔ 注册表"两层机械检查；同日的
+`07-g3-e-implementation-readiness-review.md` 判定 `G3_E_NOT_READY`，记录 B1～B7
+七项阻塞。
+
+当前推进的是这份复核给出的准备清单。**B1（DB SSOT delta 与一次性迁移）已完成**：
+十个 additive model、五处 extend-in-place delta 落库，迁移带两条 fail-closed 的
+legacy 普查 gate（已在一次性 scratch 库上被证伪过），活库枚举身份与全部唯一约束
+由 `g3-publish-process-schema.integration.test.ts` 断言。下一步是 B2 owner
+repository（十四个端口与 per-target 原子 release），随后 B3 采集读端口、B4 formal
+ingress 路由、B5 T-005 direct-interaction consumer action。B6/B7 依赖 T-007
+provider 与 T-005 G2-C 联合运行，无法提前拉入。capability activation、部署与流量
+仍保持关闭。G3-C2 face match 与 G3-B2 AI copy 是可选增强，不进入首个关键路径。

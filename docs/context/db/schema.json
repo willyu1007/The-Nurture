@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-01T02:12:15.595Z",
+  "updatedAt": "2026-08-02T11:24:22.562Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -95,6 +95,31 @@
       ]
     },
     {
+      "name": "NurtureCareCaptureBatchState",
+      "values": [
+        "collecting",
+        "cut",
+        "organized",
+        "cancelled"
+      ]
+    },
+    {
+      "name": "NurtureCareCaptureKind",
+      "values": [
+        "text",
+        "voice_transcript",
+        "media"
+      ]
+    },
+    {
+      "name": "NurtureCareCaptureOrganizeTrigger",
+      "values": [
+        "manual",
+        "idle",
+        "daily_fallback"
+      ]
+    },
+    {
       "name": "NurtureCareGroupStatus",
       "values": [
         "active",
@@ -143,6 +168,15 @@
       ]
     },
     {
+      "name": "NurtureChildAttributionState",
+      "values": [
+        "candidate",
+        "confirmed",
+        "rejected",
+        "superseded"
+      ]
+    },
+    {
       "name": "NurtureChildCareProcessStatus",
       "values": [
         "active",
@@ -185,7 +219,8 @@
         "family_care_item",
         "daily_care_log",
         "media_attribution",
-        "system_summary"
+        "system_summary",
+        "publication_release"
       ]
     },
     {
@@ -224,6 +259,14 @@
       "values": [
         "applied",
         "already_satisfied"
+      ]
+    },
+    {
+      "name": "NurtureContentSafetyRoute",
+      "values": [
+        "ordinary",
+        "review_required",
+        "direct_interaction_required"
       ]
     },
     {
@@ -500,7 +543,8 @@
         "care_constraint_update",
         "family_care_question",
         "family_follow_up_request",
-        "direct_care_communication"
+        "direct_care_communication",
+        "child_growth_record"
       ]
     },
     {
@@ -604,6 +648,16 @@
       ]
     },
     {
+      "name": "NurtureMediaAssetLifecycle",
+      "values": [
+        "preparing",
+        "ready",
+        "unavailable",
+        "discarded",
+        "redacted"
+      ]
+    },
+    {
       "name": "NurtureMediaAssetSourceKind",
       "values": [
         "class_album",
@@ -613,31 +667,12 @@
       ]
     },
     {
-      "name": "NurtureMediaAssetStatus",
-      "values": [
-        "active",
-        "hidden",
-        "deleted"
-      ]
-    },
-    {
       "name": "NurtureMediaAttributionSource",
       "values": [
         "face_reference",
         "manual",
         "history_match",
         "system"
-      ]
-    },
-    {
-      "name": "NurtureMediaAttributionStatus",
-      "values": [
-        "candidate",
-        "confirmed",
-        "rejected",
-        "corrected",
-        "hidden",
-        "deleted"
       ]
     },
     {
@@ -757,6 +792,32 @@
         "completed",
         "archived",
         "escalated",
+        "cancelled"
+      ]
+    },
+    {
+      "name": "NurturePublicationVisibility",
+      "values": [
+        "visible",
+        "removed",
+        "redacted"
+      ]
+    },
+    {
+      "name": "NurturePublicationVisibilityEventKind",
+      "values": [
+        "correction",
+        "target_removal",
+        "redaction"
+      ]
+    },
+    {
+      "name": "NurturePublishProcessState",
+      "values": [
+        "draft",
+        "needs_review",
+        "pending_release",
+        "released",
         "cancelled"
       ]
     },
@@ -1067,6 +1128,504 @@
       ]
     },
     {
+      "name": "NurtureCareCapture",
+      "dbName": "nurture_care_capture",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "body_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "captureBatchId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "capture_batch_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "capturedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "captured_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "NurtureCareCaptureKind",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "mediaAssetRefId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "media_asset_ref_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceSequence",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_sequence",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "stable",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "transcriptRevision",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "transcript_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "captureBatch",
+          "to": "NurtureCareCaptureBatch",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "captureBatchId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "capturedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "capturedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "mediaAssetRef",
+          "to": "NurtureMediaAssetRef",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "mediaAssetRefId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_care_capture_group"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "captureBatchId",
+            "sourceSequence"
+          ],
+          "name": null,
+          "map": "uq_nurture_care_capture_sequence"
+        }
+      ]
+    },
+    {
+      "name": "NurtureCareCaptureBatch",
+      "dbName": "nurture_care_capture_batch",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "cutAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "cut_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "observedUserActivityAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "observed_user_activity_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyHead",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "policy_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "quiescenceSeconds",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "quiescence_seconds",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "resolvedTrigger",
+          "type": "NurtureCareCaptureOrganizeTrigger",
+          "nullable": true,
+          "list": false,
+          "dbName": "resolved_trigger",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureCareCaptureBatchState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "timeZone",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "time_zone",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "triggerRequestId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "trigger_request_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "watermarkSourceSequence",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "watermark_source_sequence",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "captures",
+          "to": "NurtureCareCapture",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "publishProcesses",
+          "to": "NurturePublishProcess",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "state",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_care_capture_batch_group"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "triggerRequestId"
+          ],
+          "name": null,
+          "map": "uq_nurture_care_capture_batch_trigger"
+        }
+      ]
+    },
+    {
       "name": "NurtureCareGroup",
       "dbName": "nurture_care_group",
       "schema": null,
@@ -1215,6 +1774,24 @@
           "references": []
         },
         {
+          "field": "captureBatches",
+          "to": "NurtureCareCaptureBatch",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "captures",
+          "to": "NurtureCareCapture",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "dailyCareLogs",
           "to": "NurtureDailyCareLog",
           "optional": false,
@@ -1266,6 +1843,15 @@
         {
           "field": "messages",
           "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishProcesses",
+          "to": "NurturePublishProcess",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -1697,6 +2283,15 @@
           "references": []
         },
         {
+          "field": "captures",
+          "to": "NurtureCareCapture",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "confirmedAttributions",
           "to": "NurtureChildMediaAttribution",
           "optional": false,
@@ -1735,6 +2330,24 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "publicationReleases",
+          "to": "NurturePublicationRelease",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishEditHolds",
+          "to": "NurturePublishEditHold",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         },
         {
           "field": "threadMemberships",
@@ -2530,6 +3143,15 @@
           "references": []
         },
         {
+          "field": "focusGoalScopes",
+          "to": "NurtureFocusGoalChildScope",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "grants",
           "to": "NurtureChildLinkGrant",
           "optional": false,
@@ -2559,6 +3181,15 @@
         {
           "field": "messages",
           "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishTargets",
+          "to": "NurturePublishProcessTarget",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -2913,6 +3544,15 @@
         {
           "field": "messages",
           "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishTargets",
+          "to": "NurturePublishProcessTarget",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -3305,6 +3945,15 @@
           ]
         },
         {
+          "field": "publicationReleases",
+          "to": "NurturePublicationRelease",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "retryOfReceipt",
           "to": "NurtureChildLinkReceipt",
           "optional": true,
@@ -3402,6 +4051,17 @@
           "unique": false
         },
         {
+          "name": "attributionRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "attribution_revision",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "childCareProcessId",
           "type": "String",
           "nullable": false,
@@ -3468,6 +4128,17 @@
           "unique": false
         },
         {
+          "name": "evidencePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "evidence_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "exposurePolicyPayload",
           "type": "Json",
           "nullable": true,
@@ -3512,11 +4183,22 @@
           "unique": false
         },
         {
-          "name": "status",
-          "type": "NurtureMediaAttributionStatus",
+          "name": "state",
+          "type": "NurtureChildAttributionState",
           "nullable": false,
           "list": false,
           "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersededByAttributionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "superseded_by_attribution_id",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -3584,6 +4266,28 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "supersededBy",
+          "to": "NurtureChildMediaAttribution",
+          "optional": true,
+          "list": false,
+          "relationName": "AttributionSupersession",
+          "fields": [
+            "supersededByAttributionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "supersedes",
+          "to": "NurtureChildMediaAttribution",
+          "optional": false,
+          "list": true,
+          "relationName": "AttributionSupersession",
+          "fields": [],
+          "references": []
         }
       ],
       "indexes": [
@@ -3592,7 +4296,7 @@
           "fields": [
             "workspaceId",
             "childCareProcessId",
-            "status",
+            "state",
             "createdAt"
           ],
           "name": null,
@@ -3603,10 +4307,21 @@
           "fields": [
             "workspaceId",
             "mediaAssetRefId",
-            "status"
+            "state"
           ],
           "name": null,
           "map": "ix_nurture_media_attribution_asset"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "mediaAssetRefId",
+            "childCareProcessId",
+            "attributionRevision"
+          ],
+          "name": null,
+          "map": "uq_nurture_media_attribution_revision"
         }
       ]
     },
@@ -4094,6 +4809,183 @@
           ],
           "name": null,
           "map": "uq_nurture_command_execution_identity"
+        }
+      ]
+    },
+    {
+      "name": "NurtureContentSafetyAssessment",
+      "dbName": "nurture_content_safety_assessment",
+      "schema": null,
+      "columns": [
+        {
+          "name": "assessedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "assessed_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "modelRevision",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "model_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "promptPolicyRevision",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "prompt_policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "providerRevision",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "provider_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publishProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "riskCodesPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "risk_codes_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "route",
+          "type": "NurtureContentSafetyRoute",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ruleRevision",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "rule_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceHeadsPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_heads_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "publishProcess",
+          "to": "NurturePublishProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publishProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "publishProcessId",
+            "assessedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_content_safety_process"
         }
       ]
     },
@@ -5302,6 +6194,15 @@
         {
           "field": "messages",
           "to": "NurtureFamilyCareMessage",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishTargets",
+          "to": "NurturePublishProcessTarget",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -9966,6 +10867,15 @@
       ],
       "relations": [
         {
+          "field": "childScopes",
+          "to": "NurtureFocusGoalChildScope",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "focusCycle",
           "to": "NurtureFocusCycle",
           "optional": false,
@@ -9988,6 +10898,172 @@
           ],
           "name": null,
           "map": "ix_6"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFocusGoalChildScope",
+      "dbName": "nurture_focus_goal_child_scope",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "focusGoalId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "focus_goal_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "provenancePayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "provenance_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scopeVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "scope_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "focusGoal",
+          "to": "NurtureFocusGoal",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "focusGoalId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId"
+          ],
+          "name": null,
+          "map": "ix_nurture_focus_goal_scope_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "focusGoalId",
+            "childCareProcessId"
+          ],
+          "name": null,
+          "map": "uq_nurture_focus_goal_child_scope"
         }
       ]
     },
@@ -10411,6 +11487,28 @@
           "unique": false
         },
         {
+          "name": "lifecycle",
+          "type": "NurtureMediaAssetLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "mediaRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "media_revision",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "safeTitle",
           "type": "String",
           "nullable": true,
@@ -10427,17 +11525,6 @@
           "nullable": false,
           "list": false,
           "dbName": "source_kind",
-          "dbType": null,
-          "default": null,
-          "primaryKey": false,
-          "unique": false
-        },
-        {
-          "name": "status",
-          "type": "NurtureMediaAssetStatus",
-          "nullable": false,
-          "list": false,
-          "dbName": null,
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -10499,6 +11586,15 @@
           "references": []
         },
         {
+          "field": "captures",
+          "to": "NurtureCareCapture",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "careGroup",
           "to": "NurtureCareGroup",
           "optional": true,
@@ -10544,7 +11640,7 @@
           "fields": [
             "workspaceId",
             "careGroupId",
-            "status",
+            "lifecycle",
             "createdAt"
           ],
           "name": null,
@@ -10555,7 +11651,7 @@
           "fields": [
             "workspaceId",
             "institutionId",
-            "status",
+            "lifecycle",
             "createdAt"
           ],
           "name": null,
@@ -11558,6 +12654,1242 @@
           ],
           "name": null,
           "map": "uq_3"
+        }
+      ]
+    },
+    {
+      "name": "NurturePublicationRelease",
+      "dbName": "nurture_publication_release",
+      "schema": null,
+      "columns": [
+        {
+          "name": "commandRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_request_id_hash",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "publishProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publishProcessRevisionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publishProcessTargetId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_target_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": true
+        },
+        {
+          "name": "receiptId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "receipt_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "releasedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "released_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "visibility",
+          "type": "NurturePublicationVisibility",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "visible",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "publishProcess",
+          "to": "NurturePublishProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publishProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "receipt",
+          "to": "NurtureChildLinkReceipt",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "receiptId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "releasedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "releasedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "revision",
+          "to": "NurturePublishProcessRevision",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publishProcessRevisionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "target",
+          "to": "NurturePublishProcessTarget",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publishProcessTargetId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "visibilityEvents",
+          "to": "NurturePublicationVisibilityEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "publishProcessId",
+            "committedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_publication_release_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publishProcessId",
+            "commandRequestIdHash",
+            "publishProcessTargetId"
+          ],
+          "name": null,
+          "map": "uq_nurture_publication_release_command"
+        }
+      ]
+    },
+    {
+      "name": "NurturePublicationVisibilityEvent",
+      "dbName": "nurture_publication_visibility_event",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "body_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "NurturePublicationVisibilityEventKind",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publicationReleaseId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publication_release_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceReleaseRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_release_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "publicationRelease",
+          "to": "NurturePublicationRelease",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publicationReleaseId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "publicationReleaseId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_publication_visibility_release"
+        }
+      ]
+    },
+    {
+      "name": "NurturePublishEditHold",
+      "dbName": "nurture_publish_edit_hold",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "holderParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "holder_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "holderRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "holder_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "publishProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "holder",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "holderRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "publishProcess",
+          "to": "NurturePublishProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publishProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_publish_edit_hold_expiry"
+        }
+      ]
+    },
+    {
+      "name": "NurturePublishProcess",
+      "dbName": "nurture_publish_process",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorizingRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "authorizing_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "captureBatchId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "capture_batch_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentRevisionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": true
+        },
+        {
+          "name": "dataClass",
+          "type": "NurtureGrantDataClass",
+          "nullable": false,
+          "list": false,
+          "dbName": "data_class",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "frozenRevisionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "frozen_revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "notAfter",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "not_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "processKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "process_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "purposeKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "purpose_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scheduledAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "scheduled_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "schedulePolicyHead",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "schedule_policy_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "schedulePolicyRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "schedule_policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scheduleTimeZone",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "schedule_time_zone",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurturePublishProcessState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "captureBatch",
+          "to": "NurtureCareCaptureBatch",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "captureBatchId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "currentRevision",
+          "to": "NurturePublishProcessRevision",
+          "optional": true,
+          "list": false,
+          "relationName": "PublishProcessCurrentRevision",
+          "fields": [
+            "currentRevisionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "editHold",
+          "to": "NurturePublishEditHold",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "releases",
+          "to": "NurturePublicationRelease",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "revisions",
+          "to": "NurturePublishProcessRevision",
+          "optional": false,
+          "list": true,
+          "relationName": "PublishProcessRevisions",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "safetyAssessments",
+          "to": "NurtureContentSafetyAssessment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "targets",
+          "to": "NurturePublishProcessTarget",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "state",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_publish_process_group"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "processKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_publish_process_key"
+        }
+      ]
+    },
+    {
+      "name": "NurturePublishProcessRevision",
+      "dbName": "nurture_publish_process_revision",
+      "schema": null,
+      "columns": [
+        {
+          "name": "bodyProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "body_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentDigest",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "content_digest",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "mediaCompositionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "media_composition_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "organizerInputRevision",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "organizer_input_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publishProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "savedByRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "saved_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceRefsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "source_refs_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "templateKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "template_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "templateVersion",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "template_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "titleProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "title_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "currentOf",
+          "to": "NurturePublishProcess",
+          "optional": true,
+          "list": false,
+          "relationName": "PublishProcessCurrentRevision",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishProcess",
+          "to": "NurturePublishProcess",
+          "optional": false,
+          "list": false,
+          "relationName": "PublishProcessRevisions",
+          "fields": [
+            "publishProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "releases",
+          "to": "NurturePublicationRelease",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publishProcessId",
+            "revision"
+          ],
+          "name": null,
+          "map": "uq_nurture_publish_revision"
+        }
+      ]
+    },
+    {
+      "name": "NurturePublishProcessTarget",
+      "dbName": "nurture_publish_process_target",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyRefKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_ref_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "grant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "publishProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publish_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "grant",
+          "to": "NurtureChildLinkGrant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "grantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "publishProcess",
+          "to": "NurturePublishProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publishProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "release",
+          "to": "NurturePublicationRelease",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId"
+          ],
+          "name": null,
+          "map": "ix_nurture_publish_target_process"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "publishProcessId",
+            "targetKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_publish_target_key"
         }
       ]
     },
