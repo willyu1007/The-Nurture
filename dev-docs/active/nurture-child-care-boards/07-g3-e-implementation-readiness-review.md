@@ -137,7 +137,18 @@ other lane declares the exact owner port its facts come from, so the capture
 batch is the one place where the owner-integration boundary is unspecified.
 G3-E should not discover that boundary while wiring the ingress.
 
-### B4 — No T-006 capability is reachable through the formal ingress (internal)
+### B4 — No T-006 capability is reachable through the formal ingress (internal) — PARTIAL 2026-08-02
+
+> The query lane is routed end to end: the six T-006 query keys reach the real
+> owner ports, and the ingress now admits each capability at its own exact
+> registered version instead of one version per lane. The guard's census is
+> derived from the capability registry and enumerates the eighteen write keys
+> that are deliberately not routed yet, so coverage cannot shrink silently.
+> Both directions of the census were falsified before acceptance.
+>
+> The eighteen write keys remain unrouted; admitting a key the engine cannot
+> serve would be the placeholder the freeze forbids, so they land with their
+> dispatch in the next unit.
 
 `assert-formal-ingress-contract.mjs` pins `expectedHarnessActionKeys` to the
 eight T-005 action keys, and `harness-http.ts` enumerates three query keys, all

@@ -17,28 +17,51 @@ export const HARNESS_READ_RESULT_PATH = "/internal/nurture/harness/read-result";
 export const INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH =
   "/internal/nurture/institution/business-communications:read";
 
-export const HARNESS_CAPABILITY_KEYS = [
-  "submit_family_care_question",
-  "initiate_caregiver_direct_message",
-  "acknowledge_family_care_item",
-  "reply_family_care_item",
-  "correct_family_care_message",
-  "withdraw_family_care_request",
-  "redact_family_care_message",
-  "policy_redact_family_care_message",
-] as const;
+/**
+ * Admission is per capability, not per lane: each key names the one exact
+ * version the ingress accepts. A shared per-lane version would admit a key at a
+ * version it was never registered at, which is the opposite of exact pinning.
+ */
+export const HARNESS_CAPABILITY_VERSIONS = {
+  submit_family_care_question: "1.0.0",
+  initiate_caregiver_direct_message: "1.0.0",
+  acknowledge_family_care_item: "1.0.0",
+  reply_family_care_item: "1.0.0",
+  correct_family_care_message: "1.0.0",
+  withdraw_family_care_request: "1.0.0",
+  redact_family_care_message: "1.0.0",
+  policy_redact_family_care_message: "1.0.0",
+} as const;
 
-export const HARNESS_QUERY_CAPABILITY_KEYS = [
-  "query_guardian_family_care_timeline",
-  "query_caregiver_family_care_work",
-  "query_family_care_item",
-] as const;
+export const HARNESS_QUERY_CAPABILITY_VERSIONS = {
+  query_guardian_family_care_timeline: "1.1.0",
+  query_caregiver_family_care_work: "1.1.0",
+  query_family_care_item: "1.1.0",
+  query_guardian_family_board: "1.0.0",
+  query_guardian_current_focus: "1.0.0",
+  query_guardian_enrollment_activity: "1.0.0",
+  query_caregiver_teacher_board: "1.0.0",
+  query_caregiver_child_today: "1.0.0",
+  query_teacher_publish_queue: "1.0.0",
+} as const;
 
-export type HarnessCapabilityKey = (typeof HARNESS_CAPABILITY_KEYS)[number];
-export type HarnessQueryCapabilityKey = (typeof HARNESS_QUERY_CAPABILITY_KEYS)[number];
+export const HARNESS_CAPABILITY_KEYS = Object.keys(
+  HARNESS_CAPABILITY_VERSIONS,
+) as ReadonlyArray<keyof typeof HARNESS_CAPABILITY_VERSIONS>;
 
-const CAPABILITY_KEY_SET = new Set<string>(HARNESS_CAPABILITY_KEYS);
-const QUERY_CAPABILITY_KEY_SET = new Set<string>(HARNESS_QUERY_CAPABILITY_KEYS);
+export const HARNESS_QUERY_CAPABILITY_KEYS = Object.keys(
+  HARNESS_QUERY_CAPABILITY_VERSIONS,
+) as ReadonlyArray<keyof typeof HARNESS_QUERY_CAPABILITY_VERSIONS>;
+
+export type HarnessCapabilityKey = keyof typeof HARNESS_CAPABILITY_VERSIONS;
+export type HarnessQueryCapabilityKey = keyof typeof HARNESS_QUERY_CAPABILITY_VERSIONS;
+
+const CAPABILITY_VERSIONS = new Map<string, string>(
+  Object.entries(HARNESS_CAPABILITY_VERSIONS),
+);
+const QUERY_CAPABILITY_VERSIONS = new Map<string, string>(
+  Object.entries(HARNESS_QUERY_CAPABILITY_VERSIONS),
+);
 const SURFACES = new Set(["chat", "board"]);
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,511}$/;
@@ -104,7 +127,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const parseSharedShell = (
   body: unknown,
   allowedKeys: Set<string>,
-  capabilityKeys: Set<string> = CAPABILITY_KEY_SET,
+  capabilityVersions: Map<string, string> = CAPABILITY_VERSIONS,
 ): Record<string, unknown> => {
   if (!isRecord(body) || Object.keys(body).some((key) => !allowedKeys.has(key))) {
     throw new HarnessRequestParseError("invalid_harness_request");
@@ -123,11 +146,11 @@ const parseSharedShell = (
   if (typeof record.capability_key !== "string") {
     throw new HarnessRequestParseError("invalid_harness_request");
   }
-  if (!capabilityKeys.has(record.capability_key)) {
+  const admittedVersion = capabilityVersions.get(record.capability_key);
+  if (admittedVersion === undefined) {
     throw new HarnessRequestParseError("unknown_capability");
   }
-  const expectedVersion = capabilityKeys === QUERY_CAPABILITY_KEY_SET ? "1.1.0" : "1.0.0";
-  if (record.capability_version !== expectedVersion) {
+  if (record.capability_version !== admittedVersion) {
     throw new HarnessRequestParseError("invalid_harness_request");
   }
   if (
@@ -172,7 +195,7 @@ export type HarnessQueryRequestV1 = {
   actor_participant_id: string;
   surface: "chat" | "board";
   capability_key: HarnessQueryCapabilityKey;
-  capability_version: "1.1.0";
+  capability_version: string;
   page_size?: number;
   cursor?: string;
   target_option_ref?: string;
@@ -215,7 +238,7 @@ const READ_RESULT_KEYS = new Set([
 ]);
 
 export const parseHarnessQueryRequestV1 = (body: unknown): HarnessQueryRequestV1 => {
-  const record = parseSharedShell(body, QUERY_KEYS, QUERY_CAPABILITY_KEY_SET);
+  const record = parseSharedShell(body, QUERY_KEYS, QUERY_CAPABILITY_VERSIONS);
   if (
     (record.page_size !== undefined && typeof record.page_size !== "number") ||
     (record.cursor !== undefined &&

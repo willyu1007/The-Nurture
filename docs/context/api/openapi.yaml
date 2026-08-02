@@ -668,9 +668,18 @@ components:
             - query_guardian_family_care_timeline
             - query_caregiver_family_care_work
             - query_family_care_item
+            - query_guardian_family_board
+            - query_guardian_current_focus
+            - query_guardian_enrollment_activity
+            - query_caregiver_teacher_board
+            - query_caregiver_child_today
+            - query_teacher_publish_queue
         capability_version:
           type: string
-          const: 1.1.0
+          description: |
+            The one exact version the named capability is registered at. The
+            pairing is enforced per capability by the ingress, not per lane.
+          enum: ['1.0.0', '1.1.0']
         page_size:
           type: integer
           minimum: 1

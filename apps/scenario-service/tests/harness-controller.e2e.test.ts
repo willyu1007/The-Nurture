@@ -7,6 +7,8 @@ import { HarnessRuntime, type HarnessEngine } from "../src/harness-runtime.js";
 import {
   HARNESS_EXECUTE_PATH,
   HARNESS_PREPARE_PATH,
+  HARNESS_QUERY_CAPABILITY_VERSIONS,
+  HARNESS_QUERY_PATH,
   INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH,
 } from "../src/harness-http.js";
 
@@ -203,5 +205,96 @@ describe("Harness controller boundary", () => {
       recovery: "reprepare",
     });
     expect(seen).toEqual(["prepare:submit_family_care_question", "execute:command:1"]);
+  });
+
+  it("admits every routed query capability at its own exact version", async () => {
+    const seen: string[] = [];
+    const baseUrl = await start(
+      fakeEngine({
+        query: async (request) => {
+          seen.push(`${request.capability_key}@${request.capability_version}`);
+          return { status: "denied", reason_code: "not_authorized" };
+        },
+      }),
+    );
+    const routed = Object.entries(HARNESS_QUERY_CAPABILITY_VERSIONS);
+    for (const [capabilityKey, capabilityVersion] of routed) {
+      const admitted = await post(baseUrl, HARNESS_QUERY_PATH, {
+        workspace_id: "ws-1",
+        actor_participant_id: "participant-1",
+        surface: "board",
+        capability_key: capabilityKey,
+        capability_version: capabilityVersion,
+      });
+      expect(admitted.status, capabilityKey).toBe(200);
+    }
+    expect(seen).toEqual(routed.map(([key, version]) => `${key}@${version}`));
+  });
+
+  it("refuses a routed key at another capability's version", async () => {
+    let calls = 0;
+    const baseUrl = await start(
+      fakeEngine({
+        query: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+      }),
+    );
+    // `query_family_care_item` is registered at 1.1.0 and the T-006 board
+    // queries at 1.0.0. A single per-lane version would have admitted both at
+    // whichever value the lane happened to carry.
+    const crossed = await post(baseUrl, HARNESS_QUERY_PATH, {
+      workspace_id: "ws-1",
+      actor_participant_id: "participant-1",
+      surface: "board",
+      capability_key: "query_guardian_family_board",
+      capability_version: "1.1.0",
+    });
+    expect(crossed.status).toBe(400);
+    await expect(crossed.json()).resolves.toEqual({ error: "invalid_harness_request" });
+
+    const legacy = await post(baseUrl, HARNESS_QUERY_PATH, {
+      workspace_id: "ws-1",
+      actor_participant_id: "participant-1",
+      surface: "board",
+      capability_key: "query_family_care_item",
+      capability_version: "1.0.0",
+    });
+    expect(legacy.status).toBe(400);
+    await expect(legacy.json()).resolves.toEqual({ error: "invalid_harness_request" });
+    expect(calls).toBe(0);
+  });
+
+  it("refuses a T-006 write key on the query lane and an unrouted one anywhere", async () => {
+    let calls = 0;
+    const baseUrl = await start(
+      fakeEngine({
+        query: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+        prepare: async () => {
+          calls += 1;
+          throw new Error("must not run");
+        },
+      }),
+    );
+    for (const [path, capabilityKey] of [
+      [HARNESS_QUERY_PATH, "save_publish_process_draft"],
+      [HARNESS_QUERY_PATH, "query_teacher_publish_queue_v2"],
+      [HARNESS_PREPARE_PATH, "release_publish_process"],
+    ] as const) {
+      const refused = await post(baseUrl, path, {
+        workspace_id: "ws-1",
+        actor_participant_id: "participant-1",
+        surface: "board",
+        capability_key: capabilityKey,
+        capability_version: "1.0.0",
+      });
+      expect(refused.status, capabilityKey).toBe(400);
+      await expect(refused.json()).resolves.toEqual({ error: "unknown_capability" });
+    }
+    expect(calls).toBe(0);
   });
 });

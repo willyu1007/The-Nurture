@@ -1038,3 +1038,35 @@ owner 事实单看都合理、合起来让规则得出错误结论"。新增
 第一层检查立刻抓到一处新漂移:三个仓储把 `before` 的形状**内联重写**成
 `{occurred_at,id}`,而接口用的是 `BoardSortKeyV1`——所以接口新加的 `rank` 项在
 仓储侧被静默丢掉了。已改为共用接口类型。
+
+## 2026-08-02 — G3-E prerequisite B4-1:query lane 接入 formal ingress
+
+B4 是"24 个 T-006 key 都不可达 formal ingress"。它拆成两段:**只有引擎真能服务的
+key 才准入**——在 transport 放行一个引擎接不住的 key,就是冻结件禁止的占位。
+本单元是 query lane 的 6 个 key,端到端打通;18 个写 key 留给 B4-2。
+
+**准入改为 per-capability 精确版本。** 原实现是 `capabilityKeys === QUERY_SET ?
+"1.1.0" : "1.0.0"`——**按 lane** 定版本。T-005 的三个 query 在 `1.1.0`,T-006 的
+六个在 `1.0.0`,同一条 lane 上按 lane 定版本必然把其中一批放行在它从未注册过的
+版本上,这与"exact key/version 准入,不接受范围与回退"直接冲突。改为
+`key → 唯一准入版本` 的映射,35 个 capability 各自一行。
+
+**守卫改为从注册表推导普查**,而不是钉死一份字面量清单:
+
+- 每个被路由的 key 必须在注册表里、且**版本逐字相同**;
+- query lane 的 key 必须是注册的 query,action lane 的必须不是;
+- 注册但尚未路由的 key 必须**逐个列出**——少列(悄悄掉了路由)与多列(已路由却
+  仍写着未路由)都会失败。18 个写 key 现在是显式的未路由清单,不是沉默。
+
+两个方向都被证伪过:删掉一个已路由 query key,守卫报出它出现在"未路由"集合;
+把 `query_caregiver_child_today` 的准入版本改成 `1.1.0`,守卫报出与注册表不符。
+
+**引擎接的是真实 owner 端口**,不是桩:六个 query 分别走
+`PrismaGuardianBoardReadPort` / `PrismaCaregiverBoardReadPort` /
+`PrismaPublishLaneReadPort`。合同身份与模块顺序从制品本身读:新增
+`loadSurfaceContractPin()` 与 `loadBoardSurfaceRegistration()`——ingress 不持有
+任何可能与制品漂移的字面量副本。
+
+顺带修掉一处既有的 fall-through:原来 query 分发把"不是前两个 key"的一切都当作
+`query_family_care_item` 处理。加进新 key 之后,那会让一个 board query 走进 item
+detail 分支返回无关结果。现在每个 key 各自显式匹配。

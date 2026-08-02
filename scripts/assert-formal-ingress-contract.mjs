@@ -40,6 +40,10 @@ const expectedHarnessExecuteRequiredFields = [
   "command_request_id",
   "confirmation_ref",
 ];
+/**
+ * The T-005 action keys, pinned as history: they were qualified at G2 Exit and
+ * must never quietly leave the ingress.
+ */
 const expectedHarnessActionKeys = [
   "submit_family_care_question",
   "initiate_caregiver_direct_message",
@@ -49,6 +53,33 @@ const expectedHarnessActionKeys = [
   "withdraw_family_care_request",
   "redact_family_care_message",
   "policy_redact_family_care_message",
+];
+
+/**
+ * Capabilities that are registered in the surface contract but deliberately not
+ * routed yet. Enumerating them is the point: a registered capability that is
+ * neither routed nor listed here fails this guard, so coverage can never shrink
+ * silently, and a key listed here after it is routed fails too.
+ */
+const expectedUnroutedCapabilityKeys = [
+  "acquire_publish_edit_hold",
+  "cancel_publish_process",
+  "confirm_child_media_attribution",
+  "correct_publication",
+  "detach_publish_process_media",
+  "discard_media_asset",
+  "organize_care_capture_batch",
+  "record_caregiver_daily_care",
+  "redact_publication",
+  "reject_child_media_attribution",
+  "release_publish_edit_hold",
+  "release_publish_process",
+  "remove_publication_target_visibility",
+  "renew_publish_edit_hold",
+  "reschedule_publish_process",
+  "save_publish_process_draft",
+  "supersede_child_media_attribution",
+  "update_guardian_current_focus",
 ];
 const expectedOwnerRequiredFields = [
   "workspace_id",
@@ -201,13 +232,6 @@ for (const identityPart of Object.values(expectedInstitutionBusinessCommunicatio
     "Institution business-communication source exact interface pin",
   );
 }
-for (const actionKey of expectedHarnessActionKeys) {
-  assertIncludes(
-    harnessTransportSource,
-    `"${actionKey}"`,
-    `Harness transport action ${actionKey}`,
-  );
-}
 assertIncludes(
   harnessTransportSource,
   `"${harnessPreparePath}"`,
@@ -251,6 +275,80 @@ assertIncludes(
   harnessControllerSource,
   "@Post(INSTITUTION_BUSINESS_COMMUNICATION_READ_PATH)",
   "Institution business-communication owner-read controller route",
+);
+
+// ---------------------------------------------------------------------------
+// Every routed capability must be registered at the exact version it is routed
+// at, and every registered capability must be either routed or explicitly
+// listed as not yet routed. Both directions matter: the first stops the ingress
+// admitting a version the contract never registered, the second stops routing
+// coverage shrinking without anyone noticing.
+
+const capabilityRegistry = JSON.parse(
+  read(
+    "packages/nurture-scenario/contracts/surfaces/v1/source/capabilities/capability-registry.json",
+  ),
+);
+const registeredVersions = new Map(
+  capabilityRegistry.capabilities.map((capability) => [
+    capability.capabilityKey,
+    capability.capabilityVersion,
+  ]),
+);
+const registeredQueryKeys = new Set(
+  capabilityRegistry.capabilities
+    .filter((capability) => capability.executionClass === "query")
+    .map((capability) => capability.capabilityKey),
+);
+
+const parseRoutedVersions = (constName) => {
+  const block = harnessTransportSource.match(
+    new RegExp(`export const ${constName} = \\{([\\s\\S]*?)\\n\\} as const;`),
+  );
+  assertTruthy(block, `harness transport ${constName} block`);
+  const routed = new Map();
+  for (const line of block[1].split("\n")) {
+    const entry = line.match(/^\s*([a-z0-9_]+):\s*"([0-9]+\.[0-9]+\.[0-9]+)",$/);
+    if (entry) routed.set(entry[1], entry[2]);
+  }
+  return routed;
+};
+
+const routedActionVersions = parseRoutedVersions("HARNESS_CAPABILITY_VERSIONS");
+const routedQueryVersions = parseRoutedVersions("HARNESS_QUERY_CAPABILITY_VERSIONS");
+const routedVersions = new Map([...routedActionVersions, ...routedQueryVersions]);
+
+for (const [key, version] of routedVersions) {
+  assertEqual(
+    registeredVersions.get(key),
+    version,
+    `routed capability ${key} is registered at the exact version it is admitted at`,
+  );
+}
+for (const key of routedQueryVersions.keys()) {
+  assertTruthy(registeredQueryKeys.has(key), `query-lane capability ${key} is a registered query`);
+}
+for (const key of routedActionVersions.keys()) {
+  assertEqual(
+    registeredQueryKeys.has(key),
+    false,
+    `action-lane capability ${key} is not a registered query`,
+  );
+}
+assertArrayEqual(
+  [...registeredVersions.keys()].filter((key) => !routedVersions.has(key)).sort(),
+  [...expectedUnroutedCapabilityKeys].sort(),
+  "registered capabilities that are deliberately not routed yet",
+);
+assertArrayEqual(
+  [...routedActionVersions.keys()].sort(),
+  [...expectedHarnessActionKeys].sort(),
+  "T-005 action keys still routed",
+);
+assertArrayEqual(
+  openApi.components?.schemas?.HarnessQueryRequest?.properties?.capability_key?.enum ?? [],
+  [...routedQueryVersions.keys()],
+  "OpenAPI query key set matches the routed query lane",
 );
 
 const apiIndex = JSON.parse(read("docs/context/api/api-index.json"));
@@ -299,9 +397,17 @@ assertArrayEqual(
 );
 
 process.stdout.write(
-  "[ok] formal ingress contract routes=7 owner-fields=8 harness-actions=8 harness-execute-fields=8 institution-owner-read-fields=5\n",
+  `[ok] formal ingress contract routes=7 owner-fields=8 harness-actions=${routedActionVersions.size} ` +
+    `harness-queries=${routedQueryVersions.size} registered=${registeredVersions.size} ` +
+    `unrouted=${expectedUnroutedCapabilityKeys.length} versions=per-capability ` +
+    "harness-execute-fields=8 institution-owner-read-fields=5\n",
 );
 
+function assertEqual(actual, expected, label) {
+  if (actual !== expected) {
+    throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+  }
+}
 function assertTruthy(value, label) {
   if (!value) throw new Error(`${label}: expected a truthy value`);
 }

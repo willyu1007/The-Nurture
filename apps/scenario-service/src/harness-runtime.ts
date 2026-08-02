@@ -26,9 +26,17 @@ import {
   prepareReplyFamilyCareItem,
   prepareSubmitFamilyCareQuestion,
   prepareWithdrawFamilyCareRequest,
+  loadBoardSurfaceRegistration,
+  loadSurfaceContractPin,
+  presentCaregiverTeacherBoard,
+  presentGuardianFamilyBoard,
+  queryCaregiverChildToday,
   queryCaregiverFamilyCareWork,
   queryFamilyCareItemDetail,
+  queryGuardianCurrentFocus,
+  queryGuardianEnrollmentActivity,
   queryGuardianFamilyCareTimeline,
+  queryTeacherPublishQueue,
   readInstitutionBusinessCommunication,
   resolveCareItemTargetRef,
   withHarnessConfirmation,
@@ -40,9 +48,12 @@ import {
   type SubmitPrepareDecision,
 } from "@the-nurture/scenario/harness";
 import {
+  PrismaCaregiverBoardReadPort,
   PrismaFamilyCareCommandTransaction,
   PrismaCaregiverDirectMessageEligibilityReadPort,
   PrismaFamilyCareHarnessQueryReadPort,
+  PrismaGuardianBoardReadPort,
+  PrismaPublishLaneReadPort,
   PrismaInteractionContextRepository,
   PrismaInstitutionBusinessCommunicationReadPort,
   PrismaNurtureCommandRepository,
@@ -147,12 +158,20 @@ export function createHarnessEngine(input: {
     new PrismaCaregiverDirectMessageEligibilityReadPort(input.prisma);
   const factsPort = new PrismaFamilyCareCommandTransaction(input.prisma);
   const queryReads = new PrismaFamilyCareHarnessQueryReadPort(input.prisma);
+  const guardianBoardReads = new PrismaGuardianBoardReadPort(input.prisma);
+  const caregiverBoardReads = new PrismaCaregiverBoardReadPort(input.prisma);
   const institutionBusinessCommunicationReads =
     new PrismaInstitutionBusinessCommunicationReadPort(input.prisma);
   const protectedContent = createAesGcmProtectedContentPort({
     keyRef: PROTECTED_CONTENT_KEY_REF,
     keyMaterial: input.contentKey,
   });
+  const publishQueueReads = new PrismaPublishLaneReadPort(input.prisma, protectedContent);
+  // The exact admitted contract identity and the registered module order come
+  // from the artifact itself; the ingress never carries a literal copy.
+  const boardContract = loadSurfaceContractPin();
+  const guardianBoardSurface = loadBoardSurfaceRegistration("guardian_family_board");
+  const caregiverBoardSurface = loadBoardSurfaceRegistration("caregiver_teacher_board");
   const submitSpec = createSubmitFamilyCareQuestionSpec({
     protected_content: protectedContent,
     integrity_key: input.integrityKey,
@@ -372,16 +391,91 @@ export function createHarnessEngine(input: {
           ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
         });
       }
-      if (!request.target_option_ref) {
-        return { status: "denied", reason_code: "invalid_query_input" };
+      if (request.capability_key === "query_family_care_item") {
+        if (!request.target_option_ref) {
+          return { status: "denied", reason_code: "invalid_query_input" };
+        }
+        const itemId = resolveCareItemTargetRef(
+          input.integrityKey,
+          scope,
+          request.target_option_ref,
+        );
+        if (!itemId) return { status: "denied", reason_code: "not_authorized" };
+        return queryFamilyCareItemDetail(queryDeps, { ...scope, item_id: itemId });
       }
-      const itemId = resolveCareItemTargetRef(
-        input.integrityKey,
-        scope,
-        request.target_option_ref,
+
+      // T-006 board lane. Each module read binds the exact admitted contract and
+      // reads through its own owner port; nothing is shared with the T-005 lane
+      // beyond the actor scope.
+      const guardianDeps = {
+        contract: boardContract,
+        integrity_key: input.integrityKey,
+        reads: guardianBoardReads,
+      };
+      const caregiverDeps = {
+        contract: boardContract,
+        integrity_key: input.integrityKey,
+        reads: caregiverBoardReads,
+      };
+      if (request.capability_key === "query_guardian_family_board") {
+        return presentGuardianFamilyBoard(
+          { ...guardianDeps, surface: guardianBoardSurface },
+          {
+            ...scope,
+            ...(request.target_option_ref
+              ? { enrollment_target_ref: request.target_option_ref }
+              : {}),
+            ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
+          },
+        );
+      }
+      if (request.capability_key === "query_guardian_current_focus") {
+        return queryGuardianCurrentFocus(guardianDeps, scope);
+      }
+      if (request.capability_key === "query_guardian_enrollment_activity") {
+        if (!request.target_option_ref) {
+          return { status: "denied", reason_code: "invalid_query_input" };
+        }
+        return queryGuardianEnrollmentActivity(guardianDeps, {
+          ...scope,
+          enrollment_target_ref: request.target_option_ref,
+          ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
+          ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
+        });
+      }
+      if (request.capability_key === "query_caregiver_teacher_board") {
+        return presentCaregiverTeacherBoard(
+          {
+            ...caregiverDeps,
+            surface: caregiverBoardSurface,
+            family_care_work: queryDeps,
+            publish_queue: publishQueueReads,
+          },
+          {
+            ...scope,
+            ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
+          },
+        );
+      }
+      if (request.capability_key === "query_caregiver_child_today") {
+        return queryCaregiverChildToday(caregiverDeps, {
+          ...scope,
+          ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
+          ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
+        });
+      }
+      return queryTeacherPublishQueue(
+        { contract: boardContract, integrity_key: input.integrityKey, reads: publishQueueReads },
+        await caregiverBoardReads.loadCaregiverScope({
+          ...scope,
+          snapshot_at: new Date().toISOString(),
+        }),
+        {
+          ...scope,
+          ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
+          ...(request.cursor !== undefined ? { cursor: request.cursor } : {}),
+        },
       );
-      if (!itemId) return { status: "denied", reason_code: "not_authorized" };
-      return queryFamilyCareItemDetail(queryDeps, { ...scope, item_id: itemId });
     },
 
     async readResult(request) {

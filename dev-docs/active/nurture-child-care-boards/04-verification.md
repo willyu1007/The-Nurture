@@ -566,3 +566,22 @@
 | `verify:test-routing` | PASS — files=91 production-db=19 |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisite B4-1 (Query Lane on the Formal Ingress)
+
+| Command / check | Result |
+| --- | --- |
+| defect: ingress pinned `capability_version` per lane, not per capability | FIXED — 35-entry key→version admission map |
+| defect: query dispatch fell through to item detail for any unmatched key | FIXED — every key matches explicitly |
+| 6 T-006 query keys routed end to end through the real owner ports | PASS |
+| contract identity and module order read from the artifact pin and surface registry | PASS — no literal copy in the ingress |
+| `pnpm verify:formal-ingress-contract` | PASS — `harness-queries=9 registered=35 unrouted=18 versions=per-capability` |
+| census falsified: a routed query key removed | PASS — guard reports it as unexpectedly unrouted |
+| census falsified: a routed key admitted at another version | PASS — guard reports the registry mismatch |
+| new e2e: every routed query capability admitted at its own exact version | PASS — 9 keys |
+| new e2e: a routed key at another capability's version | PASS — `invalid_harness_request` both directions |
+| new e2e: a write key on the query lane, an unregistered key, a write key on prepare | PASS — `unknown_capability`, engine never called |
+| `pnpm test:scenario-service` | PASS — 8 files / 52 tests |
+| `pnpm typecheck` / `test:unit` / `test:db` | PASS — 506 and 170 tests |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `persistence-boundaries` / `port-topology` / `test-routing` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
