@@ -267,11 +267,32 @@ export class PrismaPublicationReleasePort
             processKey: input.process_key,
             careGroupId: reach.care_group_id,
           },
-          include: { targets: { where: { targetKey: input.target_key }, include: { release: true } } },
+            include: {
+            targets: {
+              where: { targetKey: input.target_key },
+              include: { release: true, grant: true, enrollment: true },
+            },
+          },
         });
         if (!process) return { status: "rejected", reason_code: "target_unavailable" };
         const target = process.targets[0];
         if (!target) return { status: "rejected", reason_code: "target_unavailable" };
+
+        // Eligibility was read before the fan-out began. A thirty-target attempt
+        // spans real time, and a Grant revoked partway through must stop the
+        // targets that have not committed yet — otherwise a family receives a
+        // publication, and a delivered Receipt, under consent it withdrew.
+        if (
+          target.grant.status !== "active" ||
+          target.grant.deletedAt !== null ||
+          !target.grant.dataClasses.includes(process.dataClass) ||
+          !target.grant.purposes.includes(process.purposeKey)
+        ) {
+          return { status: "rejected", reason_code: "grant_not_allowed" };
+        }
+        if (target.enrollment.status !== "active" || target.enrollment.deletedAt !== null) {
+          return { status: "rejected", reason_code: "enrollment_inactive" };
+        }
 
         // An exact replay of the same command for the same target returns the
         // refs the original attempt committed, and writes nothing.

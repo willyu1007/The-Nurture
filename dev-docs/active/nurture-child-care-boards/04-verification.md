@@ -626,3 +626,22 @@
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 508, 173 and 26 tests |
 | `verify:test-routing` | PASS — files=92 production-db=20 |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — Independent Review Findings (paging, per-fact authority, mid-fan-out consent)
+
+| Command / check | Result |
+| --- | --- |
+| A5 reproduced before fixing | 25 rows seeded, 20 delivered, `has_more: false` |
+| A5: strictly-after pushed into the query | FIXED — all three paging lanes now share one shape |
+| new: page the guardian activity lane to closure against a known total | PASS — 25/25, no repeats |
+| A4: per-row guardian authority derived from that row's own Grant | FIXED — was one object per request with 4/5 fields hardcoded |
+| new: a revoked Grant withdraws its own facts while another Grant is live | PASS — `grant_visible: false` on that row alone |
+| new: a Grant that never admitted the fact's data class | PASS — `purpose_allowed: false` |
+| clarified: family charter and focus never travelled through a Grant | RECORDED — gating them on institution grants hid a family's own goals |
+| A7: Grant, Enrollment, data class and purpose re-checked inside the release transaction | FIXED |
+| new: Grant revoked mid fan-out | PASS — `grant_not_allowed`, no publication and no delivered Receipt |
+| new: Enrollment ended mid fan-out | PASS — `enrollment_inactive` |
+| A8: the guardian lane still had the `data_class` fallback | FIXED — explicit total map plus query-level exclusion |
+| doc correction: the earlier note claimed the fallback fix was a class, it was one lane | AMENDED in place |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 508, 178 and 26 tests |
+| `verify:test-routing` and the six contract/boundary gates | PASS — artifact unchanged at `1.13.0` |

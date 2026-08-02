@@ -1,4 +1,5 @@
 import type {
+  GuardianFactAuthorityV1,
   BoardSortKeyV1,
   GuardianBoardReadPort,
   GuardianBoardScopeFacts,
@@ -18,6 +19,77 @@ import {
   type BoardCensus,
   type BoardPrisma,
 } from "./board-read-support.js";
+
+/**
+ * "Strictly after this position" in `occurred_at desc, id desc`, pushed into the
+ * query.
+ *
+ * The earlier version selected `<= before` and then dropped the cursor row in
+ * memory. That silently spent the `take + 1` lookahead on a row it was about to
+ * discard, so from the second page onwards a full page reported `has_more:
+ * false` — the caller was told the list was complete while most of it was
+ * unreachable. Filtering in SQL keeps the lookahead meaning what it says.
+ */
+const strictlyAfter = (before: BoardSortKeyV1, timeField: "committedAt" | "updatedAt") => {
+  const at = new Date(before.occurred_at);
+  return {
+    OR: [
+      { [timeField]: { lt: at } },
+      { [timeField]: at, id: { lt: before.id } },
+    ],
+  };
+};
+
+/**
+ * The publishable data classes and the activity kinds the family board shows.
+ * The mapping is explicit and total: the earlier fallback branch sent every
+ * other class to `media`, so a released `daily_care_log` publication appeared
+ * on the family board as a photo. Only publishable classes reach a release, so
+ * the map is closed over exactly those two.
+ */
+const PUBLISHABLE_DATA_CLASSES = ["daily_care_log", "child_growth_record"] as const;
+
+const GUARDIAN_ACTIVITY_KIND: Record<
+  (typeof PUBLISHABLE_DATA_CLASSES)[number],
+  RawGuardianActivity["kind"]
+> = {
+  daily_care_log: "daily_care",
+  child_growth_record: "child_growth_record",
+};
+
+/**
+ * The authority that made one row visible, measured against that row's own
+ * Grant, Enrollment and child association.
+ *
+ * The earlier version built a single object per request with four fields
+ * hardcoded `true` and the fifth answering "does this family hold any active
+ * grant at all". Under it, revoking one Grant withdrew nothing while any other
+ * grant survived — consent withdrawal had no effect until the last one went.
+ */
+const factAuthority = (
+  reach: GuardianReach,
+  row: {
+    child_care_process_id: string;
+    grant: { status: string; deletedAt: Date | null; dataClasses: string[]; purposes: string[] } | null;
+    enrollment_active: boolean;
+    data_class: string;
+    purpose_key: string | null;
+  },
+): GuardianFactAuthorityV1 => {
+  const grantLive = Boolean(row.grant && row.grant.status === "active" && row.grant.deletedAt === null);
+  return {
+    guardian_authority_current: true,
+    child_association_exact: row.child_care_process_id === reach.child_care_process_id,
+    enrollment_visible: row.enrollment_active,
+    grant_visible: grantLive,
+    // A fact reaches the family under the exact class and purpose its Grant
+    // admitted; a Grant narrowed after delivery stops covering it.
+    purpose_allowed:
+      grantLive &&
+      row.grant!.dataClasses.includes(row.data_class) &&
+      (row.purpose_key === null || row.grant!.purposes.includes(row.purpose_key)),
+  };
+};
 
 const UNAUTHORIZED_SCOPE: GuardianBoardScopeFacts = {
   authorized: false,
@@ -267,11 +339,15 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     if (!reach) return { authorized: false, goals: [], heads: [] };
 
     const grantCensus = await this.grantCensus(input.workspace_id, reach.child_care_process_id);
+    // The family charter and focus cycle are the family's own records: they
+    // never travelled through a Grant, so there is no Grant for them to be
+    // visible through. Gating them on the family's unrelated institution grants
+    // would hide a family's own goals the moment it left an institution.
     const authority = {
       guardian_authority_current: true,
       child_association_exact: true,
       enrollment_visible: true,
-      grant_visible: grantCensus.count > 0,
+      grant_visible: true,
       purpose_allowed: true,
     };
 
@@ -426,15 +502,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     if (!enrollment) return { authorized: false, rows: [], has_more: false, heads: [] };
 
     const grantCensus = await this.grantCensus(input.workspace_id, reach.child_care_process_id);
-    const authority = {
-      guardian_authority_current: true,
-      child_association_exact: true,
-      enrollment_visible: true,
-      grant_visible: grantCensus.count > 0,
-      purpose_allowed: true,
-    };
 
-    const before = input.before ? new Date(input.before.occurred_at) : undefined;
     const [releases, logs] = await Promise.all([
       // A publication is visible only through its own committed, still-visible
       // release for this exact target.
@@ -443,9 +511,13 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
           workspaceId: input.workspace_id,
           visibility: "visible",
           target: { enrollmentId: enrollment.id },
-          ...(before ? { committedAt: { lte: before } } : {}),
+          publishProcess: { dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] } },
+          ...(input.before ? strictlyAfter(input.before, "committedAt") : {}),
         },
-        include: { publishProcess: { select: { dataClass: true, processKey: true } } },
+        include: {
+          publishProcess: { select: { dataClass: true, processKey: true, purposeKey: true } },
+          target: { include: { grant: true, enrollment: true } },
+        },
         orderBy: [{ committedAt: "desc" }, { id: "desc" }],
         take: input.take + 1,
       }),
@@ -456,8 +528,9 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
           status: "shared",
           deletedAt: null,
           grantId: { not: null },
-          ...(before ? { updatedAt: { lte: before } } : {}),
+          ...(input.before ? strictlyAfter(input.before, "updatedAt") : {}),
         },
+        include: { grant: true, enrollment: true },
         orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
         take: input.take + 1,
       }),
@@ -466,15 +539,25 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     const merged: RawGuardianActivity[] = [
       ...releases.map((release) => ({
         activity_id: release.id,
-        kind:
-          release.publishProcess.dataClass === "child_growth_record"
-            ? ("child_growth_record" as const)
-            : ("media" as const),
+        kind: GUARDIAN_ACTIVITY_KIND[
+          release.publishProcess.dataClass as (typeof PUBLISHABLE_DATA_CLASSES)[number]
+        ],
         release_id: release.id,
         source_label: "publication_release",
         occurred_at: release.committedAt.toISOString(),
         summary: release.publishProcess.processKey,
-        authority,
+        // Measured against this row's own Grant. A scope-level "does the family
+        // hold any grant" would keep a revoked Grant's facts on the board for as
+        // long as one unrelated grant survived.
+        authority: factAuthority(reach, {
+          child_care_process_id: release.target.childCareProcessId,
+          grant: release.target.grant,
+          enrollment_active:
+            release.target.enrollment.status === "active" &&
+            release.target.enrollment.deletedAt === null,
+          data_class: release.publishProcess.dataClass,
+          purpose_key: release.publishProcess.purposeKey,
+        }),
         action_grants: [],
       })),
       ...logs.map((log) => ({
@@ -486,7 +569,14 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
         source_label: "daily_care_log",
         occurred_at: log.updatedAt.toISOString(),
         summary: log.summary ?? "",
-        authority,
+        authority: factAuthority(reach, {
+          child_care_process_id: log.childCareProcessId,
+          grant: log.grant,
+          enrollment_active:
+            log.enrollment.status === "active" && log.enrollment.deletedAt === null,
+          data_class: "daily_care_log",
+          purpose_key: null,
+        }),
         action_grants: [],
       })),
     ].sort((left, right) =>
@@ -495,14 +585,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
         : right.occurred_at.localeCompare(left.occurred_at),
     );
 
-    const afterCursor = input.before
-      ? merged.filter(
-          (row) =>
-            row.occurred_at < input.before!.occurred_at ||
-            (row.occurred_at === input.before!.occurred_at && row.activity_id < input.before!.id),
-        )
-      : merged;
-    const page = afterCursor.slice(0, input.take);
+    const page = merged.slice(0, input.take);
 
     const heads: RawBoardSourceHead[] = [
       {
@@ -520,7 +603,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     return {
       authorized: true,
       rows: page,
-      has_more: afterCursor.length > page.length,
+      has_more: merged.length > page.length,
       heads,
     };
   }

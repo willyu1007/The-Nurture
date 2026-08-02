@@ -246,6 +246,62 @@ describe("owner rows arrive in the order their binding advertises", () => {
     ]);
   });
 
+  it("delivers every guardian activity row across pages, not just the first two", async () => {
+    const world = await seedInstitution();
+    const child = await seedChild(world, "Alpha");
+    await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: world.guardian.id,
+        role: "guardian",
+        scopeType: "child_care_process",
+        scopeId: child.process.id,
+        status: "active",
+      },
+    });
+    const total = 25;
+    for (let index = 0; index < total; index += 1) {
+      await prisma.nurtureDailyCareLog.create({
+        data: {
+          workspaceId: world.workspaceId,
+          childCareProcessId: child.process.id,
+          enrollmentId: child.enrollment.id,
+          careGroupId: world.group.id,
+          recordedByRoleAssignmentId: world.teacherRole.id,
+          logDate: new Date("2026-08-02T00:00:00.000Z"),
+          summary: `log ${index}`,
+          status: "shared",
+          grantId: child.grant.id,
+          mealPayload: { kind: "meal" },
+        },
+      });
+    }
+
+    const reads = new PrismaGuardianBoardReadPort(prisma);
+    const seen: string[] = [];
+    let before: { occurred_at: string; id: string } | undefined;
+    // Page to closure. The list is only complete when the owner says so, so a
+    // premature `has_more: false` is indistinguishable from the real end — which
+    // is exactly why it has to be tested against a known total.
+    for (let page = 0; page < 10; page += 1) {
+      const result = await reads.listGuardianEnrollmentActivity({
+        workspace_id: world.workspaceId,
+        participant_id: world.guardian.id,
+        enrollment_id: child.enrollment.id,
+        snapshot_at: SNAPSHOT_AT,
+        take: 10,
+        ...(before ? { before } : {}),
+      });
+      seen.push(...result.rows.map((row) => row.activity_id));
+      const tail = result.rows[result.rows.length - 1];
+      if (!result.has_more || !tail) break;
+      before = { occurred_at: tail.occurred_at, id: tail.activity_id };
+    }
+
+    expect(new Set(seen).size, "a row was delivered twice").toBe(seen.length);
+    expect(seen).toHaveLength(total);
+  });
+
   it("guardian enrollment activity follows GUARDIAN_ENROLLMENT_ACTIVITY_ORDER", async () => {
     const world = await seedInstitution();
     const child = await seedChild(world, "Alpha");

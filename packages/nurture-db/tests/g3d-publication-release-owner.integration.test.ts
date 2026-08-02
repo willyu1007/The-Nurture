@@ -376,6 +376,73 @@ describe("G3-D owner writes: atomic per-target release", () => {
     });
   });
 
+  it("refuses a target whose Grant was revoked after eligibility was read", async () => {
+    const world = await seedWorld();
+    const { process, targets } = await seedProcess(world);
+    const port = new PrismaPublicationReleasePort(prisma);
+    const commandRequestId = randomUUID();
+
+    // First target commits under a live Grant.
+    const first = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: commandRequestId,
+    });
+    expect(first.status).toBe("committed");
+
+    // The second family withdraws consent mid fan-out. Eligibility was read
+    // before the attempt began, so only a re-check inside the transaction can
+    // stop this target.
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: world.children[1]!.grant.id },
+      data: {
+        status: "revoked",
+        revokedAt: new Date("2026-08-02T05:00:00.000Z"),
+        revokedByParticipantId: world.guardian.id,
+      },
+    });
+
+    const second = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[1]!.targetKey,
+      revision: 1,
+      command_request_id: commandRequestId,
+    });
+    expect(second).toEqual({ status: "rejected", reason_code: "grant_not_allowed" });
+
+    // No publication and, crucially, no delivered Receipt under withdrawn consent.
+    expect(await census(world.workspaceId)).toEqual({
+      releases: 1,
+      receipts: 1,
+      executions: 1,
+    });
+  });
+
+  it("refuses a target whose Enrollment ended after eligibility was read", async () => {
+    const world = await seedWorld();
+    const { process, targets } = await seedProcess(world);
+    await prisma.nurtureEnrollment.update({
+      where: { id: world.children[0]!.enrollment.id },
+      data: { status: "ended" },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const result = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+    });
+    expect(result).toEqual({ status: "rejected", reason_code: "enrollment_inactive" });
+    expect((await census(world.workspaceId)).releases).toBe(0);
+  });
+
   it("refuses a caregiver of another class", async () => {
     const world = await seedWorld();
     const { process, targets } = await seedProcess(world);

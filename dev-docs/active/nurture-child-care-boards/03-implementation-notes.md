@@ -996,6 +996,9 @@ B1～B2-4 全部通过闸门,但闸门覆盖不到的地方有 6 处会产生错
 2. **`data_class` 把所有非成长记录折叠成 `daily_care_log`**。改为在查询层就只取
    两个可发布 data class,其余的既不进队列也不进普查——**排除**而不是贴上一个
    它没有的类别,后者正是 fallback 分支会干的事。
+   *(2026-08-02 更正:这一改只落在 publish 队列 lane。guardian 活动 lane 里同一
+   个兜底还在,把非成长记录的发布显示成 `media`,由独立复核发现后才补上。上面那句
+   "改为"读起来像一次全局修复,实际只是一处。)*
 3. **media 类型的 capture 被当成 `teacher_text`**。安全策略按 fact kind 路由。
    改为 `satisfies` 约束的显式全映射。
 4. **两条 lane 的行序与声明的语义序不符**。这条最深:声明的 order 首项
@@ -1166,3 +1169,34 @@ cursor 在解密处就抛错,而不是先解出一个调用方还得去怀疑的
 
 用制造这次回归的同样手法证伪过:手工 `DROP CONSTRAINT`,检查立刻报出
 `declared in a migration but absent from the database`。
+
+## 2026-08-02 — 复核第二批:分页截断、按行的授权、发布中途的同意撤销
+
+**A5 — 家庭活动分页从第二页起静默截断。** 先复现:25 条只送出 20 条,而 `hasMore`
+报 false——**事实不可达,API 却声称列表已完整**。原因是取 `lte before` 再在内存里
+丢掉游标行,`take + 1` 的前瞻额度被那一行吃掉了。改为把"严格晚于此位置"下推到 SQL
+(与另外两条 lane 同一种写法),前瞻额度才名副其实。三条分页 lane 现在形状一致。
+
+**A4 — guardian 的按行权限是伪造的,撤销授权等于无效。** 原实现一次构造一个
+`authority` 对象给所有行,五个字段里四个硬编码 `true`,第五个 `grant_visible` 回答的
+是"这个 process 还有没有任一 active grant"。于是家庭撤销 G1、G2 仍在,**G1 投递过的
+事实全部继续可见**——同意撤销要等到最后一个授权也没了才生效。日常照护查询更只看
+`grantId` 非空,从不看状态。
+
+改为按行度量,取自**该行自己的** Grant/Enrollment/child 关联,并且 `purpose_allowed`
+要求该 Grant 现在仍然承认这条事实的 data class 与 purpose——授权被收窄之后不再覆盖
+它已经投递过的东西。
+
+顺带纠正一处口径:焦点与家庭章程是**家庭自己的记录**,从来没有经过任何 Grant。原来
+拿"家庭有没有机构授权"去 gate 它们,会在家庭离开机构的那一刻把它自己的目标藏起来。
+现在写明这条路径上没有 Grant 可言。
+
+**A7 — 发布扇出中途撤销的同意拦不住后面的目标。** `commitTargetRelease` 的事务里
+只重读了 process 与 revision,不重查 Grant/Enrollment/data class/purpose。三十个目标
+的扇出跨越真实时间,中途撤销的家庭仍会收到发布**以及一条 delivered Receipt**。
+现在事务内重查,并给出各自的拒绝码(`grant_not_allowed` / `enrollment_inactive`)。
+
+**A8 — 上一轮我声称"改为排除"的修复只落在一条 lane。** guardian 活动 lane 里同一个
+一刀切兜底还在,把非成长记录的发布显示成 `media`。现在改成显式全映射,并在查询层
+排除不可发布的 data class。03-notes 里那句读起来像全局修复的话已就地更正——**文档
+声称的修复只做了一半,比没做更糟**。

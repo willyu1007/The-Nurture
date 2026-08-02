@@ -296,6 +296,8 @@ describe("G3-A owner reads: guardian lane", () => {
       take: 10,
     });
     expect(listed.authorized).toBe(true);
+    // Mapped, not defaulted: the earlier fallback sent every non-growth class to
+    // `media`, so a released daily-care publication showed up as a photo.
     expect(listed.rows.map((row) => row.kind)).toEqual(["child_growth_record"]);
 
     await prisma.nurturePublicationRelease.update({
@@ -310,6 +312,102 @@ describe("G3-A owner reads: guardian lane", () => {
       take: 10,
     });
     expect(afterRemoval.rows).toEqual([]);
+  });
+
+  it("withdraws a revoked Grant's own facts while another Grant is still live", async () => {
+    const world = await seedWorld();
+    // A second, unrelated live Grant on the same child-care process. The board
+    // must not read "the family still holds a grant" as "this fact is still
+    // visible" — that would make consent withdrawal a no-op until the last one.
+    const secondGrant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: world.process.id,
+        enrollmentId: world.enrollment.id,
+        grantedByParticipantId: world.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: world.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["daily_care_log"],
+        purposes: ["family_care_workflow"],
+        status: "active",
+      },
+    });
+    expect(secondGrant.id).toBeTruthy();
+
+    const log = await prisma.nurtureDailyCareLog.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: world.process.id,
+        enrollmentId: world.enrollment.id,
+        careGroupId: world.group.id,
+        recordedByRoleAssignmentId: world.caregiverRole.id,
+        logDate: new Date("2026-08-02T00:00:00.000Z"),
+        summary: "lunch",
+        status: "shared",
+        grantId: world.grant.id,
+        mealPayload: { kind: "meal" },
+      },
+    });
+
+    const reads = new PrismaGuardianBoardReadPort(prisma);
+    const read = () =>
+      reads.listGuardianEnrollmentActivity({
+        workspace_id: world.workspaceId,
+        participant_id: world.guardian.id,
+        enrollment_id: world.enrollment.id,
+        snapshot_at: SNAPSHOT_AT,
+        take: 10,
+      });
+
+    const before = await read();
+    const visible = before.rows.find((row) => row.activity_id === log.id);
+    expect(visible?.authority.grant_visible).toBe(true);
+
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: world.grant.id },
+      data: {
+        status: "revoked",
+        revokedAt: new Date("2026-08-02T03:00:00.000Z"),
+        revokedByParticipantId: world.guardian.id,
+      },
+    });
+
+    const after = await read();
+    const withdrawn = after.rows.find((row) => row.activity_id === log.id);
+    // The row is still returned, carrying the authority that now refuses it —
+    // the presenter filters on the fact, not on a scope-level boolean.
+    expect(withdrawn?.authority.grant_visible).toBe(false);
+    expect(withdrawn?.authority.purpose_allowed).toBe(false);
+  });
+
+  it("refuses a fact whose Grant no longer admits its data class", async () => {
+    const world = await seedWorld();
+    await prisma.nurtureDailyCareLog.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: world.process.id,
+        enrollmentId: world.enrollment.id,
+        careGroupId: world.group.id,
+        recordedByRoleAssignmentId: world.caregiverRole.id,
+        logDate: new Date("2026-08-02T00:00:00.000Z"),
+        summary: "lunch",
+        status: "shared",
+        grantId: world.grant.id,
+        mealPayload: { kind: "meal" },
+      },
+    });
+    // The seeded Grant admits `child_growth_record`, never `daily_care_log`.
+    const reads = new PrismaGuardianBoardReadPort(prisma);
+    const page = await reads.listGuardianEnrollmentActivity({
+      workspace_id: world.workspaceId,
+      participant_id: world.guardian.id,
+      enrollment_id: world.enrollment.id,
+      snapshot_at: SNAPSHOT_AT,
+      take: 10,
+    });
+    expect(page.rows[0]?.authority.grant_visible).toBe(true);
+    expect(page.rows[0]?.authority.purpose_allowed).toBe(false);
   });
 
   it("refuses an Enrollment that does not belong to the reached family", async () => {
