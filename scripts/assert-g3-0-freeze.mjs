@@ -504,7 +504,14 @@ const adoptedInG3D = [
  * registered. The list stays so a future freeze amendment that reserves a new
  * identity has somewhere to declare it before its checkpoint lands.
  */
+/**
+ * Reserved identities that no checkpoint has adopted yet. Empty today: every
+ * key the freeze reserved is registered. The census below is what keeps that
+ * true, so this list must stay a declaration rather than a habit — a key added
+ * here is a claim that it is deliberately unregistered.
+ */
 const stillUnimplementedCapabilities = [];
+
 const registeredVersions = new Map(
   capabilityRegistry.capabilities.map((capability) => [
     capability.capabilityKey,
@@ -586,7 +593,9 @@ const reservedKeys = [
     [...adoptionSet.matchAll(/`([a-z][a-z0-9_]*)`/g)].map((match) => match[1]),
   ),
 ].filter((key) => key.includes("_"));
-assertTruthy(reservedKeys.length >= 18, "adoption set reserves capability keys");
+// Exact, not a floor: `>= 18` let the adoption set grow without anyone
+// declaring it, which is the opposite of a closed set.
+assertEqual(reservedKeys.length, 19, "adoption set reserves exactly its declared capability keys");
 const accountedFor = new Set([
   ...adoptedInG3A,
   ...adoptedInG3B1,
@@ -640,6 +649,18 @@ for (const requiredText of [
   assertTextIncludes(t007Freeze, requiredText, `T-007 policy ${requiredText}`);
 }
 
+// The frozen input identity was checked only by appearing as text in this
+// document. Its digest is history — the current artifact has rotated past it —
+// so nothing here can compare it to a live artifact. What can be checked is
+// that the guard which DOES prove it against artifact evidence still pins the
+// same value: `assert-g2-exit-contract.mjs` holds `sharedCoreHash` and every
+// T-005 slice hash byte-identical since this digest.
+const g2ExitGuard = read("scripts/assert-g2-exit-contract.mjs");
+assertTextIncludes(
+  g2ExitGuard,
+  frozenInputInterface.digest,
+  "G3-0 frozen input digest still pinned by the G2 Exit contract guard",
+);
 for (const identityPart of [
   frozenInputInterface.version,
   frozenInputInterface.digest,

@@ -39,7 +39,6 @@ const identity: BoardCursorIdentityV1 = {
 };
 
 const state = {
-  snapshot_ref: "snapshot-ref-1",
   snapshot_version: 7,
   snapshot_at: "2026-08-02T00:00:00.000Z",
   drift_head: computeDriftHead(driftHeads()),

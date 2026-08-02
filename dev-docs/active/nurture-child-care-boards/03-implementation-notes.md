@@ -1296,3 +1296,27 @@ SQL 文本**。那是一条合法的历史钉,问题在于标签读起来像"这
 
 共同的形状:**守卫检查的是"文本里有没有这句话",而不是"这条规则还成不成立"**。
 四条里有三条可以用一次编辑绕过,而且绕过之后所有闸门仍是绿的。
+
+## 2026-08-02 — B7/B8 与三处清理
+
+**B7 — 冻结的输入 digest 只被断言"出现在这份文档里"。** 它是历史(当前制品早已旋转
+过去),所以这份守卫里没有任何活制品可以拿来比。能比的是:**真正用凭据证明它的那个
+守卫是否还钉着同一个值**——`assert-g2-exit-contract.mjs` 让 `sharedCoreHash` 与每个
+T-005 slice hash 自该 digest 起逐字不变。现在两个守卫互相钉住。
+
+**B8 — adoption set 用的是下限而不是精确值。** `reservedKeys.length >= 18` 意味着
+注册第 36 个能力也能通过——对一个声称"已封闭"的集合而言恰好相反。改为精确等于 19。
+
+**冻结件自身已经陈旧,而且守卫在断言它的反面。** 06 的 posture 行写着 24 个能力
+"frozen but not implemented or registered",而 `assert-g3-0-freeze.mjs` 断言全部 24 个
+**已注册**;DB SSOT 行钉着"50 tables",上下文早已是 60。冻结内容本身不动,只把这两行
+标注为已被取代,并写明当时值与现值。
+
+**清理三处**:`stillUnimplementedCapabilities = []` 的空循环保留但写明它是一条**声明**
+(往里加一个 key 等于主张它被刻意不注册),而不是一个可以随手放东西的地方;
+`BoardCursorStateV1.snapshot_ref` 被携带、被校验、被返回,却**从没有任何调用方比较过**
+——它读起来像一道并不存在的检查,已删除(`snapshot_version` 与 `drift_head` 才是真在
+比的两项);`uq_nurture_publication_release_command` 被单列的
+`publish_process_target_id @unique` 完全蕴含,永远不可能是先触发的那条约束,却让人以为
+command hash 在数据库层承担了一部分保证——已随迁移删除,重放检查本就显式写在
+`commitTargetRelease` 里。

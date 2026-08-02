@@ -2568,8 +2568,11 @@ model NurturePublicationRelease {
   receipt          NurtureChildLinkReceipt?            @relation(fields: [receiptId], references: [id], onDelete: Restrict)
   visibilityEvents NurturePublicationVisibilityEvent[]
 
-  // One committed release per target; an exact command replay never duplicates it.
-  @@unique([workspaceId, publishProcessId, commandRequestIdHash, publishProcessTargetId], map: "uq_nurture_publication_release_command")
+  // One committed release per target: `publishProcessTargetId` is already
+  // `@unique`, which is what enforces it. A composite that also named the
+  // command hash added nothing — the single-column unique always fires first —
+  // while reading as though the command identity were part of the guarantee.
+  // The replay check is explicit in `commitTargetRelease`.
   @@index([workspaceId, publishProcessId, committedAt], map: "ix_nurture_publication_release_process")
   @@map("nurture_publication_release")
 }

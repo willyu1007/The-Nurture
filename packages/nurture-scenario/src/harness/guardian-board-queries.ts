@@ -437,7 +437,6 @@ export const queryGuardianEnrollmentActivity = async (
         scope,
         identity,
         {
-          snapshot_ref: snapshotRef,
           snapshot_version: scopeFacts.snapshot_version,
           snapshot_at: snapshotAt,
           drift_head: driftHead,

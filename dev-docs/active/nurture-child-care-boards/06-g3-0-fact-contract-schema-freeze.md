@@ -6,8 +6,11 @@
 - Date: 2026-08-02
 - Verdict: `G3_0_FREEZE_PASS`
 - Next checkpoint: G3-A Shared Board Foundation
-- Implementation posture: board/publish capabilities and schema delta are frozen but not
-  implemented or registered
+- Implementation posture at freeze time: board/publish capabilities and schema delta were frozen
+  but not implemented or registered. **Superseded 2026-08-02:** all 24 capabilities are registered
+  at `1.0.0`, the schema delta is landed and migrated, and the owner read lane is implemented; see
+  `03-implementation-notes.md`. The freeze below is unchanged — only this posture line was stale,
+  and `assert-g3-0-freeze.mjs` had been asserting the opposite of it.
 - Non-effects: no migration, persistent database apply, owner-repository mutation, environment
   value, capability activation, artifact publication, deployment or traffic change
 
@@ -23,7 +26,7 @@ provider, T-007 policy provider/consumer integration or a Beta Profile Handoff.
 | T-004/T-005 surface artifact | `nurture.surface-contract@1.8.0`; `sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a` | current envelope, surfaces, presenters, visibility and T-005 direct action |
 | T-005 direct interaction | `initiate_caregiver_direct_message@1.0.0` | restricted-content route only; no T-006 wrapper or fallback |
 | T-007 policy contract | `nurture.institution-publication-policy@1.0.0` | schedule/organize policy input; implementation and qualification remain pending |
-| DB SSOT | `prisma/schema.prisma`; generated context version 2, 50 tables | landed-fact census and future additive migration boundary |
+| DB SSOT | `prisma/schema.prisma`; generated context version 2, 60 tables after the landed G3 delta (50 at freeze time) | landed-fact census and future additive migration boundary |
 
 Normative handoffs are
 [T-002 M5](../nurture-institution-mode/16-owner-integration-handoff-m5.md),

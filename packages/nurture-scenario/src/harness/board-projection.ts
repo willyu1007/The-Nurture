@@ -300,8 +300,14 @@ export type BoardCursorIdentityV1 = {
   page_size: number;
 };
 
+/**
+ * The state a resumed page is checked against. `snapshot_version` and
+ * `drift_head` are both compared by every caller; `snapshot_at` is what the
+ * later pages are read as of; `sort_key` is the position. There is deliberately
+ * no `snapshot_ref` here — it was carried and returned but never compared, so
+ * it read as a check that did not exist.
+ */
 export type BoardCursorStateV1 = {
-  snapshot_ref: string;
   snapshot_version: number;
   snapshot_at: string;
   drift_head: string;
@@ -404,7 +410,6 @@ export const resolveBoardCursor = (
   if (cursor.page_size !== expected.page_size) return null;
   const sortKey = cursor.sort_key;
   if (
-    typeof cursor.snapshot_ref !== "string" ||
     !Number.isSafeInteger(cursor.snapshot_version) ||
     typeof cursor.snapshot_at !== "string" ||
     typeof cursor.drift_head !== "string" ||
@@ -416,7 +421,6 @@ export const resolveBoardCursor = (
     return null;
   }
   return {
-    snapshot_ref: cursor.snapshot_ref,
     snapshot_version: cursor.snapshot_version,
     snapshot_at: cursor.snapshot_at,
     drift_head: cursor.drift_head,

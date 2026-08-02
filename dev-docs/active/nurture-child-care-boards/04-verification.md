@@ -683,3 +683,16 @@
 | B4: a guard certified a constraint the database no longer had | FIXED — labelled as a baseline-declaration pin; live existence is the DB test's job |
 | `pnpm typecheck` / `test:unit` / `test:db` | PASS — 509 and 178 tests |
 | all seven contract/boundary gates | PASS — artifact unchanged at `1.13.0` |
+
+## 2026-08-02 — B7/B8 and Dead-weight Cleanup
+
+| Command / check | Result |
+| --- | --- |
+| B7: the frozen input digest was pinned only as prose | FIXED — cross-pinned against the guard that proves it with artifact evidence |
+| B8: the adoption set was pinned by a floor | FIXED — exact count; a 36th capability no longer passes |
+| the freeze document contradicted its own guard | AMENDED — posture and table count marked superseded, freeze content untouched |
+| C13: an empty-list loop read as a check | FIXED — documented as a declaration |
+| C12: `snapshot_ref` carried, validated and returned but never compared | REMOVED — the two terms that are compared stay |
+| C11: a composite unique fully implied by a single-column unique | REMOVED — migration `20260802160000` |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 509, 178 and 26 tests |
+| all eight contract/boundary gates | PASS — artifact unchanged at `1.13.0` |

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-02T12:12:06.165Z",
+  "updatedAt": "2026-08-02T22:10:15.589Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -12881,17 +12881,6 @@
           ],
           "name": null,
           "map": "ix_nurture_publication_release_process"
-        },
-        {
-          "type": "unique",
-          "fields": [
-            "workspaceId",
-            "publishProcessId",
-            "commandRequestIdHash",
-            "publishProcessTargetId"
-          ],
-          "name": null,
-          "map": "uq_nurture_publication_release_command"
         }
       ]
     },
