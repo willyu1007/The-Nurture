@@ -511,6 +511,8 @@ components:
             - withdraw_family_care_request
             - redact_family_care_message
             - policy_redact_family_care_message
+            - update_guardian_current_focus
+            - record_caregiver_daily_care
         capability_version:
           type: string
           const: 1.0.0
@@ -531,8 +533,11 @@ components:
           enum: [ready_to_confirm, needs_input, denied, unavailable]
         preview:
           type: object
+          description: |
+            Safe display projection of the prepared command. Values are scalar;
+            some are numeric (for example a focus priority).
           additionalProperties:
-            type: string
+            type: [string, number]
         confirmation_ref:
           type: string
         expires_at:
@@ -594,6 +599,8 @@ components:
             - withdraw_family_care_request
             - redact_family_care_message
             - policy_redact_family_care_message
+            - update_guardian_current_focus
+            - record_caregiver_daily_care
         capability_version:
           type: string
           const: 1.0.0

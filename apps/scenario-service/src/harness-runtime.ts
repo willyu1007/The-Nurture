@@ -17,15 +17,21 @@ import {
   parseCorrectFamilyCareMessageInputV1,
   parsePolicyRedactFamilyCareMessageInputV1,
   parseReplyFamilyCareItemInputV1,
+  parseRecordCaregiverDailyCareInputV1,
   parseSubmitFamilyCareQuestionInputV1,
+  parseUpdateGuardianCurrentFocusInputV1,
   prepareAcknowledgeFamilyCareItem,
   prepareInitiateCaregiverDirectMessage,
   prepareCorrectFamilyCareMessage,
   preparePolicyRedactFamilyCareMessage,
   prepareRedactFamilyCareMessage,
   prepareReplyFamilyCareItem,
+  prepareRecordCaregiverDailyCare,
   prepareSubmitFamilyCareQuestion,
+  prepareUpdateGuardianCurrentFocus,
   prepareWithdrawFamilyCareRequest,
+  createRecordCaregiverDailyCareSpec,
+  createUpdateGuardianCurrentFocusSpec,
   loadBoardSurfaceRegistration,
   loadSurfaceContractPin,
   presentCaregiverTeacherBoard,
@@ -43,16 +49,19 @@ import {
   type HarnessConfirmationPayloadV2,
   type CaregiverDirectMessagePrepareDecision,
   type ItemActionPrepareDecision,
+  type BoardMutationPrepareDecision,
   type LifecyclePrepareDecision,
   type NurtureCommandSpec,
   type SubmitPrepareDecision,
 } from "@the-nurture/scenario/harness";
 import {
   PrismaCaregiverBoardReadPort,
+  PrismaCaregiverDailyCareEligibilityReadPort,
   PrismaFamilyCareCommandTransaction,
   PrismaCaregiverDirectMessageEligibilityReadPort,
   PrismaFamilyCareHarnessQueryReadPort,
   PrismaGuardianBoardReadPort,
+  PrismaGuardianFocusEligibilityReadPort,
   PrismaPublishLaneReadPort,
   PrismaInteractionContextRepository,
   PrismaInstitutionBusinessCommunicationReadPort,
@@ -159,6 +168,14 @@ export function createHarnessEngine(input: {
   const factsPort = new PrismaFamilyCareCommandTransaction(input.prisma);
   const queryReads = new PrismaFamilyCareHarnessQueryReadPort(input.prisma);
   const guardianBoardReads = new PrismaGuardianBoardReadPort(input.prisma);
+  // Prepare only reads: it enumerates the targets the fact owner would accept a
+  // write for. The write itself happens inside the command transaction.
+  const guardianFocusEligibility = new PrismaGuardianFocusEligibilityReadPort(input.prisma);
+  const caregiverDailyCareEligibility = new PrismaCaregiverDailyCareEligibilityReadPort(
+    input.prisma,
+  );
+  // Prepare only reads: it enumerates the targets the fact owner would accept a
+  // write for. The write itself happens inside the command transaction.
   const caregiverBoardReads = new PrismaCaregiverBoardReadPort(input.prisma);
   const institutionBusinessCommunicationReads =
     new PrismaInstitutionBusinessCommunicationReadPort(input.prisma);
@@ -198,13 +215,20 @@ export function createHarnessEngine(input: {
   const policyRedactSpec = createRedactFamilyCareMessageSpec("policy", {
     integrity_key: input.integrityKey,
   });
+  const updateGuardianFocusSpec = createUpdateGuardianCurrentFocusSpec({
+    integrity_key: input.integrityKey,
+  });
+  const recordDailyCareSpec = createRecordCaregiverDailyCareSpec({
+    integrity_key: input.integrityKey,
+  });
 
   const toPrepareResponse = (
     decision:
       | SubmitPrepareDecision
       | CaregiverDirectMessagePrepareDecision
       | ItemActionPrepareDecision
-      | LifecyclePrepareDecision,
+      | LifecyclePrepareDecision
+      | BoardMutationPrepareDecision,
   ): HarnessPrepareResponseV1 => {
     // Internal raw target ids (enrollment_id / item_id) never leave the
     // service; execute recovers the exact target from the confirmation.
@@ -230,6 +254,42 @@ export function createHarnessEngine(input: {
           ? { host_conversation_ref: request.host_conversation_ref }
           : {}),
       };
+      if (request.capability_key === "update_guardian_current_focus") {
+        return toPrepareResponse(
+          await prepareUpdateGuardianCurrentFocus(
+            {
+              eligibility: guardianFocusEligibility,
+              contexts,
+              integrity_key: input.integrityKey,
+            },
+            {
+              ...shared,
+              operation_input: request.operation_input,
+              ...(request.target_option_ref
+                ? { target_option_ref: request.target_option_ref }
+                : {}),
+            },
+          ),
+        );
+      }
+      if (request.capability_key === "record_caregiver_daily_care") {
+        return toPrepareResponse(
+          await prepareRecordCaregiverDailyCare(
+            {
+              eligibility: caregiverDailyCareEligibility,
+              contexts,
+              integrity_key: input.integrityKey,
+            },
+            {
+              ...shared,
+              operation_input: request.operation_input,
+              ...(request.target_option_ref
+                ? { target_option_ref: request.target_option_ref }
+                : {}),
+            },
+          ),
+        );
+      }
       if (request.capability_key === "submit_family_care_question") {
         return toPrepareResponse(
           await prepareSubmitFamilyCareQuestion(
@@ -558,6 +618,45 @@ export function createHarnessEngine(input: {
     request: HarnessExecuteRequestV1,
     payload: HarnessConfirmationPayloadV2,
   ): BuiltCommand {
+    if (request.capability_key === "update_guardian_current_focus") {
+      const parsed = parseUpdateGuardianCurrentFocusInputV1(request.operation_input);
+      const focusGoalId = payload.target_refs.focus_goal;
+      const focusCycleId = payload.target_refs.focus_cycle;
+      if (parsed.status !== "ok" || !focusGoalId || !focusCycleId) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      return {
+        status: "ok",
+        payload: {
+          label: parsed.input.label,
+          priority: parsed.input.priority,
+          focus_goal_id: focusGoalId,
+          focus_cycle_id: focusCycleId,
+          expected_focus_cycle_version: payload.expected_heads.focus_cycle ?? 0,
+          expected_focus_goal_version: payload.expected_heads.focus_goal ?? 0,
+        },
+        spec: updateGuardianFocusSpec as NurtureCommandSpec<never>,
+      };
+    }
+    if (request.capability_key === "record_caregiver_daily_care") {
+      const parsed = parseRecordCaregiverDailyCareInputV1(request.operation_input);
+      const childCareProcessId = payload.target_refs.child_care_process;
+      if (parsed.status !== "ok" || !childCareProcessId) {
+        return { status: "invalid", reason_code: "invalid_operation_input" };
+      }
+      return {
+        status: "ok",
+        payload: {
+          kind: parsed.input.kind,
+          summary: parsed.input.summary,
+          child_care_process_id: childCareProcessId,
+          expected_care_group_version: payload.expected_heads.care_group ?? 0,
+          expected_role_version: payload.expected_heads.role ?? 0,
+          expected_enrollment_version: payload.expected_heads.enrollment ?? 0,
+        },
+        spec: recordDailyCareSpec as NurtureCommandSpec<never>,
+      };
+    }
     if (request.capability_key === "submit_family_care_question") {
       const parsed = parseSubmitFamilyCareQuestionInputV1(request.operation_input);
       const enrollmentId = payload.target_refs.enrollment;

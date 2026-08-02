@@ -6,6 +6,9 @@ import {
   issueCareItemTargetRef,
   issueDisplayRef,
   issueFamilyCareMessageTargetRef,
+  issueBoardTargetRef,
+  CHILD_CARE_PROCESS_TARGET_KIND,
+  FOCUS_GOAL_TARGET_KIND,
   issuePolicyRedactionDecisionRef,
 } from "@the-nurture/scenario/harness";
 import { createPrismaClient, Prisma } from "@the-nurture/db";
@@ -1935,5 +1938,149 @@ describe("G2-B Institution Admin exact owner-read", () => {
     ).resolves.toMatchObject({
       json: { status: "denied", reason_code: "not_authorized" },
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// G3-A board lane through the same formal ingress.
+
+describe("G3-A board lane through the formal Harness ingress", () => {
+  const seedFocus = async (scope: SeedScope) => {
+    const familyRefKey = `${scope.workspaceId}:${scope.process.id}`;
+    const cycle = await prisma.nurtureFocusCycle.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        familyRefKey,
+        familyRef: { service: "my_chat", object_type: "family" },
+        status: "active",
+      },
+    });
+    return prisma.nurtureFocusGoal.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        focusCycleId: cycle.id,
+        familyRefKey,
+        goalKey: "sleep_rhythm",
+        priority: 2,
+      },
+    });
+  };
+
+  it("reads the guardian board and its focus module through the query route", async () => {
+    const scope = await seedScope();
+    await seedFocus(scope);
+    const board = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "board",
+      capability_key: "query_guardian_family_board",
+      capability_version: "1.0.0",
+    });
+    expect(board.status).toBe(200);
+    expect(board.json.status).toBe("ok");
+    // The envelope binds the exact admitted contract read from the artifact pin.
+    expect(board.json.output.contract.key).toBe("nurture.surface-contract");
+    expect(board.json.output.surfaceKey).toBe("guardian_family_board");
+
+    const focus = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "board",
+      capability_key: "query_guardian_current_focus",
+      capability_version: "1.0.0",
+    });
+    expect(focus.json.status).toBe("ok");
+    expect(focus.json.output.familyFocus).toHaveLength(1);
+    // A family-scope goal never becomes child focus, and no raw id is exposed.
+    expect(focus.json.output.childFocus).toEqual([]);
+    expect(JSON.stringify(focus.json)).not.toContain(scope.process.id);
+  });
+
+  it("refuses the caregiver board to a guardian and the guardian board to a caregiver", async () => {
+    const scope = await seedScope();
+    for (const [actorId, capabilityKey] of [
+      [scope.guardian.id, "query_caregiver_teacher_board"],
+      [scope.caregiver.id, "query_guardian_family_board"],
+    ] as const) {
+      const refused = await post(HARNESS_QUERY_PATH, {
+        workspace_id: scope.workspaceId,
+        actor_participant_id: actorId,
+        surface: "board",
+        capability_key: capabilityKey,
+        capability_version: "1.0.0",
+      });
+      expect(refused.status, capabilityKey).toBe(200);
+      expect(refused.json, capabilityKey).toMatchObject({ status: "denied" });
+    }
+  });
+
+  it("commits an inline focus update through prepare and execute", async () => {
+    const scope = await seedScope();
+    const goal = await seedFocus(scope);
+    // Only an owner-issued, actor-bound ref selects the goal; a raw FocusGoal
+    // id never resolves.
+    const targetOptionRef = issueBoardTargetRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: scope.guardian.id },
+      FOCUS_GOAL_TARGET_KIND,
+      goal.id,
+    );
+    const result = await prepareAndExecute({
+      scope,
+      actorId: scope.guardian.id,
+      surface: "board",
+      capabilityKey: "update_guardian_current_focus",
+      targetOptionRef,
+      operationInput: { label: "earlier bedtime", priority: 1 },
+    });
+    expect(result.prepared.json.status).toBe("ready_to_confirm");
+    expect(result.executed?.json.status).toBe("committed");
+
+    // The write landed on the focus owner row, not on any board-shaped row.
+    const stored = await prisma.nurtureFocusGoal.findUniqueOrThrow({ where: { id: goal.id } });
+    expect(stored.goalKey).toBe("earlier bedtime");
+    expect(stored.priority).toBe(1);
+    expect(stored.aggregateVersion).toBe(goal.aggregateVersion + 1);
+
+    // And the committed result is the immutable audit row.
+    const execution = await prisma.nurtureCommandExecution.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, commandKey: "update_guardian_current_focus" },
+    });
+    expect(execution.businessOutcome).toBe("applied");
+  });
+
+  it("commits a daily care record and refuses a caregiver of another class", async () => {
+    const scope = await seedScope();
+    const targetOptionRef = issueBoardTargetRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+      CHILD_CARE_PROCESS_TARGET_KIND,
+      scope.process.id,
+    );
+    const committed = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "record_caregiver_daily_care",
+      targetOptionRef,
+      operationInput: { kind: "meal", summary: "ate well" },
+    });
+    expect(committed.executed?.json.status).toBe("committed");
+    const logs = await prisma.nurtureDailyCareLog.findMany({
+      where: { workspaceId: scope.workspaceId, childCareProcessId: scope.process.id },
+    });
+    expect(logs).toHaveLength(1);
+    expect(logs[0]?.mealPayload).toEqual({ kind: "meal", summary: "ate well" });
+
+    // The guardian holds no caregiver role, so the same target does not resolve.
+    const refused = await prepareAction({
+      scope,
+      actorId: scope.guardian.id,
+      surface: "board",
+      capabilityKey: "record_caregiver_daily_care",
+      targetOptionRef,
+      operationInput: { kind: "meal", summary: "ate well" },
+    });
+    expect(refused.json).toMatchObject({ status: "denied" });
   });
 });

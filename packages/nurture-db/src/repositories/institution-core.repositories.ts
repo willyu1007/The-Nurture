@@ -20,6 +20,7 @@ import type {
   NurtureInteractionContextTransactionPort,
   NurtureWorkflowProject,
 } from "@the-nurture/scenario/harness";
+import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -116,10 +117,16 @@ const toInteraction = (row: PrismaInteractionContext): NurtureInteractionContext
 class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
+  /**
+   * The G3-A inline board mutations write their own fact owners inside this
+   * same command transaction, so the board never becomes a second writer.
+   */
+  readonly boardMutations: PrismaBoardMutationTransaction;
 
   constructor(private readonly transaction: Prisma.TransactionClient) {
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
+    this.boardMutations = new PrismaBoardMutationTransaction(transaction);
   }
 
   async findCommitted(input: {

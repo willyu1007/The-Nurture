@@ -69,7 +69,6 @@ const expectedUnroutedCapabilityKeys = [
   "detach_publish_process_media",
   "discard_media_asset",
   "organize_care_capture_batch",
-  "record_caregiver_daily_care",
   "redact_publication",
   "reject_child_media_attribution",
   "release_publish_edit_hold",
@@ -79,7 +78,6 @@ const expectedUnroutedCapabilityKeys = [
   "reschedule_publish_process",
   "save_publish_process_draft",
   "supersede_child_media_attribution",
-  "update_guardian_current_focus",
 ];
 const expectedOwnerRequiredFields = [
   "workspace_id",
@@ -213,12 +211,6 @@ assertArrayEqual(
   expectedHarnessExecuteRequiredFields,
   "OpenAPI harness execute required fields",
 );
-assertArrayEqual(
-  openApi.components?.schemas?.HarnessPrepareRequest?.properties?.capability_key?.enum ?? [],
-  expectedHarnessActionKeys,
-  "OpenAPI Harness action key set",
-);
-
 const harnessTransportSource = read(
   "apps/scenario-service/src/harness-http.ts",
 );
@@ -340,15 +332,29 @@ assertArrayEqual(
   [...expectedUnroutedCapabilityKeys].sort(),
   "registered capabilities that are deliberately not routed yet",
 );
-assertArrayEqual(
-  [...routedActionVersions.keys()].sort(),
-  [...expectedHarnessActionKeys].sort(),
-  "T-005 action keys still routed",
-);
+// Containment, not equality: the T-005 eight must never leave the ingress, but
+// the action lane is expected to grow as T-006 write keys land.
+for (const actionKey of expectedHarnessActionKeys) {
+  assertTruthy(routedActionVersions.has(actionKey), `T-005 action key still routed: ${actionKey}`);
+}
 assertArrayEqual(
   openApi.components?.schemas?.HarnessQueryRequest?.properties?.capability_key?.enum ?? [],
   [...routedQueryVersions.keys()],
   "OpenAPI query key set matches the routed query lane",
+);
+
+// The published action key set is exactly the routed one, in the same order the
+// transport declares it: a published enum that drifted from the routed map
+// would tell callers a key is admitted when it is not, or hide one that is.
+assertArrayEqual(
+  openApi.components?.schemas?.HarnessPrepareRequest?.properties?.capability_key?.enum ?? [],
+  [...routedActionVersions.keys()],
+  "OpenAPI Harness action key set matches the routed action lane",
+);
+assertArrayEqual(
+  openApi.components?.schemas?.HarnessExecuteRequest?.properties?.capability_key?.enum ?? [],
+  [...routedActionVersions.keys()],
+  "OpenAPI Harness execute key set matches the routed action lane",
 );
 
 const apiIndex = JSON.parse(read("docs/context/api/api-index.json"));

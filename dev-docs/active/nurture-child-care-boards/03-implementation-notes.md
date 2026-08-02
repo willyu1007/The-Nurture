@@ -1070,3 +1070,46 @@ key 才准入**——在 transport 放行一个引擎接不住的 key,就是冻�
 顺带修掉一处既有的 fall-through:原来 query 分发把"不是前两个 key"的一切都当作
 `query_family_care_item` 处理。加进新 key 之后,那会让一个 board query 走进 item
 detail 分支返回无关结果。现在每个 key 各自显式匹配。
+
+## 2026-08-02 — G3-E prerequisite B4-2:两个可路由的写 key,以及剩下 16 个的真实阻塞
+
+**先解决了一个设计问题**:12 个 T-006 写 capability 的 `confirmationPolicy` 是
+`direct_commit`,看上去像"不需要 prepare"。但冻结的 `ExecuteActionInvocationV1`
+**required 里就有 `confirmationRef`**,而且整个 envelope 没有 `typedInput`。所以
+`direct_commit` 描述的是**确认的 UX 强度**(不需要额外的用户确认步骤、没有强门),
+不是"跳过 prepare"。全部 18 个写 key 都走 prepare → execute,与 T-005 同形,合同
+一个字都不用改。
+
+**本单元路由了两个**:`update_guardian_current_focus` 与
+`record_caregiver_daily_care`。它们是 18 个里唯二已经具备完整写链路的——
+prepare 函数、`NurtureCommandSpec`、以及 owner 侧事务都在 G3-A 与 B2-1 里落过。
+顺带把 `PrismaBoardMutationTransaction` 接进 `PrismaNurtureCommandTransaction` 的
+`boardMutations`——此前它虽然实现了却没有被命令事务持有,spec 的
+`checkPreconditions` 会直接返回 `board_mutation_port_unavailable`。
+
+DB e2e 走真实 ingress + 真实 PostgreSQL:焦点更新落在 focus goal 的 owner 行上
+(`aggregateVersion` +1),并留下 `businessOutcome=applied` 的不可变审计行;日常
+照护记录落在 owner 的 per-kind 列;同一个 target ref 换成没有 caregiver 角色的
+Guardian 就不再解析。board query 侧也在同一条 ingress 上验了:envelope 绑定的是
+从制品 pin 读出的合同身份,家庭焦点不会变成 child focus,响应里不含任何原始 id。
+
+守卫相应放宽了一处**过紧**的断言:T-005 的 8 个 action key 原来是与已路由集合
+**相等**,那样任何新写 key 都无法路由。改为**包含**——那 8 个永远不许离开
+ingress,但 action lane 预期会随 T-006 增长。同时把 OpenAPI 的两个 action enum 与
+query enum 都绑到已路由映射上:公布的 enum 与实际准入漂移,等于对调用方说谎。
+
+### 剩下 16 个写 key 的真实阻塞
+
+它们**不是**"只差路由"。这 16 个 domain 函数(edit hold、draft、cancel、
+attribution、publication safety、release/reschedule)都是**纯决策函数**——返回
+decision,不写任何东西。要经 execute 提交,每个都还缺两层:
+
+1. **owner 侧写事务**。B2 建的是读端口,写只有两条:board mutation 与 per-target
+   release。没有"获取 edit hold""保存草稿""确认归属""redact publication"的
+   owner 写。
+2. **`NurtureCommandSpec`**。execute 通过 `NurtureCommandRunner` 提交并留下
+   `CommandExecution`;这 16 个没有 spec,也就没有可提交的命令。
+
+在 transport 放行一个引擎接不住的 key,就是冻结件禁止的占位,所以它们仍在守卫的
+显式"未路由"清单里(现在 16 个)。这层缺口在原始复核里被算进了 B2/B4,实际上是
+独立的一段工作,已记入 07 作为 B8。

@@ -146,15 +146,42 @@ G3-E should not discover that boundary while wiring the ingress.
 > that are deliberately not routed yet, so coverage cannot shrink silently.
 > Both directions of the census were falsified before acceptance.
 >
-> The eighteen write keys remain unrouted; admitting a key the engine cannot
-> serve would be the placeholder the freeze forbids, so they land with their
-> dispatch in the next unit.
+> Two write keys followed — `update_guardian_current_focus` and
+> `record_caregiver_daily_care` — with a DB-backed e2e that commits on the fact
+> owner through the real ingress. `direct_commit` was confirmed to describe the
+> confirmation strength, not a skipped prepare: the frozen
+> `ExecuteActionInvocationV1` requires `confirmationRef` and carries no typed
+> input, so every write key goes prepare → execute.
+>
+> The remaining sixteen write keys are blocked on B8 below, not on routing.
 
 `assert-formal-ingress-contract.mjs` pins `expectedHarnessActionKeys` to the
 eight T-005 action keys, and `harness-http.ts` enumerates three query keys, all
 T-005. The generic query/prepare/execute routes exist, but no T-006 key is
 admitted. G3-E's requirement to run "through the formal NestJS ingress" cannot
 be met until the 24 keys are routed and the ingress guard's census is extended.
+
+### B8 — Sixteen write capabilities have no command or owner write (internal)
+
+Discovered while routing B4-2, and not visible when this review was written.
+The publish-process, media-attribution and publication-safety capabilities were
+delivered as **pure decision functions**: they compute a verdict and return it.
+Committing one through the formal ingress needs two layers neither B2 nor B4
+built:
+
+1. **An owner write transaction.** B2 delivered read ports plus exactly two
+   write paths — the inline board mutations and the per-target release. There is
+   no owner write behind acquiring an edit hold, saving a draft, cancelling a
+   process, confirming or superseding an attribution, correcting, removing or
+   redacting a publication, detaching or discarding media, or rescheduling.
+2. **A `NurtureCommandSpec`.** `execute` commits through `NurtureCommandRunner`
+   and leaves an immutable `CommandExecution`. Only the two board mutations and
+   the T-005 set have specs.
+
+Until both exist per capability, the keys stay off the ingress: admitting a key
+the engine cannot serve is the placeholder the freeze forbids. They are carried
+in `assert-formal-ingress-contract.mjs` as an explicit unrouted list of sixteen,
+so the gap cannot go quiet.
 
 ### B5 — The T-005 direct-interaction consumer action is missing (internal)
 
@@ -192,7 +219,10 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
 3. ~~**Capture-lane port** — declare it alongside the repositories so every lane
    has one boundary shape. Unblocks B3.~~ **Done 2026-08-02.**
 4. **Ingress routing** — admit the 24 T-006 keys, extend the ingress census, keep
-   every gate default-off. Unblocks B4.
+   every gate default-off. Unblocks B4. **Partially done 2026-08-02:** the six
+   queries and two board writes are routed; the other sixteen wait on step 4b.
+4b. **Write commands and owner writes** for the sixteen decision-only
+   capabilities. Unblocks B8, then the rest of B4.
 5. **T-005 consumer action** — owner-issued `initiate_caregiver_direct_message`
    action ref from current eligibility, with the safe blocked projection kept
    for the unavailable case. Unblocks B5 and half of B7.

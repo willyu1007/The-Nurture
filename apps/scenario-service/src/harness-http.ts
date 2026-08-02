@@ -31,6 +31,8 @@ export const HARNESS_CAPABILITY_VERSIONS = {
   withdraw_family_care_request: "1.0.0",
   redact_family_care_message: "1.0.0",
   policy_redact_family_care_message: "1.0.0",
+  update_guardian_current_focus: "1.0.0",
+  record_caregiver_daily_care: "1.0.0",
 } as const;
 
 export const HARNESS_QUERY_CAPABILITY_VERSIONS = {
@@ -317,7 +319,10 @@ export type HarnessQueryResponseV1 =
 export type HarnessPrepareResponseV1 =
   | {
       status: "ready_to_confirm";
-      preview: Record<string, string>;
+      // A preview is a safe display projection of the prepared command. Some
+      // fields are genuinely numeric (a focus priority); stringifying them here
+      // would make the transport reformat domain output.
+      preview: Record<string, string | number>;
       confirmation_ref: string;
       expires_at: string;
       command_request_id: string;

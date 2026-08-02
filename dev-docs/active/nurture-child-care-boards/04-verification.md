@@ -585,3 +585,23 @@
 | `pnpm typecheck` / `test:unit` / `test:db` | PASS — 506 and 170 tests |
 | `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `persistence-boundaries` / `port-topology` / `test-routing` | PASS — artifact unchanged at `1.13.0` |
 | governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisite B4-2 (Board Write Keys on the Formal Ingress)
+
+| Command / check | Result |
+| --- | --- |
+| design question: does `direct_commit` skip prepare? | RESOLVED — the frozen `ExecuteActionInvocationV1` requires `confirmationRef` and carries no typed input, so every write key goes prepare → execute |
+| `update_guardian_current_focus` and `record_caregiver_daily_care` routed | PASS |
+| found: `PrismaBoardMutationTransaction` was never held by the command transaction | FIXED — wired as `boardMutations`; the spec would otherwise refuse with `board_mutation_port_unavailable` |
+| guard assertion was too tight: T-005 action keys pinned by equality | FIXED — containment, so the action lane can grow |
+| OpenAPI action and query enums bound to the routed maps | PASS — a published enum that drifted would misinform callers |
+| new DB e2e: focus update commits on the owner row through the real ingress | PASS — `aggregateVersion` +1, `businessOutcome=applied` audit row |
+| new DB e2e: daily care commits into the owner's per-kind column | PASS |
+| new DB e2e: same target ref offered to a participant with no caregiver role | PASS — denied at prepare |
+| new DB e2e: guardian board and focus module over the query route | PASS — contract from the artifact pin, no raw id in the response |
+| new DB e2e: caregiver board to a guardian, guardian board to a caregiver | PASS — denied |
+| `pnpm verify:formal-ingress-contract` | PASS — `harness-actions=10 harness-queries=9 unrouted=16` |
+| `pnpm test:scenario-service` / `test:scenario-service:db` | PASS — 52 and 26 tests |
+| `pnpm typecheck` / `test:unit` / `test:db` | PASS — 506 and 170 tests |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `persistence-boundaries` / `port-topology` / `test-routing` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |
