@@ -6,10 +6,10 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-02
-- Next step: G3-A 与 G3-B1 均已完成，surface artifact additive 旋转至
-  `nurture.surface-contract@1.10.0` /
-  `sha256:40fb7446de386d30cb0418a545128e7b6d15748efcfda6ef4df1944555e62ef4`；
-  下一步进入 G3-C1 manual content/media safety path。
+- Next step: G3-A、G3-B1 与 G3-C1 均已完成，surface artifact additive 旋转至
+  `nurture.surface-contract@1.11.0` /
+  `sha256:7da487390ae4278347e64959ae4795b856eeee38a92d3230e4e209a7fc403f8e`；
+  下一步进入 G3-D publish and release loop。
 
 ## Goal
 
@@ -71,6 +71,12 @@ posture、autosave 与 edit hold，以及 `query_teacher_publish_queue`。
 确定性主路径不含任何生成式 provider；G3-B2 AI copy 保持 absent。
 `teacher_publish_queue` 模块已就位，caregiver board 的 dependency NO-GO 改为
 真实缺席的 `t007_publication_policy`，policy 解析后即转为 `ready`。
+
+2026-08-02 G3-C1 已交付：Nurture 版本化 `ContentSafetyPolicy`（硬规则先于
+classifier，园区只能收紧，老师只能抬 tier，provider 失效不落回 ordinary）、
+media asset 与 child attribution 两条独立封闭轴、一次性 legacy 迁移的 fail-closed
+映射、三个手工归属能力，以及实时派生的发布资格与群像 exposure 门禁。
+G3-C2 `ClassScopedFaceMatch` 保持 default-off 且能力身份完全未注册。
 
 ## Scope In
 

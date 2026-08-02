@@ -44,6 +44,7 @@
     "record_caregiver_daily_care",
     "organize_care_capture_batch",
     "save_publish_process_draft",
-    "cancel_publish_process"
+    "cancel_publish_process",
+    "confirm_child_media_attribution"
   ]
 }

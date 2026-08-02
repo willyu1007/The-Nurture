@@ -32,6 +32,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.confirm-child-media-attribution-input@1",
+      "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
+      "jsonPointer": "/$defs/confirmInput"
+    },
+    {
+      "schemaRef": "schema:nurture.confirm-child-media-attribution-result@1",
+      "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
+      "jsonPointer": "/$defs/attributionResult"
+    },
+    {
       "schemaRef": "schema:nurture.correct-family-care-message-input@1",
       "artifactPath": "capabilities/contracts/correct-family-care-message.schema.json",
       "jsonPointer": "/$defs/input"
@@ -187,6 +197,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.reject-child-media-attribution-input@1",
+      "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
+      "jsonPointer": "/$defs/rejectInput"
+    },
+    {
+      "schemaRef": "schema:nurture.reject-child-media-attribution-result@1",
+      "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
+      "jsonPointer": "/$defs/attributionResult"
+    },
+    {
       "schemaRef": "schema:nurture.release-publish-edit-hold-input@1",
       "artifactPath": "capabilities/contracts/publish-edit-hold.schema.json",
       "jsonPointer": "/$defs/releaseInput"
@@ -235,6 +255,16 @@
       "schemaRef": "schema:nurture.submit-family-care-question-result@1",
       "artifactPath": "capabilities/contracts/submit-family-care-question.schema.json",
       "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.supersede-child-media-attribution-input@1",
+      "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
+      "jsonPointer": "/$defs/supersedeInput"
+    },
+    {
+      "schemaRef": "schema:nurture.supersede-child-media-attribution-result@1",
+      "artifactPath": "capabilities/contracts/child-media-attribution.schema.json",
+      "jsonPointer": "/$defs/attributionResult"
     },
     {
       "schemaRef": "schema:nurture.surface-contract-artifact-pin@1",

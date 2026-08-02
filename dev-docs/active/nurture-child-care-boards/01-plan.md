@@ -269,6 +269,35 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
   consent/PIPIA/retention/withdrawal/processor contract/正式隐私评审未齐时禁用 matcher
   并回退人工归属。
 
+### G3-C1 result — PASS (2026-08-02)
+
+- surface artifact additive 旋转为 `nurture.surface-contract@1.11.0` /
+  `sha256:7da487390ae4278347e64959ae4795b856eeee38a92d3230e4e209a7fc403f8e`;
+  shared core 与全部既有 slice 哈希不变。
+- 新增并实现 3 个 `1.0.0` key:`confirm_child_media_attribution`、
+  `reject_child_media_attribution`、`supersede_child_media_attribution`。
+- G3-C2 `ClassScopedFaceMatch` 保持 default-off 且**完全未注册**;
+  `verify:g3-0-freeze` 新增一条普查禁止任何含 `face_match`/`biometric` 的能力身份。
+  人工归属主路径在没有 matcher 时完整可用。
+- 冻结件的 adoption set 未为 media detach / global discard 预留能力身份。
+  两者的领域规则已实现并测试,但没有注册未被保留的 key;需要 G3-D 或一次
+  freeze 增补补上。
+
+#### G3-C1 acceptance-to-check mapping
+
+| Acceptance ID | Requirement | Mechanical check |
+| --- | --- | --- |
+| `T006-AC-031` | Nurture 版本化 `ContentSafetyPolicy` 是最终 route owner,硬规则先于 classifier | `content-safety-policy.test.ts` 硬规则与分层用例 |
+| `T006-AC-032` | 园区只能收紧、老师只能抬 tier,任何一层都不能下调 | `content-safety-policy.test.ts` overlay/teacher 用例 + `phase-3-media-safety.test.ts` |
+| `T006-AC-033` | provider 不可用/malformed/低置信/冲突不默认 ordinary | `content-safety-policy.test.ts` classifier 状态矩阵 |
+| `T006-AC-034` | 安全审计不含正文、图片或 chain-of-thought | `content-safety-policy.test.ts` 序列化负向断言 |
+| `T006-AC-035` | media asset 与 child attribution 是两条独立封闭轴,published 不污染任一 | `media-attribution.test.ts` 状态与转换矩阵 |
+| `T006-AC-036` | 已确认归属只能 supersede,历史追加而非覆写 | `media-attribution.test.ts` reject/supersede 用例 |
+| `T006-AC-037` | legacy `hidden/deleted/corrected` 行无证据时卡住迁移门禁,不被猜成新状态 | `media-attribution.test.ts` legacy 映射用例 |
+| `T006-AC-038` | 归属决策只接受 owner 签发的 media/child sealed ref | `media-attribution.test.ts` ref 负向用例 |
+| `T006-AC-039` | 发布资格实时派生;群像任一清晰可见孩子未确认或 exposure 不允许即 needs_review,只提供四条解法且不做视觉变体 | `publish-eligibility.test.ts` + `phase-3-media-safety.test.ts` |
+| `T006-AC-040` | 产品"删除"按阶段映射:detach 只影响当前草稿,global discard 仅限零 committed release | `publish-eligibility.test.ts` detach/discard 用例 |
+
 ## G3-D — Publish and Release Loop
 
 - 以 `PublishProcess` 管理一个 caregiver 可见、共享编辑的 family-publication
@@ -408,8 +437,9 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - [x] G3-B1 Capture-to-Draft deterministic main path 通过（`T006-AC-021`～
   `T006-AC-030` 全部映射检查通过）；G3-B2 optional AI copy 保持 absent，
   确定性主路径无 provider 也完整可用。
-- [ ] G3-C1 manual content/media safety path 通过；G3-C2 face match 按 beta profile
-  明确 required 或 optional/default-off。
+- [x] G3-C1 manual content/media safety path 通过（`T006-AC-031`～`T006-AC-040`
+  全部映射检查通过）；G3-C2 face match 明确 optional/default-off，能力身份完全
+  未注册，人工归属主路径不依赖它。
 - [ ] G3-D Publish and Release Loop 通过。
 - [ ] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
   PostgreSQL 完成完整黑盒与负向资格验证。

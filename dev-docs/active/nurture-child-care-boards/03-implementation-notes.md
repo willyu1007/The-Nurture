@@ -584,3 +584,53 @@
   execution class 并显式排除 query,断言意图不变但覆盖了发布过程能力。
 - 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
   Candidate、部署或流量。
+
+## 2026-08-02 — G3-C1 manual content and media safety path
+
+- 新增 `content-safety-policy.ts`：Nurture 拥有的版本化 `ContentSafetyPolicy`。
+  确定性硬规则先跑,institution overlay、classifier 与老师三层都只能经由 `raise`
+  参与,类型上不存在任何下调分支。D-15 的六类 direct-interaction 与四类
+  review 灰区落成稳定 marker key。
+- classifier 不拥有 route:`null` 表示根本没有 classifier(确定性路径合法地保持
+  ordinary);出现但 `unavailable`/`malformed`/`low_confidence`/低于置信下限,
+  表示"该到的意见没到",按可纠正不确定性抬到 `review_required`,绝不落回 ordinary。
+- 老师可以抬 tier;`isTeacherCorrectable` 明确区分"灰区可改文案后重判"与
+  "命中硬规则不可下调"。审计只留 policy/rule/provider/model/prompt revision、
+  marker 与 source head,序列化结果里没有 body 与任何 chain-of-thought(有负向断言)。
+- 新增 `media-attribution.ts`：media asset 与 child attribution 两条独立轴。
+  `preparing/ready/unavailable/discarded/redacted` 与
+  `candidate/confirmed/rejected/superseded` 各自封闭,`published` 不出现在任何一条上。
+  confirmed 只能被 supersede,不能被 reject —— 否则会抹掉已确认历史。
+- 一次性 legacy 迁移映射按冻结件 fail closed:`active` 无歧义;
+  `hidden`/`deleted` 必须带 release 证据才映射到 `redacted`/`discarded`,
+  否则 `ambiguous` 卡住迁移门禁而不是猜。attribution 的 `corrected` 必须有
+  supersession link,`hidden`/`deleted` 必须有显式 `resolved_as` + evidence。
+- 三个手工能力 `confirm/reject/supersede_child_media_attribution` 全部只接受
+  owner 签发的 sealed ref:media asset 与 child 各一个,raw id 与他人 ref 都解析
+  不出来。supersede 追加两条记录(原条 superseded + 新条 confirmed),纠正结果
+  一律记为 `manual`,不继承被纠正的 `automatic_face_match` 来源。
+- 新增 `publish-eligibility.ts`：发布资格永远派生,类型里没有可持久化的
+  `publishable`。群像门禁按 D-12 实现——任一清晰可见孩子未知或未确认、或目标
+  audience 的 exposure policy 不允许,就进 `needs_review`,并且只提供四条解法:
+  纠正归属、整图移出候选、移除目标、拆分 process。不 crop、不 blur、不生成变体,
+  发布始终绑定 exact original revision(有序列化负向断言)。
+- 逐目标派生:一个家庭因 Grant 失效被挡住不会取消其他合法目标,
+  `targets[]` 各自带 blocking reasons。
+- 产品"删除"按阶段拆开:`evaluateMediaDetach` 只影响当前 draft 的组合;
+  `evaluateMediaDiscard` 只在零 committed release 时合法,并返回受影响草稿数。
+  发布后的 target removal / redaction 属于 G3-D。
+- **冻结件缺口**:G3-C1 的 adoption set 只保留了三个 attribution key,
+  没有为 media detach / global discard 预留能力身份。两者的领域规则已实现并测试,
+  但没有注册未被冻结件保留的 key。需要在 G3-D 或一次 freeze 增补里补上这两个身份。
+- surface artifact additive 旋转到 `nurture.surface-contract@1.11.0` /
+  `sha256:7da487390ae4278347e64959ae4795b856eeee38a92d3230e4e209a7fc403f8e`;
+  `sharedCoreHash` 与全部既有 slice 哈希仍逐字节不变。
+- attribution 三件套用 `care_interaction` domainClass:它是 media owner 持有的
+  照护事实,被发布资格消费,但不是 publish process 状态。与 G3-B1 的六个
+  `publish_process` transition 保持区分。
+- `verify:g3-0-freeze` 新增一条 C2 负向普查:capability registry 里不得存在任何
+  含 `face_match` / `biometric` 的能力身份。conformance 侧
+  `phase-3-media-safety.test.ts` 另外断言 manifest 里没有
+  `ClassScopedFaceMatch` / `face_reference` / `embedding` 字样。
+- 本步骤仍未修改 Prisma schema、migration、environment、capability activation、
+  Candidate、部署或流量。media/attribution 的 DB delta 与 owner repository 一起落。

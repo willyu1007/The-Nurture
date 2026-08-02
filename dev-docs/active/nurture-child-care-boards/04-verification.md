@@ -322,3 +322,32 @@
 | photo-only end-to-end fixture | PASS — draft created with no body at all |
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
 | governance lint + `ctl-context verify --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |
+
+## 2026-08-02 — G3-C1 (Manual Content and Media Safety Path)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm build:surface-contract` / `verify:surface-contract` | PASS — `nurture.surface-contract@1.11.0` / `sha256:7da48739…`, capabilities=28 |
+| additive-rotation census | PASS — `sharedCoreHash` and every pre-existing slice hash byte-identical |
+| `pnpm verify:surface-conformance` | PASS — cases=14 slices=43/43, 74 contract tests |
+| `pnpm verify:g3-0-freeze` | PASS — 7 G3-A + 7 G3-B1 + 3 G3-C1 keys at `1.0.0`, 5 later keys absent, `c2-matcher=absent` |
+| `pnpm verify:g2-exit-contract` | PASS — T-005 slices still preserved at `1.11.0` |
+| `pnpm test:unit` | PASS — 45 files / 438 tests |
+| `pnpm typecheck` / `verify:test-routing` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — files=80 unit=45, routes=7 unchanged |
+| negative: institution overlay or a clean classifier attempting to lower a hard-rule hit | PASS — route stays `direct_interaction_required` |
+| negative: classifier `unavailable` / `malformed` / `low_confidence` / below the confidence floor | PASS — raised to `review_required`, never ordinary |
+| deterministic-only evaluation with no classifier configured | PASS — neutral content stays `ordinary` |
+| negative: safety audit inspected for body, chain-of-thought or prompt text | PASS — revisions, markers and source heads only |
+| negative: rejecting a confirmed attribution | PASS — `illegal_attribution_transition`; correction goes through supersession |
+| negative: supersede onto an already-confirmed child, or onto the same child | PASS — `target_child_already_confirmed` / `supersession_requires_distinct_child` |
+| negative: legacy `hidden`/`deleted` media and attribution rows without evidence | PASS — `ambiguous`, migration gate fails closed instead of guessing |
+| negative: raw media id, another actor's media ref, raw child id, ineligible child | PASS — `target_unavailable` / `child_not_eligible` |
+| negative: attribution on a discarded or redacted asset | PASS — `media_not_attributable` |
+| negative: group photo with an unknown or candidate-only clearly visible child | PASS — `needs_review` with exactly the four allowed remedies |
+| negative: every child confirmed but the audience exposure policy disallows one | PASS — `exposure_not_allowed`, still `needs_review` |
+| negative: eligibility result inspected for crop/blur/variant/thumbnail | PASS — one ref per exact original revision only |
+| negative: one target blocked by Grant while another is eligible | PASS — per-target results, the eligible target is not cancelled |
+| negative: global media discard after any committed release | PASS — `already_released`; detach on a released process is `process_not_editable` |
+| negative: any capability identity containing `face_match` or `biometric` | PASS — absent from the registry and the manifest |
+| `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS — 7/7 files |
+| governance lint + `ctl-context verify --strict` | PASS — after `ctl-context touch` for the rotated workflow contract doc |

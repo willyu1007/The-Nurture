@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/child-media-attribution.schema.json",
+  "title": "ChildMediaAttributionV1",
+  "$defs": {
+    "confirmInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "childRef"
+      ],
+      "properties": {
+        "childRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "rejectInput": {
+      "$ref": "#/$defs/confirmInput"
+    },
+    "supersedeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromChildRef",
+        "toChildRef"
+      ],
+      "properties": {
+        "fromChildRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "toChildRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        }
+      }
+    },
+    "attributionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mediaRef",
+        "mediaRevision",
+        "records"
+      ],
+      "properties": {
+        "mediaRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "mediaRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "records": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/attributionRecord"
+          }
+        }
+      }
+    },
+    "attributionRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attributionRef",
+        "childRef",
+        "status",
+        "revision",
+        "source",
+        "decidedAt"
+      ],
+      "properties": {
+        "attributionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "childRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "status": {
+          "enum": [
+            "candidate",
+            "confirmed",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source": {
+          "enum": [
+            "manual",
+            "organizer_candidate",
+            "automatic_face_match"
+          ]
+        },
+        "decidedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

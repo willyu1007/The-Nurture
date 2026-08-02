@@ -185,6 +185,19 @@
         "runner": "vitest",
         "target": "packages/nurture-scenario/tests/surface-contract/phase-3-capture-to-draft.test.ts"
       }
+    },
+    {
+      "caseKey": "manual-content-and-media-safety-path",
+      "kind": "deterministic_fixtures",
+      "covers": [
+        "capability:confirm_child_media_attribution",
+        "capability:reject_child_media_attribution",
+        "capability:supersede_child_media_attribution"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-media-safety.test.ts"
+      }
     }
   ]
 }

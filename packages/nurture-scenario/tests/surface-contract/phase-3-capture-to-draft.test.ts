@@ -142,9 +142,6 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
   it("leaves every capability a later G3 checkpoint owns unregistered", () => {
     for (const key of [
       "reschedule_publish_process",
-      "confirm_child_media_attribution",
-      "reject_child_media_attribution",
-      "supersede_child_media_attribution",
       "release_publish_process",
       "correct_publication",
       "remove_publication_target_visibility",

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.10.0"
+    "version": "1.11.0"
   },
   "capabilities": [
     {
@@ -1918,6 +1918,216 @@
       "handlerBinding": {
         "bindingKey": "cancel_publish_process",
         "bindingKind": "publish_process"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "confirm_child_media_attribution",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "care_interaction",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "confirm_child_media_attribution"
+      ],
+      "inputSchemaRef": "schema:nurture.confirm-child-media-attribution-input@1",
+      "resultSchemaRef": "schema:nurture.confirm-child-media-attribution-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "child_media_attribution",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "media_asset_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "confirm_child_media_attribution_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "confirm_child_media_attribution",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "reject_child_media_attribution",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "care_interaction",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "reject_child_media_attribution"
+      ],
+      "inputSchemaRef": "schema:nurture.reject-child-media-attribution-input@1",
+      "resultSchemaRef": "schema:nurture.reject-child-media-attribution-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "child_media_attribution",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "media_asset_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "reject_child_media_attribution_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "reject_child_media_attribution",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "caregiver_teacher_board",
+          "presenterKey": "present_caregiver_teacher_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "capability",
+        "surface",
+        "target",
+        "care_group"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "caregiver",
+        "lead_caregiver"
+      ]
+    },
+    {
+      "capabilityKey": "supersede_child_media_attribution",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "care_interaction",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "supersede_child_media_attribution"
+      ],
+      "inputSchemaRef": "schema:nurture.supersede-child-media-attribution-input@1",
+      "resultSchemaRef": "schema:nurture.supersede-child-media-attribution-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "child_media_attribution",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "media_asset_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "care_group_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_care_group_role",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "supersede_child_media_attribution_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "supersede_child_media_attribution",
+        "bindingKind": "action"
       },
       "presenterBindings": [
         {

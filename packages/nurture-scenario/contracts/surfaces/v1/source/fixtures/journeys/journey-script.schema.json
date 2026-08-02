@@ -151,7 +151,10 @@
         "acquire_publish_edit_hold",
         "renew_publish_edit_hold",
         "release_publish_edit_hold",
-        "cancel_publish_process"
+        "cancel_publish_process",
+        "confirm_child_media_attribution",
+        "reject_child_media_attribution",
+        "supersede_child_media_attribution"
       ]
     },
     "queryCapabilityKey": {

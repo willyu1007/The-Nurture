@@ -239,12 +239,14 @@ const adoptedInG3B1 = [
   "release_publish_edit_hold",
   "cancel_publish_process",
 ];
-const stillUnimplementedCapabilities = [
-  // Needs a T-007-resolved schedule window before it can validate anything.
-  "reschedule_publish_process",
+const adoptedInG3C1 = [
   "confirm_child_media_attribution",
   "reject_child_media_attribution",
   "supersede_child_media_attribution",
+];
+const stillUnimplementedCapabilities = [
+  // Needs a T-007-resolved schedule window before it can validate anything.
+  "reschedule_publish_process",
   "release_publish_process",
   "correct_publication",
   "remove_publication_target_visibility",
@@ -268,6 +270,21 @@ for (const capabilityKey of adoptedInG3B1) {
     registeredVersions.get(capabilityKey),
     "1.0.0",
     `G3-B1 adopted capability ${capabilityKey}`,
+  );
+}
+for (const capabilityKey of adoptedInG3C1) {
+  assertEqual(
+    registeredVersions.get(capabilityKey),
+    "1.0.0",
+    `G3-C1 adopted capability ${capabilityKey}`,
+  );
+}
+// G3-C2 stays default-off: no biometric capability identity may exist at all.
+for (const capability of capabilityRegistry.capabilities) {
+  assertEqual(
+    /face_match|biometric/.test(capability.capabilityKey),
+    false,
+    `G3-C2 matcher capability absent (${capability.capabilityKey})`,
   );
 }
 for (const capabilityKey of stillUnimplementedCapabilities) {
@@ -335,6 +352,7 @@ process.stdout.write(
   `[ok] G3-0 freeze facts=${requiredFactTables.length} surfaces=2 ` +
     `input=${frozenInputInterface.version} current=${artifactPin.interfaceContract.version} ` +
     `g3a-adopted=${adoptedInG3A.length} g3b1-adopted=${adoptedInG3B1.length} ` +
+    `g3c1-adopted=${adoptedInG3C1.length} c2-matcher=absent ` +
     "t005=exact t007=contract-frozen schema_delta=frozen " +
     "caregiver_workflow_denied=true placeholders=absent stage_gates=explicit\n",
 );

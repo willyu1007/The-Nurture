@@ -33,6 +33,12 @@
       "requiredGate": "contract_boundary"
     },
     {
+      "key": "media_attribution_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "owner_integration"
+    },
+    {
       "key": "publish_process_repository",
       "version": "1.0.0",
       "owner": "nurture",
@@ -78,6 +84,20 @@
         },
         {
           "key": "publish_process_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "confirm_child_media_attribution_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "media_attribution_repository",
           "version": "1.0.0"
         }
       ]
@@ -293,6 +313,20 @@
       ]
     },
     {
+      "key": "reject_child_media_attribution_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "media_attribution_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
       "key": "release_publish_edit_hold_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [
@@ -358,6 +392,20 @@
         },
         {
           "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "supersede_child_media_attribution_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "media_attribution_repository",
           "version": "1.0.0"
         }
       ]

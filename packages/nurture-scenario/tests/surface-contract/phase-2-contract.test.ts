@@ -32,6 +32,7 @@ const expectedCapabilityVersions: Record<string, string> = {
   acknowledge_family_care_item: "1.0.0",
   acquire_publish_edit_hold: "1.0.0",
   cancel_publish_process: "1.0.0",
+  confirm_child_media_attribution: "1.0.0",
   correct_family_care_message: "1.0.0",
   initiate_caregiver_direct_message: "1.0.0",
   organize_care_capture_batch: "1.0.0",
@@ -47,11 +48,13 @@ const expectedCapabilityVersions: Record<string, string> = {
   query_teacher_publish_queue: "1.0.0",
   record_caregiver_daily_care: "1.0.0",
   redact_family_care_message: "1.0.0",
+  reject_child_media_attribution: "1.0.0",
   release_publish_edit_hold: "1.0.0",
   renew_publish_edit_hold: "1.0.0",
   reply_family_care_item: "1.0.0",
   save_publish_process_draft: "1.0.0",
   submit_family_care_question: "1.0.0",
+  supersede_child_media_attribution: "1.0.0",
   update_guardian_current_focus: "1.0.0",
   withdraw_family_care_request: "1.0.0",
 };
@@ -74,10 +77,10 @@ const manifest = loadSurfaceContractManifest(
 );
 
 describe("Phase 2 exact surface contract", () => {
-  it("loads one exact, closed manifest with twenty-five capabilities and six surfaces", () => {
+  it("loads one exact, closed manifest with twenty-eight capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.10.0",
+      version: "1.11.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({

@@ -160,6 +160,19 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-02 — 冻结的 adoption set 漏了两个必需的能力身份
+
+- **Symptom**：G3-C 的计划文本要求"从单张卡片 detach、未发布 asset 全局
+  discarded",但 06 冻结件的 Capability Adoption Set 里 G3-C1 只保留了三个
+  attribution key,没有为这两个动作预留身份。
+- **Root cause**：adoption set 是按"能力"枚举的,而 detach/discard 在设计文本里
+  是以"产品删除的三个阶段"描述的,枚举时被归进了 media lifecycle 而没有单独成键。
+- **Fix**：实现并测试两者的领域规则(`evaluateMediaDetach` /
+  `evaluateMediaDiscard`),但**不**注册未被冻结件保留的 key,并把缺口显式记进
+  实现说明与 checkpoint 结论,留给 G3-D 或一次 freeze 增补。
+- **Prevention**：冻结 adoption set 时按"用户能触发的动作"过一遍设计文本,
+  而不是按事实模型过。发现缺口时宁可显式记账,也不要顺手发明一个未冻结的身份。
+
 ### 2026-08-02 — owner-issued target ref 会把内部标识符原样带出去
 
 - **Symptom**：`publish target` 的公开 ref 里出现了 `child-1`。测试
