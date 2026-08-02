@@ -16,6 +16,10 @@ export * from "./repositories/submit-eligibility.read.js";
 export * from "./repositories/caregiver-direct-message-eligibility.read.js";
 export * from "./repositories/family-care-harness-query.read.js";
 export * from "./repositories/institution-business-communication.read.js";
+export * from "./repositories/board-read-support.js";
+export * from "./repositories/guardian-board.read.js";
+export * from "./repositories/caregiver-board.read.js";
+export * from "./repositories/board-mutation.transaction.js";
 
 // Re-export Prisma-generated model TYPES as the data layer's domain entities,
 // so host consumers depend on @the-nurture/db (not @prisma/client) and the

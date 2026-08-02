@@ -69,7 +69,26 @@ fully-bound delivered Receipt (grant, enrollment, data class, target scope,
 `delivered_at`). Both the accepted and the refused shape are now pinned by a DB
 test.
 
-### B2 — No owner repository implements any T-006 port (internal)
+### B2 — No owner repository implements any T-006 port (internal) — PARTIAL 2026-08-02
+
+> The G3-A lane is landed: `PrismaGuardianBoardReadPort`,
+> `PrismaCaregiverBoardReadPort`, `PrismaGuardianFocusEligibilityReadPort`,
+> `PrismaCaregiverDailyCareEligibilityReadPort` and
+> `PrismaBoardMutationTransaction`, covered by
+> `packages/nurture-db/tests/g3a-board-owner.integration.test.ts`. The nine
+> remaining ports (publish queue, edit hold, draft, cancel, content safety,
+> media attribution, media lifecycle, release, post-release safety) are still
+> unimplemented, and `commitTargetRelease` — the atomic per-target write — is
+> among them.
+>
+> One limitation surfaced while landing the Guardian lane and is not a defect in
+> the implementation: `NurtureFamily` is one-to-one with
+> `NurtureChildCareProcess`, so a guardian of two children reaches two families,
+> while the G3-A board contract carries exactly one family scope. The repository
+> binds to the earliest-created family and never mixes enrollments across
+> families. A multi-child guardian therefore sees one child's board with no way
+> to select the other. Closing this needs a contract-level family selector, so
+> it belongs to G3-E scope rather than to B2.
 
 Fourteen declared ports have zero implementations in `packages/nurture-db`:
 

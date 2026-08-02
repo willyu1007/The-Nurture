@@ -443,3 +443,27 @@
 | `pnpm verify:surface-conformance` / `verify:g2-exit-contract` / `verify:formal-ingress-contract` / `verify:persistence-boundaries` / `verify:port-topology` | PASS — artifact unchanged at `1.13.0` / `sha256:1919a289…` |
 | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-child-care-boards --strict --check-anchors` | PASS |
 | governance lint + `ctl-context verify --strict` | PASS |
+
+## 2026-08-02 — G3-E Prerequisite B2-1 (G3-A Owner Repositories)
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm typecheck` | PASS — five ports implemented against the frozen interfaces |
+| `pnpm test:db` | PASS — 15 files / 116 tests |
+| guardian scope binds one family and only that family's enrollments | PASS |
+| negative: outsider, caregiver, and a guardian role outside its own validity window | PASS — `authorized: false`, empty scope |
+| child focus only from an explicit `NurtureFocusGoalChildScope` row | PASS — a goal whose payload names a child stays family focus |
+| grant drift head moves on revoke while the source head does not | PASS — authorization alone invalidates an open page |
+| redaction head moves when a released fact is withdrawn | PASS |
+| enrollment activity drops a release once its visibility is not `visible` | PASS |
+| negative: Enrollment of another family | PASS — `authorized: false` |
+| caregiver lane refuses an institution-scoped assignment and a sibling class | PASS |
+| owner attention priority mapped, not passed through | PASS — `time_sensitive` → `urgent` |
+| absent institution policy reads as unresolved | PASS — never a default window |
+| focus goal write lands on the owner row; stale expected version refused | PASS — `updateMany` matches zero rows, first write preserved |
+| negative: guardian of another family in the same workspace | PASS — `guardian_authority_current: false` |
+| daily care lands in the owner's per-kind column; unknown kind refused | PASS — no empty log row written |
+| found: `ck_nurture_grant_scope` requires `revoked_at` + `revoked_by_participant_id` | RECORDED — pinned by the revoke test |
+| `pnpm test:unit` / `verify:test-routing` | PASS — 504 tests, files=87 production-db=15 |
+| `verify:surface-conformance` / `g2-exit-contract` / `g3-0-freeze` / `formal-ingress-contract` / `persistence-boundaries` / `port-topology` | PASS — artifact unchanged at `1.13.0` |
+| governance lint + `lint-docs --strict --check-anchors` + `ctl-context verify --strict` | PASS |

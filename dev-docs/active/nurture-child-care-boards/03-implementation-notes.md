@@ -816,3 +816,48 @@ DB 覆盖为新增的 `g3-publish-process-schema.integration.test.ts`,断言的�
 同样管辖新的 `publication_release` source type —— 一条 delivered 的发布 Receipt
 必须带齐 grant/enrollment/data class/target scope/delivered_at,少一项即被拒。
 B2 的 `commitTargetRelease` 必须按这个形状写 Receipt,测试里已同时留下正反两例。
+
+## 2026-08-02 — G3-E prerequisite B2-1: G3-A owner repositories
+
+复核清单第二项(十四个端口零实现)的第一段:G3-A lane 的五个端口落地在
+`packages/nurture-db/src/repositories/`。
+
+- `board-read-support.ts` —— 共享的 owner 侧读支撑。核心是 **census**:
+  `(行数, 最新 updatedAt)`。任何插入/更新/软删都会让二者之一移动,所以由它算出的
+  head 恰好在底层集合变化时失效,而不需要把行本身读出来。另有
+  `activeRoleWindow`:role assignment 只在 `status=active` **且**处于自身
+  `startsAt/endsAt` 窗口内才算权限——只看 status 列会把已到期的角色当成现行授权。
+- `guardian-board.read.ts` —— Guardian scope/current focus/enrollment activity。
+  child focus 只由显式的 `NurtureFocusGoalChildScope` 行产生,`goalPayload` 里
+  提到某个孩子不会被提升为 child scope(DB 测试用一个带 child 提示的 payload
+  正面证伪)。enrollment activity 只列出 `visibility=visible` 的 per-target
+  release;daily care 的 `release_id` 用的是让它到达家庭的路由事实,而不是伪造
+  一个 publication。
+- `caregiver-board.read.ts` —— 只有 **CareGroup 作用域**的 caregiver 角色能读到
+  看板;institution 作用域不被放宽,兄弟班也不行。owner 的 attention 优先级
+  (`normal/attention/time_sensitive`)与看板的(`routine/attention/urgent`)是两套
+  词汇,用 `satisfies` 约束的显式映射表转换——新增 owner 值会编译失败,而不是
+  静默显示成最不紧急的一档。`publication_policy_resolved` 只在 institution
+  确实固化了 T-007 policy ref 时为真,缺失即未解析,不存在默认窗口。
+- `board-mutation.transaction.ts` —— 两个 prepare 期 eligibility 读端口,加上
+  canonical-owner 写事务。写的是 owner 行本身:focus goal 的 update 把
+  `expected_focus_goal_version` 放进 **filter**,并发写只会匹配到零行而抛错,
+  不会静默胜出;daily care 按 kind 选择 owner 的对应 payload 列,未知 kind 直接
+  拒绝而不是落一条所有列都空的日志。
+
+drift head 的口径:`grant_head` 与 `source_head` 是分开的,DB 测试证明撤销一个
+Grant 会移动 grant head 而 source head 保持不变——即"仅凭授权变化就能让打开的
+分页失效",不需要借助无关的源变化。
+
+**一处已知限制**:`NurtureFamily` 与 `NurtureChildCareProcess` 是一对一,所以
+有两个孩子的 Guardian 会 reach 到两个 family,而 G3-A 的看板契约只有一个 family
+scope。实现绑定到创建时间最早的那个 family,并且**只**取该 family 的 enrollment
+(混合会把一个 family 的标签盖在另一个 family 的活动上)。这条已记入 07 复核。
+
+## 2026-08-02 — B1 落地时暴露的既有约束交互
+
+`ck_nurture_grant_scope` 要求撤销 Grant 时同时写 `revoked_at` 与
+`revoked_by_participant_id`;`ck_nurture_receipt_route_lifecycle` 要求 delivered
+Receipt 带齐 grant/enrollment/data class/target scope/`delivered_at`。两条都不是
+T-006 新增的,但 T-006 的 release 与 drift 路径都要穿过它们,已在 DB 测试里各留
+一条正例。
