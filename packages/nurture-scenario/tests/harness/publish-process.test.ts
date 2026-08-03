@@ -18,6 +18,12 @@ import {
   admitToPendingRelease,
   type ResolvedPublishScheduleV1,
 } from "../../src/harness/publish-schedule.js";
+import {
+  INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY,
+  type CaregiverDirectMessageEligibilityReadPort,
+  type CaregiverDirectMessageTarget,
+} from "../../src/harness/caregiver-direct-message.js";
+import { issueTargetOptionRef, resolveTargetOptionRef } from "../../src/harness/keyed-refs.js";
 import { BOARD_INTEGRITY_KEY, caregiverAuthority } from "./board-fixtures.js";
 
 const scope = { workspace_id: "ws-1", participant_id: "caregiver-1" };
@@ -42,6 +48,49 @@ const safetyPort = (
     return value;
   },
 });
+
+const eligibilityTarget = (
+  overrides: Partial<CaregiverDirectMessageTarget> = {},
+): CaregiverDirectMessageTarget => ({
+  enrollment_id: "enrollment-1",
+  grant_id: "grant-1",
+  display_label: "小明的家庭",
+  enrollment_version: 1,
+  care_group_version: 1,
+  caregiver_role_version: 1,
+  grant_version: 1,
+  thread_version: 1,
+  ...overrides,
+});
+
+type EligibilityValue =
+  | {
+      participant_active: boolean;
+      target_set_complete: boolean;
+      targets: CaregiverDirectMessageTarget[];
+    }
+  | "throw";
+
+// The resolver swallows port failures by design (fail-closed to
+// dependency_no_go), so a throwing port cannot detect an out-of-route call —
+// only counting can.
+const eligibilityPort = (
+  value: EligibilityValue = {
+    participant_active: true,
+    target_set_complete: true,
+    targets: [eligibilityTarget()],
+  },
+): CaregiverDirectMessageEligibilityReadPort & { calls: () => number } => {
+  let calls = 0;
+  return {
+    calls: () => calls,
+    resolveCaregiverDirectMessageEligibility: async () => {
+      calls += 1;
+      if (value === "throw") throw new Error("eligibility owner unavailable");
+      return value;
+    },
+  };
+};
 
 const evidence: OrganizeTriggerEvidenceV1 = {
   trigger: "manual",
@@ -110,9 +159,15 @@ const candidateInput = (
 const create = (
   input = candidateInput(),
   safety: ContentSafetyAssessmentV1 | null | "throw" = assessment(),
+  eligibility?: EligibilityValue,
 ) =>
   createPublishCandidate(
-    { integrity_key: BOARD_INTEGRITY_KEY, safety: safetyPort(safety), now },
+    {
+      integrity_key: BOARD_INTEGRITY_KEY,
+      safety: safetyPort(safety),
+      direct_message_eligibility: eligibilityPort(eligibility),
+      now,
+    },
     scope,
     input,
   );
@@ -248,6 +303,126 @@ describe("G3-B1 publication candidate creation", () => {
     expect(decision).not.toHaveProperty("process");
     expect(decision.internalSourceRefs).toHaveLength(2);
     expect(JSON.stringify(decision)).not.toContain("户外活动");
+  });
+
+  describe("D-15 T-005 consumer action", () => {
+    const restricted = assessment({
+      route: "direct_interaction_required",
+      riskCodes: ["health_symptom"],
+    });
+    const direct = async (eligibility?: EligibilityValue) => {
+      const decision = await create(candidateInput(), restricted, eligibility);
+      expect(decision.status).toBe("direct_interaction_required");
+      if (decision.status !== "direct_interaction_required") throw new Error("route changed");
+      return decision;
+    };
+
+    it("issues the exact capability ref and a T-005-resolvable target option", async () => {
+      const decision = await direct();
+      expect(decision.action.status).toBe("available");
+      if (decision.action.status !== "available") return;
+      expect(decision.action.capability_key).toBe(
+        INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY.key,
+      );
+      expect(decision.action.capability_version).toBe(
+        INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY.version,
+      );
+      expect(decision.action.target_options).toEqual([
+        {
+          target_option_ref: issueTargetOptionRef(BOARD_INTEGRITY_KEY, {
+            workspace_id: scope.workspace_id,
+            participant_id: scope.participant_id,
+            enrollment_id: "enrollment-1",
+          }),
+          display_label: "小明的家庭",
+        },
+      ]);
+      // Cross-boundary proof: the option T-006 issues is the option T-005
+      // prepare resolves, for exactly the concerned enrollment.
+      expect(
+        resolveTargetOptionRef(
+          BOARD_INTEGRITY_KEY,
+          scope,
+          decision.action.target_options[0]!.target_option_ref,
+          ["enrollment-1", "enrollment-2"],
+        ),
+      ).toBe("enrollment-1");
+      // The action context carries the ref and label only — no raw Enrollment,
+      // Grant or Family identifier and no restricted body.
+      const wire = JSON.stringify(decision.action);
+      for (const leaked of ["enrollment-1", "grant-1", "family-1", "户外活动"]) {
+        expect(wire).not.toContain(leaked);
+      }
+    });
+
+    it("does not manufacture an option from eligibility the content does not concern", async () => {
+      // The caregiver can direct-message enrollment-9's family, but the
+      // restricted content concerns enrollment-1 only: nothing may be minted.
+      const decision = await direct({
+        participant_active: true,
+        target_set_complete: true,
+        targets: [eligibilityTarget({ enrollment_id: "enrollment-9", grant_id: "grant-9" })],
+      });
+      expect(decision.action).toEqual({
+        status: "unavailable",
+        reason_code: "target_unavailable",
+      });
+    });
+
+    it("blocks safely on inactive participant, empty or incomplete target sets", async () => {
+      const cases: Array<[EligibilityValue, string]> = [
+        [
+          { participant_active: false, target_set_complete: true, targets: [] },
+          "not_authorized",
+        ],
+        [
+          { participant_active: true, target_set_complete: true, targets: [] },
+          "not_authorized",
+        ],
+        [
+          {
+            participant_active: true,
+            target_set_complete: false,
+            targets: [eligibilityTarget()],
+          },
+          "target_unavailable",
+        ],
+      ];
+      for (const [eligibility, reason] of cases) {
+        const decision = await direct(eligibility);
+        expect(decision.action).toEqual({ status: "unavailable", reason_code: reason });
+      }
+    });
+
+    it("never consults T-005 eligibility off the restricted route", async () => {
+      // The read belongs to the direct-interaction branch alone. A throwing
+      // port cannot prove that (the resolver swallows failures on purpose),
+      // so the port counts its invocations instead.
+      const port = eligibilityPort();
+      const decision = await createPublishCandidate(
+        {
+          integrity_key: BOARD_INTEGRITY_KEY,
+          safety: safetyPort(assessment()),
+          direct_message_eligibility: port,
+          now,
+        },
+        scope,
+        candidateInput(),
+      );
+      expect(decision.status).toBe("draft_created");
+      expect(port.calls()).toBe(0);
+    });
+
+    it("fails closed to dependency_no_go when the eligibility owner throws", async () => {
+      const decision = await direct("throw");
+      expect(decision.action).toEqual({
+        status: "unavailable",
+        reason_code: "dependency_no_go",
+      });
+      // The route decision itself still stands: restricted content stays out
+      // of batch publication even when the action cannot be offered.
+      expect(decision.internalSourceRefs).toHaveLength(2);
+    });
   });
 
   it("fails closed when the safety route is missing or the provider throws", async () => {

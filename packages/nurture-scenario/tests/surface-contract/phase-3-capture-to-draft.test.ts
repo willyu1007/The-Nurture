@@ -78,6 +78,16 @@ const safety = (route: "ordinary" | "review_required" | "direct_interaction_requ
     }),
   }) satisfies ContentSafetyRoutePort;
 
+// The deterministic main path is ordinary-route only, so this dependency is a
+// filler. Throwing catches only a direct port call — the resolver swallows
+// failures by design — so the real route-isolation guard is the invocation
+// count in publish-process.test.ts.
+const eligibilityNeverConsulted = {
+  resolveCaregiverDirectMessageEligibility: async () => {
+    throw new Error("ordinary route must not consult T-005 eligibility");
+  },
+};
+
 describe("Phase 3 capture-to-draft deterministic main path", () => {
   it("registers every G3-B1 action as a publish-process transition for class teachers", () => {
     for (const key of B1_ACTIONS) {
@@ -273,6 +283,7 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
       {
         integrity_key: BOARD_INTEGRITY_KEY,
         safety: safety("ordinary"),
+        direct_message_eligibility: eligibilityNeverConsulted,
         now: () => new Date("2026-08-01T09:05:00.000Z"),
       },
       scope,
@@ -324,7 +335,11 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
     expect(assembled.content.body).toBeUndefined();
 
     const candidate = await createPublishCandidate(
-      { integrity_key: BOARD_INTEGRITY_KEY, safety: safety("ordinary") },
+      {
+        integrity_key: BOARD_INTEGRITY_KEY,
+        safety: safety("ordinary"),
+        direct_message_eligibility: eligibilityNeverConsulted,
+      },
       scope,
       {
         care_group_id: "care-group-1",

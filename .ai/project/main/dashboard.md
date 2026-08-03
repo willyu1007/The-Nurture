@@ -112,10 +112,12 @@ Project: `main`
   Overall audit is PASS. G3-0 froze the contract/fact/schema set and G3-A～G3-D
   are delivered, so remaining work is the G3-E preparatory checkpoint. Its serial
   foundation unit — a shared write-spec factory and a per-capability dispatch
-  table — is landed together with the first write capability; what follows is
-  three genuinely disjoint owner-aggregate lanes; the first of them (edit) is
-  landed, leaving organize, attribution and post-release safety, then the rest of
-  the ingress routing.
+  table — is landed, and the routable write set is complete: edit, attribution,
+  media lifecycle and post-release safety lanes are all in (23 actions + 9
+  queries on formal ingress; the three unrouted keys are structural blocks). The
+  T-005 direct-interaction consumer action is landed from current eligibility.
+  What remains is the release multi-command ingress shape, the organize contract
+  decisions, and the external joint runs (T-007 provider, T-005 G2-C).
 - Stage G4: T-007 uses G4-0 rolling contract/fact freeze, G4-A authority/aggregate,
   G4-B role-bound mobile, G4-C Admin Workbench Core, G4-D Enrollment Journey,
   G4-E Knowledge/RAG and G4-F qualification/handoff. The publication-policy subset

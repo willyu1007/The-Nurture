@@ -8,6 +8,11 @@ import {
 } from "./board-projection.js";
 import type { CaptureWatermarkV1, OrganizeTriggerEvidenceV1 } from "./care-capture-batch.js";
 import type { AssembledDraftContentV1 } from "./content-assembler.js";
+import {
+  INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY,
+  type CaregiverDirectMessageEligibilityReadPort,
+} from "./caregiver-direct-message.js";
+import { issueTargetOptionRef } from "./keyed-refs.js";
 
 /**
  * G3-B1 `PublishProcess` — the caregiver-side content work unit
@@ -198,13 +203,14 @@ export type CreatePublishCandidateDecisionV1 =
   | {
       /**
        * Restricted content keeps its internal source and never becomes a batch
-       * publication candidate. T-006 emits no action of its own here: the class
-       * teacher enters T-005 through an owner-issued route, and no
-       * `CareInteraction` is created on their behalf.
+       * publication candidate. T-006 emits no capability of its own here: the
+       * class teacher enters T-005 through the owner-issued action below, and
+       * no `CareInteraction` is created on their behalf.
        */
       status: "direct_interaction_required";
       assessment: ContentSafetyAssessmentV1;
       internalSourceRefs: string[];
+      action: DirectInteractionActionV1;
     }
   | { status: "skipped"; reason: "empty_assembly" }
   | { status: "denied"; reason_code: string };
@@ -212,8 +218,34 @@ export type CreatePublishCandidateDecisionV1 =
 export type PublishProcessDependencies = {
   integrity_key: string;
   safety: ContentSafetyRoutePort;
+  /**
+   * T-005 current-eligibility read, consulted only on the
+   * `direct_interaction_required` route. Required, not optional: an absent
+   * port would make the T-005 action permanently "unavailable", the exact
+   * safe-unavailable placeholder the G3-E Exit Gate refuses to sign.
+   */
+  direct_message_eligibility: CaregiverDirectMessageEligibilityReadPort;
   now?: () => Date;
 };
+
+/**
+ * The T-006 side of the D-15 restricted-content route: the exact T-005
+ * capability ref plus owner-issued target options, and nothing else — no
+ * restricted body copy, no pre-created `CareInteraction`, no raw
+ * Enrollment/Grant identifiers. Reason codes come from the frozen T-005
+ * safe-blocked taxonomy.
+ */
+export type DirectInteractionActionV1 =
+  | {
+      status: "available";
+      capability_key: typeof INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY.key;
+      capability_version: typeof INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY.version;
+      target_options: Array<{ target_option_ref: string; display_label: string }>;
+    }
+  | {
+      status: "unavailable";
+      reason_code: "not_authorized" | "target_unavailable" | "dependency_no_go";
+    };
 
 const targetWritable = (authority: CaregiverFactAuthorityV1): boolean =>
   CAREGIVER_BOARD_ROLES.includes(authority.role) &&
@@ -242,6 +274,68 @@ export const computePublishContentDigest = (
       "utf8",
     )
     .digest("hex");
+
+/**
+ * Derives the D-15 T-005 action from current owner facts and nothing else.
+ *
+ * The action exists only when `initiate_caregiver_direct_message` would accept
+ * this caregiver right now for a family the restricted content concerns: the
+ * eligibility read runs at this instant, and options are minted only for
+ * enrollments in both the candidate target set and the eligibility set — a
+ * role name, a mounted module or a cached positive result mints nothing. Every
+ * failure is a frozen-taxonomy safe block, and a provider failure never
+ * resolves to available.
+ */
+const resolveDirectInteractionAction = async (
+  deps: PublishProcessDependencies,
+  scope: BoardScopeV1,
+  targets: PublishTargetCandidateV1[],
+): Promise<DirectInteractionActionV1> => {
+  let eligibility: Awaited<
+    ReturnType<CaregiverDirectMessageEligibilityReadPort["resolveCaregiverDirectMessageEligibility"]>
+  >;
+  try {
+    eligibility = await deps.direct_message_eligibility.resolveCaregiverDirectMessageEligibility({
+      workspace_id: scope.workspace_id,
+      participant_id: scope.participant_id,
+    });
+  } catch {
+    return { status: "unavailable", reason_code: "dependency_no_go" };
+  }
+  if (!eligibility.participant_active || eligibility.targets.length === 0) {
+    return { status: "unavailable", reason_code: "not_authorized" };
+  }
+  if (!eligibility.target_set_complete) {
+    return { status: "unavailable", reason_code: "target_unavailable" };
+  }
+  const eligibleByEnrollment = new Map(
+    eligibility.targets.map((entry) => [entry.enrollment_id, entry]),
+  );
+  const concernedEnrollmentIds = [...new Set(targets.map((target) => target.enrollment_id))];
+  const options = concernedEnrollmentIds.flatMap((enrollmentId) => {
+    const eligible = eligibleByEnrollment.get(enrollmentId);
+    if (!eligible) return [];
+    return [
+      {
+        target_option_ref: issueTargetOptionRef(deps.integrity_key, {
+          workspace_id: scope.workspace_id,
+          participant_id: scope.participant_id,
+          enrollment_id: enrollmentId,
+        }),
+        display_label: eligible.display_label,
+      },
+    ];
+  });
+  if (options.length === 0) {
+    return { status: "unavailable", reason_code: "target_unavailable" };
+  }
+  return {
+    status: "available",
+    capability_key: INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY.key,
+    capability_version: INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY.version,
+    target_options: options,
+  };
+};
 
 /**
  * Turns one organized cut into at most one family-publication candidate.
@@ -291,6 +385,7 @@ export const createPublishCandidate = async (
       status: "direct_interaction_required",
       assessment,
       internalSourceRefs: input.content.sourceRefs,
+      action: await resolveDirectInteractionAction(deps, scope, input.targets),
     };
   }
 

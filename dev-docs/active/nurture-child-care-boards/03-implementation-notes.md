@@ -1746,3 +1746,37 @@ remove 的 stored-answer 分支第一轮证伪 MISSED——单测只钉了 redac
 两个方向(存储事件作答 + 无证据拒绝)后再证伪,CAUGHT。四条全部 CAUGHT:finalize
 未映射(谱系行静默缺失)、correction 正文再次丢弃、发明 kind/时刻、单调 FROM 守卫
 删除。
+
+## 2026-08-04 — B5:D-15 受限内容路由的 T-005 消费侧动作
+
+`createPublishCandidate` 的 `direct_interaction_required` 决定新增 `action` 字段——
+就绪评审 B5 所指的"可用的那一半"。此前只有安全阻断的一半(路由 + 内部源引用,
+无任何动作);Exit Gate 明确拒绝在 safe-unavailable 占位上签字的交接。
+
+### 动作只从现时 owner 事实铸造
+
+- **依赖必填**:`PublishProcessDependencies` 新增
+  `direct_message_eligibility`(T-005 既有 `CaregiverDirectMessageEligibilityReadPort`,
+  即 G2-C prepare 用的同一个端口)。设为可选会让动作永久 unavailable——正是被
+  拒绝的占位形态。
+- **交集铸造**:选项只为「候选目标集 ∩ 现时资格集」里的 enrollment 铸造,用
+  T-005 同一把 `issueTargetOptionRef`(workspace、actor、enrollment 三绑定)。角色名、
+  模块挂载、缓存的正面结果都铸不出任何东西。跨界测试把 T-006 发出的 ref 喂进
+  T-005 的 `resolveTargetOptionRef`,解析回的正是 concerned enrollment。
+- **动作上下文只有 capability ref + option ref + 展示标签**:JSON 断言原始
+  Enrollment/Grant/Family id 与受限正文都不出现。capability ref 复用
+  `INITIATE_CAREGIVER_DIRECT_MESSAGE_CAPABILITY` 常量(`@1.0.0` 精确)。
+- **安全阻断走冻结分类**:`not_authorized`(参与者非活跃/零目标)、
+  `target_unavailable`(目标集不完整/交集为空)、`dependency_no_go`(资格 owner
+  抛错,fail closed)。路由决定本身不受影响——动作不可用时受限内容照旧不进
+  批量发布。
+- **资格读取只属于受限分支**:ordinary 路径零调用。
+
+### 证伪:throwing port 探测不到被吞掉的越界调用
+
+四条证伪三条一次命中(交集守卫、fail-closed 原因码、actor 绑定),第四条
+MISSED:把资格读取挪到路由判定之前,25 个测试仍绿——resolver 按设计吞掉端口
+异常转 `dependency_no_go`,所以「被调用即抛」的 fixture 根本探测不到经由
+resolver 的调用。改成**计数端口**(`calls() === 0` 断言)后再证伪,CAUGHT。
+"证伪验收覆盖"的第三次应验,且这次教训更具体:**守卫技术要匹配泄漏通道——
+异常会被沿途的 catch 吞掉,计数不会**。

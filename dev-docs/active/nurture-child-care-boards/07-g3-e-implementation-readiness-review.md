@@ -324,9 +324,12 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
    queries and two board writes are routed; the other sixteen wait on step 4b.
 4b. **Write commands and owner writes** for the sixteen decision-only
    capabilities. Unblocks B8, then the rest of B4.
-5. **T-005 consumer action** — owner-issued `initiate_caregiver_direct_message`
+5. ~~**T-005 consumer action** — owner-issued `initiate_caregiver_direct_message`
    action ref from current eligibility, with the safe blocked projection kept
-   for the unavailable case. Unblocks B5 and half of B7.
+   for the unavailable case. Unblocks B5 and half of B7.~~ **Done 2026-08-04:**
+   the `direct_interaction_required` decision carries the exact capability ref
+   plus `targetOptionRef`s minted from current eligibility intersected with the
+   concerned target set; blocked cases use the frozen T-005 reason taxonomy.
 6. **Joint runs** — T-007 provider-backed schedule/release, then the T-005 G2-C
    joint journey. Closes B6 and B7.
 
