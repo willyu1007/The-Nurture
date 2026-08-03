@@ -63,8 +63,6 @@ const expectedHarnessActionKeys = [
  */
 const expectedUnroutedCapabilityKeys = [
   "correct_publication",
-  "detach_publish_process_media",
-  "discard_media_asset",
   "organize_care_capture_batch",
   "redact_publication",
   "release_publish_process",

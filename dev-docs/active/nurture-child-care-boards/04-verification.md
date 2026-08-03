@@ -902,3 +902,18 @@ amendment plus artifact rotation, not a code-only change.
 | execute-side childRef binding: resubmitted child ≠ prepared child → `invalid_operation_input` | PASS |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `:db` | PASS — 549, 198, 52, 36 |
 | full DB-free gate set + `ctl-context verify --strict` | PASS — artifact unchanged at `1.14.0`, actions 15 → 18 |
+
+## 2026-08-04 — B8 Media Lifecycle Pair (Detach / Discard)
+
+| Command / check | Result |
+| --- | --- |
+| both capabilities routed on the Unit 0 factory; unrouted census 8 → 6, actions 18 → 20 | LANDED |
+| detach appends a revision minus one entry, everything else carried forward; asset row untouched | PASS — owner test pins lineage, digest, provenance and the surviving history |
+| falsified: detach rewrites the current revision instead of appending | CAUGHT |
+| discard CAS on the media revision + terminal states in the WHERE + in-transaction release-window recheck | LANDED |
+| falsified: release window ignored inside the write | CAUGHT |
+| falsified: media-revision CAS removed — first round MISSED (no covering test), covered ("original replaced to rev 2, confirmation frozen at rev 1 must conflict"), re-falsified | CAUGHT |
+| blast radius measured inside the write transaction; preview and commit report the same number | PASS — e2e pins `affected_draft_count` 0 after the detach removed the only citing draft |
+| e2e: detach → discard → terminal refusal; committed release freezes the window; no raw ids on the wire | PASS |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 549, 203, 38 |
+| full DB-free gate set + `ctl-context verify --strict` (after `db:context` touch) | PASS — artifact unchanged at `1.14.0` |

@@ -81,6 +81,8 @@ export type NurturePublishDraftFacts = NurturePublishEditHoldFacts & {
   /** `0` while the process has no saved revision at all. */
   current_revision: number;
   known_source_refs: string[];
+  /** The current revision's media composition, in stored order. */
+  composition: Array<{ media_asset_id: string; media_revision: number }>;
   /** Set when this exact command identity already produced a revision. */
   replayed_revision?: { revision: number; content_digest: string; saved_at: string };
 };
@@ -158,5 +160,26 @@ export type NurturePublishProcessTransaction = {
     publish_process_ref: DomainContextRef;
     revision: number;
     saved_at: string;
+  }>;
+
+  /**
+   * Detach one media reference: appends a new revision whose composition no
+   * longer carries the asset. Everything else — title, body, sources, the
+   * assembler lineage — is carried forward unchanged; the asset itself, other
+   * drafts and anything published are untouched.
+   */
+  applyPublishProcessMediaDetach(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+    command_request_id: string;
+    expected_draft_revision: number;
+    media_asset_id: string;
+  }): Promise<{
+    publish_process_ref: DomainContextRef;
+    revision: number;
+    remaining_media_count: number;
+    /** The composed revision of the entry that was removed, for the display ref. */
+    detached_media_revision: number;
   }>;
 };

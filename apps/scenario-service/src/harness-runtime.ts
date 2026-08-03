@@ -37,6 +37,12 @@ import {
   prepareWithdrawFamilyCareRequest,
   preparePublishProcessCancel,
   prepareConfirmChildMediaAttribution,
+  prepareDetachPublishProcessMedia,
+  prepareDiscardMediaAsset,
+  createDetachPublishProcessMediaSpec,
+  createDiscardMediaAssetSpec,
+  parseDetachMediaInputV1,
+  issueMediaAssetTargetRef,
   prepareRejectChildMediaAttribution,
   prepareSupersedeChildMediaAttribution,
   createConfirmChildMediaAttributionSpec,
@@ -88,6 +94,7 @@ import {
   PrismaGuardianBoardReadPort,
   PrismaGuardianFocusEligibilityReadPort,
   PrismaMediaSafetyReadPort,
+  PrismaPublicationReleasePort,
   PrismaPublishLaneReadPort,
   PrismaInteractionContextRepository,
   PrismaInstitutionBusinessCommunicationReadPort,
@@ -285,6 +292,46 @@ export function createHarnessEngine(input: {
   const supersedeAttributionSpec = createSupersedeChildMediaAttributionSpec({
     integrity_key: input.integrityKey,
   });
+  const publicationReleaseReads = new PrismaPublicationReleasePort(input.prisma);
+  const mediaLifecycleDeps = {
+    // Two owner read surfaces, one dependency: the media lifecycle facts come
+    // from the media-safety port, the safety-addressable process set from the
+    // release port. Explicit delegation, not a merged class.
+    reads: {
+      listMediaLifecycleAssetIds: mediaAttributionReads.listMediaLifecycleAssetIds.bind(
+        mediaAttributionReads,
+      ),
+      loadMediaLifecycleFacts: mediaAttributionReads.loadMediaLifecycleFacts.bind(
+        mediaAttributionReads,
+      ),
+      listSafetyProcessKeys: publicationReleaseReads.listSafetyProcessKeys.bind(
+        publicationReleaseReads,
+      ),
+    },
+    contexts,
+    integrity_key: input.integrityKey,
+  };
+  const detachMediaSpec = createDetachPublishProcessMediaSpec({
+    integrity_key: input.integrityKey,
+  });
+  const discardMediaSpec = createDiscardMediaAssetSpec({
+    integrity_key: input.integrityKey,
+  });
+
+  /** Binds one resubmitted media ref to the id the confirmation froze. */
+  const boundMediaAssetId = (
+    built: BuildInput,
+    resubmittedRef: unknown,
+    frozenAssetId: string | undefined,
+  ): string | null => {
+    if (typeof resubmittedRef !== "string" || !frozenAssetId) return null;
+    const expected = issueMediaAssetTargetRef(
+      input.integrityKey,
+      { workspace_id: built.workspace_id, participant_id: built.actor_participant_id },
+      frozenAssetId,
+    );
+    return expected === resubmittedRef ? frozenAssetId : null;
+  };
 
   /**
    * Binds one resubmitted child ref to the id the confirmation froze. The
@@ -802,6 +849,47 @@ export function createHarnessEngine(input: {
             expected_media_revision: expectedMedia,
           },
           spec: supersedeAttributionSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    detach_publish_process_media: {
+      prepare: optionalTarget((request) =>
+        prepareDetachPublishProcessMedia(mediaLifecycleDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseDetachMediaInputV1(built.operation_input);
+        const processKey = built.target_refs.publish_process;
+        const mediaAssetId =
+          parsed.status === "ok"
+            ? boundMediaAssetId(built, parsed.mediaRef, built.target_refs.media_asset)
+            : null;
+        const expectedRevision = built.expected_heads.draft_revision;
+        if (!processKey || !mediaAssetId || expectedRevision === undefined) return null;
+        return {
+          payload: {
+            process_key: processKey,
+            media_asset_id: mediaAssetId,
+            expected_draft_revision: expectedRevision,
+          },
+          spec: detachMediaSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    discard_media_asset: {
+      prepare: optionalTarget((request) => prepareDiscardMediaAsset(mediaLifecycleDeps, request)),
+      build: (built) => {
+        const mediaAssetId = built.target_refs.media_asset;
+        const expectedRevision = built.expected_heads.media_asset_revision;
+        if (
+          !mediaAssetId ||
+          expectedRevision === undefined ||
+          !isEmptyOperationInput(built.operation_input)
+        ) {
+          return null;
+        }
+        return {
+          payload: { media_asset_id: mediaAssetId, expected_media_revision: expectedRevision },
+          spec: discardMediaSpec as NurtureCommandSpec<never>,
         };
       },
     },

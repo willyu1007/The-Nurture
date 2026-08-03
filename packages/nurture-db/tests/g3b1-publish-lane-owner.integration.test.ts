@@ -1212,3 +1212,103 @@ describe("T-006 owner write: the edit lane", () => {
     ).toBe(2);
   });
 });
+
+describe("T-006 owner write: media detach", () => {
+  it("appends a revision minus the one entry, carrying everything else forward", async () => {
+    const { world, process, revision } = await (async () => {
+      const world = await seedGroup();
+      const seeded = await seedProcess(world, { state: "draft" });
+      await prisma.nurturePublishProcessRevision.update({
+        where: { id: seeded.revision.id },
+        data: {
+          mediaCompositionPayload: {
+            media: [
+              { mediaAssetId: "asset-1", mediaRevision: 2 },
+              { mediaAssetId: "asset-2", mediaRevision: 1 },
+            ],
+          },
+          sourceRefsPayload: ["source-ref-1"],
+        },
+      });
+      return { world, ...seeded };
+    })();
+    const owner = new PrismaPublishProcessTransaction(prisma);
+
+    const applied = await owner.applyPublishProcessMediaDetach({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      command_request_id: "command:detach-1",
+      expected_draft_revision: 1,
+      media_asset_id: "asset-1",
+    });
+    expect(applied).toMatchObject({
+      revision: 2,
+      remaining_media_count: 1,
+      detached_media_revision: 2,
+    });
+
+    const stored = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id, revision: 2 },
+    });
+    // Only the composition changed; lineage, digest and provenance carry over.
+    expect(stored.mediaCompositionPayload).toEqual({
+      media: [{ mediaAssetId: "asset-2", mediaRevision: 1 }],
+    });
+    expect(stored.organizerInputRevision).toBe(revision.organizerInputRevision);
+    expect(stored.contentDigest).toBe(revision.contentDigest);
+    expect(stored.sourceRefsPayload).toEqual(["source-ref-1"]);
+    expect(stored.commandRequestIdHash).toBe(publishDraftCommandIdentity("command:detach-1"));
+
+    // The revision that composed the asset is history, not gone.
+    expect(
+      (
+        await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+          where: { id: revision.id },
+        })
+      ).mediaCompositionPayload,
+    ).toEqual({
+      media: [
+        { mediaAssetId: "asset-1", mediaRevision: 2 },
+        { mediaAssetId: "asset-2", mediaRevision: 1 },
+      ],
+    });
+  });
+
+  it("refuses a stale revision head and an asset the composition does not carry", async () => {
+    const world = await seedGroup();
+    const { process, revision } = await seedProcess(world, { state: "draft" });
+    await prisma.nurturePublishProcessRevision.update({
+      where: { id: revision.id },
+      data: {
+        mediaCompositionPayload: { media: [{ mediaAssetId: "asset-1", mediaRevision: 1 }] },
+      },
+    });
+    const owner = new PrismaPublishProcessTransaction(prisma);
+    await expect(
+      owner.applyPublishProcessMediaDetach({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        command_request_id: "command:detach-stale",
+        expected_draft_revision: 5,
+        media_asset_id: "asset-1",
+      }),
+    ).rejects.toThrow(/revision conflict/);
+    await expect(
+      owner.applyPublishProcessMediaDetach({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        command_request_id: "command:detach-missing",
+        expected_draft_revision: 1,
+        media_asset_id: "asset-9",
+      }),
+    ).rejects.toThrow(/media not in composition/);
+    expect(
+      await prisma.nurturePublishProcessRevision.count({
+        where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(1);
+  });
+});

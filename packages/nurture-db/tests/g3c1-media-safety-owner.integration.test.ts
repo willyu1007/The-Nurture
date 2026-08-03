@@ -799,3 +799,169 @@ describe("T-006 owner write: child-media attribution decisions", () => {
     ).rejects.toThrow(/ck_nurture_media_attribution_revision_floor/);
   });
 });
+
+describe("T-006 owner write: media discard", () => {
+  it("discards under the media-revision head and records the blast radius it measured", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    // One unreleased class draft cites the asset.
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: world.workspaceId,
+        careGroupId: world.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+        mediaCompositionPayload: { media: [{ mediaAssetId: asset.id, mediaRevision: 1 }] },
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: revision.id },
+    });
+
+    const owner = new PrismaMediaAttributionTransaction(prisma);
+    const facts = await owner.loadMediaDiscardFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+    });
+    expect(facts).toMatchObject({
+      media_lifecycle: "ready",
+      committed_release_count: 0,
+      referencing_draft_count: 1,
+    });
+
+    const applied = await owner.applyMediaAssetDiscard({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+      expected_media_revision: facts!.media_revision,
+    });
+    expect(applied.affected_draft_count).toBe(1);
+    const stored = await prisma.nurtureMediaAssetRef.findUniqueOrThrow({
+      where: { id: asset.id },
+    });
+    expect(stored.lifecycle).toBe("discarded");
+    expect(stored.aggregateVersion).toBe(asset.aggregateVersion + 1);
+
+    // Terminal is terminal: a second discard finds no discardable row.
+    await expect(
+      owner.applyMediaAssetDiscard({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        media_asset_id: asset.id,
+        expected_media_revision: facts!.media_revision,
+      }),
+    ).rejects.toThrow(/revision conflict/);
+  });
+
+  it("refuses a discard whose frozen media revision the asset has moved past", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    // The original was replaced: the asset now carries revision 2, while the
+    // teacher's confirmation was frozen against revision 1.
+    await prisma.nurtureMediaAssetRef.update({
+      where: { id: asset.id },
+      data: { mediaRevision: 2 },
+    });
+    const owner = new PrismaMediaAttributionTransaction(prisma);
+    await expect(
+      owner.applyMediaAssetDiscard({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        media_asset_id: asset.id,
+        expected_media_revision: 1,
+      }),
+    ).rejects.toThrow(/revision conflict/);
+    expect(
+      (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
+        .lifecycle,
+    ).toBe("ready");
+  });
+
+  it("refuses the discard once any release's frozen composition carries the asset", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: world.workspaceId,
+        careGroupId: world.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "pending_release",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+        mediaCompositionPayload: { media: [{ mediaAssetId: asset.id, mediaRevision: 1 }] },
+      },
+    });
+    const target = await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        targetKey: `target:${randomUUID()}`,
+        childCareProcessId: world.process.id,
+        enrollmentId: world.enrollment.id,
+        familyRefKey: `${world.workspaceId}:${world.process.id}`,
+        grantId: (
+          await prisma.nurtureChildLinkGrant.create({
+            data: {
+              workspaceId: world.workspaceId,
+              childCareProcessId: world.process.id,
+              enrollmentId: world.enrollment.id,
+              grantedByParticipantId: world.teacher.id,
+              grantedToScopeType: "care_group",
+              grantedToScopeId: world.group.id,
+              directions: ["org_to_family"],
+              dataClasses: ["child_growth_record"],
+              purposes: ["child_growth_publication"],
+              status: "active",
+            },
+          })
+        ).id,
+      },
+    });
+    await prisma.nurturePublicationRelease.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        publishProcessTargetId: target.id,
+        publishProcessRevisionId: revision.id,
+        releasedByRoleAssignmentId: world.teacherRole.id,
+        commandRequestIdHash: "c".repeat(64),
+      },
+    });
+
+    const owner = new PrismaMediaAttributionTransaction(prisma);
+    await expect(
+      owner.applyMediaAssetDiscard({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        media_asset_id: asset.id,
+        expected_media_revision: 1,
+      }),
+    ).rejects.toThrow(/already released/);
+    expect(
+      (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
+        .lifecycle,
+    ).toBe("ready");
+  });
+});

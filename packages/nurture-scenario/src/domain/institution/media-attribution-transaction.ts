@@ -69,6 +69,17 @@ export type NurtureAttributionAppendedRow = {
  * concurrent decision on the same child collides on the revision it also
  * tried to append.
  */
+export type NurtureMediaDiscardFacts = {
+  authority: NurtureCaregiverWriteAuthority;
+  media_asset_ref: DomainContextRef;
+  media_lifecycle: string;
+  media_revision: number;
+  /** Committed releases whose own frozen composition carries this asset. */
+  committed_release_count: number;
+  /** Unreleased class drafts that still cite the asset — the blast radius. */
+  referencing_draft_count: number;
+};
+
 export type NurtureMediaAttributionTransaction = {
   loadMediaAttributionWriteFacts(input: {
     workspace_id: string;
@@ -90,5 +101,26 @@ export type NurtureMediaAttributionTransaction = {
   }): Promise<{
     media_asset_ref: DomainContextRef;
     rows: NurtureAttributionAppendedRow[];
+  }>;
+
+  loadMediaDiscardFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    media_asset_id: string;
+  }): Promise<NurtureMediaDiscardFacts | null>;
+  /**
+   * Pre-publication global delete. The affected-draft count is measured inside
+   * this same transaction — the number the teacher confirmed is the number the
+   * commit records, and a replay answers from the stored result rather than
+   * recounting a world that has moved.
+   */
+  applyMediaAssetDiscard(input: {
+    workspace_id: string;
+    participant_id: string;
+    media_asset_id: string;
+    expected_media_revision: number;
+  }): Promise<{
+    media_asset_ref: DomainContextRef;
+    affected_draft_count: number;
   }>;
 };

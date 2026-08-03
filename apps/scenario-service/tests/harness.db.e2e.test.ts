@@ -2916,3 +2916,194 @@ describe("T-006 attribution lane through the formal Harness ingress", () => {
     });
   });
 });
+
+describe("T-006 media lifecycle through the formal Harness ingress", () => {
+  const seedComposedDraft = async (scope: SeedScope) => {
+    const asset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        careGroupId: scope.group.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+        mediaCompositionPayload: {
+          media: [
+            { mediaAssetId: asset.id, mediaRevision: 1 },
+            { mediaAssetId: randomUUID(), mediaRevision: 1 },
+          ],
+        },
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: revision.id },
+    });
+    return { asset, process };
+  };
+
+  it("detaches one entry from the card and discards the asset globally", async () => {
+    const scope = await seedScope();
+    const { asset, process } = await seedComposedDraft(scope);
+    const processRef = issueBoardSealedRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+      PUBLISH_PROCESS_TARGET_KIND,
+      process.processKey,
+    );
+    const mediaRef = issueMediaAssetTargetRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+      asset.id,
+    );
+
+    const detached = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "detach_publish_process_media",
+      targetOptionRef: processRef,
+      operationInput: { mediaRef },
+    });
+    expect(detached.prepared.json.preview).toMatchObject({ remaining_media_count: 1 });
+    expect(detached.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(detached.executed?.json.committed_result.remainingMediaCount).toBe(1);
+    const current = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+      include: { currentRevision: true },
+    });
+    expect(current.currentRevision?.revision).toBe(2);
+    expect(JSON.stringify(current.currentRevision?.mediaCompositionPayload)).not.toContain(
+      asset.id,
+    );
+    // The asset row is untouched by a card-level detach.
+    expect(
+      (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
+        .lifecycle,
+    ).toBe("ready");
+    // No raw id on the wire.
+    for (const raw of [asset.id, process.id, process.processKey]) {
+      expect(JSON.stringify(detached.executed?.json)).not.toContain(raw);
+    }
+
+    // Now the global pre-publication delete: the blast radius is stated at
+    // prepare and recorded at commit.
+    const discarded = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "discard_media_asset",
+      targetOptionRef: issueMediaAssetTargetRef(
+        INTEGRITY_KEY,
+        { workspace_id: scope.workspaceId, participant_id: scope.caregiverB.id },
+        asset.id,
+      ),
+    });
+    // The detach above removed the only citing draft, so the radius is zero.
+    expect(discarded.prepared.json.preview).toMatchObject({ affected_draft_count: 0 });
+    expect(discarded.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(discarded.executed?.json.committed_result.affectedDraftCount).toBe(0);
+    expect(
+      (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
+        .lifecycle,
+    ).toBe("discarded");
+
+    // Terminal media takes no further decisions of any kind.
+    const refused = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "discard_media_asset",
+      targetOptionRef: mediaRef,
+    });
+    expect(refused.json).toMatchObject({
+      status: "denied",
+      reason_code: "media_already_terminal",
+    });
+  });
+
+  it("refuses the discard while a committed release's frozen composition carries the asset", async () => {
+    const scope = await seedScope();
+    const { asset, process } = await seedComposedDraft(scope);
+    const revision = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+    });
+    const grant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        grantedByParticipantId: scope.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: scope.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["child_growth_record"],
+        purposes: ["child_growth_publication"],
+        status: "active",
+      },
+    });
+    const target = await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        targetKey: `target:${randomUUID()}`,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        familyRefKey: `${scope.workspaceId}:${scope.process.id}`,
+        grantId: grant.id,
+      },
+    });
+    await prisma.nurturePublicationRelease.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        publishProcessTargetId: target.id,
+        publishProcessRevisionId: revision.id,
+        releasedByRoleAssignmentId: scope.caregiverRole.id,
+        commandRequestIdHash: "d".repeat(64),
+      },
+    });
+
+    const refused = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "discard_media_asset",
+      targetOptionRef: issueMediaAssetTargetRef(
+        INTEGRITY_KEY,
+        { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+        asset.id,
+      ),
+    });
+    expect(refused.json).toMatchObject({ status: "denied", reason_code: "already_released" });
+    expect(
+      (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
+        .lifecycle,
+    ).toBe("ready");
+  });
+});

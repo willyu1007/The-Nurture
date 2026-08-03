@@ -1691,3 +1691,21 @@ confirm / reject / supersede 三条归属能力端到端,全部走 Unit 0 工厂
 finding 4(revision-0 草稿保存的仓储契约)按复核裁定属于 organize/采集 lane,
 而 organize 本身被合同决定阻塞;它作为已记录债务随那条 lane 关闭。未路由清单
 8 条:媒体生命周期 2、发布后安全 3、以及三条 B8 不可路由(release/reschedule/organize)。
+
+## 2026-08-04 — B8 媒体生命周期对:detach 与 discard
+
+产品"删除"的前两个阶段,各接各的 owner 聚合,同走 Unit 0 工厂。未路由 8 → 6。
+
+- **detach 是一次编辑,不是生命周期变更**。追加下一个 revision,composition 少一项,
+  其余(标题、正文、来源、装配谱系、内容摘要)逐字节前推;asset 行不动。head 与
+  save 同源(`draft_revision`),重放走同一个 `command_request_id_hash` 列。
+  committed `mediaRef` 用资格投影同一个 `deriveMediaRef`,盖在 owner 实际移除的那个
+  **组合内修订**上——提交回执与读取按构造一致(finding 7 的纪律)。
+- **discard 是全局的发布前删除**。`media_asset_revision` head 做 CAS(原始被替换过
+  就冲突),终态集合(`discarded`/`redacted`)在 WHERE 里;**爆炸半径在写事务内测量**
+  ——老师在 strong_confirmation 里确认的数字就是提交记录的数字,prepare 的 preview
+  也报同一口径。owner 写里再补一道"窗口在事务内已关"检查:读与写之间提交的 release
+  同样拒绝。
+- **证伪抓到一处缺覆盖**:去掉 discard 的 media-revision CAS,测试仍绿——没有任何
+  测试用错误的 expected revision 打过。补"原始已替换成 rev 2、按 rev 1 冻结的确认
+  必须冲突"后再证伪,CAUGHT。这是"证伪验收覆盖"的第二次应验。

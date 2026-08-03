@@ -11,6 +11,7 @@ import type {
 import { NO_PUBLISH_EDIT_HOLD_VERSION } from "@the-nurture/scenario/harness";
 import {
   caregiverRowAuthority,
+  readMediaComposition,
   resolveCaregiverReach,
   type BoardPrisma,
   type CaregiverReachV1,
@@ -284,6 +285,7 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
       ...loaded.facts,
       current_revision: current?.revision ?? 0,
       known_source_refs: readSourceRefs(current?.sourceRefsPayload ?? null),
+      composition: readMediaComposition(current?.mediaCompositionPayload ?? null),
       ...(replayed
         ? {
             replayed_revision: {
@@ -293,6 +295,92 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
             },
           }
         : {}),
+    };
+  }
+
+  async applyPublishProcessMediaDetach(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+    command_request_id: string;
+    expected_draft_revision: number;
+    media_asset_id: string;
+  }): Promise<{
+    publish_process_ref: DomainContextRef;
+    revision: number;
+    remaining_media_count: number;
+    detached_media_revision: number;
+  }> {
+    const loaded = await this.loadHoldRow(input);
+    if (!loaded) throw new Error("nurture publish media detach: target unavailable");
+    const current = loaded.process.currentRevisionId
+      ? await this.prisma.nurturePublishProcessRevision.findFirstOrThrow({
+          where: { workspaceId: input.workspace_id, id: loaded.process.currentRevisionId },
+        })
+      : null;
+    if (!current || current.revision !== input.expected_draft_revision) {
+      throw new Error("nurture publish media detach: revision conflict");
+    }
+    const composition = readMediaComposition(current.mediaCompositionPayload);
+    const detached = composition.find(
+      (entry) => entry.media_asset_id === input.media_asset_id,
+    );
+    const remaining = composition.filter(
+      (entry) => entry.media_asset_id !== input.media_asset_id,
+    );
+    if (!detached) {
+      throw new Error("nurture publish media detach: media not in composition");
+    }
+
+    // Detaching is an edit: it appends the next revision with everything but
+    // the composition carried forward byte for byte. The asset row itself is
+    // never touched — "remove from this card" is not a lifecycle change.
+    const revision = await this.prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: input.workspace_id,
+        publishProcessId: loaded.process.id,
+        revision: current.revision + 1,
+        contentDigest: current.contentDigest,
+        organizerInputRevision: current.organizerInputRevision,
+        commandRequestIdHash: publishDraftCommandIdentity(input.command_request_id),
+        ...(current.templateKey !== null ? { templateKey: current.templateKey } : {}),
+        ...(current.templateVersion !== null
+          ? { templateVersion: current.templateVersion }
+          : {}),
+        ...(current.titleProtectionPayload !== null
+          ? { titleProtectionPayload: asJson(current.titleProtectionPayload) }
+          : {}),
+        ...(current.bodyProtectionPayload !== null
+          ? { bodyProtectionPayload: asJson(current.bodyProtectionPayload) }
+          : {}),
+        mediaCompositionPayload: asJson({
+          media: remaining.map((entry) => ({
+            mediaAssetId: entry.media_asset_id,
+            mediaRevision: entry.media_revision,
+          })),
+        }),
+        ...(current.sourceRefsPayload !== null
+          ? { sourceRefsPayload: asJson(current.sourceRefsPayload) }
+          : {}),
+        savedByRoleAssignmentId: loaded.reach.role_assignment_id,
+      },
+    });
+    const advanced = await this.prisma.nurturePublishProcess.updateMany({
+      where: {
+        workspaceId: input.workspace_id,
+        id: loaded.process.id,
+        currentRevisionId: current.id,
+      },
+      data: { currentRevisionId: revision.id, aggregateVersion: { increment: 1 } },
+    });
+    if (advanced.count !== 1) {
+      throw new Error("nurture publish media detach: revision conflict");
+    }
+    return {
+      publish_process_ref: loaded.facts.publish_process_ref,
+      revision: revision.revision,
+      remaining_media_count: remaining.length,
+      detached_media_revision: detached.media_revision,
     };
   }
 

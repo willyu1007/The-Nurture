@@ -735,6 +735,7 @@ const ownerDraftFacts = (
   ...ownerHoldFacts(),
   current_revision: 4,
   known_source_refs: ["source-ref-1"],
+  composition: [{ media_asset_id: "asset-1", media_revision: 1 }],
   ...overrides,
 });
 

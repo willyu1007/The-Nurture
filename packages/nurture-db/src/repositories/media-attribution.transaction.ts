@@ -4,11 +4,14 @@ import type {
   NurtureAttributionAppendInput,
   NurtureMediaAttributionTransaction,
   NurtureMediaAttributionWriteFacts,
+  NurtureMediaDiscardFacts,
 } from "@the-nurture/scenario/harness";
 import {
   caregiverRowAuthority,
+  readMediaComposition,
   resolveCaregiverReach,
   type BoardPrisma,
+  type CaregiverReachV1,
 } from "./board-read-support.js";
 import { currentAttributionRowsPerChild } from "./media-safety.read.js";
 
@@ -173,6 +176,130 @@ export class PrismaMediaAttributionTransaction implements NurtureMediaAttributio
       media_asset_ref: domainRef("media_asset", asset.id, asset.mediaRevision),
       rows,
     };
+  }
+
+  async loadMediaDiscardFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    media_asset_id: string;
+  }): Promise<NurtureMediaDiscardFacts | null> {
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      new Date(),
+    );
+    if (!reach) return null;
+    const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
+      where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
+    });
+    if (!asset) return null;
+    const counts = await this.mediaReferenceCounts(input.workspace_id, reach, asset.id);
+    return {
+      authority: caregiverRowAuthority(reach, asset.careGroupId),
+      media_asset_ref: domainRef("media_asset", asset.id, asset.mediaRevision),
+      media_lifecycle: asset.lifecycle,
+      media_revision: asset.mediaRevision,
+      committed_release_count: counts.committed_release_count,
+      referencing_draft_count: counts.referencing_draft_count,
+    };
+  }
+
+  async applyMediaAssetDiscard(input: {
+    workspace_id: string;
+    participant_id: string;
+    media_asset_id: string;
+    expected_media_revision: number;
+  }): Promise<{ media_asset_ref: DomainContextRef; affected_draft_count: number }> {
+    const reach = await resolveCaregiverReach(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      new Date(),
+    );
+    if (!reach) throw new Error("nurture media discard: target unavailable");
+
+    // The blast radius is measured inside this same transaction: the number
+    // the commit records is the number that was true when the discard landed.
+    const counts = await this.mediaReferenceCounts(
+      input.workspace_id,
+      reach,
+      input.media_asset_id,
+    );
+    if (counts.committed_release_count > 0) {
+      // Belt over the rule's own check: a release that committed between the
+      // owner read and this write closes the window even mid-transaction.
+      throw new Error("nurture media discard: already released");
+    }
+
+    const discarded = await this.prisma.nurtureMediaAssetRef.updateMany({
+      where: {
+        id: input.media_asset_id,
+        workspaceId: input.workspace_id,
+        deletedAt: null,
+        mediaRevision: input.expected_media_revision,
+        // Terminal states never leave; the same set the domain calls terminal.
+        lifecycle: { in: ["preparing", "ready", "unavailable"] },
+      },
+      data: { lifecycle: "discarded", aggregateVersion: { increment: 1 } },
+    });
+    if (discarded.count !== 1) {
+      throw new Error("nurture media discard: revision conflict");
+    }
+    const asset = await this.prisma.nurtureMediaAssetRef.findFirstOrThrow({
+      where: { id: input.media_asset_id, workspaceId: input.workspace_id },
+    });
+    return {
+      media_asset_ref: domainRef("media_asset", asset.id, asset.mediaRevision),
+      affected_draft_count: counts.referencing_draft_count,
+    };
+  }
+
+  /**
+   * The same two counts the read port derives, scoped the same way: releases
+   * whose own frozen composition carries the asset close the discard window,
+   * and unreleased class drafts still citing it are the blast radius.
+   */
+  private async mediaReferenceCounts(
+    workspaceId: string,
+    reach: CaregiverReachV1,
+    mediaAssetId: string,
+  ): Promise<{ committed_release_count: number; referencing_draft_count: number }> {
+    const releases = await this.prisma.nurturePublicationRelease.findMany({
+      where: {
+        workspaceId,
+        publishProcess: { is: { careGroupId: reach.care_group_id } },
+      },
+      select: { revision: { select: { mediaCompositionPayload: true } } },
+    });
+    const committed = releases.filter((release) =>
+      readMediaComposition(release.revision.mediaCompositionPayload).some(
+        (entry) => entry.media_asset_id === mediaAssetId,
+      ),
+    ).length;
+
+    const referencingRevisions = await this.prisma.nurturePublishProcessRevision.findMany({
+      where: {
+        workspaceId,
+        currentOf: {
+          is: {
+            state: { in: ["draft", "needs_review", "pending_release"] },
+            careGroupId: reach.care_group_id,
+          },
+        },
+      },
+      select: { mediaCompositionPayload: true, publishProcessId: true },
+    });
+    const referencing = new Set(
+      referencingRevisions
+        .filter((revision) =>
+          readMediaComposition(revision.mediaCompositionPayload).some(
+            (entry) => entry.media_asset_id === mediaAssetId,
+          ),
+        )
+        .map((revision) => revision.publishProcessId),
+    );
+    return { committed_release_count: committed, referencing_draft_count: referencing.size };
   }
 }
 

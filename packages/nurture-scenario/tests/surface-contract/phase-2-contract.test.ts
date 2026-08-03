@@ -706,6 +706,8 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "createConfirmChildMediaAttributionSpec",
     "createRejectChildMediaAttributionSpec",
     "createSupersedeChildMediaAttributionSpec",
+    "createDetachPublishProcessMediaSpec",
+    "createDiscardMediaAssetSpec",
   ].sort();
 
   /**
@@ -735,6 +737,8 @@ describe("board write commands conform to the registry's concurrency policy", ()
       child_media_attribution: "child_media_attribution",
       media_asset_revision: "media_asset_revision",
     },
+    detach_publish_process_media: { draft_revision: "draft_revision" },
+    discard_media_asset: { media_asset_revision: "media_asset_revision" },
   };
 
   /**
@@ -757,8 +761,6 @@ describe("board write commands conform to the registry's concurrency policy", ()
   ];
 
   const MUST_EQUAL_WITHOUT_SPEC = [
-    "detach_publish_process_media",
-    "discard_media_asset",
     "organize_care_capture_batch",
     "release_publish_process",
     "reschedule_publish_process",
