@@ -816,3 +816,31 @@
 | cross-boundary check: real owner output fed to the rules' own `find` | ADDED to `g3-owner-domain-boundary.integration.test.ts` |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `test:scenario-service:db` | PASS — 531, 191, 52 and 32 tests |
 | all eleven DB-free gates + `ctl-context verify --strict` | PASS — artifact unchanged at `1.13.0`, routing unchanged |
+
+## 2026-08-03 — Adversarial Quality Review of 77923e5..dc5acdd (B8 Unit 0 + Lane A + Survey Fixes)
+
+Six read-only lenses (factory/heads, edit-lane clocks+CAS, ingress+integrity-tag,
+privacy/refs, test-vacuity, survey-fix blast radius), one adversarial refuter per
+medium+ finding, then dedup+rank. 25 agents; 17/17 findings survived refutation;
+9 distinct defects after merge. Verdict: **architecture sound, range not
+shippable as-is** — both HIGHs sit on seams whose two sides are each tested only
+against a mock of the other.
+
+| # | Severity | Finding | Reachability |
+| --- | --- | --- | --- |
+| 1 | HIGH | Expired edit hold bricks the lane: expiry is encoded as absence (head 0) but the row survives, so the next acquire's `create()` hits the `publishProcessId` unique forever; release answers `already_satisfied` without deleting; no cleanup path exists. A `pending_release` card becomes permanently uneditable class-wide. | Live — any TTL lapse |
+| 2 | HIGH | Draft save is silent last-write-wins: prepare freezes `facts.current_revision` (the owner's own head) and discards the client's base, so the drift check compares the server to itself and can never fire. Violates locked D-08. The in-code comment frames the defect as a feature. | Live — concurrent editors |
+| 3 | MEDIUM | Raw owner UUIDs ship in `output_refs[].object_id` on every committed board write, beside the sealed `committed_result`; the no-raw-id tests scan only `committed_result`. Disclosure, not authz bypass (internal endpoint, refs resolve nowhere). | Live — every execute response |
+| 4 | MEDIUM | Revision-0 save: the domain admits `expected_draft_revision: 0` by explicit amendment; the repository unconditionally throws for that state. One layer lies about the contract. | Latent — no producer yet |
+| 5 | MEDIUM | Release eligibility reader has no current-fact reduction (the ac2bb6e fix landed only in `media-safety.read.ts`) and treats terminal `superseded` rows as blocking obligations — a routine A→B correction would permanently block the media. | Latent — until attribution lane routes |
+| 6 | MEDIUM | `supersede` confirms onto a to-child whose current fact is terminally rejected/superseded — skips `isLegalAttributionTransition`, persisting history the frozen state machine forbids. | Latent — until attribution lane routes |
+| 7 | LOW | Attribution `already_satisfied` stamps the evaluator's clock as `decidedAt` (the cancel-instant class); commit-time `attributionRef` derives from a (id, revision) pair no read will ever reproduce. | Latent |
+| 8 | MEDIUM | The head-conformance census swallows factory construction errors, floors at 5 while 7 exist, and never walks the reverse direction (registry must_equal → some spec). Can go vacuous silently. | Guard quality |
+| 9 | LOW |残余守卫空洞:head 一致性只比数量不比名字;committed-result 守卫是六个子串的 grep 而非闭合形状;`ttlSeconds: null` 被 `?? 默认值` 吸收而非 `needs_input`。 | Guard quality |
+
+Must-fix order before the next lane: 1, 2 (both HIGH, both live), then 5/6/7
+land with — not after — the attribution lane routing. 3 and the guard items are
+a hygiene pass. Finding 2's proper fix needs a contract decision: the frozen
+save input schema (`title`/`segments`, additionalProperties:false) has no channel
+for the client's observed base revision, so admitting one is an input-schema
+amendment plus artifact rotation, not a code-only change.
