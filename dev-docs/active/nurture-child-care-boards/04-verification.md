@@ -795,3 +795,24 @@
 | DB e2e: guardian, unknown source ref and cancelled process all refused | PASS |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `test:scenario-service:db` | PASS — 527, 190, 52 and 32 tests |
 | all eleven DB-free gates | PASS — artifact unchanged at `1.13.0`, routed actions 11 → 15, unrouted 15 → 11 |
+
+## 2026-08-03 — Pre-fan-out Survey and the Two Defects It Found in Landed Code
+
+| Command / check | Result |
+| --- | --- |
+| read-only survey of the eleven unrouted capabilities (5 clusters + owner gap audit + synthesis) | DONE — 7 agents, 0 errors |
+| its three sharpest claims verified against the tree before acting | CONFIRMED — stale-revision `find`, no `decided_at`, zero production writers for four tables |
+| `sameHeads({}, {})` was vacuously true, so a spec that forgot its head passed unconditionally | FIXED — `head_keys` declared, produced set asserted equal on both sides |
+| the union logic in `sameHeads` became unreachable once the declaration was asserted | COLLAPSED — one comparison over the declared keys, no dead defensive branch |
+| falsified: the declared/produced head assertion removed | CAUGHT |
+| falsified: head values not actually compared | CAUGHT |
+| falsified: a capability silently freezes no head at all | CAUGHT |
+| falsified: produced heads drift from the declared set | CAUGHT |
+| falsified: a stale headless exemption left in place | CAUGHT |
+| registry conformance guard finds specs reflectively, not from a hand-kept census | LANDED — a new `create*Spec` cannot hide by being left off a list |
+| the attribution rules read the oldest revision per child, not the current one | FIXED in the read port, where the ordering is the port's own contract |
+| falsified: reduction keeps the first row instead of the highest revision | CAUGHT |
+| the owner test had pinned "returns every revision" as the contract | FIXED — it now asserts one current fact per child |
+| cross-boundary check: real owner output fed to the rules' own `find` | ADDED to `g3-owner-domain-boundary.integration.test.ts` |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `test:scenario-service:db` | PASS — 531, 191, 52 and 32 tests |
+| all eleven DB-free gates + `ctl-context verify --strict` | PASS — artifact unchanged at `1.13.0`, routing unchanged |
