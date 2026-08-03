@@ -34,6 +34,10 @@ export const HARNESS_CAPABILITY_VERSIONS = {
   update_guardian_current_focus: "1.0.0",
   record_caregiver_daily_care: "1.0.0",
   cancel_publish_process: "1.0.0",
+  acquire_publish_edit_hold: "1.0.0",
+  renew_publish_edit_hold: "1.0.0",
+  release_publish_edit_hold: "1.0.0",
+  save_publish_process_draft: "1.0.0",
 } as const;
 
 export const HARNESS_QUERY_CAPABILITY_VERSIONS = {

@@ -6,6 +6,7 @@ import {
   PrismaCareCaptureReadPort,
   PrismaPublishLaneReadPort,
   PrismaPublishProcessTransaction,
+  publishDraftCommandIdentity,
 } from "../src/index.js";
 
 // Owner-side proof for the publish queue, draft/hold/cancel and capture ports
@@ -444,13 +445,30 @@ describe("G3-B1 owner reads: edit hold, draft and cancel", () => {
 
   it("answers an exact command replay from the revision that command wrote", async () => {
     const world = await seedGroup();
-    const { process } = await seedProcess(world);
+    const { process, revision } = await seedProcess(world);
     const reads = new PrismaPublishLaneReadPort(prisma, protectedContent);
-    const facts = await reads.loadDraftFacts({
+
+    // The fixture's assembler lineage is `organizer:1`. Asking with that as a
+    // command id must find nothing: the two columns mean different things, and
+    // an earlier version of this test passed only because they happened to
+    // carry the same string.
+    const byLineage = await reads.loadDraftFacts({
       workspace_id: world.workspaceId,
       participant_id: world.teacher.id,
       process_key: process.processKey,
       command_request_id: "organizer:1",
+    });
+    expect(byLineage?.replayed_revision).toBeUndefined();
+
+    await prisma.nurturePublishProcessRevision.update({
+      where: { id: revision.id },
+      data: { commandRequestIdHash: publishDraftCommandIdentity("command:save-1") },
+    });
+    const facts = await reads.loadDraftFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      command_request_id: "command:save-1",
     });
     expect(facts?.replayed_revision).toEqual({
       revision: 1,
@@ -844,5 +862,257 @@ describe("T-006 owner write: pre-release publish-process cancel", () => {
         process_key: process.processKey,
       }),
     ).toBeNull();
+  });
+});
+
+describe("T-006 owner write: the edit lane", () => {
+  const owner = () => new PrismaPublishProcessTransaction(prisma);
+
+  const laneScope = async () => {
+    const world = await seedGroup();
+    const { process, revision } = await seedProcess(world, { state: "draft" });
+    return { world, process, revision };
+  };
+
+  it("reports the hold as stored plus the instant the read was true at", async () => {
+    const { world, process } = await laneScope();
+    const before = Date.now();
+    const facts = await owner().loadPublishEditHoldFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.current_hold).toBeUndefined();
+    // Expiry is the rule's call, so the owner has to say when it looked.
+    const readAt = Date.parse(facts!.read_at);
+    expect(readAt).toBeGreaterThanOrEqual(before);
+    expect(readAt).toBeLessThanOrEqual(Date.now());
+  });
+
+  it("takes a hold that can never carry the reserved absence version", async () => {
+    const { world, process } = await laneScope();
+    const expiresAt = new Date(Date.now() + 120_000).toISOString();
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: expiresAt,
+    });
+    const stored = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    expect(stored.holderParticipantId).toBe(world.teacher.id);
+    expect(stored.holderRoleAssignmentId).toBe(world.teacherRole.id);
+    // 0 means "no hold". A real row must never be able to claim it.
+    expect(stored.aggregateVersion).toBeGreaterThanOrEqual(1);
+    await expect(
+      prisma.nurturePublishEditHold.update({
+        where: { id: stored.id },
+        data: { aggregateVersion: 0 },
+      }),
+    ).rejects.toThrow(/ck_nurture_publish_edit_hold_version_floor/);
+  });
+
+  it("refuses to take a hold a colleague took in between", async () => {
+    const { world, process } = await laneScope();
+    const expiresAt = new Date(Date.now() + 120_000).toISOString();
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.colleague.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: expiresAt,
+    });
+    // Prepared against "no hold", so this is exactly the race the reserved
+    // absence value exists to stop.
+    await expect(
+      owner().applyPublishEditHoldGrant({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        expected_hold_version: 0,
+        expires_at: expiresAt,
+      }),
+    ).rejects.toThrow();
+    const stored = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    expect(stored.holderParticipantId).toBe(world.colleague.id);
+  });
+
+  it("extends and releases only the holder's own hold, under its own version", async () => {
+    const { world, process } = await laneScope();
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    const taken = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+
+    const extendedTo = new Date(Date.now() + 300_000).toISOString();
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_hold_version: taken.aggregateVersion,
+      expires_at: extendedTo,
+    });
+    const extended = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { id: taken.id },
+    });
+    expect(extended.expiresAt.toISOString()).toBe(extendedTo);
+    expect(extended.aggregateVersion).toBe(taken.aggregateVersion + 1);
+
+    // A colleague cannot extend or release it, and a stale version cannot either.
+    for (const attempt of [
+      () =>
+        owner().applyPublishEditHoldGrant({
+          workspace_id: world.workspaceId,
+          participant_id: world.colleague.id,
+          process_key: process.processKey,
+          expected_hold_version: extended.aggregateVersion,
+          expires_at: extendedTo,
+        }),
+      () =>
+        owner().applyPublishEditHoldRelease({
+          workspace_id: world.workspaceId,
+          participant_id: world.colleague.id,
+          process_key: process.processKey,
+          expected_hold_version: extended.aggregateVersion,
+        }),
+      () =>
+        owner().applyPublishEditHoldRelease({
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          process_key: process.processKey,
+          expected_hold_version: taken.aggregateVersion,
+        }),
+    ]) {
+      await expect(attempt()).rejects.toThrow(/version conflict/);
+    }
+    expect(
+      await prisma.nurturePublishEditHold.count({ where: { id: taken.id } }),
+    ).toBe(1);
+
+    await owner().applyPublishEditHoldRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_hold_version: extended.aggregateVersion,
+    });
+    // Releasing deletes the coordination row and nothing else.
+    expect(await prisma.nurturePublishEditHold.count({ where: { id: taken.id } })).toBe(0);
+    expect(
+      (await prisma.nurturePublishProcess.findUniqueOrThrow({ where: { id: process.id } })).state,
+    ).toBe("draft");
+  });
+
+  it("appends a draft revision that carries the lineage and the command identity", async () => {
+    const { world, process, revision } = await laneScope();
+    await prisma.nurturePublishProcessRevision.update({
+      where: { id: revision.id },
+      data: { sourceRefsPayload: ["source-ref-1", "source-ref-2"] },
+    });
+    const applied = await owner().applyPublishProcessDraftSave({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      command_request_id: "command:save-1",
+      expected_draft_revision: 1,
+      content: {
+        title_envelope: protectedContent.seal("春游安排"),
+        body_envelope: protectedContent.seal(JSON.stringify([{ text: "老师原文" }])),
+        content_digest: "sha256:saved",
+      },
+    });
+    expect(applied.revision).toBe(2);
+
+    const stored = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id, revision: 2 },
+    });
+    expect(stored.contentDigest).toBe("sha256:saved");
+    // The assembler lineage is carried forward, never rewritten by an edit.
+    expect(stored.organizerInputRevision).toBe(revision.organizerInputRevision);
+    expect(stored.savedByRoleAssignmentId).toBe(world.teacherRole.id);
+    // The provenance the process knows stays the process's.
+    expect(stored.sourceRefsPayload).toEqual(["source-ref-1", "source-ref-2"]);
+    // Only envelopes reach the owner: the plaintext is nowhere in the row.
+    expect(JSON.stringify(stored)).not.toContain("春游安排");
+    expect(protectedContent.unseal(stored.titleProtectionPayload as never)).toBe("春游安排");
+
+    const advanced = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(advanced.currentRevisionId).toBe(stored.id);
+
+    // Revision 1 is still there: a save appends, it never rewrites.
+    expect(
+      await prisma.nurturePublishProcessRevision.count({
+        where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(2);
+
+    // And the replay lookup finds it by the command that wrote it.
+    const facts = await owner().loadPublishDraftFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      command_request_id: "command:save-1",
+    });
+    expect(facts?.replayed_revision).toMatchObject({
+      revision: 2,
+      content_digest: "sha256:saved",
+    });
+    expect(facts?.current_revision).toBe(2);
+  });
+
+  it("refuses a stale revision head and a second revision for one command", async () => {
+    const { world, process } = await laneScope();
+    const content = {
+      title_envelope: protectedContent.seal("t"),
+      body_envelope: protectedContent.seal("[]"),
+      content_digest: "sha256:a",
+    };
+    await expect(
+      owner().applyPublishProcessDraftSave({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        command_request_id: "command:stale",
+        expected_draft_revision: 5,
+        content,
+      }),
+    ).rejects.toThrow(/revision conflict/);
+
+    await owner().applyPublishProcessDraftSave({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      command_request_id: "command:once",
+      expected_draft_revision: 1,
+      content,
+    });
+    // The revision-level unique is the second layer: even a caller that got
+    // past every check above cannot append twice for one command.
+    await expect(
+      owner().applyPublishProcessDraftSave({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        command_request_id: "command:once",
+        expected_draft_revision: 2,
+        content: { ...content, content_digest: "sha256:b" },
+      }),
+    ).rejects.toThrow();
+    expect(
+      await prisma.nurturePublishProcessRevision.count({
+        where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(2);
   });
 });

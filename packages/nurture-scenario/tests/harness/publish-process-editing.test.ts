@@ -9,7 +9,12 @@ import {
   NurtureInteractionContextService,
   type NurtureInteractionContextRepository,
 } from "../../src/domain/interactions/interaction-context.js";
-import type { NurturePublishProcessCancelFacts } from "../../src/domain/institution/publish-process-transaction.js";
+import {
+  NO_PUBLISH_EDIT_HOLD_VERSION,
+  type NurturePublishDraftFacts,
+  type NurturePublishEditHoldFacts,
+  type NurturePublishProcessCancelFacts,
+} from "../../src/domain/institution/publish-process-transaction.js";
 import { issueBoardOpaqueRef, issueBoardSealedRef } from "../../src/harness/board-projection.js";
 import {
   PUBLISH_PROCESS_TARGET_KIND,
@@ -20,7 +25,15 @@ import {
   DEFAULT_EDIT_HOLD_TTL_SECONDS,
   acquirePublishEditHold,
   cancelPublishProcess,
+  createAcquirePublishEditHoldSpec,
   createCancelPublishProcessSpec,
+  createReleasePublishEditHoldSpec,
+  createRenewPublishEditHoldSpec,
+  createSavePublishProcessDraftSpec,
+  prepareAcquirePublishEditHold,
+  prepareReleasePublishEditHold,
+  prepareRenewPublishEditHold,
+  prepareSavePublishProcessDraft,
   parseCancelPublishProcessInputV1,
   parseSavePublishProcessDraftInputV1,
   preparePublishProcessCancel,
@@ -30,6 +43,7 @@ import {
   savePublishProcessDraft,
   computeDraftContentDigest,
   type CancelPublishProcessCommandV1,
+  type PublishEditHoldCommandV1,
   type PublishCancelFactsV1,
   type PublishDraftFactsV1,
   type PublishEditHoldFactsV1,
@@ -419,6 +433,7 @@ describe("G3-B1 pre-release cancel", () => {
 const commandContext: NurtureCommandExecutionContext = {
   workspace_id: scope.workspace_id,
   business_actor_ref: scope.participant_id,
+  command_request_id: "command:edit-lane-1",
 };
 
 const OWNER_CANCELLED_AT = "2026-08-01T09:07:11.000Z";
@@ -697,5 +712,325 @@ describe("cancel_publish_process command", () => {
     expect(created.canonicalize(cancelCommand())).not.toEqual(
       created.canonicalize(cancelCommand({ expected_process_version: 4 })),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The edit lane commands.
+
+const HOLD_READ_AT = "2026-08-01T09:00:00.000Z";
+
+const ownerHoldFacts = (
+  overrides: Partial<NurturePublishEditHoldFacts> = {},
+): NurturePublishEditHoldFacts => ({
+  authority: caregiverAuthority(),
+  publish_process_ref: ownerProcessRef,
+  process_state: "draft",
+  read_at: HOLD_READ_AT,
+  ...overrides,
+});
+
+const ownerDraftFacts = (
+  overrides: Partial<NurturePublishDraftFacts> = {},
+): NurturePublishDraftFacts => ({
+  ...ownerHoldFacts(),
+  current_revision: 4,
+  known_source_refs: ["source-ref-1"],
+  ...overrides,
+});
+
+type HoldCalls = Array<{ kind: "grant" | "release"; expected: number; expires_at?: string }>;
+
+const editLaneTransaction = (
+  facts: {
+    hold?: NurturePublishEditHoldFacts | null;
+    draft?: NurturePublishDraftFacts | null;
+  } = {},
+  calls: HoldCalls = [],
+): NurtureCommandTransaction =>
+  ({
+    publishProcess: {
+      loadPublishEditHoldFacts: async () =>
+        facts.hold === undefined ? ownerHoldFacts() : facts.hold,
+      loadPublishDraftFacts: async () =>
+        facts.draft === undefined ? ownerDraftFacts() : facts.draft,
+      applyPublishEditHoldGrant: async (input: {
+        expected_hold_version: number;
+        expires_at: string;
+      }) => {
+        calls.push({
+          kind: "grant",
+          expected: input.expected_hold_version,
+          expires_at: input.expires_at,
+        });
+        return { publish_process_ref: ownerProcessRef, expires_at: "2026-08-01T09:59:00.000Z" };
+      },
+      applyPublishEditHoldRelease: async (input: { expected_hold_version: number }) => {
+        calls.push({ kind: "release", expected: input.expected_hold_version });
+        return { publish_process_ref: ownerProcessRef };
+      },
+      applyPublishProcessDraftSave: async () => ({
+        publish_process_ref: ownerProcessRef,
+        revision: 5,
+        saved_at: "2026-08-01T09:58:00.000Z",
+      }),
+    },
+  }) as unknown as NurtureCommandTransaction;
+
+const holdCommand = (
+  overrides: Partial<PublishEditHoldCommandV1> = {},
+): PublishEditHoldCommandV1 => ({
+  process_key: PROCESS_KEY,
+  expected_hold_version: 0,
+  ttl_seconds: 120,
+  ...overrides,
+});
+
+const liveOwnerHold = (participantId: string, version = 3) => ({
+  holder_participant_id: participantId,
+  holder_label: "Syn Colleague",
+  expires_at: "2026-08-01T09:05:00.000Z",
+  hold_version: version,
+});
+
+describe("edit lane prepare", () => {
+  const prepareDeps = (facts: PublishEditHoldFactsV1 | null) => ({
+    ...holdDeps(facts),
+    contexts: contexts(),
+    create_command_id: () => "command:hold-1",
+  });
+
+  it("freezes the reserved absence value when nothing holds the card", async () => {
+    const ready = await prepareAcquirePublishEditHold(prepareDeps(holdFacts()), {
+      ...scope,
+      surface: "board",
+      target_option_ref: processRef(),
+    });
+    expect(ready).toMatchObject({
+      status: "ready_to_confirm",
+      preview: { effect: "acquire_publish_edit_hold", ttl_seconds: DEFAULT_EDIT_HOLD_TTL_SECONDS },
+    });
+  });
+
+  it("refuses a card another class teacher is holding, without naming a shape for them", async () => {
+    const refused = await prepareAcquirePublishEditHold(
+      prepareDeps(holdFacts({ current_hold: liveHold("caregiver-9") })),
+      { ...scope, surface: "board", target_option_ref: processRef() },
+    );
+    expect(refused).toEqual({ status: "denied", reason_code: "held_by_other" });
+  });
+
+  it("rejects a TTL the frozen contract does not admit, and an unknown field", async () => {
+    for (const invalid of [{ ttlSeconds: 0 }, { ttlSeconds: 601 }, { ttl: 60 }]) {
+      await expect(
+        prepareAcquirePublishEditHold(prepareDeps(holdFacts()), {
+          ...scope,
+          surface: "board",
+          target_option_ref: processRef(),
+          operation_input: invalid,
+        }),
+      ).resolves.toMatchObject({ status: "needs_input" });
+    }
+  });
+
+  it("refuses to renew a hold that has expired rather than reviving it", async () => {
+    await expect(
+      prepareRenewPublishEditHold(
+        prepareDeps(holdFacts({ current_hold: expiredHold("caregiver-1") })),
+        { ...scope, surface: "board", target_option_ref: processRef() },
+      ),
+    ).resolves.toEqual({ status: "denied", reason_code: "hold_expired" });
+  });
+
+  it("prepares a release even when there is nothing to release", async () => {
+    await expect(
+      prepareReleasePublishEditHold(prepareDeps(holdFacts()), {
+        ...scope,
+        surface: "board",
+        target_option_ref: processRef(),
+      }),
+    ).resolves.toMatchObject({ status: "ready_to_confirm" });
+  });
+
+  it("freezes the owner's revision head, never the one the caller remembers", async () => {
+    const ready = await prepareSavePublishProcessDraft(
+      {
+        ...draftDeps(draftFacts({ current_revision: 7 })),
+        contexts: contexts(),
+        create_command_id: () => "command:save-1",
+      },
+      {
+        ...scope,
+        surface: "board",
+        target_option_ref: processRef(),
+        operation_input: { title: "标题", segments: [{ text: "原文" }] },
+      },
+    );
+    expect(ready).toMatchObject({
+      status: "ready_to_confirm",
+      preview: { effect: "save_publish_process_draft", revision: 8, segments: 1 },
+    });
+  });
+});
+
+describe("edit lane commands", () => {
+  const holdSpec = () =>
+    createAcquirePublishEditHoldSpec({ integrity_key: BOARD_INTEGRITY_KEY });
+  const releaseSpec = () =>
+    createReleasePublishEditHoldSpec({ integrity_key: BOARD_INTEGRITY_KEY });
+
+  it("fails closed without the publish-process owner port", async () => {
+    await expect(
+      holdSpec().checkPreconditions(
+        {} as NurtureCommandTransaction,
+        holdCommand(),
+        commandContext,
+      ),
+    ).resolves.toEqual({
+      status: "invalid",
+      reason_code: "publish_process_port_unavailable",
+    });
+  });
+
+  it("judges expiry at the owner's read instant, not at its own clock", async () => {
+    // The stored hold expires five minutes after the owner's read. A command
+    // that re-read a wall clock long past that instant would call the same row
+    // expired and hand the card to a second editor.
+    const facts = ownerHoldFacts({ current_hold: liveOwnerHold("caregiver-9") });
+    await expect(
+      holdSpec().checkPreconditions(
+        editLaneTransaction({ hold: facts }),
+        holdCommand({ expected_hold_version: 3 }),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "blocked", reason_code: "held_by_other" });
+
+    // Same row, same command, a read instant past the expiry: now it is free.
+    await expect(
+      holdSpec().checkPreconditions(
+        editLaneTransaction({
+          hold: ownerHoldFacts({
+            current_hold: liveOwnerHold("caregiver-9"),
+            read_at: "2026-08-01T09:06:00.000Z",
+          }),
+        }),
+        holdCommand({ expected_hold_version: 0 }),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "ready" });
+  });
+
+  it("separates absence from a brand-new hold when comparing the frozen head", async () => {
+    // Prepared against no hold; a colleague took one in between. Encoding
+    // absence as a version a real row could also carry would let this through.
+    await expect(
+      holdSpec().checkPreconditions(
+        editLaneTransaction({ hold: ownerHoldFacts({ current_hold: liveOwnerHold("caregiver-9", 1) }) }),
+        holdCommand({ expected_hold_version: NO_PUBLISH_EDIT_HOLD_VERSION }),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "blocked", reason_code: "held_by_other" });
+  });
+
+  it("writes the hold window the owner stored, under the frozen version", async () => {
+    const calls: HoldCalls = [];
+    const applied = await holdSpec().apply(
+      editLaneTransaction({}, calls),
+      holdCommand({ expected_hold_version: 0, ttl_seconds: 300 }),
+      commandContext,
+    );
+    expect(calls).toEqual([
+      {
+        kind: "grant",
+        expected: 0,
+        // The window starts at the owner's read instant, not at "now".
+        expires_at: "2026-08-01T09:05:00.000Z",
+      },
+    ]);
+    expect(applied).toEqual({
+      output_refs: [ownerProcessRef],
+      result_schema_version: 1,
+      committed_result: {
+        processRef: processRef(),
+        expiresAt: "2026-08-01T09:59:00.000Z",
+        ttlSeconds: 300,
+      },
+    });
+  });
+
+  it("answers a release with nothing to release from the owner's own process ref", async () => {
+    const calls: HoldCalls = [];
+    const decision = await releaseSpec().checkPreconditions(
+      editLaneTransaction({}, calls),
+      holdCommand({ ttl_seconds: undefined }),
+      commandContext,
+    );
+    expect(decision).toEqual({
+      status: "already_satisfied",
+      output_refs: [ownerProcessRef],
+      result_schema_version: 1,
+      committed_result: { processRef: processRef(), released: true },
+    });
+    expect(calls).toEqual([]);
+
+    const released = await releaseSpec().apply(
+      editLaneTransaction(
+        { hold: ownerHoldFacts({ current_hold: liveOwnerHold("caregiver-1", 2) }) },
+        calls,
+      ),
+      holdCommand({ ttl_seconds: undefined, expected_hold_version: 2 }),
+      commandContext,
+    );
+    expect(calls).toEqual([{ kind: "release", expected: 2 }]);
+    expect(released.committed_result).toEqual({
+      processRef: processRef(),
+      released: true,
+    });
+  });
+
+  it("keeps the three transitions on their own command scopes", () => {
+    const scopes = [
+      createAcquirePublishEditHoldSpec({ integrity_key: BOARD_INTEGRITY_KEY }),
+      createRenewPublishEditHoldSpec({ integrity_key: BOARD_INTEGRITY_KEY }),
+      createReleasePublishEditHoldSpec({ integrity_key: BOARD_INTEGRITY_KEY }),
+    ].map((spec) => spec.command_scope);
+    expect(new Set(scopes).size).toBe(3);
+  });
+
+  it("never puts the draft body in the canonical command payload", async () => {
+    const spec = createSavePublishProcessDraftSpec({
+      integrity_key: BOARD_INTEGRITY_KEY,
+      protected_content: {
+        seal: (plaintext: string) => ({ sealed: plaintext }) as never,
+        unseal: () => "",
+      },
+    });
+    const canonical = JSON.stringify(
+      spec.canonicalize({
+        process_key: PROCESS_KEY,
+        expected_draft_revision: 4,
+        title: "春游安排",
+        segments: [{ text: "老师原文" }],
+      }),
+    );
+    expect(canonical).not.toContain("春游安排");
+    expect(canonical).not.toContain("老师原文");
+
+    const applied = await spec.apply(
+      editLaneTransaction(),
+      {
+        process_key: PROCESS_KEY,
+        expected_draft_revision: 4,
+        title: "春游安排",
+        segments: [{ text: "老师原文" }],
+      },
+      commandContext,
+    );
+    expect(applied.committed_result).toEqual({
+      processRef: processRef(),
+      revision: 5,
+      savedAt: "2026-08-01T09:58:00.000Z",
+    });
+    expect(JSON.stringify(applied.committed_result)).not.toContain("春游安排");
   });
 });

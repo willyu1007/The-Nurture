@@ -1,5 +1,6 @@
 import type { OnApplicationShutdown } from "@nestjs/common";
 import {
+  DEFAULT_EDIT_HOLD_TTL_SECONDS,
   NurtureCommandRunner,
   NurtureInteractionContextService,
   createInitiateCaregiverDirectMessageSpec,
@@ -21,6 +22,8 @@ import {
   parseSubmitFamilyCareQuestionInputV1,
   parseUpdateGuardianCurrentFocusInputV1,
   parseCancelPublishProcessInputV1,
+  parsePublishEditHoldInputV1,
+  parseSavePublishProcessDraftInputV1,
   prepareAcknowledgeFamilyCareItem,
   prepareInitiateCaregiverDirectMessage,
   prepareCorrectFamilyCareMessage,
@@ -32,6 +35,14 @@ import {
   prepareUpdateGuardianCurrentFocus,
   prepareWithdrawFamilyCareRequest,
   preparePublishProcessCancel,
+  prepareAcquirePublishEditHold,
+  prepareRenewPublishEditHold,
+  prepareReleasePublishEditHold,
+  prepareSavePublishProcessDraft,
+  createAcquirePublishEditHoldSpec,
+  createRenewPublishEditHoldSpec,
+  createReleasePublishEditHoldSpec,
+  createSavePublishProcessDraftSpec,
   createCancelPublishProcessSpec,
   createRecordCaregiverDailyCareSpec,
   createUpdateGuardianCurrentFocusSpec,
@@ -54,6 +65,7 @@ import {
   type ItemActionPrepareDecision,
   type BoardMutationPrepareDecision,
   type CancelPublishProcessPrepareDecision,
+  type EditLanePrepareDecision,
   type LifecyclePrepareDecision,
   type NurtureCommandSpec,
   type SubmitPrepareDecision,
@@ -230,6 +242,51 @@ export function createHarnessEngine(input: {
   const cancelPublishProcessSpec = createCancelPublishProcessSpec({
     integrity_key: input.integrityKey,
   });
+  const editLaneDeps = {
+    reads: publishQueueReads,
+    contexts,
+    integrity_key: input.integrityKey,
+  };
+  const acquireEditHoldSpec = createAcquirePublishEditHoldSpec({
+    integrity_key: input.integrityKey,
+  });
+  const renewEditHoldSpec = createRenewPublishEditHoldSpec({
+    integrity_key: input.integrityKey,
+  });
+  const releaseEditHoldSpec = createReleasePublishEditHoldSpec({
+    integrity_key: input.integrityKey,
+  });
+  const saveDraftSpec = createSavePublishProcessDraftSpec({
+    integrity_key: input.integrityKey,
+    protected_content: protectedContent,
+  });
+
+  /** The three hold transitions differ only by which spec they commit through. */
+  const buildEditHoldCommand =
+    (spec: NurtureCommandSpec<never>, carriesTtl: boolean) =>
+    (built: BuildInput): BuiltPayload | null => {
+      const processKey = built.target_refs.publish_process;
+      const expectedHoldVersion = built.expected_heads.publish_edit_hold;
+      if (!processKey || expectedHoldVersion === undefined) return null;
+      if (!carriesTtl) {
+        return isEmptyOperationInput(built.operation_input)
+          ? {
+              payload: { process_key: processKey, expected_hold_version: expectedHoldVersion },
+              spec,
+            }
+          : null;
+      }
+      const parsed = parsePublishEditHoldInputV1(built.operation_input);
+      if (parsed.status !== "ok") return null;
+      return {
+        payload: {
+          process_key: processKey,
+          expected_hold_version: expectedHoldVersion,
+          ttl_seconds: parsed.ttl_seconds ?? DEFAULT_EDIT_HOLD_TTL_SECONDS,
+        },
+        spec,
+      };
+    };
 
   const toPrepareResponse = (
     decision:
@@ -238,7 +295,8 @@ export function createHarnessEngine(input: {
       | ItemActionPrepareDecision
       | LifecyclePrepareDecision
       | BoardMutationPrepareDecision
-      | CancelPublishProcessPrepareDecision,
+      | CancelPublishProcessPrepareDecision
+      | EditLanePrepareDecision,
   ): HarnessPrepareResponseV1 => {
     // Internal raw target ids (enrollment_id / item_id) never leave the
     // service; execute recovers the exact target from the confirmation.
@@ -565,6 +623,36 @@ export function createHarnessEngine(input: {
         return {
           payload: { process_key: processKey, expected_process_version: expectedVersion },
           spec: cancelPublishProcessSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    acquire_publish_edit_hold: {
+      prepare: optionalTarget((request) => prepareAcquirePublishEditHold(editLaneDeps, request)),
+      build: buildEditHoldCommand(acquireEditHoldSpec as NurtureCommandSpec<never>, true),
+    },
+    renew_publish_edit_hold: {
+      prepare: optionalTarget((request) => prepareRenewPublishEditHold(editLaneDeps, request)),
+      build: buildEditHoldCommand(renewEditHoldSpec as NurtureCommandSpec<never>, true),
+    },
+    release_publish_edit_hold: {
+      prepare: optionalTarget((request) => prepareReleasePublishEditHold(editLaneDeps, request)),
+      build: buildEditHoldCommand(releaseEditHoldSpec as NurtureCommandSpec<never>, false),
+    },
+    save_publish_process_draft: {
+      prepare: optionalTarget((request) => prepareSavePublishProcessDraft(editLaneDeps, request)),
+      build: (built) => {
+        const processKey = built.target_refs.publish_process;
+        const expectedRevision = built.expected_heads.draft_revision;
+        const parsed = parseSavePublishProcessDraftInputV1(built.operation_input);
+        if (!processKey || expectedRevision === undefined || parsed.status !== "ok") return null;
+        return {
+          payload: {
+            process_key: processKey,
+            expected_draft_revision: expectedRevision,
+            title: parsed.input.title,
+            segments: parsed.input.segments,
+          },
+          spec: saveDraftSpec as NurtureCommandSpec<never>,
         };
       },
     },

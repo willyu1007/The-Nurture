@@ -170,6 +170,7 @@ describe("withHarnessConfirmation", () => {
   const context = {
     workspace_id: workspaceId,
     business_actor_ref: "participant-1",
+    command_request_id: "command:test-1",
   };
 
   const transactionWith = (

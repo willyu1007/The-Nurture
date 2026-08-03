@@ -116,6 +116,13 @@ export type NurtureCommandExecutionContext = {
   workspace_id: string;
   business_actor_ref: string;
   child_care_process_id?: string;
+  /**
+   * The stable business command identity this execution runs under. Owner
+   * writes that carry their own row-level idempotency key need it, and the
+   * runner already holds it — deriving it a second time from the payload would
+   * be a second source of the same identity.
+   */
+  command_request_id: string;
 };
 
 export type NurtureCommandApplyResult = {
@@ -499,6 +506,7 @@ export class NurtureCommandRunner {
           const executionContext: NurtureCommandExecutionContext = {
             workspace_id: input.workspace_id,
             business_actor_ref: input.business_actor_ref,
+            command_request_id: input.command_request_id,
             ...(input.child_care_process_id
               ? { child_care_process_id: input.child_care_process_id }
               : {}),

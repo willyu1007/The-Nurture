@@ -2272,3 +2272,253 @@ describe("T-006 pre-release cancel through the formal Harness ingress", () => {
     ).toBe("draft");
   });
 });
+
+describe("T-006 edit lane through the formal Harness ingress", () => {
+  const seedEditableProcess = async (scope: SeedScope) => {
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+        sourceRefsPayload: ["source-ref-1"],
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: revision.id },
+    });
+    return { process, revision };
+  };
+
+  const processRefFor = (scope: SeedScope, participantId: string, processKey: string) =>
+    issueBoardSealedRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: participantId },
+      PUBLISH_PROCESS_TARGET_KIND,
+      processKey,
+    );
+
+  it("takes, extends and releases one hold, and refuses a colleague in between", async () => {
+    const scope = await seedScope();
+    const { process } = await seedEditableProcess(scope);
+    const mine = processRefFor(scope, scope.caregiver.id, process.processKey);
+
+    const acquired = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "acquire_publish_edit_hold",
+      targetOptionRef: mine,
+      operationInput: { ttlSeconds: 300 },
+    });
+    expect(acquired.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(acquired.executed?.json.committed_result.ttlSeconds).toBe(300);
+    const held = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+    });
+    expect(held.holderParticipantId).toBe(scope.caregiver.id);
+    expect(acquired.executed?.json.committed_result.expiresAt).toBe(
+      held.expiresAt.toISOString(),
+    );
+
+    // A colleague of the same class sees the card but cannot take the hold.
+    const colleague = await prepareAction({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "acquire_publish_edit_hold",
+      targetOptionRef: processRefFor(scope, scope.caregiverB.id, process.processKey),
+    });
+    expect(colleague.json).toMatchObject({ status: "denied", reason_code: "held_by_other" });
+
+    const renewed = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "renew_publish_edit_hold",
+      targetOptionRef: mine,
+      operationInput: { ttlSeconds: 600 },
+    });
+    expect(renewed.executed?.json.status).toBe("committed");
+    const extended = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { id: held.id },
+    });
+    expect(extended.aggregateVersion).toBe(held.aggregateVersion + 1);
+    expect(extended.expiresAt.getTime()).toBeGreaterThan(held.expiresAt.getTime());
+
+    const released = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_edit_hold",
+      targetOptionRef: mine,
+    });
+    expect(released.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(await prisma.nurturePublishEditHold.count({ where: { id: held.id } })).toBe(0);
+    // The hold was never a process state.
+    expect(
+      (await prisma.nurturePublishProcess.findUniqueOrThrow({ where: { id: process.id } })).state,
+    ).toBe("draft");
+
+    // Releasing again changed nothing, and says so.
+    const again = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_edit_hold",
+      targetOptionRef: mine,
+    });
+    expect(again.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "already_satisfied",
+    });
+  });
+
+  it("saves a draft revision and refuses the head the owner has moved past", async () => {
+    const scope = await seedScope();
+    const { process, revision } = await seedEditableProcess(scope);
+    const mine = processRefFor(scope, scope.caregiver.id, process.processKey);
+    const draft = {
+      title: "春游安排",
+      segments: [{ text: "今天孩子们去了公园", sourceRef: "source-ref-1" }],
+    };
+
+    const saved = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "save_publish_process_draft",
+      targetOptionRef: mine,
+      operationInput: draft,
+    });
+    expect(saved.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(saved.executed?.json.committed_result.revision).toBe(2);
+    // The body never appears in a public result.
+    expect(JSON.stringify(saved.executed?.json)).not.toContain("春游安排");
+    expect(JSON.stringify(saved.executed?.json)).not.toContain(process.processKey);
+
+    const stored = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id, revision: 2 },
+    });
+    expect(stored.organizerInputRevision).toBe(revision.organizerInputRevision);
+    expect(stored.commandRequestIdHash).not.toBeNull();
+    expect(
+      await prisma.nurturePublishProcessRevision.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(2);
+
+    // Prepared against revision 2, then a colleague saves revision 3 first.
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "save_publish_process_draft",
+      targetOptionRef: mine,
+      operationInput: draft,
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "save_publish_process_draft",
+      targetOptionRef: processRefFor(scope, scope.caregiverB.id, process.processKey),
+      operationInput: { title: "另一位老师", segments: [{ text: "另一段" }] },
+    });
+    const stale = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "save_publish_process_draft",
+      prepared,
+      operationInput: draft,
+    });
+    // No last-write-wins: the client refreshes and reapplies.
+    expect(stale.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "stale_confirmation",
+      recovery: "reprepare",
+    });
+    expect(
+      (await prisma.nurturePublishProcess.findUniqueOrThrow({ where: { id: process.id } }))
+        .currentRevisionId,
+    ).not.toBe(stored.id);
+  });
+
+  it("refuses a guardian, an unknown source ref and a cancelled process", async () => {
+    const scope = await seedScope();
+    const { process } = await seedEditableProcess(scope);
+
+    await expect(
+      prepareAction({
+        scope,
+        actorId: scope.guardian.id,
+        surface: "board",
+        capabilityKey: "acquire_publish_edit_hold",
+        targetOptionRef: processRefFor(scope, scope.guardian.id, process.processKey),
+      }).then((response) => response.json),
+    ).resolves.toMatchObject({ status: "denied", reason_code: "target_unavailable" });
+
+    const mine = processRefFor(scope, scope.caregiver.id, process.processKey);
+    await expect(
+      prepareAction({
+        scope,
+        actorId: scope.caregiver.id,
+        surface: "board",
+        capabilityKey: "save_publish_process_draft",
+        targetOptionRef: mine,
+        operationInput: { title: "t", segments: [{ text: "x", sourceRef: "1.not-issued" }] },
+      }).then((response) => response.json),
+    ).resolves.toMatchObject({ status: "denied", reason_code: "unknown_source_ref" });
+
+    await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "cancel_publish_process",
+      targetOptionRef: mine,
+    });
+    // A cancelled process is never edited in place.
+    for (const capabilityKey of [
+      "acquire_publish_edit_hold",
+      "save_publish_process_draft",
+    ] as const) {
+      const refused = await prepareAction({
+        scope,
+        actorId: scope.caregiver.id,
+        surface: "board",
+        capabilityKey,
+        targetOptionRef: mine,
+        ...(capabilityKey === "save_publish_process_draft"
+          ? { operationInput: { title: "t", segments: [{ text: "x" }] } }
+          : {}),
+      });
+      expect(refused.json, capabilityKey).toMatchObject({
+        status: "denied",
+        reason_code: "process_not_editable",
+      });
+    }
+  });
+});

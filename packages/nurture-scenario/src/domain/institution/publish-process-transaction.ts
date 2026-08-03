@@ -48,6 +48,55 @@ export type NurturePublishProcessCancelFacts = {
 };
 
 /**
+ * The head the `publish_edit_hold must_equal` binding freezes.
+ *
+ * `0` means "no live hold" and is reserved: a real row is floored at 1 by
+ * `ck_nurture_publish_edit_hold_version_floor`. Sharing 0 between absence and a
+ * freshly created hold would let an acquire prepared against absence pass its
+ * head check against a hold another class teacher took in between.
+ */
+export const NO_PUBLISH_EDIT_HOLD_VERSION = 0;
+
+export type NurturePublishEditHoldFacts = {
+  authority: NurtureCaregiverWriteAuthority;
+  publish_process_ref: DomainContextRef;
+  process_state: string;
+  /**
+   * The instant this read was true at. Every expiry decision and every new hold
+   * window is measured from exactly this value: a rule that read its own clock
+   * would answer at a different moment than the row it is judging, and "the hold
+   * was live when the owner looked" would stop being checkable.
+   */
+  read_at: string;
+  /** The stored hold, whether or not it has expired; expiry is the rule's call. */
+  current_hold?: {
+    holder_participant_id: string;
+    holder_label: string;
+    expires_at: string;
+    hold_version: number;
+  };
+};
+
+export type NurturePublishDraftFacts = NurturePublishEditHoldFacts & {
+  /** `0` while the process has no saved revision at all. */
+  current_revision: number;
+  known_source_refs: string[];
+  /** Set when this exact command identity already produced a revision. */
+  replayed_revision?: { revision: number; content_digest: string; saved_at: string };
+};
+
+/**
+ * The protected shape a draft save hands the owner. The command layer seals the
+ * plaintext; the owner stores envelopes and never derives, logs or re-reads the
+ * body.
+ */
+export type NurturePublishDraftContent = {
+  title_envelope: unknown;
+  body_envelope: unknown;
+  content_digest: string;
+};
+
+/**
  * Canonical-owner writes behind the T-006 publish-process lifecycle. The board
  * is an operable projection, not a fact owner: each write re-reads the owner
  * inside the command transaction and updates the owner row under its own
@@ -67,4 +116,47 @@ export type NurturePublishProcessTransaction = {
     expected_process_version: number;
     cancelled_at: string;
   }): Promise<{ publish_process_ref: DomainContextRef; cancelled_at: string }>;
+
+  loadPublishEditHoldFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+  }): Promise<NurturePublishEditHoldFacts | null>;
+  /**
+   * Take or extend the one hold on this process. `expected_hold_version` is
+   * `NO_PUBLISH_EDIT_HOLD_VERSION` when the caller prepared against no hold, and
+   * the exact row version when extending one it already holds.
+   */
+  applyPublishEditHoldGrant(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+    expected_hold_version: number;
+    expires_at: string;
+  }): Promise<{ publish_process_ref: DomainContextRef; expires_at: string }>;
+  applyPublishEditHoldRelease(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+    expected_hold_version: number;
+  }): Promise<{ publish_process_ref: DomainContextRef }>;
+
+  loadPublishDraftFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+    command_request_id: string;
+  }): Promise<NurturePublishDraftFacts | null>;
+  applyPublishProcessDraftSave(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+    command_request_id: string;
+    expected_draft_revision: number;
+    content: NurturePublishDraftContent;
+  }): Promise<{
+    publish_process_ref: DomainContextRef;
+    revision: number;
+    saved_at: string;
+  }>;
 };

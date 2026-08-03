@@ -31,6 +31,7 @@ const caregiverScope = { workspace_id: "ws-1", participant_id: "caregiver-1" };
 const context: NurtureCommandExecutionContext = {
   workspace_id: "ws-1",
   business_actor_ref: "guardian-1",
+  command_request_id: "command:board-1",
 };
 
 const contexts = (): NurtureInteractionContextService =>

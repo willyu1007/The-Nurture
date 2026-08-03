@@ -15,6 +15,7 @@ import type {
   TeacherPublishQueueReadPort,
 } from "@the-nurture/scenario/harness";
 import { assertProtectedContentEnvelopeV1 } from "@the-nurture/scenario/harness";
+import { publishDraftCommandIdentity } from "./publish-process.transaction.js";
 import {
   aggregateCensus,
   caregiverRowAuthority,
@@ -332,12 +333,14 @@ export class PrismaPublishLaneReadPort
     const { at, reach, process } = loaded;
 
     // An exact command replay is answered from the revision that command wrote,
-    // never by writing a second one.
+    // never by writing a second one. Searched by the command identity column:
+    // `organizer_input_revision` carries the assembler's input revision, so the
+    // lookup that used to run here could never match what it was looking for.
     const replayed = await this.prisma.nurturePublishProcessRevision.findFirst({
       where: {
         workspaceId: input.workspace_id,
         publishProcessId: process.id,
-        organizerInputRevision: input.command_request_id,
+        commandRequestIdHash: publishDraftCommandIdentity(input.command_request_id),
       },
       orderBy: { revision: "desc" },
     });

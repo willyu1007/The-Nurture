@@ -425,7 +425,7 @@ const producers: Record<string, () => Promise<unknown>> = {
         expected_focus_cycle_version: 3,
         expected_focus_goal_version: 4,
       },
-      { workspace_id: "ws-1", business_actor_ref: "guardian-1" },
+      { workspace_id: "ws-1", business_actor_ref: "guardian-1", command_request_id: "command:fixture-1" },
     );
     return applied.committed_result;
   },
@@ -473,7 +473,7 @@ const producers: Record<string, () => Promise<unknown>> = {
         expected_role_version: 5,
         expected_enrollment_version: 6,
       },
-      { workspace_id: "ws-1", business_actor_ref: "caregiver-1" },
+      { workspace_id: "ws-1", business_actor_ref: "caregiver-1", command_request_id: "command:fixture-1" },
     );
     return applied.committed_result;
   },

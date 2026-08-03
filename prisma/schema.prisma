@@ -2529,7 +2529,12 @@ model NurturePublishEditHold {
   holderRoleAssignmentId String   @map("holder_role_assignment_id")
   holderParticipantId    String   @map("holder_participant_id")
   expiresAt              DateTime @map("expires_at")
-  aggregateVersion       Int      @default(0) @map("aggregate_version")
+  // Floored at 1 by `ck_nurture_publish_edit_hold_version_floor`, so 0 is
+  // reserved for "no live hold" — the value the `publish_edit_hold must_equal`
+  // head freezes when a process carries none. Sharing 0 with a freshly created
+  // hold would let an acquire prepared against absence overwrite a hold another
+  // class teacher took in between.
+  aggregateVersion       Int      @default(1) @map("aggregate_version")
   createdAt              DateTime @default(now()) @map("created_at")
   updatedAt              DateTime @updatedAt @map("updated_at")
 

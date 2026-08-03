@@ -62,7 +62,6 @@ const expectedHarnessActionKeys = [
  * silently, and a key listed here after it is routed fails too.
  */
 const expectedUnroutedCapabilityKeys = [
-  "acquire_publish_edit_hold",
   "confirm_child_media_attribution",
   "correct_publication",
   "detach_publish_process_media",
@@ -70,12 +69,9 @@ const expectedUnroutedCapabilityKeys = [
   "organize_care_capture_batch",
   "redact_publication",
   "reject_child_media_attribution",
-  "release_publish_edit_hold",
   "release_publish_process",
   "remove_publication_target_visibility",
-  "renew_publish_edit_hold",
   "reschedule_publish_process",
-  "save_publish_process_draft",
   "supersede_child_media_attribution",
 ];
 const expectedOwnerRequiredFields = [

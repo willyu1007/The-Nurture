@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-02T23:42:41.473Z",
+  "updatedAt": "2026-08-03T00:18:50.378Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -13127,7 +13127,7 @@
           "list": false,
           "dbName": "aggregate_version",
           "dbType": null,
-          "default": "0",
+          "default": "1",
           "primaryKey": false,
           "unique": false
         },
