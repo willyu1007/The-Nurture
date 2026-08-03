@@ -244,9 +244,18 @@ be met until the 24 keys are routed and the ingress guard's census is extended.
 >   organize would cut. Resolve the CareGroup binding and the outcome enum
 >   first.
 >
-> The eight routable ones are the attribution lane (confirm / reject /
+> The eight routable ones were the attribution lane (confirm / reject /
 > supersede), the two media-lifecycle actions (detach / discard) and the three
 > post-release safety actions (correct / remove visibility / redact).
+>
+> **The attribution lane landed on 2026-08-04**, with review findings 5, 6 and 7
+> closed in the same unit: the release-eligibility reader now reduces to the
+> current fact per child and drops terminal states from its obligations, the
+> supersession's to-child obeys the transition machine, and idempotent repeats
+> answer from the stored decision instant with a ref every read reproduces.
+> Five routable capabilities remain — detach / discard and the three
+> post-release safety actions — and the ingress guard's explicit unrouted list
+> is now eight (those five plus the three B8 cannot route at all).
 
 
 Discovered while routing B4-2, and not visible when this review was written.

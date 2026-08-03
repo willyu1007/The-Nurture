@@ -5,17 +5,22 @@
 - State: in-progress
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-03
+- Updated: 2026-08-04
 - Next step: G3-E readiness review 的 B1/B2/B3 已关闭，B4 部分完成。**B8 Unit 0
   与 Lane A 已落地**：写命令工厂 `createBoardWriteSpec`、按能力的 ingress 描述表、
   `cancel_publish_process`，以及编辑 lane 的四条写能力（edit hold 取得/续期/释放、
   草稿自动保存），全部含 owner 写事务、prepare、spec、路由与真 PostgreSQL 的
   DB e2e。formal ingress 现在准入 15 个 action 与 9 个 query，显式未路由的写 key
   从 16 降到 11。
-  接下来按规划走剩余三段：`organize_care_capture_batch`（与几乎所有东西重叠，
-  须排在编辑 lane 之后）、归属 lane 5 条、发布后安全 lane 5 条；随后是 B4 余下
-  路由与 B5 的 T-005 consumer action。B6/B7 依赖 T-007 provider 与 T-005 G2-C
-  联合运行，无法提前拉入。详见
+  2026-08-03 的对抗复核判定该范围架构成立但两条 HIGH 必修——两条均已修复
+  （过期 hold 卡死、草稿 LWW 经输入 schema 增补 + 制品旋转至 `1.14.0`），随后的
+  卫生批密封了线上的原始 id 并加固了 head 普查。**归属 lane 三条已于 2026-08-04
+  落地**（复核发现 5/6/7 同单元关闭），ingress 现准入 18 action + 9 query。
+  剩余可路由 5 条：媒体生命周期 2 条（detach/discard）与发布后安全 3 条
+  （correct/remove visibility/redact，需 `afterExecutionCreated` 或行 id 预生成，
+  因 `command_execution_id` 外键指向尚不存在的 CommandExecution）；三条 B8 内
+  不可路由（release 需多命令 ingress 形状、reschedule 等 T-007、organize 待
+  CareGroup 绑定与 outcome 枚举的合同决定）。B6/B7 依赖外部联合运行。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal

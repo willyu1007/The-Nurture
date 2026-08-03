@@ -880,3 +880,25 @@ amendment plus artifact rotation, not a code-only change.
 | falsified: production result gains an undeclared raw key | CAUGHT |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `:db` | PASS — 546, 193, 52, 33 |
 | full DB-free gate set + `ctl-context verify --strict` | PASS — artifact unchanged at `1.14.0` |
+
+## 2026-08-04 — B8 Attribution Lane (Confirm / Reject / Supersede + Findings 5, 6, 7)
+
+| Command / check | Result |
+| --- | --- |
+| three capabilities routed end to end on the Unit 0 factory; unrouted census 11 → 8 | LANDED |
+| decisions append revisions; per-revision unique is the CAS, plus an exact-current guard against gapped heads | LANDED |
+| falsified: gapped-head guard removed | CAUGHT |
+| `attribution_revision` floor migration + CHECK (absence head 0 unrepresentable by a real row) | PASS — gate verified, constraint live |
+| confirmed appends always manual; rejected/superseded inherit the row's own stored source, never the lossy display mapping | LANDED |
+| falsified: confirmed append inherits the proposing source | CAUGHT |
+| finding 7: repeats answer from the stored instant; candidate/undated facts refuse (`attribution_evidence_unavailable`); ref basis (asset, child, revision) reproducible by commit ack and reads alike | LANDED |
+| falsified: already_satisfied invents the instant again | CAUGHT |
+| finding 6: supersede's to-child obeys the same transition machine | LANDED |
+| falsified: guard removed — first round MISSED (no covering test), covered, re-falsified | CAUGHT |
+| finding 5: release reader reduces to the current fact per child and drops terminal states from obligations | LANDED |
+| falsified: history mapped again | CAUGHT |
+| cross-boundary: real owner rows (superseded→rejected history + live confirmation) → `derivePublishEligibility` says releasable | PASS |
+| e2e: confirm commits on owner rows, exact replay, colleague repeat at the stored instant, supersede A→B linked, guardian refused, moved state refused fail-closed, child-binding mismatch refused | PASS |
+| execute-side childRef binding: resubmitted child ≠ prepared child → `invalid_operation_input` | PASS |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `:db` | PASS — 549, 198, 52, 36 |
+| full DB-free gate set + `ctl-context verify --strict` | PASS — artifact unchanged at `1.14.0`, actions 15 → 18 |

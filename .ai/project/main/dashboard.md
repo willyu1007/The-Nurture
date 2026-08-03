@@ -28,9 +28,14 @@ Project: `main`
   registered version. B8's serial foundation unit landed on 2026-08-03 — the
   shared write-spec factory, a per-capability ingress descriptor table that makes
   admitting an unservable key a type error, and `cancel_publish_process` end to
-  end on real PostgreSQL — followed by Lane A, the four edit-lane capabilities.
-  A 2026-08-03 survey then split the eleven that remain: eight are routable and
-  still need an owner write transaction and a command spec each, while
+  end on real PostgreSQL — followed by Lane A (the four edit-lane capabilities)
+  and, after an adversarial review whose two HIGH findings were fixed (expired
+  holds bricked the lane; draft saves silently last-write-won, fixed by an
+  input-schema amendment and an additive rotation to 1.14.0), the attribution
+  lane (confirm/reject/supersede) with review findings 5/6/7 closed in the same
+  unit. A 2026-08-03 survey split what remains: five routable capabilities
+  (detach/discard media, and the three post-release safety actions) still need
+  an owner write transaction and a command spec each, while
   `release_publish_process`, `reschedule_publish_process` and
   `organize_care_capture_batch` cannot be routed in B8 at all — the first needs
   a multi-command ingress shape, the second waits on the T-007 provider, and the

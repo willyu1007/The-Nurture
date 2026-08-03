@@ -1641,3 +1641,53 @@ keyed display handle。密封是确定性的,重放响应仍与原响应逐字�
 会失败,此前会静默通过。
 
 四条证伪全 CAUGHT:拆掉密封、`??` 回退、映射表删一条、production 结果加一个未声明键。
+
+## 2026-08-04 — B8 归属 lane:三条写能力,与随行的复核发现 5/6/7
+
+confirm / reject / supersede 三条归属能力端到端,全部走 Unit 0 工厂;复核判定必须
+**随** lane 落地的三条发现在同一单元内关闭。
+
+### 形状
+
+- **决策即追加**。每个决定按 (asset, child) 追加一个新修订;confirmed 历史永不改写。
+  per-revision 唯一约束就是 CAS,owner 侧再补一道"expected 必须恰等于当前最大修订"
+  ——唯一约束挡得住重复,挡不住**跳空**(current 1、expected 5 → 插入 rev 6),这一道
+  挡住它。
+- **head**:`child_media_attribution` = 该孩子当前修订,0 保留给"尚无归属"
+  (`ck_nurture_media_attribution_revision_floor` 把下界钉进库里,hold version 0 的
+  同一课);`media_asset_revision` = 不可变原始媒体修订;supersede 额外冻结
+  `target_child_attribution`(注册表之外的更强 head,与 cancel 同理)。
+- **来源是 owner 的裁决**:confirmed 追加一律记 manual;rejected/superseded 从**行自己
+  存储的来源**继承——不经过领域侧有损的展示映射(face_reference/history_match/system
+  → 三合二)往返。
+- **supersede 原子两行**:from 孩子的 superseded 修订 + to 孩子的 confirmed 行,
+  同一瞬间,`superseded_by_attribution_id` 指向被纠正成的那一行;底下的 confirmed
+  历史原样留存。
+- **execute 侧的 childRef 绑定**:sealed ref 对同一 actor 是确定性的,transport 用
+  确认里冻结的 id 重新签发并要求与重提交的 ref 相等——重提交一个不同的孩子直接
+  `invalid_operation_input`,而不是被确认静默纠正回去。
+
+### 随行的三条复核发现
+
+- **5(发布资格读取器)**:ac2bb6e 的 current-fact 归约此前只落在姊妹文件——又一个
+  半程修复。现在共享同一个归约器,且终态 `superseded` 与 `rejected` 一样不再构成
+  义务。跨界测试:真实 owner 行(rev1 superseded → rev2 rejected + 另一孩子
+  confirmed)喂进 `derivePublishEligibility`,结论必须是可发布。fixture 第一版把
+  被纠正掉的孩子也设成发布**目标**,曝光检查正确地拦了它——"不在照片里的孩子不该是
+  受众"本身就是规则在工作。
+- **6(supersede 的 to-child)**:此前只挡"已 confirmed",终态 rejected/superseded
+  的孩子能被纠正成 confirmed。补 `isLegalAttributionTransition(replaced.status,
+  "confirmed")`。**证伪先抓到我自己**:第一轮撤掉守卫测试仍绿——守卫没有覆盖;
+  补了测试再证伪才 CAUGHT。
+- **7(decided_at 与 ref 基底)**:幂等复述从**存储的**决定时刻作答——confirmed 用
+  `confirmed_at`,rejected/superseded 用追加行的 `created_at`(追加即决定);candidate
+  没有决定时刻,复述一个 owner 无法作证的决定直接拒
+  (`attribution_evidence_unavailable`,cancel 先例)。`attributionRef` 的基底从
+  "前驱行 id + 后继修订"(一个永不存在的组合)改为 (asset, child, revision)——
+  提交回执与后续读取按构造一致。
+
+### 这一格没有做的
+
+finding 4(revision-0 草稿保存的仓储契约)按复核裁定属于 organize/采集 lane,
+而 organize 本身被合同决定阻塞;它作为已记录债务随那条 lane 关闭。未路由清单
+8 条:媒体生命周期 2、发布后安全 3、以及三条 B8 不可路由(release/reschedule/organize)。
