@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import {
   PrismaPublicationReleasePort,
+  PrismaPublicationSafetyTransaction,
   publicationReleaseAttemptIdentity,
   publicationReleaseCommandIdentity,
 } from "../src/index.js";
@@ -700,5 +701,154 @@ describe("G3-D owner reads: post-release safety", () => {
     });
     expect(after?.media[0]?.media_revision).toBe(1);
     expect(after?.media[0]?.current_media_revision).toBe(2);
+  });
+});
+
+describe("T-006 owner write: post-release safety", () => {
+  const owner = () => new PrismaPublicationSafetyTransaction(prisma);
+
+  /** One committed release, landed by the real per-target release port. */
+  const seedCommittedRelease = async (world: World) => {
+    const { process, targets } = await seedProcess(world);
+    const port = new PrismaPublicationReleasePort(prisma);
+    const result = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+    });
+    if (result.status !== "committed") {
+      throw new Error(`seedCommittedRelease failed: ${JSON.stringify(result)}`);
+    }
+    const release = await prisma.nurturePublicationRelease.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    return { process, release };
+  };
+
+  it("moves visibility monotonically and refuses a transition the lineage already passed", async () => {
+    const world = await seedWorld();
+    const released = await seedCommittedRelease(world);
+    await owner().applyPublicationVisibilityUpdate({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      updates: [
+        {
+          publication_id: released.release.id,
+          from_visibility: ["visible"],
+          to_visibility: "removed",
+        },
+      ],
+    });
+    expect(
+      (
+        await prisma.nurturePublicationRelease.findUniqueOrThrow({
+          where: { id: released.release.id },
+        })
+      ).visibility,
+    ).toBe("removed");
+
+    // Removing again finds nothing visible: the FROM set is the guard.
+    await expect(
+      owner().applyPublicationVisibilityUpdate({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        updates: [
+          {
+            publication_id: released.release.id,
+            from_visibility: ["visible"],
+            to_visibility: "removed",
+          },
+        ],
+      }),
+    ).rejects.toThrow(/visibility transition conflict/);
+
+    // But redaction still covers a removed release.
+    await owner().applyPublicationVisibilityUpdate({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      updates: [
+        {
+          publication_id: released.release.id,
+          from_visibility: ["visible", "removed"],
+          to_visibility: "redacted",
+        },
+      ],
+    });
+    expect(
+      (
+        await prisma.nurturePublicationRelease.findUniqueOrThrow({
+          where: { id: released.release.id },
+        })
+      ).visibility,
+    ).toBe("redacted");
+  });
+
+  it("appends lineage rows that name the command execution, under pre-generated ids", async () => {
+    const world = await seedWorld();
+    const released = await seedCommittedRelease(world);
+    const execution = await prisma.nurtureCommandExecution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        commandRequestIdHash: "e".repeat(64),
+        originInvocationRequestIdHash: "f".repeat(64),
+        requestIdentityHashVersion: 1,
+        commandKey: "remove_publication_target_visibility",
+        commandScope: "publication_remove_target",
+        commandContractVersion: 1,
+        payloadHash: "1".repeat(64),
+        payloadCanonicalizationVersion: 1,
+        businessActorRef: world.teacher.id,
+        targetRefs: [],
+        businessOutcome: "applied",
+        outputRefs: [],
+        handoffSnapshotSchemaVersion: 1,
+        handoffRequestSnapshotsPayload: [],
+      },
+    });
+
+    const eventId = randomUUID();
+    await owner().appendPublicationVisibilityEvents({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      command_execution_id: execution.id,
+      events: [
+        {
+          event_id: eventId,
+          publication_id: released.release.id,
+          kind: "target_removal",
+          reason_key: "family_request",
+          source_release_revision: 1,
+          occurred_at: "2026-08-04T08:00:00.000Z",
+        },
+      ],
+    });
+    const stored = await prisma.nurturePublicationVisibilityEvent.findUniqueOrThrow({
+      where: { id: eventId },
+    });
+    expect(stored.commandExecutionId).toBe(execution.id);
+    expect(stored.actorRoleAssignmentId).toBe(world.teacherRole.id);
+    expect(stored.occurredAt.toISOString()).toBe("2026-08-04T08:00:00.000Z");
+
+    // The lineage must name a real execution: a made-up id fails the FK.
+    await expect(
+      owner().appendPublicationVisibilityEvents({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        command_execution_id: randomUUID(),
+        events: [
+          {
+            event_id: randomUUID(),
+            publication_id: released.release.id,
+            kind: "redaction",
+            reason_key: "policy_requirement",
+            source_release_revision: 1,
+            occurred_at: "2026-08-04T08:05:00.000Z",
+          },
+        ],
+      }),
+    ).rejects.toThrow();
   });
 });

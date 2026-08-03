@@ -258,6 +258,7 @@ describe("Phase 3 publish and release loop", () => {
                 receipt_id: "receipt-1",
                 release_revision: 4,
                 visibility: "visible",
+                events: [],
               },
             ],
           }),

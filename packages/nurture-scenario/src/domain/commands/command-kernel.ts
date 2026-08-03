@@ -7,6 +7,7 @@ import type { NurtureWorkflowProject } from "../../repositories.js";
 import type { NurtureBoardMutationTransaction } from "../institution/board-mutation-transaction.js";
 import type { NurturePublishProcessTransaction } from "../institution/publish-process-transaction.js";
 import type { NurtureMediaAttributionTransaction } from "../institution/media-attribution-transaction.js";
+import type { NurturePublicationSafetyTransaction } from "../institution/publication-safety-transaction.js";
 import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
@@ -67,6 +68,8 @@ export type NurtureCommandTransaction = {
   publishProcess?: NurturePublishProcessTransaction;
   /** Present when the G3-C1 child-media attribution owner write adapter is wired. */
   mediaAttribution?: NurtureMediaAttributionTransaction;
+  /** Present when the G3-D post-release safety owner write adapter is wired. */
+  publicationSafety?: NurturePublicationSafetyTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {

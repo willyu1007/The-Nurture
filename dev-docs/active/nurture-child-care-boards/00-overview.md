@@ -16,11 +16,12 @@
   （过期 hold 卡死、草稿 LWW 经输入 schema 增补 + 制品旋转至 `1.14.0`），随后的
   卫生批密封了线上的原始 id 并加固了 head 普查。**归属 lane 三条已于 2026-08-04
   落地**（复核发现 5/6/7 同单元关闭），ingress 现准入 18 action + 9 query。
-  剩余可路由 5 条：媒体生命周期 2 条（detach/discard）与发布后安全 3 条
-  （correct/remove visibility/redact，需 `afterExecutionCreated` 或行 id 预生成，
-  因 `command_execution_id` 外键指向尚不存在的 CommandExecution）；三条 B8 内
-  不可路由（release 需多命令 ingress 形状、reschedule 等 T-007、organize 待
-  CareGroup 绑定与 outcome 枚举的合同决定）。B6/B7 依赖外部联合运行。详见
+  **B8 可路由集合已于 2026-08-04 清零**：媒体生命周期 2 条与发布后安全 3 条
+  （工厂 `finalize` 钩子解决 `command_execution_id` 外键时序，幂等复述从存储
+  事件作答）全部落地。ingress 现准入 23 action + 9 query；显式未路由恰为三条
+  结构性阻塞（release 需多命令 ingress 形状、reschedule 等 T-007、organize 待
+  CareGroup 绑定与 outcome 枚举的合同决定）。余下：B5 的 T-005 consumer
+  action，及 B6/B7 的外部联合运行。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal

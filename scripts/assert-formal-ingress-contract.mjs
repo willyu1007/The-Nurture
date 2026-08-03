@@ -62,11 +62,8 @@ const expectedHarnessActionKeys = [
  * silently, and a key listed here after it is routed fails too.
  */
 const expectedUnroutedCapabilityKeys = [
-  "correct_publication",
   "organize_care_capture_batch",
-  "redact_publication",
   "release_publish_process",
-  "remove_publication_target_visibility",
   "reschedule_publish_process",
 ];
 const expectedOwnerRequiredFields = [

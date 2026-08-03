@@ -38,6 +38,13 @@ import {
   preparePublishProcessCancel,
   prepareConfirmChildMediaAttribution,
   prepareDetachPublishProcessMedia,
+  prepareCorrectPublication,
+  prepareRemovePublicationTargetVisibility,
+  prepareRedactPublication,
+  createCorrectPublicationSpec,
+  createRemovePublicationTargetVisibilitySpec,
+  createRedactPublicationSpec,
+  parseReasonInput,
   prepareDiscardMediaAsset,
   createDetachPublishProcessMediaSpec,
   createDiscardMediaAssetSpec,
@@ -315,6 +322,21 @@ export function createHarnessEngine(input: {
     integrity_key: input.integrityKey,
   });
   const discardMediaSpec = createDiscardMediaAssetSpec({
+    integrity_key: input.integrityKey,
+  });
+  const publicationSafetyDeps = {
+    reads: publicationReleaseReads,
+    contexts,
+    integrity_key: input.integrityKey,
+  };
+  const correctPublicationSpec = createCorrectPublicationSpec({
+    integrity_key: input.integrityKey,
+    protected_content: protectedContent,
+  });
+  const removeTargetVisibilitySpec = createRemovePublicationTargetVisibilitySpec({
+    integrity_key: input.integrityKey,
+  });
+  const redactPublicationSpec = createRedactPublicationSpec({
     integrity_key: input.integrityKey,
   });
 
@@ -890,6 +912,57 @@ export function createHarnessEngine(input: {
         return {
           payload: { media_asset_id: mediaAssetId, expected_media_revision: expectedRevision },
           spec: discardMediaSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    correct_publication: {
+      prepare: optionalTarget((request) =>
+        prepareCorrectPublication(publicationSafetyDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseReasonInput(built.operation_input, "correctionText");
+        const processKey = built.target_refs.publish_process;
+        if (parsed.status !== "ok" || !processKey || !parsed.input.correctionText) return null;
+        return {
+          payload: {
+            process_key: processKey,
+            reason: parsed.input.reason,
+            correction_text: parsed.input.correctionText,
+          },
+          spec: correctPublicationSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    remove_publication_target_visibility: {
+      prepare: optionalTarget((request) =>
+        prepareRemovePublicationTargetVisibility(publicationSafetyDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseReasonInput(built.operation_input, "publicationRef");
+        const processKey = built.target_refs.publish_process;
+        const publicationId = built.target_refs.publication;
+        if (parsed.status !== "ok" || !processKey || !publicationId) return null;
+        return {
+          payload: {
+            process_key: processKey,
+            publication_id: publicationId,
+            reason: parsed.input.reason,
+          },
+          spec: removeTargetVisibilitySpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    redact_publication: {
+      prepare: optionalTarget((request) =>
+        prepareRedactPublication(publicationSafetyDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseReasonInput(built.operation_input);
+        const processKey = built.target_refs.publish_process;
+        if (parsed.status !== "ok" || !processKey) return null;
+        return {
+          payload: { process_key: processKey, reason: parsed.input.reason },
+          spec: redactPublicationSpec as NurtureCommandSpec<never>,
         };
       },
     },

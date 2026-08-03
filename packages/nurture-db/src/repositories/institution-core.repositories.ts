@@ -23,6 +23,7 @@ import type {
 import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js";
 import { PrismaPublishProcessTransaction } from "./publish-process.transaction.js";
 import { PrismaMediaAttributionTransaction } from "./media-attribution.transaction.js";
+import { PrismaPublicationSafetyTransaction } from "./publication-safety.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -139,12 +140,19 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
    */
   readonly mediaAttribution: PrismaMediaAttributionTransaction;
 
+  /**
+   * The G3-D post-release safety writes: monotone visibility in apply, the
+   * command-naming lineage rows in finalize, one transaction throughout.
+   */
+  readonly publicationSafety: PrismaPublicationSafetyTransaction;
+
   constructor(private readonly transaction: Prisma.TransactionClient) {
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
     this.publishProcess = new PrismaPublishProcessTransaction(transaction);
     this.mediaAttribution = new PrismaMediaAttributionTransaction(transaction);
+    this.publicationSafety = new PrismaPublicationSafetyTransaction(transaction);
   }
 
   async findCommitted(input: {

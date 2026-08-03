@@ -1709,3 +1709,40 @@ finding 4(revision-0 草稿保存的仓储契约)按复核裁定属于 organize/
 - **证伪抓到一处缺覆盖**:去掉 discard 的 media-revision CAS,测试仍绿——没有任何
   测试用错误的 expected revision 打过。补"原始已替换成 rev 2、按 rev 1 冻结的确认
   必须冲突"后再证伪,CAUGHT。这是"证伪验收覆盖"的第二次应验。
+
+## 2026-08-04 — B8 发布后安全三条:工厂 finalize 钩子与"谱系命名它的命令"
+
+correct / remove / redact 端到端。**B8 的可路由集合至此清零**——未路由 3 条全部是
+结构性阻塞(release 需多命令 ingress 形状、reschedule 等 T-007、organize 待合同决定)。
+
+### 时序问题的解法:finalize
+
+谱系行携带 `command_execution_id`——指向 CommandExecution 的外键,而 `apply` 运行时
+那一行还不存在。解法沿 G2 redaction cascade 的既有先例:工厂新增可选 `finalize`,
+映射到内核的 `afterExecutionCreated`(execution 已建、事务未提交)。**行 id 在 apply
+里预生成**并经 `finalization_payload` 传递,所以 `output_refs` 能命名 finalize 尚未
+写入的行;`already_satisfied` 无写入,finalize 相应跳过。
+
+- **可见性迁移在 apply**:单调,FROM 集合写进 WHERE——谱系已经走过的迁移匹配零行、
+  响亮失败,而不是被悄悄倒回。
+- **谱系行在 finalize**:带 execution id、actor role、以及 correct 的**密封正文**——
+  复核指出 `correctionText` 此前"校验后被静默丢弃",现在以信封形态进
+  `body_protection_payload`,命令载荷里只有 keyed digest。
+- **head 集合为空是声明,不是遗漏**:注册表就是 `compatible_append`,三条进
+  `HEADLESS_BOARD_WRITES` 具名豁免——事件表 (release, command, kind) 唯一约束与
+  单调 WHERE 就是并发契约。
+
+### 幂等复述从存储事件作答
+
+复核 finding:remove 的重复此前拿求值器时钟当 `occurredAt`,甚至把 removal 报成
+redaction。现在查询与写入两侧的 facts 都带**存储谱系**,重复回答的是使它不可见的
+那个事件——它自己的 kind、自己的 reason、自己的时刻;owner 无法作证时拒绝
+(`visibility_evidence_unavailable`)。receipt 缺失同理拒绝——空串哨兵哈希出的
+"看起来有效"的 preservedReceiptRef 不再可能。
+
+### 证伪又抓到一处缺覆盖
+
+remove 的 stored-answer 分支第一轮证伪 MISSED——单测只钉了 redact 的。补 remove 的
+两个方向(存储事件作答 + 无证据拒绝)后再证伪,CAUGHT。四条全部 CAUGHT:finalize
+未映射(谱系行静默缺失)、correction 正文再次丢弃、发明 kind/时刻、单调 FROM 守卫
+删除。

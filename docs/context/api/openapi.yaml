@@ -523,6 +523,9 @@ components:
             - supersede_child_media_attribution
             - detach_publish_process_media
             - discard_media_asset
+            - correct_publication
+            - remove_publication_target_visibility
+            - redact_publication
         capability_version:
           type: string
           const: 1.0.0
@@ -621,6 +624,9 @@ components:
             - supersede_child_media_attribution
             - detach_publish_process_media
             - discard_media_asset
+            - correct_publication
+            - remove_publication_target_visibility
+            - redact_publication
         capability_version:
           type: string
           const: 1.0.0

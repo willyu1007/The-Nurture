@@ -43,6 +43,9 @@ export const HARNESS_CAPABILITY_VERSIONS = {
   supersede_child_media_attribution: "1.0.0",
   detach_publish_process_media: "1.0.0",
   discard_media_asset: "1.0.0",
+  correct_publication: "1.0.0",
+  remove_publication_target_visibility: "1.0.0",
+  redact_publication: "1.0.0",
 } as const;
 
 export const HARNESS_QUERY_CAPABILITY_VERSIONS = {

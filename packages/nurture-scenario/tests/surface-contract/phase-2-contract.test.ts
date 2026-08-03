@@ -669,7 +669,14 @@ function text(value: unknown): string {
  * what stands in for the equality; an empty head set is otherwise the vacuous
  * case and must not be reachable by omission.
  */
-const HEADLESS_BOARD_WRITES: Record<string, string> = {};
+const HEADLESS_BOARD_WRITES: Record<string, string> = {
+  correct_publication:
+    "append-only lineage (registry: publication_visibility_lineage compatible_append); the per-(release, command, kind) event unique is the concurrency contract",
+  remove_publication_target_visibility:
+    "append-only lineage plus a monotone visibility WHERE; nothing to freeze by declaration",
+  redact_publication:
+    "append-only lineage plus a monotone visibility WHERE; nothing to freeze by declaration",
+};
 
 const boardWriteSpecDeps = {
   integrity_key: "phase-2-contract-integrity-key-32chars!",
@@ -708,6 +715,9 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "createSupersedeChildMediaAttributionSpec",
     "createDetachPublishProcessMediaSpec",
     "createDiscardMediaAssetSpec",
+    "createCorrectPublicationSpec",
+    "createRemovePublicationTargetVisibilitySpec",
+    "createRedactPublicationSpec",
   ].sort();
 
   /**
@@ -739,6 +749,9 @@ describe("board write commands conform to the registry's concurrency policy", ()
     },
     detach_publish_process_media: { draft_revision: "draft_revision" },
     discard_media_asset: { media_asset_revision: "media_asset_revision" },
+    correct_publication: {},
+    remove_publication_target_visibility: {},
+    redact_publication: {},
   };
 
   /**

@@ -429,7 +429,11 @@ export class PrismaPublicationReleasePort
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
       include: {
         releases: {
-          include: { target: { select: { targetKey: true } }, revision: { select: { revision: true } } },
+          include: {
+            target: { select: { targetKey: true } },
+            revision: { select: { revision: true } },
+            visibilityEvents: { orderBy: [{ occurredAt: "asc" }, { id: "asc" }] },
+          },
           orderBy: [{ committedAt: "asc" }, { id: "asc" }],
         },
       },
@@ -447,6 +451,14 @@ export class PrismaPublicationReleasePort
         receipt_id: release.receiptId ?? "",
         release_revision: release.revision.revision,
         visibility: release.visibility,
+        // The stored lineage, oldest first: what an idempotent repeat answers
+        // from instead of its own clock.
+        events: release.visibilityEvents.map((event) => ({
+          kind: event.kind,
+          reason_key: event.reasonKey,
+          occurred_at: event.occurredAt.toISOString(),
+          source_release_revision: event.sourceReleaseRevision,
+        })),
       })),
     };
   }

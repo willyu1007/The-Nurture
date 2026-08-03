@@ -37,6 +37,7 @@ const publication = (
   receipt_id: "receipt-1",
   release_revision: 4,
   visibility: "visible",
+  events: [],
   ...overrides,
 });
 
@@ -132,6 +133,66 @@ describe("G3-D post-release safety actions", () => {
     expect(decision.events[0]?.kind).toBe("target_removal");
   });
 
+  it("repeats a removal from the STORED event — its own kind, reason and instant", async () => {
+    // The publication was removed (never redacted). An earlier version of the
+    // repeat stamped its own clock, echoed the repeat's reason, and even
+    // reported kind "redaction" for a removal it never performed.
+    const decision = await removePublicationTargetVisibility(
+      safetyDeps(
+        safetyFacts({
+          publications: [
+            publication({
+              visibility: "removed",
+              events: [
+                {
+                  kind: "target_removal",
+                  reason_key: "family_request",
+                  occurred_at: "2026-08-03T07:00:00.000Z",
+                  source_release_revision: 4,
+                },
+              ],
+            }),
+          ],
+        }),
+      ),
+      scope,
+      {
+        process_ref: processRef(),
+        operation_input: {
+          reason: "wrong_target",
+          publicationRef: issuePublicationRef(BOARD_INTEGRITY_KEY, scope, "pub-1"),
+        },
+      },
+    );
+    expect(decision.status).toBe("already_satisfied");
+    if (decision.status !== "already_satisfied") return;
+    expect(decision.events[0]).toMatchObject({
+      kind: "target_removal",
+      reason: "family_request",
+      occurredAt: "2026-08-03T07:00:00.000Z",
+    });
+
+    // A removed publication the owner cannot explain refuses the repeat.
+    await expect(
+      removePublicationTargetVisibility(
+        safetyDeps(
+          safetyFacts({ publications: [publication({ visibility: "removed" })] }),
+        ),
+        scope,
+        {
+          process_ref: processRef(),
+          operation_input: {
+            reason: "wrong_target",
+            publicationRef: issuePublicationRef(BOARD_INTEGRITY_KEY, scope, "pub-1"),
+          },
+        },
+      ),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "visibility_evidence_unavailable",
+    });
+  });
+
   it("redacts every release of the process and is idempotent afterwards", async () => {
     const decision = await redactPublication(
       safetyDeps(
@@ -149,16 +210,51 @@ describe("G3-D post-release safety actions", () => {
     if (decision.status !== "appended") return;
     expect(decision.events).toHaveLength(2);
 
+    // The repeat answers from the STORED redaction — its own reason and its
+    // own instant — never from the repeat's clock or the repeat's reason.
     const repeat = await redactPublication(
       safetyDeps(
         safetyFacts({
-          publications: [publication({ visibility: "redacted" })],
+          publications: [
+            publication({
+              visibility: "redacted",
+              events: [
+                {
+                  kind: "redaction",
+                  reason_key: "policy_requirement",
+                  occurred_at: "2026-08-03T08:00:00.000Z",
+                  source_release_revision: 4,
+                },
+              ],
+            }),
+          ],
         }),
       ),
       scope,
       { process_ref: processRef(), operation_input: { reason: "family_request" } },
     );
     expect(repeat.status).toBe("already_satisfied");
+    if (repeat.status !== "already_satisfied") return;
+    expect(repeat.events[0]).toMatchObject({
+      kind: "redaction",
+      reason: "policy_requirement",
+      occurredAt: "2026-08-03T08:00:00.000Z",
+    });
+
+    // A redacted publication the owner cannot explain refuses the repeat: no
+    // stored event means any answer would be invented.
+    await expect(
+      redactPublication(
+        safetyDeps(
+          safetyFacts({ publications: [publication({ visibility: "redacted" })] }),
+        ),
+        scope,
+        { process_ref: processRef(), operation_input: { reason: "family_request" } },
+      ),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "visibility_evidence_unavailable",
+    });
   });
 
   it("has no expiry window: a safety action is legal long after the release", async () => {

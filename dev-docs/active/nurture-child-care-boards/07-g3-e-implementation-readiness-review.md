@@ -253,9 +253,15 @@ be met until the 24 keys are routed and the ingress guard's census is extended.
 > current fact per child and drops terminal states from its obligations, the
 > supersession's to-child obeys the transition machine, and idempotent repeats
 > answer from the stored decision instant with a ref every read reproduces.
-> Five routable capabilities remain — detach / discard and the three
-> post-release safety actions — and the ingress guard's explicit unrouted list
-> is now eight (those five plus the three B8 cannot route at all).
+> The final five followed on 2026-08-04: the media pair (detach as a
+> composition edit, discard as the terminal pre-publication delete under the
+> media-revision head) and the post-release safety trio, whose lineage rows
+> name their CommandExecution through a factory `finalize` hook and whose
+> idempotent repeats answer from the stored events. **B8's routable set is
+> complete: 21 of the 24 T-006 capabilities are routed on the formal ingress,
+> and the explicit unrouted list is exactly the three that cannot route —
+> `release_publish_process`, `reschedule_publish_process`,
+> `organize_care_capture_batch`.**
 
 
 Discovered while routing B4-2, and not visible when this review was written.

@@ -917,3 +917,22 @@ amendment plus artifact rotation, not a code-only change.
 | e2e: detach → discard → terminal refusal; committed release freezes the window; no raw ids on the wire | PASS |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 549, 203, 38 |
 | full DB-free gate set + `ctl-context verify --strict` (after `db:context` touch) | PASS — artifact unchanged at `1.14.0` |
+
+## 2026-08-04 — B8 Post-release Safety Trio (Correct / Remove / Redact)
+
+| Command / check | Result |
+| --- | --- |
+| three capabilities routed; unrouted census 6 → 3 (all structurally blocked), actions 20 → 23 | LANDED — B8's routable set is now empty |
+| factory `finalize` hook → `afterExecutionCreated`; event row ids pre-generated via `finalization_payload` so output_refs name them | LANDED |
+| falsified: finalize never mapped — lineage rows silently missing | CAUGHT (e2e) |
+| visibility transitions monotone with the FROM set in the WHERE | LANDED |
+| falsified: FROM guard dropped | CAUGHT (owner test) |
+| lineage rows name the command execution; FK enforced against a made-up id | PASS |
+| correction body sealed into the lineage row; keyed digest in the canonical payload | LANDED |
+| falsified: body validated then dropped again | CAUGHT (e2e pins `body_protection_payload` non-null) |
+| repeats answer from the STORED event — own kind, reason, instant; refusal when the owner cannot explain | LANDED (both query-side wrappers and the specs) |
+| falsified: invented kind/instant — first round MISSED on remove (no covering test), covered both directions, re-falsified | CAUGHT |
+| receipt-less publication refuses instead of hashing the empty-string sentinel | LANDED |
+| e2e: correct → remove → repeat-from-stored → redact → terminal repeat; full lineage survives naming its commands; release + Receipt untouched | PASS |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 550, 205, 40 |
+| full DB-free gate set | PASS — artifact unchanged at `1.14.0` |

@@ -33,9 +33,10 @@ Project: `main`
   holds bricked the lane; draft saves silently last-write-won, fixed by an
   input-schema amendment and an additive rotation to 1.14.0), the attribution
   lane (confirm/reject/supersede) with review findings 5/6/7 closed in the same
-  unit. A 2026-08-03 survey split what remains: five routable capabilities
-  (detach/discard media, and the three post-release safety actions) still need
-  an owner write transaction and a command spec each, while
+  unit. The final five landed on 2026-08-04 — the media pair and the
+  post-release safety trio (lineage rows naming their CommandExecution through
+  a factory finalize hook) — so B8's routable set is complete: 21 of 24 T-006
+  capabilities are on the formal ingress, while
   `release_publish_process`, `reschedule_publish_process` and
   `organize_care_capture_batch` cannot be routed in B8 at all — the first needs
   a multi-command ingress shape, the second waits on the T-007 provider, and the

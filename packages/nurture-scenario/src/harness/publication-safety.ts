@@ -9,6 +9,11 @@ import type {
   NurturePublishDraftFacts,
   NurturePublishProcessTransaction,
 } from "../domain/institution/publish-process-transaction.js";
+import type {
+  NurturePublicationSafetyTransaction,
+  NurturePublicationSafetyWriteFacts,
+} from "../domain/institution/publication-safety-transaction.js";
+import type { ProtectedContentWritePort } from "./protected-content.js";
 import {
   CAREGIVER_BOARD_ROLES,
   issueBoardOpaqueRef,
@@ -24,6 +29,7 @@ import {
   computeHarnessInputIntegrityTag,
   issueHarnessConfirmation,
 } from "./confirmation.js";
+import { computeProtectedBodyTag } from "./keyed-refs.js";
 import {
   deriveMediaRef,
   evaluateMediaDetach,
@@ -115,12 +121,25 @@ export type PublicationSafetyDecisionV1 =
   | { status: "needs_input"; fields: string[] }
   | { status: "denied"; reason_code: string };
 
+export type StoredVisibilityEventFactV1 = {
+  kind: PublicationVisibilityEventKindV1;
+  reason_key: string;
+  occurred_at: string;
+  source_release_revision: number;
+};
+
 export type CommittedPublicationFactV1 = {
   publication_id: string;
   target_key: string;
   receipt_id: string;
   release_revision: number;
   visibility: "visible" | "removed" | "redacted";
+  /**
+   * The stored lineage, oldest first. An idempotent repeat answers from these
+   * — a repeat that stamped its own clock or guessed a kind would report a
+   * decision at a moment, and of a shape, the decision did not have.
+   */
+  events: StoredVisibilityEventFactV1[];
 };
 
 export type PublicationSafetyFactsV1 = {
@@ -159,7 +178,7 @@ type ParsedInput<Input> =
   | { status: "ok"; input: Input }
   | { status: "invalid"; fields: string[] };
 
-const parseReasonInput = (
+export const parseReasonInput = (
   value: unknown,
   extraField?: "correctionText" | "publicationRef",
 ): ParsedInput<{
@@ -262,6 +281,45 @@ const loadSafetyContext = async (
   return { facts, occurredAt: (deps.now ?? (() => new Date()))().toISOString() };
 };
 
+/** The stored event projected back into the public vocabulary. */
+const storedEventRecord = (
+  deps: { integrity_key: string },
+  scope: BoardScopeV1,
+  publication: Pick<CommittedPublicationFactV1, "publication_id" | "receipt_id" | "release_revision">,
+  event: StoredVisibilityEventFactV1,
+):
+  | { status: "ok"; event: PublicationVisibilityEventV1 }
+  | { status: "denied"; reason_code: string } => {
+  if (!PUBLICATION_SAFETY_REASONS.includes(event.reason_key as PublicationSafetyReasonV1)) {
+    // A stored reason outside the taxonomy is not a fact to repeat.
+    return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+  }
+  return {
+    status: "ok",
+    event: buildEvent(
+      deps as PublicationSafetyDependencies,
+      scope,
+      publication as CommittedPublicationFactV1,
+      event.kind,
+      event.reason_key as PublicationSafetyReasonV1,
+      event.occurred_at,
+    ),
+  };
+};
+
+/**
+ * The stored event that explains one publication's current non-visible state:
+ * the LATEST event whose kind matches the visibility. Absent when the rows
+ * predate the write lane — the repeat then refuses rather than inventing.
+ */
+const explainingEvent = (
+  publication: CommittedPublicationFactV1,
+): StoredVisibilityEventFactV1 | undefined => {
+  const wanted: PublicationVisibilityEventKindV1 =
+    publication.visibility === "redacted" ? "redaction" : "target_removal";
+  return [...publication.events].reverse().find((event) => event.kind === wanted);
+};
+
 /**
  * Appends a correction to every visible release of one process. It never
  * rewrites the published body: the original release and its Receipt stay
@@ -318,19 +376,17 @@ export const removePublicationTargetVisibility = async (
   );
   if (!publication) return { status: "denied", reason_code: "target_unavailable" };
   if (publication.visibility !== "visible") {
-    return {
-      status: "already_satisfied",
-      events: [
-        buildEvent(
-          deps,
-          scope,
-          publication,
-          publication.visibility === "redacted" ? "redaction" : "target_removal",
-          parsed.input.reason,
-          context.occurredAt,
-        ),
-      ],
-    };
+    // Already non-visible: the answer is the STORED event that made it so —
+    // its own kind, its own reason, its own instant. An earlier version
+    // stamped the repeat's clock and even reported "redaction" for a removal
+    // it never performed.
+    const stored = explainingEvent(publication);
+    if (!stored) {
+      return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+    }
+    const record = storedEventRecord(deps, scope, publication, stored);
+    if (record.status === "denied") return record;
+    return { status: "already_satisfied", events: [record.event] };
   }
   return {
     status: "appended",
@@ -362,12 +418,19 @@ export const redactPublication = async (
     (publication) => publication.visibility !== "redacted",
   );
   if (pending.length === 0) {
-    return {
-      status: "already_satisfied",
-      events: context.facts.publications.map((publication) =>
-        buildEvent(deps, scope, publication, "redaction", parsed.input.reason, context.occurredAt),
-      ),
-    };
+    const events: PublicationVisibilityEventV1[] = [];
+    for (const publication of context.facts.publications) {
+      const stored = [...publication.events]
+        .reverse()
+        .find((event) => event.kind === "redaction");
+      if (!stored) {
+        return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+      }
+      const record = storedEventRecord(deps, scope, publication, stored);
+      if (record.status === "denied") return record;
+      events.push(record.event);
+    }
+    return { status: "already_satisfied", events };
   }
   return {
     status: "appended",
@@ -899,6 +962,569 @@ export const createDiscardMediaAssetSpec = (deps: {
           // Measured inside the write transaction — the number the teacher
           // confirmed is the number the commit records.
           affectedDraftCount: applied.affected_draft_count,
+        },
+      };
+    },
+  });
+
+// ---------------------------------------------------------------------------
+// The three post-release safety commands.
+
+export const CORRECT_PUBLICATION_COMMAND_SCOPE = "publication_correct";
+export const REMOVE_PUBLICATION_TARGET_VISIBILITY_COMMAND_SCOPE = "publication_remove_target";
+export const REDACT_PUBLICATION_COMMAND_SCOPE = "publication_redact";
+
+export type CorrectPublicationCommandV1 = {
+  process_key: string;
+  reason: PublicationSafetyReasonV1;
+  correction_text: string;
+};
+
+export type RemovePublicationTargetCommandV1 = {
+  process_key: string;
+  publication_id: string;
+  reason: PublicationSafetyReasonV1;
+};
+
+export type RedactPublicationCommandV1 = {
+  process_key: string;
+  reason: PublicationSafetyReasonV1;
+};
+
+/**
+ * The correction body never enters the canonical payload: a keyed digest
+ * stands in, so neither the CommandExecution payload hash nor the confirmation
+ * stores an enumerable bare hash of what a teacher wrote.
+ */
+export const canonicalizeCorrectPublicationCommand =
+  (integrityKey: string) =>
+  (input: CorrectPublicationCommandV1): unknown => ({
+    process_key: input.process_key,
+    reason: input.reason,
+    correction_tag: computeProtectedBodyTag(integrityKey, input.correction_text),
+  });
+
+export const canonicalizeRemovePublicationTargetCommand = (
+  input: RemovePublicationTargetCommandV1,
+): unknown => ({
+  process_key: input.process_key,
+  publication_id: input.publication_id,
+  reason: input.reason,
+});
+
+export const canonicalizeRedactPublicationCommand = (
+  input: RedactPublicationCommandV1,
+): unknown => ({
+  process_key: input.process_key,
+  reason: input.reason,
+});
+
+export type PublicationSafetyPrepareDecision =
+  | {
+      status: "ready_to_confirm";
+      preview: Record<string, string | number>;
+      confirmation_ref: string;
+      expires_at: string;
+      command_request_id: string;
+    }
+  | { status: "needs_input"; fields: string[] }
+  | { status: "denied"; reason_code: string };
+
+type PublicationSafetyPrepareDeps = PublicationSafetyDependencies & {
+  contexts: NurtureInteractionContextService;
+  create_command_id?: () => string;
+};
+
+type PublicationSafetyPrepareRequest = BoardScopeV1 & {
+  surface: string;
+  host_conversation_ref?: string;
+  operation_input?: unknown;
+  target_option_ref?: string;
+};
+
+const preparePublicationSafetyAction = async (
+  deps: PublicationSafetyPrepareDeps,
+  request: PublicationSafetyPrepareRequest,
+  action: {
+    capability: { key: string; version: string };
+    extra_field?: "correctionText" | "publicationRef";
+    decide(
+      context: SafetyContext,
+      scope: BoardScopeV1,
+      parsed: { reason: PublicationSafetyReasonV1; correctionText?: string; publicationRef?: string },
+    ): Promise<PublicationSafetyDecisionV1> | PublicationSafetyDecisionV1;
+    freeze(
+      processKey: string,
+      context: SafetyContext,
+      parsed: { reason: PublicationSafetyReasonV1; correctionText?: string; publicationRef?: string },
+      scope: BoardScopeV1,
+    ): { target_refs: Record<string, string>; canonical_command: unknown } | { denied: string };
+  },
+): Promise<PublicationSafetyPrepareDecision> => {
+  const parsed = parseReasonInput(request.operation_input, action.extra_field);
+  if (parsed.status === "invalid") return { status: "needs_input", fields: parsed.fields };
+  if (!request.target_option_ref) return { status: "needs_input", fields: ["target"] };
+  const scope: BoardScopeV1 = {
+    workspace_id: request.workspace_id,
+    participant_id: request.participant_id,
+  };
+  const processKey = resolveBoardSealedRef(
+    deps.integrity_key,
+    scope,
+    PUBLISH_PROCESS_TARGET_KIND,
+    request.target_option_ref,
+    await deps.reads.listSafetyProcessKeys(scope),
+  );
+  if (!processKey) return { status: "denied", reason_code: "target_unavailable" };
+  const safetyContext = await loadSafetyContext(deps, scope, request.target_option_ref);
+  if ("denied" in safetyContext) return { status: "denied", reason_code: safetyContext.denied };
+
+  const decision = await action.decide(safetyContext, scope, parsed.input);
+  if (decision.status === "denied") return decision;
+  if (decision.status === "needs_input") return decision;
+
+  const frozen = action.freeze(processKey, safetyContext, parsed.input, scope);
+  if ("denied" in frozen) return { status: "denied", reason_code: frozen.denied };
+  const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
+  const issued = await issueHarnessConfirmation(deps.contexts, {
+    workspace_id: request.workspace_id,
+    participant_id: request.participant_id,
+    surface: request.surface,
+    ...(request.host_conversation_ref
+      ? { host_conversation_ref: request.host_conversation_ref }
+      : {}),
+    payload: {
+      capability_key: action.capability.key,
+      capability_version: action.capability.version,
+      command_request_id: commandRequestId,
+      target_refs: { publish_process: processKey, ...frozen.target_refs },
+      // Append-compatible lineage: no equality to freeze. The per-(release,
+      // command, kind) unique on the event table is the concurrency contract.
+      expected_heads: {},
+      input_integrity_tag: computeHarnessInputIntegrityTag(
+        deps.integrity_key,
+        frozen.canonical_command,
+      ),
+      integrity_tag_version: 1,
+    },
+  });
+  return {
+    status: "ready_to_confirm",
+    preview: {
+      effect: action.capability.key,
+      outcome: decision.status === "appended" ? "apply" : "already_satisfied",
+      affected_publications: decision.events.length,
+    },
+    confirmation_ref: issued.token,
+    expires_at: issued.expires_at,
+    command_request_id: commandRequestId,
+  };
+};
+
+export const prepareCorrectPublication = (
+  deps: PublicationSafetyPrepareDeps,
+  request: PublicationSafetyPrepareRequest,
+): Promise<PublicationSafetyPrepareDecision> =>
+  preparePublicationSafetyAction(deps, request, {
+    capability: CORRECT_PUBLICATION_CAPABILITY,
+    extra_field: "correctionText",
+    decide: (_context, scope, parsed) =>
+      correctPublication(deps, scope, {
+        process_ref: request.target_option_ref ?? "",
+        operation_input: { reason: parsed.reason, correctionText: parsed.correctionText },
+      }),
+    freeze: (processKey, _context, parsed) => ({
+      target_refs: {},
+      canonical_command: canonicalizeCorrectPublicationCommand(deps.integrity_key)({
+        process_key: processKey,
+        reason: parsed.reason,
+        correction_text: parsed.correctionText ?? "",
+      }),
+    }),
+  });
+
+export const prepareRemovePublicationTargetVisibility = (
+  deps: PublicationSafetyPrepareDeps,
+  request: PublicationSafetyPrepareRequest,
+): Promise<PublicationSafetyPrepareDecision> =>
+  preparePublicationSafetyAction(deps, request, {
+    capability: REMOVE_PUBLICATION_TARGET_VISIBILITY_CAPABILITY,
+    extra_field: "publicationRef",
+    decide: (_context, scope, parsed) =>
+      removePublicationTargetVisibility(deps, scope, {
+        process_ref: request.target_option_ref ?? "",
+        operation_input: { reason: parsed.reason, publicationRef: parsed.publicationRef },
+      }),
+    freeze: (processKey, context, parsed, scope) => {
+      const publicationId = resolveBoardSealedRef(
+        deps.integrity_key,
+        scope,
+        PUBLICATION_TARGET_KIND,
+        parsed.publicationRef ?? "",
+        context.facts.publications.map((publication) => publication.publication_id),
+      );
+      if (!publicationId) return { denied: "target_unavailable" };
+      return {
+        target_refs: { publication: publicationId },
+        canonical_command: canonicalizeRemovePublicationTargetCommand({
+          process_key: processKey,
+          publication_id: publicationId,
+          reason: parsed.reason,
+        }),
+      };
+    },
+  });
+
+export const prepareRedactPublication = (
+  deps: PublicationSafetyPrepareDeps,
+  request: PublicationSafetyPrepareRequest,
+): Promise<PublicationSafetyPrepareDecision> =>
+  preparePublicationSafetyAction(deps, request, {
+    capability: REDACT_PUBLICATION_CAPABILITY,
+    decide: (_context, scope, parsed) =>
+      redactPublication(deps, scope, {
+        process_ref: request.target_option_ref ?? "",
+        operation_input: { reason: parsed.reason },
+      }),
+    freeze: (processKey, _context, parsed) => ({
+      target_refs: {},
+      canonical_command: canonicalizeRedactPublicationCommand({
+        process_key: processKey,
+        reason: parsed.reason,
+      }),
+    }),
+  });
+
+// ---------------------------------------------------------------------------
+// The three command specs. All append-compatible: no equality to freeze, the
+// per-(release, command, kind) unique on the event table is the concurrency
+// contract, and the visibility transitions are monotone.
+
+const safetyCommandScope = (context: NurtureCommandExecutionContext): BoardScopeV1 => ({
+  workspace_id: context.workspace_id,
+  participant_id: context.business_actor_ref,
+});
+
+type SafetyWritePublication = NurturePublicationSafetyWriteFacts["publications"][number];
+
+const PUBLICATION_VISIBILITIES = ["visible", "removed", "redacted"] as const;
+
+const asCommittedFact = (
+  publication: SafetyWritePublication,
+):
+  | { status: "ok"; fact: CommittedPublicationFactV1 }
+  | { status: "denied"; reason_code: string } => {
+  if (
+    !PUBLICATION_VISIBILITIES.includes(
+      publication.visibility as (typeof PUBLICATION_VISIBILITIES)[number],
+    )
+  ) {
+    return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+  }
+  if (!publication.receipt_id) {
+    // Every committed release carries its Receipt; one without is not a fact
+    // this lane can echo — the empty-string sentinel it used to hash produced
+    // a valid-looking preserved ref shared by every receiptless publication.
+    return { status: "denied", reason_code: "receipt_evidence_unavailable" };
+  }
+  const events: StoredVisibilityEventFactV1[] = [];
+  for (const event of publication.events) {
+    if (
+      event.kind !== "correction" &&
+      event.kind !== "target_removal" &&
+      event.kind !== "redaction"
+    ) {
+      return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+    }
+    events.push({
+      kind: event.kind,
+      reason_key: event.reason_key,
+      occurred_at: event.occurred_at,
+      source_release_revision: event.source_release_revision,
+    });
+  }
+  return {
+    status: "ok",
+    fact: {
+      publication_id: publication.publication_id,
+      target_key: "",
+      receipt_id: publication.receipt_id,
+      release_revision: publication.release_revision,
+      visibility: publication.visibility as CommittedPublicationFactV1["visibility"],
+      events,
+    },
+  };
+};
+
+type SafetyAppendPlan = {
+  kind: PublicationVisibilityEventKindV1;
+  targets: CommittedPublicationFactV1[];
+  updates: Array<{
+    publication_id: string;
+    from_visibility: string[];
+    to_visibility: "removed" | "redacted";
+  }>;
+};
+
+type SafetyRuleDecision =
+  | { status: "append"; plan: SafetyAppendPlan }
+  | { status: "already_satisfied"; answers: Array<{ fact: CommittedPublicationFactV1; event: StoredVisibilityEventFactV1 }> }
+  | { status: "denied"; reason_code: string };
+
+const createPublicationSafetySpec = <
+  Command extends { process_key: string; reason: PublicationSafetyReasonV1 },
+>(
+  deps: { integrity_key: string; now?: () => Date },
+  shape: {
+    capability: { key: string; version: string };
+    command_scope: string;
+    canonicalize(input: Command): unknown;
+    revalidate(input: Command): boolean;
+    evaluate(facts: CommittedPublicationFactV1[], input: Command): SafetyRuleDecision;
+    /** The sealed correction body, when this action carries one. */
+    body_envelope?(input: Command): unknown;
+  },
+): NurtureBoardWriteSpec<Command> =>
+  createBoardWriteSpec<
+    Command,
+    NurturePublicationSafetyTransaction,
+    NurturePublicationSafetyWriteFacts,
+    SafetyAppendPlan
+  >({
+    capability: shape.capability,
+    command_scope: shape.command_scope,
+    contract_version: 1,
+    result_schema_version: 1,
+    canonicalize: shape.canonicalize,
+    port: {
+      select: (tx) => tx.publicationSafety,
+      unavailable_reason_code: "publication_safety_port_unavailable",
+    },
+    revalidateInput: (input) =>
+      input.process_key.length > 0 &&
+      PUBLICATION_SAFETY_REASONS.includes(input.reason) &&
+      shape.revalidate(input)
+        ? null
+        : { status: "invalid", reason_code: "invalid_safety_input" },
+    loadFacts: (owner, input, context) =>
+      owner.loadPublicationSafetyWriteFacts({
+        workspace_id: context.workspace_id,
+        participant_id: context.business_actor_ref,
+        process_key: input.process_key,
+      }),
+    facts_absent_reason_code: "target_unavailable",
+    // Append-compatible lineage: nothing to freeze, by declaration — the
+    // registry binds `publication_visibility_lineage compatible_append`, and
+    // the event unique plus the monotone visibility WHERE carry concurrency.
+    head_keys: [],
+    expectedHeads: () => ({}),
+    currentHeads: () => ({}),
+    authorize: (facts, input, context) => {
+      if (!actorEligible(facts.authority as CaregiverFactAuthorityV1)) {
+        return { status: "blocked", reason_code: "not_authorized" };
+      }
+      if (facts.publications.length === 0) {
+        return { status: "blocked", reason_code: "no_committed_publication" };
+      }
+      const committed: CommittedPublicationFactV1[] = [];
+      for (const publication of facts.publications) {
+        const fact = asCommittedFact(publication);
+        if (fact.status === "denied") return { status: "blocked", reason_code: fact.reason_code };
+        committed.push(fact.fact);
+      }
+      const decision = shape.evaluate(committed, input);
+      if (decision.status === "denied") {
+        return { status: "blocked", reason_code: decision.reason_code };
+      }
+      if (decision.status === "already_satisfied") {
+        const scope = safetyCommandScope(context);
+        const events: PublicationVisibilityEventV1[] = [];
+        for (const answer of decision.answers) {
+          const record = storedEventRecord(deps, scope, answer.fact, answer.event);
+          if (record.status === "denied") {
+            return { status: "blocked", reason_code: record.reason_code };
+          }
+          events.push(record.event);
+        }
+        return {
+          status: "already_satisfied",
+          effect: {
+            output_refs: [facts.publish_process_ref],
+            committed_result: { events },
+          },
+        };
+      }
+      return { status: "authorized", write: decision.plan };
+    },
+    apply: async (owner, input, context, plan) => {
+      const scope = safetyCommandScope(context);
+      const occurredAt = (deps.now ?? (() => new Date()))().toISOString();
+      if (plan.updates.length > 0) {
+        await owner.applyPublicationVisibilityUpdate({
+          workspace_id: context.workspace_id,
+          participant_id: context.business_actor_ref,
+          updates: plan.updates,
+        });
+      }
+      // Event rows are named NOW and written by `finalize`: they carry the
+      // command execution id, a row that does not exist until apply returns.
+      const events = plan.targets.map((publication) => ({
+        event_id: randomUUID(),
+        publication_id: publication.publication_id,
+        kind: plan.kind,
+        reason_key: input.reason,
+        source_release_revision: publication.release_revision,
+        occurred_at: occurredAt,
+        ...(shape.body_envelope ? { body_envelope: shape.body_envelope(input) } : {}),
+      }));
+      return {
+        output_refs: events.map((event) => ({
+          schema_version: 1 as const,
+          namespace: "nurture",
+          object_type: "publication_visibility_event",
+          object_id: event.event_id,
+          version: 1,
+        })),
+        committed_result: {
+          events: plan.targets.map((publication) =>
+            buildEvent(
+              { integrity_key: deps.integrity_key } as PublicationSafetyDependencies,
+              scope,
+              publication,
+              plan.kind,
+              input.reason,
+              occurredAt,
+            ),
+          ),
+        },
+        finalization_payload: { events },
+      };
+    },
+    finalize: async (owner, _input, context, applied) => {
+      const payload = applied.finalization_payload as {
+        events: Array<{
+          event_id: string;
+          publication_id: string;
+          kind: PublicationVisibilityEventKindV1;
+          reason_key: string;
+          source_release_revision: number;
+          occurred_at: string;
+          body_envelope?: unknown;
+        }>;
+      };
+      await owner.appendPublicationVisibilityEvents({
+        workspace_id: context.workspace_id,
+        participant_id: context.business_actor_ref,
+        command_execution_id: applied.execution_id,
+        events: payload.events,
+      });
+    },
+  });
+
+export const createCorrectPublicationSpec = (deps: {
+  integrity_key: string;
+  protected_content: ProtectedContentWritePort;
+  now?: () => Date;
+}): NurtureBoardWriteSpec<CorrectPublicationCommandV1> =>
+  createPublicationSafetySpec<CorrectPublicationCommandV1>(deps, {
+    capability: CORRECT_PUBLICATION_CAPABILITY,
+    command_scope: CORRECT_PUBLICATION_COMMAND_SCOPE,
+    canonicalize: canonicalizeCorrectPublicationCommand(deps.integrity_key),
+    revalidate: (input) =>
+      input.correction_text.length >= 1 && input.correction_text.length <= 2_000,
+    evaluate: (publications) => {
+      const visible = publications.filter((publication) => publication.visibility === "visible");
+      if (visible.length === 0) {
+        return { status: "denied", reason_code: "no_visible_publication" };
+      }
+      // A correction never hides anything: events only, no visibility change.
+      return {
+        status: "append",
+        plan: { kind: "correction", targets: visible, updates: [] },
+      };
+    },
+    // The correction body rides sealed into the lineage row; an earlier
+    // version validated it and then silently dropped it.
+    body_envelope: (input) => deps.protected_content.seal(input.correction_text),
+  });
+
+export const createRemovePublicationTargetVisibilitySpec = (deps: {
+  integrity_key: string;
+  now?: () => Date;
+}): NurtureBoardWriteSpec<RemovePublicationTargetCommandV1> =>
+  createPublicationSafetySpec<RemovePublicationTargetCommandV1>(deps, {
+    capability: REMOVE_PUBLICATION_TARGET_VISIBILITY_CAPABILITY,
+    command_scope: REMOVE_PUBLICATION_TARGET_VISIBILITY_COMMAND_SCOPE,
+    canonicalize: canonicalizeRemovePublicationTargetCommand,
+    revalidate: (input) => input.publication_id.length > 0,
+    evaluate: (publications, input) => {
+      const publication = publications.find(
+        (entry) => entry.publication_id === input.publication_id,
+      );
+      if (!publication) return { status: "denied", reason_code: "target_unavailable" };
+      if (publication.visibility !== "visible") {
+        const stored = explainingEvent(publication);
+        if (!stored) {
+          return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+        }
+        return { status: "already_satisfied", answers: [{ fact: publication, event: stored }] };
+      }
+      return {
+        status: "append",
+        plan: {
+          kind: "target_removal",
+          targets: [publication],
+          updates: [
+            {
+              publication_id: publication.publication_id,
+              from_visibility: ["visible"],
+              to_visibility: "removed",
+            },
+          ],
+        },
+      };
+    },
+  });
+
+export const createRedactPublicationSpec = (deps: {
+  integrity_key: string;
+  now?: () => Date;
+}): NurtureBoardWriteSpec<RedactPublicationCommandV1> =>
+  createPublicationSafetySpec<RedactPublicationCommandV1>(deps, {
+    capability: REDACT_PUBLICATION_CAPABILITY,
+    command_scope: REDACT_PUBLICATION_COMMAND_SCOPE,
+    canonicalize: canonicalizeRedactPublicationCommand,
+    revalidate: () => true,
+    evaluate: (publications) => {
+      const pending = publications.filter(
+        (publication) => publication.visibility !== "redacted",
+      );
+      if (pending.length === 0) {
+        const answers: Array<{
+          fact: CommittedPublicationFactV1;
+          event: StoredVisibilityEventFactV1;
+        }> = [];
+        for (const publication of publications) {
+          const stored = [...publication.events]
+            .reverse()
+            .find((event) => event.kind === "redaction");
+          if (!stored) {
+            return { status: "denied", reason_code: "visibility_evidence_unavailable" };
+          }
+          answers.push({ fact: publication, event: stored });
+        }
+        return { status: "already_satisfied", answers };
+      }
+      return {
+        status: "append",
+        plan: {
+          kind: "redaction",
+          targets: pending,
+          updates: pending.map((publication) => ({
+            publication_id: publication.publication_id,
+            from_visibility: ["visible", "removed"],
+            to_visibility: "redacted" as const,
+          })),
         },
       };
     },

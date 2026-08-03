@@ -9,6 +9,7 @@ import {
   issueBoardSealedRef,
   issueChildOptionRef,
   issueMediaAssetTargetRef,
+  issuePublicationRef,
   CHILD_CARE_PROCESS_TARGET_KIND,
   FOCUS_GOAL_TARGET_KIND,
   PUBLISH_PROCESS_TARGET_KIND,
@@ -3105,5 +3106,267 @@ describe("T-006 media lifecycle through the formal Harness ingress", () => {
       (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
         .lifecycle,
     ).toBe("ready");
+  });
+});
+
+describe("T-006 post-release safety through the formal Harness ingress", () => {
+  const seedReleased = async (scope: SeedScope) => {
+    // `released` requires its frozen revision (the state CHECK enforces it),
+    // so the process reaches `released` only together with the freeze — the
+    // same shape commitTargetRelease writes.
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "pending_release",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: {
+        state: "released",
+        currentRevisionId: revision.id,
+        frozenRevisionId: revision.id,
+      },
+    });
+    const grant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        grantedByParticipantId: scope.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: scope.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["child_growth_record"],
+        purposes: ["child_growth_publication"],
+        status: "active",
+      },
+    });
+    const target = await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        targetKey: `target:${randomUUID()}`,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        familyRefKey: `${scope.workspaceId}:${scope.process.id}`,
+        grantId: grant.id,
+      },
+    });
+    const receipt = await prisma.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        grantId: grant.id,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        direction: "org_to_family",
+        dataClass: "child_growth_record",
+        sourceType: "publication_release",
+        sourceId: target.id,
+        routingAttemptKey: `attempt:${randomUUID()}`,
+        targetScopeType: "family",
+        targetScopeId: scope.family.id,
+        status: "delivered",
+        deliveredAt: new Date("2026-08-04T03:00:00.000Z"),
+      },
+    });
+    const release = await prisma.nurturePublicationRelease.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        publishProcessTargetId: target.id,
+        publishProcessRevisionId: revision.id,
+        releasedByRoleAssignmentId: scope.caregiverRole.id,
+        commandRequestIdHash: "e".repeat(64),
+        receiptId: receipt.id,
+      },
+    });
+    return { process, release };
+  };
+
+  const safetyProcessRef = (scope: SeedScope, participantId: string, processKey: string) =>
+    issueBoardSealedRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: participantId },
+      PUBLISH_PROCESS_TARGET_KIND,
+      processKey,
+    );
+
+  it("corrects with a sealed body, removes one target, redacts, and repeats from stored facts", async () => {
+    const scope = await seedScope();
+    const { process, release } = await seedReleased(scope);
+    const mine = safetyProcessRef(scope, scope.caregiver.id, process.processKey);
+
+    // Correction: an event that hides nothing and carries the sealed body.
+    const corrected = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "correct_publication",
+      targetOptionRef: mine,
+      operationInput: { reason: "content_error", correctionText: "昨天的活动是周三,不是周四" },
+    });
+    expect(corrected.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(corrected.executed?.json.committed_result.events).toHaveLength(1);
+    expect(corrected.executed?.json.committed_result.events[0]).toMatchObject({
+      kind: "correction",
+      reason: "content_error",
+    });
+    const correctionRow = await prisma.nurturePublicationVisibilityEvent.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, kind: "correction" },
+    });
+    // The lineage names the command, the actor and carries the SEALED body.
+    expect(correctionRow.commandExecutionId).not.toBeNull();
+    expect(correctionRow.bodyProtectionPayload).not.toBeNull();
+    expect(JSON.stringify(correctionRow.bodyProtectionPayload)).not.toContain("周三");
+    expect(JSON.stringify(corrected.executed?.json)).not.toContain(release.id);
+    expect(
+      (
+        await prisma.nurturePublicationRelease.findUniqueOrThrow({ where: { id: release.id } })
+      ).visibility,
+    ).toBe("visible");
+
+    // Target removal.
+    const removed = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "remove_publication_target_visibility",
+      targetOptionRef: mine,
+      operationInput: {
+        reason: "family_request",
+        publicationRef: issuePublicationRef(
+          INTEGRITY_KEY,
+          { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+          release.id,
+        ),
+      },
+    });
+    expect(removed.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    const removedAt = removed.executed?.json.committed_result.events[0].occurredAt;
+    expect(
+      (
+        await prisma.nurturePublicationRelease.findUniqueOrThrow({ where: { id: release.id } })
+      ).visibility,
+    ).toBe("removed");
+
+    // A colleague repeats the removal: the answer is the STORED event — its
+    // own kind and its own instant, not a fresh redaction-shaped guess.
+    const repeat = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "remove_publication_target_visibility",
+      targetOptionRef: safetyProcessRef(scope, scope.caregiverB.id, process.processKey),
+      operationInput: {
+        reason: "wrong_target",
+        publicationRef: issuePublicationRef(
+          INTEGRITY_KEY,
+          { workspace_id: scope.workspaceId, participant_id: scope.caregiverB.id },
+          release.id,
+        ),
+      },
+    });
+    expect(repeat.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "already_satisfied",
+    });
+    expect(repeat.executed?.json.committed_result.events[0]).toMatchObject({
+      kind: "target_removal",
+      reason: "family_request",
+      occurredAt: removedAt,
+    });
+
+    // Redaction covers the removed release; the terminal repeat answers from
+    // the stored redaction.
+    const redacted = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "redact_publication",
+      targetOptionRef: mine,
+      operationInput: { reason: "policy_requirement" },
+    });
+    expect(redacted.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(
+      (
+        await prisma.nurturePublicationRelease.findUniqueOrThrow({ where: { id: release.id } })
+      ).visibility,
+    ).toBe("redacted");
+    const redactionAt = redacted.executed?.json.committed_result.events[0].occurredAt;
+
+    const redactRepeat = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "redact_publication",
+      targetOptionRef: safetyProcessRef(scope, scope.caregiverB.id, process.processKey),
+      operationInput: { reason: "family_request" },
+    });
+    expect(redactRepeat.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "already_satisfied",
+    });
+    expect(redactRepeat.executed?.json.committed_result.events[0]).toMatchObject({
+      kind: "redaction",
+      reason: "policy_requirement",
+      occurredAt: redactionAt,
+    });
+
+    // The full lineage survives: correction + removal + redaction, all naming
+    // their commands; the release and its Receipt are untouched.
+    const lineage = await prisma.nurturePublicationVisibilityEvent.findMany({
+      where: { workspaceId: scope.workspaceId, publicationReleaseId: release.id },
+      orderBy: { occurredAt: "asc" },
+    });
+    expect(lineage.map((event) => event.kind)).toEqual([
+      "correction",
+      "target_removal",
+      "redaction",
+    ]);
+    for (const event of lineage) {
+      expect(event.commandExecutionId).not.toBeNull();
+    }
+    expect(
+      (await prisma.nurturePublicationRelease.findUniqueOrThrow({ where: { id: release.id } }))
+        .receiptId,
+    ).not.toBeNull();
+  });
+
+  it("refuses a guardian and a process with no committed publication", async () => {
+    const scope = await seedScope();
+    const { process } = await seedReleased(scope);
+    await expect(
+      prepareAction({
+        scope,
+        actorId: scope.guardian.id,
+        surface: "board",
+        capabilityKey: "redact_publication",
+        targetOptionRef: safetyProcessRef(scope, scope.guardian.id, process.processKey),
+        operationInput: { reason: "family_request" },
+      }).then((response) => response.json),
+    ).resolves.toMatchObject({ status: "denied", reason_code: "target_unavailable" });
   });
 });

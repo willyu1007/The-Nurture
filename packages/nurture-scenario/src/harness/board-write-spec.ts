@@ -37,6 +37,11 @@ export type BoardWriteEffectV1 = {
   /** At least one; the factory refuses an effect that names nothing. */
   output_refs: DomainContextRef[];
   committed_result: unknown;
+  /**
+   * Transaction-local data for the optional `finalize` step. Never persisted
+   * with the execution and never protected content.
+   */
+  finalization_payload?: unknown;
 };
 
 /**
@@ -112,6 +117,20 @@ export type BoardWriteSpecDefinitionV1<Input, Port, Facts, Write> = {
     context: NurtureCommandExecutionContext,
     write: Write,
   ): Promise<BoardWriteEffectV1>;
+
+  /**
+   * Runs after the CommandExecution row exists, inside the same transaction.
+   * This is the only place a write may reference the execution row itself —
+   * an append-only lineage whose rows carry `command_execution_id` cannot be
+   * written in `apply`, because the row it must point at does not exist yet.
+   * A throw here still aborts the whole command.
+   */
+  finalize?(
+    port: Port,
+    input: Input,
+    context: NurtureCommandExecutionContext,
+    applied: { execution_id: string; finalization_payload: unknown },
+  ): Promise<void>;
 };
 
 type EvaluationV1<Port, Facts, Write> =
@@ -223,6 +242,24 @@ export const createBoardWriteSpec = <Input, Port, Facts, Write>(
       return evaluation;
     },
 
+    ...(definition.finalize
+      ? {
+          async afterExecutionCreated(transaction, input, context, applied) {
+            // An already_satisfied outcome performed no write, so there is
+            // nothing to finalize against the execution either.
+            if (applied.business_outcome !== "applied") return;
+            const port = definition.port.select(transaction);
+            if (!port) {
+              throw new NurtureDeterministicRollback(definition.port.unavailable_reason_code);
+            }
+            await definition.finalize!(port, input, context, {
+              execution_id: applied.execution.id,
+              finalization_payload: applied.finalization_payload,
+            });
+          },
+        }
+      : {}),
+
     async apply(transaction, input, context) {
       // The owner is read again here, and the write only ever uses values this
       // read authorised. A caller reaching `apply` on facts that no longer
@@ -248,6 +285,9 @@ export const createBoardWriteSpec = <Input, Port, Facts, Write>(
         output_refs: effect.output_refs,
         result_schema_version: definition.result_schema_version,
         committed_result: effect.committed_result,
+        ...(effect.finalization_payload !== undefined
+          ? { finalization_payload: effect.finalization_payload }
+          : {}),
       };
     },
   };
