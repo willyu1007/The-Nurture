@@ -62,17 +62,14 @@ const expectedHarnessActionKeys = [
  * silently, and a key listed here after it is routed fails too.
  */
 const expectedUnroutedCapabilityKeys = [
-  "confirm_child_media_attribution",
   "correct_publication",
   "detach_publish_process_media",
   "discard_media_asset",
   "organize_care_capture_batch",
   "redact_publication",
-  "reject_child_media_attribution",
   "release_publish_process",
   "remove_publication_target_visibility",
   "reschedule_publish_process",
-  "supersede_child_media_attribution",
 ];
 const expectedOwnerRequiredFields = [
   "workspace_id",

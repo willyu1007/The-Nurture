@@ -39,13 +39,15 @@ const CAPTURE_FACT_KIND = {
  * the port's own contract with the query, and re-deriving it here would be a
  * second place for it to disagree.
  */
-const currentAttributionPerChild = (
+export const currentAttributionRowsPerChild = (
   rows: ReadonlyArray<{
     id: string;
     childCareProcessId: string;
     state: ChildAttributionStateV1;
     attributionRevision: number;
     source: keyof typeof ATTRIBUTION_SOURCE;
+    confirmedAt: Date | null;
+    createdAt: Date;
   }>,
 ): ChildAttributionFactV1[] => {
   const latest = new Map<string, (typeof rows)[number]>();
@@ -61,7 +63,25 @@ const currentAttributionPerChild = (
     status: row.state,
     revision: row.attributionRevision,
     source: ATTRIBUTION_SOURCE[row.source],
+    ...(attributionDecidedAt(row) ? { decided_at: attributionDecidedAt(row) } : {}),
   }));
+};
+
+/**
+ * The stored decision instant. Rows are append-only, so for a rejected or
+ * superseded fact the append IS the decision and `created_at` records it; a
+ * confirmation carries its own explicit instant. A candidate has not been
+ * decided, so a candidate has none — and an idempotent repeat that cannot cite
+ * a stored instant refuses rather than inventing one.
+ */
+const attributionDecidedAt = (row: {
+  state: ChildAttributionStateV1;
+  confirmedAt: Date | null;
+  createdAt: Date;
+}): string | undefined => {
+  if (row.state === "candidate") return undefined;
+  if (row.state === "confirmed") return row.confirmedAt?.toISOString();
+  return row.createdAt.toISOString();
 };
 
 const ATTRIBUTION_SOURCE = {
@@ -247,7 +267,7 @@ export class PrismaMediaSafetyReadPort
       // the moment a supersession exists, every rule would answer on a revision
       // that has already been replaced. The ordering is known here, so the
       // reduction belongs here rather than in each rule.
-      attributions: currentAttributionPerChild(asset.attributions),
+      attributions: currentAttributionRowsPerChild(asset.attributions),
     };
   }
 

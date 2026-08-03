@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { createContentSafetyRoutePort } from "@the-nurture/scenario/harness";
 import { createPrismaClient } from "../src/client.js";
-import { PrismaMediaSafetyReadPort } from "../src/index.js";
+import { PrismaMediaAttributionTransaction, PrismaMediaSafetyReadPort } from "../src/index.js";
 
 // Owner-side proof for the media and content-safety ports (G3-E prerequisite
 // B2-3). What has to hold here is that a source the owner could not assess
@@ -581,5 +581,221 @@ describe("G3-C1 owner reads: media lifecycle", () => {
     });
     expect(facts?.composition_media_ids).toEqual([]);
     expect(facts?.referencing_draft_count).toBe(0);
+  });
+});
+
+describe("T-006 owner write: child-media attribution decisions", () => {
+  const owner = () => new PrismaMediaAttributionTransaction(prisma);
+
+  const seedCandidate = async (world: World, assetId: string, childProcessId: string) =>
+    prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: assetId,
+        childCareProcessId: childProcessId,
+        source: "system",
+        state: "candidate",
+        attributionRevision: 1,
+      },
+    });
+
+  it("confirms by appending a manual revision that satisfies the confirmation CHECK", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    await seedCandidate(world, asset.id, world.process.id);
+
+    const applied = await owner().applyChildAttributionAppends({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+      appends: [
+        { child_care_process_id: world.process.id, expected_revision: 1, state: "confirmed" },
+      ],
+      link_supersession: false,
+    });
+    expect(applied.rows).toHaveLength(1);
+    expect(applied.rows[0]).toMatchObject({ revision: 2, state: "confirmed", source: "manual" });
+
+    const rows = await prisma.nurtureChildMediaAttribution.findMany({
+      where: { workspaceId: world.workspaceId, mediaAssetRefId: asset.id },
+      orderBy: { attributionRevision: "asc" },
+    });
+    // Append-only: the candidate survives as history under the confirmation.
+    expect(rows.map((row) => [row.attributionRevision, row.state])).toEqual([
+      [1, "candidate"],
+      [2, "confirmed"],
+    ]);
+    // The CHECK's whole clause is present, and the decision instant IS the
+    // stored confirmation instant.
+    expect(rows[1]?.confirmedByRoleAssignmentId).toBe(world.teacherRole.id);
+    expect(rows[1]?.confirmedAt?.toISOString()).toBe(applied.rows[0]?.decided_at);
+    expect(rows[1]?.exposurePolicyPayload).toEqual({ audience: "own_family" });
+
+    // And the write facts now answer the repeat from that same stored instant.
+    const facts = await owner().loadMediaAttributionWriteFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+    });
+    expect(facts?.attributions).toEqual([
+      expect.objectContaining({
+        status: "confirmed",
+        revision: 2,
+        decided_at: applied.rows[0]?.decided_at,
+      }),
+    ]);
+  });
+
+  it("rejects by appending and inherits the row's own stored source", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    await seedCandidate(world, asset.id, world.process.id);
+
+    const applied = await owner().applyChildAttributionAppends({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+      appends: [
+        { child_care_process_id: world.process.id, expected_revision: 1, state: "rejected" },
+      ],
+      link_supersession: false,
+    });
+    // The prisma-level source is copied from the row (system), and reported in
+    // the domain vocabulary (organizer_candidate) — never round-tripped
+    // through the lossy display mapping.
+    expect(applied.rows[0]).toMatchObject({
+      revision: 2,
+      state: "rejected",
+      source: "organizer_candidate",
+    });
+    const stored = await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, mediaAssetRefId: asset.id, attributionRevision: 2 },
+    });
+    expect(stored.source).toBe("system");
+    expect(stored.confirmedAt).toBeNull();
+  });
+
+  it("supersedes atomically: from-child superseded, to-child confirmed, and linked", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    // Both children must be in the SAME class for one teacher to correct
+    // between them; enroll the second child in the teacher's group too.
+    const childB = await prisma.nurtureChild.create({
+      data: { workspaceId: world.workspaceId, displayName: "Child C", status: "active" },
+    });
+    const processB = await prisma.nurtureChildCareProcess.create({
+      data: { workspaceId: world.workspaceId, childId: childB.id, status: "active" },
+    });
+    await prisma.nurtureEnrollment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: processB.id,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        status: "active",
+      },
+    });
+    // Child A is confirmed at revision 2 (via a candidate), child B has nothing.
+    await seedCandidate(world, asset.id, world.process.id);
+    await owner().applyChildAttributionAppends({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+      appends: [
+        { child_care_process_id: world.process.id, expected_revision: 1, state: "confirmed" },
+      ],
+      link_supersession: false,
+    });
+
+    const applied = await owner().applyChildAttributionAppends({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+      appends: [
+        { child_care_process_id: world.process.id, expected_revision: 2, state: "superseded" },
+        { child_care_process_id: processB.id, expected_revision: 0, state: "confirmed" },
+      ],
+      link_supersession: true,
+    });
+    expect(applied.rows.map((row) => [row.state, row.revision])).toEqual([
+      ["superseded", 3],
+      ["confirmed", 1],
+    ]);
+    // One instant for the whole correction.
+    expect(applied.rows[0]?.decided_at).toBe(applied.rows[1]?.decided_at);
+
+    const supersededRow = await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+      where: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: world.process.id,
+        attributionRevision: 3,
+      },
+    });
+    const confirmedRow = await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+      where: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: processB.id,
+      },
+    });
+    // The superseded revision names the confirmed row it was corrected in
+    // favour of; the confirmed history underneath is untouched.
+    expect(supersededRow.supersededByAttributionId).toBe(confirmedRow.id);
+    expect(
+      (
+        await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+          where: {
+            workspaceId: world.workspaceId,
+            mediaAssetRefId: asset.id,
+            childCareProcessId: world.process.id,
+            attributionRevision: 2,
+          },
+        })
+      ).state,
+    ).toBe("confirmed");
+  });
+
+  it("refuses a stale head, a gapped head, and the reserved revision 0 on a real row", async () => {
+    const world = await seedWorld();
+    const asset = await seedAsset(world);
+    await seedCandidate(world, asset.id, world.process.id);
+
+    for (const expected of [0, 2]) {
+      await expect(
+        owner().applyChildAttributionAppends({
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          media_asset_id: asset.id,
+          appends: [
+            {
+              child_care_process_id: world.process.id,
+              expected_revision: expected,
+              state: "confirmed",
+            },
+          ],
+          link_supersession: false,
+        }),
+      ).rejects.toThrow(/revision conflict/);
+    }
+    expect(
+      await prisma.nurtureChildMediaAttribution.count({
+        where: { workspaceId: world.workspaceId, mediaAssetRefId: asset.id },
+      }),
+    ).toBe(1);
+
+    // The floor keeps absence unrepresentable by a real row.
+    await expect(
+      prisma.nurtureChildMediaAttribution.create({
+        data: {
+          workspaceId: world.workspaceId,
+          mediaAssetRefId: asset.id,
+          childCareProcessId: world.otherProcess.id,
+          source: "manual",
+          state: "candidate",
+          attributionRevision: 0,
+        },
+      }),
+    ).rejects.toThrow(/ck_nurture_media_attribution_revision_floor/);
   });
 });

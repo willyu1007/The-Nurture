@@ -21,6 +21,7 @@ export * from "./repositories/guardian-board.read.js";
 export * from "./repositories/caregiver-board.read.js";
 export * from "./repositories/board-mutation.transaction.js";
 export * from "./repositories/publish-process.transaction.js";
+export * from "./repositories/media-attribution.transaction.js";
 export * from "./repositories/publish-lane.read.js";
 export * from "./repositories/care-capture.read.js";
 export * from "./repositories/media-safety.read.js";

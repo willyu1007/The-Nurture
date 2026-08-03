@@ -703,6 +703,9 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "createRenewPublishEditHoldSpec",
     "createReleasePublishEditHoldSpec",
     "createSavePublishProcessDraftSpec",
+    "createConfirmChildMediaAttributionSpec",
+    "createRejectChildMediaAttributionSpec",
+    "createSupersedeChildMediaAttributionSpec",
   ].sort();
 
   /**
@@ -720,6 +723,18 @@ describe("board write commands conform to the registry's concurrency policy", ()
     renew_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
     release_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
     cancel_publish_process: {},
+    confirm_child_media_attribution: {
+      child_media_attribution: "child_media_attribution",
+      media_asset_revision: "media_asset_revision",
+    },
+    reject_child_media_attribution: {
+      child_media_attribution: "child_media_attribution",
+      media_asset_revision: "media_asset_revision",
+    },
+    supersede_child_media_attribution: {
+      child_media_attribution: "child_media_attribution",
+      media_asset_revision: "media_asset_revision",
+    },
   };
 
   /**
@@ -742,9 +757,6 @@ describe("board write commands conform to the registry's concurrency policy", ()
   ];
 
   const MUST_EQUAL_WITHOUT_SPEC = [
-    "confirm_child_media_attribution",
-    "reject_child_media_attribution",
-    "supersede_child_media_attribution",
     "detach_publish_process_media",
     "discard_media_asset",
     "organize_care_capture_batch",

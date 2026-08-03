@@ -7,6 +7,8 @@ import {
   issueDisplayRef,
   issueFamilyCareMessageTargetRef,
   issueBoardSealedRef,
+  issueChildOptionRef,
+  issueMediaAssetTargetRef,
   CHILD_CARE_PROCESS_TARGET_KIND,
   FOCUS_GOAL_TARGET_KIND,
   PUBLISH_PROCESS_TARGET_KIND,
@@ -2634,5 +2636,283 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
         reason_code: "process_not_editable",
       });
     }
+  });
+});
+
+describe("T-006 attribution lane through the formal Harness ingress", () => {
+  const seedAttributableAsset = async (scope: SeedScope) => {
+    const asset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        careGroupId: scope.group.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    const candidate = await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: scope.process.id,
+        source: "system",
+        state: "candidate",
+        attributionRevision: 1,
+      },
+    });
+    return { asset, candidate };
+  };
+
+  const mediaRefFor = (scope: SeedScope, participantId: string, assetId: string) =>
+    issueMediaAssetTargetRef(INTEGRITY_KEY, {
+      workspace_id: scope.workspaceId,
+      participant_id: participantId,
+    }, assetId);
+
+  const childRefFor = (scope: SeedScope, participantId: string, childProcessId: string) =>
+    issueChildOptionRef(INTEGRITY_KEY, {
+      workspace_id: scope.workspaceId,
+      participant_id: participantId,
+    }, childProcessId);
+
+  it("confirms a candidate on the owner rows and replays the exact result", async () => {
+    const scope = await seedScope();
+    const { asset } = await seedAttributableAsset(scope);
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiver.id, asset.id),
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      prepared,
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    expect(executed.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(executed.json.committed_result.records).toHaveLength(1);
+    expect(executed.json.committed_result.records[0]).toMatchObject({
+      status: "confirmed",
+      revision: 2,
+      source: "manual",
+    });
+
+    const stored = await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        mediaAssetRefId: asset.id,
+        attributionRevision: 2,
+      },
+    });
+    expect(stored.state).toBe("confirmed");
+    expect(stored.confirmedAt?.toISOString()).toBe(
+      executed.json.committed_result.records[0].decidedAt,
+    );
+
+    // No raw id anywhere on the wire.
+    const serialized = JSON.stringify(executed.json);
+    for (const raw of [asset.id, scope.process.id, stored.id]) {
+      expect(serialized).not.toContain(raw);
+    }
+
+    // The same command identity replays the same stored result.
+    const replayed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      prepared,
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+      invocationSuffix: ":replay",
+    });
+    expect(replayed.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "replayed",
+    });
+    expect(replayed.json.committed_result).toEqual(executed.json.committed_result);
+  });
+
+  it("a second teacher's repeat answers from the stored instant; supersede corrects A to B", async () => {
+    const scope = await seedScope();
+    const { asset } = await seedAttributableAsset(scope);
+    const first = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiver.id, asset.id),
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    expect(first.executed?.json.status).toBe("committed");
+
+    // Colleague repeats the same confirmation: already_satisfied, the SAME
+    // stored instant, no third revision.
+    const repeat = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiverB.id, asset.id),
+      operationInput: { childRef: childRefFor(scope, scope.caregiverB.id, scope.process.id) },
+    });
+    expect(repeat.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "already_satisfied",
+    });
+    expect(repeat.executed?.json.committed_result.records[0].decidedAt).toBe(
+      first.executed?.json.committed_result.records[0].decidedAt,
+    );
+    expect(
+      await prisma.nurtureChildMediaAttribution.count({
+        where: { workspaceId: scope.workspaceId, mediaAssetRefId: asset.id },
+      }),
+    ).toBe(2);
+
+    // The photo is actually the second child: supersede A → B in one commit.
+    const childB = await prisma.nurtureChild.create({
+      data: { workspaceId: scope.workspaceId, displayName: "Child B", status: "active" },
+    });
+    const processB = await prisma.nurtureChildCareProcess.create({
+      data: { workspaceId: scope.workspaceId, childId: childB.id, status: "active" },
+    });
+    await prisma.nurtureEnrollment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: processB.id,
+        institutionId: scope.institution.id,
+        careGroupId: scope.group.id,
+        status: "active",
+      },
+    });
+    const superseded = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "supersede_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiver.id, asset.id),
+      operationInput: {
+        fromChildRef: childRefFor(scope, scope.caregiver.id, scope.process.id),
+        toChildRef: childRefFor(scope, scope.caregiver.id, processB.id),
+      },
+    });
+    expect(superseded.executed?.json.status).toBe("committed");
+    expect(
+      superseded.executed?.json.committed_result.records.map(
+        (record: { status: string; revision: number }) => [record.status, record.revision],
+      ),
+    ).toEqual([
+      ["superseded", 3],
+      ["confirmed", 1],
+    ]);
+    const linked = await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: scope.process.id,
+        attributionRevision: 3,
+      },
+    });
+    expect(linked.supersededByAttributionId).not.toBeNull();
+  });
+
+  it("refuses a guardian, a stale head, and a resubmitted child that differs from the prepared one", async () => {
+    const scope = await seedScope();
+    const { asset } = await seedAttributableAsset(scope);
+
+    // A guardian holds no class role: the media ref never resolves.
+    await expect(
+      prepareAction({
+        scope,
+        actorId: scope.guardian.id,
+        surface: "board",
+        capabilityKey: "confirm_child_media_attribution",
+        targetOptionRef: mediaRefFor(scope, scope.guardian.id, asset.id),
+        operationInput: { childRef: childRefFor(scope, scope.guardian.id, scope.process.id) },
+      }).then((response) => response.json),
+    ).resolves.toMatchObject({ status: "denied", reason_code: "target_unavailable" });
+
+    // Prepared, then the attribution advances under the confirmation.
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reject_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiver.id, asset.id),
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: scope.process.id,
+        source: "manual",
+        state: "confirmed",
+        attributionRevision: 2,
+        confirmedByRoleAssignmentId: scope.caregiverRole.id,
+        confirmedAt: new Date(),
+        exposurePolicyPayload: { audience: "own_family" },
+      },
+    });
+    const stale = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reject_child_media_attribution",
+      prepared,
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    // The re-run rule sees the moved state before the head comparison does:
+    // rejecting a now-confirmed fact is an illegal transition, refused without
+    // any write. The head comparison stays behind it as the backstop for drift
+    // the state rules cannot see.
+    expect(stale.json).toMatchObject({
+      status: "not_committed",
+      decision: "blocked",
+      reason_code: "illegal_attribution_transition",
+    });
+    expect(
+      await prisma.nurtureChildMediaAttribution.count({
+        where: { workspaceId: scope.workspaceId, mediaAssetRefId: asset.id },
+      }),
+    ).toBe(2);
+
+    // A resubmitted child that differs from the prepared one is refused by the
+    // binding, not silently corrected back by the confirmation.
+    const prepared2 = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiver.id, asset.id),
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    // Already confirmed now, so prepare reports the repeat posture — fine; the
+    // point is the execute-side binding below.
+    const mismatched = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "confirm_child_media_attribution",
+      prepared: prepared2,
+      operationInput: {
+        childRef: childRefFor(scope, scope.caregiver.id, "some-other-child"),
+      },
+    });
+    expect(mismatched.json).toMatchObject({
+      status: "not_committed",
+      decision: "invalid",
+      reason_code: "invalid_operation_input",
+    });
   });
 });

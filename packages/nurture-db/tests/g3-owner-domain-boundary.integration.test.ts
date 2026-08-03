@@ -359,93 +359,10 @@ describe("owner rows arrive in the order their binding advertises", () => {
 // Check 2: owner facts through the domain rule that consumes them.
 
 describe("owner release facts reach the right eligibility verdict", () => {
-  const seedReleasable = async (world: Institution, children: Awaited<ReturnType<typeof seedChild>>[]) => {
-    const asset = await prisma.nurtureMediaAssetRef.create({
-      data: {
-        workspaceId: world.workspaceId,
-        institutionId: world.institution.id,
-        careGroupId: world.group.id,
-        sourceKind: "class_album",
-        storageRefPayload: { bucket: "media", key: randomUUID() },
-        lifecycle: "ready",
-      },
-    });
-    const process = await prisma.nurturePublishProcess.create({
-      data: {
-        workspaceId: world.workspaceId,
-        careGroupId: world.group.id,
-        processKey: `publish:${randomUUID()}`,
-        state: "pending_release",
-        dataClass: "child_growth_record",
-        purposeKey: "child_growth_publication",
-        scheduledAt: new Date("2026-08-03T09:00:00.000Z"),
-        notAfter: new Date("2026-08-03T11:00:00.000Z"),
-        scheduleTimeZone: "Asia/Shanghai",
-        schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
-        schedulePolicyHead: 3,
-      },
-    });
-    const revision = await prisma.nurturePublishProcessRevision.create({
-      data: {
-        workspaceId: world.workspaceId,
-        publishProcessId: process.id,
-        revision: 1,
-        contentDigest: "sha256:content",
-        organizerInputRevision: "organizer:1",
-        mediaCompositionPayload: { media: [{ mediaAssetId: asset.id, mediaRevision: 1 }] },
-      },
-    });
-    await prisma.nurturePublishProcess.update({
-      where: { id: process.id },
-      data: { currentRevisionId: revision.id },
-    });
-    for (const entry of children) {
-      await prisma.nurturePublishProcessTarget.create({
-        data: {
-          workspaceId: world.workspaceId,
-          publishProcessId: process.id,
-          targetKey: `target:${entry.label}`,
-          childCareProcessId: entry.process.id,
-          enrollmentId: entry.enrollment.id,
-          familyRefKey: entry.family.id,
-          grantId: entry.grant.id,
-        },
-      });
-    }
-    return { asset, process, revision };
-  };
-
-  const verdictFor = async (world: Institution, processKey: string) => {
-    const port = new PrismaPublicationReleasePort(prisma);
-    const facts = await port.loadReleaseFacts({
-      workspace_id: world.workspaceId,
-      participant_id: world.teacher.id,
-      process_key: processKey,
-    });
-    expect(facts).not.toBeNull();
-    return derivePublishEligibility(
-      "boundary-key",
-      { workspace_id: world.workspaceId, participant_id: world.teacher.id },
-      {
-        process_state: facts!.process_state,
-        media: facts!.media,
-        targets: facts!.targets.map((target) => ({
-          target_key: target.target_key,
-          child_care_process_id: target.child_care_process_id,
-          enrollment_active: target.enrollment_active,
-          grant_allows: target.grant_allows,
-          data_class_allowed: target.data_class_allowed,
-          purpose_allowed: target.purpose_allowed,
-          exposure_allows_child_ids: target.exposure_allows_child_ids,
-        })),
-      },
-    );
-  };
-
   it("publishes a confirmed single-child photo", async () => {
     const world = await seedInstitution();
     const alpha = await seedChild(world, "Alpha");
-    const { asset, process } = await seedReleasable(world, [alpha]);
+    const { asset, process } = await seedReleasableFor(world, [alpha]);
     await prisma.nurtureChildMediaAttribution.create({
       data: {
         workspaceId: world.workspaceId,
@@ -459,7 +376,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
         attributionRevision: 1,
       },
     });
-    const verdict = await verdictFor(world, process.processKey);
+    const verdict = await releaseVerdictFor(world, process.processKey);
     expect(verdict.blockingReasons).toEqual([]);
     expect(verdict.eligible).toBe(true);
   });
@@ -468,7 +385,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
     const world = await seedInstitution();
     const alpha = await seedChild(world, "Alpha");
     const bravo = await seedChild(world, "Bravo");
-    const { asset, process } = await seedReleasable(world, [alpha]);
+    const { asset, process } = await seedReleasableFor(world, [alpha]);
     await prisma.nurtureChildMediaAttribution.create({
       data: {
         workspaceId: world.workspaceId,
@@ -495,7 +412,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
         attributionRevision: 1,
       },
     });
-    const verdict = await verdictFor(world, process.processKey);
+    const verdict = await releaseVerdictFor(world, process.processKey);
     expect(verdict.blockingReasons).not.toContain("unknown_visible_child");
     expect(verdict.eligible).toBe(true);
   });
@@ -504,7 +421,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
     const world = await seedInstitution();
     const alpha = await seedChild(world, "Alpha");
     const bravo = await seedChild(world, "Bravo");
-    const { asset, process } = await seedReleasable(world, [alpha]);
+    const { asset, process } = await seedReleasableFor(world, [alpha]);
     for (const entry of [alpha, bravo]) {
       await prisma.nurtureChildMediaAttribution.create({
         data: {
@@ -520,7 +437,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
         },
       });
     }
-    const verdict = await verdictFor(world, process.processKey);
+    const verdict = await releaseVerdictFor(world, process.processKey);
     expect(verdict.blockingReasons).toContain("exposure_not_allowed");
     expect(verdict.eligible).toBe(false);
   });
@@ -528,7 +445,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
   it("blocks an unconfirmed candidate and a media revision that moved", async () => {
     const world = await seedInstitution();
     const alpha = await seedChild(world, "Alpha");
-    const { asset, process } = await seedReleasable(world, [alpha]);
+    const { asset, process } = await seedReleasableFor(world, [alpha]);
     await prisma.nurtureChildMediaAttribution.create({
       data: {
         workspaceId: world.workspaceId,
@@ -539,14 +456,14 @@ describe("owner release facts reach the right eligibility verdict", () => {
         attributionRevision: 1,
       },
     });
-    const candidate = await verdictFor(world, process.processKey);
+    const candidate = await releaseVerdictFor(world, process.processKey);
     expect(candidate.blockingReasons).toContain("unconfirmed_visible_child");
 
     await prisma.nurtureMediaAssetRef.update({
       where: { id: asset.id },
       data: { mediaRevision: 2 },
     });
-    const drifted = await verdictFor(world, process.processKey);
+    const drifted = await releaseVerdictFor(world, process.processKey);
     expect(drifted.blockingReasons).toContain("media_revision_drift");
   });
 
@@ -554,7 +471,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
     const world = await seedInstitution();
     const alpha = await seedChild(world, "Alpha");
     const bravo = await seedChild(world, "Bravo");
-    const { asset, process } = await seedReleasable(world, [alpha, bravo]);
+    const { asset, process } = await seedReleasableFor(world, [alpha, bravo]);
     for (const entry of [alpha, bravo]) {
       await prisma.nurtureChildMediaAttribution.create({
         data: {
@@ -578,7 +495,7 @@ describe("owner release facts reach the right eligibility verdict", () => {
         revokedByParticipantId: world.guardian.id,
       },
     });
-    const verdict = await verdictFor(world, process.processKey);
+    const verdict = await releaseVerdictFor(world, process.processKey);
     const alphaTarget = verdict.targets.find((target) =>
       target.blockingReasons.includes("grant_not_allowed"),
     );
@@ -589,6 +506,151 @@ describe("owner release facts reach the right eligibility verdict", () => {
     expect(
       verdict.targets.filter((target) => target.blockingReasons.includes("grant_not_allowed")),
     ).toHaveLength(1);
+  });
+});
+
+const seedReleasableFor = async (world: Institution, children: Awaited<ReturnType<typeof seedChild>>[]) => {
+  const asset = await prisma.nurtureMediaAssetRef.create({
+    data: {
+      workspaceId: world.workspaceId,
+      institutionId: world.institution.id,
+      careGroupId: world.group.id,
+      sourceKind: "class_album",
+      storageRefPayload: { bucket: "media", key: randomUUID() },
+      lifecycle: "ready",
+    },
+  });
+  const process = await prisma.nurturePublishProcess.create({
+    data: {
+      workspaceId: world.workspaceId,
+      careGroupId: world.group.id,
+      processKey: `publish:${randomUUID()}`,
+      state: "pending_release",
+      dataClass: "child_growth_record",
+      purposeKey: "child_growth_publication",
+      scheduledAt: new Date("2026-08-03T09:00:00.000Z"),
+      notAfter: new Date("2026-08-03T11:00:00.000Z"),
+      scheduleTimeZone: "Asia/Shanghai",
+      schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
+      schedulePolicyHead: 3,
+    },
+  });
+  const revision = await prisma.nurturePublishProcessRevision.create({
+    data: {
+      workspaceId: world.workspaceId,
+      publishProcessId: process.id,
+      revision: 1,
+      contentDigest: "sha256:content",
+      organizerInputRevision: "organizer:1",
+      mediaCompositionPayload: { media: [{ mediaAssetId: asset.id, mediaRevision: 1 }] },
+    },
+  });
+  await prisma.nurturePublishProcess.update({
+    where: { id: process.id },
+    data: { currentRevisionId: revision.id },
+  });
+  for (const entry of children) {
+    await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        targetKey: `target:${entry.label}`,
+        childCareProcessId: entry.process.id,
+        enrollmentId: entry.enrollment.id,
+        familyRefKey: entry.family.id,
+        grantId: entry.grant.id,
+      },
+    });
+  }
+  return { asset, process, revision };
+};
+
+const releaseVerdictFor = async (world: Institution, processKey: string) => {
+  const port = new PrismaPublicationReleasePort(prisma);
+  const facts = await port.loadReleaseFacts({
+    workspace_id: world.workspaceId,
+    participant_id: world.teacher.id,
+    process_key: processKey,
+  });
+  expect(facts).not.toBeNull();
+  return derivePublishEligibility(
+    "boundary-key",
+    { workspace_id: world.workspaceId, participant_id: world.teacher.id },
+    {
+      process_state: facts!.process_state,
+      media: facts!.media,
+      targets: facts!.targets.map((target) => ({
+        target_key: target.target_key,
+        child_care_process_id: target.child_care_process_id,
+        enrollment_active: target.enrollment_active,
+        grant_allows: target.grant_allows,
+        data_class_allowed: target.data_class_allowed,
+        purpose_allowed: target.purpose_allowed,
+        exposure_allows_child_ids: target.exposure_allows_child_ids,
+      })),
+    },
+  );
+};
+
+
+describe("release facts reduce attribution history to the current fact per child", () => {
+  it("neither a superseded predecessor nor a routine A-to-B correction blocks the release", async () => {
+    const world = await seedInstitution();
+    const alpha = await seedChild(world, "Alpha");
+    const bravo = await seedChild(world, "Bravo");
+    // Only Bravo — the child actually in the photo — is a release target;
+    // Alpha exists as attribution HISTORY, not as an audience.
+    const { asset, process } = await seedReleasableFor(world, [bravo]);
+
+    // Alpha's history: rev1 superseded by rev2 rejected — the teacher first
+    // pointed at Alpha, then corrected: Alpha is NOT in the photo. Bravo holds
+    // the live confirmation.
+    const first = await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: alpha.process.id,
+        source: "manual",
+        state: "superseded",
+        attributionRevision: 1,
+      },
+    });
+    const second = await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: alpha.process.id,
+        source: "manual",
+        state: "rejected",
+        attributionRevision: 2,
+      },
+    });
+    await prisma.nurtureChildMediaAttribution.update({
+      where: { id: first.id },
+      data: { supersededByAttributionId: second.id },
+    });
+    await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: bravo.process.id,
+        source: "manual",
+        state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt: new Date("2026-08-02T03:00:00.000Z"),
+        exposurePolicyPayload: { audience: "own_family" },
+        attributionRevision: 1,
+      },
+    });
+
+    // Fed the real owner rows, the eligibility rule must see ONE current fact
+    // per child: Alpha's current fact says "not in the photo" and carries no
+    // obligation. The unreduced reader handed the rule Alpha's STALE superseded
+    // predecessor as a live obligation — so a child the teacher explicitly
+    // removed blocked the release forever.
+    const verdict = await releaseVerdictFor(world, process.processKey);
+    expect(verdict.blockingReasons).toEqual([]);
+    expect(verdict.eligible).toBe(true);
   });
 });
 

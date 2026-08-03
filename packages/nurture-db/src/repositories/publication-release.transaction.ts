@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { currentAttributionRowsPerChild } from "./media-safety.read.js";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type {
   CaregiverFactAuthorityV1,
@@ -224,16 +225,23 @@ export class PrismaPublicationReleasePort
           media_revision: entry.media_revision,
           current_media_revision: asset.mediaRevision,
           lifecycle: asset.lifecycle,
-          // A rejected attribution records that this child is NOT in the
-          // asset, so it carries no obligation and is dropped. The owner has a
-          // row only for a child it identified in the asset, so every remaining
-          // row is a clearly visible child; a face nobody attributed produces
-          // no row and therefore no obligation.
-          visible_children: asset.attributions
-            .filter((attribution) => attribution.state !== "rejected")
+          // One CURRENT fact per child, then the terminal "not this child"
+          // states drop out. Mapping every historical row treated a stale
+          // superseded predecessor as a live obligation while dropping the
+          // current rejected fact that replaced it — a child the teacher said
+          // is NOT in the photo blocked it as unconfirmed, and a routine A→B
+          // correction blocked the media forever. A rejected or superseded
+          // current fact records that this child is not in the asset, so it
+          // carries no obligation; a face nobody attributed produces no row
+          // and therefore no obligation either.
+          visible_children: currentAttributionRowsPerChild(asset.attributions)
+            .filter(
+              (attribution) =>
+                attribution.status !== "rejected" && attribution.status !== "superseded",
+            )
             .map((attribution) => ({
-              child_care_process_id: attribution.childCareProcessId,
-              attribution_status: attribution.state,
+              child_care_process_id: attribution.child_care_process_id,
+              attribution_status: attribution.status,
               clearly_visible: true,
             })),
         },

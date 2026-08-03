@@ -38,6 +38,9 @@ export const HARNESS_CAPABILITY_VERSIONS = {
   renew_publish_edit_hold: "1.0.0",
   release_publish_edit_hold: "1.0.0",
   save_publish_process_draft: "1.0.0",
+  confirm_child_media_attribution: "1.0.0",
+  reject_child_media_attribution: "1.0.0",
+  supersede_child_media_attribution: "1.0.0",
 } as const;
 
 export const HARNESS_QUERY_CAPABILITY_VERSIONS = {

@@ -60,6 +60,7 @@ export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/board-mutation-transaction.js";
 export * from "./domain/institution/publish-process-transaction.js";
+export * from "./domain/institution/media-attribution-transaction.js";
 export * from "./domain/institution/family-care-commands.js";
 export * from "./domain/institution/family-care-query.js";
 export * from "./domain/institution/user-attention-activation.js";

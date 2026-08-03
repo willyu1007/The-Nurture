@@ -36,6 +36,14 @@ import {
   prepareUpdateGuardianCurrentFocus,
   prepareWithdrawFamilyCareRequest,
   preparePublishProcessCancel,
+  prepareConfirmChildMediaAttribution,
+  prepareRejectChildMediaAttribution,
+  prepareSupersedeChildMediaAttribution,
+  createConfirmChildMediaAttributionSpec,
+  createRejectChildMediaAttributionSpec,
+  createSupersedeChildMediaAttributionSpec,
+  issueChildOptionRef,
+  parseChildAttributionExecuteInput,
   prepareAcquirePublishEditHold,
   prepareRenewPublishEditHold,
   prepareReleasePublishEditHold,
@@ -79,6 +87,7 @@ import {
   PrismaFamilyCareHarnessQueryReadPort,
   PrismaGuardianBoardReadPort,
   PrismaGuardianFocusEligibilityReadPort,
+  PrismaMediaSafetyReadPort,
   PrismaPublishLaneReadPort,
   PrismaInteractionContextRepository,
   PrismaInstitutionBusinessCommunicationReadPort,
@@ -261,6 +270,41 @@ export function createHarnessEngine(input: {
     integrity_key: input.integrityKey,
     protected_content: protectedContent,
   });
+  const mediaAttributionReads = new PrismaMediaSafetyReadPort(input.prisma);
+  const attributionDeps = {
+    reads: mediaAttributionReads,
+    contexts,
+    integrity_key: input.integrityKey,
+  };
+  const confirmAttributionSpec = createConfirmChildMediaAttributionSpec({
+    integrity_key: input.integrityKey,
+  });
+  const rejectAttributionSpec = createRejectChildMediaAttributionSpec({
+    integrity_key: input.integrityKey,
+  });
+  const supersedeAttributionSpec = createSupersedeChildMediaAttributionSpec({
+    integrity_key: input.integrityKey,
+  });
+
+  /**
+   * Binds one resubmitted child ref to the id the confirmation froze. The
+   * sealed ref is deterministic per actor, so a caller that resubmits a
+   * different child than it prepared fails here rather than being silently
+   * corrected by the confirmation.
+   */
+  const boundChildId = (
+    built: BuildInput,
+    resubmittedRef: unknown,
+    frozenChildId: string | undefined,
+  ): string | null => {
+    if (typeof resubmittedRef !== "string" || !frozenChildId) return null;
+    const expected = issueChildOptionRef(
+      input.integrityKey,
+      { workspace_id: built.workspace_id, participant_id: built.actor_participant_id },
+      frozenChildId,
+    );
+    return expected === resubmittedRef ? frozenChildId : null;
+  };
 
   /** The three hold transitions differ only by which spec they commit through. */
   const buildEditHoldCommand =
@@ -667,6 +711,100 @@ export function createHarnessEngine(input: {
         };
       },
     },
+    confirm_child_media_attribution: {
+      prepare: optionalTarget((request) =>
+        prepareConfirmChildMediaAttribution(attributionDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseChildAttributionExecuteInput(built.operation_input, ["childRef"]);
+        const mediaAssetId = built.target_refs.media_asset;
+        const childId = parsed
+          ? boundChildId(built, parsed.childRef, built.target_refs.child)
+          : null;
+        const expectedRevision = built.expected_heads.child_media_attribution;
+        const expectedMedia = built.expected_heads.media_asset_revision;
+        if (!mediaAssetId || !childId || expectedRevision === undefined || expectedMedia === undefined) {
+          return null;
+        }
+        return {
+          payload: {
+            media_asset_id: mediaAssetId,
+            child_care_process_id: childId,
+            expected_attribution_revision: expectedRevision,
+            expected_media_revision: expectedMedia,
+          },
+          spec: confirmAttributionSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    reject_child_media_attribution: {
+      prepare: optionalTarget((request) =>
+        prepareRejectChildMediaAttribution(attributionDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseChildAttributionExecuteInput(built.operation_input, ["childRef"]);
+        const mediaAssetId = built.target_refs.media_asset;
+        const childId = parsed
+          ? boundChildId(built, parsed.childRef, built.target_refs.child)
+          : null;
+        const expectedRevision = built.expected_heads.child_media_attribution;
+        const expectedMedia = built.expected_heads.media_asset_revision;
+        if (!mediaAssetId || !childId || expectedRevision === undefined || expectedMedia === undefined) {
+          return null;
+        }
+        return {
+          payload: {
+            media_asset_id: mediaAssetId,
+            child_care_process_id: childId,
+            expected_attribution_revision: expectedRevision,
+            expected_media_revision: expectedMedia,
+          },
+          spec: rejectAttributionSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    supersede_child_media_attribution: {
+      prepare: optionalTarget((request) =>
+        prepareSupersedeChildMediaAttribution(attributionDeps, request),
+      ),
+      build: (built) => {
+        const parsed = parseChildAttributionExecuteInput(built.operation_input, [
+          "fromChildRef",
+          "toChildRef",
+        ]);
+        const mediaAssetId = built.target_refs.media_asset;
+        const fromChildId = parsed
+          ? boundChildId(built, parsed.fromChildRef, built.target_refs.from_child)
+          : null;
+        const toChildId = parsed
+          ? boundChildId(built, parsed.toChildRef, built.target_refs.to_child)
+          : null;
+        const expectedFrom = built.expected_heads.child_media_attribution;
+        const expectedTo = built.expected_heads.target_child_attribution;
+        const expectedMedia = built.expected_heads.media_asset_revision;
+        if (
+          !mediaAssetId ||
+          !fromChildId ||
+          !toChildId ||
+          expectedFrom === undefined ||
+          expectedTo === undefined ||
+          expectedMedia === undefined
+        ) {
+          return null;
+        }
+        return {
+          payload: {
+            media_asset_id: mediaAssetId,
+            from_child_care_process_id: fromChildId,
+            to_child_care_process_id: toChildId,
+            expected_from_revision: expectedFrom,
+            expected_to_revision: expectedTo,
+            expected_media_revision: expectedMedia,
+          },
+          spec: supersedeAttributionSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
   } satisfies Record<HarnessCapabilityKey, HarnessActionDescriptor>;
 
   return {
@@ -997,6 +1135,8 @@ export function createHarnessEngine(input: {
       operation_input: request.operation_input,
       target_refs: payload.target_refs,
       expected_heads: payload.expected_heads,
+      workspace_id: request.workspace_id,
+      actor_participant_id: request.actor_participant_id,
     });
     return built
       ? { status: "ok", payload: built.payload, spec: built.spec }
@@ -1018,6 +1158,13 @@ type BuildInput = {
   operation_input: unknown;
   target_refs: Record<string, string>;
   expected_heads: Record<string, number>;
+  /**
+   * The authenticated actor scope, for descriptors that must bind a
+   * resubmitted sealed ref to the id the confirmation froze — sealed refs are
+   * deterministic per actor, so the binding is an equality, not a resolution.
+   */
+  workspace_id: string;
+  actor_participant_id: string;
 };
 
 type BuiltPayload = { payload: unknown; spec: NurtureCommandSpec<never> };

@@ -98,7 +98,11 @@ export type BoardWriteSpecDefinitionV1<Input, Port, Facts, Write> = {
   head_keys: readonly string[];
   /** (2) What prepare froze, against what the owner holds inside the write. */
   expectedHeads(input: Input): Record<string, number>;
-  currentHeads(facts: Facts): Record<string, number>;
+  /**
+   * The input names WHICH head when one aggregate carries many — an
+   * attribution head is per child, and the child is in the command.
+   */
+  currentHeads(facts: Facts, input: Input): Record<string, number>;
   /** Defaults to `stale_confirmation`, the reason code the transport maps to a re-prepare. */
   drift_reason_code?: string;
 
@@ -188,7 +192,7 @@ export const createBoardWriteSpec = <Input, Port, Facts, Write>(
     if (authorization.status !== "authorized") return authorization;
 
     const expected = definition.expectedHeads(input);
-    const current = definition.currentHeads(facts);
+    const current = definition.currentHeads(facts, input);
     assertDeclaredHeads(definition.capability.key, definition.head_keys, expected, "expected");
     assertDeclaredHeads(definition.capability.key, definition.head_keys, current, "current");
     if (!sameHeads(definition.head_keys, expected, current)) {

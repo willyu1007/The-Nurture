@@ -518,6 +518,9 @@ components:
             - renew_publish_edit_hold
             - release_publish_edit_hold
             - save_publish_process_draft
+            - confirm_child_media_attribution
+            - reject_child_media_attribution
+            - supersede_child_media_attribution
         capability_version:
           type: string
           const: 1.0.0
@@ -611,6 +614,9 @@ components:
             - renew_publish_edit_hold
             - release_publish_edit_hold
             - save_publish_process_draft
+            - confirm_child_media_attribution
+            - reject_child_media_attribution
+            - supersede_child_media_attribution
         capability_version:
           type: string
           const: 1.0.0

@@ -210,7 +210,36 @@ describe("G3-C1 manual attribution capabilities", () => {
     expect(JSON.stringify(decision)).not.toContain("attr-1");
   });
 
-  it("is idempotent on an already confirmed child", async () => {
+  it("repeats an already confirmed child from the stored instant, never the clock", async () => {
+    const decision = await confirmChildMediaAttribution(
+      deps(
+        facts({
+          attributions: [
+            {
+              attribution_id: "attr-1",
+              child_care_process_id: "child-1",
+              status: "confirmed",
+              revision: 4,
+              source: "manual",
+              decided_at: "2026-08-01T08:15:00.000Z",
+            },
+          ],
+        }),
+      ),
+      scope,
+      { media_ref: mediaRef(), operation_input: { childRef: childRef("child-1") } },
+    );
+    expect(decision.status).toBe("already_satisfied");
+    if (decision.status !== "already_satisfied") return;
+    // The stored decision instant — the evaluator's own clock reads a
+    // different moment, so equality here is an observable fact.
+    expect(decision.records[0]?.decidedAt).toBe("2026-08-01T08:15:00.000Z");
+    expect(decision.records[0]?.revision).toBe(4);
+  });
+
+  it("refuses to repeat a decided fact the owner cannot date", async () => {
+    // A confirmed fact with no stored instant would force the repeat to invent
+    // one — the cancel-instant class. Refusal is the honest answer.
     const decision = await confirmChildMediaAttribution(
       deps(
         facts({
@@ -228,7 +257,10 @@ describe("G3-C1 manual attribution capabilities", () => {
       scope,
       { media_ref: mediaRef(), operation_input: { childRef: childRef("child-1") } },
     );
-    expect(decision.status).toBe("already_satisfied");
+    expect(decision).toEqual({
+      status: "denied",
+      reason_code: "attribution_evidence_unavailable",
+    });
   });
 
   it("rejects a candidate but refuses to reject confirmed history", async () => {
@@ -341,14 +373,74 @@ describe("G3-C1 manual attribution capabilities", () => {
         },
       }),
     ).resolves.toEqual({ status: "denied", reason_code: "target_child_already_confirmed" });
+  });
+
+  it("never confirms onto a to-child whose current fact is terminal", async () => {
+    // The to-child's confirmation obeys the same state machine confirm obeys:
+    // rejected and superseded are terminal, so a correction cannot resurrect
+    // them into a confirmation. Only "already confirmed" gets its own code.
+    for (const terminal of ["rejected", "superseded"] as const) {
+      const base = facts({
+        attributions: [
+          {
+            attribution_id: "attr-1",
+            child_care_process_id: "child-1",
+            status: "confirmed",
+            revision: 2,
+            source: "manual",
+            decided_at: "2026-08-01T08:00:00.000Z",
+          },
+          {
+            attribution_id: "attr-2",
+            child_care_process_id: "child-2",
+            status: terminal,
+            revision: 1,
+            source: "manual",
+            decided_at: "2026-08-01T08:05:00.000Z",
+          },
+        ],
+      });
+      await expect(
+        supersedeChildMediaAttribution(deps(base), scope, {
+          media_ref: mediaRef(),
+          operation_input: {
+            fromChildRef: childRef("child-1"),
+            toChildRef: childRef("child-2"),
+          },
+        }),
+      ).resolves.toEqual({
+        status: "denied",
+        reason_code: "illegal_attribution_transition",
+      });
+    }
+  });
+
+  it("requires the supersession to name a distinct child", async () => {
     await expect(
-      supersedeChildMediaAttribution(deps(base), scope, {
-        media_ref: mediaRef(),
-        operation_input: {
-          fromChildRef: childRef("child-1"),
-          toChildRef: childRef("child-1"),
+      supersedeChildMediaAttribution(
+        deps(
+          facts({
+            attributions: [
+              {
+                attribution_id: "attr-1",
+                child_care_process_id: "child-1",
+                status: "confirmed",
+                revision: 2,
+                source: "manual",
+                decided_at: "2026-08-01T08:00:00.000Z",
+              },
+            ],
+          }),
+        ),
+        scope,
+        {
+          media_ref: mediaRef(),
+          operation_input: {
+            fromChildRef: childRef("child-1"),
+            toChildRef: childRef("child-1"),
+          },
         },
-      }),
+      ),
     ).resolves.toEqual({
       status: "denied",
       reason_code: "supersession_requires_distinct_child",

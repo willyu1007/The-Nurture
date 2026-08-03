@@ -22,6 +22,7 @@ import type {
 } from "@the-nurture/scenario/harness";
 import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js";
 import { PrismaPublishProcessTransaction } from "./publish-process.transaction.js";
+import { PrismaMediaAttributionTransaction } from "./media-attribution.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -131,11 +132,19 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
    */
   readonly publishProcess: PrismaPublishProcessTransaction;
 
+  /**
+   * The G3-C1 attribution decisions append their own owner revisions inside
+   * this same command transaction, so the board never becomes a second writer
+   * of attribution history.
+   */
+  readonly mediaAttribution: PrismaMediaAttributionTransaction;
+
   constructor(private readonly transaction: Prisma.TransactionClient) {
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
     this.publishProcess = new PrismaPublishProcessTransaction(transaction);
+    this.mediaAttribution = new PrismaMediaAttributionTransaction(transaction);
   }
 
   async findCommitted(input: {
