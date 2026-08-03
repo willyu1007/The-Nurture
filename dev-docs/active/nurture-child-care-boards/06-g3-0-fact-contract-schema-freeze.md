@@ -270,6 +270,27 @@ instant, so the migration's census aborts on such a row rather than backfilling
 one. The capability adoption set, exact inputs, authority predicates and surface
 topology above are unchanged.
 
+### Amendment 2026-08-03 — the draft save binds the client's observed revision
+
+Locked decision D-08 requires every save to bind `expectedDraftRevision` and
+makes head drift an explicit conflict. The frozen save input
+(`title`/`segments`, additionalProperties: false) gave the client no channel to
+state the revision its buffer was composed against — so the implementation froze
+the owner's own current head, the drift check compared the server to itself, and
+a concurrent save silently last-write-won. The check existed; the value it
+exists to protect could not reach it.
+
+| Change | Boundary |
+| --- | --- |
+| `save_publish_process_draft` input gains required `expectedDraftRevision` (integer, ≥ 0) | the revision the CLIENT observed; `0` means "no saved revision yet". The owner conflicts on mismatch. It is business input, not transport metadata: server-issued heads, refs and identities remain forbidden in typed input |
+
+The surface artifact rotates additively to `nurture.surface-contract@1.14.0` /
+`sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c`; the
+shared core and every other capability slice are unchanged, and the capability
+stays at `1.0.0` — it has never been activated and has no consumer. The
+capability adoption set, exact inputs, authority predicates and surface topology
+above are unchanged.
+
 ## DB SSOT Delta
 
 All persisted changes originate in `prisma/schema.prisma` through the DB SSOT workflow. No JSON

@@ -1568,3 +1568,43 @@ lane 5 条。`held_by_other` 目前映射成 `denied + reason_code`,持有者姓
 
 原来那条 owner 测试把"返回全部历史"钉成了契约。它不是没覆盖,是把两侧的分歧写进了
 期望值——与 draft 重放那条同形。
+
+## 2026-08-03 — 复核两条 HIGH 的修复:过期 hold 与草稿 LWW
+
+### 过期 hold 卡死编辑 lane(finding 1)
+
+领域层把过期编码为"不存在"(head 冻结 0),但过期的**行**还占着 `publish_process_id`
+唯一槽位,而且没有任何路径清理它——TTL 一到,第一次 acquire 就永远撞唯一约束。
+
+修法:version-0 的 grant 路径先按 **owner 自己的 read_at** 清扫已死的行再插入;
+清扫按过期时刻过滤,所以中途被同事拿走的**活** hold 不受影响、插入照旧碰撞——
+那正是保留值 0 要暴露的竞争。release 按 absence head 准备时,对"行还在但已死"的
+状态走**真实写入**清掉它,而不是用 `already_satisfied` 宣称一次从未发生的删除;
+清扫按过期而非按持有者限定,因为清一条已失效的行不释放任何人的活协调。
+
+四条证伪:去掉清扫(原缺陷)、清扫不按过期过滤(偷走活 hold)、release 清扫分支
+不按过期过滤、release 退回 already_satisfied——全部 CAUGHT。fixture 里过期不能
+靠把 `expires_at` 弯到 `created_at` 之前伪造(窗口 CHECK 会拒),要把整个窗口
+平移进过去——真实的过期就是时间流逝。
+
+### 草稿保存的静默 last-write-wins(finding 2,按用户决定走 schema 增补 + 旋转)
+
+prepare 声明了 `expected_draft_revision` 却从不读它,冻结的是 owner 自己的
+`current_revision`——漂移检查变成服务器和自己比。根因在**合同**:冻结的 save 输入
+只有 `title`/`segments`,客户端的观察基线没有传输通道。
+
+- 冻结源 schema 增补必填 `expectedDraftRevision`(integer ≥ 0,0 表示尚无已存修订),
+  制品 additive 旋转 `1.13.0 → 1.14.0`,capability 保持 `1.0.0`(从未激活、无消费者)。
+- 领域侧单一来源:基线只住在 typed input 里。评估器从 `input.expectedDraftRevision`
+  读,prepare 冻结**客户端的值**,ingress 的 build 要求重提交的值与确认冻结的相等。
+- 内容摘要只盖 `title`/`segments`(`SavePublishProcessDraftContentV1`)——基线是 head,
+  不是内容。
+
+**两条被钉死的旧测试**都是把缺陷写进期望值的实例:单测断言"冻结 owner 的头、
+不冻结调用方记得的",合同守卫把 `expectedDraftRevision` 列进"禁止进 typed input"。
+后者混淆了两类东西——服务端签发的传输元数据(仍然全部禁止)与**只有客户端知道的
+业务事实**。守卫改为分立:save 的输入**必须**含它,其余 key 仍禁止。
+
+证伪:prepare 换回冻结 owner 头(原缺陷)、parser 把必填改成默认——都 CAUGHT。
+e2e 加了 kill shot:按 revision 1 组稿的缓冲在 revision 2 之后到达,**prepare 即拒**
+`draft_revision_conflict`,零写入。

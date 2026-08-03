@@ -844,3 +844,20 @@ a hygiene pass. Finding 2's proper fix needs a contract decision: the frozen
 save input schema (`title`/`segments`, additionalProperties:false) has no channel
 for the client's observed base revision, so admitting one is an input-schema
 amendment plus artifact rotation, not a code-only change.
+
+## 2026-08-03 — Fixes for Review Findings 1 and 2
+
+| Command / check | Result |
+| --- | --- |
+| finding 1: version-0 grant sweeps rows dead at the owner's read_at, then inserts | LANDED |
+| finding 1: release on the absence head clears the dead row by a real write, expiry-scoped not holder-scoped | LANDED |
+| falsified: sweep removed / sweep unscoped / release-clear unscoped / release reverts to already_satisfied | 4× CAUGHT |
+| DB: acquire-after-expiry replaces the dead row; live colleague hold still collides; sweep never steals | PASS |
+| e2e: TTL lapse → next teacher's acquire commits; release-after-expiry clears the slot | PASS |
+| finding 2: `expectedDraftRevision` required in the frozen save input; artifact rotated additively to `1.14.0` / `sha256:d03559e5…` | LANDED — shared core and all other slices unchanged |
+| prepare freezes the CLIENT's base; evaluator reads one source; ingress build binds resubmitted value to the frozen one | LANDED |
+| the two tests that had pinned the defect as the contract | REWRITTEN — the unit test now demands conflict-on-stale-base; the metadata guard now distinguishes server-issued metadata (still forbidden) from the client's observed base (required on save, forbidden elsewhere) |
+| falsified: prepare substitutes the server's head / parser defaults the base | 2× CAUGHT |
+| e2e kill shot: buffer composed against rev 1 arriving after rev 2 → prepare denies `draft_revision_conflict`, zero writes | PASS |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `test:scenario-service:db` | PASS — 545, 193, 52 and 33 tests |
+| full gate set incl. `verify:surface-contract` (new digest), conformance 16/16, g2-exit slices preserved at `1.14.0` | PASS |
