@@ -914,6 +914,102 @@ describe("T-006 owner write: the edit lane", () => {
     ).rejects.toThrow(/ck_nurture_publish_edit_hold_version_floor/);
   });
 
+  it("acquires over an expired hold by sweeping the dead row, not by colliding on it", async () => {
+    const { world, process } = await laneScope();
+    // The colleague's hold lapses without an explicit release — the ordinary
+    // closed-laptop case the short TTL exists for. The row survives the lapse.
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.colleague.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    const stale = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    // Real expiry is time passing after a valid grant. The window CHECK keeps
+    // `expires_at > created_at`, so the lapse is simulated by shifting the
+    // whole window into the past, not by bending expiry below creation.
+    await prisma.nurturePublishEditHold.update({
+      where: { id: stale.id },
+      data: {
+        createdAt: new Date(Date.now() - 300_000),
+        expiresAt: new Date(Date.now() - 180_000),
+      },
+    });
+
+    // Prepared against "no hold" (the query port filters expired rows), so the
+    // frozen head is 0 — and the write must succeed, not retry forever on the
+    // unique slot the dead row still occupies.
+    const expiresAt = new Date(Date.now() + 120_000).toISOString();
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: expiresAt,
+    });
+    const holds = await prisma.nurturePublishEditHold.findMany({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    expect(holds).toHaveLength(1);
+    expect(holds[0]?.holderParticipantId).toBe(world.teacher.id);
+    expect(holds[0]?.id).not.toBe(stale.id);
+  });
+
+  it("release with the absence head clears the expired row it was prepared against", async () => {
+    const { world, process } = await laneScope();
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.colleague.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    const stale = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    await prisma.nurturePublishEditHold.update({
+      where: { id: stale.id },
+      data: {
+        createdAt: new Date(Date.now() - 300_000),
+        expiresAt: new Date(Date.now() - 180_000),
+      },
+    });
+
+    // A different teacher sweeps it: expiry-scoped, not holder-scoped.
+    await owner().applyPublishEditHoldRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+    });
+    expect(
+      await prisma.nurturePublishEditHold.count({
+        where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(0);
+
+    // But the absence head never sweeps a LIVE hold: with a live row present,
+    // the same call has nothing expired to clear and must fail loudly.
+    await owner().applyPublishEditHoldGrant({
+      workspace_id: world.workspaceId,
+      participant_id: world.colleague.id,
+      process_key: process.processKey,
+      expected_hold_version: 0,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    await expect(
+      owner().applyPublishEditHoldRelease({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        process_key: process.processKey,
+        expected_hold_version: 0,
+      }),
+    ).rejects.toThrow(/release version conflict/);
+  });
+
   it("refuses to take a hold a colleague took in between", async () => {
     const { world, process } = await laneScope();
     const expiresAt = new Date(Date.now() + 120_000).toISOString();

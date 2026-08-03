@@ -880,20 +880,28 @@ const createPublishEditHoldSpec = (
           write: { expires_at: decision.hold.expiresAt, ttl_seconds: decision.hold.ttlSeconds },
         };
       }
-      // A release with no live hold changed nothing, and says so against the
-      // process the owner just returned rather than claiming a fresh release.
-      return currentPublishEditHold(facts, ruleRequest.now)
-        ? { status: "authorized", write: {} }
-        : {
-            status: "already_satisfied",
-            effect: {
-              output_refs: [facts.publish_process_ref],
-              committed_result: {
-                processRef: ruleRequest.process_ref,
-                released: true,
-              },
-            },
-          };
+      // A live hold held by this actor is released by a real write.
+      if (currentPublishEditHold(facts, ruleRequest.now)) {
+        return { status: "authorized", write: {} };
+      }
+      // No live hold, but the DEAD row may still occupy the unique slot.
+      // Answering already_satisfied here would claim a delete that never
+      // happened — and leave the slot blocking every future acquire — so a
+      // present-but-expired row is cleared by a real write too.
+      if (facts.current_hold) {
+        return { status: "authorized", write: {} };
+      }
+      // Truly nothing to release: no row at all, provably a no-op.
+      return {
+        status: "already_satisfied",
+        effect: {
+          output_refs: [facts.publish_process_ref],
+          committed_result: {
+            processRef: ruleRequest.process_ref,
+            released: true,
+          },
+        },
+      };
     },
     apply: async (owner, input, context, write) => {
       const processRef = issueBoardSealedRef(

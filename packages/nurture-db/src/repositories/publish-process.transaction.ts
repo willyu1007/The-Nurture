@@ -162,10 +162,21 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
     const expiresAt = new Date(input.expires_at);
 
     if (input.expected_hold_version === NO_PUBLISH_EDIT_HOLD_VERSION) {
-      // Prepared against no hold. `publish_process_id` is unique, so a hold
-      // another teacher took in between makes this insert fail rather than
-      // silently replace theirs — and it can never carry version 0 itself,
-      // which is what keeps absence and a fresh hold distinguishable.
+      // Prepared against no hold. The domain encodes an expired hold as
+      // absence, but the expired ROW still occupies the `publish_process_id`
+      // unique slot — and nothing else ever clears it, so without this sweep
+      // the first acquire after any TTL lapse would collide forever. Only rows
+      // already dead at this read's own instant are swept: a live hold a
+      // colleague took in between is untouched, so the insert below still
+      // collides on it — which is exactly the race the reserved 0 exists to
+      // surface.
+      await this.prisma.nurturePublishEditHold.deleteMany({
+        where: {
+          workspaceId: input.workspace_id,
+          publishProcessId: loaded.process.id,
+          expiresAt: { lte: new Date(loaded.facts.read_at) },
+        },
+      });
       await this.prisma.nurturePublishEditHold.create({
         data: {
           workspaceId: input.workspace_id,
@@ -211,7 +222,27 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
   }): Promise<{ publish_process_ref: DomainContextRef }> {
     const loaded = await this.loadHoldRow(input);
     if (!loaded) throw new Error("nurture publish edit hold: target unavailable");
-    // Releasing is deleting the coordination row, never a process state change.
+
+    if (input.expected_hold_version === NO_PUBLISH_EDIT_HOLD_VERSION) {
+      // Prepared against no live hold while the dead row still occupies the
+      // slot. Sweeping an expired row is not releasing anyone's coordination —
+      // any current class teacher may do it, whoever the lapsed holder was —
+      // so this branch is scoped by expiry, not by holder.
+      const cleared = await this.prisma.nurturePublishEditHold.deleteMany({
+        where: {
+          workspaceId: input.workspace_id,
+          publishProcessId: loaded.process.id,
+          expiresAt: { lte: new Date(loaded.facts.read_at) },
+        },
+      });
+      if (cleared.count !== 1) {
+        throw new Error("nurture publish edit hold: release version conflict");
+      }
+      return { publish_process_ref: loaded.facts.publish_process_ref };
+    }
+
+    // Releasing one's own live hold deletes the coordination row under its
+    // exact version, never a process state change.
     const released = await this.prisma.nurturePublishEditHold.deleteMany({
       where: {
         workspaceId: input.workspace_id,

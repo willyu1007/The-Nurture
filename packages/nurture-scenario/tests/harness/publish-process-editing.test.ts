@@ -958,6 +958,51 @@ describe("edit lane commands", () => {
     });
   });
 
+  it("sweeps the dead row when acquiring over an expired hold", async () => {
+    // The expired-but-present row is the state that bricked the lane: the
+    // domain calls it absent (head 0), the unique slot calls it occupied.
+    // Acquire must go through apply — a real write that clears the slot —
+    // never through an already_satisfied that leaves it standing.
+    const calls: HoldCalls = [];
+    const expired = ownerHoldFacts({
+      current_hold: liveOwnerHold("caregiver-9", 3),
+      read_at: "2026-08-01T09:06:00.000Z",
+    });
+    const applied = await holdSpec().apply(
+      editLaneTransaction({ hold: expired }, calls),
+      holdCommand({ expected_hold_version: 0, ttl_seconds: 120 }),
+      commandContext,
+    );
+    expect(calls).toEqual([
+      { kind: "grant", expected: 0, expires_at: "2026-08-01T09:08:00.000Z" },
+    ]);
+    expect(applied.committed_result).toMatchObject({ processRef: processRef() });
+  });
+
+  it("clears a present-but-expired row on release instead of claiming a delete it skipped", async () => {
+    const calls: HoldCalls = [];
+    const expired = ownerHoldFacts({
+      current_hold: liveOwnerHold("caregiver-9", 3),
+      read_at: "2026-08-01T09:06:00.000Z",
+    });
+    // Not already_satisfied: the row exists, so "released" must be earned by
+    // the write that actually removes it.
+    await expect(
+      releaseSpec().checkPreconditions(
+        editLaneTransaction({ hold: expired }, calls),
+        holdCommand({ ttl_seconds: undefined, expected_hold_version: 0 }),
+        commandContext,
+      ),
+    ).resolves.toEqual({ status: "ready" });
+    const released = await releaseSpec().apply(
+      editLaneTransaction({ hold: expired }, calls),
+      holdCommand({ ttl_seconds: undefined, expected_hold_version: 0 }),
+      commandContext,
+    );
+    expect(calls).toEqual([{ kind: "release", expected: 0 }]);
+    expect(released.committed_result).toEqual({ processRef: processRef(), released: true });
+  });
+
   it("answers a release with nothing to release from the owner's own process ref", async () => {
     const calls: HoldCalls = [];
     const decision = await releaseSpec().checkPreconditions(

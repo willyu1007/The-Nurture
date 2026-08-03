@@ -2392,6 +2392,79 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
     });
   });
 
+  it("recovers the lane after a hold lapses by TTL instead of bricking it", async () => {
+    const scope = await seedScope();
+    const { process } = await seedEditableProcess(scope);
+
+    // Teacher B takes the hold and their laptop closes: the TTL lapses with no
+    // explicit release, and the dead row keeps occupying the unique slot.
+    const taken = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "acquire_publish_edit_hold",
+      targetOptionRef: processRefFor(scope, scope.caregiverB.id, process.processKey),
+      operationInput: { ttlSeconds: 120 },
+    });
+    expect(taken.executed?.json.status).toBe("committed");
+    const stale = await prisma.nurturePublishEditHold.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+    });
+    await prisma.nurturePublishEditHold.update({
+      where: { id: stale.id },
+      data: {
+        createdAt: new Date(Date.now() - 300_000),
+        expiresAt: new Date(Date.now() - 180_000),
+      },
+    });
+
+    // The next teacher's acquire must commit — previously this retried forever
+    // on the unique collision with the dead row.
+    const acquired = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "acquire_publish_edit_hold",
+      targetOptionRef: processRefFor(scope, scope.caregiver.id, process.processKey),
+      operationInput: { ttlSeconds: 300 },
+    });
+    expect(acquired.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    const holds = await prisma.nurturePublishEditHold.findMany({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+    });
+    expect(holds).toHaveLength(1);
+    expect(holds[0]?.holderParticipantId).toBe(scope.caregiver.id);
+
+    // Release-after-expiry is a real write that clears the slot, not an
+    // already_satisfied that leaves the dead row standing.
+    await prisma.nurturePublishEditHold.update({
+      where: { id: holds[0]!.id },
+      data: {
+        createdAt: new Date(Date.now() - 300_000),
+        expiresAt: new Date(Date.now() - 180_000),
+      },
+    });
+    const swept = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "release_publish_edit_hold",
+      targetOptionRef: processRefFor(scope, scope.caregiverB.id, process.processKey),
+    });
+    expect(swept.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(
+      await prisma.nurturePublishEditHold.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(0);
+  });
+
   it("saves a draft revision and refuses the head the owner has moved past", async () => {
     const scope = await seedScope();
     const { process, revision } = await seedEditableProcess(scope);
