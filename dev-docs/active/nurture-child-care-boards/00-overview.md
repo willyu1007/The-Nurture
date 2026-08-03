@@ -6,15 +6,16 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-03
-- Next step: G3-E readiness review 的 B1/B2/B3 已关闭，B4 部分完成。
-  **B8 Unit 0 已落地**：写命令工厂 `createBoardWriteSpec`、按能力的 ingress
-  描述表，以及第一条端到端写能力 `cancel_publish_process`（owner 写事务 +
-  spec + 路由 + 真 PostgreSQL 的 DB e2e）。formal ingress 现在准入 11 个 action
-  与 9 个 query，显式未路由的写 key 从 16 降到 15。
-  接下来是 B8 余下 15 个写能力，按 owner 聚合分三条不相交的 lane（编辑 lane /
-  归属 lane / 发布后安全 lane，organize 与几乎所有东西重叠，须排在编辑 lane
-  之后），然后是 B4 余下路由与 B5 的 T-005 consumer action；B6/B7 依赖
-  T-007 provider 与 T-005 G2-C 联合运行，无法提前拉入。详见
+- Next step: G3-E readiness review 的 B1/B2/B3 已关闭，B4 部分完成。**B8 Unit 0
+  与 Lane A 已落地**：写命令工厂 `createBoardWriteSpec`、按能力的 ingress 描述表、
+  `cancel_publish_process`，以及编辑 lane 的四条写能力（edit hold 取得/续期/释放、
+  草稿自动保存），全部含 owner 写事务、prepare、spec、路由与真 PostgreSQL 的
+  DB e2e。formal ingress 现在准入 15 个 action 与 9 个 query，显式未路由的写 key
+  从 16 降到 11。
+  接下来按规划走剩余三段：`organize_care_capture_batch`（与几乎所有东西重叠，
+  须排在编辑 lane 之后）、归属 lane 5 条、发布后安全 lane 5 条；随后是 B4 余下
+  路由与 B5 的 T-005 consumer action。B6/B7 依赖 T-007 provider 与 T-005 G2-C
+  联合运行，无法提前拉入。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal

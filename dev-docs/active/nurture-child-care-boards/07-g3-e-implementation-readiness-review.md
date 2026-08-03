@@ -207,8 +207,15 @@ be met until the 24 keys are routed and the ingress guard's census is extended.
 > fact the frozen set did not hold — see the amendment in
 > `06-g3-0-fact-contract-schema-freeze.md`.
 >
-> Fifteen write capabilities remain, and the ingress guard's explicit unrouted
-> list is now fifteen.
+> **Lane A followed on 2026-08-03.** The edit lane — `acquire_publish_edit_hold`,
+> `renew_publish_edit_hold`, `release_publish_edit_hold` and
+> `save_publish_process_draft` — is routed end to end on the same factory, with
+> its owner writes, prepare steps and a DB e2e on real PostgreSQL. Landing it
+> closed two holes the contract implied but nothing enforced: the
+> `publish_edit_hold must_equal` head had no way to say "no hold" that a
+> brand-new hold could not also say, and the draft replay column added in the
+> previous checkpoint was used by nothing. Eleven write capabilities remain, and
+> the ingress guard's explicit unrouted list is now eleven.
 
 
 Discovered while routing B4-2, and not visible when this review was written.

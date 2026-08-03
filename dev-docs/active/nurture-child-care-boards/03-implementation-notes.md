@@ -1462,3 +1462,64 @@ execute(走命令事务端口)**调用同一个函数**。为此把两侧的"照
 其余 15 个写能力、B4 余下路由、B5 consumer action。以及一处已知的整洁性机会:
 `publish_process` 的 sealed ref 目前由五个模块各自用共享的 kind 常量签发,虽然值一定
 一致(kind 是同一个导出常量),但"一个概念一个发放器"这条规则还没有在这里落实。
+
+## 2026-08-03 — B8 Lane A:编辑 lane 四条写能力,以及上一格只修了一半的重放
+
+按规划的三条 lane,先走编辑 lane。四条能力(edit hold ×3、save draft)同属一个
+owner 聚合、复用同一个读端口,领域决策函数在 G3-B1 已有,缺的是 owner 写、prepare、
+spec 与路由。全部走 Unit 0 的 `createBoardWriteSpec`,没有为它们新开一套形状。
+
+### 先修上一格的半成品
+
+`NurturePublishProcessRevision.command_request_id_hash` 在
+`20260802170000` 落了库、加了唯一约束,**但没有任何代码在用**——读端口仍按
+`organizer_input_revision` 查重放。上一格的记录写的是"新增独立的列与唯一约束",读起来
+像修好了,实际只落了一半。这正是 05 里"文档声称的修复只做了一半,比没做更糟"的复现。
+
+更值得记的是那条测试:它传 `command_request_id: "organizer:1"`,而 fixture 的
+`organizerInputRevision` 恰好也是 `"organizer:1"`。于是它一直是绿的——**它证明的是两个
+不同含义的列碰巧装着同一个字符串**,不是重放。改成先断言"用装配谱系当命令 id 必须查
+不到",再写入真正的命令哈希去查,缺陷才可见。
+
+### 一个必须先堵的洞:absence 与"刚建的 hold"不能同值
+
+`publish_edit_hold must_equal` 在没有 hold 时也要冻结一个值,自然编码是 0。但
+`aggregate_version` 默认就是 0,于是"没有 hold"和"一秒前刚建的 hold"报同一个数——
+一个按"没有 hold"准备的 acquire 会通过头部检查,**覆盖掉同班另一位老师刚拿到的 hold**。
+那正是这个头存在的理由。
+
+改法是让 0 对真实行不可达:`aggregate_version` 默认改 1,加
+`ck_nurture_publish_edit_hold_version_floor`。"0 表示不存在"从一条约定变成数据库保证。
+迁移带按行普查的 `RAISE EXCEPTION`(此前没有任何 owner 写,所以是纯前向保证,普查把这
+句话写成可执行的而不是假设)。
+
+### 第二个洞:两个时钟
+
+owner 按 `at` 过滤过期、而 `currentHeads` / `authorize` / `apply` 各自再读一次钟,就会
+出现"owner 认为还在、规则认为已过期"。改为 **owner 回报它读取的那一刻**(`read_at`),
+过期由规则在那一刻判定,新 hold 的窗口也从那一刻起算。全链路一个瞬间。
+
+这条用"会走的时钟"证伪:同一行 hold、同一条命令,只把 `read_at` 推过到期时刻,结论就
+从 `held_by_other` 变成 `ready`——两者可区分,断言才不是空的。
+
+### 落地细节
+
+- **hold 写**:`expected_hold_version === 0` 走 `create`(`publish_process_id` 唯一,
+  所以中途被别人拿走会插入失败而不是静默替换);否则走按
+  `holder_participant_id + aggregate_version` 过滤的 `updateMany`。release 是删除协调行,
+  从不改 process 状态。
+- **draft 写**:追加 revision,`organizer_input_revision` **从当前 revision 前推**——
+  装配谱系是 organize 产生的,编辑不改写它;`source_refs_payload` 同样前推,所以删掉一段
+  不会永久失去再引用该来源的能力。标题与正文只以信封形态到达 owner,明文留在命令层。
+- **无 revision 的可编辑 process**:owner 直接失败。每张卡片都由采集 lane 带着 revision 1
+  产生,这条路径产品上不可达;在这里发明一个 `organizer_input_revision` 等于给一列写上
+  一个从未运行过的装配输入。
+- **命令标识进内核**:`NurtureCommandExecutionContext` 增补 `command_request_id`。owner
+  侧的行级幂等键需要它,运行器本来就持有,从 payload 再推一次等于第二个来源。
+
+### 这一格没有做的
+
+organize(与几乎所有东西重叠,按规划排在编辑 lane 之后)、归属 lane 5 条、发布后安全
+lane 5 条。`held_by_other` 目前映射成 `denied + reason_code`,持有者姓名与到期时间留在
+队列投影里——refusal 信封没有承载它们的形状,在这里发明一个就是把同事姓名塞进一个
+本不该有它的结构。

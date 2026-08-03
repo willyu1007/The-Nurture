@@ -768,3 +768,30 @@
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 527, 184 and 29 tests |
 | `verify:surface-conformance` `test-routing` `formal-ingress-contract` `persistence-boundaries` `port-topology` `g2-exit-contract` `g3-0-freeze` `n1-schema-contract` | PASS — artifact unchanged at `1.13.0`, routed actions 10 → 11, unrouted 16 → 15 |
 | `ctl-project-governance lint` / `lint-docs --check-anchors --strict` | PASS |
+
+## 2026-08-03 — B8 Lane A (Edit Lane: Hold ×3 and Draft Autosave)
+
+| Command / check | Result |
+| --- | --- |
+| four capabilities routed end to end on `createBoardWriteSpec` | LANDED — no second write shape was introduced |
+| the draft replay column landed in the previous checkpoint was used by nothing | FIXED — read and write both go through `publishDraftCommandIdentity` |
+| the replay test passed only because two differently-meaning columns held the same string | FIXED — it now asserts the lineage value finds nothing first |
+| absence and a brand-new hold shared version 0 | FIXED — default 1 plus `ck_nurture_publish_edit_hold_version_floor` |
+| hold version floor migration gate on a hold at the reserved value | CAUGHT — aborts with the row count; under a single transaction the constraint does not land |
+| the floor refuses the reserved value afterwards | PASS — verified on the live scratch database |
+| expiry judged at the owner's read instant rather than each caller's clock | LANDED — `read_at` travels with the facts |
+| falsified: expiry judged at the command's own clock | CAUGHT |
+| falsified: head compared at a fresh clock | CAUGHT |
+| falsified: release with nothing held reported as a fresh write | CAUGHT |
+| falsified: draft body left in the canonical command payload | CAUGHT |
+| falsified: hold grant is an upsert, replacing a colleague's hold | CAUGHT |
+| falsified: extend/release not scoped to the holder | CAUGHT |
+| falsified: release without the version compare-and-set | CAUGHT |
+| falsified: assembler lineage overwritten by the editing command | CAUGHT |
+| falsified: revision written without its command identity | CAUGHT |
+| DB e2e: take → colleague refused → extend → release → release again | PASS — `already_satisfied` on the repeat, process state untouched throughout |
+| DB e2e: draft save appends revision 2, carries lineage and command hash, body absent from the result | PASS |
+| DB e2e: a colleague's save in between makes the prepared save `stale_confirmation` / `reprepare` | PASS — no last-write-wins |
+| DB e2e: guardian, unknown source ref and cancelled process all refused | PASS |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `test:scenario-service:db` | PASS — 527, 190, 52 and 32 tests |
+| all eleven DB-free gates | PASS — artifact unchanged at `1.13.0`, routed actions 11 → 15, unrouted 15 → 11 |
