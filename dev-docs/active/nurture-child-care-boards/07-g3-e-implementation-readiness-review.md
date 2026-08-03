@@ -216,6 +216,36 @@ be met until the 24 keys are routed and the ingress guard's census is extended.
 > brand-new hold could not also say, and the draft replay column added in the
 > previous checkpoint was used by nothing. Eleven write capabilities remain, and
 > the ingress guard's explicit unrouted list is now eleven.
+>
+> **Of those eleven, three cannot be routed at all (surveyed 2026-08-03).** The
+> remaining scope is eight routable capabilities, not eleven:
+>
+> - `release_publish_process` — `PrismaPublicationReleasePort` takes a
+>   `PrismaClient`, opens its own `$transaction` per target and writes its own
+>   `CommandExecution`. `NurtureCommandTransaction` has no slot for it. Routing
+>   it through the generic path would nest a transaction inside the runner's
+>   Serializable one and produce N+1 executions; and `apply` is all-or-nothing
+>   while a release is a deliberate partial commit — one blocked family must not
+>   roll back another. The target shape is one runner command per target with the
+>   attempt identity as parent, which needs a multi-command ingress shape that
+>   does not exist. Not a B8 item.
+> - `reschedule_publish_process` — no T-007 provider, so nothing writes the six
+>   schedule columns, so `readResolvedSchedule` returns null for every real row
+>   and `publication_schedule must_equal` has no owner value to freeze. Routing
+>   it ships exactly the placeholder this freeze forbids.
+> - `organize_care_capture_batch` — blocked on a contract decision, not on
+>   effort. Its frozen input is `emptyInput` and its target policy is
+>   `exact_bound`, so the CareGroup reaches prepare through neither typed input
+>   nor an owner-issued option ref — unlike every other routed write key. Its
+>   frozen `outcome` enum is `organized | nothing_to_organize`, which cannot
+>   express `direct_interaction_required`, `skipped(empty_assembly)` or any of
+>   the five denial codes the domain returns. Separately, no production code
+>   writes a capture or a batch at all, so it has no producer for the rows it
+>   would cut. Resolve the CareGroup binding and the outcome enum first.
+>
+> The eight routable ones are the attribution lane (confirm / reject /
+> supersede), the two media-lifecycle actions (detach / discard) and the three
+> post-release safety actions (correct / remove visibility / redact).
 
 
 Discovered while routing B4-2, and not visible when this review was written.

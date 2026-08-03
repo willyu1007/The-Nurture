@@ -29,8 +29,12 @@ Project: `main`
   shared write-spec factory, a per-capability ingress descriptor table that makes
   admitting an unservable key a type error, and `cancel_publish_process` end to
   end on real PostgreSQL — followed by Lane A, the four edit-lane capabilities.
-  Eleven decision-only write capabilities remain, each still needing an owner
-  write transaction and a command spec.
+  A 2026-08-03 survey then split the eleven that remain: eight are routable and
+  still need an owner write transaction and a command spec each, while
+  `release_publish_process`, `reschedule_publish_process` and
+  `organize_care_capture_batch` cannot be routed in B8 at all — the first needs
+  a multi-command ingress shape, the second waits on the T-007 provider, and the
+  third needs a contract decision on its CareGroup binding and outcome enum.
   An independent review of the landed work produced 46 findings; 2 did not hold,
   2 held in part, the rest are fixed or recorded. The sharpest were public
   results carrying raw identifiers, a page cursor readable without a key, and a
