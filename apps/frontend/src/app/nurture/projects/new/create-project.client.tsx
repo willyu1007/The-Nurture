@@ -1,6 +1,7 @@
 "use client";
 
-import { ActionButton, Scene, SettingsFrame, type SettingsSchema, type SettingsValues } from "@willyu1007/web-workbench";
+import { ActionButton, Scene } from "@willyu1007/web-workbench";
+import { FormFrame, type FieldValues, type FormSchema } from "@willyu1007/web-workbench/form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createProject, runAction, startRun } from "@/lib/api";
@@ -18,43 +19,44 @@ const ISSUE_OPTIONS = [
 const CAPABILITY = "family_strategy";
 const ENTRYPOINT = "calibrate_family_strategy";
 
-const SCHEMA: SettingsSchema = {
-  sections: [
+const SCHEMA: FormSchema = {
+  groups: [
     {
-      key: "basics",
-      label: "试运行设置",
-      blocks: [
+      key: "family",
+      label: "目标家庭",
+      fields: [
         {
-          kind: "group",
-          label: "目标家庭",
-          fields: [
-            { kind: "text", key: "family_ref_key", label: "家庭标识", placeholder: "family-...", desc: "My-Chat canonical 家庭对象的引用键。" },
-            { kind: "text", key: "primary_child_ref_key", label: "主要孩子标识（可选）", placeholder: "child-..." },
-          ],
+          kind: "text",
+          key: "family_ref_key",
+          label: "家庭标识",
+          placeholder: "family-...",
+          desc: "My-Chat canonical 家庭对象的引用键。",
+          required: true,
         },
+        { kind: "text", key: "primary_child_ref_key", label: "主要孩子标识（可选）", placeholder: "child-..." },
+      ],
+    },
+    {
+      key: "issue",
+      label: "议题",
+      fields: [{ kind: "select", key: "issue_type", label: "议题类型", options: ISSUE_OPTIONS }],
+    },
+    {
+      key: "workflow",
+      label: "工作流",
+      fields: [
         {
-          kind: "group",
-          label: "议题",
-          fields: [{ kind: "select", key: "issue_type", label: "议题类型", options: ISSUE_OPTIONS }],
-        },
-        {
-          kind: "group",
-          label: "工作流",
-          fields: [
-            {
-              kind: "toggle",
-              key: "start_run",
-              label: "立即启动工作流运行",
-              desc: "创建后启动 calibrate_family_strategy 运行并绑定到项目。",
-            },
-          ],
+          kind: "toggle",
+          key: "start_run",
+          label: "立即启动工作流运行",
+          desc: "创建后启动 calibrate_family_strategy 运行并绑定到项目。",
         },
       ],
     },
   ],
 };
 
-const INITIAL: SettingsValues = {
+const INITIAL: FieldValues = {
   family_ref_key: "",
   primary_child_ref_key: "",
   issue_type: "bedtime",
@@ -65,10 +67,11 @@ export function CreateProject() {
   const router = useRouter();
   const [error, setError] = useState<string>();
 
-  const onSave = async (values: SettingsValues) => {
+  const onSubmit = async (values: FieldValues) => {
     setError(undefined);
+    // `required` on the field handles the empty case now — FormFrame blocks
+    // submit and marks the field, so this only sees values that passed.
     const familyRefKey = String(values.family_ref_key ?? "").trim();
-    if (!familyRefKey) throw new Error("请填写家庭标识。");
     const childRef = String(values.primary_child_ref_key ?? "").trim();
     const issueType = String(values.issue_type ?? "bedtime");
     // collect_context needs context_refs + issue_type to complete; without them
@@ -113,14 +116,13 @@ export function CreateProject() {
           创建失败：{error}
         </p>
       ) : null}
-      <SettingsFrame
+      <FormFrame
         schema={SCHEMA}
         values={INITIAL}
-        onSave={onSave}
+        onSubmit={onSubmit}
         onError={(e) => setError(e instanceof Error ? e.message : String(e))}
-        navHeading="规则试运行"
-        saveLabel="创建项目"
-        dirtyLabel="未保存"
+        submitLabel="创建项目"
+        submittingLabel="创建中…"
       />
     </Scene>
   );
