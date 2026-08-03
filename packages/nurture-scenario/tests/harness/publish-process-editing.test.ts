@@ -820,7 +820,7 @@ describe("edit lane prepare", () => {
   });
 
   it("rejects a TTL the frozen contract does not admit, and an unknown field", async () => {
-    for (const invalid of [{ ttlSeconds: 0 }, { ttlSeconds: 601 }, { ttl: 60 }]) {
+    for (const invalid of [{ ttlSeconds: 0 }, { ttlSeconds: 601 }, { ttlSeconds: null }, { ttl: 60 }]) {
       await expect(
         prepareAcquirePublishEditHold(prepareDeps(holdFacts()), {
           ...scope,

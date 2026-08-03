@@ -390,21 +390,16 @@ describe("G3-A record_caregiver_daily_care", () => {
   it("commits an internal class fact that claims no family visibility", async () => {
     const spec = createRecordCaregiverDailyCareSpec({ integrity_key: BOARD_INTEGRITY_KEY });
     const applied = await spec.apply(boardTransaction(), dailyCareCommand(), context);
-    expect(applied.committed_result).toMatchObject({
+    // A closed shape, not a substring grep: the earlier six-substring scan
+    // would have passed a raw enrollmentId straight through. Exactly these
+    // keys, exactly these values, and the ref is a keyed 32-hex handle rather
+    // than anything derived readably from the row id.
+    expect(applied.committed_result).toEqual({
+      dailyCareLogRef: expect.stringMatching(/^[0-9a-f]{32}$/),
       kind: "nap",
       recordedAt: "2026-08-02T10:00:00.000Z",
     });
-    const serialized = JSON.stringify(applied.committed_result);
-    for (const forbidden of [
-      "receipt",
-      "publication",
-      "release",
-      "visib",
-      "delivered",
-      "log-1",
-    ]) {
-      expect(serialized.toLowerCase()).not.toContain(forbidden);
-    }
+    expect(JSON.stringify(applied.committed_result)).not.toContain("log-1");
     await expect(
       spec.apply(
         boardTransaction({}, { dailyCare: dailyCareFacts({ enrollment_version: 9 }) }),

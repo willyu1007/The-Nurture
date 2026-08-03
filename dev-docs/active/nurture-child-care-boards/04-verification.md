@@ -861,3 +861,22 @@ amendment plus artifact rotation, not a code-only change.
 | e2e kill shot: buffer composed against rev 1 arriving after rev 2 → prepare denies `draft_revision_conflict`, zero writes | PASS |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `test:scenario-service:db` | PASS — 545, 193, 52 and 33 tests |
 | full gate set incl. `verify:surface-contract` (new digest), conformance 16/16, g2-exit slices preserved at `1.14.0` | PASS |
+
+## 2026-08-03 — Hygiene Pass (Review Findings 3, 8, 9)
+
+| Command / check | Result |
+| --- | --- |
+| `execution_ref` + `output_refs[].object_id` sealed at the transport boundary with the same keyed handle `committed_result` uses | LANDED — deterministic, so replay responses still compare equal |
+| e2e no-raw-id scans extended from `committed_result` to the WHOLE serialized response (focus goal id, execution row id, process id/key, group id) | PASS |
+| falsified: sealing removed | CAUGHT |
+| head census: construction failures now fail; the meta-factory is excluded by name with its reason | LANDED — the loop had been constructing `createBoardWriteSpec` itself and swallowing the throw |
+| census pinned to the exact factory list, two-way | LANDED |
+| count comparison replaced by identity mapping (registry `must_equal` head → spec head name); missing mapping fails | LANDED |
+| reverse walk: every must_equal capability has a spec, a named debt, or a named hand-built (T-005) spec; all three lists carry staleness checks | LANDED — the staleness check rejected my own over-listing of two no-must_equal keys during development |
+| falsified: a registry head dropped from the mapping | CAUGHT |
+| `ttlSeconds: null` no longer absorbed by `??` into the default | FIXED — only genuine absence defaults |
+| falsified: `??` restored | CAUGHT |
+| daily-care committed-result guard: six-substring grep → closed `toEqual` shape | FIXED |
+| falsified: production result gains an undeclared raw key | CAUGHT |
+| `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service` / `:db` | PASS — 546, 193, 52, 33 |
+| full DB-free gate set + `ctl-context verify --strict` | PASS — artifact unchanged at `1.14.0` |

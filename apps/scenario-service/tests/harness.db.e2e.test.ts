@@ -2048,6 +2048,13 @@ describe("G3-A board lane through the formal Harness ingress", () => {
       where: { workspaceId: scope.workspaceId, commandKey: "update_guardian_current_focus" },
     });
     expect(execution.businessOutcome).toBe("applied");
+
+    // The whole wire response is free of raw owner ids: the goal id, the
+    // execution row id, everything output_refs used to carry verbatim.
+    const serialized = JSON.stringify(result.executed?.json);
+    for (const raw of [goal.id, execution.id]) {
+      expect(serialized).not.toContain(raw);
+    }
   });
 
   it("commits a daily care record and refuses a caregiver of another class", async () => {
@@ -2159,8 +2166,10 @@ describe("T-006 pre-release cancel through the formal Harness ingress", () => {
     expect(executed.json.committed_result.cancelledAt).toBe(
       stored.cancelledAt?.toISOString(),
     );
-    // No raw owner identifier reaches the public result.
-    const serialized = JSON.stringify(executed.json.committed_result);
+    // No raw owner identifier reaches ANY part of the wire response — the
+    // committed_result was always sealed, but output_refs and execution_ref
+    // used to carry the raw row ids beside it.
+    const serialized = JSON.stringify(executed.json);
     for (const raw of [process.id, process.processKey, scope.group.id]) {
       expect(serialized).not.toContain(raw);
     }
@@ -2488,9 +2497,10 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
       business_outcome: "applied",
     });
     expect(saved.executed?.json.committed_result.revision).toBe(2);
-    // The body never appears in a public result.
+    // Neither the body nor any raw owner id appears anywhere in the response.
     expect(JSON.stringify(saved.executed?.json)).not.toContain("春游安排");
     expect(JSON.stringify(saved.executed?.json)).not.toContain(process.processKey);
+    expect(JSON.stringify(saved.executed?.json)).not.toContain(process.id);
 
     const stored = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId, publishProcessId: process.id, revision: 2 },

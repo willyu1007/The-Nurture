@@ -13,6 +13,7 @@ import {
   grantAuthorizesDirectCareCommunication,
   hashCommandRequestId,
   hashScenarioToken,
+  issueCapabilityResultRef,
   parseHarnessConfirmationPayloadV2,
   parseInitiateCaregiverDirectMessageInputV1,
   parseCorrectFamilyCareMessageInputV1,
@@ -732,7 +733,7 @@ export function createHarnessEngine(input: {
           integrity_key: input.integrityKey,
         }),
       });
-      return mapHarnessCommandResult(result);
+      return sealCommittedRefs(request.workspace_id, mapHarnessCommandResult(result));
     },
 
     async query(request) {
@@ -936,6 +937,52 @@ export function createHarnessEngine(input: {
   type BuiltCommand =
     | { status: "ok"; payload: unknown; spec: NurtureCommandSpec<never> }
     | { status: "invalid"; reason_code: string };
+
+  /**
+   * Public execute responses never carry a raw owner row id. The runner's refs
+   * keep their canonical ids internally — storage, replay comparison and
+   * readResult all need them — but on the wire each `object_id` is replaced by
+   * the same keyed display handle `committed_result` uses for the same concept.
+   * The sealing is deterministic, so a replayed response still compares equal
+   * to the original executed one.
+   */
+  function sealCommittedRefs(
+    workspaceId: string,
+    response: HarnessExecuteResponseV1,
+  ): HarnessExecuteResponseV1 {
+    if (response.status !== "committed") return response;
+    const seal = (value: unknown): unknown => {
+      const ref = value as {
+        schema_version?: number;
+        namespace?: string;
+        object_type?: string;
+        object_id?: string;
+        version?: number;
+      };
+      if (
+        typeof ref?.namespace !== "string" ||
+        typeof ref?.object_type !== "string" ||
+        typeof ref?.object_id !== "string"
+      ) {
+        // A ref this cannot read must not pass through unsealed.
+        return { sealed: false };
+      }
+      return {
+        ...ref,
+        object_id: issueCapabilityResultRef(
+          input.integrityKey,
+          { workspace_id: workspaceId },
+          ref.object_type,
+          { namespace: ref.namespace, object_type: ref.object_type, object_id: ref.object_id },
+        ),
+      };
+    };
+    return {
+      ...response,
+      execution_ref: seal(response.execution_ref),
+      output_refs: response.output_refs.map(seal),
+    };
+  }
 
   /**
    * The confirmation is the only source of targets and frozen heads; the typed

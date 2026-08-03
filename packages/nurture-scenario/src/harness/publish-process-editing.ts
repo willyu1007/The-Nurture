@@ -197,7 +197,9 @@ export const currentPublishEditHold = (
 export const parseEditHoldTtlSeconds = (
   value: unknown,
 ): { status: "ok"; ttl_seconds: number } | { status: "invalid" } => {
-  const ttlSeconds = value ?? DEFAULT_EDIT_HOLD_TTL_SECONDS;
+  // Only genuine absence takes the default. `??` would absorb null too, and a
+  // caller that sent null said something — just not something this accepts.
+  const ttlSeconds = value === undefined ? DEFAULT_EDIT_HOLD_TTL_SECONDS : value;
   return Number.isSafeInteger(ttlSeconds) &&
     (ttlSeconds as number) >= 1 &&
     (ttlSeconds as number) <= MAX_EDIT_HOLD_TTL_SECONDS

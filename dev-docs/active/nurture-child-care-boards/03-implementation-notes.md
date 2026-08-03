@@ -1608,3 +1608,36 @@ prepare 声明了 `expected_draft_revision` 却从不读它,冻结的是 owner �
 证伪:prepare 换回冻结 owner 头(原缺陷)、parser 把必填改成默认——都 CAUGHT。
 e2e 加了 kill shot:按 revision 1 组稿的缓冲在 revision 2 之后到达,**prepare 即拒**
 `draft_revision_conflict`,零写入。
+
+## 2026-08-03 — 卫生批:线上的原始 id、普查加固、null TTL
+
+复核 finding 3/8/9 的收尾。
+
+**线上的原始 id(finding 3)。** 每个 committed 响应的 `output_refs[].object_id`
+与 `execution_ref` 都带着原始 owner 行 id 出线——与刻意密封的 `committed_result`
+同一个信封。没有任何调用方消费它们(服务端内部用的是存储的 execution),所以在
+transport 边界统一密封:`object_id` 换成 `committed_result` 对同一概念用的同一把
+keyed display handle。密封是确定性的,重放响应仍与原响应逐字节相等(既有的重放
+相等性 e2e 直接验证了这一点)。e2e 的 no-raw-id 扫描从 `committed_result` 扩到
+**整个序列化响应**——把密封拆掉,扫描立即失败。
+
+**普查加固(finding 8 + 9a)。** phase-2 的 head 一致性普查原来吞掉构造异常、
+下限 5 而实有 7、只比数量不比名字。改为:
+- 构造失败即失败(`createBoardWriteSpec` 本身是工厂的工厂,具名排除并写明理由);
+- 反射发现对照**具名的精确清单**双向核对——藏不进普查,也消失不了;
+- 数量比较换成**身份遍历**:每个注册表 `must_equal` head 经映射表对到 spec 冻结的
+  head 名,映射缺失即失败;
+- 反向遍历:每个声明 `must_equal` 的注册能力,要么有 spec,要么在具名债务表里,
+  要么在"前工厂时代手写 spec"表里(T-005 四条)——三张表都有各自的过期检查。
+
+加固过程本身抓到两条:发现循环把 `createBoardWriteSpec` 当能力工厂构造(异常此前
+会被吞掉);我自己把两个没有 `must_equal` 的 key 塞进了债务表,过期检查当场拒绝。
+
+**null TTL(finding 9c)。** `value ?? DEFAULT` 把 `ttlSeconds: null` 吸收成默认值。
+只有真正的缺席才取默认;null 是调用方说了话——只是说的不是这里接受的东西。
+
+**封闭形状(finding 9b)。** daily-care 的 committed-result 守卫从六个子串的 grep
+改成 `toEqual` 的封闭形状断言——多出一个未声明的键(例如原始 enrollmentId)现在
+会失败,此前会静默通过。
+
+四条证伪全 CAUGHT:拆掉密封、`??` 回退、映射表删一条、production 结果加一个未声明键。

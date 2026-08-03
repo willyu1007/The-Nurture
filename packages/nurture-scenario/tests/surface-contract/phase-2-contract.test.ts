@@ -690,45 +690,156 @@ describe("board write commands conform to the registry's concurrency policy", ()
   };
 
   /**
-   * Found reflectively rather than from a hand-kept list: a new
-   * `create*Spec` that forgot to declare its heads cannot hide by being left
-   * out of a census someone has to remember to update.
+   * The exact set of board-write spec factories. New factories are still
+   * discovered reflectively below — this list is what the discovery is checked
+   * against, so a factory can neither hide from the census (discovery finds
+   * it, the list rejects it) nor silently vanish from it (the list demands it).
    */
-  const builtSpecs = Object.entries(harness)
-    .filter(([name]) => /^create[A-Za-z]+Spec$/.test(name))
-    .map(([name, factory]) => {
-      let spec: unknown;
-      try {
-        spec = (factory as (deps: unknown) => unknown)(boardWriteSpecDeps);
-      } catch {
-        return null;
-      }
-      const built = spec as { command_key?: string; board_write_head_keys?: readonly string[] };
-      return built?.board_write_head_keys && built.command_key
-        ? { name, command_key: built.command_key, head_keys: built.board_write_head_keys }
-        : null;
-    })
-    .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
+  const EXPECTED_BOARD_WRITE_FACTORIES = [
+    "createUpdateGuardianCurrentFocusSpec",
+    "createRecordCaregiverDailyCareSpec",
+    "createCancelPublishProcessSpec",
+    "createAcquirePublishEditHoldSpec",
+    "createRenewPublishEditHoldSpec",
+    "createReleasePublishEditHoldSpec",
+    "createSavePublishProcessDraftSpec",
+  ].sort();
 
-  it("finds every factory-built command spec", () => {
-    // If this drops to zero the whole suite below becomes vacuous.
-    expect(builtSpecs.length).toBeGreaterThanOrEqual(5);
+  /**
+   * How each registry `must_equal` head name maps onto the spec's frozen head
+   * name. Counting alone proved nothing — a spec could freeze the wrong head
+   * and still count right — so the conformance below walks identities through
+   * this table, and a registry head with no mapping fails rather than being
+   * skipped.
+   */
+  const REGISTRY_HEAD_TO_SPEC_HEAD: Record<string, Record<string, string>> = {
+    update_guardian_current_focus: { focus_cycle: "focus_cycle", focus_goal: "focus_goal" },
+    record_caregiver_daily_care: { enrollment_lifecycle: "enrollment" },
+    save_publish_process_draft: { draft_revision: "draft_revision" },
+    acquire_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
+    renew_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
+    release_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
+    cancel_publish_process: {},
+  };
+
+  /**
+   * Registered capabilities that declare a `must_equal` head but have no
+   * command spec yet — the unrouted write lanes. Each entry is a debt this
+   * census carries visibly; a spec landing for one of these without removing
+   * the entry fails below, so the list cannot go stale.
+   */
+  /**
+   * T-005 capabilities whose specs predate the factory: hand-built, so they
+   * publish no `board_write_head_keys` for this census to read. Their head
+   * discipline is pinned by their own G2 suites; they are named here so the
+   * reverse walk distinguishes "has a pre-factory spec" from "has none".
+   */
+  const HAND_BUILT_SPECS = [
+    "correct_family_care_message",
+    "withdraw_family_care_request",
+    "redact_family_care_message",
+    "policy_redact_family_care_message",
+  ];
+
+  const MUST_EQUAL_WITHOUT_SPEC = [
+    "confirm_child_media_attribution",
+    "reject_child_media_attribution",
+    "supersede_child_media_attribution",
+    "detach_publish_process_media",
+    "discard_media_asset",
+    "organize_care_capture_batch",
+    "release_publish_process",
+    "reschedule_publish_process",
+  ];
+
+  /**
+   * `createBoardWriteSpec` is the factory the seven factories are built FROM —
+   * it takes a definition, not deps, so the census constructs everything except
+   * itself. Nothing else may join this list without a reason of the same kind.
+   */
+  const NOT_A_CAPABILITY_FACTORY = new Set(["createBoardWriteSpec"]);
+
+  type ConstructedSpec = { name: string; command_key: string; head_keys: readonly string[] };
+  const constructionFailures: Array<{ name: string; error: string }> = [];
+  const builtSpecs: ConstructedSpec[] = [];
+  for (const [name, factory] of Object.entries(harness)) {
+    if (!/^create[A-Za-z]+Spec$/.test(name) || NOT_A_CAPABILITY_FACTORY.has(name)) continue;
+    let spec: unknown;
+    try {
+      spec = (factory as (deps: unknown) => unknown)(boardWriteSpecDeps);
+    } catch (error) {
+      // A factory this census cannot construct is a spec it cannot check —
+      // swallowing the throw is exactly how two of seven once went missing.
+      constructionFailures.push({ name, error: String(error) });
+      continue;
+    }
+    const built = spec as { command_key?: string; board_write_head_keys?: readonly string[] };
+    if (built?.board_write_head_keys && built.command_key) {
+      builtSpecs.push({ name, command_key: built.command_key, head_keys: built.board_write_head_keys });
+    }
+  }
+
+  it("constructs every spec factory and finds exactly the declared census", () => {
+    expect(constructionFailures).toEqual([]);
+    expect(builtSpecs.map((entry) => entry.name).sort()).toEqual(EXPECTED_BOARD_WRITE_FACTORIES);
     expect(new Set(builtSpecs.map((entry) => entry.command_key)).size).toBe(builtSpecs.length);
   });
 
-  it("freezes at least the equalities its capability declares", () => {
+  it("freezes the exact head each declared equality maps to", () => {
     for (const spec of builtSpecs) {
       const capability = registry.capabilities.find(
         (entry) => entry.capabilityKey === spec.command_key,
       );
       expect(capability, `${spec.name} commits an unregistered capability`).toBeTruthy();
-      const declared = capability!.concurrencyPolicy.headBindings.filter(
-        (binding) => binding.mode === "must_equal",
-      );
+      const mapping = REGISTRY_HEAD_TO_SPEC_HEAD[spec.command_key];
+      expect(mapping, `${spec.command_key} has no registry-head mapping`).toBeTruthy();
+      for (const binding of capability!.concurrencyPolicy.headBindings) {
+        if (binding.mode !== "must_equal") continue;
+        const specHead = mapping![binding.headKey];
+        expect(
+          specHead,
+          `${spec.command_key}: registry head ${binding.headKey} maps to no spec head`,
+        ).toBeTruthy();
+        expect(
+          spec.head_keys,
+          `${spec.command_key}: mapped head ${specHead} is not frozen`,
+        ).toContain(specHead);
+      }
+      // And nothing in the mapping is fiction: every mapped name is declared.
+      for (const specHead of Object.values(mapping!)) {
+        expect(spec.head_keys, `${spec.command_key}: mapping names unknown head ${specHead}`).toContain(
+          specHead,
+        );
+      }
+    }
+  });
+
+  it("walks the reverse direction: every must_equal capability has a spec or a named debt", () => {
+    const specKeys = new Set(builtSpecs.map((entry) => entry.command_key));
+    const mustEqualKeys = registry.capabilities
+      .filter((entry) =>
+        entry.concurrencyPolicy.headBindings.some((binding) => binding.mode === "must_equal"),
+      )
+      .map((entry) => entry.capabilityKey);
+    for (const key of mustEqualKeys) {
+      if (specKeys.has(key) || HAND_BUILT_SPECS.includes(key)) continue;
       expect(
-        spec.head_keys.length,
-        `${spec.command_key} declares ${declared.length} must_equal head(s) but freezes ${spec.head_keys.length}`,
-      ).toBeGreaterThanOrEqual(declared.length);
+        MUST_EQUAL_WITHOUT_SPEC,
+        `${key} declares a must_equal head, has no spec and is not carried as a named debt`,
+      ).toContain(key);
+    }
+    // A hand-built entry that grows factory head keys belongs to the census,
+    // not to this list.
+    for (const key of HAND_BUILT_SPECS) {
+      expect(specKeys.has(key), `${key} is listed as hand-built but the factory now builds it`).toBe(
+        false,
+      );
+    }
+    // A debt that has been paid must leave the list, or the next real gap
+    // hides behind it. And a debt no registry entry backs is fiction.
+    for (const key of MUST_EQUAL_WITHOUT_SPEC) {
+      expect(specKeys.has(key), `${key} is listed as spec-less but a spec exists`).toBe(false);
+      expect(mustEqualKeys, `${key} is listed but declares no must_equal head`).toContain(key);
     }
   });
 
