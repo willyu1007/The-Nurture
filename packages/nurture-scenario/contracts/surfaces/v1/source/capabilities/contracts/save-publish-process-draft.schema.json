@@ -7,10 +7,16 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "expectedDraftRevision",
         "title",
         "segments"
       ],
       "properties": {
+        "expectedDraftRevision": {
+          "description": "The draft revision this save was composed against, as the client observed it (D-08). 0 means the process has no saved revision yet. The owner conflicts on mismatch; a save that omits the client's base would let the server compare its own head to itself and silently last-write-win.",
+          "type": "integer",
+          "minimum": 0
+        },
         "title": {
           "type": "string",
           "minLength": 1,

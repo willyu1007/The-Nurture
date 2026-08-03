@@ -2470,6 +2470,7 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
     const { process, revision } = await seedEditableProcess(scope);
     const mine = processRefFor(scope, scope.caregiver.id, process.processKey);
     const draft = {
+      expectedDraftRevision: 1,
       title: "春游安排",
       segments: [{ text: "今天孩子们去了公园", sourceRef: "source-ref-1" }],
     };
@@ -2502,31 +2503,57 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
       }),
     ).toBe(2);
 
+    // The LWW kill shot: a buffer composed against revision 1 arrives AFTER the
+    // save that made revision 2. Prepare itself must conflict — previously the
+    // server substituted its own head here and the stale buffer silently won.
+    const staleBase = await prepareAction({
+      scope,
+      actorId: scope.caregiverB.id,
+      surface: "board",
+      capabilityKey: "save_publish_process_draft",
+      targetOptionRef: processRefFor(scope, scope.caregiverB.id, process.processKey),
+      operationInput: { expectedDraftRevision: 1, title: "旧缓冲", segments: [{ text: "旧" }] },
+    });
+    expect(staleBase.json).toEqual({
+      status: "denied",
+      reason_code: "draft_revision_conflict",
+    });
+    // Nothing was written: the overwrite the old behavior would have committed.
+    expect(
+      await prisma.nurturePublishProcessRevision.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(2);
+
     // Prepared against revision 2, then a colleague saves revision 3 first.
-    const prepared = await prepareAction({
+    const stalePrepared = await prepareAction({
       scope,
       actorId: scope.caregiver.id,
       surface: "board",
       capabilityKey: "save_publish_process_draft",
       targetOptionRef: mine,
-      operationInput: draft,
+      operationInput: { ...draft, expectedDraftRevision: 2 },
     });
-    expect(prepared.json.status).toBe("ready_to_confirm");
+    expect(stalePrepared.json.status).toBe("ready_to_confirm");
     await prepareAndExecute({
       scope,
       actorId: scope.caregiverB.id,
       surface: "board",
       capabilityKey: "save_publish_process_draft",
       targetOptionRef: processRefFor(scope, scope.caregiverB.id, process.processKey),
-      operationInput: { title: "另一位老师", segments: [{ text: "另一段" }] },
+      operationInput: {
+        expectedDraftRevision: 2,
+        title: "另一位老师",
+        segments: [{ text: "另一段" }],
+      },
     });
     const stale = await executePrepared({
       scope,
       actorId: scope.caregiver.id,
       surface: "board",
       capabilityKey: "save_publish_process_draft",
-      prepared,
-      operationInput: draft,
+      prepared: stalePrepared,
+      operationInput: { ...draft, expectedDraftRevision: 2 },
     });
     // No last-write-wins: the client refreshes and reapplies.
     expect(stale.json).toMatchObject({
@@ -2562,7 +2589,11 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
         surface: "board",
         capabilityKey: "save_publish_process_draft",
         targetOptionRef: mine,
-        operationInput: { title: "t", segments: [{ text: "x", sourceRef: "1.not-issued" }] },
+        operationInput: {
+          expectedDraftRevision: 1,
+          title: "t",
+          segments: [{ text: "x", sourceRef: "1.not-issued" }],
+        },
       }).then((response) => response.json),
     ).resolves.toMatchObject({ status: "denied", reason_code: "unknown_source_ref" });
 
@@ -2585,7 +2616,7 @@ describe("T-006 edit lane through the formal Harness ingress", () => {
         capabilityKey,
         targetOptionRef: mine,
         ...(capabilityKey === "save_publish_process_draft"
-          ? { operationInput: { title: "t", segments: [{ text: "x" }] } }
+          ? { operationInput: { expectedDraftRevision: 1, title: "t", segments: [{ text: "x" }] } }
           : {}),
       });
       expect(refused.json, capabilityKey).toMatchObject({

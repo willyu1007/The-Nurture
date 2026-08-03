@@ -339,9 +339,22 @@ export type DraftSegmentInputV1 = {
 };
 
 export type SavePublishProcessDraftInputV1 = {
+  /**
+   * The draft revision this save was composed against, as the CLIENT observed
+   * it (D-08). 0 means "no saved revision yet". The head comparison exists to
+   * protect this value: a save that substituted the server's own current head
+   * here would compare the server to itself and silently last-write-win.
+   */
+  expectedDraftRevision: number;
   title: string;
   segments: DraftSegmentInputV1[];
 };
+
+/** The content half of a save: what the digest and the sealed body cover. */
+export type SavePublishProcessDraftContentV1 = Pick<
+  SavePublishProcessDraftInputV1,
+  "title" | "segments"
+>;
 
 export const parseSavePublishProcessDraftInputV1 = (
   value: unknown,
@@ -349,12 +362,22 @@ export const parseSavePublishProcessDraftInputV1 = (
   | { status: "ok"; input: SavePublishProcessDraftInputV1 }
   | { status: "invalid"; fields: string[] } => {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return { status: "invalid", fields: ["title", "segments"] };
+    return { status: "invalid", fields: ["expectedDraftRevision", "title", "segments"] };
   }
   const record = value as Record<string, unknown>;
-  const unknown = Object.keys(record).filter((key) => !["title", "segments"].includes(key));
+  const unknown = Object.keys(record).filter(
+    (key) => !["expectedDraftRevision", "title", "segments"].includes(key),
+  );
   if (unknown.length > 0) return { status: "invalid", fields: unknown };
   const fields: string[] = [];
+  const expectedDraftRevision = record.expectedDraftRevision;
+  if (
+    typeof expectedDraftRevision !== "number" ||
+    !Number.isSafeInteger(expectedDraftRevision) ||
+    expectedDraftRevision < 0
+  ) {
+    fields.push("expectedDraftRevision");
+  }
   const title = typeof record.title === "string" ? record.title.trim() : "";
   if (title.length < 1 || title.length > MAX_TITLE_CHARS) fields.push("title");
   const rawSegments = record.segments;
@@ -385,7 +408,10 @@ export const parseSavePublishProcessDraftInputV1 = (
     }
   }
   if (fields.length > 0) return { status: "invalid", fields: [...new Set(fields)] };
-  return { status: "ok", input: { title, segments } };
+  return {
+    status: "ok",
+    input: { expectedDraftRevision: expectedDraftRevision as number, title, segments },
+  };
 };
 
 export type SavedDraftRevisionV1 = {
@@ -427,7 +453,7 @@ export type PublishDraftReadPort = {
 
 export const computeDraftContentDigest = (
   integrityKey: string,
-  input: SavePublishProcessDraftInputV1,
+  input: SavePublishProcessDraftContentV1,
 ): string =>
   createHmac("sha256", integrityKey)
     .update("nurture.publish-draft.v1\0", "utf8")
@@ -456,19 +482,17 @@ export const evaluatePublishProcessDraftSave = (
   request: {
     process_ref: string;
     input: SavePublishProcessDraftInputV1;
-    expected_draft_revision: number;
     facts: PublishDraftRuleFactsV1;
     now: Date;
   },
 ): SaveDraftDecisionV1 => {
   const facts = request.facts;
-  if (
-    !Number.isSafeInteger(request.expected_draft_revision) ||
-    // A process with no saved revision reports `current_revision: 0`, and the
-    // save that creates revision 1 must be able to say so. Rejecting 0 left
-    // that process with no satisfiable input at all.
-    request.expected_draft_revision < 0
-  ) {
+  // The base is the CLIENT's, carried inside the typed input — the one value
+  // the drift check exists to protect. A process with no saved revision
+  // reports `current_revision: 0`, and the save that creates revision 1 must
+  // be able to say so.
+  const expectedDraftRevision = request.input.expectedDraftRevision;
+  if (!Number.isSafeInteger(expectedDraftRevision) || expectedDraftRevision < 0) {
     return { status: "denied", reason_code: "invalid_expected_revision" };
   }
   if (!actorEligible(facts.authority)) {
@@ -511,7 +535,7 @@ export const evaluatePublishProcessDraftSave = (
       },
     };
   }
-  if (facts.current_revision !== request.expected_draft_revision) {
+  if (facts.current_revision !== expectedDraftRevision) {
     return { status: "conflict", currentRevision: facts.current_revision };
   }
 
@@ -532,7 +556,6 @@ export const savePublishProcessDraft = async (
   request: {
     process_ref: string;
     command_request_id: string;
-    expected_draft_revision: number;
     operation_input: unknown;
   },
 ): Promise<SaveDraftDecisionV1> => {
@@ -549,7 +572,6 @@ export const savePublishProcessDraft = async (
   return evaluatePublishProcessDraftSave(deps, scope, {
     process_ref: request.process_ref,
     input: parsed.input,
-    expected_draft_revision: request.expected_draft_revision,
     facts,
     now: (deps.now ?? (() => new Date()))(),
   });
@@ -997,7 +1019,7 @@ export const canonicalizeSavePublishProcessDraftCommand =
 
 export const prepareSavePublishProcessDraft = async (
   deps: EditLanePrepareDeps & { reads: PublishDraftReadPort & PublishEditHoldReadPort },
-  request: EditLanePrepareRequest & { expected_draft_revision?: unknown },
+  request: EditLanePrepareRequest,
 ): Promise<EditLanePrepareDecision> => {
   const parsed = parseSavePublishProcessDraftInputV1(request.operation_input);
   if (parsed.status === "invalid") return { status: "needs_input", fields: parsed.fields };
@@ -1018,12 +1040,14 @@ export const prepareSavePublishProcessDraft = async (
   });
   if (!facts) return { status: "denied", reason_code: "target_unavailable" };
 
-  // The revision head is the owner's, never the caller's: a client that has not
-  // refreshed cannot talk this step into accepting the revision it remembers.
+  // The frozen head is the CLIENT's observed base (D-08). An earlier version
+  // froze the owner's own current head here — which made the drift check
+  // compare the server to itself and turned every concurrent save into a
+  // silent last-write-wins. The check exists to protect the caller's base, so
+  // the caller's base is what it compares.
   const decision = evaluatePublishProcessDraftSave(deps, scope, {
     process_ref: request.target_option_ref,
     input: parsed.input,
-    expected_draft_revision: facts.current_revision,
     facts,
     now: (deps.now ?? (() => new Date()))(),
   });
@@ -1038,7 +1062,7 @@ export const prepareSavePublishProcessDraft = async (
 
   const command: SavePublishProcessDraftCommandV1 = {
     process_key: processKey,
-    expected_draft_revision: facts.current_revision,
+    expected_draft_revision: parsed.input.expectedDraftRevision,
     title: parsed.input.title,
     segments: parsed.input.segments,
   };
@@ -1097,12 +1121,11 @@ export const createSavePublishProcessDraftSpec = (deps: {
     },
     revalidateInput: (input) => {
       const parsed = parseSavePublishProcessDraftInputV1({
+        expectedDraftRevision: input.expected_draft_revision,
         title: input.title,
         segments: input.segments,
       });
       return input.process_key.length > 0 &&
-        Number.isSafeInteger(input.expected_draft_revision) &&
-        input.expected_draft_revision >= 0 &&
         parsed.status === "ok" &&
         parsed.input.title === input.title
         ? null
@@ -1131,8 +1154,11 @@ export const createSavePublishProcessDraftSpec = (deps: {
       );
       const decision = evaluatePublishProcessDraftSave(deps, scope, {
         process_ref: processRef,
-        input: { title: input.title, segments: input.segments },
-        expected_draft_revision: input.expected_draft_revision,
+        input: {
+          expectedDraftRevision: input.expected_draft_revision,
+          title: input.title,
+          segments: input.segments,
+        },
         facts,
         // The owner's own read instant decides whether the hold is live.
         now: new Date(facts.read_at),

@@ -644,7 +644,17 @@ export function createHarnessEngine(input: {
         const processKey = built.target_refs.publish_process;
         const expectedRevision = built.expected_heads.draft_revision;
         const parsed = parseSavePublishProcessDraftInputV1(built.operation_input);
-        if (!processKey || expectedRevision === undefined || parsed.status !== "ok") return null;
+        if (
+          !processKey ||
+          expectedRevision === undefined ||
+          parsed.status !== "ok" ||
+          // The base the caller resubmits must be the base the confirmation
+          // froze. The integrity tag would catch the mismatch one step later;
+          // refusing here keeps the two sources visibly one.
+          parsed.input.expectedDraftRevision !== expectedRevision
+        ) {
+          return null;
+        }
         return {
           payload: {
             process_key: processKey,

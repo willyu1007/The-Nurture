@@ -63,7 +63,7 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["renew_publish_edit_hold", "sha256:4c6071b4fa3b6a6041b0d2a7fa4ac25ed58316ec831a6abe492aa3f66f14d851"],
   ["reply_family_care_item", "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6"],
   ["reschedule_publish_process", "sha256:de3e89f85b4299321e777749a3953f5d2d5c1f9dfed095fc96cbc554361c2c81"],
-  ["save_publish_process_draft", "sha256:8799b360be4a0b30fd12cfd5f8d4669246bb194d3a944d0be4f87dc7e8ac176d"],
+  ["save_publish_process_draft", "sha256:ab39d1a6cea379996c7152436cb898ac10381970a186afcd8ea414f6e4d256df"],
   ["submit_family_care_question", "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"],
   ["supersede_child_media_attribution", "sha256:b4b9ea873c8dde19ecfb1a21e7f5524aba2bd02bb84ebd08d885c1e43e5e692f"],
   ["update_guardian_current_focus", "sha256:b959809c1f0737be5ea71a0b08ce03a77286a409f079406d26573c3e37b9471b"],
@@ -269,7 +269,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.13.0");
+    expect(contract.version).toBe("1.14.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

@@ -52,9 +52,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -138,9 +138,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -216,9 +216,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -296,9 +296,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -380,9 +380,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -476,9 +476,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -552,9 +552,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -635,9 +635,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -731,9 +731,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -828,9 +828,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -904,9 +904,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -985,9 +985,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1065,9 +1065,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1154,9 +1154,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1239,9 +1239,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1347,9 +1347,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1434,9 +1434,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1521,9 +1521,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1605,9 +1605,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1693,9 +1693,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1773,9 +1773,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1857,9 +1857,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -1953,9 +1953,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2034,9 +2034,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2110,9 +2110,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2200,9 +2200,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2282,9 +2282,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2358,9 +2358,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2440,9 +2440,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2534,9 +2534,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2623,9 +2623,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2672,7 +2672,7 @@
           "optionSchemaRef": "schema:nurture.owner-target-option@1"
         }
       },
-      "sliceHash": "sha256:8799b360be4a0b30fd12cfd5f8d4669246bb194d3a944d0be4f87dc7e8ac176d"
+      "sliceHash": "sha256:ab39d1a6cea379996c7152436cb898ac10381970a186afcd8ea414f6e4d256df"
     },
     {
       "capabilityKey": "submit_family_care_question",
@@ -2711,9 +2711,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2802,9 +2802,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2882,9 +2882,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2957,9 +2957,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+          "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
           "key": "nurture.surface-contract",
-          "version": "1.13.0"
+          "version": "1.14.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -3062,9 +3062,9 @@
     }
   ],
   "interfaceContract": {
-    "digest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef",
+    "digest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c",
     "key": "nurture.surface-contract",
-    "version": "1.13.0"
+    "version": "1.14.0"
   },
   "schemaVersion": 1,
   "sharedCoreHash": "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2",
@@ -3075,7 +3075,7 @@
         "path": "capabilities/capability-descriptor.schema.json"
       },
       {
-        "artifactHash": "sha256:91de7800932ce06fe4cd1d2b5c2d253183f08ff49d68661549057cb1085412fb",
+        "artifactHash": "sha256:3f87fd3d084a9c823262109c2d186d3cc88959b14358b33dcbfdf9ccad8616b2",
         "path": "capabilities/capability-registry.json"
       },
       {
@@ -3183,7 +3183,7 @@
         "path": "capabilities/contracts/reply-family-care-item.schema.json"
       },
       {
-        "artifactHash": "sha256:09840a741b61717fe40f4e8d75c67c11be30b2d91d74195353ac2dc74cd77688",
+        "artifactHash": "sha256:899d03de6f1be309b110c3b639a3fb292b0a310104d825305fb13a14aaaad1de",
         "path": "capabilities/contracts/save-publish-process-draft.schema.json"
       },
       {
@@ -3471,7 +3471,7 @@
         "path": "surfaces/surface-registry.json"
       }
     ],
-    "sourceDigest": "sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef"
+    "sourceDigest": "sha256:d03559e5c5624947bba0bc9b9f2671ddff187baf56f5f3d61d6ccb33a3fec24c"
   },
   "surfaces": [
     {

@@ -233,11 +233,11 @@ describe("G3-B1 publish edit hold", () => {
 });
 
 describe("G3-B1 draft autosave", () => {
-  const input = { title: "户外活动 · 3 张照片", segments: [{ text: "原文" }] };
+  const content = { title: "户外活动 · 3 张照片", segments: [{ text: "原文" }] };
+  const input = { expectedDraftRevision: 4, ...content };
   const save = (
     facts: PublishDraftFactsV1 | null,
     overrides: Partial<{
-      expected_draft_revision: number;
       operation_input: unknown;
       command_request_id: string;
     }> = {},
@@ -245,20 +245,26 @@ describe("G3-B1 draft autosave", () => {
     savePublishProcessDraft(draftDeps(facts), scope, {
       process_ref: processRef(),
       command_request_id: "command:save-1",
-      expected_draft_revision: 4,
       operation_input: input,
       ...overrides,
     });
 
-  it("keeps concurrency metadata out of the typed business input", () => {
+  it("requires the client's observed base and nothing else beyond the content", () => {
+    // The base the client composed against IS typed business input (D-08): it
+    // is the one value the drift check exists to protect. A save without it
+    // once let prepare substitute the server's own head — the comparison then
+    // ran server-against-server and every concurrent save silently won.
     expect(parseSavePublishProcessDraftInputV1(input)).toEqual({ status: "ok", input });
     for (const invalid of [
+      content, // no base: the field is required, not optional
       { ...input, expectedHeads: { draft: 4 } },
       { ...input, targetOptionRef: "x" },
       { ...input, commandIdentity: "x" },
-      { title: "", segments: [] },
-      { title: "ok", segments: [{ text: "" }] },
-      { title: "ok", segments: [{ text: "ok", role: "caregiver" }] },
+      { ...input, expectedDraftRevision: -1 },
+      { ...input, expectedDraftRevision: 1.5 },
+      { expectedDraftRevision: 4, title: "", segments: [] },
+      { expectedDraftRevision: 4, title: "ok", segments: [{ text: "" }] },
+      { expectedDraftRevision: 4, title: "ok", segments: [{ text: "ok", role: "caregiver" }] },
       "not-an-object",
     ]) {
       expect(parseSavePublishProcessDraftInputV1(invalid).status).toBe("invalid");
@@ -272,7 +278,7 @@ describe("G3-B1 draft autosave", () => {
     expect(decision.result.revision).toBe(5);
     expect(decision.result.savedAt).toBe("2026-08-01T09:00:00.000Z");
     expect(decision.result.contentDigest).toBe(
-      computeDraftContentDigest(BOARD_INTEGRITY_KEY, input),
+      computeDraftContentDigest(BOARD_INTEGRITY_KEY, content),
     );
   });
 
@@ -284,7 +290,7 @@ describe("G3-B1 draft autosave", () => {
   it("replays an identical command and conflicts when the same identity changed payload", async () => {
     const replayed = {
       revision: 5,
-      content_digest: computeDraftContentDigest(BOARD_INTEGRITY_KEY, input),
+      content_digest: computeDraftContentDigest(BOARD_INTEGRITY_KEY, content),
       saved_at: "2026-08-01T08:59:00.000Z",
     };
     const decision = await save(
@@ -297,7 +303,7 @@ describe("G3-B1 draft autosave", () => {
 
     const drifted = await save(
       draftFacts({ current_revision: 5, replayed_revision: replayed }),
-      { operation_input: { ...input, title: "另一个标题" } },
+      { operation_input: { ...input, expectedDraftRevision: 5, title: "另一个标题" } },
     );
     expect(drifted).toEqual({ status: "conflict", currentRevision: 5 });
   });
@@ -335,6 +341,7 @@ describe("G3-B1 draft autosave", () => {
     await expect(
       save(draftFacts(), {
         operation_input: {
+          expectedDraftRevision: 4,
           title: "标题",
           segments: [{ text: "原文", sourceRef: "source-ref-unknown" }],
         },
@@ -343,6 +350,7 @@ describe("G3-B1 draft autosave", () => {
     await expect(
       save(draftFacts(), {
         operation_input: {
+          expectedDraftRevision: 4,
           title: "标题",
           segments: [{ text: "原文", sourceRef: "source-ref-1" }],
         },
@@ -350,21 +358,12 @@ describe("G3-B1 draft autosave", () => {
     ).resolves.toMatchObject({ status: "saved" });
   });
 
-  it("refuses a malformed expected revision before reading anything", async () => {
-    for (const expected of [-1, 1.5]) {
-      await expect(save(draftFacts(), { expected_draft_revision: expected })).resolves.toEqual({
-        status: "denied",
-        reason_code: "invalid_expected_revision",
-      });
-    }
-  });
-
   it("lets the first save of a process state that it expects revision zero", async () => {
     // A process with nothing saved reports `current_revision: 0`. Rejecting 0
     // as malformed left it with no input it could ever satisfy — the earlier
     // expectation here treated that dead end as the contract.
     const result = await save(draftFacts({ current_revision: 0 }), {
-      expected_draft_revision: 0,
+      operation_input: { ...input, expectedDraftRevision: 0 },
     });
     expect(result.status).toBe("saved");
     if (result.status !== "saved") return;
@@ -852,24 +851,52 @@ describe("edit lane prepare", () => {
     ).resolves.toMatchObject({ status: "ready_to_confirm" });
   });
 
-  it("freezes the owner's revision head, never the one the caller remembers", async () => {
-    const ready = await prepareSavePublishProcessDraft(
-      {
-        ...draftDeps(draftFacts({ current_revision: 7 })),
-        contexts: contexts(),
-        create_command_id: () => "command:save-1",
-      },
-      {
-        ...scope,
-        surface: "board",
-        target_option_ref: processRef(),
-        operation_input: { title: "标题", segments: [{ text: "原文" }] },
-      },
-    );
-    expect(ready).toMatchObject({
+  it("freezes the client's observed base, and conflicts on a stale one at prepare", async () => {
+    // An earlier version of this test pinned the opposite: prepare froze the
+    // owner's own head, so the drift check compared the server to itself and a
+    // concurrent save silently last-write-won (review finding 2, D-08).
+    const prepareDraft = (expectedDraftRevision: number) =>
+      prepareSavePublishProcessDraft(
+        {
+          ...draftDeps(draftFacts({ current_revision: 7 })),
+          contexts: contexts(),
+          create_command_id: () => "command:save-1",
+        },
+        {
+          ...scope,
+          surface: "board",
+          target_option_ref: processRef(),
+          operation_input: { expectedDraftRevision, title: "标题", segments: [{ text: "原文" }] },
+        },
+      );
+
+    // Composed against the current head: ready.
+    await expect(prepareDraft(7)).resolves.toMatchObject({
       status: "ready_to_confirm",
       preview: { effect: "save_publish_process_draft", revision: 8, segments: 1 },
     });
+    // Composed against a head a colleague has moved past: an explicit
+    // conflict, never a silent overwrite.
+    await expect(prepareDraft(6)).resolves.toEqual({
+      status: "denied",
+      reason_code: "draft_revision_conflict",
+    });
+    // The base is required, not optional-with-a-server-default.
+    await expect(
+      prepareSavePublishProcessDraft(
+        {
+          ...draftDeps(draftFacts({ current_revision: 7 })),
+          contexts: contexts(),
+          create_command_id: () => "command:save-1",
+        },
+        {
+          ...scope,
+          surface: "board",
+          target_option_ref: processRef(),
+          operation_input: { title: "标题", segments: [{ text: "原文" }] },
+        },
+      ),
+    ).resolves.toMatchObject({ status: "needs_input" });
   });
 });
 

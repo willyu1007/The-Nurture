@@ -112,7 +112,14 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
     );
   });
 
-  it("keeps concurrency and target metadata out of every typed business input", () => {
+  it("keeps server-issued metadata out of every typed business input", () => {
+    // Two different things must not be conflated here. Server-issued transport
+    // metadata (heads the owner froze, refs the owner sealed, identities the
+    // runner owns) never rides in typed input. The client's OBSERVED BASE
+    // REVISION is neither: it is a business fact only the client knows, and
+    // D-08 requires every save to carry it — an earlier version of this list
+    // forbade it, which forced prepare to substitute the server's own head and
+    // turned concurrent saves into silent last-write-wins (review finding 2).
     for (const key of [...B1_ACTIONS, "query_teacher_publish_queue"]) {
       const inputRef = capability(key)?.descriptor.inputSchemaRef;
       const binding = schemaRegistry.schemas.find((entry) => entry.schemaRef === inputRef);
@@ -126,7 +133,6 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
       const pointer = (binding?.jsonPointer ?? "").replace("/$defs/", "");
       const serialized = JSON.stringify(artifact.$defs[pointer]);
       for (const forbidden of [
-        "expectedDraftRevision",
         "expectedHeads",
         "targetOptionRef",
         "commandIdentity",
@@ -135,6 +141,16 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
         "scopeRef",
       ]) {
         expect(serialized, `${key} ${forbidden}`).not.toContain(forbidden);
+      }
+      if (key === "save_publish_process_draft") {
+        // Required, not merely permitted: without it the drift check has
+        // nothing of the client's to protect.
+        expect(serialized).toContain('"expectedDraftRevision"');
+        expect(JSON.stringify((artifact.$defs[pointer] as { required?: string[] }).required)).toContain(
+          "expectedDraftRevision",
+        );
+      } else {
+        expect(serialized, `${key} expectedDraftRevision`).not.toContain("expectedDraftRevision");
       }
     }
   });

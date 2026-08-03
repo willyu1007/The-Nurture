@@ -505,8 +505,11 @@ const producers: Record<string, () => Promise<unknown>> = {
     const decision = await savePublishProcessDraft(editingDeps(), scope, {
       process_ref: processRef(),
       command_request_id: "command:save-1",
-      expected_draft_revision: 4,
-      operation_input: { title: "标题", segments: [{ text: "原文" }] },
+      operation_input: {
+        expectedDraftRevision: 4,
+        title: "标题",
+        segments: [{ text: "原文" }],
+      },
     });
     if (decision.status !== "saved") throw new Error("save fixture failed");
     const { contentDigest: _digest, ...payload } = decision.result;
