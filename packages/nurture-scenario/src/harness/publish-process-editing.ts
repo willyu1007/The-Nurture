@@ -862,6 +862,7 @@ const createPublishEditHoldSpec = (
         process_key: input.process_key,
       }),
     facts_absent_reason_code: "target_unavailable",
+    head_keys: ["publish_edit_hold"],
     expectedHeads: (input) => ({ publish_edit_hold: input.expected_hold_version }),
     // Expiry is decided at the owner's read instant, so the head this compares
     // and the hold the rule judged are the same hold.
@@ -1109,6 +1110,7 @@ export const createSavePublishProcessDraftSpec = (deps: {
       return facts ? { ...facts, command_request_id: context.command_request_id } : null;
     },
     facts_absent_reason_code: "target_unavailable",
+    head_keys: ["draft_revision"],
     expectedHeads: (input) => ({ draft_revision: input.expected_draft_revision }),
     currentHeads: (facts) => ({ draft_revision: facts.current_revision }),
     authorize: (facts, input, context) => {
@@ -1480,6 +1482,10 @@ export const createCancelPublishProcessSpec = (deps: {
       }
       return { status: "authorized", write: {} };
     },
+    // The registry declares no `must_equal` head for cancel — the lifecycle
+    // binding is a predicate. This head is strictly stronger: it makes the
+    // transition a compare-and-set instead of a last-writer-wins update.
+    head_keys: ["publish_process"],
     expectedHeads: (input) => ({ publish_process: input.expected_process_version }),
     currentHeads: (facts) => ({ publish_process: facts.process_version }),
     apply: async (owner, input, context) => {

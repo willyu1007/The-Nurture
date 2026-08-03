@@ -274,6 +274,7 @@ export const createUpdateGuardianCurrentFocusSpec = (deps: {
           // promotes a family-scope goal into a child-scoped one by writing text.
           { status: "authorized", write: { child_scope_explicit: facts.child_scope_explicit } }
         : { status: "blocked", reason_code: "not_authorized" },
+    head_keys: ["focus_cycle", "focus_goal"],
     expectedHeads: (input) => ({
       focus_cycle: input.expected_focus_cycle_version,
       focus_goal: input.expected_focus_goal_version,
@@ -509,6 +510,7 @@ export const createRecordCaregiverDailyCareSpec = (deps: {
             },
           }
         : { status: "blocked", reason_code: "not_authorized" },
+    head_keys: ["care_group", "role", "enrollment"],
     expectedHeads: (input) => ({
       care_group: input.expected_care_group_version,
       role: input.expected_role_version,

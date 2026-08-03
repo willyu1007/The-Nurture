@@ -86,6 +86,16 @@ export type BoardWriteSpecDefinitionV1<Input, Port, Facts, Write> = {
     context: NurtureCommandExecutionContext,
   ): BoardWriteAuthorizationV1<Write>;
 
+  /**
+   * (2) The heads this command freezes, declared once and by name.
+   *
+   * Comparing two empty maps succeeds, so a capability that simply forgot its
+   * head would pass head comparison unconditionally — a check that cannot fail.
+   * Naming the set makes an empty one a visible statement rather than an
+   * omission, and lets a contract-conformance test read it without running the
+   * command. `expectedHeads` and `currentHeads` must produce exactly these keys.
+   */
+  head_keys: readonly string[];
   /** (2) What prepare froze, against what the owner holds inside the write. */
   expectedHeads(input: Input): Record<string, number>;
   currentHeads(facts: Facts): Record<string, number>;
@@ -108,25 +118,44 @@ type EvaluationV1<Port, Facts, Write> =
 const DEFAULT_DRIFT_REASON_CODE = "stale_confirmation";
 
 /**
- * Head equality, including the key sets. A head the prepare step froze but the
- * owner no longer reports (or the reverse) is drift, not a head to skip: the
- * comparison has to fail closed rather than silently compare fewer things.
+ * Head equality over the declared key set. Comparing whatever keys happen to be
+ * present would let a head quietly drop out of the comparison; `head_keys` is
+ * the set, and `assertDeclaredHeads` below has already established that both
+ * sides carry exactly it.
  */
 const sameHeads = (
+  declared: readonly string[],
   expected: Record<string, number>,
   current: Record<string, number>,
-): boolean => {
-  const keys = new Set([...Object.keys(expected), ...Object.keys(current)]);
-  for (const key of keys) {
-    if (expected[key] === undefined || current[key] === undefined) return false;
-    if (expected[key] !== current[key]) return false;
+): boolean => declared.every((key) => expected[key] === current[key]);
+
+/**
+ * The produced key set must be exactly the declared one. A head that appears
+ * only at runtime was never reviewable, and one that is declared but never
+ * produced silently drops out of the comparison above.
+ */
+const assertDeclaredHeads = (
+  capabilityKey: string,
+  declared: readonly string[],
+  produced: Record<string, number>,
+  side: string,
+): void => {
+  const producedKeys = Object.keys(produced).sort();
+  const declaredKeys = [...declared].sort();
+  if (producedKeys.join("\u0000") !== declaredKeys.join("\u0000")) {
+    throw new NurtureDeterministicRollback(`undeclared_${side}_head`);
   }
-  return true;
+  if (capabilityKey.length === 0) throw new NurtureDeterministicRollback("invalid_capability_key");
+};
+
+/** A command spec that also publishes the head set it freezes. */
+export type NurtureBoardWriteSpec<Input> = NurtureCommandSpec<Input> & {
+  readonly board_write_head_keys: readonly string[];
 };
 
 export const createBoardWriteSpec = <Input, Port, Facts, Write>(
   definition: BoardWriteSpecDefinitionV1<Input, Port, Facts, Write>,
-): NurtureCommandSpec<Input> => {
+): NurtureBoardWriteSpec<Input> => {
   const driftReasonCode = definition.drift_reason_code ?? DEFAULT_DRIFT_REASON_CODE;
 
   const evaluate = async (
@@ -158,7 +187,11 @@ export const createBoardWriteSpec = <Input, Port, Facts, Write>(
     }
     if (authorization.status !== "authorized") return authorization;
 
-    if (!sameHeads(definition.expectedHeads(input), definition.currentHeads(facts))) {
+    const expected = definition.expectedHeads(input);
+    const current = definition.currentHeads(facts);
+    assertDeclaredHeads(definition.capability.key, definition.head_keys, expected, "expected");
+    assertDeclaredHeads(definition.capability.key, definition.head_keys, current, "current");
+    if (!sameHeads(definition.head_keys, expected, current)) {
       return { status: "conflict", reason_code: driftReasonCode };
     }
     return { status: "authorized", port, facts, write: authorization.write };
@@ -168,6 +201,8 @@ export const createBoardWriteSpec = <Input, Port, Facts, Write>(
     command_key: definition.capability.key,
     command_scope: definition.command_scope,
     contract_version: definition.contract_version,
+    /** Readable without executing anything, for the contract-conformance guard. */
+    board_write_head_keys: [...definition.head_keys],
     canonicalize: definition.canonicalize,
 
     async checkPreconditions(transaction, input, context) {

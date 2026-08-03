@@ -1,6 +1,8 @@
 import type {
   AttributionSourceV1,
   CaregiverFactAuthorityV1,
+  ChildAttributionFactV1,
+  ChildAttributionStateV1,
   ContentSafetySourceReadPort,
   ContentSafetySourceSignalV1,
   MediaAttributionFactsV1,
@@ -31,6 +33,37 @@ const CAPTURE_FACT_KIND = {
  * The mapping is explicit and total, so a new owner value is a compile error
  * rather than something that quietly presents as a manual teacher decision.
  */
+/**
+ * The latest revision per child, from rows ordered by `attributionRevision`
+ * ascending. `reduce` over the ordered rows rather than a sort: the ordering is
+ * the port's own contract with the query, and re-deriving it here would be a
+ * second place for it to disagree.
+ */
+const currentAttributionPerChild = (
+  rows: ReadonlyArray<{
+    id: string;
+    childCareProcessId: string;
+    state: ChildAttributionStateV1;
+    attributionRevision: number;
+    source: keyof typeof ATTRIBUTION_SOURCE;
+  }>,
+): ChildAttributionFactV1[] => {
+  const latest = new Map<string, (typeof rows)[number]>();
+  for (const row of rows) {
+    const held = latest.get(row.childCareProcessId);
+    if (!held || row.attributionRevision >= held.attributionRevision) {
+      latest.set(row.childCareProcessId, row);
+    }
+  }
+  return [...latest.values()].map((row) => ({
+    attribution_id: row.id,
+    child_care_process_id: row.childCareProcessId,
+    status: row.state,
+    revision: row.attributionRevision,
+    source: ATTRIBUTION_SOURCE[row.source],
+  }));
+};
+
 const ATTRIBUTION_SOURCE = {
   manual: "manual",
   face_reference: "automatic_face_match",
@@ -209,13 +242,12 @@ export class PrismaMediaSafetyReadPort
       // Only children of this exact CareGroup; a child of a sibling class is
       // not an attribution target however visible they are in the photo.
       eligible_child_ids: enrollments.map((enrollment) => enrollment.childCareProcessId),
-      attributions: asset.attributions.map((attribution) => ({
-        attribution_id: attribution.id,
-        child_care_process_id: attribution.childCareProcessId,
-        status: attribution.state,
-        revision: attribution.attributionRevision,
-        source: ATTRIBUTION_SOURCE[attribution.source],
-      })),
+      // One current fact per child. The table is append-only per revision, so
+      // returning every revision let the domain's `find` pick the OLDEST one —
+      // the moment a supersession exists, every rule would answer on a revision
+      // that has already been replaced. The ordering is known here, so the
+      // reduction belongs here rather than in each rule.
+      attributions: currentAttributionPerChild(asset.attributions),
     };
   }
 

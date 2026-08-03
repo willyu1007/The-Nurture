@@ -484,6 +484,7 @@ const probeSpec = (overrides: Partial<ProbeDefinition> = {}) =>
             effect: { output_refs: [probeRef], committed_result: { probeRef: "existing" } },
           }
         : { status: "authorized", write: { label: input.label } },
+    head_keys: ["probe"],
     expectedHeads: (input) => ({ probe: input.expected_version }),
     currentHeads: (facts) => ({ probe: facts.version }),
     apply: async (_port, _input, _context, write) => ({
@@ -533,18 +534,35 @@ describe("createBoardWriteSpec", () => {
     ).resolves.toEqual({ status: "invalid", reason_code: "invalid_probe_input" });
   });
 
-  it("treats a head the owner no longer reports as drift, not as a head to skip", async () => {
-    // The owner's head set shrinks. Comparing only the intersection would make
-    // this pass with nothing actually compared, which is the failure mode.
-    const spec = probeSpec({ currentHeads: () => ({}) });
+  it("conflicts when a declared head moved under the command", async () => {
+    const spec = probeSpec();
     await expect(
-      spec.checkPreconditions(probeTransaction(probePort()), probeInput(), context),
+      spec.checkPreconditions(
+        probeTransaction(probePort({ version: 4, already: false })),
+        probeInput(),
+        context,
+      ),
     ).resolves.toEqual({ status: "conflict", reason_code: "stale_confirmation" });
+  });
 
-    const grown = probeSpec({ currentHeads: (facts) => ({ probe: facts.version, extra: 1 }) });
-    await expect(
-      grown.checkPreconditions(probeTransaction(probePort()), probeInput(), context),
-    ).resolves.toEqual({ status: "conflict", reason_code: "stale_confirmation" });
+  it("refuses a head that appears only at runtime, on either side", async () => {
+    // A head produced but not declared was never reviewable; a head declared but
+    // not produced drops silently out of the comparison. Both fail closed.
+    const undeclared = probeSpec({
+      expectedHeads: (input) => ({ probe: input.expected_version, sneaky: 1 }),
+    });
+    expect(
+      await rollbackReason(
+        undeclared.checkPreconditions(probeTransaction(probePort()), probeInput(), context),
+      ),
+    ).toBe("undeclared_expected_head");
+
+    const missing = probeSpec({ currentHeads: () => ({}) as Record<string, number> });
+    expect(
+      await rollbackReason(
+        missing.checkPreconditions(probeTransaction(probePort()), probeInput(), context),
+      ),
+    ).toBe("undeclared_current_head");
   });
 
   it("answers already_satisfied before the head it necessarily moved", async () => {

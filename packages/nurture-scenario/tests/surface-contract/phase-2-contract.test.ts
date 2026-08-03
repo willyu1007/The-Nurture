@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import * as harness from "../../src/index.js";
 import {
   SurfaceContractPortError,
   SurfaceContractValidationError,
@@ -654,3 +655,95 @@ function text(value: unknown): string {
   expect(typeof value).toBe("string");
   return value as string;
 }
+
+// ---------------------------------------------------------------------------
+// Every board write command declares the head set it freezes. This binds that
+// declaration to the registry's concurrency policy, across the boundary: the
+// contract says which equalities a capability guarantees, and the runtime has to
+// actually freeze at least that many. Comparing two empty head maps succeeds, so
+// without this a capability that simply forgot its head would pass head
+// comparison unconditionally.
+
+/**
+ * A capability that legitimately freezes no head at all. Each entry has to name
+ * what stands in for the equality; an empty head set is otherwise the vacuous
+ * case and must not be reachable by omission.
+ */
+const HEADLESS_BOARD_WRITES: Record<string, string> = {};
+
+const boardWriteSpecDeps = {
+  integrity_key: "phase-2-contract-integrity-key-32chars!",
+  protected_content: {
+    seal: (plaintext: string) => ({ sealed: plaintext }) as never,
+    unseal: () => "",
+  },
+};
+
+describe("board write commands conform to the registry's concurrency policy", () => {
+  const registry = JSON.parse(
+    readFileSync(path.join(sourceRoot, "capabilities/capability-registry.json"), "utf8"),
+  ) as {
+    capabilities: Array<{
+      capabilityKey: string;
+      concurrencyPolicy: { headBindings: Array<{ headKey: string; mode: string }> };
+    }>;
+  };
+
+  /**
+   * Found reflectively rather than from a hand-kept list: a new
+   * `create*Spec` that forgot to declare its heads cannot hide by being left
+   * out of a census someone has to remember to update.
+   */
+  const builtSpecs = Object.entries(harness)
+    .filter(([name]) => /^create[A-Za-z]+Spec$/.test(name))
+    .map(([name, factory]) => {
+      let spec: unknown;
+      try {
+        spec = (factory as (deps: unknown) => unknown)(boardWriteSpecDeps);
+      } catch {
+        return null;
+      }
+      const built = spec as { command_key?: string; board_write_head_keys?: readonly string[] };
+      return built?.board_write_head_keys && built.command_key
+        ? { name, command_key: built.command_key, head_keys: built.board_write_head_keys }
+        : null;
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
+
+  it("finds every factory-built command spec", () => {
+    // If this drops to zero the whole suite below becomes vacuous.
+    expect(builtSpecs.length).toBeGreaterThanOrEqual(5);
+    expect(new Set(builtSpecs.map((entry) => entry.command_key)).size).toBe(builtSpecs.length);
+  });
+
+  it("freezes at least the equalities its capability declares", () => {
+    for (const spec of builtSpecs) {
+      const capability = registry.capabilities.find(
+        (entry) => entry.capabilityKey === spec.command_key,
+      );
+      expect(capability, `${spec.name} commits an unregistered capability`).toBeTruthy();
+      const declared = capability!.concurrencyPolicy.headBindings.filter(
+        (binding) => binding.mode === "must_equal",
+      );
+      expect(
+        spec.head_keys.length,
+        `${spec.command_key} declares ${declared.length} must_equal head(s) but freezes ${spec.head_keys.length}`,
+      ).toBeGreaterThanOrEqual(declared.length);
+    }
+  });
+
+  it("never reaches an empty head set by omission", () => {
+    for (const spec of builtSpecs) {
+      if (spec.head_keys.length > 0) continue;
+      expect(
+        HEADLESS_BOARD_WRITES[spec.command_key],
+        `${spec.command_key} freezes no head and names no reason`,
+      ).toBeTruthy();
+    }
+    // A stale exemption is how the next real omission gets ignored.
+    for (const key of Object.keys(HEADLESS_BOARD_WRITES)) {
+      const spec = builtSpecs.find((entry) => entry.command_key === key);
+      expect(spec?.head_keys, `${key} is exempted but now freezes a head`).toEqual([]);
+    }
+  });
+});

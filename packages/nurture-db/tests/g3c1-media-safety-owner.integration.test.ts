@@ -358,10 +358,13 @@ describe("G3-C1 owner reads: media attribution", () => {
       participant_id: world.teacher.id,
       media_asset_id: asset.id,
     });
+    // One current fact per child, not the history. Every attribution rule looks
+    // this up with a `find` by child, so returning both revisions handed them
+    // the superseded one — the oldest — for every decision.
     expect(facts?.attributions.map((entry) => [entry.revision, entry.status])).toEqual([
-      [1, "superseded"],
       [2, "confirmed"],
     ]);
+    expect(facts?.attributions).toHaveLength(1);
   });
 
   it("refuses an asset belonging to a sibling class", async () => {

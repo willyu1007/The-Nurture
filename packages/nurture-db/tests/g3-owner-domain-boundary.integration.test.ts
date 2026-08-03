@@ -11,6 +11,7 @@ import { createPrismaClient } from "../src/client.js";
 import {
   PrismaCaregiverBoardReadPort,
   PrismaGuardianBoardReadPort,
+  PrismaMediaSafetyReadPort,
   PrismaPublicationReleasePort,
   PrismaPublishLaneReadPort,
 } from "../src/index.js";
@@ -588,5 +589,66 @@ describe("owner release facts reach the right eligibility verdict", () => {
     expect(
       verdict.targets.filter((target) => target.blockingReasons.includes("grant_not_allowed")),
     ).toHaveLength(1);
+  });
+});
+
+describe("owner attribution rows reach the rule as the current fact", () => {
+  it("hands the rule the latest revision, not the one it superseded", async () => {
+    const world = await seedInstitution();
+    const child = await seedChild(world, "Alpha");
+    const asset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    const confirmedAt = new Date("2026-08-03T03:00:00.000Z");
+    const first = await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: child.process.id,
+        source: "manual",
+        state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt,
+        exposurePolicyPayload: { audience: "own_family" },
+        attributionRevision: 1,
+      },
+    });
+    const second = await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: child.process.id,
+        source: "manual",
+        state: "rejected",
+        attributionRevision: 2,
+      },
+    });
+    await prisma.nurtureChildMediaAttribution.update({
+      where: { id: first.id },
+      data: { state: "superseded", supersededByAttributionId: second.id },
+    });
+
+    const reads = new PrismaMediaSafetyReadPort(prisma);
+    const facts = await reads.loadMediaAttributionFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      media_asset_id: asset.id,
+    });
+
+    // The rules all locate a child's attribution with exactly this `find`. Fed
+    // the real owner output, it must land on the revision that is current — the
+    // superseded one still describes the child, so a port that returned both
+    // would answer every rule with a fact that has already been replaced.
+    const located = facts?.attributions.find(
+      (entry) => entry.child_care_process_id === child.process.id,
+    );
+    expect(located).toMatchObject({ revision: 2, status: "rejected", attribution_id: second.id });
   });
 });
