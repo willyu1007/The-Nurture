@@ -1,5 +1,17 @@
 # Plan — 儿童照护双看板
 
+## Current Execution Target — Confirmed 2026-08-05
+
+The next implementation objective is to close T-006 / G3, without opening T-008,
+deployment, activation or Pilot scope:
+
+1. T-007 supplies the exact, default-off
+   `nurture.institution-publication-policy@1.0.0` provider.
+2. T-006 routes `reschedule_publish_process` and runs the real policy-backed
+   schedule/reschedule/release joint qualification with T-007.
+3. T-006 runs the exact G2-C provider/consumer journey with T-005.
+4. T-006 issues its exact Beta Profile Handoff only after both joint records pass.
+
 ## G1 Progressive Entry Boundary
 
 - At G1 start, T-006 MAY design the shared read model, `PublishProcess`, content/media

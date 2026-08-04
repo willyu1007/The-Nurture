@@ -6,33 +6,13 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-05
-- Next step: G3-E readiness review 的 B1/B2/B3 已关闭，B4 部分完成。**B8 Unit 0
-  与 Lane A 已落地**：写命令工厂 `createBoardWriteSpec`、按能力的 ingress 描述表、
-  `cancel_publish_process`，以及编辑 lane 的四条写能力（edit hold 取得/续期/释放、
-  草稿自动保存），全部含 owner 写事务、prepare、spec、路由与真 PostgreSQL 的
-  DB e2e。formal ingress 现在准入 15 个 action 与 9 个 query，显式未路由的写 key
-  从 16 降到 11。
-  2026-08-03 的对抗复核判定该范围架构成立但两条 HIGH 必修——两条均已修复
-  （过期 hold 卡死、草稿 LWW 经输入 schema 增补 + 制品旋转至 `1.14.0`），随后的
-  卫生批密封了线上的原始 id 并加固了 head 普查。**归属 lane 三条已于 2026-08-04
-  落地**（复核发现 5/6/7 同单元关闭），ingress 现准入 18 action + 9 query。
-  **B8 可路由集合已于 2026-08-04 清零**：媒体生命周期 2 条与发布后安全 3 条
-  （工厂 `finalize` 钩子解决 `command_execution_id` 外键时序，幂等复述从存储
-  事件作答）全部落地。ingress 现准入 23 action + 9 query；显式未路由恰为三条
-  结构性阻塞（release 需多命令 ingress 形状、reschedule 等 T-007、organize 待
-  CareGroup 绑定与 outcome 枚举的合同决定）。**release 已于 2026-08-04 以传输层
-  fan-out attempt 形状路由**；**organize 已于同日端到端落地**（1.15.0 修订给出
-  owner 班级选项通道与含 D-15 动作的路由结果；25 action + 9 query，未路由仅剩
-  reschedule）。**B5 已于 2026-08-04 落地**：
-  `direct_interaction_required` 决定携带 owner-issued T-005 动作（现时资格 ∩
-  候选目标集铸造 `targetOptionRef`，安全阻断走冻结分类）。
-  **G3-E 自备三项已于 2026-08-05 收官**：双班照护者盲点清除（键列表并集全部
-  班级、行范围授权按行所属班精确解析）、多子女 guardian 家庭选择器（按已注册的
-  `unique_eligible_default` 补实现，整板重绑不混排家庭）、以及
-  `verify:owner-integration` 证据层（e2e 运行时逐 key 记录，action 须有
-  committed 执行、query 须有 ok 读取）。当日对抗复核 10 条 confirmed 全部修复
-  并逐条证伪（最尖锐：独立查询用默认家庭的 drift heads 服务另一家庭的行）。
-  余下：B6/B7 的外部联合运行。详见
+- Next step: **关闭 T-006/G3：先交付 exact T-007 publication-policy provider 并完成两组 joint run；T-008、deployment 与 Pilot 保持关闭。** T-006 self-prep 已完成于
+  `nurture.surface-contract@1.15.0`；formal ingress 当前准入 25 action + 9 query，
+  唯一未路由能力是依赖 T-007 provider 的 `reschedule_publish_process`。执行顺序固定为：
+  先交付 `nurture.institution-publication-policy@1.0.0` 的 exact、default-off provider
+  并完成 T-007/T-006 schedule/reschedule/release joint run，再完成 T-005/T-006
+  G2-C direct-interaction joint run，最后签发 T-006 Beta Profile Handoff。T-008、
+  deployment、activation 与 Pilot 不进入当前目标。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal

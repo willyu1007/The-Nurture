@@ -1,10 +1,10 @@
 # Scenario service
 
 `@the-nurture/scenario-service` is the production-intended NestJS ingress for
-Nurture-owned APIs. M3 exposes health and the fail-closed binding-owner route
-through the frozen P7 service-auth guard and production Prisma composition. It
-does not replace My-Chat auth/runtime ownership and does not enable any scenario
-capability.
+Nurture-owned APIs. It exposes health, the fail-closed binding-owner route and
+the default-disabled Harness/institution owner-read routes through service-authenticated
+production Prisma compositions. It does not replace My-Chat auth/runtime ownership;
+route availability does not activate a scenario capability or authorize traffic.
 
 ## Current routes
 
@@ -12,9 +12,17 @@ capability.
 | --- | --- | --- |
 | `GET` | `/health` | `200 {"ok":true}` |
 | `POST` | `/internal/nurture/scenario-binding/authorize` | Disabled-first service auth; when fully configured, runs the M3 owner authorizer and returns the frozen P7 receipt |
+| `POST` | `/internal/nurture/harness/prepare-action` | Prepares one exact admitted capability and returns a bound confirmation or fail-closed decision |
+| `POST` | `/internal/nurture/harness/execute-action` | Executes one confirmed action through the real owner path |
+| `POST` | `/internal/nurture/harness/query` | Reads one role-safe capability projection |
+| `POST` | `/internal/nurture/harness/read-result` | Re-reads the current projection for a committed command |
+| `POST` | `/internal/nurture/institution/business-communications:read` | Additional default-off Institution Admin owner-read route |
 
 All other paths return a body-safe `404`. The legacy Fastify workflow harness
-and `user_attention` route do not run in this service.
+and `user_attention` route do not run in this service. Every private route uses
+the same service bearer; the Harness remains disabled until service auth,
+`DATABASE_URL`, the integrity key and the protected-content key are all present.
+Institution business-communication read additionally requires its explicit flag.
 
 The owner route returns `503 {"error":"binding_owner_disabled"}` when either
 the authorizer composition or the service token is absent. Only when both are
@@ -35,6 +43,9 @@ The service reads configuration only through `src/config.ts`.
 | `DATABASE_URL` | none | Nurture-owned production Prisma connection |
 | `NURTURE_INTERNAL_SERVICE_TOKEN` | unset | optional secret; absence disables the owner guard |
 | `NURTURE_BINDING_EVIDENCE_KEY` | unset | optional secret of at least 32 characters; absence disables production owner composition |
+| `NURTURE_HARNESS_INTEGRITY_KEY` | unset | secret of at least 32 characters; absence disables the Harness runtime |
+| `NURTURE_PROTECTED_CONTENT_KEY` | unset | secret of at least 32 characters; absence disables the Harness runtime |
+| `NURTURE_INSTITUTION_BUSINESS_COMMUNICATION_READ_ENABLED` | `false` | exact `true` enables only the additional Institution owner-read route after the Harness is available |
 
 The service token is loaded into a dedicated timing-safe authenticator rather
 than the printable non-secret configuration object. The evidence key is loaded

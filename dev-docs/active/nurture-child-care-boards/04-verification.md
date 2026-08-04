@@ -1035,3 +1035,21 @@ same pass:
 | presenter rebind untested at every layer | FIXED — envelope unit tests for explicit rebind and auto-unique rebind (label, snapshot version, module bind threading); falsified: CAUGHT |
 | `tx as never` in commitTargetRelease | FIXED — plain `tx` typechecks |
 | full battery after fixes: typecheck, unit 565, db 208, e2e 50, populations, all verify:*, governance lint | PASS |
+
+## 2026-08-05 — Governance Repair and G3 Close Target
+
+| Command / check | Result |
+| --- | --- |
+| project hub manual focus and F-003 semantic checkpoint | ALIGNED — one critical objective: close T-006/G3 through the T-007 policy and T-005 G2-C joint runs |
+| `ctl-project-governance sync --apply` + `lint --check` | PASS |
+| `resume --task T-006 --json` malformed-trailer census | PASS — 60 historical `Task: T-006` markers outside Git's final trailer block are reported as unlinked, not silently counted |
+| commit hook: historical malformed message | REJECTED as designed |
+| commit hook: valid contiguous `Task` trailer | PASS |
+| `node .githooks/install.mjs --check` | PASS — `core.hooksPath=.githooks` |
+| `node --check` governance script + `sh -n` all installed hooks | PASS |
+| `pnpm verify:formal-ingress-contract` | PASS — routes 7, actions 25, queries 9, registered 35, unrouted 1 |
+| `git diff --check` | PASS |
+
+This repair changes governance recovery, task/documentation focus and developer
+documentation only. It does not change product code, schema, migration,
+capability admission, activation, deployment or traffic state.
