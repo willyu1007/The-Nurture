@@ -23,6 +23,7 @@ export * from "./repositories/board-mutation.transaction.js";
 export * from "./repositories/publish-process.transaction.js";
 export * from "./repositories/media-attribution.transaction.js";
 export * from "./repositories/publication-safety.transaction.js";
+export * from "./repositories/care-capture.transaction.js";
 export * from "./repositories/publish-lane.read.js";
 export * from "./repositories/care-capture.read.js";
 export * from "./repositories/media-safety.read.js";

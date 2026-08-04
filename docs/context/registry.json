@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-04T13:57:09.838Z",
+  "updatedAt": "2026-08-04T14:55:55.268Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -11,8 +11,8 @@
       "tags": [
         "api"
       ],
-      "checksumSha256": "ab3391af4a38466dc1bc3c59874ced80f320ec3bd9cdefe4d7039f556e08884a",
-      "lastUpdated": "2026-08-04T13:57:09.835Z",
+      "checksumSha256": "216d96f6d4ae24cde4123e9b84451636d25e69dd8d129828b6468c209b93aecf",
+      "lastUpdated": "2026-08-04T14:55:55.266Z",
       "source": {
         "kind": "manual",
         "notes": "Edit the contract file; then run ctl-context touch."

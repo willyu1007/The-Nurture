@@ -715,6 +715,7 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "createSupersedeChildMediaAttributionSpec",
     "createDetachPublishProcessMediaSpec",
     "createDiscardMediaAssetSpec",
+    "createOrganizeCareCaptureBatchSpec",
     "createCorrectPublicationSpec",
     "createRemovePublicationTargetVisibilitySpec",
     "createRedactPublicationSpec",
@@ -748,6 +749,7 @@ describe("board write commands conform to the registry's concurrency policy", ()
       media_asset_revision: "media_asset_revision",
     },
     detach_publish_process_media: { draft_revision: "draft_revision" },
+    organize_care_capture_batch: { capture_batch: "capture_batch" },
     discard_media_asset: {
       media_asset_revision: "media_asset_revision",
       referencing_draft_count: "referencing_draft_count",
@@ -777,8 +779,10 @@ describe("board write commands conform to the registry's concurrency policy", ()
   ];
 
   const MUST_EQUAL_WITHOUT_SPEC = [
-    "organize_care_capture_batch",
+    // release IS routed — as a transport fan-out attempt whose revision head
+    // is enforced by the attempt itself (stale_confirmation), not by a spec.
     "release_publish_process",
+    // reschedule waits on the T-007 provider.
     "reschedule_publish_process",
   ];
 

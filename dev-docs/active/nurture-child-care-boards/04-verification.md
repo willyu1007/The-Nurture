@@ -975,3 +975,19 @@ semantic, not drift.
 | wire scan: no process/release/receipt/grant/target raw id in any response | PASS |
 | execution_ref/output_refs name the attempt only (bounded; whole-class safe) | LANDED |
 | full gates: typecheck, unit 563, test:db 205, scenario-service:db 43, all verify:* | PASS |
+
+## 2026-08-04 — organize_care_capture_batch End to End
+
+| Command / check | Result |
+| --- | --- |
+| routed: actions 24 → 25; unrouted census exactly `reschedule_publish_process` | LANDED — B4's T-006 side complete |
+| owner-issued class option channel (no ref → choices; raw group id never on the wire) | PASS (e2e) |
+| one transaction: batch CAS + process + revision 1 + targets + safety assessment | PASS (e2e + schema constraints) |
+| T-007 policy fail-closed (`policy_unavailable`), NULL markers fail-closed (`safety_route_unavailable`) | LANDED |
+| restricted marker → `direct_interaction_required`: no process, batch organized, assessment anchored on CareGroup, B5 action carried with exact capability ref + owner option | PASS (e2e) |
+| falsified: direct route creating a candidate anyway | CAUGHT (e2e) |
+| capture landing between prepare and execute (`capture_batch` head) → `stale_confirmation`, batch stays collecting | PASS (e2e) |
+| guardian refused the channel | PASS (e2e) |
+| phase-2 censuses (factory count 16, `capture_batch` head mapping, debt list) tripped before list updates | CAUGHT ×3 |
+| ck_nurture_content_safety_evidence caught an array payload where the contract wants an object | CAUGHT (fixed to `{capture_ids}`) |
+| full gates: typecheck, unit 563, db 205, e2e 48, all verify:* | PASS |

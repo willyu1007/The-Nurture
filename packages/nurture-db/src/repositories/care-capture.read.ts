@@ -3,6 +3,7 @@ import type {
   CaptureOrganizeSourceV1,
 } from "@the-nurture/scenario/harness";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
+import { readOrganizePolicy } from "./care-capture.transaction.js";
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 
@@ -14,6 +15,38 @@ const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
  */
 export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
   constructor(private readonly prisma: BoardPrisma) {}
+
+  async listOrganizeCareGroups(input: {
+    workspace_id: string;
+    participant_id: string;
+  }): Promise<Array<{ care_group_id: string; display_label: string }>> {
+    const at = new Date();
+    const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        participantId: input.participant_id,
+        role: { in: [...CAREGIVER_ROLES] },
+        scopeType: "care_group",
+        ...activeRoleWindow(at),
+      },
+      orderBy: { id: "asc" },
+    });
+    if (roles.length === 0) return [];
+    const groups = await this.prisma.nurtureCareGroup.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        id: { in: [...new Set(roles.map((role) => role.scopeId))] },
+        status: "active",
+        deletedAt: null,
+        institution: { status: "active", deletedAt: null },
+      },
+      orderBy: { id: "asc" },
+    });
+    return groups.map((group) => ({
+      care_group_id: group.id,
+      display_label: group.name,
+    }));
+  }
 
   async loadOrganizeSource(input: {
     workspace_id: string;
@@ -44,6 +77,17 @@ export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
       : null;
     if (!role || !participant) return null;
 
+    const group = await this.prisma.nurtureCareGroup.findFirst({
+      where: {
+        id: input.care_group_id,
+        workspaceId: input.workspace_id,
+        status: "active",
+        deletedAt: null,
+      },
+      include: { institution: { select: { policyConfigPayload: true, status: true } } },
+    });
+    if (!group || group.institution.status !== "active") return null;
+
     const batch = await this.prisma.nurtureCareCaptureBatch.findFirst({
       where: {
         workspaceId: input.workspace_id,
@@ -70,10 +114,12 @@ export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
       purpose_allowed: true,
     };
 
+    const organizePolicy = readOrganizePolicy(group.institution.policyConfigPayload ?? null);
     return {
       batch_id: batch.id,
       batch_version: batch.aggregateVersion,
       state: batch.state,
+      ...(organizePolicy ? { organize_policy: organizePolicy } : {}),
       captures: batch.captures.map((capture) => ({
         capture_id: capture.id,
         kind: capture.kind,

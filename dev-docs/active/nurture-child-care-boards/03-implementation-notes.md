@@ -1866,3 +1866,44 @@ stale_confirmation 守卫(单测 CAUGHT)、确认 CAS 消费撤除(e2e 重放测
   phase-2 head-conformance 普查在映射更新前就先咬住了新头——双层防线各自工作。
 
 制品 `1.14.0` → `1.15.0`(sha256:a5e8e226…),shared core 与其余 slice 逐字节不变。
+
+## 2026-08-04 — organize_care_capture_batch 端到端:最后一条 T-006 自有能力路由
+
+ingress 现准入 **25 action + 9 query**;显式未路由仅剩 `reschedule_publish_process`
+(等 T-007 provider)。B4 的 T-006 侧至此完整。
+
+### 手动"整理"路由
+
+- **owner 选项通道**(1.15.0 修订的落地):prepare 无 target 时给出 owner-issued
+  班级选项(`issueBoardSealedRef` kind `care_group`);两个班的老师由此说"整理哪个班"。
+- **单命令、单事务**:新 owner 槽 `careCapture`(`PrismaCareCaptureTransaction`)——
+  批次 collecting→organized(CAS on `aggregateVersion`,即 `capture_batch` 冻结头)、
+  PublishProcess + revision 1 + targets、安全评估行,一起落或一起不落;
+  `processKey = careGroupId~commandRequestId`,批次存 `triggerRequestId`,同一
+  trigger 身份不可能第二次切批。
+- **手动路由绕过 idle/quiescence 门,但绝不绕过**:T-007 策略解析(institution
+  payload 的 `publicationPolicyRef` 精确匹配 + head + timeZone,数字参数取冻结
+  pilot 默认;未解析 → `policy_unavailable` fail closed)、stable-prefix watermark、
+  安全路由(存储 markers → `evaluateContentSafetyRoute`;NULL markers = 未读源,
+  fail closed)。
+- **同步/异步分界**:authorize 同步判定全部拒绝路径(actor、批次、策略、装配、
+  目标集);apply 只补一个异步件——B5 的 T-005 资格读取。受限路由的
+  `directInteractionAction` 由此在 organize 结果面世(e2e 钉住 available + 精确
+  capability ref + 1 个 option、原始 enrollment id 不出现)。
+- **精确班级角色查询**(而非 `resolveCaregiverReach` 的"第一个班"):G3-E 已知的
+  双班盲点在这条新 lane 不再复制。
+- **评估行双锚**:`direct_interaction_required` 不建 process,评估以 CareGroup 为锚
+  记录(`publishProcessId` NULL)——最该留痕的决定不再无处可记。
+
+### finding 4 关闭
+
+revision-0 草稿保存的仓储契约问题按复核裁定属于本 lane:organize 在切批事务内
+直接创建 revision 1(含 title/body envelope、composition、`sourceRefsPayload`、
+`commandRequestIdHash`),"存在 process 而无 revision"的状态在这条路径上不可构造,
+`expectedDraftRevision >= 1` 的保存契约由构造保证。
+
+### 证伪
+
+受限路由与候选创建的分离(把 direct 路由也建 process)→ e2e CAUGHT;
+capture_batch 头(prepare 后新采集到达)→ `stale_confirmation` e2e 钉住;
+phase-2 普查在三张名单更新前先行咬住(工厂数、头映射、debt 名单)。

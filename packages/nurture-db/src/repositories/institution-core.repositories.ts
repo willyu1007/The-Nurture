@@ -24,6 +24,7 @@ import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js"
 import { PrismaPublishProcessTransaction } from "./publish-process.transaction.js";
 import { PrismaMediaAttributionTransaction } from "./media-attribution.transaction.js";
 import { PrismaPublicationSafetyTransaction } from "./publication-safety.transaction.js";
+import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -145,6 +146,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
    * command-naming lineage rows in finalize, one transaction throughout.
    */
   readonly publicationSafety: PrismaPublicationSafetyTransaction;
+  /** G3-B1 organize-cut owner writes, same transaction. */
+  readonly careCapture: PrismaCareCaptureTransaction;
 
   constructor(private readonly transaction: Prisma.TransactionClient) {
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
@@ -153,6 +156,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     this.publishProcess = new PrismaPublishProcessTransaction(transaction);
     this.mediaAttribution = new PrismaMediaAttributionTransaction(transaction);
     this.publicationSafety = new PrismaPublicationSafetyTransaction(transaction);
+    this.careCapture = new PrismaCareCaptureTransaction(transaction);
   }
 
   async findCommitted(input: {

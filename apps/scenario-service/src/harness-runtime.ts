@@ -84,7 +84,9 @@ import {
   canonicalizeReleasePublishProcessCommand,
   classifyInteractionContextRow,
   computeHarnessInputIntegrityTag,
+  prepareOrganizeCareCaptureBatch,
   prepareReleasePublishProcess,
+  createOrganizeCareCaptureBatchSpec,
   queryTeacherPublishQueue,
   readInstitutionBusinessCommunication,
   releasePublishProcess,
@@ -110,6 +112,7 @@ import {
   PrismaGuardianBoardReadPort,
   PrismaGuardianFocusEligibilityReadPort,
   PrismaMediaSafetyReadPort,
+  PrismaCareCaptureReadPort,
   PrismaPublicationReleasePort,
   PrismaPublishLaneReadPort,
   publicationReleaseAttemptIdentity,
@@ -339,6 +342,12 @@ export function createHarnessEngine(input: {
     contexts,
     integrity_key: input.integrityKey,
   };
+  const careCaptureReads = new PrismaCareCaptureReadPort(input.prisma);
+  const organizeSpec = createOrganizeCareCaptureBatchSpec({
+    integrity_key: input.integrityKey,
+    protected_content: protectedContent,
+    direct_message_eligibility: directMessageEligibility,
+  });
   const correctPublicationSpec = createCorrectPublicationSpec({
     integrity_key: input.integrityKey,
     protected_content: protectedContent,
@@ -1006,6 +1015,36 @@ export function createHarnessEngine(input: {
         return {
           payload: { process_key: processKey, reason: parsed.input.reason },
           spec: redactPublicationSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    organize_care_capture_batch: {
+      prepare: optionalTarget((request) =>
+        prepareOrganizeCareCaptureBatch(
+          {
+            integrity_key: input.integrityKey,
+            reads: careCaptureReads,
+            contexts,
+          },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const careGroupId = built.target_refs.care_group;
+        const expectedBatchVersion = built.expected_heads.capture_batch;
+        if (
+          !careGroupId ||
+          expectedBatchVersion === undefined ||
+          !isEmptyOperationInput(built.operation_input)
+        ) {
+          return null;
+        }
+        return {
+          payload: {
+            care_group_id: careGroupId,
+            expected_batch_version: expectedBatchVersion,
+          },
+          spec: organizeSpec as NurtureCommandSpec<never>,
         };
       },
     },

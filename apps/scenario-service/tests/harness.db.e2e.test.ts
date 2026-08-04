@@ -15,7 +15,12 @@ import {
   PUBLISH_PROCESS_TARGET_KIND,
   issuePolicyRedactionDecisionRef,
 } from "@the-nurture/scenario/harness";
-import { createPrismaClient, Prisma, publicationReleaseAttemptIdentity } from "@the-nurture/db";
+import {
+  createAesGcmProtectedContentPort,
+  createPrismaClient,
+  Prisma,
+  publicationReleaseAttemptIdentity,
+} from "@the-nurture/db";
 import { createScenarioServiceApplication } from "../src/application.js";
 import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
 import { createHarnessRuntime } from "../src/harness-runtime.js";
@@ -3701,5 +3706,231 @@ describe("G3-D release fan-out on the formal ingress", () => {
         where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
       }),
     ).toBe(0);
+  });
+});
+
+describe("G3-B1 manual organize through the formal Harness ingress", () => {
+  const sealer = createAesGcmProtectedContentPort({
+    keyRef: "nurture-protected-content-v1",
+    keyMaterial: CONTENT_KEY,
+  });
+
+  const seedOrganizeScope = async (options: { markers?: string[] } = {}) => {
+    const scope = await seedScope();
+    await prisma.nurtureCareInstitution.update({
+      where: { id: scope.institution.id },
+      data: {
+        policyConfigPayload: {
+          publicationPolicyRef: "nurture.institution-publication-policy@1.0.0",
+          publicationPolicyHead: 5,
+          timeZone: "Asia/Shanghai",
+          contentSafetyPolicyRef: "syn-content-safety-1",
+          contentSafetyPolicyHead: 2,
+        },
+      },
+    });
+    await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        grantedByParticipantId: scope.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: scope.group.id,
+        directions: ["org_to_family"],
+        dataClasses: ["daily_care_log"],
+        purposes: ["family_daily_care_update"],
+        status: "active",
+      },
+    });
+    const batch = await prisma.nurtureCareCaptureBatch.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        state: "collecting",
+      },
+    });
+    await prisma.nurtureCareCapture.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        captureBatchId: batch.id,
+        capturedByRoleAssignmentId: scope.caregiverRole.id,
+        kind: "text",
+        sourceSequence: 1,
+        stable: true,
+        bodyProtectionPayload: sealer.seal("户外活动结束后回教室。") as never,
+        safetyMarkersPayload: (options.markers ?? []) as never,
+        occurredAt: new Date("2026-08-04T09:00:00.000Z"),
+      },
+    });
+    return { scope, batch };
+  };
+
+  const organizePrepare = async (
+    scope: Awaited<ReturnType<typeof seedScope>>,
+    targetOptionRef?: string,
+  ) =>
+    prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "organize_care_capture_batch",
+      targetOptionRef: targetOptionRef as never,
+    });
+
+  it("organizes the batch into a daily-care draft with its class targets", async () => {
+    const { scope, batch } = await seedOrganizeScope();
+
+    // The class channel is an owner-issued option, never a raw group id.
+    const choices = await organizePrepare(scope);
+    expect(choices.json.status).toBe("needs_input");
+    expect(choices.json.choices).toHaveLength(1);
+    expect(choices.json.choices[0].display_label).toBe("Class A");
+    const targetOptionRef = choices.json.choices[0].target_option_ref as string;
+    expect(targetOptionRef).not.toContain(scope.group.id);
+
+    const prepared = await organizePrepare(scope, targetOptionRef);
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    expect(prepared.json.preview).toMatchObject({
+      included_capture_count: 1,
+      deferred_capture_count: 0,
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "organize_care_capture_batch",
+      prepared,
+    });
+    expect(executed.json, JSON.stringify(executed.json)).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    expect(executed.json.committed_result).toMatchObject({
+      outcome: "organized",
+      includedCaptureCount: 1,
+      deferredCaptureCount: 0,
+    });
+    expect(executed.json.committed_result.processRef).toBeTruthy();
+
+    const storedBatch = await prisma.nurtureCareCaptureBatch.findUniqueOrThrow({
+      where: { id: batch.id },
+    });
+    expect(storedBatch.state).toBe("organized");
+    expect(storedBatch.resolvedTrigger).toBe("manual");
+    expect(storedBatch.triggerRequestId).toBe(prepared.json.command_request_id);
+
+    const process = await prisma.nurturePublishProcess.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, captureBatchId: batch.id },
+      include: { currentRevision: true, targets: true },
+    });
+    expect(process.state).toBe("draft");
+    expect(process.dataClass).toBe("daily_care_log");
+    expect(process.currentRevision?.revision).toBe(1);
+    expect(process.currentRevision?.titleProtectionPayload).toBeTruthy();
+    expect(process.targets).toHaveLength(1);
+    const assessment = await prisma.nurtureContentSafetyAssessment.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+    });
+    expect(assessment.route).toBe("ordinary");
+
+    // No raw owner identifier on the wire.
+    const serialized = JSON.stringify(executed.json);
+    for (const raw of [batch.id, process.id, process.processKey, scope.group.id]) {
+      expect(serialized).not.toContain(raw);
+    }
+  });
+
+  it("routes restricted content to direct interaction with the owner-issued T-005 entry", async () => {
+    const { scope, batch } = await seedOrganizeScope({ markers: ["health_symptom"] });
+    const choices = await organizePrepare(scope);
+    const prepared = await organizePrepare(
+      scope,
+      choices.json.choices[0].target_option_ref as string,
+    );
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "organize_care_capture_batch",
+      prepared,
+    });
+    expect(executed.json.status).toBe("committed");
+    const result = executed.json.committed_result;
+    expect(result.outcome).toBe("direct_interaction_required");
+    expect(result.processRef).toBeUndefined();
+    // The D-15 entry: exact capability ref plus an owner-issued option the
+    // T-005 prepare resolves — current eligibility, not a role name.
+    expect(result.directInteractionAction).toMatchObject({
+      status: "available",
+      capabilityKey: "initiate_caregiver_direct_message",
+      capabilityVersion: "1.0.0",
+    });
+    expect(result.directInteractionAction.targetOptions).toHaveLength(1);
+    expect(JSON.stringify(result)).not.toContain(scope.enrollment.id);
+
+    // No publication candidate exists, and the batch still organized.
+    expect(
+      await prisma.nurturePublishProcess.count({
+        where: { workspaceId: scope.workspaceId, captureBatchId: batch.id },
+      }),
+    ).toBe(0);
+    expect(
+      (await prisma.nurtureCareCaptureBatch.findUniqueOrThrow({ where: { id: batch.id } }))
+        .state,
+    ).toBe("organized");
+    // The most safety-relevant decision of all is still addressable.
+    const assessment = await prisma.nurtureContentSafetyAssessment.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, careGroupId: scope.group.id },
+    });
+    expect(assessment.route).toBe("direct_interaction_required");
+    expect(assessment.publishProcessId).toBeNull();
+  });
+
+  it("refuses stale_confirmation when a capture lands between prepare and execute", async () => {
+    const { scope, batch } = await seedOrganizeScope();
+    const choices = await organizePrepare(scope);
+    const prepared = await organizePrepare(
+      scope,
+      choices.json.choices[0].target_option_ref as string,
+    );
+    expect(prepared.json.status).toBe("ready_to_confirm");
+
+    // Intake bumps the batch head: the cut the teacher confirmed is stale.
+    await prisma.nurtureCareCaptureBatch.update({
+      where: { id: batch.id },
+      data: { aggregateVersion: { increment: 1 } },
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "organize_care_capture_batch",
+      prepared,
+    });
+    expect(executed.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "stale_confirmation",
+      recovery: "reprepare",
+    });
+    expect(
+      (await prisma.nurtureCareCaptureBatch.findUniqueOrThrow({ where: { id: batch.id } }))
+        .state,
+    ).toBe("collecting");
+  });
+
+  it("refuses a guardian the organize channel entirely", async () => {
+    const { scope } = await seedOrganizeScope();
+    const refused = await prepareAction({
+      scope,
+      actorId: scope.guardian.id,
+      surface: "board",
+      capabilityKey: "organize_care_capture_batch",
+      targetOptionRef: undefined as never,
+    });
+    expect(refused.json).toMatchObject({ status: "denied", reason_code: "not_authorized" });
   });
 });

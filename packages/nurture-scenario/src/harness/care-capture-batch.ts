@@ -265,6 +265,12 @@ const idleSeconds = (activity: CaptureActivityHeadV1, now: Date): number =>
 export type CaptureOrganizeSourceV1 = {
   batch_id: string;
   /**
+   * The T-007 organize-parameter subset, resolved from the institution's
+   * explicit policy payload; absent means "not resolved" and prepare fails
+   * closed.
+   */
+  organize_policy?: OrganizeTriggerPolicyV1;
+  /**
    * The head the `capture_batch must_equal` binding compares against, so a
    * capture arriving between the read and the cut fails the cut rather than
    * letting it land on a stale watermark.
@@ -289,6 +295,14 @@ export type CaptureBatchReadPort = {
     care_group_id: string;
     snapshot_at: string;
   }): Promise<CaptureOrganizeSourceV1 | null>;
+  /**
+   * The CareGroups this actor may currently organize for — the owner-issued
+   * option set the prepare step presents. A role name grants nothing here.
+   */
+  listOrganizeCareGroups(input: {
+    workspace_id: string;
+    participant_id: string;
+  }): Promise<Array<{ care_group_id: string; display_label: string }>>;
 };
 
 /**
@@ -401,13 +415,31 @@ export const evaluateOrganizeTrigger = (
  * the registered `organize_care_capture_batch` result had no producer at all —
  * a contract nothing in the runtime could actually satisfy.
  */
+export type OrganizeDirectInteractionActionV1 =
+  | {
+      status: "available";
+      capabilityKey: "initiate_caregiver_direct_message";
+      capabilityVersion: "1.0.0";
+      targetOptions: Array<{ targetOptionRef: string; displayLabel: string }>;
+    }
+  | {
+      status: "unavailable";
+      reasonCode: "not_authorized" | "target_unavailable" | "dependency_no_go";
+    };
+
 export type OrganizeCareCaptureBatchResultV1 = {
   batchRef: string;
-  outcome: "organized" | "nothing_to_organize";
+  outcome:
+    | "organized"
+    | "nothing_to_organize"
+    | "needs_review"
+    | "direct_interaction_required";
   processRef?: string;
   watermarkSequence: number;
   includedCaptureCount: number;
   deferredCaptureCount: number;
+  /** The D-15 route's owner-issued T-005 entry; present exactly on that route. */
+  directInteractionAction?: OrganizeDirectInteractionActionV1;
 };
 
 export const projectOrganizeResult = (
