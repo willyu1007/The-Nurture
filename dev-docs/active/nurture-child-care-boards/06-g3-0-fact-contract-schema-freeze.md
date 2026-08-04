@@ -291,6 +291,24 @@ stays at `1.0.0` — it has never been activated and has no consumer. The
 capability adoption set, exact inputs, authority predicates and surface topology
 above are unchanged.
 
+### Amendment 2026-08-04 — the organize channel, its routed outcomes, and the discard blast radius
+
+Two contract gaps blocked the last T-006-owned capability and left one
+confirmed review finding open:
+
+| Change | Boundary |
+| --- | --- |
+| `organize_care_capture_batch` targetPolicy `exact_bound` → `owner_option_required` | `exact_bound` with an empty input gave the CareGroup no channel at all: a caregiver of two classes could not say which class to organize. The target option is the owner-issued care-group selector — never a raw CareGroup id |
+| organize result outcome enum gains `needs_review` and `direct_interaction_required`; result gains optional `directInteractionAction` | the routed decision surface. `needs_review` creates a process (with `processRef`) the scheduler must not publish; `direct_interaction_required` creates none and carries the D-15 T-005 entry — the exact capability ref plus owner-issued `targetOptionRef`s from current eligibility, or a frozen-taxonomy safe block (`not_authorized` / `target_unavailable` / `dependency_no_go`). No restricted body, no raw identifier, no fallback |
+| `discard_media_asset` gains headBinding `referencing_draft_count must_equal` | `media_asset_revision` is immutable by schema, so alone it could never drift and the strong-confirmation blast radius (`affected_draft_count`) was unenforceable. The count the teacher confirmed is now a frozen head: a draft attaching or dropping the asset between prepare and execute is a `stale_confirmation`, not a silently different commit |
+
+The surface artifact rotates additively to `nurture.surface-contract@1.15.0` /
+`sha256:a5e8e226704647f1a1d20d8b8faa91f955bcb5ca45ad2d583c0a85d5d7d0073e`; the
+shared core and every other capability slice are unchanged, and both
+capabilities stay at `1.0.0` — neither has been activated and neither has a
+consumer. The capability adoption set, authority predicates and surface
+topology above are unchanged.
+
 ## DB SSOT Delta
 
 All persisted changes originate in `prisma/schema.prisma` through the DB SSOT workflow. No JSON

@@ -1846,3 +1846,23 @@ PublicationRelease + Receipt + CommandExecution(attempt 身份作父)——单�
 ### 证伪
 
 stale_confirmation 守卫(单测 CAUGHT)、确认 CAS 消费撤除(e2e 重放测试 CAUGHT)。
+
+## 2026-08-04 — 1.15.0 旋转:organize 合同决定 + discard 爆炸半径头
+
+冻结修订(见 06 文档 Amendment 2026-08-04)与复核 finding「discard 唯一冻结头
+永不漂移」同一次 additive 旋转关闭:
+
+- **organize 通道**:targetPolicy `exact_bound` → `owner_option_required`——空输入
+  + exact_bound 让两个班的老师没有任何说"整理哪个班"的通道;目标选项是
+  owner-issued 班级选择器。
+- **organize outcome 扩展**:枚举增 `needs_review` 与 `direct_interaction_required`,
+  结果新增可选 `directInteractionAction`——B5 落地的 D-15 动作正是经此面世
+  (available 携带精确 capability ref + targetOptionRefs;unavailable 走冻结分类)。
+- **discard 爆炸半径头**:`referencing_draft_count must_equal`。`media_asset_revision`
+  被 schema 声明为不可变,单独作头是构造上不可能失败的检查;确认里的
+  `affected_draft_count` 现在是冻结头——prepare 与 execute 之间任何草稿增删该
+  资产都是 `stale_confirmation` 而不是静默不同的提交。e2e 钉住(prepare 预览 1、
+  同事清空 composition、execute 拒绝、资产 lifecycle 不动),证伪(撤头)CAUGHT;
+  phase-2 head-conformance 普查在映射更新前就先咬住了新头——双层防线各自工作。
+
+制品 `1.14.0` → `1.15.0`(sha256:a5e8e226…),shared core 与其余 slice 逐字节不变。

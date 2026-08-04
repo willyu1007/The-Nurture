@@ -3107,6 +3107,60 @@ describe("T-006 media lifecycle through the formal Harness ingress", () => {
         .lifecycle,
     ).toBe("ready");
   });
+
+  it("refuses the discard when the blast radius moved between prepare and execute", async () => {
+    const scope = await seedScope();
+    const { asset, process } = await seedComposedDraft(scope);
+
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "discard_media_asset",
+      targetOptionRef: issueMediaAssetTargetRef(
+        INTEGRITY_KEY,
+        { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+        asset.id,
+      ),
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    expect(prepared.json.preview).toMatchObject({ affected_draft_count: 1 });
+
+    // A colleague edits the citing draft and drops the asset: the number the
+    // teacher confirmed is no longer the number a commit would record.
+    const next = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 2,
+        contentDigest: "sha256:content-detached",
+        organizerInputRevision: "organizer:2",
+        mediaCompositionPayload: [],
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: next.id },
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "discard_media_asset",
+      prepared,
+    });
+    expect(executed.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "stale_confirmation",
+      recovery: "reprepare",
+    });
+    // Nothing moved: the asset is still live.
+    expect(
+      (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
+        .lifecycle,
+    ).toBe("ready");
+  });
 });
 
 describe("T-006 post-release safety through the formal Harness ingress", () => {

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.14.0"
+    "version": "1.15.0"
   },
   "capabilities": [
     {
@@ -1546,7 +1546,7 @@
       "resultSchemaRef": "schema:nurture.organize-care-capture-batch-result@1",
       "errorSchemaRef": "schema:nurture.surface-operation-error@1",
       "targetPolicy": {
-        "kind": "exact_bound",
+        "kind": "owner_option_required",
         "optionSchemaRef": "schema:nurture.owner-target-option@1"
       },
       "confirmationPolicy": "direct_commit",
@@ -2606,6 +2606,10 @@
         "headBindings": [
           {
             "headKey": "media_asset_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "referencing_draft_count",
             "mode": "must_equal"
           },
           {

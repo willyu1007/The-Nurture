@@ -1,47 +1,120 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/organize-care-capture-batch.schema.json",
-  "title": "OrganizeCareCaptureBatchV1",
-  "$defs": {
-    "input": {
-      "$ref": "publish-process-types.schema.json#/$defs/emptyInput"
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/organize-care-capture-batch.schema.json",
+ "title": "OrganizeCareCaptureBatchV1",
+ "$defs": {
+  "input": {
+   "$ref": "publish-process-types.schema.json#/$defs/emptyInput"
+  },
+  "result": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "batchRef",
+    "outcome",
+    "watermarkSequence",
+    "includedCaptureCount",
+    "deferredCaptureCount"
+   ],
+   "properties": {
+    "batchRef": {
+     "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
     },
-    "result": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "batchRef",
-        "outcome",
-        "watermarkSequence",
-        "includedCaptureCount",
-        "deferredCaptureCount"
-      ],
-      "properties": {
-        "batchRef": {
-          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
-        },
-        "outcome": {
-          "enum": [
-            "organized",
-            "nothing_to_organize"
-          ]
-        },
-        "processRef": {
-          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
-        },
-        "watermarkSequence": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "includedCaptureCount": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "deferredCaptureCount": {
-          "type": "integer",
-          "minimum": 0
-        }
-      }
+    "outcome": {
+     "enum": [
+      "organized",
+      "nothing_to_organize",
+      "needs_review",
+      "direct_interaction_required"
+     ]
+    },
+    "processRef": {
+     "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+    },
+    "watermarkSequence": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "includedCaptureCount": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "deferredCaptureCount": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "directInteractionAction": {
+     "$ref": "#/$defs/directInteractionAction"
     }
+   }
+  },
+  "directInteractionAction": {
+   "description": "The D-15 route's owner-issued T-005 entry: the exact capability ref plus target options minted from current eligibility, or a frozen-taxonomy safe block. Never a restricted body copy and never a raw identifier.",
+   "oneOf": [
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "status",
+      "capabilityKey",
+      "capabilityVersion",
+      "targetOptions"
+     ],
+     "properties": {
+      "status": {
+       "const": "available"
+      },
+      "capabilityKey": {
+       "const": "initiate_caregiver_direct_message"
+      },
+      "capabilityVersion": {
+       "const": "1.0.0"
+      },
+      "targetOptions": {
+       "type": "array",
+       "minItems": 1,
+       "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "targetOptionRef",
+         "displayLabel"
+        ],
+        "properties": {
+         "targetOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+         },
+         "displayLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "status",
+      "reasonCode"
+     ],
+     "properties": {
+      "status": {
+       "const": "unavailable"
+      },
+      "reasonCode": {
+       "enum": [
+        "not_authorized",
+        "target_unavailable",
+        "dependency_no_go"
+       ]
+      }
+     }
+    }
+   ]
   }
+ }
 }

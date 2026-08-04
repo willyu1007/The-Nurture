@@ -40,9 +40,9 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["correct_family_care_message", "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3"],
   ["correct_publication", "sha256:61c3cdea9d35982ab7da14aa2f968e2d15874374f30fab69abb3830c7434fda8"],
   ["detach_publish_process_media", "sha256:f520e1987e2e6f2835a219eca3e0dde3544ffa8aa4157284bf3841c5fed97f38"],
-  ["discard_media_asset", "sha256:252c1824e9bd4e48dace40c8446b388edfb38dc4ace1bfe3b9104ad237949da3"],
+  ["discard_media_asset", "sha256:7d3615ccb4a2212e7a46a62c4119f3f0c3efa9f0d21b35bc4caf07f297be237e"],
   ["initiate_caregiver_direct_message", "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"],
-  ["organize_care_capture_batch", "sha256:c1fc8655c655641d76998392a2635eb8aa46d744a6b2a060a7d4f233ffcc7bb1"],
+  ["organize_care_capture_batch", "sha256:1f8bc556b1c81a6844e7e2a6b30d61b6d39e48c77a3520079faba0e0d2c36f90"],
   ["policy_redact_family_care_message", "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"],
   ["query_caregiver_child_today", "sha256:bf1b9bd160bd6c962d7020cfb46074d902ddd2ec10efff6c9b3c895e2a94a5c0"],
   ["query_caregiver_family_care_work", "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"],
@@ -269,7 +269,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.14.0");
+    expect(contract.version).toBe("1.15.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

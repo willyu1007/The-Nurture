@@ -615,6 +615,14 @@ export type DetachPublishProcessMediaCommandV1 = {
 export type DiscardMediaAssetCommandV1 = {
   media_asset_id: string;
   expected_media_revision: number;
+  /**
+   * The blast radius the teacher confirmed. `media_asset_revision` is
+   * immutable by schema, so it can never drift — this head is the one that
+   * makes the strong_confirmation number enforceable: a draft attaching or
+   * dropping the asset between prepare and execute is a stale confirmation,
+   * not a silently different commit.
+   */
+  expected_referencing_draft_count: number;
 };
 
 export const canonicalizeDetachPublishProcessMediaCommand = (
@@ -630,6 +638,7 @@ export const canonicalizeDiscardMediaAssetCommand = (
 ): unknown => ({
   media_asset_id: input.media_asset_id,
   expected_media_revision: input.expected_media_revision,
+  expected_referencing_draft_count: input.expected_referencing_draft_count,
 });
 
 export const parseDetachMediaInputV1 = (
@@ -807,6 +816,8 @@ export const prepareDiscardMediaAsset = async (
   const command: DiscardMediaAssetCommandV1 = {
     media_asset_id: mediaAssetId,
     expected_media_revision: facts.media_revision,
+    // The exact number the strong_confirmation preview shows.
+    expected_referencing_draft_count: decision.affectedDraftCount,
   };
   const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
   const issued = await issueHarnessConfirmation(deps.contexts, {
@@ -821,7 +832,10 @@ export const prepareDiscardMediaAsset = async (
       capability_version: DISCARD_MEDIA_ASSET_CAPABILITY.version,
       command_request_id: commandRequestId,
       target_refs: { media_asset: mediaAssetId },
-      expected_heads: { media_asset_revision: command.expected_media_revision },
+      expected_heads: {
+        media_asset_revision: command.expected_media_revision,
+        referencing_draft_count: command.expected_referencing_draft_count,
+      },
       input_integrity_tag: computeHarnessInputIntegrityTag(
         deps.integrity_key,
         canonicalizeDiscardMediaAssetCommand(command),
@@ -987,7 +1001,9 @@ export const createDiscardMediaAssetSpec = (deps: {
     revalidateInput: (input) =>
       input.media_asset_id.length > 0 &&
       Number.isSafeInteger(input.expected_media_revision) &&
-      input.expected_media_revision >= 1
+      input.expected_media_revision >= 1 &&
+      Number.isSafeInteger(input.expected_referencing_draft_count) &&
+      input.expected_referencing_draft_count >= 0
         ? null
         : { status: "invalid", reason_code: "invalid_discard_input" },
     loadFacts: (owner, input, context) =>
@@ -997,9 +1013,18 @@ export const createDiscardMediaAssetSpec = (deps: {
         media_asset_id: input.media_asset_id,
       }),
     facts_absent_reason_code: "target_unavailable",
-    head_keys: ["media_asset_revision"],
-    expectedHeads: (input) => ({ media_asset_revision: input.expected_media_revision }),
-    currentHeads: (facts) => ({ media_asset_revision: facts.media_revision }),
+    // media_asset_revision is immutable by schema, so alone it could never
+    // drift; the draft-reference count is the head that makes the confirmed
+    // blast radius enforceable.
+    head_keys: ["media_asset_revision", "referencing_draft_count"],
+    expectedHeads: (input) => ({
+      media_asset_revision: input.expected_media_revision,
+      referencing_draft_count: input.expected_referencing_draft_count,
+    }),
+    currentHeads: (facts) => ({
+      media_asset_revision: facts.media_revision,
+      referencing_draft_count: facts.referencing_draft_count,
+    }),
     authorize: (facts, input, context) => {
       if (!actorEligible(facts.authority as CaregiverFactAuthorityV1)) {
         return { status: "blocked", reason_code: "not_authorized" };

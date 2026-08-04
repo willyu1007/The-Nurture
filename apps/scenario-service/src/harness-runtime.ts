@@ -932,15 +932,21 @@ export function createHarnessEngine(input: {
       build: (built) => {
         const mediaAssetId = built.target_refs.media_asset;
         const expectedRevision = built.expected_heads.media_asset_revision;
+        const expectedReferencingDrafts = built.expected_heads.referencing_draft_count;
         if (
           !mediaAssetId ||
           expectedRevision === undefined ||
+          expectedReferencingDrafts === undefined ||
           !isEmptyOperationInput(built.operation_input)
         ) {
           return null;
         }
         return {
-          payload: { media_asset_id: mediaAssetId, expected_media_revision: expectedRevision },
+          payload: {
+            media_asset_id: mediaAssetId,
+            expected_media_revision: expectedRevision,
+            expected_referencing_draft_count: expectedReferencingDrafts,
+          },
           spec: discardMediaSpec as NurtureCommandSpec<never>,
         };
       },

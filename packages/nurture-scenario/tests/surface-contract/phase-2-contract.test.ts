@@ -88,7 +88,7 @@ describe("Phase 2 exact surface contract", () => {
   it("loads one exact, closed manifest with thirty-five capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.14.0",
+      version: "1.15.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -748,7 +748,10 @@ describe("board write commands conform to the registry's concurrency policy", ()
       media_asset_revision: "media_asset_revision",
     },
     detach_publish_process_media: { draft_revision: "draft_revision" },
-    discard_media_asset: { media_asset_revision: "media_asset_revision" },
+    discard_media_asset: {
+      media_asset_revision: "media_asset_revision",
+      referencing_draft_count: "referencing_draft_count",
+    },
     correct_publication: {},
     remove_publication_target_visibility: {},
     redact_publication: {},
