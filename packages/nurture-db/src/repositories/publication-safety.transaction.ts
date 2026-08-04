@@ -60,6 +60,7 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
     if (!process) return null;
     return {
       authority: caregiverRowAuthority(reach, process.careGroupId),
+      actor_role_assignment_id: reach.role_assignment_id,
       publish_process_ref: domainRef("publish_process", process.id, process.aggregateVersion),
       publications: process.releases.map((release) => ({
         publication_id: release.id,
@@ -111,6 +112,7 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
     workspace_id: string;
     participant_id: string;
     command_execution_id: string;
+    actor_role_assignment_id: string;
     events: Array<{
       event_id: string;
       publication_id: string;
@@ -121,13 +123,6 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
       body_envelope?: unknown;
     }>;
   }): Promise<void> {
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      new Date(),
-    );
-    if (!reach) throw new Error("nurture publication safety: target unavailable");
     for (const event of input.events) {
       await this.prisma.nurturePublicationVisibilityEvent.create({
         data: {
@@ -136,7 +131,9 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
           publicationReleaseId: event.publication_id,
           kind: event.kind,
           reasonKey: event.reason_key,
-          actorRoleAssignmentId: reach.role_assignment_id,
+          // The assignment the authorization validated, on the load-time
+          // clock — never a finalize-time re-resolution.
+          actorRoleAssignmentId: input.actor_role_assignment_id,
           sourceReleaseRevision: event.source_release_revision,
           // The lineage names the command behind it — the reason the append
           // happens in finalize, after the execution row exists.

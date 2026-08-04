@@ -991,3 +991,19 @@ semantic, not drift.
 | phase-2 censuses (factory count 16, `capture_batch` head mapping, debt list) tripped before list updates | CAUGHT ×3 |
 | ck_nurture_content_safety_evidence caught an array payload where the contract wants an object | CAUGHT (fixed to `{capture_ids}`) |
 | full gates: typecheck, unit 563, db 205, e2e 48, all verify:* | PASS |
+
+## 2026-08-04 — Review Leftovers Closed (coverage debt + lows triage)
+
+| Command / check | Result |
+| --- | --- |
+| DB-backed finalize-throw atomicity: probe spec flips visibility in apply, throws in finalize → definite not_committed, visibility rolled back, zero execution rows | PASS (g3d, real PostgreSQL) |
+| falsified: kernel swallowing the finalizer failure — release committed as removed with no lineage | CAUGHT |
+| e2e name overclaim: "no committed publication" half now actually performed (`no_committed_publication` on a draft-only process) | FIXED |
+| wire scans widened: correction/removal/discard responses scanned for release/receipt/process/event/group raw ids | LANDED |
+| low: finalize re-resolved caregiver reach on its own clock — lineage now names the authorize-validated `actor_role_assignment_id`, threaded through the finalization payload | FIXED |
+| low: detach preview counted `length - 1` while the owner removes every occurrence — preview now filters identically | FIXED |
+| low: eventRef digests publication~kind~occurredAt (same-ms same-kind collision) | ACCEPTED — one command appends at most one event per (publication, kind) by unique constraint; a cross-command same-millisecond repeat is a display-handle collision only, and rebasing on event_id would ripple the stored-answer read shape for no integrity gain |
+| low: detach replay branch answers from current composition | DEFERRED — needs stored-evidence on the replayed revision; recorded, not silent |
+| low: concurrent-remove loser surfaces as technical_error | ACCEPTED — serializable isolation makes the window retry-shaped; the monotone FROM guard keeps it safe |
+| low: already_satisfied previews report affected_publications; e2e envelope naming nits | DEFERRED — cosmetic |
+| full suites after all fixes: unit 563, db 206, e2e 48 | PASS |

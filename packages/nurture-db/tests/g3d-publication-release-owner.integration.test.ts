@@ -2,11 +2,13 @@ import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import {
+  PrismaNurtureCommandRepository,
   PrismaPublicationReleasePort,
   PrismaPublicationSafetyTransaction,
   publicationReleaseAttemptIdentity,
   publicationReleaseCommandIdentity,
 } from "../src/index.js";
+import { NurtureCommandRunner, type NurtureCommandSpec } from "@the-nurture/scenario";
 
 // Owner-side proof for the release and post-release safety ports (G3-E
 // prerequisite B2-4). `commitTargetRelease` is the only place in T-006 where
@@ -728,6 +730,79 @@ describe("T-006 owner write: post-release safety", () => {
     return { process, release };
   };
 
+  it("rolls the visibility update back when the finalize step throws mid-command", async () => {
+    // The safety trio splits its write: apply flips visibility, finalize
+    // appends the command-naming lineage. Atomicity rests entirely on the
+    // wiring — the TransactionClient construction and afterExecutionCreated
+    // running inside the same $transaction — so this pins it against the real
+    // database: a refactor that moves either outside the transaction turns a
+    // definite rollback into a committed removal no stored fact can explain.
+    const world = await seedWorld();
+    const released = await seedCommittedRelease(world);
+    const probeSpec: NurtureCommandSpec<{ publication_id: string }> = {
+      command_key: "probe_finalize_atomicity",
+      command_scope: "probe",
+      contract_version: 1,
+      canonicalize: (input) => input,
+      checkPreconditions: async () => ({ status: "ready" }),
+      apply: async (transaction, input) => {
+        await transaction.publicationSafety!.applyPublicationVisibilityUpdate({
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          updates: [
+            {
+              publication_id: input.publication_id,
+              from_visibility: ["visible"],
+              to_visibility: "removed",
+            },
+          ],
+        });
+        return {
+          output_refs: [
+            {
+              schema_version: 1,
+              namespace: "nurture",
+              object_type: "probe_output",
+              object_id: input.publication_id,
+              version: 1,
+            },
+          ],
+        };
+      },
+      afterExecutionCreated: async () => {
+        throw new Error("finalize failed after the visibility update");
+      },
+    };
+    const result = await new NurtureCommandRunner(
+      new PrismaNurtureCommandRepository(prisma),
+    ).execute({
+      workspace_id: world.workspaceId,
+      invocation_request_id: "invocation:probe-finalize-1",
+      command_request_id: "command:probe-finalize-1",
+      business_actor_ref: world.teacher.id,
+      payload: { publication_id: released.release.id },
+      spec: probeSpec,
+    });
+    expect(result).toEqual({
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "command_execution_failed",
+    });
+    // Everything rolled back together: the visibility, the execution row.
+    expect(
+      (
+        await prisma.nurturePublicationRelease.findUniqueOrThrow({
+          where: { id: released.release.id },
+        })
+      ).visibility,
+    ).toBe("visible");
+    expect(
+      await prisma.nurtureCommandExecution.count({
+        where: { workspaceId: world.workspaceId, commandKey: "probe_finalize_atomicity" },
+      }),
+    ).toBe(0);
+  });
+
   it("moves visibility monotonically and refuses a transition the lineage already passed", async () => {
     const world = await seedWorld();
     const released = await seedCommittedRelease(world);
@@ -814,6 +889,7 @@ describe("T-006 owner write: post-release safety", () => {
       workspace_id: world.workspaceId,
       participant_id: world.teacher.id,
       command_execution_id: execution.id,
+      actor_role_assignment_id: world.teacherRole.id,
       events: [
         {
           event_id: eventId,
@@ -838,6 +914,7 @@ describe("T-006 owner write: post-release safety", () => {
         workspace_id: world.workspaceId,
         participant_id: world.teacher.id,
         command_execution_id: randomUUID(),
+        actor_role_assignment_id: world.teacherRole.id,
         events: [
           {
             event_id: randomUUID(),

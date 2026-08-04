@@ -3034,6 +3034,9 @@ describe("T-006 media lifecycle through the formal Harness ingress", () => {
       business_outcome: "applied",
     });
     expect(discarded.executed?.json.committed_result.affectedDraftCount).toBe(0);
+    for (const raw of [asset.id, process.id, process.processKey, scope.group.id]) {
+      expect(JSON.stringify(discarded.executed?.json)).not.toContain(raw);
+    }
     expect(
       (await prisma.nurtureMediaAssetRef.findUniqueOrThrow({ where: { id: asset.id } }))
         .lifecycle,
@@ -3294,7 +3297,18 @@ describe("T-006 post-release safety through the formal Harness ingress", () => {
     expect(correctionRow.commandExecutionId).not.toBeNull();
     expect(correctionRow.bodyProtectionPayload).not.toBeNull();
     expect(JSON.stringify(correctionRow.bodyProtectionPayload)).not.toContain("周三");
-    expect(JSON.stringify(corrected.executed?.json)).not.toContain(release.id);
+    // The whole response, not selected fields: no raw owner identifier of
+    // any concept this action touched may reach the wire.
+    for (const raw of [
+      release.id,
+      release.receiptId,
+      process.id,
+      process.processKey,
+      correctionRow.id,
+      scope.group.id,
+    ]) {
+      expect(JSON.stringify(corrected.executed?.json)).not.toContain(raw);
+    }
     expect(
       (
         await prisma.nurturePublicationRelease.findUniqueOrThrow({ where: { id: release.id } })
@@ -3322,6 +3336,9 @@ describe("T-006 post-release safety through the formal Harness ingress", () => {
       business_outcome: "applied",
     });
     const removedAt = removed.executed?.json.committed_result.events[0].occurredAt;
+    for (const raw of [release.id, release.receiptId, process.id, process.processKey]) {
+      expect(JSON.stringify(removed.executed?.json)).not.toContain(raw);
+    }
     expect(
       (
         await prisma.nurturePublicationRelease.findUniqueOrThrow({ where: { id: release.id } })
@@ -3427,6 +3444,32 @@ describe("T-006 post-release safety through the formal Harness ingress", () => {
         operationInput: { reason: "family_request" },
       }).then((response) => response.json),
     ).resolves.toMatchObject({ status: "denied", reason_code: "target_unavailable" });
+
+    // The second half the name promises: a process the class CAN see, but
+    // with no committed publication to act on.
+    const unreleased = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    await expect(
+      prepareAction({
+        scope,
+        actorId: scope.caregiver.id,
+        surface: "board",
+        capabilityKey: "redact_publication",
+        targetOptionRef: safetyProcessRef(scope, scope.caregiver.id, unreleased.processKey),
+        operationInput: { reason: "family_request" },
+      }).then((response) => response.json),
+    ).resolves.toMatchObject({
+      status: "denied",
+      reason_code: "no_committed_publication",
+    });
   });
 });
 

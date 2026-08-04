@@ -14,6 +14,12 @@ export type NurtureStoredVisibilityEvent = {
 
 export type NurturePublicationSafetyWriteFacts = {
   authority: NurtureCaregiverWriteAuthority;
+  /**
+   * The exact role assignment the authorization validated. The lineage rows
+   * name it — re-resolving inside finalize read a second clock and could
+   * attribute the action to an assignment authorize never checked.
+   */
+  actor_role_assignment_id: string;
   publish_process_ref: DomainContextRef;
   publications: Array<{
     publication_id: string;
@@ -58,6 +64,8 @@ export type NurturePublicationSafetyTransaction = {
     workspace_id: string;
     participant_id: string;
     command_execution_id: string;
+    /** The load-time, authorize-validated assignment; never re-resolved here. */
+    actor_role_assignment_id: string;
     events: Array<{
       event_id: string;
       publication_id: string;

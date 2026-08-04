@@ -244,7 +244,12 @@ export const evaluateMediaDetach = (
   return {
     status: "detached",
     mediaRef: deriveMediaRef(integrityKey, scope, input),
-    remainingMediaCount: input.composition_media_ids.length - 1,
+    // The owner removes every occurrence of the asset, so the preview counts
+    // the same way — `length - 1` disagreed with the commit whenever the
+    // composition carried the asset twice.
+    remainingMediaCount: input.composition_media_ids.filter(
+      (entry) => entry !== input.media_asset_id,
+    ).length,
   };
 };
 

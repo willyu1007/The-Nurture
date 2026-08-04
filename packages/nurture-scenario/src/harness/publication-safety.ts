@@ -1373,10 +1373,12 @@ type SafetyAppendPlan = {
    * `outcome_unknown`.
    */
   publish_process_ref: NurturePublicationSafetyWriteFacts["publish_process_ref"];
+  /** The authorize-validated assignment the lineage rows must name. */
+  actor_role_assignment_id: string;
 };
 
-/** What a rule decides; the aggregate ref is attached by authorize, from facts. */
-type SafetyRulePlan = Omit<SafetyAppendPlan, "publish_process_ref">;
+/** What a rule decides; the aggregate ref and actor come from facts, in authorize. */
+type SafetyRulePlan = Omit<SafetyAppendPlan, "publish_process_ref" | "actor_role_assignment_id">;
 
 type SafetyRuleDecision =
   | { status: "append"; plan: SafetyRulePlan }
@@ -1457,7 +1459,11 @@ const createPublicationSafetySpec = <
       if (decision.status === "append") {
         return {
           status: "authorized",
-          write: { ...decision.plan, publish_process_ref: facts.publish_process_ref },
+          write: {
+            ...decision.plan,
+            publish_process_ref: facts.publish_process_ref,
+            actor_role_assignment_id: facts.actor_role_assignment_id,
+          },
         };
       }
       const scope = safetyCommandScope(context);
@@ -1517,7 +1523,10 @@ const createPublicationSafetySpec = <
             ),
           ),
         },
-        finalization_payload: { events },
+        finalization_payload: {
+          events,
+          actor_role_assignment_id: plan.actor_role_assignment_id,
+        },
       };
     },
     finalize: async (owner, _input, context, applied) => {
@@ -1531,11 +1540,13 @@ const createPublicationSafetySpec = <
           occurred_at: string;
           body_envelope?: unknown;
         }>;
+        actor_role_assignment_id: string;
       };
       await owner.appendPublicationVisibilityEvents({
         workspace_id: context.workspace_id,
         participant_id: context.business_actor_ref,
         command_execution_id: applied.execution_id,
+        actor_role_assignment_id: payload.actor_role_assignment_id,
         events: payload.events,
       });
     },
