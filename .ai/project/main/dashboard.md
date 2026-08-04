@@ -120,8 +120,14 @@ Project: `main`
   organize_care_capture_batch landed end to end after a 1.15.0 contract
   amendment (owner class-option channel, routed outcomes carrying the D-15
   action, and an enforceable discard blast radius). The ingress admits 25
-  actions + 9 queries; the unrouted census is exactly reschedule. What remains
-  is the external joint runs (T-007 provider, T-005 G2-C).
+  actions + 9 queries; the unrouted census is exactly reschedule. The G3-E
+  self-prep closed on 2026-08-05: the dual-class caregiver blind spot is
+  cleared (listings union every class, row-scoped authority asks the row's own
+  class), the multi-child guardian selects the family per the registered
+  unique_eligible_default policy, and verify:owner-integration provides the
+  real-owner-path evidence layer from runtime-recorded per-key outcomes — with
+  the same-day adversarial review's ten confirmed findings fixed and falsified.
+  What remains is the external joint runs (T-007 provider, T-005 G2-C).
 - Stage G4: T-007 uses G4-0 rolling contract/fact freeze, G4-A authority/aggregate,
   G4-B role-bound mobile, G4-C Admin Workbench Core, G4-D Enrollment Journey,
   G4-E Knowledge/RAG and G4-F qualification/handoff. The publication-policy subset

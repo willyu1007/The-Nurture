@@ -319,11 +319,13 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
    Unblocks B2.~~ **Done 2026-08-02.**
 3. ~~**Capture-lane port** — declare it alongside the repositories so every lane
    has one boundary shape. Unblocks B3.~~ **Done 2026-08-02.**
-4. **Ingress routing** — admit the 24 T-006 keys, extend the ingress census, keep
-   every gate default-off. Unblocks B4. **Partially done 2026-08-02:** the six
-   queries and two board writes are routed; the other sixteen wait on step 4b.
-4b. **Write commands and owner writes** for the sixteen decision-only
-   capabilities. Unblocks B8, then the rest of B4.
+4. ~~**Ingress routing** — admit the 24 T-006 keys, extend the ingress census, keep
+   every gate default-off. Unblocks B4.~~ **Done 2026-08-04:** every T-006-owned
+   key is routed (25 actions + 9 queries, including the release fan-out and the
+   organize cut after its 1.15.0 contract amendment); the unrouted census is
+   exactly `reschedule_publish_process`, which waits on the T-007 provider.
+4b. ~~**Write commands and owner writes** for the sixteen decision-only
+   capabilities. Unblocks B8, then the rest of B4.~~ **Done 2026-08-04.**
 5. ~~**T-005 consumer action** — owner-issued `initiate_caregiver_direct_message`
    action ref from current eligibility, with the safe blocked projection kept
    for the unavailable case. Unblocks B5 and half of B7.~~ **Done 2026-08-04:**

@@ -5,7 +5,7 @@
 - State: in-progress
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-04
+- Updated: 2026-08-05
 - Next step: G3-E readiness review 的 B1/B2/B3 已关闭，B4 部分完成。**B8 Unit 0
   与 Lane A 已落地**：写命令工厂 `createBoardWriteSpec`、按能力的 ingress 描述表、
   `cancel_publish_process`，以及编辑 lane 的四条写能力（edit hold 取得/续期/释放、
@@ -25,8 +25,14 @@
   owner 班级选项通道与含 D-15 动作的路由结果；25 action + 9 query，未路由仅剩
   reschedule）。**B5 已于 2026-08-04 落地**：
   `direct_interaction_required` 决定携带 owner-issued T-005 动作（现时资格 ∩
-  候选目标集铸造 `targetOptionRef`，安全阻断走冻结分类）。余下：B6/B7 的外部
-  联合运行。详见
+  候选目标集铸造 `targetOptionRef`，安全阻断走冻结分类）。
+  **G3-E 自备三项已于 2026-08-05 收官**：双班照护者盲点清除（键列表并集全部
+  班级、行范围授权按行所属班精确解析）、多子女 guardian 家庭选择器（按已注册的
+  `unique_eligible_default` 补实现，整板重绑不混排家庭）、以及
+  `verify:owner-integration` 证据层（e2e 运行时逐 key 记录，action 须有
+  committed 执行、query 须有 ok 读取）。当日对抗复核 10 条 confirmed 全部修复
+  并逐条证伪（最尖锐：独立查询用默认家庭的 drift heads 服务另一家庭的行）。
+  余下：B6/B7 的外部联合运行。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal
