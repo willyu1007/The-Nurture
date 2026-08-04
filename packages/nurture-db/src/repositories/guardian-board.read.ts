@@ -149,21 +149,22 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
    * because a mixed board would present one family's label over another
    * family's activity.
    */
-  private async resolveReach(
+  /** Every family this guardian currently reaches, earliest-created first. */
+  private async resolveReachableFamilies(
     workspaceId: string,
     participantId: string,
     at: Date,
-  ): Promise<GuardianReach | null> {
+  ): Promise<GuardianReach[]> {
     const participant = await this.prisma.nurtureParticipant.findFirst({
       where: { id: participantId, workspaceId, status: "active", deletedAt: null },
     });
-    if (!participant) return null;
+    if (!participant) return [];
 
     const roles = await this.prisma.nurtureCareRoleAssignment.findMany({
       where: { workspaceId, participantId, role: "guardian", ...activeRoleWindow(at) },
       orderBy: { createdAt: "asc" },
     });
-    if (roles.length === 0) return null;
+    if (roles.length === 0) return [];
 
     const processIds = new Set<string>();
     const familyIds = new Set<string>();
@@ -183,25 +184,44 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
       },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
-    const family = families[0];
-    if (!family) return null;
+    const reaches: GuardianReach[] = [];
+    for (const family of families) {
+      const reachingRole = roles.find(
+        (role) =>
+          (role.scopeType === "child_care_process" &&
+            role.scopeId === family.childCareProcessId) ||
+          (role.scopeType === "family" && role.scopeId === family.id),
+      );
+      if (!reachingRole) continue;
+      reaches.push({
+        participant_active: true,
+        family_id: family.id,
+        family_label: family.displayName ?? "",
+        family_ref_key: `${workspaceId}:${family.childCareProcessId}`,
+        child_care_process_id: family.childCareProcessId,
+        role_version: reachingRole.aggregateVersion,
+        family_version: family.aggregateVersion,
+      });
+    }
+    return reaches;
+  }
 
-    const reachingRole = roles.find(
-      (role) =>
-        (role.scopeType === "child_care_process" && role.scopeId === family.childCareProcessId) ||
-        (role.scopeType === "family" && role.scopeId === family.id),
-    );
-    if (!reachingRole) return null;
-
-    return {
-      participant_active: true,
-      family_id: family.id,
-      family_label: family.displayName ?? "",
-      family_ref_key: `${workspaceId}:${family.childCareProcessId}`,
-      child_care_process_id: family.childCareProcessId,
-      role_version: reachingRole.aggregateVersion,
-      family_version: family.aggregateVersion,
-    };
+  /**
+   * The board binds to one family: the requested one (when reachable), the
+   * unique one, or the earliest — never a mix. A multi-child guardian selects
+   * through the owner-issued enrollment option, which rebinds the board.
+   */
+  private async resolveReach(
+    workspaceId: string,
+    participantId: string,
+    at: Date,
+    bindFamilyId?: string,
+  ): Promise<GuardianReach | null> {
+    const reaches = await this.resolveReachableFamilies(workspaceId, participantId, at);
+    if (bindFamilyId) {
+      return reaches.find((reach) => reach.family_id === bindFamilyId) ?? null;
+    }
+    return reaches[0] ?? null;
   }
 
   /** The Grant census drives both the Grant drift head and every visibility head. */
@@ -217,10 +237,40 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     workspace_id: string;
     participant_id: string;
     snapshot_at: string;
+    bind_family_id?: string;
   }): Promise<GuardianBoardScopeFacts> {
     const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reaches = await this.resolveReachableFamilies(
+      input.workspace_id,
+      input.participant_id,
+      at,
+    );
+    const reach = input.bind_family_id
+      ? reaches.find((entry) => entry.family_id === input.bind_family_id)
+      : reaches[0];
     if (!reach) return UNAUTHORIZED_SCOPE;
+    // The option candidate set spans every reachable family; the board's own
+    // binding stays the one family above.
+    const allEligibleEnrollments = (
+      await this.prisma.nurtureEnrollment.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          childCareProcessId: { in: reaches.map((entry) => entry.child_care_process_id) },
+          status: "active",
+          deletedAt: null,
+          institution: { status: "active", deletedAt: null },
+          careGroup: { status: "active", deletedAt: null },
+        },
+        include: { careGroup: { select: { name: true } } },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      })
+    ).map((enrollment) => ({
+      enrollment_id: enrollment.id,
+      family_id:
+        reaches.find((entry) => entry.child_care_process_id === enrollment.childCareProcessId)
+          ?.family_id ?? reach.family_id,
+      display_label: enrollment.careGroup.name,
+    }));
 
     const [enrollments, roles, grants, corrections, redactions, focusCycles, charters] =
       await Promise.all([
@@ -321,10 +371,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
         ),
         grant_head: censusHead("guardian.grant", grantCensus),
       },
-      eligible_enrollments: enrollments.map((enrollment) => ({
-        enrollment_id: enrollment.id,
-        display_label: enrollment.careGroup.name,
-      })),
+      eligible_enrollments: allEligibleEnrollments,
       // Owner-issued eligibility. The Guardian may adjust current focus because
       // the focus owner accepts the write, not because the role reads "guardian".
       surface_action_grants: [],
@@ -343,6 +390,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
   async loadGuardianCurrentFocus(input: {
     workspace_id: string;
     participant_id: string;
+    bind_family_id?: string;
     snapshot_at: string;
   }): Promise<{
     authorized: boolean;
@@ -351,7 +399,12 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     heads: RawBoardSourceHead[];
   }> {
     const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await this.resolveReach(
+      input.workspace_id,
+      input.participant_id,
+      at,
+      input.bind_family_id,
+    );
     if (!reach) return { authorized: false, goals: [], heads: [] };
 
     const grantCensus = await this.grantCensus(input.workspace_id, reach.child_care_process_id);
@@ -510,6 +563,7 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     participant_id: string;
     enrollment_id: string;
     snapshot_at: string;
+    bind_family_id?: string;
     take: number;
     before?: BoardSortKeyV1;
   }): Promise<{
@@ -519,7 +573,12 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
     heads: RawBoardSourceHead[];
   }> {
     const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(input.workspace_id, input.participant_id, at);
+    const reach = await this.resolveReach(
+      input.workspace_id,
+      input.participant_id,
+      at,
+      input.bind_family_id,
+    );
     if (!reach) return { authorized: false, rows: [], has_more: false, heads: [] };
 
     // The Enrollment must still belong to the reached family at read time; a

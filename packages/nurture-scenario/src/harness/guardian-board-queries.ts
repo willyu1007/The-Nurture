@@ -50,7 +50,17 @@ export type GuardianBoardScopeFacts = {
   family_label: string;
   snapshot_version: number;
   drift_heads: BoardDriftHeadsV1;
-  eligible_enrollments: Array<{ enrollment_id: string; display_label: string }>;
+  /**
+   * Every Enrollment this guardian currently reaches, across EVERY family —
+   * the option-ref candidate set. The board itself stays bound to ONE family
+   * (`family_id` above); selecting an option from another family rebinds the
+   * whole board rather than mixing families.
+   */
+  eligible_enrollments: Array<{
+    enrollment_id: string;
+    family_id: string;
+    display_label: string;
+  }>;
   /** Owner-issued surface- and module-scope eligibility. Without a grant the
    * presenter has nothing to project, whatever the role says. */
   surface_action_grants: OwnerEligibilityGrantV1[];
@@ -98,11 +108,14 @@ export type GuardianBoardReadPort = {
     workspace_id: string;
     participant_id: string;
     snapshot_at: string;
+    /** Bind to this reachable family instead of the unique/earliest default. */
+    bind_family_id?: string;
   }): Promise<GuardianBoardScopeFacts>;
   loadGuardianCurrentFocus(input: {
     workspace_id: string;
     participant_id: string;
     snapshot_at: string;
+    bind_family_id?: string;
   }): Promise<{
     authorized: boolean;
     charter?: RawGuardianCharter;
@@ -114,6 +127,7 @@ export type GuardianBoardReadPort = {
     participant_id: string;
     enrollment_id: string;
     snapshot_at: string;
+    bind_family_id?: string;
     take: number;
     before?: BoardSortKeyV1;
   }): Promise<{
@@ -214,8 +228,11 @@ export const queryGuardianCurrentFocus = async (
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
 
   const result = await deps.reads.loadGuardianCurrentFocus({
-    ...request,
+    workspace_id: request.workspace_id,
+    participant_id: request.participant_id,
     snapshot_at: snapshotAt,
+    // The module follows the board's bound family, never its own default.
+    bind_family_id: scopeFacts.family_id,
   });
   if (!result.authorized) return { status: "denied", reason_code: "not_authorized" };
 
@@ -340,6 +357,9 @@ export const queryGuardianEnrollmentActivity = async (
     scopeFacts.eligible_enrollments.map((entry) => entry.enrollment_id),
   );
   if (!enrollmentId) return { status: "denied", reason_code: "target_unavailable" };
+  const selectedFamilyId = scopeFacts.eligible_enrollments.find(
+    (entry) => entry.enrollment_id === enrollmentId,
+  )?.family_id;
 
   const scopeRef = guardianScopeRef(deps, scope, scopeFacts);
   const enrollmentRef = issueBoardOpaqueRef(
@@ -404,6 +424,7 @@ export const queryGuardianEnrollmentActivity = async (
         participant_id: scope.participant_id,
         enrollment_id: enrollmentId,
         snapshot_at: snapshotAt,
+        ...(selectedFamilyId ? { bind_family_id: selectedFamilyId } : {}),
         take,
         ...(cursorKey ? { before: cursorKey } : {}),
       });

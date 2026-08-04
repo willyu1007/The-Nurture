@@ -215,8 +215,8 @@ describe("G3-A guardian_family_board envelope", () => {
     const port = createGuardianReadPort({
       scope: {
         eligible_enrollments: [
-          { enrollment_id: "enrollment-1", display_label: "Syn Class A" },
-          { enrollment_id: "enrollment-2", display_label: "Syn Class B" },
+          { enrollment_id: "enrollment-1", family_id: "family-1", display_label: "Syn Class A" },
+          { enrollment_id: "enrollment-2", family_id: "family-1", display_label: "Syn Class B" },
         ],
       },
       activityPages: [{ rows: [guardianActivity()], has_more: false }],

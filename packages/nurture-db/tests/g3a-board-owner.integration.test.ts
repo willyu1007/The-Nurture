@@ -165,7 +165,7 @@ const seedFocus = async (world: World) => {
 };
 
 describe("G3-A owner reads: guardian lane", () => {
-  it("binds the family scope and offers only enrollments of that family", async () => {
+  it("binds the family scope while offering every reachable family's enrollments", async () => {
     const world = await seedWorld();
     const reads = new PrismaGuardianBoardReadPort(prisma);
     const scope = await reads.loadGuardianScope({
@@ -175,9 +175,84 @@ describe("G3-A owner reads: guardian lane", () => {
     });
     expect(scope.authorized).toBe(true);
     expect(scope.family_id).toBe(world.family.id);
+    // Each option names its own family: selecting one from another family
+    // rebinds the whole board rather than mixing families.
     expect(scope.eligible_enrollments).toEqual([
-      { enrollment_id: world.enrollment.id, display_label: "Class A" },
+      {
+        enrollment_id: world.enrollment.id,
+        family_id: world.family.id,
+        display_label: "Class A",
+      },
     ]);
+  });
+
+  it("rebinds to a second child's family on request and never mixes them", async () => {
+    const world = await seedWorld();
+    // A second child of the same guardian: its own process, family, enrollment.
+    const secondChild = await prisma.nurtureChild.create({
+      data: { workspaceId: world.workspaceId, displayName: "Second Child", status: "active" },
+    });
+    const secondProcess = await prisma.nurtureChildCareProcess.create({
+      data: { workspaceId: world.workspaceId, childId: secondChild.id, status: "active" },
+    });
+    const secondFamily = await prisma.nurtureFamily.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: secondProcess.id,
+        displayName: "Second Family",
+        status: "active",
+      },
+    });
+    await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: world.guardian.id,
+        role: "guardian",
+        scopeType: "child_care_process",
+        scopeId: secondProcess.id,
+        status: "active",
+      },
+    });
+    const secondEnrollment = await prisma.nurtureEnrollment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        childCareProcessId: secondProcess.id,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        status: "active",
+      },
+    });
+
+    const reads = new PrismaGuardianBoardReadPort(prisma);
+    const unbound = await reads.loadGuardianScope({
+      workspace_id: world.workspaceId,
+      participant_id: world.guardian.id,
+      snapshot_at: SNAPSHOT_AT,
+    });
+    // Default binding stays the earliest family; BOTH families' enrollments
+    // are offered as owner-issued options.
+    expect(unbound.family_id).toBe(world.family.id);
+    expect(unbound.eligible_enrollments.map((entry) => entry.enrollment_id).sort()).toEqual(
+      [world.enrollment.id, secondEnrollment.id].sort(),
+    );
+
+    const rebound = await reads.loadGuardianScope({
+      workspace_id: world.workspaceId,
+      participant_id: world.guardian.id,
+      snapshot_at: SNAPSHOT_AT,
+      bind_family_id: secondFamily.id,
+    });
+    expect(rebound.family_id).toBe(secondFamily.id);
+    expect(rebound.family_label).toBe("Second Family");
+
+    // A family outside the guardian's reach never binds.
+    const foreign = await reads.loadGuardianScope({
+      workspace_id: world.workspaceId,
+      participant_id: world.guardian.id,
+      snapshot_at: SNAPSHOT_AT,
+      bind_family_id: randomUUID(),
+    });
+    expect(foreign.authorized).toBe(false);
   });
 
   it("refuses a participant with no current guardian authority", async () => {

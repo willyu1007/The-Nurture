@@ -28,7 +28,7 @@ import {
   queryTeacherPublishQueue,
   type TeacherPublishQueueReadPort,
 } from "./teacher-publish-queue.js";
-import { issueTargetOptionRef } from "./keyed-refs.js";
+import { issueTargetOptionRef, resolveTargetOptionRef } from "./keyed-refs.js";
 import type { InterfaceContractRefV1 } from "../surface-contract/types.js";
 
 /**
@@ -146,11 +146,35 @@ export const presentGuardianFamilyBoard = async (
   };
   const now = (deps.now ?? (() => new Date()))();
   const generatedAt = now.toISOString();
-  const scopeFacts = await deps.reads.loadGuardianScope({
+  let scopeFacts = await deps.reads.loadGuardianScope({
     ...scope,
     snapshot_at: generatedAt,
   });
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
+
+  // unique_eligible_default at the family level: an option ref naming an
+  // enrollment of ANOTHER reachable family rebinds the whole board to that
+  // family — label, focus and activity together — rather than mixing two
+  // families in one envelope.
+  if (request.enrollment_target_ref) {
+    const selected = resolveTargetOptionRef(
+      deps.integrity_key,
+      scope,
+      request.enrollment_target_ref,
+      scopeFacts.eligible_enrollments.map((entry) => entry.enrollment_id),
+    );
+    const selectedFamily = scopeFacts.eligible_enrollments.find(
+      (entry) => entry.enrollment_id === selected,
+    )?.family_id;
+    if (selectedFamily && selectedFamily !== scopeFacts.family_id) {
+      scopeFacts = await deps.reads.loadGuardianScope({
+        ...scope,
+        snapshot_at: generatedAt,
+        bind_family_id: selectedFamily,
+      });
+      if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
+    }
+  }
 
   // One scope, one instant, shared by every module in this envelope.
   const resolvedScope = { facts: scopeFacts, snapshot_at: generatedAt };

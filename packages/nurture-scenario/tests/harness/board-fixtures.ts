@@ -192,7 +192,7 @@ export const createGuardianReadPort = (
         snapshot_version: 7,
         drift_heads: driftHeads(),
         eligible_enrollments: [
-          { enrollment_id: "enrollment-1", display_label: "Syn Class A" },
+          { enrollment_id: "enrollment-1", family_id: "family-1", display_label: "Syn Class A" },
         ],
         surface_action_grants: [],
         module_action_grants: {},

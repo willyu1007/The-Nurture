@@ -1931,3 +1931,21 @@ G3-E 就绪评审点名的已知缺陷:`resolveCaregiverReach` 返回"第一个�
 
 正面证明:双班老师两个班的键都在列表、第二班的行以第二班的 authority 加载
 (`matches_source: true`);证伪(单点回退到 first-group)CAUGHT。
+
+## 2026-08-05 — G3-E 自备:多子女 guardian 家庭选择器
+
+`query_guardian_family_board` 的注册合同本就是 `unique_eligible_default`——唯一时
+默认、多个时经 owner 选项选择;实现却无条件绑最早创建的 family。无需旋转,按合同
+补齐实现:
+
+- **owner 读**:`resolveReachableFamilies` 枚举该 guardian 当前全部可达 family;
+  `loadGuardianScope` 接受可选 `bind_family_id`(必须可达,否则 unauthorized);
+  `eligible_enrollments` 跨全部 family 枚举并携带各自的 `family_id`——选项集跨
+  family,看板绑定始终单 family。
+- **presenter 重绑**:enrollment 选项 ref 解析到另一个可达 family 的 enrollment
+  时,整个看板(标签、focus、activity)重绑到那个 family——绝不混排两个家庭;
+  focus/activity 模块读经 `bind_family_id` 跟随看板绑定,不再各自回落到
+  "最早 family"。
+- 默认行为不变:无选项时绑唯一/最早 family。
+- DB 测试:双子女 guardian 默认绑最早、两家 enrollment 都在选项集、按第二家
+  重绑标签正确、不可达 family 拒绝;证伪(owner 忽略 bind)CAUGHT。
