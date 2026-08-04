@@ -1,11 +1,28 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import test from 'node:test';
 
-import { computeContractHash, verifyWorkflowContractPin } from './verify-workflow-contract-pin.mjs';
+import {
+  computeContractHash,
+  isMainModule,
+  verifyWorkflowContractPin,
+} from './verify-workflow-contract-pin.mjs';
+
+test('CLI entry detection resolves filesystem aliases', async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-entry-'));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const target = path.join(root, 'target.mjs');
+  const alias = path.join(root, 'alias.mjs');
+  await writeFile(target, 'export {};\n');
+  await symlink(target, alias);
+
+  assert.equal(isMainModule(alias, pathToFileURL(target).href), true);
+  assert.equal(isMainModule(undefined, pathToFileURL(target).href), false);
+});
 
 test('contract hash is stable across input order and directory traversal', async (context) => {
   const root = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-'));

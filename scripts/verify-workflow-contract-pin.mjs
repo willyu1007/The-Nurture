@@ -2,6 +2,7 @@
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { realpathSync } from 'node:fs';
 import { lstat, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -195,7 +196,16 @@ async function main() {
   }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+export function isMainModule(invokedPath, moduleUrl) {
+  if (!invokedPath) return false;
+  try {
+    return realpathSync(invokedPath) === realpathSync(fileURLToPath(moduleUrl));
+  } catch {
+    return false;
+  }
+}
+
+if (isMainModule(process.argv[1], import.meta.url)) {
   main().catch((error) => {
     process.stderr.write(`[error] ${error.message}\n`);
     process.exitCode = 1;

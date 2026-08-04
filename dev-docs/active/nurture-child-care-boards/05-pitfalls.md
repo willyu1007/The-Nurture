@@ -686,3 +686,9 @@
   同一冻结 checkout。
 - **Prevention**:联合资格化不能把“pin 文件存在”当作“运行使用了 pin”；必须同时证明
   revision/hash 和实际 module resolution topology。
+
+同一轮 detached rehearsal 还暴露了入口本身的空跑风险：macOS 的 `/tmp` 与
+`/private/tmp` 指向同一位置，verifier 却用未 realpath 的字符串判断
+`process.argv[1] === import.meta.url`，导致脚本在 `/tmp` checkout 中静默退出 0。
+入口判断已改为 filesystem realpath 比较，并用 symlink alias 回归用例钉住；CLI 工具的
+“exit 0”只有在 `main` 确实执行后才可作为证据。

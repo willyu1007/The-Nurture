@@ -1119,3 +1119,10 @@ task to pretend the source population never changed. Git-object recomputation at
 the frozen owner commits independently reconfirmed Base/My-Chat contract parity
 (`8dd53be4…`, 11 files), `web_workbench` (59), `x5_joint_api` (169) and
 `wave4_binding_host` (20).
+
+The first detached-topology rehearsal exposed a CLI-entry defect before any DB
+write: macOS aliases `/tmp` to `/private/tmp`, while the pin verifier compared the
+two path spellings as strings and silently exited 0. Entry detection now compares
+filesystem realpaths and has a symlink-alias regression test; `test:workflow-contract-pin`
+passes 5/5. A qualification runner that does not actually enter `main` can no longer
+stand in for exact pin evidence.
