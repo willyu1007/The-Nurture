@@ -1,10 +1,16 @@
+import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
+import {
+  NurtureInteractionContextService,
+  type NurtureInteractionContextRepository,
+} from "../../src/domain/interactions/interaction-context.js";
 import { issueBoardSealedRef } from "../../src/harness/board-projection.js";
 import { PUBLISH_PROCESS_TARGET_KIND } from "../../src/harness/publish-process.js";
 import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js";
 import type { ResolvedPublishScheduleV1 } from "../../src/harness/publish-schedule.js";
 import {
   derivePartialReleaseFollowUp,
+  prepareReleasePublishProcess,
   releasePublishProcess,
   type CommitTargetReleaseResultV1,
   type ReleaseFactsV1,
@@ -339,5 +345,94 @@ describe("G3-D release loop", () => {
         trigger: "immediate",
       }),
     ).resolves.toEqual({ status: "denied", reason_code: "target_unavailable" });
+  });
+});
+
+describe("G3-D release formal-ingress entry", () => {
+  const prepareContexts = (): NurtureInteractionContextService =>
+    new NurtureInteractionContextService({
+      create: async (input: unknown) =>
+        ({
+          ...(input as object),
+          id: randomUUID(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }) as never,
+      findByTokenHash: async () => null,
+      findLatestActiveByConversationHash: async () => null,
+      consume: async () => null,
+      revoke: async () => null,
+    } satisfies NurtureInteractionContextRepository);
+
+  const prepare = (value: ReleaseFactsV1 | null, operationInput?: unknown) =>
+    prepareReleasePublishProcess(
+      { ...deps(value), contexts: prepareContexts() },
+      {
+        ...scope,
+        surface: "board",
+        operation_input: operationInput,
+        target_option_ref: processRef(),
+      },
+    );
+
+  it("freezes the release revision as the draft_revision head and previews the attempt", async () => {
+    const decision = await prepare(facts());
+    expect(decision.status).toBe("ready_to_confirm");
+    if (decision.status !== "ready_to_confirm") return;
+    expect(decision.preview).toEqual({
+      effect: "release_publish_process",
+      target_count: 1,
+      already_committed_count: 0,
+      release_revision: 4,
+    });
+    expect(decision.command_request_id).toMatch(/^command:/);
+  });
+
+  it("refuses a queued process the same way the attempt would", async () => {
+    const cases: Array<[Partial<ReleaseFactsV1>, string]> = [
+      [{ process_state: "draft" }, "process_not_queued"],
+      [{ edit_hold_active: true }, "edit_hold_active"],
+      [{ has_unsaved_revision: true }, "unsaved_revision"],
+      [{ targets: [] }, "no_eligible_target"],
+    ];
+    for (const [overrides, reason] of cases) {
+      await expect(prepare(facts(overrides))).resolves.toEqual({
+        status: "denied",
+        reason_code: reason,
+      });
+    }
+  });
+
+  it("rejects any non-empty operation input: the frozen contract's input is empty", async () => {
+    await expect(prepare(facts(), { anything: 1 })).resolves.toEqual({
+      status: "needs_input",
+      fields: ["operation_input"],
+    });
+  });
+
+  it("refuses stale_confirmation before committing anything when a save landed in between", async () => {
+    // The teacher confirmed revision 4; a colleague saved revision 5.
+    const attempt = release(facts({ current_revision: 5 }));
+    const decision = await releasePublishProcess(attempt.dependencies, scope, {
+      process_ref: processRef(),
+      command_request_id: "command:release-1",
+      trigger: "immediate",
+      expected_release_revision: 4,
+    });
+    expect(decision).toEqual({ status: "denied", reason_code: "stale_confirmation" });
+    // Nothing was committed for any target: the refusal is attempt-wide.
+    expect(attempt.dependencies.commits).toHaveLength(0);
+  });
+
+  it("releases normally when the frozen revision still matches", async () => {
+    const attempt = release(facts());
+    const decision = await releasePublishProcess(attempt.dependencies, scope, {
+      process_ref: processRef(),
+      command_request_id: "command:release-1",
+      trigger: "immediate",
+      expected_release_revision: 4,
+    });
+    expect(decision).toMatchObject({ status: "released" });
+    expect(attempt.dependencies.commits).toHaveLength(1);
   });
 });

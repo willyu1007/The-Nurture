@@ -1806,3 +1806,43 @@ resolver 的调用。改成**计数端口**(`calls() === 0` 断言)后再证伪,
 
 全部修复逐条证伪(逆向编辑回退),全部 CAUGHT。全量门禁绿(unit 558、db 205、
 e2e 40)。
+
+## 2026-08-04 — release_publish_process:多命令 ingress 形状落地
+
+结构性阻塞三条中的第一条解除。ingress 现准入 **24 action + 9 query**;显式未路由
+恰为 organize(待合同决定)与 reschedule(等 T-007)两条。
+
+### 形状:传输层 fan-out,不是内核命令
+
+`commitTargetRelease` 自持 `$transaction` 并逐目标写入
+PublicationRelease + Receipt + CommandExecution(attempt 身份作父)——单内核事务会把
+三十家庭发送变成跨家庭 all-or-nothing,正是 D-09 禁止的耦合。因此传输层新增
+描述符变体 `fanout`(与 `build` 互斥的联合类型):
+
+- **prepare**(`prepareReleasePublishProcess`):与提交循环共享
+  `resolveReleaseAttemptContext` 门禁(单一来源,prepare 拒绝的 execute 必以同码
+  拒绝);确认冻结注册表的 `draft_revision must_equal` 头 = 本次要发布的 revision;
+  preview 报 target_count / already_committed_count / release_revision。冻结合同的
+  输入是 emptyInput,非空 operation_input 直接 needs_input。
+- **execute**(`executeReleaseFanout`):镜像 `withHarnessConfirmation` 的分类语义
+  (expired/replayed/revoked/actor 漂移),但在服务层做 CAS 消费——没有单一命令事务
+  可以容纳它;完整性标签由冻结值重建验证。域函数新增
+  `expected_release_revision`:两步之间有同事保存 → 全 attempt 层面
+  `stale_confirmation`(证伪:守卫撤除时单测与 e2e 均红)。
+- **回答**:`committed_result` 用已冻结的 `releaseResult` schema(processState/
+  frozenRevision/results/summary/missedSendAttention);execution_ref 与
+  output_refs 只命名 attempt(`publicationReleaseAttemptIdentity`,即每条逐目标
+  execution 的 parent hash)——逐 release 命名会在整班进程上越过 32-ref 上限,
+  正是本日复核修掉的缺陷类。committed>0 → committed;全部确定性拒绝且零提交 →
+  `no_target_committed`(无任何写入,诚实 not_committed);有 outcome_unknown →
+  整体 outcome_unknown。
+- **重放语义是声明的差异**:消费掉的确认不可重放(conflict),对账 = 重新 prepare
+  + 新 attempt——`already_committed` 由行存在性识别,不靠命令身份。e2e 钉住:重放
+  拒绝、re-prepare 报 already_committed_count=1、对账 execute 返回与首次相同的
+  sealed publicationRef、release 行数仍为 1。
+- **部分提交**:两目标、prepare 后撤销一家 Grant → committed 1 + rejected 1,
+  另一家不回滚(e2e)。
+
+### 证伪
+
+stale_confirmation 守卫(单测 CAUGHT)、确认 CAS 消费撤除(e2e 重放测试 CAUGHT)。

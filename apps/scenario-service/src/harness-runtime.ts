@@ -78,10 +78,18 @@ import {
   queryGuardianCurrentFocus,
   queryGuardianEnrollmentActivity,
   queryGuardianFamilyCareTimeline,
+  issueBoardSealedRef,
   issuePublicationRef,
+  PUBLISH_PROCESS_TARGET_KIND,
+  canonicalizeReleasePublishProcessCommand,
+  classifyInteractionContextRow,
+  computeHarnessInputIntegrityTag,
+  prepareReleasePublishProcess,
   queryTeacherPublishQueue,
   readInstitutionBusinessCommunication,
+  releasePublishProcess,
   resolveCareItemTargetRef,
+  type NurtureInteractionContextRecord,
   withHarnessConfirmation,
   type HarnessConfirmationPayloadV2,
   type CaregiverDirectMessagePrepareDecision,
@@ -104,6 +112,7 @@ import {
   PrismaMediaSafetyReadPort,
   PrismaPublicationReleasePort,
   PrismaPublishLaneReadPort,
+  publicationReleaseAttemptIdentity,
   PrismaInteractionContextRepository,
   PrismaInstitutionBusinessCommunicationReadPort,
   PrismaNurtureCommandRepository,
@@ -994,6 +1003,17 @@ export function createHarnessEngine(input: {
         };
       },
     },
+    release_publish_process: {
+      prepare: optionalTarget((request) =>
+        prepareReleasePublishProcess(publicationSafetyDeps, request),
+      ),
+      // Deliberately NOT a kernel command: each target commits its own
+      // PublicationRelease + Receipt + CommandExecution atomically inside the
+      // owner, with the attempt identity as every execution's parent. One
+      // kernel transaction would make a thirty-family send all-or-nothing —
+      // the exact cross-family coupling D-09 forbids.
+      fanout: (request, row, payload) => executeReleaseFanout(request, row, payload),
+    },
   } satisfies Record<HarnessCapabilityKey, HarnessActionDescriptor>;
 
   return {
@@ -1036,6 +1056,13 @@ export function createHarnessEngine(input: {
         return notCommitted("blocked", "invalid_confirmation");
       }
 
+      const descriptor = actions[request.capability_key];
+      if ("fanout" in descriptor) {
+        return sealCommittedRefs(
+          request.workspace_id,
+          await descriptor.fanout(request, row, payload),
+        );
+      }
       const command = buildHarnessCommand(request, payload);
       if (command.status === "invalid") {
         return notCommitted("invalid", command.reason_code);
@@ -1312,6 +1339,141 @@ export function createHarnessEngine(input: {
   }
 
   /**
+   * The release fan-out: confirmation semantics first (same classification and
+   * CAS consume as `withHarnessConfirmation`, but service-level — there is no
+   * single command transaction to host them), then one attempt over every
+   * target. Each target's PublicationRelease + Receipt + CommandExecution
+   * commit atomically inside the owner with the attempt as parent; the wire
+   * answer names the attempt once and carries every per-target outcome in the
+   * frozen `releaseResult` shape. A consumed confirmation is not replayable —
+   * reconciliation is re-prepare + a fresh attempt, answered from stored rows
+   * (`already_committed` is detected by row presence, not command identity).
+   */
+  async function executeReleaseFanout(
+    request: HarnessExecuteRequestV1,
+    row: Awaited<ReturnType<typeof confirmations.findByTokenHash>>,
+    payload: HarnessConfirmationPayloadV2,
+  ): Promise<HarnessExecuteResponseV1> {
+    const now = new Date();
+    const scope = {
+      workspace_id: request.workspace_id,
+      participant_id: request.actor_participant_id,
+    };
+    const classified = classifyInteractionContextRow(
+      row,
+      {
+        workspace_id: request.workspace_id,
+        participant_id: request.actor_participant_id,
+        purpose: "prepare_action",
+        surface: request.surface,
+        ...(request.host_conversation_ref
+          ? { host_conversation_ref: request.host_conversation_ref }
+          : {}),
+      },
+      now,
+    );
+    if (classified.status === "expired") {
+      return notCommitted("conflict", "confirmation_expired");
+    }
+    if (classified.status !== "current") {
+      if (classified.status === "blocked" && classified.reason_code === "token_replayed") {
+        return notCommitted("conflict", "confirmation_replayed");
+      }
+      if (classified.status === "blocked" && classified.reason_code === "token_revoked") {
+        return notCommitted("blocked", "confirmation_revoked");
+      }
+      return notCommitted("blocked", "invalid_confirmation");
+    }
+    if (payload.command_request_id !== request.command_request_id) {
+      return notCommitted("blocked", "invalid_confirmation");
+    }
+    if (!isEmptyOperationInput(request.operation_input)) {
+      return notCommitted("invalid", "invalid_operation_input");
+    }
+    const processKey = payload.target_refs.publish_process;
+    const expectedRevision = payload.expected_heads.draft_revision;
+    if (!processKey || expectedRevision === undefined) {
+      return notCommitted("blocked", "invalid_confirmation");
+    }
+    const expectedTag = computeHarnessInputIntegrityTag(
+      input.integrityKey,
+      canonicalizeReleasePublishProcessCommand({
+        process_key: processKey,
+        expected_release_revision: expectedRevision,
+        trigger: "immediate",
+      }),
+    );
+    if (expectedTag !== payload.input_integrity_tag) {
+      return notCommitted("conflict", "input_integrity_mismatch");
+    }
+
+    const consumed = await confirmations.consume({
+      workspace_id: request.workspace_id,
+      context_id: classified.context.id,
+      expected_version: classified.context.version,
+      consumed_at: now.toISOString(),
+    });
+    if (!consumed) return notCommitted("conflict", "confirmation_replayed");
+
+    const decision = await releasePublishProcess(
+      { integrity_key: input.integrityKey, reads: publicationReleaseReads },
+      scope,
+      {
+        process_ref: issueBoardSealedRef(
+          input.integrityKey,
+          scope,
+          PUBLISH_PROCESS_TARGET_KIND,
+          processKey,
+        ),
+        command_request_id: request.command_request_id,
+        trigger: "immediate",
+        expected_release_revision: expectedRevision,
+      },
+    );
+    if (decision.status === "denied") {
+      return decision.reason_code === "stale_confirmation"
+        ? notCommitted("conflict", "stale_confirmation")
+        : notCommitted("blocked", decision.reason_code);
+    }
+    const attemptRef = {
+      schema_version: 1,
+      namespace: "nurture",
+      object_type: "publication_release_attempt",
+      // The owner's real parent identity: every per-target CommandExecution
+      // this attempt committed carries exactly this hash as its parent.
+      object_id: publicationReleaseAttemptIdentity(request.command_request_id),
+      version: 1,
+    };
+    const committedResult = {
+      processState: decision.processState,
+      ...(decision.frozenRevision !== undefined
+        ? { frozenRevision: decision.frozenRevision }
+        : {}),
+      results: decision.results,
+      summary: decision.summary,
+      missedSendAttention: decision.missedSendAttention,
+    };
+    if (decision.summary.committed > 0) {
+      return {
+        status: "committed",
+        execution_disposition: "executed",
+        business_outcome: "applied",
+        execution_ref: attemptRef,
+        output_refs: [attemptRef],
+        committed_result: committedResult,
+      };
+    }
+    if (decision.summary.outcomeUnknown > 0) {
+      // At least one target may or may not have committed and this attempt's
+      // confirmation is spent: the honest answer is indeterminate, and the
+      // reconciliation is a fresh prepare whose facts read the stored rows.
+      return { status: "outcome_unknown", reason_code: "target_outcome_unknown", recovery: "reconcile_same_command" };
+    }
+    // Zero commits and every outcome certain: nothing was written anywhere.
+    return notCommitted("blocked", "no_target_committed");
+  }
+
+  /**
    * The confirmation is the only source of targets and frozen heads; the typed
    * input is the only thing the caller resubmits. Each descriptor turns that
    * pair into its own exact command, or refuses.
@@ -1320,7 +1482,11 @@ export function createHarnessEngine(input: {
     request: HarnessExecuteRequestV1,
     payload: HarnessConfirmationPayloadV2,
   ): BuiltCommand {
-    const built = actions[request.capability_key].build({
+    const descriptor = actions[request.capability_key];
+    if (!("build" in descriptor)) {
+      return { status: "invalid", reason_code: "invalid_operation_input" };
+    }
+    const built = descriptor.build({
       operation_input: request.operation_input,
       target_refs: payload.target_refs,
       expected_heads: payload.expected_heads,
@@ -1363,9 +1529,24 @@ type HarnessActionDescriptor = {
     request: HarnessPrepareRequestV1,
     scope: PrepareScope,
   ): Promise<HarnessPrepareResponseV1>;
-  /** `null` is the single "this confirmation and this input do not compose" answer. */
-  build(built: BuildInput): BuiltPayload | null;
-};
+} & (
+  | {
+      /** `null` is the single "this confirmation and this input do not compose" answer. */
+      build(built: BuildInput): BuiltPayload | null;
+    }
+  | {
+      /**
+       * A deliberate non-kernel execution: the capability runs a fan-out
+       * attempt whose per-target effects commit atomically inside the owner.
+       * Confirmation semantics are the callee's obligation.
+       */
+      fanout(
+        request: HarnessExecuteRequestV1,
+        row: NurtureInteractionContextRecord | null,
+        payload: HarnessConfirmationPayloadV2,
+      ): Promise<HarnessExecuteResponseV1>;
+    }
+);
 
 /**
  * Several capabilities take no typed input at all. Absent and `{}` are the two

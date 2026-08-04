@@ -526,6 +526,7 @@ components:
             - correct_publication
             - remove_publication_target_visibility
             - redact_publication
+            - release_publish_process
         capability_version:
           type: string
           const: 1.0.0
@@ -627,6 +628,7 @@ components:
             - correct_publication
             - remove_publication_target_visibility
             - redact_publication
+            - release_publish_process
         capability_version:
           type: string
           const: 1.0.0

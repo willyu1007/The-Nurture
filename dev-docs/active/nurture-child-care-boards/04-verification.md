@@ -958,3 +958,20 @@ semantic, not drift.
 | e2e raw-id wire scans skip most discard/safety envelopes | confirmed (coverage) | OPEN — tracked |
 | 9 lows (finalize re-resolves reach on its own clock; eventRef same-ms collision; detach replay answers from current composition; duplicate composition entries; concurrent-remove as technical_error; already_satisfied preview wording; test-name overclaim) | low | OPEN — triage recorded, fix opportunistically |
 | full gates after fixes: typecheck, unit 558, test:db 205, scenario-service:db 40, ingress/freeze/schema/routing/governance/docs | PASS |
+
+## 2026-08-04 — release_publish_process Fan-out Ingress
+
+| Command / check | Result |
+| --- | --- |
+| routed on formal ingress: actions 23 → 24, unrouted census 3 → 2 (organize, reschedule) | LANDED |
+| prepare/attempt gates share `resolveReleaseAttemptContext` — one source, no drift | LANDED |
+| `draft_revision must_equal` head frozen at prepare; save between prepare/execute → `stale_confirmation`, zero commits | PASS (unit + e2e) |
+| falsified: expected-revision guard removed | CAUGHT |
+| confirmation classified + CAS-consumed at service level; replay of a consumed confirmation → conflict | PASS (e2e) |
+| falsified: consume dropped — replay silently re-ran the attempt | CAUGHT (e2e) |
+| per-target atomic commit: release + Receipt + CommandExecution together, attempt hash as parent | PASS (e2e) |
+| reconciliation: re-prepare answers already_committed from stored rows; same sealed publicationRef; release row count stays 1 | PASS (e2e) |
+| mid-attempt grant revocation rejects its own target only; committed 1 / rejected 1 | PASS (e2e) |
+| wire scan: no process/release/receipt/grant/target raw id in any response | PASS |
+| execution_ref/output_refs name the attempt only (bounded; whole-class safe) | LANDED |
+| full gates: typecheck, unit 563, test:db 205, scenario-service:db 43, all verify:* | PASS |

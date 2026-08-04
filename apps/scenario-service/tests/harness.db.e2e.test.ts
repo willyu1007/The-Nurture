@@ -15,7 +15,7 @@ import {
   PUBLISH_PROCESS_TARGET_KIND,
   issuePolicyRedactionDecisionRef,
 } from "@the-nurture/scenario/harness";
-import { createPrismaClient, Prisma } from "@the-nurture/db";
+import { createPrismaClient, Prisma, publicationReleaseAttemptIdentity } from "@the-nurture/db";
 import { createScenarioServiceApplication } from "../src/application.js";
 import { createBindingOwnerServiceAuth } from "../src/binding-owner-service-auth.js";
 import { createHarnessRuntime } from "../src/harness-runtime.js";
@@ -3368,5 +3368,284 @@ describe("T-006 post-release safety through the formal Harness ingress", () => {
         operationInput: { reason: "family_request" },
       }).then((response) => response.json),
     ).resolves.toMatchObject({ status: "denied", reason_code: "target_unavailable" });
+  });
+});
+
+describe("G3-D release fan-out on the formal ingress", () => {
+  const seedQueuedRelease = async (scope: SeedScope, targetCount = 1) => {
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "pending_release",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: "sha256:content",
+        organizerInputRevision: "organizer:1",
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: revision.id },
+    });
+    const targets = [];
+    for (let index = 0; index < targetCount; index += 1) {
+      const grant = await prisma.nurtureChildLinkGrant.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          childCareProcessId: scope.process.id,
+          enrollmentId: scope.enrollment.id,
+          grantedByParticipantId: scope.guardian.id,
+          grantedToScopeType: "care_group",
+          grantedToScopeId: scope.group.id,
+          directions: ["org_to_family"],
+          dataClasses: ["child_growth_record"],
+          purposes: ["child_growth_publication"],
+          status: "active",
+        },
+      });
+      targets.push({
+        grant,
+        target: await prisma.nurturePublishProcessTarget.create({
+          data: {
+            workspaceId: scope.workspaceId,
+            publishProcessId: process.id,
+            targetKey: `target:${randomUUID()}`,
+            childCareProcessId: scope.process.id,
+            enrollmentId: scope.enrollment.id,
+            familyRefKey: `${scope.workspaceId}:${scope.process.id}:${index}`,
+            grantId: grant.id,
+          },
+        }),
+      });
+    }
+    return { process, revision, targets };
+  };
+
+  const releaseRef = (scope: SeedScope, processKey: string) =>
+    issueBoardSealedRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+      PUBLISH_PROCESS_TARGET_KIND,
+      processKey,
+    );
+
+  it("commits the target atomically and reconciles the repeat from stored rows", async () => {
+    const scope = await seedScope();
+    const { process, targets } = await seedQueuedRelease(scope);
+
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+    expect(prepared.json.preview).toEqual({
+      effect: "release_publish_process",
+      target_count: 1,
+      already_committed_count: 0,
+      release_revision: 1,
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared,
+    });
+    expect(executed.json).toMatchObject({
+      status: "committed",
+      execution_disposition: "executed",
+      business_outcome: "applied",
+    });
+    expect(executed.json.committed_result).toMatchObject({
+      processState: "released",
+      frozenRevision: 1,
+      summary: { total: 1, committed: 1, rejected: 0, outcomeUnknown: 0 },
+      missedSendAttention: false,
+    });
+    expect(executed.json.committed_result.results[0].outcome).toBe("committed");
+
+    // The three per-target facts landed together, and the execution names the
+    // attempt as its parent — the "one runner command per target" identity.
+    const release = await prisma.nurturePublicationRelease.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+    });
+    expect(release.receiptId).not.toBeNull();
+    const execution = await prisma.nurtureCommandExecution.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        commandKey: "release_publish_process",
+      },
+    });
+    expect(execution.parentCommandRequestIdHash).toBe(
+      publicationReleaseAttemptIdentity(prepared.json.command_request_id),
+    );
+    const stored = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(stored.state).toBe("released");
+    expect(stored.frozenRevisionId).not.toBeNull();
+
+    // No raw owner identifier reaches the wire.
+    const serialized = JSON.stringify(executed.json);
+    for (const raw of [
+      process.id,
+      process.processKey,
+      release.id,
+      release.receiptId,
+      targets[0]!.grant.id,
+      targets[0]!.target.id,
+    ]) {
+      expect(serialized).not.toContain(raw);
+    }
+
+    // The consumed confirmation is not replayable...
+    const replayed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared,
+      invocationSuffix: ":replay",
+    });
+    expect(replayed.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "confirmation_replayed",
+    });
+
+    // ...reconciliation is a fresh prepare, answered from stored rows.
+    const reprepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+    });
+    expect(reprepared.json.preview).toMatchObject({ already_committed_count: 1 });
+    const reconciled = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared: reprepared,
+    });
+    expect(reconciled.json.status).toBe("committed");
+    expect(reconciled.json.committed_result.results[0].outcome).toBe("already_committed");
+    expect(reconciled.json.committed_result.results[0].publicationRef).toBe(
+      executed.json.committed_result.results[0].publicationRef,
+    );
+    // Still exactly one release row: the repeat wrote nothing.
+    expect(
+      await prisma.nurturePublicationRelease.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(1);
+  });
+
+  it("keeps a mid-attempt grant revocation to its own target", async () => {
+    const scope = await seedScope();
+    const { process, targets } = await seedQueuedRelease(scope, 2);
+
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+    });
+    expect(prepared.json.preview).toMatchObject({ target_count: 2 });
+
+    // The family withdraws consent between prepare and execute: their target
+    // must stop, and no other family's rolls back with it.
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: targets[1]!.grant.id },
+      data: {
+        status: "revoked",
+        revokedAt: new Date(),
+        revokedByParticipantId: scope.guardian.id,
+      },
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared,
+    });
+    expect(executed.json.status).toBe("committed");
+    expect(executed.json.committed_result.summary).toEqual({
+      total: 2,
+      committed: 1,
+      rejected: 1,
+      outcomeUnknown: 0,
+    });
+    const outcomes = executed.json.committed_result.results.map(
+      (result: { outcome: string }) => result.outcome,
+    );
+    expect(outcomes.sort()).toEqual(["committed", "rejected"]);
+    expect(
+      await prisma.nurturePublicationRelease.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(1);
+  });
+
+  it("refuses stale_confirmation when a save lands between prepare and execute", async () => {
+    const scope = await seedScope();
+    const { process } = await seedQueuedRelease(scope);
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+
+    // A colleague saves revision 2 after the teacher confirmed revision 1.
+    const second = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        publishProcessId: process.id,
+        revision: 2,
+        contentDigest: "sha256:content-2",
+        organizerInputRevision: "organizer:2",
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: second.id },
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared,
+    });
+    expect(executed.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "stale_confirmation",
+      recovery: "reprepare",
+    });
+    expect(
+      await prisma.nurturePublicationRelease.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(0);
   });
 });

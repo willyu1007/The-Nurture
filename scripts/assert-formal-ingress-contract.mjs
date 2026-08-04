@@ -63,7 +63,6 @@ const expectedHarnessActionKeys = [
  */
 const expectedUnroutedCapabilityKeys = [
   "organize_care_capture_batch",
-  "release_publish_process",
   "reschedule_publish_process",
 ];
 const expectedOwnerRequiredFields = [

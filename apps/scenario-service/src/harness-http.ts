@@ -46,6 +46,7 @@ export const HARNESS_CAPABILITY_VERSIONS = {
   correct_publication: "1.0.0",
   remove_publication_target_visibility: "1.0.0",
   redact_publication: "1.0.0",
+  release_publish_process: "1.0.0",
 } as const;
 
 export const HARNESS_QUERY_CAPABILITY_VERSIONS = {
