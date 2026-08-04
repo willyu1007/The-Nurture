@@ -644,16 +644,15 @@ describe("G3-D owner reads: post-release safety", () => {
       }),
     ).toEqual([]);
     // A teacher of another class can never name this process key — sealed refs
-    // resolve only against their own list. Asked directly, the port still
-    // answers with the authority that decides, and it says no match, so the
-    // domain refuses with `not_authorized` rather than pretending the card is
-    // missing.
+    // resolve only against their own list. Asked directly, the authority
+    // question is asked of the process's OWN class, where the outsider holds
+    // nothing: the facts are absent entirely.
     const foreign = await port.loadPublicationSafetyFacts({
       workspace_id: world.workspaceId,
       participant_id: world.outsider.id,
       process_key: process.processKey,
     });
-    expect(foreign?.authority.role_scope_matches_source).toBe(false);
+    expect(foreign).toBeNull();
   });
 
   it("reports the composed media revision against the asset's current one", async () => {

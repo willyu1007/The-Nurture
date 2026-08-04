@@ -6,7 +6,7 @@ import type {
 } from "@the-nurture/scenario/harness";
 import {
   caregiverRowAuthority,
-  resolveCaregiverReach,
+  resolveCaregiverReachFor,
   type BoardPrisma,
 } from "./board-read-support.js";
 
@@ -38,13 +38,6 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
     participant_id: string;
     process_key: string;
   }): Promise<NurturePublicationSafetyWriteFacts | null> {
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      new Date(),
-    );
-    if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
       include: {
@@ -58,6 +51,15 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
       },
     });
     if (!process) return null;
+    // The row names its class; authority is asked of exactly that class.
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      process.careGroupId,
+      new Date(),
+    );
+    if (!reach) return null;
     return {
       authority: caregiverRowAuthority(reach, process.careGroupId),
       actor_role_assignment_id: reach.role_assignment_id,

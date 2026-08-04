@@ -376,9 +376,9 @@ describe("G3-C1 owner reads: media attribution", () => {
       participant_id: world.teacher.id,
       media_asset_id: foreign.id,
     });
-    // The asset is found but carries no matching authority, so the domain rule
-    // refuses it instead of the repository quietly widening the scope.
-    expect(facts?.authority.role_scope_matches_source).toBe(false);
+    // The authority question is asked of the asset's OWN class, where this
+    // teacher holds nothing: the facts are absent, not merely flagged.
+    expect(facts).toBeNull();
     expect(
       await reads.listAttributableMediaIds({
         workspace_id: world.workspaceId,

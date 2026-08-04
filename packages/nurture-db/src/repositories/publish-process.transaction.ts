@@ -12,7 +12,7 @@ import { NO_PUBLISH_EDIT_HOLD_VERSION } from "@the-nurture/scenario/harness";
 import {
   caregiverRowAuthority,
   readMediaComposition,
-  resolveCaregiverReach,
+  resolveCaregiverReachFor,
   type BoardPrisma,
   type CaregiverReachV1,
 } from "./board-read-support.js";
@@ -61,17 +61,19 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
     participant_id: string;
     process_key: string;
   }): Promise<NurturePublishProcessCancelFacts | null> {
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      new Date(),
-    );
-    if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
     });
     if (!process) return null;
+    // The row names its class; authority is asked of exactly that class.
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      process.careGroupId,
+      new Date(),
+    );
+    if (!reach) return null;
     // Any committed per-target release closes the pre-release cancel window,
     // whatever the process state currently says.
     const committed = await this.prisma.nurturePublicationRelease.count({
@@ -116,18 +118,19 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
     process: { id: string; careGroupId: string; currentRevisionId: string | null };
   } | null> {
     const readAt = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      readAt,
-    );
-    if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
       include: { editHold: { include: { holder: true } } },
     });
     if (!process) return null;
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      process.careGroupId,
+      readAt,
+    );
+    if (!reach) return null;
     const hold = process.editHold;
     return {
       reach,

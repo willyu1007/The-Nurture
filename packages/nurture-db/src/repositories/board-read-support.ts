@@ -137,16 +137,22 @@ export type CaregiverReachV1 = {
 
 const CAREGIVER_BOARD_ROLES = ["caregiver", "lead_caregiver"] as const;
 
-export const resolveCaregiverReach = async (
+/**
+ * EVERY CareGroup this participant currently holds a caregiver role in.
+ * Key listings must union over these — a listing built from "the first
+ * group" made a two-class teacher's second class unreachable through every
+ * sealed ref that resolves against it.
+ */
+export const resolveCaregiverReaches = async (
   prisma: BoardPrisma,
   workspaceId: string,
   participantId: string,
   at: Date,
-): Promise<CaregiverReachV1 | null> => {
+): Promise<CaregiverReachV1[]> => {
   const participant = await prisma.nurtureParticipant.findFirst({
     where: { id: participantId, workspaceId, status: "active", deletedAt: null },
   });
-  if (!participant) return null;
+  if (!participant) return [];
   const roles = await prisma.nurtureCareRoleAssignment.findMany({
     where: {
       workspaceId,
@@ -157,12 +163,16 @@ export const resolveCaregiverReach = async (
     },
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
   });
+  const reaches: CaregiverReachV1[] = [];
+  const seenGroups = new Set<string>();
   for (const role of roles) {
+    if (seenGroups.has(role.scopeId)) continue;
     const group = await prisma.nurtureCareGroup.findFirst({
       where: { id: role.scopeId, workspaceId, status: "active", deletedAt: null },
     });
     if (!group) continue;
-    return {
+    seenGroups.add(group.id);
+    reaches.push({
       care_group_id: group.id,
       care_group_label: group.name,
       institution_id: group.institutionId,
@@ -170,9 +180,71 @@ export const resolveCaregiverReach = async (
       role_assignment_id: role.id,
       role_version: role.aggregateVersion,
       care_group_version: group.aggregateVersion,
-    };
+    });
   }
-  return null;
+  return reaches;
+};
+
+/**
+ * The reach for one EXACT CareGroup — the shape every row-scoped fact load
+ * and write must use: the row names its group, and the authority question is
+ * "does this participant hold that group now", never "whichever group comes
+ * first".
+ */
+export const resolveCaregiverReachFor = async (
+  prisma: BoardPrisma,
+  workspaceId: string,
+  participantId: string,
+  careGroupId: string,
+  at: Date,
+): Promise<CaregiverReachV1 | null> => {
+  const participant = await prisma.nurtureParticipant.findFirst({
+    where: { id: participantId, workspaceId, status: "active", deletedAt: null },
+  });
+  if (!participant) return null;
+  const role = await prisma.nurtureCareRoleAssignment.findFirst({
+    where: {
+      workspaceId,
+      participantId,
+      role: { in: [...CAREGIVER_BOARD_ROLES] },
+      scopeType: "care_group",
+      scopeId: careGroupId,
+      ...activeRoleWindow(at),
+    },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+  });
+  if (!role) return null;
+  const group = await prisma.nurtureCareGroup.findFirst({
+    where: { id: careGroupId, workspaceId, status: "active", deletedAt: null },
+  });
+  if (!group) return null;
+  return {
+    care_group_id: group.id,
+    care_group_label: group.name,
+    institution_id: group.institutionId,
+    role: role.role,
+    role_assignment_id: role.id,
+    role_version: role.aggregateVersion,
+    care_group_version: group.aggregateVersion,
+  };
+};
+
+/**
+ * The single-class board posture: the board surface is exact_bound to one
+ * class, and until the board-level class selector is amended into the
+ * contract it presents the first current class. Capability lanes must NOT
+ * use this — they take the row's own group through
+ * `resolveCaregiverReachFor`, or union listings over
+ * `resolveCaregiverReaches`.
+ */
+export const resolveCaregiverReach = async (
+  prisma: BoardPrisma,
+  workspaceId: string,
+  participantId: string,
+  at: Date,
+): Promise<CaregiverReachV1 | null> => {
+  const reaches = await resolveCaregiverReaches(prisma, workspaceId, participantId, at);
+  return reaches[0] ?? null;
 };
 
 /** The authority every caregiver-lane row carries, measured against its source. */

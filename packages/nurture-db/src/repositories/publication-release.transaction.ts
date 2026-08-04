@@ -16,7 +16,8 @@ import {
   activeRoleWindow,
   caregiverRowAuthority,
   readMediaComposition,
-  resolveCaregiverReach,
+  resolveCaregiverReachFor,
+  resolveCaregiverReaches,
 } from "./board-read-support.js";
 
 const RELEASE_COMMAND_KEY = "release_publish_process";
@@ -75,15 +76,20 @@ export class PrismaPublicationReleasePort
     workspace_id: string;
     participant_id: string;
   }): Promise<string[]> {
-    const reach = await resolveCaregiverReach(
+    // Every class this caregiver currently holds: a listing built from "the
+    // first class" made the second class's sealed refs unresolvable.
+    const reaches = await resolveCaregiverReaches(
       this.prisma,
       input.workspace_id,
       input.participant_id,
       new Date(),
     );
-    if (!reach) return [];
+    if (reaches.length === 0) return [];
     const processes = await this.prisma.nurturePublishProcess.findMany({
-      where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: { in: reaches.map((reach) => reach.care_group_id) },
+      },
       select: { processKey: true },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
@@ -110,13 +116,6 @@ export class PrismaPublicationReleasePort
     process_key: string;
   }): Promise<ReleaseFactsV1 | null> {
     const at = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      at,
-    );
-    if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
       include: {
@@ -133,6 +132,15 @@ export class PrismaPublicationReleasePort
       },
     });
     if (!process) return null;
+    // The row names its class; the authority question is about THAT class.
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      process.careGroupId,
+      at,
+    );
+    if (!reach) return null;
 
     const schedule = readResolvedSchedule(process);
 
@@ -258,14 +266,6 @@ export class PrismaPublicationReleasePort
     command_request_id: string;
   }): Promise<CommitTargetReleaseResultV1> {
     const at = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      at,
-    );
-    if (!reach) return { status: "rejected", reason_code: "not_authorized" };
-
     const commandHash = publicationReleaseCommandIdentity(input.command_request_id, input.target_key);
 
     try {
@@ -274,7 +274,6 @@ export class PrismaPublicationReleasePort
           where: {
             workspaceId: input.workspace_id,
             processKey: input.process_key,
-            careGroupId: reach.care_group_id,
           },
             include: {
             targets: {
@@ -284,6 +283,18 @@ export class PrismaPublicationReleasePort
           },
         });
         if (!process) return { status: "rejected", reason_code: "target_unavailable" };
+        // Authority against the process's own class, re-read inside the
+        // transaction — never "whichever class comes first". The refusal is
+        // target_unavailable, the same answer an unresolvable sealed ref
+        // gives: an unauthorized caller learns nothing about existence.
+        const reach = await resolveCaregiverReachFor(
+          tx as never,
+          input.workspace_id,
+          input.participant_id,
+          process.careGroupId,
+          at,
+        );
+        if (!reach) return { status: "rejected", reason_code: "target_unavailable" };
         const target = process.targets[0];
         if (!target) return { status: "rejected", reason_code: "target_unavailable" };
 
@@ -418,13 +429,6 @@ export class PrismaPublicationReleasePort
     process_key: string;
   }): Promise<PublicationSafetyFactsV1 | null> {
     const at = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      at,
-    );
-    if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId: input.workspace_id, processKey: input.process_key },
       include: {
@@ -439,6 +443,14 @@ export class PrismaPublicationReleasePort
       },
     });
     if (!process) return null;
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      process.careGroupId,
+      at,
+    );
+    if (!reach) return null;
 
     return {
       authority: caregiverRowAuthority(reach, process.careGroupId) as CaregiverFactAuthorityV1,

@@ -1907,3 +1907,27 @@ revision-0 草稿保存的仓储契约问题按复核裁定属于本 lane:organi
 受限路由与候选创建的分离(把 direct 路由也建 process)→ e2e CAUGHT;
 capture_batch 头(prepare 后新采集到达)→ `stale_confirmation` e2e 钉住;
 phase-2 普查在三张名单更新前先行咬住(工厂数、头映射、debt 名单)。
+
+## 2026-08-05 — G3-E 自备:双班照护者盲点清除
+
+G3-E 就绪评审点名的已知缺陷:`resolveCaregiverReach` 返回"第一个班",两个班的
+老师的第二个班在全部能力 lane 里不可达。修复分三类,共 17 处调用点迁移:
+
+- **键/资产列表**(release/safety/editable 键、可归属媒体)→
+  `resolveCaregiverReaches`:并集覆盖该参与者当前全部班级,第二个班的 sealed ref
+  从此可解析。
+- **行范围事实与写**(cancel/hold/draft、release facts、commitTargetRelease、
+  safety write facts、attribution 四方法、media lifecycle、publish-lane
+  loadProcess)→ 先取行、再 `resolveCaregiverReachFor(行自己的班)`:授权问题问
+  的是"这个参与者现在是否持有**这一班**",不再是"随便哪个班先来"。附带的语义
+  收紧:同级班照护者现在连事实都读不到(null / target_unavailable),不再拿到
+  `matches_source: false` 的 authority——四个负例断言随之更新,拒绝形状与
+  sealed-ref 的存在性隐藏纪律一致。
+- **看板范围**(teacher board scope / child today)保持单班 posture:三条看板
+  query 是 `exact_bound`,板级班选择器是另一次合同修订(与 organize 同型),
+  记录为后续决定;`resolveCaregiverReach` 保留但注释限定"仅看板 posture 使用,
+  能力 lane 禁用"。teacher publish queue 改为按**被请求的班**精确解析
+  (此前第二个班直接 unauthorized)。
+
+正面证明:双班老师两个班的键都在列表、第二班的行以第二班的 authority 加载
+(`matches_source: true`);证伪(单点回退到 first-group)CAUGHT。

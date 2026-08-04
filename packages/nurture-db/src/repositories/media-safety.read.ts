@@ -13,7 +13,8 @@ import type {
 import {
   caregiverRowAuthority,
   readMediaComposition,
-  resolveCaregiverReach,
+  resolveCaregiverReachFor,
+  resolveCaregiverReaches,
   type BoardPrisma,
 } from "./board-read-support.js";
 
@@ -199,17 +200,18 @@ export class PrismaMediaSafetyReadPort
     workspace_id: string;
     participant_id: string;
   }): Promise<string[]> {
-    const reach = await resolveCaregiverReach(
+    // Every class this caregiver currently holds, not just the first.
+    const reaches = await resolveCaregiverReaches(
       this.prisma,
       input.workspace_id,
       input.participant_id,
       new Date(),
     );
-    if (!reach) return [];
+    if (reaches.length === 0) return [];
     const assets = await this.prisma.nurtureMediaAssetRef.findMany({
       where: {
         workspaceId: input.workspace_id,
-        careGroupId: reach.care_group_id,
+        careGroupId: { in: reaches.map((reach) => reach.care_group_id) },
         deletedAt: null,
       },
       select: { id: true },
@@ -224,13 +226,6 @@ export class PrismaMediaSafetyReadPort
     media_asset_id: string;
   }): Promise<MediaAttributionFactsV1 | null> {
     const at = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      at,
-    );
-    if (!reach) return null;
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
       include: {
@@ -240,7 +235,16 @@ export class PrismaMediaSafetyReadPort
         },
       },
     });
-    if (!asset) return null;
+    if (!asset || !asset.careGroupId) return null;
+    // The asset names its class; authority is asked of exactly that class.
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      asset.careGroupId,
+      at,
+    );
+    if (!reach) return null;
 
     const enrollments = await this.prisma.nurtureEnrollment.findMany({
       where: {
@@ -288,17 +292,18 @@ export class PrismaMediaSafetyReadPort
     process_key?: string;
   }): Promise<MediaLifecycleFactsV1 | null> {
     const at = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      at,
-    );
-    if (!reach) return null;
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
     });
-    if (!asset) return null;
+    if (!asset || !asset.careGroupId) return null;
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      asset.careGroupId,
+      at,
+    );
+    if (!reach) return null;
 
     const process = input.process_key
       ? await this.prisma.nurturePublishProcess.findFirst({

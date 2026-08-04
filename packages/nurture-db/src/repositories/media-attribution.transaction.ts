@@ -9,7 +9,7 @@ import type {
 import {
   caregiverRowAuthority,
   readMediaComposition,
-  resolveCaregiverReach,
+  resolveCaregiverReachFor,
   type BoardPrisma,
   type CaregiverReachV1,
 } from "./board-read-support.js";
@@ -44,13 +44,6 @@ export class PrismaMediaAttributionTransaction implements NurtureMediaAttributio
     media_asset_id: string;
   }): Promise<NurtureMediaAttributionWriteFacts | null> {
     const readAt = new Date();
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      readAt,
-    );
-    if (!reach) return null;
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
       include: {
@@ -60,7 +53,16 @@ export class PrismaMediaAttributionTransaction implements NurtureMediaAttributio
         },
       },
     });
-    if (!asset) return null;
+    if (!asset || !asset.careGroupId) return null;
+    // The asset names its class; authority is asked of exactly that class.
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      asset.careGroupId,
+      readAt,
+    );
+    if (!reach) return null;
 
     const enrollments = await this.prisma.nurtureEnrollment.findMany({
       where: {
@@ -93,17 +95,20 @@ export class PrismaMediaAttributionTransaction implements NurtureMediaAttributio
     media_asset_ref: DomainContextRef;
     rows: NurtureAttributionAppendedRow[];
   }> {
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      new Date(),
-    );
-    if (!reach) throw new Error("nurture attribution: target unavailable");
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
     });
-    if (!asset) throw new Error("nurture attribution: target unavailable");
+    if (!asset || !asset.careGroupId) {
+      throw new Error("nurture attribution: target unavailable");
+    }
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      asset.careGroupId,
+      new Date(),
+    );
+    if (!reach) throw new Error("nurture attribution: target unavailable");
 
     // One instant for the whole decision: every appended row is created at it,
     // and for a confirmation it is also the confirmation instant — so the
@@ -183,17 +188,18 @@ export class PrismaMediaAttributionTransaction implements NurtureMediaAttributio
     participant_id: string;
     media_asset_id: string;
   }): Promise<NurtureMediaDiscardFacts | null> {
-    const reach = await resolveCaregiverReach(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      new Date(),
-    );
-    if (!reach) return null;
     const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
       where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
     });
-    if (!asset) return null;
+    if (!asset || !asset.careGroupId) return null;
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      asset.careGroupId,
+      new Date(),
+    );
+    if (!reach) return null;
     const counts = await this.mediaReferenceCounts(input.workspace_id, reach, asset.id);
     return {
       authority: caregiverRowAuthority(reach, asset.careGroupId),
@@ -211,10 +217,18 @@ export class PrismaMediaAttributionTransaction implements NurtureMediaAttributio
     media_asset_id: string;
     expected_media_revision: number;
   }): Promise<{ media_asset_ref: DomainContextRef; affected_draft_count: number }> {
-    const reach = await resolveCaregiverReach(
+    const assetRow = await this.prisma.nurtureMediaAssetRef.findFirst({
+      where: { id: input.media_asset_id, workspaceId: input.workspace_id, deletedAt: null },
+      select: { careGroupId: true },
+    });
+    if (!assetRow || !assetRow.careGroupId) {
+      throw new Error("nurture media discard: target unavailable");
+    }
+    const reach = await resolveCaregiverReachFor(
       this.prisma,
       input.workspace_id,
       input.participant_id,
+      assetRow.careGroupId,
       new Date(),
     );
     if (!reach) throw new Error("nurture media discard: target unavailable");

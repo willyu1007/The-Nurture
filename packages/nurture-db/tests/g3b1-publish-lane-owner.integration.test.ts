@@ -507,6 +507,54 @@ describe("G3-B1 owner reads: edit hold, draft and cancel", () => {
     expect(facts?.process_state).toBe("draft");
   });
 
+  it("reaches BOTH classes of a dual-class caregiver, not just the first", async () => {
+    // The blind spot in the flesh: Teacher Lin also takes Class B. Every
+    // listing must union both classes, and a Class B row must load with the
+    // authority of Class B — "the first class" answered for both before.
+    const world = await seedGroup();
+    await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: world.teacher.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: world.otherGroup.id,
+        status: "active",
+        displayLabel: "Teacher Lin (B)",
+      },
+    });
+    const inFirst = await seedProcess(world);
+    const inSecond = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: world.workspaceId,
+        careGroupId: world.otherGroup.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
+    const reads = new PrismaPublishLaneReadPort(prisma, protectedContent);
+    const keys = await reads.listEditableProcessKeys({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+    });
+    expect(keys).toContain(inFirst.process.processKey);
+    expect(keys).toContain(inSecond.processKey);
+
+    // The Class B row answers with Class B authority, matched to its source.
+    const owner = new PrismaPublishProcessTransaction(prisma);
+    const facts = await owner.loadPublishProcessCancelFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: inSecond.processKey,
+    });
+    expect(facts?.authority).toMatchObject({
+      role_scope_matches_source: true,
+      role_assignment_current: true,
+    });
+  });
+
   it("resolves a process key only while the actor still reaches its class", async () => {
     const world = await seedGroup();
     const { process } = await seedProcess(world);
@@ -841,15 +889,18 @@ describe("T-006 owner write: pre-release publish-process cancel", () => {
         status: "active",
       },
     });
-    // Reachable, but not for this CareGroup: the authority says so rather than
-    // the read hiding the row.
+    // The authority question is asked of the process's OWN class, so a
+    // sibling-class caregiver holds no reach there at all: the facts are
+    // absent, not merely flagged. (The old shape answered with
+    // role_scope_matches_source=false from whichever class came first —
+    // the dual-class blind spot in mirror image.)
     expect(
       await owner.loadPublishProcessCancelFacts({
         workspace_id: world.workspaceId,
         participant_id: outsider.id,
         process_key: process.processKey,
       }),
-    ).toMatchObject({ authority: { role_scope_matches_source: false } });
+    ).toBeNull();
 
     await prisma.nurtureCareRoleAssignment.update({
       where: { id: world.teacherRole.id },

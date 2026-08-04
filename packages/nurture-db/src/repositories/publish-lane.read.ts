@@ -20,7 +20,8 @@ import {
   aggregateCensus,
   caregiverRowAuthority,
   censusOf,
-  resolveCaregiverReach,
+  resolveCaregiverReachFor,
+  resolveCaregiverReaches,
   sourceHeadPair,
   type BoardPrisma,
   type CaregiverReachV1,
@@ -119,13 +120,16 @@ export class PrismaPublishLaneReadPort
       PUBLISH_STATES.map((state) => [state, 0]),
     ) as Record<PublishProcessStateV1, number>;
     const at = new Date(input.snapshot_at);
-    const reach = await resolveCaregiverReach(
+    // The requested class, exactly — a two-class teacher's second class is as
+    // much theirs as the first.
+    const reach = await resolveCaregiverReachFor(
       this.prisma,
       input.workspace_id,
       input.participant_id,
+      input.care_group_id,
       at,
     );
-    if (!reach || reach.care_group_id !== input.care_group_id) {
+    if (!reach) {
       return {
         authorized: false,
         rows: [],
@@ -238,15 +242,18 @@ export class PrismaPublishLaneReadPort
     workspace_id: string;
     participant_id: string;
   }): Promise<string[]> {
-    const reach = await resolveCaregiverReach(
+    const reaches = await resolveCaregiverReaches(
       this.prisma,
       input.workspace_id,
       input.participant_id,
       new Date(),
     );
-    if (!reach) return [];
+    if (reaches.length === 0) return [];
     const processes = await this.prisma.nurturePublishProcess.findMany({
-      where: { workspaceId: input.workspace_id, careGroupId: reach.care_group_id },
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: { in: reaches.map((reach) => reach.care_group_id) },
+      },
       select: { processKey: true },
       orderBy: [{ createdAt: "asc" }, { id: "asc" }],
     });
@@ -259,8 +266,6 @@ export class PrismaPublishLaneReadPort
     processKey: string,
   ) {
     const at = new Date();
-    const reach = await resolveCaregiverReach(this.prisma, workspaceId, participantId, at);
-    if (!reach) return null;
     const process = await this.prisma.nurturePublishProcess.findFirst({
       where: { workspaceId, processKey },
       include: {
@@ -269,6 +274,14 @@ export class PrismaPublishLaneReadPort
       },
     });
     if (!process) return null;
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      workspaceId,
+      participantId,
+      process.careGroupId,
+      at,
+    );
+    if (!reach) return null;
     return { at, reach, process };
   }
 
