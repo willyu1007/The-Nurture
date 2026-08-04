@@ -1,5 +1,6 @@
 import type { AddressInfo } from "node:net";
 import { randomUUID } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   INSTITUTION_BUSINESS_COMMUNICATION_INTERFACE,
@@ -76,9 +77,37 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  const evidencePath = new URL(
+    "../../../.ai/.tmp/test-results/owner-integration-evidence.json",
+    import.meta.url,
+  );
+  await mkdir(new URL(".", evidencePath), { recursive: true });
+  await writeFile(
+    evidencePath,
+    JSON.stringify(
+      Object.fromEntries(
+        Object.entries(capabilityEvidence).map(([key, statuses]) => [key, [...statuses].sort()]),
+      ),
+      null,
+      2,
+    ),
+  );
   await closeService?.();
   await prisma.$disconnect();
 });
+
+/**
+ * Runtime capability evidence for `verify:owner-integration`: every call that
+ * actually succeeded on the real path is recorded, and the census reads the
+ * artifact instead of grepping literals — a refusal-only test, a comment or a
+ * skipped block can no longer count as end-to-end evidence.
+ */
+const capabilityEvidence: Record<string, Set<string>> = {};
+const recordEvidence = (body: unknown, json: { status?: string }): void => {
+  const key = (body as { capability_key?: string })?.capability_key;
+  if (!key || typeof json?.status !== "string") return;
+  (capabilityEvidence[key] ??= new Set()).add(json.status);
+};
 
 const post = async (
   path: string,
@@ -93,7 +122,9 @@ const post = async (
     },
     body: JSON.stringify(body),
   });
-  return { status: response.status, json: await response.json(), headers: response.headers };
+  const json = await response.json();
+  recordEvidence(body, json as { status?: string });
+  return { status: response.status, json, headers: response.headers };
 };
 
 const seedScope = async () => {
@@ -2037,7 +2068,22 @@ describe("G3-A board lane through the formal Harness ingress", () => {
     });
     expect(childToday.status).toBe(200);
     expect(childToday.json.status).toBe("ok");
+    // The seeded class has one enrolled child; a content-free "ok" would let
+    // an empty projection pass as evidence.
+    expect(childToday.json.output.children).toHaveLength(1);
+    expect(JSON.stringify(childToday.json)).not.toContain(scope.process.id);
 
+    // Seed a real draft so the queue projects a non-trivial state count.
+    await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "draft",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+      },
+    });
     const queue = await post(HARNESS_QUERY_PATH, {
       workspace_id: scope.workspaceId,
       actor_participant_id: scope.caregiver.id,
@@ -2047,7 +2093,23 @@ describe("G3-A board lane through the formal Harness ingress", () => {
     });
     expect(queue.status).toBe(200);
     expect(queue.json.status).toBe("ok");
+    expect(queue.json.output.counts.draft).toBe(1);
     expect(JSON.stringify(queue.json)).not.toContain(scope.group.id);
+
+    // The teacher board itself, on the ok path — its only prior e2e coverage
+    // was the guardian-refusal test, which the runtime census rightly rejects
+    // as evidence.
+    const board = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "query_caregiver_teacher_board",
+      capability_version: "1.0.0",
+    });
+    expect(board.status).toBe(200);
+    expect(board.json.status).toBe("ok");
+    expect(board.json.output.surfaceKey).toBe("caregiver_teacher_board");
+    expect(JSON.stringify(board.json)).not.toContain(scope.group.id);
   });
 
   it("refuses the caregiver board to a guardian and the guardian board to a caregiver", async () => {
@@ -2874,6 +2936,35 @@ describe("T-006 attribution lane through the formal Harness ingress", () => {
       },
     });
     expect(linked.supersededByAttributionId).not.toBeNull();
+  });
+
+  it("commits a rejection: the candidate's next revision records the decision", async () => {
+    // The runtime evidence census exposed this gap: reject had only
+    // refusal-path e2e coverage, which is not real-path evidence.
+    const scope = await seedScope();
+    const { asset } = await seedAttributableAsset(scope);
+    const rejected = await prepareAndExecute({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reject_child_media_attribution",
+      targetOptionRef: mediaRefFor(scope, scope.caregiver.id, asset.id),
+      operationInput: { childRef: childRefFor(scope, scope.caregiver.id, scope.process.id) },
+    });
+    expect(rejected.executed?.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+    const current = await prisma.nurtureChildMediaAttribution.findFirstOrThrow({
+      where: {
+        workspaceId: scope.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: scope.process.id,
+      },
+      orderBy: { attributionRevision: "desc" },
+    });
+    expect(current.state).toBe("rejected");
+    expect(JSON.stringify(rejected.executed?.json)).not.toContain(asset.id);
   });
 
   it("refuses a guardian, a stale head, and a resubmitted child that differs from the prepared one", async () => {

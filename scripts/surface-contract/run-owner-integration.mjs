@@ -21,14 +21,10 @@ const httpSource = readFileSync(
   path.join(repoRoot, "apps/scenario-service/src/harness-http.ts"),
   "utf8",
 );
-const e2eSource = readFileSync(
-  path.join(repoRoot, "apps/scenario-service/tests/harness.db.e2e.test.ts"),
-  "utf8",
-);
-
 const [actionBlock, queryBlock] = httpSource.split("HARNESS_QUERY_CAPABILITY_VERSIONS");
+// [a-z0-9_]: a key containing a digit must be censused, not silently skipped.
 const keysOf = (block) =>
-  [...block.matchAll(/^\s+([a-z_]+): "\d+\.\d+\.\d+",$/gm)].map((match) => match[1]);
+  [...block.matchAll(/^\s+([a-z0-9_]+): "\d+\.\d+\.\d+",$/gm)].map((match) => match[1]);
 const actionKeys = keysOf(actionBlock);
 const queryKeys = keysOf(queryBlock).filter((key) => key.startsWith("query_"));
 
@@ -36,22 +32,33 @@ if (actionKeys.length === 0 || queryKeys.length === 0) {
   throw new Error("owner integration census: failed to read the admitted key sets");
 }
 
-// Census: every admitted key must appear as an exercised capability in the
-// end-to-end suite. Grepping the literal is deliberately blunt — a key that
-// is admitted but never even NAMED by the e2e file has no real-path evidence,
-// whatever else may cover it.
-const unexercised = [...actionKeys, ...queryKeys].filter(
-  (key) => !e2eSource.includes(`"${key}"`),
+// The evidence itself: the formal service booted for real, driven over HTTP,
+// against disposable PostgreSQL — plus the binding-owner journey suite. The
+// run also writes the runtime capability-evidence artifact the census reads.
+execFileSync("pnpm", ["test:scenario-service:db"], { cwd: repoRoot, stdio: "inherit" });
+
+// Census over RUNTIME evidence, not literals: a key counts only when a real
+// HTTP call actually succeeded on it — a refusal-only test, a comment or a
+// skipped block cannot stand in for end-to-end evidence.
+const evidence = JSON.parse(
+  readFileSync(
+    path.join(repoRoot, ".ai/.tmp/test-results/owner-integration-evidence.json"),
+    "utf8",
+  ),
 );
-if (unexercised.length > 0) {
+const missingPositive = [
+  ...actionKeys
+    .filter((key) => !(evidence[key] ?? []).includes("committed"))
+    .map((key) => `${key} (no committed execution)`),
+  ...queryKeys
+    .filter((key) => !(evidence[key] ?? []).includes("ok"))
+    .map((key) => `${key} (no ok read)`),
+];
+if (missingPositive.length > 0) {
   throw new Error(
-    `owner integration census: admitted keys with no end-to-end evidence: ${unexercised.join(", ")}`,
+    `owner integration census: admitted keys without positive real-path evidence: ${missingPositive.join(", ")}`,
   );
 }
-
-// The evidence itself: the formal service booted for real, driven over HTTP,
-// against disposable PostgreSQL — plus the binding-owner journey suite.
-execFileSync("pnpm", ["test:scenario-service:db"], { cwd: repoRoot, stdio: "inherit" });
 
 const manifest = JSON.parse(readFileSync(generatedManifestPath, "utf8"));
 const contract = manifest.interfaceContract;
@@ -61,7 +68,7 @@ process.stdout.write(
     "[ok] owner-integration evidence layer",
     `  interface=${contract.key}@${contract.version} ${contract.digest}`,
     `  ingress-actions=${actionKeys.length} ingress-queries=${queryKeys.length} unexercised=0`,
-    "  path=formal scenario-service HTTP + real PostgreSQL (harness.db.e2e + binding-owner e2e)",
+    "  path=formal scenario-service HTTP + real PostgreSQL, runtime-recorded per-key evidence",
     "  joint-conformance=NOT-RUN (T-007 provider and T-005 G2-C joint runs are gated externally)",
     "",
   ].join("\n"),

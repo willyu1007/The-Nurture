@@ -1017,3 +1017,21 @@ semantic, not drift.
 | `verify:owner-integration`: census of all 25 actions + 9 queries against real-path e2e evidence, then the suites (49 + 6 on real HTTP + PostgreSQL) | PASS — falsified (split literal): CAUGHT |
 | three queries previously without real-path evidence now exercised end to end | FIXED |
 | full suites: unit 563, db 208, scenario-service e2e 49; all DB-free gates | PASS |
+
+## 2026-08-05 — Adversarial Review of the G3-E Self-Prep Units (14-agent workflow)
+
+Three lenses (authority/leakage, cross-layer consistency, evidence vacuity),
+each finding adversarially verified. 10 confirmed (1 refuted), all fixed in the
+same pass:
+
+| Finding (deduplicated) | Disposition |
+| --- | --- |
+| HIGH — standalone `query_guardian_enrollment_activity` served family-B rows under family-A drift heads, snapshot version and scopeRef: a family-B redaction never invalidated an open family-B page set (two lenses found it independently) | FIXED — the query rebinds its scope facts to the selected enrollment's family before deriving heads, cursor identity and scopeRef |
+| Envelope auto-default mixed families: a unique eligible enrollment in a non-earliest family produced family-A label/focus over family-B activity | FIXED — selection (explicit OR auto-unique) is computed first and the rebind covers both; falsified by re-gating on the explicit ref only: CAUGHT |
+| standalone `query_guardian_current_focus` could never follow a family-B binding | FIXED — optional owner-issued enrollment option wired through the runtime, rebinds the module's family |
+| owner-integration census greps literals: refusal-only coverage counted as evidence (`query_caregiver_teacher_board` had exactly that), digit-bearing keys silently skipped | FIXED — the census now reads RUNTIME evidence the e2e run records per key (actions must show a committed execution, queries an ok read); regex widened. The new census immediately caught `reject_child_media_attribution` with refusal-only coverage — a committed rejection e2e now exists |
+| three new query e2e cases asserted only status ok (vacuous wire scans) | FIXED — child_today asserts the projected child, queue asserts a seeded draft count, teacher board gains its ok path |
+| dual-class listing union pinned only for the publish lane | FIXED — release keys and attributable media assert both classes in the dual-class fixture |
+| presenter rebind untested at every layer | FIXED — envelope unit tests for explicit rebind and auto-unique rebind (label, snapshot version, module bind threading); falsified: CAUGHT |
+| `tx as never` in commitTargetRelease | FIXED — plain `tx` typechecks |
+| full battery after fixes: typecheck, unit 565, db 208, e2e 50, populations, all verify:*, governance lint | PASS |

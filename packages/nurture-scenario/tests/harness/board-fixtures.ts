@@ -154,6 +154,8 @@ export const childToday = (
 
 export type GuardianPortConfig = {
   scope?: Partial<GuardianBoardScopeFacts>;
+  /** Full scope facts served for an explicit `bind_family_id` request. */
+  families?: Record<string, GuardianBoardScopeFacts>;
   charter?: RawGuardianCharter;
   goals?: RawGuardianFocusGoal[];
   focusHeads?: RawBoardSourceHead[];
@@ -185,6 +187,23 @@ export const createGuardianReadPort = (
     async loadGuardianScope(input) {
       scopeReads.push(input.snapshot_at);
       snapshotInstants.push(input.snapshot_at);
+      // The owner posture: an explicit bind wins; an unreachable bind refuses.
+      if (input.bind_family_id) {
+        const bound = (config.families ?? {})[input.bind_family_id];
+        if (!bound) {
+          return {
+            authorized: false,
+            family_id: "",
+            family_label: "",
+            snapshot_version: 0,
+            drift_heads: driftHeads(),
+            eligible_enrollments: [],
+            surface_action_grants: [],
+            module_action_grants: {},
+          };
+        }
+        return bound;
+      }
       return {
         authorized: true,
         family_id: "family-1",

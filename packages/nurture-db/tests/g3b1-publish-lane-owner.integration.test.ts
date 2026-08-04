@@ -4,6 +4,8 @@ import { createPrismaClient } from "../src/client.js";
 import {
   createAesGcmProtectedContentPort,
   PrismaCareCaptureReadPort,
+  PrismaMediaSafetyReadPort,
+  PrismaPublicationReleasePort,
   PrismaPublishLaneReadPort,
   PrismaPublishProcessTransaction,
   publishDraftCommandIdentity,
@@ -553,6 +555,32 @@ describe("G3-B1 owner reads: edit hold, draft and cancel", () => {
       role_scope_matches_source: true,
       role_assignment_current: true,
     });
+
+    // The union is a property of EVERY listing lane, not just the edit lane:
+    // release/safety keys and attributable media must span both classes too.
+    const releasePort = new PrismaPublicationReleasePort(prisma);
+    const releaseKeys = await releasePort.listReleasableProcessKeys({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+    });
+    expect(releaseKeys).toContain(inFirst.process.processKey);
+    expect(releaseKeys).toContain(inSecond.processKey);
+
+    const assetInSecond = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.otherGroup.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    const mediaIds = await new PrismaMediaSafetyReadPort(prisma).listAttributableMediaIds({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+    });
+    expect(mediaIds).toContain(assetInSecond.id);
   });
 
   it("resolves a process key only while the actor still reaches its class", async () => {

@@ -152,28 +152,35 @@ export const presentGuardianFamilyBoard = async (
   });
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
 
-  // unique_eligible_default at the family level: an option ref naming an
-  // enrollment of ANOTHER reachable family rebinds the whole board to that
-  // family — label, focus and activity together — rather than mixing two
-  // families in one envelope.
-  if (request.enrollment_target_ref) {
-    const selected = resolveTargetOptionRef(
-      deps.integrity_key,
-      scope,
-      request.enrollment_target_ref,
-      scopeFacts.eligible_enrollments.map((entry) => entry.enrollment_id),
-    );
-    const selectedFamily = scopeFacts.eligible_enrollments.find(
-      (entry) => entry.enrollment_id === selected,
-    )?.family_id;
-    if (selectedFamily && selectedFamily !== scopeFacts.family_id) {
-      scopeFacts = await deps.reads.loadGuardianScope({
-        ...scope,
-        snapshot_at: generatedAt,
-        bind_family_id: selectedFamily,
-      });
-      if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
-    }
+  // Owner target selection FIRST: the explicit owner-issued option ref, or
+  // the unique eligible Enrollment across every reachable family. With
+  // several eligible Enrollments and no option the activity module stays
+  // empty rather than guessing a child.
+  const selectedEnrollmentId = request.enrollment_target_ref
+    ? resolveTargetOptionRef(
+        deps.integrity_key,
+        scope,
+        request.enrollment_target_ref,
+        scopeFacts.eligible_enrollments.map((entry) => entry.enrollment_id),
+      )
+    : scopeFacts.eligible_enrollments.length === 1
+      ? scopeFacts.eligible_enrollments[0]!.enrollment_id
+      : undefined;
+
+  // unique_eligible_default at the family level: a selection — explicit OR
+  // the auto-selected unique enrollment — naming an enrollment of ANOTHER
+  // reachable family rebinds the whole board to that family: label, focus,
+  // censuses, drift heads and activity together, never a mix of two families.
+  const selectedFamily = scopeFacts.eligible_enrollments.find(
+    (entry) => entry.enrollment_id === selectedEnrollmentId,
+  )?.family_id;
+  if (selectedFamily && selectedFamily !== scopeFacts.family_id) {
+    scopeFacts = await deps.reads.loadGuardianScope({
+      ...scope,
+      snapshot_at: generatedAt,
+      bind_family_id: selectedFamily,
+    });
+    if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
   }
 
   // One scope, one instant, shared by every module in this envelope.
@@ -181,19 +188,12 @@ export const presentGuardianFamilyBoard = async (
   const focus = await queryGuardianCurrentFocus(deps, { ...scope, resolved_scope: resolvedScope });
   if (focus.status !== "ok") return focus;
 
-  // Owner target selection: an explicit owner-issued option ref, or the unique
-  // eligible Enrollment. With several eligible Enrollments and no option the
-  // activity module stays empty rather than guessing a child.
-  const uniqueEnrollment =
-    scopeFacts.eligible_enrollments.length === 1
-      ? scopeFacts.eligible_enrollments[0]
-      : undefined;
   const enrollmentTargetRef =
     request.enrollment_target_ref ??
-    (uniqueEnrollment
+    (selectedEnrollmentId
       ? issueTargetOptionRef(deps.integrity_key, {
           ...scope,
-          enrollment_id: uniqueEnrollment.enrollment_id,
+          enrollment_id: selectedEnrollmentId,
         })
       : undefined);
 

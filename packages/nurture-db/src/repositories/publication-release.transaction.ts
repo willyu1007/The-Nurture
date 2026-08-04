@@ -288,7 +288,7 @@ export class PrismaPublicationReleasePort
         // target_unavailable, the same answer an unresolvable sealed ref
         // gives: an unauthorized caller learns nothing about existence.
         const reach = await resolveCaregiverReachFor(
-          tx as never,
+          tx,
           input.workspace_id,
           input.participant_id,
           process.careGroupId,

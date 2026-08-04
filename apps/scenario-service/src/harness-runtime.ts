@@ -1207,7 +1207,12 @@ export function createHarnessEngine(input: {
         );
       }
       if (request.capability_key === "query_guardian_current_focus") {
-        return queryGuardianCurrentFocus(guardianDeps, scope);
+        return queryGuardianCurrentFocus(guardianDeps, {
+          ...scope,
+          ...(request.target_option_ref
+            ? { enrollment_target_ref: request.target_option_ref }
+            : {}),
+        });
       }
       if (request.capability_key === "query_guardian_enrollment_activity") {
         if (!request.target_option_ref) {

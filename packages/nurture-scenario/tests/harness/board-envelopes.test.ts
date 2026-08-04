@@ -9,6 +9,7 @@ import {
 } from "../../src/harness/board-envelopes.js";
 import { issueTargetOptionRef } from "../../src/harness/keyed-refs.js";
 import {
+  driftHeads,
   BOARD_CONTRACT,
   BOARD_INTEGRITY_KEY,
   caregiverAuthority,
@@ -91,6 +92,70 @@ describe("G3-A guardian_family_board envelope", () => {
     // fix did exactly that, and the first version of this test did not notice.
     expect(port.snapshotInstants.length).toBeGreaterThan(1);
     expect(new Set(port.snapshotInstants).size).toBe(1);
+  });
+
+  it("rebinds the WHOLE envelope to the selected enrollment's family", async () => {
+    const familyB = {
+      authorized: true,
+      family_id: "family-2",
+      family_label: "Second Syn Family",
+      snapshot_version: 11,
+      drift_heads: driftHeads(),
+      eligible_enrollments: [
+        { enrollment_id: "enrollment-1", family_id: "family-1", display_label: "Syn Class A" },
+        { enrollment_id: "enrollment-2", family_id: "family-2", display_label: "Syn Class B" },
+      ],
+      surface_action_grants: [],
+      module_action_grants: {},
+    };
+    const port = createGuardianReadPort({
+      scope: { eligible_enrollments: familyB.eligible_enrollments },
+      families: { "family-2": familyB },
+    });
+    const result = await presentGuardianFamilyBoard(guardianDeps(port), {
+      ...guardianScope,
+      enrollment_target_ref: issueTargetOptionRef(BOARD_INTEGRITY_KEY, {
+        ...guardianScope,
+        enrollment_id: "enrollment-2",
+      }),
+    });
+    expect(result.status).toBe("ok");
+    if (result.status !== "ok") return;
+    // Label, scopeRef, snapshot version — the envelope IS family B now.
+    expect(result.output.actorContext.scopeLabel).toBe("Second Syn Family");
+    expect(result.output.snapshotVersion).toBe(11);
+    // The activity module was asked with family B's binding, not family A's.
+    const activityRequest = port.activityRequests[0] as { bind_family_id?: string };
+    expect(activityRequest?.bind_family_id).toBe("family-2");
+  });
+
+  it("auto-rebinds when the UNIQUE eligible enrollment lives in another family", async () => {
+    // Family A (earliest, no enrollment) + family B holding the only eligible
+    // enrollment: no option ref given, yet the envelope must not mix A's
+    // label and censuses with B's activity.
+    const familyB = {
+      authorized: true,
+      family_id: "family-2",
+      family_label: "Second Syn Family",
+      snapshot_version: 11,
+      drift_heads: driftHeads(),
+      eligible_enrollments: [
+        { enrollment_id: "enrollment-2", family_id: "family-2", display_label: "Syn Class B" },
+      ],
+      surface_action_grants: [],
+      module_action_grants: {},
+    };
+    const port = createGuardianReadPort({
+      scope: { eligible_enrollments: familyB.eligible_enrollments },
+      families: { "family-2": familyB },
+    });
+    const result = await presentGuardianFamilyBoard(guardianDeps(port), guardianScope);
+    expect(result.status).toBe("ok");
+    if (result.status !== "ok") return;
+    expect(result.output.actorContext.scopeLabel).toBe("Second Syn Family");
+    expect(
+      (port.activityRequests[0] as { bind_family_id?: string })?.bind_family_id,
+    ).toBe("family-2");
   });
 
   it("emits the exact registry module order and the frozen envelope fields", async () => {

@@ -214,11 +214,15 @@ const guardianScopeRef = (
 
 export const queryGuardianCurrentFocus = async (
   deps: GuardianBoardDependencies,
-  request: BoardScopeV1 & { resolved_scope?: ResolvedGuardianScopeV1 },
+  request: BoardScopeV1 & {
+    resolved_scope?: ResolvedGuardianScopeV1;
+    /** Optional standalone family selection, as an owner-issued enrollment option. */
+    enrollment_target_ref?: string;
+  },
 ): Promise<BoardQueryDecision<GuardianCurrentFocusOutputV1>> => {
   const now = (deps.now ?? (() => new Date()))();
   const snapshotAt = request.resolved_scope?.snapshot_at ?? now.toISOString();
-  const scopeFacts =
+  let scopeFacts =
     request.resolved_scope?.facts ??
     (await deps.reads.loadGuardianScope({
       workspace_id: request.workspace_id,
@@ -226,6 +230,29 @@ export const queryGuardianCurrentFocus = async (
       snapshot_at: snapshotAt,
     }));
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
+  if (!request.resolved_scope && request.enrollment_target_ref) {
+    // Standalone family selection mirrors the envelope: the owner-issued
+    // enrollment option rebinds the module to that enrollment's family.
+    const selected = resolveTargetOptionRef(
+      deps.integrity_key,
+      { workspace_id: request.workspace_id, participant_id: request.participant_id },
+      request.enrollment_target_ref,
+      scopeFacts.eligible_enrollments.map((entry) => entry.enrollment_id),
+    );
+    if (!selected) return { status: "denied", reason_code: "target_unavailable" };
+    const selectedFamily = scopeFacts.eligible_enrollments.find(
+      (entry) => entry.enrollment_id === selected,
+    )?.family_id;
+    if (selectedFamily && selectedFamily !== scopeFacts.family_id) {
+      scopeFacts = await deps.reads.loadGuardianScope({
+        workspace_id: request.workspace_id,
+        participant_id: request.participant_id,
+        snapshot_at: snapshotAt,
+        bind_family_id: selectedFamily,
+      });
+      if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
+    }
+  }
 
   const result = await deps.reads.loadGuardianCurrentFocus({
     workspace_id: request.workspace_id,
@@ -343,9 +370,10 @@ export const queryGuardianEnrollmentActivity = async (
     participant_id: request.participant_id,
   };
   const now = (deps.now ?? (() => new Date()))();
-  const scopeFacts =
+  const snapshotAtInitial = request.resolved_scope?.snapshot_at ?? now.toISOString();
+  let scopeFacts =
     request.resolved_scope?.facts ??
-    (await deps.reads.loadGuardianScope({ ...scope, snapshot_at: now.toISOString() }));
+    (await deps.reads.loadGuardianScope({ ...scope, snapshot_at: snapshotAtInitial }));
   if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
 
   // Only an owner-issued, actor-bound option ref selects an Enrollment. A raw
@@ -360,6 +388,18 @@ export const queryGuardianEnrollmentActivity = async (
   const selectedFamilyId = scopeFacts.eligible_enrollments.find(
     (entry) => entry.enrollment_id === enrollmentId,
   )?.family_id;
+  if (selectedFamilyId && selectedFamilyId !== scopeFacts.family_id) {
+    // The selected enrollment belongs to another reachable family: EVERYTHING
+    // below — drift heads, snapshot version, the actor scopeRef, the cursor
+    // identity — must come from THAT family's scope, or a family-B page set
+    // would be invalidated by family-A's redactions and labeled family A.
+    scopeFacts = await deps.reads.loadGuardianScope({
+      ...scope,
+      snapshot_at: snapshotAtInitial,
+      bind_family_id: selectedFamilyId,
+    });
+    if (!scopeFacts.authorized) return { status: "denied", reason_code: "not_authorized" };
+  }
 
   const scopeRef = guardianScopeRef(deps, scope, scopeFacts);
   const enrollmentRef = issueBoardOpaqueRef(
