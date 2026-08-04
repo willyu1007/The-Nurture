@@ -116,9 +116,12 @@ Project: `main`
   media lifecycle and post-release safety lanes are all in (23 actions + 9
   queries on formal ingress; the three unrouted keys are structural blocks). The
   T-005 direct-interaction consumer action is landed from current eligibility,
-  and release_publish_process is routed as a transport fan-out attempt (24
-  actions + 9 queries). What remains is the organize contract decisions and the
-  external joint runs (T-007 provider, T-005 G2-C).
+  release_publish_process is routed as a transport fan-out attempt, and
+  organize_care_capture_batch landed end to end after a 1.15.0 contract
+  amendment (owner class-option channel, routed outcomes carrying the D-15
+  action, and an enforceable discard blast radius). The ingress admits 25
+  actions + 9 queries; the unrouted census is exactly reschedule. What remains
+  is the external joint runs (T-007 provider, T-005 G2-C).
 - Stage G4: T-007 uses G4-0 rolling contract/fact freeze, G4-A authority/aggregate,
   G4-B role-bound mobile, G4-C Admin Workbench Core, G4-D Enrollment Journey,
   G4-E Knowledge/RAG and G4-F qualification/handoff. The publication-policy subset
