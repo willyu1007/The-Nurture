@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { issueBoardSealedRef } from "../../src/harness/board-projection.js";
 import { PUBLISH_PROCESS_TARGET_KIND } from "../../src/harness/publish-process.js";
 import {
+  INSTITUTION_PUBLICATION_POLICY_REF,
   resolvePublishSchedule,
   type InstitutionPublicationPolicyV1,
 } from "../../src/harness/publish-schedule.js";
@@ -57,7 +58,7 @@ const processRef = () =>
   issueBoardSealedRef(BOARD_INTEGRITY_KEY, scope, PUBLISH_PROCESS_TARGET_KIND, PROCESS_KEY);
 
 const policy: InstitutionPublicationPolicyV1 = {
-  policy_ref: "syn-publication-policy-1",
+  policy_ref: INSTITUTION_PUBLICATION_POLICY_REF,
   policy_head: 5,
   policy_version: 2,
   institution_ref: "syn-institution-1",
@@ -166,6 +167,11 @@ describe("Phase 3 publish and release loop", () => {
       has_unsaved_revision: false,
       edit_hold_active: false,
       schedule: resolved.schedule,
+      current_policy: {
+        policy_ref: resolved.schedule.policyRef,
+        policy_head: resolved.schedule.policyHead,
+        policy_version: resolved.schedule.policyVersion,
+      },
       media: [
         {
           media_asset_id: "media-1",

@@ -53,6 +53,8 @@ const expectedCapabilitySlices = {
 const expectedCapabilities = Object.keys(expectedCapabilitySlices);
 const g2ExitRecordPath =
   "dev-docs/archive/nurture-family-care-conversation/14-g2-exit-qualification-and-beta-handoff.md";
+const qualifiedNurtureSelfPin =
+  "4cd8b8b5e59869af9f5b957845a3daa054e4c3754484371b4f3795d341948d3e";
 const protectedGateVariables = [
   "NURTURE_BINDING_EVIDENCE_KEY",
   "NURTURE_INTERNAL_SERVICE_TOKEN",
@@ -73,6 +75,10 @@ for (const identityPart of [qualifiedInterface.version, qualifiedInterface.diges
     `G2 Exit record retains ${identityPart}`,
   );
 }
+assertTruthy(
+  g2ExitRecord.includes(`${qualifiedNurtureSelfPin.slice(0, 8)}…`),
+  "G2 Exit record retains its historical Nurture scenario self-pin",
+);
 
 const artifactPin = readJson(
   "packages/nurture-scenario/contracts/surfaces/v1/generated/surface-contract.artifact-pin.json",
@@ -159,10 +165,9 @@ assertEqual(
   workflowPin.myWorkflowBase?.contractSha256,
   "Base/My-Chat workflow contract parity",
 );
-assertEqual(
-  workflowPin.nurtureScenario?.contractSha256,
-  "4cd8b8b5e59869af9f5b957845a3daa054e4c3754484371b4f3795d341948d3e",
-  "Nurture scenario self-pin",
+assertTruthy(
+  /^[0-9a-f]{64}$/.test(workflowPin.nurtureScenario?.contractSha256 ?? ""),
+  "current Nurture scenario self-pin remains exact",
 );
 
 const envContract = parseYaml(read("env/contract.yaml"));

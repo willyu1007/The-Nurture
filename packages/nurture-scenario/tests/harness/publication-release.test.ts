@@ -68,6 +68,11 @@ const facts = (overrides: Partial<ReleaseFactsV1> = {}): ReleaseFactsV1 => ({
   has_unsaved_revision: false,
   edit_hold_active: false,
   schedule,
+  current_policy: {
+    policy_ref: schedule.policyRef,
+    policy_head: schedule.policyHead,
+    policy_version: schedule.policyVersion,
+  },
   media: [media()],
   targets: [target()],
   ...overrides,
@@ -292,6 +297,27 @@ describe("G3-D release loop", () => {
     // The class teacher may still send explicitly after the cutoff.
     const explicit = await release(facts(), undefined, "immediate", late).run();
     expect(explicit.status).toBe("released");
+  });
+
+  it("fails closed when the T-007 policy is absent or drifted", async () => {
+    await expect(release(facts({ current_policy: null })).run()).resolves.toEqual({
+      status: "denied",
+      reason_code: "publication_policy_unavailable",
+    });
+    await expect(
+      release(
+        facts({
+          current_policy: {
+            policy_ref: schedule.policyRef,
+            policy_head: schedule.policyHead + 1,
+            policy_version: schedule.policyVersion + 1,
+          },
+        }),
+      ).run(),
+    ).resolves.toEqual({
+      status: "denied",
+      reason_code: "publication_policy_drift",
+    });
   });
 
   it("surfaces a missed-send attention when nothing committed past the cutoff", async () => {

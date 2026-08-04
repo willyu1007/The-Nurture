@@ -27,6 +27,8 @@ const SCHEDULE = {
   scheduleTimeZone: "Asia/Shanghai",
   schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
   schedulePolicyHead: 3,
+  schedulePolicyVersion: 1,
+  scheduleResolvedAt: new Date("2026-08-03T02:00:00.000Z"),
 };
 
 const seedWorld = async () => {
@@ -551,6 +553,47 @@ describe("G3-D owner reads: release facts", () => {
         process_key: process.processKey,
       }),
     ).toBeNull();
+  });
+
+  it("fails closed when the process has no authorizing role", async () => {
+    const world = await seedWorld();
+    const { process } = await seedProcess(world);
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { authorizingRoleAssignmentId: null },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const facts = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.authorizing_role_current).toBe(false);
+  });
+
+  it("fails closed when the authorizing role belongs to another care group", async () => {
+    const world = await seedWorld();
+    const { process } = await seedProcess(world);
+    const wrongScopeRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: world.teacher.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: world.otherGroup.id,
+        status: "active",
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { authorizingRoleAssignmentId: wrongScopeRole.id },
+    });
+    const facts = await new PrismaPublicationReleasePort(prisma).loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.authorizing_role_current).toBe(false);
   });
 
   it("surfaces an already committed target so a retry reconciles instead of duplicating", async () => {

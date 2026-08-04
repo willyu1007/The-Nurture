@@ -6,13 +6,15 @@
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-05
-- Next step: **关闭 T-006/G3：先交付 exact T-007 publication-policy provider 并完成两组 joint run；T-008、deployment 与 Pilot 保持关闭。** T-006 self-prep 已完成于
-  `nurture.surface-contract@1.15.0`；formal ingress 当前准入 25 action + 9 query，
-  唯一未路由能力是依赖 T-007 provider 的 `reschedule_publish_process`。执行顺序固定为：
-  先交付 `nurture.institution-publication-policy@1.0.0` 的 exact、default-off provider
-  并完成 T-007/T-006 schedule/reschedule/release joint run，再完成 T-005/T-006
-  G2-C direct-interaction joint run，最后签发 T-006 Beta Profile Handoff。T-008、
-  deployment、activation 与 Pilot 不进入当前目标。详见
+- Next step: **关闭 T-006/G3；T-008、deployment 与 Pilot 保持关闭。** 当前
+  implementation candidate 已补齐 exact、default-off
+  `nurture.institution-publication-policy@1.0.0` provider、
+  `reschedule_publish_process` formal ingress，以及 T-007/T-006 和 T-005/T-006
+  联合旅程；formal ingress repo-only 普查为 26 action + 9 query、35 个注册能力、
+  未路由 0。所有无数据库写入检查已经通过。下一步须先获得明确授权，再把新迁移应用到
+  disposable local PostgreSQL，执行 provider、schedule/reschedule/release 与
+  direct-interaction owner/joint qualification。通过后才能提交实现、签发 T-006
+  Beta Profile Handoff 并关闭 G3；当前仍不得声称 G3 已通过。详见
   [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
 
 ## Goal

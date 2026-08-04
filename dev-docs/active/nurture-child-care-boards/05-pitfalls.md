@@ -586,3 +586,103 @@
 - **Prevention**:任何"X 已被 Y 覆盖"式的机械普查,先问信号来源:静态文本只能
   证明"被提到",只有运行时记录能证明"被执行"。(与 08-04 的"异常被 catch 吞掉"
   同属一类:守卫技术必须匹配信号通道。)
+
+### 2026-08-05 — 冻结值必须整组读取，不能用相邻聚合字段补洞
+
+- **Symptom**:持久化已经有 `schedulePolicyVersion` 和 `scheduleResolvedAt`，release
+  读取却返回 `PublishProcess.aggregateVersion` 与 `updatedAt`；类型形状正确，语义身份
+  错误，策略 drift 判断会拿错 head 的来源。
+- **Root cause**:schedule 在多个 repository 内各自拼装，partial NULL 检查和字段映射
+  被复制；“都是 number/date”让 TypeScript 无法区分聚合版本与策略版本。
+- **Fix**:建立唯一 `readResolvedPublishSchedule`，把七个字段视为 all-or-none 值；任一
+  缺失即 fail closed，并只返回实际持久化的 policy version/resolved-at。迁移同时把
+  数据库 check constraint 扩为同一七字段约束。
+- **Prevention**:跨 owner 冻结值需要一个共享 reader 和数据库 all-or-none constraint；
+  不允许调用点用相邻聚合的“看起来同型”字段补默认值。
+
+### 2026-08-05 — 精确持久化普查是 schema 变更的显式登记点
+
+- **Symptom**:新增合法的 T-007 policy owner table 后，`verify:g3-0-freeze` 立即失败，
+  虽然 Prisma validation 和全部单元测试通过。
+- **Root cause**:该 guard 的 persisted-table census 是冻结 allowlist，不会从 schema
+  自动接受新表；这是刻意的治理边界，不是生成器漂移。
+- **Fix**:把 `NurtureInstitutionPublicationPolicy` 作为本次 exact owner delta 显式
+  加入 census，并重跑 freeze guard。
+- **Prevention**:每次新增持久化 owner 都同时检查 schema、migration、DB context 和
+  exact table census；不能为了让 guard 变绿而扩大为通配或自动发现。
+
+### 2026-08-05 — 联合测试不能手工伪造中间 owner fact
+
+- **Symptom**:早期 T-007/T-006 e2e 先手工写入七字段 schedule，再验证 reschedule 与
+  release；后半段虽真实，仍没有证明 provider 的输出能通过生产 admission 路径成为
+  T-006 输入。
+- **Root cause**:测试把“准备夹具”误当成“上游能力已执行”，跳过了真正缺失的
+  `draft -> pending_release` owner transaction。
+- **Fix**:新增 scenario-side queue admission，并把联合旅程改为 formal organize →
+  provider-backed atomic admission → formal reschedule → formal release；同一 process
+  贯穿全链。
+- **Prevention**:联合验证的跨任务交接点必须来自生产 provider/consumer 路径；若测试
+  直接 seed 交接 fact，只能标为下游隔离测试，不能计作 joint conformance。
+
+### 2026-08-05 — 历史授权字段缺失不能解释为仍有效
+
+- **Symptom**:release 读取在 `authorizingRoleAssignmentId` 为 NULL 时返回
+  `authorizing_role_current=true`，且非空时只检查时间窗，没有验证 role、scope 与
+  Participant currentness。
+- **Root cause**:兼容旧夹具的便利逻辑进入了生产事实解释，形成 fail-open。
+- **Fix**:缺失直接返回 false；非空必须是同一 Workspace/CareGroup 的 current
+  caregiver/lead_caregiver assignment，且 Participant current。
+- **Prevention**:用于未来自动执行的授权 episode 必须精确重读；缺失、错误 scope、
+  错误 role 或主体失效都属于授权不可用，不能以历史兼容为默认值。
+
+### 2026-08-05 — Host timer 只能提供触发身份，不能提供策略事实
+
+- **Symptom**:`resolveOrganizeTrigger` 虽然通过 owner port 读取 capture source，却仍要求
+  caller 同时传入 `policy`；T-007 owner read 的结果被忽略，idle/fallback 可以被 host
+  提供的 timezone/head/threshold 驱动。
+- **Root cause**:早期 isolated-domain API 把 fixture policy 当作依赖注入，provider 落地后
+  没有把该参数从生产边界删除。
+- **Fix**:resolver 只接受 trigger kind/identity，策略只能来自同次 owner read；缺失时以
+  `policy_unavailable` fail closed，并增加 persisted-provider → idle/fallback/watermark/replay
+  DB 联合用例。
+- **Prevention**:provider 落地时不仅替换 repository，还要删除 consumer 边界上的同名
+  caller 输入；测试夹具可构造 owner fact，但生产函数签名不能继续接受替代 authority。
+
+### 2026-08-05 — 已计算的 trigger evidence 必须作为事务输入落库
+
+- **Symptom**:manual organize 已计算 exact T-007 policy、timezone、quiescence 与 activity
+  head，但 owner write 仍硬编码 `resolvedTrigger=manual`，其余证据列保持 NULL；纯函数
+  测试正确，持久化后的批次却无法证明自己在哪个 policy head 下切出。
+- **Root cause**:write port 只接收 watermark，没有接收 authorize 阶段已经冻结的 trigger
+  evidence，repository 只能靠路由名称猜测。
+- **Fix**:将实际 trigger 与 durable evidence 作为 `applyOrganizeCut` 的显式输入，并与
+  batch CAS、process/revision/targets 一起提交；端到端断言 exact ref/head/timezone/gate/
+  activity head。
+- **Prevention**:authorize 阶段产生且用于“不被后续策略重解释”的证据，必须显式进入
+  owner transaction；repository 不得从 capability key、调用路径或默认值重建。
+
+### 2026-08-05 — 家庭摘要不能拿内部幂等键充当安全文案
+
+- **Symptom**:`PublicationRelease` 已正确写入 Receipt，但 guardian activity repository
+  把 `PublishProcess.processKey` 直接放进 `summary`；原有 e2e 在 release row 处结束，
+  没有读取家庭投影，因此 raw key 泄漏未被发现。
+- **Root cause**:owner reader 缺少 protected-content port，使用“非空且稳定”的内部键
+  填补用户文案；opaque ref 保护了 `activityRef`，却没有保护普通字符串字段。
+- **Fix**:guardian reader 只从 current frozen revision 的 title envelope 解封安全摘要，
+  无密钥/非法 envelope 返回空串；联合旅程延伸到 delivered Receipt + guardian reread，
+  并扫描 process/release/receipt/enrollment raw ids。
+- **Prevention**:跨 owner 旅程必须在最终消费者投影结束，不能以中间事实表落库作为终点；
+  user-facing string 也必须接受与 ref 字段相同的 raw-identifier 泄漏审计。
+
+### 2026-08-05 — 验证的 pin 路径必须与运行时 link 指向同一 source
+
+- **Symptom**:T-005 slice/core 静态守卫仍绿，但 live workflow pin verifier 拒绝当前
+  sibling revision；若继续运行 scenario-service，pnpm link 会加载这个浮动 sibling，
+  “real pinned owner path”只剩文案。
+- **Root cause**:owner-integration runner 先前只读 artifact manifest，不先验证相邻
+  Base/My-Chat revision/source population，也未证明 verifier 与 runtime dependency 同源。
+- **Fix**:runner 在数据库测试前强制执行 workflow/source pin 与 G2 Exit guard；正式
+  G3 qualification 使用相邻 exact detached worktrees，pnpm link 与 verifier 自然指向
+  同一冻结 checkout。
+- **Prevention**:联合资格化不能把“pin 文件存在”当作“运行使用了 pin”；必须同时证明
+  revision/hash 和实际 module resolution topology。

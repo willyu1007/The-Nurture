@@ -12,6 +12,19 @@ deployment, activation or Pilot scope:
 3. T-006 runs the exact G2-C provider/consumer journey with T-005.
 4. T-006 issues its exact Beta Profile Handoff only after both joint records pass.
 
+### Execution checkpoint — 2026-08-05
+
+- Steps 1–3 now have an implementation candidate pending DB qualification: the Prisma SSOT
+  and migration, exact policy read port, seven-field frozen schedule,
+  reschedule action, release-time current-policy reread and both joint journeys.
+- Repository-only qualification is green: schema validation/generation/context,
+  TypeScript, 577 unit tests and the relevant contract/topology/governance gates.
+- The current blocking gate is intentional: applying the migration and running
+  PostgreSQL-backed qualification require explicit database-write approval.
+- G3-E, the Beta Profile Handoff and task closure remain pending until those
+  database runs pass and the resulting evidence is recorded. T-008,
+  deployment, activation and Pilot remain outside the objective.
+
 ## G1 Progressive Entry Boundary
 
 - At G1 start, T-006 MAY design the shared read model, `PublishProcess`, content/media

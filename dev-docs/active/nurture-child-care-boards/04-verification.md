@@ -1053,3 +1053,69 @@ same pass:
 This repair changes governance recovery, task/documentation focus and developer
 documentation only. It does not change product code, schema, migration,
 capability admission, activation, deployment or traffic state.
+
+## 2026-08-05 — G3 Closure Candidate, Repository-only Qualification
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm db:validate` / `pnpm db:generate` / `pnpm db:context` | PASS — Prisma SSOT valid; generated client and DB/context registry refreshed; no database write |
+| scenario, DB and scenario-service TypeScript checks | PASS |
+| targeted release/reschedule/provider-free unit suites | PASS |
+| `pnpm test:unit` | PASS — 52 files, 577 tests |
+| `pnpm verify:persistence-boundaries` / `verify:port-topology` | PASS |
+| `pnpm verify:g3-0-freeze` | PASS after explicitly adding the new owner table to the exact persisted-table census |
+| `pnpm verify:surface-contract-schemas` | PASS |
+| `pnpm verify:formal-ingress-contract` | PASS — routes 7, actions 26, queries 9, registered 35, unrouted 0 |
+| governance lint | PASS |
+| migration apply and all PostgreSQL-backed provider/owner/joint suites | **NOT RUN — explicit database-write approval pending** |
+
+This evidence qualifies the implementation candidate only. It does not qualify
+T-007/T-006 or T-005/T-006 jointly, does not close G3-E and does not authorize a
+Beta Profile Handoff, activation, deployment or traffic.
+
+The authored but not yet executed DB journey is deliberately end-to-end on one
+persisted process: formal organize creates an unscheduled draft, scenario-side
+admission reads the persisted T-007 policy and atomically queues it, then formal
+reschedule and formal release consume the same frozen schedule. The same journey
+then requires the target-specific delivered Receipt and rereads the publication
+through the guardian enrollment-activity projection; its protected title must be
+family-visible while process/release/receipt/enrollment raw identifiers remain
+absent. A separate
+formal path passes the exact T-006 direct-interaction option to T-005 prepare and
+execute. Provider absence, policy drift and invalid owner-role scope have explicit
+negative cases; they remain candidate evidence until PostgreSQL execution passes.
+
+The same pending PostgreSQL suite pins both sides of the freeze boundary. Before
+queue admission, a policy replacement from version 1/head 5 to version 2/head 6
+must rebase the unscheduled draft onto the new seven-field schedule. After queue
+admission, the identical class of replacement blocks reschedule and release as
+`publication_policy_drift`. The organize assertion also requires the persisted
+batch to carry the exact policy/timezone/quiescence/activity evidence rather than
+a reconstructed or hard-coded trigger.
+
+`verify:owner-integration` now requires runtime `passed` markers for both exact
+cross-task journeys in addition to one committed/ok execution per admitted
+capability/query. The marker is emitted only after the final persisted assertion;
+it is not inferred from test names or source literals.
+
+The T-007 matrix also includes an authored production-DB path from the persisted
+Institution policy through `PrismaCareCaptureReadPort` into idle and daily-fallback
+resolution. It asserts the stable watermark, exact replay, default-off policy
+absence and that owner-reported machine progress cannot reset the user-activity
+gate. Host callers no longer supply policy values to this resolver.
+
+The owner-integration command now runs the live workflow/source pin verifier and
+the preserved T-005 G2 Exit guard before touching PostgreSQL. The current sibling
+checkouts have advanced beyond the frozen revisions, so they are intentionally not
+accepted as final G3 evidence. The frozen commits remain locally available; the
+pending qualification must run from adjacent detached worktrees so the verified
+source and the linked runtime dependency are identical.
+
+The repository-only checkpoint recomputes the expanded Nurture scenario source
+population as 89 files / `2714c5c3853595f9ab979db069dd0fa01286ab6f5a0461159fd8e8547af978c0`.
+The historical T-005 self-pin remains bound inside the archived G2 Exit record;
+the current integration pin now names this G3 candidate instead of forcing a later
+task to pretend the source population never changed. Git-object recomputation at
+the frozen owner commits independently reconfirmed Base/My-Chat contract parity
+(`8dd53be4…`, 11 files), `web_workbench` (59), `x5_joint_api` (169) and
+`wave4_binding_host` (20).

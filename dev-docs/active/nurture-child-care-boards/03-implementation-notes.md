@@ -1965,3 +1965,56 @@ G3-E 就绪评审点名的已知缺陷:`resolveCaregiverReach` 返回"第一个�
 - **主张边界**:明确打印 joint-conformance=NOT-RUN——T-007 provider 与 T-005
   G2-C 联合运行仍是外部门控的独立资格化,这一层不冒充。
 - 证伪:把一条 query 字面量拆开(census 抓不到)→ 失败,CAUGHT。
+
+## 2026-08-05 — G3 closure implementation candidate (DB qualification pending)
+
+本轮候选实现把“等待 T-007 provider”从外部门控变为仓库内、default-off 的 exact
+owner path，但尚未执行任何数据库写入，也尚未宣称 G3-E 通过：
+
+- Prisma SSOT 新增 `NurtureInstitutionPublicationPolicy` 与迁移；策略按 exact
+  Workspace + Institution、effective window 和唯一 current row 读取，缺失、歧义、
+  非法 IANA timezone、contract drift 或相对历史最大值回退 version/head 全部 fail
+  closed。
+- capture、queue、board、schedule/reschedule/release 统一消费 typed provider，删除
+  publication-policy loose JSON fallback；content-safety JSON 是另一个 owner concern，
+  未被混入本次替换。
+- idle/daily-fallback resolver 不再接收 caller policy；host timer 只提交 trigger kind
+  与 identity，timezone/head/threshold 全部来自 capture owner read 同次返回的 exact
+  T-007 provider fact。缺失 policy 时 trigger 以 `policy_unavailable` fail closed。
+- organize apply 不再把所有批次硬编码为 `manual`；事务输入携带已判定的 trigger evidence，
+  owner 原子保存实际 trigger、policy ref/head、timezone、quiescence、观察到的 user-activity
+  head 与 stable watermark。已经切出的批次因此不会被后续 policy 换版重解释。
+- schedule 读取统一要求七个冻结字段，并修复了把 process `aggregateVersion` / `updatedAt`
+  冒充 policy version / resolved-at 的跨层错误。
+- organize 只创建带 exact authorizing-role 的 `draft`；新增 scenario-side
+  Serializable queue-admission owner transaction，在 30 秒快捷调整结束后重读 role、hold
+  与 T-007 policy，再原子写入 `pending_release` 和七字段 schedule。My-Chat 仍只拥有
+  timer/retry，不拥有该业务判断。
+- `reschedule_publish_process` 已进入 formal runtime/OpenAPI，准入普查从
+  25 action + 9 query / unrouted 1 变为 26 action + 9 query / unrouted 0。
+- 新增 T-007 provider 负向 DB 测试；正式 scenario-service 联合旅程现在使用同一事实链：
+  formal organize → provider-backed admission → formal reschedule → formal release，未再由
+  测试手工填充 schedule。另一条联合旅程把 T-006 产生的 direct-interaction option
+  交给真实 T-005 `initiate_caregiver_direct_message` prepare + execute。
+- 另有冻结边界用例：draft 尚未入队时将 owner policy 从 version 1/head 5 换到
+  version 2/head 6，admission 必须按新 policy 解析并一次性固化七字段；入队后的
+  reschedule/release 则在同样换版时以 `publication_policy_drift` fail closed。
+- 两条联合旅程只有在最终持久化断言通过后才分别记录
+  `joint:t007_t006_publication` 与 `joint:t005_t006_direct_interaction` runtime evidence；
+  owner-integration census 缺任一 marker 都失败，单能力的孤立成功不再能冒充联合证明。
+- T-007/T-006 旅程现继续读取 guardian enrollment activity：要求真实
+  `PublicationRelease` 的 delivered Receipt 出现于家庭投影，并从 protected revision
+  解封安全标题。审计发现并删除了把内部 `PublishProcess.processKey` 当家庭摘要返回的
+  泄漏；联合 marker 只有在 Receipt、家庭投影和 raw-id 扫描全部通过后才记录。
+- owner-integration runner 在任何数据库套件前先执行 live workflow/source pin 与
+  preserved T-005 G2 Exit 守卫。当前浮动 sibling checkout 不等于冻结 owner；正式
+  资格化必须在相邻的 exact detached worktree 拓扑运行，使 verifier 读取的 source 与
+  package-manager link 实际加载的 source 是同一份。
+- release 对缺失、过期、错误 CareGroup/role 或失效 Participant 的 authorizing role
+  全部 fail closed；迁移在任何 DDL 前执行 partial-schedule census，并用显式事务避免
+  gate 或后续 DDL 失败留下半迁移状态。
+
+已完成 repo-only qualification；数据库阶段仍等待明确授权。授权后的下一步是将
+`20260805090000_t007_publication_policy_provider` 应用到 disposable local PostgreSQL，
+在 exact detached owner 拓扑运行 provider DB、scenario-service owner/joint suites、
+population/final false-empty census 与完整 gates。任何一项失败都不签发 handoff。

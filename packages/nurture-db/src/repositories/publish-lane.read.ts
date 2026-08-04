@@ -10,12 +10,15 @@ import type {
   PublishEditHoldFactsV1,
   PublishEditHoldReadPort,
   PublishProcessStateV1,
+  PublishProcessRescheduleFactsV1,
   RawBoardSourceHead,
   RawPublishQueueRow,
   TeacherPublishQueueReadPort,
 } from "@the-nurture/scenario/harness";
 import { assertProtectedContentEnvelopeV1 } from "@the-nurture/scenario/harness";
 import { publishDraftCommandIdentity } from "./publish-process.transaction.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
+import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
 import {
   aggregateCensus,
   caregiverRowAuthority,
@@ -400,6 +403,47 @@ export class PrismaPublishLaneReadPort
       ...(loaded.process.cancelledAt
         ? { cancelled_at: loaded.process.cancelledAt.toISOString() }
         : {}),
+    };
+  }
+
+  async loadRescheduleFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+  }): Promise<PublishProcessRescheduleFactsV1 | null> {
+    const loaded = await this.loadProcess(
+      input.workspace_id,
+      input.participant_id,
+      input.process_key,
+    );
+    if (!loaded) return null;
+    const [committed, policy] = await Promise.all([
+      this.prisma.nurturePublicationRelease.count({
+        where: {
+          workspaceId: input.workspace_id,
+          publishProcessId: loaded.process.id,
+        },
+      }),
+      loadCurrentInstitutionPublicationPolicy(this.prisma, {
+        workspace_id: input.workspace_id,
+        institution_id: loaded.reach.institution_id,
+        at: loaded.at,
+      }),
+    ]);
+    return {
+      ...this.holdFacts(loaded.at, loaded.reach, loaded.process),
+      authorizing_role_assignment_id: loaded.reach.role_assignment_id,
+      process_version: loaded.process.aggregateVersion,
+      read_at: loaded.at.toISOString(),
+      schedule: readResolvedPublishSchedule(loaded.process),
+      committed_release_count: committed,
+      current_policy: policy
+        ? {
+            policy_ref: policy.policy_ref,
+            policy_head: policy.policy_head,
+            policy_version: policy.policy_version,
+          }
+        : null,
     };
   }
 }

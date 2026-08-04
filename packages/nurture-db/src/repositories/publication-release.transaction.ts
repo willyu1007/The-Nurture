@@ -10,7 +10,6 @@ import type {
   PublicationSafetyReadPort,
   ReleaseFactsV1,
   ReleaseTargetFactsV1,
-  ResolvedPublishScheduleV1,
 } from "@the-nurture/scenario/harness";
 import {
   activeRoleWindow,
@@ -19,9 +18,12 @@ import {
   resolveCaregiverReachFor,
   resolveCaregiverReaches,
 } from "./board-read-support.js";
+import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 
 const RELEASE_COMMAND_KEY = "release_publish_process";
 const RELEASE_COMMAND_SCOPE = "board_publication";
+const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 const RELEASE_COMMAND_CONTRACT_VERSION = 1;
 
 const sha256 = (value: string): string =>
@@ -142,7 +144,12 @@ export class PrismaPublicationReleasePort
     );
     if (!reach) return null;
 
-    const schedule = readResolvedSchedule(process);
+    const schedule = readResolvedPublishSchedule(process);
+    const policy = await loadCurrentInstitutionPublicationPolicy(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: reach.institution_id,
+      at,
+    });
 
     const frozenRevision = process.frozenRevisionId
       ? await this.prisma.nurturePublishProcessRevision.findFirst({
@@ -158,10 +165,14 @@ export class PrismaPublicationReleasePort
           where: {
             id: process.authorizingRoleAssignmentId,
             workspaceId: input.workspace_id,
+            role: { in: [...CAREGIVER_ROLES] },
+            scopeType: "care_group",
+            scopeId: process.careGroupId,
             ...activeRoleWindow(at),
+            participant: { status: "active", deletedAt: null },
           },
         })) === 1
-      : true;
+      : false;
 
     const media = await this.loadMediaEligibility(
       input.workspace_id,
@@ -203,6 +214,13 @@ export class PrismaPublicationReleasePort
       has_unsaved_revision: false,
       edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
       schedule,
+      current_policy: policy
+        ? {
+            policy_ref: policy.policy_ref,
+            policy_head: policy.policy_head,
+            policy_version: policy.policy_version,
+          }
+        : null,
       media,
       targets,
     };
@@ -482,36 +500,3 @@ const isUniqueViolation = (error: unknown): boolean =>
   typeof error === "object" &&
   error !== null &&
   (error as { code?: unknown }).code === "P2002";
-
-/**
- * A schedule is only resolved when the owner recorded every field the T-007
- * contract fixes. A partially recorded schedule is not a window.
- */
-const readResolvedSchedule = (process: {
-  scheduledAt: Date | null;
-  notAfter: Date | null;
-  scheduleTimeZone: string | null;
-  schedulePolicyRef: string | null;
-  schedulePolicyHead: number | null;
-  updatedAt: Date;
-  aggregateVersion: number;
-}): ResolvedPublishScheduleV1 | null => {
-  if (
-    !process.scheduledAt ||
-    !process.notAfter ||
-    !process.scheduleTimeZone ||
-    !process.schedulePolicyRef ||
-    process.schedulePolicyHead === null
-  ) {
-    return null;
-  }
-  return {
-    scheduledAt: process.scheduledAt.toISOString(),
-    notAfter: process.notAfter.toISOString(),
-    timeZone: process.scheduleTimeZone,
-    policyRef: process.schedulePolicyRef,
-    policyHead: process.schedulePolicyHead,
-    policyVersion: process.aggregateVersion,
-    resolvedAt: process.updatedAt.toISOString(),
-  };
-};

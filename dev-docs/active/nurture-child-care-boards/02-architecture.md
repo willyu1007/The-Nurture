@@ -764,3 +764,33 @@ canonical fact heads。任何微调完成后，旧 snapshot/cursor 必须失效�
 G3-0 的 exact query topology、source-head/cursor binding、T-005/T-007 dependency
 contract 与 DB SSOT delta 见
 [06-g3-0-fact-contract-schema-freeze.md](06-g3-0-fact-contract-schema-freeze.md)。
+
+## G3-E Publication-policy Provider and Reschedule Candidate — 2026-08-05
+
+- T-007 policy facts live in a versioned, exact Workspace + Institution scoped
+  `NurtureInstitutionPublicationPolicy` table. The read port accepts exactly one
+  effective row and validates the contract identity, positive version/head,
+  local-time window, durations and IANA timezone; missing, ambiguous or invalid
+  rows fail closed. Existing loose JSON configuration is not a fallback.
+- A frozen publish schedule is one atomic seven-field value:
+  `scheduledAt`, `notAfter`, `timeZone`, `policyRef`, `policyHead`,
+  `policyVersion` and `resolvedAt`. Persistence constraints and the shared read
+  helper reject partial schedules. The stored policy version/resolution time are
+  not substituted with the process aggregate version/update time.
+- `reschedule_publish_process` is an owner-issued, confirmation-bound action.
+  Prepare rereads current authority/process/hold/provider state; execute rereads
+  them in the transaction and uses the `PublishProcess` aggregate version as the
+  schedule CAS head. Organize creates a `draft` with the exact authorizing role
+  but no schedule. After the 30-second quick-adjust interval, the scenario-side
+  queue-admission transaction rereads the role, hold and T-007 provider and
+  atomically advances `draft -> pending_release` while freezing the seven-field
+  schedule. A successful reschedule changes only `scheduledAt` inside that
+  frozen window, rebases scheduler authority to the current executor's exact
+  role episode, and preserves policy identity and resolution instant.
+- Scheduler and immediate release both reread the current exact policy and
+  require compatibility with the frozen identity/version/head. Immediate send
+  skips only the clock window; it does not bypass authority, saved revision,
+  edit hold, targets, media or policy compatibility.
+- No policy write capability, activation path or host-runtime ownership was
+  introduced. My-Chat still owns timer/retry; Nurture owns the admission rule
+  and owner transaction. The provider remains default-off through fact absence.

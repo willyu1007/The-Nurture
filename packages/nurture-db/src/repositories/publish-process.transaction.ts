@@ -6,6 +6,7 @@ import type {
   NurturePublishDraftFacts,
   NurturePublishEditHoldFacts,
   NurturePublishProcessCancelFacts,
+  NurturePublishProcessRescheduleFacts,
   NurturePublishProcessTransaction,
 } from "@the-nurture/scenario/harness";
 import { NO_PUBLISH_EDIT_HOLD_VERSION } from "@the-nurture/scenario/harness";
@@ -16,6 +17,8 @@ import {
   type BoardPrisma,
   type CaregiverReachV1,
 } from "./board-read-support.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
+import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
 
 type DomainContextRef = CanonicalRef;
 
@@ -90,6 +93,102 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
       process_version: process.aggregateVersion,
       committed_release_count: committed,
       ...(process.cancelledAt ? { cancelled_at: process.cancelledAt.toISOString() } : {}),
+    };
+  }
+
+  async loadPublishProcessRescheduleFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+  }): Promise<NurturePublishProcessRescheduleFacts | null> {
+    const readAt = new Date();
+    const process = await this.prisma.nurturePublishProcess.findFirst({
+      where: { workspaceId: input.workspace_id, processKey: input.process_key },
+      include: {
+        careGroup: { select: { institutionId: true } },
+        editHold: { include: { holder: true } },
+        _count: { select: { releases: true } },
+      },
+    });
+    if (!process) return null;
+    const reach = await resolveCaregiverReachFor(
+      this.prisma,
+      input.workspace_id,
+      input.participant_id,
+      process.careGroupId,
+      readAt,
+    );
+    if (!reach) return null;
+    const policy = await loadCurrentInstitutionPublicationPolicy(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: process.careGroup.institutionId,
+      at: readAt,
+    });
+    return {
+      authority: caregiverRowAuthority(reach, process.careGroupId),
+      authorizing_role_assignment_id: reach.role_assignment_id,
+      publish_process_ref: domainRef("publish_process", process.id, process.aggregateVersion),
+      process_state: process.state,
+      process_version: process.aggregateVersion,
+      read_at: readAt.toISOString(),
+      schedule: readResolvedPublishSchedule(process),
+      ...(process.editHold
+        ? {
+            current_hold: {
+              holder_participant_id: process.editHold.holderParticipantId,
+              holder_label: process.editHold.holder.displayLabel ?? "",
+              expires_at: process.editHold.expiresAt.toISOString(),
+              hold_version: process.editHold.aggregateVersion,
+            },
+          }
+        : {}),
+      committed_release_count: process._count.releases,
+      current_policy: policy
+        ? {
+            policy_ref: policy.policy_ref,
+            policy_head: policy.policy_head,
+            policy_version: policy.policy_version,
+          }
+        : null,
+    };
+  }
+
+  async applyPublishProcessReschedule(input: {
+    workspace_id: string;
+    process_key: string;
+    expected_process_version: number;
+    scheduled_at: string;
+    authorizing_role_assignment_id: string;
+  }): Promise<{
+    publish_process_ref: DomainContextRef;
+    schedule: NonNullable<NurturePublishProcessRescheduleFacts["schedule"]>;
+  }> {
+    const scheduledAt = new Date(input.scheduled_at);
+    const updated = await this.prisma.nurturePublishProcess.updateMany({
+      where: {
+        workspaceId: input.workspace_id,
+        processKey: input.process_key,
+        state: "pending_release",
+        aggregateVersion: input.expected_process_version,
+        notAfter: { gt: scheduledAt },
+      },
+      data: {
+        scheduledAt,
+        authorizingRoleAssignmentId: input.authorizing_role_assignment_id,
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    if (updated.count !== 1) {
+      throw new Error("nurture publish process: reschedule version conflict");
+    }
+    const process = await this.prisma.nurturePublishProcess.findFirstOrThrow({
+      where: { workspaceId: input.workspace_id, processKey: input.process_key },
+    });
+    const schedule = readResolvedPublishSchedule(process);
+    if (!schedule) throw new Error("nurture publish process: schedule unavailable after write");
+    return {
+      publish_process_ref: domainRef("publish_process", process.id, process.aggregateVersion),
+      schedule,
     };
   }
 
@@ -374,7 +473,11 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
         id: loaded.process.id,
         currentRevisionId: current.id,
       },
-      data: { currentRevisionId: revision.id, aggregateVersion: { increment: 1 } },
+      data: {
+        currentRevisionId: revision.id,
+        authorizingRoleAssignmentId: loaded.reach.role_assignment_id,
+        aggregateVersion: { increment: 1 },
+      },
     });
     if (advanced.count !== 1) {
       throw new Error("nurture publish media detach: revision conflict");
@@ -442,7 +545,11 @@ export class PrismaPublishProcessTransaction implements NurturePublishProcessTra
         id: loaded.process.id,
         currentRevisionId: current.id,
       },
-      data: { currentRevisionId: revision.id, aggregateVersion: { increment: 1 } },
+      data: {
+        currentRevisionId: revision.id,
+        authorizingRoleAssignmentId: loaded.reach.role_assignment_id,
+        aggregateVersion: { increment: 1 },
+      },
     });
     if (advanced.count !== 1) {
       throw new Error("nurture publish draft: revision conflict");

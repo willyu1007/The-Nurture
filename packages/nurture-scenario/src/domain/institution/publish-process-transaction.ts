@@ -98,6 +98,33 @@ export type NurturePublishDraftContent = {
   content_digest: string;
 };
 
+export type NurtureStoredPublishSchedule = {
+  scheduledAt: string;
+  notAfter: string;
+  timeZone: string;
+  policyRef: string;
+  policyHead: number;
+  policyVersion: number;
+  resolvedAt: string;
+};
+
+export type NurturePublishProcessRescheduleFacts = {
+  authority: NurtureCaregiverWriteAuthority;
+  authorizing_role_assignment_id: string;
+  publish_process_ref: DomainContextRef;
+  process_state: string;
+  process_version: number;
+  read_at: string;
+  schedule: NurtureStoredPublishSchedule | null;
+  current_hold?: NurturePublishEditHoldFacts["current_hold"];
+  committed_release_count: number;
+  current_policy: {
+    policy_ref: string;
+    policy_head: number;
+    policy_version: number;
+  } | null;
+};
+
 /**
  * Canonical-owner writes behind the T-006 publish-process lifecycle. The board
  * is an operable projection, not a fact owner: each write re-reads the owner
@@ -118,6 +145,22 @@ export type NurturePublishProcessTransaction = {
     expected_process_version: number;
     cancelled_at: string;
   }): Promise<{ publish_process_ref: DomainContextRef; cancelled_at: string }>;
+
+  loadPublishProcessRescheduleFacts(input: {
+    workspace_id: string;
+    participant_id: string;
+    process_key: string;
+  }): Promise<NurturePublishProcessRescheduleFacts | null>;
+  applyPublishProcessReschedule(input: {
+    workspace_id: string;
+    process_key: string;
+    expected_process_version: number;
+    scheduled_at: string;
+    authorizing_role_assignment_id: string;
+  }): Promise<{
+    publish_process_ref: DomainContextRef;
+    schedule: NurtureStoredPublishSchedule;
+  }>;
 
   loadPublishEditHoldFacts(input: {
     workspace_id: string;

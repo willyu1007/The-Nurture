@@ -10,6 +10,7 @@ import {
   PrismaPublishProcessTransaction,
   publishDraftCommandIdentity,
 } from "../src/index.js";
+import { resolveOrganizeTrigger } from "@the-nurture/scenario/harness";
 
 // Owner-side proof for the publish queue, draft/hold/cancel and capture ports
 // (G3-E prerequisites B2 and B3). The queue is class-shared work, so what has
@@ -80,6 +81,26 @@ const seedGroup = async () => {
 };
 
 type Group = Awaited<ReturnType<typeof seedGroup>>;
+
+const seedPublicationPolicy = (world: Group) =>
+  prisma.nurtureInstitutionPublicationPolicy.create({
+    data: {
+      workspaceId: world.workspaceId,
+      institutionId: world.institution.id,
+      policyRef: "nurture.institution-publication-policy@1.0.0",
+      policyVersion: 1,
+      policyHead: 7,
+      timeZone: "Asia/Shanghai",
+      defaultReleaseLocalTime: "17:00",
+      retryCutoffLocalTime: "19:00",
+      organizeIdleSeconds: 600,
+      organizeFallbackLeadSeconds: 1800,
+      automaticQuiescenceSeconds: 60,
+      captureActivityLeaseSeconds: 60,
+      automaticOrganizeEnabled: true,
+      effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+    },
+  });
 
 const seedProcess = async (
   world: Group,
@@ -270,6 +291,8 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
         scheduleTimeZone: "Asia/Shanghai",
         schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
         schedulePolicyHead: 3,
+        schedulePolicyVersion: 1,
+        scheduleResolvedAt: new Date("2026-08-03T02:00:00.000Z"),
       },
     });
     const scheduled = await reads.listTeacherPublishQueue({
@@ -668,6 +691,84 @@ describe("G3-B1 owner reads: capture lane", () => {
       [4, true],
     ]);
     expect(source?.activity.last_user_activity_at).toBe("2026-08-02T03:55:00.000Z");
+  });
+
+  it("drives idle from the exact T-007 owner policy and replays the same watermark", async () => {
+    const world = await seedGroup();
+    await Promise.all([seedBatch(world), seedPublicationPolicy(world)]);
+    const reads = new PrismaCareCaptureReadPort(prisma);
+    const request = { trigger: "idle" as const, trigger_request_id: "trigger:idle:1" };
+    const run = () =>
+      resolveOrganizeTrigger(
+        { reads, now: () => new Date("2026-08-02T04:05:00.000Z") },
+        {
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          care_group_id: world.group.id,
+        },
+        request,
+      );
+    const first = await run();
+    expect(first).toMatchObject({
+      status: "evaluated",
+      decision: {
+        status: "cut",
+        evidence: {
+          trigger: "idle",
+          policyRef: "nurture.institution-publication-policy@1.0.0",
+          policyHead: 7,
+          watermark: { source_sequence: 2 },
+        },
+        includedCaptureIds: expect.any(Array),
+      },
+    });
+    await expect(run()).resolves.toEqual(first);
+  });
+
+  it("lets daily fallback ignore machine progress but fails closed without policy", async () => {
+    const world = await seedGroup();
+    const batch = await seedBatch(world);
+    await prisma.nurtureCareCaptureBatch.update({
+      where: { id: batch.id },
+      data: { observedUserActivityAt: new Date("2026-08-02T08:30:00.000Z") },
+    });
+    const reads = new PrismaCareCaptureReadPort(prisma);
+    const scope = {
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      care_group_id: world.group.id,
+    };
+    const request = {
+      trigger: "daily_fallback" as const,
+      trigger_request_id: "trigger:fallback:1",
+    };
+    await expect(
+      resolveOrganizeTrigger(
+        { reads, now: () => new Date("2026-08-02T08:35:00.000Z") },
+        scope,
+        request,
+      ),
+    ).resolves.toMatchObject({
+      status: "evaluated",
+      decision: { status: "invalid", reason_code: "policy_unavailable" },
+    });
+
+    await seedPublicationPolicy(world);
+    const resolved = await resolveOrganizeTrigger(
+      { reads, now: () => new Date("2026-08-02T08:35:00.000Z") },
+      scope,
+      request,
+    );
+    expect(resolved).toMatchObject({
+      status: "evaluated",
+      decision: {
+        status: "cut",
+        evidence: {
+          trigger: "daily_fallback",
+          observedUserActivityAt: "2026-08-02T08:30:00.000Z",
+        },
+      },
+    });
   });
 
   it("never opens or advances a batch as a side effect of being read", async () => {

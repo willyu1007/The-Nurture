@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-03T00:18:50.378Z",
+  "updatedAt": "2026-08-04T22:39:32.202Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -2072,6 +2072,15 @@
         {
           "field": "mediaAssets",
           "to": "NurtureMediaAssetRef",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publicationPolicies",
+          "to": "NurtureInstitutionPublicationPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -11233,6 +11242,248 @@
           ],
           "name": null,
           "map": "ix_50"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionPublicationPolicy",
+      "dbName": "nurture_institution_publication_policy",
+      "schema": null,
+      "columns": [
+        {
+          "name": "automaticOrganizeEnabled",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "automatic_organize_enabled",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "automaticQuiescenceSeconds",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "automatic_quiescence_seconds",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "captureActivityLeaseSeconds",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "capture_activity_lease_seconds",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "defaultReleaseLocalTime",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "default_release_local_time",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "organizeFallbackLeadSeconds",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "organize_fallback_lead_seconds",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "organizeIdleSeconds",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "organize_idle_seconds",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "retryCutoffLocalTime",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "retry_cutoff_local_time",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersededAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "superseded_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "timeZone",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "time_zone",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "effectiveFrom",
+            "supersededAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_publication_policy_effective"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "policyHead"
+          ],
+          "name": null,
+          "map": "uq_nurture_publication_policy_head"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "policyVersion"
+          ],
+          "name": null,
+          "map": "uq_nurture_publication_policy_version"
         }
       ]
     },

@@ -9,8 +9,10 @@
 // HTTP surface against real PostgreSQL — a census first (a routed key with no
 // end-to-end evidence fails before anything runs), then the actual suites.
 //
-// It does NOT claim Joint Conformance: the T-007 provider run and the T-005
-// G2-C joint journey remain separate, externally-gated qualifications.
+// It also requires runtime markers from the two cross-task formal journeys.
+// Those markers are recorded only after their final persisted assertions pass;
+// the broader T-007 negative/DST/trigger matrix remains a separate production-
+// DB qualification and is not implied by this runner.
 
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -27,10 +29,27 @@ const keysOf = (block) =>
   [...block.matchAll(/^\s+([a-z0-9_]+): "\d+\.\d+\.\d+",$/gm)].map((match) => match[1]);
 const actionKeys = keysOf(actionBlock);
 const queryKeys = keysOf(queryBlock).filter((key) => key.startsWith("query_"));
+const requiredJointEvidence = [
+  "joint:t007_t006_publication",
+  "joint:t005_t006_direct_interaction",
+];
 
 if (actionKeys.length === 0 || queryKeys.length === 0) {
   throw new Error("owner integration census: failed to read the admitted key sets");
 }
+
+// Qualification must execute against the same exact sibling revisions and
+// source populations it claims. In the intended detached topology these are
+// the adjacent pinned worktrees, which are also the package-manager link
+// targets used by the scenario-service process itself.
+execFileSync("pnpm", ["verify:workflow-contract-pin"], {
+  cwd: repoRoot,
+  stdio: "inherit",
+});
+execFileSync("pnpm", ["verify:g2-exit-contract"], {
+  cwd: repoRoot,
+  stdio: "inherit",
+});
 
 // The evidence itself: the formal service booted for real, driven over HTTP,
 // against disposable PostgreSQL — plus the binding-owner journey suite. The
@@ -59,6 +78,14 @@ if (missingPositive.length > 0) {
     `owner integration census: admitted keys without positive real-path evidence: ${missingPositive.join(", ")}`,
   );
 }
+const missingJoint = requiredJointEvidence.filter(
+  (key) => !(evidence[key] ?? []).includes("passed"),
+);
+if (missingJoint.length > 0) {
+  throw new Error(
+    `owner integration census: missing completed cross-task journey evidence: ${missingJoint.join(", ")}`,
+  );
+}
 
 const manifest = JSON.parse(readFileSync(generatedManifestPath, "utf8"));
 const contract = manifest.interfaceContract;
@@ -69,7 +96,7 @@ process.stdout.write(
     `  interface=${contract.key}@${contract.version} ${contract.digest}`,
     `  ingress-actions=${actionKeys.length} ingress-queries=${queryKeys.length} unexercised=0`,
     "  path=formal scenario-service HTTP + real PostgreSQL, runtime-recorded per-key evidence",
-    "  joint-conformance=NOT-RUN (T-007 provider and T-005 G2-C joint runs are gated externally)",
+    "  joint-journeys=PASS t007-t006=publication t005-t006=direct-interaction",
     "",
   ].join("\n"),
 );

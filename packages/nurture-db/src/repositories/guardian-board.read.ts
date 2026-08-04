@@ -3,11 +3,14 @@ import type {
   BoardSortKeyV1,
   GuardianBoardReadPort,
   GuardianBoardScopeFacts,
+  ProtectedContentEnvelopeV1,
+  ProtectedContentWritePort,
   RawBoardSourceHead,
   RawGuardianActivity,
   RawGuardianCharter,
   RawGuardianFocusGoal,
 } from "@the-nurture/scenario/harness";
+import { assertProtectedContentEnvelopeV1 } from "@the-nurture/scenario/harness";
 import {
   activeRoleWindow,
   boardHead,
@@ -140,7 +143,21 @@ type GuardianReach = {
  * and nothing here writes or caches a board snapshot.
  */
 export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
-  constructor(private readonly prisma: BoardPrisma) {}
+  constructor(
+    private readonly prisma: BoardPrisma,
+    private readonly protectedContent?: ProtectedContentWritePort,
+  ) {}
+
+  /** Family-visible copy must come from protected owner content, never an internal key. */
+  private safePublicationSummary(payload: unknown): string {
+    if (!this.protectedContent || payload === null || typeof payload !== "object") return "";
+    try {
+      assertProtectedContentEnvelopeV1(payload);
+      return this.protectedContent.unseal(payload as ProtectedContentEnvelopeV1);
+    } catch {
+      return "";
+    }
+  }
 
   /**
    * The Guardian board is scoped to one family. A guardian who reaches several
@@ -608,7 +625,13 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
           ...(input.before ? strictlyAfter(input.before, "committedAt") : {}),
         },
         include: {
-          publishProcess: { select: { dataClass: true, processKey: true, purposeKey: true } },
+          publishProcess: {
+            select: {
+              dataClass: true,
+              purposeKey: true,
+            },
+          },
+          revision: { select: { titleProtectionPayload: true } },
           target: { include: { grant: true, enrollment: true } },
         },
         orderBy: [{ committedAt: "desc" }, { id: "desc" }],
@@ -638,7 +661,9 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
         release_id: release.id,
         source_label: "publication_release",
         occurred_at: release.committedAt.toISOString(),
-        summary: release.publishProcess.processKey,
+        summary: this.safePublicationSummary(
+          release.revision.titleProtectionPayload,
+        ),
         // Measured against this row's own Grant. A scope-level "does the family
         // hold any grant" would keep a revoked Grant's facts on the board for as
         // long as one unrelated grant survived.

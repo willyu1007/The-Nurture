@@ -528,11 +528,14 @@ const seedReleasableFor = async (world: Institution, children: Awaited<ReturnTyp
       state: "pending_release",
       dataClass: "child_growth_record",
       purposeKey: "child_growth_publication",
+      authorizingRoleAssignmentId: world.teacherRole.id,
       scheduledAt: new Date("2026-08-03T09:00:00.000Z"),
       notAfter: new Date("2026-08-03T11:00:00.000Z"),
       scheduleTimeZone: "Asia/Shanghai",
       schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
       schedulePolicyHead: 3,
+      schedulePolicyVersion: 1,
+      scheduleResolvedAt: new Date("2026-08-03T02:00:00.000Z"),
     },
   });
   const revision = await prisma.nurturePublishProcessRevision.create({

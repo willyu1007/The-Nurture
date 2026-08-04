@@ -23,6 +23,7 @@ import {
   parseSubmitFamilyCareQuestionInputV1,
   parseUpdateGuardianCurrentFocusInputV1,
   parseCancelPublishProcessInputV1,
+  parseRescheduleInputV1,
   parsePublishEditHoldInputV1,
   parseSavePublishProcessDraftInputV1,
   prepareAcknowledgeFamilyCareItem,
@@ -36,6 +37,7 @@ import {
   prepareUpdateGuardianCurrentFocus,
   prepareWithdrawFamilyCareRequest,
   preparePublishProcessCancel,
+  prepareReschedulePublishProcess,
   prepareConfirmChildMediaAttribution,
   prepareDetachPublishProcessMedia,
   prepareCorrectPublication,
@@ -66,6 +68,7 @@ import {
   createReleasePublishEditHoldSpec,
   createSavePublishProcessDraftSpec,
   createCancelPublishProcessSpec,
+  createReschedulePublishProcessSpec,
   createRecordCaregiverDailyCareSpec,
   createUpdateGuardianCurrentFocusSpec,
   loadBoardSurfaceRegistration,
@@ -98,6 +101,7 @@ import {
   type ItemActionPrepareDecision,
   type BoardMutationPrepareDecision,
   type CancelPublishProcessPrepareDecision,
+  type ReschedulePublishProcessPrepareDecision,
   type EditLanePrepareDecision,
   type LifecyclePrepareDecision,
   type NurtureCommandSpec,
@@ -221,7 +225,11 @@ export function createHarnessEngine(input: {
     new PrismaCaregiverDirectMessageEligibilityReadPort(input.prisma);
   const factsPort = new PrismaFamilyCareCommandTransaction(input.prisma);
   const queryReads = new PrismaFamilyCareHarnessQueryReadPort(input.prisma);
-  const guardianBoardReads = new PrismaGuardianBoardReadPort(input.prisma);
+  const protectedContent = createAesGcmProtectedContentPort({
+    keyRef: PROTECTED_CONTENT_KEY_REF,
+    keyMaterial: input.contentKey,
+  });
+  const guardianBoardReads = new PrismaGuardianBoardReadPort(input.prisma, protectedContent);
   // Prepare only reads: it enumerates the targets the fact owner would accept a
   // write for. The write itself happens inside the command transaction.
   const guardianFocusEligibility = new PrismaGuardianFocusEligibilityReadPort(input.prisma);
@@ -233,10 +241,6 @@ export function createHarnessEngine(input: {
   const caregiverBoardReads = new PrismaCaregiverBoardReadPort(input.prisma);
   const institutionBusinessCommunicationReads =
     new PrismaInstitutionBusinessCommunicationReadPort(input.prisma);
-  const protectedContent = createAesGcmProtectedContentPort({
-    keyRef: PROTECTED_CONTENT_KEY_REF,
-    keyMaterial: input.contentKey,
-  });
   const publishQueueReads = new PrismaPublishLaneReadPort(input.prisma, protectedContent);
   // The exact admitted contract identity and the registered module order come
   // from the artifact itself; the ingress never carries a literal copy.
@@ -279,6 +283,7 @@ export function createHarnessEngine(input: {
   const cancelPublishProcessSpec = createCancelPublishProcessSpec({
     integrity_key: input.integrityKey,
   });
+  const reschedulePublishProcessSpec = createReschedulePublishProcessSpec();
   const editLaneDeps = {
     reads: publishQueueReads,
     contexts,
@@ -449,6 +454,7 @@ export function createHarnessEngine(input: {
       | LifecyclePrepareDecision
       | BoardMutationPrepareDecision
       | CancelPublishProcessPrepareDecision
+      | ReschedulePublishProcessPrepareDecision
       | EditLanePrepareDecision,
   ): HarnessPrepareResponseV1 => {
     // Internal raw target ids (enrollment_id / item_id) never leave the
@@ -776,6 +782,38 @@ export function createHarnessEngine(input: {
         return {
           payload: { process_key: processKey, expected_process_version: expectedVersion },
           spec: cancelPublishProcessSpec as NurtureCommandSpec<never>,
+        };
+      },
+    },
+    reschedule_publish_process: {
+      prepare: optionalTarget((request) =>
+        prepareReschedulePublishProcess(
+          {
+            reads: publishQueueReads,
+            contexts,
+            integrity_key: input.integrityKey,
+          },
+          request,
+        ),
+      ),
+      build: (built) => {
+        const processKey = built.target_refs.publish_process;
+        const expectedScheduleVersion = built.expected_heads.publication_schedule;
+        const parsed = parseRescheduleInputV1(built.operation_input);
+        if (
+          !processKey ||
+          expectedScheduleVersion === undefined ||
+          parsed.status !== "ok"
+        ) {
+          return null;
+        }
+        return {
+          payload: {
+            process_key: processKey,
+            scheduled_at: parsed.input.scheduledAt,
+            expected_schedule_version: expectedScheduleVersion,
+          },
+          spec: reschedulePublishProcessSpec as NurtureCommandSpec<never>,
         };
       },
     },

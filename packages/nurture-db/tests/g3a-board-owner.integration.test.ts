@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import {
+  createAesGcmProtectedContentPort,
   PrismaBoardMutationTransaction,
   PrismaCaregiverBoardReadPort,
   PrismaCaregiverDailyCareEligibilityReadPort,
@@ -15,6 +16,10 @@ import {
 // head actually moves when the scope changes, and that an inline board mutation
 // lands on the fact owner rather than on any board-shaped row.
 const prisma = createPrismaClient();
+const protectedContent = createAesGcmProtectedContentPort({
+  keyRef: "g3a-family-activity",
+  keyMaterial: "g3a-family-activity-key-32-chars!",
+});
 
 afterAll(async () => {
   await prisma.$disconnect();
@@ -50,9 +55,24 @@ const seedWorld = async () => {
       workspaceId,
       displayName: "Care Center",
       status: "active",
-      policyConfigPayload: {
-        publicationPolicyRef: "nurture.institution-publication-policy@1.0.0",
-      },
+    },
+  });
+  await prisma.nurtureInstitutionPublicationPolicy.create({
+    data: {
+      workspaceId,
+      institutionId: institution.id,
+      policyRef: "nurture.institution-publication-policy@1.0.0",
+      policyVersion: 1,
+      policyHead: 1,
+      timeZone: "Asia/Shanghai",
+      defaultReleaseLocalTime: "17:00",
+      retryCutoffLocalTime: "19:00",
+      organizeIdleSeconds: 600,
+      organizeFallbackLeadSeconds: 1800,
+      automaticQuiescenceSeconds: 60,
+      captureActivityLeaseSeconds: 60,
+      automaticOrganizeEnabled: true,
+      effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
     },
   });
   const group = await prisma.nurtureCareGroup.create({
@@ -340,7 +360,7 @@ describe("G3-A owner reads: guardian lane", () => {
       participant_id: world.guardian.id,
       snapshot_at: SNAPSHOT_AT,
     });
-    const release = await seedRelease(world);
+    const { release } = await seedRelease(world);
     await prisma.nurturePublicationVisibilityEvent.create({
       data: {
         workspaceId: world.workspaceId,
@@ -361,8 +381,8 @@ describe("G3-A owner reads: guardian lane", () => {
 
   it("lists a released publication and drops it once the release is no longer visible", async () => {
     const world = await seedWorld();
-    const release = await seedRelease(world);
-    const reads = new PrismaGuardianBoardReadPort(prisma);
+    const { release, publishProcess } = await seedRelease(world);
+    const reads = new PrismaGuardianBoardReadPort(prisma, protectedContent);
     const listed = await reads.listGuardianEnrollmentActivity({
       workspace_id: world.workspaceId,
       participant_id: world.guardian.id,
@@ -374,6 +394,8 @@ describe("G3-A owner reads: guardian lane", () => {
     // Mapped, not defaulted: the earlier fallback sent every non-growth class to
     // `media`, so a released daily-care publication showed up as a photo.
     expect(listed.rows.map((row) => row.kind)).toEqual(["child_growth_record"]);
+    expect(listed.rows[0]?.summary).toBe("Spring outing");
+    expect(listed.rows[0]?.summary).not.toContain(publishProcess.processKey);
 
     await prisma.nurturePublicationRelease.update({
       where: { id: release.id },
@@ -518,6 +540,7 @@ const seedRelease = async (world: World) => {
       revision: 1,
       contentDigest: "sha256:content",
       organizerInputRevision: "organizer:1",
+      titleProtectionPayload: protectedContent.seal("Spring outing"),
     },
   });
   const target = await prisma.nurturePublishProcessTarget.create({
@@ -533,9 +556,13 @@ const seedRelease = async (world: World) => {
   });
   await prisma.nurturePublishProcess.update({
     where: { id: publishProcess.id },
-    data: { state: "released", frozenRevisionId: revision.id },
+    data: {
+      state: "released",
+      currentRevisionId: revision.id,
+      frozenRevisionId: revision.id,
+    },
   });
-  return prisma.nurturePublicationRelease.create({
+  const release = await prisma.nurturePublicationRelease.create({
     data: {
       workspaceId: world.workspaceId,
       publishProcessId: publishProcess.id,
@@ -545,6 +572,7 @@ const seedRelease = async (world: World) => {
       commandRequestIdHash: randomUUID().replace(/-/g, "").repeat(2),
     },
   });
+  return { release, publishProcess };
 };
 
 describe("G3-A owner reads: caregiver lane", () => {
@@ -564,9 +592,11 @@ describe("G3-A owner reads: caregiver lane", () => {
 
   it("treats an absent institution policy as unresolved rather than as a default window", async () => {
     const world = await seedWorld();
-    await prisma.nurtureCareInstitution.update({
-      where: { id: world.institution.id },
-      data: { policyConfigPayload: {} },
+    await prisma.nurtureInstitutionPublicationPolicy.deleteMany({
+      where: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+      },
     });
     const reads = new PrismaCaregiverBoardReadPort(prisma);
     const scope = await reads.loadCaregiverScope({

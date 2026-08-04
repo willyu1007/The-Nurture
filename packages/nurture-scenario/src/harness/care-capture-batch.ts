@@ -265,9 +265,9 @@ const idleSeconds = (activity: CaptureActivityHeadV1, now: Date): number =>
 export type CaptureOrganizeSourceV1 = {
   batch_id: string;
   /**
-   * The T-007 organize-parameter subset, resolved from the institution's
-   * explicit policy payload; absent means "not resolved" and prepare fails
-   * closed.
+   * The T-007 organize-parameter subset, resolved by the exact Institution
+   * owner provider; absent means dependency unavailable and every trigger
+   * fails closed.
    */
   organize_policy?: OrganizeTriggerPolicyV1;
   /**
@@ -306,9 +306,9 @@ export type CaptureBatchReadPort = {
 };
 
 /**
- * Loads the capture source through the owner port and evaluates the trigger
- * against it. The policy stays a caller input: it is resolved from T-007, not
- * from the capture owner.
+ * Loads the capture source and its exact T-007 policy through the owner port,
+ * then evaluates the trigger. Host timers provide only trigger identity and
+ * kind; timezone, policy head and thresholds are never caller authority.
  */
 export const resolveOrganizeTrigger = async (
   deps: { reads: CaptureBatchReadPort; now?: () => Date },
@@ -316,7 +316,6 @@ export const resolveOrganizeTrigger = async (
   request: {
     trigger: OrganizeTriggerKindV1;
     trigger_request_id: string;
-    policy: OrganizeTriggerPolicyV1;
   },
 ): Promise<
   | { status: "no_batch" }
@@ -330,6 +329,13 @@ export const resolveOrganizeTrigger = async (
     snapshot_at: now.toISOString(),
   });
   if (!source) return { status: "no_batch" };
+  if (!source.organize_policy) {
+    return {
+      status: "evaluated",
+      batch_id: source.batch_id,
+      decision: { status: "invalid", reason_code: "policy_unavailable" },
+    };
+  }
   return {
     status: "evaluated",
     batch_id: source.batch_id,
@@ -337,7 +343,7 @@ export const resolveOrganizeTrigger = async (
       trigger: request.trigger,
       trigger_request_id: request.trigger_request_id,
       now,
-      policy: request.policy,
+      policy: source.organize_policy,
       batch: {
         state: source.state,
         captures: source.captures,

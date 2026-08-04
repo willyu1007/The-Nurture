@@ -335,6 +335,16 @@ digest on the formal ingress has not happened, and B5 blocks the consumer side.
 6. **Joint runs** — T-007 provider-backed schedule/release, then the T-005 G2-C
    joint journey. Closes B6 and B7.
 
+> **2026-08-05 candidate update:** the exact T-007 provider, formal reschedule
+> route, provider-backed queue admission and both cross-task journeys are now
+> implemented. The owner-integration runner requires runtime completion markers
+> for the persisted T-007 → T-006 organize/admission/reschedule/release journey
+> and the T-006 → T-005 owner-issued direct-interaction journey. The production-
+> DB provider matrix also covers owner policy → idle/fallback, stable watermark,
+> exact replay, machine-progress exclusion and default-off absence. Step 6 and
+> G3-E remain **pending**, because neither migration apply nor the PostgreSQL
+> suites have been executed under the required explicit DB-write authorization.
+
 Steps 1–5 are T-006's own work and are the natural content of one preparatory
 checkpoint. Steps 6 depends on other tasks and cannot be pulled forward.
 

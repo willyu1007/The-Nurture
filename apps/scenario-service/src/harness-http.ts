@@ -48,6 +48,7 @@ export const HARNESS_CAPABILITY_VERSIONS = {
   redact_publication: "1.0.0",
   release_publish_process: "1.0.0",
   organize_care_capture_batch: "1.0.0",
+  reschedule_publish_process: "1.0.0",
 } as const;
 
 export const HARNESS_QUERY_CAPABILITY_VERSIONS = {

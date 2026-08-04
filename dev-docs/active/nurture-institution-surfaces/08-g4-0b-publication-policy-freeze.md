@@ -5,12 +5,14 @@
 - Date: 2026-08-01
 - Contract identity: `nurture.institution-publication-policy@1.0.0`
 - Verdict: `G4_0B_CONTRACT_FREEZE_PASS`
-- Implementation: pending
-- Provider/consumer qualification: pending
+- Implementation candidate: ready; database qualification pending
+- Provider/consumer qualification: pending database-backed execution
 
 This record freezes the T-007-owned publication-policy contract consumed by
-T-006 G3-D/E. It does not add a database model, policy repository, Admin
-command, capability, activation or traffic authority.
+T-006 G3-D/E. The current implementation candidate adds the owner
+table/read repository and T-006 consumer wiring, but no Admin command, policy
+write capability, activation or traffic authority. Contract freeze is not
+provider/consumer qualification.
 
 ## Ownership and Boundary
 
@@ -120,5 +122,6 @@ Implementation is not complete until T-007 and T-006 jointly prove:
 - `scheduledAt`/`notAfter` persistence and release-time reread;
 - final default-off/false-empty census.
 
-Until then T-006 G3-D/E must report the publication-policy dependency as
-unavailable and cannot issue a Beta Profile Handoff.
+Until then T-006 G3-D/E cannot issue a Beta Profile Handoff. In the candidate,
+fact absence still reports the dependency as unavailable; configured rows are
+not considered qualified until the database-backed joint evidence passes.

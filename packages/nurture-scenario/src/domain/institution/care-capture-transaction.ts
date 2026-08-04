@@ -1,5 +1,7 @@
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
-import type { NurtureCaregiverWriteAuthority } from "./publish-process-transaction.js";
+import type {
+  NurtureCaregiverWriteAuthority,
+} from "./publish-process-transaction.js";
 
 type DomainContextRef = CanonicalRef;
 
@@ -33,6 +35,8 @@ export type NurtureOrganizeTargetFact = {
 
 export type NurtureOrganizeCutFacts = {
   authority: NurtureCaregiverWriteAuthority;
+  /** Exact role episode that authorizes the future scheduler attempt. */
+  authorizing_role_assignment_id: string;
   care_group_id: string;
   /** The instant this read was true at; every window decision is judged here. */
   read_at: string;
@@ -46,13 +50,18 @@ export type NurtureOrganizeCutFacts = {
   organize_policy?: {
     policy_ref: string;
     policy_head: number;
+    institution_ref: string;
+    policy_version: number;
     time_zone: string;
     default_release_local_time: string;
+    retry_cutoff_local_time: string;
     organize_idle_seconds: number;
     organize_fallback_lead_seconds: number;
     automatic_quiescence_seconds: number;
     capture_activity_lease_seconds: number;
     automatic_organize_enabled: boolean;
+    effective_from: string;
+    effective_to?: string;
   };
   batch?: {
     batch_id: string;
@@ -73,6 +82,18 @@ export type NurtureOrganizeCutApplyInput = {
   expected_batch_version: number;
   included_capture_ids: string[];
   organizer_input_revision: string;
+  /**
+   * The exact policy-backed trigger evidence that cut this batch. The owner
+   * persists the durable subset instead of reconstructing it from the route.
+   */
+  trigger_evidence: {
+    trigger: "manual" | "idle" | "daily_fallback";
+    policy_ref: string;
+    policy_head: number;
+    time_zone: string;
+    quiescence_seconds: number;
+    observed_user_activity_at: string;
+  };
   /**
    * Recorded for every route. `direct_interaction_required` deliberately
    * creates no process, and the most safety-relevant decision of all must
@@ -102,6 +123,7 @@ export type NurtureOrganizeCutApplyInput = {
     media_asset_ids: string[];
     /** The owner-issued source refs later edits must retain provenance from. */
     source_refs: string[];
+    authorizing_role_assignment_id: string;
     targets: Array<{
       target_key: string;
       child_care_process_id: string;
