@@ -20,7 +20,9 @@
   （工厂 `finalize` 钩子解决 `command_execution_id` 外键时序，幂等复述从存储
   事件作答）全部落地。ingress 现准入 23 action + 9 query；显式未路由恰为三条
   结构性阻塞（release 需多命令 ingress 形状、reschedule 等 T-007、organize 待
-  CareGroup 绑定与 outcome 枚举的合同决定）。**B5 已于 2026-08-04 落地**：
+  CareGroup 绑定与 outcome 枚举的合同决定）。**release 已于 2026-08-04 以传输层
+  fan-out attempt 形状路由**（24 action + 9 query；未路由恰为 organize 与
+  reschedule 两条）。**B5 已于 2026-08-04 落地**：
   `direct_interaction_required` 决定携带 owner-issued T-005 动作（现时资格 ∩
   候选目标集铸造 `targetOptionRef`，安全阻断走冻结分类）。余下：B6/B7 的外部
   联合运行。详见
