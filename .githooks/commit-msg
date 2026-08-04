@@ -8,7 +8,10 @@
 # Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 #
 # Also checks the `Task: T-###` trailer that links a commit to a dev-docs task.
-# The check warns by default. To block instead:
+# Missing task links warn by default. A literal `Task:` line outside Git's
+# final contiguous trailer block is always rejected because Git would silently
+# ignore it and project recovery would lose the commit association. To make
+# missing links block too:
 #   git config hooks.requireTaskTrailer true
 #
 # Skip once: SKIP_TASK_TRAILER=1 git commit -m "..."
@@ -87,8 +90,23 @@ report() {
 }
 
 # Parse real trailers only (not arbitrary "Task:" lines in the body).
-TASK_LINES=$(git interpret-trailers --parse <"$COMMIT_MSG_FILE" | grep -E '^Task:')
+TASK_LINES=$(printf '%s\n' "$COMMIT_MSG" | git interpret-trailers --parse | grep -E '^Task:')
 TASK_COUNT=$(printf '%s\n' "$TASK_LINES" | grep -c .)
+RAW_TASK_LINES=$(printf '%s\n' "$COMMIT_MSG" | grep -E '^[[:space:]]*Task:[[:space:]]*' || true)
+RAW_TASK_COUNT=$(printf '%s\n' "$RAW_TASK_LINES" | grep -c .)
+
+# `git interpret-trailers` recognizes only one contiguous footer block. A blank
+# line between Task and another footer such as Co-Authored-By turns Task into a
+# body line even though it looks correct to a reader. Never accept that silent
+# loss of traceability, regardless of the missing-trailer strictness setting.
+if [ "$RAW_TASK_COUNT" -gt "$TASK_COUNT" ]; then
+  echo "[hook] A Task line is outside the final Git trailer block."
+  echo ""
+  echo "Keep all trailers contiguous, with no blank lines between them:"
+  echo "  Task: T-###"
+  echo "  Co-Authored-By: Name <email>"
+  exit 1
+fi
 
 if [ "$TASK_COUNT" -gt 1 ]; then
   report "Multiple Task trailers found; use exactly one 'Task: T-###' trailer." "$FIX_HINT"

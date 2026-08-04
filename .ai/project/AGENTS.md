@@ -55,6 +55,9 @@ Installed hooks:
 - `commit-msg`: Validates conventional commit format and any `Task: T-###` trailer
 
 The trailer check warns by default. To block instead: `git config hooks.requireTaskTrailer true`.
+All trailers belong to one contiguous final block. Do not put a blank line between
+`Task: T-###` and `Co-Authored-By`, `Docs`, `Phase`, or `Verify`; the commit hook rejects
+an explicit `Task:` line that Git would otherwise parse as ordinary body text.
 To skip the trailer hooks once:
 - sh/bash: `SKIP_TASK_TRAILER=1 git commit -m "..."`
 - PowerShell: `$env:SKIP_TASK_TRAILER="1"; git commit -m "..."; Remove-Item Env:SKIP_TASK_TRAILER`
