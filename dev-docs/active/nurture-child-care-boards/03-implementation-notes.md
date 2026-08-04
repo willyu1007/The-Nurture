@@ -1949,3 +1949,19 @@ G3-E 就绪评审点名的已知缺陷:`resolveCaregiverReach` 返回"第一个�
 - 默认行为不变:无选项时绑唯一/最早 family。
 - DB 测试:双子女 guardian 默认绑最早、两家 enrollment 都在选项集、按第二家
   重绑标签正确、不可达 family 拒绝;证伪(owner 忽略 bind)CAUGHT。
+
+## 2026-08-05 — G3-E 自备:owner-integration 证据层
+
+合成资格化按设计不主张真实 owner 路径;新增 `verify:owner-integration`
+(`scripts/surface-contract/run-owner-integration.mjs`)作为缺失的证据层:
+
+- **普查先行**:从传输层读出 formal ingress 准入的全部 key(25 action + 9
+  query),任何一个在端到端套件里连名字都没出现即失败——先于任何测试运行。
+  普查揭示 3 条 query 无真实路径证据(guardian enrollment activity /
+  caregiver child today / teacher publish queue),已补 e2e(owner 选项选择、
+  原始 id 线上扫描)。
+- **证据本体**:真实 scenario-service HTTP + 一次性 PostgreSQL 的两套 e2e
+  (harness 49 + binding-owner 6)。
+- **主张边界**:明确打印 joint-conformance=NOT-RUN——T-007 provider 与 T-005
+  G2-C 联合运行仍是外部门控的独立资格化,这一层不冒充。
+- 证伪:把一条 query 字面量拆开(census 抓不到)→ 失败,CAUGHT。

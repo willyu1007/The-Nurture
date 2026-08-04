@@ -1007,3 +1007,13 @@ semantic, not drift.
 | low: concurrent-remove loser surfaces as technical_error | ACCEPTED — serializable isolation makes the window retry-shaped; the monotone FROM guard keeps it safe |
 | low: already_satisfied previews report affected_publications; e2e envelope naming nits | DEFERRED — cosmetic |
 | full suites after all fixes: unit 563, db 206, e2e 48 | PASS |
+
+## 2026-08-05 — G3-E Self-Prep Closed (dual-class, family selector, owner-integration evidence)
+
+| Command / check | Result |
+| --- | --- |
+| dual-class caregiver: listings union all classes; row-scoped loads/writes resolve the row's own class; sibling-class refusals tightened to fact-absence; queue resolves the requested class | LANDED — falsified (first-group revert): CAUGHT |
+| multi-child guardian: unique_eligible_default implemented as registered — all families' enrollments offered, board rebinds whole to the selected family, foreign family refused | LANDED — falsified (bind ignored): CAUGHT |
+| `verify:owner-integration`: census of all 25 actions + 9 queries against real-path e2e evidence, then the suites (49 + 6 on real HTTP + PostgreSQL) | PASS — falsified (split literal): CAUGHT |
+| three queries previously without real-path evidence now exercised end to end | FIXED |
+| full suites: unit 563, db 208, scenario-service e2e 49; all DB-free gates | PASS |

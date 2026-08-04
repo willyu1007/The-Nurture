@@ -7,6 +7,7 @@ import {
   issueDisplayRef,
   issueFamilyCareMessageTargetRef,
   issueBoardSealedRef,
+  issueTargetOptionRef,
   issueChildOptionRef,
   issueMediaAssetTargetRef,
   issuePublicationRef,
@@ -2003,6 +2004,50 @@ describe("G3-A board lane through the formal Harness ingress", () => {
     // A family-scope goal never becomes child focus, and no raw id is exposed.
     expect(focus.json.output.childFocus).toEqual([]);
     expect(JSON.stringify(focus.json)).not.toContain(scope.process.id);
+  });
+
+  it("serves the remaining board queries on the real owner path", async () => {
+    const scope = await seedScope();
+
+    // Guardian enrollment activity: target selection is the owner-issued
+    // option, never a raw Enrollment id.
+    const activity = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "board",
+      capability_key: "query_guardian_enrollment_activity",
+      capability_version: "1.0.0",
+      target_option_ref: issueTargetOptionRef(INTEGRITY_KEY, {
+        workspace_id: scope.workspaceId,
+        participant_id: scope.guardian.id,
+        enrollment_id: scope.enrollment.id,
+      }),
+    });
+    expect(activity.status).toBe(200);
+    expect(activity.json.status).toBe("ok");
+    expect(activity.json.output.items).toEqual([]);
+    expect(JSON.stringify(activity.json)).not.toContain(scope.enrollment.id);
+
+    const childToday = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "query_caregiver_child_today",
+      capability_version: "1.0.0",
+    });
+    expect(childToday.status).toBe(200);
+    expect(childToday.json.status).toBe("ok");
+
+    const queue = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.caregiver.id,
+      surface: "board",
+      capability_key: "query_teacher_publish_queue",
+      capability_version: "1.0.0",
+    });
+    expect(queue.status).toBe(200);
+    expect(queue.json.status).toBe("ok");
+    expect(JSON.stringify(queue.json)).not.toContain(scope.group.id);
   });
 
   it("refuses the caregiver board to a guardian and the guardian board to a caregiver", async () => {
