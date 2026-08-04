@@ -49,6 +49,10 @@ import {
   issuePublicationRef,
   type PublishProcessStateV1,
 } from "./publish-process.js";
+import {
+  currentPublishEditHold,
+  requiresOnlineEditHold,
+} from "./publish-process-editing.js";
 
 /**
  * G3-D post-release safety and media lifecycle actions
@@ -131,7 +135,12 @@ export type StoredVisibilityEventFactV1 = {
 export type CommittedPublicationFactV1 = {
   publication_id: string;
   target_key: string;
-  receipt_id: string;
+  /**
+   * Absent when the owner cannot prove the Receipt — refusal territory,
+   * never "": the empty-string sentinel hashed into a valid-looking
+   * preserved ref shared by every receiptless publication.
+   */
+  receipt_id?: string;
   release_revision: number;
   visibility: "visible" | "removed" | "redacted";
   /**
@@ -140,6 +149,15 @@ export type CommittedPublicationFactV1 = {
    * decision at a moment, and of a shape, the decision did not have.
    */
   events: StoredVisibilityEventFactV1[];
+};
+
+/**
+ * A publication whose Receipt the owner has proven. The only shape an event
+ * projection accepts: both lanes refuse the process before this type exists
+ * for a receiptless row.
+ */
+export type ProvenCommittedPublicationFactV1 = CommittedPublicationFactV1 & {
+  receipt_id: string;
 };
 
 export type PublicationSafetyFactsV1 = {
@@ -222,7 +240,7 @@ export const parseReasonInput = (
 const buildEvent = (
   deps: PublicationSafetyDependencies,
   scope: BoardScopeV1,
-  publication: CommittedPublicationFactV1,
+  publication: ProvenCommittedPublicationFactV1,
   kind: PublicationVisibilityEventKindV1,
   reason: PublicationSafetyReasonV1,
   occurredAt: string,
@@ -252,7 +270,9 @@ const buildEvent = (
 });
 
 type SafetyContext = {
-  facts: PublicationSafetyFactsV1;
+  facts: Omit<PublicationSafetyFactsV1, "publications"> & {
+    publications: ProvenCommittedPublicationFactV1[];
+  };
   occurredAt: string;
 };
 
@@ -278,14 +298,29 @@ const loadSafetyContext = async (
   // visibility, without waiting for an institution role.
   if (!actorEligible(facts.authority)) return { denied: "not_authorized" };
   if (facts.publications.length === 0) return { denied: "no_committed_publication" };
-  return { facts, occurredAt: (deps.now ?? (() => new Date()))().toISOString() };
+  const publications: ProvenCommittedPublicationFactV1[] = [];
+  for (const publication of facts.publications) {
+    if (!publication.receipt_id) {
+      // The same refusal, at the same scope, as the write lane: prepare must
+      // never promise an action execute refuses on its first receiptless row.
+      return { denied: "receipt_evidence_unavailable" };
+    }
+    publications.push(publication as ProvenCommittedPublicationFactV1);
+  }
+  return {
+    facts: { ...facts, publications },
+    occurredAt: (deps.now ?? (() => new Date()))().toISOString(),
+  };
 };
 
 /** The stored event projected back into the public vocabulary. */
 const storedEventRecord = (
   deps: { integrity_key: string },
   scope: BoardScopeV1,
-  publication: Pick<CommittedPublicationFactV1, "publication_id" | "receipt_id" | "release_revision">,
+  publication: Pick<
+    ProvenCommittedPublicationFactV1,
+    "publication_id" | "receipt_id" | "release_revision"
+  >,
   event: StoredVisibilityEventFactV1,
 ):
   | { status: "ok"; event: PublicationVisibilityEventV1 }
@@ -299,7 +334,7 @@ const storedEventRecord = (
     event: buildEvent(
       deps as PublicationSafetyDependencies,
       scope,
-      publication as CommittedPublicationFactV1,
+      publication as ProvenCommittedPublicationFactV1,
       event.kind,
       event.reason_key as PublicationSafetyReasonV1,
       event.occurred_at,
@@ -448,6 +483,15 @@ export const redactPublication = async (
 export type MediaLifecycleFactsV1 = {
   authority: CaregiverFactAuthorityV1;
   process_state: PublishProcessStateV1;
+  /** The instant this read was true at; hold expiry is judged here only. */
+  read_at: string;
+  /** The stored hold, whether or not it has expired; expiry is the rule's call. */
+  current_hold?: {
+    holder_participant_id: string;
+    holder_label: string;
+    expires_at: string;
+    hold_version: number;
+  };
   /**
    * The head `detach_publish_process_media` binds `draft_revision must_equal`
    * to. Detaching appends a new revision, so it needs the one it is detaching
@@ -509,6 +553,16 @@ export const detachPublishProcessMedia = async (
   });
   if (!facts) return { status: "denied", reason_code: "target_unavailable" };
   if (!actorEligible(facts.authority)) return { status: "denied", reason_code: "not_authorized" };
+  // Detaching edits the shared composition, so it obeys the two draft-save
+  // hold rules; expiry is judged at the owner's read instant, on no other
+  // clock.
+  const hold = currentPublishEditHold(facts, new Date(facts.read_at));
+  if (hold && hold.holder_participant_id !== scope.participant_id) {
+    return { status: "denied", reason_code: "held_by_other" };
+  }
+  if (requiresOnlineEditHold(facts.process_state) && !hold) {
+    return { status: "denied", reason_code: "edit_hold_required" };
+  }
   return evaluateMediaDetach(deps.integrity_key, scope, {
     process_state: facts.process_state,
     composition_media_ids: facts.composition_media_ids,
@@ -651,6 +705,16 @@ export const prepareDetachPublishProcessMedia = async (
   });
   if (!facts) return { status: "denied", reason_code: "target_unavailable" };
   if (!actorEligible(facts.authority)) return { status: "denied", reason_code: "not_authorized" };
+
+  // The same two hold rules the execute spec enforces: prepare must not
+  // issue a confirmation the command is certain to refuse.
+  const hold = currentPublishEditHold(facts, new Date(facts.read_at));
+  if (hold && hold.holder_participant_id !== request.participant_id) {
+    return { status: "denied", reason_code: "held_by_other" };
+  }
+  if (requiresOnlineEditHold(facts.process_state) && !hold) {
+    return { status: "denied", reason_code: "edit_hold_required" };
+  }
 
   const decision = evaluateMediaDetach(deps.integrity_key, scope, {
     process_state: facts.process_state,
@@ -852,6 +916,18 @@ export const createDetachPublishProcessMediaSpec = (deps: {
       }
       if (!isPublishProcessState(facts.process_state)) {
         return { status: "blocked", reason_code: "process_not_editable" };
+      }
+      // Detaching is an edit of the shared composition, so it obeys the same
+      // two hold rules as a draft save: another teacher's live hold
+      // serializes it away, and a queued process needs an online hold —
+      // offline devices cannot reliably stop a server-side scheduled send.
+      // Expiry is judged at the owner's own read instant, on no other clock.
+      const hold = currentPublishEditHold(facts, new Date(facts.read_at));
+      if (hold && hold.holder_participant_id !== context.business_actor_ref) {
+        return { status: "blocked", reason_code: "held_by_other" };
+      }
+      if (requiresOnlineEditHold(facts.process_state) && !hold) {
+        return { status: "blocked", reason_code: "edit_hold_required" };
       }
       const decision = evaluateMediaDetach(deps.integrity_key, mediaCommandScope(context), {
         process_state: facts.process_state,
@@ -1212,7 +1288,7 @@ const PUBLICATION_VISIBILITIES = ["visible", "removed", "redacted"] as const;
 const asCommittedFact = (
   publication: SafetyWritePublication,
 ):
-  | { status: "ok"; fact: CommittedPublicationFactV1 }
+  | { status: "ok"; fact: ProvenCommittedPublicationFactV1 }
   | { status: "denied"; reason_code: string } => {
   if (
     !PUBLICATION_VISIBILITIES.includes(
@@ -1258,17 +1334,34 @@ const asCommittedFact = (
 
 type SafetyAppendPlan = {
   kind: PublicationVisibilityEventKindV1;
-  targets: CommittedPublicationFactV1[];
+  targets: ProvenCommittedPublicationFactV1[];
   updates: Array<{
     publication_id: string;
     from_visibility: string[];
     to_visibility: "removed" | "redacted";
   }>;
+  /**
+   * The aggregate the action operated on — the one output ref. Per-event refs
+   * live in `committed_result.events`; naming every event here would grow
+   * with the release count and cross the kernel's 32-ref bound on a
+   * whole-class process, turning a rolled-back redaction into a permanent
+   * `outcome_unknown`.
+   */
+  publish_process_ref: NurturePublicationSafetyWriteFacts["publish_process_ref"];
 };
 
+/** What a rule decides; the aggregate ref is attached by authorize, from facts. */
+type SafetyRulePlan = Omit<SafetyAppendPlan, "publish_process_ref">;
+
 type SafetyRuleDecision =
-  | { status: "append"; plan: SafetyAppendPlan }
-  | { status: "already_satisfied"; answers: Array<{ fact: CommittedPublicationFactV1; event: StoredVisibilityEventFactV1 }> }
+  | { status: "append"; plan: SafetyRulePlan }
+  | {
+      status: "already_satisfied";
+      answers: Array<{
+        fact: ProvenCommittedPublicationFactV1;
+        event: StoredVisibilityEventFactV1;
+      }>;
+    }
   | { status: "denied"; reason_code: string };
 
 const createPublicationSafetySpec = <
@@ -1280,7 +1373,7 @@ const createPublicationSafetySpec = <
     command_scope: string;
     canonicalize(input: Command): unknown;
     revalidate(input: Command): boolean;
-    evaluate(facts: CommittedPublicationFactV1[], input: Command): SafetyRuleDecision;
+    evaluate(facts: ProvenCommittedPublicationFactV1[], input: Command): SafetyRuleDecision;
     /** The sealed correction body, when this action carries one. */
     body_envelope?(input: Command): unknown;
   },
@@ -1326,7 +1419,7 @@ const createPublicationSafetySpec = <
       if (facts.publications.length === 0) {
         return { status: "blocked", reason_code: "no_committed_publication" };
       }
-      const committed: CommittedPublicationFactV1[] = [];
+      const committed: ProvenCommittedPublicationFactV1[] = [];
       for (const publication of facts.publications) {
         const fact = asCommittedFact(publication);
         if (fact.status === "denied") return { status: "blocked", reason_code: fact.reason_code };
@@ -1336,25 +1429,28 @@ const createPublicationSafetySpec = <
       if (decision.status === "denied") {
         return { status: "blocked", reason_code: decision.reason_code };
       }
-      if (decision.status === "already_satisfied") {
-        const scope = safetyCommandScope(context);
-        const events: PublicationVisibilityEventV1[] = [];
-        for (const answer of decision.answers) {
-          const record = storedEventRecord(deps, scope, answer.fact, answer.event);
-          if (record.status === "denied") {
-            return { status: "blocked", reason_code: record.reason_code };
-          }
-          events.push(record.event);
-        }
+      if (decision.status === "append") {
         return {
-          status: "already_satisfied",
-          effect: {
-            output_refs: [facts.publish_process_ref],
-            committed_result: { events },
-          },
+          status: "authorized",
+          write: { ...decision.plan, publish_process_ref: facts.publish_process_ref },
         };
       }
-      return { status: "authorized", write: decision.plan };
+      const scope = safetyCommandScope(context);
+      const events: PublicationVisibilityEventV1[] = [];
+      for (const answer of decision.answers) {
+        const record = storedEventRecord(deps, scope, answer.fact, answer.event);
+        if (record.status === "denied") {
+          return { status: "blocked", reason_code: record.reason_code };
+        }
+        events.push(record.event);
+      }
+      return {
+        status: "already_satisfied",
+        effect: {
+          output_refs: [facts.publish_process_ref],
+          committed_result: { events },
+        },
+      };
     },
     apply: async (owner, input, context, plan) => {
       const scope = safetyCommandScope(context);
@@ -1378,13 +1474,12 @@ const createPublicationSafetySpec = <
         ...(shape.body_envelope ? { body_envelope: shape.body_envelope(input) } : {}),
       }));
       return {
-        output_refs: events.map((event) => ({
-          schema_version: 1 as const,
-          namespace: "nurture",
-          object_type: "publication_visibility_event",
-          object_id: event.event_id,
-          version: 1,
-        })),
+        // One aggregate ref, like the already_satisfied answer above: a
+        // whole-class process has one lineage row per release, and a
+        // per-event list would cross the kernel's 32-ref bound — turning a
+        // definitely-rolled-back redaction into a permanent outcome_unknown.
+        // The events themselves are named in `committed_result.events`.
+        output_refs: [plan.publish_process_ref],
         committed_result: {
           events: plan.targets.map((publication) =>
             buildEvent(
@@ -1501,7 +1596,7 @@ export const createRedactPublicationSpec = (deps: {
       );
       if (pending.length === 0) {
         const answers: Array<{
-          fact: CommittedPublicationFactV1;
+          fact: ProvenCommittedPublicationFactV1;
           event: StoredVisibilityEventFactV1;
         }> = [];
         for (const publication of publications) {

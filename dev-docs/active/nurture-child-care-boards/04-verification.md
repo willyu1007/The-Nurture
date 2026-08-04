@@ -936,3 +936,25 @@ amendment plus artifact rotation, not a code-only change.
 | e2e: correct → remove → repeat-from-stored → redact → terminal repeat; full lineage survives naming its commands; release + Receipt untouched | PASS |
 | `pnpm typecheck` / `test:unit` / `test:db` / `test:scenario-service:db` | PASS — 550, 205, 40 |
 | full DB-free gate set | PASS — artifact unchanged at `1.14.0` |
+
+## 2026-08-04 — Adversarial Review of the Two Newest Units (49d9a..e0c0b, 17-agent workflow)
+
+Four read-only lenses (finalize-hook, media-pair, safety-trio, tests-and-wire),
+each finding adversarially verified by an independent agent. 15/17 agents
+completed; one verify (correct/redact execute-time target-set drift) and the
+final synthesis hit the session limit — the drift question was re-verified by
+hand: the headless `compatible_append` declaration plus the monotone FROM set
+make process-wide application to post-confirmation releases the intended
+semantic, not drift.
+
+| Finding (deduplicated) | Verdict | Disposition |
+| --- | --- | --- |
+| HIGH — safety trio emits one output ref per release; >32 releases crosses the kernel bound, and `validateRefs` threw OUTSIDE the deterministic-rollback catch, so a definitely-rolled-back redaction reported `outcome_unknown` forever | confirmed | FIXED — applied effect now names the aggregate once (`publish_process_ref`, matching the already_satisfied branch; events stay in `committed_result`); kernel moves `validateRefs` inside the classification. Both falsified: CAUGHT |
+| Read lane still encoded a missing Receipt as `""` (three lenses found it independently) — prepare promised what execute refuses, and the empty string hashed into a shared valid-looking preserved receipt ref | confirmed | FIXED — `receipt_id` is optional and omitted by the owner read; `loadSafetyContext` refuses `receipt_evidence_unavailable` at the same scope as the write lane; `ProvenCommittedPublicationFactV1` makes an unproven receipt unrepresentable in `buildEvent`. Falsified: CAUGHT |
+| Detach bypassed both draft-save hold rules (`held_by_other`, `edit_hold_required` on `pending_release`) in all three paths | confirmed | FIXED — read wrapper, prepare and execute spec all judge `currentPublishEditHold` at the owner's `read_at`; media facts now carry `read_at` + `current_hold`. Falsified: CAUGHT |
+| remove's execute build ignored the resubmitted `publicationRef` (frozen target silently used instead) | confirmed | FIXED — `boundPublicationId` requires equality with the sealed ref re-issued from the frozen id, like the media/child bindings |
+| Discard's only frozen head (`media_asset_revision`) can never drift, so the confirmed `affected_draft_count` is unenforceable | confirmed | OPEN — needs a `referencing_draft_count must_equal` head: registry amendment + artifact rotation to 1.15.0 (tracked as its own unit) |
+| No DB-backed test forces a finalize throw after the visibility update | confirmed (coverage) | OPEN — tracked with the rotation unit |
+| e2e raw-id wire scans skip most discard/safety envelopes | confirmed (coverage) | OPEN — tracked |
+| 9 lows (finalize re-resolves reach on its own clock; eventRef same-ms collision; detach replay answers from current composition; duplicate composition entries; concurrent-remove as technical_error; already_satisfied preview wording; test-name overclaim) | low | OPEN — triage recorded, fix opportunistically |
+| full gates after fixes: typecheck, unit 558, test:db 205, scenario-service:db 40, ingress/freeze/schema/routing/governance/docs | PASS |

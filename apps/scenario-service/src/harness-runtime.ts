@@ -78,6 +78,7 @@ import {
   queryGuardianCurrentFocus,
   queryGuardianEnrollmentActivity,
   queryGuardianFamilyCareTimeline,
+  issuePublicationRef,
   queryTeacherPublishQueue,
   readInstitutionBusinessCommunication,
   resolveCareItemTargetRef,
@@ -373,6 +374,26 @@ export function createHarnessEngine(input: {
       frozenChildId,
     );
     return expected === resubmittedRef ? frozenChildId : null;
+  };
+
+  /**
+   * Binds one resubmitted publication ref to the id the confirmation froze,
+   * like the media and child bindings above: a caller that resubmits a
+   * different publication than it prepared is refused, not silently
+   * corrected to the frozen one.
+   */
+  const boundPublicationId = (
+    built: BuildInput,
+    resubmittedRef: unknown,
+    frozenPublicationId: string | undefined,
+  ): string | null => {
+    if (typeof resubmittedRef !== "string" || !frozenPublicationId) return null;
+    const expected = issuePublicationRef(
+      input.integrityKey,
+      { workspace_id: built.workspace_id, participant_id: built.actor_participant_id },
+      frozenPublicationId,
+    );
+    return expected === resubmittedRef ? frozenPublicationId : null;
   };
 
   /** The three hold transitions differ only by which spec they commit through. */
@@ -940,7 +961,14 @@ export function createHarnessEngine(input: {
       build: (built) => {
         const parsed = parseReasonInput(built.operation_input, "publicationRef");
         const processKey = built.target_refs.publish_process;
-        const publicationId = built.target_refs.publication;
+        const publicationId =
+          parsed.status === "ok"
+            ? boundPublicationId(
+                built,
+                parsed.input.publicationRef,
+                built.target_refs.publication,
+              )
+            : null;
         if (parsed.status !== "ok" || !processKey || !publicationId) return null;
         return {
           payload: {

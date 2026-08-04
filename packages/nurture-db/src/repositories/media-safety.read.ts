@@ -303,7 +303,7 @@ export class PrismaMediaSafetyReadPort
     const process = input.process_key
       ? await this.prisma.nurturePublishProcess.findFirst({
           where: { workspaceId: input.workspace_id, processKey: input.process_key },
-          include: { currentRevision: true },
+          include: { currentRevision: true, editHold: { include: { holder: true } } },
         })
       : null;
     if (input.process_key && !process) return null;
@@ -374,6 +374,17 @@ export class PrismaMediaSafetyReadPort
       // Answering "draft" invented one; `cancelled` is the one value that can
       // never gate this decision, so it reads as "not a process question".
       process_state: process?.state ?? "cancelled",
+      read_at: at.toISOString(),
+      ...(process?.editHold
+        ? {
+            current_hold: {
+              holder_participant_id: process.editHold.holderParticipantId,
+              holder_label: process.editHold.holder.displayLabel ?? "",
+              expires_at: process.editHold.expiresAt.toISOString(),
+              hold_version: process.editHold.aggregateVersion,
+            },
+          }
+        : {}),
       // The revision a detach would append after. Zero on the global path,
       // where there is no draft to detach from.
       draft_revision: process?.currentRevision?.revision ?? 0,

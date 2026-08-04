@@ -1780,3 +1780,29 @@ MISSED:把资格读取挪到路由判定之前,25 个测试仍绿——resolver 
 resolver 的调用。改成**计数端口**(`calls() === 0` 断言)后再证伪,CAUGHT。
 "证伪验收覆盖"的第三次应验,且这次教训更具体:**守卫技术要匹配泄漏通道——
 异常会被沿途的 catch 吞掉,计数不会**。
+
+## 2026-08-04 — 对抗性复核修复:两个最新单元的 4 条 confirmed
+
+17-agent 工作流复核媒体对 + 安全三条(4 条视角 lens → 独立对抗验证)。confirmed
+去重后 6 条,本单元修 4 条,discard 头旋转与两条覆盖债列为后续单元。
+
+- **[high] 批量安全动作越过内核 32-ref 上限**:correct/redact 按 release 逐个命名
+  output_refs,33 目标班级的 redaction 在 `validateRefs` 抛错——且它在确定性回滚
+  分类**之外**,回滚被报成永远无法 reconcile 的 `outcome_unknown`。双侧修复:
+  applied 效果与 already_satisfied 一致只命名聚合(`publish_process_ref`,事件在
+  `committed_result`);内核把 `validateRefs` 挪进分类 try(规格缺陷 = 确定回滚)。
+- **读道回执空串哨兵(三条 lens 独立发现)**:写道已拒绝的 `""` 在读道仍被哈希成
+  "共享的看起来有效"的 preservedReceiptRef,且 prepare 会承诺 execute 必拒的动作。
+  `receipt_id` 改 optional、owner 读省略键,`loadSafetyContext` 与写道同码同范围
+  拒绝;`ProvenCommittedPublicationFactV1` 让未证实回执在 `buildEvent` 类型上不可
+  表示。
+- **detach 绕过两条编辑保持规则**:save 强制的 `held_by_other` 与 pending_release
+  的 `edit_hold_required`,detach 三条路径(读包装、prepare、execute 规格)全都不看。
+  三处补齐,过期判定用 owner 的 `read_at` 单时钟;媒体事实新增 `read_at` +
+  `current_hold`(读端口 include editHold)。
+- **remove 的 build 忽略重提交的 publicationRef**:冻结目标被静默采用,请求说 B、
+  提交 A。补 `boundPublicationId`(从冻结 id 重铸密封 ref、要求相等),与 media/
+  child 绑定同型。
+
+全部修复逐条证伪(逆向编辑回退),全部 CAUGHT。全量门禁绿(unit 558、db 205、
+e2e 40)。

@@ -548,6 +548,10 @@ export class NurtureCommandRunner {
                   business_outcome: "applied" as const,
                   ...(await input.spec.apply(transaction, input.payload, executionContext)),
                 };
+            // Inside the try on purpose: a spec emitting out-of-contract refs
+            // is a deterministic defect and the transaction definitely rolls
+            // back — reported as certain, never as outcome_unknown.
+            validateRefs(applied.output_refs, "output_refs");
           } catch (error) {
             // The operation body threw, so this transaction definitely rolls
             // back; rethrow tagged so the outcome is reported as certain.
@@ -555,7 +559,6 @@ export class NurtureCommandRunner {
               ? error
               : new NurtureDeterministicRollback("command_execution_failed");
           }
-          validateRefs(applied.output_refs, "output_refs");
           const handoffRequestSnapshots = activation
             ? buildNurtureHandoffRequestSnapshots({
                 activation,

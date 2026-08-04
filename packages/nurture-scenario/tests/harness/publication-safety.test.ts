@@ -9,6 +9,7 @@ import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js
 import {
   PUBLICATION_SAFETY_REASONS,
   correctPublication,
+  createRedactPublicationSpec,
   detachPublishProcessMedia,
   discardMediaAsset,
   redactPublication,
@@ -64,6 +65,7 @@ const mediaFacts = (
 ): MediaLifecycleFactsV1 => ({
   authority: caregiverAuthority(),
   process_state: "draft",
+  read_at: now().toISOString(),
   draft_revision: 1,
   composition_media_ids: [MEDIA_ID, "media-2"],
   media_revision: 3,
@@ -320,6 +322,40 @@ describe("G3-D post-release safety actions", () => {
   });
 });
 
+describe("G3-D receipt evidence in the read lane", () => {
+  // A committed release without a Receipt is refusal territory in BOTH lanes:
+  // prepare must not promise an action execute refuses, and no lane may hash
+  // an empty string into a valid-looking preserved receipt ref.
+  it("denies the whole process when any publication lacks its Receipt", async () => {
+    const facts = safetyFacts({
+      publications: [
+        publication(),
+        (() => {
+          const { receipt_id: _receiptId, ...rest } = publication({
+            publication_id: "pub-2",
+          });
+          return rest;
+        })(),
+      ],
+    });
+    const attempts: Array<[typeof correctPublication, Record<string, unknown>]> = [
+      [correctPublication, { reason: "family_request", correctionText: "更正" }],
+      [redactPublication, { reason: "family_request" }],
+    ];
+    for (const [act, operationInput] of attempts) {
+      await expect(
+        act(safetyDeps(facts), scope, {
+          process_ref: processRef(),
+          operation_input: operationInput,
+        }),
+      ).resolves.toEqual({
+        status: "denied",
+        reason_code: "receipt_evidence_unavailable",
+      });
+    }
+  });
+});
+
 describe("G3-D media lifecycle capabilities", () => {
   it("detaches one media reference from one draft composition", async () => {
     const decision = await detachPublishProcessMedia(mediaDeps(mediaFacts()), scope, {
@@ -339,6 +375,70 @@ describe("G3-D media lifecycle capabilities", () => {
         state,
       ).resolves.toEqual({ status: "denied", reason_code: "process_not_editable" });
     }
+  });
+
+  it("obeys the two draft-save hold rules: another holder blocks, queued needs a hold", async () => {
+    // Another teacher's live hold serializes the edit away.
+    await expect(
+      detachPublishProcessMedia(
+        mediaDeps(
+          mediaFacts({
+            current_hold: {
+              holder_participant_id: "caregiver-2",
+              holder_label: "王老师",
+              expires_at: new Date(now().getTime() + 60_000).toISOString(),
+              hold_version: 3,
+            },
+          }),
+        ),
+        scope,
+        { process_ref: processRef(), media_ref: mediaRef() },
+      ),
+    ).resolves.toEqual({ status: "denied", reason_code: "held_by_other" });
+    // An EXPIRED foreign hold no longer blocks — expiry judged at read_at.
+    await expect(
+      detachPublishProcessMedia(
+        mediaDeps(
+          mediaFacts({
+            current_hold: {
+              holder_participant_id: "caregiver-2",
+              holder_label: "王老师",
+              expires_at: new Date(now().getTime() - 1_000).toISOString(),
+              hold_version: 3,
+            },
+          }),
+        ),
+        scope,
+        { process_ref: processRef(), media_ref: mediaRef() },
+      ),
+    ).resolves.toMatchObject({ status: "detached" });
+    // A queued process needs an online hold: offline devices cannot reliably
+    // stop a server-side scheduled send.
+    await expect(
+      detachPublishProcessMedia(
+        mediaDeps(mediaFacts({ process_state: "pending_release" })),
+        scope,
+        { process_ref: processRef(), media_ref: mediaRef() },
+      ),
+    ).resolves.toEqual({ status: "denied", reason_code: "edit_hold_required" });
+    // With the actor's own live hold, the queued detach proceeds.
+    await expect(
+      detachPublishProcessMedia(
+        mediaDeps(
+          mediaFacts({
+            process_state: "pending_release",
+            current_hold: {
+              holder_participant_id: scope.participant_id,
+              holder_label: "李老师",
+              expires_at: new Date(now().getTime() + 60_000).toISOString(),
+              hold_version: 3,
+            },
+          }),
+        ),
+        scope,
+        { process_ref: processRef(), media_ref: mediaRef() },
+      ),
+    ).resolves.toMatchObject({ status: "detached" });
   });
 
   it("allows a global discard only before any release commits", async () => {
@@ -366,5 +466,63 @@ describe("G3-D media lifecycle capabilities", () => {
     await expect(
       discardMediaAsset(mediaDeps(mediaFacts(), []), scope, { media_ref: mediaRef() }),
     ).resolves.toEqual({ status: "denied", reason_code: "target_unavailable" });
+  });
+});
+
+describe("G3-D bulk safety actions stay inside the kernel ref bound", () => {
+  // The kernel rejects more than 32 output_refs, and a whole-class process
+  // has one lineage event per committed release — so the applied effect must
+  // name the aggregate once and leave per-event naming to committed_result.
+  it("redacting a 33-release process emits one aggregate output ref", async () => {
+    const spec = createRedactPublicationSpec({ integrity_key: BOARD_INTEGRITY_KEY, now });
+    const aggregateRef = {
+      schema_version: 1,
+      namespace: "nurture",
+      object_type: "publish_process",
+      object_id: "process-1",
+      version: 7,
+    };
+    const updates: Array<{ publication_id: string }> = [];
+    const transaction = {
+      publicationSafety: {
+        loadPublicationSafetyWriteFacts: async () => ({
+          authority: caregiverAuthority(),
+          publish_process_ref: aggregateRef,
+          publications: Array.from({ length: 33 }, (_, index) => ({
+            publication_id: `pub-${index + 1}`,
+            receipt_id: `receipt-${index + 1}`,
+            release_revision: 1,
+            visibility: "visible",
+            events: [],
+          })),
+        }),
+        applyPublicationVisibilityUpdate: async (input: {
+          updates: Array<{ publication_id: string }>;
+        }) => {
+          updates.push(...input.updates);
+          return {
+            updated_publication_ids: input.updates.map((update) => update.publication_id),
+          };
+        },
+        appendPublicationVisibilityEvents: async () => {},
+      },
+    } as never;
+    const context = {
+      workspace_id: scope.workspace_id,
+      business_actor_ref: scope.participant_id,
+      command_request_id: "command:redact-bulk-1",
+    } as never;
+    const applied = await spec.apply(
+      transaction,
+      { process_key: PROCESS_KEY, reason: "policy_requirement" },
+      context,
+    );
+    // Every release still transitions; only the naming is aggregate-level.
+    expect(updates).toHaveLength(33);
+    expect(applied.output_refs).toEqual([aggregateRef]);
+    expect((applied.committed_result as { events: unknown[] }).events).toHaveLength(33);
+    expect(
+      (applied.finalization_payload as { events: unknown[] }).events,
+    ).toHaveLength(33);
   });
 });

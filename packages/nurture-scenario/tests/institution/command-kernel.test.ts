@@ -462,6 +462,25 @@ describe("NurtureCommandRunner", () => {
       decision: "technical_error",
       reason_code: "command_lookup_failed",
     });
+
+    // A spec emitting out-of-contract refs is a deterministic defect: the
+    // transaction rolls back for certain, so the answer is a definite
+    // not_committed — never outcome_unknown, which would strand the caller in
+    // a reconciliation loop that can never find an execution.
+    const overflowing: NurtureCommandSpec<{ value: number }> = {
+      ...spec(() => undefined),
+      apply: async () => ({
+        output_refs: Array.from({ length: 33 }, (_, index) => ({
+          ...outputRef(),
+          object_id: `output-${index + 1}`,
+        })),
+      }),
+    };
+    expect(await command(createInMemoryNurtureCommandRepository(), overflowing)).toEqual({
+      status: "not_committed",
+      decision: "technical_error",
+      reason_code: "command_execution_failed",
+    });
   });
 });
 

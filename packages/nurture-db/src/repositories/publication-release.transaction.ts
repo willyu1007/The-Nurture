@@ -448,7 +448,9 @@ export class PrismaPublicationReleasePort
       publications: process.releases.map((release) => ({
         publication_id: release.id,
         target_key: release.target.targetKey,
-        receipt_id: release.receiptId ?? "",
+        // Omitted, never "": absence must stay unrepresentable by a value
+        // that hashes into a valid-looking preserved receipt ref.
+        ...(release.receiptId ? { receipt_id: release.receiptId } : {}),
         release_revision: release.revision.revision,
         visibility: release.visibility,
         // The stored lineage, oldest first: what an idempotent repeat answers
