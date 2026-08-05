@@ -4333,7 +4333,7 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
     });
     expect(publicationRelease.receipt).toMatchObject({
       sourceType: "publication_release",
-      logicalStatus: "delivered",
+      status: "delivered",
       direction: "org_to_family",
     });
 
@@ -4421,7 +4421,6 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
       surface: "board",
       capabilityKey: "organize_care_capture_batch",
       prepared,
-      operationInput: { expected_batch_version: batch.aggregateVersion },
     });
     expect(executed.json.status).toBe("committed");
 
