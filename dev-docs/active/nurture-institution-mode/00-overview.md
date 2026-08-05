@@ -3,15 +3,16 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B accepted）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B accepted；I1-C scope frozen）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
 - Next step: G1, T-005 G2 Exit, T-006 G3 Exit, all `C30-I0` gates and
   `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
-  `9a15865…`; separately authorize only I1-C scope review/freeze before any
-  subject-presentation source work. I1-C remains unstarted.
+  `9a15865…`; I1-C subject-context/presentation scope is frozen in artifact 21.
+  Separately authorize only I1-C1 before any subject-presentation source work;
+  all I1-C implementation remains unstarted.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -54,6 +55,10 @@
   pins source `edbcd74…`, metadata-only lock `9a15865…`, source hash
   `16be693c…2512` and the repeated full Base qualification. I1-B is accepted;
   I1-C and every consumer/runtime adoption remain unstarted.
+- C30-I1-C planning handoff: `artifacts/21-c30-i1-c-scope-freeze.md` freezes the
+  neutral list/resolve provider, six closed semantic blocks, navigation and
+  prepare-only action offers, safe-copy rules, bounds, negatives and ordered C1-C4
+  gates. No Base source or consumer/runtime adoption has started.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

@@ -258,7 +258,8 @@ dev-docs/active/nurture-institution-mode/
   Nurture-side update changes task/project/context documentation only.
 - Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
   frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; the B1-only checkpoint is in
-  artifacts 17-20. I1-B is accepted; I1-C scope review remains separately gated.
+  artifacts 17-20. I1-B is accepted; artifact 21 freezes I1-C provider/presentation
+  scope and four ordered implementation gates. I1-C1 remains separately gated.
 
 Hard gates:
 
@@ -270,14 +271,16 @@ Hard gates:
   Host-internal/Scenario-private 暴露边界、reservation、pair result、current
   evidence 与 writer-fenced recovery。B1 reservation、B2 atomic pair 与 B3
   private evidence/status 已通过 Base `edbcd74…` 实施；B4 在 `9a15865…` 完成
-  累计验证与 source-lock，I1-B 已验收，I1-C 尚未启动。
+  累计验证与 source-lock，I1-B 已验收；I1-C 的 list/resolve、semantic blocks、
+  navigation/action offer、safe-copy、bounds 与 C1-C4 顺序已冻结，但实现尚未启动。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
   `artifacts/17-c30-i1-b1-implementation-record.md` 与
   `artifacts/18-c30-i1-b2-implementation-record.md`、
   `artifacts/19-c30-i1-b3-implementation-record.md` 与
-  `artifacts/20-c30-i1-b4-qualification-record.md`。
+  `artifacts/20-c30-i1-b4-qualification-record.md` 与
+  `artifacts/21-c30-i1-c-scope-freeze.md`。
 - Nurture does not import/run My-Workflow-Base；Base is template contract, My-Chat is the actual package/runtime owner。
 - Existing My-Chat `workflow-runtime` task remains historical scaffold scope；concrete persistence uses a new `workflow-handoff-materialization` task。
 - N1 can proceed before X3 only with explicit empty snapshot arrays；non-empty activation requires X2/X3 host capability and exact claimed-Step ownership。

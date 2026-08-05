@@ -13,7 +13,8 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B is accepted while I1-C is ready but unstarted. G1 is
+  I1-B is accepted and I1-C scope is frozen while its implementation remains
+  unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -30,6 +31,19 @@
   Base/My-Chat source, secret/KMS/environment value, capability, deployment or
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-C subject-presentation scope review and freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; M-002/F-002/T-002. Existing task and roadmap remain SSOT. |
+| Accepted-input trace | PASS | I1-C composes as I1-A `operation.input`, consumes rather than redefines I1-B, and preserves the locked C-3-0c-1/2 presentation decisions. |
+| Provider boundary | PASS | Distinct list/resolve operations, opaque expiring subject contexts, no Host ranking/inference/auto-selection and closed resolved/selection/change/unavailable results are frozen. |
+| Presentation boundary | PASS | Safe owner text, six flat semantic blocks, read-only navigation, prepare-only action offers, bounded output and stripped AI narration projection are frozen. |
+| Donor disposition | PASS | T-029 remains zero-direct-merge; current Run-level Base action availability, broad My-Chat interaction envelope and Nurture database-id refs are negative donors. |
+| Implementation decomposition | PASS | C1 safe-copy/ref → C2 provider → C3 presentation → C4 cumulative qualification/source lock. Every unit requires separate authorization and none opens I1-D or C30-I2. |
+| Context/governance/docs | PASS | Workflow Context checksum `46c566a0123a9e555b5b6bc0142bb3fef9938612d314e643eb5916563ab244dd`; strict Context/project-state/governance checks and T-002 query pass. Repository document/anchor lint checks 417 Markdown files with zero errors/warnings. |
+| Effect boundary | PASS | Planning/docs only. No Base/My-Chat/Nurture product source, build, Prisma/database, runtime, capability, deployment, activation, T-007/T-008, Pilot or traffic action ran. |
   Earlier P0/P1/P2/M1/M2/M3-baseline `OPEN`, `BLOCKED`, counts and hashes remain
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;

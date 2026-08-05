@@ -7,6 +7,17 @@
 
 ## What changed
 
+- 2026-08-05: Reused T-002 and froze only the `C30-I1-C` subject-presentation
+  contract scope. The freeze retains distinct list/resolve operations, opaque
+  expiring subject/presentation locators, six closed semantic block variants,
+  read-only navigation, prepare-only action offers, safe owner-localized text,
+  bounded pagination/output and narration projection exclusions. It orders future
+  Base work as I1-C1 through I1-C4 and rejects reuse of Run-level
+  `WorkflowActionAvailability`, the broad My-Chat `InteractionEnvelope`, and
+  Nurture database-id `opaque_ref` strings. No Base/My-Chat/Nurture product source,
+  build, schema/database, runtime, capability, deployment, activation, T-007/T-008,
+  Pilot or traffic work ran. I1-C1 and C30-I2 remain separately unauthorized.
+
 - 2026-08-05: Completed only the separately authorized Base `C30-I1-B4`
   cumulative qualification and exact source-lock seal. Full typecheck/build,
   canonical-ref lint, runtime/scenario/conformance populations, all 23 Schemas,

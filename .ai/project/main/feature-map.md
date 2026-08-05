@@ -32,8 +32,9 @@ Project: `main`
   and Base-only I1-A are complete; C30-I1 remains split into ordered I1-A..F.
   I1-B scope is frozen around neutral reservation/pair/evidence/recovery wires;
   Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
-  cumulative qualification. Separately authorize I1-C scope review/freeze before
-  presentation source work. Remaining I1-C..F,
+  cumulative qualification. I1-C subject-context/presentation scope is now frozen;
+  separately authorize only I1-C1 safe-copy/ref primitives before source work.
+  Remaining I1-C implementation and I1-D..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

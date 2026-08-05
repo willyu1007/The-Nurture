@@ -86,6 +86,7 @@ Rollback I1-B acceptance by reverting lock commit
 in reverse order if their contracts must also be removed. No runtime, consumer or
 database compensation exists.
 
-The only eligible next decision in this C30-I1 sequence is separate authorization
-to review and freeze `I1-C` subject-presentation scope. I1-C implementation and
-C30-I2 remain unauthorized.
+The separately authorized I1-C review has now frozen its subject-presentation
+scope in `21-c30-i1-c-scope-freeze.md`. The only eligible next implementation
+decision is separate authorization for I1-C1 safe-copy/ref primitives. All I1-C
+source work and C30-I2 otherwise remain unauthorized.
