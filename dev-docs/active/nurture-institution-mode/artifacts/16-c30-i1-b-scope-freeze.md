@@ -7,9 +7,9 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Planning mode: Default-mode planning update against the existing roadmap SSOT
 - Scope decision: `C30_I1_B_SCOPE_FROZEN`
-- Current slice state: `I1_B_IN_PROGRESS / I1_B1_B2_B3_COMPLETE / I1_B4_UNAUTHORIZED`
-- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B1_B2_B3_COMPLETE`
-- Downstream state: `I1_C_BLOCKED / C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
+- Current slice state: `I1_B_ACCEPTED / I1_B1_B2_B3_B4_COMPLETE`
+- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B_ACCEPTED`
+- Downstream state: `I1_C_READY_NOT_STARTED / C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
 
 I1-B defines only the neutral canonical-object scenario-binding wire that later
 owners may adopt. I1-B does not implement platform identity, scenario anchors,
@@ -359,6 +359,12 @@ The user then authorized I1-B3. Its exact Base source/verification record is
 `19-c30-i1-b3-implementation-record.md`. The B3a/B3b heading repair aligns the
 wire-family labels with the ordered units; it changes no fields and does not
 authorize cumulative I1-B4.
+
+The user then separately authorized I1-B4. The cumulative qualification and
+metadata-only source-lock seal are recorded in
+`20-c30-i1-b4-qualification-record.md`. All four I1-B units now pass on source
+`edbcd74…` plus lock `9a15865…`; this accepts I1-B but does not authorize I1-C or
+C30-I2.
 
 ## Execution handoff
 

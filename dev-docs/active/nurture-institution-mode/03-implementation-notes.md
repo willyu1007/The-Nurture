@@ -7,6 +7,18 @@
 
 ## What changed
 
+- 2026-08-05: Completed only the separately authorized Base `C30-I1-B4`
+  cumulative qualification and exact source-lock seal. Full typecheck/build,
+  canonical-ref lint, runtime/scenario/conformance populations, all 23 Schemas,
+  107 Node tests, consumer-boundary execution and exact source-lock verification
+  pass repeatedly. Two builds produced the same 60-file digest
+  `e7195035…a9a1a`; two manifests were byte-identical. The metadata-only Base
+  commit `9a1586597a2eabd2876ad39e02c90491373595d0` binds source
+  `edbcd747eb50106b8f4967c3cb03b5480cbebc7f` at hash
+  `16be693c…2512`. I1-B is accepted. No wire/runtime/consumer/database/capability/
+  deployment/activation work ran; I1-C is ready but unstarted and C30-I2 remains
+  NO-GO.
+
 - 2026-08-05: Implemented only the separately authorized Base `C30-I1-B3`
   current-owner evidence and writer-fenced status bodies at
   `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`. Added exact two-owner current

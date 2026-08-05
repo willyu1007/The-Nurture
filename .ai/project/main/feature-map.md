@@ -31,8 +31,9 @@ Project: `main`
 - Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs. `C30-I0`
   and Base-only I1-A are complete; C30-I1 remains split into ordered I1-A..F.
   I1-B scope is frozen around neutral reservation/pair/evidence/recovery wires;
-  Base-only B1-B3 are implemented/locally verified through `edbcd74…`. Separately
-  authorize I1-B4 before cumulative qualification/source lock. Remaining I1-B, I1-C..F,
+  Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
+  cumulative qualification. Separately authorize I1-C scope review/freeze before
+  presentation source work. Remaining I1-C..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

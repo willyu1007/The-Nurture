@@ -112,3 +112,7 @@ runtime, consumer, database or source-lock compensation exists.
 The only eligible next implementation decision is a separate authorization for
 `I1-B4`: cumulative Schema/codec/exposure verification, full Base qualification
 and the exact source-lock seal. It must not start I1-C or C30-I2.
+
+Post-B3 checkpoint: the user later authorized and completed I1-B4 at Base lock
+commit `9a1586597a2eabd2876ad39e02c90491373595d0`, recorded in
+`20-c30-i1-b4-qualification-record.md`. This does not change the B3 source result.

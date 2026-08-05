@@ -251,15 +251,14 @@ dev-docs/active/nurture-institution-mode/
   context and Pilot-0-C decisions > T-029 donor disposition > bounded inference.
 - Merge decision: I1-B composes with I1-A instead of defining a second private
   transport/signature envelope. No unresolved product-scope conflict remains.
-- Project structure checkpoint: separately authorized I1-B1/B2/B3 now add only
-  reservation and Host-internal atomic-pair types/Schemas/conformance through Base
-  `edbcd74…`, plus private current-evidence/status bodies; later separately authorized I1-B4 may
-  add only Base workflow-contract types/schemas/conformance fixtures/tests, package
-  exports and the final TypeScript source lock. The current Nurture-side update
-  changes task/project/context documentation only.
+- Project structure checkpoint: separately authorized I1-B1/B2/B3 add reservation,
+  Host-internal atomic-pair and private current-evidence/status contracts through
+  Base `edbcd74…`. I1-B4 passes cumulative qualification and seals that exact source
+  at metadata-only lock `9a15865…`; no consumer/runtime adoption exists. The current
+  Nurture-side update changes task/project/context documentation only.
 - Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
   frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; the B1-only checkpoint is in
-  artifacts 17-19. Cumulative B4 remains unauthorized.
+  artifacts 17-20. I1-B is accepted; I1-C scope review remains separately gated.
 
 Hard gates:
 
@@ -270,13 +269,15 @@ Hard gates:
   I1-A 已在 Base `ce7118c…` + source lock `bd69d19…` 验收；I1-B 已冻结
   Host-internal/Scenario-private 暴露边界、reservation、pair result、current
   evidence 与 writer-fenced recovery。B1 reservation、B2 atomic pair 与 B3
-  private evidence/status 已通过 Base `edbcd74…` 实施/本地验证，B4 尚未授权。
+  private evidence/status 已通过 Base `edbcd74…` 实施；B4 在 `9a15865…` 完成
+  累计验证与 source-lock，I1-B 已验收，I1-C 尚未启动。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
   `artifacts/17-c30-i1-b1-implementation-record.md` 与
-  `artifacts/18-c30-i1-b2-implementation-record.md` 与
-  `artifacts/19-c30-i1-b3-implementation-record.md`。
+  `artifacts/18-c30-i1-b2-implementation-record.md`、
+  `artifacts/19-c30-i1-b3-implementation-record.md` 与
+  `artifacts/20-c30-i1-b4-qualification-record.md`。
 - Nurture does not import/run My-Workflow-Base；Base is template contract, My-Chat is the actual package/runtime owner。
 - Existing My-Chat `workflow-runtime` task remains historical scaffold scope；concrete persistence uses a new `workflow-handoff-materialization` task。
 - N1 can proceed before X3 only with explicit empty snapshot arrays；non-empty activation requires X2/X3 host capability and exact claimed-Step ownership。

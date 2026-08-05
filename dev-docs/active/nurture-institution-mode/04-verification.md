@@ -13,7 +13,7 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B1/B2/B3 are implemented/locally verified while B4 remains unauthorized/unstarted. G1 is
+  I1-B is accepted while I1-C is ready but unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +34,21 @@
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-B4 cumulative qualification — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User separately authorized I1-B4 only. Base change is one metadata source-lock file; no I1-C/C30-I2 or consumer/runtime work entered scope. |
+| Exact source/lock chain | PASS | Source `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`; metadata-only lock commit `9a1586597a2eabd2876ad39e02c90491373595d0`; source hash `16be693cd877bfac3638a615b391614cddccbf219ef6a115a450ff5f47eb2512`. |
+| Full Base verifier | PASS x3 | After refreshing the stale I1-A lock, `pnpm verify:workflow-contracts` passes twice before the lock commit and once after it. |
+| Type/build populations | PASS | Four package typechecks pass; runtime 28/28 and scenario 10/10 tests pass. The contract build emits 60 ignored files. |
+| Schema/codec/conformance | PASS | All 23 Schemas compile; 107 Node tests cover I1-A, B1 reservation replay, all four B2 branches, B3 three-state recovery, exposure negatives and integration-lock behavior. |
+| Determinism | PASS | Two contract builds produce digest `e7195035c4c9e062aee26f2b759aca7c48167dcb2119713c4fe12913fd5a9a1a`; two manifest outputs produce identical digest `76eeb87a…d876`. |
+| Source-lock negative/positive | PASS | The pre-refresh portability gate rejects the stale I1-A lock as expected; the unchanged verifier then accepts the exact B1-B3 source manifest and committed revision. |
+| Boundaries | PASS | Canonical-ref lint, actual consumer-boundary check, contract-doc alignment, semantic lint, source-hash portability and source-lock exact-revision checks pass. |
+| Context/governance/docs | PASS | Context checksum `040f9bd16ee83667dcbc73b712fef8bfdc2c7a7017ed868fe71fbdbfdbdcbf91`; strict Context/project-state/governance checks, T-002 query and 416-file document/anchor lint pass. |
+| Effect boundary | PASS | No new wire/source test, dependency, package version, My-Chat/Nurture product source, manifest/module, Prisma/database, C30-I2, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
 
 ## C30-I1-B3 implementation — 2026-08-05
 
