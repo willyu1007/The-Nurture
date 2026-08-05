@@ -5,8 +5,8 @@
 - Date: 2026-08-05
 - Task: T-002
 - `C30-I0-C`: `COMPLETE`
-- `C30-I0-D`: `PARTIAL`
-- Overall: `C30_I1_NO_GO`
+- `C30-I0-D`: `COMPLETE`
+- Overall: `C30_I1_READY_NOT_STARTED`
 
 This record supersedes only the current-state/worktree portions of the 2026-07-21
 inventory. The donor disposition remains authoritative: old T-029 work is not merged
@@ -19,12 +19,13 @@ does not start from mutable package paths.
 | --- | --- | --- | --- |
 | My-Workflow-Base | `20c4b7a7b38bdbec3a273f997bb5a8ec93b09abb` | repaired integration-lock verifier and Base contract source | clean |
 | My-Chat | `dc4a77b257f952e2c0f0aede9521e16ac274de9d` | current committed Host source, isolated from the dirty primary file | clean |
-| The-Nurture | `882d80fff0c31b789d7120cbed18cf06cf030ba4` | G3-closed Nurture runtime checkpoint | clean |
+| The-Nurture | `cc8b034456121b65a1a575813bd193f72ffa867c` | evidence-only successor over G3-closed runtime checkpoint `882d80f…` | clean |
 
-The Nurture C30 branch was created from the qualified runtime checkpoint above.
-Evidence-only T-002 documentation may advance that branch without changing the
-runtime source population; any later joint run must pin the then-current exact Git
-HEAD and recompute the same declared source population hash.
+The Nurture C30 branch was created from runtime checkpoint `882d80f…` and advanced
+to the qualified input above only through T-002 evidence documentation. Later
+evidence-only documentation may advance the branch without changing the runtime
+source population; any later joint run must pin the then-current exact Git HEAD and
+recompute the same declared source population hash.
 
 Existing X5, Q4B5, T-029, T-027, release and Claude worktrees were not deleted or
 rewritten. Each is clean and remains attributable to its original owner. The only
@@ -63,14 +64,27 @@ The Nurture scenario manifest does not declare `scenario_federation_v1`, and the
 My-Chat canonical Prisma schema has no `ScenarioWorkspaceActivation` model. This is
 repository false/empty evidence only; no database or environment row census was run.
 
-## Remaining D gate
+## Completed build-aware baseline
 
-A scripts-disabled frozen Base install completed without lockfile drift. The full
-conformance/typecheck commands then reached the existing compiled
-`@host/workflow-contracts/dist` prerequisite. Repository policy requires explicit
-authorization before running build commands, so no build was started and the full
-canonical Base/My-Chat/Nurture baseline remains pending.
+After explicit authorization, the isolated topology passed the required compiled
+baseline:
 
-Until that build-aware baseline passes, `C30-I0-D` stays partial and `C30-I1` remains
-NO-GO. This run changed no schema/migration, database, environment value, secret,
-capability, deployment, activation, T-007/T-008, Pilot or traffic state.
+| Repository | Result |
+| --- | --- |
+| Base | Full `verify:workflow-contracts`: contract/runtime/scenario/conformance typechecks, canonical-ref lint, 28 runtime tests, 10 scenario tests, all conformance scripts, 6 integration-lock tests and exact source lock. |
+| My-Chat | Prisma Client generate/validate with a non-connecting placeholder URL, all 17 workspace typechecks, full lint, and 89 files/504 unit tests; 15 files/58 tests are repository-declared skips. |
+| Nurture | Both Prisma Clients and schema validations, build-aware typecheck, frontend lint, 52 files/579 unit tests, 95-file routing census, persistence boundary, N1 schema and X4 replay checks. |
+
+The final disposable joint lock pinned Base `20c4b7a…`, My-Chat `dc4a77b…` and
+Nurture `cc8b034…`; all exact revisions and the three hashes above passed. The
+18-source repository false/empty census also passed again. The temporary lock was
+deleted.
+
+Nurture's historical G1 verifier remains exactly pinned to Base `06303e9…` and
+therefore correctly rejects C30 Base `20c4b7a…`. That preserved negative result is
+not source drift and is not substituted for the passing C30 joint lock.
+
+`C30-I0-D` is complete. `C30-I1` is eligible for its separately reviewed exact
+implementation slice but remains unstarted. This run changed no schema/migration,
+database, environment value, secret, capability, deployment, activation,
+T-007/T-008, Pilot or traffic state.

@@ -28,10 +28,10 @@ Project: `main`
 - Risks: confusing `DR-*` design findings with `TR-*` traffic blockers, treating green CI/design completion/X5 PASS or superseded exact-claimant evidence as source/deployment authority, issuing a receipt after its authority source changed, exposing stable anchors through Host clients, widening CareGroup responsibility to same-Institution access, bypassing the opaque My-Chat Child/Family binding chain, publishing mutable artifacts, or weakening owner-reread/revoke/privacy fences for pilot convenience.
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
-- Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs. `C30-I0-C`
-  now has an isolated clean three-repository topology; finish D's build-aware
-  canonical baseline before C30-I1. C30-C35, C40-C45, D, Pilot-0-E and Pilot-1
-  remain separate; no downstream PASS is deployment or traffic authority.
+- Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs. `C30-I0`
+  is complete, so review the exact C30-I1 implementation slice before starting
+  it. C30-I1 remains unstarted; C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain
+  separate, and no downstream PASS is deployment or traffic authority.
 
 ### F-003 Six-surface store-beta readiness
 - Intent: turn the six-surface T-003 design into a qualified, default-off Nurture Service Candidate and versioned interface that My-Chat can integrate through authenticated API calls and validate on iOS and Android internal-testing channels.

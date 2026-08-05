@@ -3,14 +3,13 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（A/B/C complete；D partial）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（A/B/C/D complete）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
-- Next step: G1, T-005 G2 Exit and T-006 G3 Exit are PASS. `C30-I0-C` now has
-  clean, isolated Base/My-Chat/Nurture branches. Finish `C30-I0-D` by explicitly
-  authorizing the build prerequisites, then run the complete clean-topology
-  canonical baseline before opening C30-I1.
+- Next step: G1, T-005 G2 Exit, T-006 G3 Exit and all `C30-I0` gates are PASS.
+  Review and authorize the exact C30-I1 implementation slice before starting it;
+  C30-I1 is entry-eligible but remains unstarted.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -25,10 +24,10 @@
   artifact publication, capability activation, and external traffic remain
   separately unauthorized.
 - C30-I0 exact topology: Base `20c4b7a…` (immutable joint-pin verifier repair),
-  My-Chat `dc4a77b…`, Nurture runtime checkpoint `882d80f…`. Joint Git pins and
-  source hashes pass; 18 C-3 source-identity checks, Nurture umbrella admission
-  and My-Chat activation-model checks are empty/absent. The remaining D gate is
-  the build-aware canonical baseline, not product implementation.
+  My-Chat `dc4a77b…`, Nurture qualification input `cc8b034…` over runtime
+  checkpoint `882d80f…`. Joint Git pins/source hashes, the build-aware canonical
+  baseline and all 18 C-3 source-identity checks pass; Nurture umbrella admission
+  and the My-Chat activation model remain empty/absent.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

@@ -11,8 +11,8 @@
 ## Current Verification Status
 
 - Last updated: 2026-08-05
-- Current phase: NestJS ingress M0-M5 and G1 Joint Conformance are complete;
-  `C30-I0-A/B/C` are complete and `C30-I0-D` is partial. G1 is
+- Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
+  `C30-I0-A/B/C/D` gates are complete. C30-I1 is ready but not started. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -1360,7 +1360,7 @@ the rejected checkpoint and are historical.
 | x5 联合套件(pinned 物化) | PASS 4/4 | My-Chat `a019566` / Base `06303e9` detached worktree + disposable pgvector PG;pin 全部核对一致;运行后销毁 |
 | 效果边界 | PASS | 无 schema/migration、无持久化 DB apply、无 capability/secret/激活/流量变更 |
 
-## 2026-08-05 — C30-I0-C closure and I0-D partial qualification
+## 2026-08-05 — C30-I0-C/D closure
 
 | Check | Result | Evidence |
 | --- | --- | --- |
@@ -1371,7 +1371,10 @@ the rejected checkpoint and are historical.
 | Base frozen install | PASS | `pnpm install --frozen-lockfile --ignore-scripts`; 48 packages reused locally, lockfile unchanged, no lifecycle/build scripts. |
 | Exact joint lock | PASS | Git-only joint lock verifies all three exact HEADs and normalized source hashes: Base `e2276404…`, My-Chat `f675d505…`, Nurture `d47648e5…`. The temporary lock was deleted after the run. |
 | Repository false/empty census | PASS | 18 exact source-identity checks are absent; Nurture manifest omits `scenario_federation_v1`; My-Chat canonical Prisma omits `ScenarioWorkspaceActivation`. No environment DB census was claimed. |
-| Full Base conformance/typecheck before install | EXPECTED PREREQUISITE FAIL | New worktree lacked `node_modules`; this was corrected with a frozen, scripts-disabled install. |
-| Full Base conformance/typecheck after install | BUILD PREREQUISITE PENDING | Both reach the existing `@host/workflow-contracts/dist` prerequisite. No code diagnostic was accepted from this state, and build was not run without explicit authorization. |
-| C30-I0 verdict | `C_COMPLETE / D_PARTIAL / C30_I1_NO_GO` | Build-aware canonical Base/My-Chat/Nurture baseline remains required before D closes. |
+| Full Base canonical baseline | PASS | After the authorized contract build, `pnpm verify:workflow-contracts` passes all typechecks, canonical-ref lint, 28 runtime tests, 10 scenario tests, conformance scripts, 6 integration-lock tests and the source lock. |
+| My-Chat canonical baseline | PASS | Frozen scripts-disabled install; Prisma generate/validate with a non-connecting placeholder URL; all 17 workspace typechecks; full lint; 89 files/504 unit tests pass, with 15 files/58 repository-declared skips. |
+| Nurture canonical baseline | PASS | Both Prisma Clients generate; both schemas validate with non-connecting placeholder URLs; build-aware typecheck, frontend lint, 52 files/579 unit tests, routing census (95 files), persistence boundaries, N1 schema and X4 replay checks pass. |
+| Historical G1 pin | EXPECTED REJECTION / PRESERVED | Nurture's existing G1 verifier remains locked to Base `06303e9…` and correctly rejects C30 Base `20c4b7a…`. It was not changed or counted as the C30 joint pin; the exact three-Git C30 lock passes separately. |
+| Repeated exact joint lock and false/empty census | PASS | Current Nurture input `cc8b034…` retains source hash `d47648e5…`; the temporary lock passes and is deleted. All 18 source-identity checks plus umbrella admission and activation-model checks remain absent. |
+| C30-I0 verdict | `I0_COMPLETE / C30_I1_READY_NOT_STARTED` | All I0 entry gates are closed; no C30-I1 implementation was started. |
 | Effect boundary | PASS | No schema/migration, database, secret, capability, deployment, activation, T-007/T-008, Pilot or traffic action. |

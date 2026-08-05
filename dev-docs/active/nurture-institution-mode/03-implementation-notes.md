@@ -7,6 +7,20 @@
 
 ## What changed
 
+- 2026-08-05: Closed `C30-I0-D` after the explicitly authorized build-aware
+  canonical baseline. Base passed full contract verification with 28 runtime and
+  10 scenario tests plus all conformance gates. My-Chat passed Prisma generation
+  and validation with a non-connecting placeholder URL, all 17 workspace
+  typechecks, lint, and 89 files/504 unit tests (15 files/58 repository-declared
+  skips). Nurture passed both Prisma generations and schema validations,
+  build-aware typecheck, frontend lint, 52 files/579 unit tests, routing census,
+  persistence boundaries, N1 and X4 checks. The current exact three-Git lock and
+  repeated 18-source false/empty census passed. The historical G1 pin correctly
+  rejects C30 Base revision `20c4b7a…` because it remains locked to `06303e9…`;
+  it was not changed or misreported as the C30 joint pin. `C30-I1` is now
+  entry-eligible but remains unstarted. No database connection/apply, migration,
+  deployment, capability, activation, T-007/T-008, Pilot or traffic action ran.
+
 - 2026-08-05: Closed `C30-I0-C` with isolated clean branches at Base `20c4b7a…`
   and My-Chat `dc4a77b…`, plus a Nurture branch created from runtime checkpoint
   `882d80f…`; all pre-existing auxiliary worktrees remain untouched under their

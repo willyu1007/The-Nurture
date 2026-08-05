@@ -625,7 +625,7 @@ refreshed pin/source hashes, and native CI pass. Formal joint owner/PR adoption
 review remains. The resulting revision is not a C30 component candidate,
 qualified Pilot artifact, applied migration, or release approval.
 
-## C30-I0 — Implementation baseline isolation（进行中）
+## C30-I0 — Implementation baseline isolation（已完成）
 
 `C30-I0` 只建立可归属、可回放、不可变的实施入口，不实现 C30-I1
 合同，也不修改 schema/runtime/database/gate。详细证据见
@@ -636,11 +636,11 @@ qualified Pilot artifact, applied migration, or release approval.
 | `C30-I0-A` 三仓/worktree/依赖/schema/gate census | Complete | 精确 revision、dirty ownership、重叠路径、migration/source/gate 和验证状态已记录。 |
 | `C30-I0-B` T-029 donor disposition | Complete | `artifacts/13-c30-i0-b-t029-disposition.md` 覆盖 Base 57、My-Chat 79、Nurture 40 个候选文件；无文件可原样合并，可抽取机制全部标为 `REWORK`，直接平台 ref、umbrella source、双 manifest/Execution track 和跨节点混合迁移均已排除。 |
 | `C30-I0-C` scoped commits and clean worktrees | Complete | Exact isolated branches exist at Base `20c4b7a…` and My-Chat `dc4a77b…`; the Nurture branch was created from runtime checkpoint `882d80f…` and may advance only through T-002 evidence documentation. Historical X5/Q4B5/T-029/T-027/Claude worktrees are clean and retained under their owners; the dirty My-Chat primary `next-env.d.ts` is excluded and untouched. |
-| `C30-I0-D` immutable pins and false/empty proof | Partial | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact joint pins/source hashes and repository false/empty census pass. Build-aware full conformance/typecheck remains pending explicit build authorization. |
+| `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
 
-`C30-I1` 仅在 I0-B/C/D 全部完成后进入 `in_progress`。数据库 apply、
-环境 row census、capability/Workspace activation、artifact/cloud/secret/traffic
-仍需各自的单独授权。
+`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 可以进入单独的精确范围评审，
+但尚未进入 `in_progress`。数据库 apply、环境 row census、capability/Workspace
+activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
 
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).

@@ -9,7 +9,7 @@ Project: `main`
 - Primary active feature: F-002 Institution ecology.
 - Completed checkpoint: T-006/G3 is `done` with an exact, default-off Beta
   Profile Handoff at Nurture `0374087…`; archival remains separately approved.
-- Active tasks: T-002 (`C30-I0-C` complete; D build-aware baseline pending) and the
+- Active tasks: T-002 (`C30-I0` complete; C30-I1 ready but not started) and the
   non-blocking T-003 artifact closeout.
 - Planned chain: T-007 G4 remains unstarted; T-008 continues to wait for the
   complete T-007 Exit even though T-004～T-006 handoffs are ready.
