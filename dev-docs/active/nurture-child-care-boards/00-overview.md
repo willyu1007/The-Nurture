@@ -2,16 +2,15 @@
 
 ## Status
 
-- State: in-progress
+- State: done
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-05
-- Next step: **T-006/G3 的 Exit PASS 已因发布事务质量复核撤回，任务恢复为
-  in-progress；T-008、deployment、capability activation 与 Pilot 保持关闭。**
-  当前修复范围只包含三项：并发首发必须冻结唯一 revision；policy/authority/hold/
-  media 等发布门禁与逐目标 effect 共用事务边界；receipt-less release 必须 fail
-  closed。修复并通过隔离 PostgreSQL 证伪测试和 exact detached requalification 后，
-  才能重新签发
+- Next step: **T-006/G3 已在修复 checkpoint `0374087…` 的 exact detached
+  requalification 后重新关闭，等待单独批准后归档；T-008、deployment、capability
+  activation 与 Pilot 保持关闭。** 并发首发唯一 frozen revision、事务内 gate
+  reread、receipt/media fail-closed 与 canonical organize composition 已通过真实
+  PostgreSQL 回归；一次性容器/tmpfs 与 detached topology 已销毁。当前 exact 交接见
   [G3 Exit Qualification and T-006 Beta Profile Handoff](08-g3-exit-qualification-and-beta-profile-handoff.md)。
 
 ## Goal
@@ -89,8 +88,8 @@ correction/target removal/redaction 与两个 media lifecycle 能力。
 G3 adoption set 至此关闭（35 个 capability）；真实 policy-backed schedule/release
 与 provider/consumer 联合资格化仍属 G3-E。
 
-2026-08-05 G3-E 已通过：在 Base `06303e9…`、My-Chat `a019566…`、Nurture
-`97eab03…` 的相邻 detached 拓扑中，从空库应用完整 16 条迁移，并以 formal
+2026-08-05 G3-E 修复后重新通过：在 Base `06303e9…`、My-Chat `a019566…`、Nurture
+`0374087…` 的相邻 detached 拓扑中，从空库应用完整 16 条迁移，并以 formal
 scenario-service HTTP + 真实 PostgreSQL 执行 26 action、9 query 与两条联合旅程。
 T-007 policy 经 owner provider 进入 organize/admission/reschedule/release；T-006
 产生的 direct-interaction option 被 T-005 exact G2-C owner action 消费。最终

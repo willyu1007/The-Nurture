@@ -2084,3 +2084,22 @@ PostgreSQL 上通过目标 64 tests、并发用例连续三次和完整 producti
 `command_identity_conflict` 后复跑通过。Nurture runtime self-pin 已旋转为 168 files /
 `b44f4fad985bf760b0bf1a6c4abac8badd7e91ea7999d829bb1fabcd2dfbf8c0`。exact detached
 owner/joint requalification 完成前仍不得恢复 G3 Exit PASS 或签发 Beta Profile Handoff。
+
+## 2026-08-05 — G3 release 修复 exact requalification 通过
+
+修复候选在当前树目标 DB 证伪通过后提交为 `0374087…`，随后只从相邻 detached
+worktree 执行正式资格化。Base `06303e9…`、My-Chat `a019566…` 与 Nurture
+`0374087…` 的 revision/hash、package-manager link 和 runtime source 完全同源；
+Nurture self-pin 为 168 files / `b44f4fad…`。
+
+55437 上的 `postgres:16-alpine` tmpfs 从空库重放 16 migrations，catalog 为 61
+tables / 90 enums 且 schema diff 为零。exact 结果包括 unit 579、scenario-service
+unit 52、production DB 225、formal owner 55、surface conformance 110 和 tooling 5；
+26 actions、9 queries 与两条 joint journey 都有 runtime evidence。
+
+最终 census 为 partial schedules 0、released without frozen revision 0、invalid
+policy contracts 0、activation-like tables 0。31 条测试 release 中 10 条是刻意的
+receipt-less fixture，但它们与 applied CommandExecution 的交集为 0。一次性容器与
+tmpfs 已销毁，55437 释放，原 5433/55439 容器 ID 未变；三个 detached worktree 也已
+通过 Git 正规移除。G3 Exit PASS 与 exact Beta Profile Handoff 因而恢复；未执行
+deployment、activation、T-008、Pilot、Candidate 或 device/native 工作。

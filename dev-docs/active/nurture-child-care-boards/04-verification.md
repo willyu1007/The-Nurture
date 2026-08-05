@@ -1191,11 +1191,38 @@ Pilot, native/device work or traffic.
 | new production-DB regressions | PASS on current repair tree — target 2 files / 64 tests; concurrent first-freeze 3/3 additional passes |
 | full production DB suite | PASS on current repair tree — 21 files / 225 tests |
 | Nurture runtime self-pin | ROTATED — 168 files / `b44f4fad985bf760b0bf1a6c4abac8badd7e91ea7999d829bb1fabcd2dfbf8c0` |
-| exact detached owner/joint requalification | NOT RUN |
+| exact detached owner/joint requalification | PASS — Nurture checkpoint `0374087…` |
 
-The authorized disposable listener is now active only on 55437; existing 5433/55439
-listeners remain excluded. The first target run exposed one stale classification assertion:
+The authorized disposable listener ran only on 55437; existing 5433/55439 listeners
+remained excluded. The first target run exposed one stale classification assertion:
 an audit-key `P2002` proves rollback and now returns `command_identity_conflict` rather than
-`outcome_unknown` or the false `already_released`. G3-D/E, the Beta Profile Handoff and task
-closure remain pending until exact detached qualification passes and the disposable resource
-is destroyed.
+`outcome_unknown` or the false `already_released`. The exact detached qualification passed;
+the disposable resource and topology were destroyed, so G3-D/E and the Beta Profile Handoff
+are restored and T-006 may close.
+
+## 2026-08-05 — G3 release repair exact requalification
+
+| Command / check | Result |
+| --- | --- |
+| exact topology | PASS — Base `06303e9…`, My-Chat `a019566…`, Nurture `0374087…` |
+| exact source pins | PASS — parity 11; Base 59; My-Chat 169/20; Nurture 168 / `b44f4fad…` |
+| frozen install + explicit build/generate | PASS — lifecycle scripts disabled; three Prisma clients generated; no dev server |
+| clean migrations/catalog/drift | PASS — 16 migrations; 61 tables / 90 enums; no difference |
+| aggregate + scenario-service DB typecheck | PASS |
+| root/scenario-service unit | PASS — 579 + 52 tests |
+| production DB | PASS — 21 files / 225 tests |
+| release/organize target DB | PASS — 2 files / 64 tests; concurrent first-freeze extra 3/3 |
+| formal owner integration | PASS — 2 files / 55 tests; actions 26, queries 9, unexercised 0 |
+| joint journeys | PASS — T-007/T-006 publication; T-005/T-006 direct interaction |
+| runtime evidence | PASS — 37 keys / `e02ee06300c3c232ca938314f38cec156fdc24a75fff11bf94fe4ad67e929910` |
+| surface conformance/tooling | PASS — 11 files / 110 tests; tooling 5/5 |
+| G2 DB preservation | PASS — items 53/11; messages 74/12; violations 0 |
+| built default-off smoke | PASS — binding owner/Harness disabled; legacy route absent |
+| context/docs/governance/static guards | PASS |
+| final DB census | PASS — schedules 0; frozen violations 0; policy violations 0; activation-like tables 0 |
+| receipt invariant | PASS — releases 31; receipt-less fixtures 10; receipt-less with applied execution 0 |
+| teardown | PASS — container/tmpfs/topology absent; 55437 free; excluded 5433/55439 unchanged |
+
+Verdict: `G3_EXIT_PASS_RESTORED`. This is default-off provider/consumer qualification,
+not deployment or activation authority. T-008, Pilot, Candidate and native/device work were
+not started.

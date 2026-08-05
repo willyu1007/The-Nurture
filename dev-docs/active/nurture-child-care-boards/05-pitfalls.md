@@ -776,3 +776,16 @@
 - **Prevention**：absence、unavailable 与 empty 是三种事实；owner contract 必须分别表示。
   JSON payload 应只有一个 writer/reader shape，并用生产 writer → owner reader 的 DB 回归
   钉住，不只手工 seed canonical fixture。
+
+### 2026-08-05 — 冲突分类必须来自已提交事实，而不是异常类型本身
+
+- **Symptom**：强制 `CommandExecution` 唯一键冲突时，整个逐目标事务已确定回滚且目标
+  `PublicationRelease` 不存在，但实现仍返回 `outcome_unknown`；若直接把 `P2002` 当 replay，
+  又会把未发布错误报告成 `already_released`。
+- **Root cause**：异常分类没有区分“事务结局未知”和“事务确定回滚”，也没有在唯一键冲突后
+  读取目标 release 事实进行 reconciliation。
+- **Fix**：`P2002` 后读取 exact target release；存在且身份匹配才按 replay 返回，不存在且事务
+  已确定回滚则返回 `command_identity_conflict`。只有数据库无法确认提交结局时才使用
+  `outcome_unknown`。
+- **Prevention**：幂等冲突的业务结论必须由已提交行证明；异常码只触发 reconciliation，不能
+  单独证明“已执行”或“结果未知”。

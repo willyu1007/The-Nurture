@@ -808,3 +808,19 @@ The first beta profile therefore freezes B1/C1/D/E while B2/C2 remain absent and
 default-off. Camera, protected local cache, native/device interaction, notification
 delivery, Candidate and deployment remain My-Chat/T-008 responsibilities. This Exit
 is an architectural handoff boundary, not activation authority.
+
+### G3-D repair-qualified transaction boundary
+
+The exact release owner now treats frozen revision acquisition as the first write in
+each target transaction. A Serializable transaction rereads the process-bound schedule,
+T-007 policy, executor reach, original authorizing role, edit hold, Grant, Enrollment,
+Receipt census and frozen media eligibility; only an exact pending/current/unfrozen CAS
+may advance the parent to released before Receipt, PublicationRelease and
+CommandExecution land atomically. Later targets bind only to that frozen revision.
+
+Preview and effect reuse one ref-free target eligibility derivation, but preview is not
+authority. Missing Receipt evidence, unavailable or foreign-class media and composition
+revision drift remain explicit blocking facts. The organize owner writes the canonical
+composition shape and resolves assets within the batch's exact CareGroup. These rules were
+qualified at Nurture checkpoint `0374087…`; they do not change host/runtime ownership or
+authorize capability activation.

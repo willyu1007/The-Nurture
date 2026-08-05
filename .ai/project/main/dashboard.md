@@ -38,13 +38,13 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 8 (planned: 2, in-progress: 3, blocked: 0, done: 2, archived: 1)
+- Tasks: 8 (planned: 2, in-progress: 2, blocked: 0, done: 3, archived: 1)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-006 nurture-child-care-boards | in-progress | F-003 | dev-docs/active/nurture-child-care-boards |
+| T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
 | T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
