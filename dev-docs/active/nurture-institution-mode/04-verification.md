@@ -13,9 +13,9 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B and successor I1-C are accepted; artifacts 26-27 record the quality repair
-  freeze and requalification; artifact 28 freezes I1-D scope without opening
-  source. G1 is
+  I1-B, successor I1-C and I1-D are accepted; artifacts 28-33 record the I1-D
+  scope, ordered implementation, quality repair and cumulative qualification.
+  I1-E is unstarted and eligible only for a separate scope review. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -24,14 +24,28 @@
   default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: the current source includes the formal NestJS
-  binding-owner route, compiled shared runtime boundaries and production
-  Prisma/Guardian authority composition. The quality repair makes anchor
-  reservation and receipt issuance one owner transaction and cleans build
-  outputs before compilation. No schema/migration, persistent database,
-  Base/My-Chat source, secret/KMS/environment value, capability, deployment or
-  traffic is changed.
+- Code/config/schema impact: Base now includes the accepted neutral I1-A..D
+  contract source and exact source locks. I1-D changes only standalone contract
+  types/assertions, JSON Schemas, neutral fixtures/tests and its metadata lock;
+  the existing formal NestJS owner path is unchanged. No Base runtime/Scenario
+  starter/manifest, My-Chat or Nurture product source, schema/migration,
+  persistent database, secret/KMS/environment value, capability, deployment or
+  traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-D cumulative implementation and qualification — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User authorized all I1-D operations through closure. D1-D5 changed only Base standalone contracts/Schemas/fixtures/tests and the final source lock. |
+| Exact chain | PASS | D1 `57c0be0…`; D2 `9a35757…`; D3 `818b983…`; D4 `6fc07bd…`; review source `52c0dc2…`; metadata lock `c179bb5…`. |
+| Quality review | PASS / 3 FIXED | Strict JSON delegated input, committed-only exact replay and fail-closed unavailable lookup gaps were repaired; no finding remains open. |
+| Full Base verifier | PASS x3 | 55 Schemas, 291 Node tests, runtime 28/28 and Scenario 10/10; typecheck/build, exposure/consumer, canonical-ref and exact source-lock checks pass. |
+| Source identity | PASS | 20 normalized TypeScript files; hash `50c5fa162aa2c9f81b1eb053ebe48f1df90d8a14984e0f715af13224a3c7f093`; lock names exact source `52c0dc2…`. |
+| Determinism | PASS | Two 76-file builds: `2caf4603…70b7`; two manifests: `4553ffbf…1d70`; temporary outputs destroyed. |
+| Scope audit | PASS | No Base runtime/Scenario starter/manifest diff, `any`, product vocabulary, consumer source, DB, deployment, capability or activation change. |
+| Detailed evidence | PASS | Artifacts 29-32 record D1-D4; artifact 33 records the cumulative D5 qualification and rollback chain. |
+| Context/governance/docs | PASS | Context checksum `f51f331b061bdb67718a70ef1038b03850a9619d03a792aba3066facff1198bc`; strict Context/project-state/governance checks and T-002 query pass; 63 task and 429 repository Markdown files pass strict anchor lint. |
 
 ## C30-I1-D domain-action scope freeze — 2026-08-05
 

@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C accepted；I1-D scope frozen）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D accepted）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
@@ -12,10 +12,11 @@
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
   `9a15865…`; I1-C is reaccepted at successor Base source `ae0c357…`, metadata
   lock `3c30337…` and source hash `fc35c6b…e5cf3`. The prior source/lock remains
-  historical. I1-D domain-action scope is now frozen in artifact 28 with five
-  ordered units, neutral driver names and symmetric effect-identity inputs. The
-  only eligible next decision is separately authorizing I1-D1; no I1-D source is
-  open.
+  historical. I1-D is accepted at Base source `52c0dc2…`, metadata lock
+  `c179bb5…` and source hash `50c5fa16…f093`; artifacts 28-33 record the frozen
+  scope, ordered D1-D5 chain, quality repair and cumulative qualification. The
+  only eligible next decision is a separately authorized I1-E scope review and
+  freeze; I1-E implementation is not open.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -82,13 +83,23 @@
 - C30-I1-C4 successor qualification: `artifacts/27-c30-i1-c4-quality-repair-qualification-record.md`
   closes all six findings at Base source `ae0c357…`, lock `3c30337…`, source hash
   `fc35c6b…e5cf3`, three full verifier rounds and deterministic build/manifest.
-  I1-C is reaccepted; I1-D source remains unstarted and separately authorized.
-- C30-I1-D planning handoff: `artifacts/28-c30-i1-d-scope-freeze.md` freezes
+  I1-C was reaccepted there; the successor I1-D chain is recorded below.
+- C30-I1-D planning handoff: `artifacts/28-c30-i1-d-scope-freeze.md` froze
   standalone Base action contract, prepare/submit, assurance separation,
   direct/claimed identity and result/recovery wires as D1-D5. The exact neutral
   drivers are `scenario_direct_empty_v1|workflow_claimed_step_v1`; both effect
   identities include `scenario_key`. Manifest dependency/source convergence stays
-  I1-F. I1-D1 implementation requires another explicit authorization.
+  I1-F.
+- C30-I1-D1 through D4 implementation records: artifacts
+  `29-c30-i1-d1-implementation-record.md` through
+  `32-c30-i1-d4-implementation-record.md` pin the separately attributable Base
+  core, prepare/submit/assurance, identity/result and claimed-Step recovery
+  checkpoints.
+- C30-I1-D5 qualification record:
+  `artifacts/33-c30-i1-d5-qualification-record.md` pins exact source `52c0dc2…`,
+  metadata lock `c179bb5…`, source hash `50c5fa16…f093`, 55 Schemas, 291 Node
+  tests and deterministic 76-file builds. I1-D is accepted; I1-E remains
+  unstarted pending a separate scope-review authorization.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

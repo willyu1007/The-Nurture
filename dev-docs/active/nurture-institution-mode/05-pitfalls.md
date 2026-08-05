@@ -952,6 +952,24 @@ This file exists to prevent repeating mistakes within this task.
 - References: `artifacts/28-c30-i1-d-scope-freeze.md`, `02-architecture.md`
   Pilot-0-C3-0d, `06-ib-nurture-schema-spec.md` C-3-0d refinement.
 
+### 2026-08-05 — Treating JSON serialization and recovery parity as contract proof
+
+- Symptom: delegated `action_input` could admit non-JSON JavaScript values; exact
+  replay could compare a committed original with a non-committed replay; and a
+  stored binding plus an unavailable lookup could be rejected instead of remaining
+  safely unavailable.
+- Root cause: successful `JSON.stringify` was used as a JSON-domain proxy, result
+  parity did not first require terminal committed state, and recovery validation
+  coupled lookup availability to stored binding presence.
+- Fix / workaround: D5 added a recursive strict-JSON assertion, committed-state
+  preconditions for exact replay and an explicit fail-closed unavailable branch.
+  The repaired source is `52c0dc2…`, sealed by `c179bb5…`.
+- Prevention: delegated-value tests must include `undefined`, non-finite numbers,
+  dates, functions and cycles; replay tests must cross every terminal/nonterminal
+  state; recovery tests must keep storage evidence distinct from current lookup
+  availability.
+- References: `artifacts/33-c30-i1-d5-qualification-record.md`.
+
 ### 2026-07-19 — Treating encryption or a protected ref as the whole privacy boundary
 
 - Symptom: A Message can carry `body=null` and a `protected_content_ref` while no real encrypted owner store exists, or the same text can survive in ordinary Chat, `PublicDraft`, Item detail, browser cache, logs, AI prompts, backups, or a stale protected view. The system then appears protected at the schema row while retaining several authoritative or readable copies.

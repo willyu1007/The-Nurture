@@ -1,5 +1,8 @@
 # C30-I1-C4 Quality Repair Qualification and Source-Lock Record
 
+> This remains the accepted I1-C evidence. Its original “I1-D ready” next-state
+> handoff was consumed by artifacts 28-33, which later accepted I1-D.
+
 ## Result
 
 - Date: 2026-08-05

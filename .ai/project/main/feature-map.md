@@ -34,10 +34,11 @@ Project: `main`
   Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
   cumulative qualification. I1-C subject-context/presentation is reaccepted at
   successor Base source `ae0c357…` plus lock `3c30337…` after artifact 26-27
-  quality repair; the earlier chain is historical. Artifact 28 freezes I1-D as
-  five separately gated D1-D5 units with neutral direct/claimed names, symmetric
-  scenario-bound identity and manifest/source convergence retained by I1-F. I1-D1
-  implementation is the next separately authorized decision. Remaining I1-D..F,
+  quality repair; the earlier chain is historical. Artifacts 28-33 accept I1-D at
+  Base source `52c0dc2…` plus lock `c179bb5…`, with neutral direct/claimed names,
+  symmetric scenario-bound identity and manifest/source convergence retained by
+  I1-F. An I1-E scope review/freeze is the next separately authorized decision;
+  I1-E implementation remains closed. Remaining I1-E..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

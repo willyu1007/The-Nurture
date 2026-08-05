@@ -8,12 +8,14 @@
 - Entry: C30-I1-A/I1-B/I1-C accepted; current Base source
   `ae0c35709f0798abb7b0a2a365805b76ba9f5cd4` plus source lock
   `3c30337eabe012eb936e91eec5c9d421463e67c7`
-- State: `I1_D_SCOPE_FROZEN / IMPLEMENTATION_NOT_AUTHORIZED`
-- Downstream: `I1_E_BLOCKED / I1_F_BLOCKED / C30_I2_NO_GO / ACTIVATION_NO_GO`
+- State: `I1_D_ACCEPTED / I1_D1_D2_D3_D4_D5_COMPLETE`
+- Downstream: `I1_E_SCOPE_REVIEW_READY / I1_F_BLOCKED / C30_I2_NO_GO / ACTIVATION_NO_GO`
 
-This review freezes only the neutral My-Workflow-Base domain-action contract
-surface. It authorizes no Base source, My-Chat or Nurture consumer, manifest,
-runtime, schema, database, capability, deployment, activation or traffic change.
+This review originally froze only the neutral My-Workflow-Base domain-action
+contract surface. The user later authorized all I1-D operations through closure;
+artifacts 29-33 record the resulting Base-only D1-D5 chain. It still authorizes no
+My-Chat or Nurture consumer, manifest convergence, runtime, database, capability,
+deployment, activation or traffic change.
 
 Three review decisions are normative:
 
@@ -496,9 +498,10 @@ or Nurture source, schema, migration, database or registry value.
 | `I1-D4` claimed-Step binding and recovery | Bind/rebind, body-free lookup, transient claimed driver and cross-wire contextual validation. | D3 accepted. | Wrong-Step/driver, crash-window, expiry, same-Step replay and different-Step seed-transfer negatives pass. |
 | `I1-D5` cumulative qualification | Full Base verification, deterministic build/manifest, exact source-lock seal and scope audit; adds no wire. | D1-D4 accepted. | Cumulative I1-D is accepted at one exact source plus metadata-only source lock. |
 
-No unit starts automatically. Each source unit requires later explicit
-authorization. I1-D5 acceptance opens only a separate I1-E scope-review decision;
-it does not open implementation, I1-F, C30-I2 or activation.
+At freeze time no unit started automatically. The later explicit authorization
+opened D1-D5 in order, and artifacts 29-33 record each checkpoint and cumulative
+acceptance. I1-D5 acceptance opens only a separate I1-E scope-review decision; it
+does not open implementation, I1-F, C30-I2 or activation.
 
 ## Cumulative acceptance matrix
 
@@ -527,10 +530,10 @@ I1-D acceptance requires all of the following:
 
 ## Rollback and invalidation
 
-Each future unit MUST be committed separately. Rollback reverses the metadata-only
+Each source unit was committed separately. Rollback reverses the metadata-only
 I1-D5 source lock first, then D4, D3, D2 and D1 as needed. No database, runtime or
 consumer compensation exists because this freeze authorizes Base contract source
-only after a later gate and authorizes no adoption.
+only and authorizes no adoption.
 
 Any change to a wire field, exposure zone, driver name/meaning, direct/claimed
 effect-identity inputs, submit-context lifetime, public/private result vocabulary,
@@ -544,24 +547,39 @@ this freeze and requires renewed scope review before source work continues.
   terminology contract and current Base contract population.
 - Expected documentation checks: strict task-doc/anchor lint, governance sync/lint,
   strict Context verification and `git diff --check`.
-- No build, Prisma generate, database connection/apply, one-time PostgreSQL,
-  deployment, capability, activation, T-008, Pilot or traffic action belongs to
-  this documentation-only freeze.
+- At freeze time no build, Prisma generate, database connection/apply, one-time
+  PostgreSQL, deployment, capability, activation, T-008, Pilot or traffic action
+  belonged to the documentation-only review. The later D5 build qualification is
+  recorded separately in artifact 33.
+
+## Implementation acceptance — 2026-08-05
+
+- D1-D4 source checkpoints are Base `57c0be0…`, `9a35757…`, `818b983…` and
+  `6fc07bd…`; artifacts 29-32 record their exact boundaries.
+- The D5 architecture review repaired strict JSON delegated-input validation,
+  committed-only exact replay and the fail-closed unavailable-lookup branch in
+  exact source `52c0dc21c12b0f96741d4fe4c8a5439285479c6b`.
+- Metadata-only lock `c179bb5fe914311a7a4fe9a59b898eeee53297a4`
+  binds 20 normalized TypeScript files at
+  `50c5fa162aa2c9f81b1eb053ebe48f1df90d8a14984e0f715af13224a3c7f093`.
+- Full verification passes three times with 55 Schemas, 291 Node tests, runtime
+  28/28 and Scenario 10/10. Two isolated 76-file builds and two manifests are
+  deterministic; temporary outputs were destroyed.
+- No manifest dependency/source convergence, consumer/runtime, database,
+  capability, deployment, activation, T-008 or Pilot work entered I1-D.
 
 ## Next gate
 
-The only eligible next action is a separately authorized `I1-D1` Base contract
-implementation. I1-D2 through I1-D5, I1-E/I1-F, all consumers and C30-I2 remain
-unauthorized until their own gates are satisfied.
+The only eligible next action is a separately authorized `C30-I1-E` protected-
+interaction scope review and freeze. I1-E implementation, I1-F, all consumers and
+C30-I2 remain unauthorized until their own gates are satisfied.
 
 ```text
-Goal: Implement only C30-I1-D1 neutral domain-action contract/common primitives.
-Constraints: Use scenario_direct_empty_v1|workflow_claimed_step_v1; include
-             scenario_key in both effect-identity input branches; no any;
-             no manifest/runtime/database/consumer/source-convergence change;
-             do not start I1-D2 or I1-E.
-Relevant paths: workflow-contract domain-action types/assertions/Schemas,
-                neutral conformance fixtures/tests and package export index.
-Acceptance: D1 row plus cumulative invariants that already apply to D1 pass;
-            the existing source lock remains intentionally stale until I1-D5.
+Goal: Review and freeze only C30-I1-E protected-interaction contract scope.
+Constraints: Keep protected bytes outside generic Host payloads; preserve the
+             accepted I1-D source/lock; do not implement I1-E or start I1-F.
+Relevant inputs: accepted I1-A..D exports, protected-content ownership decisions,
+                 no-copy boundaries and T-029 donor disposition.
+Acceptance: exact wires, exposure zones, negatives, Base impact, ordered units,
+            rollback/invalidation and a separate implementation gate are frozen.
 ```

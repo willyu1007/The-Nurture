@@ -7,6 +7,19 @@
 
 ## What changed
 
+- 2026-08-05: Completed and accepted the authorized Base `C30-I1-D` chain.
+  D1-D4 add the neutral action contract, zero-effect prepare/exact submit echo,
+  detached Host assurance, scenario-bound direct/claimed identities, layered
+  private/public results and immutable original-Step binding/recovery. The D5
+  architecture review rejected non-JSON delegated inputs, non-committed exact
+  replays and an over-strict unavailable-lookup branch before sealing successor
+  source `52c0dc21c12b0f96741d4fe4c8a5439285479c6b` in metadata-only lock
+  `c179bb5fe914311a7a4fe9a59b898eeee53297a4`. Three full Base verifier rounds
+  pass with 55 Schemas, 291 Node tests, runtime 28/28, Scenario 10/10, source hash
+  `50c5fa16…f093` and deterministic 76-file builds. No manifest/source
+  convergence, consumer, runtime, DB, deployment, capability, activation, T-008
+  or Pilot work ran. I1-E is eligible only for a separate scope review/freeze.
+
 - 2026-08-05: Reused T-002 and froze only the `C30-I1-D` neutral Base
   domain-action contract scope in artifact 28. The review separates client echo,
   Host-private assurance, worker claim and server-only result zones; freezes

@@ -263,10 +263,11 @@ dev-docs/active/nurture-institution-mode/
   `64533a6…`; I1-C2 is complete at `600faee…`, I1-C3 is complete at
   `13d2077…`. Artifact 26 reopens/freezes the bounded repair and artifact 27
   reaccepts cumulative I1-C at successor source `ae0c357…` / lock `3c30337…`.
-  The earlier chain remains historical. Artifact 28 now freezes I1-D as five
-  separately gated D1-D5 units with neutral driver naming, symmetric
-  scenario-bound effect identity and manifest/source convergence deferred to I1-F.
-  No I1-D source is authorized.
+  The earlier chain remains historical. Artifact 28 froze I1-D as five D1-D5
+  units with neutral driver naming, symmetric scenario-bound effect identity and
+  manifest/source convergence deferred to I1-F. Artifacts 29-33 now accept the
+  exact D1-D5 chain at source `52c0dc2…` plus lock `c179bb5…`; no consumer or
+  I1-F convergence is implied.
 
 Hard gates:
 
@@ -283,8 +284,10 @@ Hard gates:
   `64533a6…` 完成，C2 已在 `600faee…` 完成，C3 已在 `13d2077…` 完成；
   原 C4 source `d14bf31…` + lock `9d16810…` 已成为历史；artifact 26 冻结六项
   修复，artifact 27 以 source `ae0c357…` + lock `3c30337…` 完成再验收。
-  I1-D 范围已在 artifact 28 冻结；下一步仅可另行授权 I1-D1，I1-D2-D5 不
-  自动开启，manifest dependency/source convergence 仍由 I1-F 负责。
+  I1-D 范围已在 artifact 28 冻结，并由 artifacts 29-33 在 Base source
+  `52c0dc2…` + lock `c179bb5…` 完成 D1-D5 实施、复核和累计验收。下一步仅可
+  另行授权 I1-E 范围评审与冻结；I1-E 实施、manifest dependency/source
+  convergence 与 I1-F 仍未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
@@ -293,7 +296,7 @@ Hard gates:
   `artifacts/19-c30-i1-b3-implementation-record.md` 与
   `artifacts/20-c30-i1-b4-qualification-record.md` 与
   `artifacts/21-c30-i1-c-scope-freeze.md` 与
-  `artifacts/28-c30-i1-d-scope-freeze.md`。
+  `artifacts/28-c30-i1-d-scope-freeze.md` 与 artifacts 29-33。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

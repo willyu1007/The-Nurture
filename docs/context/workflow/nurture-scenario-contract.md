@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C accepted after successor quality repair; I1-D scope frozen, source and all consumer adoption/activation pending separate authorization
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E scope review and all consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 
@@ -21,14 +21,17 @@ Workflow merely because it is asynchronous, cross-owner, retried, or delivered t
 Handoff/Outbox. Existing family-care claimed-Step activation remains a compatibility gap
 and MUST stay default-off until the owner contract is reconciled with the product semantics.
 
-The frozen C30-I1-D Base contract uses the neutral static drivers
+The accepted C30-I1-D Base contract uses the neutral static drivers
 `scenario_direct_empty_v1|workflow_claimed_step_v1`. Both server-only effect
 identity input branches explicitly bind `scenario_key`; the direct branch binds
 Workspace/scenario/action/submit context and the claimed branch binds
 Workspace/scenario/action/original Step. I1-D defines standalone wire/codec/schema
 conformance only. Manifest dependency/capability convergence, legacy/vNext atomic
-exclusion and `scenario_domain_action_source_v1` remain I1-F work. No I1-D source,
-consumer, runtime or activation exists yet.
+exclusion and `scenario_domain_action_source_v1` remain I1-F work. The exact Base
+source is `52c0dc21c12b0f96741d4fe4c8a5439285479c6b`, sealed by metadata lock
+`c179bb5fe914311a7a4fe9a59b898eeee53297a4` at source hash
+`50c5fa162aa2c9f81b1eb053ebe48f1df90d8a14984e0f715af13224a3c7f093`.
+No consumer, runtime, manifest convergence or activation exists yet.
 
 ## Decision
 
