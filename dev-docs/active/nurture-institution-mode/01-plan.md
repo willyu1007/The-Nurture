@@ -646,7 +646,7 @@ census、capability/Workspace activation、artifact/cloud/secret/traffic 仍需�
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C/I1-D 已验收）
+## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C 已验收；I1-D 验收重开）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -656,8 +656,8 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | `C30-I1-A` trusted invocation contract spine | Accepted | Base `ce7118c…` plus source lock `bd69d19…`; principal, ingress and private envelope types/codecs/Schemas/fixtures only. |
 | `C30-I1-B` canonical-object binding envelope | Accepted | B1-B3 source `edbcd74…` plus B4 lock `9a15865…`; cumulative Schema/codec/exposure/build/conformance and exact source hash `16be693c…2512` pass. No consumer adoption. |
 | `C30-I1-C` subject presentation | Accepted | Successor source `ae0c357…` plus lock `3c30337…`; R1-R6 and repeated Schema/codec/exposure/build/conformance pass at hash `fc35c6b…e5cf3`. No consumer adoption. |
-| `C30-I1-D` domain action | Accepted | D1-D4 plus D5 review repair source `52c0dc2…` and metadata lock `c179bb5…`; 55 Schemas, 291 Node tests and deterministic build/source evidence pass. Manifest dependency/source convergence remains I1-F. |
-| `C30-I1-E` protected interaction | Ready for separate scope review | Protected lifecycle control wire and no-copy negatives only; implementation is not authorized. |
+| `C30-I1-D` domain action | Acceptance reopened / successor repair frozen | Artifact 34 freezes D-R1..D-R5. The prior `52c0dc2…` / `c179bb5…` chain is historical until successor source repair, cumulative requalification and reseal pass. Manifest dependency/source convergence remains I1-F. |
+| `C30-I1-E` protected interaction | Blocked by I1-D successor repair | Protected lifecycle control wire and no-copy negatives only; neither scope review nor implementation is open during repair. |
 | `C30-I1-F` dependency/source convergence | Blocked by I1-A..E | Atomic dependencies, legacy/vNext exclusion, schema/codec parity and four separate source identities. |
 
 I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
@@ -700,6 +700,8 @@ The four source checkpoints are recorded in artifacts
 [`32`](./artifacts/32-c30-i1-d4-implementation-record.md). The cumulative quality
 review, exact source and metadata lock are recorded in
 [`artifact 33`](./artifacts/33-c30-i1-d5-qualification-record.md).
+Its acceptance reopening and bounded successor-repair scope are recorded in
+[`artifact 34`](./artifacts/34-c30-i1-d5-quality-repair-freeze.md).
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---

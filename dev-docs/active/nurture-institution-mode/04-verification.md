@@ -10,12 +10,12 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-08-05
+- Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B, successor I1-C and I1-D are accepted; artifacts 28-33 record the I1-D
-  scope, ordered implementation, quality repair and cumulative qualification.
-  I1-E is unstarted and eligible only for a separate scope review. G1 is
+  I1-B and successor I1-C are accepted. I1-D acceptance is reopened; artifact 34
+  freezes five successor-repair findings and supersedes artifact 33 as current
+  qualification authority. I1-E/I1-F remain closed. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -32,6 +32,24 @@
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-D successor quality-review reopening — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Existing regression populations | PASS but insufficient | Direct contract typecheck, runtime 28/28, Scenario 10/10, conformance 291/291, 55 strict Schemas and the historical source lock remain green. |
+| Prepare Schema/codec parity | FINDING D-R1 | Ajv accepts `prepared` plus `safe_reason`, and `context_changed` plus `submit_token`; the runtime codec rejects both mixed branches. |
+| Resolved submit identity | FINDING D-R2 | Replacing a shape-valid submit token while retaining principal/expiry context passes the current assertion; scenario/action are absent from that private context. |
+| Exact rebind immutability | FINDING D-R3 | An exact assertion replay can replace the evidence hash and extend expiry because the existing-binding context stores neither value. |
+| Claimed-Step execution composition | FINDING D-R4 | A Step-01 driver and a Step-02 effect identity pass their respective assertions because no composed assertion joins them. |
+| Bind failure outcomes | FINDING D-R5 | Structural `unavailable` passes, but contextual fresh-bind validation demands success metadata; differing-request `request_conflict` has no accepted contextual path. |
+| Scope/effect census | PASS | Review and freeze changed Nurture governance/context evidence only. Base and My-Chat remain clean; no runtime/consumer, DB, manifest convergence, deployment, activation, T-008, Pilot or traffic action ran. |
+| Context/governance | PASS | Context touch/strict verify, project sync/lint and T-002 query pass; the registered workflow-context checksum is `fb601c44…37f2`. |
+| Documentation lint | PASS AFTER COMMAND CORRECTION | An initial call referenced three nonexistent legacy script names and stopped with `MODULE_NOT_FOUND`; no repository state changed. The canonical `lint-docs.mjs` task scan passes 64/64 and the repository scan passes 430/430 with strict anchor checking and zero warnings/errors. |
+
+The exact repair and falsification matrix is frozen in artifact 34. Artifact 33
+is historical evidence until successor source, repeated qualification and a new
+metadata source lock are recorded.
 
 ## C30-I1-D cumulative implementation and qualification — 2026-08-05
 

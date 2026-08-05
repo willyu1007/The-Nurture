@@ -3,9 +3,20 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-08-05
+- Last updated: 2026-08-06
 
 ## What changed
+
+- 2026-08-06: Reopened cumulative Base `C30-I1-D` acceptance and froze the
+  successor D5 repair in artifact 34 before source work. Independent executable
+  probes found five missed compositions: mixed prepare-result Schema branches,
+  an unbound submit token/resolved scenario-action context, mutable expiry/evidence
+  on exact rebind, separately valid but cross-Step claimed execution, and
+  success-only context requirements that blocked legitimate `unavailable` and
+  `request_conflict` outcomes. The prior `52c0dc2…` / `c179bb5…` chain remains
+  historical. Repair is limited to neutral Base Schema/private assertions/tests
+  and later metadata resealing; I1-E/I1-F, consumers, DB, deployment, activation,
+  T-008 and Pilot remain NO-GO.
 
 - 2026-08-05: Completed and accepted the authorized Base `C30-I1-D` chain.
   D1-D4 add the neutral action contract, zero-effect prepare/exact submit echo,

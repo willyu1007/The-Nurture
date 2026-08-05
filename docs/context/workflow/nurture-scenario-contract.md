@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E scope review and all consumer adoption/activation pending separate authorization
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C accepted; I1-D acceptance reopened for bounded successor repair; I1-E/I1-F and all consumer adoption/activation closed
 
 ## Product Terminology Compatibility
 
@@ -21,17 +21,21 @@ Workflow merely because it is asynchronous, cross-owner, retried, or delivered t
 Handoff/Outbox. Existing family-care claimed-Step activation remains a compatibility gap
 and MUST stay default-off until the owner contract is reconciled with the product semantics.
 
-The accepted C30-I1-D Base contract uses the neutral static drivers
+The C30-I1-D Base contract uses the neutral static drivers
 `scenario_direct_empty_v1|workflow_claimed_step_v1`. Both server-only effect
 identity input branches explicitly bind `scenario_key`; the direct branch binds
 Workspace/scenario/action/submit context and the claimed branch binds
 Workspace/scenario/action/original Step. I1-D defines standalone wire/codec/schema
 conformance only. Manifest dependency/capability convergence, legacy/vNext atomic
 exclusion and `scenario_domain_action_source_v1` remain I1-F work. The exact Base
-source is `52c0dc21c12b0f96741d4fe4c8a5439285479c6b`, sealed by metadata lock
+historical source is `52c0dc21c12b0f96741d4fe4c8a5439285479c6b`, sealed by metadata lock
 `c179bb5fe914311a7a4fe9a59b898eeee53297a4` at source hash
 `50c5fa162aa2c9f81b1eb053ebe48f1df90d8a14984e0f715af13224a3c7f093`.
-No consumer, runtime, manifest convergence or activation exists yet.
+Independent quality review reopened acceptance on 2026-08-06 for Schema branch
+closure, resolved submit identity, immutable exact rebind, claimed-Step execution
+composition and legitimate fail-closed bind outcomes. Artifact 34 freezes the
+successor repair; the cited source/lock remains historical until resealed. No
+consumer, runtime, manifest convergence or activation exists yet.
 
 ## Decision
 
