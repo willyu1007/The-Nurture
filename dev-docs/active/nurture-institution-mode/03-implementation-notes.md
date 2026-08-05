@@ -7,6 +7,15 @@
 
 ## What changed
 
+- 2026-08-05: Accepted cumulative Base `C30-I1-C`. The C4 review aligned
+  portable SafeText exposure negatives in follow-up source `d14bf31…`, then sealed
+  that exact revision in metadata-only lock `9d16810…` with source hash
+  `9e18ae68…09ae`. `pnpm verify:workflow-contracts` passes twice before and once
+  after the lock commit: 36 Schemas, 206 Node tests, runtime 28/28 and Scenario
+  10/10. Two isolated 68-file builds and two source-manifest outputs are byte-tree
+  deterministic. No runtime/provider/consumer, database, capability, deployment or
+  activation changed. I1-D remains unstarted pending separate scope authorization.
+
 - 2026-08-05: Implemented and locally verified Base `C30-I1-C3` at
   `13d207791d91b5efb168494af896c5f716d16c39`. Added the exact read-only
   present input/four-state result, six flat semantic blocks, navigation offers,

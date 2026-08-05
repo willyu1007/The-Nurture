@@ -32,6 +32,20 @@
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
 
+## C30-I1-C4 cumulative qualification and source lock — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Cumulative Base source `d14bf31da957ed42e6ce0dfecc3299c42b7c6a51`; metadata lock `9d168105ea8ccdf701c0b527764ede4de1f25a82`. |
+| Full verifier | PASS x3 | `pnpm verify:workflow-contracts` passes twice before and once after the lock commit. |
+| Schema/conformance | PASS | 36 Schemas compile; 206 Node tests, runtime 28/28 and Scenario 10/10 pass. |
+| Source identity | PASS | Hash `9e18ae68fb4541ab562ee8209edf497f58af0a09daa31783e5099ce8364609ae`; 18 normalized files; exact reachable revision and byte comparison pass. |
+| Deterministic build | PASS | Two isolated 68-file builds produce tree digest `2b504b48c934f74798fcef42bac62360828651e1c854cb763eeda3574ca759d1`. |
+| Deterministic manifest | PASS | Two source-manifest outputs produce digest `9a9b0aefdd072585334aa60f64b272202ac280b77b5932589f9c0813092f14f6`. |
+| Boundary review | PASS | Closed union, exposure, canonical-ref, actual consumer-boundary, portability, documentation alignment and UI-token checks pass. |
+| Context/governance/docs | PASS | Context checksum `3fac79261f7fe8a8d5671dd11a016b68e4be734184a3e2c71744d324a36a02dd`; strict checks and document/anchor lint pass. |
+| Effect boundary | PASS | No runtime/provider/consumer, My-Chat/Nurture product source, DB, capability, deployment, activation, I1-D or C30-I2. |
+
 ## C30-I1-C3 semantic-presentation implementation — 2026-08-05
 
 | Check | Result | Evidence |

@@ -7,8 +7,8 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Entry: C30-I1-A accepted; C30-I1-B accepted at Base source `edbcd74…`
   plus source lock `9a15865…`
-- State: `I1_C1_C2_C3_COMPLETE / I1_C4_IN_PROGRESS`
-- Downstream: `I1_D_BLOCKED / C30_I2_NO_GO / ACTIVATION_NO_GO`
+- State: `I1_C_ACCEPTED / I1_C1_C2_C3_C4_COMPLETE`
+- Downstream: `I1_D_READY_NOT_STARTED / C30_I2_NO_GO / ACTIVATION_NO_GO`
 
 This review freezes the neutral Base contract for discovering and resolving a
 Scenario-owned subject context and presenting owner-safe semantic output. The later
@@ -308,7 +308,7 @@ reason, product action or Child/Family/Institution vocabulary.
 | `I1-C1` safe-copy/ref primitives | SafeText/Label/Reason, tone/narration and opaque ref/cursor bounded-syntax validators plus lifetime-contract fixtures. | Complete at Base `64533a6…`. | Types/assertions/Schemas/neutral fixtures pass; no provider/presentation union. |
 | `I1-C2` subject-context provider | List/resolve inputs, option and closed result unions; pagination, selection and context-change behavior. | Complete at Base `600faee…`. | Provider Schema/codec parity and authority/exposure negatives pass. |
 | `I1-C3` semantic presentation | Present input/result, six blocks, navigation/action offers and narration projection/exposure negatives. | Complete at Base `13d2077…`. | Presentation bounds, closed unions and prepare-only semantics pass. |
-| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | I1-C1-C3 complete; authorized. | One exact I1-C source/lock chain passes cumulative conformance. |
+| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | Complete at source `d14bf31…` plus lock `9d16810…`. | One exact I1-C source/lock chain passes cumulative conformance. |
 
 No unit opens I1-D, performs consumer adoption or satisfies the cumulative C30-I1
 exit. I1-D begins only after I1-C4 acceptance and another explicit authorization.
@@ -337,9 +337,8 @@ I1-C cumulative acceptance requires all of the following:
 
 ## Rollback and invalidation
 
-Each future unit must be committed separately. Before I1-C4, rollback reverts the
-latest accepted unit in reverse order. After I1-C4, revert the metadata-only source
-lock first, then C3, C2 and C1 as needed. No database or runtime compensation exists
+Each unit is committed separately. To roll back the accepted slice, revert the metadata-only source
+lock first, then the cumulative review repair, C3, C2 and C1 as needed. No database or runtime compensation exists
 because this freeze and the planned Base slice create no consumer adoption.
 
 Any change to wire fields, result variants, block variants, safe-copy rules, bounds,
@@ -348,18 +347,20 @@ this freeze and requires renewed scope review before source work continues.
 
 ## Verification and effect boundary
 
-- Current review inspects the accepted Pilot/context contracts, T-029 disposition,
+- The original scope review inspected the accepted Pilot/context contracts, T-029 disposition,
   prior presentation decisions and live Base/My-Chat/Nurture candidate surfaces.
-- Workflow Context checksum is
+- Its Workflow Context checksum was
   `46c566a0123a9e555b5b6bc0142bb3fef9938612d314e643eb5916563ab244dd`;
   strict Context, project-state, governance, T-002 query and whitespace checks pass.
   Document/anchor lint checks 417 Markdown files with zero errors or warnings.
-- No build, Prisma generate, database connection/apply, one-time PostgreSQL,
+- C4 later ran the authorized Base-only build/qualification and is recorded in
+  artifact 25. No Prisma generate, database connection/apply, one-time PostgreSQL,
   deployment, capability, activation, T-007/T-008, Pilot or traffic action ran.
-- No Base/My-Chat/Nurture product source changed. This artifact is planning SSOT only.
+- No My-Chat/Nurture product source changed. This artifact remains the scope SSOT;
+  artifact 25 is the accepted implementation/qualification record.
 
 ## Next gate
 
-The next ordered implementation unit is `C30-I1-C4` cumulative qualification and
-source-lock sealing. I1-D, all consumer/runtime adoption and C30-I2 remain
+I1-C is accepted. The next eligible decision is a separately authorized C30-I1-D
+scope review/freeze; I1-D source, all consumer/runtime adoption and C30-I2 remain
 unauthorized.

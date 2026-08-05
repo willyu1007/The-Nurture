@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B accepted; I1-C1-C3 complete with I1-C4 and consumer adoption/activation pending
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C accepted; I1-D and all consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 

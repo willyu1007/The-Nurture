@@ -67,3 +67,6 @@ database or consumer compensation.
 
 Proceed to authorized I1-C4 cumulative qualification, repeated deterministic build
 and exact source-lock sealing only. I1-D, consumer adoption and C30-I2 remain blocked.
+
+The later cumulative C4 review added only portable SafeText Schema/codec parity
+repair `d14bf31…` before sealing; artifact 25 is the final accepted I1-C chain.

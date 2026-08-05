@@ -16,6 +16,11 @@ This file exists to prevent repeating mistakes within this task.
   mixed-variant negative fixture.
 - Under strict Ajv, a nested `not.pattern` constraint must also declare
   `type: string`; keep strict Schema compilation inside each implementation unit.
+- A TypeScript safe-copy codec may reject exposure that its JSON Schema still
+  accepts, especially case-insensitive URLs, single-line Markdown prefixes and
+  internal provider/database terms. Portable exposure negatives must assert both
+  layers; leave only non-portable semantic checks such as NFC normalization to the
+  codec/owner contract and record that distinction explicitly.
 
 - Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
 - Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
