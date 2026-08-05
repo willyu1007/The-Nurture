@@ -33,8 +33,8 @@ Project: `main`
   I1-B scope is frozen around neutral reservation/pair/evidence/recovery wires;
   Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
   cumulative qualification. I1-C subject-context/presentation scope is now frozen;
-  I1-C1 safe-copy/ref primitives are implemented and locally verified at Base
-  `64533a6…`; continue in order with I1-C2 provider work. Remaining I1-C2-C4 and I1-D..F,
+  I1-C1 safe-copy/ref primitives and I1-C2 list/resolve provider are implemented at
+  Base `600faee…`; continue in order with I1-C3 semantic presentation. Remaining I1-C3-C4 and I1-D..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

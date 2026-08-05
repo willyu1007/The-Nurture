@@ -7,6 +7,15 @@
 
 ## What changed
 
+- 2026-08-05: Implemented and locally verified Base `C30-I1-C2` at
+  `600faee233490a4d3110b24594474dd7ff79eae5`. Added distinct list/resolve
+  inputs, display-safe context options and closed discovery/resolution results;
+  enforced page/candidate bounds, unique refs, scope/route pairing, 30-minute
+  lifetime, current-version and resolved-time semantics. Full typecheck,
+  runtime/scenario regression, 30-Schema compilation and 160 Node tests pass
+  outside the intentionally deferred source lock. No Host selection/inference,
+  runtime/provider, consumer, database or activation work was added. I1-C3 is next.
+
 - 2026-08-05: Implemented and locally verified the authorized Base `C30-I1-C1`
   checkpoint at `64533a66d2b95c9b31ff317920515962a0d3cb32`. Added neutral safe
   text/label/reason, tone/narration and opaque subject/item/action/cursor/
