@@ -13,7 +13,7 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B1 is implemented/locally verified while B2-B4 remain unauthorized/unstarted. G1 is
+  I1-B1/B2 are implemented/locally verified while B3-B4 remain unauthorized/unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +34,20 @@
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-B2 implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User text `I2-B2` was resolved to sequential `I1-B2`; C30-I2 remained NO-GO. Base change is limited to Host-internal pair types/assertions, five Schemas, fixtures/tests and schema-package registration. |
+| Exact source | PASS | Base `445c23649c5177f6d10ebcb1456b8191ea928fb4`, parent B1 `6a437897…`; worktree clean after commit. Detailed record: `artifacts/18-c30-i1-b2-implementation-record.md`. |
+| Type/Schema closure | PASS | Contract `tsc --noEmit`, six source-mapped fixture files, 20-Schema package twice and strict Ajv execution pass. |
+| Four legal branches | PASS | Reuse/reuse, reuse/create, create/reuse and create/create plus exact replay pass Schema and in-memory codec execution. |
+| Cross-object parity | PASS | Duplicate/unsorted slots, wrong bound owner, operation/hash/slot/canonical/owner/head/version/effect drift and partial pairs are rejected. B2 bodies also fail B1 private codecs. |
+| Boundary checks | PASS | Canonical-ref lint, consumer boundary, contract/doc alignment, semantic-lint wrapper, diff/secret scan and test syntax checks pass. |
+| Deferred cumulative checks | EXPECTED / B4 | No build was requested; generated `dist`, normal built-package conformance, deterministic build and final source lock remain B4 responsibilities. |
+| Context/governance/docs | PASS | Context checksum `69b891e3dff190976a1f31ef4318ae2326806540c7186e4097537afff82bbf33`; strict Context/project-state/governance checks and 414-file document/anchor lint pass. |
+| Effect boundary | PASS | No runtime transaction, source lock, dependency/package version, My-Chat/Nurture source, manifest/module, Prisma/database, C30-I2, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
 
 ## C30-I1-B1 implementation — 2026-08-05
 

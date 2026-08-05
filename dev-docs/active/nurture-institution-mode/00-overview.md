@@ -3,15 +3,15 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A accepted，I1-B1 implemented/locally verified）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A accepted，I1-B1/B2 implemented/locally verified）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
 - Next step: G1, T-005 G2 Exit, T-006 G3 Exit, all `C30-I0` gates and
   `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
-  slices. I1-B1's neutral owner-binding reservation contract is implemented and
-  locally verified at Base `6a43789…`; separately authorize only I1-B2 before
-  atomic-pair source changes. The cumulative I1-B gate is not accepted.
+  slices. I1-B1 reservation and I1-B2 atomic-pair contracts are implemented and
+  locally verified through Base `445c236…`; separately authorize only I1-B3 before
+  current-evidence/recovery source changes. The cumulative I1-B gate is not accepted.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -37,10 +37,14 @@
 - C30-I1-B planning handoff: `artifacts/16-c30-i1-b-scope-freeze.md` freezes
   Host-internal versus Scenario-private exposure, owner-endpoint reservation,
   exact pair request/result, current owner evidence and writer-fenced three-state
-  status lookup. B2-B4 and all My-Chat/Nurture adoption remain absent.
+  status lookup. B3-B4 and all My-Chat/Nurture adoption remain absent.
 - C30-I1-B1 implementation record: `artifacts/17-c30-i1-b1-implementation-record.md`
   pins Base `6a43789…`, its neutral reservation surface and no-output verification.
-  My-Chat/Nurture adoption, B2-B4 and the cumulative I1-B source lock remain absent.
+  My-Chat/Nurture adoption and the cumulative I1-B source lock remain absent; the
+  later B2 checkpoint is recorded separately below.
+- C30-I1-B2 implementation record: `artifacts/18-c30-i1-b2-implementation-record.md`
+  pins Base `445c236…`, exact ordered-pair/head/effect parity and all four legal
+  resolution branches. B3-B4 and every consumer/runtime adoption remain absent.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

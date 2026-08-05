@@ -7,6 +7,17 @@
 
 ## What changed
 
+- 2026-08-05: Interpreted the user's `I2-B2` text as the only eligible next gate,
+  `I1-B2`, without opening downstream C30-I2. Implemented the Base-only
+  Host-internal atomic pair contract at `445c23649c5177f6d10ebcb1456b8191ea928fb4`:
+  closed absent/bound heads, intents, exact two-member request/result, created/reused
+  effects, committed/exact-replay disposition, five Schemas and four-branch plus
+  cross-object parity tests. The codec enforces ordered distinct slots, exact
+  ID/hash/ref parity, expected-owner equality, head ref/version parity and
+  absent-created/bound-reused mapping. It performs no transaction or owner read.
+  No build/source-lock/runtime/consumer/database/capability/deployment/activation
+  work ran; B3-B4, I1-C and C30-I2 remain unstarted/NO-GO.
+
 - 2026-08-05: Implemented only the separately authorized Base `C30-I1-B1`
   owner-binding reservation surface at `6a4378970246dc724b43a30b1f9b4c6fdfde494b`.
   Added neutral owner-binding/request/result types, strict structural and exchange

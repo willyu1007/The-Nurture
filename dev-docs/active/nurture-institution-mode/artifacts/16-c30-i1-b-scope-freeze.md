@@ -7,8 +7,8 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Planning mode: Default-mode planning update against the existing roadmap SSOT
 - Scope decision: `C30_I1_B_SCOPE_FROZEN`
-- Current slice state: `I1_B_IN_PROGRESS / I1_B1_COMPLETE / I1_B2_UNAUTHORIZED`
-- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B1_COMPLETE`
+- Current slice state: `I1_B_IN_PROGRESS / I1_B1_B2_COMPLETE / I1_B3_UNAUTHORIZED`
+- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B1_B2_COMPLETE`
 - Downstream state: `I1_C_BLOCKED / C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
 
 I1-B defines only the neutral canonical-object scenario-binding wire that later
@@ -350,6 +350,10 @@ Post-freeze checkpoint: the user separately authorized I1-B1 on 2026-08-05. Its
 exact Base source/verification record is
 `17-c30-i1-b1-implementation-record.md`. This does not amend the frozen wire or
 authorize I1-B2 through B4.
+
+The user later authorized I1-B2. Its exact Base source/verification record is
+`18-c30-i1-b2-implementation-record.md`. This also leaves the frozen wire
+unchanged and does not authorize I1-B3 or B4.
 
 ## Execution handoff
 

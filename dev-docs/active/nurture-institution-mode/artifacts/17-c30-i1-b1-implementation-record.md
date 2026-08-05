@@ -99,3 +99,6 @@ source-lock compensation exists.
 
 The only eligible next implementation decision is a separate authorization for
 `I1-B2`: the Host-internal atomic pair request/result and cross-object parity tests.
+
+Post-B1 checkpoint: the user later authorized I1-B2, now recorded in
+`18-c30-i1-b2-implementation-record.md`. This does not change the B1 result.
