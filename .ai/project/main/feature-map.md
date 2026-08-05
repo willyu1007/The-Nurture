@@ -29,9 +29,10 @@ Project: `main`
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
 - Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs. `C30-I0`
-  is complete, so review the exact C30-I1 implementation slice before starting
-  it. C30-I1 remains unstarted; C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain
-  separate, and no downstream PASS is deployment or traffic authority.
+  is complete and C30-I1 is split into ordered I1-A..F. Review/authorize the
+  Base-only I1-A trusted-invocation contract and build prerequisites; all I1 source,
+  C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
+  downstream PASS is deployment or traffic authority.
 
 ### F-003 Six-surface store-beta readiness
 - Intent: turn the six-surface T-003 design into a qualified, default-off Nurture Service Candidate and versioned interface that My-Chat can integrate through authenticated API calls and validate on iOS and Android internal-testing channels.

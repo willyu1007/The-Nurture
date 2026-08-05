@@ -244,6 +244,11 @@ dev-docs/active/nurture-institution-mode/
 Hard gates:
 
 - C40 之前，C-3 必须实现并资格化 `platform_child_family_identity_source_v1`；My-Chat schema-only presence、live checkout revision 或既有 workflow pin 都不能替代 owner runtime/API、Nurture anchors/associations 和 joint conformance。
+- C30-I1 保持一个累计 Base Exit，但实施按 I1-A trusted invocation、I1-B
+  canonical-object binding、I1-C subject presentation、I1-D domain action、I1-E
+  protected interaction、I1-F dependency/source convergence 严格排序。当前仅
+  I1-A 范围冻结并 ready-not-started；详见
+  `artifacts/15-c30-i1-scope-freeze.md`。
 - Nurture does not import/run My-Workflow-Base；Base is template contract, My-Chat is the actual package/runtime owner。
 - Existing My-Chat `workflow-runtime` task remains historical scaffold scope；concrete persistence uses a new `workflow-handoff-materialization` task。
 - N1 can proceed before X3 only with explicit empty snapshot arrays；non-empty activation requires X2/X3 host capability and exact claimed-Step ownership。

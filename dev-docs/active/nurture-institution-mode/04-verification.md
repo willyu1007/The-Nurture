@@ -12,7 +12,8 @@
 
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
-  `C30-I0-A/B/C/D` gates are complete. C30-I1 is ready but not started. G1 is
+  `C30-I0-A/B/C/D` gates are complete. C30-I1 scope is frozen; I1-A is ready but
+  no C30-I1 source is started. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -1378,3 +1379,14 @@ the rejected checkpoint and are historical.
 | Repeated exact joint lock and false/empty census | PASS | Current Nurture input `cc8b034…` retains source hash `d47648e5…`; the temporary lock passes and is deleted. All 18 source-identity checks plus umbrella admission and activation-model checks remain absent. |
 | C30-I0 verdict | `I0_COMPLETE / C30_I1_READY_NOT_STARTED` | All I0 entry gates are closed; no C30-I1 implementation was started. |
 | Effect boundary | PASS | No schema/migration, database, secret, capability, deployment, activation, T-007/T-008, Pilot or traffic action. |
+
+## 2026-08-05 — C30-I1 scope freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; M-002/F-002/T-002. Existing task and roadmap remain SSOT. |
+| Cumulative ledger trace | PASS | The accepted C30-I1 output in `09-pilot-readiness.md` remains unchanged and is decomposed without dropping trusted ingress, binding, presentation, action, protected interaction, dependency or source-identity obligations. |
+| Donor boundary trace | PASS | I1-A follows B01/B02/B05/B07 `REWORK` rules; it imports no T-029 file as-is and excludes B03/B06/B08-B14. |
+| I1-A exact scope | PASS | Three named neutral wire types, closed envelope-owned fields, delegated operation input, 60-second bound, exact canonical refs and schema/codec parity acceptance are frozen in artifact 15. |
+| Downstream isolation | PASS | I1-B..F remain ordered and unstarted; C30-I2/I3/I4 remain NO-GO. |
+| Effect boundary | PASS | Planning/docs only; no Base/My-Chat/Nurture application source, schema, runtime, manifest, package, database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |

@@ -7,6 +7,16 @@
 
 ## What changed
 
+- 2026-08-05: Reused T-002 and froze the exact C30-I1 implementation
+  decomposition without changing product source. The cumulative Base gate is split
+  into ordered I1-A trusted invocation, I1-B canonical-object binding, I1-C subject
+  presentation, I1-D domain action, I1-E protected interaction and I1-F
+  dependency/source convergence. Only I1-A is ready: it owns neutral
+  `ScenarioHumanPrincipalV1`, `ScenarioIngressSurfaceV1` and
+  `ScenarioPrivateInvocationV1` types, strict codecs/Schemas/fixtures and no Host or
+  scenario adoption. C30-I2/I3/I4, database, capability, deployment, activation,
+  T-007/T-008, Pilot and traffic remain NO-GO.
+
 - 2026-08-05: Closed `C30-I0-D` after the explicitly authorized build-aware
   canonical baseline. Base passed full contract verification with 28 runtime and
   10 scenario tests plus all conformance gates. My-Chat passed Prisma generation
