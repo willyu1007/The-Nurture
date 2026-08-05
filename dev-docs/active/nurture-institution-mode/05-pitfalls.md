@@ -9,6 +9,13 @@ This file exists to prevent repeating mistakes within this task.
 - Under strict Ajv, every nested `properties`/string constraint introduced through
   `allOf` still needs its own explicit `type`; a referenced parent type is not a
   sufficient strictTypes annotation.
+- A top-level `additionalProperties: false` closes only the union's combined field
+  vocabulary. It does not stop another branch's optional field from occupying the
+  current branch's optional slot when `minProperties`/`maxProperties` still pass.
+  Give every discriminated branch an exact `propertyNames.enum` allowlist and a
+  mixed-variant negative fixture.
+- Under strict Ajv, a nested `not.pattern` constraint must also declare
+  `type: string`; keep strict Schema compilation inside each implementation unit.
 
 - Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
 - Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.

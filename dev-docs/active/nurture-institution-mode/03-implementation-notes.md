@@ -7,6 +7,16 @@
 
 ## What changed
 
+- 2026-08-05: Implemented and locally verified Base `C30-I1-C3` at
+  `13d207791d91b5efb168494af896c5f716d16c39`. Added the exact read-only
+  present input/four-state result, six flat semantic blocks, navigation offers,
+  prepare-only action offers and a copied safe-text-only narration projection.
+  Bounds, closed-union, authority-smuggling, Anti-Metrics, UTF-8 size and I1-A
+  composition negatives pass across 36 Schemas and 201 Node tests. Final review
+  repaired branch-level JSON Schema field closure, including the affected C2
+  selection union. No runtime/provider/consumer, DB, capability or activation was
+  added. I1-C4 cumulative qualification and source-lock sealing are next.
+
 - 2026-08-05: Implemented and locally verified Base `C30-I1-C2` at
   `600faee233490a4d3110b24594474dd7ff79eae5`. Added distinct list/resolve
   inputs, display-safe context options and closed discovery/resolution results;

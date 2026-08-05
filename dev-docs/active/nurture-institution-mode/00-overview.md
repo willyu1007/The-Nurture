@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B accepted；I1-C1/C2 complete）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B accepted；I1-C1-C3 complete）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
@@ -11,8 +11,8 @@
   `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
   `9a15865…`; I1-C subject-context/presentation scope is frozen in artifact 21.
-  I1-C1/C2 are implemented and locally verified through Base `600faee…`; continue
-  the already authorized sequence with I1-C3. I1-C4 remains ordered after it.
+  I1-C1-C3 are implemented and locally verified through Base `13d2077…`; continue
+  the already authorized sequence with cumulative I1-C4 qualification/source lock.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -64,7 +64,10 @@
   Node tests. The cumulative source lock remains deferred to I1-C4.
 - C30-I1-C2 implementation record: `artifacts/23-c30-i1-c2-implementation-record.md`
   pins Base `600faee…`, distinct list/resolve provider contracts, 30-Schema
-  compilation and 160 Node tests. I1-C3 is next.
+  compilation and 160 Node tests.
+- C30-I1-C3 implementation record: `artifacts/24-c30-i1-c3-implementation-record.md`
+  pins Base `13d2077…`, six closed semantic blocks, read-only navigation,
+  prepare-only action offers, 36-Schema compilation and 201 Node tests. I1-C4 is next.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

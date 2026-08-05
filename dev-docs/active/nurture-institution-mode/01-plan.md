@@ -655,7 +655,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | --- | --- | --- |
 | `C30-I1-A` trusted invocation contract spine | Accepted | Base `ce7118c…` plus source lock `bd69d19…`; principal, ingress and private envelope types/codecs/Schemas/fixtures only. |
 | `C30-I1-B` canonical-object binding envelope | Accepted | B1-B3 source `edbcd74…` plus B4 lock `9a15865…`; cumulative Schema/codec/exposure/build/conformance and exact source hash `16be693c…2512` pass. No consumer adoption. |
-| `C30-I1-C` subject presentation | C1/C2 complete / C3 in progress | Safe-copy/ref and list/resolve provider landed through Base `600faee…`; continue semantic presentation, then cumulative qualification/source lock. |
+| `C30-I1-C` subject presentation | C1-C3 complete / C4 in progress | Safe-copy/ref, list/resolve provider and semantic presentation landed through Base `13d2077…`; continue cumulative qualification and exact source-lock seal. |
 | `C30-I1-D` domain action | Blocked by I1-C | Prepare/submit, direct/claimed and result/recovery wire only. |
 | `C30-I1-E` protected interaction | Blocked by I1-D | Protected lifecycle control wire and no-copy negatives only. |
 | `C30-I1-F` dependency/source convergence | Blocked by I1-A..E | Atomic dependencies, legacy/vNext exclusion, schema/codec parity and four separate source identities. |
@@ -681,6 +681,8 @@ The exact I1-C1 source and local verification checkpoint is recorded in
 [`artifacts/22-c30-i1-c1-implementation-record.md`](./artifacts/22-c30-i1-c1-implementation-record.md).
 The exact I1-C2 source and local verification checkpoint is recorded in
 [`artifacts/23-c30-i1-c2-implementation-record.md`](./artifacts/23-c30-i1-c2-implementation-record.md).
+The exact I1-C3 source and local verification checkpoint is recorded in
+[`artifacts/24-c30-i1-c3-implementation-record.md`](./artifacts/24-c30-i1-c3-implementation-record.md).
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---

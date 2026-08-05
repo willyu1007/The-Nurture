@@ -7,7 +7,7 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Entry: C30-I1-A accepted; C30-I1-B accepted at Base source `edbcd74…`
   plus source lock `9a15865…`
-- State: `I1_C1_C2_COMPLETE / I1_C3_IN_PROGRESS`
+- State: `I1_C1_C2_C3_COMPLETE / I1_C4_IN_PROGRESS`
 - Downstream: `I1_D_BLOCKED / C30_I2_NO_GO / ACTIVATION_NO_GO`
 
 This review freezes the neutral Base contract for discovering and resolving a
@@ -307,8 +307,8 @@ reason, product action or Child/Family/Institution vocabulary.
 | --- | --- | --- | --- |
 | `I1-C1` safe-copy/ref primitives | SafeText/Label/Reason, tone/narration and opaque ref/cursor bounded-syntax validators plus lifetime-contract fixtures. | Complete at Base `64533a6…`. | Types/assertions/Schemas/neutral fixtures pass; no provider/presentation union. |
 | `I1-C2` subject-context provider | List/resolve inputs, option and closed result unions; pagination, selection and context-change behavior. | Complete at Base `600faee…`. | Provider Schema/codec parity and authority/exposure negatives pass. |
-| `I1-C3` semantic presentation | Present input/result, six blocks, navigation/action offers and narration projection/exposure negatives. | I1-C2 complete; authorized. | Presentation bounds, closed unions and prepare-only semantics pass. |
-| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | I1-C1-C3 accepted; separate authorization. | One exact I1-C source/lock chain passes cumulative conformance. |
+| `I1-C3` semantic presentation | Present input/result, six blocks, navigation/action offers and narration projection/exposure negatives. | Complete at Base `13d2077…`. | Presentation bounds, closed unions and prepare-only semantics pass. |
+| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | I1-C1-C3 complete; authorized. | One exact I1-C source/lock chain passes cumulative conformance. |
 
 No unit opens I1-D, performs consumer adoption or satisfies the cumulative C30-I1
 exit. I1-D begins only after I1-C4 acceptance and another explicit authorization.
@@ -360,5 +360,6 @@ this freeze and requires renewed scope review before source work continues.
 
 ## Next gate
 
-The next ordered implementation unit is `C30-I1-C3`; C4 follows only after its
-exit. I1-D, all consumer/runtime adoption and C30-I2 remain unauthorized.
+The next ordered implementation unit is `C30-I1-C4` cumulative qualification and
+source-lock sealing. I1-D, all consumer/runtime adoption and C30-I2 remain
+unauthorized.

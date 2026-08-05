@@ -32,6 +32,20 @@
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
 
+## C30-I1-C3 semantic-presentation implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source | PASS | Base `13d207791d91b5efb168494af896c5f716d16c39`; 14 scoped files over C2. |
+| Type safety/build | PASS | Full Base typecheck and contract build pass. |
+| Presentation Schema/codec | PASS | 36 Schemas compile; read input, six blocks, navigation/action offers and four result variants pass parity/semantic negatives. |
+| Regression population | PASS | Runtime 28/28, Scenario 10/10 and 201 Node tests pass outside the intentionally stale source-lock step. |
+| Privacy/authority | PASS | Raw/canonical ids, recursive/UI/protected blocks, URLs, Run/server-action/command/submit fields, mixed union variants and Anti-Metrics are rejected. |
+| AI projection | PASS | Only copied `narration=allowed` safe text remains; refs, versions, codes, cursors, action targets and display-only values are absent. |
+| Deferred source lock | EXPECTED / I1-C4 | I1-B lock remains unchanged until cumulative C1-C3 source qualification completes. |
+| Context/governance/docs | PASS | Context checksum `35f2808ae58a1bfc9f846d4ff171cdc6c58c14442f1afb6a9d85a23eefce20dd`; strict checks and document/anchor lint pass. |
+| Effect boundary | PASS | No runtime/provider/consumer, My-Chat/Nurture product source, DB, capability, deployment or activation. |
+
 ## C30-I1-C2 subject-context provider implementation — 2026-08-05
 
 | Check | Result | Evidence |
