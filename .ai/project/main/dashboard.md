@@ -9,7 +9,7 @@ Project: `main`
 - Primary active feature: F-002 Institution ecology.
 - Completed checkpoint: T-006/G3 is `done` with an exact, default-off Beta
   Profile Handoff at Nurture `0374087…`; archival remains separately approved.
-- Active tasks: T-002 (`C30-I0` complete; C30-I1 scope frozen, I1-A ready) and the
+- Active tasks: T-002 (`C30-I0` and C30-I1-A complete; I1-B review pending) and the
   non-blocking T-003 artifact closeout.
 - Planned chain: T-007 G4 remains unstarted; T-008 continues to wait for the
   complete T-007 Exit even though T-004～T-006 handoffs are ready.
@@ -20,8 +20,8 @@ Project: `main`
 ### Next Governance Checkpoint
 
 1. Preserve T-006 as done and archive it only after explicit approval.
-2. By current-status priority, resume T-002 at the remaining `C30-I0-C/D`
-   baseline-isolation gate; T-003 may close independently as a short design track.
+2. By current-status priority, review and freeze T-002 `C30-I1-B` without starting
+   implementation; T-003 may close independently as a short design track.
 3. If the six-surface chain is prioritized instead, explicitly start T-007 at
    G4-0C; do not skip to T-008, deployment, activation or Pilot.
 

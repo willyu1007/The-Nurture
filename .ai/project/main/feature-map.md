@@ -29,8 +29,8 @@ Project: `main`
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
 - Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs. `C30-I0`
-  is complete and C30-I1 is split into ordered I1-A..F. Review/authorize the
-  Base-only I1-A trusted-invocation contract and build prerequisites; all I1 source,
+  and Base-only I1-A are complete; C30-I1 remains split into ordered I1-A..F.
+  Review/freeze I1-B before separate implementation authorization. I1-B..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

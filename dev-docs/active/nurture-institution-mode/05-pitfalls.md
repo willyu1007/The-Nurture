@@ -1889,3 +1889,21 @@ This file exists to prevent repeating mistakes within this task.
   covering the complete `8000/3001/3200/3201` topology and consumer variables.
 - Prevention: every port or URL-key change must run both env-contract
   validation and the consumer-level topology assertion.
+
+### 2026-08-05 — A source lock cannot bind uncommitted contract source
+
+- Symptom: contract conformance portability correctly failed after the I1-A source
+  changed, while the exact source-revision check could not be made green before an
+  implementation commit existed.
+- Root cause: the Base source lock stores both the current source manifest and an
+  exact Git commit that must already contain every current TypeScript contract file.
+  A single new commit cannot name its own not-yet-known commit id.
+- What we tried: ran source/type/schema tests independently, then refreshed the
+  deterministic manifest while retaining the historical revision long enough to
+  prove portability.
+- Fix: commit the verified source/test population first, update the lock to that exact
+  commit, run the complete verifier, then create one metadata-only lock commit. This
+  follows the repository's existing source-lock lineage.
+- Prevention: plan source-lock-bearing Base changes as an ordered two-commit logical
+  work unit and roll them back in reverse order; never weaken the exact-revision gate
+  or point it at a symbolic/mutable revision to force a nominal single commit.

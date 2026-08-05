@@ -57,3 +57,4 @@ Project: `main`
 - 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=freeze-amendment id=g3-0-amendment-2 scope=content-safety-marker-facts columns=nullable-on-purpose
 - 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=freeze-amendment id=g3-0-amendment-3 scope=command-identity,safety-route-anchor,frozen-schedule-heads blocker=b8-prerequisites migration_gate=fail-closed
 - 2026-08-02 task_id=T-006 slug=nurture-child-care-boards event=blocker id=B8 status=open scope=sixteen-write-capabilities need=owner-write-transaction,command-spec decomposition=unit-0-serial-then-three-parallel
+- 2026-08-05 task_id=T-002 event=checkpoint id=C30-I1-A result=accepted base_source=ce7118c85e10bd607f7c73ddc42f44ba6732e15e base_lock=bd69d1988e0d066dad586f16d839c6ff7f67e2c9 source_hash=8621c6cc6e81e99450f42d7b0879da9e029f90a350c11bb4a0d64f341c370b0c next=C30-I1-B-review-only activation=unchanged

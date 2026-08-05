@@ -11,9 +11,9 @@
 ## Current Verification Status
 
 - Last updated: 2026-08-05
-- Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
-  `C30-I0-A/B/C/D` gates are complete. C30-I1 scope is frozen; I1-A is ready but
-  no C30-I1 source is started. G1 is
+- Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
+  `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
+  I1-B is review-pending but unauthorized/unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +34,18 @@
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-A trusted invocation acceptance — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Initial TypeScript check | FAIL, REPAIRED | The first contracts typecheck found two `unknown` narrowing errors in the new validator. Explicitly typing the failure helper as a `never` function repaired control-flow narrowing without a cast or `any`; contracts build and conformance fixture typecheck then passed. |
+| Executable JSON Schema | PASS AFTER COMPATIBILITY REPAIR | Ajv strict compilation first exposed a pre-existing `strictRequired` annotation issue in legacy `integration-lock-v3`, not a wire validation failure. The package-wide check now executes all 12 legacy/current schemas with Ajv compatibility mode, while the canonical-ref plus three I1-A schemas compile separately under strict mode. |
+| Schema/codec parity | PASS | One neutral positive is accepted by both. Eleven closed-envelope mutations are rejected by both, covering embedded signature/body, authority field, wrong ref, origin/category/method/hash/identifier/time/input failures. Three cross-field lifetime negatives are rejected by the runtime codec; opaque delegated input is accepted by the envelope validators. |
+| Source-lock portability pre-seal | EXPECTED FAIL, CLOSED | Conformance initially stopped because the intentionally stale source lock did not yet contain the new source manifest. After the source population stabilized, the deterministic manifest was refreshed, implementation commit `ce7118c…` created, and lock commit `bd69d19…` bound that exact source revision. |
+| Full Base verification | PASS | `pnpm verify:workflow-contracts`: all four typecheck populations and required contracts build pass; runtime 28/28, scenario 10/10 and Node conformance 21/21 pass; canonical-ref lint has zero findings; consumer boundaries, all 12 schemas and exact source lock pass. Source hash `8621c6cc6e81e99450f42d7b0879da9e029f90a350c11bb4a0d64f341c370b0c`. |
+| Hygiene and determinism | PASS | Repeated schema/conformance/full verification changed no tracked output; `git diff --check` and the credential/connection-string scan pass. Base worktree is clean after the two commits. |
+| Effect boundary | PASS | No PostgreSQL was started or contacted. No My-Chat/Nurture product source, Prisma/schema/migration, runtime adoption, capability, deployment, activation, T-007/T-008, Pilot or traffic operation ran. |
 
 ## Documentation warning remediation — 2026-07-31
 

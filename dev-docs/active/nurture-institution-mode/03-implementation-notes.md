@@ -7,6 +7,18 @@
 
 ## What changed
 
+- 2026-08-05: Accepted the Base-only `C30-I1-A` trusted invocation spine. Base
+  commit `ce7118c…` adds neutral `ScenarioHumanPrincipalV1`,
+  `ScenarioIngressSurfaceV1`, `ScenarioPrivateInvocationV1`, strict structural
+  assertions, three JSON Schemas and matching neutral positive/negative fixtures;
+  `bd69d19…` binds the exact source lock at hash `8621c6cc…70b0c`. Full
+  `verify:workflow-contracts` passes. Detached signatures/service credentials stay
+  outside the JSON body, envelope-owned objects are closed, and only
+  `operation.input` delegates to a separately registered codec. I1-B is now eligible
+  for scope review but remains unauthorized and unstarted. No My-Chat/Nurture product
+  code, runtime, schema, database, capability, deployment, activation, T-007/T-008,
+  Pilot or traffic state changed.
+
 - 2026-08-05: Reused T-002 and froze the exact C30-I1 implementation
   decomposition without changing product source. The cumulative Base gate is split
   into ordered I1-A trusted invocation, I1-B canonical-object binding, I1-C subject

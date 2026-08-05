@@ -5,7 +5,7 @@
 - Date: 2026-08-05
 - Governance decision: `REUSE_TASK`
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
-- Overall state: `C30_I1_SCOPE_FROZEN / I1_A_READY_NOT_STARTED`
+- Overall state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B_REVIEW_PENDING`
 - Downstream state: `C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
 
 The existing task and roadmap remain the planning SSOT. No new task or parallel
@@ -26,7 +26,7 @@ activation row or traffic authority.
 
 | Slice | Scope | Entry | Exit |
 | --- | --- | --- | --- |
-| `C30-I1-A` trusted invocation contract spine | Human principal, registered ingress context and exact private invocation envelope; strict structural codecs/Schemas/negative fixtures. | `C30-I0` complete. | Accepted Base source and conformance commit; no Host/scenario adoption. |
+| `C30-I1-A` trusted invocation contract spine | Human principal, registered ingress context and exact private invocation envelope; strict structural codecs/Schemas/negative fixtures. | `C30-I0` complete. | **Accepted** at Base source `ce7118c…` plus exact source lock `bd69d19…`; no Host/scenario adoption. |
 | `C30-I1-B` canonical-object binding envelope | Neutral typed owner refs, pair-binding request/result/recovery and current-owner evidence without platform Child/Family policy. | I1-A accepted. | Binding wire/codecs/Schemas pass; owner semantics remain I2/I3. |
 | `C30-I1-C` subject presentation | Subject-context discovery/resolve, semantic presentation, navigation/action offers and safe owner text. | I1-B accepted. | Presentation types/codecs/Schemas/bounds/fixtures pass. |
 | `C30-I1-D` domain action | Prepare/submit, direct-empty versus claimed-Step driver, result/recovery and canonical effect-identity inputs. | I1-C accepted. | Action contracts and replay/changed-payload/wrong-driver negatives pass. |
@@ -99,7 +99,7 @@ separately registered strict codec before a verified context can exist.
 | --- | --- |
 | `templates/host-runtime/packages/workflow-contracts/src/types/` | Add invocation types and strict structural assertions; export from the package index. |
 | `templates/host-runtime/packages/workflow-contracts/schemas/` | Add three version-1 JSON Schemas matching the TypeScript codecs. |
-| `conformance/fixtures/` and `conformance/tests/` | Add neutral positive, legacy-compatible and closed negative fixtures; prove schema/codec parity. |
+| `conformance/fixtures/` and `conformance/tests/` | Add neutral positive, legacy-compatible and closed negative fixtures; prove schema/codec parity. Ajv dependency metadata is recorded in `conformance/package.json` and the root pnpm lock. |
 | Source lock | Regenerate only after the accepted source/test population is final. |
 
 No current federation type, legacy manifest, runtime template, scenario starter,
@@ -109,11 +109,12 @@ replacement are owned by later I1 slices, especially I1-F.
 ### Execution controls
 
 - Blast radius: only the planned Base workflow-contract type/schema/conformance
-  paths and the final contract-source lock may change.
+  paths, conformance dependency manifest/root pnpm lock and final contract-source
+  lock may change.
 - Idempotency: codec/schema tests and source-lock generation MUST be deterministic;
   repeated verification may change no tracked file after the lock is current.
-- Rollback: revert the single separately attributable Base I1-A commit. No Host or
-  scenario consumer may adopt I1-A before its acceptance commit, so rollback
+- Rollback: revert the exact source-lock commit, then the separately attributable
+  Base I1-A source commit. No Host or scenario consumer adopted I1-A, so rollback
   requires no database, runtime or environment compensation.
 
 ## I1-A acceptance
@@ -127,8 +128,33 @@ replacement are owned by later I1 slices, especially I1-F.
    path or activation implication.
 5. Contract-source lock, canonical-ref lint, consumer-boundary checks and complete
    Base conformance pass after separately authorized build prerequisites.
-6. The resulting commit is exact and separately attributable to T-002; C30-I2 stays
-   NO-GO until all I1-A through I1-F exits pass.
+6. The resulting source/lock commit chain is exact and separately attributable to
+   T-002; C30-I2 stays NO-GO until all I1-A through I1-F exits pass.
+
+### Acceptance record — 2026-08-05
+
+- Base implementation commit:
+  `ce7118c85e10bd607f7c73ddc42f44ba6732e15e`; source-lock commit:
+  `bd69d1988e0d066dad586f16d839c6ff7f67e2c9`. The second metadata-only commit is
+  required by the existing Base lock verifier because the lock must name an already
+  existing exact commit containing the current TypeScript source. Rollback is the
+  reverse two-commit sequence; no consumer or database compensation exists.
+- Added the three frozen types, structural assertions, three JSON Schemas, neutral
+  JSON/TypeScript fixtures and schema/codec parity tests. Ajv executes all 12 Base
+  schemas; the four new/ref schemas additionally compile in strict mode.
+- The runtime assertion enforces canonical UTC instants and the ordered 60-second
+  lifetime. JSON Schema enforces each instant structurally; cross-field time ordering
+  is deliberately exercised as a runtime-codec semantic negative because standard
+  JSON Schema has no portable cross-property time-difference keyword.
+- `pnpm verify:workflow-contracts` passes: contracts/runtime/scenario/conformance
+  typechecks, required contracts build, 28 runtime tests, 10 scenario tests, 21 Node
+  conformance tests, canonical-ref lint, consumer boundaries, schema execution and
+  exact source-lock verification. Source hash:
+  `8621c6cc6e81e99450f42d7b0879da9e029f90a350c11bb4a0d64f341c370b0c`.
+- I1-A introduced no My-Chat or Nurture product source, runtime, schema, migration,
+  database, capability, deployment, activation, T-007/T-008, Pilot or traffic
+  change. I1-B is eligible for a separate scope review only; it is not authorized or
+  started. C30-I2/I3/I4 remain NO-GO.
 
 ## Explicit non-goals
 
@@ -147,5 +173,6 @@ Constraints: Additive and neutral; no any; no runtime/database/Nurture values;
              preserve legacy contracts; do not start I1-B or C30-I2.
 Relevant paths: workflow-contract types/schemas, conformance fixtures/tests,
                 package export index, final workflow contract source lock.
-Acceptance criteria: Section "I1-A acceptance" passes on one exact Base commit.
+Acceptance criteria: Section "I1-A acceptance" passes on an exact Base source
+                     commit followed by its exact source-lock commit.
 ```
