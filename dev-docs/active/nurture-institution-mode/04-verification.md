@@ -13,7 +13,7 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B1/B2 are implemented/locally verified while B3-B4 remain unauthorized/unstarted. G1 is
+  I1-B1/B2/B3 are implemented/locally verified while B4 remains unauthorized/unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +34,21 @@
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-B3 implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User separately authorized I1-B3 only. Base change is limited to private current evidence/status types/assertions, three Schemas, fixtures/tests and schema-package registration. |
+| Exact source | PASS | Base `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`, parent B2 `445c236…`; worktree clean after commit. Detailed record: `artifacts/19-c30-i1-b3-implementation-record.md`. |
+| Type/Schema closure | PASS | Contract `tsc --noEmit`, seven source-mapped fixtures, 23-Schema package twice and strict Ajv execution pass. |
+| Three-state closure | PASS | Committed/confirmed-no-effect/unknown and four unknown reasons pass; mixed variants, invalid reasons, noncanonical times and null/unknown fields fail. |
+| I1-A/exposure boundary | PASS | Private bodies compose as I1-A operation inputs, reject duplicated transport/raw platform fields and reject B2 Host-internal pair bodies. |
+| Exchange/runtime truth | PASS / RUNTIME DEFERRED | Operation/command identities are cross-checked. Base makes no writer-fence, terminal-attempt, deadline, absence or database truth claim. |
+| Boundary checks | PASS | Canonical-ref lint, consumer boundary, contract/doc alignment, semantic-lint wrapper, diff/secret scan and test syntax checks pass. |
+| Context/governance/docs | PASS | Context checksum `ae0dcf183fb7222fd662077943bc99466862c3e3572cc7c78ea66e45e0fba9df`; strict Context/project-state/governance checks, T-002 query and 415-file document/anchor lint pass. |
+| Deferred cumulative checks | EXPECTED / B4 | No build was requested; generated `dist`, normal package tests, cumulative exposure audit, deterministic build and exact source lock remain B4. |
+| Effect boundary | PASS | No runtime, source lock, dependency/package version, My-Chat/Nurture source, manifest/module, Prisma/database, C30-I2, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
 
 ## C30-I1-B2 implementation — 2026-08-05
 

@@ -7,8 +7,8 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Planning mode: Default-mode planning update against the existing roadmap SSOT
 - Scope decision: `C30_I1_B_SCOPE_FROZEN`
-- Current slice state: `I1_B_IN_PROGRESS / I1_B1_B2_COMPLETE / I1_B3_UNAUTHORIZED`
-- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B1_B2_COMPLETE`
+- Current slice state: `I1_B_IN_PROGRESS / I1_B1_B2_B3_COMPLETE / I1_B4_UNAUTHORIZED`
+- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B1_B2_B3_COMPLETE`
 - Downstream state: `I1_C_BLOCKED / C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
 
 I1-B defines only the neutral canonical-object scenario-binding wire that later
@@ -168,7 +168,7 @@ owner refs must exactly match the request. `exact_replay` returns the original r
 changed payload, pair, principal, continuation context, expected head or owner ref is
 a conflict, never a new operation.
 
-### B3 — Current owner binding evidence
+### B3a — Current owner binding evidence
 
 Current evidence is Scenario-private and is valid only within its enclosing I1-A
 invocation.
@@ -193,7 +193,7 @@ objects, binding heads, pair relationship and required adult-owner relation. The
 Scenario treats that digest as opaque and still rereads its own association and
 business authority graph.
 
-### B4 — Writer-fenced Scenario commit status lookup
+### B3b — Writer-fenced Scenario commit status lookup
 
 The request is Scenario-private inside I1-A. The strict result body is signed by the
 later isolated response transport without embedding key/signature fields.
@@ -354,6 +354,11 @@ authorize I1-B2 through B4.
 The user later authorized I1-B2. Its exact Base source/verification record is
 `18-c30-i1-b2-implementation-record.md`. This also leaves the frozen wire
 unchanged and does not authorize I1-B3 or B4.
+
+The user then authorized I1-B3. Its exact Base source/verification record is
+`19-c30-i1-b3-implementation-record.md`. The B3a/B3b heading repair aligns the
+wire-family labels with the ordered units; it changes no fields and does not
+authorize cumulative I1-B4.
 
 ## Execution handoff
 

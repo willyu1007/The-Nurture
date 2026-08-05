@@ -100,3 +100,6 @@ runtime, consumer, database or source-lock compensation exists.
 
 The only eligible next implementation decision is a separate authorization for
 `I1-B3`: Scenario-private current owner evidence and writer-fenced status bodies.
+
+Post-B2 checkpoint: the user later authorized I1-B3, now recorded in
+`19-c30-i1-b3-implementation-record.md`. This does not change the B2 result.

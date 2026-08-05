@@ -7,6 +7,18 @@
 
 ## What changed
 
+- 2026-08-05: Implemented only the separately authorized Base `C30-I1-B3`
+  current-owner evidence and writer-fenced status bodies at
+  `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`. Added exact two-owner current
+  evidence, status request and closed committed/confirmed-no-effect/unknown result
+  types/assertions, three Schemas and I1-A composition/variant/exposure fixtures.
+  Unknown remains nonterminal quarantine with four allowlisted reasons. The codec
+  proves shape and operation/command identity only; it does not prove a writer
+  fence or database absence. Corrected the freeze heading labels to B3a/B3b so B4
+  remains cumulative verification/source lock. No build/source-lock/runtime/
+  consumer/database/capability/deployment/activation work ran; I1-C and C30-I2
+  remain unstarted/NO-GO.
+
 - 2026-08-05: Interpreted the user's `I2-B2` text as the only eligible next gate,
   `I1-B2`, without opening downstream C30-I2. Implemented the Base-only
   Host-internal atomic pair contract at `445c23649c5177f6d10ebcb1456b8191ea928fb4`:

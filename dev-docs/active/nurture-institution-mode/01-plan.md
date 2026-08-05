@@ -646,7 +646,7 @@ census、capability/Workspace activation、artifact/cloud/secret/traffic 仍需�
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A 已验收；I1-B1/B2 已实施）
+## C30-I1 — Neutral shared contracts（I1-A 已验收；I1-B1/B2/B3 已实施）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -654,7 +654,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | Slice | State | Boundary |
 | --- | --- | --- |
 | `C30-I1-A` trusted invocation contract spine | Accepted | Base `ce7118c…` plus source lock `bd69d19…`; principal, ingress and private envelope types/codecs/Schemas/fixtures only. |
-| `C30-I1-B` canonical-object binding envelope | In progress / B1-B2 implemented | Neutral reservation and Host-internal pair binding are implemented/locally verified through Base `445c236…`; Scenario-private current evidence, writer-fenced recovery and final source lock remain B3-B4. Separate B3 authorization required. |
+| `C30-I1-B` canonical-object binding envelope | In progress / B1-B3 implemented | Reservation, Host-internal pair binding and Scenario-private current evidence/writer-fenced status bodies are implemented/locally verified through Base `edbcd74…`; cumulative parity/build/source lock remains B4. Separate B4 authorization required. |
 | `C30-I1-C` subject presentation | Blocked by I1-B | Subject discovery/resolve and semantic presentation wire only. |
 | `C30-I1-D` domain action | Blocked by I1-C | Prepare/submit, direct/claimed and result/recovery wire only. |
 | `C30-I1-E` protected interaction | Blocked by I1-D | Protected lifecycle control wire and no-copy negatives only. |
@@ -670,6 +670,8 @@ The exact I1-B1 source and verification checkpoint is recorded in
 [`artifacts/17-c30-i1-b1-implementation-record.md`](./artifacts/17-c30-i1-b1-implementation-record.md).
 The exact I1-B2 source and verification checkpoint is recorded in
 [`artifacts/18-c30-i1-b2-implementation-record.md`](./artifacts/18-c30-i1-b2-implementation-record.md).
+The exact I1-B3 source and verification checkpoint is recorded in
+[`artifacts/19-c30-i1-b3-implementation-record.md`](./artifacts/19-c30-i1-b3-implementation-record.md).
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---
