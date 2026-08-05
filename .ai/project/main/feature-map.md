@@ -32,10 +32,10 @@ Project: `main`
   and Base-only I1-A are complete; C30-I1 remains split into ordered I1-A..F.
   I1-B scope is frozen around neutral reservation/pair/evidence/recovery wires;
   Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
-  cumulative qualification. I1-C subject-context/presentation acceptance is
-  reopened under artifact 26; the earlier Base source `d14bf31…` plus lock
-  `9d16810…` is historical pending a successor repair/lock. I1-D is ineligible.
-  Remaining I1-D..F,
+  cumulative qualification. I1-C subject-context/presentation is reaccepted at
+  successor Base source `ae0c357…` plus lock `3c30337…` after artifact 26-27
+  quality repair; the earlier chain is historical. I1-D scope review/freeze is the
+  next separately authorized decision. Remaining I1-D..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

@@ -7,8 +7,8 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Entry: C30-I1-A accepted; C30-I1-B accepted at Base source `edbcd74…`
   plus source lock `9a15865…`
-- State: `I1_C_ACCEPTANCE_REOPENED / I1_C4_QUALITY_REPAIR_FROZEN`
-- Downstream: `I1_D_NO_GO / C30_I2_NO_GO / ACTIVATION_NO_GO`
+- State: `I1_C_ACCEPTED / I1_C4_QUALITY_REPAIR_COMPLETE`
+- Downstream: `I1_D_READY_NOT_STARTED / C30_I2_NO_GO / ACTIVATION_NO_GO`
 
 This review freezes the neutral Base contract for discovering and resolving a
 Scenario-owned subject context and presenting owner-safe semantic output. The later
@@ -315,11 +315,10 @@ reason, product action or Child/Family/Institution vocabulary.
 | `I1-C1` safe-copy/ref primitives | SafeText/Label/Reason, tone/narration and opaque ref/cursor bounded-syntax validators plus lifetime-contract fixtures. | Complete at Base `64533a6…`. | Types/assertions/Schemas/neutral fixtures pass; no provider/presentation union. |
 | `I1-C2` subject-context provider | List/resolve inputs, option and closed result unions; pagination, selection and context-change behavior. | Complete at Base `600faee…`. | Provider Schema/codec parity and authority/exposure negatives pass. |
 | `I1-C3` semantic presentation | Present input/result, six blocks, navigation/action offers and narration projection/exposure negatives. | Complete at Base `13d2077…`. | Presentation bounds, closed unions and prepare-only semantics pass. |
-| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | Reopened after quality review; repair scope frozen in artifact 26. | Successor source/lock chain closes R1-R6 and passes cumulative conformance. |
+| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | Reaccepted at source `ae0c357…` plus lock `3c30337…`; repair scope/result in artifacts 26-27. | Successor source/lock chain closes R1-R6 and passes cumulative conformance. |
 
 No unit opens I1-D, performs consumer adoption or satisfies the cumulative C30-I1
-exit. The previous I1-C4 acceptance is reopened; I1-D is ineligible until successor
-I1-C4 acceptance and another explicit authorization.
+exit. Successor I1-C4 is accepted; I1-D still requires another explicit authorization.
 
 ## Acceptance matrix
 
@@ -366,14 +365,14 @@ this freeze and requires renewed scope review before source work continues.
   strict Context, project-state, governance, T-002 query and whitespace checks pass.
   Document/anchor lint checks 417 Markdown files with zero errors or warnings.
 - C4's prior build/qualification is historical in artifact 25. The quality review
-  reopened acceptance and artifact 26 freezes the successor repair before source
-  work. No Prisma generate, database connection/apply, one-time PostgreSQL,
+  reopening/freeze is in artifact 26 and successor qualification is in artifact 27.
+  No Prisma generate, database connection/apply, one-time PostgreSQL,
   deployment, capability, activation, T-007/T-008, Pilot or traffic action ran.
 - No My-Chat/Nurture product source changed. This artifact remains the scope SSOT;
-  artifact 26 is the current repair-scope record.
+  artifact 27 is the current qualification record.
 
 ## Next gate
 
-I1-C acceptance is reopened. The next eligible work is only the frozen I1-C4
-quality repair and successor qualification; I1-D source/scope review, all
-consumer/runtime adoption and C30-I2 remain unauthorized.
+I1-C is reaccepted. The next eligible decision is a separately authorized I1-D
+scope review/freeze; I1-D source, all consumer/runtime adoption and C30-I2 remain
+unauthorized.

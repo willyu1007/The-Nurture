@@ -13,8 +13,8 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B is accepted and I1-C acceptance is reopened under the artifact 26 quality
-  repair freeze. G1 is
+  I1-B and successor I1-C are accepted; artifacts 26-27 record the quality repair
+  freeze and requalification. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -31,6 +31,18 @@
   Base/My-Chat source, secret/KMS/environment value, capability, deployment or
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-C4 quality repair qualification and successor lock — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `ae0c35709f0798abb7b0a2a365805b76ba9f5cd4`; metadata-only lock `3c30337eabe012eb936e91eec5c9d421463e67c7`. |
+| Finding closure | PASS | R1-R6 close structural locator bypasses, current expiry, semantic-policy ownership, locale stability, page default and response-local item keys. |
+| Full verifier | PASS x3 | 36 Schemas, 220 Node tests, runtime 28/28 and Scenario 10/10; typecheck/build, consumer/exposure, source portability/revision and canonical-ref gates pass. |
+| Source identity | PASS | Hash `fc35c6b8aec9e7d7c01a336884f49e4f0821626d72846449e2b186a6102e5cf3`; 18 normalized TypeScript files. |
+| Deterministic output | PASS | Two 68-file builds: `3770474a…c0dbf`; two manifests: `35861319…e925d`; temporary directories destroyed. |
+| Context/governance/docs | PASS | Context checksum `6e77aab9f6482b805163d5682bf3831eb3328ecec3f2341408747602bafeca52`; strict checks and 423-file document/anchor lint pass. |
+| Repository boundary | PASS | Base and My-Chat worktrees clean; My-Chat remains `dc4a77b257f952e2c0f0aede9521e16ac274de9d`. No consumer/runtime/DB/deploy/activation/I1-D. |
 
 ## C30-I1-C4 quality repair scope freeze — 2026-08-05
 

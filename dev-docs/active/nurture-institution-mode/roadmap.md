@@ -261,9 +261,9 @@ dev-docs/active/nurture-institution-mode/
   artifacts 17-20. I1-B is accepted; artifact 21 freezes I1-C provider/presentation
   scope and four ordered implementation gates. I1-C1 is complete at Base
   `64533a6…`; I1-C2 is complete at `600faee…`, I1-C3 is complete at
-  `13d2077…`. The quality review reopened cumulative I1-C acceptance; artifact 26
-  freezes the bounded I1-C4 repair and makes the earlier `d14bf31…` / `9d16810…`
-  chain historical. I1-D is not eligible until successor qualification.
+  `13d2077…`. Artifact 26 reopens/freezes the bounded repair and artifact 27
+  reaccepts cumulative I1-C at successor source `ae0c357…` / lock `3c30337…`.
+  The earlier chain remains historical; I1-D is the next separate decision.
 
 Hard gates:
 
@@ -278,8 +278,9 @@ Hard gates:
   累计验证与 source-lock，I1-B 已验收；I1-C 的 list/resolve、semantic blocks、
   navigation/action offer、safe-copy、bounds 与 C1-C4 顺序已冻结；C1 已在 Base
   `64533a6…` 完成，C2 已在 `600faee…` 完成，C3 已在 `13d2077…` 完成；
-  原 C4 source `d14bf31…` + lock `9d16810…` 已因质量评审重开；artifact 26
-  冻结六项 I1-C4 修复。下一步仅实施与重验该修复，不开展 I1-D。
+  原 C4 source `d14bf31…` + lock `9d16810…` 已成为历史；artifact 26 冻结六项
+  修复，artifact 27 以 source `ae0c357…` + lock `3c30337…` 完成再验收。
+  下一步 I1-D 范围评审仍需单独授权。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与

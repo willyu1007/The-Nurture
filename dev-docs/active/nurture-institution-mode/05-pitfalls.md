@@ -1925,3 +1925,30 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: plan source-lock-bearing Base changes as an ordered two-commit logical
   work unit and roll them back in reverse order; never weaken the exact-revision gate
   or point it at a symbolic/mutable revision to force a nominal single commit.
+
+### 2026-08-05 — Presentation acceptance exceeded its executable invariants
+
+- Symptom: the accepted I1-C record claimed broad URL rejection, current locator
+  expiry, localized diagnostic/prescriptive safety, executable page defaults and
+  response-local item keys, while adversarial probes bypassed five structural
+  invariants and revealed that one semantic claim had no neutral implementation.
+- Root cause: positive Schema/codec parity and local-block tests were treated as
+  proof of broader cross-field, cross-block, current-time and natural-language
+  guarantees. Documentary defaults and owner responsibilities were also phrased as
+  if Base enforced them directly.
+- What we tried: replayed the original bypass values against both JSON Schema and
+  the built codec, separated portable shape checks from deterministic clocked and
+  cross-array assertions, and evaluated keyword matching for medical copy. Keyword
+  matching was rejected because it would be English-specific and unsafe across
+  locales.
+- Fix: reopen acceptance before source work; broaden structural locator rejection;
+  add explicit-clock active option/result assertions, stable locale error mapping,
+  exported/default-resolving page bounds and presentation-wide item/entry keys;
+  reapprove localized disclosure/Anti-Metric semantics as a mandatory executable
+  Scenario-owner adoption gate; then run three full verifiers, two isolated builds
+  and an exact successor source lock.
+- Prevention: every acceptance statement must name its executable owner and
+  falsification layer. Test generic-scheme/network-path/bare-address values,
+  expired/future clocks, duplicate keys across containers, omitted defaults and
+  runtime-library exceptions; never claim neutral localized semantic classification
+  without an owner-policy conformance suite.

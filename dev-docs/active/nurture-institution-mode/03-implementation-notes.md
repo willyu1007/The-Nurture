@@ -7,6 +7,17 @@
 
 ## What changed
 
+- 2026-08-05: Reaccepted cumulative Base `C30-I1-C` after closing all six quality
+  findings. Source `ae0c357…` adds structural URI/address negatives, deterministic
+  active-context assertions, stable locale errors, executable page defaults and
+  response-local item-key uniqueness; governance now accurately assigns localized
+  diagnostic/prescriptive and semantic Anti-Metric enforcement to the later
+  Scenario-owner adoption gate. Metadata-only lock `3c30337…` binds source hash
+  `fc35c6b…e5cf3`. Three full verifiers pass with 36 Schemas, 220 Node tests,
+  runtime 28/28 and Scenario 10/10; isolated build and manifest outputs are
+  deterministic. No consumer/runtime, DB, deployment, capability or activation
+  changed. I1-D remains unstarted pending separate scope authorization.
+
 - 2026-08-05: Reopened cumulative Base `C30-I1-C` acceptance after the quality
   review and froze all six findings in artifact 26 before source work. Five are
   executable Base gaps (URL/address detection, explicitly clocked current expiry,

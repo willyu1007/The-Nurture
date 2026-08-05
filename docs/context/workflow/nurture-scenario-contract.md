@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B accepted; I1-C4 quality repair reopened; I1-D and all consumer adoption/activation NO-GO
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C accepted after successor quality repair; I1-D and all consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 

@@ -3,17 +3,17 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B accepted；I1-C quality repair reopened）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C accepted）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
 - Next step: G1, T-005 G2 Exit, T-006 G3 Exit, all `C30-I0` gates and
   `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
-  `9a15865…`; the quality review reopened I1-C acceptance and artifact 26 freezes
-  six bounded repairs before source work. The previous source `d14bf31…` / lock
-  `9d16810…` remains historical only. The next eligible T-002 work is I1-C4 repair
-  and successor qualification; I1-D is not eligible.
+  `9a15865…`; I1-C is reaccepted at successor Base source `ae0c357…`, metadata
+  lock `3c30337…` and source hash `fc35c6b…e5cf3`. The prior source/lock remains
+  historical. The next eligible T-002 decision is a separately authorized I1-D
+  scope review/freeze; no I1-D source is open.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -76,7 +76,11 @@
 - C30-I1-C4 quality repair freeze: `artifacts/26-c30-i1-c4-quality-repair-freeze.md`
   reopens acceptance and freezes URL/address detection, current-time expiry,
   semantic-policy ownership, stable locale errors, executable page defaults and
-  response-local item-key uniqueness. I1-D remains NO-GO.
+  response-local item-key uniqueness.
+- C30-I1-C4 successor qualification: `artifacts/27-c30-i1-c4-quality-repair-qualification-record.md`
+  closes all six findings at Base source `ae0c357…`, lock `3c30337…`, source hash
+  `fc35c6b…e5cf3`, three full verifier rounds and deterministic build/manifest.
+  I1-C is reaccepted; I1-D remains unstarted and separately authorized.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

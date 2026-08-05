@@ -56,3 +56,9 @@ needed to make the already frozen expiry and pagination behavior executable.
 The repair exits only through a successor I1-C4 qualification/source-lock record.
 Until then, I1-C acceptance is reopened, artifact 25 is superseded as current
 qualification evidence, and I1-D is not eligible.
+
+## Successor qualification
+
+Complete: artifact 27 records Base source `ae0c357…`, metadata lock `3c30337…`,
+source hash `fc35c6b…e5cf3`, R1-R6 closure and cumulative reacceptance. Artifact 26
+remains the immutable pre-source scope record.
