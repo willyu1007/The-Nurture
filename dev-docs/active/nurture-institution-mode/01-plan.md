@@ -638,14 +638,15 @@ qualified Pilot artifact, applied migration, or release approval.
 | `C30-I0-C` scoped commits and clean worktrees | Complete | Exact isolated branches exist at Base `20c4b7a…` and My-Chat `dc4a77b…`; the Nurture branch was created from runtime checkpoint `882d80f…` and may advance only through T-002 evidence documentation. Historical X5/Q4B5/T-029/T-027/Claude worktrees are clean and retained under their owners; the dirty My-Chat primary `next-env.d.ts` is excluded and untouched. |
 | `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
 
-`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 可以进入单独的精确范围评审，
-但尚未进入 `in_progress`。数据库 apply、环境 row census、capability/Workspace
-activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
+`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A 验收和
+I1-B1 实施/本地验证。I1-B2 及后续片仍需分别授权。数据库 apply、环境 row
+census、capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自
+的单独授权。
 
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A 已验收；I1-B 范围已冻结）
+## C30-I1 — Neutral shared contracts（I1-A 已验收；I1-B1 已实施）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -653,7 +654,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | Slice | State | Boundary |
 | --- | --- | --- |
 | `C30-I1-A` trusted invocation contract spine | Accepted | Base `ce7118c…` plus source lock `bd69d19…`; principal, ingress and private envelope types/codecs/Schemas/fixtures only. |
-| `C30-I1-B` canonical-object binding envelope | Scope frozen / ready-not-started | Neutral owner-ref reservation, Host-internal pair binding, Scenario-private current evidence and writer-fenced recovery; `artifacts/16-c30-i1-b-scope-freeze.md`. Separate implementation authorization required. |
+| `C30-I1-B` canonical-object binding envelope | In progress / B1 implemented | Neutral owner-ref reservation is implemented/locally verified at Base `6a43789…`; Host-internal pair binding, Scenario-private current evidence, writer-fenced recovery and final source lock remain B2-B4. Separate B2 authorization required. |
 | `C30-I1-C` subject presentation | Blocked by I1-B | Subject discovery/resolve and semantic presentation wire only. |
 | `C30-I1-D` domain action | Blocked by I1-C | Prepare/submit, direct/claimed and result/recovery wire only. |
 | `C30-I1-E` protected interaction | Blocked by I1-D | Protected lifecycle control wire and no-copy negatives only. |
@@ -665,6 +666,8 @@ criteria and non-goals are frozen in
 I1-B's exposure classes, wire families, validation/fixture matrix, impact preview
 and four ordered implementation units are frozen in
 [`artifacts/16-c30-i1-b-scope-freeze.md`](./artifacts/16-c30-i1-b-scope-freeze.md).
+The exact I1-B1 source and verification checkpoint is recorded in
+[`artifacts/17-c30-i1-b1-implementation-record.md`](./artifacts/17-c30-i1-b1-implementation-record.md).
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---

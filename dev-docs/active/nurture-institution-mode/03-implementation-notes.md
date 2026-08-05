@@ -7,6 +7,17 @@
 
 ## What changed
 
+- 2026-08-05: Implemented only the separately authorized Base `C30-I1-B1`
+  owner-binding reservation surface at `6a4378970246dc724b43a30b1f9b4c6fdfde494b`.
+  Added neutral owner-binding/request/result types, strict structural and exchange
+  parity assertions, three Schemas, typed/JSON fixtures, negative conformance cases
+  and package exports. No `any`, product object/slot value, Host runtime import,
+  raw canonical object in the private body or embedded credential/signature was
+  introduced. No build ran; source-mapped no-output typecheck, strict Schema and
+  in-memory codec execution cover B1 locally. `dist`, dependency metadata and the
+  cumulative source lock remain unchanged for B4. I1-B2-B4, I1-C, My-Chat/Nurture
+  adoption, database, capability, deployment, activation and Pilot remain unstarted.
+
 - 2026-08-05: Reused T-002 and froze the Base-only `C30-I1-B` canonical-object
   binding envelope without starting implementation. The freeze separates
   `host_owner_internal` canonical object/binding refs from `scenario_private`

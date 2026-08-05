@@ -13,7 +13,7 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B scope is frozen/ready but implementation remains unauthorized/unstarted. G1 is
+  I1-B1 is implemented/locally verified while B2-B4 remain unauthorized/unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +34,19 @@
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-B1 implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User separately authorized I1-B1 only. Base change is limited to owner-binding ref, reservation request/result, strict assertions/Schemas, fixtures/tests and exports. |
+| Exact source | PASS | Base `6a4378970246dc724b43a30b1f9b4c6fdfde494b`; worktree clean after commit. Detailed record: `artifacts/17-c30-i1-b1-implementation-record.md`. |
+| Source type safety | PASS | Contract package `tsc --noEmit` and source-mapped conformance fixture typecheck pass; no `any` or Host/Scenario runtime imports. |
+| Schema/codec behavior | PASS | 15-Schema package compiles twice; request/result positives, exact replay, strict exposure negatives and exchange identity/slot drift execute successfully through no-output Schema/codec harnesses. |
+| Boundary checks | PASS | Canonical-ref lint, consumer boundary, contract/doc alignment, semantic-lint wrapper, diff check and secret scan pass. |
+| Deferred cumulative checks | EXPECTED / B4 | Repository instruction forbids an unrequested build, so generated `dist` and normal built-package conformance remain unchanged. I1-B4 owns full build/conformance/deterministic/source-lock closure. Bare `pnpm semantic-lint` requires descriptor arguments; the suite wrapper passes and no out-of-scope script repair was made. |
+| Context/governance/docs | PASS | Context checksum `8bc3dc50abd1d285b60d45a4dfedd4d1877a04895bd5a226a0eac374f5b65cbc`; strict Context/project-state/governance checks and 413-file document/anchor lint pass. |
+| Effect boundary | PASS | No final source lock, dependency/package version, runtime, My-Chat/Nurture source, manifest/module, Prisma/database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
 
 ## C30-I1-B scope review and freeze — 2026-08-05
 

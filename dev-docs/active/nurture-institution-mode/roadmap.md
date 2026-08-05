@@ -245,18 +245,21 @@ dev-docs/active/nurture-institution-mode/
 
 - Goal: deliver the cumulative neutral Base contract through ordered I1-A..F
   without importing Host runtime or Scenario product policy.
-- Runtime signal: Default mode; this is a planning/documentation update only.
+- Runtime signal: Default mode; B1 is a Base contract-source checkpoint only and
+  performs no Host/Scenario runtime action.
 - Input trace: latest user instruction > accepted I1-A source/lock > workflow
   context and Pilot-0-C decisions > T-029 donor disposition > bounded inference.
 - Merge decision: I1-B composes with I1-A instead of defining a second private
   transport/signature envelope. No unresolved product-scope conflict remains.
-- Project structure preview: a later separately authorized I1-B implementation may
+- Project structure checkpoint: separately authorized I1-B1 now adds only
+  owner-binding reservation types/Schemas/conformance at Base `6a43789…`; later
+  separately authorized I1-B2-B4 implementation may
   add only Base workflow-contract types/schemas/conformance fixtures/tests, package
-  exports and the final TypeScript source lock. This planning update changes task/
-  project/context documentation only.
+  exports and the final TypeScript source lock. The current Nurture-side update
+  changes task/project/context documentation only.
 - Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
-  frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; no implementation is authorized
-  by this roadmap update.
+  frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; the B1-only checkpoint is in
+  `artifacts/17-c30-i1-b1-implementation-record.md`. B2 remains unauthorized.
 
 Hard gates:
 
@@ -266,9 +269,11 @@ Hard gates:
   protected interaction、I1-F dependency/source convergence 严格排序。当前
   I1-A 已在 Base `ce7118c…` + source lock `bd69d19…` 验收；I1-B 已冻结
   Host-internal/Scenario-private 暴露边界、reservation、pair result、current
-  evidence 与 writer-fenced recovery，但实现尚未授权或启动。详见
+  evidence 与 writer-fenced recovery。B1 reservation 已在 Base `6a43789…`
+  实施/本地验证，B2-B4 尚未授权或启动。详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
-  `artifacts/16-c30-i1-b-scope-freeze.md`。
+  `artifacts/16-c30-i1-b-scope-freeze.md` 与
+  `artifacts/17-c30-i1-b1-implementation-record.md`。
 - Nurture does not import/run My-Workflow-Base；Base is template contract, My-Chat is the actual package/runtime owner。
 - Existing My-Chat `workflow-runtime` task remains historical scaffold scope；concrete persistence uses a new `workflow-handoff-materialization` task。
 - N1 can proceed before X3 only with explicit empty snapshot arrays；non-empty activation requires X2/X3 host capability and exact claimed-Step ownership。

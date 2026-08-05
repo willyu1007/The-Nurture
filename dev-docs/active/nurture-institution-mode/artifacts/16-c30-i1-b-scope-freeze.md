@@ -6,8 +6,9 @@
 - Governance decision: `REUSE_TASK`
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Planning mode: Default-mode planning update against the existing roadmap SSOT
-- Slice state: `C30_I1_B_SCOPE_FROZEN / READY_NOT_STARTED`
-- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B_READY`
+- Scope decision: `C30_I1_B_SCOPE_FROZEN`
+- Current slice state: `I1_B_IN_PROGRESS / I1_B1_COMPLETE / I1_B2_UNAUTHORIZED`
+- Cumulative state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B1_COMPLETE`
 - Downstream state: `I1_C_BLOCKED / C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
 
 I1-B defines only the neutral canonical-object scenario-binding wire that later
@@ -344,6 +345,11 @@ units pass together on one exact Base source/lock chain.
   No consumer/runtime/database compensation exists because adoption is out of scope.
 - Authorization gate: this freeze authorizes no implementation. A separate user
   instruction is required before `I1-B1` begins.
+
+Post-freeze checkpoint: the user separately authorized I1-B1 on 2026-08-05. Its
+exact Base source/verification record is
+`17-c30-i1-b1-implementation-record.md`. This does not amend the frozen wire or
+authorize I1-B2 through B4.
 
 ## Execution handoff
 
