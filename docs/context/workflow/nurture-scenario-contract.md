@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E scope review and all I1-F/consumer adoption/activation pending separate authorization
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E scope frozen but not implemented; all I1-F/consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 
@@ -36,6 +36,17 @@ stored rebind-seal and claimed-Step execution composition assertions plus closed
 prepare branches and legitimate fail-closed outcomes. The public wires and neutral
 driver names remain unchanged. No consumer, runtime, manifest convergence or
 activation exists yet.
+
+The C30-I1-E scope is frozen in artifact 36 without implementation. The neutral
+split is one dedicated `ScenarioProtectedPlainTextCarrierV1` plus body-free static,
+prepare, prepared/committed and read/tombstone controls. Carrier bytes never enter
+I1-A `operation.input`, I1-D `action_input`/result/Step, I1-C semantic output or a
+durable Host DTO; a keyed request/response binding joins the separately transported
+carrier to the body-free control. Submit and commit continue to use the accepted
+I1-D direct/claimed path, and no generic erase operation is introduced. E1-E5 each
+remain unstarted. Manifest dependency/source convergence and
+`scenario_protected_interaction_source_v1` remain I1-F work; no My-Chat/Nurture
+consumer, protected route, schema/KMS, capability or activation exists.
 
 ## Decision
 

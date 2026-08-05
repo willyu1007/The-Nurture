@@ -15,8 +15,9 @@
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
   I1-B, successor I1-C and successor I1-D are accepted. Artifact 35 closes all
   five artifact-34 findings at exact repaired source/lock; artifact 33 remains
-  historical. I1-E is unstarted and eligible only for a separate scope review;
-  I1-F remains closed. G1 is
+  historical. Artifact 36 freezes I1-E scope as a dedicated plaintext carrier plus
+  body-free lifecycle controls, but no E1-E5 implementation has started; I1-F
+  remains closed. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -28,11 +29,26 @@
 - Code/config/schema impact: Base now includes the accepted neutral I1-A..D
   contract source and exact source locks. I1-D changes only standalone contract
   types/assertions, JSON Schemas, neutral fixtures/tests and its metadata lock;
-  the existing formal NestJS owner path is unchanged. No Base runtime/Scenario
+  I1-E currently changes documentation only. The existing formal NestJS owner
+  path is unchanged. No Base runtime/Scenario
   starter/manifest, My-Chat or Nurture product source, schema/migration,
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-E protected-interaction scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; existing `M-002 > F-002 > T-002` and task bundle remain the SSOT. |
+| Accepted-input trace | PASS | Artifact 36 consumes current I1-A..D source/lock, C-3-0e decisions and T-029 disposition without changing accepted wire semantics. |
+| Carrier/control separation | PASS | Protected plaintext exists only in `ScenarioProtectedPlainTextCarrierV1`; I1-A operation input, I1-D action/result/Step, I1-C presentation and durable Host DTOs remain body-free. |
+| Lifecycle completeness | PASS | Static contract, keyed carrier binding, prepare result, prepared/committed controls, read locator/input, `ready|tombstone|context_changed|unavailable` and 60-second no-store lease are frozen. Submit remains I1-D; no third driver or generic erase operation exists. |
+| Donor and convergence boundary | PASS | Zero T-029/My-Chat/Nurture file is directly mergeable; manifest dependency, legacy/vNext exclusion and `scenario_protected_interaction_source_v1` remain I1-F. |
+| Implementation decomposition | PASS | E1 primitives → E2 prepare → E3 commit composition → E4 read/no-copy → E5 cumulative qualification/source lock. No unit starts automatically. |
+| Context/governance/docs | PASS | Context checksum `3e862779743e801abb498cc6ee8990104c05819cf09bd8037ab211f61a5bf93d`; strict Context/project-state/governance checks and T-002 query pass. Task 66/66 and repository 432/432 Markdown/anchor checks pass with zero warnings/errors. |
+| Repository boundary | PASS | Base is clean at `1cb56910f32ab5e13f9d378af3b3043dfc94b180`; My-Chat is clean at `dc4a77b257f952e2c0f0aede9521e16ac274de9d`; Nurture changes from `daae1ff…` are restricted to task/project/context documentation and `git diff --check` passes. |
+| Effect boundary | PASS | Documentation/governance only; no Base/My-Chat/Nurture product source, build, Prisma generate, database/PostgreSQL, KMS, runtime, capability, deployment, activation, T-008, Pilot or traffic action. |
 
 ## C30-I1-D successor quality repair qualification — 2026-08-06
 

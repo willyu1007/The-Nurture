@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-05T22:32:29.603Z",
+  "updatedAt": "2026-08-05T23:51:59.030Z",
   "artifacts": [
     {
       "id": "api-openapi",
@@ -117,8 +117,8 @@
         "my-chat",
         "nurture"
       ],
-      "checksumSha256": "7ff6f13e9410ce7d0601dce4762f5e51e9684b2e8d3db13cac816387f767b701",
-      "lastUpdated": "2026-08-05T22:32:29.601Z",
+      "checksumSha256": "3e862779743e801abb498cc6ee8990104c05819cf09bd8037ab211f61a5bf93d",
+      "lastUpdated": "2026-08-05T23:51:59.029Z",
       "source": {
         "kind": "command",
         "command": "ctl-context add-artifact",

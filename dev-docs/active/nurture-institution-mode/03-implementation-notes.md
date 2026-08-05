@@ -7,6 +7,17 @@
 
 ## What changed
 
+- 2026-08-06: Reused T-002 and froze only the `C30-I1-E` neutral Base
+  protected-interaction scope in artifact 36. The review separates the sole
+  body-bearing `ScenarioProtectedPlainTextCarrierV1` from I1-A body-free operation
+  input and all generic Host DTOs; freezes static, prepare, prepared/committed,
+  read-locator/result/tombstone and 60-second display-lease controls; and composes
+  commit with the accepted I1-D direct/claimed path without a third driver or
+  generic erase operation. T-029 remains zero-direct-merge. E1-E5 are ordered but
+  no implementation unit is authorized; manifest dependency/source convergence
+  remains I1-F. No Base/My-Chat/Nurture product source, build, Prisma/database,
+  KMS, capability, deployment, activation, T-008, Pilot or traffic action ran.
+
 - 2026-08-06: Reaccepted cumulative Base `C30-I1-D` after closing all five
   artifact-34 findings. Successor source `3580a9b…` closes prepare Schema
   branches, binds token/scenario/action to resolved submit context, preserves

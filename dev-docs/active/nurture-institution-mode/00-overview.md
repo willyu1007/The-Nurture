@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D accepted）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D accepted；I1-E scope frozen）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -15,8 +15,10 @@
   historical. I1-D is reaccepted by artifact 35 at successor Base source
   `3580a9b…`, metadata lock `1cb5691…` and source hash `5c5f2c53…99ef` after
   closing all five artifact-34 findings. The prior `52c0dc2…` / `c179bb5…` chain
-  remains historical. The only eligible next decision is a separately authorized
-  I1-E scope review and freeze; I1-E implementation and I1-F are not open.
+  remains historical. Artifact 36 now freezes I1-E as a dedicated plaintext
+  carrier plus body-free prepare/commit/read controls, with I1-D submit reuse and
+  five ordered E1-E5 units. No implementation unit is authorized. The only
+  eligible next decision is separate I1-E1 authorization; I1-F remains closed.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -103,7 +105,13 @@
   `artifacts/35-c30-i1-d5-successor-quality-repair-qualification-record.md`
   closes D-R1..D-R5 and pins source `3580a9b…`, metadata lock `1cb5691…`, source
   hash `5c5f2c53…99ef`, 55 Schemas, 296 Node tests and deterministic 76-file
-  builds. I1-D is reaccepted; I1-E remains unstarted pending separate scope review.
+  builds. I1-D is reaccepted.
+- C30-I1-E planning handoff: `artifacts/36-c30-i1-e-scope-freeze.md` freezes the
+  dedicated `ScenarioProtectedPlainTextCarrierV1`, body-free static/prepare/
+  prepared/committed/read/tombstone controls, opaque locator and display-lease
+  rules, recursive no-copy negatives, donor disposition and E1-E5 ordering.
+  Protected bytes never enter generic I1-A/I1-C/I1-D or durable Host payloads;
+  I1-E implementation, I1-F and every consumer remain unstarted.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

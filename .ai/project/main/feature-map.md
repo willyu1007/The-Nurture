@@ -37,9 +37,10 @@ Project: `main`
   quality repair; the earlier chain is historical. Artifacts 34-35 reaccept I1-D
   at successor Base source `3580a9b…` plus lock `1cb5691…` after closing five
   composition findings; the artifact-33 chain is historical. Neutral direct/claimed
-  names stay unchanged and manifest/source convergence remains I1-F. An I1-E scope
-  review/freeze is the next separately authorized decision; implementation remains
-  closed. Remaining I1-E..F,
+  names stay unchanged and manifest/source convergence remains I1-F. Artifact 36
+  freezes I1-E as a dedicated plaintext carrier plus body-free lifecycle controls,
+  no-copy negatives and five ordered E1-E5 units. Implementation remains closed;
+  the next eligible decision is separate I1-E1 authorization. Remaining I1-E..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 
