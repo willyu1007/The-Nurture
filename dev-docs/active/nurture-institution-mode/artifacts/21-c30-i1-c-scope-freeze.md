@@ -373,6 +373,7 @@ this freeze and requires renewed scope review before source work continues.
 
 ## Next gate
 
-I1-C is reaccepted. The next eligible decision is a separately authorized I1-D
-scope review/freeze; I1-D source, all consumer/runtime adoption and C30-I2 remain
-unauthorized.
+I1-C is reaccepted. Artifact 28 subsequently freezes I1-D scope without opening
+source. The next eligible decision is separately authorizing I1-D1; all I1-D
+source, consumer/runtime adoption and C30-I2 remain unauthorized until their exact
+gates open.

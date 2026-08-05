@@ -921,9 +921,36 @@ This file exists to prevent repeating mistakes within this task.
 - Context: B3 separated product action keys from legacy Workflow Run actions before C-3-0d selected exact execution drivers. C-2f-5 already requires every non-empty-capable path to be Host-first and preserves original-Step replay ownership.
 - What we tried: Reusing “direct” for both handler shape and empty Host effect, creating a Step only after Nurture returns snapshots, selecting driver from the current recipient list, or storing the submit token/target/body so a later worker could call Nurture.
 - Root cause: Product action identity, handler shape, business transaction, Host-effect capability, and durable recovery prove different facts. Data-dependent driver selection creates two command identities and lets a new Step acquire an old seed; raw token/body persistence violates the Host privacy boundary.
-- Fix / workaround: C-3-0d defines static `nurture_direct_empty_v1|workflow_claimed_step_v1` per action, makes question/reply/transfer-proposal/withdrawal/service-end claimed, and uses content-free non-claimable Step -> immutable Nurture binding -> claim. Nurture derives effect identity, consumes context with effect/Execution/snapshots atomically, and permits only original-Step replay. A different `already_satisfied` Step stores `[]` and cannot resend. Typed Participant evidence is additive and legacy `business_actor_ref` remains unchanged.
+- Fix / workaround: C-3-0d defines static `scenario_direct_empty_v1|workflow_claimed_step_v1` per action, makes question/reply/transfer-proposal/withdrawal/service-end claimed, and uses content-free non-claimable Step -> immutable Nurture binding -> claim. Nurture derives effect identity, consumes context with effect/Execution/snapshots atomically, and permits only original-Step replay. A different `already_satisfied` Step stores `[]` and cannot resend. Typed Participant evidence is additive and legacy `business_actor_ref` remains unchanged.
 - Prevention: Contract/manifest tests must assert one driver per action/surface, reject recipient/outcome-based switching and reply-as-direct, scan every Step/persistence destination for token/target/body/claim leakage, fault every pre-bind/post-bind seam, and deny different-Step seed transfer. Invitation, provisioning, portability, and Technical Operator remain separate protocols rather than a third catch-all driver.
 - References: `02-architecture.md` Pilot-0-C3-0d, `06-ib-nurture-schema-spec.md` C-3-0d refinement, `08-iia-schema-policy-test-design.md` C-3-0d test design, `09-pilot-readiness.md` C-3-0d.
+
+### 2026-08-05 — Carrying a Scenario-owner label into the neutral Base driver
+
+- Symptom: The locked C-3 design called the direct driver
+  `nurture_direct_empty_v1`, while C30-I1 requires Base types, Schemas and neutral
+  fixtures to contain no Nurture registry value. The direct identity tuple also
+  omitted the otherwise contract-defining `scenario_key` even though the claimed
+  branch included it.
+- Context: I1-D is the first Base slice that must encode the driver and
+  effect-identity inputs rather than merely describing Nurture product behavior.
+- What we tried: Preserving the earlier label as an exact shared enum, treating the
+  InteractionContext as an implicit substitute for `scenario_key`, or postponing
+  both inconsistencies until consumer adoption.
+- Root cause: Product-owner terminology, reusable Base contract vocabulary and
+  owner-internal hash derivation had been documented in one layer. An implicit
+  context invariant was also carrying part of the canonical contract identity.
+- Fix / workaround: Artifact 28 freezes
+  `scenario_direct_empty_v1|workflow_claimed_step_v1` for Base and explicitly
+  includes `scenario_key` in both server-only effect-identity input branches. The
+  Nurture-owned domain-separated hash implementation remains later owner work;
+  manifest dependency/source convergence remains I1-F.
+- Prevention: Base neutrality scans must reject Scenario product names in shared
+  enums/fixtures, identity parity tests must compare both driver branches field by
+  field, and future owner-specific implementation details must not silently become
+  reusable wire vocabulary.
+- References: `artifacts/28-c30-i1-d-scope-freeze.md`, `02-architecture.md`
+  Pilot-0-C3-0d, `06-ib-nurture-schema-spec.md` C-3-0d refinement.
 
 ### 2026-07-19 — Treating encryption or a protected ref as the whole privacy boundary
 

@@ -14,7 +14,8 @@
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
   I1-B and successor I1-C are accepted; artifacts 26-27 record the quality repair
-  freeze and requalification. G1 is
+  freeze and requalification; artifact 28 freezes I1-D scope without opening
+  source. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -31,6 +32,21 @@
   Base/My-Chat source, secret/KMS/environment value, capability, deployment or
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-D domain-action scope freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | Reused `T-002 / M-002 > F-002`; task remains `in-progress` and I1-D implementation is not open. |
+| Contract completeness | PASS | Artifact 28 freezes standalone action declaration, exposure zones, prepare/submit, Host assurance, direct result, claimed Step bind/recovery, effect identity and public/private result layering. |
+| Neutrality and identity repair | PASS | Shared enum is exactly `scenario_direct_empty_v1|workflow_claimed_step_v1`; both direct and claimed effect-identity input branches include `scenario_key`. |
+| Slice boundary | PASS | D1-D5 are separately gated; manifest dependency/capability, legacy/vNext exclusion and `scenario_domain_action_source_v1` remain I1-F. |
+| Task-doc lint | PASS | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --strict --check-anchors`: 58 files, zero errors/warnings. |
+| Repository-doc lint | PASS | `node .ai/scripts/lint-docs.mjs --strict --check-anchors`: 424 files, zero errors/warnings. |
+| Context | PASS | `ctl-context touch` refreshed `workflow-nurture-scenario-contract` to `f0231d72cbde31d0acc6e8b9ed3cebb935a7f9da7b109c7faa70fab8c428132d`; strict verification passes. |
+| Project governance/state | PASS | Governance sync/lint/query pass; T-002 resolves under F-002/M-002; project Context mode remains enabled/contract. |
+| Repository boundary | PASS | My-Workflow-Base remains clean at `3c30337…`; My-Chat remains clean at `dc4a77b…`; Nurture changes are limited to task/project/context documentation. |
+| Effect boundary | PASS | No Base/My-Chat/Nurture product source, build, Prisma generate, database connection/apply, one-time PostgreSQL, deployment, capability, activation, T-008, Pilot or traffic action ran. |
 
 ## C30-I1-C4 quality repair qualification and successor lock — 2026-08-05
 
