@@ -8,6 +8,29 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HASH_ALGORITHM = 'sha256-path-content-v1';
+const REQUIRED_NURTURE_EXACT_PATHS = [
+  'package.json',
+  'pnpm-lock.yaml',
+  'pnpm-workspace.yaml',
+  'tsconfig.json',
+  'apps/scenario-service/package.json',
+  'apps/scenario-service/src',
+  'apps/scenario-service/tsconfig.build.json',
+  'apps/scenario-service/tsconfig.db.json',
+  'apps/scenario-service/tsconfig.json',
+  'docs/context/workflow/nurture-scenario-contract.md',
+  'packages/nurture-db/package.json',
+  'packages/nurture-db/src',
+  'packages/nurture-db/tsconfig.build.json',
+  'packages/nurture-db/tsconfig.json',
+  'packages/nurture-scenario/package.json',
+  'packages/nurture-scenario/scenario.manifest.yaml',
+  'packages/nurture-scenario/src',
+  'packages/nurture-scenario/tsconfig.build.json',
+  'packages/nurture-scenario/tsconfig.json',
+  'prisma/migrations',
+  'prisma/schema.prisma',
+];
 
 function parseArgs(argv) {
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
@@ -134,6 +157,17 @@ function assertPinShape(pin) {
     !/^[0-9a-f]{64}$/.test(pin?.nurtureScenario?.contractSha256 ?? '')
   ) {
     throw new Error('Invalid nurtureScenario contract pin');
+  }
+  if (pin.nurtureScenario.contractRoot !== '.') {
+    throw new Error('The-Nurture scenario contractRoot must be the repository root');
+  }
+  for (const requiredPath of REQUIRED_NURTURE_EXACT_PATHS) {
+    const covered = pin.nurtureScenario.contractPaths.some(
+      (contractPath) => contractPath === requiredPath || requiredPath.startsWith(`${contractPath}/`),
+    );
+    if (!covered) {
+      throw new Error(`The-Nurture exact runtime path is not pinned: ${requiredPath}`);
+    }
   }
 }
 

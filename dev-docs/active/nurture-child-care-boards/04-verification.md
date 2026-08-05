@@ -1111,8 +1111,8 @@ accepted as final G3 evidence. The frozen commits remain locally available; the
 pending qualification must run from adjacent detached worktrees so the verified
 source and the linked runtime dependency are identical.
 
-The repository-only checkpoint recomputes the expanded Nurture scenario source
-population as 89 files / `2714c5c3853595f9ab979db069dd0fa01286ab6f5a0461159fd8e8547af978c0`.
+The repository-only checkpoint now recomputes the complete Nurture runtime source
+population as 168 files / `4980226cba92780b558f60aa010b6d2c48917b379e901456d0acf931699a8b1a`.
 The historical T-005 self-pin remains bound inside the archived G2 Exit record;
 the current integration pin now names this G3 candidate instead of forcing a later
 task to pretend the source population never changed. Git-object recomputation at
@@ -1126,3 +1126,14 @@ two path spellings as strings and silently exited 0. Entry detection now compare
 filesystem realpaths and has a symlink-alias regression test; `test:workflow-contract-pin`
 passes 5/5. A qualification runner that does not actually enter `main` can no longer
 stand in for exact pin evidence.
+
+A second completion audit compared every runtime file changed since `69eba8d` with
+the self-pin population. It caught 14 unpinned files among 25 runtime changes,
+including the T-007 provider, queue admission, release/reschedule repositories and
+the new migration. The pin now covers the full runtime source directories, complete
+migration stream, build configs and package lock instead of a selective file list.
+The verifier rejects any pin that omits a required runtime root even when the narrowed
+hash is internally consistent; the regression test passes. Exact Base/My-Chat pins,
+the expanded 168-file Nurture hash, G2 preservation, G3 freeze and formal ingress all
+pass after the repair. This closes a qualification-integrity gap only; it does not
+run or qualify the pending PostgreSQL suites.

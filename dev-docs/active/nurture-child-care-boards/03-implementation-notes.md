@@ -2018,3 +2018,12 @@ owner path，但尚未执行任何数据库写入，也尚未宣称 G3-E 通过�
 `20260805090000_t007_publication_policy_provider` 应用到 disposable local PostgreSQL，
 在 exact detached owner 拓扑运行 provider DB、scenario-service owner/joint suites、
 population/final false-empty census 与完整 gates。任何一项失败都不签发 handoff。
+
+完成性审计随后发现原 Nurture self-pin 仍沿用逐文件白名单：本轮 25 个运行时变更文件中
+有 14 个未进入哈希，包括 T-007 policy read、queue admission、reschedule/release owner
+repositories 和新迁移。这使“exact owner path”主张不能成立，即使入口与 sibling pin 都
+通过。self-pin 已改为覆盖 root package/lock/workspace、完整 scenario-service source、完整
+`nurture-db/src`、完整 `nurture-scenario/src`、各构建 tsconfig、完整 Prisma migration stream
+与 schema；population 从 89 文件扩到 168 文件。verifier 同时要求关键 runtime 根路径
+必须显式存在，不能通过重算较窄哈希绕过。新 exact hash 为
+`4980226cba92780b558f60aa010b6d2c48917b379e901456d0acf931699a8b1a`。
