@@ -1997,3 +1997,29 @@ This file exists to prevent repeating mistakes within this task.
   expired/future clocks, duplicate keys across containers, omitted defaults and
   runtime-library exceptions; never claim neutral localized semantic classification
   without an owner-policy conformance suite.
+
+### 2026-08-06 — Green standalone validators did not prove cross-seam action identity
+
+- Symptom: 55 Schemas and 291 Node tests were green, yet mixed prepare-result
+  branches passed Schema validation, a shape-valid replacement submit token was
+  accepted, exact rebind could replace expiry/evidence, claimed driver/effect
+  identity could name different Steps, and legitimate bind failure outcomes had
+  no contextual validation path.
+- Root cause: branch-local closure and cross-seam composition were inferred from
+  independently green validators. Existing-binding context stored only the
+  assertion, while token/scenario/action and the execution Step join were absent
+  from the trusted private context.
+- What we tried: replayed concrete bypass values against the built codec and Ajv,
+  then paired independently valid Step-01/Step-02 objects. The first full
+  pre-lock conformance aggregate also stopped at portability because it correctly
+  still compared changed source with the historical lock.
+- Fix / workaround: independently close Schema branches; bind submit identity to
+  resolved private context; store and replay the full binding seal; add one
+  claimed-Step execution composition assertion; branch fail-closed outcomes
+  before success metadata; then reseal the committed source and requalify the
+  final exact chain.
+- Prevention: every union needs mixed-branch Schema/codec parity cases, and every
+  invariant spanning two validators needs a composed adversarial test. Rebind
+  tests must mutate both result and proposed new context while retaining an
+  immutable stored baseline. Treat pre-lock source mismatch as sequencing
+  evidence, never as permission to weaken the lock.

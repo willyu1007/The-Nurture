@@ -34,11 +34,12 @@ Project: `main`
   Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
   cumulative qualification. I1-C subject-context/presentation is reaccepted at
   successor Base source `ae0c357…` plus lock `3c30337…` after artifact 26-27
-  quality repair; the earlier chain is historical. Artifact 34 reopens I1-D
-  acceptance after five composition findings; the artifact 33 Base source
-  `52c0dc2…` plus lock `c179bb5…` is historical until the bounded successor repair
-  and reseal pass. Neutral direct/claimed names stay unchanged and manifest/source
-  convergence remains I1-F. I1-E/I1-F remain closed. Remaining I1-E..F,
+  quality repair; the earlier chain is historical. Artifacts 34-35 reaccept I1-D
+  at successor Base source `3580a9b…` plus lock `1cb5691…` after closing five
+  composition findings; the artifact-33 chain is historical. Neutral direct/claimed
+  names stay unchanged and manifest/source convergence remains I1-F. An I1-E scope
+  review/freeze is the next separately authorized decision; implementation remains
+  closed. Remaining I1-E..F,
   C30-I2..I4, C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no
   downstream PASS is deployment or traffic authority.
 

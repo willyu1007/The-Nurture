@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C accepted; I1-D acceptance reopened for bounded successor repair; I1-E/I1-F and all consumer adoption/activation closed
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E scope review and all I1-F/consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 
@@ -27,15 +27,15 @@ identity input branches explicitly bind `scenario_key`; the direct branch binds
 Workspace/scenario/action/submit context and the claimed branch binds
 Workspace/scenario/action/original Step. I1-D defines standalone wire/codec/schema
 conformance only. Manifest dependency/capability convergence, legacy/vNext atomic
-exclusion and `scenario_domain_action_source_v1` remain I1-F work. The exact Base
-historical source is `52c0dc21c12b0f96741d4fe4c8a5439285479c6b`, sealed by metadata lock
-`c179bb5fe914311a7a4fe9a59b898eeee53297a4` at source hash
-`50c5fa162aa2c9f81b1eb053ebe48f1df90d8a14984e0f715af13224a3c7f093`.
-Independent quality review reopened acceptance on 2026-08-06 for Schema branch
-closure, resolved submit identity, immutable exact rebind, claimed-Step execution
-composition and legitimate fail-closed bind outcomes. Artifact 34 freezes the
-successor repair; the cited source/lock remains historical until resealed. No
-consumer, runtime, manifest convergence or activation exists yet.
+exclusion and `scenario_domain_action_source_v1` remain I1-F work. The exact
+current Base source is `3580a9be74bd6ebe81d00c9fe99ccdf98d147664`, sealed by
+metadata lock `1cb56910f32ab5e13f9d378af3b3043dfc94b180` at source hash
+`5c5f2c5380773ccb651925199d403f267edb60bfbb0512bb0779218d074a99ef`.
+Artifact 35 closes the artifact-34 findings by adding private resolved-submit,
+stored rebind-seal and claimed-Step execution composition assertions plus closed
+prepare branches and legitimate fail-closed outcomes. The public wires and neutral
+driver names remain unchanged. No consumer, runtime, manifest convergence or
+activation exists yet.
 
 ## Decision
 

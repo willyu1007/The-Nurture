@@ -1,8 +1,9 @@
 # C30-I1-D5 Cumulative Qualification and Source-Lock Record
 
-> **Superseded for current acceptance (2026-08-06):** artifact 34 reopens I1-D
-> after five successor-review findings. The source/lock and test results below
-> remain historical evidence, not current qualification authority.
+> **Superseded for current acceptance (2026-08-06):** artifact 34 reopened I1-D
+> after five successor-review findings; artifact 35 now holds the repaired
+> successor qualification. The source/lock and test results below remain
+> historical evidence, not current qualification authority.
 
 ## Result
 

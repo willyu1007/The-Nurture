@@ -56,3 +56,9 @@ private validation context/helpers required to enforce already frozen semantics.
 The repair exits only through a successor I1-D5 qualification/source-lock record.
 Until then, I1-D acceptance is reopened, artifact 33 is superseded as current
 qualification evidence, and I1-E/I1-F remain closed.
+
+## Successor qualification
+
+Complete: artifact 35 records Base source `3580a9b…`, metadata lock `1cb5691…`,
+source hash `5c5f2c53…99ef`, D-R1 through D-R5 closure and cumulative I1-D
+reacceptance. Artifact 34 remains the immutable pre-source scope record.

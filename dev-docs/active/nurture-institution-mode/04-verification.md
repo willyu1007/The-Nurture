@@ -13,9 +13,10 @@
 - Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B and successor I1-C are accepted. I1-D acceptance is reopened; artifact 34
-  freezes five successor-repair findings and supersedes artifact 33 as current
-  qualification authority. I1-E/I1-F remain closed. G1 is
+  I1-B, successor I1-C and successor I1-D are accepted. Artifact 35 closes all
+  five artifact-34 findings at exact repaired source/lock; artifact 33 remains
+  historical. I1-E is unstarted and eligible only for a separate scope review;
+  I1-F remains closed. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -32,6 +33,25 @@
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-D successor quality repair qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `3580a9be74bd6ebe81d00c9fe99ccdf98d147664`; metadata-only lock `1cb56910f32ab5e13f9d378af3b3043dfc94b180`. |
+| Finding closure | PASS | D-R1..D-R5 close prepare branch parity, resolved submit identity, stored exact-rebind seal, original-Step execution composition and legitimate bind failure outcomes. |
+| Full verifier | PASS | Repaired content passed repeated cumulative qualification and the final exact source/lock chain passed twice after commit metadata correction: 55 Schemas, 296 Node tests, runtime 28/28 and Scenario 10/10. |
+| Source identity | PASS | 20 normalized TypeScript files; source hash `5c5f2c5380773ccb651925199d403f267edb60bfbb0512bb0779218d074a99ef`; exact revision, committed bytes and alias portability pass. |
+| Determinism | PASS | Two isolated 76-file builds: `e702757a…ca8d`; two source manifests: `cb42c393…c068`; temporary outputs destroyed. |
+| Commit/document correction | PASS AFTER CORRECTION | Literal `\n\nTask:` text was replaced by real trailers in all three unpushed commits; the Base lock was rebound and the final exact chain reverified. The first documentation-lint command used nonexistent legacy names; canonical strict scans passed. |
+| Scope audit | PASS | No Base runtime/Scenario starter/manifest, public wire/result/driver/package, consumer/product source, `any`, DB, deployment, capability, activation, T-008, Pilot or traffic change. |
+| Detailed evidence | PASS | Artifact 34 is the pre-source repair freeze; artifact 35 records finding closure, exact chain, verification, rollback and next gate. |
+| Context/governance/docs | PASS | Context checksum `7ff6f13e9410ce7d0601dce4762f5e51e9684b2e8d3db13cac816387f767b701`; strict Context/project governance, T-002 query and document/anchor lint pass for 65 task and 431 repository Markdown files. |
+
+One pre-lock conformance aggregate stopped at the intentionally historical source
+lock after the non-locking population passed. Updating the candidate lock to the
+committed source made the complete portability/revision gate pass; no check was
+disabled. I1-D is reaccepted only by artifact 35, not by the historical artifact 33.
 
 ## C30-I1-D successor quality-review reopening — 2026-08-06
 

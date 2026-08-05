@@ -7,6 +7,20 @@
 
 ## What changed
 
+- 2026-08-06: Reaccepted cumulative Base `C30-I1-D` after closing all five
+  artifact-34 findings. Successor source `3580a9b…` closes prepare Schema
+  branches, binds token/scenario/action to resolved submit context, preserves
+  stored rebind evidence/expiry, composes claimed driver and execution identity
+  through the original Step, and admits legitimate fail-closed binding outcomes.
+  Metadata-only lock `1cb5691…` binds source hash `5c5f2c53…99ef`. Repeated full
+  verification passes with 55 Schemas, 296 Node tests, runtime 28/28 and Scenario
+  10/10; isolated 76-file builds and source manifests are deterministic. Initial
+  literal trailer encoding was corrected in the unpushed commits, the lock was
+  rebound and the final exact chain was reverified twice. No public wire,
+  manifest/source convergence, consumer/runtime, DB, deployment, capability,
+  activation, T-008 or Pilot work ran. I1-E is eligible only for a separately
+  authorized scope review/freeze.
+
 - 2026-08-06: Reopened cumulative Base `C30-I1-D` acceptance and froze the
   successor D5 repair in artifact 34 before source work. Independent executable
   probes found five missed compositions: mixed prepare-result Schema branches,
