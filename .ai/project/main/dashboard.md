@@ -6,29 +6,24 @@ Project: `main`
 
 ### Current Focus
 
-- Primary feature: F-003 Six-surface store-beta readiness.
-- Supporting feature: F-002 Institution ecology.
-- Critical task: T-006 nurture-child-care-boards (`in-progress`).
-- Confirmed objective: close T-006/G3 before starting T-008, deployment or Pilot work.
-- Current state: G3 self-prep is complete at
-  `nurture.surface-contract@1.15.0`; formal ingress admits 25 actions and 9
-  queries. Only `reschedule_publish_process` remains unrouted.
-- Required dependencies: the exact, default-off T-007
-  `nurture.institution-publication-policy@1.0.0` provider and the already
-  qualified T-005 G2-C provider.
+- Primary active feature: F-002 Institution ecology.
+- Completed checkpoint: T-006/G3 is `done` with an exact, default-off Beta
+  Profile Handoff at Nurture `0374087…`; archival remains separately approved.
+- Active tasks: T-002 (`C30-I0` cross-repository C/D pending) and the
+  non-blocking T-003 artifact closeout.
+- Planned chain: T-007 G4 remains unstarted; T-008 continues to wait for the
+  complete T-007 Exit even though T-004～T-006 handoffs are ready.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized.
 - Semantic detail: see `feature-map.md` F-002 and F-003 briefs.
 
 ### Next Governance Checkpoint
 
-1. Deliver the narrow T-007 publication-policy provider without opening the
-   remaining G4 scope.
-2. Route `reschedule_publish_process` and complete the T-007/T-006
-   schedule/reschedule/release joint run.
-3. Complete the T-005/T-006 G2-C direct-interaction joint run.
-4. Issue the exact T-006 Beta Profile Handoff and close G3 only when both joint
-   records pass and the final default-off/false-empty census is clean.
+1. Preserve T-006 as done and archive it only after explicit approval.
+2. By current-status priority, resume T-002 at the remaining `C30-I0-C/D`
+   baseline-isolation gate; T-003 may close independently as a short design track.
+3. If the six-surface chain is prioritized instead, explicitly start T-007 at
+   G4-0C; do not skip to T-008, deployment, activation or Pilot.
 
 ## Notes (manual)
 
@@ -44,12 +39,12 @@ Project: `main`
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
-| T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
-| T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
+| T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
+| T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
+| T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-003 nurture-uiux-pitch | in-progress | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-001 nurture-mvp | done | F-001 | dev-docs/active/nurture-mvp |
 <!-- AUTO-GENERATED:END dashboard -->

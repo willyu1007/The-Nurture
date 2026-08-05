@@ -7,6 +7,14 @@
 
 ## What changed
 
+- 2026-08-05: T-006 completed its exact G3 repair qualification and issued a
+  default-off Beta Profile Handoff at Nurture checkpoint `0374087…`. This consumes
+  and preserves the qualified T-002 owner path but does not close or supersede the
+  broader T-002 `C30-I0-C/D`, C31～C35, C40～C45, D or Pilot gates. T-002's next
+  implementation checkpoint therefore returns to the remaining cross-repository
+  C/D baseline-isolation work. No T-002 code, schema, database, deployment,
+  activation or traffic state changed in this governance synchronization.
+
 - 2026-07-31: Completed NestJS ingress M4 governance alignment. The formal
   OpenAPI and generated API index now describe exactly `GET /health` and
   `POST /internal/nurture/scenario-binding/authorize`; CI verifies OpenAPI

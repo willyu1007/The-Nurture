@@ -1,5 +1,13 @@
 # Implementation Notes — Store Beta Readiness
 
+## 2026-08-05 — Upstream readiness ledger advanced without starting T-008
+
+- T-005 G2 and T-006 G3 now have exact qualified handoffs; T-004 was already done.
+- T-007's narrow publication-policy dependency is qualified, but its complete G4 Exit
+  remains pending, so G5-0 and Candidate identity stay closed.
+- This update changes only the readiness ledger. T-008 implementation, Candidate
+  Freeze, build, deployment, activation, internal-store work and Pilot were not started.
+
 ## 2026-07-29 — Task package and roadmap created
 
 - 创建 T-008 规划包、总体 requirement 和 roadmap。

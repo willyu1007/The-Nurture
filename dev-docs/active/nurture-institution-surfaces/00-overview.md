@@ -6,13 +6,12 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-05
-- Next step: **先交付 exact、default-off publication-policy provider，解除 T-006/G3 Exit 依赖。** G4-0A exact inventory 已完成并记录为
-  `G4_0A_INVENTORY_PASS`；G4-0B publication-policy contract 已冻结为
-  `nurture.institution-publication-policy@1.0.0`，实现与 provider/consumer
-  qualification 仍待 T-007/T-006 交付。为关闭当前 T-006/G3 主线，下一实施单元先
-  交付该 exact、default-off provider，并完成 schedule/reschedule/release joint run；
-  G4-0C Authority/Surface freeze 在该窄依赖闭环之后继续。本任务在代码实施开始前
-  保持 `planned`，当前未产生 schema apply、activation 或 traffic。
+- Next step: **由单独治理决定是否启动 G4-0C Authority/Surface freeze。** G4-0A
+  exact inventory 已完成；G4-0B 的
+  `nurture.institution-publication-policy@1.0.0` 已作为窄、default-off 依赖完成
+  provider/consumer qualification，并随 T-006/G3 exact handoff 关闭。该早期子集不
+  等于 T-007 启动或完成；完整 G4-0C～G4-F 仍未实施，T-008 继续等待 T-007 Exit。
+  当前未产生 persistent schema apply、activation、deployment 或 traffic。
 
 ## Goal
 

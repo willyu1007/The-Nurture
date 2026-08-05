@@ -7,12 +7,12 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
-- Next step: G1 and T-005 G2 Exit are PASS; T-006 self-prep is complete. The
-  single implementation mainline is now to close T-006/G3 through the exact
-  T-007 publication-policy provider, the T-007/T-006 policy joint run and the
-  T-005/T-006 G2-C joint run. Broader C-3/C-4/D, T-008, deployment, activation
-  and Pilot gates remain separate and unauthorized.
-- Current gate: The current dependency pin is My-Chat `a019566` / Base
+- Next step: G1, T-005 G2 Exit and T-006 G3 Exit are PASS. T-002's existing
+  implementation mainline returns to `C30-I0`: finish the Base/My-Chat portion
+  of C and the immutable-pin/false-empty proof in D before opening C30-I1.
+  T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
+  and are not opened by the downstream G2/G3 handoffs.
+- Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
   `06303e9` (workflow-contract parity `8dd53be4…a34d`, `x5_joint_api`
   `89a61355…`, `wave4_binding_host` `960afb2c…`); the Nurture self-pin is
   `ec763a27…f152` (41 paths / 54 files). G1 Joint Conformance passed on
