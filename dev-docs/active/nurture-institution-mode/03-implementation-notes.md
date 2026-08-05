@@ -7,6 +7,17 @@
 
 ## What changed
 
+- 2026-08-05: Implemented and locally verified the authorized Base `C30-I1-C1`
+  checkpoint at `64533a66d2b95c9b31ff317920515962a0d3cb32`. Added neutral safe
+  text/label/reason, tone/narration and opaque subject/item/action/cursor/
+  continuation locator types, assertions, two strict Schemas and neutral fixtures.
+  Full typecheck, runtime/scenario regression, 25-Schema compilation and 129 Node
+  tests pass when the intentionally stale source-lock portability check is excluded;
+  I1-C4 owns that lock refresh. The initial checks exposed and fixed explicit
+  TypeScript assertion-signature and strict Ajv nested-type annotations without
+  weakening validation. No runtime/consumer/database/capability/deployment/
+  activation work ran. I1-C2 is next under the user's ordered I1-C authorization.
+
 - 2026-08-05: Reused T-002 and froze only the `C30-I1-C` subject-presentation
   contract scope. The freeze retains distinct list/resolve operations, opaque
   expiring subject/presentation locators, six closed semantic block variants,

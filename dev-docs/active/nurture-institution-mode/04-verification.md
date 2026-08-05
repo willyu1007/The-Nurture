@@ -32,6 +32,19 @@
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
 
+## C30-I1-C1 safe-copy/ref implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source | PASS | Base `64533a66d2b95c9b31ff317920515962a0d3cb32`; nine scoped files; no runtime or consumer source. |
+| Type safety/build | PASS | Full Base typecheck passes; the contract package builds with no `any` or Host/Scenario imports. |
+| Schema/codec | PASS | 25 Schemas compile; strict safe-copy/reason and opaque-locator positive/negative cases pass. |
+| Regression population | PASS | Runtime 28/28, Scenario example 10/10 and 129 Node tests pass when the intentionally stale source-lock portability step is excluded. |
+| Deferred source lock | EXPECTED / I1-C4 | The existing I1-B lock rejects the new C1 source population. No verifier weakening or premature lock refresh was made. |
+| Boundary checks | PASS | Canonical-ref, consumer, contract-doc, semantic, diff and credential-pattern checks pass. |
+| Context/governance/docs | PASS | Context checksum `19924622e39bc9f8e48d96e146ca44897a333fbba9d51e8fe272a3f9e74e34fe`; strict Context/project-state/governance checks and 418-file document/anchor lint pass. |
+| Effect boundary | PASS | No My-Chat/Nurture product source, runtime/provider, Prisma/database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
 ## C30-I1-C subject-presentation scope review and freeze — 2026-08-05
 
 | Check | Result | Evidence |

@@ -4,6 +4,12 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- TypeScript assertion helpers called by exported assertion functions require an
+  explicit assertion signature; inferred arrow-function assertions trigger TS2775.
+- Under strict Ajv, every nested `properties`/string constraint introduced through
+  `allOf` still needs its own explicit `type`; a referenced parent type is not a
+  sufficient strictTypes annotation.
+
 - Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
 - Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
 - Do not let a service token stand in for the represented adult principal, or let

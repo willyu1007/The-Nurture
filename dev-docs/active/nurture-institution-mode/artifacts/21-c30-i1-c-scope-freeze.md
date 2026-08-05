@@ -7,13 +7,13 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Entry: C30-I1-A accepted; C30-I1-B accepted at Base source `edbcd74…`
   plus source lock `9a15865…`
-- State: `I1_C_SCOPE_FROZEN / I1_C_IMPLEMENTATION_NOT_STARTED`
+- State: `I1_C1_COMPLETE / I1_C2_IN_PROGRESS`
 - Downstream: `I1_D_BLOCKED / C30_I2_NO_GO / ACTIVATION_NO_GO`
 
 This review freezes the neutral Base contract for discovering and resolving a
-Scenario-owned subject context and presenting owner-safe semantic output. It does
-not authorize source changes. I1-C implementation is split into four separately
-reviewable units; only I1-C1 can be considered for the next separate authorization.
+Scenario-owned subject context and presenting owner-safe semantic output. The later
+user authorization opens all four ordered implementation units but does not alter
+their boundaries or permit downstream adoption.
 
 ## Accepted inputs and ownership
 
@@ -305,8 +305,8 @@ reason, product action or Child/Family/Institution vocabulary.
 
 | Unit | Scope | Entry | Exit |
 | --- | --- | --- | --- |
-| `I1-C1` safe-copy/ref primitives | SafeText/Label/Reason, tone/narration and opaque ref/cursor bounded-syntax validators plus lifetime-contract fixtures. | This scope freeze committed; separate authorization. | Types/assertions/Schemas/neutral fixtures pass locally; no provider/presentation union yet. |
-| `I1-C2` subject-context provider | List/resolve inputs, option and closed result unions; pagination, selection and context-change behavior. | I1-C1 accepted; separate authorization. | Provider Schema/codec parity and authority/exposure negatives pass. |
+| `I1-C1` safe-copy/ref primitives | SafeText/Label/Reason, tone/narration and opaque ref/cursor bounded-syntax validators plus lifetime-contract fixtures. | Complete at Base `64533a6…`. | Types/assertions/Schemas/neutral fixtures pass; no provider/presentation union. |
+| `I1-C2` subject-context provider | List/resolve inputs, option and closed result unions; pagination, selection and context-change behavior. | I1-C1 complete; authorized. | Provider Schema/codec parity and authority/exposure negatives pass. |
 | `I1-C3` semantic presentation | Present input/result, six blocks, navigation/action offers and narration projection/exposure negatives. | I1-C2 accepted; separate authorization. | Presentation bounds, closed unions and prepare-only semantics pass. |
 | `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | I1-C1-C3 accepted; separate authorization. | One exact I1-C source/lock chain passes cumulative conformance. |
 
@@ -360,5 +360,6 @@ this freeze and requires renewed scope review before source work continues.
 
 ## Next gate
 
-The only eligible next decision is separate authorization for `C30-I1-C1`.
-I1-C2-C4, I1-D, all consumer/runtime adoption and C30-I2 remain unauthorized.
+The next ordered implementation unit is `C30-I1-C2`. I1-C3/C4 follow only after
+their predecessor exits. I1-D, all consumer/runtime adoption and C30-I2 remain
+unauthorized.
