@@ -7,8 +7,8 @@
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
 - Entry: C30-I1-A accepted; C30-I1-B accepted at Base source `edbcd74…`
   plus source lock `9a15865…`
-- State: `I1_C_ACCEPTED / I1_C1_C2_C3_C4_COMPLETE`
-- Downstream: `I1_D_READY_NOT_STARTED / C30_I2_NO_GO / ACTIVATION_NO_GO`
+- State: `I1_C_ACCEPTANCE_REOPENED / I1_C4_QUALITY_REPAIR_FROZEN`
+- Downstream: `I1_D_NO_GO / C30_I2_NO_GO / ACTIVATION_NO_GO`
 
 This review freezes the neutral Base contract for discovering and resolving a
 Scenario-owned subject context and presenting owner-safe semantic output. The later
@@ -122,11 +122,14 @@ type ScenarioToneV1 =
 type ScenarioNarrationPolicyV1 = "allowed" | "display_only";
 ```
 
-Safe text is owner-localized BCP-47 plain text. It rejects Markdown, HTML, URLs,
-control characters, unresolved template parameters, internal exception/provider/
-database text and diagnostic or prescriptive medical copy. Display-safe does not
-mean persist-safe: these values remain ephemeral presentation output unless a later
-Host contract explicitly classifies a durable shell field.
+Safe text is owner-localized BCP-47 plain text. Base rejects Markdown, HTML, URL/
+URI/address-like locator text, control characters, unresolved template parameters
+and explicit internal exception/provider/database details. Locale- and domain-aware
+diagnostic, prescriptive and Anti-Metric semantics remain an executable Scenario-owner
+disclosure-policy gate before construction of these values; neutral Base does not
+guess medical meaning from localized prose. Display-safe does not mean persist-safe:
+these values remain ephemeral presentation output unless a later Host contract
+explicitly classifies a durable shell field.
 `reason_code` is owner-declared registered vocabulary; My-Chat may route only on
 `retry_class` and cannot translate the reason code into business meaning or copy.
 
@@ -190,8 +193,10 @@ A branch's exact discriminator is `kind` with the corresponding table value.
 A badge contains only `label: ScenarioSafeTextV1` and
 `tone: ScenarioToneV1`. Blocks cannot nest and have no arbitrary extension,
 renderer primitive, form, draft, media body, URL, raw id, canonical ref,
-command/audit ref or protected-interaction body. Metric rows cannot express rank,
-score, comparative trend, cross-scope comparison or another Anti-Metric.
+command/audit ref or protected-interaction body. Metric rows cannot use Base's
+explicit forbidden rank/score/comparison key vocabulary. The Scenario owner
+additionally rejects semantic rank, score, comparative trend, cross-scope comparison
+or another Anti-Metric in key or copy before emitting the structurally valid row.
 
 ## Frozen navigation and action offers
 
@@ -258,9 +263,11 @@ or `CommandExecution`. Action execution remains entirely outside I1-C.
 | Summary or body / help | at most 500 / 240 characters |
 
 All exposed timestamps are canonical UTC instants. Assertions own explicit
-cross-field subject-option expiry and output-size checks where JSON Schema alone
-cannot express them portably. Opaque-ref codecs own bounded syntax, not hidden token
-claims; the issuing/resolving owner enforces the five- or thirty-minute lifetime.
+cross-field subject-option duration and output-size checks where JSON Schema alone
+cannot express them portably. Explicitly clocked active-option/result assertions
+own current-time qualification without reading the wall clock. Opaque-ref codecs
+own bounded syntax, not hidden token claims; the issuing/resolving owner enforces
+the five- or thirty-minute lifetime.
 Unknown fields, non-canonical time, unsafe machine keys and duplicate block/item
 keys are rejected; an owner rejects expired locators without extending them.
 
@@ -308,10 +315,11 @@ reason, product action or Child/Family/Institution vocabulary.
 | `I1-C1` safe-copy/ref primitives | SafeText/Label/Reason, tone/narration and opaque ref/cursor bounded-syntax validators plus lifetime-contract fixtures. | Complete at Base `64533a6…`. | Types/assertions/Schemas/neutral fixtures pass; no provider/presentation union. |
 | `I1-C2` subject-context provider | List/resolve inputs, option and closed result unions; pagination, selection and context-change behavior. | Complete at Base `600faee…`. | Provider Schema/codec parity and authority/exposure negatives pass. |
 | `I1-C3` semantic presentation | Present input/result, six blocks, navigation/action offers and narration projection/exposure negatives. | Complete at Base `13d2077…`. | Presentation bounds, closed unions and prepare-only semantics pass. |
-| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | Complete at source `d14bf31…` plus lock `9d16810…`. | One exact I1-C source/lock chain passes cumulative conformance. |
+| `I1-C4` cumulative qualification | Full Base verification, deterministic build/manifest and exact source-lock seal. Adds no wire. | Reopened after quality review; repair scope frozen in artifact 26. | Successor source/lock chain closes R1-R6 and passes cumulative conformance. |
 
 No unit opens I1-D, performs consumer adoption or satisfies the cumulative C30-I1
-exit. I1-D begins only after I1-C4 acceptance and another explicit authorization.
+exit. The previous I1-C4 acceptance is reopened; I1-D is ineligible until successor
+I1-C4 acceptance and another explicit authorization.
 
 ## Acceptance matrix
 
@@ -321,7 +329,8 @@ I1-C cumulative acceptance requires all of the following:
 2. Every public union is closed and JSON Schema/TypeScript assertion behavior is
    aligned for neutral positive and negative fixtures.
 3. Negatives cover unknown/missing fields, malformed/overlong refs and cursors,
-   expired subject options and provider-side expired-locator handling, unsafe text,
+   expired/not-yet-issued subject options and provider-side expired-locator handling,
+   unsafe structural text,
    invalid locale/time/key, duplicate keys, overflow, nesting, arbitrary extensions
    and forbidden ids/URLs/command/protected bodies.
 4. Provider fixtures prove distinct list/resolve semantics, no auto-selection,
@@ -332,7 +341,10 @@ I1-C cumulative acceptance requires all of the following:
    omission, and AI projection stripping.
 6. Legacy fixtures remain unchanged; no fallback, activation or runtime behavior is
    inferred from successful validation.
-7. Full Base qualification, repeated deterministic output and exact source lock pass
+7. Locale/domain semantic disclosure and Anti-Metric negatives are required from
+   each later Scenario owner before consumer adoption; Base qualification does not
+   claim localized natural-language policy enforcement.
+8. Full Base qualification, repeated deterministic output and exact source lock pass
    in I1-C4. C30-I2 remains NO-GO until I1-A through I1-F all pass.
 
 ## Rollback and invalidation
@@ -353,14 +365,15 @@ this freeze and requires renewed scope review before source work continues.
   `46c566a0123a9e555b5b6bc0142bb3fef9938612d314e643eb5916563ab244dd`;
   strict Context, project-state, governance, T-002 query and whitespace checks pass.
   Document/anchor lint checks 417 Markdown files with zero errors or warnings.
-- C4 later ran the authorized Base-only build/qualification and is recorded in
-  artifact 25. No Prisma generate, database connection/apply, one-time PostgreSQL,
+- C4's prior build/qualification is historical in artifact 25. The quality review
+  reopened acceptance and artifact 26 freezes the successor repair before source
+  work. No Prisma generate, database connection/apply, one-time PostgreSQL,
   deployment, capability, activation, T-007/T-008, Pilot or traffic action ran.
 - No My-Chat/Nurture product source changed. This artifact remains the scope SSOT;
-  artifact 25 is the accepted implementation/qualification record.
+  artifact 26 is the current repair-scope record.
 
 ## Next gate
 
-I1-C is accepted. The next eligible decision is a separately authorized C30-I1-D
-scope review/freeze; I1-D source, all consumer/runtime adoption and C30-I2 remain
-unauthorized.
+I1-C acceptance is reopened. The next eligible work is only the frozen I1-C4
+quality repair and successor qualification; I1-D source/scope review, all
+consumer/runtime adoption and C30-I2 remain unauthorized.

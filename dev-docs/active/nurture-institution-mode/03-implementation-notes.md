@@ -7,6 +7,15 @@
 
 ## What changed
 
+- 2026-08-05: Reopened cumulative Base `C30-I1-C` acceptance after the quality
+  review and froze all six findings in artifact 26 before source work. Five are
+  executable Base gaps (URL/address detection, explicitly clocked current expiry,
+  stable locale failure, page-size default and presentation-wide item keys); one
+  corrects an overclaimed boundary by reserving localized diagnostic/prescriptive
+  and semantic Anti-Metric enforcement for the Scenario-owner disclosure gate.
+  The prior `d14bf31…` / `9d16810…` chain remains historical. I1-D, consumers,
+  database, deployment and activation remain NO-GO.
+
 - 2026-08-05: Accepted cumulative Base `C30-I1-C`. The C4 review aligned
   portable SafeText exposure negatives in follow-up source `d14bf31…`, then sealed
   that exact revision in metadata-only lock `9d16810…` with source hash

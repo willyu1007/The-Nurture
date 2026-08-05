@@ -1,5 +1,9 @@
 # C30-I1-C4 Cumulative Qualification and Source-Lock Record
 
+> Superseded as current qualification evidence on 2026-08-05 by the quality
+> repair freeze in artifact 26. This record remains immutable historical evidence
+> for source `d14bf31…` / lock `9d16810…`; it no longer opens I1-D.
+
 ## Result
 
 - Date: 2026-08-05

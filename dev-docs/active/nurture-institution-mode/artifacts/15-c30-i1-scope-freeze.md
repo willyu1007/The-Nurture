@@ -5,7 +5,7 @@
 - Date: 2026-08-05
 - Governance decision: `REUSE_TASK`
 - Mapping: `M-002 > F-002 > T-002 nurture-institution-mode`
-- Overall state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B_ACCEPTED / I1_C_ACCEPTED`
+- Overall state: `C30_I1_IN_PROGRESS / I1_A_ACCEPTED / I1_B_ACCEPTED / I1_C_REPAIR_REOPENED`
 - Downstream state: `C30_I2_NO_GO / C30_I3_NO_GO / C30_I4_NO_GO`
 
 The existing task and roadmap remain the planning SSOT. No new task or parallel
@@ -28,8 +28,8 @@ activation row or traffic authority.
 | --- | --- | --- | --- |
 | `C30-I1-A` trusted invocation contract spine | Human principal, registered ingress context and exact private invocation envelope; strict structural codecs/Schemas/negative fixtures. | `C30-I0` complete. | **Accepted** at Base source `ce7118c…` plus exact source lock `bd69d19…`; no Host/scenario adoption. |
 | `C30-I1-B` canonical-object binding envelope | Neutral typed owner refs, reservation, pair-binding request/result/recovery and current-owner evidence without platform Child/Family policy. | I1-A accepted. | **Accepted:** B1-B3 source `edbcd74…` plus B4 lock `9a15865…`; exact source hash and cumulative qualification are recorded in artifacts 17-20. |
-| `C30-I1-C` subject presentation | Subject-context discovery/resolve, semantic presentation, navigation/action offers and safe owner text. | I1-B accepted. | **Accepted:** cumulative source `d14bf31…`, metadata lock `9d16810…` and source hash `9e18ae68…09ae`; artifacts 21-25 record scope, units and qualification. No consumer adoption. |
-| `C30-I1-D` domain action | Prepare/submit, direct-empty versus claimed-Step driver, result/recovery and canonical effect-identity inputs. | I1-C accepted. | Action contracts and replay/changed-payload/wrong-driver negatives pass. |
+| `C30-I1-C` subject presentation | Subject-context discovery/resolve, semantic presentation, navigation/action offers and safe owner text. | I1-B accepted. | **Acceptance reopened:** artifact 26 freezes six quality repairs; prior source `d14bf31…` / lock `9d16810…` is historical pending successor qualification. No consumer adoption. |
+| `C30-I1-D` domain action | Prepare/submit, direct-empty versus claimed-Step driver, result/recovery and canonical effect-identity inputs. | Successor I1-C acceptance. | Blocked; no scope review or source is open during the I1-C repair. |
 | `C30-I1-E` protected interaction | Prepared/committed/read/tombstone body-free control contracts; protected bytes remain outside generic Host payloads. | I1-D accepted. | Protected wire, no-copy boundaries and negative fixtures pass. |
 | `C30-I1-F` dependency/source convergence | Atomic manifest dependencies, legacy/vNext exclusion, schema/codec parity, four separate C30 source identities and source lock. | I1-A through I1-E accepted. | Full Base conformance passes and one immutable C30-I1 handoff is issued. |
 

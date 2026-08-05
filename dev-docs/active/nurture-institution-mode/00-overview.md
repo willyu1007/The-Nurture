@@ -3,16 +3,17 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C accepted）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B accepted；I1-C quality repair reopened）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
 - Next step: G1, T-005 G2 Exit, T-006 G3 Exit, all `C30-I0` gates and
   `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
-  `9a15865…`; I1-C is accepted at cumulative Base source `d14bf31…`, metadata
-  source lock `9d16810…` and source hash `9e18ae68…09ae`. The next eligible T-002
-  decision is a separately authorized I1-D scope review/freeze; no I1-D source is open.
+  `9a15865…`; the quality review reopened I1-C acceptance and artifact 26 freezes
+  six bounded repairs before source work. The previous source `d14bf31…` / lock
+  `9d16810…` remains historical only. The next eligible T-002 work is I1-C4 repair
+  and successor qualification; I1-D is not eligible.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -71,7 +72,11 @@
 - C30-I1-C4 qualification record: `artifacts/25-c30-i1-c4-qualification-record.md`
   pins cumulative source `d14bf31…`, metadata lock `9d16810…`, source hash
   `9e18ae68…09ae`, three full verification rounds and deterministic build/manifest.
-  I1-C is accepted; I1-D remains unstarted and separately authorized.
+  That qualification is now historical and superseded as current evidence.
+- C30-I1-C4 quality repair freeze: `artifacts/26-c30-i1-c4-quality-repair-freeze.md`
+  reopens acceptance and freezes URL/address detection, current-time expiry,
+  semantic-policy ownership, stable locale errors, executable page defaults and
+  response-local item-key uniqueness. I1-D remains NO-GO.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

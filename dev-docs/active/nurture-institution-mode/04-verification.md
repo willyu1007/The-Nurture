@@ -13,8 +13,8 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B is accepted and I1-C scope is frozen while its implementation remains
-  unstarted. G1 is
+  I1-B is accepted and I1-C acceptance is reopened under the artifact 26 quality
+  repair freeze. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -31,6 +31,16 @@
   Base/My-Chat source, secret/KMS/environment value, capability, deployment or
   traffic is changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-C4 quality repair scope freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | Reused `T-002 / M-002 > F-002`; prior accepted source/lock retained as historical evidence. |
+| Repair completeness | PASS | R1-R6 cover every review finding: URL/address text, current expiry, semantic-policy ownership, locale errors, page default and response-local item keys. |
+| Pre-source gate | PASS | Artifact 26 freezes exact Base exports/assertions/Schemas/tests plus successor qualification/reseal before any source change. |
+| Context/governance/docs | PASS | Context checksum `fb872e597b272b170f312e5603be0c200287b80bc0c42818bf77c429adf674e6`; strict Context/governance checks and 422-file document/anchor lint pass. |
+| Boundary | PASS | No I1-D, consumer/runtime/provider, My-Chat/Nurture product source, DB, capability, deployment, activation, T-008, Pilot or traffic work is authorized. |
 
 ## C30-I1-C4 cumulative qualification and source lock — 2026-08-05
 
