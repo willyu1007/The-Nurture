@@ -2027,3 +2027,23 @@ repositories 和新迁移。这使“exact owner path”主张不能成立，即
 与 schema；population 从 89 文件扩到 168 文件。verifier 同时要求关键 runtime 根路径
 必须显式存在，不能通过重算较窄哈希绕过。新 exact hash 为
 `4980226cba92780b558f60aa010b6d2c48917b379e901456d0acf931699a8b1a`。
+
+## 2026-08-05 — G3 Exit：exact detached 联合资格化通过
+
+获授权后，最终资格化只在相邻 detached worktrees 与 loopback `55437` 的一次性
+PostgreSQL 上运行。Base/My-Chat 固定在既有 owner revisions，Nurture 固定在
+`97eab03…`；package-manager link、pin verifier 与实际 scenario-service runtime 因而
+指向同一份源码。所有 16 条迁移从空库重放，schema diff 为零。
+
+formal owner path 最终执行 26 条 action、9 条 query，运行时证据无缺口。两个联合
+marker 都在最终持久化/投影断言后产生：T-007/T-006 旅程贯穿 formal organize →
+provider-backed admission → reschedule → release → Receipt → Guardian reread；
+T-005/T-006 旅程把 T-006 owner-issued direct-interaction option 交给 exact G2-C
+prepare/execute。policy absence/drift、错误 role scope、revision/confirmation drift 与
+raw-id leakage 负例均保持 fail closed。
+
+资格库销毁前的 census 明确区分了生产事务和底层夹具：10 条无 Receipt release 都没有
+applied CommandExecution；真实 runtime commit 没有无 Receipt 的发布。最终 built smoke、
+环境/合同 guard、activation-like table census 与容器销毁共同证明 default-off 与零持久
+effect。T-006/G3 因而签发 `G3_EXIT_PASS`；G3-B2/C2 继续 absent/default-off，T-008、
+deployment、Pilot 与 capability activation 未启动。

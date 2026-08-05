@@ -14,16 +14,15 @@ deployment, activation or Pilot scope:
 
 ### Execution checkpoint — 2026-08-05
 
-- Steps 1–3 now have an implementation candidate pending DB qualification: the Prisma SSOT
-  and migration, exact policy read port, seven-field frozen schedule,
-  reschedule action, release-time current-policy reread and both joint journeys.
-- Repository-only qualification is green: schema validation/generation/context,
-  TypeScript, 577 unit tests and the relevant contract/topology/governance gates.
-- The current blocking gate is intentional: applying the migration and running
-  PostgreSQL-backed qualification require explicit database-write approval.
-- G3-E, the Beta Profile Handoff and task closure remain pending until those
-  database runs pass and the resulting evidence is recorded. T-008,
-  deployment, activation and Pilot remain outside the objective.
+- Steps 1–4 are complete. Exact detached owner/runtime pins, clean 16-migration
+  replay, formal owner integration, T-007/T-006 publication and T-005/T-006
+  direct-interaction joint journeys all passed against the disposable database.
+- Repository/static checks, TypeScript, 577 unit tests, 216 production-DB tests,
+  55 formal owner-path tests and the final default-off/effect census passed.
+- The disposable PostgreSQL container/tmpfs has been destroyed; existing database
+  listeners were excluded and remained unchanged.
+- T-006/G3 is done and has issued its exact Beta Profile Handoff. T-008,
+  deployment, activation and Pilot remain outside the objective and unopened.
 
 ## G1 Progressive Entry Boundary
 
@@ -507,15 +506,15 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
   全部映射检查通过）；G3-C2 face match 明确 optional/default-off，能力身份完全
   未注册，人工归属主路径不依赖它。
 - [x] G3-D Publish and Release Loop 通过（`T006-AC-041`～`T006-AC-050` 全部映射检查通过）；真实 policy-backed schedule/release 资格化留给 G3-E。
-- [ ] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
+- [x] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
   PostgreSQL 完成完整黑盒与负向资格验证。
-- [ ] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；
+- [x] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；
   不接受 safe-unavailable 占位、普通 family-question 或 PublishProcess fallback。
-- [ ] T-007 publication-policy subset 已按 exact owner contract 资格化；可选
+- [x] T-007 publication-policy subset 已按 exact owner contract 资格化；可选
   `InstitutionWorkflowProjection` 的 absent/empty 行为与 beta profile 一致。
-- [ ] 最终 capability/environment 为 false、active test rows 为空；无 persistent
-  DB apply、Candidate、native/internal-store、activation 或 traffic effect。
-- [ ] 形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
+- [x] 最终 capability/environment 为 false；disposable test rows 已随 tmpfs 销毁，
+  无 persistent DB apply、Candidate、native/internal-store、activation 或 traffic effect。
+- [x] 形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
   notification/delivery 留给 My-Chat companion/T-008。
 
 所有清单项满足后 T-006 才可转为 done。T-008 仍需独立核验该 handoff 后才能开始

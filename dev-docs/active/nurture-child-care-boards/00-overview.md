@@ -2,20 +2,17 @@
 
 ## Status
 
-- State: in-progress
+- State: done
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-05
-- Next step: **关闭 T-006/G3；T-008、deployment 与 Pilot 保持关闭。** 当前
-  implementation candidate 已补齐 exact、default-off
-  `nurture.institution-publication-policy@1.0.0` provider、
-  `reschedule_publish_process` formal ingress，以及 T-007/T-006 和 T-005/T-006
-  联合旅程；formal ingress repo-only 普查为 26 action + 9 query、35 个注册能力、
-  未路由 0。所有无数据库写入检查已经通过。下一步须先获得明确授权，再把新迁移应用到
-  disposable local PostgreSQL，执行 provider、schedule/reschedule/release 与
-  direct-interaction owner/joint qualification。通过后才能提交实现、签发 T-006
-  Beta Profile Handoff 并关闭 G3；当前仍不得声称 G3 已通过。详见
-  [G3-E readiness review](07-g3-e-implementation-readiness-review.md)。
+- Next step: **T-006/G3 已关闭，等待单独批准后归档；T-008、deployment、
+  capability activation 与 Pilot 保持关闭。** exact detached topology 上的 clean
+  migration、formal NestJS owner path、T-007/T-006 publication joint journey、
+  T-005/T-006 direct-interaction joint journey、Guardian Receipt 回读、负向矩阵与
+  final default-off/empty census 均通过。一次性 PostgreSQL 已销毁，未触碰既有数据库。
+  exact 交接见
+  [G3 Exit Qualification and T-006 Beta Profile Handoff](08-g3-exit-qualification-and-beta-profile-handoff.md)。
 
 ## Goal
 
@@ -91,6 +88,15 @@ attempt 门禁、逐目标 `PublicationRelease` 扇出（首个 commit 冻结共
 correction/target removal/redaction 与两个 media lifecycle 能力。
 G3 adoption set 至此关闭（35 个 capability）；真实 policy-backed schedule/release
 与 provider/consumer 联合资格化仍属 G3-E。
+
+2026-08-05 G3-E 已通过：在 Base `06303e9…`、My-Chat `a019566…`、Nurture
+`97eab03…` 的相邻 detached 拓扑中，从空库应用完整 16 条迁移，并以 formal
+scenario-service HTTP + 真实 PostgreSQL 执行 26 action、9 query 与两条联合旅程。
+T-007 policy 经 owner provider 进入 organize/admission/reschedule/release；T-006
+产生的 direct-interaction option 被 T-005 exact G2-C owner action 消费。最终
+default-off、无 activation-like table、无持久 qualification effect；容器和 tmpfs
+均已销毁。G3-B2/C2 继续 absent/default-off，宿主相机、native/device、delivery 与
+Candidate Freeze 留给 T-008，且本交接不授权启动它。
 
 ## Scope In
 
@@ -169,166 +175,157 @@ G3 adoption set 至此关闭（35 个 capability）；真实 policy-backed sched
 
 ## Acceptance Criteria
 
-- [ ] 两个看板读取同一事实来源，不各自复制业务真相。
-- [ ] 看板响应不是新的事实源或跨角色超级 DTO；同一事实通过共享模块语义与
+- [x] 两个看板读取同一事实来源，不各自复制业务真相。
+- [x] 看板响应不是新的事实源或跨角色超级 DTO；同一事实通过共享模块语义与
   provenance 投影到角色独立的 public content。
-- [ ] 看板允许原地微调，但每项业务修改都通过对应 canonical owner 的 versioned
+- [x] 看板允许原地微调，但每项业务修改都通过对应 canonical owner 的 versioned
   capability 提交；不得直接 patch snapshot、缓存或 derived projection。
-- [ ] 展示偏好、发布前草稿调整和发布后 correction/redaction 等不同修改类型具有
+- [x] 展示偏好、发布前草稿调整和发布后 correction/redaction 等不同修改类型具有
   明确 owner、持久化与审计边界。
-- [ ] guardian 只看到自己被授权 child scope 的家庭投影。
-- [ ] caregiver 只看到授权班级/孩子的工作投影，且不会泄漏其他家庭私密内容。
-- [ ] teacher board 不把 acknowledge actor 显示为独占负责人；同一精确 CareGroup
+- [x] guardian 只看到自己被授权 child scope 的家庭投影。
+- [x] caregiver 只看到授权班级/孩子的工作投影，且不会泄漏其他家庭私密内容。
+- [x] teacher board 不把 acknowledge actor 显示为独占负责人；同一精确 CareGroup
   内其他当前合格照护者仍可回复，跨班级或仅同园区不可操作。
-- [ ] 同班不同老师的独立回复可以并发提交并稳定排序；board 不把第一条回复投影成
+- [x] 同班不同老师的独立回复可以并发提交并稳定排序；board 不把第一条回复投影成
   terminal/unique reply，也不重复创建待回复 Attention。
-- [ ] `PublishProcess` 只使用 draft、needs_review、pending_release、released 与
+- [x] `PublishProcess` 只使用 draft、needs_review、pending_release、released 与
   cancelled 五个业务状态；低置信/归属不明/D-15 可修正灰区进入 needs_review，普通
   内容不增加逐条审核；direct-interaction-required 不伪装成第六个状态。
-- [ ] 30 秒倒计时、scheduledAt、CommandExecution、逐目标失败和 ActionDelivery
+- [x] 30 秒倒计时、scheduledAt、CommandExecution、逐目标失败和 ActionDelivery
   不成为 `PublishProcess` 状态；产品标签映射清晰且 owner 仍可解释。
-- [ ] 单次拍照、记录、上传完成或 media ready 不创建家庭发布候选、不启动 30 秒；
+- [x] 单次拍照、记录、上传完成或 media ready 不创建家庭发布候选、不启动 30 秒；
   老师可以在待整理批次中高频移出素材而不触发全局 discard。
-- [ ] 整理只由本班老师手动点击，或园区可配置的静默期/每日兜底时点触发；Pilot 默认
+- [x] 整理只由本班老师手动点击，或园区可配置的静默期/每日兜底时点触发；Pilot 默认
   10 分钟静默期与 `default send window - 30 分钟` 兜底（17:00 对应 16:30），均使用
   服务端时间并保存 policy head。
-- [ ] 一分钟 quiescence 只是自动 trigger 的防打断 gate：正常 10 分钟 idle 已满足；
+- [x] 一分钟 quiescence 只是自动 trigger 的防打断 gate：正常 10 分钟 idle 已满足；
   兜底 due 后一分钟无用户操作即切批；手动“整理”绕过，不形成独立 trigger。
-- [ ] 任一本班老师的采集/增删/选择/编辑或有效 capture-activity lease 重置 gate；
+- [x] 任一本班老师的采集/增删/选择/编辑或有效 capture-activity lease 重置 gate；
   后台上传/缩略图/heartbeat/provider 进度不重置、不阻塞。默认可在 30 秒～3 分钟配置，
   自动整理启用时不可设为 0。
-- [ ] trigger 按 stable source watermark 原子切批；进行中的上传及之后的新拍摄进入
+- [x] trigger 按 stable source watermark 原子切批；进行中的上传及之后的新拍摄进入
   下一批，相同 trigger exact replay，不能重复创建 PublishProcess。
-- [ ] 30 秒快捷调整超时只进入待发送队列，不发布、不产生 Receipt，也不形成 AI
+- [x] 30 秒快捷调整超时只进入待发送队列，不发布、不产生 Receipt，也不形成 AI
   发布授权；用户开始编辑时暂停推进，scheduler 不得早于该候选的 deadline 发布。
-- [ ] pending-release 内容在实际 release commit 前始终可编辑；正在编辑或存在未保存
+- [x] pending-release 内容在实际 release commit 前始终可编辑；正在编辑或存在未保存
   revision 的内容不得被定时任务发布。
-- [ ] 发布后不设置老师复查窗口或持续修改义务；低频 correction、target visibility
+- [x] 发布后不设置老师复查窗口或持续修改义务；低频 correction、target visibility
   removal、replacement 与 redaction 能力长期存在并保留审计。
-- [ ] 原始班级采集不因存在而自动创建家庭发布或跨边界；只有成为明确的家庭发布候选后
+- [x] 原始班级采集不因存在而自动创建家庭发布或跨边界；只有成为明确的家庭发布候选后
   才进入 `PublishProcess`。
-- [ ] `PublishProcess` 不吸收 device upload、AI provider execution、CareInteraction、
+- [x] `PublishProcess` 不吸收 device upload、AI provider execution、CareInteraction、
   ActionDelivery 或 InstitutionWorkflow 的状态和所有权。
-- [ ] 一个共享内容 revision 只需编辑一次，但每个目标 family 的
+- [x] 一个共享内容 revision 只需编辑一次，但每个目标 family 的
   `PublicationRelease` 独立绑定 ChildCareProcess、Enrollment、child-scoped Family、
   Grant 与 Receipt；不得用一个跨家庭事务冒充整体成功。
-- [ ] 多目标发布返回明确的逐目标结果；一个目标失败不回滚其他合法发布，重试只作用于
+- [x] 多目标发布返回明确的逐目标结果；一个目标失败不回滚其他合法发布，重试只作用于
   失败或 outcome-unknown 目标且不得重复发布。
-- [ ] 首个逐目标 release commit 将 process 转为 released 并冻结共享 revision；部分
+- [x] 首个逐目标 release commit 将 process 转为 released 并冻结共享 revision；部分
   成功通过逐目标结果/派生 summary 表达，零目标提交则保持 pending_release。
-- [ ] process 已进入 released 后，未提交目标只能基于冻结的 exact revision
+- [x] process 已进入 released 后，未提交目标只能基于冻结的 exact revision
   reconcile/retry；若需要改变共享正文、媒体组合或目标语义，必须创建新的
   `PublishProcess`/replacement，不得回写原 revision。
-- [ ] cancelled 仅允许发生在任何 release commit 之前；released 后的 correction、
+- [x] cancelled 仅允许发生在任何 release commit 之前；released 后的 correction、
   target visibility removal、replacement 与 redaction 不倒退主状态。
-- [ ] 任一本班老师可以查看和共同处理同一 CareGroup 的 PublishProcess，包括创建、
+- [x] 任一本班老师可以查看和共同处理同一 CareGroup 的 PublishProcess，包括创建、
   发布前调整、异常确认、立即发送和发布前取消；不按创建者形成个人所有权或独占认领。
-- [ ] Lead designation、Institution Admin、园区成员身份或 system operator 均不成为
+- [x] Lead designation、Institution Admin、园区成员身份或 system operator 均不成为
   T-006 内容读取/发布 authority；具备这些身份的人只有同时拥有 exact CareGroup
   caregiver RoleAssignment 时，才以普通本班老师身份操作。
-- [ ] CareGroup 是家庭侧业务发送方；creator、editor、reviewer 与 release executor
+- [x] CareGroup 是家庭侧业务发送方；creator、editor、reviewer 与 release executor
   分别留存个人审计，但不改变共同责任或扩张班级范围。
-- [ ] 草稿使用约 1 秒 debounce 自动保存并明确显示 saving/saved/failed；仅 Nurture
+- [x] 草稿使用约 1 秒 debounce 自动保存并明确显示 saving/saved/failed；仅 Nurture
   已提交的 draftRevision 可以进入发布，My-Chat 本地缓冲不能成为发布事实。
-- [ ] 一个 process 同时只有一个短期 edit hold；它暂停 scheduler 和其他编辑者，但
+- [x] 一个 process 同时只有一个短期 edit hold；它暂停 scheduler 和其他编辑者，但
   不是个人 owner、authority 或 PublishProcess lifecycle，离开/完成/过期后释放。
-- [ ] 每次保存携带 expectedDraftRevision；并发变化明确 conflict/rebase，禁止
+- [x] 每次保存携带 expectedDraftRevision；并发变化明确 conflict/rebase，禁止
   last-write-wins 静默覆盖。
-- [ ] pending_release 编辑前必须在线取得 edit hold；离线只允许准备新的本地草稿/
+- [x] pending_release 编辑前必须在线取得 edit hold；离线只允许准备新的本地草稿/
   media，不能声称暂停或修改已经等待发送的服务端 revision。
-- [ ] pending_release 本身表达已获得定时发送意图，不要求逐条二次审批；needs_review
+- [x] pending_release 本身表达已获得定时发送意图，不要求逐条二次审批；needs_review
   不可发送，“现在发送”的明确点击不再增加确认弹窗。
-- [ ] 园区默认发送时段由 T-007 运营管理，T-006 保存解析后的 scheduledAt/notAfter、
+- [x] 园区默认发送时段由 T-007 运营管理，T-006 保存解析后的 scheduledAt/notAfter、
   timezone 与 policy head；默认 17:00/19:00 是 Pilot 参数，设备时间不参与判定。
-- [ ] 定时执行前重新读取 exact saved revision、edit hold、authorizing caregiver
+- [x] 定时执行前重新读取 exact saved revision、edit hold、authorizing caregiver
   RoleAssignment、CareGroup、Enrollment、Grant、targets、media 和 policy；任一漂移
   跳过而非发布旧内容，也不静默换一位老师授权。
-- [ ] 自动重试仅发生在 notAfter 前；outcome-unknown 先以原 command identity
+- [x] 自动重试仅发生在 notAfter 前；outcome-unknown 先以原 command identity
   reconcile，逐目标失败只补偿对应目标。超过 notAfter 保持可见待处理状态。
-- [ ] media asset 使用 preparing/ready/unavailable/discarded/redacted 业务生命周期；
+- [x] media asset 使用 preparing/ready/unavailable/discarded/redacted 业务生命周期；
   child attribution 使用 candidate/confirmed/rejected/superseded，published 不成为
   asset 或 attribution 状态。
-- [ ] 发布资格从 exact ready media revision、confirmed attributions、所有可见孩子的
+- [x] 发布资格从 exact ready media revision、confirmed attributions、所有可见孩子的
   exposure policy、当前 Grant/scope 和非 redacted 状态实时派生；ready 本身不授权。
-- [ ] 从卡片删除默认只 detach 当前 PublishProcess；没有任何 committed release 时可
+- [x] 从卡片删除默认只 detach 当前 PublishProcess；没有任何 committed release 时可
   显式全局 discarded，存储物理清理由无引用与 retention policy 决定。
-- [ ] 发布后“删除”映射为 target visibility removal 或 redaction，后续读取停止展示
+- [x] 发布后“删除”映射为 target visibility removal 或 redaction，后续读取停止展示
   但保留 actor、原 release/Receipt 与审计，不宣称召回已查看内容或通知。
-- [ ] 群像照片中所有清晰可见孩子必须 confirmed 且 exposure policy 允许目标 audience；
+- [x] 群像照片中所有清晰可见孩子必须 confirmed 且 exposure policy 允许目标 audience；
   未确认/不允许时进入 needs_review，只能纠正归属、移除整张原图、调整目标或拆分
   process；首轮产品不 crop、不 blur。
-- [ ] 若不同目标需要不同正文或媒体组合，必须拆成不同 `PublishProcess`，不得在同一
+- [x] 若不同目标需要不同正文或媒体组合，必须拆成不同 `PublishProcess`，不得在同一
   共享 revision 下隐藏目标特有内容。
-- [ ] 发布成功只表示 Nurture 已提交家庭可见事实与 Receipt，不冒充 notification、
+- [x] 发布成功只表示 Nurture 已提交家庭可见事实与 Receipt，不冒充 notification、
   provider 或 device delivery。
-- [ ] My-Chat 本地缓存只优化离线/上传体验，不成为授权或 canonical media 状态；
+- [x] My-Chat 本地缓存只优化离线/上传体验，不成为授权或 canonical media 状态；
   owner-reread 失败、logout 或相关撤权后不能继续展示受保护缓存内容。
-- [ ] domain effect、Receipt 与 CommandExecution 原子提交；重试 exact replay，
+- [x] domain effect、Receipt 与 CommandExecution 原子提交；重试 exact replay，
   board cache、ActionDelivery 与 AI provider 状态均不能替代 owner-reread。
-- [ ] 若 beta profile 包含 G3-C2，`ClassScopedFaceMatch` 只使用当前 exact
+- [x] 若 beta profile 包含 G3-C2，`ClassScopedFaceMatch` 只使用当前 exact
   CareGroup、current Enrollment 和当前
   允许用途的头像 reference set；禁止全园/跨班/历史图库匹配及 raw child/family ID、
   姓名进入 matcher。
-- [ ] G3-C2 同时满足版本化质量、top-1 与 margin 门槛的结果可以自动 confirmed，不要求老师
+- [x] G3-C2 同时满足版本化质量、top-1 与 margin 门槛的结果可以自动 confirmed，不要求老师
   逐张确认；低置信、相似/遮挡、未知或冲突只进入 needs_review，且人工纠正 supersede
   自动结果。
-- [ ] G3-C2 原图保持不变；reference template 按班级/用途隔离并加密，照片临时 embedding
+- [x] G3-C2 原图保持不变；reference template 按班级/用途隔离并加密，照片临时 embedding
   匹配后删除，provider 不得训练、二次使用或写入普通日志。
-- [ ] G3-C2 人脸 matcher 默认关闭；专门告知/单独同意与监护人同意、PIPIA、retention、
+- [x] G3-C2 人脸 matcher 默认关闭；专门告知/单独同意与监护人同意、PIPIA、retention、
   撤回、processor contract 和法律/隐私评审任一门禁不满足时回退人工归属。
-- [ ] 若实现 G3-B2，可选 AI copy 必须可采用、可修改、可拒绝，且不产生排名或诊断；不得借 D-14
+- [x] 若实现 G3-B2，可选 AI copy 必须可采用、可修改、可拒绝，且不产生排名或诊断；不得借 D-14
   自动归属例外扩张正文、敏感判断或发布授权。
-- [ ] 自动 photo-first 路径不依赖生成式文案：老师文字保持原文，语音使用有 provenance
+- [x] 自动 photo-first 路径不依赖生成式文案：老师文字保持原文，语音使用有 provenance
   的转写，活动/时间/媒体数等通过版本化模板组装；photo-only 可以没有自由正文。
-- [ ] 若实现 G3-B2，AI copy 只在老师显式点击“帮我整理一句/润色”或独立日/周总结能力中出现；日常
+- [x] 若实现 G3-B2，AI copy 只在老师显式点击“帮我整理一句/润色”或独立日/周总结能力中出现；日常
   自动整理不能静默调用。老师选择采用后才写入当前 draftRevision。
-- [ ] G3-B2 生成式文案不得新增事实、情绪、原因、频率、引语或发展结论，不把不确定改成
+- [x] G3-B2 生成式文案不得新增事实、情绪、原因、频率、引语或发展结论，不把不确定改成
   确定，也不覆盖老师原文；provider 失败不阻塞原文/转写/模板/photo-only 路径。
-- [ ] Nurture 版本化 ContentSafetyPolicy 是最终 route owner；硬规则优先，classifier
+- [x] Nurture 版本化 ContentSafetyPolicy 是最终 route owner；硬规则优先，classifier
   只提供 signals。园区只能收紧，老师可以提高 tier 或修正灰区，不能降低硬门禁。
-- [ ] ordinary 可进入 D-10；可纠正的评价性/上下文不明内容进入 needs_review；磕碰/
+- [x] ordinary 可进入 D-10；可纠正的评价性/上下文不明内容进入 needs_review；磕碰/
   事故、健康症状、用药/医疗资料、明显情绪行为冲突、身体隐私/裸露/如厕影像以及
   证件/联系方式进入 direct-interaction-required，不进入自动批量发布。
-- [ ] direct-interaction-required 只提供 owner-issued T-005 navigation/action；本班
+- [x] direct-interaction-required 只提供 owner-issued T-005 navigation/action；本班
   老师明确选择 child/family target 后才创建 CareInteraction，T-006 不自动建对话或
   复制敏感 body。
-- [ ] 只有 T-005 返回当前 actor/target 可用的专用 caregiver-initiated capability 时，
+- [x] 只有 T-005 返回当前 actor/target 可用的专用 caregiver-initiated capability 时，
   T-006 才显示可执行 direct-interaction action；能力尚未交付或不满足门禁时保持内部
   来源并显示安全阻塞，不降级为普通批量发布或现有 family-question action。
-- [ ] Stage G2-C 未冻结 exact effect/response/Receipt contract、未进入当前 T-004
+- [x] Stage G2-C 未冻结 exact effect/response/Receipt contract、未进入当前 T-004
   digest 或未通过 qualification 时，T-006 不猜测 capability key/schema，不发布
   占位 action；G3-E 未完成真实 provider/consumer 联合资格验证时不得签发 T-006
   Beta Profile Handoff。
-- [ ] G3-C1 人工归属与 exposure 路径完整可用；G3-C2 自动人脸匹配未进入首个 beta
+- [x] G3-C1 人工归属与 exposure 路径完整可用；G3-C2 自动人脸匹配未进入首个 beta
   profile 时可保持 absent/default-off，但不得削弱人工 fallback 或发布资格检查。
-- [ ] G3-B1 确定性内容组装在无生成式 provider 时完整可用；G3-B2 AI copy 未实现或
+- [x] G3-B1 确定性内容组装在无生成式 provider 时完整可用；G3-B2 AI copy 未实现或
   不可用不阻塞 G3 Exit，若实现则采用后重新经过 ContentSafetyPolicy。
-- [ ] T-007 发布策略子合同通过 exact owner contract 解析并固化
+- [x] T-007 发布策略子合同通过 exact owner contract 解析并固化
   `scheduledAt/notAfter/timezone/policyHead`；后续策略变化不静默移动既有 process。
-- [ ] `InstitutionWorkflowProjection` 不可用或无适用 Workflow 时只产生合法空态，
+- [x] `InstitutionWorkflowProjection` 不可用或无适用 Workflow 时只产生合法空态，
   不阻塞家庭看板、采集、草稿或发布。
-- [ ] risk 在 candidate、edit 和 release 时 current-reread；provider 失败/低置信/
+- [x] risk 在 candidate、edit 和 release 时 current-reread；provider 失败/低置信/
   规则冲突不能默认 ordinary，policy drift 立即使既有 draft/pending 失去发布资格，
   但不增加 PublishProcess 状态。
-- [ ] My-Chat 可通过公共 view-model 实现看板，无需访问 Nurture persistence。
-- [ ] two-stage publish 使用 `PublishProcess`，不因多状态或异步投递被归类为 Workflow。
-- [ ] Workflow 信息只通过当前授权的 projection 展示；board 不拥有 Run/Step，也不以
+- [x] My-Chat 可通过公共 view-model 实现看板，无需访问 Nurture persistence。
+- [x] two-stage publish 使用 `PublishProcess`，不因多状态或异步投递被归类为 Workflow。
+- [x] Workflow 信息只通过当前授权的 projection 展示；board 不拥有 Run/Step，也不以
   “相同角色”替代 Workspace/scope/visibility 检查。
 
 ## Next Step
 
-G3-A、G3-B1、G3-C1、G3-D 的 domain 与合同层已全部落地，artifact additive 旋转至
-`nurture.surface-contract@1.13.0` / `sha256:1919a289…`，shared core 与全部 T-005
-slice 保持逐字不变。2026-08-02 的实施质量复核修掉 7 处缺陷，并补上"运行时输出 ↔
-已注册 result schema"与"运行时 capability 常量 ↔ 注册表"两层机械检查；同日的
-`07-g3-e-implementation-readiness-review.md` 判定 `G3_E_NOT_READY`，记录 B1～B7
-七项阻塞。
-
-当前推进的是这份复核给出的准备清单。**B1（DB SSOT delta 与一次性迁移）已完成**：
-十个 additive model、五处 extend-in-place delta 落库，迁移带两条 fail-closed 的
-legacy 普查 gate（已在一次性 scratch 库上被证伪过），活库枚举身份与全部唯一约束
-由 `g3-publish-process-schema.integration.test.ts` 断言。下一步是 B2 owner
-repository（十四个端口与 per-target 原子 release），随后 B3 采集读端口、B4 formal
-ingress 路由、B5 T-005 direct-interaction consumer action。B6/B7 依赖 T-007
-provider 与 T-005 G2-C 联合运行，无法提前拉入。capability activation、部署与流量
-仍保持关闭。G3-C2 face match 与 G3-B2 AI copy 是可选增强，不进入首个关键路径。
+G3-A、G3-B1、G3-C1、G3-D、G3-E 与最终 Exit 已全部通过；surface artifact 为
+`nurture.surface-contract@1.15.0` /
+`sha256:a5e8e226704647f1a1d20d8b8faa91f955bcb5ca45ad2d583c0a85d5d7d0073e`。
+T-006 现在仅等待单独批准后的归档移动。T-008 必须独立核验本交接，才可开始
+Candidate/native/device/deployment 资格化；本任务没有启动或预授权该工作。G3-C2
+face match 与 G3-B2 AI copy 未进入首个 beta profile，继续 absent/default-off。

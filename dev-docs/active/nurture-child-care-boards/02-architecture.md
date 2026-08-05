@@ -794,3 +794,17 @@ contract 与 DB SSOT delta 见
 - No policy write capability, activation path or host-runtime ownership was
   introduced. My-Chat still owns timer/retry; Nurture owns the admission rule
   and owner transaction. The provider remains default-off through fact absence.
+
+## G3 Exit Boundary — 2026-08-05
+
+The detached qualification confirms that the design above composes through the
+real owner path: T-007 policy facts enter Nurture only through the exact read port;
+T-006 owns queue admission, schedule freezing and release transactions; restricted
+content exits into T-005 only through the exact owner-issued G2-C action; Guardian
+visibility is proven by Receipt-backed owner reread. No host timer, cache, delivery,
+Workflow or provider state became a substitute owner fact.
+
+The first beta profile therefore freezes B1/C1/D/E while B2/C2 remain absent and
+default-off. Camera, protected local cache, native/device interaction, notification
+delivery, Candidate and deployment remain My-Chat/T-008 responsibilities. This Exit
+is an architectural handoff boundary, not activation authority.

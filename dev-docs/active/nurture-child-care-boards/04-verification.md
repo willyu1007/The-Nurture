@@ -1137,3 +1137,35 @@ hash is internally consistent; the regression test passes. Exact Base/My-Chat pi
 the expanded 168-file Nurture hash, G2 preservation, G3 freeze and formal ingress all
 pass after the repair. This closes a qualification-integrity gap only; it does not
 run or qualify the pending PostgreSQL suites.
+
+## 2026-08-05 — G3 Exit Qualification and Beta Profile Handoff
+
+| Command / check | Result |
+| --- | --- |
+| exact detached topology pin | PASS — Base `06303e9…`, My-Chat `a019566…`, Nurture `97eab03…`; contract parity 11 files, full Nurture runtime 168 files / `4980226…` |
+| frozen installs, explicit builds and three Prisma generations | PASS — no dev server; generation used non-connecting qualification configuration |
+| clean `prisma migrate deploy` + status + schema diff | PASS — 16 migrations; 61 tables / 90 enums; up to date; no difference detected |
+| aggregate + scenario-service DB typecheck | PASS |
+| `pnpm test:unit` | PASS — 52 files / 577 tests |
+| scenario-service unit suite | PASS — 8 files / 52 tests |
+| `pnpm test:db` | PASS — 21 files / 216 tests |
+| `pnpm verify:owner-integration` | PASS — 2 files / 55 tests; 26 committed actions, 9 successful queries, unexercised 0 |
+| T-007/T-006 publication joint journey | PASS — persisted provider → organize → admission → reschedule → release → Receipt → Guardian reread |
+| T-005/T-006 direct-interaction joint journey | PASS — exact owner-issued option consumed by G2-C prepare/execute |
+| runtime evidence artifact | PASS — 37 keys; SHA-256 `e02ee06300c3c232ca938314f38cec156fdc24a75fff11bf94fe4ad67e929910` |
+| `verify:g2-exit-db-census` | PASS — items 68/11, messages 97/12, violations 0 |
+| surface conformance/tooling | PASS — 11 files / 110 tests; tooling 5/5; `1.15.0` digest `a5e8e226…` |
+| persistence, port, G3 freeze, formal ingress, schema, exact pin and G2 preservation guards | PASS |
+| built default-off smoke | PASS — `binding-owner=disabled harness=disabled legacy-route=absent` |
+| DB context sync + strict context verification + database governance suite | PASS; optional Convex pack tests skipped by declared absence |
+| final database census | PASS — partial schedules 0, invalid released processes 0, invalid policy contracts 0, activation-like tables 0 |
+| disposable resource teardown | PASS — named container absent, port 55437 free; excluded 5433/55439 containers unchanged; detached topology moved to Trash after the final static rerun |
+
+The release census found 10 intentionally low-level fixture rows without Receipt,
+but zero such rows with an applied CommandExecution. Production commit semantics
+remain Receipt + release + CommandExecution in one transaction; this distinction is
+preserved in `artifacts/db/g3-exit/04-post-verify.md` instead of hiding fixture shape.
+
+Verdict: `G3_EXIT_PASS`. This qualifies the default-off Nurture provider and exact
+Beta Profile Handoff only. It does not authorize activation, deployment, T-008,
+Pilot, native/device work or traffic.

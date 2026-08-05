@@ -692,3 +692,41 @@
 `process.argv[1] === import.meta.url`，导致脚本在 `/tmp` checkout 中静默退出 0。
 入口判断已改为 filesystem realpath 比较，并用 symlink alias 回归用例钉住；CLI 工具的
 “exit 0”只有在 `main` 确实执行后才可作为证据。
+
+### 2026-08-05 — frozen install 后的类型检查不能假设 Prisma client 已存在
+
+- **Symptom**：exact detached aggregate typecheck 首次失败，My-Chat 与 Nurture
+  dev-host 的生成类型缺失。
+- **Root cause**：资格化刻意用 `--ignore-scripts` 做 frozen install；这也跳过了平时可能
+  隐式生成 Prisma client 的生命周期脚本。
+- **Attempts**：先运行 aggregate typecheck 暴露缺失；没有通过放松类型或改用浮动
+  `node_modules` 绕过。
+- **Fix**：以不连接数据库的 qualification-only 配置显式生成 My-Chat、Nurture SSOT
+  与 Nurture dev-host 三套 client，再重跑类型检查并通过。
+- **Prevention**：clean/frozen 资格化清单必须把每个 schema 的 generate 列成显式步骤，
+  不依赖 install side effect。
+
+### 2026-08-05 — “未知能力”测试值不能取自正在扩展的生产命名空间
+
+- **Symptom**：`harness-controller.e2e` 的未知写能力负例在 exact run 中不再未知，
+  因为 `release_publish_process` 已正式路由。
+- **Root cause**：测试把一个当时尚未实现、但已在产品 adoption set 中的真实 key 当作
+  永久 sentinel。
+- **Attempts**：完整 owner-integration 首次运行如实失败；没有删除负例或降低 ingress
+  断言。
+- **Fix**：改用明确保留给测试的 `unregistered_write_capability`，目标拒绝语义不变。
+- **Prevention**：unknown-key 用例使用永不进入 registry 的测试专名，并由 formal ingress
+  census 独立证明所有真实 key 的路由状态。
+
+### 2026-08-05 — 联合旅程必须区分 public DTO 与 Prisma 行字段
+
+- **Symptom**：数据库联合旅程读取 Receipt 时断言不存在的 `logicalStatus`，同时 organize
+  execute 还提交了调用方不应拥有的 `expected_batch_version`。
+- **Root cause**：测试把 public Receipt DTO 命名投射到 Prisma `Receipt.status`，并把
+  confirmation 冻结的 owner head 又错误放回 operation input。
+- **Attempts**：exact detached DB run 在真实 Prisma 类型/输入校验处暴露两处错误；没有
+  用类型断言或放宽 schema 掩盖。
+- **Fix**：持久化断言改读 `status`；organize execute 删除 forbidden head，让版本只从
+  confirmation owner evidence 进入事务。目标用例及完整 55-test owner suite 均通过。
+- **Prevention**：跨层 e2e 分别按 public contract 与持久化 schema 命名字段；owner-frozen
+  heads 只在 prepare/confirmation 边界出现，client operation input 不重复提交。

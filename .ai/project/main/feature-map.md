@@ -370,7 +370,7 @@ Project: `main`
 | --- | --- | --- |
 | T-004 nurture-surface-contract-foundation | done | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | archived | dev-docs/archive/nurture-family-care-conversation |
-| T-006 nurture-child-care-boards | in-progress | dev-docs/active/nurture-child-care-boards |
+| T-006 nurture-child-care-boards | done | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | dev-docs/active/nurture-store-beta-readiness |
 <!-- AUTO-GENERATED:END feature-map -->

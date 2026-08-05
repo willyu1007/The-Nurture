@@ -83,11 +83,11 @@ tasks:
     updated: 2026-08-02
   - id: T-006
     slug: nurture-child-care-boards
-    status: in-progress
+    status: done
     milestone_id: M-002
     feature_id: F-003
     dev_docs_path: dev-docs/active/nurture-child-care-boards
-    updated: 2026-08-02
+    updated: 2026-08-05
   - id: T-007
     slug: nurture-institution-surfaces
     status: planned
