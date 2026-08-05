@@ -13,7 +13,7 @@
 - Last updated: 2026-08-05
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B is review-pending but unauthorized/unstarted. G1 is
+  I1-B scope is frozen/ready but implementation remains unauthorized/unstarted. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +34,20 @@
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-B scope review and freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Task/governance routing | PASS | Project Orchestrator reused `M-002 > F-002 > T-002`; no task, bundle or parallel roadmap was created. Existing `roadmap.md` remains the planning SSOT in Default mode. |
+| Accepted-input review | PASS | Reviewed accepted I1-A source/types, Pilot-0-C identity boundary, workflow context, current manifest/module and T-029 donor disposition before choosing wire fields. |
+| Ownership neutrality | PASS | Base wire uses registered slots and `CanonicalRef` only. No Child, Family, stewardship, membership, Nurture anchor kind, role, Grant, policy or concrete issuer/audience/endpoint value is hard-coded. |
+| Exposure boundary | PASS | `host_owner_internal` alone may carry canonical object/binding refs. Scenario-private reservation/evidence/status bodies carry typed owner refs and non-reversible hashes only; raw platform/binding/membership identity and protected bodies are forbidden. |
+| I1-A composition | PASS | Private I1-B requests are I1-A operation inputs. Duplicate caller/issuer/audience/route/time/nonce/key/signature fields were removed from the frozen body; detached signing remains I2/I3 transport work. |
+| Pair/recovery closure | PASS | The freeze covers reservation replay, all four legal reuse/create pair branches, atomic all-or-none result parity and the closed writer-fenced `committed|confirmed_no_effect|unknown` union. `unknown` remains nonterminal quarantine. |
+| Implementation readiness | PASS / NOT AUTHORIZED | Exact names, fields, validation rules, legal/illegal fixture matrix, planned Base paths, four ordered units, acceptance and rollback are frozen in `artifacts/16-c30-i1-b-scope-freeze.md`. No source implementation began. |
+| Context/governance/docs | PASS | Context checksum refreshed to `b4494a9229a5eb107502bfc26a033219f7c2a32df4dd346db09a479a313599f6`; strict context and project-state verification pass. Repository document/anchor lint checks 412 Markdown files with zero errors/warnings; governance sync/lint passes. |
+| Effect boundary | PASS | Documentation/context only. No manifest/module/product source, package/lock, Prisma/schema/migration, PostgreSQL, runtime, capability, deployment, activation, T-007/T-008, Pilot or traffic action ran. |
 
 ## C30-I1-A trusted invocation acceptance — 2026-08-05
 

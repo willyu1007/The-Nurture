@@ -3,14 +3,15 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A accepted，I1-B review pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A accepted，I1-B scope frozen/ready-not-started）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
 - Next step: G1, T-005 G2 Exit, T-006 G3 Exit, all `C30-I0` gates and
   `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
-  slices. Review and freeze I1-B's neutral canonical-object binding envelope before
-  any further implementation; I1-B is not authorized or started.
+  slices. I1-B's neutral canonical-object binding envelope is now scope-frozen;
+  review and separately authorize only I1-B1 implementation before source changes.
+  I1-B implementation is not started.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -33,6 +34,10 @@
   commit `bd69d19…`, contract source hash `8621c6cc…70b0c`. Full Base contract
   verification passes. My-Chat and Nurture consumers have not adopted it; I1-B and
   C30-I2/I3/I4 remain unstarted/NO-GO.
+- C30-I1-B planning handoff: `artifacts/16-c30-i1-b-scope-freeze.md` freezes
+  Host-internal versus Scenario-private exposure, owner-endpoint reservation,
+  exact pair request/result, current owner evidence and writer-fenced three-state
+  status lookup. No Base/My-Chat/Nurture implementation or adoption exists.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

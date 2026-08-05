@@ -645,7 +645,7 @@ activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A 已验收；I1-B 待范围评审）
+## C30-I1 — Neutral shared contracts（I1-A 已验收；I1-B 范围已冻结）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -653,7 +653,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | Slice | State | Boundary |
 | --- | --- | --- |
 | `C30-I1-A` trusted invocation contract spine | Accepted | Base `ce7118c…` plus source lock `bd69d19…`; principal, ingress and private envelope types/codecs/Schemas/fixtures only. |
-| `C30-I1-B` canonical-object binding envelope | Review pending / not started | Neutral typed owner refs and pair-binding/recovery wire only; separate scope freeze and authorization required. |
+| `C30-I1-B` canonical-object binding envelope | Scope frozen / ready-not-started | Neutral owner-ref reservation, Host-internal pair binding, Scenario-private current evidence and writer-fenced recovery; `artifacts/16-c30-i1-b-scope-freeze.md`. Separate implementation authorization required. |
 | `C30-I1-C` subject presentation | Blocked by I1-B | Subject discovery/resolve and semantic presentation wire only. |
 | `C30-I1-D` domain action | Blocked by I1-C | Prepare/submit, direct/claimed and result/recovery wire only. |
 | `C30-I1-E` protected interaction | Blocked by I1-D | Protected lifecycle control wire and no-copy negatives only. |
@@ -662,6 +662,9 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
 criteria and non-goals are frozen in
 [`artifacts/15-c30-i1-scope-freeze.md`](./artifacts/15-c30-i1-scope-freeze.md).
+I1-B's exposure classes, wire families, validation/fixture matrix, impact preview
+and four ordered implementation units are frozen in
+[`artifacts/16-c30-i1-b-scope-freeze.md`](./artifacts/16-c30-i1-b-scope-freeze.md).
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---

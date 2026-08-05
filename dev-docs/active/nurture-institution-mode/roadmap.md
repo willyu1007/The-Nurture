@@ -241,15 +241,34 @@ dev-docs/active/nurture-institution-mode/
 | G6 / Pilot-0-E..1 | Proposed future Nurture release task + My-Chat companion | Reconcile the exact G5 handoff; close current C-3/C-4/D; assemble/sign the complete candidate; run disposable D evidence and E; after separate Pilot-1 authorization publish exact bytes and deploy one isolated persistent environment default-off; seal Pilot-2 readiness | Exact G5 decision + separately authorized C-3/C-4/D implementation; E Go + separate Pilot-1 approval before persistent state | Exit only as `G6_DEFAULT_OFF_QUALIFIED / PILOT2_STAGE_AUTHORIZATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; G6 task/feature identity remains pending and no implementation is authorized by this roadmap |
 | G7 / Pilot-2..4 | Proposed future `nurture-bounded-pilot-observation` task + My-Chat companion | Freeze current heads/authority；activate and bootstrap one exact synthetic cohort；run ordered Pilot-3 fault/recovery/kill-switch rehearsal to terminal disable；use the final Binding, no-reset baseline, new Pilot-4 authorization/row and five contiguous 24-hour observation segments；seal `pass|no_pass|stopped` plus a non-authorizing recommendation | Current G6 readiness seal + separate Pilot-2 authorization；Pilot-4 separately requires the terminal rehearsal and baseline seals | Exact seven-account synthetic cohort only. G7 freezes the observed environment, not mainline development；staging/production/GA, cohort expansion and external product traffic remain NO-GO |
 
+### C30-I1 current planning overlay（2026-08-05）
+
+- Goal: deliver the cumulative neutral Base contract through ordered I1-A..F
+  without importing Host runtime or Scenario product policy.
+- Runtime signal: Default mode; this is a planning/documentation update only.
+- Input trace: latest user instruction > accepted I1-A source/lock > workflow
+  context and Pilot-0-C decisions > T-029 donor disposition > bounded inference.
+- Merge decision: I1-B composes with I1-A instead of defining a second private
+  transport/signature envelope. No unresolved product-scope conflict remains.
+- Project structure preview: a later separately authorized I1-B implementation may
+  add only Base workflow-contract types/schemas/conformance fixtures/tests, package
+  exports and the final TypeScript source lock. This planning update changes task/
+  project/context documentation only.
+- Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
+  frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; no implementation is authorized
+  by this roadmap update.
+
 Hard gates:
 
 - C40 之前，C-3 必须实现并资格化 `platform_child_family_identity_source_v1`；My-Chat schema-only presence、live checkout revision 或既有 workflow pin 都不能替代 owner runtime/API、Nurture anchors/associations 和 joint conformance。
 - C30-I1 保持一个累计 Base Exit，但实施按 I1-A trusted invocation、I1-B
   canonical-object binding、I1-C subject presentation、I1-D domain action、I1-E
   protected interaction、I1-F dependency/source convergence 严格排序。当前
-  I1-A 已在 Base `ce7118c…` + source lock `bd69d19…` 验收；I1-B 仅进入范围
-  评审候选，尚未授权或启动。详见
-  `artifacts/15-c30-i1-scope-freeze.md`。
+  I1-A 已在 Base `ce7118c…` + source lock `bd69d19…` 验收；I1-B 已冻结
+  Host-internal/Scenario-private 暴露边界、reservation、pair result、current
+  evidence 与 writer-fenced recovery，但实现尚未授权或启动。详见
+  `artifacts/15-c30-i1-scope-freeze.md` 与
+  `artifacts/16-c30-i1-b-scope-freeze.md`。
 - Nurture does not import/run My-Workflow-Base；Base is template contract, My-Chat is the actual package/runtime owner。
 - Existing My-Chat `workflow-runtime` task remains historical scaffold scope；concrete persistence uses a new `workflow-handoff-materialization` task。
 - N1 can proceed before X3 only with explicit empty snapshot arrays；non-empty activation requires X2/X3 host capability and exact claimed-Step ownership。

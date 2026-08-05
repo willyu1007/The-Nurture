@@ -7,6 +7,19 @@
 
 ## What changed
 
+- 2026-08-05: Reused T-002 and froze the Base-only `C30-I1-B` canonical-object
+  binding envelope without starting implementation. The freeze separates
+  `host_owner_internal` canonical object/binding refs from `scenario_private`
+  typed owner refs and hashes; defines owner-endpoint reservation, atomic pair
+  request/result, current owner evidence and writer-fenced
+  `committed|confirmed_no_effect|unknown` lookup bodies; and orders implementation
+  as I1-B1 through I1-B4. It also resolves an older duplicate-signature design:
+  private I1-B requests are I1-A `operation.input`, so I1-A alone owns caller,
+  issuer, audience, route, time window and nonce while credentials/key/signatures
+  stay detached. The workflow context is synchronized to this boundary. No Base,
+  My-Chat or Nurture product source, manifest/module, schema/database, runtime,
+  capability, deployment, activation, T-007/T-008, Pilot or traffic changed.
+
 - 2026-08-05: Accepted the Base-only `C30-I1-A` trusted invocation spine. Base
   commit `ce7118c…` adds neutral `ScenarioHumanPrincipalV1`,
   `ScenarioIngressSurfaceV1`, `ScenarioPrivateInvocationV1`, strict structural
