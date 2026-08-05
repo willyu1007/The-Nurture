@@ -1744,3 +1744,20 @@ success status is `C4_QUALIFIED_DEFAULT_OFF / PILOT0_D_DESIGN_LOCKED /
 COMPLETE_PILOT_CANDIDATE_PENDING / EXTERNAL_TRAFFIC_NO_GO`; D implementation,
 candidate assembly, Pilot-0-E, and every deployment/activation stage stay
 separate.
+
+## C30-I0 joint qualification evidence boundary
+
+Joint Base/My-Chat/Nurture qualification accepts only immutable Git inputs. Each
+participant is identified by an exact lowercase 40-character commit id, the verifier
+resolves that id to a commit, and the isolated checkout HEAD must equal the resolved
+commit. A normalized source-population SHA-256 binds the files that supply each
+contract or scenario role. Mutable package paths remain valid only for ordinary
+single-package development checks and cannot satisfy a joint candidate.
+
+A clean isolated worktree is part of the evidence boundary: user-owned primary-tree
+changes and historical auxiliary worktrees are excluded rather than rewritten. The
+installed verifier entry compares real paths so a package-manager symlink cannot
+silently bypass CLI execution. Exact lock verification and repository false/empty
+census prove only source state; they do not imply compiled baseline success,
+database/environment emptiness, schema authority, capability admission, deployment,
+activation, Pilot or traffic authority.

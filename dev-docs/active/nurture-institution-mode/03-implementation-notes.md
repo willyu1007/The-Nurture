@@ -3,9 +3,22 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-08-01
+- Last updated: 2026-08-05
 
 ## What changed
+
+- 2026-08-05: Closed `C30-I0-C` with isolated clean branches at Base `20c4b7a…`
+  and My-Chat `dc4a77b…`, plus a Nurture branch created from runtime checkpoint
+  `882d80f…`; all pre-existing auxiliary worktrees remain untouched under their
+  original owners, and the dirty My-Chat primary `next-env.d.ts` was excluded.
+  Base's integration-lock verifier now requires exact
+  40-character commit ids for joint qualification, rejects package-path joint inputs,
+  detects checkout drift, resolves installed-bin symlinks and rejects unknown flags;
+  six focused tests pass. A one-time three-Git lock and 18-source false/empty census
+  passed with all three qualification worktrees clean. `C30-I0-D` remains partial
+  because full conformance/typecheck requires a contracts build that was not run
+  without explicit authorization. No schema, database, capability, deployment,
+  activation, Pilot or traffic effect occurred.
 
 - 2026-08-05: T-006 completed its exact G3 repair qualification and issued a
   default-off Beta Profile Handoff at Nurture checkpoint `0374087…`. This consumes

@@ -10,8 +10,9 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-08-01
-- Current phase: NestJS ingress M0-M5 is complete and G1 Joint Conformance is
+- Last updated: 2026-08-05
+- Current phase: NestJS ingress M0-M5 and G1 Joint Conformance are complete;
+  `C30-I0-A/B/C` are complete and `C30-I0-D` is partial. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -1358,3 +1359,19 @@ the rejected checkpoint and are historical.
 | legacy 单写入面 | PASS | acknowledge/reply/redact 三个 legacy 变更器加 `writerContract` 前置,打 harness 行零写入 |
 | x5 联合套件(pinned 物化) | PASS 4/4 | My-Chat `a019566` / Base `06303e9` detached worktree + disposable pgvector PG;pin 全部核对一致;运行后销毁 |
 | 效果边界 | PASS | 无 schema/migration、无持久化 DB apply、无 capability/secret/激活/流量变更 |
+
+## 2026-08-05 — C30-I0-C closure and I0-D partial qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Task continuity | PASS | Governance recovery selected existing T-002; decision is `REUSE_TASK`, M-002/F-002/T-002. |
+| Current three-repository census | PASS | Base primary and four auxiliary worktrees are clean; My-Chat auxiliary worktrees are clean, while its primary has one excluded user-owned `next-env.d.ts`; Nurture primary and retained Claude worktree are clean. No existing worktree was removed or modified. |
+| Isolated C30 topology | PASS | New clean branches: Base `20c4b7a…`, My-Chat `dc4a77b…`; Nurture was created from qualified runtime input `882d80f…` and may advance only through T-002 evidence documentation. |
+| Integration-lock negative tests | PASS | 6/6: exact public package/version, unknown lock field, package-path joint rejection, exact commit + checkout drift, installed-bin symlink entry and unknown CLI flag. |
+| Base frozen install | PASS | `pnpm install --frozen-lockfile --ignore-scripts`; 48 packages reused locally, lockfile unchanged, no lifecycle/build scripts. |
+| Exact joint lock | PASS | Git-only joint lock verifies all three exact HEADs and normalized source hashes: Base `e2276404…`, My-Chat `f675d505…`, Nurture `d47648e5…`. The temporary lock was deleted after the run. |
+| Repository false/empty census | PASS | 18 exact source-identity checks are absent; Nurture manifest omits `scenario_federation_v1`; My-Chat canonical Prisma omits `ScenarioWorkspaceActivation`. No environment DB census was claimed. |
+| Full Base conformance/typecheck before install | EXPECTED PREREQUISITE FAIL | New worktree lacked `node_modules`; this was corrected with a frozen, scripts-disabled install. |
+| Full Base conformance/typecheck after install | BUILD PREREQUISITE PENDING | Both reach the existing `@host/workflow-contracts/dist` prerequisite. No code diagnostic was accepted from this state, and build was not run without explicit authorization. |
+| C30-I0 verdict | `C_COMPLETE / D_PARTIAL / C30_I1_NO_GO` | Build-aware canonical Base/My-Chat/Nurture baseline remains required before D closes. |
+| Effect boundary | PASS | No schema/migration, database, secret, capability, deployment, activation, T-007/T-008, Pilot or traffic action. |
