@@ -730,3 +730,49 @@
   confirmation owner evidence 进入事务。目标用例及完整 55-test owner suite 均通过。
 - **Prevention**：跨层 e2e 分别按 public contract 与持久化 schema 命名字段；owner-frozen
   heads 只在 prepare/confirmation 边界出现，client operation input 不重复提交。
+
+### 2026-08-05 — 共享 revision 必须先冻结，再产生任何逐目标 effect
+
+- **Symptom**：两个首发 target 可以各自写入 Receipt/Release/CommandExecution，随后都
+  对 `frozenRevisionId IS NULL` 做一个不检查 count 的更新；并发时不同 revision 的 effect
+  可能共存，而 process 最终只显示其中一个 frozen revision。
+- **Root cause**：freeze 被当作 effect 后的状态同步，而不是 effect 的前置所有权 CAS；
+  `updateMany` 的零行结果被忽略。
+- **Attempts**：顺序 fan-out 和单 target replay 全绿，但它们没有制造两个首发事务的
+  interleaving，因此不能证伪该竞态。
+- **Fix**：逐 target 使用 Serializable transaction；先按 exact pending/current/unfrozen
+  条件 CAS 到 released/frozen，`count === 1` 后才写三个 effect；后续 target 只能绑定
+  exact frozen revision，`P2034` 有界重试。
+- **Prevention**：凡是“首个子 effect 冻结父聚合”的模型，freeze CAS 必须排在 effect
+  前且检查 affected-row count；资格测试必须包含同父聚合的真实并发首发。
+
+### 2026-08-05 — preview 事实不是 effect authority
+
+- **Symptom**：T-007 policy、原始 authorizing role、edit hold、schedule 与 media 在
+  `loadReleaseFacts` 中判断，逐 target transaction 只重读 executor/Grant/Enrollment；
+  prepare 到 effect 之间的撤权或 revision drift 仍可能放行发布。
+- **Root cause**：把“给用户看的可发布预览”误当成“提交瞬间仍然成立的授权事实”，
+  事务边界只包住写入，没有包住决定写入是否合法的全部读。
+- **Attempts**：先补单项顺序负例只能证明 repository 会读取该字段，不能证明读与 effect
+  不可被并发变更拆开。
+- **Fix**：effect transaction 内按 exact process scope 重读 policy/schedule、executor、
+  original authorizer、hold、Grant/Enrollment、receipt census 和 frozen media；共享
+  eligibility derivation 避免 preview/commit 规则复制。
+- **Prevention**：列出每个 effect 的 authorizing fact，并要求它们与 effect 在同一隔离
+  边界内读取；外层 prepare 只负责 UX 和 confirmation，不承担最终 authority。
+
+### 2026-08-05 — 缺失证据不能编码成可哈希的空值，也不能被过滤成“无对象”
+
+- **Symptom**：receipt-less release 被映射为 `receipt_ref: ""` 后仍可生成合法-looking
+  opaque ref；缺失/跨班 media asset 被过滤后，含媒体的 revision 被解释成无媒体；
+  organize writer 的 snake_case 数组同样被 canonical reader 读成空 composition。
+- **Root cause**：三条路径都把“证据存在但不可用”折叠成空字符串或空数组；下游只能把
+  空集合解释为业务上确实没有该对象。
+- **Attempts**：类型检查无法区分 `""` 与真实 id，也无法发现合法 JSON 的语义 shape
+  不一致；原有 happy-path fixture 使用 canonical shape，未走自动 organize writer。
+- **Fix**：缺 Receipt 时省略 committed mapping 并全 process fail closed；缺失/外组 asset
+  保留为 unavailable blocker；organize writer 统一 canonical shape 并按 exact CareGroup
+  查资产。
+- **Prevention**：absence、unavailable 与 empty 是三种事实；owner contract 必须分别表示。
+  JSON payload 应只有一个 writer/reader shape，并用生产 writer → owner reader 的 DB 回归
+  钉住，不只手工 seed canonical fixture。

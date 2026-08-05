@@ -958,9 +958,10 @@ B2 的最后两个端口。`commitTargetRelease` 是整个 T-006 里唯一"三�
 仍是 `pending_release`、`frozenRevisionId` 仍为 null。
 
 **精确重放**返回原次提交的 refs 且不写任何东西(前后三张表计数完全相同);换一个
-command 打同一个已发布目标则是 `already_released`。捕获到的唯一约束冲突映射成
-`already_released`,其余异常一律 `outcome_unknown`——调用方必须去对账,而不是假定
-已经回滚。
+command 打同一个已发布目标则是 `already_released`。捕获到唯一约束冲突后必须先
+读取 committed target：存在 release 才按 command identity reconciliation；不存在
+release 说明原事务已确定回滚，以 `command_identity_conflict` 拒绝。其余无法确定提交
+结果的异常才是 `outcome_unknown`，调用方必须用相同 command identity 对账。
 
 **又撞到两条既有 CHECK**,都不是 T-006 新增的:
 `ck_nurture_command_execution_handoff_v2` / `_n1` 要求 `output_refs` 与
@@ -2047,3 +2048,39 @@ applied CommandExecution；真实 runtime commit 没有无 Receipt 的发布。�
 环境/合同 guard、activation-like table census 与容器销毁共同证明 default-off 与零持久
 effect。T-006/G3 因而签发 `G3_EXIT_PASS`；G3-B2/C2 继续 absent/default-off，T-008、
 deployment、Pilot 与 capability activation 未启动。
+
+## 2026-08-05 — G3 release 质量修复候选（DB requalification pending）
+
+质量复核撤回了上一版 G3 Exit PASS。本轮没有打开 T-008、deployment、activation
+或 Pilot，只收紧 G3-D/E 已有 owner 边界：
+
+- `commitTargetRelease` 改为 PostgreSQL Serializable 的逐目标事务并对 `P2034`
+  有界重试。首个 effect 前先以 `pending_release + currentRevision + frozenRevisionId
+  IS NULL` 做 CAS freeze，且 `count !== 1` 必须拒绝；Receipt、Release 与
+  CommandExecution 只能在 CAS 成功后落入同一事务。
+- effect 事务重读 exact process/revision、resolved schedule、T-007 current policy、
+  当前 executor reach、原始 authorizing role episode、edit hold、Grant、Enrollment、
+  receipt census 和 frozen revision 的 media/attribution。preview 仍提供早期反馈，但
+  不再是 effect authority。
+- release 复用 preview 的无 ref eligibility derivation；缺失、跨 CareGroup、删除、
+  非 ready 或 revision drift 的 composition asset 均 fail closed，不能通过过滤资产
+  把“媒体不可用”变成“没有媒体”。
+- receipt-less release 不再映射 `receipt_ref: ""`，也不再参与 `already_committed`；
+  load、exact replay 及同 process 其他 target commit 都以
+  `receipt_evidence_unavailable` 拒绝。
+- 并发 `P2002` 只在确有 committed target release 时 reconciliation；若没有 release
+  证据，该事务已确定回滚，以 `command_identity_conflict` 拒绝，不虚构
+  `already_released`，也不把确定回滚误报为 `outcome_unknown`。
+- 同轮审查发现 organize owner 写出的 media composition 与唯一 reader 不同形：
+  snake_case 数组会被读成空 composition。writer 已统一为
+  `{ media: [{ mediaAssetId, mediaRevision }] }`，并要求每个资产属于 batch 的 exact
+  CareGroup；跨班资产在外层 command transaction 内拒绝并回滚 batch transition。
+
+新增 PostgreSQL 回归覆盖并发双 target freeze、冻结后 revision 冲突、policy/schedule/
+authorizer/hold/media drift、receipt-less exact/other-target 拒绝，以及 organize
+composition canonical shape/跨班资产回滚。当前树已在重新授权的 55437 disposable
+PostgreSQL 上通过目标 64 tests、并发用例连续三次和完整 production DB 225 tests；
+首轮还抓到确定回滚被误分为 `outcome_unknown` 的分类问题，修复为
+`command_identity_conflict` 后复跑通过。Nurture runtime self-pin 已旋转为 168 files /
+`b44f4fad985bf760b0bf1a6c4abac8badd7e91ea7999d829bb1fabcd2dfbf8c0`。exact detached
+owner/joint requalification 完成前仍不得恢复 G3 Exit PASS 或签发 Beta Profile Handoff。

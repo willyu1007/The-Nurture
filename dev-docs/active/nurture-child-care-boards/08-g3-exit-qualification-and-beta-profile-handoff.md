@@ -4,9 +4,9 @@
 
 - Task: T-006
 - Date: 2026-08-05
-- Verdict: `G3_EXIT_PASS`
-- Provider state: Nurture-side `qualified`, default-off
-- Task state: `done` after this record and governance sync land
+- Verdict: `G3_EXIT_WITHDRAWN_PENDING_REQUALIFICATION`
+- Provider state: Nurture-side qualification withdrawn, default-off
+- Task state: `in-progress`
 - Non-effects: no existing database access, persistent qualification database,
   deployment, capability activation, Candidate, native/internal-store effect,
   T-008, Pilot, device validation or traffic authorization
@@ -16,6 +16,12 @@ verdict. Optional G3-B2 AI copy and G3-C2 face match remain absent/default-off.
 This handoff qualifies the Nurture scenario provider and its exact owner/consumer
 boundary. It does not claim My-Chat native camera/cache/device/notification delivery
 completion and does not authorize T-008 to start.
+
+The original PASS was withdrawn after an implementation-quality review found that
+the per-target transaction did not enforce a unique frozen revision under concurrent
+first commits, did not place every release gate in the effect transaction, and could
+mint a valid-looking receipt reference from a receipt-less release row. The historical
+run below remains evidence of what was executed, but it is not a current Exit verdict.
 
 ## Exact Bound Inputs
 

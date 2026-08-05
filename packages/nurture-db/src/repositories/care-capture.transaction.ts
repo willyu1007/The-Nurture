@@ -224,6 +224,8 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
   async applyOrganizeCut(input: NurtureOrganizeCutApplyInput): Promise<NurtureOrganizeCutApplied> {
     const cutAt = new Date(input.watermark.cut_at);
     const observedUserActivityAt = new Date(input.trigger_evidence.observed_user_activity_at);
+    const careGroupId = await this.batchGroupId(input);
+    if (!careGroupId) throw new Error("nurture care capture: batch unavailable");
     // CAS against the exact version the head comparison already accepted —
     // second-line defence against a capture landing inside the window.
     const transitioned = await this.prisma.nurtureCareCaptureBatch.updateMany({
@@ -257,7 +259,12 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       const composition = await Promise.all(
         input.process.media_asset_ids.map(async (mediaAssetId) => {
           const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
-            where: { id: mediaAssetId, workspaceId: input.workspace_id, deletedAt: null },
+            where: {
+              id: mediaAssetId,
+              workspaceId: input.workspace_id,
+              careGroupId,
+              deletedAt: null,
+            },
             select: { mediaRevision: true },
           });
           if (!asset) throw new Error("nurture care capture: media asset unavailable");
@@ -267,7 +274,7 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       const process = await this.prisma.nurturePublishProcess.create({
         data: {
           workspaceId: input.workspace_id,
-          careGroupId: (await this.batchGroupId(input))!,
+          careGroupId,
           captureBatchId: input.batch_id,
           processKey: input.process.process_key,
           state: input.process.state,
@@ -288,7 +295,12 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
           ...(input.process.body_envelope !== undefined
             ? { bodyProtectionPayload: asJson(input.process.body_envelope) }
             : {}),
-          mediaCompositionPayload: asJson(composition),
+          mediaCompositionPayload: asJson({
+            media: composition.map((entry) => ({
+              mediaAssetId: entry.media_asset_id,
+              mediaRevision: entry.media_revision,
+            })),
+          }),
           sourceRefsPayload: asJson(input.process.source_refs),
         },
       });
@@ -319,7 +331,7 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       data: {
         workspaceId: input.workspace_id,
         ...(processId ? { publishProcessId: processId } : {}),
-        careGroupId: (await this.batchGroupId(input))!,
+        careGroupId,
         organizerInputRevision: input.organizer_input_revision,
         route: input.safety.route as never,
         policyRef: input.safety.policy_ref,

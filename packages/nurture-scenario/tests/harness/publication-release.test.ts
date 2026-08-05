@@ -73,6 +73,7 @@ const facts = (overrides: Partial<ReleaseFactsV1> = {}): ReleaseFactsV1 => ({
     policy_head: schedule.policyHead,
     policy_version: schedule.policyVersion,
   },
+  receipt_evidence_available: true,
   media: [media()],
   targets: [target()],
   ...overrides,
@@ -89,7 +90,12 @@ const deps = (
   }),
   now = () => new Date("2026-08-01T09:30:00.000Z"),
 ) => {
-  const commits: Array<{ target_key: string; revision: number; command_request_id: string }> = [];
+  const commits: Array<{
+    target_key: string;
+    revision: number;
+    command_request_id: string;
+    trigger: "immediate" | "scheduler";
+  }> = [];
   return {
     integrity_key: BOARD_INTEGRITY_KEY,
     now,
@@ -101,6 +107,7 @@ const deps = (
         target_key: string;
         revision: number;
         command_request_id: string;
+        trigger: "immediate" | "scheduler";
       }) => {
         commits.push(input);
         return commit(input);
@@ -320,6 +327,15 @@ describe("G3-D release loop", () => {
     });
   });
 
+  it("fails closed before preview or commit when any stored release lacks its Receipt", async () => {
+    const attempt = release(facts({ receipt_evidence_available: false }));
+    await expect(attempt.run()).resolves.toEqual({
+      status: "denied",
+      reason_code: "receipt_evidence_unavailable",
+    });
+    expect(attempt.dependencies.commits).toEqual([]);
+  });
+
   it("surfaces a missed-send attention when nothing committed past the cutoff", async () => {
     const decision = await release(
       facts({ targets: [target({ grant_allows: false })] }),
@@ -419,6 +435,7 @@ describe("G3-D release formal-ingress entry", () => {
       [{ process_state: "draft" }, "process_not_queued"],
       [{ edit_hold_active: true }, "edit_hold_active"],
       [{ has_unsaved_revision: true }, "unsaved_revision"],
+      [{ receipt_evidence_available: false }, "receipt_evidence_unavailable"],
       [{ targets: [] }, "no_eligible_target"],
     ];
     for (const [overrides, reason] of cases) {

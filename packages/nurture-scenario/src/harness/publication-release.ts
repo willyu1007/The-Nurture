@@ -106,6 +106,8 @@ export type ReleaseFactsV1 = {
     policy_head: number;
     policy_version: number;
   } | null;
+  /** False when a stored release lacks the Receipt required to prove commit. */
+  receipt_evidence_available: boolean;
   media: MediaEligibilityInputV1[];
   targets: ReleaseTargetFactsV1[];
 };
@@ -137,6 +139,7 @@ export type PublicationReleasePort = {
     target_key: string;
     revision: number;
     command_request_id: string;
+    trigger: ReleaseTriggerV1;
   }): Promise<CommitTargetReleaseResultV1>;
 };
 
@@ -207,6 +210,9 @@ const resolveReleaseAttemptContext = async (
     facts.current_policy.policy_version !== facts.schedule.policyVersion
   ) {
     return { denied: "publication_policy_drift" };
+  }
+  if (!facts.receipt_evidence_available) {
+    return { denied: "receipt_evidence_unavailable" };
   }
   if (
     request.trigger === "scheduler" &&
@@ -311,6 +317,7 @@ export const releasePublishProcess = async (
       target_key: target.target_key,
       revision: releaseRevision,
       command_request_id: request.command_request_id,
+      trigger: request.trigger,
     });
     if (commit.status === "committed") {
       committed += 1;

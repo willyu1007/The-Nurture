@@ -15,7 +15,7 @@ Project: `main`
 | T-003 nurture-uiux-pitch | in-progress | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
-| T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
+| T-006 nurture-child-care-boards | in-progress | F-003 | dev-docs/active/nurture-child-care-boards |
 | T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
 <!-- AUTO-GENERATED:END task-index -->

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   GROUP_PHOTO_RESOLUTION_PATHS,
+  deriveTargetPublishBlockingReasons,
   derivePublishEligibility,
   deriveMediaRef,
   evaluateMediaDetach,
@@ -73,6 +74,16 @@ describe("G3-C1 publish eligibility derivation", () => {
     expect(
       derive({ media: [media({ current_media_revision: 4 })] }).blockingReasons,
     ).toContain("media_revision_drift");
+  });
+
+  it("exposes the same ref-free target rule for transactional revalidation", () => {
+    const blockedMedia = media({ lifecycle: "unavailable" });
+    const blockedTarget = target({ grant_allows: false });
+    const projected = derive({ media: [blockedMedia], targets: [blockedTarget] });
+
+    expect(deriveTargetPublishBlockingReasons(blockedTarget, [blockedMedia])).toEqual(
+      projected.targets[0]?.blockingReasons,
+    );
   });
 
   it("holds a group photo until every clearly visible child is confirmed", () => {

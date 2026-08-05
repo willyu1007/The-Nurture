@@ -2,16 +2,16 @@
 
 ## Status
 
-- State: done
+- State: in-progress
 - Task: T-006
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-05
-- Next step: **T-006/G3 已关闭，等待单独批准后归档；T-008、deployment、
-  capability activation 与 Pilot 保持关闭。** exact detached topology 上的 clean
-  migration、formal NestJS owner path、T-007/T-006 publication joint journey、
-  T-005/T-006 direct-interaction joint journey、Guardian Receipt 回读、负向矩阵与
-  final default-off/empty census 均通过。一次性 PostgreSQL 已销毁，未触碰既有数据库。
-  exact 交接见
+- Next step: **T-006/G3 的 Exit PASS 已因发布事务质量复核撤回，任务恢复为
+  in-progress；T-008、deployment、capability activation 与 Pilot 保持关闭。**
+  当前修复范围只包含三项：并发首发必须冻结唯一 revision；policy/authority/hold/
+  media 等发布门禁与逐目标 effect 共用事务边界；receipt-less release 必须 fail
+  closed。修复并通过隔离 PostgreSQL 证伪测试和 exact detached requalification 后，
+  才能重新签发
   [G3 Exit Qualification and T-006 Beta Profile Handoff](08-g3-exit-qualification-and-beta-profile-handoff.md)。
 
 ## Goal

@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import {
   createAesGcmProtectedContentPort,
+  PrismaCareCaptureTransaction,
   PrismaCareCaptureReadPort,
   PrismaMediaSafetyReadPort,
   PrismaPublicationReleasePort,
@@ -826,6 +827,103 @@ describe("G3-B1 owner reads: capture lane", () => {
         snapshot_at: SNAPSHOT_AT,
       }),
     ).toBeNull();
+  });
+});
+
+describe("T-006 owner write: organize media composition", () => {
+  const applyWithMedia = async (
+    world: Group,
+    batchId: string,
+    mediaAssetId: string,
+  ) =>
+    prisma.$transaction((tx) =>
+      new PrismaCareCaptureTransaction(tx).applyOrganizeCut({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        command_request_id: randomUUID(),
+        batch_id: batchId,
+        expected_batch_version: 0,
+        included_capture_ids: [],
+        organizer_input_revision: `organizer:${randomUUID()}`,
+        trigger_evidence: {
+          trigger: "manual",
+          policy_ref: "nurture.institution-publication-policy@1.0.0",
+          policy_head: 7,
+          time_zone: "Asia/Shanghai",
+          quiescence_seconds: 60,
+          observed_user_activity_at: new Date().toISOString(),
+        },
+        safety: {
+          route: "ordinary",
+          policy_ref: "nurture.content-safety@1.0.0",
+          policy_head: 1,
+          rule_revision: "rules:1",
+          risk_codes: [],
+        },
+        watermark: { source_sequence: 0, cut_at: new Date().toISOString() },
+        process: {
+          process_key: `publish:${randomUUID()}`,
+          state: "draft",
+          data_class: "daily_care_log",
+          purpose_key: "family_daily_care_update",
+          content_digest: "sha256:organized",
+          title_envelope: protectedContent.seal("Organized media"),
+          media_asset_ids: [mediaAssetId],
+          source_refs: [],
+          authorizing_role_assignment_id: world.teacherRole.id,
+          targets: [],
+        },
+      }),
+    );
+
+  it("stores the canonical composition shape and refuses an asset from another class", async () => {
+    const world = await seedGroup();
+    const batch = await prisma.nurtureCareCaptureBatch.create({
+      data: { workspaceId: world.workspaceId, careGroupId: world.group.id, state: "collecting" },
+    });
+    const asset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+        mediaRevision: 3,
+      },
+    });
+
+    const applied = await applyWithMedia(world, batch.id, asset.id);
+    const revision = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+      where: {
+        workspaceId: world.workspaceId,
+        publishProcess: { captureBatchId: batch.id },
+      },
+    });
+    expect(applied.process_revision).toBe(1);
+    expect(revision.mediaCompositionPayload).toEqual({
+      media: [{ mediaAssetId: asset.id, mediaRevision: 3 }],
+    });
+
+    const foreignBatch = await prisma.nurtureCareCaptureBatch.create({
+      data: { workspaceId: world.workspaceId, careGroupId: world.group.id, state: "collecting" },
+    });
+    const foreignAsset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.otherGroup.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    await expect(applyWithMedia(world, foreignBatch.id, foreignAsset.id)).rejects.toThrow(
+      /media asset unavailable/,
+    );
+    expect(
+      await prisma.nurtureCareCaptureBatch.findUniqueOrThrow({ where: { id: foreignBatch.id } }),
+    ).toMatchObject({ state: "collecting", aggregateVersion: 0 });
   });
 });
 

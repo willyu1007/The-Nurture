@@ -160,6 +160,18 @@ const targetBlockingReasons = (
   return reasons;
 };
 
+/**
+ * The owner transaction uses the same eligibility rule as the preview lane.
+ * Keeping this derivation ref-free lets persistence revalidate the exact
+ * target without inventing an integrity key merely to discard projected refs.
+ */
+export const deriveTargetPublishBlockingReasons = (
+  target: TargetEligibilityInputV1,
+  media: readonly MediaEligibilityInputV1[],
+): PublishEligibilityReasonV1[] =>
+  [...new Set([...media.flatMap(mediaBlockingReasons), ...targetBlockingReasons(target, media)])]
+    .sort();
+
 export const deriveMediaRef = (
   integrityKey: string,
   scope: BoardScopeV1,
@@ -182,9 +194,8 @@ export const derivePublishEligibility = (
   scope: BoardScopeV1,
   input: PublishEligibilityInputV1,
 ): PublishEligibilityV1 => {
-  const mediaReasons = input.media.flatMap(mediaBlockingReasons);
   const targets = input.targets.map((target) => {
-    const reasons = [...new Set([...mediaReasons, ...targetBlockingReasons(target, input.media)])];
+    const reasons = deriveTargetPublishBlockingReasons(target, input.media);
     return {
       targetRef: issuePublishTargetRef(integrityKey, scope, target.target_key),
       eligible: reasons.length === 0,

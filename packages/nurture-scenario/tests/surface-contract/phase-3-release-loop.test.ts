@@ -172,6 +172,7 @@ describe("Phase 3 publish and release loop", () => {
         policy_head: resolved.schedule.policyHead,
         policy_version: resolved.schedule.policyVersion,
       },
+      receipt_evidence_available: true,
       media: [
         {
           media_asset_id: "media-1",

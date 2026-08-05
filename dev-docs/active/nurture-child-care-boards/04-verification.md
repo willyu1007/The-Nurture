@@ -1169,3 +1169,33 @@ preserved in `artifacts/db/g3-exit/04-post-verify.md` instead of hiding fixture 
 Verdict: `G3_EXIT_PASS`. This qualifies the default-off Nurture provider and exact
 Beta Profile Handoff only. It does not authorize activation, deployment, T-008,
 Pilot, native/device work or traffic.
+
+## 2026-08-05 — G3 release quality repair checkpoint
+
+上一节的历史运行记录仍证明当时执行过哪些门禁，但其 `G3_EXIT_PASS` verdict 已撤回；
+下面是修复候选当前独立证据，不能与历史 PostgreSQL 结果拼接成新资格结论。
+
+| Command / check | Result |
+| --- | --- |
+| scenario package typecheck | PASS |
+| DB package typecheck | PASS |
+| aggregate `pnpm exec tsc --noEmit`（包含 DB test source） | PASS |
+| targeted release/eligibility suites | PASS — 4 files / 63 tests |
+| `pnpm test:unit` | PASS — 52 files / 579 tests |
+| persistence boundary / port topology / G3-0 freeze / formal ingress | PASS |
+| surface schema / test routing | PASS — 56 schemas; 95 routed files |
+| governance lint | PASS |
+| strict context verification | PASS — correct entry is `.ai/skills/features/context-awareness/scripts/ctl-context.mjs` |
+| `git diff --check` | PASS |
+| attempted obsolete context entry `.ai/scripts/ctl-context.mjs` | NOT RUN — path does not exist; corrected command above passed |
+| new production-DB regressions | PASS on current repair tree — target 2 files / 64 tests; concurrent first-freeze 3/3 additional passes |
+| full production DB suite | PASS on current repair tree — 21 files / 225 tests |
+| Nurture runtime self-pin | ROTATED — 168 files / `b44f4fad985bf760b0bf1a6c4abac8badd7e91ea7999d829bb1fabcd2dfbf8c0` |
+| exact detached owner/joint requalification | NOT RUN |
+
+The authorized disposable listener is now active only on 55437; existing 5433/55439
+listeners remain excluded. The first target run exposed one stale classification assertion:
+an audit-key `P2002` proves rollback and now returns `command_identity_conflict` rather than
+`outcome_unknown` or the false `already_released`. G3-D/E, the Beta Profile Handoff and task
+closure remain pending until exact detached qualification passes and the disposable resource
+is destroyed.

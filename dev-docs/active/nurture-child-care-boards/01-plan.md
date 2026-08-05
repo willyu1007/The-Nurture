@@ -12,17 +12,18 @@ deployment, activation or Pilot scope:
 3. T-006 runs the exact G2-C provider/consumer journey with T-005.
 4. T-006 issues its exact Beta Profile Handoff only after both joint records pass.
 
-### Execution checkpoint — 2026-08-05
+### Execution checkpoint — 2026-08-05 quality review reopen
 
-- Steps 1–4 are complete. Exact detached owner/runtime pins, clean 16-migration
-  replay, formal owner integration, T-007/T-006 publication and T-005/T-006
-  direct-interaction joint journeys all passed against the disposable database.
-- Repository/static checks, TypeScript, 577 unit tests, 216 production-DB tests,
-  55 formal owner-path tests and the final default-off/effect census passed.
-- The disposable PostgreSQL container/tmpfs has been destroyed; existing database
-  listeners were excluded and remained unchanged.
-- T-006/G3 is done and has issued its exact Beta Profile Handoff. T-008,
-  deployment, activation and Pilot remain outside the objective and unopened.
+- The prior exact detached run remains valid evidence for migration replay, owner/runtime
+  pins, formal ingress, default-off posture and the two joint journeys, but it did not
+  falsify concurrent revision freeze, mid-effect policy/authority/media drift or
+  receipt-less reconciliation.
+- G3-D/E Exit PASS and the Beta Profile Handoff are withdrawn pending correction and
+  requalification. T-006 is in progress again; this does not open T-008, deployment,
+  activation or Pilot.
+- The repair gate is: atomic unique frozen revision across concurrent target commits;
+  every release-authorizing fact re-read in the effect transaction; receipt evidence
+  absent means deterministic refusal; real PostgreSQL interleavings prove all three.
 
 ## G1 Progressive Entry Boundary
 
@@ -85,7 +86,7 @@ G3-B saved revision 和 G3-C publish eligibility，G3-E 汇合全部真实 owner
   absent/empty 不阻塞核心看板与发布路径。
 - T-008 Candidate/Deployment/Platform tooling 不进入 G3 开发关键路径。
 
-## Stage G3 Overall Audit — PASS
+## Stage G3 Overall Audit — REQUALIFICATION PENDING
 
 - **Goal closure**：G3-A～E 覆盖 shared facts → role-safe board → internal capture →
   exact saved draft → content/media eligibility → per-target release/Receipt →
@@ -505,8 +506,9 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - [x] G3-C1 manual content/media safety path 通过（`T006-AC-031`～`T006-AC-040`
   全部映射检查通过）；G3-C2 face match 明确 optional/default-off，能力身份完全
   未注册，人工归属主路径不依赖它。
-- [x] G3-D Publish and Release Loop 通过（`T006-AC-041`～`T006-AC-050` 全部映射检查通过）；真实 policy-backed schedule/release 资格化留给 G3-E。
-- [x] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
+- [ ] G3-D Publish and Release Loop 重新资格化（`T006-AC-043`、`T006-AC-045`～
+  `T006-AC-047` 需补并发、事务内 drift 与 receipt-less fail-closed 证据）。
+- [ ] G3-E 重新通过 formal NestJS ingress + real pinned owner path，在 disposable
   PostgreSQL 完成完整黑盒与负向资格验证。
 - [x] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；
   不接受 safe-unavailable 占位、普通 family-question 或 PublishProcess fallback。
@@ -514,7 +516,7 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
   `InstitutionWorkflowProjection` 的 absent/empty 行为与 beta profile 一致。
 - [x] 最终 capability/environment 为 false；disposable test rows 已随 tmpfs 销毁，
   无 persistent DB apply、Candidate、native/internal-store、activation 或 traffic effect。
-- [x] 形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
+- [ ] 重新形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
   notification/delivery 留给 My-Chat companion/T-008。
 
 所有清单项满足后 T-006 才可转为 done。T-008 仍需独立核验该 handoff 后才能开始
