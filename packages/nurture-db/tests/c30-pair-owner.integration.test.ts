@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import {
+  AesGcmNurtureC30SubjectLocatorCodec,
   computeNurtureC30AssociationExpectationHash,
   computeNurtureC30PairCommandHash,
+  NurtureC30ChildCareProcessPresentationOwner,
+  nurtureC30PresentationKey,
   nurtureSha256Base64Url,
   nurtureSha256Hex,
   type NurtureC30PairAssociationCommandV1,
@@ -14,6 +17,10 @@ import {
   PrismaNurtureC30PairAssociationRepository,
   type TransactionalNurtureC30PairAuthorityReader,
 } from "../src/c30/pair-association.repository.js";
+import {
+  PrismaNurtureC30SubjectReadRepository,
+  type TransactionalNurtureC30CurrentPairEvidenceReader,
+} from "../src/c30/subject-presentation.repository.js";
 
 const prisma = createPrismaClient();
 
@@ -273,6 +280,140 @@ describe("C30 atomic canonical-pair association", () => {
     })).rejects.toBeDefined();
   });
 });
+
+describe("C30 current subject/presentation read model", () => {
+  const currentPairEvidence: TransactionalNurtureC30CurrentPairEvidenceReader = {
+    verifyCurrent: async () => ({
+      current: true,
+      evidenceSourceRef: "my_chat.current_pair_evidence",
+      evidenceSourceVersion: 1,
+    }),
+  };
+
+  it("rereads the typed binding, role, pair, association and lifecycle for every operation", async () => {
+    const fixture = await createFixture();
+    const pairRepository = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await pairRepository.registerEligibleAttempt(fixture.command);
+    await pairRepository.commitAssociation(fixture.command);
+    const pairReader = { verifyCurrent: vi.fn(currentPairEvidence.verifyCurrent) };
+    const owner = presentationOwner(pairReader);
+
+    const listed = await owner.list(fixture.command.principal, { provider_version: 1 });
+    expect(listed.status).toBe("resolved");
+    if (listed.status !== "resolved") throw new Error("expected resolved subject");
+    expect(listed.context.subject_context_ref).not.toContain(
+      fixture.command.local_seed.child_care_process_id,
+    );
+    const resolved = await owner.resolve(fixture.command.principal, {
+      provider_version: 1,
+      subject_context_ref: listed.context.subject_context_ref,
+      known_context_version: listed.context.context_version,
+    });
+    expect(resolved.status).toBe("resolved");
+    const presented = await owner.present(fixture.command.principal, {
+      presentation_version: 1,
+      presentation_key: nurtureC30PresentationKey,
+      subject_context_ref: listed.context.subject_context_ref,
+      view_query: { view_mode: "current" },
+    });
+    expect(presented).toMatchObject({
+      status: "ready",
+      presentation: { actions: [] },
+    });
+    expect(pairReader.verifyCurrent).toHaveBeenCalledTimes(3);
+  });
+
+  it("returns context_changed after an aggregate revision changes", async () => {
+    const fixture = await createFixture();
+    const pairRepository = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await pairRepository.registerEligibleAttempt(fixture.command);
+    await pairRepository.commitAssociation(fixture.command);
+    const owner = presentationOwner(currentPairEvidence);
+    const listed = await owner.list(fixture.command.principal, { provider_version: 1 });
+    if (listed.status !== "resolved") throw new Error("expected resolved subject");
+    await prisma.nurtureChildCareProcess.update({
+      where: { id: fixture.command.local_seed.child_care_process_id },
+      data: { aggregateVersion: { increment: 1 } },
+    });
+    await expect(owner.present(fixture.command.principal, {
+      presentation_version: 1,
+      presentation_key: nurtureC30PresentationKey,
+      subject_context_ref: listed.context.subject_context_ref,
+    })).resolves.toMatchObject({ status: "context_changed" });
+  });
+
+  it("fails closed after role or pair association revocation", async () => {
+    const roleFixture = await createFixture();
+    const pairRepository = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await pairRepository.registerEligibleAttempt(roleFixture.command);
+    await pairRepository.commitAssociation(roleFixture.command);
+    const roleOwner = presentationOwner(currentPairEvidence);
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: roleFixture.command.local_seed.initial_role_assignment_id },
+      data: { status: "revoked", aggregateVersion: { increment: 1 } },
+    });
+    await expect(roleOwner.list(roleFixture.command.principal, {
+      provider_version: 1,
+    })).resolves.toMatchObject({
+      status: "unavailable",
+      safe_reason: { reason_code: "subject_unavailable" },
+    });
+
+    const associationFixture = await createFixture();
+    await pairRepository.registerEligibleAttempt(associationFixture.command);
+    await pairRepository.commitAssociation(associationFixture.command);
+    const associationOwner = presentationOwner(currentPairEvidence);
+    const listed = await associationOwner.list(associationFixture.command.principal, {
+      provider_version: 1,
+    });
+    if (listed.status !== "resolved") throw new Error("expected resolved subject");
+    await prisma.nurtureFamilyAnchorAssociation.update({
+      where: { id: associationFixture.command.local_seed.family_association_id },
+      data: {
+        status: "revoked",
+        currentKey: null,
+        currentChildAssociationId: null,
+        revokedAt: new Date(),
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    await expect(associationOwner.resolve(associationFixture.command.principal, {
+      provider_version: 1,
+      subject_context_ref: listed.context.subject_context_ref,
+    })).resolves.toMatchObject({ status: "unavailable" });
+  });
+
+  it("keeps the production pair-evidence dependency hard default-deny", async () => {
+    const fixture = await createFixture();
+    const pairRepository = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await pairRepository.registerEligibleAttempt(fixture.command);
+    await pairRepository.commitAssociation(fixture.command);
+    const owner = presentationOwner();
+    await expect(owner.list(fixture.command.principal, {
+      provider_version: 1,
+    })).resolves.toMatchObject({
+      status: "unavailable",
+      safe_reason: { reason_code: "authority_changed" },
+    });
+  });
+});
+
+function presentationOwner(pairEvidence?: TransactionalNurtureC30CurrentPairEvidenceReader) {
+  return new NurtureC30ChildCareProcessPresentationOwner({
+    binding_reader: new PrismaNurtureParticipantBindingReader(prisma),
+    authority_reader: {
+      authorizeCurrent: async () => ({
+        authority_version: 1,
+        authorized: true,
+        authority_revision: 1,
+        reason_code: "authorized",
+      }),
+    },
+    subject_repository: new PrismaNurtureC30SubjectReadRepository(prisma, pairEvidence),
+    locator_codec: new AesGcmNurtureC30SubjectLocatorCodec(Buffer.alloc(32, 23)),
+    clock: () => new Date(),
+  });
+}
 
 async function createFixture(deadlineOffsetMs = 30_000) {
   const workspaceId = randomUUID();
