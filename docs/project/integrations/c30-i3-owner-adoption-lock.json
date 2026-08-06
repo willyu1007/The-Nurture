@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "5bb260e98670ecae3ca9e42983873c0df5ac3340",
+  "source_revision": "25e7a78a9c7e02cab00520ff6baa29a71f84f55a",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
@@ -12,11 +12,11 @@
     "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
     "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
   },
-  "source_hash": "e40fb649080943a5f39fb59080a2b2c246e353a4707c47ae2ad956fc5e4cb404",
+  "source_hash": "7de367134701e22a592d0706a397641d796cdd7321682e1bb5ad14e8ea38c085",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
-      "source_hash": "e823028a4cfd44af88b0807e1a40b79846e063d230ced9f09e0941ab1f302644",
+      "source_hash": "b19a9071bfaeddce51892c8fae785216d68cf641b72c5bcfef49e54dc1ae69d4",
       "files": [
         "package.json",
         "packages/nurture-scenario/package.json",
@@ -37,7 +37,7 @@
     },
     {
       "source_identity": "nurture_c30_private_trust_participant_v1",
-      "source_hash": "8a3e86aa9a0b8cbb7eb9533bb96125a2dc00a27d2901bd22c03bdee909b2e2a8",
+      "source_hash": "c471077990939365d0f47280fc4a6a9e19ae6b6c11185dcc80ad7dc408ae649b",
       "files": [
         "packages/nurture-scenario/src/c30/canonical-json.ts",
         "packages/nurture-scenario/src/c30/participant-binding.ts",
@@ -48,7 +48,7 @@
     },
     {
       "source_identity": "nurture_c30_pair_local_persistence_v1",
-      "source_hash": "2616e568caf12a2b02d29678a5ad688a9548fde052ac25628f3291abfdf8ad23",
+      "source_hash": "e711981f1bdd0ab110fd4bca4be6416415de2a9752cc29dfb0212ea2ac524b77",
       "files": [
         "docs/context/db/schema.json",
         "docs/context/registry.json",
@@ -72,6 +72,22 @@
         "packages/nurture-scenario/src/c30/subject-presentation.ts",
         "packages/nurture-scenario/src/generated/manifest.generated.ts",
         "packages/nurture-scenario/tests/c30/subject-presentation.test.ts"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_canonical_action_v1",
+      "source_hash": "9af217ee20eaaabf70c7e0726269910874195151e17395d2b8467d8387b91008",
+      "files": [
+        "docs/context/db/schema.json",
+        "docs/context/registry.json",
+        "packages/nurture-db/src/c30/canonical-action.repository.ts",
+        "packages/nurture-db/tests/c30-canonical-action.integration.test.ts",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/c30/canonical-action.ts",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/tests/c30/canonical-action.test.ts",
+        "prisma/migrations/20260806130000_c30_i3_canonical_action_runtime/migration.sql",
+        "prisma/schema.prisma"
       ]
     }
   ]

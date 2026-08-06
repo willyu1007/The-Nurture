@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_D_ACCEPTED / I3_E_AUTHORIZED_IN_PROGRESS`. G1 is
+  `C30_I3_E_ACCEPTED / I3_F_AUTHORIZED_IN_PROGRESS`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -35,11 +35,28 @@
   Host runtime support and the narrow nonce/pair schema under T-035, all
   default-off. Nurture I3-A has one generated canonical manifest/module and
   I3-B adds private trust/nonce/response-signing and typed Participant authority
-  primitives without registering a route. I3-C adds only Nurture-owned local
-  persistence on an isolated disposable target; no existing database,
+  primitives without registering a route. I3-C through I3-E add only
+  Nurture-owned local pair, presentation and generic action persistence on an
+  isolated disposable target; no production action, existing database,
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3-E canonical action owner runtime — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Fixture-only declarations | PASS | Both Base-neutral drivers are supplied only by tests; production action/protected arrays remain empty and no positive route/handler was added. |
+| Prepare/submit/status | PASS | Exact Base validators, fresh Participant/authority/target rereads, scenario-bound direct identity and original-Step claimed identity; claim token is excluded from the execution command. |
+| Atomic execution | PASS | One Serializable transaction writes the injected neutral effect, typed `CommandExecution`, committed result, refs-only audit/outbox and operation terminal state. |
+| Replay/recovery/fault | PASS | Concurrent exact replay creates one effect; changed immutable payload conflicts; revoked current authority denies committed replay; faulting effects roll back and deadline recovery writer-fences `confirmed_no_effect`. |
+| Additive SSOT migration | PASS | Migration `20260806130000_c30_i3_canonical_action_runtime`, SHA-256 `e72636eb…eb0f`; 18/18 on exact disposable 55440; migrations-to-SSOT and DB-to-SSOT are empty; strict context passes. |
+| Verification | PASS | Focused Scenario 7/7 + DB 6/6; complete Scenario 56 files / 627 tests; complete DB 23 files / 245 tests; Scenario/DB typecheck and production build. |
+| Cumulative lock | PASS | Runtime `9a59c51…`; lock-tool `25e7a78…`; aggregate `7de36713…c085`; canonical-action profile `9af217ee…1008`. |
+| Effect boundary | PASS | Synthetic neutral fixture data only; no product action/body/claim-token persistence, existing DB, route, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_E_ACCEPTED / I3_F_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/58-c30-i3-e-implementation-record.md`.
 
 ## C30-I3-D subject provider and baseline presentation — 2026-08-06
 

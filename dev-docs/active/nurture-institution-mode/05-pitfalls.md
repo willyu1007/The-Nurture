@@ -2281,3 +2281,16 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: negative tests should transition persisted fixtures through a
   legal lifecycle state before asserting consumer behavior; constraint failures
   and consumer denials prove different boundaries.
+
+### 2026-08-06 — Base64URL last-character mutation may preserve decoded bytes
+
+- Symptom: the full Scenario suite intermittently accepted a test signature
+  whose encoded last character had supposedly been changed.
+- Root cause: for an unpadded Base64URL value, the final character can include
+  unused low-order bits; changing only those bits produces the same decoded
+  signature bytes and therefore is not cryptographic tampering.
+- Fix / workaround: mutate the first encoded character, which always changes a
+  significant byte, while keeping the encoded shape valid.
+- Prevention: signature-negative fixtures must alter a known significant byte
+  or decode/mutate/re-encode; do not assume every textual Base64URL change
+  changes the represented bytes.

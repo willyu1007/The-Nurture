@@ -7,9 +7,9 @@
 
 ## Next concrete actions
 
-1. Implement C30-I3-E's one canonical Base-neutral direct/claimed owner runner
-   only through an isolated conformance fixture; keep production actions absent.
-2. Continue I3-F..G only in the frozen order. Keep I4 joint adoption, C31-C35,
+1. Implement C30-I3-F authoritative protected-content lifecycle with one
+   per-content wrapped DEK and a production-default-deny KMS port.
+2. Continue I3-G only after I3-F acceptance. Keep I4 joint adoption, C31-C35,
    T-008, persistent database apply, capability/Workspace activation,
    deployment, Pilot and traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
@@ -18,6 +18,17 @@
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Accepted C30-I3-E in artifact 58 at runtime source `9a59c51…`
+  and lock-tool source `25e7a78…`. One Base-neutral runner now owns prepare,
+  submit and status semantics for both direct and claimed drivers without any
+  production action declaration. The additive action-operation migration and
+  repository atomically bind current authority, effect, typed Execution,
+  refs-only audit/outbox and writer-fenced recovery. Focused Scenario 7/7 and
+  DB 6/6, complete Scenario 56 files/627 tests, DB 23 files/245 tests, builds,
+  Prisma/context convergence, upstream verification and cumulative lock
+  `7de36713…c085` pass. The full run also repaired a nondeterministic signature
+  tamper fixture by changing a significant Base64URL character.
 
 - 2026-08-06: Accepted C30-I3-D in artifact 57 at runtime source `cccdc6b…`
   and lock-tool source `5bb260e…`. The exact declared provider/presenter use
