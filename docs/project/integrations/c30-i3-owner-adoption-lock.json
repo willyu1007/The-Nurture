@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "ac049b49f73c27efdccf362f76290915c2ee40df",
+  "source_revision": "60ee4a48a83df2ab46247cc0a92d47ccecc7bf43",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
@@ -12,11 +12,11 @@
     "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
     "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
   },
-  "source_hash": "b251bb461c6fbd26745ae17f7c1b067e287c9d7ca4f099366ec282e26ae148a8",
+  "source_hash": "3bbf780a2d8f1e3dced017ff7d7c0e4da87281132a7a92e6ec072e4a1dc5dafc",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
-      "source_hash": "5e9b80b4f923f69b2e81fa0742b1f0d80fafc49f43bc59115a7ecbf2a8f3ef29",
+      "source_hash": "d433d5ca7b4d539edabb199f16d3564b4b85e1f6f17affb028fc0b019203a72a",
       "files": [
         "package.json",
         "packages/nurture-scenario/package.json",
@@ -106,6 +106,24 @@
         "packages/nurture-scenario/tests/c30/protected-content.test.ts",
         "prisma/migrations/20260806140000_c30_i3_protected_owner_lifecycle/migration.sql",
         "prisma/schema.prisma"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_cumulative_convergence_v1",
+      "source_hash": "73ecda95bf4df9fd607b457202aeaa570496131fa804280d819202625c7e3254",
+      "files": [
+        "package.json",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/src/module.ts",
+        "packages/nurture-scenario/tests/c30/cumulative-convergence.test.ts",
+        "packages/nurture-scenario/tests/c30/full-graph.fixture.ts",
+        "prisma/schema.prisma",
+        "scripts/assert-test-routing.mjs",
+        "scripts/compute-c30-i3-owner-adoption-hash.mjs",
+        "scripts/generate-nurture-scenario-manifest.mjs",
+        "scripts/verify-c30-i3-default-off.mjs",
+        "scripts/verify-c30-i3-upstream.mjs"
       ]
     }
   ]
