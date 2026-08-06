@@ -18,6 +18,17 @@
   is provisional.
 - No G1 state authorizes capability activation, persistent database apply or traffic.
 
+## Execution checkpoint — 2026-08-05 G4-0B bounded dependency closed
+
+- The exact, default-off publication-policy provider and its T-006 consumer journey
+  passed on the pinned Base `06303e9…`, My-Chat `a019566…`, Nurture `0374087…`
+  topology and are recorded by the T-006 G3 Exit handoff.
+- This closes only G4-0B's early cross-task dependency. It does not mark T-007
+  in-progress, satisfy G4-A～F, authorize schema apply/activation/deployment, or open
+  T-008.
+- If T-007 is separately selected as the next implementation task, resume from
+  G4-0C Authority & Surface Contracts and revalidate the exact upstream handoffs.
+
 ## Stage G4 Delivery Structure — Accepted
 
 ### Overall goal
@@ -71,7 +82,8 @@ the current exact inventory is closed by
 [`07-g4-0a-inventory-record.md`](./07-g4-0a-inventory-record.md) with
 `G4_0A_INVENTORY_PASS`. The publication-policy fast-lane contract is frozen in
 [`08-g4-0b-publication-policy-freeze.md`](./08-g4-0b-publication-policy-freeze.md);
-its implementation/qualification remains pending.
+its bounded provider/consumer implementation qualification is complete for the T-006
+handoff. Broader T-007 qualification remains pending.
 
 ### Freeze record contract
 

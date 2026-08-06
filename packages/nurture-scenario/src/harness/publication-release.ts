@@ -100,6 +100,14 @@ export type ReleaseFactsV1 = {
    * sending explicitly — only the scheduler depends on a window.
    */
   schedule: ResolvedPublishScheduleV1 | null;
+  /** Current T-007 owner answer, reread for every release attempt. */
+  current_policy: {
+    policy_ref: string;
+    policy_head: number;
+    policy_version: number;
+  } | null;
+  /** False when a stored release lacks the Receipt required to prove commit. */
+  receipt_evidence_available: boolean;
   media: MediaEligibilityInputV1[];
   targets: ReleaseTargetFactsV1[];
 };
@@ -131,6 +139,7 @@ export type PublicationReleasePort = {
     target_key: string;
     revision: number;
     command_request_id: string;
+    trigger: ReleaseTriggerV1;
   }): Promise<CommitTargetReleaseResultV1>;
 };
 
@@ -189,21 +198,30 @@ const resolveReleaseAttemptContext = async (
     // Only a revision Nurture has actually committed may be released.
     return { denied: "unsaved_revision" };
   }
-  // An explicit "send now" is the class teacher's own decision and is not bound
-  // by the automatic retry cutoff; the scheduler is.
-  if (request.trigger === "scheduler" && !facts.schedule) {
+  // Every release depends on the exact policy that produced the frozen window.
+  // "Send now" bypasses clock bounds, not policy compatibility.
+  if (!facts.schedule) {
     return { denied: "schedule_unavailable" };
+  }
+  if (!facts.current_policy) return { denied: "publication_policy_unavailable" };
+  if (
+    facts.current_policy.policy_ref !== facts.schedule.policyRef ||
+    facts.current_policy.policy_head !== facts.schedule.policyHead ||
+    facts.current_policy.policy_version !== facts.schedule.policyVersion
+  ) {
+    return { denied: "publication_policy_drift" };
+  }
+  if (!facts.receipt_evidence_available) {
+    return { denied: "receipt_evidence_unavailable" };
   }
   if (
     request.trigger === "scheduler" &&
-    facts.schedule !== null &&
     now.getTime() >= Date.parse(facts.schedule.notAfter)
   ) {
     return { denied: "past_cutoff" };
   }
   if (
     request.trigger === "scheduler" &&
-    facts.schedule !== null &&
     now.getTime() < Date.parse(facts.schedule.scheduledAt)
   ) {
     return { denied: "before_scheduled_at" };
@@ -299,6 +317,7 @@ export const releasePublishProcess = async (
       target_key: target.target_key,
       revision: releaseRevision,
       command_request_id: request.command_request_id,
+      trigger: request.trigger,
     });
     if (commit.status === "committed") {
       committed += 1;

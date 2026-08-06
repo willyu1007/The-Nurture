@@ -5,13 +5,13 @@
 - State: planned
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-01
-- Next step: G4-0A exact inventory 已完成并记录为
-  `G4_0A_INVENTORY_PASS`；G4-0B publication-policy contract 已冻结为
-  `nurture.institution-publication-policy@1.0.0`，实现与 provider/consumer
-  qualification 仍待后续 T-007/T-006 交付。下一步在 T-005 G2-B 主线之外进入
-  G4-0C Authority/Surface freeze；本任务仍保持 `planned`，未产生 capability、
-  schema apply、activation 或 traffic。
+- Updated: 2026-08-05
+- Next step: **由单独治理决定是否启动 G4-0C Authority/Surface freeze。** G4-0A
+  exact inventory 已完成；G4-0B 的
+  `nurture.institution-publication-policy@1.0.0` 已作为窄、default-off 依赖完成
+  provider/consumer qualification，并随 T-006/G3 exact handoff 关闭。该早期子集不
+  等于 T-007 启动或完成；完整 G4-0C～G4-F 仍未实施，T-008 继续等待 T-007 Exit。
+  当前未产生 persistent schema apply、activation、deployment 或 traffic。
 
 ## Goal
 

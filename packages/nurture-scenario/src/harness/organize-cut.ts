@@ -55,6 +55,10 @@ import type {
   AssembledDraftContentV1,
 } from "./content-assembler.js";
 import type { OrganizeDirectInteractionActionV1 } from "./care-capture-batch.js";
+import {
+  validateInstitutionPublicationPolicy,
+  type InstitutionPublicationPolicyV1,
+} from "./publish-schedule.js";
 
 /**
  * G3-B1 organize on the formal ingress: the manual "整理" route.
@@ -104,6 +108,7 @@ type OrganizeWritePlan = {
   assessment: ReturnType<typeof evaluateContentSafetyRoute>["assessment"];
   content: AssembledDraftContentV1;
   targets: PublishTargetCandidateV1[];
+  authorizing_role_assignment_id: string;
 };
 
 type OrganizeSpecDeps = {
@@ -145,6 +150,14 @@ const evaluateManualCut = (
   }
   const policy: OrganizeTriggerPolicyV1 = facts.organize_policy;
   if (validateOrganizeTriggerPolicy(policy).status === "invalid") {
+    return { status: "blocked", reason_code: "policy_unavailable" };
+  }
+  if (
+    validateInstitutionPublicationPolicy(
+      facts.organize_policy as InstitutionPublicationPolicyV1,
+      new Date(facts.read_at),
+    ).status === "invalid"
+  ) {
     return { status: "blocked", reason_code: "policy_unavailable" };
   }
   if (!facts.batch || facts.batch.state !== "collecting") {
@@ -282,6 +295,7 @@ const authorizeCut = (
       assessment: evaluation.assessment,
       content: assembled.content,
       targets,
+      authorizing_role_assignment_id: facts.authorizing_role_assignment_id,
     },
   };
 };
@@ -390,6 +404,14 @@ export const createOrganizeCareCaptureBatchSpec = (
         expected_batch_version: input.expected_batch_version,
         included_capture_ids: plan.included.map((capture) => capture.capture_id),
         organizer_input_revision: plan.content.organizerInputRevision,
+        trigger_evidence: {
+          trigger: plan.evidence.trigger,
+          policy_ref: plan.evidence.policyRef,
+          policy_head: plan.evidence.policyHead,
+          time_zone: plan.evidence.timeZone,
+          quiescence_seconds: plan.evidence.quiescenceSeconds,
+          observed_user_activity_at: plan.evidence.observedUserActivityAt,
+        },
         safety: {
           route: plan.assessment.route,
           policy_ref: plan.assessment.policyRef,
@@ -416,6 +438,7 @@ export const createOrganizeCareCaptureBatchSpec = (
                   : {}),
                 media_asset_ids: plan.content.mediaRefs,
                 source_refs: plan.content.sourceRefs,
+                authorizing_role_assignment_id: plan.authorizing_role_assignment_id,
                 targets: plan.targets.map((target) => ({
                   target_key: publishTargetKey(target),
                   child_care_process_id: target.child_care_process_id,

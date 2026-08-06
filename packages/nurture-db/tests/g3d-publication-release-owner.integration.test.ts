@@ -27,6 +27,8 @@ const SCHEDULE = {
   scheduleTimeZone: "Asia/Shanghai",
   schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
   schedulePolicyHead: 3,
+  schedulePolicyVersion: 1,
+  scheduleResolvedAt: new Date("2026-08-03T02:00:00.000Z"),
 };
 
 const seedWorld = async () => {
@@ -55,6 +57,24 @@ const seedWorld = async () => {
       scopeType: "care_group",
       scopeId: group.id,
       status: "active",
+    },
+  });
+  const publicationPolicy = await prisma.nurtureInstitutionPublicationPolicy.create({
+    data: {
+      workspaceId,
+      institutionId: institution.id,
+      policyRef: SCHEDULE.schedulePolicyRef,
+      policyVersion: SCHEDULE.schedulePolicyVersion,
+      policyHead: SCHEDULE.schedulePolicyHead,
+      timeZone: SCHEDULE.scheduleTimeZone,
+      defaultReleaseLocalTime: "17:00",
+      retryCutoffLocalTime: "19:00",
+      organizeIdleSeconds: 600,
+      organizeFallbackLeadSeconds: 1800,
+      automaticQuiescenceSeconds: 60,
+      captureActivityLeaseSeconds: 60,
+      automaticOrganizeEnabled: true,
+      effectiveFrom: new Date("2026-08-01T00:00:00.000Z"),
     },
   });
   await prisma.nurtureCareRoleAssignment.create({
@@ -120,6 +140,7 @@ const seedWorld = async () => {
     group,
     otherGroup,
     teacherRole,
+    publicationPolicy,
     children,
   };
 };
@@ -190,6 +211,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: commandRequestId,
+      trigger: "immediate",
     });
     expect(result.status).toBe("committed");
     if (result.status !== "committed") return;
@@ -258,8 +280,12 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: commandRequestId,
+      trigger: "immediate",
     });
-    expect(result.status).toBe("rejected");
+    expect(result).toEqual({
+      status: "rejected",
+      reason_code: "command_identity_conflict",
+    });
 
     // Nothing partial survives: no publication the family could hold without a
     // receipt, and no receipt pointing at a release that never committed.
@@ -288,6 +314,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
         target_key: targets[0]!.targetKey,
         revision: 1,
         command_request_id: commandRequestId,
+        trigger: "immediate",
       });
 
     const first = await commit();
@@ -309,6 +336,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     const second = await port.commitTargetRelease({
       workspace_id: world.workspaceId,
@@ -317,6 +345,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     expect(second).toEqual({ status: "rejected", reason_code: "already_released" });
     expect((await census(world.workspaceId)).releases).toBe(1);
@@ -336,6 +365,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
         target_key: target.targetKey,
         revision: 1,
         command_request_id: commandRequestId,
+        trigger: "immediate",
       });
       expect(result.status).toBe("committed");
     }
@@ -359,6 +389,88 @@ describe("G3-D owner writes: atomic per-target release", () => {
     expect(released.frozenRevisionId).toBe(revision.id);
   });
 
+  it("serializes concurrent targets on one frozen revision", async () => {
+    const world = await seedWorld();
+    const { process, targets, revision } = await seedProcess(world);
+    const port = new PrismaPublicationReleasePort(prisma);
+    const commandRequestId = randomUUID();
+
+    const results = await Promise.all(
+      targets.map((target) =>
+        port.commitTargetRelease({
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          process_key: process.processKey,
+          target_key: target.targetKey,
+          revision: 1,
+          command_request_id: commandRequestId,
+          trigger: "immediate",
+        }),
+      ),
+    );
+
+    expect(results.every((result) => result.status === "committed")).toBe(true);
+    const stored = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    const releases = await prisma.nurturePublicationRelease.findMany({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    expect(stored.frozenRevisionId).toBe(revision.id);
+    expect(releases).toHaveLength(2);
+    expect(new Set(releases.map((release) => release.publishProcessRevisionId))).toEqual(
+      new Set([revision.id]),
+    );
+  });
+
+  it("never commits a later target against a revision different from the frozen one", async () => {
+    const world = await seedWorld();
+    const { process, targets, revision } = await seedProcess(world);
+    const port = new PrismaPublicationReleasePort(prisma);
+    const first = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(first.status).toBe("committed");
+
+    const secondRevision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        revision: 2,
+        contentDigest: "sha256:content-2",
+        organizerInputRevision: "organizer:2",
+      },
+    });
+    // This deliberately creates the stale-pointer shape the owner boundary
+    // must contain: a released process may never reinterpret its frozen effect.
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: secondRevision.id },
+    });
+    const second = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[1]!.targetKey,
+      revision: 2,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+
+    expect(second).toEqual({ status: "rejected", reason_code: "revision_conflict" });
+    const releases = await prisma.nurturePublicationRelease.findMany({
+      where: { workspaceId: world.workspaceId, publishProcessId: process.id },
+    });
+    expect(releases).toHaveLength(1);
+    expect(releases[0]?.publishProcessRevisionId).toBe(revision.id);
+  });
+
   it("refuses a revision the process does not have, before writing anything", async () => {
     const world = await seedWorld();
     const { process, targets } = await seedProcess(world);
@@ -370,6 +482,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 7,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     expect(result).toEqual({ status: "rejected", reason_code: "revision_unavailable" });
     expect(await census(world.workspaceId)).toEqual({
@@ -393,6 +506,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: commandRequestId,
+      trigger: "immediate",
     });
     expect(first.status).toBe("committed");
 
@@ -415,6 +529,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[1]!.targetKey,
       revision: 1,
       command_request_id: commandRequestId,
+      trigger: "immediate",
     });
     expect(second).toEqual({ status: "rejected", reason_code: "grant_not_allowed" });
 
@@ -441,9 +556,272 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     expect(result).toEqual({ status: "rejected", reason_code: "enrollment_inactive" });
     expect((await census(world.workspaceId)).releases).toBe(0);
+  });
+
+  it("rechecks the frozen T-007 policy inside the target effect transaction", async () => {
+    const world = await seedWorld();
+    const { process, targets } = await seedProcess(world);
+    const port = new PrismaPublicationReleasePort(prisma);
+    const before = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(before?.current_policy?.policy_head).toBe(SCHEDULE.schedulePolicyHead);
+
+    const changedAt = new Date(Date.now() - 1_000);
+    await prisma.nurtureInstitutionPublicationPolicy.update({
+      where: { id: world.publicationPolicy.id },
+      data: { supersededAt: changedAt },
+    });
+    await prisma.nurtureInstitutionPublicationPolicy.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        policyRef: SCHEDULE.schedulePolicyRef,
+        policyVersion: SCHEDULE.schedulePolicyVersion + 1,
+        policyHead: SCHEDULE.schedulePolicyHead + 1,
+        timeZone: SCHEDULE.scheduleTimeZone,
+        defaultReleaseLocalTime: "17:00",
+        retryCutoffLocalTime: "19:00",
+        organizeIdleSeconds: 600,
+        organizeFallbackLeadSeconds: 1800,
+        automaticQuiescenceSeconds: 60,
+        captureActivityLeaseSeconds: 60,
+        automaticOrganizeEnabled: true,
+        effectiveFrom: changedAt,
+      },
+    });
+
+    const result = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(result).toEqual({ status: "rejected", reason_code: "publication_policy_drift" });
+    expect(await census(world.workspaceId)).toEqual({ releases: 0, receipts: 0, executions: 0 });
+  });
+
+  it("rechecks scheduler bounds inside the target effect transaction", async () => {
+    const world = await seedWorld();
+    const { process, targets } = await seedProcess(world);
+    const now = Date.now();
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: {
+        scheduledAt: new Date(now - 60_000),
+        notAfter: new Date(now + 60_000),
+      },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const before = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(Date.parse(before?.schedule?.notAfter ?? "")).toBeGreaterThan(now);
+
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { notAfter: new Date(Date.now() - 1_000) },
+    });
+    const result = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "scheduler",
+    });
+
+    expect(result).toEqual({ status: "rejected", reason_code: "past_cutoff" });
+    expect(await census(world.workspaceId)).toEqual({ releases: 0, receipts: 0, executions: 0 });
+  });
+
+  it("rechecks the original authorizing role and edit hold inside the target transaction", async () => {
+    const world = await seedWorld();
+    const { process, targets } = await seedProcess(world);
+    const authorizer = await prisma.nurtureParticipant.create({
+      data: {
+        workspaceId: world.workspaceId,
+        myChatUserId: `authorizer:${world.workspaceId}`,
+        status: "active",
+      },
+    });
+    const authorizingRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: authorizer.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: world.group.id,
+        status: "active",
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { authorizingRoleAssignmentId: authorizingRole.id },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    expect(
+      (
+        await port.loadReleaseFacts({
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          process_key: process.processKey,
+        })
+      )?.authorizing_role_current,
+    ).toBe(true);
+
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: authorizingRole.id },
+      data: { endsAt: new Date(Date.now() - 1_000) },
+    });
+    const lapsed = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(lapsed).toEqual({ status: "rejected", reason_code: "not_authorized" });
+
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: authorizingRole.id },
+      data: { endsAt: null },
+    });
+    await prisma.nurturePublishEditHold.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        holderRoleAssignmentId: world.teacherRole.id,
+        holderParticipantId: world.teacher.id,
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    const held = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(held).toEqual({ status: "rejected", reason_code: "edit_hold_active" });
+    expect(await census(world.workspaceId)).toEqual({ releases: 0, receipts: 0, executions: 0 });
+  });
+
+  it("rechecks the composed original media revision inside the target transaction", async () => {
+    const world = await seedWorld();
+    const { process, revision, targets } = await seedProcess(world);
+    const asset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    await prisma.nurtureChildMediaAttribution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        mediaAssetRefId: asset.id,
+        childCareProcessId: world.children[0]!.process.id,
+        source: "manual",
+        state: "confirmed",
+        confirmedByRoleAssignmentId: world.teacherRole.id,
+        confirmedAt: new Date(),
+        exposurePolicyPayload: { audience: "own_family" },
+        attributionRevision: 1,
+      },
+    });
+    await prisma.nurturePublishProcessRevision.update({
+      where: { id: revision.id },
+      data: {
+        mediaCompositionPayload: {
+          media: [{ mediaAssetId: asset.id, mediaRevision: asset.mediaRevision }],
+        },
+      },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const before = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(before?.media[0]?.current_media_revision).toBe(1);
+
+    await prisma.nurtureMediaAssetRef.update({
+      where: { id: asset.id },
+      data: { mediaRevision: 2 },
+    });
+    const result = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(result).toEqual({ status: "rejected", reason_code: "media_revision_drift" });
+    expect(await census(world.workspaceId)).toEqual({ releases: 0, receipts: 0, executions: 0 });
+  });
+
+  it("keeps a missing or foreign-class composed asset as a blocking fact", async () => {
+    const world = await seedWorld();
+    const { process, revision, targets } = await seedProcess(world);
+    const foreignAsset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.otherGroup.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    await prisma.nurturePublishProcessRevision.update({
+      where: { id: revision.id },
+      data: {
+        mediaCompositionPayload: {
+          media: [{ mediaAssetId: foreignAsset.id, mediaRevision: 1 }],
+        },
+      },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const facts = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.media).toMatchObject([{ lifecycle: "unavailable" }]);
+
+    const result = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(result).toEqual({ status: "rejected", reason_code: "media_not_ready" });
+    expect(await census(world.workspaceId)).toEqual({ releases: 0, receipts: 0, executions: 0 });
   });
 
   it("refuses a caregiver of another class", async () => {
@@ -457,6 +835,7 @@ describe("G3-D owner writes: atomic per-target release", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     expect(result).toEqual({ status: "rejected", reason_code: "target_unavailable" });
     expect((await census(world.workspaceId)).releases).toBe(0);
@@ -553,6 +932,47 @@ describe("G3-D owner reads: release facts", () => {
     ).toBeNull();
   });
 
+  it("fails closed when the process has no authorizing role", async () => {
+    const world = await seedWorld();
+    const { process } = await seedProcess(world);
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { authorizingRoleAssignmentId: null },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const facts = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.authorizing_role_current).toBe(false);
+  });
+
+  it("fails closed when the authorizing role belongs to another care group", async () => {
+    const world = await seedWorld();
+    const { process } = await seedProcess(world);
+    const wrongScopeRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: world.workspaceId,
+        participantId: world.teacher.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: world.otherGroup.id,
+        status: "active",
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { authorizingRoleAssignmentId: wrongScopeRole.id },
+    });
+    const facts = await new PrismaPublicationReleasePort(prisma).loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+    expect(facts?.authorizing_role_current).toBe(false);
+  });
+
   it("surfaces an already committed target so a retry reconciles instead of duplicating", async () => {
     const world = await seedWorld();
     const { process, targets } = await seedProcess(world);
@@ -564,6 +984,7 @@ describe("G3-D owner reads: release facts", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
@@ -585,6 +1006,70 @@ describe("G3-D owner reads: release facts", () => {
     // The frozen revision is what the remaining target must bind to.
     expect(facts?.frozen_revision).toBe(1);
   });
+
+  it("fails closed when a stored release has no Receipt evidence", async () => {
+    const world = await seedWorld();
+    const { process, revision, targets } = await seedProcess(world);
+    const commandRequestId = randomUUID();
+    const commandHash = publicationReleaseCommandIdentity(
+      commandRequestId,
+      targets[0]!.targetKey,
+    );
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { state: "released", frozenRevisionId: revision.id },
+    });
+    const release = await prisma.nurturePublicationRelease.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: process.id,
+        publishProcessTargetId: targets[0]!.id,
+        publishProcessRevisionId: revision.id,
+        releasedByRoleAssignmentId: world.teacherRole.id,
+        commandRequestIdHash: commandHash,
+        receiptId: null,
+      },
+    });
+    const port = new PrismaPublicationReleasePort(prisma);
+    const facts = await port.loadReleaseFacts({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+    });
+
+    expect(facts?.receipt_evidence_available).toBe(false);
+    expect(facts?.targets[0]?.already_committed).toBeUndefined();
+    const replay = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[0]!.targetKey,
+      revision: 1,
+      command_request_id: commandRequestId,
+      trigger: "immediate",
+    });
+    expect(replay).toEqual({
+      status: "rejected",
+      reason_code: "receipt_evidence_unavailable",
+    });
+    const otherTarget = await port.commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: process.processKey,
+      target_key: targets[1]!.targetKey,
+      revision: 1,
+      command_request_id: randomUUID(),
+      trigger: "immediate",
+    });
+    expect(otherTarget).toEqual({
+      status: "rejected",
+      reason_code: "receipt_evidence_unavailable",
+    });
+    expect(release.receiptId).toBeNull();
+    expect(await prisma.nurtureChildLinkReceipt.count({
+      where: { workspaceId: world.workspaceId },
+    })).toBe(0);
+  });
 });
 
 describe("G3-D owner reads: post-release safety", () => {
@@ -600,6 +1085,7 @@ describe("G3-D owner reads: post-release safety", () => {
         target_key: target.targetKey,
         revision: 1,
         command_request_id: randomUUID(),
+        trigger: "immediate",
       });
     }
     const releases = await prisma.nurturePublicationRelease.findMany({
@@ -719,6 +1205,7 @@ describe("T-006 owner write: post-release safety", () => {
       target_key: targets[0]!.targetKey,
       revision: 1,
       command_request_id: randomUUID(),
+      trigger: "immediate",
     });
     if (result.status !== "committed") {
       throw new Error(`seedCommittedRelease failed: ${JSON.stringify(result)}`);

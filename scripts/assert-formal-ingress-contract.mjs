@@ -61,9 +61,7 @@ const expectedHarnessActionKeys = [
  * neither routed nor listed here fails this guard, so coverage can never shrink
  * silently, and a key listed here after it is routed fails too.
  */
-const expectedUnroutedCapabilityKeys = [
-  "reschedule_publish_process",
-];
+const expectedUnroutedCapabilityKeys = [];
 const expectedOwnerRequiredFields = [
   "workspace_id",
   "acting_user_id",

@@ -42,6 +42,7 @@ import {
   supersedeChildMediaAttribution,
 } from "../../src/harness/media-attribution.js";
 import {
+  INSTITUTION_PUBLICATION_POLICY_REF,
   evaluateReschedule,
   resolvePublishSchedule,
 } from "../../src/harness/publish-schedule.js";
@@ -179,6 +180,7 @@ const policy: OrganizeTriggerPolicyV1 = {
 
 const publicationPolicy = {
   ...policy,
+  policy_ref: INSTITUTION_PUBLICATION_POLICY_REF,
   institution_ref: "syn-institution-1",
   policy_version: 2,
   retry_cutoff_local_time: "19:00",
@@ -630,6 +632,12 @@ const producers: Record<string, () => Promise<unknown>> = {
             has_unsaved_revision: false,
             edit_hold_active: false,
             schedule: resolved.schedule,
+            current_policy: {
+              policy_ref: resolved.schedule.policyRef,
+              policy_head: resolved.schedule.policyHead,
+              policy_version: resolved.schedule.policyVersion,
+            },
+            receipt_evidence_available: true,
             media: [
               {
                 media_asset_id: "media-1",

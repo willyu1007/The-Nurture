@@ -706,6 +706,7 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "createUpdateGuardianCurrentFocusSpec",
     "createRecordCaregiverDailyCareSpec",
     "createCancelPublishProcessSpec",
+    "createReschedulePublishProcessSpec",
     "createAcquirePublishEditHoldSpec",
     "createRenewPublishEditHoldSpec",
     "createReleasePublishEditHoldSpec",
@@ -736,6 +737,7 @@ describe("board write commands conform to the registry's concurrency policy", ()
     renew_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
     release_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },
     cancel_publish_process: {},
+    reschedule_publish_process: { publication_schedule: "publication_schedule" },
     confirm_child_media_attribution: {
       child_media_attribution: "child_media_attribution",
       media_asset_revision: "media_asset_revision",
@@ -782,8 +784,6 @@ describe("board write commands conform to the registry's concurrency policy", ()
     // release IS routed — as a transport fan-out attempt whose revision head
     // is enforced by the attempt itself (stale_confirmation), not by a spec.
     "release_publish_process",
-    // reschedule waits on the T-007 provider.
-    "reschedule_publish_process",
   ];
 
   /**

@@ -1,11 +1,28 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import test from 'node:test';
 
-import { computeContractHash, verifyWorkflowContractPin } from './verify-workflow-contract-pin.mjs';
+import {
+  computeContractHash,
+  isMainModule,
+  verifyWorkflowContractPin,
+} from './verify-workflow-contract-pin.mjs';
+
+test('CLI entry detection resolves filesystem aliases', async (context) => {
+  const root = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-entry-'));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const target = path.join(root, 'target.mjs');
+  const alias = path.join(root, 'alias.mjs');
+  await writeFile(target, 'export {};\n');
+  await symlink(target, alias);
+
+  assert.equal(isMainModule(alias, pathToFileURL(target).href), true);
+  assert.equal(isMainModule(undefined, pathToFileURL(target).href), false);
+});
 
 test('contract hash is stable across input order and directory traversal', async (context) => {
   const root = await mkdtemp(path.join(tmpdir(), 'workflow-contract-pin-'));
@@ -66,16 +83,51 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
   const nurtureRepo = path.join(root, 'nurture');
   const workflowBaseRevision = await createGitContractRepo(workflowBaseRepo, 'export const value = 1;\n');
   const myChatRevision = await createGitContractRepo(myChatRepo, 'export const value = 1;\n');
-  await mkdir(path.join(nurtureRepo, 'scenario'), { recursive: true });
-  await writeFile(path.join(nurtureRepo, 'scenario', 'contract.md'), '# Scenario\n');
+  const nurtureFiles = {
+    'package.json': '{"private":true}\n',
+    'pnpm-lock.yaml': 'lockfileVersion: 9\n',
+    'pnpm-workspace.yaml': 'packages: []\n',
+    'tsconfig.json': '{"compilerOptions":{}}\n',
+    'apps/scenario-service/package.json': '{"private":true}\n',
+    'apps/scenario-service/src/main.ts': 'export const service = true;\n',
+    'apps/scenario-service/tsconfig.build.json': '{"extends":"./tsconfig.json"}\n',
+    'apps/scenario-service/tsconfig.db.json': '{"extends":"./tsconfig.json"}\n',
+    'apps/scenario-service/tsconfig.json': '{"compilerOptions":{}}\n',
+    'docs/context/workflow/nurture-scenario-contract.md': '# Contract\n',
+    'packages/nurture-db/package.json': '{"private":true}\n',
+    'packages/nurture-db/src/index.ts': 'export const database = true;\n',
+    'packages/nurture-db/tsconfig.build.json': '{"extends":"./tsconfig.json"}\n',
+    'packages/nurture-db/tsconfig.json': '{"compilerOptions":{}}\n',
+    'packages/nurture-scenario/package.json': '{"private":true}\n',
+    'packages/nurture-scenario/scenario.manifest.yaml': 'key: test\n',
+    'packages/nurture-scenario/src/index.ts': 'export const scenario = true;\n',
+    'packages/nurture-scenario/tsconfig.build.json': '{"extends":"./tsconfig.json"}\n',
+    'packages/nurture-scenario/tsconfig.json': '{"compilerOptions":{}}\n',
+    'prisma/migrations/0001_initial/migration.sql': 'SELECT 1;\n',
+    'prisma/schema.prisma': 'generator client { provider = "prisma-client-js" }\n',
+  };
+  for (const [relativePath, content] of Object.entries(nurtureFiles)) {
+    const absolutePath = path.join(nurtureRepo, relativePath);
+    await mkdir(path.dirname(absolutePath), { recursive: true });
+    await writeFile(absolutePath, content);
+  }
+  const nurtureContractPaths = [
+    'package.json',
+    'pnpm-lock.yaml',
+    'pnpm-workspace.yaml',
+    'tsconfig.json',
+    'apps/scenario-service',
+    'docs/context/workflow/nurture-scenario-contract.md',
+    'packages/nurture-db',
+    'packages/nurture-scenario',
+    'prisma',
+  ];
 
   const dependencyHash = await computeContractHash(path.join(workflowBaseRepo, 'contract'), ['value.ts']);
   const sourceHash = await computeContractHash(workflowBaseRepo, ['source/value.txt']);
-  const scenarioHash = await computeContractHash(nurtureRepo, ['scenario/contract.md']);
+  const scenarioHash = await computeContractHash(nurtureRepo, nurtureContractPaths);
   const pinPath = path.join(root, 'pin.json');
-  await writeFile(
-    pinPath,
-    JSON.stringify({
+  const pin = {
       schemaVersion: 2,
       hashAlgorithm: 'sha256-path-content-v1',
       compatibility: { baseAndMyChatContractParityRequired: true },
@@ -117,13 +169,31 @@ test('full verifier rejects contract drift at the pinned revision', async (conte
       },
       nurtureScenario: {
         contractRoot: '.',
-        contractPaths: ['scenario/contract.md'],
+        contractPaths: nurtureContractPaths,
         contractSha256: scenarioHash.sha256,
+      },
+    };
+  await writeFile(pinPath, JSON.stringify(pin));
+
+  await verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath });
+  const narrowedPaths = nurtureContractPaths.filter((entry) => entry !== 'packages/nurture-db');
+  const narrowedHash = await computeContractHash(nurtureRepo, narrowedPaths);
+  await writeFile(
+    pinPath,
+    JSON.stringify({
+      ...pin,
+      nurtureScenario: {
+        ...pin.nurtureScenario,
+        contractPaths: narrowedPaths,
+        contractSha256: narrowedHash.sha256,
       },
     }),
   );
-
-  await verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath });
+  await assert.rejects(
+    () => verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath }),
+    /exact runtime path is not pinned: packages\/nurture-db\//,
+  );
+  await writeFile(pinPath, JSON.stringify(pin));
   await writeFile(path.join(workflowBaseRepo, 'source', 'value.txt'), 'changed source\n');
   await assert.rejects(
     () => verifyWorkflowContractPin({ nurtureRepo, workflowBaseRepo, myChatRepo, pinPath }),

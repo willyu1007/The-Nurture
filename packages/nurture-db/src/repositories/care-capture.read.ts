@@ -3,7 +3,7 @@ import type {
   CaptureOrganizeSourceV1,
 } from "@the-nurture/scenario/harness";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
-import { readOrganizePolicy } from "./care-capture.transaction.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 
@@ -84,7 +84,7 @@ export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
         status: "active",
         deletedAt: null,
       },
-      include: { institution: { select: { policyConfigPayload: true, status: true } } },
+      include: { institution: { select: { status: true } } },
     });
     if (!group || group.institution.status !== "active") return null;
 
@@ -114,7 +114,11 @@ export class PrismaCareCaptureReadPort implements CaptureBatchReadPort {
       purpose_allowed: true,
     };
 
-    const organizePolicy = readOrganizePolicy(group.institution.policyConfigPayload ?? null);
+    const organizePolicy = await loadCurrentInstitutionPublicationPolicy(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: group.institutionId,
+      at,
+    });
     return {
       batch_id: batch.id,
       batch_version: batch.aggregateVersion,

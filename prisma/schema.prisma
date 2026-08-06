@@ -1698,9 +1698,40 @@ model NurtureCareInstitution {
   careGroups  NurtureCareGroup[]
   enrollments NurtureEnrollment[]
   mediaAssets NurtureMediaAssetRef[]
+  publicationPolicies NurtureInstitutionPublicationPolicy[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
+}
+
+// T-007's exact-Institution publication policy owner. Rows are immutable
+// versions; effectiveFrom/supersededAt select the one policy a T-006 consumer
+// may use at an instant. No row means dependency unavailable, never defaults.
+model NurtureInstitutionPublicationPolicy {
+  id                              String   @id @default(uuid())
+  workspaceId                     String   @map("workspace_id")
+  institutionId                   String   @map("institution_id")
+  policyRef                       String   @map("policy_ref")
+  policyVersion                   Int      @map("policy_version")
+  policyHead                      Int      @map("policy_head")
+  timeZone                        String   @map("time_zone")
+  defaultReleaseLocalTime         String   @map("default_release_local_time")
+  retryCutoffLocalTime            String   @map("retry_cutoff_local_time")
+  organizeIdleSeconds             Int      @map("organize_idle_seconds")
+  organizeFallbackLeadSeconds     Int      @map("organize_fallback_lead_seconds")
+  automaticQuiescenceSeconds      Int      @map("automatic_quiescence_seconds")
+  captureActivityLeaseSeconds     Int      @map("capture_activity_lease_seconds")
+  automaticOrganizeEnabled        Boolean  @map("automatic_organize_enabled")
+  effectiveFrom                   DateTime @map("effective_from")
+  supersededAt                    DateTime? @map("superseded_at")
+  createdAt                       DateTime @default(now()) @map("created_at")
+
+  institution NurtureCareInstitution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, institutionId, policyVersion], map: "uq_nurture_publication_policy_version")
+  @@unique([workspaceId, institutionId, policyHead], map: "uq_nurture_publication_policy_head")
+  @@index([workspaceId, institutionId, effectiveFrom, supersededAt], map: "ix_nurture_publication_policy_effective")
+  @@map("nurture_institution_publication_policy")
 }
 
 model NurtureCareGroup {

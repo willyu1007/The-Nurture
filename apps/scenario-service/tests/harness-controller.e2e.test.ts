@@ -283,7 +283,7 @@ describe("Harness controller boundary", () => {
     for (const [path, capabilityKey] of [
       [HARNESS_QUERY_PATH, "save_publish_process_draft"],
       [HARNESS_QUERY_PATH, "query_teacher_publish_queue_v2"],
-      [HARNESS_PREPARE_PATH, "release_publish_process"],
+      [HARNESS_PREPARE_PATH, "unregistered_write_capability"],
     ] as const) {
       const refused = await post(baseUrl, path, {
         workspace_id: "ws-1",

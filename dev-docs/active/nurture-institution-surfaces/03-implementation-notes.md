@@ -1,5 +1,16 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-05 — G4-0B bounded provider/consumer dependency qualified
+
+- The exact `nurture.institution-publication-policy@1.0.0` owner provider was
+  consumed through the production organize/admission/reschedule/release path during
+  the repaired T-006 G3 qualification at Nurture `0374087…`.
+- The exact detached owner/joint run passed and kept the provider default-off; its
+  disposable PostgreSQL and topology were destroyed after verification.
+- This is only the early G4-0B dependency handoff. T-007 remains `planned`; G4-0C～F,
+  persistent schema apply, capability activation, deployment, T-008 and traffic were
+  not started.
+
 ## 2026-07-29 — Task package created
 
 - 创建 T-007 规划包。

@@ -22,6 +22,7 @@ import {
   type BoardCensus,
   type BoardPrisma,
 } from "./board-read-support.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 
 const UNAUTHORIZED_SCOPE: CaregiverBoardScopeFacts = {
   authorized: false,
@@ -134,7 +135,7 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
     );
     if (!reach) return UNAUTHORIZED_SCOPE;
 
-    const [logs, attention, roles, enrollments, grants, corrections, redactions, institution] =
+    const [logs, attention, roles, enrollments, grants, corrections, redactions, publicationPolicy] =
       await Promise.all([
         aggregateCensus((args) =>
           this.prisma.nurtureDailyCareLog.aggregate({
@@ -193,9 +194,10 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
           },
           select: { occurredAt: true },
         }),
-        this.prisma.nurtureCareInstitution.findFirst({
-          where: { id: reach.institution_id, workspaceId: input.workspace_id },
-          select: { policyConfigPayload: true },
+        loadCurrentInstitutionPublicationPolicy(this.prisma, {
+          workspace_id: input.workspace_id,
+          institution_id: reach.institution_id,
+          at,
         }),
       ]);
 
@@ -243,9 +245,7 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
       },
       // The publish queue may list work without a policy, but nothing can be
       // scheduled until the institution has actually resolved a send window.
-      publication_policy_resolved: isPublicationPolicyResolved(
-        institution?.policyConfigPayload ?? null,
-      ),
+      publication_policy_resolved: publicationPolicy !== null,
     };
   }
 
@@ -412,13 +412,3 @@ export class PrismaCaregiverBoardReadPort implements CaregiverBoardReadPort {
     };
   }
 }
-
-/**
- * A resolved publication policy is an explicit institution fact. An absent or
- * malformed payload is "not resolved" — never a default window.
- */
-const isPublicationPolicyResolved = (payload: unknown): boolean =>
-  typeof payload === "object" &&
-  payload !== null &&
-  (payload as { publicationPolicyRef?: unknown }).publicationPolicyRef ===
-    "nurture.institution-publication-policy@1.0.0";

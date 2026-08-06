@@ -21,6 +21,7 @@ import {
   createAesGcmProtectedContentPort,
   createPrismaClient,
   Prisma,
+  PrismaPublishQueueAdmissionService,
   publicationReleaseAttemptIdentity,
 } from "@the-nurture/db";
 import { createScenarioServiceApplication } from "../src/application.js";
@@ -103,10 +104,17 @@ afterAll(async () => {
  * skipped block can no longer count as end-to-end evidence.
  */
 const capabilityEvidence: Record<string, Set<string>> = {};
+const JOINT_EVIDENCE_KEYS = {
+  t007T006Publication: "joint:t007_t006_publication",
+  t005T006DirectInteraction: "joint:t005_t006_direct_interaction",
+} as const;
 const recordEvidence = (body: unknown, json: { status?: string }): void => {
   const key = (body as { capability_key?: string })?.capability_key;
   if (!key || typeof json?.status !== "string") return;
   (capabilityEvidence[key] ??= new Set()).add(json.status);
+};
+const recordJointEvidence = (key: (typeof JOINT_EVIDENCE_KEYS)[keyof typeof JOINT_EVIDENCE_KEYS]) => {
+  (capabilityEvidence[key] ??= new Set()).add("passed");
 };
 
 const post = async (
@@ -3610,7 +3618,40 @@ describe("T-006 post-release safety through the formal Harness ingress", () => {
 });
 
 describe("G3-D release fan-out on the formal ingress", () => {
+  const policyDataForInstitution = (
+    scope: SeedScope,
+    overrides: Partial<{
+      policyVersion: number;
+      policyHead: number;
+      effectiveFrom: Date;
+    }> = {},
+  ) => ({
+    workspaceId: scope.workspaceId,
+    institutionId: scope.institution.id,
+    policyRef: "nurture.institution-publication-policy@1.0.0",
+    policyVersion: 1,
+    policyHead: 1,
+    timeZone: "Asia/Shanghai",
+    defaultReleaseLocalTime: "17:00",
+    retryCutoffLocalTime: "19:00",
+    organizeIdleSeconds: 600,
+    organizeFallbackLeadSeconds: 1800,
+    automaticQuiescenceSeconds: 60,
+    captureActivityLeaseSeconds: 60,
+    automaticOrganizeEnabled: true,
+    effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+    ...overrides,
+  });
+
   const seedQueuedRelease = async (scope: SeedScope, targetCount = 1) => {
+    const resolvedAt = new Date();
+    const scheduledAt = new Date(resolvedAt.getTime() + 60 * 60 * 1000);
+    const notAfter = new Date(resolvedAt.getTime() + 3 * 60 * 60 * 1000);
+    const policy = await prisma.nurtureInstitutionPublicationPolicy.create({
+      data: policyDataForInstitution(scope, {
+        effectiveFrom: new Date(resolvedAt.getTime() - 60 * 60 * 1000),
+      }),
+    });
     const process = await prisma.nurturePublishProcess.create({
       data: {
         workspaceId: scope.workspaceId,
@@ -3619,6 +3660,14 @@ describe("G3-D release fan-out on the formal ingress", () => {
         state: "pending_release",
         dataClass: "child_growth_record",
         purposeKey: "child_growth_publication",
+        authorizingRoleAssignmentId: scope.caregiverRole.id,
+        scheduledAt,
+        notAfter,
+        scheduleTimeZone: "Asia/Shanghai",
+        schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
+        schedulePolicyHead: 1,
+        schedulePolicyVersion: 1,
+        scheduleResolvedAt: resolvedAt,
       },
     });
     const revision = await prisma.nurturePublishProcessRevision.create({
@@ -3665,7 +3714,13 @@ describe("G3-D release fan-out on the formal ingress", () => {
         }),
       });
     }
-    return { process, revision, targets };
+    return {
+      process,
+      revision,
+      targets,
+      policy,
+      schedule: { resolvedAt, scheduledAt, notAfter },
+    };
   };
 
   const releaseRef = (scope: SeedScope, processKey: string) =>
@@ -3675,6 +3730,111 @@ describe("G3-D release fan-out on the formal ingress", () => {
       PUBLISH_PROCESS_TARGET_KIND,
       processKey,
     );
+
+  it("reschedules through the formal ingress against the persisted T-007 policy", async () => {
+    const scope = await seedScope();
+    const { process, schedule } = await seedQueuedRelease(scope);
+    const requestedScheduledAt = new Date(
+      schedule.resolvedAt.getTime() + 2 * 60 * 60 * 1000,
+    );
+
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reschedule_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+      operationInput: { scheduledAt: requestedScheduledAt.toISOString() },
+    });
+    expect(prepared.json).toMatchObject({
+      status: "ready_to_confirm",
+      preview: {
+        effect: "reschedule_publish_process",
+        scheduledAt: requestedScheduledAt.toISOString(),
+        notAfter: schedule.notAfter.toISOString(),
+      },
+    });
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reschedule_publish_process",
+      prepared,
+      operationInput: { scheduledAt: requestedScheduledAt.toISOString() },
+    });
+    expect(executed.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+      committed_result: {
+        scheduledAt: requestedScheduledAt.toISOString(),
+        notAfter: schedule.notAfter.toISOString(),
+        timeZone: "Asia/Shanghai",
+        policyHead: 1,
+        policyVersion: 1,
+        resolvedAt: schedule.resolvedAt.toISOString(),
+      },
+    });
+    const stored = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(stored.scheduledAt?.toISOString()).toBe(requestedScheduledAt.toISOString());
+    expect(stored.notAfter?.toISOString()).toBe(schedule.notAfter.toISOString());
+    expect(stored.schedulePolicyHead).toBe(1);
+    expect(stored.schedulePolicyVersion).toBe(1);
+    expect(stored.scheduleResolvedAt?.toISOString()).toBe(
+      schedule.resolvedAt.toISOString(),
+    );
+  });
+
+  it("blocks reschedule when the exact T-007 policy changes after confirmation", async () => {
+    const scope = await seedScope();
+    const { process, policy, schedule } = await seedQueuedRelease(scope);
+    const requestedScheduledAt = new Date(
+      schedule.resolvedAt.getTime() + 2 * 60 * 60 * 1000,
+    );
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reschedule_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+      operationInput: { scheduledAt: requestedScheduledAt.toISOString() },
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+
+    const changedAt = new Date(Date.now() - 1);
+    await prisma.nurtureInstitutionPublicationPolicy.update({
+      where: { id: policy.id },
+      data: { supersededAt: changedAt },
+    });
+    await prisma.nurtureInstitutionPublicationPolicy.create({
+      data: policyDataForInstitution(scope, {
+        policyVersion: 2,
+        policyHead: 2,
+        effectiveFrom: changedAt,
+      }),
+    });
+
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reschedule_publish_process",
+      prepared,
+      operationInput: { scheduledAt: requestedScheduledAt.toISOString() },
+    });
+    expect(executed.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "publication_policy_drift",
+    });
+    expect(
+      (
+        await prisma.nurturePublishProcess.findUniqueOrThrow({
+          where: { id: process.id },
+        })
+      ).scheduledAt?.toISOString(),
+    ).toBe(schedule.scheduledAt.toISOString());
+  });
 
   it("commits the target atomically and reconciles the repeat from stored rows", async () => {
     const scope = await seedScope();
@@ -3886,6 +4046,48 @@ describe("G3-D release fan-out on the formal ingress", () => {
       }),
     ).toBe(0);
   });
+
+  it("blocks release when the exact T-007 policy changes after confirmation", async () => {
+    const scope = await seedScope();
+    const { process, policy } = await seedQueuedRelease(scope);
+    const prepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      targetOptionRef: releaseRef(scope, process.processKey),
+    });
+    expect(prepared.json.status).toBe("ready_to_confirm");
+
+    const changedAt = new Date(Date.now() - 1);
+    await prisma.nurtureInstitutionPublicationPolicy.update({
+      where: { id: policy.id },
+      data: { supersededAt: changedAt },
+    });
+    await prisma.nurtureInstitutionPublicationPolicy.create({
+      data: policyDataForInstitution(scope, {
+        policyVersion: 2,
+        policyHead: 2,
+        effectiveFrom: changedAt,
+      }),
+    });
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared,
+    });
+    expect(executed.json).toMatchObject({
+      status: "not_committed",
+      reason_code: "publication_policy_drift",
+    });
+    expect(
+      await prisma.nurturePublicationRelease.count({
+        where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      }),
+    ).toBe(0);
+  });
 });
 
 describe("G3-B1 manual organize through the formal Harness ingress", () => {
@@ -3900,12 +4102,27 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
       where: { id: scope.institution.id },
       data: {
         policyConfigPayload: {
-          publicationPolicyRef: "nurture.institution-publication-policy@1.0.0",
-          publicationPolicyHead: 5,
-          timeZone: "Asia/Shanghai",
           contentSafetyPolicyRef: "syn-content-safety-1",
           contentSafetyPolicyHead: 2,
         },
+      },
+    });
+    await prisma.nurtureInstitutionPublicationPolicy.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        policyRef: "nurture.institution-publication-policy@1.0.0",
+        policyVersion: 1,
+        policyHead: 5,
+        timeZone: "Asia/Shanghai",
+        defaultReleaseLocalTime: "17:00",
+        retryCutoffLocalTime: "19:00",
+        organizeIdleSeconds: 600,
+        organizeFallbackLeadSeconds: 1800,
+        automaticQuiescenceSeconds: 60,
+        captureActivityLeaseSeconds: 60,
+        automaticOrganizeEnabled: true,
+        effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
       },
     });
     await prisma.nurtureChildLinkGrant.create({
@@ -4000,6 +4217,11 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
     expect(storedBatch.state).toBe("organized");
     expect(storedBatch.resolvedTrigger).toBe("manual");
     expect(storedBatch.triggerRequestId).toBe(prepared.json.command_request_id);
+    expect(storedBatch.policyRef).toBe("nurture.institution-publication-policy@1.0.0");
+    expect(storedBatch.policyHead).toBe(5);
+    expect(storedBatch.timeZone).toBe("Asia/Shanghai");
+    expect(storedBatch.quiescenceSeconds).toBe(60);
+    expect(storedBatch.observedUserActivityAt).toEqual(storedBatch.cutAt);
 
     const process = await prisma.nurturePublishProcess.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId, captureBatchId: batch.id },
@@ -4010,16 +4232,249 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
     expect(process.currentRevision?.revision).toBe(1);
     expect(process.currentRevision?.titleProtectionPayload).toBeTruthy();
     expect(process.targets).toHaveLength(1);
+    expect(process.authorizingRoleAssignmentId).toBe(scope.caregiverRole.id);
+    expect(process.scheduledAt).toBeNull();
+
+    // My-Chat owns timer/retry, while this scenario-side service owns the
+    // admission decision and atomic schedule write. This is the real
+    // provider-backed schedule path, not a hand-seeded pending row.
+    const admission = await new PrismaPublishQueueAdmissionService(prisma).admitDueProcess({
+      workspace_id: scope.workspaceId,
+      process_key: process.processKey,
+      now: new Date(process.createdAt.getTime() + 31_000),
+    });
+    expect(admission).toMatchObject({
+      status: "queued",
+      schedule: {
+        policyRef: "nurture.institution-publication-policy@1.0.0",
+        policyHead: 5,
+        policyVersion: 1,
+        timeZone: "Asia/Shanghai",
+      },
+    });
+    const queued = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(queued.state).toBe("pending_release");
+    expect(queued.scheduledAt).not.toBeNull();
+    expect(queued.notAfter).not.toBeNull();
+    expect(queued.notAfter!.getTime()).toBeGreaterThan(queued.scheduledAt!.getTime());
+    expect(queued.scheduleResolvedAt?.toISOString()).toBe(
+      new Date(process.createdAt.getTime() + 31_000).toISOString(),
+    );
+
+    // Continue the same persisted provider/consumer journey through the
+    // formal reschedule and release actions.
+    const requestedScheduledAt = new Date(
+      Math.min(
+        queued.notAfter!.getTime() - 1_000,
+        Math.max(Date.now() + 60_000, queued.scheduledAt!.getTime() + 15 * 60_000),
+      ),
+    );
+    const processTargetRef = issueBoardSealedRef(
+      INTEGRITY_KEY,
+      { workspace_id: scope.workspaceId, participant_id: scope.caregiver.id },
+      PUBLISH_PROCESS_TARGET_KIND,
+      process.processKey,
+    );
+    const reschedulePrepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reschedule_publish_process",
+      targetOptionRef: processTargetRef,
+      operationInput: { scheduledAt: requestedScheduledAt.toISOString() },
+    });
+    expect(reschedulePrepared.json.status).toBe("ready_to_confirm");
+    const rescheduled = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "reschedule_publish_process",
+      prepared: reschedulePrepared,
+      operationInput: { scheduledAt: requestedScheduledAt.toISOString() },
+    });
+    expect(rescheduled.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+      committed_result: {
+        scheduledAt: requestedScheduledAt.toISOString(),
+        policyHead: 5,
+        policyVersion: 1,
+      },
+    });
+
+    const releasePrepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      targetOptionRef: processTargetRef,
+    });
+    expect(releasePrepared.json.status).toBe("ready_to_confirm");
+    const released = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "release_publish_process",
+      prepared: releasePrepared,
+    });
+    expect(released.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+      committed_result: {
+        processState: "released",
+        summary: { total: 1, committed: 1 },
+      },
+    });
+    const publicationRelease = await prisma.nurturePublicationRelease.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
+      include: { receipt: true },
+    });
+    expect(publicationRelease.receipt).toMatchObject({
+      sourceType: "publication_release",
+      status: "delivered",
+      direction: "org_to_family",
+    });
+
+    // Close the real journey on the family projection, not merely on the
+    // release row. The summary is the protected owner title; an internal
+    // process key must never become family-visible copy.
+    const familyActivity = await post(HARNESS_QUERY_PATH, {
+      workspace_id: scope.workspaceId,
+      actor_participant_id: scope.guardian.id,
+      surface: "board",
+      capability_key: "query_guardian_enrollment_activity",
+      capability_version: "1.0.0",
+      target_option_ref: issueTargetOptionRef(INTEGRITY_KEY, {
+        workspace_id: scope.workspaceId,
+        participant_id: scope.guardian.id,
+        enrollment_id: scope.enrollment.id,
+      }),
+    });
+    expect(familyActivity.json).toMatchObject({
+      status: "ok",
+      output: {
+        items: [
+          {
+            kind: "daily_care",
+            sourceLabel: "publication_release",
+          },
+        ],
+      },
+    });
+    expect(familyActivity.json.output.items[0].summary).toBeTruthy();
+    const familyWire = JSON.stringify(familyActivity.json);
+    for (const raw of [
+      process.id,
+      process.processKey,
+      publicationRelease.id,
+      publicationRelease.receiptId,
+      scope.enrollment.id,
+    ]) {
+      expect(familyWire).not.toContain(raw);
+    }
     const assessment = await prisma.nurtureContentSafetyAssessment.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId, publishProcessId: process.id },
     });
     expect(assessment.route).toBe("ordinary");
+    recordJointEvidence(JOINT_EVIDENCE_KEYS.t007T006Publication);
 
     // No raw owner identifier on the wire.
     const serialized = JSON.stringify(executed.json);
     for (const raw of [batch.id, process.id, process.processKey, scope.group.id]) {
       expect(serialized).not.toContain(raw);
     }
+  });
+
+  it("keeps organize default-off when the T-007 publication policy is absent", async () => {
+    const { scope } = await seedOrganizeScope();
+    const choices = await organizePrepare(scope);
+    expect(choices.json.status).toBe("needs_input");
+    await prisma.nurtureInstitutionPublicationPolicy.deleteMany({
+      where: { workspaceId: scope.workspaceId, institutionId: scope.institution.id },
+    });
+
+    const prepared = await organizePrepare(
+      scope,
+      choices.json.choices[0].target_option_ref as string,
+    );
+    expect(prepared.json).toMatchObject({
+      status: "denied",
+      reason_code: "policy_unavailable",
+    });
+    expect(
+      await prisma.nurturePublishProcess.count({ where: { workspaceId: scope.workspaceId } }),
+    ).toBe(0);
+  });
+
+  it("rebases an unqueued draft onto the current T-007 policy before schedule freeze", async () => {
+    const { scope, batch } = await seedOrganizeScope();
+    const choices = await organizePrepare(scope);
+    const prepared = await organizePrepare(
+      scope,
+      choices.json.choices[0].target_option_ref as string,
+    );
+    const executed = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "organize_care_capture_batch",
+      prepared,
+    });
+    expect(executed.json.status).toBe("committed");
+
+    const process = await prisma.nurturePublishProcess.findFirstOrThrow({
+      where: { workspaceId: scope.workspaceId, captureBatchId: batch.id },
+    });
+    const policyChangedAt = new Date(process.createdAt.getTime() + 10_000);
+    await prisma.nurtureInstitutionPublicationPolicy.updateMany({
+      where: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        policyVersion: 1,
+      },
+      data: { supersededAt: policyChangedAt },
+    });
+    await prisma.nurtureInstitutionPublicationPolicy.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        policyRef: "nurture.institution-publication-policy@1.0.0",
+        policyVersion: 2,
+        policyHead: 6,
+        timeZone: "Asia/Shanghai",
+        defaultReleaseLocalTime: "18:00",
+        retryCutoffLocalTime: "20:00",
+        organizeIdleSeconds: 600,
+        organizeFallbackLeadSeconds: 1800,
+        automaticQuiescenceSeconds: 60,
+        captureActivityLeaseSeconds: 60,
+        automaticOrganizeEnabled: true,
+        effectiveFrom: policyChangedAt,
+      },
+    });
+
+    const admission = await new PrismaPublishQueueAdmissionService(prisma).admitDueProcess({
+      workspace_id: scope.workspaceId,
+      process_key: process.processKey,
+      now: new Date(process.createdAt.getTime() + 31_000),
+    });
+    expect(admission).toMatchObject({
+      status: "queued",
+      schedule: {
+        policyRef: "nurture.institution-publication-policy@1.0.0",
+        policyHead: 6,
+        policyVersion: 2,
+        timeZone: "Asia/Shanghai",
+      },
+    });
+    const queued = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: process.id },
+    });
+    expect(queued.state).toBe("pending_release");
+    expect(queued.schedulePolicyHead).toBe(6);
+    expect(queued.schedulePolicyVersion).toBe(2);
   });
 
   it("routes restricted content to direct interaction with the owner-issued T-005 entry", async () => {
@@ -4050,6 +4505,33 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
     expect(result.directInteractionAction.targetOptions).toHaveLength(1);
     expect(JSON.stringify(result)).not.toContain(scope.enrollment.id);
 
+    // Consume the exact T-006-produced option through the real T-005 provider,
+    // not through a synthetic option or the ordinary family-question lane.
+    const directMessageInput = {
+      body: "想进一步确认今天的情况，请家里方便时回复。",
+    };
+    const directPrepared = await prepareAction({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: result.directInteractionAction.capabilityKey,
+      targetOptionRef: result.directInteractionAction.targetOptions[0].targetOptionRef,
+      operationInput: directMessageInput,
+    });
+    expect(directPrepared.json.status).toBe("ready_to_confirm");
+    const directExecuted = await executePrepared({
+      scope,
+      actorId: scope.caregiver.id,
+      surface: "board",
+      capabilityKey: "initiate_caregiver_direct_message",
+      prepared: directPrepared,
+      operationInput: directMessageInput,
+    });
+    expect(directExecuted.json).toMatchObject({
+      status: "committed",
+      business_outcome: "applied",
+    });
+
     // No publication candidate exists, and the batch still organized.
     expect(
       await prisma.nurturePublishProcess.count({
@@ -4066,6 +4548,7 @@ describe("G3-B1 manual organize through the formal Harness ingress", () => {
     });
     expect(assessment.route).toBe("direct_interaction_required");
     expect(assessment.publishProcessId).toBeNull();
+    recordJointEvidence(JOINT_EVIDENCE_KEYS.t005T006DirectInteraction);
   });
 
   it("refuses stale_confirmation when a capture lands between prepare and execute", async () => {

@@ -314,6 +314,7 @@ const expectedTableCensus = [
   "NurtureFocusGoal",
   "NurtureFocusGoalChildScope",
   "NurtureHealthStateSummary",
+  "NurtureInstitutionPublicationPolicy",
   "NurtureInteractionContext",
   "NurtureMediaAssetRef",
   "NurtureMetricDefinition",
@@ -702,8 +703,8 @@ for (const requiredText of [
   "organizeFallbackLeadSeconds = 1800",
   "automaticQuiescenceSeconds = 60",
   "captureActivityLeaseSeconds = 60",
-  "Implementation: pending",
-  "Provider/consumer qualification: pending",
+  "Implementation candidate: ready; database qualification pending",
+  "Provider/consumer qualification: pending database-backed execution",
 ]) {
   assertTextIncludes(t007Freeze, requiredText, `T-007 policy ${requiredText}`);
 }

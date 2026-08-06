@@ -764,3 +764,63 @@ canonical fact heads。任何微调完成后，旧 snapshot/cursor 必须失效�
 G3-0 的 exact query topology、source-head/cursor binding、T-005/T-007 dependency
 contract 与 DB SSOT delta 见
 [06-g3-0-fact-contract-schema-freeze.md](06-g3-0-fact-contract-schema-freeze.md)。
+
+## G3-E Publication-policy Provider and Reschedule Candidate — 2026-08-05
+
+- T-007 policy facts live in a versioned, exact Workspace + Institution scoped
+  `NurtureInstitutionPublicationPolicy` table. The read port accepts exactly one
+  effective row and validates the contract identity, positive version/head,
+  local-time window, durations and IANA timezone; missing, ambiguous or invalid
+  rows fail closed. Existing loose JSON configuration is not a fallback.
+- A frozen publish schedule is one atomic seven-field value:
+  `scheduledAt`, `notAfter`, `timeZone`, `policyRef`, `policyHead`,
+  `policyVersion` and `resolvedAt`. Persistence constraints and the shared read
+  helper reject partial schedules. The stored policy version/resolution time are
+  not substituted with the process aggregate version/update time.
+- `reschedule_publish_process` is an owner-issued, confirmation-bound action.
+  Prepare rereads current authority/process/hold/provider state; execute rereads
+  them in the transaction and uses the `PublishProcess` aggregate version as the
+  schedule CAS head. Organize creates a `draft` with the exact authorizing role
+  but no schedule. After the 30-second quick-adjust interval, the scenario-side
+  queue-admission transaction rereads the role, hold and T-007 provider and
+  atomically advances `draft -> pending_release` while freezing the seven-field
+  schedule. A successful reschedule changes only `scheduledAt` inside that
+  frozen window, rebases scheduler authority to the current executor's exact
+  role episode, and preserves policy identity and resolution instant.
+- Scheduler and immediate release both reread the current exact policy and
+  require compatibility with the frozen identity/version/head. Immediate send
+  skips only the clock window; it does not bypass authority, saved revision,
+  edit hold, targets, media or policy compatibility.
+- No policy write capability, activation path or host-runtime ownership was
+  introduced. My-Chat still owns timer/retry; Nurture owns the admission rule
+  and owner transaction. The provider remains default-off through fact absence.
+
+## G3 Exit Boundary — 2026-08-05
+
+The detached qualification confirms that the design above composes through the
+real owner path: T-007 policy facts enter Nurture only through the exact read port;
+T-006 owns queue admission, schedule freezing and release transactions; restricted
+content exits into T-005 only through the exact owner-issued G2-C action; Guardian
+visibility is proven by Receipt-backed owner reread. No host timer, cache, delivery,
+Workflow or provider state became a substitute owner fact.
+
+The first beta profile therefore freezes B1/C1/D/E while B2/C2 remain absent and
+default-off. Camera, protected local cache, native/device interaction, notification
+delivery, Candidate and deployment remain My-Chat/T-008 responsibilities. This Exit
+is an architectural handoff boundary, not activation authority.
+
+### G3-D repair-qualified transaction boundary
+
+The exact release owner now treats frozen revision acquisition as the first write in
+each target transaction. A Serializable transaction rereads the process-bound schedule,
+T-007 policy, executor reach, original authorizing role, edit hold, Grant, Enrollment,
+Receipt census and frozen media eligibility; only an exact pending/current/unfrozen CAS
+may advance the parent to released before Receipt, PublicationRelease and
+CommandExecution land atomically. Later targets bind only to that frozen revision.
+
+Preview and effect reuse one ref-free target eligibility derivation, but preview is not
+authority. Missing Receipt evidence, unavailable or foreign-class media and composition
+revision drift remain explicit blocking facts. The organize owner writes the canonical
+composition shape and resolves assets within the batch's exact CareGroup. These rules were
+qualified at Nurture checkpoint `0374087…`; they do not change host/runtime ownership or
+authorize capability activation.

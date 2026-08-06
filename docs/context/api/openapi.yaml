@@ -528,6 +528,7 @@ components:
             - redact_publication
             - release_publish_process
             - organize_care_capture_batch
+            - reschedule_publish_process
         capability_version:
           type: string
           const: 1.0.0
@@ -631,6 +632,7 @@ components:
             - redact_publication
             - release_publish_process
             - organize_care_capture_batch
+            - reschedule_publish_process
         capability_version:
           type: string
           const: 1.0.0

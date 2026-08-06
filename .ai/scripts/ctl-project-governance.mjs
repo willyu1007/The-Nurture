@@ -1548,7 +1548,15 @@ const COMMIT_FIELDS = [
   '%(trailers:key=Phase,valueonly,separator=%x2C)',
   '%(trailers:key=Docs,valueonly,separator=%x2C)',
   '%(trailers:key=Verify,valueonly,separator=%x2C)',
+  '%B',
 ];
+
+function taskMarkersFromMessage(message) {
+  return String(message || '')
+    .split(/\r?\n/)
+    .map((line) => line.match(/^[ \t]*Task:[ \t]*(T-\d{3})[ \t]*$/)?.[1] || '')
+    .filter(Boolean);
+}
 
 function readCommitTimeline({ repoRoot, scan }) {
   // Trailers are parsed by git itself, then filtered here. Filtering in JS
@@ -1566,17 +1574,21 @@ function readCommitTimeline({ repoRoot, scan }) {
   for (const chunk of raw.split('\x1e')) {
     const line = chunk.replace(/^\n/, '');
     if (!line.trim()) continue;
-    const [sha, short, date, author, subject, task, phase, docs, verify] = line.split('\x1f');
+    const [sha, short, date, author, subject, task, phase, docs, verify, message] = line.split('\x1f');
+    const tasks = String(task || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     records.push({
       commit: short || '',
       sha: sha || '',
       date: date || '',
       author: author || '',
       subject: subject || '',
-      tasks: String(task || '')
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
+      tasks,
+      malformed_task_markers: taskMarkersFromMessage(message).filter(
+        (taskId) => !tasks.includes(taskId)
+      ),
       phase: String(phase || '').trim(),
       docs: String(docs || '').trim(),
       verify: String(verify || '').trim(),
@@ -1838,6 +1850,9 @@ function cmdResume({ repoRoot, projectSlug, taskId, limit, scan, limitClamped, s
   }
 
   const linked = records.filter((record) => record.tasks.includes(task.id));
+  const malformedTaskMarkers = records.filter((record) =>
+    record.malformed_task_markers.includes(task.id)
+  );
   const commits = linked
     .slice(0, limit)
     .reverse()
@@ -1861,6 +1876,11 @@ function cmdResume({ repoRoot, projectSlug, taskId, limit, scan, limitClamped, s
   if (linked.length === 0) {
     warnings.push(`No commit carries "Task: ${task.id}"; linked progress is unknown, not zero.`);
   }
+  if (malformedTaskMarkers.length > 0) {
+    warnings.push(
+      `${malformedTaskMarkers.length} scanned commit(s) contain "Task: ${task.id}" outside Git's final trailer block; they are intentionally not counted as linked history.`
+    );
+  }
   if (records.length >= scan) warnings.push(`Commit scan limit reached (${scan}); older commits were not examined.`);
   if (worktree === null) warnings.push('Worktree state is unavailable.');
   else if (!worktree.clean) {
@@ -1868,6 +1888,9 @@ function cmdResume({ repoRoot, projectSlug, taskId, limit, scan, limitClamped, s
   }
 
   const suggestions = buildResumeSuggestions({ task, commits, worktree });
+  if (malformedTaskMarkers.length > 0) {
+    suggestions.commands.unshift(`git show --stat ${malformedTaskMarkers[0].sha}`);
+  }
   const limiter = createResumeTextLimiter();
   const boundedCommits = commits.map((commit, index) => ({
     commit: commit.commit,
@@ -1919,6 +1942,7 @@ function cmdResume({ repoRoot, projectSlug, taskId, limit, scan, limitClamped, s
     timeline: {
       state: linked.length > 0 ? 'linked' : 'unknown',
       linked_total: linked.length,
+      malformed_task_marker_total: malformedTaskMarkers.length,
       scanned_commits: records.length,
       scan_limit: scan,
       limit,
@@ -1966,6 +1990,9 @@ function cmdCommits({ repoRoot, projectSlug, taskId, limit, scan, json }) {
   }
 
   const matched = records.filter((r) => r.tasks.includes(task.id));
+  const malformedTaskMarkers = records.filter((record) =>
+    record.malformed_task_markers.includes(task.id)
+  );
   // Output oldest -> newest so "the last line" is unambiguously the latest commit.
   // The limit still keeps the *most recent* N commits.
   const rows = matched.slice(0, limit).reverse();
@@ -1995,6 +2022,19 @@ function cmdCommits({ repoRoot, projectSlug, taskId, limit, scan, json }) {
       );
       console.error(colors.dim(`[info] Inspect manually: git log --oneline -- ${task.dev_docs_path}`));
     }
+  }
+
+  if (malformedTaskMarkers.length > 0) {
+    console.error(
+      colors.yellow(
+        `[warning] ${malformedTaskMarkers.length} scanned commit(s) contain "Task: ${task.id}" outside Git's final trailer block and are not linked.`
+      )
+    );
+    console.error(
+      colors.dim(
+        '[info] Keep Task and Co-Authored-By (or other trailers) contiguous in the final message block; do not rewrite published history.'
+      )
+    );
   }
 
   const dirty = countWorktreeChanges(repoRoot);

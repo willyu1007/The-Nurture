@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  INSTITUTION_PUBLICATION_POLICY_REF,
   PILOT_RELEASE_DEFAULTS,
   evaluateReschedule,
   evaluateSchedulerAttempt,
@@ -16,7 +17,7 @@ import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js
 const policy = (
   overrides: Partial<InstitutionPublicationPolicyV1> = {},
 ): InstitutionPublicationPolicyV1 => ({
-  policy_ref: "syn-publication-policy-1",
+  policy_ref: INSTITUTION_PUBLICATION_POLICY_REF,
   policy_head: 5,
   policy_version: 2,
   institution_ref: "syn-institution-1",
@@ -80,8 +81,13 @@ describe("G3-D schedule resolution", () => {
     for (const [override, reason] of [
       [{ retry_cutoff_local_time: "16:00" }, "cutoff_not_after_release"],
       [{ retry_cutoff_local_time: "25:00" }, "invalid_retry_cutoff_local_time"],
+      [{ policy_ref: "nurture.institution-publication-policy@2.0.0" }, "unsupported_policy_contract"],
       [{ institution_ref: "" }, "missing_institution_ref"],
       [{ policy_version: 0 }, "invalid_policy_version"],
+      [{ organize_idle_seconds: 59, automatic_organize_enabled: false }, "invalid_policy_interval"],
+      [{ organize_fallback_lead_seconds: 59 }, "invalid_policy_interval"],
+      [{ automatic_quiescence_seconds: 181 }, "invalid_quiescence_gate"],
+      [{ capture_activity_lease_seconds: 181 }, "invalid_policy_interval"],
       [{ effective_from: "2027-01-01T00:00:00.000Z" }, "policy_not_yet_effective"],
       [{ effective_to: "2026-01-02T00:00:00.000Z" }, "policy_expired"],
       [{ time_zone: "Not/AZone" }, "invalid_time_zone"],
@@ -95,6 +101,34 @@ describe("G3-D schedule resolution", () => {
 
   it("validates the policy against the frozen T-007 field set", () => {
     expect(validateInstitutionPublicationPolicy(policy(), morning)).toEqual({ status: "ok" });
+  });
+
+  it("handles DST deterministically and fails closed on a nonexistent wall clock", () => {
+    const fallBack = resolvePublishSchedule({
+      policy: policy({
+        time_zone: "America/New_York",
+        default_release_local_time: "01:30",
+        retry_cutoff_local_time: "02:30",
+      }),
+      now: new Date("2026-11-01T04:00:00.000Z"),
+    });
+    expect(fallBack).toMatchObject({ status: "resolved" });
+    if (fallBack.status === "resolved") {
+      // The repeated 01:30 deterministically chooses the first occurrence.
+      expect(fallBack.schedule.scheduledAt).toBe("2026-11-01T05:30:00.000Z");
+      expect(fallBack.schedule.notAfter).toBe("2026-11-01T07:30:00.000Z");
+    }
+
+    expect(
+      resolvePublishSchedule({
+        policy: policy({
+          time_zone: "America/New_York",
+          default_release_local_time: "02:30",
+          retry_cutoff_local_time: "03:30",
+        }),
+        now: new Date("2026-03-08T05:00:00.000Z"),
+      }),
+    ).toEqual({ status: "unavailable", reason_code: "nonexistent_local_time" });
   });
 
   it("never moves an already-resolved window when the policy changes", () => {

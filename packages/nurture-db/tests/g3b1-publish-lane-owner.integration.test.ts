@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 import {
   createAesGcmProtectedContentPort,
+  PrismaCareCaptureTransaction,
   PrismaCareCaptureReadPort,
   PrismaMediaSafetyReadPort,
   PrismaPublicationReleasePort,
@@ -10,6 +11,7 @@ import {
   PrismaPublishProcessTransaction,
   publishDraftCommandIdentity,
 } from "../src/index.js";
+import { resolveOrganizeTrigger } from "@the-nurture/scenario/harness";
 
 // Owner-side proof for the publish queue, draft/hold/cancel and capture ports
 // (G3-E prerequisites B2 and B3). The queue is class-shared work, so what has
@@ -80,6 +82,26 @@ const seedGroup = async () => {
 };
 
 type Group = Awaited<ReturnType<typeof seedGroup>>;
+
+const seedPublicationPolicy = (world: Group) =>
+  prisma.nurtureInstitutionPublicationPolicy.create({
+    data: {
+      workspaceId: world.workspaceId,
+      institutionId: world.institution.id,
+      policyRef: "nurture.institution-publication-policy@1.0.0",
+      policyVersion: 1,
+      policyHead: 7,
+      timeZone: "Asia/Shanghai",
+      defaultReleaseLocalTime: "17:00",
+      retryCutoffLocalTime: "19:00",
+      organizeIdleSeconds: 600,
+      organizeFallbackLeadSeconds: 1800,
+      automaticQuiescenceSeconds: 60,
+      captureActivityLeaseSeconds: 60,
+      automaticOrganizeEnabled: true,
+      effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+    },
+  });
 
 const seedProcess = async (
   world: Group,
@@ -270,6 +292,8 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
         scheduleTimeZone: "Asia/Shanghai",
         schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
         schedulePolicyHead: 3,
+        schedulePolicyVersion: 1,
+        scheduleResolvedAt: new Date("2026-08-03T02:00:00.000Z"),
       },
     });
     const scheduled = await reads.listTeacherPublishQueue({
@@ -670,6 +694,84 @@ describe("G3-B1 owner reads: capture lane", () => {
     expect(source?.activity.last_user_activity_at).toBe("2026-08-02T03:55:00.000Z");
   });
 
+  it("drives idle from the exact T-007 owner policy and replays the same watermark", async () => {
+    const world = await seedGroup();
+    await Promise.all([seedBatch(world), seedPublicationPolicy(world)]);
+    const reads = new PrismaCareCaptureReadPort(prisma);
+    const request = { trigger: "idle" as const, trigger_request_id: "trigger:idle:1" };
+    const run = () =>
+      resolveOrganizeTrigger(
+        { reads, now: () => new Date("2026-08-02T04:05:00.000Z") },
+        {
+          workspace_id: world.workspaceId,
+          participant_id: world.teacher.id,
+          care_group_id: world.group.id,
+        },
+        request,
+      );
+    const first = await run();
+    expect(first).toMatchObject({
+      status: "evaluated",
+      decision: {
+        status: "cut",
+        evidence: {
+          trigger: "idle",
+          policyRef: "nurture.institution-publication-policy@1.0.0",
+          policyHead: 7,
+          watermark: { source_sequence: 2 },
+        },
+        includedCaptureIds: expect.any(Array),
+      },
+    });
+    await expect(run()).resolves.toEqual(first);
+  });
+
+  it("lets daily fallback ignore machine progress but fails closed without policy", async () => {
+    const world = await seedGroup();
+    const batch = await seedBatch(world);
+    await prisma.nurtureCareCaptureBatch.update({
+      where: { id: batch.id },
+      data: { observedUserActivityAt: new Date("2026-08-02T08:30:00.000Z") },
+    });
+    const reads = new PrismaCareCaptureReadPort(prisma);
+    const scope = {
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      care_group_id: world.group.id,
+    };
+    const request = {
+      trigger: "daily_fallback" as const,
+      trigger_request_id: "trigger:fallback:1",
+    };
+    await expect(
+      resolveOrganizeTrigger(
+        { reads, now: () => new Date("2026-08-02T08:35:00.000Z") },
+        scope,
+        request,
+      ),
+    ).resolves.toMatchObject({
+      status: "evaluated",
+      decision: { status: "invalid", reason_code: "policy_unavailable" },
+    });
+
+    await seedPublicationPolicy(world);
+    const resolved = await resolveOrganizeTrigger(
+      { reads, now: () => new Date("2026-08-02T08:35:00.000Z") },
+      scope,
+      request,
+    );
+    expect(resolved).toMatchObject({
+      status: "evaluated",
+      decision: {
+        status: "cut",
+        evidence: {
+          trigger: "daily_fallback",
+          observedUserActivityAt: "2026-08-02T08:30:00.000Z",
+        },
+      },
+    });
+  });
+
   it("never opens or advances a batch as a side effect of being read", async () => {
     const world = await seedGroup();
     const reads = new PrismaCareCaptureReadPort(prisma);
@@ -725,6 +827,103 @@ describe("G3-B1 owner reads: capture lane", () => {
         snapshot_at: SNAPSHOT_AT,
       }),
     ).toBeNull();
+  });
+});
+
+describe("T-006 owner write: organize media composition", () => {
+  const applyWithMedia = async (
+    world: Group,
+    batchId: string,
+    mediaAssetId: string,
+  ) =>
+    prisma.$transaction((tx) =>
+      new PrismaCareCaptureTransaction(tx).applyOrganizeCut({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        command_request_id: randomUUID(),
+        batch_id: batchId,
+        expected_batch_version: 0,
+        included_capture_ids: [],
+        organizer_input_revision: `organizer:${randomUUID()}`,
+        trigger_evidence: {
+          trigger: "manual",
+          policy_ref: "nurture.institution-publication-policy@1.0.0",
+          policy_head: 7,
+          time_zone: "Asia/Shanghai",
+          quiescence_seconds: 60,
+          observed_user_activity_at: new Date().toISOString(),
+        },
+        safety: {
+          route: "ordinary",
+          policy_ref: "nurture.content-safety@1.0.0",
+          policy_head: 1,
+          rule_revision: "rules:1",
+          risk_codes: [],
+        },
+        watermark: { source_sequence: 0, cut_at: new Date().toISOString() },
+        process: {
+          process_key: `publish:${randomUUID()}`,
+          state: "draft",
+          data_class: "daily_care_log",
+          purpose_key: "family_daily_care_update",
+          content_digest: "sha256:organized",
+          title_envelope: protectedContent.seal("Organized media"),
+          media_asset_ids: [mediaAssetId],
+          source_refs: [],
+          authorizing_role_assignment_id: world.teacherRole.id,
+          targets: [],
+        },
+      }),
+    );
+
+  it("stores the canonical composition shape and refuses an asset from another class", async () => {
+    const world = await seedGroup();
+    const batch = await prisma.nurtureCareCaptureBatch.create({
+      data: { workspaceId: world.workspaceId, careGroupId: world.group.id, state: "collecting" },
+    });
+    const asset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.group.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+        mediaRevision: 3,
+      },
+    });
+
+    const applied = await applyWithMedia(world, batch.id, asset.id);
+    const revision = await prisma.nurturePublishProcessRevision.findFirstOrThrow({
+      where: {
+        workspaceId: world.workspaceId,
+        publishProcess: { captureBatchId: batch.id },
+      },
+    });
+    expect(applied.process_revision).toBe(1);
+    expect(revision.mediaCompositionPayload).toEqual({
+      media: [{ mediaAssetId: asset.id, mediaRevision: 3 }],
+    });
+
+    const foreignBatch = await prisma.nurtureCareCaptureBatch.create({
+      data: { workspaceId: world.workspaceId, careGroupId: world.group.id, state: "collecting" },
+    });
+    const foreignAsset = await prisma.nurtureMediaAssetRef.create({
+      data: {
+        workspaceId: world.workspaceId,
+        institutionId: world.institution.id,
+        careGroupId: world.otherGroup.id,
+        sourceKind: "class_album",
+        storageRefPayload: { bucket: "media", key: randomUUID() },
+        lifecycle: "ready",
+      },
+    });
+    await expect(applyWithMedia(world, foreignBatch.id, foreignAsset.id)).rejects.toThrow(
+      /media asset unavailable/,
+    );
+    expect(
+      await prisma.nurtureCareCaptureBatch.findUniqueOrThrow({ where: { id: foreignBatch.id } }),
+    ).toMatchObject({ state: "collecting", aggregateVersion: 0 });
   });
 });
 

@@ -17,13 +17,17 @@ import {
  * clock and the institution timezone, and freezes the policy identity with it —
  * a later policy edit never silently moves content that is already queued.
  *
- * The provider itself is still absent, so every resolution here runs against an
- * exact isolated fixture and no real schedule is claimed.
+ * T-007 owns the provider and T-006 consumes it only through the exact
+ * Institution-scoped read port below. No client timezone, cutoff or policy head
+ * is accepted as authority.
  */
 export const INSTITUTION_PUBLICATION_POLICY_CONTRACT = {
   key: "nurture.institution-publication-policy",
   version: "1.0.0",
 } as const;
+
+export const INSTITUTION_PUBLICATION_POLICY_REF =
+  `${INSTITUTION_PUBLICATION_POLICY_CONTRACT.key}@${INSTITUTION_PUBLICATION_POLICY_CONTRACT.version}`;
 
 /** Pilot operating values from the T-007 freeze; not correctness constants. */
 export const PILOT_RELEASE_DEFAULTS = {
@@ -39,6 +43,15 @@ export type InstitutionPublicationPolicyV1 = OrganizeTriggerPolicyV1 & {
   effective_to?: string;
 };
 
+/** T-007's exact-scope owner read. Absence includes ambiguity and invalidity. */
+export type InstitutionPublicationPolicyReadPort = {
+  loadCurrentInstitutionPublicationPolicy(input: {
+    workspace_id: string;
+    institution_id: string;
+    at: string;
+  }): Promise<InstitutionPublicationPolicyV1 | null>;
+};
+
 const LOCAL_TIME_PATTERN = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
 
 export type PolicyValidationV1 =
@@ -51,6 +64,9 @@ export const validateInstitutionPublicationPolicy = (
 ): PolicyValidationV1 => {
   const organize = validateOrganizeTriggerPolicy(policy);
   if (organize.status === "invalid") return organize;
+  if (policy.policy_ref !== INSTITUTION_PUBLICATION_POLICY_REF) {
+    return { status: "invalid", reason_code: "unsupported_policy_contract" };
+  }
   if (!policy.institution_ref) {
     return { status: "invalid", reason_code: "missing_institution_ref" };
   }
@@ -64,13 +80,24 @@ export const validateInstitutionPublicationPolicy = (
     // A cutoff at or before the send time would leave no retry window at all.
     return { status: "invalid", reason_code: "cutoff_not_after_release" };
   }
+  if (
+    policy.organize_idle_seconds < 60 ||
+    policy.organize_fallback_lead_seconds < 60 ||
+    !Number.isSafeInteger(policy.automatic_quiescence_seconds) ||
+    policy.automatic_quiescence_seconds < 30 ||
+    policy.automatic_quiescence_seconds > 180 ||
+    policy.capture_activity_lease_seconds < 30 ||
+    policy.capture_activity_lease_seconds > 180
+  ) {
+    return { status: "invalid", reason_code: "invalid_policy_interval" };
+  }
   const from = Date.parse(policy.effective_from);
   if (Number.isNaN(from) || from > now.getTime()) {
     return { status: "invalid", reason_code: "policy_not_yet_effective" };
   }
   if (policy.effective_to !== undefined) {
     const to = Date.parse(policy.effective_to);
-    if (Number.isNaN(to) || to <= now.getTime()) {
+    if (Number.isNaN(to) || to <= from || to <= now.getTime()) {
       return { status: "invalid", reason_code: "policy_expired" };
     }
   }
@@ -152,6 +179,31 @@ const addDays = (date: ZonedParts, days: number): ZonedParts => {
   };
 };
 
+const matchesZonedWallClock = (
+  instant: Date,
+  date: ZonedParts,
+  minutesOfDay: number,
+  timeZone: string,
+): boolean => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(instant);
+  const read = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? "0");
+  return (
+    read("year") === date.year &&
+    read("month") === date.month &&
+    read("day") === date.day &&
+    read("hour") % 24 === Math.floor(minutesOfDay / 60) &&
+    read("minute") === minutesOfDay % 60
+  );
+};
+
 /** The frozen schedule a process carries for its whole life. */
 export type ResolvedPublishScheduleV1 = {
   scheduledAt: string;
@@ -193,6 +245,14 @@ export const resolvePublishSchedule = (input: {
     notAfter = zonedLocalTimeToInstant(day, cutoffMinutes, policy.time_zone);
   }
   const scheduledAt = zonedLocalTimeToInstant(day, releaseMinutes, policy.time_zone);
+  if (
+    !matchesZonedWallClock(scheduledAt, day, releaseMinutes, policy.time_zone) ||
+    !matchesZonedWallClock(notAfter, day, cutoffMinutes, policy.time_zone)
+  ) {
+    // A DST spring-forward gap has no canonical instant for the configured
+    // wall clock. Moving it silently would change the institution's policy.
+    return { status: "unavailable", reason_code: "nonexistent_local_time" };
+  }
 
   return {
     status: "resolved",

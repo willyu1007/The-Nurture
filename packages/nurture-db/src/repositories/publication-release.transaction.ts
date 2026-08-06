@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { currentAttributionRowsPerChild } from "./media-safety.read.js";
-import type { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
+import { deriveTargetPublishBlockingReasons } from "@the-nurture/scenario/harness";
 import type {
   CaregiverFactAuthorityV1,
   CommitTargetReleaseResultV1,
@@ -10,7 +11,7 @@ import type {
   PublicationSafetyReadPort,
   ReleaseFactsV1,
   ReleaseTargetFactsV1,
-  ResolvedPublishScheduleV1,
+  ReleaseTriggerV1,
 } from "@the-nurture/scenario/harness";
 import {
   activeRoleWindow,
@@ -18,11 +19,26 @@ import {
   readMediaComposition,
   resolveCaregiverReachFor,
   resolveCaregiverReaches,
+  type BoardPrisma,
 } from "./board-read-support.js";
+import { readResolvedPublishSchedule } from "./publish-schedule.support.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 
 const RELEASE_COMMAND_KEY = "release_publish_process";
 const RELEASE_COMMAND_SCOPE = "board_publication";
+const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
 const RELEASE_COMMAND_CONTRACT_VERSION = 1;
+const MAX_SERIALIZABLE_ATTEMPTS = 3;
+
+type CommitTargetReleaseInput = {
+  workspace_id: string;
+  participant_id: string;
+  process_key: string;
+  target_key: string;
+  revision: number;
+  command_request_id: string;
+  trigger: ReleaseTriggerV1;
+};
 
 const sha256 = (value: string): string =>
   createHash("sha256").update(value, "utf8").digest("hex");
@@ -142,12 +158,17 @@ export class PrismaPublicationReleasePort
     );
     if (!reach) return null;
 
-    const schedule = readResolvedSchedule(process);
+    const schedule = readResolvedPublishSchedule(process);
+    const policy = await loadCurrentInstitutionPublicationPolicy(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: reach.institution_id,
+      at,
+    });
 
     const frozenRevision = process.frozenRevisionId
       ? await this.prisma.nurturePublishProcessRevision.findFirst({
           where: { id: process.frozenRevisionId, workspaceId: input.workspace_id },
-          select: { revision: true },
+          select: { revision: true, mediaCompositionPayload: true },
         })
       : null;
 
@@ -158,14 +179,26 @@ export class PrismaPublicationReleasePort
           where: {
             id: process.authorizingRoleAssignmentId,
             workspaceId: input.workspace_id,
+            role: { in: [...CAREGIVER_ROLES] },
+            scopeType: "care_group",
+            scopeId: process.careGroupId,
             ...activeRoleWindow(at),
+            participant: { status: "active", deletedAt: null },
           },
         })) === 1
-      : true;
+      : false;
 
     const media = await this.loadMediaEligibility(
+      this.prisma,
       input.workspace_id,
-      process.currentRevision?.mediaCompositionPayload ?? null,
+      process.careGroupId,
+      frozenRevision?.mediaCompositionPayload ??
+        process.currentRevision?.mediaCompositionPayload ??
+        null,
+    );
+
+    const receiptEvidenceAvailable = process.targets.every(
+      (target) => !target.release || target.release.receipt !== null,
     );
 
     const targets: ReleaseTargetFactsV1[] = process.targets.map((target) => {
@@ -179,11 +212,11 @@ export class PrismaPublicationReleasePort
         // One family may see its own child and no one else's. Any other
         // clearly visible child in the composed media blocks this target.
         exposure_allows_child_ids: [target.childCareProcessId],
-        ...(target.release
+        ...(target.release?.receipt
           ? {
               already_committed: {
                 publication_ref: target.release.id,
-                receipt_ref: target.release.receipt?.id ?? "",
+                receipt_ref: target.release.receipt.id,
               },
             }
           : {}),
@@ -203,20 +236,31 @@ export class PrismaPublicationReleasePort
       has_unsaved_revision: false,
       edit_hold_active: Boolean(process.editHold && process.editHold.expiresAt > at),
       schedule,
+      current_policy: policy
+        ? {
+            policy_ref: policy.policy_ref,
+            policy_head: policy.policy_head,
+            policy_version: policy.policy_version,
+          }
+        : null,
+      receipt_evidence_available: receiptEvidenceAvailable,
       media,
       targets,
     };
   }
 
   private async loadMediaEligibility(
+    prisma: BoardPrisma,
     workspaceId: string,
+    careGroupId: string,
     compositionPayload: unknown,
   ): Promise<MediaEligibilityInputV1[]> {
     const composed = readMediaComposition(compositionPayload);
     if (composed.length === 0) return [];
-    const assets = await this.prisma.nurtureMediaAssetRef.findMany({
+    const assets = await prisma.nurtureMediaAssetRef.findMany({
       where: {
         workspaceId,
+        careGroupId,
         id: { in: composed.map((entry) => entry.media_asset_id) },
         deletedAt: null,
       },
@@ -225,7 +269,20 @@ export class PrismaPublicationReleasePort
     const byId = new Map(assets.map((asset) => [asset.id, asset]));
     return composed.flatMap((entry) => {
       const asset = byId.get(entry.media_asset_id);
-      if (!asset) return [];
+      if (!asset) {
+        // A missing or foreign-class asset is still part of the saved
+        // composition. Dropping it would turn "media unavailable" into "no
+        // media" and silently make the target publishable.
+        return [
+          {
+            media_asset_id: entry.media_asset_id,
+            media_revision: entry.media_revision,
+            current_media_revision: entry.media_revision,
+            lifecycle: "unavailable",
+            visible_children: [],
+          },
+        ];
+      }
       return [
         {
           media_asset_id: asset.id,
@@ -257,25 +314,68 @@ export class PrismaPublicationReleasePort
     });
   }
 
-  async commitTargetRelease(input: {
-    workspace_id: string;
-    participant_id: string;
-    process_key: string;
-    target_key: string;
-    revision: number;
-    command_request_id: string;
-  }): Promise<CommitTargetReleaseResultV1> {
-    const at = new Date();
+  async commitTargetRelease(
+    input: CommitTargetReleaseInput,
+  ): Promise<CommitTargetReleaseResultV1> {
     const commandHash = publicationReleaseCommandIdentity(input.command_request_id, input.target_key);
 
-    try {
-      return await this.prisma.$transaction(async (tx) => {
+    for (let attempt = 1; attempt <= MAX_SERIALIZABLE_ATTEMPTS; attempt += 1) {
+      try {
+        return await this.commitTargetReleaseOnce(input, commandHash);
+      } catch (error) {
+        if (isRetryableTransactionConflict(error) && attempt < MAX_SERIALIZABLE_ATTEMPTS) {
+          continue;
+        }
+        if (isUniqueViolation(error)) {
+          // A concurrent same-target winner is reconciled from the committed
+          // row. A different unique-key collision is still a definite rollback,
+          // so reject it without pretending a target release already exists.
+          const target = await this.prisma.nurturePublishProcessTarget.findFirst({
+            where: {
+              workspaceId: input.workspace_id,
+              targetKey: input.target_key,
+              publishProcess: {
+                workspaceId: input.workspace_id,
+                processKey: input.process_key,
+              },
+            },
+            include: { release: true },
+          });
+          if (!target?.release) {
+            return { status: "rejected", reason_code: "command_identity_conflict" };
+          }
+          if (target.release.commandRequestIdHash === commandHash) {
+            return target.release.receiptId
+              ? {
+                  status: "committed",
+                  publication_ref: target.release.id,
+                  receipt_ref: target.release.receiptId,
+                }
+              : { status: "rejected", reason_code: "receipt_evidence_unavailable" };
+          }
+          return { status: "rejected", reason_code: "already_released" };
+        }
+        return { status: "outcome_unknown" };
+      }
+    }
+
+    return { status: "outcome_unknown" };
+  }
+
+  private async commitTargetReleaseOnce(
+    input: CommitTargetReleaseInput,
+    commandHash: string,
+  ): Promise<CommitTargetReleaseResultV1> {
+    const at = new Date();
+    return this.prisma.$transaction(
+      async (tx) => {
         const process = await tx.nurturePublishProcess.findFirst({
           where: {
             workspaceId: input.workspace_id,
             processKey: input.process_key,
           },
-            include: {
+          include: {
+            editHold: true,
             targets: {
               where: { targetKey: input.target_key },
               include: { release: true, grant: true, enrollment: true },
@@ -298,33 +398,30 @@ export class PrismaPublicationReleasePort
         const target = process.targets[0];
         if (!target) return { status: "rejected", reason_code: "target_unavailable" };
 
-        // Eligibility was read before the fan-out began. A thirty-target attempt
-        // spans real time, and a Grant revoked partway through must stop the
-        // targets that have not committed yet — otherwise a family receives a
-        // publication, and a delivered Receipt, under consent it withdrew.
-        if (
-          target.grant.status !== "active" ||
-          target.grant.deletedAt !== null ||
-          !target.grant.dataClasses.includes(process.dataClass) ||
-          !target.grant.purposes.includes(process.purposeKey)
-        ) {
-          return { status: "rejected", reason_code: "grant_not_allowed" };
-        }
-        if (target.enrollment.status !== "active" || target.enrollment.deletedAt !== null) {
-          return { status: "rejected", reason_code: "enrollment_inactive" };
-        }
-
         // An exact replay of the same command for the same target returns the
         // refs the original attempt committed, and writes nothing.
         if (target.release) {
-          const existingReceipt = target.release.receiptId ?? "";
+          if (!target.release.receiptId) {
+            return { status: "rejected", reason_code: "receipt_evidence_unavailable" };
+          }
           return target.release.commandRequestIdHash === commandHash
             ? {
                 status: "committed" as const,
                 publication_ref: target.release.id,
-                receipt_ref: existingReceipt,
+                receipt_ref: target.release.receiptId,
               }
             : { status: "rejected" as const, reason_code: "already_released" };
+        }
+
+        const receiptlessReleaseCount = await tx.nurturePublicationRelease.count({
+          where: {
+            workspaceId: input.workspace_id,
+            publishProcessId: process.id,
+            receiptId: null,
+          },
+        });
+        if (receiptlessReleaseCount > 0) {
+          return { status: "rejected", reason_code: "receipt_evidence_unavailable" };
         }
 
         const revision = await tx.nurturePublishProcessRevision.findFirst({
@@ -335,6 +432,119 @@ export class PrismaPublicationReleasePort
           },
         });
         if (!revision) return { status: "rejected", reason_code: "revision_unavailable" };
+
+        if (process.state !== "pending_release" && process.state !== "released") {
+          return { status: "rejected", reason_code: "process_not_queued" };
+        }
+        if (
+          (process.state === "pending_release" &&
+            (process.frozenRevisionId !== null || process.currentRevisionId !== revision.id)) ||
+          (process.state === "released" && process.frozenRevisionId !== revision.id)
+        ) {
+          return { status: "rejected", reason_code: "revision_conflict" };
+        }
+
+        const schedule = readResolvedPublishSchedule(process);
+        if (!schedule) return { status: "rejected", reason_code: "schedule_unavailable" };
+        if (input.trigger === "scheduler" && at.getTime() >= Date.parse(schedule.notAfter)) {
+          return { status: "rejected", reason_code: "past_cutoff" };
+        }
+        if (input.trigger === "scheduler" && at.getTime() < Date.parse(schedule.scheduledAt)) {
+          return { status: "rejected", reason_code: "before_scheduled_at" };
+        }
+
+        const policy = await loadCurrentInstitutionPublicationPolicy(tx, {
+          workspace_id: input.workspace_id,
+          institution_id: reach.institution_id,
+          at,
+        });
+        if (!policy) {
+          return { status: "rejected", reason_code: "publication_policy_unavailable" };
+        }
+        if (
+          policy.policy_ref !== schedule.policyRef ||
+          policy.policy_head !== schedule.policyHead ||
+          policy.policy_version !== schedule.policyVersion
+        ) {
+          return { status: "rejected", reason_code: "publication_policy_drift" };
+        }
+
+        const authorizingRoleCurrent = process.authorizingRoleAssignmentId
+          ? (await tx.nurtureCareRoleAssignment.count({
+              where: {
+                id: process.authorizingRoleAssignmentId,
+                workspaceId: input.workspace_id,
+                role: { in: [...CAREGIVER_ROLES] },
+                scopeType: "care_group",
+                scopeId: process.careGroupId,
+                ...activeRoleWindow(at),
+                participant: { status: "active", deletedAt: null },
+              },
+            })) === 1
+          : false;
+        if (!authorizingRoleCurrent) {
+          return { status: "rejected", reason_code: "not_authorized" };
+        }
+        if (process.editHold && process.editHold.expiresAt > at) {
+          return { status: "rejected", reason_code: "edit_hold_active" };
+        }
+
+        const media = await this.loadMediaEligibility(
+          tx,
+          input.workspace_id,
+          process.careGroupId,
+          revision.mediaCompositionPayload,
+        );
+        const blockingReasons = deriveTargetPublishBlockingReasons(
+          {
+            target_key: target.targetKey,
+            child_care_process_id: target.childCareProcessId,
+            enrollment_active:
+              target.enrollment.status === "active" && target.enrollment.deletedAt === null,
+            grant_allows: target.grant.status === "active" && target.grant.deletedAt === null,
+            data_class_allowed: target.grant.dataClasses.includes(process.dataClass),
+            purpose_allowed: target.grant.purposes.includes(process.purposeKey),
+            exposure_allows_child_ids: [target.childCareProcessId],
+          },
+          media,
+        );
+        if (blockingReasons.includes("enrollment_inactive")) {
+          return { status: "rejected", reason_code: "enrollment_inactive" };
+        }
+        if (
+          blockingReasons.includes("grant_not_allowed") ||
+          blockingReasons.includes("data_class_not_allowed") ||
+          blockingReasons.includes("purpose_not_allowed")
+        ) {
+          return { status: "rejected", reason_code: "grant_not_allowed" };
+        }
+        const mediaBlock = blockingReasons.find(
+          (reason) =>
+            reason !== "enrollment_inactive" &&
+            reason !== "grant_not_allowed" &&
+            reason !== "data_class_not_allowed" &&
+            reason !== "purpose_not_allowed",
+        );
+        if (mediaBlock) return { status: "rejected", reason_code: mediaBlock };
+
+        if (process.state === "pending_release") {
+          // Freeze before issuing any target effect. The CAS is part of this
+          // transaction, so a loser cannot leave a release on a different
+          // revision and a later write failure rolls the freeze back too.
+          const frozen = await tx.nurturePublishProcess.updateMany({
+            where: {
+              id: process.id,
+              workspaceId: input.workspace_id,
+              state: "pending_release",
+              currentRevisionId: revision.id,
+              frozenRevisionId: null,
+            },
+            data: { frozenRevisionId: revision.id, state: "released" },
+          });
+          if (frozen.count !== 1) {
+            return { status: "rejected", reason_code: "revision_conflict" };
+          }
+        }
 
         // The T-005 receipt lifecycle CHECK governs this source type too: a
         // delivered publication Receipt must carry its whole routing identity.
@@ -404,23 +614,10 @@ export class PrismaPublicationReleasePort
           },
         });
 
-        // The first committed target freezes the shared revision; later targets
-        // of the same process bind to it rather than to a newer save.
-        await tx.nurturePublishProcess.updateMany({
-          where: { id: process.id, frozenRevisionId: null },
-          data: { frozenRevisionId: revision.id, state: "released" },
-        });
-
         return { status: "committed", publication_ref: release.id, receipt_ref: receipt.id };
-      });
-    } catch (error) {
-      // A unique violation here means a concurrent attempt won the same target.
-      // Anything else leaves this attempt genuinely unresolved: the caller must
-      // reconcile rather than assume a rollback.
-      return isUniqueViolation(error)
-        ? { status: "rejected", reason_code: "already_released" }
-        : { status: "outcome_unknown" };
-    }
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
   }
 
   async loadPublicationSafetyFacts(input: {
@@ -483,35 +680,7 @@ const isUniqueViolation = (error: unknown): boolean =>
   error !== null &&
   (error as { code?: unknown }).code === "P2002";
 
-/**
- * A schedule is only resolved when the owner recorded every field the T-007
- * contract fixes. A partially recorded schedule is not a window.
- */
-const readResolvedSchedule = (process: {
-  scheduledAt: Date | null;
-  notAfter: Date | null;
-  scheduleTimeZone: string | null;
-  schedulePolicyRef: string | null;
-  schedulePolicyHead: number | null;
-  updatedAt: Date;
-  aggregateVersion: number;
-}): ResolvedPublishScheduleV1 | null => {
-  if (
-    !process.scheduledAt ||
-    !process.notAfter ||
-    !process.scheduleTimeZone ||
-    !process.schedulePolicyRef ||
-    process.schedulePolicyHead === null
-  ) {
-    return null;
-  }
-  return {
-    scheduledAt: process.scheduledAt.toISOString(),
-    notAfter: process.notAfter.toISOString(),
-    timeZone: process.scheduleTimeZone,
-    policyRef: process.schedulePolicyRef,
-    policyHead: process.schedulePolicyHead,
-    policyVersion: process.aggregateVersion,
-    resolvedAt: process.updatedAt.toISOString(),
-  };
-};
+const isRetryableTransactionConflict = (error: unknown): boolean =>
+  typeof error === "object" &&
+  error !== null &&
+  (error as { code?: unknown }).code === "P2034";

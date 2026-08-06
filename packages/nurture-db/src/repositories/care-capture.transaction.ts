@@ -1,7 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import {
-  PILOT_ORGANIZE_TRIGGER_DEFAULTS,
   type NurtureCareCaptureTransaction,
   type NurtureOrganizeCaptureRow,
   type NurtureOrganizeCutFacts,
@@ -9,6 +8,7 @@ import {
   type NurtureOrganizeCutApplied,
 } from "@the-nurture/scenario/harness";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
+import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 import { publishDraftCommandIdentity } from "./publish-process.transaction.js";
 
 const CAREGIVER_ROLES = ["caregiver", "lead_caregiver"] as const;
@@ -22,55 +22,6 @@ const domainRef = (objectType: string, objectId: string, version: number): Canon
   object_id: objectId,
   version,
 });
-
-/**
- * The T-007 organize-parameter subset from the institution's explicit policy
- * payload. Identity (ref/head/timeZone) must be resolved; the pilot parameter
- * defaults are the frozen fallback for the numbers only. Anything less is
- * "not resolved" — never a default window.
- */
-export const readOrganizePolicy = (
-  payload: unknown,
-): NonNullable<NurtureOrganizeCutFacts["organize_policy"]> | null => {
-  if (typeof payload !== "object" || payload === null) return null;
-  const record = payload as Record<string, unknown>;
-  if (record.publicationPolicyRef !== "nurture.institution-publication-policy@1.0.0") {
-    return null;
-  }
-  if (!Number.isSafeInteger(record.publicationPolicyHead)) return null;
-  if (typeof record.timeZone !== "string" || record.timeZone.length === 0) return null;
-  const number = (key: string, fallback: number): number =>
-    Number.isSafeInteger(record[key]) ? (record[key] as number) : fallback;
-  return {
-    policy_ref: record.publicationPolicyRef,
-    policy_head: record.publicationPolicyHead as number,
-    time_zone: record.timeZone,
-    default_release_local_time:
-      typeof record.defaultReleaseLocalTime === "string"
-        ? record.defaultReleaseLocalTime
-        : PILOT_ORGANIZE_TRIGGER_DEFAULTS.default_release_local_time,
-    organize_idle_seconds: number(
-      "organizeIdleSeconds",
-      PILOT_ORGANIZE_TRIGGER_DEFAULTS.organize_idle_seconds,
-    ),
-    organize_fallback_lead_seconds: number(
-      "organizeFallbackLeadSeconds",
-      PILOT_ORGANIZE_TRIGGER_DEFAULTS.organize_fallback_lead_seconds,
-    ),
-    automatic_quiescence_seconds: number(
-      "automaticQuiescenceSeconds",
-      PILOT_ORGANIZE_TRIGGER_DEFAULTS.automatic_quiescence_seconds,
-    ),
-    capture_activity_lease_seconds: number(
-      "captureActivityLeaseSeconds",
-      PILOT_ORGANIZE_TRIGGER_DEFAULTS.capture_activity_lease_seconds,
-    ),
-    automatic_organize_enabled:
-      typeof record.automaticOrganizeEnabled === "boolean"
-        ? record.automaticOrganizeEnabled
-        : true,
-  };
-};
 
 const readSafetyPolicyIdentity = (
   payload: unknown,
@@ -137,6 +88,12 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       include: { institution: true },
     });
     if (!group || group.institution.status !== "active") return null;
+
+    const publicationPolicy = await loadCurrentInstitutionPublicationPolicy(this.prisma, {
+      workspace_id: input.workspace_id,
+      institution_id: group.institutionId,
+      at: readAt,
+    });
 
     const batch = await this.prisma.nurtureCareCaptureBatch.findFirst({
       where: {
@@ -209,14 +166,13 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
         fact_visible: true,
         purpose_allowed: true,
       } as NurtureOrganizeCutFacts["authority"],
+      authorizing_role_assignment_id: role.id,
       care_group_id: input.care_group_id,
       read_at: readAt.toISOString(),
       ...(readSafetyPolicyIdentity(group.institution.policyConfigPayload ?? null)
         ? { safety_policy: readSafetyPolicyIdentity(group.institution.policyConfigPayload ?? null)! }
         : {}),
-      ...(readOrganizePolicy(group.institution.policyConfigPayload ?? null)
-        ? { organize_policy: readOrganizePolicy(group.institution.policyConfigPayload ?? null)! }
-        : {}),
+      ...(publicationPolicy ? { organize_policy: publicationPolicy } : {}),
       ...(batch
         ? {
             batch: {
@@ -267,6 +223,9 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
 
   async applyOrganizeCut(input: NurtureOrganizeCutApplyInput): Promise<NurtureOrganizeCutApplied> {
     const cutAt = new Date(input.watermark.cut_at);
+    const observedUserActivityAt = new Date(input.trigger_evidence.observed_user_activity_at);
+    const careGroupId = await this.batchGroupId(input);
+    if (!careGroupId) throw new Error("nurture care capture: batch unavailable");
     // CAS against the exact version the head comparison already accepted —
     // second-line defence against a capture landing inside the window.
     const transitioned = await this.prisma.nurtureCareCaptureBatch.updateMany({
@@ -278,8 +237,13 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       },
       data: {
         state: "organized",
-        resolvedTrigger: "manual",
+        resolvedTrigger: input.trigger_evidence.trigger,
         triggerRequestId: input.command_request_id,
+        policyRef: input.trigger_evidence.policy_ref,
+        policyHead: input.trigger_evidence.policy_head,
+        timeZone: input.trigger_evidence.time_zone,
+        quiescenceSeconds: input.trigger_evidence.quiescence_seconds,
+        observedUserActivityAt,
         watermarkSourceSequence: input.watermark.source_sequence,
         cutAt,
         aggregateVersion: { increment: 1 },
@@ -295,7 +259,12 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       const composition = await Promise.all(
         input.process.media_asset_ids.map(async (mediaAssetId) => {
           const asset = await this.prisma.nurtureMediaAssetRef.findFirst({
-            where: { id: mediaAssetId, workspaceId: input.workspace_id, deletedAt: null },
+            where: {
+              id: mediaAssetId,
+              workspaceId: input.workspace_id,
+              careGroupId,
+              deletedAt: null,
+            },
             select: { mediaRevision: true },
           });
           if (!asset) throw new Error("nurture care capture: media asset unavailable");
@@ -305,12 +274,13 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       const process = await this.prisma.nurturePublishProcess.create({
         data: {
           workspaceId: input.workspace_id,
-          careGroupId: (await this.batchGroupId(input))!,
+          careGroupId,
           captureBatchId: input.batch_id,
           processKey: input.process.process_key,
           state: input.process.state,
           dataClass: input.process.data_class as never,
           purposeKey: input.process.purpose_key,
+          authorizingRoleAssignmentId: input.process.authorizing_role_assignment_id,
         },
       });
       const revision = await this.prisma.nurturePublishProcessRevision.create({
@@ -325,7 +295,12 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
           ...(input.process.body_envelope !== undefined
             ? { bodyProtectionPayload: asJson(input.process.body_envelope) }
             : {}),
-          mediaCompositionPayload: asJson(composition),
+          mediaCompositionPayload: asJson({
+            media: composition.map((entry) => ({
+              mediaAssetId: entry.media_asset_id,
+              mediaRevision: entry.media_revision,
+            })),
+          }),
           sourceRefsPayload: asJson(input.process.source_refs),
         },
       });
@@ -356,7 +331,7 @@ export class PrismaCareCaptureTransaction implements NurtureCareCaptureTransacti
       data: {
         workspaceId: input.workspace_id,
         ...(processId ? { publishProcessId: processId } : {}),
-        careGroupId: (await this.batchGroupId(input))!,
+        careGroupId,
         organizerInputRevision: input.organizer_input_revision,
         route: input.safety.route as never,
         policyRef: input.safety.policy_ref,

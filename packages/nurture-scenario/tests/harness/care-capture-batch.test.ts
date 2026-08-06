@@ -4,6 +4,7 @@ import {
   evaluateOrganizeTrigger,
   fallbackLocalMinutes,
   localMinutesOfDay,
+  resolveOrganizeTrigger,
   resolveCaptureWatermark,
   validateOrganizeTriggerPolicy,
   type CaptureActivityHeadV1,
@@ -321,5 +322,56 @@ describe("G3-B1 organize trigger", () => {
     expect(
       evaluateOrganizeTrigger(request({ policy: policy({ automatic_quiescence_seconds: 0 }) })),
     ).toEqual({ status: "invalid", reason_code: "invalid_quiescence_gate" });
+  });
+});
+
+describe("G3-B1 provider-backed trigger resolution", () => {
+  const source = (organizePolicy: OrganizeTriggerPolicyV1 | undefined) => ({
+    batch_id: "batch-1",
+    batch_version: 4,
+    state: "collecting" as const,
+    ...(organizePolicy ? { organize_policy: organizePolicy } : {}),
+    captures: [capture()],
+    activity: activity(),
+  });
+
+  it("uses only the policy returned by the owner read", async () => {
+    const resolved = await resolveOrganizeTrigger(
+      {
+        reads: {
+          loadOrganizeSource: async () =>
+            source(policy({ policy_ref: "owner-policy", policy_head: 9 })),
+          listOrganizeCareGroups: async () => [],
+        },
+        now: () => new Date("2026-08-01T08:30:00.000Z"),
+      },
+      { workspace_id: "ws-1", participant_id: "caregiver-1", care_group_id: "group-1" },
+      { trigger: "manual", trigger_request_id: "trigger-owner-policy" },
+    );
+    expect(resolved).toMatchObject({
+      status: "evaluated",
+      decision: {
+        status: "cut",
+        evidence: { policyRef: "owner-policy", policyHead: 9 },
+      },
+    });
+  });
+
+  it("fails closed when the owner returns no policy", async () => {
+    const resolved = await resolveOrganizeTrigger(
+      {
+        reads: {
+          loadOrganizeSource: async () => source(undefined),
+          listOrganizeCareGroups: async () => [],
+        },
+      },
+      { workspace_id: "ws-1", participant_id: "caregiver-1", care_group_id: "group-1" },
+      { trigger: "idle", trigger_request_id: "trigger-no-policy" },
+    );
+    expect(resolved).toEqual({
+      status: "evaluated",
+      batch_id: "batch-1",
+      decision: { status: "invalid", reason_code: "policy_unavailable" },
+    });
   });
 });

@@ -1,5 +1,30 @@
 # Plan — 儿童照护双看板
 
+## Current Execution Target — Confirmed 2026-08-05
+
+The next implementation objective is to close T-006 / G3, without opening T-008,
+deployment, activation or Pilot scope:
+
+1. T-007 supplies the exact, default-off
+   `nurture.institution-publication-policy@1.0.0` provider.
+2. T-006 routes `reschedule_publish_process` and runs the real policy-backed
+   schedule/reschedule/release joint qualification with T-007.
+3. T-006 runs the exact G2-C provider/consumer journey with T-005.
+4. T-006 issues its exact Beta Profile Handoff only after both joint records pass.
+
+### Execution checkpoint — 2026-08-05 repair requalification complete
+
+- The quality review repair landed at `0374087…`; exact detached source pins are Base
+  `06303e9…`, My-Chat `a019566…` and Nurture 168 files / `b44f4fad…`.
+- Clean migration replay, target DB regressions, concurrent first-freeze 3-pass probe,
+  full 225-test production DB suite, 55-test formal owner path and both joint journeys
+  passed on disposable PostgreSQL at 55437.
+- Final census proves partial schedules 0, invalid frozen releases 0, invalid policies 0,
+  activation-like tables 0 and receipt-less release with applied execution 0. The named
+  container/tmpfs and detached topology were destroyed; excluded 5433/55439 remained unchanged.
+- G3-D/E Exit PASS and the Beta Profile Handoff are restored. T-006 is done; T-008,
+  deployment, activation and Pilot remain outside the objective and unopened.
+
 ## G1 Progressive Entry Boundary
 
 - At G1 start, T-006 MAY design the shared read model, `PublishProcess`, content/media
@@ -481,16 +506,17 @@ G3-0 冻结。它们只有在改变上述 ownership/product boundary 时才重�
 - [x] G3-C1 manual content/media safety path 通过（`T006-AC-031`～`T006-AC-040`
   全部映射检查通过）；G3-C2 face match 明确 optional/default-off，能力身份完全
   未注册，人工归属主路径不依赖它。
-- [x] G3-D Publish and Release Loop 通过（`T006-AC-041`～`T006-AC-050` 全部映射检查通过）；真实 policy-backed schedule/release 资格化留给 G3-E。
-- [ ] G3-E 通过 formal NestJS ingress + real pinned owner path，在 disposable
+- [x] G3-D Publish and Release Loop 重新资格化（`T006-AC-043`、`T006-AC-045`～
+  `T006-AC-047` 已补并发、事务内 drift 与 receipt-less fail-closed 证据）。
+- [x] G3-E 重新通过 formal NestJS ingress + real pinned owner path，在 disposable
   PostgreSQL 完成完整黑盒与负向资格验证。
-- [ ] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；
+- [x] `direct_interaction_required` 已与 T-005 Stage G2-C 完成真实联合资格验证；
   不接受 safe-unavailable 占位、普通 family-question 或 PublishProcess fallback。
-- [ ] T-007 publication-policy subset 已按 exact owner contract 资格化；可选
+- [x] T-007 publication-policy subset 已按 exact owner contract 资格化；可选
   `InstitutionWorkflowProjection` 的 absent/empty 行为与 beta profile 一致。
-- [ ] 最终 capability/environment 为 false、active test rows 为空；无 persistent
-  DB apply、Candidate、native/internal-store、activation 或 traffic effect。
-- [ ] 形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
+- [x] 最终 capability/environment 为 false；disposable test rows 已随 tmpfs 销毁，
+  无 persistent DB apply、Candidate、native/internal-store、activation 或 traffic effect。
+- [x] 重新形成 exact T-006 Beta Profile Handoff；宿主相机、原生列表性能、设备交互和
   notification/delivery 留给 My-Chat companion/T-008。
 
 所有清单项满足后 T-006 才可转为 done。T-008 仍需独立核验该 handoff 后才能开始

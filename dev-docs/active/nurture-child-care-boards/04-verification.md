@@ -1035,3 +1035,194 @@ same pass:
 | presenter rebind untested at every layer | FIXED — envelope unit tests for explicit rebind and auto-unique rebind (label, snapshot version, module bind threading); falsified: CAUGHT |
 | `tx as never` in commitTargetRelease | FIXED — plain `tx` typechecks |
 | full battery after fixes: typecheck, unit 565, db 208, e2e 50, populations, all verify:*, governance lint | PASS |
+
+## 2026-08-05 — Governance Repair and G3 Close Target
+
+| Command / check | Result |
+| --- | --- |
+| project hub manual focus and F-003 semantic checkpoint | ALIGNED — one critical objective: close T-006/G3 through the T-007 policy and T-005 G2-C joint runs |
+| `ctl-project-governance sync --apply` + `lint --check` | PASS |
+| `resume --task T-006 --json` malformed-trailer census | PASS — 60 historical `Task: T-006` markers outside Git's final trailer block are reported as unlinked, not silently counted |
+| commit hook: historical malformed message | REJECTED as designed |
+| commit hook: valid contiguous `Task` trailer | PASS |
+| `node .githooks/install.mjs --check` | PASS — `core.hooksPath=.githooks` |
+| `node --check` governance script + `sh -n` all installed hooks | PASS |
+| `pnpm verify:formal-ingress-contract` | PASS — routes 7, actions 25, queries 9, registered 35, unrouted 1 |
+| `git diff --check` | PASS |
+
+This repair changes governance recovery, task/documentation focus and developer
+documentation only. It does not change product code, schema, migration,
+capability admission, activation, deployment or traffic state.
+
+## 2026-08-05 — G3 Closure Candidate, Repository-only Qualification
+
+| Command / check | Result |
+| --- | --- |
+| `pnpm db:validate` / `pnpm db:generate` / `pnpm db:context` | PASS — Prisma SSOT valid; generated client and DB/context registry refreshed; no database write |
+| scenario, DB and scenario-service TypeScript checks | PASS |
+| targeted release/reschedule/provider-free unit suites | PASS |
+| `pnpm test:unit` | PASS — 52 files, 577 tests |
+| `pnpm verify:persistence-boundaries` / `verify:port-topology` | PASS |
+| `pnpm verify:g3-0-freeze` | PASS after explicitly adding the new owner table to the exact persisted-table census |
+| `pnpm verify:surface-contract-schemas` | PASS |
+| `pnpm verify:formal-ingress-contract` | PASS — routes 7, actions 26, queries 9, registered 35, unrouted 0 |
+| governance lint | PASS |
+| migration apply and all PostgreSQL-backed provider/owner/joint suites | **NOT RUN — explicit database-write approval pending** |
+
+This evidence qualifies the implementation candidate only. It does not qualify
+T-007/T-006 or T-005/T-006 jointly, does not close G3-E and does not authorize a
+Beta Profile Handoff, activation, deployment or traffic.
+
+The authored but not yet executed DB journey is deliberately end-to-end on one
+persisted process: formal organize creates an unscheduled draft, scenario-side
+admission reads the persisted T-007 policy and atomically queues it, then formal
+reschedule and formal release consume the same frozen schedule. The same journey
+then requires the target-specific delivered Receipt and rereads the publication
+through the guardian enrollment-activity projection; its protected title must be
+family-visible while process/release/receipt/enrollment raw identifiers remain
+absent. A separate
+formal path passes the exact T-006 direct-interaction option to T-005 prepare and
+execute. Provider absence, policy drift and invalid owner-role scope have explicit
+negative cases; they remain candidate evidence until PostgreSQL execution passes.
+
+The same pending PostgreSQL suite pins both sides of the freeze boundary. Before
+queue admission, a policy replacement from version 1/head 5 to version 2/head 6
+must rebase the unscheduled draft onto the new seven-field schedule. After queue
+admission, the identical class of replacement blocks reschedule and release as
+`publication_policy_drift`. The organize assertion also requires the persisted
+batch to carry the exact policy/timezone/quiescence/activity evidence rather than
+a reconstructed or hard-coded trigger.
+
+`verify:owner-integration` now requires runtime `passed` markers for both exact
+cross-task journeys in addition to one committed/ok execution per admitted
+capability/query. The marker is emitted only after the final persisted assertion;
+it is not inferred from test names or source literals.
+
+The T-007 matrix also includes an authored production-DB path from the persisted
+Institution policy through `PrismaCareCaptureReadPort` into idle and daily-fallback
+resolution. It asserts the stable watermark, exact replay, default-off policy
+absence and that owner-reported machine progress cannot reset the user-activity
+gate. Host callers no longer supply policy values to this resolver.
+
+The owner-integration command now runs the live workflow/source pin verifier and
+the preserved T-005 G2 Exit guard before touching PostgreSQL. The current sibling
+checkouts have advanced beyond the frozen revisions, so they are intentionally not
+accepted as final G3 evidence. The frozen commits remain locally available; the
+pending qualification must run from adjacent detached worktrees so the verified
+source and the linked runtime dependency are identical.
+
+The repository-only checkpoint now recomputes the complete Nurture runtime source
+population as 168 files / `4980226cba92780b558f60aa010b6d2c48917b379e901456d0acf931699a8b1a`.
+The historical T-005 self-pin remains bound inside the archived G2 Exit record;
+the current integration pin now names this G3 candidate instead of forcing a later
+task to pretend the source population never changed. Git-object recomputation at
+the frozen owner commits independently reconfirmed Base/My-Chat contract parity
+(`8dd53be4…`, 11 files), `web_workbench` (59), `x5_joint_api` (169) and
+`wave4_binding_host` (20).
+
+The first detached-topology rehearsal exposed a CLI-entry defect before any DB
+write: macOS aliases `/tmp` to `/private/tmp`, while the pin verifier compared the
+two path spellings as strings and silently exited 0. Entry detection now compares
+filesystem realpaths and has a symlink-alias regression test; `test:workflow-contract-pin`
+passes 5/5. A qualification runner that does not actually enter `main` can no longer
+stand in for exact pin evidence.
+
+A second completion audit compared every runtime file changed since `69eba8d` with
+the self-pin population. It caught 14 unpinned files among 25 runtime changes,
+including the T-007 provider, queue admission, release/reschedule repositories and
+the new migration. The pin now covers the full runtime source directories, complete
+migration stream, build configs and package lock instead of a selective file list.
+The verifier rejects any pin that omits a required runtime root even when the narrowed
+hash is internally consistent; the regression test passes. Exact Base/My-Chat pins,
+the expanded 168-file Nurture hash, G2 preservation, G3 freeze and formal ingress all
+pass after the repair. This closes a qualification-integrity gap only; it does not
+run or qualify the pending PostgreSQL suites.
+
+## 2026-08-05 — G3 Exit Qualification and Beta Profile Handoff
+
+| Command / check | Result |
+| --- | --- |
+| exact detached topology pin | PASS — Base `06303e9…`, My-Chat `a019566…`, Nurture `97eab03…`; contract parity 11 files, full Nurture runtime 168 files / `4980226…` |
+| frozen installs, explicit builds and three Prisma generations | PASS — no dev server; generation used non-connecting qualification configuration |
+| clean `prisma migrate deploy` + status + schema diff | PASS — 16 migrations; 61 tables / 90 enums; up to date; no difference detected |
+| aggregate + scenario-service DB typecheck | PASS |
+| `pnpm test:unit` | PASS — 52 files / 577 tests |
+| scenario-service unit suite | PASS — 8 files / 52 tests |
+| `pnpm test:db` | PASS — 21 files / 216 tests |
+| `pnpm verify:owner-integration` | PASS — 2 files / 55 tests; 26 committed actions, 9 successful queries, unexercised 0 |
+| T-007/T-006 publication joint journey | PASS — persisted provider → organize → admission → reschedule → release → Receipt → Guardian reread |
+| T-005/T-006 direct-interaction joint journey | PASS — exact owner-issued option consumed by G2-C prepare/execute |
+| runtime evidence artifact | PASS — 37 keys; SHA-256 `e02ee06300c3c232ca938314f38cec156fdc24a75fff11bf94fe4ad67e929910` |
+| `verify:g2-exit-db-census` | PASS — items 68/11, messages 97/12, violations 0 |
+| surface conformance/tooling | PASS — 11 files / 110 tests; tooling 5/5; `1.15.0` digest `a5e8e226…` |
+| persistence, port, G3 freeze, formal ingress, schema, exact pin and G2 preservation guards | PASS |
+| built default-off smoke | PASS — `binding-owner=disabled harness=disabled legacy-route=absent` |
+| DB context sync + strict context verification + database governance suite | PASS; optional Convex pack tests skipped by declared absence |
+| final database census | PASS — partial schedules 0, invalid released processes 0, invalid policy contracts 0, activation-like tables 0 |
+| disposable resource teardown | PASS — named container absent, port 55437 free; excluded 5433/55439 containers unchanged; detached topology moved to Trash after the final static rerun |
+
+The release census found 10 intentionally low-level fixture rows without Receipt,
+but zero such rows with an applied CommandExecution. Production commit semantics
+remain Receipt + release + CommandExecution in one transaction; this distinction is
+preserved in `artifacts/db/g3-exit/04-post-verify.md` instead of hiding fixture shape.
+
+Verdict: `G3_EXIT_PASS`. This qualifies the default-off Nurture provider and exact
+Beta Profile Handoff only. It does not authorize activation, deployment, T-008,
+Pilot, native/device work or traffic.
+
+## 2026-08-05 — G3 release quality repair checkpoint
+
+上一节的历史运行记录仍证明当时执行过哪些门禁，但其 `G3_EXIT_PASS` verdict 已撤回；
+下面是修复候选当前独立证据，不能与历史 PostgreSQL 结果拼接成新资格结论。
+
+| Command / check | Result |
+| --- | --- |
+| scenario package typecheck | PASS |
+| DB package typecheck | PASS |
+| aggregate `pnpm exec tsc --noEmit`（包含 DB test source） | PASS |
+| targeted release/eligibility suites | PASS — 4 files / 63 tests |
+| `pnpm test:unit` | PASS — 52 files / 579 tests |
+| persistence boundary / port topology / G3-0 freeze / formal ingress | PASS |
+| surface schema / test routing | PASS — 56 schemas; 95 routed files |
+| governance lint | PASS |
+| strict context verification | PASS — correct entry is `.ai/skills/features/context-awareness/scripts/ctl-context.mjs` |
+| `git diff --check` | PASS |
+| attempted obsolete context entry `.ai/scripts/ctl-context.mjs` | NOT RUN — path does not exist; corrected command above passed |
+| new production-DB regressions | PASS on current repair tree — target 2 files / 64 tests; concurrent first-freeze 3/3 additional passes |
+| full production DB suite | PASS on current repair tree — 21 files / 225 tests |
+| Nurture runtime self-pin | ROTATED — 168 files / `b44f4fad985bf760b0bf1a6c4abac8badd7e91ea7999d829bb1fabcd2dfbf8c0` |
+| exact detached owner/joint requalification | PASS — Nurture checkpoint `0374087…` |
+
+The authorized disposable listener ran only on 55437; existing 5433/55439 listeners
+remained excluded. The first target run exposed one stale classification assertion:
+an audit-key `P2002` proves rollback and now returns `command_identity_conflict` rather than
+`outcome_unknown` or the false `already_released`. The exact detached qualification passed;
+the disposable resource and topology were destroyed, so G3-D/E and the Beta Profile Handoff
+are restored and T-006 may close.
+
+## 2026-08-05 — G3 release repair exact requalification
+
+| Command / check | Result |
+| --- | --- |
+| exact topology | PASS — Base `06303e9…`, My-Chat `a019566…`, Nurture `0374087…` |
+| exact source pins | PASS — parity 11; Base 59; My-Chat 169/20; Nurture 168 / `b44f4fad…` |
+| frozen install + explicit build/generate | PASS — lifecycle scripts disabled; three Prisma clients generated; no dev server |
+| clean migrations/catalog/drift | PASS — 16 migrations; 61 tables / 90 enums; no difference |
+| aggregate + scenario-service DB typecheck | PASS |
+| root/scenario-service unit | PASS — 579 + 52 tests |
+| production DB | PASS — 21 files / 225 tests |
+| release/organize target DB | PASS — 2 files / 64 tests; concurrent first-freeze extra 3/3 |
+| formal owner integration | PASS — 2 files / 55 tests; actions 26, queries 9, unexercised 0 |
+| joint journeys | PASS — T-007/T-006 publication; T-005/T-006 direct interaction |
+| runtime evidence | PASS — 37 keys / `e02ee06300c3c232ca938314f38cec156fdc24a75fff11bf94fe4ad67e929910` |
+| surface conformance/tooling | PASS — 11 files / 110 tests; tooling 5/5 |
+| G2 DB preservation | PASS — items 53/11; messages 74/12; violations 0 |
+| built default-off smoke | PASS — binding owner/Harness disabled; legacy route absent |
+| context/docs/governance/static guards | PASS |
+| final DB census | PASS — schedules 0; frozen violations 0; policy violations 0; activation-like tables 0 |
+| receipt invariant | PASS — releases 31; receipt-less fixtures 10; receipt-less with applied execution 0 |
+| teardown | PASS — container/tmpfs/topology absent; 55437 free; excluded 5433/55439 unchanged |
+
+Verdict: `G3_EXIT_PASS_RESTORED`. This is default-off provider/consumer qualification,
+not deployment or activation authority. T-008, Pilot, Candidate and native/device work were
+not started.
