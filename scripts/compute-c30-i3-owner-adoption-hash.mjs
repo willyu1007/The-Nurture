@@ -73,6 +73,21 @@ const profileDefinitions = [
       "packages/nurture-scenario/tests/c30/subject-presentation.test.ts",
     ],
   },
+  {
+    source_identity: "nurture_c30_canonical_action_v1",
+    files: [
+      "docs/context/db/schema.json",
+      "docs/context/registry.json",
+      "packages/nurture-db/src/c30/canonical-action.repository.ts",
+      "packages/nurture-db/tests/c30-canonical-action.integration.test.ts",
+      "packages/nurture-scenario/scenario.manifest.yaml",
+      "packages/nurture-scenario/src/c30/canonical-action.ts",
+      "packages/nurture-scenario/src/generated/manifest.generated.ts",
+      "packages/nurture-scenario/tests/c30/canonical-action.test.ts",
+      "prisma/migrations/20260806130000_c30_i3_canonical_action_runtime/migration.sql",
+      "prisma/schema.prisma",
+    ],
+  },
 ];
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
