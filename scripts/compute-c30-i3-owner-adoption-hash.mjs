@@ -62,6 +62,17 @@ const profileDefinitions = [
       "prisma/schema.prisma",
     ],
   },
+  {
+    source_identity: "nurture_c30_subject_presentation_v1",
+    files: [
+      "packages/nurture-db/src/c30/subject-presentation.repository.ts",
+      "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
+      "packages/nurture-scenario/scenario.manifest.yaml",
+      "packages/nurture-scenario/src/c30/subject-presentation.ts",
+      "packages/nurture-scenario/src/generated/manifest.generated.ts",
+      "packages/nurture-scenario/tests/c30/subject-presentation.test.ts",
+    ],
+  },
 ];
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
