@@ -9,7 +9,7 @@
 - Base commit: `7506eb796a7c38963ae7dd33a4ba308d5379bb25`
 - Parent: `4b23c79e6558d5d93e201b53e1a12b005e3fd67d`
 - Source lock: intentionally deferred to I1-E5
-- Current acceptance: hardened and superseded by exact source `5433124…` in artifact 41
+- Current acceptance: hardened by exact successor source `48fd3d6…` in artifact 43
 
 E4 adds the opaque read locator, body-free read input, at-most-60-second no-store
 display lease and the `ready|tombstone|context_changed|unavailable` result family.

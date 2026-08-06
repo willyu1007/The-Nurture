@@ -268,9 +268,9 @@ dev-docs/active/nurture-institution-mode/
   manifest/source convergence deferred to I1-F. Artifacts 34-35 supersede the
   earlier chain and reaccept exact D1-D5 at source `3580a9b…` plus lock
   `1cb5691…`. Artifact 36 froze I1-E as a dedicated plaintext carrier plus
-  body-free prepare/commit/read controls and E1-E5 ordering. Artifacts 37-41
-  accept that chain at exact Base source `5433124…` plus metadata lock
-  `3a08d1f…`; no consumer or I1-F convergence is implied.
+  body-free prepare/commit/read controls and E1-E5 ordering. Artifacts 42-43
+  supersede the earlier qualification and reaccept that chain at exact Base source
+  `48fd3d6…` plus metadata lock `9abde2b…`; no consumer or I1-F convergence is implied.
 
 Hard gates:
 
@@ -290,8 +290,8 @@ Hard gates:
   I1-D 范围已在 artifact 28 冻结；artifacts 34-35 已以 successor Base source
   `3580a9b…` + lock `1cb5691…` 完成 D1-D5 修复和再验收。artifact 36 冻结的
   I1-E 专用 plaintext carrier、body-free lifecycle controls、no-copy negatives
-  与 E1-E5 顺序已由 artifacts 37-41 在 source `5433124…` + lock `3a08d1f…`
-  完成验收。下一步仅可另行授权 I1-F 范围评审/冻结；manifest dependency/
+  与 E1-E5 顺序已由 artifacts 42-43 在 successor source `48fd3d6…` + lock
+  `9abde2b…` 完成再验收。下一步仅可另行授权 I1-F 范围评审/冻结；manifest dependency/
   source convergence、I1-F 实施与 C30-I2 仍未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
@@ -302,7 +302,7 @@ Hard gates:
   `artifacts/20-c30-i1-b4-qualification-record.md` 与
   `artifacts/21-c30-i1-c-scope-freeze.md`、
   `artifacts/28-c30-i1-d-scope-freeze.md`、artifacts 29-35、
-  `artifacts/36-c30-i1-e-scope-freeze.md` 与 artifacts 37-41。
+  `artifacts/36-c30-i1-e-scope-freeze.md` 与 artifacts 37-43。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

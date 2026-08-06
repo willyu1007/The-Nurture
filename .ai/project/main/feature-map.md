@@ -39,10 +39,11 @@ Project: `main`
   composition findings; the artifact-33 chain is historical. Neutral direct/claimed
   names stay unchanged and manifest/source convergence remains I1-F. Artifact 36
   froze I1-E as a dedicated plaintext carrier plus body-free lifecycle controls,
-  no-copy negatives and five ordered E1-E5 units. Artifact 42 reopens I1-E after
-  four deterministic validation/composition findings; artifacts 37-41 and Base
-  source `5433124…` plus lock `3a08d1f…` are historical until the bounded repair
-  is requalified. I1-F remains blocked. C30-I2..I4,
+  no-copy negatives and five ordered E1-E5 units. Artifacts 42-43 reaccept I1-E at
+  successor Base source `48fd3d6…` plus metadata lock `9abde2b…` after closing four
+  deterministic validation/composition findings; artifacts 37-41 and their
+  source/lock remain historical. The next eligible decision is a separate I1-F
+  scope review/freeze. I1-F implementation and C30-I2..I4,
   C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no downstream
   PASS is deployment or traffic authority.
 

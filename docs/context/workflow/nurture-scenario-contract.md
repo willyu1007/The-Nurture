@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E acceptance reopened for bounded successor repair; I1-F and all consumer adoption/activation blocked
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D/I1-E accepted; I1-F scope review and all implementation/consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 
@@ -37,8 +37,8 @@ prepare branches and legitimate fail-closed outcomes. The public wires and neutr
 driver names remain unchanged. No consumer, runtime, manifest convergence or
 activation exists yet.
 
-The C30-I1-E scope frozen in artifact 36 is implemented and accepted by artifacts
-37-41. The neutral split is one dedicated
+The C30-I1-E scope frozen in artifact 36 was implemented by artifacts 37-41 and
+is currently accepted by successor artifact 43. The neutral split is one dedicated
 `ScenarioProtectedPlainTextCarrierV1` plus body-free static, prepare,
 prepared/committed and read/tombstone controls. Carrier bytes never enter I1-A
 `operation.input`, I1-D `action_input`/result/Step, I1-C semantic output or a
@@ -50,8 +50,11 @@ seconds; non-ready results are carrier-free. Historical Base source
 `5433124506ca8d48a536a283796765209b93d808` is sealed by metadata-only lock
 `3a08d1f117aad0ba8440df75f5e68dad392e8e45` at source hash
 `7ba9458f0e1a91f6fda1a47e5682064020017c41731b1016f8bdad962664c126`.
-Artifact 42 reopens acceptance for bounded no-copy, current-time and Schema/runtime
-parity repairs; the cited source/lock no longer qualifies current I1-E acceptance.
+Artifacts 42-43 close bounded no-copy, current-time and Schema/runtime parity
+repairs at successor Base source `48fd3d65b34a1dd7a6b1e85713fca81f7c9da171`,
+metadata-only lock `9abde2b994f6528fc5afb26125eb029ed6027237` and source
+hash `be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d`.
+The cited artifact-41 source/lock is historical.
 Manifest dependency/source convergence and
 `scenario_protected_interaction_source_v1` remain I1-F work; no My-Chat/Nurture
 consumer, protected route/store/KMS, capability or activation exists.

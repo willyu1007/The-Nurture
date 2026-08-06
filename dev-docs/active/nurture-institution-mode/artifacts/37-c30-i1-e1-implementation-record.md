@@ -8,7 +8,7 @@
 - Result: `I1_E1_IMPLEMENTED_LOCALLY_VERIFIED`
 - Base commit: `75715538e5f320ea8722b76b436f1f4a6feb0b05`
 - Source lock: intentionally deferred to I1-E5
-- Current acceptance: hardened and superseded by exact source `5433124…` in artifact 41
+- Current acceptance: hardened by exact successor source `48fd3d6…` in artifact 43
 
 E1 adds only the Base-neutral static protected-interaction contract, opaque
 protected-content reference alias, dedicated `ScenarioProtectedPlainTextCarrierV1`

@@ -9,7 +9,7 @@
 - Base commit: `4b23c79e6558d5d93e201b53e1a12b005e3fd67d`
 - Parent: `066dcf18970372ca02b2049cb4ff3fdfa44ceeb4`
 - Source lock: intentionally deferred to I1-E5
-- Current acceptance: hardened and superseded by exact source `5433124…` in artifact 41
+- Current acceptance: hardened by exact successor source `48fd3d6…` in artifact 43
 
 E3 adds the closed committed protected-content control and private composition
 assertions that bind the same E2 prepared object to the accepted I1-D execution.

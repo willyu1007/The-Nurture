@@ -2050,3 +2050,28 @@ This file exists to prevent repeating mistakes within this task.
   generic value needs recursive forbidden-field checks, and every claimed no-copy
   boundary needs encoded/fragmented sentinels plus an explicit statement of which
   later runtime layers remain unproven.
+
+### 2026-08-06 — Naive substring scanning inverted protected-copy safety
+
+- Symptom: green I1-E tests still allowed a protected fragment when wrapped in a
+  longer control string and allowed a base64url protected ref, while one-character
+  carrier/version values rejected unrelated operation and driver strings.
+- Root cause: plaintext fragment matching tested whether the complete candidate
+  was inside the protected text, while ref/version scanning used only direct
+  substring inclusion. Neither algorithm separated high-entropy fragment evidence
+  from low-entropy coincidence. Commit time and forbidden property names also had
+  one-sided runtime/Schema checks rather than composed parity.
+- What we tried: replayed wrapped raw fragments, encoded refs, one-character values,
+  a post-expiry commit and case/separator/prefix property variants against the built
+  codec and Ajv. The first full aggregate then correctly stopped at the historical
+  source lock, confirming the two-commit reseal sequence was still required.
+- Fix / workaround: build one bounded representation/window profile per assertion;
+  use exact comparison below 16 code points and 16-code-point windows above it;
+  reuse it recursively for text/ref/version/integrity; bound commit time to resolved
+  `now`; mirror runtime property normalization in Schema; then commit source before
+  a metadata-only exact lock.
+- Prevention: every no-copy detector needs both false-negative and false-positive
+  adversarial cases, including wrapped, encoded and minimum-length values. Structural
+  scanners must state their entropy threshold and never be described as semantic
+  DLP. Every lifecycle time must be checked against both lower and current-time
+  bounds, and every runtime key normalization rule needs generated parity coverage.

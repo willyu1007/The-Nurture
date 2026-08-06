@@ -2,7 +2,8 @@
 
 > Superseded as current qualification evidence on 2026-08-06. Artifact 42
 > reopens I1-E acceptance after four deterministic quality findings. The exact
-> source and lock below remain historical until a successor repair is qualified.
+> source and lock below remain historical; artifact 43 records the qualified
+> successor repair.
 
 ## Result
 

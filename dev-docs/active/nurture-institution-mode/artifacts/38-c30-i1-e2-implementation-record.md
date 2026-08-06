@@ -9,7 +9,7 @@
 - Base commit: `066dcf18970372ca02b2049cb4ff3fdfa44ceeb4`
 - Parent: `75715538e5f320ea8722b76b436f1f4a6feb0b05`
 - Source lock: intentionally deferred to I1-E5
-- Current acceptance: hardened and superseded by exact source `5433124…` in artifact 41
+- Current acceptance: hardened by exact successor source `48fd3d6…` in artifact 43
 
 E2 composes the E1 carrier with accepted I1-D action preparation through a
 body-free prepare input, prepared content control and closed success/failure

@@ -13,9 +13,10 @@
 - Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B, successor I1-C and successor I1-D are accepted. I1-E acceptance is
-  reopened; artifact 42 freezes four successor-repair findings and supersedes
-  artifact 41 as current qualification authority. I1-F remains blocked. G1 is
+  I1-B, successor I1-C, successor I1-D and successor I1-E are accepted. Artifact
+  43 closes E-R1..E-R4 at exact source/lock; artifact 42 remains the immutable
+  repair scope and artifact 41 is historical. I1-F is eligible only for a
+  separately authorized scope review/freeze; implementation remains closed. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -24,14 +25,33 @@
   default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: Base now includes accepted neutral I1-A..D plus the
-  historical I1-E source/lock under repair. I1-E remains limited to standalone
-  contract assertions, JSON Schemas, neutral fixtures/tests and its metadata lock.
+- Code/config/schema impact: Base now includes accepted neutral I1-A..E and exact
+  source locks. The I1-E repair remains limited to standalone validation, one
+  existing JSON Schema, neutral tests and its metadata lock.
   The existing formal NestJS owner path is unchanged. No Base runtime/Scenario
   starter/manifest, My-Chat or Nurture product source, schema/migration,
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-E5 successor repair qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `48fd3d65b34a1dd7a6b1e85713fca81f7c9da171`; metadata-only lock `9abde2b994f6528fc5afb26125eb029ed6027237`. |
+| Finding closure | PASS | E-R1..E-R4 close wrapped fragments/short-value false positives, encoded refs/short versions, future commit time and Schema/runtime forbidden-key parity. |
+| Focused regression | PASS 80/80 | E1-E4 includes both negative bypasses and positive low-entropy controls/versions plus direct/claimed time checks and all 18 normalized forbidden forms. |
+| Full Base verifier | PASS x3 | 66 Schemas, 376 Node tests, runtime 28/28 and Scenario 10/10; all typecheck/build, canonical-ref, exposure, portability and exact source-lock gates pass. |
+| Source identity | PASS | Hash `be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d`; 22 normalized TypeScript files. |
+| Deterministic output | PASS | Two 84-file builds: `1e03ea30…34749`; two byte-identical manifests: `6ae16f44…633c3`; temporary directories destroyed. |
+| Metadata-only seal | PASS | `9abde2b…` changes only the source-lock JSON and names committed source `48fd3d6…`. |
+| Expected pre-lock rejection | PASS / SEQUENCING EVIDENCE | The first full aggregate stopped at portability against the historical lock; all independent checks passed, then the exact two-commit reseal made the full aggregate green without weakening the gate. |
+| Repository/effect boundary | PASS | Base/My-Chat are clean; Nurture closes governance only. No public wire, manifest/source convergence, consumer/runtime, DB, deployment, capability, activation, T-008, Pilot or traffic change. |
+| Detailed evidence | PASS | Artifact 42 freezes the repair; artifact 43 records exact closure, qualification and rollback. |
+| Context/governance/docs | PASS | Context checksum `672d4bf7…74dce6`; strict Context/project-state/governance checks and T-002 query pass; strict task/repository Markdown and anchor lint cover 73/439 files with zero warnings/errors. |
+
+I1-E is reaccepted. I1-F scope review requires separate authorization and I1-F
+implementation remains unauthorized.
 
 ## C30-I1-E successor quality-review reopening — 2026-08-06
 

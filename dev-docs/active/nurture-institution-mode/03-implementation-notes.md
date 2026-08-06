@@ -7,6 +7,16 @@
 
 ## What changed
 
+- 2026-08-06: Reaccepted cumulative Base `C30-I1-E` after closing E-R1 through
+  E-R4. Source `48fd3d6…` adds bounded representation/window no-copy detection,
+  low-entropy exact matching, resolved-current-time commit bounds and recursive
+  Schema/runtime forbidden-key parity; metadata-only lock `9abde2b…` binds source
+  hash `be6fd800…fb7d`. Three full verifiers pass with 66 Schemas, 376 Node tests,
+  runtime 28/28 and Scenario 10/10; isolated 84-file builds and source manifests
+  are deterministic. No public wire, consumer/runtime, manifest convergence, DB,
+  deployment, capability or activation changed. I1-F is eligible only for a
+  separate scope review/freeze.
+
 - 2026-08-06: Reopened cumulative Base `C30-I1-E` acceptance and froze E-R1
   through E-R4 in artifact 42 before source work. Deterministic probes proved a
   wrapped-fragment bypass plus low-entropy false positive, encoded protected-ref

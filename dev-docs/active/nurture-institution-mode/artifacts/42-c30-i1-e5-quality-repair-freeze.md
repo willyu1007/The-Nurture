@@ -62,3 +62,9 @@ warning that Base structural scans are not runtime DLP evidence.
 The repair exits only through a successor I1-E5 qualification/source-lock record.
 Until then, I1-E acceptance is reopened, artifact 41 is superseded as current
 qualification evidence, and I1-F/C30-I2 remain closed.
+
+## Successor qualification
+
+Complete: artifact 43 records Base source `48fd3d6…`, metadata lock `9abde2b…`,
+source hash `be6fd800…fb7d`, E-R1 through E-R4 closure and cumulative I1-E
+reacceptance. Artifact 42 remains the immutable pre-source repair scope record.

@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D accepted；I1-E acceptance reopened；I1-F blocked）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D/I1-E accepted；I1-F pending）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -15,14 +15,15 @@
   historical. I1-D is reaccepted by artifact 35 at successor Base source
   `3580a9b…`, metadata lock `1cb5691…` and source hash `5c5f2c53…99ef` after
   closing all five artifact-34 findings. The prior `52c0dc2…` / `c179bb5…` chain
-  remains historical. Artifacts 37-41 now close the ordered I1-E chain at Base
+  remains historical. Artifacts 37-41 originally closed the ordered I1-E chain at Base
   source `5433124…`, metadata-only lock `3a08d1f…` and source hash
   `7ba9458f…c126`: the dedicated plaintext carrier, body-free prepare/commit/read
   controls, exact I1-D submit reuse, foreground-only read and recursive no-copy
-  suite remain historical. Artifact 42 reopens I1-E acceptance for four bounded
-  repairs: fragment/low-entropy scanning, encoded ref/version handling, future
-  commit time and Schema/runtime body-key parity. I1-F is blocked until the exact
-  successor source is requalified and resealed.
+  suite are reaccepted by artifact 43 at successor Base source `48fd3d6…`,
+  metadata-only lock `9abde2b…` and source hash `be6fd800…fb7d` after closing
+  E-R1..E-R4. The prior `5433124…` / `3a08d1f…` chain remains historical. The
+  only eligible next decision is a separately authorized I1-F scope review/freeze;
+  I1-F implementation remains unauthorized.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -125,7 +126,12 @@
   generic I1-A/I1-C/I1-D or durable Host payloads. This record is historical.
 - C30-I1-E5 successor quality repair freeze:
   `artifacts/42-c30-i1-e5-quality-repair-freeze.md` reopens acceptance and freezes
-  E-R1..E-R4 before Base source changes. I1-F, C30-I2 and every consumer remain blocked.
+  E-R1..E-R4 before Base source changes.
+- C30-I1-E5 successor qualification:
+  `artifacts/43-c30-i1-e5-successor-quality-repair-qualification-record.md` closes
+  all four findings at Base source `48fd3d6…`, metadata lock `9abde2b…`, source
+  hash `be6fd800…fb7d`, 66 Schemas and 376 Node tests. I1-E is reaccepted; I1-F
+  implementation, C30-I2 and every consumer remain unstarted.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 
