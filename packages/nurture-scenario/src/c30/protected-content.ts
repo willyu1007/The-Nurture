@@ -62,7 +62,6 @@ export type NurtureC30ProtectedReadCommandV1 = {
   current_target: NurtureC30ActionTargetV1;
   request_identity_hash: string;
   verified_foreground_context_hash: string;
-  read_carrier_binding_hash: string;
 };
 
 export type NurtureC30ProtectedEraseReasonV1 =
@@ -116,12 +115,20 @@ export type NurtureC30WrappedDataKeyV1 = {
   wrapping_algorithm: string;
 };
 
+export type NurtureC30ProvisionedDataKeyV1 = NurtureC30WrappedDataKeyV1 & {
+  plaintext_dek: Uint8Array;
+};
+
 export type NurtureC30ProtectedKmsPort = {
-  wrapDataKey(input: {
-    plaintext_dek: Uint8Array;
+  /**
+   * Idempotently provisions one data key for the durable provisioning key.
+   * Replays MUST return the same DEK and wrapped-key identity until erasure.
+   */
+  provisionDataKey(input: {
+    provisioning_key: string;
     content_ref_hash: string;
     encryption_context_hash: string;
-  }): Promise<NurtureC30WrappedDataKeyV1>;
+  }): Promise<NurtureC30ProvisionedDataKeyV1>;
   unwrapDataKey(input: NurtureC30WrappedDataKeyV1 & {
     content_ref_hash: string;
     encryption_context_hash: string;
@@ -135,6 +142,25 @@ export type NurtureC30ProtectedKmsPort = {
   }): Promise<void>;
 };
 
+export type NurtureC30ProtectedReadBindingV1 = {
+  keyed_binding_hash: string;
+  valid_until: string;
+};
+
+export type NurtureC30ProtectedReadBindingPort = {
+  bindCurrent(input: {
+    verified_foreground_context_hash: string;
+    request_identity_hash: string;
+    principal: ScenarioHumanPrincipalV1;
+    current_participant: AuthorizedNurtureParticipantV1;
+    contract: ScenarioProtectedInteractionContractV1;
+    protected_content_ref: string;
+    protected_content_version: string;
+    carrier: ScenarioProtectedPlainTextCarrierV1;
+    now: Date;
+  }): Promise<NurtureC30ProtectedReadBindingV1>;
+};
+
 export type NurtureC30ProtectedIntegrityPort = {
   verify(input: {
     carrier: ScenarioProtectedPlainTextCarrierV1;
@@ -145,7 +171,9 @@ export type NurtureC30ProtectedIntegrityPort = {
 };
 
 export class DenyNurtureC30ProtectedKmsPort implements NurtureC30ProtectedKmsPort {
-  async wrapDataKey(_input: Parameters<NurtureC30ProtectedKmsPort["wrapDataKey"]>[0]): Promise<never> {
+  async provisionDataKey(
+    _input: Parameters<NurtureC30ProtectedKmsPort["provisionDataKey"]>[0],
+  ): Promise<never> {
     throw protectedError("protected_kms_unavailable", "Protected KMS is not configured.");
   }
 
@@ -155,6 +183,13 @@ export class DenyNurtureC30ProtectedKmsPort implements NurtureC30ProtectedKmsPor
 
   async destroyDataKey(_input: Parameters<NurtureC30ProtectedKmsPort["destroyDataKey"]>[0]): Promise<never> {
     throw protectedError("protected_kms_unavailable", "Protected KMS is not configured.");
+  }
+}
+
+export class DenyNurtureC30ProtectedReadBindingPort
+implements NurtureC30ProtectedReadBindingPort {
+  async bindCurrent(): Promise<never> {
+    throw protectedError("protected_context_changed", "Protected foreground binding is not configured.");
   }
 }
 
@@ -211,7 +246,6 @@ export function assertNurtureC30ProtectedReadCommandV1(
   for (const value of [
     command.request_identity_hash,
     command.verified_foreground_context_hash,
-    command.read_carrier_binding_hash,
   ]) assertSha256(value);
 }
 

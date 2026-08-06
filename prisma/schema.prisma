@@ -400,7 +400,9 @@ enum NurtureC30ActionOperationState {
 }
 
 enum NurtureC30ProtectedContentLifecycle {
+  provisioning
   active
+  erasing
   tombstoned
   erased
 }
@@ -1715,6 +1717,9 @@ model NurtureC30PairOperation {
   familyAssociationId             String?                      @unique(map: "uq_nurture_c30_pair_family_assoc") @map("family_association_id")
   commandExecutionId              String?                      @unique(map: "uq_nurture_c30_pair_execution") @map("command_execution_id")
   scenarioCommitEvidenceHash      String?                      @map("scenario_commit_evidence_hash") @db.Char(64)
+  participantVersion              Int?                         @map("participant_version")
+  childCareProcessVersion         Int?                         @map("child_care_process_version")
+  familyVersion                   Int?                         @map("family_version")
   noEffectFenceEvidenceHash       String?                      @map("no_effect_fence_evidence_hash") @db.Char(64)
   committedAt                     DateTime?                    @map("committed_at")
   recoveryCheckedAt               DateTime?                    @map("recovery_checked_at")
@@ -1893,16 +1898,17 @@ model NurtureC30ProtectedContent {
   encryptionAlgorithm                    String                              @map("encryption_algorithm")
   encryptionVersion                      Int                                 @map("encryption_version")
   encryptionContextHash                  String                              @map("encryption_context_hash") @db.Char(64)
+  kmsProvisioningKey                     String                              @unique(map: "uq_nurture_c30_protected_kms_provisioning") @map("kms_provisioning_key") @db.Char(64)
   ciphertext                             Bytes?
   nonce                                  Bytes?
   authenticationTag                      Bytes?                              @map("authentication_tag")
   wrappedDek                             Bytes?                              @map("wrapped_dek")
-  kmsKeyDomain                           String                              @map("kms_key_domain")
-  kmsKeyVersion                          String                              @map("kms_key_version")
+  kmsKeyDomain                           String?                             @map("kms_key_domain")
+  kmsKeyVersion                          String?                             @map("kms_key_version")
   kmsKeyHandle                           String?                             @map("kms_key_handle") @db.VarChar(512)
-  kmsKeyHandleHash                       String                              @map("kms_key_handle_hash") @db.Char(64)
-  wrappingAlgorithm                      String                              @map("wrapping_algorithm")
-  lifecycle                              NurtureC30ProtectedContentLifecycle @default(active)
+  kmsKeyHandleHash                       String?                             @map("kms_key_handle_hash") @db.Char(64)
+  wrappingAlgorithm                      String?                             @map("wrapping_algorithm")
+  lifecycle                              NurtureC30ProtectedContentLifecycle @default(provisioning)
   readableUntil                          DateTime                            @map("readable_until")
   retentionUntil                         DateTime                            @map("retention_until")
   tombstoneReason                        String?                             @map("tombstone_reason")
@@ -1914,7 +1920,7 @@ model NurtureC30ProtectedContent {
   lastTransitionEvidenceHash             String                              @map("last_transition_evidence_hash") @db.Char(64)
   lastTransitionAuthorityRevision        Int                                 @map("last_transition_authority_revision")
   aggregateVersion                       Int                                 @default(1) @map("aggregate_version")
-  committedAt                            DateTime                            @map("committed_at")
+  committedAt                            DateTime?                           @map("committed_at")
   createdAt                              DateTime                            @default(now()) @map("created_at")
   updatedAt                              DateTime                            @updatedAt @map("updated_at")
 

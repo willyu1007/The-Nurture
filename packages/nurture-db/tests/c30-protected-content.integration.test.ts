@@ -11,6 +11,7 @@ import {
   assertReadScenarioProtectedDetailExchangeV1,
   type CanonicalRef,
   type ScenarioProtectedInteractionContractV1,
+  type ScenarioProtectedPlainTextCarrierV1,
 } from "@my-chat/workflow-contracts";
 import {
   computeNurtureC30PrincipalBindingHash,
@@ -22,6 +23,8 @@ import {
   type NurtureC30ProtectedCommitCommandV1,
   type NurtureC30ProtectedIntegrityPort,
   type NurtureC30ProtectedKmsPort,
+  type NurtureC30ProtectedReadBindingPort,
+  type NurtureC30ProvisionedDataKeyV1,
   type NurtureC30WrappedDataKeyV1,
 } from "@the-nurture/scenario";
 import { createPrismaClient } from "../src/client.js";
@@ -33,6 +36,9 @@ import {
 const prisma = createPrismaClient();
 const masterKey = createHash("sha256").update("c30-i3-f-isolated-test-kms", "utf8").digest();
 const integrityKey = "c30-i3-f-isolated-integrity-test-only";
+const foregroundKey = "c30-i3-quality-repair-foreground-test-only";
+const carrierBindingKey = "c30-i3-quality-repair-carrier-binding-test-only";
+const protectedSurfaceKey = "fixture.neutral_surface_v1";
 
 afterAll(async () => {
   masterKey.fill(0);
@@ -123,6 +129,27 @@ const integrity: NurtureC30ProtectedIntegrityPort = {
   ),
 };
 
+const readBinding: NurtureC30ProtectedReadBindingPort = {
+  bindCurrent: async (input) => {
+    if (input.verified_foreground_context_hash !== foregroundHash(
+      input.principal,
+      input.request_identity_hash,
+    )) throw nurtureC30ProtectedContentError(
+      "protected_context_changed",
+      "fixture foreground context changed",
+    );
+    return {
+      keyed_binding_hash: carrierBindingHash(
+        input.principal,
+        input.request_identity_hash,
+        input.contract,
+        input.carrier,
+      ),
+      valid_until: new Date(input.now.getTime() + 45_000).toISOString(),
+    };
+  },
+};
+
 describe("C30 authoritative protected-content lifecycle", () => {
   it("commits/replays one ciphertext and returns only a no-store foreground carrier", async () => {
     const fixture = await createFixture();
@@ -132,6 +159,7 @@ describe("C30 authoritative protected-content lifecycle", () => {
       authorityReader,
       kms,
       integrity,
+      readBinding,
     );
     const [first, replay] = await Promise.all([
       repository.commit(fixture.command),
@@ -159,15 +187,18 @@ describe("C30 authoritative protected-content lifecycle", () => {
     expect(read.result).toMatchObject({ status: "ready", content_kind: contract.content_kind });
     expect(read.carrier?.plain_text).toBe(fixture.plaintext);
     expect(read.cache_control).toBe("no-store");
+    if (read.result.status !== "ready" || !read.carrier) throw new Error("expected ready protected read");
+    const readyResult = read.result;
+    const readyCarrier = read.carrier;
     expect(() => assertReadScenarioProtectedDetailExchangeV1(
       contract,
       readInput.locator,
       readInput.request,
       first.committed_content,
-      read.result,
-      read.carrier,
+      readyResult,
+      readyCarrier,
       {
-        now: read.result.status === "ready" ? read.result.display_lease.issued_at : new Date().toISOString(),
+        now: readyResult.display_lease.issued_at,
         locator_verification: {
           access_mode: "foreground_current",
           request_identity_hash: readInput.request_identity_hash,
@@ -178,7 +209,7 @@ describe("C30 authoritative protected-content lifecycle", () => {
           ),
           scenario_key: "nurture",
           action_key: contract.action_key,
-          surface_key: "fixture.neutral_surface_v1",
+          surface_key: protectedSurfaceKey,
           protected_content_ref: readInput.locator.protected_content_ref,
           content_kind: contract.content_kind,
           issued_at: readInput.locator.issued_at,
@@ -188,7 +219,7 @@ describe("C30 authoritative protected-content lifecycle", () => {
         carrier_binding_verification: {
           carrier_scope: "read_output",
           protected_field_key: contract.protected_field_key,
-          verified_keyed_binding_hash: readInput.read_carrier_binding_hash,
+          verified_keyed_binding_hash: readyResult.carrier_binding.keyed_binding_hash,
           request_identity_hash: readInput.request_identity_hash,
           workspace_ref: readInput.principal.workspace_ref,
           principal_binding_hash: computeNurtureC30PrincipalBindingHash(
@@ -197,19 +228,31 @@ describe("C30 authoritative protected-content lifecycle", () => {
           ),
           scenario_key: "nurture",
           action_key: contract.action_key,
-          surface_key: "fixture.neutral_surface_v1",
+          surface_key: protectedSurfaceKey,
         },
         decrypted_content_verification: {
           protected_content_ref: readInput.locator.protected_content_ref,
           protected_content_version: first.committed_content.committed_content_version,
           protected_field_key: contract.protected_field_key,
           content_kind: contract.content_kind,
-          read_carrier_binding_hash: readInput.read_carrier_binding_hash,
+          read_carrier_binding_hash: readyResult.carrier_binding.keyed_binding_hash,
           request_identity_hash: readInput.request_identity_hash,
           verified_keyed_integrity_hash: first.committed_content.keyed_integrity_hash,
         },
       },
     )).not.toThrow();
+    expect(readyResult.carrier_binding.keyed_binding_hash).toBe(
+      carrierBindingHash(
+        readInput.principal,
+        readInput.request_identity_hash,
+        contract,
+        readyCarrier,
+      ),
+    );
+    await expect(repository.read({
+      ...readInput,
+      verified_foreground_context_hash: digest("caller-invented-foreground"),
+    })).rejects.toMatchObject({ code: "protected_context_changed" });
     const durable = JSON.stringify({
       row: { ...row, ciphertext: row.ciphertext?.toString("base64"), wrappedDek: row.wrappedDek?.toString("base64") },
       audits: await prisma.nurtureC30ProtectedContentAuditRecord.findMany({
@@ -229,7 +272,13 @@ describe("C30 authoritative protected-content lifecycle", () => {
   it("uses distinct per-content DEKs and fails closed on ciphertext tamper", async () => {
     const fixture = await createFixture();
     const kms = new IsolatedTestKms();
-    const repository = new PrismaNurtureC30ProtectedContentRepository(prisma, authorityReader, kms, integrity);
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      readBinding,
+    );
     await repository.commit(fixture.command);
     const secondCommand = reidentify(fixture.command);
     await repository.commit(secondCommand);
@@ -250,6 +299,24 @@ describe("C30 authoritative protected-content lifecycle", () => {
       .rejects.toMatchObject({ code: "protected_integrity_failed" });
   });
 
+  it("recovers an ambiguous KMS provision response without minting or destroying a second key", async () => {
+    const fixture = await createFixture();
+    const kms = new FailAfterProvisionOnceKms();
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      readBinding,
+    );
+    await expect(repository.commit(fixture.command)).rejects.toThrow("ambiguous provision response");
+    await expect(prisma.nurtureC30ProtectedContent.findUniqueOrThrow({
+      where: { protectedContentRef: fixture.command.prepared_content.protected_content_ref },
+    })).resolves.toMatchObject({ lifecycle: "provisioning", committedAt: null });
+    await expect(repository.commit(fixture.command)).resolves.toMatchObject({ disposition: "committed" });
+    expect(kms.provisionedCount()).toBe(1);
+  });
+
   it("denies unconfigured integrity/KMS and never falls back to the legacy static-key port", async () => {
     const fixture = await createFixture();
     await expect(new PrismaNurtureC30ProtectedContentRepository(prisma).commit(fixture.command))
@@ -265,9 +332,9 @@ describe("C30 authoritative protected-content lifecycle", () => {
       new DenyNurtureC30ProtectedKmsPort(),
       integrity,
     ).commit(fixture.command)).rejects.toMatchObject({ code: "protected_kms_unavailable" });
-    expect(await prisma.nurtureC30ProtectedContent.count({
+    await expect(prisma.nurtureC30ProtectedContent.findUniqueOrThrow({
       where: { protectedContentRef: fixture.command.prepared_content.protected_content_ref },
-    })).toBe(0);
+    })).resolves.toMatchObject({ lifecycle: "provisioning", committedAt: null });
   });
 
   it("rereads current pair/local authority before read and erase", async () => {
@@ -277,6 +344,7 @@ describe("C30 authoritative protected-content lifecycle", () => {
       authorityReader,
       new IsolatedTestKms(),
       integrity,
+      readBinding,
     );
     const committed = await repository.commit(fixture.command);
     await prisma.nurtureFamilyAnchorAssociation.update({
@@ -294,10 +362,43 @@ describe("C30 authoritative protected-content lifecycle", () => {
       .rejects.toMatchObject({ code: "protected_authority_denied" });
   });
 
+  it("rereads authority after decrypt and foreground binding before returning plaintext", async () => {
+    const fixture = await createFixture();
+    const kms = new IsolatedTestKms();
+    const revokingBinding: NurtureC30ProtectedReadBindingPort = {
+      bindCurrent: async (input) => {
+        const binding = await readBinding.bindCurrent(input);
+        await prisma.nurtureParticipant.update({
+          where: { id: fixture.command.current_participant.participant_ref.object_id },
+          data: { status: "suspended", aggregateVersion: { increment: 1 } },
+        });
+        return binding;
+      },
+    };
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      revokingBinding,
+    );
+    const committed = await repository.commit(fixture.command);
+    await expect(repository.read(readCommand(
+      fixture,
+      committed.committed_content.committed_content_version,
+    ))).rejects.toMatchObject({ code: "protected_authority_denied" });
+  });
+
   it("cryptographically erases, exact-replays, and rejects a pre-erasure DB snapshot", async () => {
     const fixture = await createFixture();
     const kms = new IsolatedTestKms();
-    const repository = new PrismaNurtureC30ProtectedContentRepository(prisma, authorityReader, kms, integrity);
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      readBinding,
+    );
     const committed = await repository.commit(fixture.command);
     const snapshot = await prisma.nurtureC30ProtectedContent.findUniqueOrThrow({
       where: { protectedContentRef: fixture.command.prepared_content.protected_content_ref },
@@ -315,7 +416,13 @@ describe("C30 authoritative protected-content lifecycle", () => {
     });
     expect((await repository.read(readCommand(fixture, committed.committed_content.committed_content_version))).result.status)
       .toBe("tombstone");
-    if (!snapshot.wrappedDek || !snapshot.kmsKeyHandle) throw new Error("expected snapshot key material");
+    if (
+      !snapshot.wrappedDek
+      || !snapshot.kmsKeyDomain
+      || !snapshot.kmsKeyVersion
+      || !snapshot.kmsKeyHandle
+      || !snapshot.wrappingAlgorithm
+    ) throw new Error("expected snapshot key material");
     await expect(kms.unwrapDataKey({
       wrapped_dek: snapshot.wrappedDek,
       kms_key_domain: snapshot.kmsKeyDomain,
@@ -327,10 +434,45 @@ describe("C30 authoritative protected-content lifecycle", () => {
     })).rejects.toThrow("destroyed");
   });
 
+  it("keeps ambiguous KMS destruction fail-closed in erasing and converges on retry", async () => {
+    const fixture = await createFixture();
+    const kms = new FailDestroyOnceKms();
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      readBinding,
+    );
+    const committed = await repository.commit(fixture.command);
+    await expect(repository.erase(eraseCommand(fixture, "crypto_erasure")))
+      .rejects.toThrow("ambiguous destroy response");
+    await expect(prisma.nurtureC30ProtectedContent.findUniqueOrThrow({
+      where: { protectedContentRef: fixture.command.prepared_content.protected_content_ref },
+    })).resolves.toMatchObject({ lifecycle: "erasing", ciphertext: expect.any(Buffer) });
+    await prisma.nurtureParticipant.update({
+      where: { id: fixture.command.current_participant.participant_ref.object_id },
+      data: { status: "suspended", aggregateVersion: { increment: 1 } },
+    });
+    await expect(repository.read(readCommand(
+      fixture,
+      committed.committed_content.committed_content_version,
+    ))).rejects.toMatchObject({ code: "protected_authority_denied" });
+    await expect(prisma.nurtureC30ProtectedContent.findUniqueOrThrow({
+      where: { protectedContentRef: fixture.command.prepared_content.protected_content_ref },
+    })).resolves.toMatchObject({ lifecycle: "erased", ciphertext: null, kmsKeyHandle: null });
+  });
+
   it("expires to a carrier-free tombstone and destroys its data key", async () => {
     const fixture = await createFixture({ preparedMs: 1_000, readableMs: 1_200, retentionMs: 1_600 });
     const kms = new IsolatedTestKms();
-    const repository = new PrismaNurtureC30ProtectedContentRepository(prisma, authorityReader, kms, integrity);
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      readBinding,
+    );
     const committed = await repository.commit(fixture.command);
     const row = await prisma.nurtureC30ProtectedContent.findUniqueOrThrow({
       where: { protectedContentRef: fixture.command.prepared_content.protected_content_ref },
@@ -347,7 +489,13 @@ describe("C30 authoritative protected-content lifecycle", () => {
   it("retention expiry converges directly to erased with no carrier", async () => {
     const fixture = await createFixture({ preparedMs: 1_000, readableMs: 1_100, retentionMs: 1_200 });
     const kms = new IsolatedTestKms();
-    const repository = new PrismaNurtureC30ProtectedContentRepository(prisma, authorityReader, kms, integrity);
+    const repository = new PrismaNurtureC30ProtectedContentRepository(
+      prisma,
+      authorityReader,
+      kms,
+      integrity,
+      readBinding,
+    );
     const committed = await repository.commit(fixture.command);
     await new Promise((resolve) => setTimeout(resolve, 1_250));
     const read = await repository.read(readCommand(fixture, committed.committed_content.committed_content_version));
@@ -365,6 +513,7 @@ describe("C30 authoritative protected-content lifecycle", () => {
       authorityReader,
       new IsolatedTestKms(),
       integrity,
+      readBinding,
     );
     await repository.commit(fixture.command);
     await expect(prisma.nurtureC30ProtectedContent.update({
@@ -379,25 +528,58 @@ describe("C30 authoritative protected-content lifecycle", () => {
 });
 
 class IsolatedTestKms implements NurtureC30ProtectedKmsPort {
-  private readonly keys = new Map<string, { contentRefHash: string; destroyed: boolean }>();
+  private readonly keys = new Map<string, {
+    contentRefHash: string;
+    destroyed: boolean;
+    plaintextDek: Buffer;
+    wrappedDek: Buffer;
+  }>();
+  private readonly provisioning = new Map<string, string>();
   private sequence = 0;
 
-  async wrapDataKey(input: {
-    plaintext_dek: Uint8Array;
+  async provisionDataKey(input: {
+    provisioning_key: string;
     content_ref_hash: string;
     encryption_context_hash: string;
-  }): Promise<NurtureC30WrappedDataKeyV1> {
+  }): Promise<NurtureC30ProvisionedDataKeyV1> {
+    const replayHandle = this.provisioning.get(input.provisioning_key);
+    if (replayHandle) {
+      const replay = this.keys.get(replayHandle);
+      if (!replay || replay.destroyed || replay.contentRefHash !== input.content_ref_hash) {
+        throw new Error("invalid test KMS provisioning replay");
+      }
+      return this.result(replayHandle, replay);
+    }
     this.sequence += 1;
+    const plaintextDek = deterministicBytes(
+      `dek:${this.sequence}:${input.provisioning_key}:${input.encryption_context_hash}`,
+      32,
+    );
     const nonce = deterministicBytes(`nonce:${this.sequence}:${input.encryption_context_hash}`, 12);
     const cipher = createCipheriv("aes-256-gcm", masterKey, nonce);
     cipher.setAAD(Buffer.from(input.encryption_context_hash, "utf8"));
-    const ciphertext = Buffer.concat([cipher.update(input.plaintext_dek), cipher.final()]);
+    const ciphertext = Buffer.concat([cipher.update(plaintextDek), cipher.final()]);
     const handle = nurtureSha256Base64Url(
       deterministicBytes(`handle:${this.sequence}:${input.content_ref_hash}`, 32),
     );
-    this.keys.set(handle, { contentRefHash: input.content_ref_hash, destroyed: false });
+    const key = {
+      contentRefHash: input.content_ref_hash,
+      destroyed: false,
+      plaintextDek,
+      wrappedDek: Buffer.concat([nonce, cipher.getAuthTag(), ciphertext]),
+    };
+    this.keys.set(handle, key);
+    this.provisioning.set(input.provisioning_key, handle);
+    return this.result(handle, key);
+  }
+
+  private result(
+    handle: string,
+    key: { plaintextDek: Buffer; wrappedDek: Buffer },
+  ): NurtureC30ProvisionedDataKeyV1 {
     return {
-      wrapped_dek: Buffer.concat([nonce, cipher.getAuthTag(), ciphertext]),
+      plaintext_dek: Buffer.from(key.plaintextDek),
+      wrapped_dek: Buffer.from(key.wrappedDek),
       kms_key_domain: "fixture.kms",
       kms_key_version: "v1",
       kms_key_handle: handle,
@@ -430,6 +612,39 @@ class IsolatedTestKms implements NurtureC30ProtectedKmsPort {
 
   isDestroyed(handle: string): boolean {
     return this.keys.get(handle)?.destroyed === true;
+  }
+
+  provisionedCount(): number {
+    return this.provisioning.size;
+  }
+}
+
+class FailAfterProvisionOnceKms extends IsolatedTestKms {
+  private shouldFail = true;
+
+  override async provisionDataKey(
+    input: Parameters<NurtureC30ProtectedKmsPort["provisionDataKey"]>[0],
+  ): Promise<NurtureC30ProvisionedDataKeyV1> {
+    const result = await super.provisionDataKey(input);
+    if (this.shouldFail) {
+      this.shouldFail = false;
+      throw new Error("ambiguous provision response");
+    }
+    return result;
+  }
+}
+
+class FailDestroyOnceKms extends IsolatedTestKms {
+  private shouldFail = true;
+
+  override async destroyDataKey(
+    input: Parameters<NurtureC30ProtectedKmsPort["destroyDataKey"]>[0],
+  ): Promise<void> {
+    await super.destroyDataKey(input);
+    if (this.shouldFail) {
+      this.shouldFail = false;
+      throw new Error("ambiguous destroy response");
+    }
   }
 }
 
@@ -602,6 +817,7 @@ function readCommand(
   committedContentVersion: string,
 ) {
   const now = Date.now();
+  const requestIdentityHash = digest(`read:${randomUUID()}`);
   return {
     protected_store_read_version: 1 as const,
     contract,
@@ -620,9 +836,11 @@ function readCommand(
     principal: fixture.command.principal,
     current_participant: fixture.command.current_participant,
     current_target: fixture.command.current_target,
-    request_identity_hash: digest(`read:${randomUUID()}`),
-    verified_foreground_context_hash: digest(`foreground:${randomUUID()}`),
-    read_carrier_binding_hash: digest(`read-binding:${randomUUID()}`),
+    request_identity_hash: requestIdentityHash,
+    verified_foreground_context_hash: foregroundHash(
+      fixture.command.principal,
+      requestIdentityHash,
+    ),
   };
 }
 
@@ -674,6 +892,46 @@ function integrityHash(plaintext: string, contentRef: string, requestIdentityHas
 
 function authorityHash(processId: string): string {
   return digest(`authority:${processId}`);
+}
+
+function foregroundHash(
+  principal: Awaited<ReturnType<typeof createFixture>>["command"]["principal"],
+  requestIdentityHash: string,
+): string {
+  return createHmac("sha256", foregroundKey)
+    .update(nurtureCanonicalJsonBytes({
+      domain: "scenario_protected_foreground_context_v1",
+      request_identity_hash: requestIdentityHash,
+      workspace_ref: principal.workspace_ref,
+      account_ref: principal.account_ref,
+      actor_ref: principal.actor_ref,
+      scenario_key: "nurture",
+      action_key: contract.action_key,
+      surface_key: protectedSurfaceKey,
+    }))
+    .digest("hex");
+}
+
+function carrierBindingHash(
+  principal: Awaited<ReturnType<typeof createFixture>>["command"]["principal"],
+  requestIdentityHash: string,
+  protectedContract: ScenarioProtectedInteractionContractV1,
+  carrier: ScenarioProtectedPlainTextCarrierV1,
+): string {
+  return createHmac("sha256", carrierBindingKey)
+    .update(nurtureCanonicalJsonBytes({
+      domain: "scenario_protected_carrier_binding_v1",
+      scope: "read_output",
+      request_identity_hash: requestIdentityHash,
+      workspace_ref: principal.workspace_ref,
+      scenario_key: protectedContract.scenario_key,
+      action_key: protectedContract.action_key,
+      surface_key: protectedSurfaceKey,
+      protected_field_key: protectedContract.protected_field_key,
+      media_type: carrier.media_type,
+      plain_text: carrier.plain_text,
+    }))
+    .digest("hex");
 }
 
 function digest(value: string): string {

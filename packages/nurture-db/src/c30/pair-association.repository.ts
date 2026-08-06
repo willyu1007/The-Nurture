@@ -30,7 +30,7 @@ export type NurtureC30PairAuthorityInput = {
   representedOrganizationObjectId?: string;
   childAnchorId: string;
   familyAnchorId: string;
-  purpose: "associate_canonical_pair";
+  purpose: "associate_canonical_pair" | "recover_canonical_pair";
   now: Date;
 };
 
@@ -86,6 +86,14 @@ implements NurtureC30PairAssociationRepository {
       const existing = await lockOperation(transaction, command.pair_request.identity_operation_id);
       if (existing) {
         assertOperationMatches(existing, command);
+        const now = await databaseNow(transaction);
+        const context = await lockBootstrapContext(transaction, command);
+        const authority = await this.verifyAuthority(transaction, command, context.participant, now);
+        assertSameAdmissionAuthority(existing, authority);
+        if (existing.state === "eligible") assertOpenDeadline(command.effect_deadline_at, now);
+        if (existing.state === "committed") {
+          await assertCommittedLocalState(transaction, existing, command, context.participant);
+        }
         return registration(existing, "exact_replay");
       }
       const now = await databaseNow(transaction);
@@ -142,20 +150,18 @@ implements NurtureC30PairAssociationRepository {
       const operation = await lockOperation(transaction, command.pair_request.identity_operation_id);
       if (!operation) throw pairError("pair_attempt_not_current", "The eligible pair attempt was not found.");
       assertOperationMatches(operation, command);
-      if (operation.state === "committed") return resultFromCommand(command, operation, "exact_replay");
+      const now = await databaseNow(transaction);
+      const context = await lockBootstrapContext(transaction, command);
+      const authority = await this.verifyAuthority(transaction, command, context.participant, now);
+      assertSameAdmissionAuthority(operation, authority);
+      if (operation.state === "committed") {
+        await assertCommittedLocalState(transaction, operation, command, context.participant);
+        return resultFromCommand(command, operation, "exact_replay");
+      }
       if (operation.state !== "eligible") {
         throw pairError("pair_attempt_not_current", "The pair attempt is not eligible for dispatch.");
       }
-      const now = await databaseNow(transaction);
       assertOpenDeadline(command.effect_deadline_at, now);
-      const context = await lockBootstrapContext(transaction, command);
-      const authority = await this.verifyAuthority(transaction, command, context.participant, now);
-      if (
-        authority.authoritySourceRef !== operation.authoritySourceRef
-        || authority.authoritySourceVersion !== operation.authoritySourceVersion
-      ) {
-        throw pairError("pair_authority_denied", "Current local authority differs from admission.");
-      }
       const claimed = await transaction.nurtureC30PairOperation.updateMany({
         where: { id: operation.id, state: "eligible", writerFenceHash: command.writer_fence_hash },
         data: { state: "dispatching" },
@@ -165,7 +171,7 @@ implements NurtureC30PairAssociationRepository {
       }
 
       const binding = await ensurePrincipalBinding(transaction, command);
-      await ensureLocalObjects(transaction, command);
+      const localObjects = await ensureLocalObjects(transaction, command);
       await assertNoCurrentAssociationConflict(transaction, command);
       await transaction.nurtureChildAnchorAssociation.create({
         data: {
@@ -198,9 +204,19 @@ implements NurtureC30PairAssociationRepository {
       });
       await ensureInitialRole(transaction, command);
 
-      const scenarioCommitEvidenceHash = commitEvidenceHash(command, binding.aggregateVersion, now);
+      const scenarioCommitEvidenceHash = commitEvidenceHash(
+        command,
+        binding.aggregateVersion,
+        context.participant.aggregateVersion,
+        localObjects.process.aggregateVersion,
+        localObjects.family.aggregateVersion,
+        now,
+      );
       const executionRef = executionRefValue(command.local_seed.command_execution_id);
-      const participantRef = participantRefValue(command.local_seed.participant_id, binding.aggregateVersion);
+      const participantRef = participantRefValue(
+        command.local_seed.participant_id,
+        context.participant.aggregateVersion,
+      );
       await transaction.nurtureCommandExecution.create({
         data: {
           id: command.local_seed.command_execution_id,
@@ -228,13 +244,21 @@ implements NurtureC30PairAssociationRepository {
           executionDriver: null,
           childCareProcessId: command.local_seed.child_care_process_id,
           targetRefs: [
-            localRef("child_care_process", command.local_seed.child_care_process_id, 1),
-            localRef("family", command.local_seed.family_id, 1),
+            localRef(
+              "child_care_process",
+              command.local_seed.child_care_process_id,
+              localObjects.process.aggregateVersion,
+            ),
+            localRef("family", command.local_seed.family_id, localObjects.family.aggregateVersion),
           ],
           businessOutcome: "applied",
           outputRefs: [
-            localRef("child_care_process", command.local_seed.child_care_process_id, 1),
-            localRef("family", command.local_seed.family_id, 1),
+            localRef(
+              "child_care_process",
+              command.local_seed.child_care_process_id,
+              localObjects.process.aggregateVersion,
+            ),
+            localRef("family", command.local_seed.family_id, localObjects.family.aggregateVersion),
           ],
           handoffRequestSnapshotsPayload: [],
           resultSchemaVersion: 1,
@@ -281,6 +305,9 @@ implements NurtureC30PairAssociationRepository {
           familyAssociationId: command.local_seed.family_association_id,
           commandExecutionId: command.local_seed.command_execution_id,
           scenarioCommitEvidenceHash,
+          participantVersion: context.participant.aggregateVersion,
+          childCareProcessVersion: localObjects.process.aggregateVersion,
+          familyVersion: localObjects.family.aggregateVersion,
           committedAt: now,
         },
       });
@@ -302,7 +329,9 @@ implements NurtureC30PairAssociationRepository {
       if (!operation || !statusEvidenceMatches(operation, request)) {
         return unknownStatus(request, checkedAt, "compatible_evidence_ambiguous");
       }
+      const current = await this.verifyOperationAuthority(transaction, operation, checkedAt);
       if (operation.state === "committed" && operation.commandExecutionId && operation.scenarioCommitEvidenceHash) {
+        await assertCommittedOperationSnapshot(transaction, operation, current.participant);
         return {
           status_lookup_result_version: 1,
           identity_operation_id: operation.id,
@@ -353,7 +382,7 @@ implements NurtureC30PairAssociationRepository {
           operationId: operation.id,
           eventType: "nurture.canonical_pair.confirmed_no_effect",
           aggregateRef: pairOperationRef(operation.id),
-          participantRef: participantRefValue(operation.participantId, 1),
+          participantRef: participantRefValue(operation.participantId, current.participant.aggregateVersion),
           correlationRef: request.scenario_command_id,
           evidenceHash: noEffectFenceEvidenceHash,
         },
@@ -378,17 +407,44 @@ implements NurtureC30PairAssociationRepository {
       purpose: "associate_canonical_pair",
       now,
     }).then((evidence) => {
-      if (
-        evidence.authorized !== true
-        || !evidence.authoritySourceRef
-        || evidence.authoritySourceRef.length > 256
-        || !Number.isSafeInteger(evidence.authoritySourceVersion)
-        || evidence.authoritySourceVersion < 1
-      ) {
-        throw pairError("pair_authority_denied", "Current local authority evidence is invalid.");
-      }
+      assertAuthorityEvidence(evidence);
       return evidence;
     });
+  }
+
+  private async verifyOperationAuthority(
+    transaction: TransactionClient,
+    operation: NurtureC30PairOperation,
+    now: Date,
+  ): Promise<{ participant: LockedParticipant }> {
+    const participant = await lockParticipant(transaction, operation.participantId);
+    if (participant.workspaceId !== operation.workspaceId || participant.status !== "active") {
+      throw pairError("pair_authority_denied", "The recovery Participant is unavailable.");
+    }
+    const [childAnchor, familyAnchor] = await Promise.all([
+      lockAnchor(transaction, "child", operation.childAnchorId),
+      lockAnchor(transaction, "family", operation.familyAnchorId),
+    ]);
+    if (
+      childAnchor.aggregateVersion !== operation.childOwnerVersion
+      || familyAnchor.aggregateVersion !== operation.familyOwnerVersion
+    ) throw pairError("pair_evidence_mismatch", "Current owner evidence changed during recovery.");
+    const authority = await this.authorityReader.verifyCurrent(transaction, {
+      workspaceId: operation.workspaceId,
+      participantId: operation.participantId,
+      accountObjectId: operation.accountObjectId,
+      actorObjectId: operation.actorObjectId,
+      ...(operation.representedOrganizationObjectId
+        ? { representedOrganizationObjectId: operation.representedOrganizationObjectId }
+        : {}),
+      childAnchorId: operation.childAnchorId,
+      familyAnchorId: operation.familyAnchorId,
+      purpose: "recover_canonical_pair",
+      now,
+    });
+    assertAuthorityEvidence(authority);
+    assertSameAdmissionAuthority(operation, authority);
+    return { participant };
   }
 
   private async retrySerializable<TResult>(
@@ -444,6 +500,21 @@ async function lockBootstrapContext(
     throw pairError("pair_evidence_mismatch", "The owner anchor version is stale.");
   }
   return { participant, childAnchor, familyAnchor };
+}
+
+async function lockParticipant(
+  transaction: TransactionClient,
+  participantId: string,
+): Promise<LockedParticipant> {
+  const rows = await transaction.$queryRaw<LockedParticipant[]>(Prisma.sql`
+    SELECT "id", "workspace_id" AS "workspaceId", "status", "aggregate_version" AS "aggregateVersion"
+    FROM "nurture_participant"
+    WHERE "id" = ${participantId}
+    FOR UPDATE
+  `);
+  const participant = rows[0];
+  if (!participant) throw pairError("pair_authority_denied", "The current local Participant is unavailable.");
+  return participant;
 }
 
 async function lockAnchor(
@@ -517,7 +588,10 @@ async function ensurePrincipalBinding(
 async function ensureLocalObjects(
   transaction: TransactionClient,
   command: NurtureC30PairAssociationCommandV1,
-): Promise<void> {
+): Promise<{
+  process: { id: string; aggregateVersion: number };
+  family: { id: string; aggregateVersion: number };
+}> {
   const workspaceId = command.principal.workspace_ref.object_id;
   const child = await transaction.nurtureChild.findUnique({ where: { id: command.local_seed.child_id } });
   if (child) {
@@ -584,6 +658,20 @@ async function ensureLocalObjects(
       },
     });
   }
+  const [currentProcess, currentFamily] = await Promise.all([
+    transaction.nurtureChildCareProcess.findUnique({
+      where: { id: command.local_seed.child_care_process_id },
+      select: { id: true, aggregateVersion: true },
+    }),
+    transaction.nurtureFamily.findUnique({
+      where: { id: command.local_seed.family_id },
+      select: { id: true, aggregateVersion: true },
+    }),
+  ]);
+  if (!currentProcess || !currentFamily) {
+    throw pairError("pair_local_conflict", "The local canonical objects are incomplete.");
+  }
+  return { process: currentProcess, family: currentFamily };
 }
 
 async function ensureInitialRole(
@@ -723,6 +811,114 @@ function assertOperationMatches(
   }
 }
 
+function assertAuthorityEvidence(evidence: NurtureC30PairAuthorityEvidence): void {
+  if (
+    evidence.authorized !== true
+    || !evidence.authoritySourceRef
+    || evidence.authoritySourceRef.length > 256
+    || !Number.isSafeInteger(evidence.authoritySourceVersion)
+    || evidence.authoritySourceVersion < 1
+  ) throw pairError("pair_authority_denied", "Current local authority evidence is invalid.");
+}
+
+function assertSameAdmissionAuthority(
+  operation: NurtureC30PairOperation,
+  authority: NurtureC30PairAuthorityEvidence,
+): void {
+  if (
+    authority.authoritySourceRef !== operation.authoritySourceRef
+    || authority.authoritySourceVersion !== operation.authoritySourceVersion
+  ) throw pairError("pair_authority_denied", "Current local authority differs from admission.");
+}
+
+async function assertCommittedLocalState(
+  transaction: TransactionClient,
+  operation: NurtureC30PairOperation,
+  command: NurtureC30PairAssociationCommandV1,
+  participant: LockedParticipant,
+): Promise<void> {
+  await assertCommittedOperationSnapshot(transaction, operation, participant);
+  const [childAssociation, familyAssociation] = await Promise.all([
+    operation.childAssociationId
+      ? transaction.nurtureChildAnchorAssociation.findUnique({ where: { id: operation.childAssociationId } })
+      : null,
+    operation.familyAssociationId
+      ? transaction.nurtureFamilyAnchorAssociation.findUnique({ where: { id: operation.familyAssociationId } })
+      : null,
+  ]);
+  if (
+    childAssociation?.childId !== command.local_seed.child_id
+    || familyAssociation?.childCareProcessId !== command.local_seed.child_care_process_id
+    || familyAssociation?.familyId !== command.local_seed.family_id
+  ) throw pairError("pair_local_conflict", "The committed local pair no longer matches the command.");
+}
+
+async function assertCommittedOperationSnapshot(
+  transaction: TransactionClient,
+  operation: NurtureC30PairOperation,
+  participant: LockedParticipant,
+): Promise<void> {
+  if (
+    !operation.participantBindingId
+    || !operation.childAssociationId
+    || !operation.familyAssociationId
+    || operation.participantVersion === null
+    || operation.childCareProcessVersion === null
+    || operation.familyVersion === null
+    || participant.aggregateVersion !== operation.participantVersion
+  ) throw pairError("pair_attempt_conflict", "The committed pair snapshot is incomplete or stale.");
+  const [binding, childAssociation, familyAssociation] = await Promise.all([
+    transaction.nurtureParticipantPrincipalBinding.findUnique({
+      where: { id: operation.participantBindingId },
+    }),
+    transaction.nurtureChildAnchorAssociation.findUnique({
+      where: { id: operation.childAssociationId },
+    }),
+    transaction.nurtureFamilyAnchorAssociation.findUnique({
+      where: { id: operation.familyAssociationId },
+    }),
+  ]);
+  if (
+    !binding
+    || binding.participantId !== operation.participantId
+    || binding.workspaceId !== operation.workspaceId
+    || binding.accountObjectId !== operation.accountObjectId
+    || binding.actorObjectId !== operation.actorObjectId
+    || binding.representedOrganizationObjectId !== operation.representedOrganizationObjectId
+    || binding.status !== "active"
+    || binding.currentKey !== "current"
+    || !childAssociation
+    || childAssociation.workspaceId !== operation.workspaceId
+    || childAssociation.childAnchorId !== operation.childAnchorId
+    || childAssociation.status !== "active"
+    || childAssociation.currentKey !== "current"
+    || !familyAssociation
+    || familyAssociation.workspaceId !== operation.workspaceId
+    || familyAssociation.familyAnchorId !== operation.familyAnchorId
+    || familyAssociation.childAnchorId !== operation.childAnchorId
+    || familyAssociation.childAssociationId !== childAssociation.id
+    || familyAssociation.currentChildAssociationId !== childAssociation.id
+    || familyAssociation.status !== "active"
+    || familyAssociation.currentKey !== "current"
+  ) throw pairError("pair_authority_denied", "The committed pair authority is no longer current.");
+  const [process, family] = await Promise.all([
+    transaction.nurtureChildCareProcess.findUnique({ where: { id: familyAssociation.childCareProcessId } }),
+    transaction.nurtureFamily.findUnique({ where: { id: familyAssociation.familyId } }),
+  ]);
+  if (
+    !process
+    || process.workspaceId !== operation.workspaceId
+    || process.childId !== childAssociation.childId
+    || process.status !== "active"
+    || process.aggregateVersion !== operation.childCareProcessVersion
+    || !family
+    || family.workspaceId !== operation.workspaceId
+    || family.childCareProcessId !== process.id
+    || family.status !== "active"
+    || family.aggregateVersion !== operation.familyVersion
+  ) throw pairError("pair_authority_denied", "The committed local objects are no longer current.");
+}
+
 function statusEvidenceMatches(
   operation: NurtureC30PairOperation,
   request: ScenarioIdentityOperationStatusLookupRequestV1,
@@ -760,7 +956,14 @@ function resultFromCommand(
   operation: NurtureC30PairOperation,
   disposition: "committed" | "exact_replay",
 ): NurtureC30PairAssociationResultV1 {
-  if (!operation.commandExecutionId || !operation.scenarioCommitEvidenceHash || !operation.participantBindingId) {
+  if (
+    !operation.commandExecutionId
+    || !operation.scenarioCommitEvidenceHash
+    || !operation.participantBindingId
+    || operation.participantVersion === null
+    || operation.childCareProcessVersion === null
+    || operation.familyVersion === null
+  ) {
     throw pairError("pair_attempt_conflict", "The committed pair result is incomplete.");
   }
   return {
@@ -768,9 +971,17 @@ function resultFromCommand(
     identity_operation_id: operation.id,
     scenario_command_id: operation.scenarioCommandId,
     disposition,
-    participant_ref: localRef("participant", command.local_seed.participant_id, 1),
-    child_care_process_ref: localRef("child_care_process", command.local_seed.child_care_process_id, 1),
-    family_ref: localRef("family", command.local_seed.family_id, 1),
+    participant_ref: localRef(
+      "participant",
+      command.local_seed.participant_id,
+      operation.participantVersion,
+    ),
+    child_care_process_ref: localRef(
+      "child_care_process",
+      command.local_seed.child_care_process_id,
+      operation.childCareProcessVersion,
+    ),
+    family_ref: localRef("family", command.local_seed.family_id, operation.familyVersion),
     scenario_execution_ref: localRef("command_execution", operation.commandExecutionId, 1),
     scenario_commit_evidence_hash: operation.scenarioCommitEvidenceHash,
   };
@@ -815,6 +1026,9 @@ function unknownStatus(
 function commitEvidenceHash(
   command: NurtureC30PairAssociationCommandV1,
   bindingVersion: number,
+  participantVersion: number,
+  processVersion: number,
+  familyVersion: number,
   committedAt: Date,
 ): string {
   return hashCanonical({
@@ -823,6 +1037,9 @@ function commitEvidenceHash(
     scenario_command_hash: command.scenario_command_hash,
     association_expectation_hash: command.association_expectation_hash,
     participant_binding_version: bindingVersion,
+    participant_version: participantVersion,
+    child_care_process_version: processVersion,
+    family_version: familyVersion,
     child_association_id: command.local_seed.child_association_id,
     family_association_id: command.local_seed.family_association_id,
     command_execution_id: command.local_seed.command_execution_id,

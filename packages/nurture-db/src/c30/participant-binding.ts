@@ -16,7 +16,12 @@ export class PrismaNurtureParticipantBindingReader implements NurtureParticipant
         accountObjectId: input.account_ref.object_id,
         actorObjectId: input.actor_ref.object_id,
         currentKey: "current",
+        participant: {
+          workspaceId: input.workspace_ref.object_id,
+          status: "active",
+        },
       },
+      include: { participant: { select: { aggregateVersion: true } } },
       orderBy: { id: "asc" },
       take: 2,
     });
@@ -24,7 +29,12 @@ export class PrismaNurtureParticipantBindingReader implements NurtureParticipant
       binding_version: 1,
       binding_revision: row.aggregateVersion,
       status: row.status,
-      participant_ref: ref("nurture", "participant", row.participantId, row.aggregateVersion),
+      participant_ref: ref(
+        "nurture",
+        "participant",
+        row.participantId,
+        row.participant.aggregateVersion,
+      ),
       account_ref: ref("my_chat", "user", row.accountObjectId),
       actor_ref: ref("my_chat", "actor", row.actorObjectId),
       workspace_ref: ref("my_chat", "workspace", row.workspaceId),

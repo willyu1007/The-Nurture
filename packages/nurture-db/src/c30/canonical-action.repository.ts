@@ -280,7 +280,10 @@ implements NurtureC30ActionExecutionRepository {
           actionOperationId: operation.id,
           eventType: "nurture.c30.action.confirmed_no_effect",
           aggregateRef,
-          participantRef: participantRefValue(operation.participantId, 1),
+          participantRef: participantRefValue(
+            operation.participantId,
+            command.current_participant.participant_ref.version ?? 1,
+          ),
           correlationRef: correlationRef(operation.requestCorrelationHash),
           evidenceHash: noEffectEvidenceHash,
         },

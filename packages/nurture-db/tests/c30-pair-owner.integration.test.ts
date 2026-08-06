@@ -254,6 +254,102 @@ describe("C30 atomic canonical-pair association", () => {
     });
   });
 
+  it("rereads current authority for committed registration, replay, and recovery", async () => {
+    const fixture = await createFixture();
+    const repository = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await repository.registerEligibleAttempt(fixture.command);
+    await repository.commitAssociation(fixture.command);
+    await prisma.nurtureParticipant.update({
+      where: { id: fixture.participant.id },
+      data: { status: "suspended", aggregateVersion: { increment: 1 } },
+    });
+    await expect(repository.registerEligibleAttempt(fixture.command)).rejects.toMatchObject({
+      code: "pair_authority_denied",
+    });
+    await expect(repository.commitAssociation(fixture.command)).rejects.toMatchObject({
+      code: "pair_authority_denied",
+    });
+    await expect(repository.lookupStatus(statusRequest(fixture.command), new Date()))
+      .rejects.toMatchObject({ code: "pair_authority_denied" });
+  });
+
+  it("does not let stored pair evidence replace the current platform-authority reader", async () => {
+    const fixture = await createFixture();
+    const admitted = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await admitted.registerEligibleAttempt(fixture.command);
+    await admitted.commitAssociation(fixture.command);
+    const denied = new PrismaNurtureC30PairAssociationRepository(prisma);
+    await expect(denied.registerEligibleAttempt(fixture.command)).rejects.toMatchObject({
+      code: "pair_authority_denied",
+    });
+    await expect(denied.commitAssociation(fixture.command)).rejects.toMatchObject({
+      code: "pair_authority_denied",
+    });
+    await expect(denied.lookupStatus(statusRequest(fixture.command), new Date()))
+      .rejects.toMatchObject({ code: "pair_authority_denied" });
+  });
+
+  it("keeps canonical Participant and local object versions distinct from binding revision", async () => {
+    const fixture = await createFixture(30_000, 7);
+    await prisma.nurtureChild.create({
+      data: {
+        id: fixture.command.local_seed.child_id,
+        workspaceId: fixture.command.principal.workspace_ref.object_id,
+        displayName: fixture.command.local_seed.child_display_name,
+        status: "active",
+        aggregateVersion: 4,
+      },
+    });
+    await prisma.nurtureChildCareProcess.create({
+      data: {
+        id: fixture.command.local_seed.child_care_process_id,
+        workspaceId: fixture.command.principal.workspace_ref.object_id,
+        childId: fixture.command.local_seed.child_id,
+        status: "active",
+        aggregateVersion: 5,
+      },
+    });
+    await prisma.nurtureFamily.create({
+      data: {
+        id: fixture.command.local_seed.family_id,
+        workspaceId: fixture.command.principal.workspace_ref.object_id,
+        childCareProcessId: fixture.command.local_seed.child_care_process_id,
+        displayName: fixture.command.local_seed.family_display_name,
+        status: "active",
+        aggregateVersion: 6,
+      },
+    });
+    const repository = new PrismaNurtureC30PairAssociationRepository(prisma, authorityReader);
+    await repository.registerEligibleAttempt(fixture.command);
+    const committed = await repository.commitAssociation(fixture.command);
+    expect(committed.participant_ref.version).toBe(7);
+    expect(committed.child_care_process_ref.version).toBe(5);
+    expect(committed.family_ref.version).toBe(6);
+    const binding = await prisma.nurtureParticipantPrincipalBinding.findUniqueOrThrow({
+      where: { id: fixture.command.local_seed.principal_binding_id },
+    });
+    expect(binding.aggregateVersion).toBe(1);
+    const reader = new PrismaNurtureParticipantBindingReader(prisma);
+    await expect(reader.readCurrentBindings({
+      account_ref: fixture.command.principal.account_ref,
+      actor_ref: fixture.command.principal.actor_ref,
+      workspace_ref: fixture.command.principal.workspace_ref,
+    })).resolves.toMatchObject([{ participant_ref: { version: 7 }, binding_revision: 1 }]);
+    const replay = await repository.commitAssociation(fixture.command);
+    expect(replay).toMatchObject({
+      participant_ref: { version: 7 },
+      child_care_process_ref: { version: 5 },
+      family_ref: { version: 6 },
+    });
+    const execution = await prisma.nurtureCommandExecution.findUniqueOrThrow({
+      where: { id: fixture.command.local_seed.command_execution_id },
+    });
+    expect(execution.targetRefs).toMatchObject([
+      { object_type: "child_care_process", version: 5 },
+      { object_type: "family", version: 6 },
+    ]);
+  });
+
   it("remains hard default-deny when no local authority reader is supplied", async () => {
     const fixture = await createFixture();
     const repository = new PrismaNurtureC30PairAssociationRepository(prisma);
@@ -415,7 +511,7 @@ function presentationOwner(pairEvidence?: TransactionalNurtureC30CurrentPairEvid
   });
 }
 
-async function createFixture(deadlineOffsetMs = 30_000) {
+async function createFixture(deadlineOffsetMs = 30_000, participantVersion = 1) {
   const workspaceId = randomUUID();
   const accountId = randomUUID();
   const actorId = randomUUID();
@@ -425,7 +521,7 @@ async function createFixture(deadlineOffsetMs = 30_000) {
       workspaceId,
       myChatUserId: `legacy:${randomUUID()}`,
       status: "active",
-      aggregateVersion: 1,
+      aggregateVersion: participantVersion,
     },
   });
   const [childAnchor, familyAnchor] = await Promise.all([

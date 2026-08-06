@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-06T13:45:58.648Z",
+  "updatedAt": "2026-08-06T14:57:05.885Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -64,7 +64,9 @@
     {
       "name": "NurtureC30ProtectedContentLifecycle",
       "values": [
+        "provisioning",
         "active",
+        "erasing",
         "tombstoned",
         "erased"
       ]
@@ -2400,6 +2402,17 @@
           "unique": false
         },
         {
+          "name": "childCareProcessVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_care_process_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "childOwnerVersion",
           "type": "Int",
           "nullable": false,
@@ -2521,6 +2534,17 @@
           "unique": false
         },
         {
+          "name": "familyVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "hostIdentityEvidenceHash",
           "type": "String",
           "nullable": false,
@@ -2592,6 +2616,17 @@
           "nullable": false,
           "list": false,
           "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "participant_version",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -2971,7 +3006,7 @@
         {
           "name": "committedAt",
           "type": "DateTime",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "committed_at",
           "dbType": null,
@@ -3147,7 +3182,7 @@
         {
           "name": "kmsKeyDomain",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "kms_key_domain",
           "dbType": null,
@@ -3169,7 +3204,7 @@
         {
           "name": "kmsKeyHandleHash",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "kms_key_handle_hash",
           "dbType": "Char",
@@ -3180,10 +3215,21 @@
         {
           "name": "kmsKeyVersion",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "kms_key_version",
           "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsProvisioningKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "kms_provisioning_key",
+          "dbType": "Char",
           "default": null,
           "primaryKey": false,
           "unique": false
@@ -3239,7 +3285,7 @@
           "list": false,
           "dbName": null,
           "dbType": null,
-          "default": "active",
+          "default": "provisioning",
           "primaryKey": false,
           "unique": false
         },
@@ -3433,7 +3479,7 @@
         {
           "name": "wrappingAlgorithm",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "wrapping_algorithm",
           "dbType": null,

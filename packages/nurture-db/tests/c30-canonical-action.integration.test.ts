@@ -166,6 +166,17 @@ describe("C30 canonical action transaction", () => {
     expect(await prisma.nurtureC30ActionAuditRecord.count({
       where: { actionOperation: { effectIdentityHash: computeNurtureC30ActionEffectIdentityHash(fixture.command.execution_binding) } },
     })).toBe(1);
+    await expect(prisma.nurtureC30ActionOutboxEvent.findFirstOrThrow({
+      where: {
+        actionOperation: {
+          effectIdentityHash: computeNurtureC30ActionEffectIdentityHash(
+            fixture.command.execution_binding,
+          ),
+        },
+      },
+    })).resolves.toMatchObject({
+      participantRef: `nurture:participant:${fixture.command.current_participant.participant_ref.object_id}:v3`,
+    });
   });
 
   it("preserves claimed original-Step identity and stores no claim token", async () => {

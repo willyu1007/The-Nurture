@@ -8,6 +8,7 @@ import {
   computeNurtureC30ProtectedEncryptionContextHash,
   DenyNurtureC30ProtectedIntegrityPort,
   DenyNurtureC30ProtectedKmsPort,
+  DenyNurtureC30ProtectedReadBindingPort,
   nurtureCanonicalJsonBytes,
   nurtureC30ProtectedContentError,
   nurtureC30ProtectedEncryptionAlgorithm,
@@ -22,8 +23,10 @@ import {
   type NurtureC30ProtectedEraseResultV1,
   type NurtureC30ProtectedIntegrityPort,
   type NurtureC30ProtectedKmsPort,
+  type NurtureC30ProtectedReadBindingPort,
   type NurtureC30ProtectedReadCommandV1,
   type NurtureC30ProtectedReadResultV1,
+  type NurtureC30ProvisionedDataKeyV1,
   type NurtureC30WrappedDataKeyV1,
 } from "@the-nurture/scenario";
 import {
@@ -60,6 +63,20 @@ implements TransactionalNurtureC30ProtectedAuthorityReader {
   }
 }
 
+type ErasurePlan = {
+  row: NurtureC30ProtectedContent;
+  terminal_lifecycle: "tombstoned" | "erased";
+};
+
+type ReadAdmission =
+  | { kind: "closed"; result: NurtureC30ProtectedReadResultV1 }
+  | { kind: "erase"; plan: ErasurePlan }
+  | {
+      kind: "active";
+      row: NurtureC30ProtectedContent;
+      admitted_at: Date;
+    };
+
 export class PrismaNurtureC30ProtectedContentRepository
 implements NurtureC30ProtectedContentRepository {
   constructor(
@@ -69,288 +86,119 @@ implements NurtureC30ProtectedContentRepository {
     private readonly kms: NurtureC30ProtectedKmsPort = new DenyNurtureC30ProtectedKmsPort(),
     private readonly integrity: NurtureC30ProtectedIntegrityPort =
       new DenyNurtureC30ProtectedIntegrityPort(),
+    private readonly readBinding: NurtureC30ProtectedReadBindingPort =
+      new DenyNurtureC30ProtectedReadBindingPort(),
   ) {}
 
   async commit(
     command: NurtureC30ProtectedCommitCommandV1,
   ): Promise<NurtureC30ProtectedCommitResultV1> {
     assertNurtureC30ProtectedCommitCommandV1(command);
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      let cleanup: (NurtureC30WrappedDataKeyV1 & {
-        content_ref_hash: string;
-        erasure_evidence_hash: string;
-      }) | undefined;
-      try {
-        const result: NurtureC30ProtectedCommitResultV1 = await this.prisma.$transaction(async (transaction) => {
-          const now = await databaseNow(transaction);
-          const participantBindingId = await assertCurrentActor(transaction, command);
-          const authority = await this.authorityReader.verifyCurrent(transaction, {
-            command,
-            participant_binding_id: participantBindingId,
-            purpose: "commit_protected",
-            now,
-          });
-          assertAuthority(authority);
-          if (
-            authority.authority_evidence_hash !== command.current_target.authority_evidence_hash
-            || authority.authority_revision !== command.current_target.authority_revision
-          ) throw protectedError("protected_authority_denied", "Protected commit authority changed.");
-          if (!await this.integrity.verify({
-            carrier: command.carrier,
-            protected_content_ref: command.prepared_content.protected_content_ref,
-            request_identity_hash: command.request_identity_hash,
-            expected_keyed_integrity_hash: command.prepared_content.keyed_integrity_hash,
-          })) throw protectedError("protected_integrity_failed", "Protected carrier integrity failed.");
-          const existing = await lockContentByIdentity(transaction, command);
-          if (existing) {
-            assertCommitReplay(existing, command);
-            if (existing.lifecycle !== "active") {
-              throw protectedError("protected_conflict", "Protected content is terminal.");
-            }
-            return {
-              result_version: 1,
-              disposition: "replayed",
-              committed_content: committedControl(existing),
-            };
-          }
-          assertCommitTimes(command, now);
-          const committedContentVersion = committedVersion(command);
-          const encryptionContextHash = computeNurtureC30ProtectedEncryptionContextHash({
-            protected_content_ref: command.prepared_content.protected_content_ref,
-            workspace_ref: command.principal.workspace_ref,
-            scenario_key: "nurture",
-            action_key: command.contract.action_key,
-            content_kind: command.contract.content_kind,
-            protected_field_key: command.contract.protected_field_key,
-            aggregate_ref: command.aggregate_ref,
-            committed_content_version: committedContentVersion,
-          });
-          const contentRefHash = computeNurtureC30ProtectedContentRefHash(
-            command.prepared_content.protected_content_ref,
-          );
-          const aad = encryptionAad(command, committedContentVersion);
-          const plaintextDek = randomBytes(32);
-          try {
-            const sealed = encrypt(command.carrier.plain_text, plaintextDek, aad);
-            const wrapped = await this.kms.wrapDataKey({
-              plaintext_dek: plaintextDek,
-              content_ref_hash: contentRefHash,
-              encryption_context_hash: encryptionContextHash,
-            });
-            assertWrappedDataKey(wrapped);
-            cleanup = {
-              ...wrapped,
-              content_ref_hash: contentRefHash,
-              erasure_evidence_hash: hashCanonical({
-                erasure_version: 1,
-                reason: "uncommitted_cleanup",
-                content_ref_hash: contentRefHash,
-                kms_key_handle_hash: hashString(wrapped.kms_key_handle),
-              }),
-            };
-            const committedAt = now.toISOString();
-            const transitionEvidenceHash = hashCanonical({
-              transition_version: 1,
-              event: "committed",
-              content_ref_hash: contentRefHash,
-              authority,
-              committed_at: committedAt,
-            });
-            const row = await transaction.nurtureC30ProtectedContent.create({
-              data: {
-                id: command.content_id,
-                workspaceId: command.principal.workspace_ref.object_id,
-                scenarioKey: "nurture",
-                actionKey: command.contract.action_key,
-                protectedContentRef: command.prepared_content.protected_content_ref,
-                contentKind: command.contract.content_kind,
-                protectedFieldKey: command.contract.protected_field_key,
-                owningActionRef: json(command.owning_action_ref),
-                aggregateRef: json(command.aggregate_ref),
-                creatorParticipantId: command.current_participant.participant_ref.object_id,
-                creatorParticipantBindingId: participantBindingId,
-                creatorAccountObjectId: command.principal.account_ref.object_id,
-                creatorActorObjectId: command.principal.actor_ref.object_id,
-                creatorRepresentedOrganizationObjectId:
-                  command.current_participant.represented_organization_ref?.object_id,
-                principalBindingHash: principalBindingHash(command),
-                requestIdentityHash: command.request_identity_hash,
-                acceptedCarrierBindingHash: command.accepted_carrier_binding_hash,
-                canonicalPayloadHash: command.canonical_payload_hash,
-                keyedIntegrityHash: command.prepared_content.keyed_integrity_hash,
-                authorityEvidenceHash: authority.authority_evidence_hash,
-                authorityRevision: authority.authority_revision,
-                pairEvidenceHash: authority.pair_evidence_hash,
-                policyEvidenceHash: authority.policy_evidence_hash,
-                preparedContentVersion: command.prepared_content.protected_content_version,
-                committedContentVersion,
-                encryptionAlgorithm: nurtureC30ProtectedEncryptionAlgorithm,
-                encryptionVersion: nurtureC30ProtectedEncryptionVersion,
-                encryptionContextHash,
-                ciphertext: sealed.ciphertext,
-                nonce: sealed.nonce,
-                authenticationTag: sealed.authenticationTag,
-                wrappedDek: Buffer.from(wrapped.wrapped_dek),
-                kmsKeyDomain: wrapped.kms_key_domain,
-                kmsKeyVersion: wrapped.kms_key_version,
-                kmsKeyHandle: wrapped.kms_key_handle,
-                kmsKeyHandleHash: hashString(wrapped.kms_key_handle),
-                wrappingAlgorithm: wrapped.wrapping_algorithm,
-                lifecycle: "active",
-                readableUntil: new Date(command.readable_until),
-                retentionUntil: new Date(command.retention_until),
-                lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
-                lastTransitionParticipantBindingId: participantBindingId,
-                lastTransitionEvidenceHash: transitionEvidenceHash,
-                lastTransitionAuthorityRevision: authority.authority_revision,
-                committedAt: now,
-              },
-            });
-            await transaction.nurtureC30ProtectedContentAuditRecord.create({
-              data: {
-                protectedContentId: row.id,
-                eventKey: "c30.protected.committed",
-                contentRefHash,
-                aggregateRef: canonicalRefValue(command.aggregate_ref),
-                participantRef: participantRefValue(command.current_participant),
-                principalBindingRef: principalBindingRef(participantBindingId),
-                evidenceHash: transitionEvidenceHash,
-              },
-            });
-            return {
-              result_version: 1,
-              disposition: "committed",
-              committed_content: committedControl(row),
-            };
-          } finally {
-            plaintextDek.fill(0);
-          }
-        }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
-        cleanup = undefined;
-        return result;
-      } catch (error) {
-        if (cleanup) await destroyCleanupKey(this.kms, cleanup);
-        if (attempt < 2 && isRetryable(error)) continue;
-        throw error;
-      }
+    await this.retrySerializable((transaction) => this.admitCommit(transaction, command));
+    if (!await this.integrity.verify({
+      carrier: command.carrier,
+      protected_content_ref: command.prepared_content.protected_content_ref,
+      request_identity_hash: command.request_identity_hash,
+      expected_keyed_integrity_hash: command.prepared_content.keyed_integrity_hash,
+    })) throw protectedError("protected_integrity_failed", "Protected carrier integrity failed.");
+
+    const reservation = await this.retrySerializable((transaction) =>
+      this.reserveCommit(transaction, command));
+    if (reservation.lifecycle === "active") {
+      return {
+        result_version: 1,
+        disposition: "replayed",
+        committed_content: committedControl(reservation),
+      };
     }
-    throw protectedError("protected_conflict", "Protected commit retry was exhausted.");
+
+    const contentRefHash = computeNurtureC30ProtectedContentRefHash(reservation.protectedContentRef);
+    const provisioned = await this.kms.provisionDataKey({
+      provisioning_key: reservation.kmsProvisioningKey,
+      content_ref_hash: contentRefHash,
+      encryption_context_hash: reservation.encryptionContextHash,
+    });
+    assertProvisionedDataKey(provisioned);
+    const plaintextDek = Buffer.from(provisioned.plaintext_dek);
+    try {
+      const sealed = encrypt(command.carrier.plain_text, plaintextDek, encryptionAadFromRow(reservation));
+      return await this.retrySerializable((transaction) =>
+        this.finalizeCommit(transaction, command, provisioned, sealed));
+    } finally {
+      plaintextDek.fill(0);
+      provisioned.plaintext_dek.fill(0);
+    }
   }
 
   async read(command: NurtureC30ProtectedReadCommandV1): Promise<NurtureC30ProtectedReadResultV1> {
     assertNurtureC30ProtectedReadCommandV1(command);
-    return this.prisma.$transaction(async (transaction) => {
-      const now = await databaseNow(transaction);
-      if (now < new Date(command.locator.issued_at) || now >= new Date(command.locator.expires_at)) {
-        return closedRead("context_changed", "Protected foreground context changed.");
+    await this.reconcilePendingErasure(command.request.protected_content_ref);
+    const admission = await this.retrySerializable((transaction) =>
+      this.admitRead(transaction, command));
+    if (admission.kind === "closed") return admission.result;
+    if (admission.kind === "erase") {
+      await this.completeErasure(admission.plan);
+      return closedRead("tombstone", "Protected content is no longer available.");
+    }
+
+    const row = admission.row;
+    assertEncryptionContext(row);
+    const plaintextDek = Buffer.from(await this.kms.unwrapDataKey({
+      ...wrappedDataKey(row),
+      content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
+      encryption_context_hash: row.encryptionContextHash,
+    }));
+    try {
+      if (plaintextDek.byteLength !== 32) {
+        throw protectedError("protected_kms_unavailable", "Protected KMS returned an invalid key.");
       }
-      const participantBindingId = await assertCurrentActor(transaction, command);
-      const authority = await this.authorityReader.verifyCurrent(transaction, {
-        command,
-        participant_binding_id: participantBindingId,
-        purpose: "read_protected",
-        now,
-      });
-      assertAuthority(authority);
-      const row = await lockContentByRef(transaction, command.request.protected_content_ref);
-      if (!row || !readContextMatches(row, command)) {
-        return closedRead("unavailable", "Protected content is unavailable.");
-      }
-      if (row.lifecycle !== "active") return closedRead("tombstone", "Protected content is no longer available.");
-      if (
-        command.request.known_content_version !== undefined
-        && command.request.known_content_version !== row.committedContentVersion
-      ) return closedRead("context_changed", "Protected content changed.");
-      if (now >= row.readableUntil || now >= row.retentionUntil) {
-        const reason: NurtureC30ProtectedEraseReasonV1 = now >= row.retentionUntil
-          ? "retention_elapsed"
-          : "expired";
-        await this.transitionFromActive(transaction, row, command, participantBindingId, authority, reason, now);
-        return closedRead("tombstone", "Protected content is no longer available.");
-      }
-      const expectedEncryptionContextHash = computeNurtureC30ProtectedEncryptionContextHash({
-        protected_content_ref: row.protectedContentRef,
-        workspace_ref: workspaceRef(row.workspaceId),
-        scenario_key: row.scenarioKey,
-        action_key: row.actionKey,
-        content_kind: row.contentKind,
+      const carrier: ScenarioProtectedPlainTextCarrierV1 = {
+        protected_carrier_version: 1,
         protected_field_key: row.protectedFieldKey,
-        aggregate_ref: row.aggregateRef as CanonicalRef,
-        committed_content_version: row.committedContentVersion,
+        media_type: "text/plain; charset=utf-8",
+        plain_text: decrypt(row, plaintextDek, encryptionAadFromRow(row)),
+        attachment_refs: [],
+      };
+      if (!await this.integrity.verify({
+        carrier,
+        protected_content_ref: row.protectedContentRef,
+        request_identity_hash: row.requestIdentityHash,
+        expected_keyed_integrity_hash: row.keyedIntegrityHash,
+      })) throw protectedError("protected_integrity_failed", "Protected plaintext integrity failed.");
+      const binding = await this.readBinding.bindCurrent({
+        verified_foreground_context_hash: command.verified_foreground_context_hash,
+        request_identity_hash: command.request_identity_hash,
+        principal: command.principal,
+        current_participant: command.current_participant,
+        contract: command.contract,
+        protected_content_ref: row.protectedContentRef,
+        protected_content_version: row.committedContentVersion,
+        carrier,
+        now: admission.admitted_at,
       });
-      if (row.encryptionContextHash !== expectedEncryptionContextHash) {
-        throw protectedError("protected_integrity_failed", "Protected encryption context changed.");
-      }
-      const wrapped = wrappedDataKey(row);
-      const plaintextDek = Buffer.from(await this.kms.unwrapDataKey({
-        ...wrapped,
-        content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
-        encryption_context_hash: row.encryptionContextHash,
-      }));
-      try {
-        if (plaintextDek.byteLength !== 32) {
-          throw protectedError("protected_kms_unavailable", "Protected KMS returned an invalid key.");
-        }
-        const plaintext = decrypt(row, plaintextDek, encryptionAadFromRow(row));
-        const carrier: ScenarioProtectedPlainTextCarrierV1 = {
-          protected_carrier_version: 1,
-          protected_field_key: row.protectedFieldKey,
-          media_type: "text/plain; charset=utf-8",
-          plain_text: plaintext,
-          attachment_refs: [],
-        };
-        if (!await this.integrity.verify({
-          carrier,
-          protected_content_ref: row.protectedContentRef,
-          request_identity_hash: row.requestIdentityHash,
-          expected_keyed_integrity_hash: row.keyedIntegrityHash,
-        })) throw protectedError("protected_integrity_failed", "Protected plaintext integrity failed.");
-        const leaseExpiry = new Date(Math.min(
-          now.getTime() + displayLeaseMs,
-          new Date(command.locator.expires_at).getTime(),
-          row.readableUntil.getTime(),
-        ));
-        if (leaseExpiry <= now) return closedRead("tombstone", "Protected content is no longer available.");
-        const result = {
-          protected_read_result_version: 1 as const,
-          status: "ready" as const,
-          protected_content_version: row.committedContentVersion,
-          content_kind: row.contentKind,
-          carrier_binding: {
-            carrier_binding_version: 1 as const,
-            carrier_scope: "read_output" as const,
-            protected_field_key: row.protectedFieldKey,
-            keyed_binding_hash: command.read_carrier_binding_hash,
-          },
-          display_lease: {
-            display_lease_version: 1 as const,
-            cache_policy: "no_store" as const,
-            issued_at: now.toISOString(),
-            expires_at: leaseExpiry.toISOString(),
-          },
-        };
-        assertReadScenarioProtectedDetailResultV1(result);
-        return { result, carrier, cache_control: "no-store" };
-      } finally {
-        plaintextDek.fill(0);
-      }
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      assertReadBinding(binding);
+      return this.retrySerializable((transaction) =>
+        this.finalizeRead(transaction, command, row, carrier, binding));
+    } finally {
+      plaintextDek.fill(0);
+    }
   }
 
   async erase(
     command: NurtureC30ProtectedEraseCommandV1,
   ): Promise<NurtureC30ProtectedEraseResultV1> {
     assertNurtureC30ProtectedEraseCommandV1(command);
-    return this.prisma.$transaction(async (transaction) => {
+    await this.reconcilePendingErasure(command.protected_content_ref);
+    const admission = await this.retrySerializable(async (transaction) => {
       const now = await databaseNow(transaction);
       const participantBindingId = await assertCurrentActor(transaction, command);
-      const authority = await this.authorityReader.verifyCurrent(transaction, {
+      const authority = await this.verifyAuthority(
+        transaction,
         command,
-        participant_binding_id: participantBindingId,
-        purpose: "erase_protected",
+        participantBindingId,
+        "erase_protected",
         now,
-      });
-      assertAuthority(authority);
+      );
       const row = await lockContentByRef(transaction, command.protected_content_ref);
       if (!row || !eraseContextMatches(row, command)) {
         throw protectedError("protected_context_changed", "Protected erase target changed.");
@@ -358,13 +206,30 @@ implements NurtureC30ProtectedContentRepository {
       assertEraseTime(row, command.reason, now);
       const desiredLifecycle = terminalLifecycle(command.reason);
       if (row.lifecycle === "erased" || row.lifecycle === desiredLifecycle) {
-        return { result_version: 1, lifecycle: row.lifecycle, disposition: "already_terminal" };
+        return {
+          kind: "terminal" as const,
+          result: {
+            result_version: 1 as const,
+            lifecycle: row.lifecycle,
+            disposition: "already_terminal" as const,
+          },
+        };
+      }
+      if (row.lifecycle === "provisioning") {
+        throw protectedError("protected_conflict", "Protected content provisioning is incomplete.");
       }
       if (row.lifecycle === "tombstoned") {
         if (desiredLifecycle !== "erased") {
-          return { result_version: 1, lifecycle: "tombstoned", disposition: "already_terminal" };
+          return {
+            kind: "terminal" as const,
+            result: {
+              result_version: 1 as const,
+              lifecycle: "tombstoned" as const,
+              disposition: "already_terminal" as const,
+            },
+          };
         }
-        await this.finishErasedTransition(
+        await finishErasedTransition(
           transaction,
           row,
           command,
@@ -372,9 +237,19 @@ implements NurtureC30ProtectedContentRepository {
           authority,
           now,
         );
-        return { result_version: 1, lifecycle: "erased", disposition: "transitioned" };
+        return {
+          kind: "terminal" as const,
+          result: {
+            result_version: 1 as const,
+            lifecycle: "erased" as const,
+            disposition: "transitioned" as const,
+          },
+        };
       }
-      await this.transitionFromActive(
+      if (row.lifecycle === "erasing") {
+        return { kind: "erase" as const, plan: erasurePlan(row) };
+      }
+      const started = await beginErasure(
         transaction,
         row,
         command,
@@ -383,114 +258,506 @@ implements NurtureC30ProtectedContentRepository {
         command.reason,
         now,
       );
-      return { result_version: 1, lifecycle: desiredLifecycle, disposition: "transitioned" };
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      return { kind: "erase" as const, plan: erasurePlan(started) };
+    });
+    if (admission.kind === "terminal") return admission.result;
+    await this.completeErasure(admission.plan);
+    return {
+      result_version: 1,
+      lifecycle: admission.plan.terminal_lifecycle,
+      disposition: "transitioned",
+    };
   }
 
-  private async transitionFromActive(
+  private async reserveCommit(
     transaction: Prisma.TransactionClient,
-    row: NurtureC30ProtectedContent,
-    command: NurtureC30ProtectedReadCommandV1 | NurtureC30ProtectedEraseCommandV1,
-    participantBindingId: string,
-    authority: NurtureC30ProtectedAuthorityEvidenceV1,
-    reason: NurtureC30ProtectedEraseReasonV1,
-    now: Date,
-  ): Promise<void> {
-    if (!row.kmsKeyHandle) throw protectedError("protected_conflict", "Protected key handle is missing.");
-    const erasureEvidenceHash = hashCanonical({
-      erasure_version: 1,
-      content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
-      kms_key_handle_hash: row.kmsKeyHandleHash,
-      reason,
-      transition_evidence_hash: "transition_evidence_hash" in command
-        ? command.transition_evidence_hash
-        : command.request_identity_hash,
-      erased_at: now.toISOString(),
+    command: NurtureC30ProtectedCommitCommandV1,
+  ): Promise<NurtureC30ProtectedContent> {
+    const now = await databaseNow(transaction);
+    const participantBindingId = await assertCurrentActor(transaction, command);
+    const authority = await this.verifyAuthority(
+      transaction,
+      command,
+      participantBindingId,
+      "commit_protected",
+      now,
+    );
+    const existing = await lockContentByIdentity(transaction, command);
+    if (existing) {
+      assertCommitReplay(existing, command);
+      if (!['provisioning', 'active'].includes(existing.lifecycle)) {
+        throw protectedError("protected_conflict", "Protected content is terminal.");
+      }
+      return existing;
+    }
+    assertCommitTimes(command, now);
+    const committedContentVersion = committedVersion(command);
+    const encryptionContextHash = computeNurtureC30ProtectedEncryptionContextHash({
+      protected_content_ref: command.prepared_content.protected_content_ref,
+      workspace_ref: command.principal.workspace_ref,
+      scenario_key: "nurture",
+      action_key: command.contract.action_key,
+      content_kind: command.contract.content_kind,
+      protected_field_key: command.contract.protected_field_key,
+      aggregate_ref: command.aggregate_ref,
+      committed_content_version: committedContentVersion,
     });
+    const contentRefHash = computeNurtureC30ProtectedContentRefHash(
+      command.prepared_content.protected_content_ref,
+    );
+    const transitionEvidenceHash = hashCanonical({
+      transition_version: 2,
+      event: "provisioning_reserved",
+      content_ref_hash: contentRefHash,
+      authority,
+      reserved_at: now.toISOString(),
+    });
+    return transaction.nurtureC30ProtectedContent.create({
+      data: {
+        id: command.content_id,
+        workspaceId: command.principal.workspace_ref.object_id,
+        scenarioKey: "nurture",
+        actionKey: command.contract.action_key,
+        protectedContentRef: command.prepared_content.protected_content_ref,
+        contentKind: command.contract.content_kind,
+        protectedFieldKey: command.contract.protected_field_key,
+        owningActionRef: json(command.owning_action_ref),
+        aggregateRef: json(command.aggregate_ref),
+        creatorParticipantId: command.current_participant.participant_ref.object_id,
+        creatorParticipantBindingId: participantBindingId,
+        creatorAccountObjectId: command.principal.account_ref.object_id,
+        creatorActorObjectId: command.principal.actor_ref.object_id,
+        creatorRepresentedOrganizationObjectId:
+          command.current_participant.represented_organization_ref?.object_id,
+        principalBindingHash: principalBindingHash(command),
+        requestIdentityHash: command.request_identity_hash,
+        acceptedCarrierBindingHash: command.accepted_carrier_binding_hash,
+        canonicalPayloadHash: command.canonical_payload_hash,
+        keyedIntegrityHash: command.prepared_content.keyed_integrity_hash,
+        authorityEvidenceHash: authority.authority_evidence_hash,
+        authorityRevision: authority.authority_revision,
+        pairEvidenceHash: authority.pair_evidence_hash,
+        policyEvidenceHash: authority.policy_evidence_hash,
+        preparedContentVersion: command.prepared_content.protected_content_version,
+        committedContentVersion,
+        encryptionAlgorithm: nurtureC30ProtectedEncryptionAlgorithm,
+        encryptionVersion: nurtureC30ProtectedEncryptionVersion,
+        encryptionContextHash,
+        kmsProvisioningKey: hashCanonical({
+          provisioning_key_version: 1,
+          content_ref_hash: contentRefHash,
+          request_identity_hash: command.request_identity_hash,
+        }),
+        lifecycle: "provisioning",
+        readableUntil: new Date(command.readable_until),
+        retentionUntil: new Date(command.retention_until),
+        lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
+        lastTransitionParticipantBindingId: participantBindingId,
+        lastTransitionEvidenceHash: transitionEvidenceHash,
+        lastTransitionAuthorityRevision: authority.authority_revision,
+      },
+    });
+  }
+
+  private async admitCommit(
+    transaction: Prisma.TransactionClient,
+    command: NurtureC30ProtectedCommitCommandV1,
+  ): Promise<void> {
+    const now = await databaseNow(transaction);
+    const participantBindingId = await assertCurrentActor(transaction, command);
+    await this.verifyAuthority(
+      transaction,
+      command,
+      participantBindingId,
+      "commit_protected",
+      now,
+    );
+    const existing = await lockContentByIdentity(transaction, command);
+    if (existing) {
+      assertCommitReplay(existing, command);
+      if (!["provisioning", "active"].includes(existing.lifecycle)) {
+        throw protectedError("protected_conflict", "Protected content is terminal.");
+      }
+      return;
+    }
+    assertCommitTimes(command, now);
+  }
+
+  private async finalizeCommit(
+    transaction: Prisma.TransactionClient,
+    command: NurtureC30ProtectedCommitCommandV1,
+    provisioned: NurtureC30ProvisionedDataKeyV1,
+    sealed: { ciphertext: Buffer; nonce: Buffer; authenticationTag: Buffer },
+  ): Promise<NurtureC30ProtectedCommitResultV1> {
+    const now = await databaseNow(transaction);
+    const participantBindingId = await assertCurrentActor(transaction, command);
+    const authority = await this.verifyAuthority(
+      transaction,
+      command,
+      participantBindingId,
+      "commit_protected",
+      now,
+    );
+    const row = await lockContentByIdentity(transaction, command);
+    if (!row) throw protectedError("protected_conflict", "Protected reservation is absent.");
+    assertCommitReplay(row, command);
+    if (row.lifecycle === "active") {
+      return {
+        result_version: 1,
+        disposition: "replayed",
+        committed_content: committedControl(row),
+      };
+    }
+    if (row.lifecycle !== "provisioning") {
+      throw protectedError("protected_conflict", "Protected reservation is no longer provisionable.");
+    }
+    assertCommitTimes(command, now);
+    if (
+      authority.authority_evidence_hash !== row.authorityEvidenceHash
+      || authority.authority_revision !== row.authorityRevision
+      || authority.pair_evidence_hash !== row.pairEvidenceHash
+      || authority.policy_evidence_hash !== row.policyEvidenceHash
+    ) throw protectedError("protected_authority_denied", "Protected authority changed during provisioning.");
+    const transitionEvidenceHash = hashCanonical({
+      transition_version: 2,
+      event: "committed",
+      content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
+      authority,
+      committed_at: now.toISOString(),
+    });
+    const committed = await transaction.nurtureC30ProtectedContent.update({
+      where: { id: row.id },
+      data: {
+        lifecycle: "active",
+        ciphertext: sealed.ciphertext,
+        nonce: sealed.nonce,
+        authenticationTag: sealed.authenticationTag,
+        wrappedDek: Buffer.from(provisioned.wrapped_dek),
+        kmsKeyDomain: provisioned.kms_key_domain,
+        kmsKeyVersion: provisioned.kms_key_version,
+        kmsKeyHandle: provisioned.kms_key_handle,
+        kmsKeyHandleHash: hashString(provisioned.kms_key_handle),
+        wrappingAlgorithm: provisioned.wrapping_algorithm,
+        committedAt: now,
+        lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
+        lastTransitionParticipantBindingId: participantBindingId,
+        lastTransitionEvidenceHash: transitionEvidenceHash,
+        lastTransitionAuthorityRevision: authority.authority_revision,
+        aggregateVersion: { increment: 1 },
+      },
+    });
+    await createAudit(
+      transaction,
+      committed,
+      "committed",
+      participantRefValue(command.current_participant),
+      principalBindingRef(participantBindingId),
+      transitionEvidenceHash,
+    );
+    return {
+      result_version: 1,
+      disposition: "committed",
+      committed_content: committedControl(committed),
+    };
+  }
+
+  private async admitRead(
+    transaction: Prisma.TransactionClient,
+    command: NurtureC30ProtectedReadCommandV1,
+  ): Promise<ReadAdmission> {
+    const now = await databaseNow(transaction);
+    if (now < new Date(command.locator.issued_at) || now >= new Date(command.locator.expires_at)) {
+      return { kind: "closed", result: closedRead("context_changed", "Protected foreground context changed.") };
+    }
+    const participantBindingId = await assertCurrentActor(transaction, command);
+    const authority = await this.verifyAuthority(
+      transaction,
+      command,
+      participantBindingId,
+      "read_protected",
+      now,
+    );
+    const row = await lockContentByRef(transaction, command.request.protected_content_ref);
+    if (!row || !readContextMatches(row, command)) {
+      return { kind: "closed", result: closedRead("unavailable", "Protected content is unavailable.") };
+    }
+    if (row.lifecycle === "provisioning") {
+      return { kind: "closed", result: closedRead("unavailable", "Protected content is unavailable.") };
+    }
+    if (["tombstoned", "erased"].includes(row.lifecycle)) {
+      return { kind: "closed", result: closedRead("tombstone", "Protected content is no longer available.") };
+    }
+    if (row.lifecycle === "erasing") return { kind: "erase", plan: erasurePlan(row) };
+    if (
+      command.request.known_content_version !== undefined
+      && command.request.known_content_version !== row.committedContentVersion
+    ) return { kind: "closed", result: closedRead("context_changed", "Protected content changed.") };
+    if (now >= row.readableUntil || now >= row.retentionUntil) {
+      const reason: NurtureC30ProtectedEraseReasonV1 = now >= row.retentionUntil
+        ? "retention_elapsed"
+        : "expired";
+      const started = await beginErasure(
+        transaction,
+        row,
+        command,
+        participantBindingId,
+        authority,
+        reason,
+        now,
+      );
+      return { kind: "erase", plan: erasurePlan(started) };
+    }
+    return { kind: "active", row, admitted_at: now };
+  }
+
+  private async finalizeRead(
+    transaction: Prisma.TransactionClient,
+    command: NurtureC30ProtectedReadCommandV1,
+    admittedRow: NurtureC30ProtectedContent,
+    carrier: ScenarioProtectedPlainTextCarrierV1,
+    binding: { keyed_binding_hash: string; valid_until: string },
+  ): Promise<NurtureC30ProtectedReadResultV1> {
+    const now = await databaseNow(transaction);
+    if (now >= new Date(command.locator.expires_at) || now >= new Date(binding.valid_until)) {
+      return closedRead("context_changed", "Protected foreground context changed.");
+    }
+    const participantBindingId = await assertCurrentActor(transaction, command);
+    await this.verifyAuthority(transaction, command, participantBindingId, "read_protected", now);
+    const current = await lockContentByRef(transaction, command.request.protected_content_ref);
+    if (
+      !current
+      || current.lifecycle !== "active"
+      || current.aggregateVersion !== admittedRow.aggregateVersion
+      || current.encryptionContextHash !== admittedRow.encryptionContextHash
+      || current.committedContentVersion !== admittedRow.committedContentVersion
+      || !readContextMatches(current, command)
+      || now >= current.readableUntil
+      || now >= current.retentionUntil
+    ) return closedRead("context_changed", "Protected content changed.");
+    const leaseExpiry = new Date(Math.min(
+      now.getTime() + displayLeaseMs,
+      new Date(command.locator.expires_at).getTime(),
+      new Date(binding.valid_until).getTime(),
+      current.readableUntil.getTime(),
+    ));
+    if (leaseExpiry <= now) return closedRead("context_changed", "Protected foreground context changed.");
+    const result = {
+      protected_read_result_version: 1 as const,
+      status: "ready" as const,
+      protected_content_version: current.committedContentVersion,
+      content_kind: current.contentKind,
+      carrier_binding: {
+        carrier_binding_version: 1 as const,
+        carrier_scope: "read_output" as const,
+        protected_field_key: current.protectedFieldKey,
+        keyed_binding_hash: binding.keyed_binding_hash,
+      },
+      display_lease: {
+        display_lease_version: 1 as const,
+        cache_policy: "no_store" as const,
+        issued_at: now.toISOString(),
+        expires_at: leaseExpiry.toISOString(),
+      },
+    };
+    assertReadScenarioProtectedDetailResultV1(result);
+    return { result, carrier, cache_control: "no-store" };
+  }
+
+  private async completeErasure(plan: ErasurePlan): Promise<void> {
+    const row = plan.row;
+    const key = wrappedDataKey(row);
+    if (!row.erasureEvidenceHash) {
+      throw protectedError("protected_conflict", "Protected erasure evidence is absent.");
+    }
     await this.kms.destroyDataKey({
-      kms_key_domain: row.kmsKeyDomain,
-      kms_key_version: row.kmsKeyVersion,
-      kms_key_handle: row.kmsKeyHandle,
+      kms_key_domain: key.kms_key_domain,
+      kms_key_version: key.kms_key_version,
+      kms_key_handle: key.kms_key_handle,
       content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
-      erasure_evidence_hash: erasureEvidenceHash,
+      erasure_evidence_hash: row.erasureEvidenceHash,
     });
-    const lifecycle = terminalLifecycle(reason);
-    const transitionEvidenceHash = hashCanonical({
-      transition_version: 1,
-      event: lifecycle,
-      content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
-      reason,
-      authority,
-      at: now.toISOString(),
+    await this.retrySerializable(async (transaction) => {
+      const current = await lockContentByRef(transaction, row.protectedContentRef);
+      if (!current) throw protectedError("protected_conflict", "Protected erasure target is absent.");
+      if (current.lifecycle === plan.terminal_lifecycle || current.lifecycle === "erased") return;
+      if (
+        current.lifecycle !== "erasing"
+        || current.erasureEvidenceHash !== row.erasureEvidenceHash
+        || current.kmsKeyHandleHash !== row.kmsKeyHandleHash
+      ) throw protectedError("protected_conflict", "Protected erasure coordination changed.");
+      const completedAt = await databaseNow(transaction);
+      const transitionEvidenceHash = hashCanonical({
+        transition_version: 2,
+        event: plan.terminal_lifecycle,
+        erasure_evidence_hash: current.erasureEvidenceHash,
+        completed_at: completedAt.toISOString(),
+      });
+      const completed = await transaction.nurtureC30ProtectedContent.update({
+        where: { id: current.id },
+        data: {
+          lifecycle: plan.terminal_lifecycle,
+          ciphertext: null,
+          nonce: null,
+          authenticationTag: null,
+          wrappedDek: null,
+          kmsKeyDomain: null,
+          kmsKeyVersion: null,
+          kmsKeyHandle: null,
+          kmsKeyHandleHash: null,
+          wrappingAlgorithm: null,
+          erasedAt: plan.terminal_lifecycle === "erased" ? completedAt : null,
+          lastTransitionEvidenceHash: transitionEvidenceHash,
+          aggregateVersion: { increment: 1 },
+        },
+      });
+      await createAudit(
+        transaction,
+        completed,
+        plan.terminal_lifecycle,
+        participantRefValueFromRow(current),
+        principalBindingRef(current.lastTransitionParticipantBindingId),
+        transitionEvidenceHash,
+      );
     });
-    await transaction.nurtureC30ProtectedContent.update({
-      where: { id: row.id },
-      data: {
-        lifecycle,
-        ciphertext: null,
-        nonce: null,
-        authenticationTag: null,
-        wrappedDek: null,
-        kmsKeyHandle: null,
-        tombstoneReason: reason,
-        tombstonedAt: now,
-        erasedAt: lifecycle === "erased" ? now : null,
-        erasureEvidenceHash,
-        lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
-        lastTransitionParticipantBindingId: participantBindingId,
-        lastTransitionEvidenceHash: transitionEvidenceHash,
-        lastTransitionAuthorityRevision: authority.authority_revision,
-        aggregateVersion: { increment: 1 },
-      },
-    });
-    await createTransitionAudit(
-      transaction,
-      row,
-      command.current_participant,
-      participantBindingId,
-      lifecycle,
-      transitionEvidenceHash,
-    );
   }
 
-  private async finishErasedTransition(
-    transaction: Prisma.TransactionClient,
-    row: NurtureC30ProtectedContent,
-    command: NurtureC30ProtectedEraseCommandV1,
-    participantBindingId: string,
-    authority: NurtureC30ProtectedAuthorityEvidenceV1,
-    now: Date,
-  ): Promise<void> {
-    const transitionEvidenceHash = hashCanonical({
-      transition_version: 1,
-      event: "erased",
-      prior_erasure_evidence_hash: row.erasureEvidenceHash,
-      requested_evidence_hash: command.transition_evidence_hash,
-      authority,
-      at: now.toISOString(),
+  private async reconcilePendingErasure(protectedContentRef: string): Promise<void> {
+    const plan = await this.retrySerializable(async (transaction) => {
+      const row = await lockContentByRef(transaction, protectedContentRef);
+      return row?.lifecycle === "erasing" ? erasurePlan(row) : undefined;
     });
-    await transaction.nurtureC30ProtectedContent.update({
-      where: { id: row.id },
-      data: {
-        lifecycle: "erased",
-        tombstoneReason: command.reason,
-        erasedAt: now,
-        lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
-        lastTransitionParticipantBindingId: participantBindingId,
-        lastTransitionEvidenceHash: transitionEvidenceHash,
-        lastTransitionAuthorityRevision: authority.authority_revision,
-        aggregateVersion: { increment: 1 },
-      },
-    });
-    await createTransitionAudit(
-      transaction,
-      row,
-      command.current_participant,
-      participantBindingId,
-      "erased",
-      transitionEvidenceHash,
-    );
+    if (plan) await this.completeErasure(plan);
   }
+
+  private async verifyAuthority(
+    transaction: Prisma.TransactionClient,
+    command: ProtectedAuthorityCommand,
+    participantBindingId: string,
+    purpose: "commit_protected" | "read_protected" | "erase_protected",
+    now: Date,
+  ): Promise<NurtureC30ProtectedAuthorityEvidenceV1> {
+    const authority = await this.authorityReader.verifyCurrent(transaction, {
+      command,
+      participant_binding_id: participantBindingId,
+      purpose,
+      now,
+    });
+    assertAuthority(authority);
+    if (
+      authority.authority_evidence_hash !== command.current_target.authority_evidence_hash
+      || authority.authority_revision !== command.current_target.authority_revision
+    ) throw protectedError("protected_authority_denied", "Protected current authority changed.");
+    return authority;
+  }
+
+  private async retrySerializable<T>(
+    work: (transaction: Prisma.TransactionClient) => Promise<T>,
+  ): Promise<T> {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        return await this.prisma.$transaction(work, {
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        });
+      } catch (error) {
+        if (attempt < 2 && isRetryable(error)) continue;
+        throw error;
+      }
+    }
+    throw protectedError("protected_conflict", "Protected transaction retry was exhausted.");
+  }
+}
+
+async function beginErasure(
+  transaction: Prisma.TransactionClient,
+  row: NurtureC30ProtectedContent,
+  command: NurtureC30ProtectedReadCommandV1 | NurtureC30ProtectedEraseCommandV1,
+  participantBindingId: string,
+  authority: NurtureC30ProtectedAuthorityEvidenceV1,
+  reason: NurtureC30ProtectedEraseReasonV1,
+  now: Date,
+): Promise<NurtureC30ProtectedContent> {
+  if (!row.kmsKeyHandle || !row.kmsKeyHandleHash) {
+    throw protectedError("protected_conflict", "Protected key handle is missing.");
+  }
+  const erasureEvidenceHash = hashCanonical({
+    erasure_version: 2,
+    content_ref_hash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
+    kms_key_handle_hash: row.kmsKeyHandleHash,
+    reason,
+    transition_evidence_hash: "transition_evidence_hash" in command
+      ? command.transition_evidence_hash
+      : command.request_identity_hash,
+    requested_at: now.toISOString(),
+  });
+  const transitionEvidenceHash = hashCanonical({
+    transition_version: 2,
+    event: "erasure_started",
+    erasure_evidence_hash: erasureEvidenceHash,
+    authority,
+    at: now.toISOString(),
+  });
+  const started = await transaction.nurtureC30ProtectedContent.update({
+    where: { id: row.id },
+    data: {
+      lifecycle: "erasing",
+      tombstoneReason: reason,
+      tombstonedAt: now,
+      erasureEvidenceHash,
+      lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
+      lastTransitionParticipantBindingId: participantBindingId,
+      lastTransitionEvidenceHash: transitionEvidenceHash,
+      lastTransitionAuthorityRevision: authority.authority_revision,
+      aggregateVersion: { increment: 1 },
+    },
+  });
+  await createAudit(
+    transaction,
+    started,
+    "erasure_started",
+    participantRefValue(command.current_participant),
+    principalBindingRef(participantBindingId),
+    transitionEvidenceHash,
+  );
+  return started;
+}
+
+async function finishErasedTransition(
+  transaction: Prisma.TransactionClient,
+  row: NurtureC30ProtectedContent,
+  command: NurtureC30ProtectedEraseCommandV1,
+  participantBindingId: string,
+  authority: NurtureC30ProtectedAuthorityEvidenceV1,
+  now: Date,
+): Promise<void> {
+  const transitionEvidenceHash = hashCanonical({
+    transition_version: 2,
+    event: "erased",
+    prior_erasure_evidence_hash: row.erasureEvidenceHash,
+    requested_evidence_hash: command.transition_evidence_hash,
+    authority,
+    at: now.toISOString(),
+  });
+  const completed = await transaction.nurtureC30ProtectedContent.update({
+    where: { id: row.id },
+    data: {
+      lifecycle: "erased",
+      tombstoneReason: command.reason,
+      erasedAt: now,
+      lastTransitionParticipantId: command.current_participant.participant_ref.object_id,
+      lastTransitionParticipantBindingId: participantBindingId,
+      lastTransitionEvidenceHash: transitionEvidenceHash,
+      lastTransitionAuthorityRevision: authority.authority_revision,
+      aggregateVersion: { increment: 1 },
+    },
+  });
+  await createAudit(
+    transaction,
+    completed,
+    "erased",
+    participantRefValue(command.current_participant),
+    principalBindingRef(participantBindingId),
+    transitionEvidenceHash,
+  );
 }
 
 async function assertCurrentActor(
@@ -633,6 +900,7 @@ function eraseContextMatches(
 }
 
 function committedControl(row: NurtureC30ProtectedContent): ScenarioCommittedProtectedContentControlV1 {
+  if (!row.committedAt) throw protectedError("protected_conflict", "Protected commit time is absent.");
   const control = {
     protected_content_control_version: 1 as const,
     state: "committed" as const,
@@ -648,9 +916,13 @@ function committedControl(row: NurtureC30ProtectedContent): ScenarioCommittedPro
 }
 
 function wrappedDataKey(row: NurtureC30ProtectedContent): NurtureC30WrappedDataKeyV1 {
-  if (!row.wrappedDek || !row.kmsKeyHandle) {
-    throw protectedError("protected_conflict", "Protected key material is unavailable.");
-  }
+  if (
+    !row.wrappedDek
+    || !row.kmsKeyDomain
+    || !row.kmsKeyVersion
+    || !row.kmsKeyHandle
+    || !row.wrappingAlgorithm
+  ) throw protectedError("protected_conflict", "Protected key material is unavailable.");
   return {
     wrapped_dek: row.wrappedDek,
     kms_key_domain: row.kmsKeyDomain,
@@ -658,23 +930,6 @@ function wrappedDataKey(row: NurtureC30ProtectedContent): NurtureC30WrappedDataK
     kms_key_handle: row.kmsKeyHandle,
     wrapping_algorithm: row.wrappingAlgorithm,
   };
-}
-
-function encryptionAad(
-  command: NurtureC30ProtectedCommitCommandV1,
-  committedContentVersion: string,
-): Uint8Array {
-  return nurtureCanonicalJsonBytes({
-    aad_version: 1,
-    protected_content_ref: command.prepared_content.protected_content_ref,
-    workspace_ref: workspaceRef(command.principal.workspace_ref.object_id),
-    scenario_key: "nurture",
-    action_key: command.contract.action_key,
-    content_kind: command.contract.content_kind,
-    protected_field_key: command.contract.protected_field_key,
-    aggregate_ref: command.aggregate_ref,
-    committed_content_version: committedContentVersion,
-  });
 }
 
 function encryptionAadFromRow(row: NurtureC30ProtectedContent): Uint8Array {
@@ -713,6 +968,13 @@ function decrypt(row: NurtureC30ProtectedContent, dek: Buffer, aad: Uint8Array):
   }
 }
 
+function assertProvisionedDataKey(value: NurtureC30ProvisionedDataKeyV1): void {
+  assertWrappedDataKey(value);
+  if (!(value.plaintext_dek instanceof Uint8Array) || value.plaintext_dek.byteLength !== 32) {
+    throw protectedError("protected_kms_unavailable", "Protected KMS data key is invalid.");
+  }
+}
+
 function assertWrappedDataKey(value: NurtureC30WrappedDataKeyV1): void {
   if (
     !(value.wrapped_dek instanceof Uint8Array)
@@ -725,6 +987,22 @@ function assertWrappedDataKey(value: NurtureC30WrappedDataKeyV1): void {
   ) throw protectedError("protected_kms_unavailable", "Protected KMS response is invalid.");
 }
 
+function assertEncryptionContext(row: NurtureC30ProtectedContent): void {
+  const expected = computeNurtureC30ProtectedEncryptionContextHash({
+    protected_content_ref: row.protectedContentRef,
+    workspace_ref: workspaceRef(row.workspaceId),
+    scenario_key: row.scenarioKey,
+    action_key: row.actionKey,
+    content_kind: row.contentKind,
+    protected_field_key: row.protectedFieldKey,
+    aggregate_ref: row.aggregateRef as CanonicalRef,
+    committed_content_version: row.committedContentVersion,
+  });
+  if (row.encryptionContextHash !== expected) {
+    throw protectedError("protected_integrity_failed", "Protected encryption context changed.");
+  }
+}
+
 function assertAuthority(authority: NurtureC30ProtectedAuthorityEvidenceV1): void {
   if (
     authority.authorized !== true
@@ -734,6 +1012,16 @@ function assertAuthority(authority: NurtureC30ProtectedAuthorityEvidenceV1): voi
     || !sha256Pattern.test(authority.pair_evidence_hash)
     || !sha256Pattern.test(authority.policy_evidence_hash)
   ) throw protectedError("protected_authority_denied", "Protected authority evidence is invalid.");
+}
+
+function assertReadBinding(binding: { keyed_binding_hash: string; valid_until: string }): void {
+  if (!sha256Pattern.test(binding.keyed_binding_hash)) {
+    throw protectedError("protected_context_changed", "Protected carrier binding is invalid.");
+  }
+  const validUntil = Date.parse(binding.valid_until);
+  if (!canonicalInstantPattern.test(binding.valid_until) || !Number.isFinite(validUntil)) {
+    throw protectedError("protected_context_changed", "Protected foreground validity is invalid.");
+  }
 }
 
 function principalBindingHash(command: ProtectedAuthorityCommand): string {
@@ -759,6 +1047,14 @@ function terminalLifecycle(reason: NurtureC30ProtectedEraseReasonV1): "tombstone
   return reason === "retention_elapsed" || reason === "crypto_erasure" ? "erased" : "tombstoned";
 }
 
+function erasurePlan(row: NurtureC30ProtectedContent): ErasurePlan {
+  if (!row.tombstoneReason) throw protectedError("protected_conflict", "Protected erasure reason is absent.");
+  return {
+    row,
+    terminal_lifecycle: terminalLifecycle(row.tombstoneReason as NurtureC30ProtectedEraseReasonV1),
+  };
+}
+
 function closedRead(
   status: "tombstone" | "context_changed" | "unavailable",
   message: string,
@@ -776,40 +1072,24 @@ function closedRead(
   return { result, cache_control: "no-store" };
 }
 
-async function createTransitionAudit(
+async function createAudit(
   transaction: Prisma.TransactionClient,
   row: NurtureC30ProtectedContent,
-  participant: ProtectedAuthorityCommand["current_participant"],
-  participantBindingId: string,
-  lifecycle: "tombstoned" | "erased",
+  event: "committed" | "erasure_started" | "tombstoned" | "erased",
+  participantRef: string,
+  bindingRef: string,
   evidenceHash: string,
 ): Promise<void> {
   await transaction.nurtureC30ProtectedContentAuditRecord.create({
     data: {
       protectedContentId: row.id,
-      eventKey: `c30.protected.${lifecycle}`,
+      eventKey: `c30.protected.${event}`,
       contentRefHash: computeNurtureC30ProtectedContentRefHash(row.protectedContentRef),
       aggregateRef: canonicalRefValue(row.aggregateRef),
-      participantRef: participantRefValue(participant),
-      principalBindingRef: principalBindingRef(participantBindingId),
+      participantRef,
+      principalBindingRef: bindingRef,
       evidenceHash,
     },
-  });
-}
-
-async function destroyCleanupKey(
-  kms: NurtureC30ProtectedKmsPort,
-  key: NurtureC30WrappedDataKeyV1 & {
-    content_ref_hash: string;
-    erasure_evidence_hash: string;
-  },
-): Promise<void> {
-  await kms.destroyDataKey({
-    kms_key_domain: key.kms_key_domain,
-    kms_key_version: key.kms_key_version,
-    kms_key_handle: key.kms_key_handle,
-    content_ref_hash: key.content_ref_hash,
-    erasure_evidence_hash: key.erasure_evidence_hash,
   });
 }
 
@@ -822,7 +1102,9 @@ async function databaseNow(transaction: Prisma.TransactionClient): Promise<Date>
   return now;
 }
 
-function canonicalRefValue(value: Prisma.JsonValue | { namespace: string; object_type: string; object_id: string; version?: number }): string {
+function canonicalRefValue(
+  value: Prisma.JsonValue | { namespace: string; object_type: string; object_id: string; version?: number },
+): string {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw protectedError("protected_conflict", "Protected aggregate reference is invalid.");
   }
@@ -848,6 +1130,10 @@ function workspaceRef(workspaceId: string) {
 
 function participantRefValue(participant: ProtectedAuthorityCommand["current_participant"]): string {
   return `nurture:participant:${participant.participant_ref.object_id}:v${participant.participant_ref.version ?? 1}`;
+}
+
+function participantRefValueFromRow(row: NurtureC30ProtectedContent): string {
+  return `nurture:participant:${row.lastTransitionParticipantId}`;
 }
 
 function principalBindingRef(bindingId: string): string {
@@ -886,3 +1172,4 @@ const sha256Pattern = /^[a-f0-9]{64}$/u;
 const machineKeyPattern = /^[a-z][a-z0-9._:-]{0,127}$/u;
 const opaqueValuePattern = /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,199}$/u;
 const opaqueLocatorPattern = /^[A-Za-z0-9_-]{32,512}$/u;
+const canonicalInstantPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u;

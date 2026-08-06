@@ -76,8 +76,8 @@ describe("C30 protected owner contracts", () => {
 
   it("keeps unconfigured KMS and integrity verification default-deny", async () => {
     const kms = new DenyNurtureC30ProtectedKmsPort();
-    await expect(kms.wrapDataKey({
-      plaintext_dek: new Uint8Array(32),
+    await expect(kms.provisionDataKey({
+      provisioning_key: digest("provisioning"),
       content_ref_hash: digest("content"),
       encryption_context_hash: digest("context"),
     })).rejects.toMatchObject({ code: "protected_kms_unavailable" });
