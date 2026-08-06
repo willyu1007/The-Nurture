@@ -13,11 +13,10 @@
 - Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B, successor I1-C and successor I1-D are accepted. Artifact 35 closes all
-  five artifact-34 findings at exact repaired source/lock; artifact 33 remains
-  historical. Artifact 36 freezes I1-E scope as a dedicated plaintext carrier plus
-  body-free lifecycle controls, but no E1-E5 implementation has started; I1-F
-  remains closed. G1 is
+  I1-B, successor I1-C, successor I1-D and I1-E are accepted. Artifact 41 closes
+  E1-E5 at exact repaired source/lock after the independent quality pass; artifact
+  36 remains the frozen scope authority. I1-F is eligible only for a separately
+  authorized scope review/freeze and its implementation remains closed. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -26,15 +25,32 @@
   default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: Base now includes the accepted neutral I1-A..D
-  contract source and exact source locks. I1-D changes only standalone contract
-  types/assertions, JSON Schemas, neutral fixtures/tests and its metadata lock;
-  I1-E currently changes documentation only. The existing formal NestJS owner
-  path is unchanged. No Base runtime/Scenario
+- Code/config/schema impact: Base now includes the accepted neutral I1-A..E
+  contract source and exact source locks. I1-E changes only standalone contract
+  types/assertions, JSON Schemas, neutral fixtures/tests and its metadata lock.
+  The existing formal NestJS owner path is unchanged. No Base runtime/Scenario
   starter/manifest, My-Chat or Nurture product source, schema/migration,
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-E cumulative implementation and qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User authorized all I1-E operations through closure. E1-E5 changed only Base standalone contracts/Schemas/fixtures/tests and the final source lock. |
+| Exact chain | PASS | E1 `7571553…`; E2 `066dcf1…`; E3 `4b23c79…`; E4 `7506eb7…`; quality source `5433124…`; metadata lock `3a08d1f…`. |
+| Quality review | PASS / ALL FIXED | Exact failure unions, validation-only normalization, closed internal evidence, full contextual/direct-or-Step binding, recursive body-free validation and cumulative no-copy/adversarial coverage are repaired; no finding remains. |
+| Full Base verifier | PASS repeated | 66 Schemas, 371 Node conformance tests, runtime 28/28 and Scenario 10/10; all typecheck/build, canonical-ref, exposure, portability and exact source-lock gates pass. |
+| Source identity | PASS | 22 normalized TypeScript files; hash `7ba9458f0e1a91f6fda1a47e5682064020017c41731b1016f8bdad962664c126`; lock names exact committed source `5433124…`. |
+| Determinism | PASS | Two 84-file builds: `1020dbb6…b99`; two byte-identical source manifests: `42549108…98a`. |
+| Scope audit | PASS | No Base runtime/Scenario starter/manifest dependency/source identity/package version, `any`, product vocabulary, consumer source, DB, deployment, capability or activation change. |
+| Detailed evidence | PASS | Artifacts 37-40 record E1-E4; artifact 41 records cumulative E5 qualification, finding closure, exact lock and rollback chain. |
+| Downstream boundary | PASS | I1-F manifest dependency/source convergence, C30-I2, My-Chat/Nurture consumers, T-008, Pilot, deployment and activation remain unauthorized/unstarted. |
+| Context/governance/docs | PASS | Context checksum `9d01a1ecd5c911228daabd47220f3197314ba7f984c5d4356bcce9b35a1bdea1`; strict Context/project-state/governance checks and T-002 query pass; strict task/repository Markdown and anchor lint cover 71/437 files with zero warnings/errors. |
+
+I1-E is accepted. The only eligible next T-002 decision is separate I1-F scope
+review and freeze; this does not authorize I1-F implementation.
 
 ## C30-I1-E protected-interaction scope review and freeze — 2026-08-06
 

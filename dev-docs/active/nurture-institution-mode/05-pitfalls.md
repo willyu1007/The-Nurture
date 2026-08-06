@@ -2023,3 +2023,30 @@ This file exists to prevent repeating mistakes within this task.
   tests must mutate both result and proposed new context while retaining an
   immutable stored baseline. Treat pre-lock source mismatch as sequencing
   evidence, never as permission to weaken the lock.
+
+### 2026-08-06 — Shape-valid protected controls did not prove carrier confinement
+
+- Symptom: the first E1-E4 implementation passed focused positive/negative tests,
+  but Base still exported owner-internal evidence types, offered a normalization
+  transformer, grouped distinct read failures, checked only shallow body fields,
+  and did not compose the exact request/Workspace/principal/surface or direct/Step
+  identity across every protected lifecycle seam.
+- Root cause: closed public wire shapes and keyed hashes were treated as sufficient
+  proof even though trust depends on independently verified context and the absence
+  of protected copies in recursively nested or adjacent generic objects. Hash shape
+  alone does not prove which request, field, carrier or execution produced it.
+- What we tried: mutated one contextual axis at a time while retaining valid hashes,
+  nested forbidden fields under generic action keys, paired a direct context or
+  claimed Step from another execution, and scanned high-entropy plaintext/ref/
+  version/integrity sentinels in exact, normalized, escaped, base64 and fragmented
+  forms across every generic Base fixture.
+- Fix / workaround: keep owner verification evidence private and closed; make Base
+  validate already-normalized text without transforming it; split each failure arm;
+  bind request, Workspace, principal, surface, scenario, action, field/direction,
+  carrier integrity and exact direct/original-Step execution; recursively reject
+  body-like action input; and add cumulative generic-fixture no-copy scans.
+- Prevention: protected-content review must test trust provenance, not just hash
+  syntax. Every carrier/control join needs cross-context substitution tests, every
+  generic value needs recursive forbidden-field checks, and every claimed no-copy
+  boundary needs encoded/fragmented sentinels plus an explicit statement of which
+  later runtime layers remain unproven.

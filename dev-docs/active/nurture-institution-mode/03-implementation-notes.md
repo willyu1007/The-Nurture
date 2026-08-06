@@ -7,6 +7,23 @@
 
 ## What changed
 
+- 2026-08-06: Completed and accepted the authorized Base `C30-I1-E` chain in
+  strict E1→E5 order. E1-E4 add the dedicated protected plaintext carrier,
+  body-free prepare and committed controls, exact I1-D direct/claimed commit
+  composition, foreground-only detail read, closed tombstone/context/unavailable
+  results and recursive no-copy tests. The independent quality pass removed a
+  silent normalization transformer and public internal-evidence types, split exact
+  failure unions, bound request/Workspace/principal/surface/scenario/action and
+  original direct/Step execution identity, and expanded recursive/adversarial
+  leakage coverage. Exact source `5433124…` is sealed by metadata-only lock
+  `3a08d1f…` at source hash `7ba9458f…c126`. Repeated full verification passes
+  with 66 Schemas, 371 Node conformance tests, runtime 28/28 and Scenario 10/10;
+  two 84-file builds and source manifests are deterministic. Artifacts 37-41
+  preserve every checkpoint and rollback order. No manifest dependency/source
+  convergence, consumer/runtime, Prisma/database, KMS, deployment, capability,
+  activation, T-008 or Pilot work ran. Only a separately authorized I1-F scope
+  review/freeze is now eligible; I1-F implementation and C30-I2 remain closed.
+
 - 2026-08-06: Reused T-002 and froze only the `C30-I1-E` neutral Base
   protected-interaction scope in artifact 36. The review separates the sole
   body-bearing `ScenarioProtectedPlainTextCarrierV1` from I1-A body-free operation

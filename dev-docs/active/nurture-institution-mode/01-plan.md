@@ -638,15 +638,14 @@ qualified Pilot artifact, applied migration, or release approval.
 | `C30-I0-C` scoped commits and clean worktrees | Complete | Exact isolated branches exist at Base `20c4b7a…` and My-Chat `dc4a77b…`; the Nurture branch was created from runtime checkpoint `882d80f…` and may advance only through T-002 evidence documentation. Historical X5/Q4B5/T-029/T-027/Claude worktrees are clean and retained under their owners; the dirty My-Chat primary `next-env.d.ts` is excluded and untouched. |
 | `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
 
-`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A 验收和
-I1-B1 实施/本地验证。I1-B2 及后续片仍需分别授权。数据库 apply、环境 row
-census、capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自
-的单独授权。
+`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A～I1-E
+验收。I1-F 仅开放后续范围评审，尚未授权实施。数据库 apply、环境 row census、
+capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
 
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C/I1-D 已验收；I1-E 范围已冻结）
+## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C/I1-D/I1-E 已验收；I1-F 待评审）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -657,8 +656,8 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | `C30-I1-B` canonical-object binding envelope | Accepted | B1-B3 source `edbcd74…` plus B4 lock `9a15865…`; cumulative Schema/codec/exposure/build/conformance and exact source hash `16be693c…2512` pass. No consumer adoption. |
 | `C30-I1-C` subject presentation | Accepted | Successor source `ae0c357…` plus lock `3c30337…`; R1-R6 and repeated Schema/codec/exposure/build/conformance pass at hash `fc35c6b…e5cf3`. No consumer adoption. |
 | `C30-I1-D` domain action | Reaccepted | Artifact 35 closes D-R1..D-R5 at source `3580a9b…` plus metadata lock `1cb5691…`; 55 Schemas, 296 Node tests and deterministic build/source evidence pass. Manifest dependency/source convergence remains I1-F. |
-| `C30-I1-E` protected interaction | Scope frozen / not started | Artifact 36 freezes a dedicated plaintext carrier, body-free prepare/commit/read controls, tombstone result, no-copy boundaries and E1-E5; implementation is not authorized. |
-| `C30-I1-F` dependency/source convergence | Blocked by I1-A..E | Atomic dependencies, legacy/vNext exclusion, schema/codec parity and four separate source identities. |
+| `C30-I1-E` protected interaction | Accepted | Artifacts 37-41 close E1-E5 at source `5433124…` plus metadata lock `3a08d1f…`; 66 Schemas, 371 Node tests, exact source identity and deterministic build/manifest pass. No consumer adoption. |
+| `C30-I1-F` dependency/source convergence | Scope review eligible / implementation not authorized | Atomic dependencies, legacy/vNext exclusion, schema/codec parity and four separate source identities remain to be frozen before source work. |
 
 I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
 criteria and non-goals are frozen in
@@ -706,10 +705,16 @@ The successor repair qualification and source-lock checkpoint are recorded in
 [`artifact 35`](./artifacts/35-c30-i1-d5-successor-quality-repair-qualification-record.md).
 I1-E's dedicated carrier/body-free control split, exact wire families, exposure
 zones, content/lease bounds, lifecycle composition, no-copy negatives, zero-direct-
-merge donor disposition and five ordered implementation units are frozen in
-[`artifact 36`](./artifacts/36-c30-i1-e-scope-freeze.md). No I1-E unit has started;
-the next eligible decision is separate I1-E1 authorization. Manifest dependency,
-legacy/vNext and source-identity convergence remain I1-F.
+merge donor disposition and five ordered implementation units were frozen in
+[`artifact 36`](./artifacts/36-c30-i1-e-scope-freeze.md). E1-E4 source checkpoints
+are recorded in artifacts [`37`](./artifacts/37-c30-i1-e1-implementation-record.md),
+[`38`](./artifacts/38-c30-i1-e2-implementation-record.md),
+[`39`](./artifacts/39-c30-i1-e3-implementation-record.md) and
+[`40`](./artifacts/40-c30-i1-e4-implementation-record.md). The cumulative quality
+review, exact source and metadata lock are recorded in
+[`artifact 41`](./artifacts/41-c30-i1-e5-qualification-record.md). I1-E is accepted.
+The next eligible decision is a separate I1-F scope review/freeze; manifest
+dependency, legacy/vNext and source-identity implementation remains closed.
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---
