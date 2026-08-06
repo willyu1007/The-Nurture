@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "bf3fee8d47f292e0a991a7e0ce65f864db36ad4b",
+  "source_revision": "5bb260e98670ecae3ca9e42983873c0df5ac3340",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
@@ -12,11 +12,11 @@
     "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
     "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
   },
-  "source_hash": "c94ac5ed28a26011b37b556271becf575d7693909a7ba91a2543b0a8dfe0158e",
+  "source_hash": "e40fb649080943a5f39fb59080a2b2c246e353a4707c47ae2ad956fc5e4cb404",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
-      "source_hash": "e6d313c0619c11d747bb395cd03ea86d6cc58190c0dfccbfe851c3950725bfdf",
+      "source_hash": "e823028a4cfd44af88b0807e1a40b79846e063d230ced9f09e0941ab1f302644",
       "files": [
         "package.json",
         "packages/nurture-scenario/package.json",
@@ -48,7 +48,7 @@
     },
     {
       "source_identity": "nurture_c30_pair_local_persistence_v1",
-      "source_hash": "99916dcb6c284afde4d9293551e5c0239a6152f0957b1bfd3815263c46d164cc",
+      "source_hash": "2616e568caf12a2b02d29678a5ad688a9548fde052ac25628f3291abfdf8ad23",
       "files": [
         "docs/context/db/schema.json",
         "docs/context/registry.json",
@@ -60,6 +60,18 @@
         "packages/nurture-scenario/src/c30/pair-association.ts",
         "prisma/migrations/20260806120000_c30_i3_pair_owner_foundation/migration.sql",
         "prisma/schema.prisma"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_subject_presentation_v1",
+      "source_hash": "76c957978027ef04ae320f4fca71a91714bdcb032e8493c4bbca85c8b986b339",
+      "files": [
+        "packages/nurture-db/src/c30/subject-presentation.repository.ts",
+        "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/c30/subject-presentation.ts",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/tests/c30/subject-presentation.test.ts"
       ]
     }
   ]

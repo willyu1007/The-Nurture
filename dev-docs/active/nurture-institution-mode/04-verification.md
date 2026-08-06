@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_C_ACCEPTED / I3_D_AUTHORIZED_IN_PROGRESS`. G1 is
+  `C30_I3_D_ACCEPTED / I3_E_AUTHORIZED_IN_PROGRESS`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -40,6 +40,22 @@
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3-D subject provider and baseline presentation — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Stable declarations | PASS | Exact provider/presentation/surface keys match the generated manifest; production actions/protected declarations remain empty. |
+| Current owner resolution | PASS | Every list/resolve/present rereads Participant/business authority and one Serializable binding/role/pair/association/lifecycle snapshot plus injected current pair evidence. |
+| Opaque locators | PASS | Bounded AES-256-GCM subject refs/cursors bind Workspace, Participant, target/version and expiry without exposing local IDs. |
+| Safe presentation | PASS | Exactly six closed block kinds, fixed role-neutral safe copy, display-only navigation and `actions=[]`; stale context returns `context_changed`. |
+| Negative matrix | PASS | Cross-Workspace, tamper, expiry, durable origin, undeclared presentation, role/association revoke, aggregate drift and default-deny evidence all fail closed. |
+| Verification | PASS | Scenario/DB typecheck and build; focused 8 + 14 tests; complete Scenario 55 files / 620 tests; complete DB 22 files / 239 tests. |
+| Cumulative lock | PASS | Runtime `cccdc6b…`; lock source `5bb260e…`; aggregate `e40fb649…b404`; presentation profile `76c95797…b339`. |
+| Effect boundary | PASS | No route, schema/migration, existing DB, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_D_ACCEPTED / I3_E_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/57-c30-i3-d-implementation-record.md`.
 
 ## C30-I3-C canonical pair/local association — 2026-08-06
 

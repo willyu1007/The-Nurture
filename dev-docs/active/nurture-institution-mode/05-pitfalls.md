@@ -2255,3 +2255,29 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: use an explicitly scoped disposable shadow database for migration
   previews and validate its target identity before use; do not use transient file
   descriptors as Prisma datasource authorities.
+
+### 2026-08-06 — Opaque locator encryption still needs a wire-size budget
+
+- Symptom: a valid encrypted subject locator passed short-ID unit tests but
+  exceeded Base's 512-character bound with UUID-shaped persisted identities.
+- Root cause: the first encrypted plaintext used verbose JSON field names; AEAD
+  overhead and base64url expansion made wire size depend unnecessarily on names.
+- Fix / workaround: retain the typed internal locator but encrypt a closed,
+  versioned positional tuple. UUID-shaped integration locators now remain within
+  the accepted 32..512 bound and still reveal no identifier.
+- Prevention: test opaque locators with maximum realistic IDs and account for
+  nonce, tag and encoding expansion; opacity, authenticity and bounded size are
+  separate acceptance properties.
+
+### 2026-08-06 — Lifecycle-negative fixtures must satisfy the lifecycle constraint
+
+- Symptom: a family-association revoke test was rejected by PostgreSQL before
+  the read path ran.
+- Root cause: the test cleared `current_key` but retained the current-child link,
+  creating an invalid mixed lifecycle row under the maintained constraint.
+- Fix / workaround: revoke atomically with `current_key` and
+  `current_child_association_id` both cleared and the revocation timestamp set;
+  the owner read then correctly failed closed.
+- Prevention: negative tests should transition persisted fixtures through a
+  legal lifecycle state before asserting consumer behavior; constraint failures
+  and consumer denials prove different boundaries.

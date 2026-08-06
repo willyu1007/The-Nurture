@@ -7,9 +7,9 @@
 
 ## Next concrete actions
 
-1. Implement C30-I3-D current owner-resolved subject provider and safe,
-   action-free presentation against the exact artifact-56 persistence boundary.
-2. Continue I3-E..G only in the frozen order. Keep I4 joint adoption, C31-C35,
+1. Implement C30-I3-E's one canonical Base-neutral direct/claimed owner runner
+   only through an isolated conformance fixture; keep production actions absent.
+2. Continue I3-F..G only in the frozen order. Keep I4 joint adoption, C31-C35,
    T-008, persistent database apply, capability/Workspace activation,
    deployment, Pilot and traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
@@ -18,6 +18,16 @@
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Accepted C30-I3-D in artifact 57 at runtime source `cccdc6b…`
+  and lock-tool source `5bb260e…`. The exact declared provider/presenter use
+  sealed owner locators and reread typed Participant/business authority plus a
+  Serializable local role/pair/association/lifecycle snapshot and injected
+  current pair evidence on every operation. The presentation emits all six
+  closed Base block kinds, fixed safe copy, display-only navigation and no
+  actions. Scenario 55 files/620 tests, DB 22 files/239 tests, builds,
+  typechecks, upstream verification and cumulative lock `e40fb649…b404` pass.
+  No route, schema, capability or activation changed.
 
 - 2026-08-06: Accepted C30-I3-C in artifact 56 at source `bf3fee8…`. The
   additive `20260806120000_c30_i3_pair_owner_foundation` migration adds
