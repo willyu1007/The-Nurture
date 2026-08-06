@@ -20,6 +20,10 @@ milestones:
     title: "Institution ecology"
     status: in-progress
     description: "Child-centered institution ecology with My-Chat account/shell ownership and Nurture-owned care process, participant, role, institution, group, enrollment, grant, communication, care, and media facts."
+  - id: M-003
+    title: "Family growth material delivery"
+    status: in-progress
+    description: "Deliver explicitly released Nurture materials to My-Chat family growth continuity through the frozen family_growth_material v1 contract: provider envelope, outbox delivery, lifecycle propagation, and admission-receipt consumption."
 
 features:
   - id: F-000
@@ -42,6 +46,11 @@ features:
     status: planned
     description: "Turn the six-surface product design into a qualified Nurture service candidate and versioned interface that My-Chat can integrate and validate through TestFlight Internal and Google Play Internal Testing."
     milestone_id: M-002
+  - id: F-004
+    title: "Family growth material provider"
+    status: in-progress
+    description: "Implement the Nurture provider side of the frozen My-Chat family_growth_material v1 contract: fail-closed canonical target resolution, release/lifecycle envelopes with JCS payload digests, transactional provider outbox, family rendition exchange, and admission-receipt consumption."
+    milestone_id: M-003
 
 requirements: []
 
@@ -102,3 +111,10 @@ tasks:
     feature_id: F-003
     dev_docs_path: dev-docs/active/nurture-store-beta-readiness
     updated: 2026-08-05
+  - id: T-009
+    slug: nurture-family-growth-provider
+    status: in-progress
+    milestone_id: M-003
+    feature_id: F-004
+    dev_docs_path: dev-docs/active/nurture-family-growth-provider
+    updated: 2026-08-07

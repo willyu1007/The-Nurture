@@ -1,0 +1,17 @@
+version: 1
+task_id: T-009
+project: main
+slug: nurture-family-growth-provider
+status: in-progress
+updated: "2026-08-07"
+keywords:
+  - family-growth-material
+  - release-envelope
+  - provider-outbox
+  - admission-receipt
+  - canonical-target-resolution
+  - family-rendition
+  - jcs-payload-digest
+  - lifecycle-delivery
+  - my-chat-consumer
+  - transport-addendum

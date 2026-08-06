@@ -5,7 +5,7 @@ The Nurture is a My-Chat scenario module for pregnancy, motherhood, childcare, f
 ## Non-Negotiables
 
 - The Nurture is not an independent product shell.
-- My-Chat owns canonical objects, auth, shared workflow runtime, dashboard/chat/mobile/forum/knowledge/notification/admin surfaces, ledgers, workers, and outbox.
+- My-Chat owns canonical objects, auth, shared workflow runtime, dashboard/chat/mobile/forum/knowledge/notification/admin surfaces, ledgers, workers, and the shared workflow outbox. The Nurture owns its scenario-local provider outbox for outbound cross-owner contract events (for example `family_growth_material_release`); these are different objects.
 - The Nurture owns scenario workflows, local projections, policies, artifacts, and scenario-specific console/API surfaces.
 - Nurture profiles MUST attach to My-Chat canonical objects; do not create duplicate child/family/person identity ownership.
 - My-Chat `child_id` is the opaque shared subject key. Nurture binds it to a

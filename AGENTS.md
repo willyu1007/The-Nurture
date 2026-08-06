@@ -50,7 +50,7 @@ Before changing workflow integration, read:
 
 The Nurture owns scenario manifest, handlers, actions, presenters, adapters, policies, repository ports, local projections, and scenario artifacts.
 
-My-Chat owns canonical object identity, auth, shared workflow runtime, routes, workers, outbox, ledgers, dashboard/chat/mobile/forum/knowledge/notification/admin consumers.
+My-Chat owns canonical object identity, auth, shared workflow runtime, routes, workers, the shared workflow outbox, ledgers, dashboard/chat/mobile/forum/knowledge/notification/admin consumers. The Nurture owns a scenario-local provider outbox for its own outbound cross-owner contract events (family growth material release/lifecycle); that provider outbox is not the My-Chat workflow outbox.
 
 Nurture consumes `my_chat.child` through pinned owner contracts/APIs and
 stores only an opaque binding to its local child. It MUST NOT import the
