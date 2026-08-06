@@ -11,12 +11,12 @@
 ## Current Verification Status
 
 - Last updated: 2026-08-06
-- Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
-  `C30-I0-A/B/C/D` gates and cumulative `C30-I1-A..F` are complete. Artifacts
-  45-48 close I1-F at exact Base source `3d91591…` and metadata-only lock
-  `afe47e8…`; the current state is `C30_I1_BASE_CONTRACTS_ACCEPTED /
-  C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. Artifact 44 remains the immutable F1-F4
-  scope freeze. G1 is
+- Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
+  `C30-I0-A/B/C/D` gates remain complete. C30-I1-F acceptance is reopened by
+  artifact 49 after four post-implementation findings; artifacts 45-48 are
+  historical until a successor source/lock qualifies. The current state is
+  `I1_F_ACCEPTANCE_REOPENED / C30_I2_NO_GO`. Artifact 44 remains the original
+  F1-F4 scope freeze and artifact 49 is the bounded repair freeze. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -33,6 +33,20 @@
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-F post-implementation quality review and reopening — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Existing focused/full evidence | PASS BUT INSUFFICIENT | F1-F4 focused 59/59, full conformance 435/435 and exact source-lock check pass. The defects are uncovered paths, not unexplained baseline failures. |
+| Multi-action adversarial probe | REPRODUCED / P1 | A second unique handler fails `missing_domain_action_handler`; sharing the prepare handler fails `duplicate_scenario_handler`. |
+| Presentation-ingress probe | REPRODUCED / P1 | Two surfaces split across list/resolve versus present operations are accepted although one declared surface cannot invoke its presentation. |
+| Bound probe | REPRODUCED / P2 | Runtime and strict JSON Schema accept 10,000 safe reason codes plus 10,000 route classes. |
+| Symlink-root probe | REPRODUCED / P2 | Existing workspace symlink roots reproduce the trusted aggregate and all four named hashes. |
+| Repository/effect boundary | PASS | Three repositories stayed clean; no build, source mutation, Prisma/database, consumer, capability, deployment, activation, T-008, Pilot or traffic action ran during review. |
+
+Verdict: artifact 48 is historical; artifact 49 authorizes only F-R1..F-R4 and
+keeps C30-I2 plus every downstream/operational action closed.
 
 ## C30-I1-F cumulative implementation and qualification — 2026-08-06
 

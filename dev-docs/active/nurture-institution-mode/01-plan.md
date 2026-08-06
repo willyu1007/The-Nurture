@@ -657,7 +657,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | `C30-I1-C` subject presentation | Accepted | Successor source `ae0c357…` plus lock `3c30337…`; R1-R6 and repeated Schema/codec/exposure/build/conformance pass at hash `fc35c6b…e5cf3`. No consumer adoption. |
 | `C30-I1-D` domain action | Reaccepted | Artifact 35 closes D-R1..D-R5 at source `3580a9b…` plus metadata lock `1cb5691…`; 55 Schemas, 296 Node tests and deterministic build/source evidence pass. Manifest dependency/source convergence remains I1-F. |
 | `C30-I1-E` protected interaction | Reaccepted | Artifact 43 closes E-R1..E-R4 at source `48fd3d6…` plus metadata lock `9abde2b…`; 66 Schemas, 376 Node tests and deterministic build/source evidence pass. The artifact-41 chain is historical. |
-| `C30-I1-F` dependency/source convergence | Accepted | Artifacts 45-48 close ordered F1-F4 at Base source `3d91591…` plus metadata lock `afe47e8…`; the closed manifest graph, exact aliases/references, four named profiles, 66 Schemas, 435 Node tests and repeated deterministic qualification pass. |
+| `C30-I1-F` dependency/source convergence | Acceptance reopened / repair authorized | Artifacts 45-48 are historical. Artifact 49 freezes four successor repairs: multi-action handler separation, operation-local presentation ingress, bounded declaration arrays and ancestor-symlink rejection. C30-I2 remains NO-GO. |
 
 I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
 criteria and non-goals are frozen in
@@ -723,10 +723,10 @@ Artifacts [`45`](./artifacts/45-c30-i1-f1-dependency-graph-implementation-record
 [`46`](./artifacts/46-c30-i1-f2-interface-convergence-implementation-record.md),
 [`47`](./artifacts/47-c30-i1-f3-action-protected-convergence-implementation-record.md)
 and [`48`](./artifacts/48-c30-i1-f4-cumulative-qualification-record.md) record the
-accepted implementation and immutable Base handoff. The full I1-A..F Base exit is
-now `C30_I1_BASE_CONTRACTS_ACCEPTED`; the only eligible next decision is a
-separately authorized C30-I2 scope review/freeze. It does not authorize C30-I2
-implementation or any consumer/operational action.
+historical implementation and Base handoff. Artifact
+[`49`](./artifacts/49-c30-i1-f4-quality-repair-freeze.md) reopens acceptance and
+freezes the authorized successor repair. C30-I2 scope review/implementation and
+every consumer/operational action remain closed until requalification.
 
 ---
 

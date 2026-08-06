@@ -5,19 +5,24 @@
 - Current status: `in-progress`
 - Last updated: 2026-08-06
 
-## Next concrete actions (not yet authorized)
+## Next concrete actions
 
-1. Obtain explicit authorization for a C30-I2 scope review/freeze; do not infer it
-   from I1 acceptance.
-2. After authorization, resume with
-   `node .ai/scripts/ctl-project-governance.mjs resume --task T-002 --json` and
-   use artifact 48 plus `docs/context/workflow/nurture-scenario-contract.md` as
-   the immutable Base handoff/current boundary.
-3. Produce a separate I2 freeze artifact before any My-Chat/Nurture consumer
-   source, manifest adoption, database, capability or runtime action. Any I2
-   implementation still requires its own subsequent authorization.
+1. Implement only artifact-49 F-R1..F-R4 in Base.
+2. Re-run focused adversarial, complete Base and deterministic qualification.
+3. Commit successor source, then one metadata-only lock, and record the resulting
+   qualification before reconsidering I1-F acceptance. C30-I2 remains NO-GO.
 
 ## What changed
+
+- 2026-08-06: Reopened `C30-I1-F` acceptance after a read-only quality review
+  reproduced four gaps despite the green 435-test suite: multi-action handler
+  rules are mutually exclusive, presentation reachability is checked against a
+  global rather than operation-local ingress set, two declaration arrays are
+  unbounded, and source hashing accepts a symlinked physical root. Artifact 49
+  freezes the exact successor corrections and additionally bounds surface action
+  keys. The user authorized all four repairs. No Base source, build, database,
+  consumer, capability, deployment, activation, T-008, Pilot or traffic action
+  had occurred at the reopening checkpoint.
 
 - 2026-08-06: Completed the authorized `C30-I1-F` chain in strict F1→F4
   order. F1 (`0ce22b6…`) adds the optional closed dependency/source graph; F2
