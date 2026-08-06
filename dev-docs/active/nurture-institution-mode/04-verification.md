@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_E_ACCEPTED / I3_F_AUTHORIZED_IN_PROGRESS`. G1 is
+  `C30_I3_F_ACCEPTED / I3_G_AUTHORIZED_IN_PROGRESS`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -35,12 +35,30 @@
   Host runtime support and the narrow nonce/pair schema under T-035, all
   default-off. Nurture I3-A has one generated canonical manifest/module and
   I3-B adds private trust/nonce/response-signing and typed Participant authority
-  primitives without registering a route. I3-C through I3-E add only
-  Nurture-owned local pair, presentation and generic action persistence on an
+  primitives without registering a route. I3-C through I3-F add only
+  Nurture-owned local pair, presentation, generic action persistence and
+  protected-owner persistence on an
   isolated disposable target; no production action, existing database,
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3-F protected owner lifecycle — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Fixture-only declaration | PASS | Production action/protected arrays remain empty and no positive route/handler was added. |
+| Current owner authority | PASS | Every commit/read/erase rereads typed Participant, separate business authority, local process/role/pair association and injected canonical pair evidence. |
+| Encryption/KMS boundary | PASS | Random per-content AES-256-GCM DEK, KMS-wrapped key only, production-default-deny port and no durable plaintext/unwrapped key/display lease. |
+| Lifecycle and restoration | PASS | Retention expiry, explicit tombstone and crypto-erasure clear all recoverable material; destroyed external KMS handle denies a restored database snapshot. |
+| Replay/integrity/no-copy | PASS | Exact replay, changed-plaintext conflict, GCM tamper, revoke/expiry and recursive generic/legacy destination census all pass. |
+| Additive SSOT migration | PASS | Migration `20260806140000_c30_i3_protected_owner_lifecycle`, SHA-256 `fd371d8f…3c8`; 19/19 on exact disposable 55440; both schema diffs empty and strict context passes. |
+| Verification | PASS | Focused Scenario 5/5 + DB 8/8; complete Scenario 57 files / 632 tests; complete DB 24 files / 253 tests; Scenario/DB typecheck and production build. |
+| Cumulative lock | PASS | Runtime `13285fd…`; lock-tool `ac049b4…`; aggregate `b251bb46…48a8`; protected profile `5e48ea10…3c15`. |
+| Effect boundary | PASS | Synthetic neutral ciphertext only; no production declaration, existing DB, route, secret, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_F_ACCEPTED / I3_G_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/59-c30-i3-f-implementation-record.md`.
 
 ## C30-I3-E canonical action owner runtime — 2026-08-06
 

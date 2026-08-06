@@ -767,7 +767,7 @@ The successful I2 exit opened the now-completed I3 scope review; it did not
 authorize Nurture adoption, joint conformance, C31-C35, T-008, deployment,
 activation or Pilot.
 
-## C30-I3 — Nurture Scenario-owner adoption（实施中，I3-E 已验收）
+## C30-I3 — Nurture Scenario-owner adoption（实施中，I3-F 已验收）
 
 Artifact 53 is normative. C30-I3 remains one cumulative default-off owner
 adoption, decomposed into seven ordered units:
@@ -779,8 +779,8 @@ adoption, decomposed into seven ordered units:
 | `C30-I3-C` pair anchors/local association | Accepted | Artifact 56 pins source `bf3fee8…`, the additive migration, atomic local association and writer-fenced recovery on the isolated disposable DB. |
 | `C30-I3-D` subject/presentation | Accepted | Artifact 57 pins current owner-resolved `NurtureChildCareProcess`, sealed locators and the safe six-block action-free baseline. |
 | `C30-I3-E` canonical action runtime | Accepted | Artifact 58 pins the fixture-only direct/claimed runner, typed Execution provenance, atomic effect/audit/outbox transaction and writer-fenced recovery; production actions remain absent. |
-| `C30-I3-F` protected owner lifecycle | In progress / authorized | Per-content wrapped DEK, KMS port, retention/tombstone/crypto-erasure and recursive no-copy. |
-| `C30-I3-G` convergence/qualification | Authorized after F | Immutable Nurture lock, cumulative fresh-DB/source/default-off qualification; opens only I4 scope review. |
+| `C30-I3-F` protected owner lifecycle | Accepted | Artifact 59 pins per-content wrapped DEK, default-deny KMS port, current-authority lifecycle, retention/tombstone/crypto-erasure, restored-snapshot denial and recursive no-copy. |
+| `C30-I3-G` convergence/qualification | In progress / authorized | Immutable Nurture lock, cumulative fresh-DB/source/default-off qualification; opens only I4 scope review. |
 
 The production I3 manifest deliberately stops at the Base-permitted
 dependency-complete `trusted_scenario_invocation_v1 +
@@ -790,8 +790,8 @@ the first real action/protected declaration remains C31. Placeholder actions,
 legacy `capture_family_input` aliases and premature
 `submit_family_care_question` adoption are forbidden.
 
-The user authorized ordered I3-A..G implementation. I3-A through I3-E are
-accepted; I3-F is the active unit. Unit order remains mandatory. I4, C31-C35, T-008,
+The user authorized ordered I3-A..G implementation. I3-A through I3-F are
+accepted; I3-G is the active unit. Unit order remains mandatory. I4, C31-C35, T-008,
 deployment, activation, Pilot and traffic remain closed.
 
 ---

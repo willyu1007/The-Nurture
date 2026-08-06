@@ -7,9 +7,9 @@
 
 ## Next concrete actions
 
-1. Implement C30-I3-F authoritative protected-content lifecycle with one
-   per-content wrapped DEK and a production-default-deny KMS port.
-2. Continue I3-G only after I3-F acceptance. Keep I4 joint adoption, C31-C35,
+1. Execute C30-I3-G cumulative source/default-off convergence and fresh-database
+   qualification, then destroy the exact disposable 55440 target.
+2. Keep I4 joint adoption, C31-C35,
    T-008, persistent database apply, capability/Workspace activation,
    deployment, Pilot and traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
@@ -18,6 +18,17 @@
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Accepted C30-I3-F in artifact 59 at runtime source `13285fd…`
+  and lock-tool source `ac049b4…`. The authoritative protected owner uses a
+  random per-content AES-256-GCM DEK wrapped through a production-default-deny
+  KMS port, rereads all current Participant/business/pair/process authority,
+  and owns retention, tombstone and crypto-erasure without durable plaintext or
+  unwrapped keys. Restored snapshots remain unreadable after external KMS-handle
+  destruction; the recursive no-copy suite pins legacy non-fallback. Focused
+  Scenario 5/5 and DB 8/8, complete Scenario 57 files/632 tests, DB 24 files/253
+  tests, builds, Prisma/context convergence, upstream verification and cumulative
+  lock `b251bb46…48a8` pass. I3-G is active.
 
 - 2026-08-06: Accepted C30-I3-E in artifact 58 at runtime source `9a59c51…`
   and lock-tool source `25e7a78…`. One Base-neutral runner now owns prepare,

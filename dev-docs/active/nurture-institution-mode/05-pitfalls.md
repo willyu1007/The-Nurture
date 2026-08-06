@@ -2294,3 +2294,16 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: signature-negative fixtures must alter a known significant byte
   or decode/mutate/re-encode; do not assume every textual Base64URL change
   changes the represented bytes.
+
+### 2026-08-06 — Crypto-erasure must survive database rollback and restoration
+
+- Symptom: clearing a wrapped DEK and KMS handle only inside a database
+  transaction can be undone by rollback or by restoring an older snapshot.
+- Root cause: database deletion is not authoritative erasure while an external
+  KMS can still unwrap a snapshotted key envelope.
+- Fix / workaround: destroy the external KMS handle first, then clear all
+  recoverable database material. A later database rollback is fail-closed
+  because the destroyed handle cannot be restored from the database.
+- Prevention: qualification must restore pre-erasure database material and
+  prove unwrap denial against the external KMS state; never equate row clearing
+  alone with cryptographic erasure.
