@@ -767,20 +767,20 @@ The successful I2 exit opened the now-completed I3 scope review; it did not
 authorize Nurture adoption, joint conformance, C31-C35, T-008, deployment,
 activation or Pilot.
 
-## C30-I3 — Nurture Scenario-owner adoption（范围已冻结，未实施）
+## C30-I3 — Nurture Scenario-owner adoption（实施中，I3-A 已验收）
 
 Artifact 53 is normative. C30-I3 remains one cumulative default-off owner
 adoption, decomposed into seven ordered units:
 
 | Unit | State | Boundary |
 | --- | --- | --- |
-| `C30-I3-A` exact adoption/canonical manifest | Authorization required | Exact Base/My-Chat lock plus one YAML-generated production module using the valid trusted+presentation prefix. |
-| `C30-I3-B` private trust/Participant binding | Closed | Detached verifier/response signer, Scenario-private nonce and typed principal binding; no service-token fallback. |
-| `C30-I3-C` pair anchors/local association | Closed | Additive schema plus atomic pair association and writer-fenced recovery on a fresh disposable DB. |
-| `C30-I3-D` subject/presentation | Closed | Current owner-resolved `NurtureChildCareProcess` and safe action-free baseline presentation. |
-| `C30-I3-E` canonical action runtime | Closed | One typed direct/claimed runner, qualified only through a test-only neutral fixture; no production action. |
-| `C30-I3-F` protected owner lifecycle | Closed | Per-content wrapped DEK, KMS port, retention/tombstone/crypto-erasure and recursive no-copy. |
-| `C30-I3-G` convergence/qualification | Closed | Immutable Nurture lock, cumulative fresh-DB/source/default-off qualification; opens only I4 scope review. |
+| `C30-I3-A` exact adoption/canonical manifest | Accepted | Exact Base/My-Chat lock plus one YAML-generated production module using the valid trusted+presentation prefix. Artifact 54 records source `3b7e2a6…`, self-verifying lock source `0f1d456…` and aggregate `a8453249…69fc`. |
+| `C30-I3-B` private trust/Participant binding | In progress / authorized | Detached verifier/response signer, Scenario-private nonce and typed principal binding; no service-token fallback. |
+| `C30-I3-C` pair anchors/local association | Authorized after B | Additive schema plus atomic pair association and writer-fenced recovery on a fresh disposable DB. |
+| `C30-I3-D` subject/presentation | Authorized after C | Current owner-resolved `NurtureChildCareProcess` and safe action-free baseline presentation. |
+| `C30-I3-E` canonical action runtime | Authorized after D | One typed direct/claimed runner, qualified only through a test-only neutral fixture; no production action. |
+| `C30-I3-F` protected owner lifecycle | Authorized after E | Per-content wrapped DEK, KMS port, retention/tombstone/crypto-erasure and recursive no-copy. |
+| `C30-I3-G` convergence/qualification | Authorized after F | Immutable Nurture lock, cumulative fresh-DB/source/default-off qualification; opens only I4 scope review. |
 
 The production I3 manifest deliberately stops at the Base-permitted
 dependency-complete `trusted_scenario_invocation_v1 +
@@ -790,9 +790,9 @@ the first real action/protected declaration remains C31. Placeholder actions,
 legacy `capture_family_input` aliases and premature
 `submit_family_care_question` adoption are forbidden.
 
-Only a separate I3-A authorization, or an explicit broader ordered I3-A..G
-authorization, may start source work. I4, C31-C35, T-008, deployment,
-activation, Pilot and traffic remain closed.
+The user authorized ordered I3-A..G implementation. I3-A is accepted and I3-B
+is the active unit. Unit order remains mandatory. I4, C31-C35, T-008,
+deployment, activation, Pilot and traffic remain closed.
 
 ---
 

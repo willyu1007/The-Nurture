@@ -7,17 +7,27 @@
 
 ## Next concrete actions
 
-1. Await separate authorization for C30-I3-A, or an explicit broader mandate for
-   ordered I3-A..G implementation.
-2. Keep all C30-I3 implementation, I4 joint adoption, C31-C35, T-008, persistent
-   database apply, capability/Workspace activation, deployment, Pilot and
-   traffic closed.
+1. Implement C30-I3-B private trust and typed Participant binding against the
+   exact artifact-54 adoption lock.
+2. Continue I3-C..G only in the frozen order. Keep I4 joint adoption, C31-C35,
+   T-008, persistent database apply, capability/Workspace activation,
+   deployment, Pilot and traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
    `8172e370…10a5ad` and archive `cd7bbc2…` as the immutable default-off I2
    handoff, and artifact 53 as the normative I3 implementation-entry contract.
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Accepted C30-I3-A in artifact 54. Source `3b7e2a6…` replaces the
+  hand-copied registry and dual module variants with one YAML-generated,
+  default-off canonical module using the exact trusted+presentation prefix.
+  Lock-tool source `0f1d456…` binds clean Base `4350086…`, clean My-Chat
+  `cd7bbc2…`, Nurture aggregate `a8453249…69fc` and the 15-file manifest profile
+  `9ca462c4…5bb2`. Upstream locks, typecheck, focused 28 tests, full scenario 579
+  tests, G2 regression and self-verifying lock pass. No schema/database,
+  capability, activation or downstream work occurred. I3-B is now active under
+  the user's ordered I3-A..G authorization.
 
 - 2026-08-06: Completed the authorized C30-I3 Scenario-owner scope review and
   freeze in artifact 53. The review reuses Nurture T-002, pins accepted Base

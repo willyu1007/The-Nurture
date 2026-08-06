@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
+  "source_revision": "0f1d456f374878ad03c1317c6cbd98209dc39304",
+  "base": {
+    "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
+    "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
+    "aggregate_source_hash": "d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383"
+  },
+  "host": {
+    "head_revision": "cd7bbc2623dff8621c2c7155b04d1bf759e8404a",
+    "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
+    "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
+  },
+  "source_hash": "a8453249a23820cbc09e509dc393db8df75a8962e122f9961bb10144647269fc",
+  "source_profiles": [
+    {
+      "source_identity": "nurture_c30_manifest_foundation_v1",
+      "source_hash": "9ca462c4d5f820de7882e4b56d876e4f2f3a89f7107e8ddd1a408258dfe55bb2",
+      "files": [
+        "package.json",
+        "packages/nurture-scenario/package.json",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/src/index.ts",
+        "packages/nurture-scenario/src/module.ts",
+        "packages/nurture-scenario/src/policies.ts",
+        "packages/nurture-scenario/src/registry.ts",
+        "packages/nurture-scenario/tests/conformance.test.ts",
+        "packages/nurture-scenario/tests/institution/family-input-workflow-handler.test.ts",
+        "packages/nurture-scenario/tests/module-factory.test.ts",
+        "scripts/assert-g2-exit-contract.mjs",
+        "scripts/compute-c30-i3-owner-adoption-hash.mjs",
+        "scripts/generate-nurture-scenario-manifest.mjs",
+        "scripts/verify-c30-i3-upstream.mjs"
+      ]
+    }
+  ]
+}

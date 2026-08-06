@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_SCOPE_FROZEN / I3_A_SEPARATE_AUTHORIZATION_REQUIRED`. G1 is
+  `C30_I3_A_ACCEPTED / I3_B_AUTHORIZED_IN_PROGRESS`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -33,11 +33,25 @@
   exact named source profiles and source lock. Base adds validation only, not a
   consumer runtime or starter adoption. My-Chat now contains accepted generic
   Host runtime support and the narrow nonce/pair schema under T-035, all
-  default-off. Nurture C30-I3 changes are planning/context only; product source
-  and the existing formal NestJS owner path are unchanged. No persistent
-  database, secret/KMS/environment value,
+  default-off. Nurture I3-A now has one generated canonical manifest/module and
+  a self-verifying downstream source lock; no I3-B runtime or formal route is
+  registered yet. No persistent database, secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3-A exact adoption and canonical manifest — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Canonical source | PASS | Source `3b7e2a6…` makes YAML the only editable manifest source and emits one typed default-off module; former activation/preactivation variants are absent. |
+| Production capability prefix | PASS | Exact ordered trusted-invocation + subject-presentation graph; presentation is action-free and production action/protected declarations are empty. |
+| Upstream identity | PASS | Base `4350086…` / aggregate `d17f2358…6383` and My-Chat `cd7bbc2…` / aggregate `8172e370…10a5ad` are exact and clean. |
+| Nurture source lock | PASS | Tool source `0f1d456…`; aggregate `a8453249…69fc`; profile `nurture_c30_manifest_foundation_v1` hashes 15 exact files to `9ca462c4…5bb2`. |
+| Verification | PASS | Upstream source locks, scenario typecheck, focused 5 files / 28 tests, full 52 files / 579 tests, G2 exit assertion, generated parity and lock self-check. |
+| Effect boundary | PASS | No schema, Prisma, database, KMS, capability, deployment, activation, I4, C31, T-008, Pilot or traffic action. |
+
+Verdict: `C30_I3_A_ACCEPTED / I3_B_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/54-c30-i3-a-implementation-record.md`.
 
 ## C30-I3 Scenario-owner adoption scope review and freeze — 2026-08-06
 
