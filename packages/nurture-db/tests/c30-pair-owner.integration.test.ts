@@ -442,8 +442,8 @@ async function createFixture(deadlineOffsetMs = 30_000) {
   const familyCanonicalRef = ref("my_chat", "family", randomUUID(), 1);
   const identityOperationId = randomUUID();
   const pairRelationEvidenceHash = digest(`pair:${identityOperationId}`);
-  const pairRequest = {
-    pair_request_version: 1 as const,
+  const pairRequest: NurtureC30PairAssociationCommandV1["pair_request"] = {
+    pair_request_version: 1,
     identity_operation_id: identityOperationId,
     workspace_ref: ref("my_chat", "workspace", workspaceId),
     scenario_key: "nurture",
@@ -453,46 +453,46 @@ async function createFixture(deadlineOffsetMs = 30_000) {
     canonical_input_hash: digest(`input:${identityOperationId}`),
     bindings: [
       {
-        binding_intent_version: 1 as const,
+        binding_intent_version: 1,
         binding_slot: "child",
         canonical_object_ref: childCanonicalRef,
         scenario_owner_ref: childOwnerRef,
-        expected_head: { state: "absent" as const },
+        expected_head: { state: "absent" },
       },
       {
-        binding_intent_version: 1 as const,
+        binding_intent_version: 1,
         binding_slot: "family",
         canonical_object_ref: familyCanonicalRef,
         scenario_owner_ref: familyOwnerRef,
-        expected_head: { state: "absent" as const },
+        expected_head: { state: "absent" },
       },
-    ] as const,
+    ],
   };
-  const pairResult = {
-    pair_result_version: 1 as const,
+  const pairResult: NurtureC30PairAssociationCommandV1["pair_result"] = {
+    pair_result_version: 1,
     identity_operation_id: identityOperationId,
     canonical_input_hash: pairRequest.canonical_input_hash,
-    disposition: "committed" as const,
+    disposition: "committed",
     bindings: [
       {
-        binding_result_version: 1 as const,
+        binding_result_version: 1,
         binding_slot: "child",
         canonical_object_ref: childCanonicalRef,
         scenario_owner_ref: childOwnerRef,
         binding_ref: ref("my_chat", "scenario_binding", randomUUID(), 1),
         binding_version: 1,
-        effect: "created" as const,
+        effect: "created",
       },
       {
-        binding_result_version: 1 as const,
+        binding_result_version: 1,
         binding_slot: "family",
         canonical_object_ref: familyCanonicalRef,
         scenario_owner_ref: familyOwnerRef,
         binding_ref: ref("my_chat", "scenario_binding", randomUUID(), 1),
         binding_version: 1,
-        effect: "created" as const,
+        effect: "created",
       },
-    ] as const,
+    ],
     pair_commit_evidence_hash: digest(`pair-commit:${identityOperationId}`),
   };
   const command: NurtureC30PairAssociationCommandV1 = {
