@@ -377,6 +377,20 @@ enum NurtureScenarioBindingAuthorizationStatus {
   revoked
 }
 
+enum NurturePrincipalBindingStatus {
+  active
+  suspended
+  revoked
+}
+
+enum NurtureC30PairOperationState {
+  eligible
+  dispatching
+  committed
+  confirmed_no_effect
+  quarantined
+}
+
 enum NurtureGrantDirection {
   family_to_org
   org_to_family
@@ -1459,9 +1473,10 @@ model NurtureChildBindingAnchor {
   createdAt          DateTime                   @default(now()) @map("created_at")
   updatedAt          DateTime                   @updatedAt @map("updated_at")
 
-  authorizations NurtureScenarioBindingAuthorization[]
-  associations   NurtureChildAnchorAssociation[]
-  familyLinks    NurtureFamilyAnchorAssociation[]
+  authorizations    NurtureScenarioBindingAuthorization[]
+  associations      NurtureChildAnchorAssociation[]
+  familyLinks       NurtureFamilyAnchorAssociation[]
+  c30PairOperations NurtureC30PairOperation[]
 
   @@index([status, updatedAt], map: "ix_nurture_child_anchor_status")
   @@map("nurture_child_binding_anchor")
@@ -1478,8 +1493,9 @@ model NurtureFamilyBindingAnchor {
   createdAt          DateTime                   @default(now()) @map("created_at")
   updatedAt          DateTime                   @updatedAt @map("updated_at")
 
-  authorizations NurtureScenarioBindingAuthorization[]
-  associations   NurtureFamilyAnchorAssociation[]
+  authorizations    NurtureScenarioBindingAuthorization[]
+  associations      NurtureFamilyAnchorAssociation[]
+  c30PairOperations NurtureC30PairOperation[]
 
   @@index([status, updatedAt], map: "ix_nurture_family_anchor_status")
   @@map("nurture_family_binding_anchor")
@@ -1536,6 +1552,7 @@ model NurtureChildAnchorAssociation {
   child              NurtureChild                     @relation(fields: [workspaceId, childId], references: [workspaceId, id], onDelete: Restrict)
   familyLinks        NurtureFamilyAnchorAssociation[] @relation("NurtureChildAssociationHistory")
   currentFamilyLinks NurtureFamilyAnchorAssociation[] @relation("NurtureCurrentChildAssociation")
+  c30PairOperation   NurtureC30PairOperation?         @relation("NurtureC30ChildAssociation")
 
   @@unique([workspaceId, childAnchorId, currentKey], map: "uq_nurture_child_anchor_workspace")
   @@unique([workspaceId, childId, currentKey], map: "uq_nurture_child_anchor_local_child")
@@ -1570,6 +1587,7 @@ model NurtureFamilyAnchorAssociation {
   currentChildAssociation NurtureChildAnchorAssociation? @relation("NurtureCurrentChildAssociation", fields: [currentChildAssociationId, currentKey], references: [id, currentKey], onDelete: Restrict)
   childCareProcess        NurtureChildCareProcess        @relation(fields: [workspaceId, childCareProcessId, childId], references: [workspaceId, id, childId], onDelete: Restrict)
   family                  NurtureFamily                  @relation(fields: [workspaceId, familyId, childCareProcessId], references: [workspaceId, id, childCareProcessId], onDelete: Restrict)
+  c30PairOperation        NurtureC30PairOperation?       @relation("NurtureC30FamilyAssociation")
 
   @@unique([workspaceId, familyAnchorId, childAnchorId, currentKey], map: "uq_nurture_family_anchor_pair")
   @@unique([workspaceId, familyId, currentKey], map: "uq_nurture_family_anchor_local_family")
@@ -1597,9 +1615,140 @@ model NurtureParticipant {
   messageCorrections  NurtureFamilyCareMessageCorrection[]
   itemEvents          NurtureFamilyCareItemEvent[]
   interactionContexts NurtureInteractionContext[]
+  principalBindings   NurtureParticipantPrincipalBinding[]
+  c30PairOperations   NurtureC30PairOperation[]
 
   @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
   @@map("nurture_participant")
+}
+
+model NurtureScenarioInvocationNonce {
+  id            String   @id @default(uuid())
+  scopeHash     String   @unique(map: "uq_nurture_c30_nonce_scope") @map("scope_hash") @db.Char(64)
+  requestIdHash String   @map("request_id_hash") @db.Char(64)
+  bodySha256    String   @map("body_sha256") @db.VarChar(43)
+  expiresAt     DateTime @map("expires_at")
+  consumedAt    DateTime @default(now()) @map("consumed_at")
+
+  @@index([expiresAt], map: "ix_nurture_c30_nonce_expiry")
+  @@map("nurture_scenario_invocation_nonce")
+}
+
+model NurtureParticipantPrincipalBinding {
+  id                              String                        @id @default(uuid())
+  participantId                   String                        @map("participant_id")
+  workspaceId                     String                        @map("workspace_id")
+  accountObjectId                 String                        @map("account_object_id")
+  actorObjectId                   String                        @map("actor_object_id")
+  representedOrganizationObjectId String?                       @map("represented_organization_object_id")
+  bindingVersion                  Int                           @default(1) @map("binding_version")
+  status                          NurturePrincipalBindingStatus @default(active)
+  currentKey                      String?                       @default("current") @map("current_key")
+  aggregateVersion                Int                           @default(1) @map("aggregate_version")
+  suspendedAt                     DateTime?                     @map("suspended_at")
+  revokedAt                       DateTime?                     @map("revoked_at")
+  createdAt                       DateTime                      @default(now()) @map("created_at")
+  updatedAt                       DateTime                      @updatedAt @map("updated_at")
+
+  participant       NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  pairOperations    NurtureC30PairOperation[]
+  commandExecutions NurtureCommandExecution[]
+
+  @@unique([workspaceId, accountObjectId, actorObjectId, currentKey], map: "uq_nurture_c30_principal_current")
+  @@unique([workspaceId, participantId, currentKey], map: "uq_nurture_c30_participant_current")
+  @@index([workspaceId, status, updatedAt], map: "ix_nurture_c30_principal_status")
+  @@map("nurture_participant_principal_binding")
+}
+
+model NurtureC30PairOperation {
+  id                              String                       @id @db.VarChar(200)
+  workspaceId                     String                       @map("workspace_id")
+  scenarioKey                     String                       @map("scenario_key")
+  participantId                   String                       @map("participant_id")
+  participantBindingId            String?                      @map("participant_binding_id")
+  accountObjectId                 String                       @map("account_object_id")
+  actorObjectId                   String                       @map("actor_object_id")
+  representedOrganizationObjectId String?                      @map("represented_organization_object_id")
+  childAnchorId                   String                       @map("child_anchor_id")
+  familyAnchorId                  String                       @map("family_anchor_id")
+  childOwnerVersion               Int                          @map("child_owner_version")
+  familyOwnerVersion              Int                          @map("family_owner_version")
+  authoritySourceRef              String                       @map("authority_source_ref")
+  authoritySourceVersion          Int                          @map("authority_source_version")
+  principalProvenanceHash         String                       @map("principal_provenance_hash") @db.Char(64)
+  continuationContextHash         String                       @map("continuation_context_hash") @db.Char(64)
+  pairRelationEvidenceHash        String                       @map("pair_relation_evidence_hash") @db.Char(64)
+  currentOwnerEvidenceHash        String                       @map("current_owner_evidence_hash") @db.Char(64)
+  canonicalInputHash              String                       @map("canonical_input_hash") @db.Char(64)
+  pairCommitEvidenceHash          String                       @map("pair_commit_evidence_hash") @db.Char(64)
+  associationExpectationHash      String                       @map("association_expectation_hash") @db.Char(64)
+  scenarioCommandId               String                       @map("scenario_command_id") @db.VarChar(200)
+  scenarioCommandHash             String                       @map("scenario_command_hash") @db.Char(64)
+  requestNonceHash                String                       @map("request_nonce_hash") @db.Char(64)
+  hostIdentityEvidenceHash        String                       @map("host_identity_evidence_hash") @db.Char(64)
+  deadlineEvidenceHash            String                       @map("deadline_evidence_hash") @db.Char(64)
+  attemptLedgerHash               String                       @map("attempt_ledger_hash") @db.Char(64)
+  writerFenceHash                 String                       @map("writer_fence_hash") @db.Char(64)
+  effectDeadlineAt                DateTime                     @map("effect_deadline_at")
+  state                           NurtureC30PairOperationState @default(eligible)
+  childAssociationId              String?                      @unique(map: "uq_nurture_c30_pair_child_assoc") @map("child_association_id")
+  familyAssociationId             String?                      @unique(map: "uq_nurture_c30_pair_family_assoc") @map("family_association_id")
+  commandExecutionId              String?                      @unique(map: "uq_nurture_c30_pair_execution") @map("command_execution_id")
+  scenarioCommitEvidenceHash      String?                      @map("scenario_commit_evidence_hash") @db.Char(64)
+  noEffectFenceEvidenceHash       String?                      @map("no_effect_fence_evidence_hash") @db.Char(64)
+  committedAt                     DateTime?                    @map("committed_at")
+  recoveryCheckedAt               DateTime?                    @map("recovery_checked_at")
+  createdAt                       DateTime                     @default(now()) @map("created_at")
+  updatedAt                       DateTime                     @updatedAt @map("updated_at")
+
+  participant        NurtureParticipant                  @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  participantBinding NurtureParticipantPrincipalBinding? @relation(fields: [participantBindingId], references: [id], onDelete: Restrict)
+  childAnchor        NurtureChildBindingAnchor           @relation(fields: [childAnchorId], references: [id], onDelete: Restrict)
+  familyAnchor       NurtureFamilyBindingAnchor          @relation(fields: [familyAnchorId], references: [id], onDelete: Restrict)
+  childAssociation   NurtureChildAnchorAssociation?      @relation("NurtureC30ChildAssociation", fields: [childAssociationId], references: [id], onDelete: Restrict)
+  familyAssociation  NurtureFamilyAnchorAssociation?     @relation("NurtureC30FamilyAssociation", fields: [familyAssociationId], references: [id], onDelete: Restrict)
+  commandExecution   NurtureCommandExecution?            @relation("NurtureC30PairExecution", fields: [commandExecutionId], references: [id], onDelete: Restrict)
+  auditRecords       NurtureC30AuditRecord[]
+  outboxEvents       NurtureC30OutboxEvent[]
+
+  @@unique([workspaceId, scenarioCommandId], map: "uq_nurture_c30_pair_command")
+  @@index([workspaceId, scenarioKey, state, updatedAt], map: "ix_nurture_c30_pair_state")
+  @@map("nurture_c30_pair_operation")
+}
+
+model NurtureC30AuditRecord {
+  id             String   @id @default(uuid())
+  operationId    String   @map("operation_id") @db.VarChar(200)
+  eventKey       String   @map("event_key")
+  aggregateRef   String   @map("aggregate_ref")
+  executionRef   String?  @map("execution_ref")
+  evidenceHash   String   @map("evidence_hash") @db.Char(64)
+  correlationRef String   @map("correlation_ref")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  operation NurtureC30PairOperation @relation(fields: [operationId], references: [id], onDelete: Restrict)
+
+  @@unique([operationId, eventKey], map: "uq_nurture_c30_audit_event")
+  @@map("nurture_c30_audit_record")
+}
+
+model NurtureC30OutboxEvent {
+  id             String    @id @default(uuid())
+  operationId    String    @map("operation_id") @db.VarChar(200)
+  eventType      String    @map("event_type")
+  aggregateRef   String    @map("aggregate_ref")
+  executionRef   String?   @map("execution_ref")
+  participantRef String    @map("participant_ref")
+  correlationRef String    @map("correlation_ref")
+  evidenceHash   String    @map("evidence_hash") @db.Char(64)
+  publishedAt    DateTime? @map("published_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  operation NurtureC30PairOperation @relation(fields: [operationId], references: [id], onDelete: Restrict)
+
+  @@unique([operationId, eventType], map: "uq_nurture_c30_outbox_event")
+  @@index([publishedAt, createdAt], map: "ix_nurture_c30_outbox_delivery")
+  @@map("nurture_c30_outbox_event")
 }
 
 model NurtureChild {
@@ -1695,9 +1844,9 @@ model NurtureCareInstitution {
   updatedAt              DateTime                     @updatedAt @map("updated_at")
   deletedAt              DateTime?                    @map("deleted_at")
 
-  careGroups  NurtureCareGroup[]
-  enrollments NurtureEnrollment[]
-  mediaAssets NurtureMediaAssetRef[]
+  careGroups          NurtureCareGroup[]
+  enrollments         NurtureEnrollment[]
+  mediaAssets         NurtureMediaAssetRef[]
   publicationPolicies NurtureInstitutionPublicationPolicy[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
@@ -1708,23 +1857,23 @@ model NurtureCareInstitution {
 // versions; effectiveFrom/supersededAt select the one policy a T-006 consumer
 // may use at an instant. No row means dependency unavailable, never defaults.
 model NurtureInstitutionPublicationPolicy {
-  id                              String   @id @default(uuid())
-  workspaceId                     String   @map("workspace_id")
-  institutionId                   String   @map("institution_id")
-  policyRef                       String   @map("policy_ref")
-  policyVersion                   Int      @map("policy_version")
-  policyHead                      Int      @map("policy_head")
-  timeZone                        String   @map("time_zone")
-  defaultReleaseLocalTime         String   @map("default_release_local_time")
-  retryCutoffLocalTime            String   @map("retry_cutoff_local_time")
-  organizeIdleSeconds             Int      @map("organize_idle_seconds")
-  organizeFallbackLeadSeconds     Int      @map("organize_fallback_lead_seconds")
-  automaticQuiescenceSeconds      Int      @map("automatic_quiescence_seconds")
-  captureActivityLeaseSeconds     Int      @map("capture_activity_lease_seconds")
-  automaticOrganizeEnabled        Boolean  @map("automatic_organize_enabled")
-  effectiveFrom                   DateTime @map("effective_from")
-  supersededAt                    DateTime? @map("superseded_at")
-  createdAt                       DateTime @default(now()) @map("created_at")
+  id                          String    @id @default(uuid())
+  workspaceId                 String    @map("workspace_id")
+  institutionId               String    @map("institution_id")
+  policyRef                   String    @map("policy_ref")
+  policyVersion               Int       @map("policy_version")
+  policyHead                  Int       @map("policy_head")
+  timeZone                    String    @map("time_zone")
+  defaultReleaseLocalTime     String    @map("default_release_local_time")
+  retryCutoffLocalTime        String    @map("retry_cutoff_local_time")
+  organizeIdleSeconds         Int       @map("organize_idle_seconds")
+  organizeFallbackLeadSeconds Int       @map("organize_fallback_lead_seconds")
+  automaticQuiescenceSeconds  Int       @map("automatic_quiescence_seconds")
+  captureActivityLeaseSeconds Int       @map("capture_activity_lease_seconds")
+  automaticOrganizeEnabled    Boolean   @map("automatic_organize_enabled")
+  effectiveFrom               DateTime  @map("effective_from")
+  supersededAt                DateTime? @map("superseded_at")
+  createdAt                   DateTime  @default(now()) @map("created_at")
 
   institution NurtureCareInstitution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
 
@@ -1748,17 +1897,17 @@ model NurtureCareGroup {
   updatedAt           DateTime               @updatedAt @map("updated_at")
   deletedAt           DateTime?              @map("deleted_at")
 
-  institution    NurtureCareInstitution        @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  enrollments    NurtureEnrollment[]
-  threads        NurtureFamilyCareThread[]
-  items          NurtureFamilyCareItem[]
-  messages       NurtureFamilyCareMessage[]
-  dailyCareLogs  NurtureDailyCareLog[]
-  attentionItems NurtureTeacherAttentionItem[]
-  mediaAssets    NurtureMediaAssetRef[]
-  captures       NurtureCareCapture[]
-  captureBatches NurtureCareCaptureBatch[]
-  publishProcesses NurturePublishProcess[]
+  institution              NurtureCareInstitution           @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  enrollments              NurtureEnrollment[]
+  threads                  NurtureFamilyCareThread[]
+  items                    NurtureFamilyCareItem[]
+  messages                 NurtureFamilyCareMessage[]
+  dailyCareLogs            NurtureDailyCareLog[]
+  attentionItems           NurtureTeacherAttentionItem[]
+  mediaAssets              NurtureMediaAssetRef[]
+  captures                 NurtureCareCapture[]
+  captureBatches           NurtureCareCaptureBatch[]
+  publishProcesses         NurturePublishProcess[]
   contentSafetyAssessments NurtureContentSafetyAssessment[]
 
   @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
@@ -1780,9 +1929,9 @@ model NurtureEnrollment {
   updatedAt            DateTime                @updatedAt @map("updated_at")
   deletedAt            DateTime?               @map("deleted_at")
 
-  childCareProcess NurtureChildCareProcess   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  institution      NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  careGroup        NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess       @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  institution      NurtureCareInstitution        @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup        NurtureCareGroup              @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
   grants           NurtureChildLinkGrant[]
   receipts         NurtureChildLinkReceipt[]
   threads          NurtureFamilyCareThread[]
@@ -1856,8 +2005,8 @@ model NurtureChildLinkGrant {
   updatedAt              DateTime                    @updatedAt @map("updated_at")
   deletedAt              DateTime?                   @map("deleted_at")
 
-  childCareProcess NurtureChildCareProcess    @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  enrollment       NurtureEnrollment          @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess       @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment       NurtureEnrollment             @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
   receipts         NurtureChildLinkReceipt[]
   messages         NurtureFamilyCareMessage[]
   items            NurtureFamilyCareItem[]
@@ -1898,13 +2047,13 @@ model NurtureChildLinkReceipt {
   createdAt          DateTime                                @default(now()) @map("created_at")
   updatedAt          DateTime                                @updatedAt @map("updated_at")
 
-  grant            NurtureChildLinkGrant?               @relation(fields: [grantId], references: [id], onDelete: Restrict)
-  childCareProcess NurtureChildCareProcess              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  enrollment       NurtureEnrollment?                   @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
-  retryOfReceipt   NurtureChildLinkReceipt?             @relation("ReceiptRetry", fields: [retryOfReceiptId], references: [id], onDelete: Restrict)
-  retryReceipts    NurtureChildLinkReceipt[]            @relation("ReceiptRetry")
+  grant               NurtureChildLinkGrant?               @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  childCareProcess    NurtureChildCareProcess              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  enrollment          NurtureEnrollment?                   @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  retryOfReceipt      NurtureChildLinkReceipt?             @relation("ReceiptRetry", fields: [retryOfReceiptId], references: [id], onDelete: Restrict)
+  retryReceipts       NurtureChildLinkReceipt[]            @relation("ReceiptRetry")
   publicationReleases NurturePublicationRelease[]
-  corrections      NurtureFamilyCareMessageCorrection[]
+  corrections         NurtureFamilyCareMessageCorrection[]
 
   @@unique([workspaceId, direction, sourceType, sourceId, routingAttemptKey], map: "uq_nurture_receipt_route")
   @@index([workspaceId, grantId, status], map: "ix_nurture_receipt_grant")
@@ -2226,9 +2375,9 @@ model NurtureChildMediaAttribution {
   updatedAt                   DateTime                      @updatedAt @map("updated_at")
   deletedAt                   DateTime?                     @map("deleted_at")
 
-  mediaAssetRef    NurtureMediaAssetRef       @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
-  childCareProcess NurtureChildCareProcess    @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  confirmedBy      NurtureCareRoleAssignment? @relation(fields: [confirmedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  mediaAssetRef    NurtureMediaAssetRef           @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
+  childCareProcess NurtureChildCareProcess        @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  confirmedBy      NurtureCareRoleAssignment?     @relation(fields: [confirmedByRoleAssignmentId], references: [id], onDelete: Restrict)
   supersededBy     NurtureChildMediaAttribution?  @relation("AttributionSupersession", fields: [supersededByAttributionId], references: [id], onDelete: Restrict)
   supersedes       NurtureChildMediaAttribution[] @relation("AttributionSupersession")
 
@@ -2312,40 +2461,53 @@ model NurtureInteractionContext {
 }
 
 model NurtureCommandExecution {
-  id                             String                        @id @default(uuid())
-  workspaceId                    String                        @map("workspace_id")
-  commandRequestIdHash           String                        @map("command_request_id_hash") @db.Char(64)
-  originInvocationRequestIdHash  String                        @map("origin_invocation_request_id_hash") @db.Char(64)
-  parentCommandRequestIdHash     String?                       @map("parent_command_request_id_hash") @db.Char(64)
-  requestIdentityHashVersion     Int                           @default(1) @map("request_identity_hash_version")
-  commandKey                     String                        @map("command_key")
-  commandScope                   String                        @map("command_scope")
-  commandContractVersion         Int                           @map("command_contract_version")
-  payloadHash                    String                        @map("payload_hash") @db.Char(64)
-  payloadCanonicalizationVersion Int                           @default(1) @map("payload_canonicalization_version")
-  businessActorRef               String                        @map("business_actor_ref")
-  primaryScopeRef                Json?                         @map("primary_scope_ref")
-  childCareProcessId             String?                       @map("child_care_process_id")
-  targetRefs                     Json?                         @map("target_refs")
-  businessOutcome                NurtureCommandBusinessOutcome @map("business_outcome")
-  outputRefs                     Json                          @map("output_refs")
-  handoffSnapshotSchemaVersion   Int                           @default(1) @map("handoff_snapshot_schema_version")
-  handoffRequestSnapshotsPayload Json                          @map("handoff_request_snapshots_payload")
-  handoffDriverRef               Json?                         @map("handoff_driver_ref")
+  id                              String                        @id @default(uuid())
+  workspaceId                     String                        @map("workspace_id")
+  commandRequestIdHash            String                        @map("command_request_id_hash") @db.Char(64)
+  originInvocationRequestIdHash   String                        @map("origin_invocation_request_id_hash") @db.Char(64)
+  parentCommandRequestIdHash      String?                       @map("parent_command_request_id_hash") @db.Char(64)
+  requestIdentityHashVersion      Int                           @default(1) @map("request_identity_hash_version")
+  commandKey                      String                        @map("command_key")
+  commandScope                    String                        @map("command_scope")
+  commandContractVersion          Int                           @map("command_contract_version")
+  payloadHash                     String                        @map("payload_hash") @db.Char(64)
+  payloadCanonicalizationVersion  Int                           @default(1) @map("payload_canonicalization_version")
+  businessActorRef                String                        @map("business_actor_ref")
+  actorPrincipalBindingId         String?                       @map("actor_principal_binding_id")
+  actorBindingVersion             Int?                          @map("actor_binding_version")
+  actorAccountRef                 Json?                         @map("actor_account_ref")
+  actorRef                        Json?                         @map("actor_ref")
+  actorWorkspaceRef               Json?                         @map("actor_workspace_ref")
+  actorRepresentedOrganizationRef Json?                         @map("actor_represented_organization_ref")
+  invocationProvenance            Json?                         @map("invocation_provenance")
+  scenarioKey                     String?                       @map("scenario_key")
+  scenarioEffectIdentityHash      String?                       @map("scenario_effect_identity_hash") @db.Char(64)
+  executionDriver                 String?                       @map("execution_driver")
+  primaryScopeRef                 Json?                         @map("primary_scope_ref")
+  childCareProcessId              String?                       @map("child_care_process_id")
+  targetRefs                      Json?                         @map("target_refs")
+  businessOutcome                 NurtureCommandBusinessOutcome @map("business_outcome")
+  outputRefs                      Json                          @map("output_refs")
+  handoffSnapshotSchemaVersion    Int                           @default(1) @map("handoff_snapshot_schema_version")
+  handoffRequestSnapshotsPayload  Json                          @map("handoff_request_snapshots_payload")
+  handoffDriverRef                Json?                         @map("handoff_driver_ref")
   // G2 immutable committed result — 10-g2-schema-freeze.md (D7). Required for
   // harness_g2_v1 writes; commandExecutionRef stays the only result authority.
-  resultSchemaVersion            Int?                          @map("result_schema_version")
-  committedResultPayload         Json?                         @map("committed_result_payload")
-  committedAt                    DateTime                      @default(now()) @map("committed_at")
+  resultSchemaVersion             Int?                          @map("result_schema_version")
+  committedResultPayload          Json?                         @map("committed_result_payload")
+  committedAt                     DateTime                      @default(now()) @map("committed_at")
 
-  childCareProcess NurtureChildCareProcess?             @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  corrections      NurtureFamilyCareMessageCorrection[]
-  cascadeAudits    NurtureFamilyCareCascadeAudit[]
-  visibilityEvents NurturePublicationVisibilityEvent[]
+  childCareProcess      NurtureChildCareProcess?             @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  corrections           NurtureFamilyCareMessageCorrection[]
+  cascadeAudits         NurtureFamilyCareCascadeAudit[]
+  visibilityEvents      NurturePublicationVisibilityEvent[]
+  actorPrincipalBinding NurtureParticipantPrincipalBinding?  @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
+  c30PairOperation      NurtureC30PairOperation?             @relation("NurtureC30PairExecution")
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
   @@index([workspaceId, childCareProcessId, committedAt], map: "ix_nurture_command_execution_process")
+  @@index([workspaceId, actorPrincipalBindingId, committedAt], map: "ix_nurture_command_execution_actor_binding")
   @@map("nurture_command_execution")
 }
 
@@ -2359,15 +2521,15 @@ model NurtureCommandExecution {
 // Explicit Goal <-> ChildCareProcess association. A child hint inside
 // `goalPayload` is never inferred as child scope.
 model NurtureFocusGoalChildScope {
-  id                 String   @id @default(uuid())
-  workspaceId        String   @map("workspace_id")
-  focusGoalId        String   @map("focus_goal_id")
-  childCareProcessId String   @map("child_care_process_id")
-  scopeVersion       Int      @default(1) @map("scope_version")
-  provenancePayload  Json?    @map("provenance_payload")
-  aggregateVersion   Int      @default(0) @map("aggregate_version")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  workspaceId        String    @map("workspace_id")
+  focusGoalId        String    @map("focus_goal_id")
+  childCareProcessId String    @map("child_care_process_id")
+  scopeVersion       Int       @default(1) @map("scope_version")
+  provenancePayload  Json?     @map("provenance_payload")
+  aggregateVersion   Int       @default(0) @map("aggregate_version")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
   deletedAt          DateTime? @map("deleted_at")
 
   focusGoal        NurtureFocusGoal        @relation(fields: [focusGoalId], references: [id], onDelete: Restrict)
@@ -2381,29 +2543,29 @@ model NurtureFocusGoalChildScope {
 // CareGroup-internal source material. Existence never implies family
 // visibility, and protected content lives behind the same envelope as T-005.
 model NurtureCareCapture {
-  id                       String                 @id @default(uuid())
-  workspaceId              String                 @map("workspace_id")
-  careGroupId              String                 @map("care_group_id")
-  captureBatchId           String?                @map("capture_batch_id")
-  capturedByRoleAssignmentId String               @map("captured_by_role_assignment_id")
-  kind                     NurtureCareCaptureKind
+  id                         String                 @id @default(uuid())
+  workspaceId                String                 @map("workspace_id")
+  careGroupId                String                 @map("care_group_id")
+  captureBatchId             String?                @map("capture_batch_id")
+  capturedByRoleAssignmentId String                 @map("captured_by_role_assignment_id")
+  kind                       NurtureCareCaptureKind
   // Monotonic intake order inside the batch; the watermark is expressed in it.
-  sourceSequence           Int                    @map("source_sequence")
+  sourceSequence             Int                    @map("source_sequence")
   // False while an upload or save is still in flight. Only a stable prefix is cut.
-  stable                   Boolean                @default(false)
-  bodyProtectionPayload    Json?                  @map("body_protection_payload")
-  transcriptRevision       String?                @map("transcript_revision")
+  stable                     Boolean                @default(false)
+  bodyProtectionPayload      Json?                  @map("body_protection_payload")
+  transcriptRevision         String?                @map("transcript_revision")
   // Stable deterministic safety rule keys derived at intake, while the
   // ingesting path still holds the plaintext. Rule keys only: never body,
   // never model prose. NULL means "never derived" and is not the same fact as
   // an empty list, so the safety port can fail closed on an unread source.
-  safetyMarkersPayload     Json?                  @map("safety_markers_payload")
-  mediaAssetRefId          String?                @map("media_asset_ref_id")
-  occurredAt               DateTime               @map("occurred_at")
-  aggregateVersion         Int                    @default(0) @map("aggregate_version")
-  createdAt                DateTime               @default(now()) @map("created_at")
-  updatedAt                DateTime               @updatedAt @map("updated_at")
-  deletedAt                DateTime?              @map("deleted_at")
+  safetyMarkersPayload       Json?                  @map("safety_markers_payload")
+  mediaAssetRefId            String?                @map("media_asset_ref_id")
+  occurredAt                 DateTime               @map("occurred_at")
+  aggregateVersion           Int                    @default(0) @map("aggregate_version")
+  createdAt                  DateTime               @default(now()) @map("created_at")
+  updatedAt                  DateTime               @updatedAt @map("updated_at")
+  deletedAt                  DateTime?              @map("deleted_at")
 
   careGroup     NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
   captureBatch  NurtureCareCaptureBatch?  @relation(fields: [captureBatchId], references: [id], onDelete: Restrict)
@@ -2419,24 +2581,24 @@ model NurtureCareCapture {
 // decided under and the stable source watermark it cut at — never the raw
 // device operation stream.
 model NurtureCareCaptureBatch {
-  id                    String                             @id @default(uuid())
-  workspaceId           String                             @map("workspace_id")
-  careGroupId           String                             @map("care_group_id")
-  state                 NurtureCareCaptureBatchState
-  resolvedTrigger       NurtureCareCaptureOrganizeTrigger? @map("resolved_trigger")
-  triggerRequestId      String?                            @map("trigger_request_id")
-  policyRef             String?                            @map("policy_ref")
-  policyHead            Int?                               @map("policy_head")
-  timeZone              String?                            @map("time_zone")
-  quiescenceSeconds     Int?                               @map("quiescence_seconds")
-  observedUserActivityAt DateTime?                         @map("observed_user_activity_at")
-  watermarkSourceSequence Int?                             @map("watermark_source_sequence")
-  cutAt                 DateTime?                          @map("cut_at")
-  aggregateVersion      Int                                @default(0) @map("aggregate_version")
-  createdAt             DateTime                           @default(now()) @map("created_at")
-  updatedAt             DateTime                           @updatedAt @map("updated_at")
+  id                      String                             @id @default(uuid())
+  workspaceId             String                             @map("workspace_id")
+  careGroupId             String                             @map("care_group_id")
+  state                   NurtureCareCaptureBatchState
+  resolvedTrigger         NurtureCareCaptureOrganizeTrigger? @map("resolved_trigger")
+  triggerRequestId        String?                            @map("trigger_request_id")
+  policyRef               String?                            @map("policy_ref")
+  policyHead              Int?                               @map("policy_head")
+  timeZone                String?                            @map("time_zone")
+  quiescenceSeconds       Int?                               @map("quiescence_seconds")
+  observedUserActivityAt  DateTime?                          @map("observed_user_activity_at")
+  watermarkSourceSequence Int?                               @map("watermark_source_sequence")
+  cutAt                   DateTime?                          @map("cut_at")
+  aggregateVersion        Int                                @default(0) @map("aggregate_version")
+  createdAt               DateTime                           @default(now()) @map("created_at")
+  updatedAt               DateTime                           @updatedAt @map("updated_at")
 
-  careGroup        NurtureCareGroup       @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  careGroup        NurtureCareGroup        @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
   captures         NurtureCareCapture[]
   publishProcesses NurturePublishProcess[]
 
@@ -2449,45 +2611,45 @@ model NurtureCareCaptureBatch {
 // The caregiver-side content work unit. It owns no upload, CareInteraction,
 // ActionDelivery or Institution Workflow state.
 model NurturePublishProcess {
-  id                   String                     @id @default(uuid())
-  workspaceId          String                     @map("workspace_id")
-  careGroupId          String                     @map("care_group_id")
-  captureBatchId       String?                    @map("capture_batch_id")
-  processKey           String                     @map("process_key")
-  state                NurturePublishProcessState
-  dataClass            NurtureGrantDataClass      @map("data_class")
-  purposeKey           String                     @map("purpose_key")
-  currentRevisionId    String?                    @unique @map("current_revision_id")
+  id                          String                     @id @default(uuid())
+  workspaceId                 String                     @map("workspace_id")
+  careGroupId                 String                     @map("care_group_id")
+  captureBatchId              String?                    @map("capture_batch_id")
+  processKey                  String                     @map("process_key")
+  state                       NurturePublishProcessState
+  dataClass                   NurtureGrantDataClass      @map("data_class")
+  purposeKey                  String                     @map("purpose_key")
+  currentRevisionId           String?                    @unique @map("current_revision_id")
   // Set by the first committed target release; the shared revision is frozen then.
-  frozenRevisionId     String?                    @map("frozen_revision_id")
+  frozenRevisionId            String?                    @map("frozen_revision_id")
   // Resolved once from the T-007 window and never silently moved afterwards.
-  scheduledAt          DateTime?                  @map("scheduled_at")
-  notAfter             DateTime?                  @map("not_after")
-  scheduleTimeZone     String?                    @map("schedule_time_zone")
-  schedulePolicyRef    String?                    @map("schedule_policy_ref")
-  schedulePolicyHead   Int?                       @map("schedule_policy_head")
+  scheduledAt                 DateTime?                  @map("scheduled_at")
+  notAfter                    DateTime?                  @map("not_after")
+  scheduleTimeZone            String?                    @map("schedule_time_zone")
+  schedulePolicyRef           String?                    @map("schedule_policy_ref")
+  schedulePolicyHead          Int?                       @map("schedule_policy_head")
   // Frozen at resolution. These were being substituted by `aggregateVersion`
   // and `updatedAt`, which a reschedule moves — so a reschedule appeared to
   // change the policy version and the moment the window was resolved.
-  schedulePolicyVersion Int?                      @map("schedule_policy_version")
-  scheduleResolvedAt   DateTime?                  @map("schedule_resolved_at")
-  authorizingRoleAssignmentId String?             @map("authorizing_role_assignment_id")
+  schedulePolicyVersion       Int?                       @map("schedule_policy_version")
+  scheduleResolvedAt          DateTime?                  @map("schedule_resolved_at")
+  authorizingRoleAssignmentId String?                    @map("authorizing_role_assignment_id")
   // The instant the pre-release cancel committed. `updatedAt` cannot stand in:
   // anything else touching the row moves it, so an idempotent repeat of the
   // cancel would report a moment the cancel did not happen at.
-  cancelledAt          DateTime?                  @map("cancelled_at")
-  aggregateVersion     Int                        @default(0) @map("aggregate_version")
-  createdAt            DateTime                   @default(now()) @map("created_at")
-  updatedAt            DateTime                   @updatedAt @map("updated_at")
+  cancelledAt                 DateTime?                  @map("cancelled_at")
+  aggregateVersion            Int                        @default(0) @map("aggregate_version")
+  createdAt                   DateTime                   @default(now()) @map("created_at")
+  updatedAt                   DateTime                   @updatedAt @map("updated_at")
 
-  careGroup          NurtureCareGroup                  @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  captureBatch       NurtureCareCaptureBatch?          @relation(fields: [captureBatchId], references: [id], onDelete: Restrict)
-  currentRevision    NurturePublishProcessRevision?    @relation("PublishProcessCurrentRevision", fields: [currentRevisionId], references: [id], onDelete: Restrict)
-  revisions          NurturePublishProcessRevision[]   @relation("PublishProcessRevisions")
-  targets            NurturePublishProcessTarget[]
-  editHold           NurturePublishEditHold?
-  safetyAssessments  NurtureContentSafetyAssessment[]
-  releases           NurturePublicationRelease[]
+  careGroup         NurtureCareGroup                 @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  captureBatch      NurtureCareCaptureBatch?         @relation(fields: [captureBatchId], references: [id], onDelete: Restrict)
+  currentRevision   NurturePublishProcessRevision?   @relation("PublishProcessCurrentRevision", fields: [currentRevisionId], references: [id], onDelete: Restrict)
+  revisions         NurturePublishProcessRevision[]  @relation("PublishProcessRevisions")
+  targets           NurturePublishProcessTarget[]
+  editHold          NurturePublishEditHold?
+  safetyAssessments NurtureContentSafetyAssessment[]
+  releases          NurturePublicationRelease[]
 
   @@unique([workspaceId, processKey], map: "uq_nurture_publish_process_key")
   @@index([workspaceId, careGroupId, state, createdAt], map: "ix_nurture_publish_process_group")
@@ -2497,27 +2659,27 @@ model NurturePublishProcess {
 // Append-only shared composition. There is no target-specific hidden body:
 // different content for a different family means a different process.
 model NurturePublishProcessRevision {
-  id                    String   @id @default(uuid())
-  workspaceId           String   @map("workspace_id")
-  publishProcessId      String   @map("publish_process_id")
-  revision              Int
-  contentDigest         String   @map("content_digest")
-  organizerInputRevision String  @map("organizer_input_revision")
+  id                      String   @id @default(uuid())
+  workspaceId             String   @map("workspace_id")
+  publishProcessId        String   @map("publish_process_id")
+  revision                Int
+  contentDigest           String   @map("content_digest")
+  organizerInputRevision  String   @map("organizer_input_revision")
   // The command that produced this revision. `organizerInputRevision` carries
   // the assembler's input revision and was being searched by command id, so the
   // replay lookup could never match; this is the identity it needs.
-  commandRequestIdHash   String? @map("command_request_id_hash") @db.Char(64)
-  templateKey           String?  @map("template_key")
-  templateVersion       String?  @map("template_version")
-  titleProtectionPayload Json?   @map("title_protection_payload")
-  bodyProtectionPayload Json?    @map("body_protection_payload")
-  mediaCompositionPayload Json?  @map("media_composition_payload")
-  sourceRefsPayload     Json?    @map("source_refs_payload")
-  savedByRoleAssignmentId String? @map("saved_by_role_assignment_id")
-  createdAt             DateTime @default(now()) @map("created_at")
+  commandRequestIdHash    String?  @map("command_request_id_hash") @db.Char(64)
+  templateKey             String?  @map("template_key")
+  templateVersion         String?  @map("template_version")
+  titleProtectionPayload  Json?    @map("title_protection_payload")
+  bodyProtectionPayload   Json?    @map("body_protection_payload")
+  mediaCompositionPayload Json?    @map("media_composition_payload")
+  sourceRefsPayload       Json?    @map("source_refs_payload")
+  savedByRoleAssignmentId String?  @map("saved_by_role_assignment_id")
+  createdAt               DateTime @default(now()) @map("created_at")
 
-  publishProcess NurturePublishProcess          @relation("PublishProcessRevisions", fields: [publishProcessId], references: [id], onDelete: Restrict)
-  currentOf      NurturePublishProcess?         @relation("PublishProcessCurrentRevision")
+  publishProcess NurturePublishProcess       @relation("PublishProcessRevisions", fields: [publishProcessId], references: [id], onDelete: Restrict)
+  currentOf      NurturePublishProcess?      @relation("PublishProcessCurrentRevision")
   releases       NurturePublicationRelease[]
 
   @@unique([workspaceId, publishProcessId, revision], map: "uq_nurture_publish_revision")
@@ -2579,26 +2741,26 @@ model NurturePublishEditHold {
 // Append-only route decisions. Structured risk codes and heads only: never a
 // sensitive body, an image or model chain-of-thought.
 model NurtureContentSafetyAssessment {
-  id                    String                   @id @default(uuid())
-  workspaceId           String                   @map("workspace_id")
+  id                     String                    @id @default(uuid())
+  workspaceId            String                    @map("workspace_id")
   // NULL for `direct_interaction_required`: that route deliberately creates no
   // publication candidate, so the most safety-relevant decision of all had
   // nowhere to be recorded while this column was required.
-  publishProcessId      String?                  @map("publish_process_id")
+  publishProcessId       String?                   @map("publish_process_id")
   // The anchor that does not depend on a process. Always set, so every
   // assessment is addressable whichever route it took.
-  careGroupId           String                   @map("care_group_id")
-  organizerInputRevision String                  @map("organizer_input_revision")
-  route                 NurtureContentSafetyRoute
-  policyRef             String                   @map("policy_ref")
-  policyHead            Int                      @map("policy_head")
-  ruleRevision          String                   @map("rule_revision")
-  providerRevision      String?                  @map("provider_revision")
-  modelRevision         String?                  @map("model_revision")
-  promptPolicyRevision  String?                  @map("prompt_policy_revision")
-  riskCodesPayload      Json                     @map("risk_codes_payload")
-  sourceHeadsPayload    Json                     @map("source_heads_payload")
-  assessedAt            DateTime                 @default(now()) @map("assessed_at")
+  careGroupId            String                    @map("care_group_id")
+  organizerInputRevision String                    @map("organizer_input_revision")
+  route                  NurtureContentSafetyRoute
+  policyRef              String                    @map("policy_ref")
+  policyHead             Int                       @map("policy_head")
+  ruleRevision           String                    @map("rule_revision")
+  providerRevision       String?                   @map("provider_revision")
+  modelRevision          String?                   @map("model_revision")
+  promptPolicyRevision   String?                   @map("prompt_policy_revision")
+  riskCodesPayload       Json                      @map("risk_codes_payload")
+  sourceHeadsPayload     Json                      @map("source_heads_payload")
+  assessedAt             DateTime                  @default(now()) @map("assessed_at")
 
   publishProcess NurturePublishProcess? @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
   careGroup      NurtureCareGroup       @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
@@ -2611,16 +2773,16 @@ model NurtureContentSafetyAssessment {
 // The immutable per-target committed effect, bound to the frozen revision, the
 // exact authority that released it and its logical Receipt.
 model NurturePublicationRelease {
-  id                          String                       @id @default(uuid())
-  workspaceId                 String                       @map("workspace_id")
-  publishProcessId            String                       @map("publish_process_id")
-  publishProcessTargetId      String                       @unique @map("publish_process_target_id")
-  publishProcessRevisionId    String                       @map("publish_process_revision_id")
-  releasedByRoleAssignmentId  String                       @map("released_by_role_assignment_id")
-  commandRequestIdHash        String                       @map("command_request_id_hash")
-  receiptId                   String?                      @map("receipt_id")
-  visibility                  NurturePublicationVisibility @default(visible)
-  committedAt                 DateTime                     @default(now()) @map("committed_at")
+  id                         String                       @id @default(uuid())
+  workspaceId                String                       @map("workspace_id")
+  publishProcessId           String                       @map("publish_process_id")
+  publishProcessTargetId     String                       @unique @map("publish_process_target_id")
+  publishProcessRevisionId   String                       @map("publish_process_revision_id")
+  releasedByRoleAssignmentId String                       @map("released_by_role_assignment_id")
+  commandRequestIdHash       String                       @map("command_request_id_hash")
+  receiptId                  String?                      @map("receipt_id")
+  visibility                 NurturePublicationVisibility @default(visible)
+  committedAt                DateTime                     @default(now()) @map("committed_at")
 
   publishProcess   NurturePublishProcess               @relation(fields: [publishProcessId], references: [id], onDelete: Restrict)
   target           NurturePublishProcessTarget         @relation(fields: [publishProcessTargetId], references: [id], onDelete: Restrict)
@@ -2641,18 +2803,18 @@ model NurturePublicationRelease {
 // Append-only correction/removal/redaction lineage. It never deletes the
 // release, the Receipt or the audit trail.
 model NurturePublicationVisibilityEvent {
-  id                     String                                @id @default(uuid())
-  workspaceId            String                                @map("workspace_id")
-  publicationReleaseId   String                                @map("publication_release_id")
-  kind                   NurturePublicationVisibilityEventKind
-  reasonKey              String                                @map("reason_key")
-  actorRoleAssignmentId  String                                @map("actor_role_assignment_id")
-  sourceReleaseRevision  Int                                   @map("source_release_revision")
-  bodyProtectionPayload  Json?                                 @map("body_protection_payload")
+  id                    String                                @id @default(uuid())
+  workspaceId           String                                @map("workspace_id")
+  publicationReleaseId  String                                @map("publication_release_id")
+  kind                  NurturePublicationVisibilityEventKind
+  reasonKey             String                                @map("reason_key")
+  actorRoleAssignmentId String                                @map("actor_role_assignment_id")
+  sourceReleaseRevision Int                                   @map("source_release_revision")
+  bodyProtectionPayload Json?                                 @map("body_protection_payload")
   // Both closest analogues carry this; without it the lineage cannot name the
   // command behind it and a replay has nothing to be a no-op against.
-  commandExecutionId     String?                               @map("command_execution_id")
-  occurredAt             DateTime                              @default(now()) @map("occurred_at")
+  commandExecutionId    String?                               @map("command_execution_id")
+  occurredAt            DateTime                              @default(now()) @map("occurred_at")
 
   publicationRelease NurturePublicationRelease @relation(fields: [publicationReleaseId], references: [id], onDelete: Restrict)
   commandExecution   NurtureCommandExecution?  @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict)

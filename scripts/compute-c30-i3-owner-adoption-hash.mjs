@@ -47,6 +47,21 @@ const profileDefinitions = [
       "packages/nurture-scenario/tests/c30/trusted-invocation.test.ts",
     ],
   },
+  {
+    source_identity: "nurture_c30_pair_local_persistence_v1",
+    files: [
+      "docs/context/db/schema.json",
+      "docs/context/registry.json",
+      "packages/nurture-db/src/c30/nonce-store.ts",
+      "packages/nurture-db/src/c30/pair-association.repository.ts",
+      "packages/nurture-db/src/c30/participant-binding.ts",
+      "packages/nurture-db/src/index.ts",
+      "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
+      "packages/nurture-scenario/src/c30/pair-association.ts",
+      "prisma/migrations/20260806120000_c30_i3_pair_owner_foundation/migration.sql",
+      "prisma/schema.prisma",
+    ],
+  },
 ];
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
