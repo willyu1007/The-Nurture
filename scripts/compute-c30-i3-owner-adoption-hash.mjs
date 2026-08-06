@@ -105,6 +105,23 @@ const profileDefinitions = [
       "prisma/schema.prisma",
     ],
   },
+  {
+    source_identity: "nurture_c30_cumulative_convergence_v1",
+    files: [
+      "package.json",
+      "packages/nurture-scenario/scenario.manifest.yaml",
+      "packages/nurture-scenario/src/generated/manifest.generated.ts",
+      "packages/nurture-scenario/src/module.ts",
+      "packages/nurture-scenario/tests/c30/cumulative-convergence.test.ts",
+      "packages/nurture-scenario/tests/c30/full-graph.fixture.ts",
+      "prisma/schema.prisma",
+      "scripts/assert-test-routing.mjs",
+      "scripts/compute-c30-i3-owner-adoption-hash.mjs",
+      "scripts/generate-nurture-scenario-manifest.mjs",
+      "scripts/verify-c30-i3-default-off.mjs",
+      "scripts/verify-c30-i3-upstream.mjs",
+    ],
+  },
 ];
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");

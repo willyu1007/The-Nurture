@@ -68,6 +68,7 @@
     "test:workflow-contract-pin": "node --test scripts/verify-workflow-contract-pin.test.mjs",
     "verify:workflow-contract-pin": "node scripts/verify-workflow-contract-pin.mjs",
     "verify:c30-i3-upstream": "node scripts/verify-c30-i3-upstream.mjs",
+    "verify:c30-i3-default-off": "node scripts/verify-c30-i3-default-off.mjs",
     "hash:c30-i3-owner-adoption": "node scripts/compute-c30-i3-owner-adoption-hash.mjs",
     "verify:c30-i3-owner-adoption": "node scripts/compute-c30-i3-owner-adoption-hash.mjs --check docs/project/integrations/c30-i3-owner-adoption-lock.json"
   },

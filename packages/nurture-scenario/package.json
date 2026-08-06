@@ -28,7 +28,7 @@
     "check:manifest": "node ../../scripts/generate-nurture-scenario-manifest.mjs --check",
     "build": "pnpm run check:manifest && pnpm run clean && tsc -p tsconfig.build.json",
     "typecheck": "pnpm run check:manifest && tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run --root ../.."
   },
   "dependencies": {
     "@my-chat/workflow-contracts": "0.1.0"
