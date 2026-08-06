@@ -1761,3 +1761,31 @@ silently bypass CLI execution. Exact lock verification and repository false/empt
 census prove only source state; they do not imply compiled baseline success,
 database/environment emptiness, schema authority, capability admission, deployment,
 activation, Pilot or traffic authority.
+
+## C30-I1 neutral Base manifest convergence boundary
+
+The accepted I1-F Base extension is one optional, closed
+`ScenarioManifestV2.scenario_contracts` envelope. Omission preserves historical
+manifest v2 behavior; presence is all-or-fatal and cannot reinterpret legacy
+capabilities, actions, routes, handlers or surface mappings. The exact dependency
+chain is trusted invocation → subject presentation → domain action → protected
+interaction. Each node declares its exact source set, and only a complete prefix
+is valid.
+
+The declaration graph is bidirectionally closed: trusted operation/ingress,
+provider, presentation, product surface, I1-D action and I1-E protected rows must
+resolve their exact counterparts. The action path binds one static driver,
+scenario, handler, entitled ingress, offering surface and command metadata;
+protected declarations reuse that action plus the exact prepare/read pair and add
+no body, third driver or generic commit/erase operation. Base validates graph and
+availability only. It performs no dispatch, authorization, rendering, persistence,
+carrier handling or activation.
+
+F4 retains the aggregate Base source hash as a separate existing identity and adds
+four explicit profiles: platform child/family identity, Scenario interface,
+domain action and protected interaction. Each profile hashes only normalized Base
+contract TypeScript, exported Schemas and common manifest/module validation bytes.
+My-Chat adoption/runtime, Nurture owner/domain adapters and joint qualification
+must create their own exact downstream identities in a separately authorized
+C30-I2+ sequence. The accepted Base lock therefore makes I2 review eligible; it
+does not make any consumer or capability eligible for activation.

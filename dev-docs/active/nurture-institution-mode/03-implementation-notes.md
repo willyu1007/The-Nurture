@@ -5,7 +5,38 @@
 - Current status: `in-progress`
 - Last updated: 2026-08-06
 
+## Next concrete actions (not yet authorized)
+
+1. Obtain explicit authorization for a C30-I2 scope review/freeze; do not infer it
+   from I1 acceptance.
+2. After authorization, resume with
+   `node .ai/scripts/ctl-project-governance.mjs resume --task T-002 --json` and
+   use artifact 48 plus `docs/context/workflow/nurture-scenario-contract.md` as
+   the immutable Base handoff/current boundary.
+3. Produce a separate I2 freeze artifact before any My-Chat/Nurture consumer
+   source, manifest adoption, database, capability or runtime action. Any I2
+   implementation still requires its own subsequent authorization.
+
 ## What changed
+
+- 2026-08-06: Completed the authorized `C30-I1-F` chain in strict F1→F4
+  order. F1 (`0ce22b6…`) adds the optional closed dependency/source graph; F2
+  (`c317795…`) adds trusted ingress, subject provider/presentation and product
+  surface declarations plus exact Host support/legacy no-alias gates; F3
+  (`f59f506…`) reuses the accepted I1-D/I1-E static contracts and closes
+  action/ingress/surface/handler/protected references; F4 source `3d91591…` adds
+  four deterministic named source profiles and exact portability/revision checks.
+  Metadata-only lock `afe47e8…` points to that source, preserves the aggregate
+  22-TypeScript-file meaning at hash `33df7df9…39cd` and publishes the four exact
+  profile hashes recorded in artifact 48. Three full Base verifiers pass with 66
+  Schemas, 435 Node tests, runtime 34/34 and Scenario 10/10; two isolated
+  contracts/runtime/Scenario builds and source manifests are byte-identical.
+  Artifacts 45-48 preserve unit evidence, cumulative qualification and rollback.
+  My-Chat remained clean at `dc4a77b…`; Nurture product source remained unchanged.
+  No database/Prisma/PostgreSQL, consumer, starter manifest, env/KMS, deployment,
+  capability/Workspace activation, T-008, Pilot or traffic action ran. C30-I1
+  neutral Base contracts are accepted; only a separately authorized C30-I2 scope
+  review/freeze is eligible next.
 
 - 2026-08-06: Reused T-002 and froze only the `C30-I1-F` neutral Base
   dependency/source convergence scope in artifact 44. The current Base has one

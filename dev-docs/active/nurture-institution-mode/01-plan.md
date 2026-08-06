@@ -638,14 +638,14 @@ qualified Pilot artifact, applied migration, or release approval.
 | `C30-I0-C` scoped commits and clean worktrees | Complete | Exact isolated branches exist at Base `20c4b7a…` and My-Chat `dc4a77b…`; the Nurture branch was created from runtime checkpoint `882d80f…` and may advance only through T-002 evidence documentation. Historical X5/Q4B5/T-029/T-027/Claude worktrees are clean and retained under their owners; the dirty My-Chat primary `next-env.d.ts` is excluded and untouched. |
 | `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
 
-`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A～I1-E
-验收。I1-F 范围已冻结；F1-F4 均未实施，下一步仅可另行授权 F1。数据库 apply、环境 row census、
+`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A～I1-F
+验收。I1-F 的 F1-F4 已按顺序闭环，下一步仅可另行授权 C30-I2 范围评审/冻结。数据库 apply、环境 row census、
 capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
 
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C/I1-D/I1-E 已验收；I1-F 范围已冻结）
+## C30-I1 — Neutral shared contracts（I1-A～I1-F 已验收）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -657,7 +657,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | `C30-I1-C` subject presentation | Accepted | Successor source `ae0c357…` plus lock `3c30337…`; R1-R6 and repeated Schema/codec/exposure/build/conformance pass at hash `fc35c6b…e5cf3`. No consumer adoption. |
 | `C30-I1-D` domain action | Reaccepted | Artifact 35 closes D-R1..D-R5 at source `3580a9b…` plus metadata lock `1cb5691…`; 55 Schemas, 296 Node tests and deterministic build/source evidence pass. Manifest dependency/source convergence remains I1-F. |
 | `C30-I1-E` protected interaction | Reaccepted | Artifact 43 closes E-R1..E-R4 at source `48fd3d6…` plus metadata lock `9abde2b…`; 66 Schemas, 376 Node tests and deterministic build/source evidence pass. The artifact-41 chain is historical. |
-| `C30-I1-F` dependency/source convergence | Scope frozen / implementation not authorized | Artifact 44 freezes the optional closed `scenario_contracts` area, exact four-capability/source graph, parity, exclusions, named profiles and F1-F4 ordering. |
+| `C30-I1-F` dependency/source convergence | Accepted | Artifacts 45-48 close ordered F1-F4 at Base source `3d91591…` plus metadata lock `afe47e8…`; the closed manifest graph, exact aliases/references, four named profiles, 66 Schemas, 435 Node tests and repeated deterministic qualification pass. |
 
 I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
 criteria and non-goals are frozen in
@@ -718,10 +718,15 @@ reopening and bounded successor-repair scope are recorded in
 historical. The successor repair qualification and source-lock checkpoint are
 recorded in [`artifact 43`](./artifacts/43-c30-i1-e5-successor-quality-repair-qualification-record.md).
 I1-E is reaccepted. I1-F dependency/source convergence and ordered F1-F4 gates
-are frozen in [`artifact 44`](./artifacts/44-c30-i1-f-scope-freeze.md). The only
-eligible next decision is separate I1-F1 implementation authorization; F1-F4
-remain unstarted.
-No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
+were frozen in [`artifact 44`](./artifacts/44-c30-i1-f-scope-freeze.md).
+Artifacts [`45`](./artifacts/45-c30-i1-f1-dependency-graph-implementation-record.md),
+[`46`](./artifacts/46-c30-i1-f2-interface-convergence-implementation-record.md),
+[`47`](./artifacts/47-c30-i1-f3-action-protected-convergence-implementation-record.md)
+and [`48`](./artifacts/48-c30-i1-f4-cumulative-qualification-record.md) record the
+accepted implementation and immutable Base handoff. The full I1-A..F Base exit is
+now `C30_I1_BASE_CONTRACTS_ACCEPTED`; the only eligible next decision is a
+separately authorized C30-I2 scope review/freeze. It does not authorize C30-I2
+implementation or any consumer/operational action.
 
 ---
 

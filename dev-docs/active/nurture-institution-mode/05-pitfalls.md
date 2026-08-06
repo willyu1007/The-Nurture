@@ -2075,3 +2075,67 @@ This file exists to prevent repeating mistakes within this task.
   scanners must state their entropy threshold and never be described as semantic
   DLP. Every lifecycle time must be checked against both lower and current-time
   bounds, and every runtime key normalization rule needs generated parity coverage.
+
+### 2026-08-06 — Generic fixtures can accidentally copy protected no-copy sentinels
+
+- Symptom: the first F1 dependency fixture made the existing I1-E E4 generic-
+  fixture scan fail even though the new manifest contained no protected body.
+- Root cause: placeholder hashes used repeated `a`/`b` values that exactly matched
+  high-entropy protected-control sentinels. The no-copy suite correctly treats an
+  exact byte copy as unsafe regardless of the field's apparent purpose.
+- What we tried: ran the focused F1 suite first, then the complete Node population;
+  only the latter exposed the cross-fixture collision.
+- Fix / workaround: replaced repeated-character placeholder hashes with varied,
+  valid lowercase SHA-256 values and reran E4 plus the full conformance population.
+- Prevention: new generic fixtures must run the cumulative no-copy suite before
+  commit and must not reuse opaque values from protected fixtures, even as hashes.
+
+### 2026-08-06 — Assertion narrowing and stale build output can hide the first real error
+
+- Symptom: F3 strict TypeScript reported validated action/protected values as
+  `unknown`; the immediately parallel Node tests then loaded the prior contracts
+  build and produced broad `unknown_field` failures unrelated to the new logic.
+- Root cause: TypeScript did not preserve assertion-function narrowing across the
+  surrounding `try/catch`, and package resolution intentionally targets built
+  contracts output. The failed typecheck prevented that output from refreshing.
+- What we tried: running typecheck, focused Node and runtime suites in parallel
+  amplified the stale-build cascade but preserved the actual TypeScript diagnostic.
+- Fix / workaround: retain explicit validated contract types, bind the required
+  prepare operation with a non-null `never` branch, complete the contracts build,
+  then rerun focused/runtime tests before the cumulative suite.
+- Prevention: when tests import built workspace packages, resolve compile errors
+  first and refresh the owning package before interpreting downstream failures.
+  Keep explicit checked locals at strict assertion/catch boundaries; never use
+  `any` or relax validation to silence the compiler.
+
+### 2026-08-06 — Shallow test fixtures can leak vNext mutations into legacy cases
+
+- Symptom: after adding the F3 legacy-action negative, later unrelated legacy v1/v2
+  runtime tests failed `WF-MAN-011` and registry loading.
+- Root cause: a shallow-spread federated fixture still shared the nested
+  `action_availability` object with the module baseline. Directly replacing its
+  `scenario_actions` array mutated the shared baseline for subsequent tests.
+- What we tried: verified that the new scenario-contract cases passed, inspected
+  later validation findings and traced the first shared nested write.
+- Fix / workaround: replace `action_availability` with a new object in the negative
+  fixture before changing `scenario_actions`; all 34 runtime tests then passed.
+- Prevention: mutation-based tests must clone every nested object they modify.
+  A negative-case helper must prove the baseline object is unchanged before later
+  compatibility/hash assertions depend on it.
+
+### 2026-08-06 — Source convergence must not bypass its historical lock
+
+- Symptom: full conformance stopped at source portability after each F1-F3 source
+  unit although all independent contract, Schema, runtime and Node tests passed.
+- Root cause: the immutable I1-E lock still named the prior 22-file source. That
+  mismatch was the intended sequencing gate, not a failing F1-F3 contract.
+- What we tried: ran every non-lock check independently, kept F1/F2/F3 as separate
+  green commits, then implemented deterministic named profiles and portability
+  checks without editing the historical lock early.
+- Fix / workaround: commit the complete F4 source/tooling first, generate one lock
+  naming that exact commit, and commit only the lock JSON. Three full verifiers and
+  two isolated build/manifest comparisons then passed.
+- Prevention: source-changing units precede one metadata-only seal. Record a
+  pre-lock mismatch as sequencing evidence; never weaken, skip or point the lock at
+  an uncommitted worktree. Any validator rule addition must also update the
+  mechanically checked normative inventory in the same source unit.

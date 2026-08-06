@@ -245,17 +245,18 @@ dev-docs/active/nurture-institution-mode/
 
 - Goal: deliver the cumulative neutral Base contract through ordered I1-A..F
   without importing Host runtime or Scenario product policy.
-- Runtime signal: Default mode; B1 is a Base contract-source checkpoint only and
-  performs no Host/Scenario runtime action.
+- Runtime signal: Default mode; cumulative I1-A..F Base contracts are accepted.
+  I1-F added validation/source metadata only and performed no Host/Scenario
+  runtime or operational action.
 - Input trace: latest user instruction > accepted I1-A source/lock > workflow
   context and Pilot-0-C decisions > T-029 donor disposition > bounded inference.
 - Merge decision: I1-B composes with I1-A instead of defining a second private
   transport/signature envelope. No unresolved product-scope conflict remains.
-- Project structure checkpoint: separately authorized I1-B1/B2/B3 add reservation,
-  Host-internal atomic-pair and private current-evidence/status contracts through
-  Base `edbcd74…`. I1-B4 passes cumulative qualification and seals that exact source
-  at metadata-only lock `9a15865…`; no consumer/runtime adoption exists. The current
-  Nurture-side update changes task/project/context documentation only.
+- Project structure checkpoint: I1-F F1-F3 add only Base manifest/Schema/runtime-
+  assertion/module-validator declarations and conformance; F4 source `3d91591…`
+  adds named-profile tooling and metadata lock `afe47e8…` seals that exact source.
+  No consumer/runtime adoption exists. The current Nurture-side update changes
+  task/project/context documentation only.
 - Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
   frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; the B1-only checkpoint is in
   artifacts 17-20. I1-B is accepted; artifact 21 freezes I1-C provider/presentation
@@ -270,10 +271,12 @@ dev-docs/active/nurture-institution-mode/
   `1cb5691…`. Artifact 36 froze I1-E as a dedicated plaintext carrier plus
   body-free prepare/commit/read controls and E1-E5 ordering. Artifacts 42-43
   supersede the earlier qualification and reaccept that chain at exact Base source
-  `48fd3d6…` plus metadata lock `9abde2b…`; no consumer or I1-F convergence is
-  implied. Artifact 44 now freezes I1-F as an optional closed `scenario_contracts`
+  `48fd3d6…` plus metadata lock `9abde2b…`; no consumer was implied. Artifact 44
+  froze I1-F as an optional closed `scenario_contracts`
   area, exact four-capability/four-source graph, parity/no-alias rules, named Base
-  profiles and four ordered F1-F4 units without authorizing implementation.
+  profiles and four ordered F1-F4 units. Artifacts 45-48 now close those units at
+  Base source `3d91591…` plus metadata lock `afe47e8…`; the neutral Base handoff
+  is accepted while every consumer and C30-I2 remain separate.
 
 Hard gates:
 
@@ -294,9 +297,11 @@ Hard gates:
   `3580a9b…` + lock `1cb5691…` 完成 D1-D5 修复和再验收。artifact 36 冻结的
   I1-E 专用 plaintext carrier、body-free lifecycle controls、no-copy negatives
   与 E1-E5 顺序已由 artifacts 42-43 在 successor source `48fd3d6…` + lock
-  `9abde2b…` 完成再验收。artifact 44 已冻结 manifest dependency/source
-  convergence、legacy/vNext exclusion、named source profiles 与 F1-F4 顺序；
-  下一步仅可另行授权 I1-F1，F1-F4 与 C30-I2 均未开启。
+  `9abde2b…` 完成再验收。artifact 44 冻结的 manifest dependency/source
+  convergence、legacy/vNext exclusion、named source profiles 与 F1-F4 顺序，
+  已由 artifacts 45-48 在 Base source `3d91591…` + metadata lock `afe47e8…`
+  完成累计验收。下一步仅可另行授权 C30-I2 范围评审/冻结；C30-I2 实施、
+  consumer adoption 与所有 operational action 均未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
@@ -306,8 +311,8 @@ Hard gates:
   `artifacts/20-c30-i1-b4-qualification-record.md` 与
   `artifacts/21-c30-i1-c-scope-freeze.md`、
   `artifacts/28-c30-i1-d-scope-freeze.md`、artifacts 29-35、
-  `artifacts/36-c30-i1-e-scope-freeze.md`、artifacts 37-43 与
-  `artifacts/44-c30-i1-f-scope-freeze.md`。
+  `artifacts/36-c30-i1-e-scope-freeze.md`、artifacts 37-43、
+  `artifacts/44-c30-i1-f-scope-freeze.md` 与 artifacts 45-48。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

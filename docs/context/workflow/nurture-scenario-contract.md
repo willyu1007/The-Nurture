@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D/I1-E accepted; I1-F scope frozen; I1-F implementation/consumer adoption/activation pending separate authorization
+Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 scope review, consumer adoption and activation require separate authorization
 
 ## Product Terminology Compatibility
 
@@ -26,16 +26,16 @@ The C30-I1-D Base contract uses the neutral static drivers
 identity input branches explicitly bind `scenario_key`; the direct branch binds
 Workspace/scenario/action/submit context and the claimed branch binds
 Workspace/scenario/action/original Step. I1-D defines standalone wire/codec/schema
-conformance only. Manifest dependency/capability convergence, legacy/vNext atomic
-exclusion and `scenario_domain_action_source_v1` remain I1-F work. The exact
-current Base source is `3580a9be74bd6ebe81d00c9fe99ccdf98d147664`, sealed by
+conformance. Its historical standalone source is
+`3580a9be74bd6ebe81d00c9fe99ccdf98d147664`, sealed by
 metadata lock `1cb56910f32ab5e13f9d378af3b3043dfc94b180` at source hash
 `5c5f2c5380773ccb651925199d403f267edb60bfbb0512bb0779218d074a99ef`.
 Artifact 35 closes the artifact-34 findings by adding private resolved-submit,
 stored rebind-seal and claimed-Step execution composition assertions plus closed
 prepare branches and legitimate fail-closed outcomes. The public wires and neutral
-driver names remain unchanged. No consumer, runtime, manifest convergence or
-activation exists yet.
+driver names remain unchanged. I1-F now registers this exact static action contract
+in the closed neutral Base manifest graph, but no My-Chat/Nurture consumer,
+execution runtime or activation exists.
 
 The C30-I1-E scope frozen in artifact 36 was implemented by artifacts 37-41 and
 is currently accepted by successor artifact 43. The neutral split is one dedicated
@@ -55,12 +55,13 @@ repairs at successor Base source `48fd3d65b34a1dd7a6b1e85713fca81f7c9da171`,
 metadata-only lock `9abde2b994f6528fc5afb26125eb029ed6027237` and source
 hash `be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d`.
 The cited artifact-41 source/lock is historical.
-Manifest dependency/source convergence and
-`scenario_protected_interaction_source_v1` remain I1-F work; no My-Chat/Nurture
-consumer, protected route/store/KMS, capability or activation exists.
+I1-F now registers the exact protected static contract and
+`scenario_protected_interaction_source_v1` profile in the closed neutral Base
+manifest graph. No My-Chat/Nurture consumer, protected route/store/KMS, capability
+or activation exists.
 
-Artifact 44 freezes I1-F dependency/source convergence without implementation.
-The future Base manifest extension is one optional, closed `scenario_contracts`
+Artifact 44 froze I1-F dependency/source convergence. Artifacts 45-48 implement
+and accept one optional, closed Base `scenario_contracts`
 area with the exact capabilities `trusted_scenario_invocation_v1`,
 `scenario_subject_presentation_v1`, `scenario_domain_action_execution_v1` and
 `scenario_protected_interaction_v1`, their exact dependency graph, and the exact
@@ -68,9 +69,15 @@ source identities `platform_child_family_identity_source_v1`,
 `scenario_interface_source_v1`, `scenario_domain_action_source_v1` and
 `scenario_protected_interaction_source_v1`. The freeze covers structural Schema/runtime
 parity, contextual DAG/reference/Host checks, legacy/vNext no-alias rules, named
-Base source profiles and ordered F1-F4 gates. Artifact 44 neither changes accepted
-I1-A..E wires nor constitutes My-Chat/Nurture adoption or completed downstream
-source identity. Only F1 may be separately authorized next; F1-F4 remain unstarted.
+Base source profiles and ordered F1-F4 gates. Exact F4 source
+`3d91591eb506de2c2c6c6633536c5b43d07c2af9` is sealed by metadata-only lock
+`afe47e8a529a52b38bd07053e55f625cdb16c194` at aggregate source hash
+`33df7df95e614104465c2fa93078b897e96538a765b050246a6b4f7ccd9139cd`.
+The named identity/interface/action/protected profile hashes are respectively
+`3a438edc…9ec1a`, `52aeaa1a…40a17`, `0e4b185c…634e6` and
+`7f00570e…f9800`. This is `C30_I1_BASE_CONTRACTS_ACCEPTED`, not
+My-Chat/Nurture adoption or a completed downstream source identity. Only a
+separately authorized C30-I2 scope review/freeze is eligible next.
 
 ## Decision
 

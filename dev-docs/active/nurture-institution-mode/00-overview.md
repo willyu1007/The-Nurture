@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D/I1-E accepted；I1-F scope frozen）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（accepted；I1-A～I1-F complete）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -22,9 +22,13 @@
   suite are reaccepted by artifact 43 at successor Base source `48fd3d6…`,
   metadata-only lock `9abde2b…` and source hash `be6fd800…fb7d` after closing
   E-R1..E-R4. The prior `5433124…` / `3a08d1f…` chain remains historical.
-  Artifact 44 freezes I1-F dependency/source convergence as ordered F1-F4 units.
-  All units remain unstarted; the only eligible next decision is separate I1-F1
-  implementation authorization.
+  Artifact 44 froze I1-F dependency/source convergence as ordered F1-F4 units.
+  Artifacts 45-48 now record their authorized completion at exact Base source
+  `3d91591…`, metadata-only lock `afe47e8…` and aggregate hash
+  `33df7df9…39cd`; all four named profile hashes and cumulative qualification pass.
+  The exact state is `C30_I1_BASE_CONTRACTS_ACCEPTED /
+  C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. The only eligible next decision is a
+  separately authorized C30-I2 scope review/freeze, not implementation.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -138,6 +142,17 @@
   four named source identities, Schema/runtime parity, legacy/vNext no-alias rules,
   named Base profiles and ordered F1-F4 gates. It changes no source and authorizes
   no implementation or downstream adoption.
+- C30-I1-F implementation checkpoints: artifacts
+  `45-c30-i1-f1-dependency-graph-implementation-record.md`,
+  `46-c30-i1-f2-interface-convergence-implementation-record.md` and
+  `47-c30-i1-f3-action-protected-convergence-implementation-record.md` pin the
+  separately attributable F1-F3 commits and verification populations.
+- C30-I1-F cumulative qualification:
+  `artifacts/48-c30-i1-f4-cumulative-qualification-record.md` pins F4 source
+  `3d91591…`, metadata-only lock `afe47e8…`, aggregate source hash
+  `33df7df9…39cd`, four named source profiles, three complete verifier passes and
+  deterministic isolated builds/manifests. C30-I1 neutral Base contracts are
+  accepted; C30-I2, consumers and every operational action remain unstarted.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

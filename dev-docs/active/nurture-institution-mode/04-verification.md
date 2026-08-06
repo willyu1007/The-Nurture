@@ -12,11 +12,11 @@
 
 - Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
-  `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B, successor I1-C, successor I1-D and successor I1-E are accepted. Artifact
-  43 closes E-R1..E-R4 at exact source/lock; artifact 42 remains the immutable
-  repair scope and artifact 41 is historical. Artifact 44 freezes I1-F as F1-F4;
-  implementation remains closed and only F1 is eligible for separate authorization. G1 is
+  `C30-I0-A/B/C/D` gates and cumulative `C30-I1-A..F` are complete. Artifacts
+  45-48 close I1-F at exact Base source `3d91591…` and metadata-only lock
+  `afe47e8…`; the current state is `C30_I1_BASE_CONTRACTS_ACCEPTED /
+  C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. Artifact 44 remains the immutable F1-F4
+  scope freeze. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -25,14 +25,39 @@
   default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: Base now includes accepted neutral I1-A..E and exact
-  source locks. The I1-E repair remains limited to standalone validation, one
-  existing JSON Schema, neutral tests and its metadata lock.
-  The existing formal NestJS owner path is unchanged. No Base runtime/Scenario
-  starter/manifest, My-Chat or Nurture product source, schema/migration,
+- Code/config/schema impact: Base now includes accepted neutral I1-A..F, the
+  optional closed `scenario_contracts` manifest area, contextual module gates,
+  exact named source profiles and source lock. Base adds validation only, not a
+  consumer runtime or starter adoption. The existing formal NestJS owner path is
+  unchanged. No My-Chat or Nurture product source, schema/migration,
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-F cumulative implementation and qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Ordered source chain | PASS | F1 `0ce22b6…` → F2 `c317795…` → F3 `f59f506…` → F4 source `3d91591…` → metadata-only lock `afe47e8…`. |
+| Manifest dependency graph | PASS | Exact four-capability dependency-complete prefixes and exact four sources reject missing/stale/duplicate/cyclic/reordered/umbrella substitutions. |
+| Interface convergence | PASS | Trusted ingress, providers, presentations and product surfaces close exact operation/provider/surface references, Host support and legacy aliases. |
+| Action/protected convergence | PASS | Exact I1-D/I1-E static contracts close scenario/action/ingress/surface/handler/driver/prepare/read references; third driver, body, generic commit/erase and legacy action aliases fail. |
+| Full Base verifier | PASS x3 | All TypeScript/build, canonical-ref, runtime/Scenario/conformance, Schema/docs/boundary, portability and exact lock checks pass in three complete rounds. |
+| Runtime / Scenario | PASS | 34/34 and 10/10. |
+| Schema / Node conformance | PASS | 66 Schemas and 435/435 Node tests. |
+| Aggregate source lock | PASS | Exact source revision `3d91591…`; 22 normalized TypeScript files; aggregate hash `33df7df95e614104465c2fa93078b897e96538a765b050246a6b4f7ccd9139cd`. |
+| Named source profiles | PASS | Identity `3a438edc…9ec1a` (27), interface `52aeaa1a…40a17` (29), action `0e4b185c…634e6` (45), protected `7f00570e…f9800` (58). |
+| Portability and exact bytes | PASS | Relocated paths, `@host|@my-chat` alias normalization, BOM/CRLF normalization, sorted/closed populations, symlink rejection and exact committed TypeScript/Schema/tool bytes pass. |
+| Deterministic output | PASS | Two isolated builds: contracts 84 files `6a9f004c…33de7`, runtime 92 `a0d9729e…2af1f`, Scenario 56 `7136af38…3117`; source manifest `6229c69b…f5fd`. |
+| Metadata-only seal | PASS | `afe47e8…` changes only the lock JSON and points to committed source `3d91591…`. |
+| Repository/effect boundary | PASS | Base clean at `afe47e8…`; My-Chat unchanged/clean at `dc4a77b…`; Nurture product source unchanged before governance-only closure. No DB/Prisma/PostgreSQL, consumer, capability, deployment, activation, T-008, Pilot or traffic action. |
+| Detailed evidence | PASS | Artifacts 45-48 record unit checkpoints, exact hashes, qualification, rollback and immutable I1 handoff. |
+| Context/governance/docs | PASS | Context checksum `7f62af978bb5ef252b1a5655659622f9774153c0908e7d0781dd2e95e902af16`; strict Context/project-state/project-governance checks and T-002 query pass; task 78/78 and repository 444/444 Markdown/anchor checks pass with zero warnings/errors. |
+
+Verdict: `C30_I1_BASE_CONTRACTS_ACCEPTED /
+C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. The only eligible next decision is a
+separately authorized C30-I2 scope review/freeze. No C30-I2 implementation,
+consumer adoption or operational action is authorized.
 
 ## C30-I1-F dependency/source convergence scope review and freeze — 2026-08-06
 
