@@ -5,7 +5,13 @@ import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const sourceRevision = process.env.C30_I3_SOURCE_REVISION;
+const checkIndex = process.argv.indexOf("--check");
+const lockPath = checkIndex === -1 ? undefined : process.argv[checkIndex + 1];
+if (checkIndex !== -1 && !lockPath) throw new Error("--check requires a lock path");
+const expectedLock = lockPath
+  ? JSON.parse(readFileSync(resolve(repositoryRoot, lockPath), "utf8"))
+  : undefined;
+const sourceRevision = process.env.C30_I3_SOURCE_REVISION ?? expectedLock?.source_revision;
 if (!sourceRevision || !/^[a-f0-9]{40}$/u.test(sourceRevision)) {
   throw new Error("C30_I3_SOURCE_REVISION must be an exact committed revision");
 }
@@ -109,16 +115,12 @@ const assertSourceRevision = (lock) => {
 };
 
 const actual = computeLock();
-const checkIndex = process.argv.indexOf("--check");
 if (checkIndex === -1) {
   process.stdout.write(`${JSON.stringify(actual, null, 2)}\n`);
 } else {
-  const lockPath = process.argv[checkIndex + 1];
-  if (!lockPath) throw new Error("--check requires a lock path");
-  const expected = JSON.parse(readFileSync(resolve(repositoryRoot, lockPath), "utf8"));
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+  if (JSON.stringify(actual) !== JSON.stringify(expectedLock)) {
     throw new Error("C30-I3 owner adoption source lock does not match current bytes");
   }
-  assertSourceRevision(expected);
+  assertSourceRevision(expectedLock);
   console.log(`C30-I3 owner adoption source lock ok: ${actual.source_hash}`);
 }
