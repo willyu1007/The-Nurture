@@ -2307,3 +2307,31 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: qualification must restore pre-erasure database material and
   prove unwrap denial against the external KMS state; never equate row clearing
   alone with cryptographic erasure.
+
+### 2026-08-06 — Package-local Vitest can inherit repository-relative includes
+
+- Symptom: `pnpm --filter @the-nurture/scenario test` collected zero tests even
+  though the same files passed from the repository root.
+- Root cause: the shared Vitest include is repository-relative, while the
+  package command changed the test root to the package directory.
+- What we tried: the first filtered focused command reproduced the zero-file
+  result; a root invocation proved that discovery and test bodies were healthy.
+- Fix / workaround: the package script now passes `--root ../..`; its declared
+  command runs all 58 Scenario files / 635 tests.
+- Prevention: execute each package's public test script during convergence, not
+  only an equivalent root command, and pin the package script in the source lock.
+
+### 2026-08-06 — Package typechecks may miss integration-test wire mutability
+
+- Symptom: the final root TypeScript check rejected readonly binding tuples in
+  the C30 pair integration fixture although focused runtime tests were green.
+- Root cause: literal `as const` arrays were readonly, but the exact Base wire
+  uses mutable two-item tuples; narrower package build configurations had not
+  compiled that integration fixture.
+- What we tried: root typecheck located both request/result assignments before
+  any build compilation began.
+- Fix / workaround: contextually type both fixtures from
+  `NurtureC30PairAssociationCommandV1` and use mutable tuples; root typecheck and
+  the 14-test pair suite pass.
+- Prevention: cumulative qualification must include the root TypeScript graph
+  in addition to package builds and focused database execution.

@@ -767,7 +767,7 @@ The successful I2 exit opened the now-completed I3 scope review; it did not
 authorize Nurture adoption, joint conformance, C31-C35, T-008, deployment,
 activation or Pilot.
 
-## C30-I3 — Nurture Scenario-owner adoption（实施中，I3-F 已验收）
+## C30-I3 — Nurture Scenario-owner adoption（已闭环，default-off）
 
 Artifact 53 is normative. C30-I3 remains one cumulative default-off owner
 adoption, decomposed into seven ordered units:
@@ -780,7 +780,7 @@ adoption, decomposed into seven ordered units:
 | `C30-I3-D` subject/presentation | Accepted | Artifact 57 pins current owner-resolved `NurtureChildCareProcess`, sealed locators and the safe six-block action-free baseline. |
 | `C30-I3-E` canonical action runtime | Accepted | Artifact 58 pins the fixture-only direct/claimed runner, typed Execution provenance, atomic effect/audit/outbox transaction and writer-fenced recovery; production actions remain absent. |
 | `C30-I3-F` protected owner lifecycle | Accepted | Artifact 59 pins per-content wrapped DEK, default-deny KMS port, current-authority lifecycle, retention/tombstone/crypto-erasure, restored-snapshot denial and recursive no-copy. |
-| `C30-I3-G` convergence/qualification | In progress / authorized | Immutable Nurture lock, cumulative fresh-DB/source/default-off qualification; opens only I4 scope review. |
+| `C30-I3-G` convergence/qualification | Accepted | Artifact 60 pins the immutable seven-profile lock, exact prefix/test-only full graph, fresh 19-migration DB qualification, zero positive populations and destroyed 55440 target. |
 
 The production I3 manifest deliberately stops at the Base-permitted
 dependency-complete `trusted_scenario_invocation_v1 +
@@ -790,8 +790,9 @@ the first real action/protected declaration remains C31. Placeholder actions,
 legacy `capture_family_input` aliases and premature
 `submit_family_care_question` adoption are forbidden.
 
-The user authorized ordered I3-A..G implementation. I3-A through I3-F are
-accepted; I3-G is the active unit. Unit order remains mandatory. I4, C31-C35, T-008,
+The user authorized ordered I3-A..G implementation. I3-A through I3-G are
+accepted default-off. Only a separately authorized I4 scope review is eligible.
+I4 implementation, C31-C35, T-008,
 deployment, activation, Pilot and traffic remain closed.
 
 ---

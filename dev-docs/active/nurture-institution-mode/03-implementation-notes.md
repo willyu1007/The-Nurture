@@ -7,8 +7,8 @@
 
 ## Next concrete actions
 
-1. Execute C30-I3-G cumulative source/default-off convergence and fresh-database
-   qualification, then destroy the exact disposable 55440 target.
+1. Await separate authorization for C30-I4 scope review only; do not begin I4
+   implementation.
 2. Keep I4 joint adoption, C31-C35,
    T-008, persistent database apply, capability/Workspace activation,
    deployment, Pilot and traffic closed.
@@ -18,6 +18,18 @@
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Closed cumulative C30-I3 in artifact 60 at final source
+  `c8b9ce2…`, lock `15207ba…` and aggregate `5c08b542…c4ab6`. The exact
+  production two-capability prefix, isolated test-only complete graph and
+  maintained default-off census `448d37e1…3c3e` pass. Final qualification is
+  root TypeScript, Scenario 58 files/635 tests, DB 24 files/253 tests,
+  scenario-service 8 files/52 tests, direct package/service/frontend builds,
+  frontend lint, exact upstream/context/schema/portability checks and repeated
+  lock. It repaired the package test root, stale routing census and readonly
+  pair-fixture typing. A fresh 19/19 database had both schema diffs empty; C30
+  rows were cleared, `nurture-c30-i3` was destroyed and 55440 is free. Only I4
+  scope review is eligible next.
 
 - 2026-08-06: Accepted C30-I3-F in artifact 59 at runtime source `13285fd…`
   and lock-tool source `ac049b4…`. The authoritative protected owner uses a

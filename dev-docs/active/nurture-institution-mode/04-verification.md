@@ -19,7 +19,8 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_F_ACCEPTED / I3_G_AUTHORIZED_IN_PROGRESS`. G1 is
+  `C30_I3_SCENARIO_OWNER_ADOPTION_ACCEPTED_DEFAULT_OFF /
+  I4_SCOPE_REVIEW_ELIGIBLE`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -42,6 +43,25 @@
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3 cumulative default-off qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact convergence | PASS | Final source `c8b9ce2…`; seven-profile lock `15207ba…`; aggregate `5c08b542…c4ab6`; exact clean Base/My-Chat inputs. |
+| Production/test separation | PASS | Production is the exact action-free two-capability prefix; Base accepts the isolated full graph containing both neutral drivers and protected declaration. |
+| Default-off census | PASS | Hash `448d37e1…3c3e`; enabled/action/protected/offer/positive-route/Workspace-activation populations all zero. |
+| Static and build gates | PASS | Root typecheck; direct Scenario/DB/scenario-service/frontend builds; frontend ESLint/Stylelint; manifest, routing, persistence and G2 checks. |
+| Regression populations | PASS | Scenario 58 files / 635 tests; scenario-service 8 files / 52 tests; DB 24 files / 253 tests. |
+| Fresh database | PASS | Exact 55440 target recreated empty, 19/19 migrations, Prisma validate/generate, DB-to-SSOT and migrations-to-SSOT empty. |
+| Final data/target cleanup | PASS | Eight C30 tables proved zero; exact container destroyed; 55440 absent/free; unrelated 55439 owner untouched. |
+| Qualification repairs | PASS | Fixed package-local zero-test command, stale 52/21 routing census and readonly Base pair-wire test tuples. |
+| Historical umbrella build | EXPECTED PRE-COMPILE REJECTION | Root `pnpm build` first enforces historical G1 Base `06303e9…` and rejected current C30 Base `4350086…`; that old pin was preserved, and direct current-topology builds pass. |
+| Effect boundary | PASS | No existing DB, product declaration/route, secret, capability, deployment, activation, I4, C31-C35, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_SCENARIO_OWNER_ADOPTION_ACCEPTED_DEFAULT_OFF /
+I4_SCOPE_REVIEW_ELIGIBLE`.
+Normative record: `artifacts/60-c30-i3-default-off-acceptance-record.md`.
 
 ## C30-I3-F protected owner lifecycle — 2026-08-06
 

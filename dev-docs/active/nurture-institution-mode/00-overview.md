@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（I3-F accepted, I3-G in progress）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（accepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -34,7 +34,8 @@
   `8172e370…10a5ad` and reacceptance/archive checkpoint `cd7bbc2…`; the first
   `35a41e3…` / `3da48ba0…` chain is historical. Artifact 52 records the
   cumulative replacement result. The current
-  state is `C30_I3_F_ACCEPTED / I3_G_AUTHORIZED_IN_PROGRESS`.
+  state is `C30_I3_SCENARIO_OWNER_ADOPTION_ACCEPTED_DEFAULT_OFF /
+  I4_SCOPE_REVIEW_ELIGIBLE`.
   Artifact 53 freezes exact Base/My-Chat inputs, the production
   trusted+presentation dependency-complete prefix, owner trust/identity/binding/
   authority/protected boundaries and ordered I3-A..G units. Artifact 54 accepts
@@ -52,7 +53,10 @@
   `7de36713…c085`. Artifact 59 accepts I3-F at runtime source `13285fd…`,
   lock-tool source `ac049b4…`, additive migration
   `20260806140000_c30_i3_protected_owner_lifecycle` and cumulative lock
-  `b251bb46…48a8`; I3-G is active.
+  `b251bb46…48a8`. Artifact 60 accepts cumulative I3-A..G at final source
+  `c8b9ce2…`, lock `15207ba…`, aggregate `5c08b542…c4ab6` and default-off
+  census `448d37e1…3c3e`; the disposable 55440 database is destroyed and only a
+  separately authorized I4 scope review is eligible.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base

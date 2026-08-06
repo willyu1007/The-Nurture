@@ -51,10 +51,13 @@ Project: `main`
   ordered I3-A..G, with exact upstream pins, a production trusted+presentation
   complete prefix, detached owner trust, typed Participant/pair association,
   canonical action runtime, protected KMS/retention lifecycle and default-off
-  convergence. The next eligible decision is separately authorized I3-A or an
-  explicit broader ordered I3-A..G mandate. I3 implementation, C30-I4,
-  C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no downstream
-  PASS is deployment or traffic authority.
+  convergence. Artifacts 54-60 record ordered I3-A..G and final acceptance at
+  Nurture source `c8b9ce2…`, lock `15207ba…`, aggregate `5c08b542…c4ab6` and
+  default-off census `448d37e1…3c3e`; the fresh 19-migration database was
+  destroyed and 55440 is free. The next eligible decision is only a separately
+  authorized C30-I4 scope review. I4 implementation, C31-C35, C40-C45, D,
+  Pilot-0-E and Pilot-1 remain unstarted, and no downstream PASS is deployment
+  or traffic authority.
 
 ### F-003 Six-surface store-beta readiness
 - Intent: turn the six-surface T-003 design into a qualified, default-off Nurture Service Candidate and versioned interface that My-Chat can integrate through authenticated API calls and validate on iOS and Android internal-testing channels.
