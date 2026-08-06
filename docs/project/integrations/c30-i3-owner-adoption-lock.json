@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "60ee4a48a83df2ab46247cc0a92d47ccecc7bf43",
+  "source_revision": "c8b9ce2fa203d7f51c856dcbf21d062bb09d8f12",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
@@ -12,7 +12,7 @@
     "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
     "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
   },
-  "source_hash": "3bbf780a2d8f1e3dced017ff7d7c0e4da87281132a7a92e6ec072e4a1dc5dafc",
+  "source_hash": "5c08b542d47e60cbd189a3b0ea573b9cd10ec3f2ec0a0d9b28053a8363cc4ab6",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
@@ -48,7 +48,7 @@
     },
     {
       "source_identity": "nurture_c30_pair_local_persistence_v1",
-      "source_hash": "9328a1dd1bf755a87c7e51cccfd647e7e942fb6093770a59d5a355cb45ab5c05",
+      "source_hash": "74e6cc5d9be27fa3dbb0f2b13ce50f557f94309063bdfea09def13c5891e1867",
       "files": [
         "docs/context/db/schema.json",
         "docs/context/registry.json",
@@ -64,7 +64,7 @@
     },
     {
       "source_identity": "nurture_c30_subject_presentation_v1",
-      "source_hash": "76c957978027ef04ae320f4fca71a91714bdcb032e8493c4bbca85c8b986b339",
+      "source_hash": "5720c18bf5b64bcbf03ef42b685e5815507769496760a0a7a07cac173ea65313",
       "files": [
         "packages/nurture-db/src/c30/subject-presentation.repository.ts",
         "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
