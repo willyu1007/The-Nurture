@@ -7,12 +7,25 @@
 
 ## Next concrete actions
 
-1. Implement only artifact-49 F-R1..F-R4 in Base.
-2. Re-run focused adversarial, complete Base and deterministic qualification.
-3. Commit successor source, then one metadata-only lock, and record the resulting
-   qualification before reconsidering I1-F acceptance. C30-I2 remains NO-GO.
+1. Await separate authorization for C30-I2 scope review and freeze.
+2. Keep C30-I2 implementation, consumers, database, capability activation,
+   deployment, T-008, Pilot and traffic closed.
 
 ## What changed
+
+- 2026-08-06: Reaccepted cumulative Base `C30-I1-F` after closing artifact-49
+  F-R1 through F-R4. Source `15ff031…` separates the one
+  `prepare_domain_action` transport handler from unique per-action handlers,
+  enforces presentation-operation-local surface ingress, aligns runtime/Schema
+  array maxima at 64/64/128 and rejects symlink roots or ancestors. Metadata-only
+  lock `4350086…` binds aggregate hash `d17f2358…6383` and the four named
+  hashes recorded in artifact 50. Three full verifiers pass with 66 Schemas,
+  441 Node tests, runtime 35/35 and Scenario 10/10; isolated contracts 84,
+  runtime 92 and Scenario 56 file trees plus source manifests are deterministic.
+  Base and My-Chat finish clean; Nurture changes only governance evidence. No
+  Prisma/database/PostgreSQL, consumer/starter adoption, capability, deployment,
+  activation, C30-I2 implementation, T-008, Pilot or traffic action ran. Only a
+  separately authorized C30-I2 scope review/freeze is eligible next.
 
 - 2026-08-06: Reopened `C30-I1-F` acceptance after a read-only quality review
   reproduced four gaps despite the green 435-test suite: multi-action handler

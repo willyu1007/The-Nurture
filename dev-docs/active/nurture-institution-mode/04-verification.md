@@ -12,11 +12,12 @@
 
 - Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
-  `C30-I0-A/B/C/D` gates remain complete. C30-I1-F acceptance is reopened by
-  artifact 49 after four post-implementation findings; artifacts 45-48 are
-  historical until a successor source/lock qualifies. The current state is
-  `I1_F_ACCEPTANCE_REOPENED / C30_I2_NO_GO`. Artifact 44 remains the original
-  F1-F4 scope freeze and artifact 49 is the bounded repair freeze. G1 is
+  `C30-I0-A/B/C/D` gates remain complete. Artifact 50 reaccepts C30-I1-F after
+  the successor repair closes all four artifact-49 findings. Artifact 48 remains
+  historical. The current state is `C30_I1_BASE_CONTRACTS_ACCEPTED /
+  C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. Artifact 44 remains the original
+  F1-F4 scope freeze, artifact 49 is the repair freeze and artifact 50 is the
+  current exact qualification. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -33,6 +34,32 @@
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-F successor quality-repair qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `15ff031ed16897920c13fe24c9849531d98607ad`; following metadata-only lock `4350086993d837baa8030564f4e19593dedd96b0`. |
+| Multi-action semantics | PASS | One neutral manifest with two unique action handlers passes; shared and cross-kind handlers fail. Every action still requires the exact `prepare_domain_action` operation and its entitled ingress. |
+| Presentation reachability | PASS | A surface outside the exact presentation operation fails `missing_surface_presentation_ingress`; global ingress presence cannot substitute. |
+| Runtime/Schema bounds | PASS | Exact 64 safe reasons, 64 route classes and 128 action keys pass; each maximum plus one fails in runtime and strict Schema. |
+| Source-path ancestry | PASS | Symlinked physical roots fail with the symbolic-link rule; relocation, import aliases, BOM/CRLF, sorted populations and exact committed bytes remain green. |
+| Focused regressions | PASS 46/46 | F2/F3 positive and adversarial manifest population passes. |
+| Full Base verifier | PASS x3 | All TypeScript/build, canonical-ref, runtime/Scenario/conformance, Schema/docs/boundary, portability and exact lock checks pass in three complete rounds. |
+| Runtime / Scenario | PASS | 35/35 and 10/10. |
+| Schema / Node conformance | PASS | 66 strict Schemas and 441/441 Node tests. |
+| Aggregate source lock | PASS | Exact source revision `15ff031…`; 22 normalized TypeScript files; aggregate hash `d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383`. |
+| Named source profiles | PASS | Identity `81d9fb9d…fed4` (27), interface `37f0cdae…eaf` (29), action `b7c35259…e48d` (45), protected `78eadaf4…0efb` (58). |
+| Deterministic output | PASS | Two isolated builds: contracts 84 files `984d4fab…5f6`, runtime 92 `26b9a84c…961`, Scenario 56 `8b361719…b54`; source manifest `02d8bec5…6a6b`. Temporary outputs were destroyed. |
+| Metadata-only seal | PASS | `4350086…` changes only the lock JSON and points to committed source `15ff031…`. |
+| Scope/effect boundary | PASS | Base is clean at `4350086…`; My-Chat remains clean at `dc4a77b…`; Nurture product source is unchanged. No public I1-A through I1-E wire, capability/source graph vocabulary, package version, consumer/starter, Prisma/database, deployment, activation, C30-I2 implementation, T-008, Pilot or traffic action changed. |
+| Detailed evidence | PASS | Artifact 49 freezes the four repairs; artifact 50 records closure, hashes, qualification and rollback. |
+| Context/governance/docs | PASS | Workflow-context checksum `7f62af97…02af16`; strict Context/project-state/project-governance checks and T-002 query pass; strict task/repository Markdown and anchor lint cover 80/446 files with zero warnings/errors. |
+
+Verdict: `I1_F_REACCEPTED / C30_I1_BASE_CONTRACTS_ACCEPTED /
+C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. Only a separately authorized C30-I2
+scope review/freeze is eligible next. C30-I2 implementation, consumer adoption
+and every operational action remain closed.
 
 ## C30-I1-F post-implementation quality review and reopening — 2026-08-06
 

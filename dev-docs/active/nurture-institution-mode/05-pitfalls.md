@@ -2139,3 +2139,27 @@ This file exists to prevent repeating mistakes within this task.
   pre-lock mismatch as sequencing evidence; never weaken, skip or point the lock at
   an uncommitted worktree. Any validator rule addition must also update the
   mechanically checked normative inventory in the same source unit.
+
+### 2026-08-06 — Green declaration graphs can still be impossible or unreachable
+
+- Symptom: the accepted I1-F graph passed 435 Node tests while a second action
+  could satisfy neither handler rule, a product surface could name a presentation
+  unreachable from the presentation operation, large declaration arrays remained
+  unbounded and a symlinked source root reproduced trusted hashes.
+- Root cause: action transport and business-dispatch identities were conflated;
+  surface reachability was checked against a global ingress union; outer
+  population bounds were mistaken for inner-array bounds; source hashing checked
+  symlink leaves but not physical-root ancestry.
+- What we tried: added positive two-action graphs plus shared/cross-kind handler
+  negatives, split surfaces across trusted operations, exercised exact maxima and
+  maximum-plus-one values in runtime and Schema, and supplied a relocated
+  symbolic-link root to the source-hash tool.
+- Fix / workaround: separate transport and action handler namespaces while
+  retaining global uniqueness; resolve surface reachability through the exact
+  presentation operation; freeze 64/64/128 inner bounds; inspect every root and
+  file path segment with `lstat`; then reseal one committed source with a
+  metadata-only lock.
+- Prevention: graph conformance needs satisfiable multi-row positives and
+  operation-local reachability negatives, not only single-row dangling-reference
+  checks. Every collection needs an explicit size review, and every integrity
+  tool accepting path overrides needs root, ancestor and leaf symlink adversaries.
