@@ -7,9 +7,9 @@
 
 ## Next concrete actions
 
-1. Implement C30-I3-B private trust and typed Participant binding against the
-   exact artifact-54 adoption lock.
-2. Continue I3-C..G only in the frozen order. Keep I4 joint adoption, C31-C35,
+1. Implement C30-I3-C additive pair/local persistence and atomic association
+   against the exact artifact-55 trust boundary.
+2. Continue I3-D..G only in the frozen order. Keep I4 joint adoption, C31-C35,
    T-008, persistent database apply, capability/Workspace activation,
    deployment, Pilot and traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
@@ -18,6 +18,16 @@
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Accepted C30-I3-B in artifact 55 at source `b8974bf…`. The new
+  Scenario-owned trust boundary verifies exact service credential, trust/key
+  state, detached Ed25519 signature, body digest, strict Base invocation,
+  declared route/time and one-time nonce before owner work; its response signer
+  binds the exact request. Typed Participant binding keeps account, Actor,
+  Workspace, represented organization and local Participant distinct and
+  always requires a separate current Nurture authority decision. Focused 33
+  tests, complete 54-file/612-test scenario population, typecheck and cumulative
+  lock `24080cc5…3d18` pass. No route, schema/database or capability was changed.
 
 - 2026-08-06: Accepted C30-I3-A in artifact 54. Source `3b7e2a6…` replaces the
   hand-copied registry and dual module variants with one YAML-generated,

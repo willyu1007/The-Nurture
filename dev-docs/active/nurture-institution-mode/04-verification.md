@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_A_ACCEPTED / I3_B_AUTHORIZED_IN_PROGRESS`. G1 is
+  `C30_I3_B_ACCEPTED / I3_C_AUTHORIZED_IN_PROGRESS`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -33,11 +33,27 @@
   exact named source profiles and source lock. Base adds validation only, not a
   consumer runtime or starter adoption. My-Chat now contains accepted generic
   Host runtime support and the narrow nonce/pair schema under T-035, all
-  default-off. Nurture I3-A now has one generated canonical manifest/module and
-  a self-verifying downstream source lock; no I3-B runtime or formal route is
-  registered yet. No persistent database, secret/KMS/environment value,
+  default-off. Nurture I3-A has one generated canonical manifest/module and
+  I3-B adds private trust/nonce/response-signing and typed Participant authority
+  primitives without registering a route. No persistent database,
+  secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3-B private trust and Participant binding — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Detached request trust | PASS | Exact credential/issuer/audience/caller/key selection, Ed25519 verification, body hash, Base contract, declaration, clock and nonce order; missing/duplicate/revoked/stale inputs fail closed. |
+| Replay/concurrency | PASS | Atomic bounded Scenario-private nonce permits one consumer; replay, concurrency loser and capacity exhaustion fail before owner work. |
+| Response binding | PASS | Signed result reverses the verified trust direction and binds request ID, nonce digest, route, operation, status, body digest and expiry. |
+| Typed Participant | PASS | Canonical account/Actor/Workspace/organization/local Participant refs remain distinct; current business authority is separately mandatory. |
+| Verification | PASS | Typecheck; focused 2 files / 33 tests; complete 54 files / 612 tests; no Host-runtime/Prisma production import. |
+| Cumulative lock | PASS | Source `b8974bf…`; aggregate `24080cc5…3d18`; private-trust profile `8a3e86aa…e2a8`. |
+| Effect boundary | PASS | No route registration, schema/database, capability, deployment, activation or downstream operation. |
+
+Verdict: `C30_I3_B_ACCEPTED / I3_C_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/55-c30-i3-b-implementation-record.md`.
 
 ## C30-I3-A exact adoption and canonical manifest — 2026-08-06
 
