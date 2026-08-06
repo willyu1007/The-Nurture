@@ -241,7 +241,7 @@ dev-docs/active/nurture-institution-mode/
 | G6 / Pilot-0-E..1 | Proposed future Nurture release task + My-Chat companion | Reconcile the exact G5 handoff; close current C-3/C-4/D; assemble/sign the complete candidate; run disposable D evidence and E; after separate Pilot-1 authorization publish exact bytes and deploy one isolated persistent environment default-off; seal Pilot-2 readiness | Exact G5 decision + separately authorized C-3/C-4/D implementation; E Go + separate Pilot-1 approval before persistent state | Exit only as `G6_DEFAULT_OFF_QUALIFIED / PILOT2_STAGE_AUTHORIZATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; G6 task/feature identity remains pending and no implementation is authorized by this roadmap |
 | G7 / Pilot-2..4 | Proposed future `nurture-bounded-pilot-observation` task + My-Chat companion | Freeze current heads/authority；activate and bootstrap one exact synthetic cohort；run ordered Pilot-3 fault/recovery/kill-switch rehearsal to terminal disable；use the final Binding, no-reset baseline, new Pilot-4 authorization/row and five contiguous 24-hour observation segments；seal `pass|no_pass|stopped` plus a non-authorizing recommendation | Current G6 readiness seal + separate Pilot-2 authorization；Pilot-4 separately requires the terminal rehearsal and baseline seals | Exact seven-account synthetic cohort only. G7 freezes the observed environment, not mainline development；staging/production/GA, cohort expansion and external product traffic remain NO-GO |
 
-### C30-I1 current planning overlay（2026-08-05）
+### C30-I1 current planning overlay（2026-08-06）
 
 - Goal: deliver the cumulative neutral Base contract through ordered I1-A..F
   without importing Host runtime or Scenario product policy.
@@ -270,7 +270,10 @@ dev-docs/active/nurture-institution-mode/
   `1cb5691…`. Artifact 36 froze I1-E as a dedicated plaintext carrier plus
   body-free prepare/commit/read controls and E1-E5 ordering. Artifacts 42-43
   supersede the earlier qualification and reaccept that chain at exact Base source
-  `48fd3d6…` plus metadata lock `9abde2b…`; no consumer or I1-F convergence is implied.
+  `48fd3d6…` plus metadata lock `9abde2b…`; no consumer or I1-F convergence is
+  implied. Artifact 44 now freezes I1-F as an optional closed `scenario_contracts`
+  area, exact four-capability/four-source graph, parity/no-alias rules, named Base
+  profiles and four ordered F1-F4 units without authorizing implementation.
 
 Hard gates:
 
@@ -291,8 +294,9 @@ Hard gates:
   `3580a9b…` + lock `1cb5691…` 完成 D1-D5 修复和再验收。artifact 36 冻结的
   I1-E 专用 plaintext carrier、body-free lifecycle controls、no-copy negatives
   与 E1-E5 顺序已由 artifacts 42-43 在 successor source `48fd3d6…` + lock
-  `9abde2b…` 完成再验收。下一步仅可另行授权 I1-F 范围评审/冻结；manifest dependency/
-  source convergence、I1-F 实施与 C30-I2 仍未开启。
+  `9abde2b…` 完成再验收。artifact 44 已冻结 manifest dependency/source
+  convergence、legacy/vNext exclusion、named source profiles 与 F1-F4 顺序；
+  下一步仅可另行授权 I1-F1，F1-F4 与 C30-I2 均未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
@@ -302,7 +306,8 @@ Hard gates:
   `artifacts/20-c30-i1-b4-qualification-record.md` 与
   `artifacts/21-c30-i1-c-scope-freeze.md`、
   `artifacts/28-c30-i1-d-scope-freeze.md`、artifacts 29-35、
-  `artifacts/36-c30-i1-e-scope-freeze.md` 与 artifacts 37-43。
+  `artifacts/36-c30-i1-e-scope-freeze.md`、artifacts 37-43 与
+  `artifacts/44-c30-i1-f-scope-freeze.md`。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

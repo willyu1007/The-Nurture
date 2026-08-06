@@ -7,6 +7,16 @@
 
 ## What changed
 
+- 2026-08-06: Reused T-002 and froze only the `C30-I1-F` neutral Base
+  dependency/source convergence scope in artifact 44. The current Base has one
+  umbrella source hash, no capability dependency graph, no manifest declaration
+  areas for the accepted I1-A..E wires and no named source profiles. The freeze
+  defines one optional closed `scenario_contracts` area, the exact four-capability
+  dependency graph and four source identities, structural Schema/runtime parity,
+  legacy/vNext no-alias rules, deterministic Base profiles and ordered F1-F4
+  units. No source, build, Prisma/database, capability, deployment, activation,
+  T-008, Pilot or traffic action ran. Only F1 may be separately authorized next.
+
 - 2026-08-06: Reaccepted cumulative Base `C30-I1-E` after closing E-R1 through
   E-R4. Source `48fd3d6…` adds bounded representation/window no-copy detection,
   low-entropy exact matching, resolved-current-time commit bounds and recursive

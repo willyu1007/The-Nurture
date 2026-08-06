@@ -15,8 +15,8 @@
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
   I1-B, successor I1-C, successor I1-D and successor I1-E are accepted. Artifact
   43 closes E-R1..E-R4 at exact source/lock; artifact 42 remains the immutable
-  repair scope and artifact 41 is historical. I1-F is eligible only for a
-  separately authorized scope review/freeze; implementation remains closed. G1 is
+  repair scope and artifact 41 is historical. Artifact 44 freezes I1-F as F1-F4;
+  implementation remains closed and only F1 is eligible for separate authorization. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -33,6 +33,23 @@
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-F dependency/source convergence scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; existing `M-002 > F-002 > T-002` and task bundle remain the SSOT. |
+| Accepted-input trace | PASS | Artifact 44 consumes current accepted I1-A..E source/lock evidence without changing their public wires, validators or exposure. |
+| Current-gap review | PASS | Base has one umbrella source hash, no scenario capability DAG, no manifest areas for I1-A..E and no named C30 source profiles; Nurture's v1/manual projection is negative donor evidence only. |
+| Atomic graph | PASS | Exact four reusable capabilities, dependency-complete prefixes and the exact four source identities are frozen; missing, stale, duplicate, cyclic, umbrella and partial rows are fatal. |
+| Source-identity boundary | PASS | Named Base profiles cover only Base contribution bytes. My-Chat/Nurture adoption, completed platform identity, joint conformance and readiness remain C30-I2/I3/I4. |
+| Parity and legacy boundary | PASS | Structural JSON Schema/runtime parity is separated from contextual DAG/reference/Host checks; manifests omitting `scenario_contracts` remain unchanged, while mixed legacy/vNext aliases fail closed. |
+| Implementation decomposition | PASS | F1 primitives → F2 ingress/presentation → F3 action/protected convergence → F4 cumulative qualification/source lock. No unit starts automatically. |
+| Repository/effect boundary | PASS | Base is clean at metadata lock `9abde2b994f6528fc5afb26125eb029ed6027237`; My-Chat is clean at `dc4a77b257f952e2c0f0aede9521e16ac274de9d`; Nurture changes from `369fc8a…` are documentation/context only. No source, build, Prisma/database/PostgreSQL, runtime, capability, deployment, activation, T-008, Pilot or traffic action. |
+| Context/governance/docs | PASS AFTER WORDING CORRECTION | Context checksum `9b65ccd506af049ee1f079956f216020b07d2f4ad2fea6f0683d9ed4bd9dea2a`; strict Context/project-state/governance checks and T-002 query pass. Initial strict Markdown scans found only two vague-pronoun warnings; explicit object names closed both, then task 74/74 and repository 440/440 Markdown/anchor checks passed with zero warnings/errors. |
+
+The only eligible next action is separate I1-F1 authorization. I1-F2..F4,
+C30-I2 and every downstream consumer or operational action remain closed.
 
 ## C30-I1-E5 successor repair qualification — 2026-08-06
 

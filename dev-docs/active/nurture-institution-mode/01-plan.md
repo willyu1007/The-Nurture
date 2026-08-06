@@ -639,13 +639,13 @@ qualified Pilot artifact, applied migration, or release approval.
 | `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
 
 `C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A～I1-E
-验收。I1-F 仅开放后续范围评审，尚未授权实施。数据库 apply、环境 row census、
+验收。I1-F 范围已冻结；F1-F4 均未实施，下一步仅可另行授权 F1。数据库 apply、环境 row census、
 capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
 
 Current execution record:
 [`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
 
-## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C/I1-D/I1-E 已验收；I1-F 待评审）
+## C30-I1 — Neutral shared contracts（I1-A/I1-B/I1-C/I1-D/I1-E 已验收；I1-F 范围已冻结）
 
 The complete Base gate remains cumulative, but execution is ordered into six
 reviewable slices so one broad contract change cannot silently mix authorities:
@@ -657,7 +657,7 @@ reviewable slices so one broad contract change cannot silently mix authorities:
 | `C30-I1-C` subject presentation | Accepted | Successor source `ae0c357…` plus lock `3c30337…`; R1-R6 and repeated Schema/codec/exposure/build/conformance pass at hash `fc35c6b…e5cf3`. No consumer adoption. |
 | `C30-I1-D` domain action | Reaccepted | Artifact 35 closes D-R1..D-R5 at source `3580a9b…` plus metadata lock `1cb5691…`; 55 Schemas, 296 Node tests and deterministic build/source evidence pass. Manifest dependency/source convergence remains I1-F. |
 | `C30-I1-E` protected interaction | Reaccepted | Artifact 43 closes E-R1..E-R4 at source `48fd3d6…` plus metadata lock `9abde2b…`; 66 Schemas, 376 Node tests and deterministic build/source evidence pass. The artifact-41 chain is historical. |
-| `C30-I1-F` dependency/source convergence | Scope review eligible / implementation not authorized | Atomic dependencies, legacy/vNext exclusion, schema/codec parity and four separate source identities remain to be frozen before source work. |
+| `C30-I1-F` dependency/source convergence | Scope frozen / implementation not authorized | Artifact 44 freezes the optional closed `scenario_contracts` area, exact four-capability/source graph, parity, exclusions, named profiles and F1-F4 ordering. |
 
 I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
 criteria and non-goals are frozen in
@@ -717,8 +717,10 @@ reopening and bounded successor-repair scope are recorded in
 [`artifact 42`](./artifacts/42-c30-i1-e5-quality-repair-freeze.md). Artifact 41 is
 historical. The successor repair qualification and source-lock checkpoint are
 recorded in [`artifact 43`](./artifacts/43-c30-i1-e5-successor-quality-repair-qualification-record.md).
-I1-E is reaccepted. The next eligible decision is a separate I1-F scope
-review/freeze; I1-F implementation remains closed.
+I1-E is reaccepted. I1-F dependency/source convergence and ordered F1-F4 gates
+are frozen in [`artifact 44`](./artifacts/44-c30-i1-f-scope-freeze.md). The only
+eligible next decision is separate I1-F1 implementation authorization; F1-F4
+remain unstarted.
 No I1 sub-slice alone opens C30-I2; the full I1-A..F exit must pass first.
 
 ---

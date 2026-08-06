@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D/I1-E accepted; I1-F scope review and all implementation/consumer adoption/activation pending separate authorization
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D/I1-E accepted; I1-F scope frozen; I1-F implementation/consumer adoption/activation pending separate authorization
 
 ## Product Terminology Compatibility
 
@@ -58,6 +58,19 @@ The cited artifact-41 source/lock is historical.
 Manifest dependency/source convergence and
 `scenario_protected_interaction_source_v1` remain I1-F work; no My-Chat/Nurture
 consumer, protected route/store/KMS, capability or activation exists.
+
+Artifact 44 freezes I1-F dependency/source convergence without implementation.
+The future Base manifest extension is one optional, closed `scenario_contracts`
+area with the exact capabilities `trusted_scenario_invocation_v1`,
+`scenario_subject_presentation_v1`, `scenario_domain_action_execution_v1` and
+`scenario_protected_interaction_v1`, their exact dependency graph, and the exact
+source identities `platform_child_family_identity_source_v1`,
+`scenario_interface_source_v1`, `scenario_domain_action_source_v1` and
+`scenario_protected_interaction_source_v1`. The freeze covers structural Schema/runtime
+parity, contextual DAG/reference/Host checks, legacy/vNext no-alias rules, named
+Base source profiles and ordered F1-F4 gates. Artifact 44 neither changes accepted
+I1-A..E wires nor constitutes My-Chat/Nurture adoption or completed downstream
+source identity. Only F1 may be separately authorized next; F1-F4 remain unstarted.
 
 ## Decision
 
