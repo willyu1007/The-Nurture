@@ -2199,3 +2199,22 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: whenever an upstream acceptance is withdrawn or resealed, search
   every downstream current-state surface for the old revision, lock, aggregate,
   archive and successor gate before declaring cross-repository closure.
+
+### 2026-08-06 — A complete capability graph can force premature product semantics
+
+- Symptom: C30-I3 appeared to require a production action and protected
+  declaration even though C31 owns the first reviewed Guardian action.
+- Root cause: the complete four-capability Base fixture was mistaken for the only
+  legal manifest state. The accepted contract also permits dependency-complete
+  prefixes, while rejecting only partial, mixed or stale-source graphs.
+- What we tried: compared the I1-F graph rules, C30 implementation DAG, current
+  legacy action registry and C31 Guardian ownership rather than inventing a
+  placeholder or relabelling `capture_family_input`.
+- Fix / workaround: freeze I3 production at the exact trusted+presentation
+  complete prefix with no action offers. Implement and qualify generic
+  action/protected owner primitives through test-only neutral fixtures; let C31
+  add the first real declarations to the same canonical manifest.
+- Prevention: distinguish production declaration population, implementation
+  support and conformance fixtures. Never populate a manifest merely to prove
+  infrastructure; every production action must have an already reviewed product
+  intent, handler and protected lifecycle.

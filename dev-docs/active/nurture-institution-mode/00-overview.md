@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（scope frozen）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -34,8 +34,11 @@
   `8172e370…10a5ad` and reacceptance/archive checkpoint `cd7bbc2…`; the first
   `35a41e3…` / `3da48ba0…` chain is historical. Artifact 52 records the
   cumulative replacement result. The current
-  state is `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
-  C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`.
+  state is `C30_I3_SCOPE_FROZEN / I3_A_SEPARATE_AUTHORIZATION_REQUIRED`.
+  Artifact 53 freezes exact Base/My-Chat inputs, the production
+  trusted+presentation dependency-complete prefix, owner trust/identity/binding/
+  authority/protected boundaries and ordered I3-A..G units. It does not
+  authorize implementation.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -181,7 +184,8 @@
   identities, full type/lint/test/contract qualification, fresh disposable
   PostgreSQL proof and maintained static/DB absent-off census. My-Chat T-035 is
   reaccepted and archived at `cd7bbc2…`; Nurture product source is unchanged.
-  Only a separately authorized C30-I3 scope review is eligible next.
+  C30-I3 scope is frozen in artifact 53. Only separately authorized I3-A, or an
+  explicit broader ordered I3-A..G implementation mandate, is eligible next.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

@@ -47,8 +47,12 @@ Project: `main`
   C30-I2 generic My-Chat adoption as ordered I2-A..G. Artifact 52 accepts that
   chain plus its nine-finding remediation at My-Chat runtime `658b897…`,
   replacement lock `6725dc6…`, aggregate `8172e370…10a5ad` and archive
-  `cd7bbc2…`; the first I2-G lock is historical. The next eligible decision is
-  a separately authorized C30-I3 scope review. I3 implementation, C30-I4,
+  `cd7bbc2…`; the first I2-G lock is historical. Artifact 53 freezes C30-I3 as
+  ordered I3-A..G, with exact upstream pins, a production trusted+presentation
+  complete prefix, detached owner trust, typed Participant/pair association,
+  canonical action runtime, protected KMS/retention lifecycle and default-off
+  convergence. The next eligible decision is separately authorized I3-A or an
+  explicit broader ordered I3-A..G mandate. I3 implementation, C30-I4,
   C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no downstream
   PASS is deployment or traffic authority.
 

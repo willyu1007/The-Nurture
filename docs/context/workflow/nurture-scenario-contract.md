@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 scope frozen; I2-A, consumer adoption and activation require separate authorization
+Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 generic Host adoption accepted default-off; C30-I3 scope frozen; I3-A, joint adoption and activation require separate authorization
 
 ## Product Terminology Compatibility
 
@@ -78,21 +78,32 @@ The named identity/interface/action/protected profile hashes are respectively
 `81d9fb9d…fed4`, `37f0cdae…eaf`, `b7c35259…e48d` and
 `78eadaf4…efb`. This is `C30_I1_BASE_CONTRACTS_ACCEPTED`, not
 My-Chat/Nurture adoption or a completed downstream source identity. Artifact 51
-freezes My-Chat adoption as ordered I2-A..G units. Only a separately authorized
-I2-A adoption preflight/exact import is eligible next.
+freezes My-Chat adoption as ordered I2-A..G units; artifact 52 accepts the
+repaired default-off implementation at My-Chat runtime `658b897…`, replacement
+lock `6725dc6…`, aggregate `8172e370…10a5ad` and archive `cd7bbc2…`.
 
-The C30-I2 Host boundary is exact Base adoption, interactive/durable human
+The accepted C30-I2 Host boundary is exact Base adoption, interactive/durable human
 principal translation, detached private signing and one-time nonce verification,
 one atomic canonical Child/Family pair owner, semantic provider/presentation
 registry, direct/claimed action orchestration, protected transient carrier/read
-guards and cumulative default-off convergence. My-Chat's archived local
-`T-002 content-events` is unrelated; a new unused My-Chat task must be registered
-before implementation, and C30 commits there must not carry `Task: T-002`.
+guards and cumulative default-off convergence. My-Chat used repository-local
+T-035; its archived local `T-002 content-events` remains unrelated.
 
-All four C30 capabilities remain absent/off. Nurture protected storage/KMS and
-business authority remain I3; joint adoption remains I4; product composition,
-Notification, invitation, admission, activation, T-008 and Pilot remain later
-gates.
+Artifact 53 freezes C30-I3 as ordered I3-A..G. Its production manifest exit is
+the Base-permitted dependency-complete trusted+presentation prefix with an
+action-free `NurtureChildCareProcess` baseline presentation. Generic action and
+protected owner primitives are implemented only behind isolated conformance
+fixtures during I3; the first real Guardian action/protected declaration remains
+C31. I3 additionally owns detached request verification/response signing,
+private nonce consumption, typed Participant and actor provenance, exact pair
+anchors/local associations, one canonical runner and authoritative encrypted
+protected-content/KMS/retention/crypto-erasure lifecycle. The old G1 pin remains
+historical and separate from the new C30 downstream lock.
+
+All four C30 capabilities remain absent/off at Host activation level. Nurture I3
+implementation requires separate authorization; joint adoption remains I4;
+product composition, Notification, invitation, admission, activation, T-008 and
+Pilot remain later gates.
 
 ## Decision
 

@@ -285,7 +285,8 @@ dev-docs/active/nurture-institution-mode/
   through I2-G plus all nine quality-remediation findings are accepted in
   artifact 52 at My-Chat runtime `658b897…`, replacement lock `6725dc6…`,
   aggregate `8172e370…10a5ad` and archive `cd7bbc2…`. The first I2-G lock is
-  historical. Only separately authorized C30-I3 scope review is eligible next.
+  historical. Artifact 53 now freezes C30-I3 owner-adoption scope and ordered
+  I3-A..G; only separately authorized I3 implementation is eligible next.
 
 Hard gates:
 
@@ -312,9 +313,11 @@ Hard gates:
   `4350086…` 完成累计再验收。artifact 51 已完成 C30-I2 范围冻结；artifact
   52 记录 My-Chat T-035 对 I2-A..G 与九项质量修复的完整 default-off
   再验收，runtime `658b897…`、replacement lock `6725dc6…`、aggregate
-  `8172e370…10a5ad`、archive `cd7bbc2…`。下一步仅可另行授权
-  C30-I3 范围评审；I3 实施、I4、consumer activation 与所有 operational
-  action 均未开启。
+  `8172e370…10a5ad`、archive `cd7bbc2…`。artifact 53 已冻结 C30-I3 的
+  exact pins、production trusted+presentation complete prefix、owner trust/
+  binding/action/protected 边界与 I3-A..G 顺序。下一步仅可另行授权 I3-A，
+  或明确整体授权 ordered I3-A..G；I4、consumer activation 与所有
+  operational action 均未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
@@ -326,8 +329,9 @@ Hard gates:
   `artifacts/28-c30-i1-d-scope-freeze.md`、artifacts 29-35、
   `artifacts/36-c30-i1-e-scope-freeze.md`、artifacts 37-43、
   `artifacts/44-c30-i1-f-scope-freeze.md`、artifacts 45-50、
-  `artifacts/51-c30-i2-scope-freeze.md` 与
-  `artifacts/52-c30-i2-default-off-acceptance-record.md`。
+  `artifacts/51-c30-i2-scope-freeze.md`、
+  `artifacts/52-c30-i2-default-off-acceptance-record.md` 与
+  `artifacts/53-c30-i3-scope-freeze.md`。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

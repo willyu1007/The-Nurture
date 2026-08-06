@@ -16,10 +16,10 @@
   the successor repair closes all four artifact-49 findings. Artifact 48 remains
   historical. Artifact 44 remains the original F1-F4 scope freeze, artifact 49
   is the repair freeze and artifact 50 is the current exact qualification.
-  Artifact 51 freezes C30-I2 as ordered I2-A..G and artifact 52 accepts the
-  complete My-Chat implementation default-off; the current state is
-  `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
-  C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`. G1 is
+  Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
+  complete repaired My-Chat implementation default-off, and artifact 53 freezes
+  Nurture C30-I3 as ordered I3-A..G. The current state is
+  `C30_I3_SCOPE_FROZEN / I3_A_SEPARATE_AUTHORIZATION_REQUIRED`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -33,10 +33,32 @@
   exact named source profiles and source lock. Base adds validation only, not a
   consumer runtime or starter adoption. My-Chat now contains accepted generic
   Host runtime support and the narrow nonce/pair schema under T-035, all
-  default-off. Nurture product source and the existing formal NestJS owner path
-  are unchanged. No persistent database, secret/KMS/environment value,
+  default-off. Nurture C30-I3 changes are planning/context only; product source
+  and the existing formal NestJS owner path are unchanged. No persistent
+  database, secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3 Scenario-owner adoption scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance continuity | PASS | `resume --task T-002 --json` and triage reuse active `M-002 > F-002 > T-002 nurture-institution-mode`; no new task is created. |
+| Exact entry inputs | PASS | Base `15ff031…` / lock `4350086…` / aggregate `d17f2358…6383`; My-Chat runtime `658b897…` / replacement lock `6725dc6…` / aggregate `8172e370…10a5ad` / archive `cd7bbc2…`; Nurture entry `eec87b9…`. |
+| Manifest/module gap | PASS | Current YAML plus hand-copied registry and preactivation/activation module variants are explicitly rejected as I3 parity evidence; one YAML-generated default-off production module is frozen. |
+| Capability boundary | PASS | Production exit is the valid trusted+presentation dependency-complete prefix with `action_offer_policy=none`; action/protected primitives use test-only fixtures, while first real declarations remain C31. |
+| Trust/identity boundary | PASS | Detached verifier/response signer, private nonce, typed Participant binding, exact pair evidence, atomic local associations and business-authority rereads are frozen without identity-as-permission or service-token fallback. |
+| Action/protected boundary | PASS | One typed direct/claimed runner plus authoritative ciphertext/per-content wrapped-DEK/KMS-port/retention/crypto-erasure lifecycle is frozen; legacy action/protected paths cannot alias or fall back. |
+| Donor and impact boundary | PASS | T-029 N01-N12 are individually rework/reject/defer/regenerate dispositions. Base/My-Chat source, Host runtime/ORM/worker ownership, C31 product semantics and existing DBs remain out of scope. |
+| Implementation decomposition | PASS | I3-A exact adoption → B trust/Participant → C pair/local transaction → D subject/presentation → E action runtime → F protected lifecycle → G convergence/qualification. |
+| Acceptance/rollback/NO-GO | PASS | Exact locks, generated parity, fresh disposable DB, no-copy, concurrency/fault, KMS failure, default-off and non-destructive rollback gates are explicit. I4 opens only after cumulative I3 acceptance. |
+| Exact topology | PASS | Base is clean at metadata lock `4350086…`; My-Chat is clean at repaired T-035 archive `cd7bbc2…`; Nurture entered at `eec87b9…` and changes only the bounded scope/governance/context files. |
+| Governance/context/docs | PASS | Project sync and governance lint pass; workflow-context checksum `7a05eda2…401bd78c` and strict context verification pass; strict Markdown/anchor lint passes 83 task files, 1 workflow-context file and 4 project files with zero warnings/errors; `git diff --check` passes. |
+| Effect boundary | PASS | Planning/context only. No product code, manifest/module, Prisma/schema/migration, build, database, KMS secret, capability, deployment, activation, I4, C31, T-008, Pilot or traffic action ran. |
+
+Current verdict: `C30_I3_SCOPE_FROZEN /
+I3_A_SEPARATE_AUTHORIZATION_REQUIRED`.
+Normative record: `artifacts/53-c30-i3-scope-freeze.md`.
 
 ## C30-I2 generic Host adoption default-off acceptance — 2026-08-06
 
@@ -52,8 +74,9 @@ I2-A..G rows that follow remain historical execution evidence.
 | Mechanical default-off | PASS | Maintained static/route/DB collector hash `989e8294b47a980adcdc10ca35848c19891ca825beae80ffccc8d73271a63fdd`; positive registration/activation/private-state populations are empty and the composed pair support route is explicitly `hard_default_deny`. |
 | Governance boundary | PASS | T-035 is archived; Nurture changes only program evidence. No I3 implementation, Nurture consumer, capability/Workspace activation, deployment, T-008, Pilot or traffic action occurred. |
 
-Current verdict: `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
-C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`.
+Historical I2 exit verdict: `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
+C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`. Artifact 53 records the
+completed successor scope review.
 
 ### Historical first acceptance evidence
 

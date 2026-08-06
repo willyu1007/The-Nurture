@@ -7,16 +7,32 @@
 
 ## Next concrete actions
 
-1. Await separate authorization for C30-I3 Nurture-consumer scope review and
-   freeze.
-2. Keep C30-I3 implementation, I4 joint adoption, C31-C35, T-008, persistent
+1. Await separate authorization for C30-I3-A, or an explicit broader mandate for
+   ordered I3-A..G implementation.
+2. Keep all C30-I3 implementation, I4 joint adoption, C31-C35, T-008, persistent
    database apply, capability/Workspace activation, deployment, Pilot and
    traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
    `8172e370…10a5ad` and archive `cd7bbc2…` as the immutable default-off I2
-   handoff. The first I2-G lock is historical only.
+   handoff, and artifact 53 as the normative I3 implementation-entry contract.
+   The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Completed the authorized C30-I3 Scenario-owner scope review and
+  freeze in artifact 53. The review reuses Nurture T-002, pins accepted Base
+  `15ff031…` / lock `4350086…` and repaired My-Chat `658b897…` / replacement
+  lock `6725dc6…` / archive `cd7bbc2…`, and records Nurture entry
+  `eec87b9…`. It freezes I3-A..G across canonical generated manifest, detached
+  private trust/Participant binding, atomic pair anchors/local associations,
+  action-free `NurtureChildCareProcess` presentation, typed direct/claimed
+  execution, protected content/KMS/retention and cumulative default-off
+  convergence. The production manifest stops at the valid trusted+presentation
+  dependency-complete prefix; action/protected infrastructure is test-fixture
+  qualified without a production business declaration, leaving the first real
+  Guardian action to C31. No product source, manifest/module, schema, Prisma,
+  database, KMS secret, capability, deployment, activation, T-008, I4, Pilot or
+  traffic operation ran. Only separately authorized I3 implementation is next.
 
 - 2026-08-06: Reaccepted C30-I2 after My-Chat T-035 quality remediation closed
   all nine findings: protected key/binary no-copy; recovery pre-dispatch state
