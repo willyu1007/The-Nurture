@@ -88,6 +88,23 @@ const profileDefinitions = [
       "prisma/schema.prisma",
     ],
   },
+  {
+    source_identity: "nurture_c30_protected_owner_lifecycle_v1",
+    files: [
+      "docs/context/db/schema.json",
+      "docs/context/registry.json",
+      "packages/nurture-db/src/c30/protected-content.repository.ts",
+      "packages/nurture-db/src/protected-content.ts",
+      "packages/nurture-db/tests/c30-protected-content.integration.test.ts",
+      "packages/nurture-scenario/scenario.manifest.yaml",
+      "packages/nurture-scenario/src/c30/protected-content.ts",
+      "packages/nurture-scenario/src/generated/manifest.generated.ts",
+      "packages/nurture-scenario/src/harness/protected-content.ts",
+      "packages/nurture-scenario/tests/c30/protected-content.test.ts",
+      "prisma/migrations/20260806140000_c30_i3_protected_owner_lifecycle/migration.sql",
+      "prisma/schema.prisma",
+    ],
+  },
 ];
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
