@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_SCENARIO_OWNER_ADOPTION_ACCEPTED_DEFAULT_OFF /
+  `C30_I3_SCENARIO_OWNER_ADOPTION_REACCEPTED_DEFAULT_OFF /
   I4_SCOPE_REVIEW_ELIGIBLE`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
@@ -46,13 +46,31 @@
 
 ## C30-I3 cumulative default-off qualification — 2026-08-06
 
+The first artifact-60 acceptance below is historical. Artifact 61 is the current
+successor qualification.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Quality findings | PASS | I3-QR1 through I3-QR4 close: recoverable KMS coordination, current-authority replay/recovery, exact canonical object versions and owner-derived read carrier binding. |
+| Migration repair | PASS | Enum states commit in `20260806225000`; schema/constraint changes follow in `20260806230000`. Fresh 21/21 deploy and both diffs pass. |
+| Verification | PASS | Root typecheck; Scenario 58/635; DB 24/259; focused 3/34; scenario-service 8/52; package builds; default-off/upstream/routing/persistence gates. |
+| Documentation/governance | PASS | All 91 task Markdown files, local links and anchors have zero errors/warnings; strict context and governance lint pass. |
+| Successor identity | PASS | Source `48530be…`; lock `7db3129…`; aggregate `623da6fd…95d5`; pair `6afeedef…b1d0`; protected owner `adecec17…3487`. |
+| Cleanup/boundary | PASS | Eight C30 tables plus nonce zero; exact container destroyed; 55440 free; no existing DB, activation, deployment, I4 implementation, T-008 or Pilot operation. |
+
+Current verdict: `C30_I3_SCENARIO_OWNER_ADOPTION_REACCEPTED_DEFAULT_OFF /
+I4_SCOPE_REVIEW_ELIGIBLE`.
+Normative record: `artifacts/61-c30-i3-successor-quality-repair-qualification-record.md`.
+
+### Historical first acceptance
+
 | Check | Result | Evidence |
 | --- | --- | --- |
 | Exact convergence | PASS | Final source `c8b9ce2…`; seven-profile lock `15207ba…`; aggregate `5c08b542…c4ab6`; exact clean Base/My-Chat inputs. |
 | Production/test separation | PASS | Production is the exact action-free two-capability prefix; Base accepts the isolated full graph containing both neutral drivers and protected declaration. |
 | Default-off census | PASS | Hash `448d37e1…3c3e`; enabled/action/protected/offer/positive-route/Workspace-activation populations all zero. |
 | Static and build gates | PASS | Root typecheck; direct Scenario/DB/scenario-service/frontend builds; frontend ESLint/Stylelint; manifest, routing, persistence and G2 checks. |
-| Regression populations | PASS | Scenario 58 files / 635 tests; scenario-service 8 files / 52 tests; DB 24 files / 253 tests. |
+| Regression populations | PASS | At the historical checkpoint: Scenario 58 files / 635 tests; scenario-service 8 files / 52 tests; DB 24 files / 253 tests. |
 | Fresh database | PASS | Exact 55440 target recreated empty, 19/19 migrations, Prisma validate/generate, DB-to-SSOT and migrations-to-SSOT empty. |
 | Final data/target cleanup | PASS | Eight C30 tables proved zero; exact container destroyed; 55440 absent/free; unrelated 55439 owner untouched. |
 | Qualification repairs | PASS | Fixed package-local zero-test command, stale 52/21 routing census and readonly Base pair-wire test tuples. |

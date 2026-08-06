@@ -1,5 +1,10 @@
 # C30-I3-F Protected Owner Lifecycle Record
 
+> Historical acceptance notice: the later quality review invalidated this
+> record's external-KMS/database coordination claim. Artifact 61 supersedes the
+> current implementation and qualification evidence; this file is retained as
+> ordered I3-F history only.
+
 ## Decision
 
 - Date: 2026-08-06

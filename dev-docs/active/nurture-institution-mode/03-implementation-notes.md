@@ -19,6 +19,18 @@
 
 ## What changed
 
+- 2026-08-06: Reaccepted cumulative C30-I3 after the successor quality repair in
+  artifact 61. Source `48530be…`, lock `7db3129…` and aggregate
+  `623da6fd…95d5` replace the first artifact-60 acceptance as current evidence.
+  The repair adds durable `provisioning|erasing` KMS coordination with all KMS
+  calls outside DB transactions, current-authority rereads for pair replay and
+  recovery, exact Participant/Process/Family result versions, and an
+  owner-verified foreground/carrier binding port. Fresh PostgreSQL applied
+  21/21 migrations after splitting enum creation into its own transaction;
+  both diffs are empty. Scenario 58/635, DB 24/259 and scenario-service 8/52
+  pass. The disposable target was zeroed and destroyed. I4 implementation,
+  C31-C35, activation, deployment, T-008 and Pilot remain closed.
+
 - 2026-08-06: Closed cumulative C30-I3 in artifact 60 at final source
   `c8b9ce2…`, lock `15207ba…` and aggregate `5c08b542…c4ab6`. The exact
   production two-capability prefix, isolated test-only complete graph and

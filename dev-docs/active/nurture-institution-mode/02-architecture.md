@@ -774,6 +774,22 @@ Nurture adds an authoritative `NurtureProtectedContent` aggregate with `prepared
 
 My-Chat must render a distinct protected composer that never calls ordinary Chat persistence or durable draft/artifact paths. Nurture Chat warns before soliciting private detail and opens an empty composer from an intent-only conversation. Text entered into ordinary Chat remains under My-Chat transcript/provider/deletion policy, is never automatically copied/summarized into the protected lifecycle, and is not covered by the composer's no-Chat-persistence claim. Drafts have only current Participant + surface + foreground-process scope; deliberate leave is `stay|discard_and_navigate`, while background/lock/logout/context change clears them. `scenario_protected_ai_draft_v1` is a separate dependent capability and is off for Pilot-0; generic AI may narrate display-safe presentation but cannot receive protected bodies. Pilot retention is five-minute prepared authority with wrapped-key cleanup by 15 minutes, 30-day committed body, 365-day body-free business/audit evidence, zero durable AI prompt/output, and at-most-30-day encrypted backup with erasure-ledger replay before reads. Redaction/expiry crypto-erases the per-content key; Grant revoke stops unauthorized access but is not automatic global deletion.
 
+C30-I3 realizes the generic owner primitive with durable coordination states
+around the external KMS boundary. A database transaction first reserves
+`provisioning`; an idempotent, operation-keyed KMS provision then runs outside
+the transaction; a second locked transaction rereads current Participant,
+business and canonical-pair authority before activating ciphertext. Erasure
+first commits `erasing`, then idempotently destroys the external handle outside
+the transaction, and finally clears every recoverable cryptographic field.
+Retry or internal erasure reconciliation resumes these durable states without
+inventing a second key or representing destroyed material as readable. Read
+decrypts and derives the foreground carrier binding outside the transaction,
+then performs a final locked authority/lifecycle reread before returning
+caller-owned plaintext bytes. Canonical Participant/Process/Family versions
+come from their own aggregates and never from principal-binding revision. This
+quality-repaired generic primitive remains fixture-only and default-off; it
+does not add a production protected declaration or route.
+
 Complete adoption adds `scenario_protected_interaction_source_v1` beside interface/action source identities and separately pins Nurture storage-crypto plus My-Chat protected-runtime conformance revisions and the retention policy. Order remains Base contracts -> My-Chat Host/privacy adoption -> Nurture schema/KMS/owner services -> joint fault/privacy/restore evidence. C-3-0 is `DESIGN COMPLETE / IMPLEMENTATION OPEN`; current synthetic refs, plaintext-copy seams, missing enforceable separation between the protected composer and ordinary Chat/`PublicDraft`, absent contracts/KMS/composer/leakage scanner, and default-off capabilities keep traffic NO-GO. Actual adoption is delivered through C-3-1..5, beginning with Guardian family communication.
 
 Pilot-0-C3-1 makes one `NurtureFamilyCareItem` the internal composition root for a Guardian family-communication entry. The entry is a non-persisted Nurture presenter projection, not a Base type, Host object, new table, mutable conversation, or Thread authorization rule. It composes exact source Message/Receipt, Item/Event/Attention, optional unique reply facts, and the original Grant. `progress=sent|acknowledged|replied`, `entry_lifecycle=active|terminal|suppressed`, and independent question/reply visibility remain orthogonal, so revoke or redaction cannot erase prior business progress or automatically delete another author's body. A malformed or contradictory fact graph fails closed instead of being guessed from Item status.

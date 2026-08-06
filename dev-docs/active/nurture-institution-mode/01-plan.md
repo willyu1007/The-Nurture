@@ -735,7 +735,8 @@ Host adoption is accepted in
 scope, ownership, exact two-capability production prefix and ordered I3-A..G
 implementation gates are frozen in
 [`artifact 53`](./artifacts/53-c30-i3-scope-freeze.md). Every I3 implementation
-unit and operational action remains closed.
+unit is now complete under the successor qualification described below; I4
+implementation and every operational action remain separately closed.
 
 ## C30-I2 — Generic My-Chat Host adoption（已验收，default-off）
 
@@ -779,8 +780,8 @@ adoption, decomposed into seven ordered units:
 | `C30-I3-C` pair anchors/local association | Accepted | Artifact 56 pins source `bf3fee8…`, the additive migration, atomic local association and writer-fenced recovery on the isolated disposable DB. |
 | `C30-I3-D` subject/presentation | Accepted | Artifact 57 pins current owner-resolved `NurtureChildCareProcess`, sealed locators and the safe six-block action-free baseline. |
 | `C30-I3-E` canonical action runtime | Accepted | Artifact 58 pins the fixture-only direct/claimed runner, typed Execution provenance, atomic effect/audit/outbox transaction and writer-fenced recovery; production actions remain absent. |
-| `C30-I3-F` protected owner lifecycle | Accepted | Artifact 59 pins per-content wrapped DEK, default-deny KMS port, current-authority lifecycle, retention/tombstone/crypto-erasure, restored-snapshot denial and recursive no-copy. |
-| `C30-I3-G` convergence/qualification | Accepted | Artifact 60 pins the immutable seven-profile lock, exact prefix/test-only full graph, fresh 19-migration DB qualification, zero positive populations and destroyed 55440 target. |
+| `C30-I3-F` protected owner lifecycle | Reaccepted after repair | Artifact 59 is historical. Artifact 61 pins durable `provisioning|erasing` KMS coordination outside DB transactions, final current-authority reread, owner-derived foreground binding, retention/tombstone/crypto-erasure, restored-snapshot denial and recursive no-copy. |
+| `C30-I3-G` convergence/qualification | Reaccepted after repair | Artifact 60 is historical. Artifact 61 pins successor source `48530be…`, lock `7db3129…`, aggregate `623da6fd…95d5`, fresh 21-migration DB qualification, unchanged zero-positive census and destroyed 55440 target. |
 
 The production I3 manifest deliberately stops at the Base-permitted
 dependency-complete `trusted_scenario_invocation_v1 +
@@ -791,7 +792,10 @@ legacy `capture_family_input` aliases and premature
 `submit_family_care_question` adoption are forbidden.
 
 The user authorized ordered I3-A..G implementation. I3-A through I3-G are
-accepted default-off. Only a separately authorized I4 scope review is eligible.
+reaccepted default-off by
+[`artifact 61`](./artifacts/61-c30-i3-successor-quality-repair-qualification-record.md),
+which supersedes artifacts 59 and 60 for current implementation and cumulative
+qualification claims. Only a separately authorized I4 scope review is eligible.
 I4 implementation, C31-C35, T-008,
 deployment, activation, Pilot and traffic remain closed.
 

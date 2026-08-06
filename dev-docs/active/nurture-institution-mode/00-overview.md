@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（accepted, default-off）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（quality-repaired and reaccepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -34,7 +34,7 @@
   `8172e370…10a5ad` and reacceptance/archive checkpoint `cd7bbc2…`; the first
   `35a41e3…` / `3da48ba0…` chain is historical. Artifact 52 records the
   cumulative replacement result. The current
-  state is `C30_I3_SCENARIO_OWNER_ADOPTION_ACCEPTED_DEFAULT_OFF /
+  state is `C30_I3_SCENARIO_OWNER_ADOPTION_REACCEPTED_DEFAULT_OFF /
   I4_SCOPE_REVIEW_ELIGIBLE`.
   Artifact 53 freezes exact Base/My-Chat inputs, the production
   trusted+presentation dependency-complete prefix, owner trust/identity/binding/
@@ -56,7 +56,15 @@
   `b251bb46…48a8`. Artifact 60 accepts cumulative I3-A..G at final source
   `c8b9ce2…`, lock `15207ba…`, aggregate `5c08b542…c4ab6` and default-off
   census `448d37e1…3c3e`; the disposable 55440 database is destroyed and only a
-  separately authorized I4 scope review is eligible.
+  separately authorized I4 scope review is eligible. The later quality review
+  reopened that first acceptance. Artifact 61 closes all four findings plus the
+  fresh-migration enum defect at repair source `48530be…`, successor lock
+  `7db3129…` and aggregate `623da6fd…95d5`. KMS work is now coordinated by
+  durable `provisioning|erasing` states outside DB transactions, every pair
+  replay/recovery rereads current authority, canonical object versions are
+  independent from binding revision, and protected read binding is owner-derived.
+  The successor disposable database was also destroyed; only separately
+  authorized I4 scope review remains eligible.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base

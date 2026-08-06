@@ -2301,12 +2301,82 @@ This file exists to prevent repeating mistakes within this task.
   transaction can be undone by rollback or by restoring an older snapshot.
 - Root cause: database deletion is not authoritative erasure while an external
   KMS can still unwrap a snapshotted key envelope.
-- Fix / workaround: destroy the external KMS handle first, then clear all
-  recoverable database material. A later database rollback is fail-closed
-  because the destroyed handle cannot be restored from the database.
+- What we tried: the first lifecycle destroyed the handle and cleared the row in
+  one surrounding database transaction; ambiguity testing showed that the two
+  systems could not share a commit outcome.
+- Fix / workaround: durably commit `erasing`, destroy the external KMS handle,
+  then clear all recoverable database material in a final transaction. A later
+  database restore is fail-closed because it cannot restore the destroyed handle.
 - Prevention: qualification must restore pre-erasure database material and
   prove unwrap denial against the external KMS state; never equate row clearing
   alone with cryptographic erasure.
+
+### 2026-08-06 — External KMS calls cannot share a database transaction boundary
+
+- Symptom: a successful DB commit with an ambiguous client response could run
+  cleanup and destroy the key referenced by the committed row; conversely, a
+  successful KMS destroy followed by DB rollback could leave an `active` row
+  pointing to a destroyed key.
+- Root cause: two independent commit authorities were treated as one atomic
+  transaction, and catch-based cleanup could not distinguish rollback from an
+  ambiguous committed outcome.
+- What we tried: injected ambiguous success after KMS provision and destroy,
+  then inspected the durable row and retried the same logical operation. The
+  former transaction-wrapped flow either risked key destruction or restored an
+  `active` row whose handle no longer existed.
+- Fix / workaround: persist `provisioning` before idempotent KMS provision and
+  `erasing` before idempotent KMS destroy. Run KMS outside DB transactions and
+  finalize through locked, replayable transitions; never destroy a provisioned
+  key merely because the DB client observed an error.
+- Prevention: every external side effect needs a durable operation identity,
+  non-active intermediate state, idempotent retry and ambiguity test.
+
+### 2026-08-06 — Binding revision is not canonical object version
+
+- Symptom: Participant refs used the principal-binding aggregate revision and
+  pair/action evidence hard-coded other refs to `v1`, so independently updated
+  objects could be denied or misrepresented.
+- Root cause: association lifecycle and canonical object lifecycle were treated
+  as one version clock.
+- What we tried: exercised a Participant at version 7 with binding revision 1,
+  Process version 5 and Family version 6 across pair commit, replay, Execution
+  and outbox evidence; the prior implementation emitted incorrect versions.
+- Fix / workaround: join the Participant when reading a binding, persist exact
+  Participant/Process/Family versions in the committed pair operation and reuse
+  them in result, Execution, outbox and replay.
+- Prevention: every typed ref version must come from that object's own aggregate;
+  binding revisions remain separate evidence fields.
+
+### 2026-08-06 — PostgreSQL enum values need a committed migration before use
+
+- Symptom: a fresh migration failed with `55P04 unsafe use of new value` when
+  one migration both added `provisioning|erasing` and referenced them in a
+  default/check constraint.
+- Root cause: PostgreSQL does not allow a new enum value to be used until the
+  transaction that creates it commits.
+- What we tried: Prisma validation and schema diffs passed, but replaying the
+  complete migration chain on an empty PostgreSQL 16 target failed at the new
+  default before application tests could start.
+- Fix / workaround: add enum values in `20260806225000`, then apply columns,
+  default and constraints in `20260806230000`.
+- Prevention: whenever a migration adds and immediately consumes enum values,
+  split it at the commit boundary and prove the full chain from an empty DB.
+
+### 2026-08-06 — A digest-shaped foreground value is not verified foreground state
+
+- Symptom: protected read accepted a caller-provided SHA-256 string as the
+  carrier binding and never used the claimed foreground-context hash.
+- Root cause: shape validation was mistaken for server-owned provenance and the
+  owner did not independently bind decrypted bytes to request/surface context.
+- What we tried: supplied a validly shaped but invented foreground digest and
+  revoked authority during the decrypt/bind interval; the first implementation
+  accepted both cases because it had no owner verifier or final reread.
+- Fix / workaround: remove the caller binding field; an injected default-deny
+  owner port verifies current foreground state and derives the keyed binding
+  from request identity, server-held surface/key context and exact carrier bytes.
+- Prevention: client or transport digests are evidence inputs only. Any value
+  that authorizes or binds plaintext must be independently recomputed or
+  verified by the owner before a final current-authority reread.
 
 ### 2026-08-06 — Package-local Vitest can inherit repository-relative includes
 

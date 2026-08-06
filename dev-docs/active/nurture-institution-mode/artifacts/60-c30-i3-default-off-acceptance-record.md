@@ -1,5 +1,9 @@
 # C30-I3 Scenario-owner Adoption Default-off Acceptance Record
 
+> Historical acceptance notice: the later quality review reopened this result.
+> Artifact 61 records the repaired successor source, lock and current
+> reacceptance; this file remains the first I3-G closure record only.
+
 ## Decision
 
 - Date: 2026-08-06
