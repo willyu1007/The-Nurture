@@ -14,10 +14,11 @@
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
   `C30-I0-A/B/C/D` gates remain complete. Artifact 50 reaccepts C30-I1-F after
   the successor repair closes all four artifact-49 findings. Artifact 48 remains
-  historical. The current state is `C30_I1_BASE_CONTRACTS_ACCEPTED /
-  C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. Artifact 44 remains the original
-  F1-F4 scope freeze, artifact 49 is the repair freeze and artifact 50 is the
-  current exact qualification. G1 is
+  historical. Artifact 44 remains the original F1-F4 scope freeze, artifact 49
+  is the repair freeze and artifact 50 is the current exact qualification.
+  Artifact 51 freezes C30-I2 as ordered I2-A..G; the current state is
+  `C30_I2_SCOPE_FROZEN /
+  I2_A_SEPARATE_AUTHORIZATION_REQUIRED`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -34,6 +35,27 @@
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I2 generic Host adoption scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance continuity | PASS | Nurture `resume --task T-002 --json` resolves the active `nurture-institution-mode` bundle and exact isolated worktree. |
+| Cross-repository task identity | PASS / CORRECTION FROZEN | My-Chat `T-002` resolves archived `content-events`; artifact 51 forbids that trailer and requires a new unused My-Chat task before source changes. |
+| Base input pin | PASS | Exact accepted source `15ff031…`, metadata lock `4350086…`, aggregate hash `d17f2358…6383` and all four named profile hashes are recorded. |
+| My-Chat contract gap | PASS | Current My-Chat lock is schema v1 at local source `042b880…`, upstream Base `eb19433…`, hash `caebe85d…b2e`; no I1-A..F modules/Schemas exist. |
+| Identity/binding gap | PASS | Canonical Child/Family facts exist, but current service/repository performs separate subject writes; no exact I1-B atomic pair/current evidence/status protocol exists. |
+| Ingress/runtime gap | PASS | Interactive API auth and historical Workflow registry/claimed-Step mechanisms exist; accepted detached signer/nonce, vNext manifest registry, I1-C/D/E runtime do not. |
+| Ownership and security freeze | PASS | Human principal origins, signer/verifier order, no-fallback, pair writer fences, current reread, semantic rendering, exact two drivers and protected no-copy boundary are explicit. |
+| Donor disposition | PASS | Exact Base adoption, bounded My-Chat reuse/rework and zero direct T-029 merge are assigned without importing Nurture facts or widening Host ownership. |
+| Implementation decomposition | PASS | I2-A exact adoption → B trusted ingress → C pair owner → D presentation → E actions → F protected → G default-off qualification. Each successor stays closed. |
+| DB/operations boundary | PASS | Scope review ran no build, Prisma generate, schema change, database, capability, deployment, activation, T-008, Pilot or traffic action. I2-C requires its own disposable-target gate. |
+| Exact topology/read-only consumers | PASS | Base remains clean at `4350086…`; My-Chat remains clean at `dc4a77b…`; Nurture changes only the 12 task/project/context documentation paths listed by Git. |
+| Governance/context/docs checks | PASS | `ctl-project-governance sync --apply` and `lint --check`; context `touch` and `verify --strict`; strict docs lint over the 81-file task bundle and workflow context; `git diff --check`. All pass with zero warnings/errors. |
+| Downstream NO-GO | PASS | I2-A requires separate authorization; C30-I3/I4, C31-C35, T-008, activation and Pilot remain closed. |
+
+Scope state: `C30_I2_SCOPE_FROZEN / I2_A_SEPARATE_AUTHORIZATION_REQUIRED`.
+Normative record: `artifacts/51-c30-i2-scope-freeze.md`.
 
 ## C30-I1-F successor quality-repair qualification — 2026-08-06
 

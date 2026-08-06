@@ -4,6 +4,8 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not reuse a cross-repository task ID as though task IDs were global; resolve
+  the task independently in each repository before attaching a commit trailer.
 - TypeScript assertion helpers called by exported assertion functions require an
   explicit assertion signature; inferred arrow-function assertions trigger TS2775.
 - Under strict Ajv, every nested `properties`/string constraint introduced through
@@ -2163,3 +2165,21 @@ This file exists to prevent repeating mistakes within this task.
   operation-local reachability negatives, not only single-row dangling-reference
   checks. Every collection needs an explicit size review, and every integrity
   tool accepting path overrides needs root, ancestor and leaf symlink adversaries.
+
+### 2026-08-06 — Cross-repository task IDs are not global identities
+
+- Symptom: `resume --task T-002` resolved Nurture
+  `nurture-institution-mode`, but the same command in My-Chat resolved archived
+  `content-events` even though the shared isolated branch name also contained
+  `T-002`.
+- Root cause: project task IDs are repository-local. The worktree name preserved
+  the Nurture program ID while My-Chat had already assigned that number to a
+  different historical task.
+- What we tried: resolved continuity independently in both repositories instead
+  of trusting the branch name or copying the Nurture trailer.
+- Fix / workaround: artifact 51 keeps Nurture T-002 as the program record and
+  requires project orchestration to assign a new unused My-Chat local task before
+  any I2 source commit. My-Chat C30 commits must not use `Task: T-002`.
+- Prevention: resolve task identity against each repository's registry and task
+  bundle before a cross-repository commit; treat branch IDs and upstream task
+  references as context, never local trailer authority.

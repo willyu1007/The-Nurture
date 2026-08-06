@@ -241,13 +241,14 @@ dev-docs/active/nurture-institution-mode/
 | G6 / Pilot-0-E..1 | Proposed future Nurture release task + My-Chat companion | Reconcile the exact G5 handoff; close current C-3/C-4/D; assemble/sign the complete candidate; run disposable D evidence and E; after separate Pilot-1 authorization publish exact bytes and deploy one isolated persistent environment default-off; seal Pilot-2 readiness | Exact G5 decision + separately authorized C-3/C-4/D implementation; E Go + separate Pilot-1 approval before persistent state | Exit only as `G6_DEFAULT_OFF_QUALIFIED / PILOT2_STAGE_AUTHORIZATION_PENDING / EXTERNAL_TRAFFIC_NO_GO`; G6 task/feature identity remains pending and no implementation is authorized by this roadmap |
 | G7 / Pilot-2..4 | Proposed future `nurture-bounded-pilot-observation` task + My-Chat companion | Freeze current heads/authority；activate and bootstrap one exact synthetic cohort；run ordered Pilot-3 fault/recovery/kill-switch rehearsal to terminal disable；use the final Binding, no-reset baseline, new Pilot-4 authorization/row and five contiguous 24-hour observation segments；seal `pass|no_pass|stopped` plus a non-authorizing recommendation | Current G6 readiness seal + separate Pilot-2 authorization；Pilot-4 separately requires the terminal rehearsal and baseline seals | Exact seven-account synthetic cohort only. G7 freezes the observed environment, not mainline development；staging/production/GA, cohort expansion and external product traffic remain NO-GO |
 
-### C30-I1 current planning overlay（2026-08-06）
+### C30-I1/I2 current planning overlay（2026-08-06）
 
-- Goal: deliver the cumulative neutral Base contract through ordered I1-A..F
-  without importing Host runtime or Scenario product policy.
-- Runtime signal: Default mode; cumulative I1-A..F Base contracts are accepted.
-  I1-F added validation/source metadata only and performed no Host/Scenario
-  runtime or operational action.
+- Goal: deliver the cumulative C30 platform path through accepted neutral Base
+  I1-A..F followed by ordered My-Chat I2-A..G, without importing Scenario
+  business policy into the Host.
+- Runtime signal: Default mode; cumulative I1-A..F Base contracts are accepted
+  and C30-I2 scope is frozen. No My-Chat C30 runtime or operational action has
+  started.
 - Input trace: latest user instruction > accepted I1-A source/lock > workflow
   context and Pilot-0-C decisions > T-029 donor disposition > bounded inference.
 - Merge decision: I1-B composes with I1-A instead of defining a second private
@@ -275,8 +276,12 @@ dev-docs/active/nurture-institution-mode/
   froze I1-F as an optional closed `scenario_contracts`
   area, exact four-capability/four-source graph, parity/no-alias rules, named Base
   profiles and four ordered F1-F4 units. Artifacts 45-48 now close those units at
-  Base source `3d91591…` plus metadata lock `afe47e8…`; the neutral Base handoff
-  is accepted while every consumer and C30-I2 remain separate.
+  Base source `3d91591…` plus metadata lock `afe47e8…`; artifact 50 supersedes
+  that checkpoint at source `15ff031…` plus lock `4350086…`. The neutral Base
+  handoff is accepted. Artifact 51 freezes downstream My-Chat adoption as I2-A
+  exact import, I2-B trusted ingress, I2-C atomic pair owner, I2-D presentation,
+  I2-E action, I2-F protected runtime and I2-G default-off qualification. I2-A
+  remains separately unauthorized.
 
 Hard gates:
 
@@ -299,9 +304,10 @@ Hard gates:
   与 E1-E5 顺序已由 artifacts 42-43 在 successor source `48fd3d6…` + lock
   `9abde2b…` 完成再验收。artifact 44 冻结的 manifest dependency/source
   convergence、legacy/vNext exclusion、named source profiles 与 F1-F4 顺序，
-  已由 artifacts 45-48 在 Base source `3d91591…` + metadata lock `afe47e8…`
-  完成累计验收。下一步仅可另行授权 C30-I2 范围评审/冻结；C30-I2 实施、
-  consumer adoption 与所有 operational action 均未开启。
+  已由 artifacts 45-50 在 successor Base source `15ff031…` + metadata lock
+  `4350086…` 完成累计再验收。artifact 51 已完成 C30-I2 范围冻结；下一步仅可
+  另行授权 I2-A exact adoption preflight。I2-B..G、C30-I3/I4、consumer
+  adoption 与所有 operational action 均未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
@@ -312,7 +318,8 @@ Hard gates:
   `artifacts/21-c30-i1-c-scope-freeze.md`、
   `artifacts/28-c30-i1-d-scope-freeze.md`、artifacts 29-35、
   `artifacts/36-c30-i1-e-scope-freeze.md`、artifacts 37-43、
-  `artifacts/44-c30-i1-f-scope-freeze.md` 与 artifacts 45-48。
+  `artifacts/44-c30-i1-f-scope-freeze.md`、artifacts 45-50 与
+  `artifacts/51-c30-i2-scope-freeze.md`。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

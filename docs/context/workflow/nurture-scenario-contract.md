@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 scope review, consumer adoption and activation require separate authorization
+Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 scope frozen; I2-A, consumer adoption and activation require separate authorization
 
 ## Product Terminology Compatibility
 
@@ -69,15 +69,30 @@ source identities `platform_child_family_identity_source_v1`,
 `scenario_interface_source_v1`, `scenario_domain_action_source_v1` and
 `scenario_protected_interaction_source_v1`. The freeze covers structural Schema/runtime
 parity, contextual DAG/reference/Host checks, legacy/vNext no-alias rules, named
-Base source profiles and ordered F1-F4 gates. Exact F4 source
-`3d91591eb506de2c2c6c6633536c5b43d07c2af9` is sealed by metadata-only lock
-`afe47e8a529a52b38bd07053e55f625cdb16c194` at aggregate source hash
-`33df7df95e614104465c2fa93078b897e96538a765b050246a6b4f7ccd9139cd`.
+Base source profiles and ordered F1-F4 gates. Artifact 50 reaccepts exact
+successor source `15ff031ed16897920c13fe24c9849531d98607ad`, sealed by
+metadata-only lock `4350086993d837baa8030564f4e19593dedd96b0` at aggregate
+source hash `d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383`.
+The earlier artifact-48 source/lock/hash remains historical.
 The named identity/interface/action/protected profile hashes are respectively
-`3a438edc…9ec1a`, `52aeaa1a…40a17`, `0e4b185c…634e6` and
-`7f00570e…f9800`. This is `C30_I1_BASE_CONTRACTS_ACCEPTED`, not
-My-Chat/Nurture adoption or a completed downstream source identity. Only a
-separately authorized C30-I2 scope review/freeze is eligible next.
+`81d9fb9d…fed4`, `37f0cdae…eaf`, `b7c35259…e48d` and
+`78eadaf4…efb`. This is `C30_I1_BASE_CONTRACTS_ACCEPTED`, not
+My-Chat/Nurture adoption or a completed downstream source identity. Artifact 51
+freezes My-Chat adoption as ordered I2-A..G units. Only a separately authorized
+I2-A adoption preflight/exact import is eligible next.
+
+The C30-I2 Host boundary is exact Base adoption, interactive/durable human
+principal translation, detached private signing and one-time nonce verification,
+one atomic canonical Child/Family pair owner, semantic provider/presentation
+registry, direct/claimed action orchestration, protected transient carrier/read
+guards and cumulative default-off convergence. My-Chat's archived local
+`T-002 content-events` is unrelated; a new unused My-Chat task must be registered
+before implementation, and C30 commits there must not carry `Task: T-002`.
+
+All four C30 capabilities remain absent/off. Nurture protected storage/KMS and
+business authority remain I3; joint adoption remains I4; product composition,
+Notification, invitation, admission, activation, T-008 and Pilot remain later
+gates.
 
 ## Decision
 

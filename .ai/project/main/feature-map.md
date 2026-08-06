@@ -42,8 +42,11 @@ Project: `main`
   no-copy negatives and five ordered E1-E5 units. Artifacts 42-43 reaccept I1-E at
   successor Base source `48fd3d6…` plus metadata lock `9abde2b…` after closing four
   deterministic validation/composition findings; artifacts 37-41 and their
-  source/lock remain historical. The next eligible decision is a separate I1-F
-  scope review/freeze. I1-F implementation and C30-I2..I4,
+  source/lock remain historical. Artifacts 44-50 complete and reaccept I1-F at
+  successor Base source `15ff031…` plus lock `4350086…`. Artifact 51 freezes
+  C30-I2 generic My-Chat adoption as ordered I2-A..G and requires a new My-Chat
+  local task because its archived T-002 belongs to `content-events`. The next
+  eligible decision is separate I2-A authorization. I2-B..G, C30-I3/I4,
   C31-C35, C40-C45, D, Pilot-0-E and Pilot-1 remain unstarted, and no downstream
   PASS is deployment or traffic authority.
 

@@ -639,7 +639,7 @@ qualified Pilot artifact, applied migration, or release approval.
 | `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
 
 `C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A～I1-F
-验收。I1-F 的 F1-F4 已按顺序闭环，下一步仅可另行授权 C30-I2 范围评审/冻结。数据库 apply、环境 row census、
+验收。I1-F 的 F1-F4 已按顺序闭环，C30-I2 范围已经冻结，下一步仅可另行授权 I2-A。数据库 apply、环境 row census、
 capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
 
 Current execution record:
@@ -727,9 +727,37 @@ historical implementation and Base handoff. Artifact
 [`49`](./artifacts/49-c30-i1-f4-quality-repair-freeze.md) reopens acceptance and
 freezes the authorized successor repair. Artifact
 [`50`](./artifacts/50-c30-i1-f4-successor-quality-repair-qualification-record.md)
-closes all four findings and reaccepts cumulative C30-I1. Only a separately
-authorized C30-I2 scope review/freeze is eligible; C30-I2 implementation and every
-consumer/operational action remain closed.
+closes all four findings and reaccepts cumulative C30-I1. C30-I2 scope and its
+ordered I2-A..G implementation gates are frozen in
+[`artifact 51`](./artifacts/51-c30-i2-scope-freeze.md). Only a separately
+authorized I2-A is eligible; every implementation successor, consumer and
+operational action remains closed.
+
+## C30-I2 — Generic My-Chat Host adoption（范围已冻结）
+
+The cumulative I2 exit remains one default-off Host adoption, but implementation
+is split into seven reviewable units:
+
+| Unit | State | Boundary |
+| --- | --- | --- |
+| `C30-I2-A` adoption preflight/exact Base import | Authorization required | Register a new My-Chat local task, then adopt exact I1-A..F TypeScript/Schemas/validator and downstream source locks. No runtime or DB. |
+| `C30-I2-B` trusted ingress/signer/nonce | Closed | Public interactive and durable Run-actor translation plus detached outbound signer, inbound/response verifier and Host-private atomic nonce. Synthetic/default-off dispatch only. |
+| `C30-I2-C` canonical pair owner | Closed | Atomic Child/Family binding, current evidence and writer-fenced three-state recovery; narrow Prisma migration and disposable DB require their own target gate. |
+| `C30-I2-D` subject/presentation registry | Closed | Exact provider/presenter/surface registry, renderer, navigation and prepare-only action offers. |
+| `C30-I2-E` generic actions | Closed | Exact direct-empty and claimed-original-Step prepare/submit/recovery orchestration. |
+| `C30-I2-F` protected Host runtime | Closed | Dedicated transient carrier, composer/read foreground lifecycle and recursive leakage/cache/offline controls. |
+| `C30-I2-G` default-off convergence | Closed | Exact manifest/registry/source convergence, no legacy fallback and cumulative qualification; all capabilities remain absent/off. |
+
+The My-Chat implementation cannot reuse its archived local `T-002 content-events`
+identity. I2-A begins only after project orchestration assigns a new unused
+My-Chat task ID and cross-links it to Nurture T-002. No My-Chat C30 commit may
+carry `Task: T-002` before that correction.
+
+Artifact 51 is normative for ownership, signer/nonce order, pair-binding and
+recovery semantics, presentation/action/protected runtime, donor disposition,
+database boundary, acceptance and NO-GO. The successful I2 exit opens only an I3
+scope review; it does not authorize Nurture adoption, joint conformance,
+C31-C35, T-008, deployment, activation or Pilot.
 
 ---
 

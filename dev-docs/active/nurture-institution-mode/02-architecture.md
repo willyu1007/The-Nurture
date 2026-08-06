@@ -1789,3 +1789,40 @@ My-Chat adoption/runtime, Nurture owner/domain adapters and joint qualification
 must create their own exact downstream identities in a separately authorized
 C30-I2+ sequence. The accepted Base lock therefore makes I2 review eligible; it
 does not make any consumer or capability eligible for activation.
+
+## C30-I2 generic Host adoption boundary
+
+Artifact 51 freezes My-Chat adoption as seven ordered units: exact Base import,
+trusted ingress/signing/nonce, atomic canonical pair ownership, semantic
+presentation, direct/claimed actions, protected Host transport and cumulative
+default-off convergence. The architecture has one public-to-private trust
+transition: My-Chat resolves a current human User/Actor/Workspace from either an
+interactive session or the original durable Run actor and constructs I1-A server
+side. It signs outbound private calls; for declared Host-private inbound calls it
+verifies the detached signature and atomically consumes the nonce before dispatch.
+Ordinary API auth, a worker identity or an unsigned in-process call cannot
+substitute for that transition. Production Nurture request verification and
+response signing remain I3; I2 qualifies those Host roles against synthetic peers.
+
+The identity writer is one pair aggregate, not two endpoint calls. It fences the
+current Child, Family, family-child relation, adult authority and both expected
+binding heads in one PostgreSQL transaction, records exact replay and emits only
+refs/body-free audit/outbox. Response-loss recovery is the I1-B
+`committed|confirmed_no_effect|unknown` protocol and is entered only after a
+transport-ambiguous submitted request. Current pair evidence expires with its
+private invocation and never grants Nurture authority.
+
+Host presentation, action and protected components are generic consumers of the
+exact manifest declarations. Presenters render only I1-C semantic objects;
+action offers open prepare only; I1-D supports only `scenario_direct_empty_v1`
+and `workflow_claimed_step_v1` with `scenario_key` in both effect identities;
+I1-E plaintext exists only in a separate bounded carrier and foreground no-store
+display lease. Nurture remains the business fact, protected store/KMS and current
+Scenario-authority owner.
+
+The C30-I2 implementation is owned by a new My-Chat local task because My-Chat's
+historical `T-002` is already archived as `content-events`. Nurture T-002 remains
+the cross-repository program record, but its trailer must never be attached to
+My-Chat C30 commits. Every I2 capability remains absent/off; positive activation,
+admission, invitation, Notification, product-specific composition and all I3+
+work remain later gates.

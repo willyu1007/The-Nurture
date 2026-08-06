@@ -7,11 +7,27 @@
 
 ## Next concrete actions
 
-1. Await separate authorization for C30-I2 scope review and freeze.
-2. Keep C30-I2 implementation, consumers, database, capability activation,
+1. Await separate authorization for C30-I2-A adoption preflight and exact Base
+   import.
+2. Before My-Chat source changes, register a new unused My-Chat local task; do
+   not reuse archived `T-002 content-events` or attach its trailer.
+3. Keep I2-B..G, C30-I3/I4, consumers, database, capability activation,
    deployment, T-008, Pilot and traffic closed.
 
 ## What changed
+
+- 2026-08-06: Completed the authorized C30-I2 generic Host adoption scope review
+  and freeze in artifact 51. The review pins accepted Base source `15ff031…`,
+  metadata lock `4350086…` and aggregate/named profiles; records My-Chat
+  `dc4a77b…` as an old C30-I0 consumer; and freezes exact adoption, public/
+  durable principal translation, detached signer/nonce, atomic Child/Family pair
+  owner, semantic presentation, direct/claimed action, protected Host and
+  default-off convergence as ordered I2-A..G units. It also resolves the task-ID
+  collision: Nurture T-002 remains the program record, but My-Chat's local T-002
+  is archived `content-events`, so a new local task is mandatory before any
+  My-Chat source commit. No Base/My-Chat product source, schema, database,
+  runtime, capability, deployment, activation, T-008, Pilot or traffic action
+  ran. Only separately authorized I2-A is eligible next.
 
 - 2026-08-06: Reaccepted cumulative Base `C30-I1-F` after closing artifact-49
   F-R1 through F-R4. Source `15ff031…` separates the one
