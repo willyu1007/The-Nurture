@@ -73,4 +73,5 @@ export * from "./c30/trusted-invocation.js";
 export * from "./c30/participant-binding.js";
 export * from "./c30/pair-association.js";
 export * from "./c30/subject-presentation.js";
+export * from "./c30/canonical-action.js";
 export type * from "@my-chat/workflow-contracts";

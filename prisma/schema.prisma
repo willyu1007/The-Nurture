@@ -391,6 +391,14 @@ enum NurtureC30PairOperationState {
   quarantined
 }
 
+enum NurtureC30ActionOperationState {
+  eligible
+  dispatching
+  committed
+  confirmed_no_effect
+  quarantined
+}
+
 enum NurtureGrantDirection {
   family_to_org
   org_to_family
@@ -1617,6 +1625,7 @@ model NurtureParticipant {
   interactionContexts NurtureInteractionContext[]
   principalBindings   NurtureParticipantPrincipalBinding[]
   c30PairOperations   NurtureC30PairOperation[]
+  c30ActionOperations NurtureC30ActionOperation[]
 
   @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
   @@map("nurture_participant")
@@ -1650,8 +1659,9 @@ model NurtureParticipantPrincipalBinding {
   createdAt                       DateTime                      @default(now()) @map("created_at")
   updatedAt                       DateTime                      @updatedAt @map("updated_at")
 
-  participant       NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  participant       NurtureParticipant          @relation(fields: [participantId], references: [id], onDelete: Restrict)
   pairOperations    NurtureC30PairOperation[]
+  actionOperations  NurtureC30ActionOperation[]
   commandExecutions NurtureCommandExecution[]
 
   @@unique([workspaceId, accountObjectId, actorObjectId, currentKey], map: "uq_nurture_c30_principal_current")
@@ -1751,6 +1761,99 @@ model NurtureC30OutboxEvent {
   @@map("nurture_c30_outbox_event")
 }
 
+model NurtureC30ActionOperation {
+  id                              String                         @id @db.VarChar(200)
+  workspaceId                     String                         @map("workspace_id")
+  scenarioKey                     String                         @map("scenario_key")
+  actionKey                       String                         @map("action_key")
+  driver                          String
+  effectIdentityHash              String                         @unique(map: "uq_nurture_c30_action_effect") @map("effect_identity_hash") @db.Char(64)
+  canonicalPayloadHash            String                         @map("canonical_payload_hash") @db.Char(64)
+  participantId                   String                         @map("participant_id")
+  participantBindingId            String                         @map("participant_binding_id")
+  principalBindingHash            String                         @map("principal_binding_hash") @db.Char(64)
+  accountObjectId                 String                         @map("account_object_id")
+  actorObjectId                   String                         @map("actor_object_id")
+  representedOrganizationObjectId String?                        @map("represented_organization_object_id")
+  targetRefHash                   String                         @map("target_ref_hash") @db.Char(64)
+  targetVersion                   String                         @map("target_version")
+  primaryScopeRef                 Json                           @map("primary_scope_ref")
+  childCareProcessId              String?                        @map("child_care_process_id")
+  submitContextRef                Json?                          @map("submit_context_ref")
+  originalWorkflowStepRef         Json?                          @map("original_workflow_step_ref")
+  actionContractHash              String                         @map("action_contract_hash") @db.Char(64)
+  authorityEvidenceHash           String                         @map("authority_evidence_hash") @db.Char(64)
+  authorityRevision               Int                            @map("authority_revision")
+  scenarioCommandId               String                         @map("scenario_command_id") @db.VarChar(200)
+  scenarioCommandHash             String                         @map("scenario_command_hash") @db.Char(64)
+  clientMutationIdHash            String                         @map("client_mutation_id_hash") @db.Char(64)
+  requestNonceHash                String                         @map("request_nonce_hash") @db.Char(64)
+  hostIdentityEvidenceHash        String                         @map("host_identity_evidence_hash") @db.Char(64)
+  principalProvenanceHash         String                         @map("principal_provenance_hash") @db.Char(64)
+  requestCorrelationHash          String                         @map("request_correlation_hash") @db.Char(64)
+  deadlineEvidenceHash            String                         @map("deadline_evidence_hash") @db.Char(64)
+  attemptLedgerHash               String                         @map("attempt_ledger_hash") @db.Char(64)
+  writerFenceHash                 String                         @map("writer_fence_hash") @db.Char(64)
+  effectDeadlineAt                DateTime                       @map("effect_deadline_at")
+  state                           NurtureC30ActionOperationState @default(eligible)
+  commandExecutionId              String?                        @unique(map: "uq_nurture_c30_action_execution") @map("command_execution_id")
+  businessOutcome                 NurtureCommandBusinessOutcome? @map("business_outcome")
+  outputRefs                      Json?                          @map("output_refs")
+  handoffRequestSnapshots         Json?                          @map("handoff_request_snapshots")
+  commitEvidenceHash              String?                        @map("commit_evidence_hash") @db.Char(64)
+  noEffectFenceEvidenceHash       String?                        @map("no_effect_fence_evidence_hash") @db.Char(64)
+  committedAt                     DateTime?                      @map("committed_at")
+  recoveryCheckedAt               DateTime?                      @map("recovery_checked_at")
+  createdAt                       DateTime                       @default(now()) @map("created_at")
+  updatedAt                       DateTime                       @updatedAt @map("updated_at")
+
+  participant        NurtureParticipant                 @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  participantBinding NurtureParticipantPrincipalBinding @relation(fields: [participantBindingId], references: [id], onDelete: Restrict)
+  childCareProcess   NurtureChildCareProcess?           @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  commandExecution   NurtureCommandExecution?           @relation("NurtureC30ActionExecution", fields: [commandExecutionId], references: [id], onDelete: Restrict)
+  auditRecords       NurtureC30ActionAuditRecord[]
+  outboxEvents       NurtureC30ActionOutboxEvent[]
+
+  @@unique([workspaceId, scenarioCommandId], map: "uq_nurture_c30_action_command")
+  @@index([workspaceId, scenarioKey, actionKey, state, updatedAt], map: "ix_nurture_c30_action_state")
+  @@map("nurture_c30_action_operation")
+}
+
+model NurtureC30ActionAuditRecord {
+  id                String   @id @default(uuid())
+  actionOperationId String   @map("action_operation_id") @db.VarChar(200)
+  eventKey          String   @map("event_key")
+  aggregateRef      String   @map("aggregate_ref")
+  executionRef      String?  @map("execution_ref")
+  evidenceHash      String   @map("evidence_hash") @db.Char(64)
+  correlationRef    String   @map("correlation_ref")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  actionOperation NurtureC30ActionOperation @relation(fields: [actionOperationId], references: [id], onDelete: Restrict)
+
+  @@unique([actionOperationId, eventKey], map: "uq_nurture_c30_action_audit_event")
+  @@map("nurture_c30_action_audit_record")
+}
+
+model NurtureC30ActionOutboxEvent {
+  id                String    @id @default(uuid())
+  actionOperationId String    @map("action_operation_id") @db.VarChar(200)
+  eventType         String    @map("event_type")
+  aggregateRef      String    @map("aggregate_ref")
+  executionRef      String?   @map("execution_ref")
+  participantRef    String    @map("participant_ref")
+  correlationRef    String    @map("correlation_ref")
+  evidenceHash      String    @map("evidence_hash") @db.Char(64)
+  publishedAt       DateTime? @map("published_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  actionOperation NurtureC30ActionOperation @relation(fields: [actionOperationId], references: [id], onDelete: Restrict)
+
+  @@unique([actionOperationId, eventType], map: "uq_nurture_c30_action_outbox_event")
+  @@index([publishedAt, createdAt], map: "ix_nurture_c30_action_outbox_delivery")
+  @@map("nurture_c30_action_outbox_event")
+}
+
 model NurtureChild {
   id                   String             @id @default(uuid())
   workspaceId          String             @map("workspace_id")
@@ -1799,6 +1902,7 @@ model NurtureChildCareProcess {
   focusGoalScopes          NurtureFocusGoalChildScope[]
   publishTargets           NurturePublishProcessTarget[]
   commandExecutions        NurtureCommandExecution[]
+  c30ActionOperations      NurtureC30ActionOperation[]
   familyAnchorAssociations NurtureFamilyAnchorAssociation[]
 
   @@unique([workspaceId, id, childId], map: "uq_nurture_child_process_integrity")
@@ -2503,6 +2607,7 @@ model NurtureCommandExecution {
   visibilityEvents      NurturePublicationVisibilityEvent[]
   actorPrincipalBinding NurtureParticipantPrincipalBinding?  @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
   c30PairOperation      NurtureC30PairOperation?             @relation("NurtureC30PairExecution")
+  c30ActionOperation    NurtureC30ActionOperation?           @relation("NurtureC30ActionExecution")
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")

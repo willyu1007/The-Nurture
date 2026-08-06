@@ -185,7 +185,7 @@ describe("C30 Nurture trusted invocation", () => {
   it("rejects signature tampering before inspecting the delegated operation", async () => {
     const value = invocation();
     const signature = requestSignature(value);
-    signature.signature = `${signature.signature.slice(0, -1)}${signature.signature.endsWith("A") ? "B" : "A"}`;
+    signature.signature = `${signature.signature.startsWith("A") ? "B" : "A"}${signature.signature.slice(1)}`;
     await expect(verifyRequest({ value, signature })).rejects.toMatchObject({ code: "signature_invalid" });
   });
 
