@@ -7,9 +7,9 @@
 
 ## Next concrete actions
 
-1. Implement C30-I3-C additive pair/local persistence and atomic association
-   against the exact artifact-55 trust boundary.
-2. Continue I3-D..G only in the frozen order. Keep I4 joint adoption, C31-C35,
+1. Implement C30-I3-D current owner-resolved subject provider and safe,
+   action-free presentation against the exact artifact-56 persistence boundary.
+2. Continue I3-E..G only in the frozen order. Keep I4 joint adoption, C31-C35,
    T-008, persistent database apply, capability/Workspace activation,
    deployment, Pilot and traffic closed.
 3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
@@ -18,6 +18,18 @@
    The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Accepted C30-I3-C in artifact 56 at source `bf3fee8…`. The
+  additive `20260806120000_c30_i3_pair_owner_foundation` migration adds
+  Scenario-private nonce, typed Participant binding, pair-operation, refs-only
+  audit/outbox and typed historical execution storage. One Serializable,
+  authority-rereading transaction owns local Child/Process/Family creation,
+  both canonical-anchor associations, role, execution, audit/outbox and exact
+  replay; deadline recovery writer-fences `confirmed_no_effect`. Prisma/schema
+  convergence, focused 10 tests, complete DB 234 tests, scenario 612 tests and
+  cumulative lock `c94ac5ed…158e` pass. The exact disposable target is isolated
+  on 55440 and remains alive only for ordered I3-F/G work; I3-G must destroy it.
+  Port 55439 was already occupied and was left entirely untouched.
 
 - 2026-08-06: Accepted C30-I3-B in artifact 55 at source `b8974bf…`. The new
   Scenario-owned trust boundary verifies exact service credential, trust/key

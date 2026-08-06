@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "b8974bf76b7503221df7c6ee2bdea1eae135a8fd",
+  "source_revision": "bf3fee8d47f292e0a991a7e0ce65f864db36ad4b",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
@@ -12,11 +12,11 @@
     "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
     "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
   },
-  "source_hash": "24080cc596f59a535e0980e49e160f62778b8b65a5caf70abc9ac6b2c5e53d18",
+  "source_hash": "c94ac5ed28a26011b37b556271becf575d7693909a7ba91a2543b0a8dfe0158e",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
-      "source_hash": "789b42769af6f016d310c6cb64d0851cf6fa9d9acdf9b69a0359d83ed467b8ba",
+      "source_hash": "e6d313c0619c11d747bb395cd03ea86d6cc58190c0dfccbfe851c3950725bfdf",
       "files": [
         "package.json",
         "packages/nurture-scenario/package.json",
@@ -44,6 +44,22 @@
         "packages/nurture-scenario/src/c30/trusted-invocation.ts",
         "packages/nurture-scenario/tests/c30/participant-binding.test.ts",
         "packages/nurture-scenario/tests/c30/trusted-invocation.test.ts"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_pair_local_persistence_v1",
+      "source_hash": "99916dcb6c284afde4d9293551e5c0239a6152f0957b1bfd3815263c46d164cc",
+      "files": [
+        "docs/context/db/schema.json",
+        "docs/context/registry.json",
+        "packages/nurture-db/src/c30/nonce-store.ts",
+        "packages/nurture-db/src/c30/pair-association.repository.ts",
+        "packages/nurture-db/src/c30/participant-binding.ts",
+        "packages/nurture-db/src/index.ts",
+        "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
+        "packages/nurture-scenario/src/c30/pair-association.ts",
+        "prisma/migrations/20260806120000_c30_i3_pair_owner_foundation/migration.sql",
+        "prisma/schema.prisma"
       ]
     }
   ]

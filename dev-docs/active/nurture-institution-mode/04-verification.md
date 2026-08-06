@@ -19,7 +19,7 @@
   Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
   complete repaired My-Chat implementation default-off, and artifact 53 freezes
   Nurture C30-I3 as ordered I3-A..G. The current state is
-  `C30_I3_B_ACCEPTED / I3_C_AUTHORIZED_IN_PROGRESS`. G1 is
+  `C30_I3_C_ACCEPTED / I3_D_AUTHORIZED_IN_PROGRESS`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -35,10 +35,26 @@
   Host runtime support and the narrow nonce/pair schema under T-035, all
   default-off. Nurture I3-A has one generated canonical manifest/module and
   I3-B adds private trust/nonce/response-signing and typed Participant authority
-  primitives without registering a route. No persistent database,
+  primitives without registering a route. I3-C adds only Nurture-owned local
+  persistence on an isolated disposable target; no existing database,
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I3-C canonical pair/local association — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Additive SSOT migration | PASS | Source `bf3fee8…`; migration `20260806120000_c30_i3_pair_owner_foundation`, SHA-256 `42e022de…dd3`; migrations-to-SSOT and DB-to-SSOT show no difference. |
+| Exact isolated target | PASS | Preexisting 55439 owner was not touched; empty `nurture-c30-i3` was created on loopback 55440 and applied 17/17 migrations. |
+| Atomic association | PASS | Serializable transaction rereads local authority and atomically writes binding, local Child/Process/Family, role, both associations, typed execution and refs-only audit/outbox. |
+| Replay/recovery | PASS | Exact replay is stable; changed input, revoke, owner drift, local conflict and concurrent loser fail closed; deadline no-effect is writer-fenced against late commit. |
+| Verification | PASS | Prisma format/validate/generate; focused 10 tests; full DB 22 files / 234 tests; complete scenario 54 files / 612 tests; Scenario/DB production build. |
+| Cumulative lock | PASS | Aggregate `c94ac5ed…158e`; pair/local profile `99916dcb…4cc`. |
+| Effect boundary | PASS | Synthetic disposable data only; no existing DB, route, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_C_ACCEPTED / I3_D_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/56-c30-i3-c-implementation-record.md`.
 
 ## C30-I3-B private trust and Participant binding — 2026-08-06
 

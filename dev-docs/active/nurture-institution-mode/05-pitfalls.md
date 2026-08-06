@@ -2218,3 +2218,40 @@ This file exists to prevent repeating mistakes within this task.
   support and conformance fixtures. Never populate a manifest merely to prove
   infrastructure; every production action must have an already reviewed product
   intent, handler and protected lifecycle.
+
+### 2026-08-06 — A preselected disposable port can already belong to another target
+
+- Symptom: the planned I3 PostgreSQL port 55439 was already published by the
+  unrelated `codex-q4b5-mychat-pg` container.
+- Root cause: a prior exact port choice is not proof that the endpoint remains
+  unowned when implementation begins.
+- Fix / workaround: inspect the exact owner read-only, leave it untouched, then
+  select and prove-free 55440 before creating `nurture-c30-i3` there.
+- Prevention: resolve container name and loopback port immediately before every
+  disposable create; ownership mismatch changes the new target, never the
+  preexisting service.
+
+### 2026-08-06 — Workspace package tests can require built subpath artifacts
+
+- Symptom: the complete DB suite failed during module collection before any test
+  ran, while its focused source-imported C30 integration suite passed.
+- Root cause: historical workspace package subpath exports resolve to `dist`, and
+  the current Scenario/DB output had not yet been refreshed for the new exports.
+- Fix / workaround: run the authorized `build:binding-owner-runtime` prerequisite,
+  then rerun the whole DB population; all 22 files / 234 tests passed.
+- Prevention: refresh owning package artifacts before broad suites whose package
+  exports target `dist`; classify collection failure separately from a source or
+  database test failure.
+
+### 2026-08-06 — Prisma diff inputs need stable database endpoints
+
+- Symptom: a migration diff using a process-substitution `/dev/fd` datasource did
+  not provide Prisma a usable stable schema endpoint.
+- Root cause: Prisma's diff subprocess cannot rely on a shell-owned file
+  descriptor path remaining available through its own process lifecycle.
+- Fix / workaround: create a dedicated empty shadow database inside the exact
+  disposable I3 container and compare migrations, target and SSOT through normal
+  PostgreSQL URLs; both final diffs are empty.
+- Prevention: use an explicitly scoped disposable shadow database for migration
+  previews and validate its target identity before use; do not use transient file
+  descriptors as Prisma datasource authorities.
