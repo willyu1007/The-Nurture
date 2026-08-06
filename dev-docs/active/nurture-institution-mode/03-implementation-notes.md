@@ -7,14 +7,29 @@
 
 ## Next concrete actions
 
-1. Await separate authorization for C30-I2-A adoption preflight and exact Base
-   import.
-2. Before My-Chat source changes, register a new unused My-Chat local task; do
-   not reuse archived `T-002 content-events` or attach its trailer.
-3. Keep I2-B..G, C30-I3/I4, consumers, database, capability activation,
-   deployment, T-008, Pilot and traffic closed.
+1. Await separate authorization for C30-I3 Nurture-consumer scope review and
+   freeze.
+2. Keep C30-I3 implementation, I4 joint adoption, C31-C35, T-008, persistent
+   database apply, capability/Workspace activation, deployment, Pilot and
+   traffic closed.
+3. Treat My-Chat T-035 source `35a41e3…`, downstream lock `890ff7d…` and archive
+   `b262bfc…` as the immutable default-off I2 handoff.
 
 ## What changed
+
+- 2026-08-06: Accepted the fully authorized C30-I2 generic My-Chat Host adoption
+  as `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF` in artifact 52. My-Chat
+  T-035 completed ordered I2-A..G, sealed runtime source `35a41e3…` with
+  downstream lock `890ff7d…` and aggregate `3da48ba0…b9646`, passed the full
+  17-project build, recursive typecheck, ESLint, 102-file/643-test unit suite,
+  contract/source/portability checks and 12-file/176-test runtime adoption suite,
+  then archived at `b262bfc…`. The exact disposable PostgreSQL target on
+  `127.0.0.1:55438` applied all 26 migrations, showed no SSOT drift, passed the
+  15/15 nonce/pair matrix three times, ended with all scoped row counts zero and
+  was destroyed. Base stayed clean at `4350086…`; Nurture product source was not
+  changed. No existing database, capability/Workspace activation, deployment,
+  T-008, Pilot or traffic was touched. Only a separately authorized C30-I3 scope
+  review is eligible next.
 
 - 2026-08-06: Completed the authorized C30-I2 generic Host adoption scope review
   and freeze in artifact 51. The review pins accepted Base source `15ff031…`,
@@ -27,7 +42,8 @@
   is archived `content-events`, so a new local task is mandatory before any
   My-Chat source commit. No Base/My-Chat product source, schema, database,
   runtime, capability, deployment, activation, T-008, Pilot or traffic action
-  ran. Only separately authorized I2-A is eligible next.
+  ran. At that scope-freeze checkpoint, only separately authorized I2-A was
+  eligible next; the preceding artifact-52 entry records its later completion.
 
 - 2026-08-06: Reaccepted cumulative Base `C30-I1-F` after closing artifact-49
   F-R1 through F-R4. Source `15ff031…` separates the one

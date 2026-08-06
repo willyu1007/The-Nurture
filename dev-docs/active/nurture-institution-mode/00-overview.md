@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（scope frozen）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -28,8 +28,11 @@
   `33df7df9…39cd`. Artifact 49 reopened acceptance after four reproduced defects.
   Artifact 50 closes F-R1 through F-R4 at successor Base source `15ff031…`,
   metadata-only lock `4350086…` and aggregate hash `d17f2358…6383`. The
-  current state is `C30_I2_SCOPE_FROZEN /
-  I2_A_SEPARATE_AUTHORIZATION_REQUIRED`.
+  My-Chat T-035 then closes ordered I2-A..G at runtime source `35a41e3…`,
+  downstream lock `890ff7d…`, aggregate hash `3da48ba0…b9646` and archived
+  checkpoint `b262bfc…`. Artifact 52 records the cumulative result. The current
+  state is `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
+  C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -166,10 +169,15 @@
   durable principal translation, detached signer/nonce verification, atomic
   Child/Family pair ownership, semantic presentation, direct/claimed actions,
   protected Host runtime, default-off convergence and ordered I2-A..G gates.
-  The review also resolves the cross-repository task collision: Nurture T-002
-  remains the program record, while My-Chat must register a new unused local task
-  before any implementation commit. I2-A and every source/schema/runtime/DB/
-  capability action require separate authorization.
+  The review also resolved the cross-repository task collision: Nurture T-002
+  remains the program record, while My-Chat registered T-035 rather than reusing
+  its archived local T-002.
+- C30-I2 default-off acceptance:
+  `artifacts/52-c30-i2-default-off-acceptance-record.md` records ordered I2-A..G,
+  exact My-Chat source/lock/profile identities, full build/type/lint/test/contract
+  qualification, the three-pass disposable PostgreSQL proof and final absent/off
+  census. My-Chat T-035 is archived at `b262bfc…`; Nurture product source is
+  unchanged. Only a separately authorized C30-I3 scope review is eligible next.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

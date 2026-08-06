@@ -247,17 +247,17 @@ dev-docs/active/nurture-institution-mode/
   I1-A..F followed by ordered My-Chat I2-A..G, without importing Scenario
   business policy into the Host.
 - Runtime signal: Default mode; cumulative I1-A..F Base contracts are accepted
-  and C30-I2 scope is frozen. No My-Chat C30 runtime or operational action has
-  started.
+  and C30-I2 generic My-Chat Host adoption is accepted default-off. No Nurture
+  consumer or operational action has started.
 - Input trace: latest user instruction > accepted I1-A source/lock > workflow
   context and Pilot-0-C decisions > T-029 donor disposition > bounded inference.
 - Merge decision: I1-B composes with I1-A instead of defining a second private
   transport/signature envelope. No unresolved product-scope conflict remains.
-- Project structure checkpoint: I1-F F1-F3 add only Base manifest/Schema/runtime-
-  assertion/module-validator declarations and conformance; F4 source `3d91591…`
-  adds named-profile tooling and metadata lock `afe47e8…` seals that exact source.
-  No consumer/runtime adoption exists. The current Nurture-side update changes
-  task/project/context documentation only.
+- Project structure checkpoint: Base remains accepted at source `15ff031…` plus
+  metadata lock `4350086…`. My-Chat T-035 adds only the generic Host adoption,
+  seals runtime source `35a41e3…` with downstream lock `890ff7d…` and exits with
+  every capability/Workspace absent/off. No Nurture consumer exists. The current
+  Nurture-side update changes task/project governance documentation only.
 - Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
   frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; the B1-only checkpoint is in
   artifacts 17-20. I1-B is accepted; artifact 21 freezes I1-C provider/presentation
@@ -278,10 +278,12 @@ dev-docs/active/nurture-institution-mode/
   profiles and four ordered F1-F4 units. Artifacts 45-48 now close those units at
   Base source `3d91591…` plus metadata lock `afe47e8…`; artifact 50 supersedes
   that checkpoint at source `15ff031…` plus lock `4350086…`. The neutral Base
-  handoff is accepted. Artifact 51 freezes downstream My-Chat adoption as I2-A
+  handoff is accepted. Artifact 51 froze downstream My-Chat adoption as I2-A
   exact import, I2-B trusted ingress, I2-C atomic pair owner, I2-D presentation,
   I2-E action, I2-F protected runtime and I2-G default-off qualification. I2-A
-  remains separately unauthorized.
+  through I2-G are now accepted in artifact 52 at My-Chat runtime `35a41e3…`,
+  lock `890ff7d…` and archive `b262bfc…`. Only separately authorized C30-I3
+  scope review is eligible next.
 
 Hard gates:
 
@@ -305,9 +307,11 @@ Hard gates:
   `9abde2b…` 完成再验收。artifact 44 冻结的 manifest dependency/source
   convergence、legacy/vNext exclusion、named source profiles 与 F1-F4 顺序，
   已由 artifacts 45-50 在 successor Base source `15ff031…` + metadata lock
-  `4350086…` 完成累计再验收。artifact 51 已完成 C30-I2 范围冻结；下一步仅可
-  另行授权 I2-A exact adoption preflight。I2-B..G、C30-I3/I4、consumer
-  adoption 与所有 operational action 均未开启。
+  `4350086…` 完成累计再验收。artifact 51 已完成 C30-I2 范围冻结；artifact
+  52 记录 My-Chat T-035 对 I2-A..G 的完整 default-off 验收，runtime
+  `35a41e3…`、lock `890ff7d…`、archive `b262bfc…`。下一步仅可另行授权
+  C30-I3 范围评审；I3 实施、I4、consumer activation 与所有 operational
+  action 均未开启。
   详见
   `artifacts/15-c30-i1-scope-freeze.md` 与
   `artifacts/16-c30-i1-b-scope-freeze.md` 与
@@ -318,8 +322,9 @@ Hard gates:
   `artifacts/21-c30-i1-c-scope-freeze.md`、
   `artifacts/28-c30-i1-d-scope-freeze.md`、artifacts 29-35、
   `artifacts/36-c30-i1-e-scope-freeze.md`、artifacts 37-43、
-  `artifacts/44-c30-i1-f-scope-freeze.md`、artifacts 45-50 与
-  `artifacts/51-c30-i2-scope-freeze.md`。
+  `artifacts/44-c30-i1-f-scope-freeze.md`、artifacts 45-50、
+  `artifacts/51-c30-i2-scope-freeze.md` 与
+  `artifacts/52-c30-i2-default-off-acceptance-record.md`。
   C1 证据见 `artifacts/22-c30-i1-c1-implementation-record.md`。
   C2 证据见 `artifacts/23-c30-i1-c2-implementation-record.md`。
   C3 证据见 `artifacts/24-c30-i1-c3-implementation-record.md`。

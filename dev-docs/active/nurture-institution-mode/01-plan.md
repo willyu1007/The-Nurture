@@ -728,35 +728,38 @@ historical implementation and Base handoff. Artifact
 freezes the authorized successor repair. Artifact
 [`50`](./artifacts/50-c30-i1-f4-successor-quality-repair-qualification-record.md)
 closes all four findings and reaccepts cumulative C30-I1. C30-I2 scope and its
-ordered I2-A..G implementation gates are frozen in
-[`artifact 51`](./artifacts/51-c30-i2-scope-freeze.md). Only a separately
-authorized I2-A is eligible; every implementation successor, consumer and
-operational action remains closed.
+ordered I2-A..G implementation gates were frozen in
+[`artifact 51`](./artifacts/51-c30-i2-scope-freeze.md); the complete default-off
+Host adoption is accepted in
+[`artifact 52`](./artifacts/52-c30-i2-default-off-acceptance-record.md). Only a
+separately authorized C30-I3 scope review is eligible; every Nurture consumer,
+I3 implementation and operational action remains closed.
 
-## C30-I2 — Generic My-Chat Host adoption（范围已冻结）
+## C30-I2 — Generic My-Chat Host adoption（已验收，default-off）
 
 The cumulative I2 exit remains one default-off Host adoption, but implementation
 is split into seven reviewable units:
 
 | Unit | State | Boundary |
 | --- | --- | --- |
-| `C30-I2-A` adoption preflight/exact Base import | Authorization required | Register a new My-Chat local task, then adopt exact I1-A..F TypeScript/Schemas/validator and downstream source locks. No runtime or DB. |
-| `C30-I2-B` trusted ingress/signer/nonce | Closed | Public interactive and durable Run-actor translation plus detached outbound signer, inbound/response verifier and Host-private atomic nonce. Synthetic/default-off dispatch only. |
-| `C30-I2-C` canonical pair owner | Closed | Atomic Child/Family binding, current evidence and writer-fenced three-state recovery; narrow Prisma migration and disposable DB require their own target gate. |
-| `C30-I2-D` subject/presentation registry | Closed | Exact provider/presenter/surface registry, renderer, navigation and prepare-only action offers. |
-| `C30-I2-E` generic actions | Closed | Exact direct-empty and claimed-original-Step prepare/submit/recovery orchestration. |
-| `C30-I2-F` protected Host runtime | Closed | Dedicated transient carrier, composer/read foreground lifecycle and recursive leakage/cache/offline controls. |
-| `C30-I2-G` default-off convergence | Closed | Exact manifest/registry/source convergence, no legacy fallback and cumulative qualification; all capabilities remain absent/off. |
+| `C30-I2-A` adoption preflight/exact Base import | Accepted | My-Chat T-035 adopted exact I1-A..F TypeScript/Schemas/validator and sealed its downstream source lock. |
+| `C30-I2-B` trusted ingress/signer/nonce | Accepted | Public interactive and durable Run-actor translation plus detached outbound signer, inbound/response verifier and Host-private atomic nonce pass default-off qualification. |
+| `C30-I2-C` canonical pair owner | Accepted | Atomic Child/Family binding, current evidence and writer-fenced three-state recovery pass against a fresh disposable database. |
+| `C30-I2-D` subject/presentation registry | Accepted | Exact provider/presenter/surface registry, renderer, navigation and prepare-only action offers pass. |
+| `C30-I2-E` generic actions | Accepted | Exact direct-empty and claimed-original-Step prepare/submit/recovery orchestration passes. |
+| `C30-I2-F` protected Host runtime | Accepted | Dedicated transient carrier, composer/read foreground lifecycle and recursive leakage/cache/offline controls pass. |
+| `C30-I2-G` default-off convergence | Accepted | Exact manifest/registry/source convergence, no legacy fallback and cumulative qualification pass; all capabilities remain absent/off. |
 
-The My-Chat implementation cannot reuse its archived local `T-002 content-events`
-identity. I2-A begins only after project orchestration assigns a new unused
-My-Chat task ID and cross-links it to Nurture T-002. No My-Chat C30 commit may
-carry `Task: T-002` before that correction.
+The My-Chat implementation did not reuse its archived local `T-002
+content-events` identity. Project orchestration assigned T-035 and cross-linked
+it to Nurture T-002 before source changes; all I2 commits use the corrected local
+task identity.
 
-Artifact 51 is normative for ownership, signer/nonce order, pair-binding and
+Artifact 51 remains normative for ownership, signer/nonce order, pair-binding and
 recovery semantics, presentation/action/protected runtime, donor disposition,
-database boundary, acceptance and NO-GO. The successful I2 exit opens only an I3
-scope review; it does not authorize Nurture adoption, joint conformance,
+database boundary, acceptance and NO-GO. Artifact 52 records the exact accepted
+implementation and qualification. The successful I2 exit opens only an I3 scope
+review; it does not authorize Nurture adoption, joint conformance,
 C31-C35, T-008, deployment, activation or Pilot.
 
 ---
