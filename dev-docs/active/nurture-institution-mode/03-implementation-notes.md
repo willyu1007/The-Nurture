@@ -7,6 +7,15 @@
 
 ## What changed
 
+- 2026-08-06: Reopened cumulative Base `C30-I1-E` acceptance and froze E-R1
+  through E-R4 in artifact 42 before source work. Deterministic probes proved a
+  wrapped-fragment bypass plus low-entropy false positive, encoded protected-ref
+  bypass plus one-character version false positive, future commit timestamps and
+  prepare Schema/runtime forbidden-key drift. The prior `5433124…` / `3a08d1f…`
+  chain remains historical. Repair is limited to neutral Base validation, one
+  existing Schema, tests and later metadata resealing; I1-F, consumers, DB,
+  deployment, activation, T-008 and Pilot remain NO-GO.
+
 - 2026-08-06: Completed and accepted the authorized Base `C30-I1-E` chain in
   strict E1→E5 order. E1-E4 add the dedicated protected plaintext carrier,
   body-free prepare and committed controls, exact I1-D direct/claimed commit

@@ -1,5 +1,9 @@
 # C30-I1-E5 Cumulative Qualification and Source-Lock Record
 
+> Superseded as current qualification evidence on 2026-08-06. Artifact 42
+> reopens I1-E acceptance after four deterministic quality findings. The exact
+> source and lock below remain historical until a successor repair is qualified.
+
 ## Result
 
 - Date: 2026-08-06

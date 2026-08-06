@@ -3,7 +3,7 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D/I1-E accepted；I1-F pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1（in progress；I1-A/I1-B/I1-C/I1-D accepted；I1-E acceptance reopened；I1-F blocked）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
@@ -19,8 +19,10 @@
   source `5433124…`, metadata-only lock `3a08d1f…` and source hash
   `7ba9458f…c126`: the dedicated plaintext carrier, body-free prepare/commit/read
   controls, exact I1-D submit reuse, foreground-only read and recursive no-copy
-  suite are accepted. The only eligible next decision is a separate I1-F scope
-  review and freeze; I1-F implementation remains unauthorized.
+  suite remain historical. Artifact 42 reopens I1-E acceptance for four bounded
+  repairs: fragment/low-entropy scanning, encoded ref/version handling, future
+  commit time and Schema/runtime body-key parity. I1-F is blocked until the exact
+  successor source is requalified and resealed.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
   and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
@@ -120,8 +122,10 @@
   `artifacts/41-c30-i1-e5-qualification-record.md` pins exact source `5433124…`,
   metadata lock `3a08d1f…`, source hash `7ba9458f…c126`, 66 Schemas, 371 Node
   conformance tests and deterministic 84-file builds. Protected bytes never enter
-  generic I1-A/I1-C/I1-D or durable Host payloads. I1-E is accepted; I1-F,
-  C30-I2 and every consumer remain unstarted.
+  generic I1-A/I1-C/I1-D or durable Host payloads. This record is historical.
+- C30-I1-E5 successor quality repair freeze:
+  `artifacts/42-c30-i1-e5-quality-repair-freeze.md` reopens acceptance and freezes
+  E-R1..E-R4 before Base source changes. I1-F, C30-I2 and every consumer remain blocked.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

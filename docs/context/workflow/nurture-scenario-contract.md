@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D/I1-E accepted; I1-F scope review and all implementation/consumer adoption/activation pending separate authorization
+Status: G2 provider qualified; C30-I1-A/I1-B/I1-C/I1-D accepted; I1-E acceptance reopened for bounded successor repair; I1-F and all consumer adoption/activation blocked
 
 ## Product Terminology Compatibility
 
@@ -46,10 +46,12 @@ durable Host DTO; a keyed request/response binding joins the separately transpor
 carrier to the body-free control. Submit and commit continue to use the accepted
 I1-D direct/claimed path, and no generic commit/erase operation is introduced.
 Foreground reads require exact current context and a no-store lease of at most 60
-seconds; non-ready results are carrier-free. Exact Base source
+seconds; non-ready results are carrier-free. Historical Base source
 `5433124506ca8d48a536a283796765209b93d808` is sealed by metadata-only lock
 `3a08d1f117aad0ba8440df75f5e68dad392e8e45` at source hash
 `7ba9458f0e1a91f6fda1a47e5682064020017c41731b1016f8bdad962664c126`.
+Artifact 42 reopens acceptance for bounded no-copy, current-time and Schema/runtime
+parity repairs; the cited source/lock no longer qualifies current I1-E acceptance.
 Manifest dependency/source convergence and
 `scenario_protected_interaction_source_v1` remain I1-F work; no My-Chat/Nurture
 consumer, protected route/store/KMS, capability or activation exists.

@@ -13,10 +13,9 @@
 - Last updated: 2026-08-06
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance, all
   `C30-I0-A/B/C/D` gates and `C30-I1-A` are complete. C30-I1 remains cumulative;
-  I1-B, successor I1-C, successor I1-D and I1-E are accepted. Artifact 41 closes
-  E1-E5 at exact repaired source/lock after the independent quality pass; artifact
-  36 remains the frozen scope authority. I1-F is eligible only for a separately
-  authorized scope review/freeze and its implementation remains closed. G1 is
+  I1-B, successor I1-C and successor I1-D are accepted. I1-E acceptance is
+  reopened; artifact 42 freezes four successor-repair findings and supersedes
+  artifact 41 as current qualification authority. I1-F remains blocked. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -25,14 +24,29 @@
   default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: Base now includes the accepted neutral I1-A..E
-  contract source and exact source locks. I1-E changes only standalone contract
-  types/assertions, JSON Schemas, neutral fixtures/tests and its metadata lock.
+- Code/config/schema impact: Base now includes accepted neutral I1-A..D plus the
+  historical I1-E source/lock under repair. I1-E remains limited to standalone
+  contract assertions, JSON Schemas, neutral fixtures/tests and its metadata lock.
   The existing formal NestJS owner path is unchanged. No Base runtime/Scenario
   starter/manifest, My-Chat or Nurture product source, schema/migration,
   persistent database, secret/KMS/environment value, capability, deployment or
   traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I1-E successor quality-review reopening — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Existing regression populations | PASS but insufficient | Contract and conformance typechecks, 66 strict Schemas, 371 Node tests and the historical source lock remain green. |
+| Plaintext copy detection | FINDING E-R1 | A protected 24-character fragment wrapped by safe-looking prefix/suffix passes; a one-character carrier causes unrelated control strings containing that character to fail. |
+| Ref/version/integrity copy detection | FINDING E-R2 | A base64url protected ref in I1-D `output_refs` passes; a one-character prepared version rejects unrelated driver/control strings. |
+| Commit current-time bound | FINDING E-R3 | `committed_at=01:00` passes with resolved `now=00:02` and submit expiry `00:05`; only the before-prepare direction is checked. |
+| Prepare Schema/runtime parity | FINDING E-R4 | Schema accepts `action_input.PlainText` while the runtime rejects its case/separator-normalized forbidden prefix. |
+| Scope/effect census | PASS | Review and freeze changed Nurture governance/context evidence only. Base and My-Chat remain clean; no runtime/consumer, DB, manifest convergence, deployment, activation, T-008, Pilot or traffic action ran. |
+
+The exact repair/falsification matrix is frozen in artifact 42. Artifact 41 is
+historical until successor source, repeated qualification and a new metadata lock
+are recorded.
 
 ## C30-I1-E cumulative implementation and qualification — 2026-08-06
 
