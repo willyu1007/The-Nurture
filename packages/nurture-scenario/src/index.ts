@@ -68,4 +68,7 @@ export * from "./institution-surfaces.js";
 export * from "./observability/institution-workflow-telemetry.js";
 export * from "./domain/testing/in-memory-institution-ports.js";
 export * from "./surface-contract/index.js";
+export * from "./c30/canonical-json.js";
+export * from "./c30/trusted-invocation.js";
+export * from "./c30/participant-binding.js";
 export type * from "@my-chat/workflow-contracts";

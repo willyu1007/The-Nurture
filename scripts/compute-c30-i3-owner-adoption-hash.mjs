@@ -37,6 +37,16 @@ const profileDefinitions = [
       "scripts/verify-c30-i3-upstream.mjs",
     ],
   },
+  {
+    source_identity: "nurture_c30_private_trust_participant_v1",
+    files: [
+      "packages/nurture-scenario/src/c30/canonical-json.ts",
+      "packages/nurture-scenario/src/c30/participant-binding.ts",
+      "packages/nurture-scenario/src/c30/trusted-invocation.ts",
+      "packages/nurture-scenario/tests/c30/participant-binding.test.ts",
+      "packages/nurture-scenario/tests/c30/trusted-invocation.test.ts",
+    ],
+  },
 ];
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
