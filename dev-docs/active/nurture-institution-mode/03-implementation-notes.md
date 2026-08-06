@@ -7,15 +7,23 @@
 
 ## Next concrete actions
 
-1. Await separate authorization for C30-I4 scope review only; do not begin I4
-   implementation.
-2. Keep I4 joint adoption, C31-C35,
-   T-008, persistent database apply, capability/Workspace activation,
-   deployment, Pilot and traffic closed.
-3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
-   `8172e370…10a5ad` and archive `cd7bbc2…` as the immutable default-off I2
-   handoff, and artifact 53 as the normative I3 implementation-entry contract.
-   The first I2-G lock is historical only.
+1. Await separate authorization for C30-I4 scope review only. After authorization,
+   run `node .ai/scripts/ctl-project-governance.mjs resume --task T-002 --json`,
+   then review `artifacts/53-c30-i3-scope-freeze.md`,
+   `artifacts/61-c30-i3-successor-quality-repair-qualification-record.md` and
+   `docs/project/integrations/c30-i3-owner-adoption-lock.json` before drafting
+   any I4 scope.
+2. At I4 review entry, rerun `pnpm verify:c30-i3-owner-adoption` and
+   `pnpm verify:c30-i3-default-off`; any source-lock or positive-population drift
+   blocks scope freeze until it is explained and requalified.
+3. Keep I4 implementation, C31-C35, T-008, persistent database apply,
+   capability/Workspace activation, deployment, Pilot and traffic closed. The
+   scope review may produce planning/governance artifacts only unless the user
+   separately authorizes implementation.
+
+The current handoff chain is repair source `48530be…`, successor lock
+`7db3129…` and reacceptance documentation `cc57b13…`. The worktree was clean at
+that checkpoint; this progress sync is documentation-only.
 
 ## What changed
 

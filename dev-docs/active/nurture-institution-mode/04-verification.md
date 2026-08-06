@@ -44,6 +44,24 @@
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
 
+## Current handoff verification commands — 2026-08-06
+
+```bash
+pnpm verify:c30-i3-owner-adoption
+pnpm verify:c30-i3-default-off
+node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
+node .ai/scripts/ctl-project-governance.mjs lint --strict
+node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors
+git diff --check
+```
+
+All commands pass at the C30-I3 successor handoff. The source lock is
+`623da6fd…95d5`; the default-off census remains `448d37e1…3c3e` with every
+positive population zero. Task-doc lint checks 91 files with zero errors and
+zero warnings. The exact disposable database is destroyed, port 55440 has no
+listener, and the repository worktree was clean at `cc57b13…` before this
+documentation-only progress sync.
+
 ## C30-I3 cumulative default-off qualification — 2026-08-06
 
 The first artifact-60 acceptance below is historical. Artifact 61 is the current

@@ -7,8 +7,13 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-06
 - **Owner:** willyu1007
-- Next step: G1, T-005 G2 Exit, T-006 G3 Exit, all `C30-I0` gates and
-  `C30-I1-A` are PASS. `C30-I1` remains decomposed into ordered I1-A through I1-F
+- Next step: C30-I3 is quality-repaired and reaccepted default-off. Only a
+  separately authorized C30-I4 scope review is eligible; begin that review by
+  resuming T-002 and reading artifacts 53 and 61 plus the exact Base/My-Chat
+  successor locks. I4 implementation, C31-C35, T-008, persistent database
+  apply, deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
+  Exit, T-006 G3 Exit, all `C30-I0` gates and `C30-I1-A` are PASS. `C30-I1`
+  remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
   `9a15865…`; I1-C is reaccepted at successor Base source `ae0c357…`, metadata
   lock `3c30337…` and source hash `fc35c6b…e5cf3`. The prior source/lock remains
