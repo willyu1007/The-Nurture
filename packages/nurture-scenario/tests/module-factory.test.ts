@@ -2,15 +2,12 @@ import { describe, expect, it } from "vitest";
 import type {
   WorkflowHostValidationSnapshot,
   WorkflowRuntimePort,
-  WorkflowRuntimePortMaterializationV1,
 } from "@my-chat/workflow-contracts";
 import { standardWorkflowEvents } from "@my-chat/workflow-contracts";
 import { loadWorkflowRegistry, validateWorkflowModule } from "@my-chat/workflow-runtime";
-import {
-  createNurtureActivationScenarioModule,
-  createNurtureScenarioModule,
-} from "../src/module.js";
+import { createNurtureScenarioModule } from "../src/module.js";
 import { defaultNurtureDeps, defaultPresenterDeps } from "../src/deps.js";
+import { nurtureScenarioManifest } from "../src/registry.js";
 
 const hostSnapshot: WorkflowHostValidationSnapshot = {
   scenario_records: { nurture: { status: "draft" } },
@@ -23,7 +20,12 @@ const hostSnapshot: WorkflowHostValidationSnapshot = {
     "nurture.activity_option",
     "nurture.health_state_summary",
   ],
-  downstream_owners: ["my_chat.forum", "my_chat.knowledge_base", "my_chat.notification"],
+  downstream_owners: [
+    "my_chat.forum",
+    "my_chat.knowledge_base",
+    "my_chat.notification",
+    "user_attention",
+  ],
   standard_events: [...standardWorkflowEvents],
   platform_events: [],
   allowed_surfaces: [
@@ -40,6 +42,12 @@ const hostSnapshot: WorkflowHostValidationSnapshot = {
     "worker_runtime",
   ],
   projection_reviews: [],
+  host_capabilities: [
+    "scenario_federation_v1",
+    "workflow_handoff_materialization_v1",
+    "trusted_scenario_invocation_v1",
+    "scenario_subject_presentation_v1",
+  ],
 };
 
 // A no-op runtime port standing in for the host's Postgres implementation.
@@ -70,12 +78,6 @@ const fakeRuntimePort: WorkflowRuntimePort = {
   }),
 };
 
-const telemetryLogger = {
-  info: () => undefined,
-  warn: () => undefined,
-  error: () => undefined,
-};
-
 describe("createNurtureScenarioModule(deps)", () => {
   const module = createNurtureScenarioModule({
     handlerDeps: defaultNurtureDeps,
@@ -95,86 +97,14 @@ describe("createNurtureScenarioModule(deps)", () => {
     const registry = loadWorkflowRegistry({ modules: [module], host_snapshot: hostSnapshot });
     expect(registry.scenarios.get("nurture")).toBeDefined();
   });
-});
 
-describe("createNurtureActivationScenarioModule(deps)", () => {
-  it("requires and advertises the vNext materialization composition", () => {
-    const activationRuntime = fakeRuntimePort as WorkflowRuntimePortMaterializationV1;
-    const module = createNurtureActivationScenarioModule({
-      handlerDeps: {
-        ...defaultNurtureDeps,
-        scenarioCommandBridge: {
-          createDriverContext: () => ({
-            driverRef: {
-              schema_version: 1,
-              namespace: "my_chat",
-              object_type: "workflow_step",
-              object_id: "step-1",
-            },
-            contractHash: "a".repeat(64),
-            capabilityKey: "class_family_inbox",
-            entrypointKey: "capture_family_input",
-            claimToken: "claim",
-            expectedStepVersion: 1,
-          }),
-          createHandoffDrafts: () => [],
-        },
-        familyInputWorkflow: { resolveCommand: async () => null },
-        institutionWorkflowTelemetry: { logger: telemetryLogger },
-      },
-      presenterDeps: defaultPresenterDeps,
-      workerRuntime: activationRuntime,
-    });
-    const activationHost: WorkflowHostValidationSnapshot = {
-      ...hostSnapshot,
-      downstream_owners: [...hostSnapshot.downstream_owners, "user_attention"],
-      host_capabilities: ["workflow_handoff_materialization_v1"],
-    };
-    const report = validateWorkflowModule({
-      module,
-      host_snapshot: activationHost,
-      activation_target: module.manifest.launch_phase,
-    });
-    expect(report.findings.filter((finding) => finding.severity === "fatal")).toEqual([]);
-    expect(module.manifest.handoffs).toContainEqual(
-      expect.objectContaining({
-        handoff_key: "user_attention",
-        materialization_mode: "workflow_step_complete_v1",
-      }),
-    );
+  it("cannot change activation posture through the dependency factory", () => {
     expect(
-      module.manifest.capabilities
-        .find((capability) => capability.capability_key === "class_family_inbox")
-        ?.entrypoints.map((entrypoint) => entrypoint.entrypoint_key),
-    ).toContain("capture_family_input");
-  });
-
-  it("fails validation when the host capability is absent", () => {
-    const module = createNurtureActivationScenarioModule({
-      handlerDeps: {
-        ...defaultNurtureDeps,
-        scenarioCommandBridge: {
-          createDriverContext: () => {
-            throw new Error("unused");
-          },
-          createHandoffDrafts: () => [],
-        },
-        familyInputWorkflow: { resolveCommand: async () => null },
-        institutionWorkflowTelemetry: { logger: telemetryLogger },
-      },
-      presenterDeps: defaultPresenterDeps,
-      workerRuntime: fakeRuntimePort as WorkflowRuntimePortMaterializationV1,
-    });
-    const report = validateWorkflowModule({
-      module,
-      host_snapshot: {
-        ...hostSnapshot,
-        downstream_owners: [...hostSnapshot.downstream_owners, "user_attention"],
-      },
-      activation_target: module.manifest.launch_phase,
-    });
-    expect(report.findings).toContainEqual(
-      expect.objectContaining({ rule_id: "WF-MAN-046", severity: "fatal" }),
-    );
+      module.manifest.capabilities.every(
+        (capability) => capability.enablement_policy === "disabled",
+      ),
+    ).toBe(true);
+    expect(nurtureScenarioManifest.scenario_contracts?.domain_action_contracts).toEqual([]);
+    expect(nurtureScenarioManifest.scenario_contracts?.protected_interaction_contracts).toEqual([]);
   });
 });

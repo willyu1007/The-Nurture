@@ -1,15 +1,9 @@
 export {
   nurtureScenarioModule,
-  nurturePreActivationScenarioModule,
   createNurtureScenarioModule,
-  createNurtureActivationScenarioModule,
   type NurtureScenarioModuleDeps,
-  type NurtureActivationScenarioModuleDeps,
 } from "./module.js";
-export {
-  nurtureScenarioManifest,
-  nurturePreActivationScenarioManifest,
-} from "./registry.js";
+export { nurtureScenarioManifest } from "./registry.js";
 export { nurtureActions } from "./actions/shared-actions.js";
 export { nurtureAdapters } from "./adapters/chat-workflow.adapter.js";
 export { nurtureHandlers, createNurtureHandlers } from "./handlers/p0-handlers.js";
