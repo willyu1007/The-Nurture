@@ -758,8 +758,11 @@ task identity.
 Artifact 51 remains normative for ownership, signer/nonce order, pair-binding and
 recovery semantics, presentation/action/protected runtime, donor disposition,
 database boundary, acceptance and NO-GO. Artifact 52 records the exact accepted
-implementation and qualification. The successful I2 exit opens only an I3 scope
-review; it does not authorize Nurture adoption, joint conformance,
+implementation and qualification. Its current handoff is the remediated My-Chat
+runtime `658b897…`, replacement lock `6725dc6…`, aggregate
+`8172e370…10a5ad` and archive `cd7bbc2…`; the first I2-G lock is historical.
+The successful I2 exit opens only an I3 scope review; it does not authorize
+Nurture adoption, joint conformance,
 C31-C35, T-008, deployment, activation or Pilot.
 
 ---

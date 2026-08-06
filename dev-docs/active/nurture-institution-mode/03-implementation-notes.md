@@ -12,10 +12,26 @@
 2. Keep C30-I3 implementation, I4 joint adoption, C31-C35, T-008, persistent
    database apply, capability/Workspace activation, deployment, Pilot and
    traffic closed.
-3. Treat My-Chat T-035 source `35a41e3…`, downstream lock `890ff7d…` and archive
-   `b262bfc…` as the immutable default-off I2 handoff.
+3. Treat My-Chat T-035 source `658b897…`, replacement lock `6725dc6…`, aggregate
+   `8172e370…10a5ad` and archive `cd7bbc2…` as the immutable default-off I2
+   handoff. The first I2-G lock is historical only.
 
 ## What changed
+
+- 2026-08-06: Reaccepted C30-I2 after My-Chat T-035 quality remediation closed
+  all nine findings: protected key/binary no-copy; recovery pre-dispatch state
+  and immutable-evidence fences; coherent Serializable current reads;
+  same-transaction recovery audit/outbox; locale-independent canonical signing;
+  bounded nonce retention; and maintained static/route/DB default-off evidence.
+  The replacement runtime is `658b897…`, lock commit `6725dc6…`, aggregate
+  `8172e370…10a5ad`, and reacceptance/archive `cd7bbc2…`. Remediated source
+  passes all 17-project typechecks, ESLint and 700 unit tests. A fresh exact
+  pgvector/PostgreSQL 16 target applied 27 migrations, passed 17 integration
+  tests and produced default-off census hash `989e8294…fdd`; it was destroyed
+  and port 55438 is free. The composed pair support route is explicitly
+  `hard_default_deny`; all positive registration/activation state is empty. No
+  existing DB, Nurture product source, consumer, capability/Workspace
+  activation, deployment, T-008, Pilot or traffic was touched.
 
 - 2026-08-06: Accepted the fully authorized C30-I2 generic My-Chat Host adoption
   as `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF` in artifact 52. My-Chat
@@ -29,7 +45,8 @@
   was destroyed. Base stayed clean at `4350086…`; Nurture product source was not
   changed. No existing database, capability/Workspace activation, deployment,
   T-008, Pilot or traffic was touched. Only a separately authorized C30-I3 scope
-  review is eligible next.
+  review is eligible next. This first acceptance chain is historical and was
+  superseded by the remediation entry above.
 
 - 2026-08-06: Completed the authorized C30-I2 generic Host adoption scope review
   and freeze in artifact 51. The review pins accepted Base source `15ff031…`,

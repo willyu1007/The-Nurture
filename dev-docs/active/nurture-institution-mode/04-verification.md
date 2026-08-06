@@ -40,23 +40,41 @@
 
 ## C30-I2 generic Host adoption default-off acceptance — 2026-08-06
 
+The current acceptance is the remediated replacement below. The original
+I2-A..G rows that follow remain historical execution evidence.
+
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Governance continuity | PASS | Nurture T-002 remains the program record. My-Chat used distinct T-035 for all I2 source commits and archived that completed task at `b262bfc…`. |
+| Quality findings | PASS | All nine findings close: protected key/binary no-copy, recovery pre-dispatch eligibility and immutable binding, coherent current reads, recovery audit/outbox, canonical Unicode order, bounded nonce cleanup and collector-backed default-off evidence. |
+| Replacement identity | PASS | My-Chat runtime `658b897360734dfa916ce25abda7a8db5fb3f27d`, lock `6725dc68fb8c23da2ff39651b6d825a159a8a8b1`, aggregate `8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad`, reacceptance/archive `cd7bbc2623dff8621c2c7155b04d1bf759e8404a`. |
+| Remediated workspace | PASS | Recursive typecheck passes 17 projects; full ESLint passes; unit population passes 103 files / 700 tests with 17 files / 75 environment-gated tests skipped; Base and downstream source locks pass. |
+| Fresh database | PASS | Exact `mychat-c30-i2-remediation` target on loopback 55438 applied 27/27 migrations, reported current/empty DB-to-SSOT diff and passed 2 files / 17 integration tests. The container was destroyed and the port is free; no existing DB was touched. |
+| Mechanical default-off | PASS | Maintained static/route/DB collector hash `989e8294b47a980adcdc10ca35848c19891ca825beae80ffccc8d73271a63fdd`; positive registration/activation/private-state populations are empty and the composed pair support route is explicitly `hard_default_deny`. |
+| Governance boundary | PASS | T-035 is archived; Nurture changes only program evidence. No I3 implementation, Nurture consumer, capability/Workspace activation, deployment, T-008, Pilot or traffic action occurred. |
+
+Current verdict: `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
+C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`.
+
+### Historical first acceptance evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance continuity | HISTORICAL | Nurture T-002 remains the program record. This row ends at My-Chat's first T-035 archive `b262bfc…`; current closure is `cd7bbc2…` above. |
 | Exact Base input | PASS | Base remains clean at source `15ff031…`, metadata lock `4350086…` and aggregate `d17f2358…6383`; no accepted neutral contract byte changed during I2. |
 | Ordered implementation | PASS | My-Chat I2-A `470fc86…` → B `7aca47f…` → C `5fd7b08…` → D `82f97f3…` → E `1ef31d4…` → F `979ba42…` → G runtime `35a41e3…` and downstream lock `890ff7d…` are separately attributable. |
 | Trusted invocation | PASS | Interactive/durable principal translation, detached outbound signing, inbound/response verification and atomic one-time Host-private nonce pass exact-origin and replay negatives. |
-| Canonical pair owner | PASS | Atomic Child/Family pair creation, exact replay, current evidence and writer-fenced `committed|confirmed_no_effect|unknown` recovery pass without treating identity/binding as Scenario permission. |
+| Canonical pair owner | HISTORICAL / SUPERSEDED | Initial atomic pair tests passed, but later review found missing pre-dispatch state and immutable evidence fences plus mixed current reads. The replacement row above is authoritative. |
 | Presentation/actions | PASS | Exact provider/presenter/surface registry, semantic rendering and prepare-only offers pass; direct-empty and claimed-original-Step action orchestration use exact scenario-bound effect identities. |
-| Protected boundary | PASS | Dedicated transient carrier, authenticated binding, foreground-only view, lifecycle invalidation and recursive 22-destination no-copy census pass. |
-| Manifest/source convergence | PASS | Exact four-source dependency graph, five operations, four runtime components and no legacy fallback pass. My-Chat runtime revision `35a41e3…` is sealed by aggregate `3da48ba0…b9646` over seven named profiles. |
+| Protected boundary | HISTORICAL / SUPERSEDED | Initial value-oriented 22-destination census passed but missed object-key and binary representations. The replacement row above is authoritative. |
+| Manifest/source convergence | HISTORICAL | Runtime revision `35a41e3…` and aggregate `3da48ba0…b9646` were mechanically valid for the first source population but are not a current handoff pin. |
 | Workspace qualification | PASS | Full 17-project build, recursive typecheck, full ESLint, 102 files / 643 unit tests, workflow contract/66-Schema/source-lock/portability checks and runtime 12 files / 176 tests pass. |
 | Disposable database | PASS x3 | On exact `127.0.0.1:55438`, all 26 migrations, Prisma format/validate/generate, no-drift diff and 15/15 nonce/pair integration pass three consecutive times. Final scoped row counts are zero; the container is destroyed and the port is free. No existing DB was read or written. |
-| Default-off census | PASS | Production capability rows, Workspace allowlists, product bindings, route registrations and production peer bindings are empty; external traffic is zero. Support remains distinct from activation. |
+| Default-off census | INVALIDATED | The first qualifier accepted caller-supplied empty evidence and incorrectly claimed no composed route. Current collector-backed evidence records the pair support route as `hard_default_deny`. |
 | Repository boundary | PASS | Base is clean at `4350086…`; My-Chat closes and archives T-035; Nurture changes governance evidence only. No Nurture consumer, deployment, activation, T-008, Pilot or traffic action occurred. |
 | Detailed record | PASS | `artifacts/52-c30-i2-default-off-acceptance-record.md` pins all repository revisions, source/profile hashes, qualification populations, disposable-DB lifecycle and downstream NO-GO. |
 
-Verdict: `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
+Historical verdict, superseded by the replacement acceptance above:
+`C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
 C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`. I3 implementation, I4,
 C31-C35, consumer activation, deployment, T-008, Pilot and traffic remain
 closed.

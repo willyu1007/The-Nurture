@@ -2183,3 +2183,19 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: resolve task identity against each repository's registry and task
   bundle before a cross-repository commit; treat branch IDs and upstream task
   references as context, never local trailer authority.
+
+### 2026-08-06 — Downstream acceptance must follow a repaired upstream lock
+
+- Symptom: Nurture still named My-Chat's first I2 runtime/aggregate/archive after
+  the upstream quality review had withdrawn that acceptance; the dashboard also
+  still said I2-A required authorization after I2 had completed.
+- Root cause: program-level handoff evidence and the manual project focus were
+  not treated as consumers of the My-Chat source lock lifecycle.
+- What we tried: exact-hash search across the active T-002 bundle and project hub
+  separated intentional historical rows from current acceptance claims.
+- Fix / workaround: pin the repaired runtime, replacement lock, seven profiles,
+  aggregate and reacceptance archive in artifact 52; mark the invalidated first
+  evidence historical; update overview, roadmap, verification and project focus.
+- Prevention: whenever an upstream acceptance is withdrawn or resealed, search
+  every downstream current-state surface for the old revision, lock, aggregate,
+  archive and successor gate before declaring cross-repository closure.

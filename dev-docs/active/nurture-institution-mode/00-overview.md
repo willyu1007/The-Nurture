@@ -28,9 +28,12 @@
   `33df7df9…39cd`. Artifact 49 reopened acceptance after four reproduced defects.
   Artifact 50 closes F-R1 through F-R4 at successor Base source `15ff031…`,
   metadata-only lock `4350086…` and aggregate hash `d17f2358…6383`. The
-  My-Chat T-035 then closes ordered I2-A..G at runtime source `35a41e3…`,
-  downstream lock `890ff7d…`, aggregate hash `3da48ba0…b9646` and archived
-  checkpoint `b262bfc…`. Artifact 52 records the cumulative result. The current
+  My-Chat T-035 first closed ordered I2-A..G, then reopened its acceptance after
+  quality review and repaired all nine findings. The current immutable handoff
+  is runtime source `658b897…`, replacement lock `6725dc6…`, aggregate hash
+  `8172e370…10a5ad` and reacceptance/archive checkpoint `cd7bbc2…`; the first
+  `35a41e3…` / `3da48ba0…` chain is historical. Artifact 52 records the
+  cumulative replacement result. The current
   state is `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
   C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`.
   T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
@@ -174,10 +177,11 @@
   its archived local T-002.
 - C30-I2 default-off acceptance:
   `artifacts/52-c30-i2-default-off-acceptance-record.md` records ordered I2-A..G,
-  exact My-Chat source/lock/profile identities, full build/type/lint/test/contract
-  qualification, the three-pass disposable PostgreSQL proof and final absent/off
-  census. My-Chat T-035 is archived at `b262bfc…`; Nurture product source is
-  unchanged. Only a separately authorized C30-I3 scope review is eligible next.
+  the nine-finding remediation, replacement My-Chat source/lock/profile
+  identities, full type/lint/test/contract qualification, fresh disposable
+  PostgreSQL proof and maintained static/DB absent-off census. My-Chat T-035 is
+  reaccepted and archived at `cd7bbc2…`; Nurture product source is unchanged.
+  Only a separately authorized C30-I3 scope review is eligible next.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

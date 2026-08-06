@@ -255,9 +255,10 @@ dev-docs/active/nurture-institution-mode/
   transport/signature envelope. No unresolved product-scope conflict remains.
 - Project structure checkpoint: Base remains accepted at source `15ff031…` plus
   metadata lock `4350086…`. My-Chat T-035 adds only the generic Host adoption,
-  seals runtime source `35a41e3…` with downstream lock `890ff7d…` and exits with
-  every capability/Workspace absent/off. No Nurture consumer exists. The current
-  Nurture-side update changes task/project governance documentation only.
+  repairs and seals runtime source `658b897…` with replacement lock `6725dc6…`
+  and aggregate `8172e370…10a5ad`, and exits with every capability/Workspace
+  absent/off. No Nurture consumer exists. The current Nurture-side update changes
+  task/project governance documentation only.
 - Verification/rollback: I1-B acceptance and reverse source-lock/source rollback are
   frozen in `artifacts/16-c30-i1-b-scope-freeze.md`; the B1-only checkpoint is in
   artifacts 17-20. I1-B is accepted; artifact 21 freezes I1-C provider/presentation
@@ -281,9 +282,10 @@ dev-docs/active/nurture-institution-mode/
   handoff is accepted. Artifact 51 froze downstream My-Chat adoption as I2-A
   exact import, I2-B trusted ingress, I2-C atomic pair owner, I2-D presentation,
   I2-E action, I2-F protected runtime and I2-G default-off qualification. I2-A
-  through I2-G are now accepted in artifact 52 at My-Chat runtime `35a41e3…`,
-  lock `890ff7d…` and archive `b262bfc…`. Only separately authorized C30-I3
-  scope review is eligible next.
+  through I2-G plus all nine quality-remediation findings are accepted in
+  artifact 52 at My-Chat runtime `658b897…`, replacement lock `6725dc6…`,
+  aggregate `8172e370…10a5ad` and archive `cd7bbc2…`. The first I2-G lock is
+  historical. Only separately authorized C30-I3 scope review is eligible next.
 
 Hard gates:
 
@@ -308,8 +310,9 @@ Hard gates:
   convergence、legacy/vNext exclusion、named source profiles 与 F1-F4 顺序，
   已由 artifacts 45-50 在 successor Base source `15ff031…` + metadata lock
   `4350086…` 完成累计再验收。artifact 51 已完成 C30-I2 范围冻结；artifact
-  52 记录 My-Chat T-035 对 I2-A..G 的完整 default-off 验收，runtime
-  `35a41e3…`、lock `890ff7d…`、archive `b262bfc…`。下一步仅可另行授权
+  52 记录 My-Chat T-035 对 I2-A..G 与九项质量修复的完整 default-off
+  再验收，runtime `658b897…`、replacement lock `6725dc6…`、aggregate
+  `8172e370…10a5ad`、archive `cd7bbc2…`。下一步仅可另行授权
   C30-I3 范围评审；I3 实施、I4、consumer activation 与所有 operational
   action 均未开启。
   详见
