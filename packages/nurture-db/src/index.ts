@@ -36,6 +36,7 @@ export * from "./c30/participant-binding.js";
 export * from "./c30/pair-association.repository.js";
 export * from "./c30/subject-presentation.repository.js";
 export * from "./c30/canonical-action.repository.js";
+export * from "./c30/protected-content.repository.js";
 
 // Re-export Prisma-generated model TYPES as the data layer's domain entities,
 // so host consumers depend on @the-nurture/db (not @prisma/client) and the

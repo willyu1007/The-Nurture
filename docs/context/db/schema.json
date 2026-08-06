@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-06T13:17:15.035Z",
+  "updatedAt": "2026-08-06T13:45:58.648Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -59,6 +59,14 @@
         "committed",
         "confirmed_no_effect",
         "quarantined"
+      ]
+    },
+    {
+      "name": "NurtureC30ProtectedContentLifecycle",
+      "values": [
+        "active",
+        "tombstoned",
+        "erased"
       ]
     },
     {
@@ -2853,6 +2861,812 @@
           ],
           "name": null,
           "map": "uq_nurture_c30_pair_command"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ProtectedContent",
+      "dbName": "nurture_c30_protected_content",
+      "schema": null,
+      "columns": [
+        {
+          "name": "acceptedCarrierBindingHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "accepted_carrier_binding_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actionKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "action_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authenticationTag",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": "authentication_tag",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorityEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorityRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "canonicalPayloadHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "canonical_payload_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ciphertext",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedContentVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "committed_content_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentKind",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "content_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorAccountObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_account_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorActorObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_actor_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorParticipantBindingId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_participant_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorRepresentedOrganizationObjectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "creator_represented_organization_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "encryptionAlgorithm",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "encryption_algorithm",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "encryptionContextHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "encryption_context_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "encryptionVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "encryption_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "erasedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "erased_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "erasureEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "erasure_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "keyedIntegrityHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "keyed_integrity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyDomain",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "kms_key_domain",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyHandle",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "kms_key_handle",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyHandleHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "kms_key_handle_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "kms_key_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionAuthorityRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_authority_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionParticipantBindingId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_participant_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "NurtureC30ProtectedContentLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nonce",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "owningActionRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "owning_action_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pairEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "pair_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "preparedContentVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "prepared_content_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalBindingHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_binding_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "protectedContentRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "protected_content_ref",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "protectedFieldKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "protected_field_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "readableUntil",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "readable_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestIdentityHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_identity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "retentionUntil",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "retention_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tombstonedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "tombstoned_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tombstoneReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "tombstone_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "wrappedDek",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": "wrapped_dek",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "wrappingAlgorithm",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "wrapping_algorithm",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "auditRecords",
+          "to": "NurtureC30ProtectedContentAuditRecord",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "creatorParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentCreator",
+          "fields": [
+            "creatorParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "creatorParticipantBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentCreatorBinding",
+          "fields": [
+            "creatorParticipantBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "lastTransitionBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentTransitionBinding",
+          "fields": [
+            "lastTransitionParticipantBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "lastTransitionParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentTransitionActor",
+          "fields": [
+            "lastTransitionParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "creatorParticipantId",
+            "lifecycle",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_protected_creator"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "lifecycle",
+            "retentionUntil"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_protected_retention"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "actionKey",
+            "requestIdentityHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_protected_request"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ProtectedContentAuditRecord",
+      "dbName": "nurture_c30_protected_content_audit_record",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentRefHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "content_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "participantRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalBindingRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_binding_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "protectedContentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "protected_content_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "protectedContent",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "protectedContentId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "protectedContentId",
+            "eventKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_protected_audit_event"
         }
       ]
     },
@@ -14699,6 +15513,24 @@
           "references": []
         },
         {
+          "field": "c30ProtectedContentCreated",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentCreator",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30ProtectedContentTransitioned",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentTransitionActor",
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "interactionContexts",
           "to": "NurtureInteractionContext",
           "optional": false,
@@ -14975,6 +15807,24 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "protectedContentCreated",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentCreatorBinding",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "protectedContentTransitioned",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentTransitionBinding",
+          "fields": [],
+          "references": []
         }
       ],
       "indexes": [
