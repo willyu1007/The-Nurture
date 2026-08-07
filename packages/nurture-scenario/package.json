@@ -20,6 +20,11 @@
       "types": "./src/harness-entry.ts",
       "import": "./dist/harness-entry.js",
       "default": "./dist/harness-entry.js"
+    },
+    "./family-growth": {
+      "types": "./src/family-growth.ts",
+      "import": "./dist/family-growth.js",
+      "default": "./dist/family-growth.js"
     }
   },
   "scripts": {

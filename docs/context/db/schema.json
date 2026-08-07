@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-04T22:39:32.202Z",
+  "updatedAt": "2026-08-07T00:01:09.971Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -516,6 +516,36 @@
         "legacy_v1",
         "legacy_migrated_v1",
         "harness_g2_v1"
+      ]
+    },
+    {
+      "name": "NurtureFamilyGrowthDeliveryState",
+      "values": [
+        "pending",
+        "delivering",
+        "delivered",
+        "failed",
+        "outcome_unknown"
+      ]
+    },
+    {
+      "name": "NurtureFamilyGrowthEventKind",
+      "values": [
+        "released",
+        "correction",
+        "target_removal",
+        "redaction"
+      ]
+    },
+    {
+      "name": "NurtureFamilyGrowthReceiptStatus",
+      "values": [
+        "applied",
+        "pending_guardian_confirmation",
+        "duplicate",
+        "tombstoned",
+        "rejected",
+        "conflict"
       ]
     },
     {
@@ -9782,6 +9812,401 @@
       ]
     },
     {
+      "name": "NurtureFamilyGrowthAdmissionReceipt",
+      "dbName": "nurture_family_growth_admission_receipt",
+      "schema": null,
+      "columns": [
+        {
+          "name": "admissionRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "admission_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "materialRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "material_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "outboxEventId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "outbox_event_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "processedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "processed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonCode",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "reason_code",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "receiptId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "receipt_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "receiptPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "receipt_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureFamilyGrowthReceiptStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "suppressionRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "suppression_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "outboxEvent",
+          "to": "NurtureFamilyGrowthOutboxEvent",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "outboxEventId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "processedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_growth_receipt_status"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "outboxEventId",
+            "receiptId"
+          ],
+          "name": null,
+          "map": "uq_nurture_family_growth_receipt_identity"
+        }
+      ]
+    },
+    {
+      "name": "NurtureFamilyGrowthOutboxEvent",
+      "dbName": "nurture_family_growth_outbox_event",
+      "schema": null,
+      "columns": [
+        {
+          "name": "attemptCount",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "attempt_count",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deliveredAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "delivered_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deliveryState",
+          "type": "NurtureFamilyGrowthDeliveryState",
+          "nullable": false,
+          "list": false,
+          "dbName": "delivery_state",
+          "dbType": null,
+          "default": "pending",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "envelopePayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "envelope_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "kind",
+          "type": "NurtureFamilyGrowthEventKind",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastAttemptAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "last_attempt_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextAttemptAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "next_attempt_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "payloadDigest",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "payload_digest",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publicationReleaseId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "publication_release_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "visibilityEventId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "visibility_event_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "publicationRelease",
+          "to": "NurturePublicationRelease",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "publicationReleaseId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "receipts",
+          "to": "NurtureFamilyGrowthAdmissionReceipt",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "visibilityEvent",
+          "to": "NurturePublicationVisibilityEvent",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "visibilityEventId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "deliveryState",
+            "nextAttemptAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_growth_outbox_claim"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "publicationReleaseId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_family_growth_outbox_release"
+        }
+      ]
+    },
+    {
       "name": "NurtureFamilyPolicy",
       "dbName": "nurture_family_policy",
       "schema": null,
@@ -11768,6 +12193,17 @@
           "unique": false
         },
         {
+          "name": "contentDigest",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "content_digest",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "createdAt",
           "type": "DateTime",
           "nullable": false,
@@ -13111,6 +13547,15 @@
       ],
       "relations": [
         {
+          "field": "familyGrowthOutboxEvents",
+          "to": "NurtureFamilyGrowthOutboxEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "publishProcess",
           "to": "NurturePublishProcess",
           "optional": false,
@@ -13327,6 +13772,15 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "familyGrowthOutboxEvent",
+          "to": "NurtureFamilyGrowthOutboxEvent",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
         },
         {
           "field": "publicationRelease",
