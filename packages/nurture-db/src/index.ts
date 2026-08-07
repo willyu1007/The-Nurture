@@ -34,6 +34,7 @@ export * from "./repositories/publication-release.transaction.js";
 export * from "./repositories/family-growth-binding.read.js";
 export * from "./repositories/family-growth-outbox.transaction.js";
 export * from "./repositories/family-growth-emission.preparer.js";
+export * from "./repositories/family-growth-rendition.read.js";
 
 // Re-export Prisma-generated model TYPES as the data layer's domain entities,
 // so host consumers depend on @the-nurture/db (not @prisma/client) and the

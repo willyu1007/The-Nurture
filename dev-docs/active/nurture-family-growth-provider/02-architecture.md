@@ -153,6 +153,20 @@ line is a contract-visible choice:
   strips the prefix before resolver comparison (a bare-id assumption
   target-mismatched every production row — caught in the I3c review).
 
+## D-T009-09 — Transport frozen at family_growth_transport@1.0.0
+
+User decision 2026-08-07 settled all six open items; the addendum is frozen
+as `artifacts/family-growth-transport-addendum.md` (identical copy in
+My-Chat `dev-docs/active/growth-record/artifacts/`, sha256 `38bc6239…`).
+The load-bearing choices: dedicated direction+capability Bearer tokens with
+a `{current, previous}` rotation window; ONLY a valid 200 receipt settles an
+event and everything else retries as `outcome_unknown` (30s→1h exponential
+backoff, no terminal give-up, ops attention at 8 attempts, 10-minute
+stale-claim lease); rendition leases run 5 minutes, re-resolvable, with
+authorization re-verified on EVERY resolve and download so removal/redaction
+revokes immediately; the rendition error surface collapses unknown/revoked/
+expired into one 404; `outcome_unknown` resolves by replay only in v1.
+
 ## Component map (target state)
 
 ```

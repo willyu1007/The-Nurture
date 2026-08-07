@@ -24,6 +24,11 @@ const allowedErrors = new Set([
   "invalid_harness_request",
   "unknown_capability",
   "institution_business_communication_read_disabled",
+  // family_growth_transport@1.0.0 §5 — the frozen rendition-exchange taxonomy.
+  "service_unauthorized",
+  "rendition_ref_invalid",
+  "rendition_unavailable",
+  "rendition_temporarily_unavailable",
 ]);
 
 const bodyParserErrorStatuses = new Map<string, number>([

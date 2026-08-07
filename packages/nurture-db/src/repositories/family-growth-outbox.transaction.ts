@@ -94,33 +94,61 @@ export class PrismaFamilyGrowthOutboxPort {
   }
 
   /**
-   * Claim due rows for delivery. A row is due when it is `pending`, or
-   * `outcome_unknown` with its backoff instant reached. Claiming is
-   * per-row conditional, so a row another worker took in between is simply
-   * skipped rather than double-delivered.
+   * Claim due rows for delivery. A row is due when it is `pending`,
+   * `outcome_unknown` with its backoff instant reached, or `delivering`
+   * with a stale claim (`staleClaimBefore`, addendum §3: a worker that died
+   * mid-delivery must not strand its rows). Claiming is per-row
+   * conditional, so a row another worker took in between is simply skipped
+   * rather than double-delivered.
    */
-  async claimDue(input: { now: Date; limit: number }): Promise<FamilyGrowthOutboxClaimedRowV1[]> {
+  async claimDue(input: {
+    now: Date;
+    limit: number;
+    staleClaimBefore?: Date;
+    /** Optional shard/test scope; the production worker claims globally. */
+    workspaceId?: string;
+  }): Promise<FamilyGrowthOutboxClaimedRowV1[]> {
+    const staleClaim = input.staleClaimBefore
+      ? [
+          {
+            deliveryState: "delivering" as const,
+            lastAttemptAt: { lte: input.staleClaimBefore },
+          },
+        ]
+      : [];
     const candidates = await this.prisma.nurtureFamilyGrowthOutboxEvent.findMany({
       where: {
+        ...(input.workspaceId ? { workspaceId: input.workspaceId } : {}),
         OR: [
           { deliveryState: "pending" },
           {
             deliveryState: "outcome_unknown",
             OR: [{ nextAttemptAt: null }, { nextAttemptAt: { lte: input.now } }],
           },
+          ...staleClaim,
         ],
       },
       orderBy: { createdAt: "asc" },
       take: input.limit,
-      select: { id: true },
+      select: { id: true, deliveryState: true },
     });
     const claimed: FamilyGrowthOutboxClaimedRowV1[] = [];
     for (const candidate of candidates) {
       const result = await this.prisma.nurtureFamilyGrowthOutboxEvent.updateMany({
-        where: {
-          id: candidate.id,
-          deliveryState: { in: ["pending", "outcome_unknown"] },
-        },
+        where:
+          candidate.deliveryState === "delivering"
+            ? {
+                // A stale reclaim must re-check the staleness it saw: a row
+                // another worker just re-claimed has a fresh lastAttemptAt
+                // and is skipped, not double-delivered.
+                id: candidate.id,
+                deliveryState: "delivering",
+                lastAttemptAt: { lte: input.staleClaimBefore },
+              }
+            : {
+                id: candidate.id,
+                deliveryState: { in: ["pending", "outcome_unknown"] },
+              },
         data: {
           deliveryState: "delivering",
           attemptCount: { increment: 1 },

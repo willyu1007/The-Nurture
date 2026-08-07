@@ -14,18 +14,35 @@ import {
 } from "./harness.controller.js";
 import { HarnessRuntime } from "./harness-runtime.js";
 import { HealthController } from "./health.controller.js";
+import {
+  FAMILY_GROWTH_RENDITION_RUNTIME,
+  FamilyGrowthRenditionAuthGuard,
+  FamilyGrowthRenditionController,
+} from "./family-growth-rendition.controller.js";
+import type { FamilyGrowthRenditionRuntime } from "./family-growth-runtime.js";
 
 @Module({
-  controllers: [HealthController, BindingOwnerController, HarnessController],
+  controllers: [
+    HealthController,
+    BindingOwnerController,
+    HarnessController,
+    FamilyGrowthRenditionController,
+  ],
 })
 export class AppModule {
   static register(input: {
     bindingOwner: BindingOwnerGuardConfig;
     harness: HarnessGuardConfig;
+    familyGrowthRendition: FamilyGrowthRenditionRuntime;
   }): DynamicModule {
     return {
       module: AppModule,
       providers: [
+        {
+          provide: FAMILY_GROWTH_RENDITION_RUNTIME,
+          useValue: input.familyGrowthRendition,
+        },
+        FamilyGrowthRenditionAuthGuard,
         {
           provide: BINDING_OWNER_GUARD_CONFIG,
           useValue: Object.freeze({ ...input.bindingOwner }),
