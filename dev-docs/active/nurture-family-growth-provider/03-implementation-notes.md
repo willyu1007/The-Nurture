@@ -2,6 +2,35 @@
 
 Running log; newest first.
 
+- 2026-08-07: I3 non-wire half landed (transactional emit; the wire half —
+  delivery worker + ingress POST — still waits on the I0 transport freeze).
+  - Release path: `commitTargetRelease` accepts an optional prepared
+    emission (`FamilyGrowthPreparedReleaseEmissionV1`). Release and receipt
+    ids are pre-generated inside the transaction so the envelope binds the
+    exact rows about to commit; assembly runs after every gate and before
+    the first kept write, so an invalid emission aborts write-free (freeze
+    CAS included) and surfaces as `family_growth_emission_invalid`. One
+    deliberate deviation from the plan wording: assembly runs INSIDE the
+    transaction (it is pure computation; N5 bans network/storage calls, not
+    CPU work) — only resolution and fact loading stay pre-transaction.
+  - Harness: `PublicationReleaseDependencies.family_growth` is the optional
+    pre-commit preparer port. Denied resolution → that one target rejects
+    with `binding_unavailable` before any write and the owner exchange is
+    the only network touch; absent preparer → byte-identical G3-D commit
+    input (default-off preserved).
+  - Lifecycle path: `appendPublicationVisibilityEvents` now lands each
+    lineage row and its outbox event as one pair (per-event transaction).
+    Emission follows the release's own delivery: only releases with a
+    `released` outbox row propagate lifecycle, and the lifecycle target is
+    read back from the stored release envelope — never re-resolved, so a
+    binding revoked after release cannot stop a redaction cascade.
+  - Correction plaintext: the spec shape gained `display_safe_text`; the
+    teacher's correction input rides as `correction_display_safe_text` next
+    to the sealed body and rests only in the outbox envelope. No unseal
+    path was needed on the live route.
+  - `appendFamilyGrowthOutboxEventWithin` extracted as a standalone
+    function so release/safety owners append with their own `tx`.
+
 - 2026-08-07: I2 + I4 landed.
   - I2 schema: migration `20260807080000_t009_family_growth_provider_outbox`
     (outbox + receipt tables, media `content_digest`, hand-authored partial

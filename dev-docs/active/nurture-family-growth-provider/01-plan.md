@@ -62,19 +62,26 @@ own DoD; nothing activates by default at any point.
 
 ## I3 — Transactional emit + delivery worker
 
-- Extend `commitTargetRelease` (and the lifecycle finalize path) to append
-  the outbox row in the same transaction; no network/object-storage calls
-  inside the transaction (N5).
-- Envelope assembly happens before the transaction from already-frozen facts;
-  target resolution (I4) failure fails the release closed before any write.
-- Delivery worker (scenario-service): claims pending rows, POSTs per the
-  frozen addendum, records the synchronous receipt via I2's store, maps
-  timeout/5xx to `outcome_unknown` and retries with the same event id +
-  digest; terminal `rejected`/`conflict` stop retries and surface to the
-  queue.
-- DoD: DB integration tests for same-tx atomicity (release rollback leaves no
-  outbox row; outbox failure aborts the release), replay identity, and
-  worker state transitions against a fake consumer.
+Split executed as I3a (non-wire, DONE 2026-08-07) and I3b (wire, after I0):
+
+- I3a: `commitTargetRelease` and the lifecycle finalize append the outbox
+  row in the same transaction (N5). Resolution and fact loading run
+  pre-transaction (network allowed there); pure envelope assembly runs
+  in-transaction after every gate and before the first kept write, binding
+  pre-generated release/receipt ids — an invalid emission aborts write-free
+  as `family_growth_emission_invalid`. A denied resolution rejects only its
+  target (`binding_unavailable`) before any write. Lifecycle emission
+  follows the release's own delivery (released outbox row present) and
+  copies the stored envelope target rather than re-resolving.
+- I3b (waits on I0): delivery worker in scenario-service claims pending
+  rows, POSTs per the frozen addendum, records the synchronous receipt via
+  I2's store, maps timeout/5xx to `outcome_unknown` and retries with the
+  same event id + digest; terminal `rejected`/`conflict` stop retries and
+  surface to the queue.
+- I3a DoD (met): DB integration tests for same-tx atomicity in both
+  rollback directions, replay identity, default-off parity, lifecycle
+  pairing/skip/fail-closed. I3b DoD: worker state transitions against a
+  fake consumer per the addendum.
 
 ## I4 — Canonical target resolution (N1)
 

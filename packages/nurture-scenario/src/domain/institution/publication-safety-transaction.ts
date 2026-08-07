@@ -74,6 +74,14 @@ export type NurturePublicationSafetyTransaction = {
       source_release_revision: number;
       occurred_at: string;
       body_envelope?: unknown;
+      /**
+       * T-009: the display-safe correction text for the outbound
+       * family-growth lifecycle envelope. It rests nowhere except that
+       * envelope (the sealed `body_envelope` stays the canonical row's
+       * form); required exactly when the release was delivered to
+       * family growth and the kind is `correction`.
+       */
+      correction_display_safe_text?: string;
     }>;
   }): Promise<void>;
 };

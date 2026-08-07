@@ -1403,6 +1403,12 @@ const createPublicationSafetySpec = <
     evaluate(facts: ProvenCommittedPublicationFactV1[], input: Command): SafetyRuleDecision;
     /** The sealed correction body, when this action carries one. */
     body_envelope?(input: Command): unknown;
+    /**
+     * T-009: the display-safe correction text for the outbound family-growth
+     * lifecycle envelope. Only the outbox envelope may carry it in plain
+     * form; the canonical lineage row keeps the sealed body above.
+     */
+    display_safe_text?(input: Command): string;
   },
 ): NurtureBoardWriteSpec<Command> =>
   createBoardWriteSpec<
@@ -1503,6 +1509,9 @@ const createPublicationSafetySpec = <
         source_release_revision: publication.release_revision,
         occurred_at: occurredAt,
         ...(shape.body_envelope ? { body_envelope: shape.body_envelope(input) } : {}),
+        ...(shape.display_safe_text
+          ? { correction_display_safe_text: shape.display_safe_text(input) }
+          : {}),
       }));
       return {
         // One aggregate ref, like the already_satisfied answer above: a
@@ -1539,6 +1548,7 @@ const createPublicationSafetySpec = <
           source_release_revision: number;
           occurred_at: string;
           body_envelope?: unknown;
+          correction_display_safe_text?: string;
         }>;
         actor_role_assignment_id: string;
       };
@@ -1577,6 +1587,10 @@ export const createCorrectPublicationSpec = (deps: {
     // The correction body rides sealed into the lineage row; an earlier
     // version validated it and then silently dropped it.
     body_envelope: (input) => deps.protected_content.seal(input.correction_text),
+    // The same text, display-safe, for the family-growth lifecycle envelope
+    // (T-009): the teacher's correction input IS the display text — no
+    // unseal step exists or is needed on the live path.
+    display_safe_text: (input) => input.correction_text,
   });
 
 export const createRemovePublicationTargetVisibilitySpec = (deps: {

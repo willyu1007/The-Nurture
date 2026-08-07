@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
+import type { FamilyGrowthPreparedReleaseEmissionV1 } from "../../src/domain/family-growth/emission.js";
 import {
   NurtureInteractionContextService,
   type NurtureInteractionContextRepository,
@@ -479,3 +480,92 @@ describe("G3-D release formal-ingress entry", () => {
     expect(attempt.dependencies.commits).toHaveLength(1);
   });
 });
+
+describe("T-009 family-growth pre-commit preparation", () => {
+  const emission = (): FamilyGrowthPreparedReleaseEmissionV1 => ({
+    target: { child_id: "mc-child-1", family_id: "mc-family-1" },
+    admission: { mode: "direct_family_release", policy_ref: "pol-1", policy_version: 1 },
+    material: {
+      occurredAt: "2026-08-01T09:00:00.000Z",
+      displaySnapshot: { title: "outdoor", source_label: "class" },
+      attribution: {
+        source_contributor_ref: "contrib-1",
+        source_organization_ref: "org-1",
+        contributed_at: "2026-08-01T09:00:00.000Z",
+      },
+      media: [
+        {
+          source_asset_ref: "asset-1",
+          source_media_revision: 3,
+          content_digest: "b".repeat(64),
+          family_rendition_ref: "rendition-1",
+          mime_type: "image/jpeg",
+          access_mode: "authorized_short_lived_url",
+        },
+      ],
+    },
+    retentionMode: "family_retained",
+    contentDigest: "c".repeat(64),
+  });
+
+  it("a denied resolution rejects the target before any commit call", async () => {
+    const dependencies = deps(facts());
+    const prepares: unknown[] = [];
+    const decision = await releasePublishProcess(
+      {
+        ...dependencies,
+        family_growth: {
+          prepare: async (input) => {
+            prepares.push(input);
+            return { status: "denied", reason: "binding_missing" };
+          },
+        },
+      },
+      scope,
+      { process_ref: processRef(), command_request_id: "command:release-1", trigger: "immediate" },
+    );
+    expect(decision.status).toBe("still_pending");
+    if (decision.status !== "released" && decision.status !== "still_pending") return;
+    expect(decision.results[0]).toMatchObject({
+      outcome: "rejected",
+      reasonCode: "binding_unavailable",
+    });
+    expect(prepares).toHaveLength(1);
+    expect(prepares[0]).toMatchObject({
+      process_key: PROCESS_KEY,
+      child_care_process_id: "child-1",
+    });
+    expect(dependencies.commits).toHaveLength(0);
+  });
+
+  it("a prepared emission rides into the commit input", async () => {
+    const dependencies = deps(facts());
+    const prepared = emission();
+    const decision = await releasePublishProcess(
+      {
+        ...dependencies,
+        family_growth: { prepare: async () => ({ status: "prepared", emission: prepared }) },
+      },
+      scope,
+      { process_ref: processRef(), command_request_id: "command:release-1", trigger: "immediate" },
+    );
+    expect(decision.status).toBe("released");
+    expect(dependencies.commits).toHaveLength(1);
+    expect(
+      (dependencies.commits[0] as { family_growth?: unknown }).family_growth,
+    ).toBe(prepared);
+  });
+
+  it("without the preparer the commit input stays exactly the G3-D shape", async () => {
+    const dependencies = deps(facts());
+    const decision = await releasePublishProcess(dependencies, scope, {
+      process_ref: processRef(),
+      command_request_id: "command:release-1",
+      trigger: "immediate",
+    });
+    expect(decision.status).toBe("released");
+    expect(dependencies.commits).toHaveLength(1);
+    expect("family_growth" in (dependencies.commits[0] as object)).toBe(false);
+  });
+});
+

@@ -1,0 +1,439 @@
+import { randomUUID } from "node:crypto";
+import { afterAll, describe, expect, it } from "vitest";
+import {
+  releasePayloadDigestV1,
+  lifecyclePayloadDigestV1,
+  sha256Hex,
+  validateReleaseEventV1,
+  validateLifecycleEventV1,
+  type FamilyGrowthPreparedReleaseEmissionV1,
+  type FamilyGrowthReleaseEventV1,
+  type FamilyGrowthLifecycleEventV1,
+} from "@the-nurture/scenario/family-growth";
+import { createPrismaClient } from "../src/client.js";
+import {
+  PrismaPublicationReleasePort,
+  PrismaPublicationSafetyTransaction,
+} from "../src/index.js";
+
+// T-009 I3 (non-wire half): the release commit and the lifecycle finalize
+// each land with their family-growth outbox event as one transaction pair,
+// while an absent prepared emission keeps the exact qualified G3-D behavior.
+const prisma = createPrismaClient();
+
+afterAll(async () => {
+  await prisma.$disconnect();
+});
+
+const DIGEST = "c".repeat(64);
+
+const SCHEDULE = {
+  scheduledAt: new Date("2026-08-03T09:00:00.000Z"),
+  notAfter: new Date("2099-08-03T11:00:00.000Z"),
+  scheduleTimeZone: "Asia/Shanghai",
+  schedulePolicyRef: "nurture.institution-publication-policy@1.0.0",
+  schedulePolicyHead: 3,
+  schedulePolicyVersion: 1,
+  scheduleResolvedAt: new Date("2026-08-03T02:00:00.000Z"),
+};
+
+const seedWorld = async () => {
+  const workspaceId = randomUUID();
+  const [teacher, guardian] = await Promise.all(
+    ["teacher", "guardian"].map((tag) =>
+      prisma.nurtureParticipant.create({
+        data: { workspaceId, myChatUserId: `${tag}:${workspaceId}`, status: "active" },
+      }),
+    ),
+  );
+  const institution = await prisma.nurtureCareInstitution.create({
+    data: { workspaceId, displayName: "Care Center", status: "active" },
+  });
+  const group = await prisma.nurtureCareGroup.create({
+    data: { workspaceId, institutionId: institution.id, name: "Class A", status: "active" },
+  });
+  const teacherRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId,
+      participantId: teacher!.id,
+      role: "caregiver",
+      scopeType: "care_group",
+      scopeId: group.id,
+      status: "active",
+    },
+  });
+  await prisma.nurtureInstitutionPublicationPolicy.create({
+    data: {
+      workspaceId,
+      institutionId: institution.id,
+      policyRef: SCHEDULE.schedulePolicyRef,
+      policyVersion: SCHEDULE.schedulePolicyVersion,
+      policyHead: SCHEDULE.schedulePolicyHead,
+      timeZone: SCHEDULE.scheduleTimeZone,
+      defaultReleaseLocalTime: "17:00",
+      retryCutoffLocalTime: "19:00",
+      organizeIdleSeconds: 600,
+      organizeFallbackLeadSeconds: 1800,
+      automaticQuiescenceSeconds: 60,
+      captureActivityLeaseSeconds: 60,
+      automaticOrganizeEnabled: true,
+      effectiveFrom: new Date("2026-08-01T00:00:00.000Z"),
+    },
+  });
+  const child = await prisma.nurtureChild.create({
+    data: { workspaceId, displayName: "Child A", status: "active" },
+  });
+  const careProcess = await prisma.nurtureChildCareProcess.create({
+    data: { workspaceId, childId: child.id, status: "active" },
+  });
+  const family = await prisma.nurtureFamily.create({
+    data: {
+      workspaceId,
+      childCareProcessId: careProcess.id,
+      displayName: "Family A",
+      status: "active",
+    },
+  });
+  const enrollment = await prisma.nurtureEnrollment.create({
+    data: {
+      workspaceId,
+      childCareProcessId: careProcess.id,
+      institutionId: institution.id,
+      careGroupId: group.id,
+      status: "active",
+    },
+  });
+  const grant = await prisma.nurtureChildLinkGrant.create({
+    data: {
+      workspaceId,
+      childCareProcessId: careProcess.id,
+      enrollmentId: enrollment.id,
+      grantedByParticipantId: guardian!.id,
+      grantedToScopeType: "care_group",
+      grantedToScopeId: group.id,
+      directions: ["org_to_family"],
+      dataClasses: ["child_growth_record"],
+      purposes: ["child_growth_publication"],
+      status: "active",
+    },
+  });
+  const process = await prisma.nurturePublishProcess.create({
+    data: {
+      workspaceId,
+      careGroupId: group.id,
+      processKey: `publish:${randomUUID()}`,
+      state: "pending_release",
+      dataClass: "child_growth_record",
+      purposeKey: "child_growth_publication",
+      authorizingRoleAssignmentId: teacherRole.id,
+      ...SCHEDULE,
+    },
+  });
+  const revision = await prisma.nurturePublishProcessRevision.create({
+    data: {
+      workspaceId,
+      publishProcessId: process.id,
+      revision: 1,
+      contentDigest: "sha256:content",
+      organizerInputRevision: "organizer:1",
+    },
+  });
+  await prisma.nurturePublishProcess.update({
+    where: { id: process.id },
+    data: { currentRevisionId: revision.id },
+  });
+  const target = await prisma.nurturePublishProcessTarget.create({
+    data: {
+      workspaceId,
+      publishProcessId: process.id,
+      targetKey: "target:child-A",
+      childCareProcessId: careProcess.id,
+      enrollmentId: enrollment.id,
+      familyRefKey: family.id,
+      grantId: grant.id,
+    },
+  });
+  return { workspaceId, teacher: teacher!, teacherRole, process, revision, target };
+};
+
+const preparedEmission = (): FamilyGrowthPreparedReleaseEmissionV1 => ({
+  target: { child_id: "mc-child-1", family_id: "mc-family-1" },
+  admission: { mode: "direct_family_release", policy_ref: "pol-1", policy_version: 1 },
+  material: {
+    occurredAt: "2026-08-07T03:30:00.000Z",
+    displaySnapshot: { title: "户外写生", source_label: "向日葵班" },
+    attribution: {
+      source_contributor_ref: "contrib-1",
+      source_organization_ref: "org-1",
+      contributed_at: "2026-08-07T03:30:00.000Z",
+    },
+    media: [
+      {
+        source_asset_ref: "asset-1",
+        source_media_revision: 1,
+        content_digest: "b".repeat(64),
+        family_rendition_ref: "rendition-1",
+        mime_type: "image/jpeg",
+        access_mode: "authorized_short_lived_url",
+      },
+    ],
+  },
+  retentionMode: "family_retained",
+  contentDigest: DIGEST,
+});
+
+const port = () => new PrismaPublicationReleasePort(prisma);
+
+const commit = (
+  world: Awaited<ReturnType<typeof seedWorld>>,
+  options: {
+    commandRequestId?: string;
+    familyGrowth?: FamilyGrowthPreparedReleaseEmissionV1;
+  } = {},
+) =>
+  port().commitTargetRelease({
+    workspace_id: world.workspaceId,
+    participant_id: world.teacher.id,
+    process_key: world.process.processKey,
+    target_key: world.target.targetKey,
+    revision: 1,
+    command_request_id: options.commandRequestId ?? `cmd:${randomUUID()}`,
+    trigger: "immediate",
+    ...(options.familyGrowth ? { family_growth: options.familyGrowth } : {}),
+  });
+
+describe("T-009 I3: release commit emits the family-growth outbox event", () => {
+  it("lands release, receipt and outbox event as one transaction", async () => {
+    const world = await seedWorld();
+    const result = await commit(world, { familyGrowth: preparedEmission() });
+    expect(result.status).toBe("committed");
+    if (result.status !== "committed") return;
+
+    const outbox = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+      where: { workspaceId: world.workspaceId },
+    });
+    expect(outbox).toHaveLength(1);
+    const row = outbox[0]!;
+    expect(row.kind).toBe("released");
+    expect(row.publicationReleaseId).toBe(result.publication_ref);
+    expect(row.deliveryState).toBe("pending");
+
+    // The stored envelope is schema-valid and binds the exact committed rows.
+    const envelope = row.envelopePayload as FamilyGrowthReleaseEventV1;
+    expect(validateReleaseEventV1(envelope)).toEqual([]);
+    expect(envelope.event_id).toBe(row.id);
+    expect(envelope.source.publication_release_ref).toBe(result.publication_ref);
+    expect(envelope.source.receipt_ref).toBe(result.receipt_ref);
+    expect(envelope.source.publish_process_ref).toBe(world.process.id);
+    expect(envelope.source.publish_revision_ref).toBe(world.revision.id);
+    expect(envelope.source.source_target_ref).toBe(world.target.id);
+    expect(envelope.target).toEqual({ child_id: "mc-child-1", family_id: "mc-family-1" });
+    const { source, target, admission, material, retention } = envelope;
+    expect(row.payloadDigest).toBe(
+      releasePayloadDigestV1({ source, target, admission, material, retention }),
+    );
+
+    const release = await prisma.nurturePublicationRelease.findUniqueOrThrow({
+      where: { id: result.publication_ref },
+    });
+    expect(release.committedAt.toISOString()).toBe(envelope.source.committed_at);
+  });
+
+  it("an exact replay returns the original refs and appends no second event", async () => {
+    const world = await seedWorld();
+    const commandRequestId = `cmd:${randomUUID()}`;
+    const first = await commit(world, { commandRequestId, familyGrowth: preparedEmission() });
+    const replay = await commit(world, { commandRequestId, familyGrowth: preparedEmission() });
+    expect(first).toEqual(replay);
+    expect(
+      await prisma.nurtureFamilyGrowthOutboxEvent.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(1);
+  });
+
+  it("rejects an invalid prepared emission write-free, freeze included", async () => {
+    const world = await seedWorld();
+    const invalid = preparedEmission();
+    invalid.contentDigest = "not-a-digest";
+    const result = await commit(world, { familyGrowth: invalid });
+    expect(result).toEqual({
+      status: "rejected",
+      reason_code: "family_growth_emission_invalid",
+    });
+    expect(
+      await prisma.nurturePublicationRelease.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.nurtureChildLinkReceipt.count({ where: { workspaceId: world.workspaceId } }),
+    ).toBe(0);
+    expect(
+      await prisma.nurtureFamilyGrowthOutboxEvent.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(0);
+    // The freeze CAS rolled back with everything else.
+    const process = await prisma.nurturePublishProcess.findUniqueOrThrow({
+      where: { id: world.process.id },
+    });
+    expect(process.state).toBe("pending_release");
+    expect(process.frozenRevisionId).toBeNull();
+  });
+
+  it("without a prepared emission the commit stays the qualified G3-D path", async () => {
+    const world = await seedWorld();
+    const result = await commit(world);
+    expect(result.status).toBe("committed");
+    expect(
+      await prisma.nurtureFamilyGrowthOutboxEvent.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(0);
+  });
+});
+
+describe("T-009 I3: lifecycle finalize emits paired outbox events", () => {
+  const appendEvents = (
+    world: Awaited<ReturnType<typeof seedWorld>>,
+    publicationId: string,
+    executionId: string,
+    events: Array<{
+      kind: "correction" | "target_removal" | "redaction";
+      correction_display_safe_text?: string;
+    }>,
+  ) =>
+    new PrismaPublicationSafetyTransaction(prisma).appendPublicationVisibilityEvents({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      command_execution_id: executionId,
+      actor_role_assignment_id: world.teacherRole.id,
+      events: events.map((event) => ({
+        event_id: randomUUID(),
+        publication_id: publicationId,
+        kind: event.kind,
+        reason_key: "content_error",
+        source_release_revision: 1,
+        occurred_at: new Date().toISOString(),
+        ...(event.correction_display_safe_text !== undefined
+          ? { correction_display_safe_text: event.correction_display_safe_text }
+          : {}),
+      })),
+    });
+
+  const seedExecution = async (world: Awaited<ReturnType<typeof seedWorld>>) => {
+    const execution = await prisma.nurtureCommandExecution.create({
+      data: {
+        workspaceId: world.workspaceId,
+        commandRequestIdHash: sha256Hex(randomUUID()),
+        originInvocationRequestIdHash: sha256Hex(randomUUID()),
+        commandKey: "correct_publication",
+        commandScope: "board_publication",
+        commandContractVersion: 1,
+        payloadHash: sha256Hex("payload"),
+        businessActorRef: world.teacher.id,
+        targetRefs: [],
+        businessOutcome: "applied",
+        outputRefs: [],
+        handoffRequestSnapshotsPayload: [],
+        committedAt: new Date(),
+      },
+    });
+    return execution.id;
+  };
+
+  it("emits the lifecycle envelope for a delivered release, target copied from storage", async () => {
+    const world = await seedWorld();
+    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    expect(committed.status).toBe("committed");
+    if (committed.status !== "committed") return;
+    const executionId = await seedExecution(world);
+
+    await appendEvents(world, committed.publication_ref, executionId, [
+      { kind: "correction", correction_display_safe_text: "活动时间更正为周三上午" },
+    ]);
+
+    const rows = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+      where: { workspaceId: world.workspaceId, kind: "correction" },
+    });
+    expect(rows).toHaveLength(1);
+    const envelope = rows[0]!.envelopePayload as FamilyGrowthLifecycleEventV1;
+    expect(validateLifecycleEventV1(envelope)).toEqual([]);
+    expect(envelope.target).toEqual({ child_id: "mc-child-1", family_id: "mc-family-1" });
+    expect(envelope.source.publication_release_ref).toBe(committed.publication_ref);
+    expect(envelope.correction?.display_safe_text).toBe("活动时间更正为周三上午");
+    expect(envelope.correction?.content_digest).toBe(sha256Hex("活动时间更正为周三上午"));
+    expect(rows[0]!.visibilityEventId).toBe(envelope.source.event_ref);
+    expect(rows[0]!.payloadDigest).toBe(
+      lifecyclePayloadDigestV1({
+        source: envelope.source,
+        target: envelope.target,
+        correction: envelope.correction,
+      }),
+    );
+  });
+
+  it("skips emission for a release that never delivered to family growth", async () => {
+    const world = await seedWorld();
+    const committed = await commit(world);
+    expect(committed.status).toBe("committed");
+    if (committed.status !== "committed") return;
+    const executionId = await seedExecution(world);
+
+    await appendEvents(world, committed.publication_ref, executionId, [
+      { kind: "target_removal" },
+    ]);
+
+    expect(
+      await prisma.nurturePublicationVisibilityEvent.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(1);
+    expect(
+      await prisma.nurtureFamilyGrowthOutboxEvent.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(0);
+  });
+
+  it("a correction without display-safe text on a delivered release fails the pair closed", async () => {
+    const world = await seedWorld();
+    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    expect(committed.status).toBe("committed");
+    if (committed.status !== "committed") return;
+    const executionId = await seedExecution(world);
+
+    await expect(
+      appendEvents(world, committed.publication_ref, executionId, [{ kind: "correction" }]),
+    ).rejects.toThrow();
+    // The lineage row rolled back with the failed envelope: no half pair.
+    expect(
+      await prisma.nurturePublicationVisibilityEvent.count({
+        where: { workspaceId: world.workspaceId },
+      }),
+    ).toBe(0);
+    expect(
+      await prisma.nurtureFamilyGrowthOutboxEvent.count({
+        where: { workspaceId: world.workspaceId, kind: { not: "released" } },
+      }),
+    ).toBe(0);
+  });
+
+  it("redaction emits without a correction body", async () => {
+    const world = await seedWorld();
+    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    expect(committed.status).toBe("committed");
+    if (committed.status !== "committed") return;
+    const executionId = await seedExecution(world);
+
+    await appendEvents(world, committed.publication_ref, executionId, [{ kind: "redaction" }]);
+    const rows = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+      where: { workspaceId: world.workspaceId, kind: "redaction" },
+    });
+    expect(rows).toHaveLength(1);
+    const envelope = rows[0]!.envelopePayload as FamilyGrowthLifecycleEventV1;
+    expect(validateLifecycleEventV1(envelope)).toEqual([]);
+    expect(envelope.correction).toBeUndefined();
+  });
+});
