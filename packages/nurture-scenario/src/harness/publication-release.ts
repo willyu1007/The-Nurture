@@ -19,7 +19,7 @@ import {
 import type { ResolvedPublishScheduleV1 } from "./publish-schedule.js";
 import { randomUUID } from "node:crypto";
 import {
-  FAMILY_GROWTH_BINDING_UNAVAILABLE_REASON,
+  familyGrowthEmissionRejectionReasonCode,
   type FamilyGrowthPreparedReleaseEmissionV1,
   type FamilyGrowthReleaseEmissionPreparerV1,
 } from "../domain/family-growth/emission.js";
@@ -341,12 +341,13 @@ export const releasePublishProcess = async (
         process_key: processKey,
         target_key: target.target_key,
         child_care_process_id: target.child_care_process_id,
+        revision: releaseRevision,
       });
       if (prepared.status === "denied") {
         results.push({
           targetRef,
           outcome: "rejected",
-          reasonCode: FAMILY_GROWTH_BINDING_UNAVAILABLE_REASON,
+          reasonCode: familyGrowthEmissionRejectionReasonCode(prepared.reason),
           blockingReasons: [],
         });
         continue;

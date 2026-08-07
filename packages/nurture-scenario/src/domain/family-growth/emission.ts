@@ -33,9 +33,24 @@ export type FamilyGrowthPreparedReleaseEmissionV1 = {
   contentDigest: string;
 };
 
+/**
+ * Fact-loading failures beyond target resolution. Each is a stable teacher-
+ * queue reason code of its own (requirements §四: binding 不可用 / policy
+ * drift / 媒体不合规 are distinct displayable states).
+ */
+export type FamilyGrowthPreparationDenyReasonV1 =
+  | "release_facts_unavailable"
+  | "publication_policy_unavailable"
+  | "media_facts_unavailable"
+  | "display_content_unavailable";
+
+export type FamilyGrowthEmissionDenyReasonV1 =
+  | FamilyGrowthTargetDenyReasonV1
+  | FamilyGrowthPreparationDenyReasonV1;
+
 export type FamilyGrowthReleaseEmissionPrepResultV1 =
   | { status: "prepared"; emission: FamilyGrowthPreparedReleaseEmissionV1 }
-  | { status: "denied"; reason: FamilyGrowthTargetDenyReasonV1 };
+  | { status: "denied"; reason: FamilyGrowthEmissionDenyReasonV1 };
 
 /**
  * Pre-commit preparer, injected into the release flow. Absent dependency =
@@ -49,8 +64,31 @@ export type FamilyGrowthReleaseEmissionPreparerV1 = {
     process_key: string;
     target_key: string;
     child_care_process_id: string;
+    /** The exact revision this release will bind; never "whatever is current". */
+    revision: number;
   }): Promise<FamilyGrowthReleaseEmissionPrepResultV1>;
 };
 
 /** The teacher-queue reason code a denied resolution surfaces (§四 vocabulary). */
 export const FAMILY_GROWTH_BINDING_UNAVAILABLE_REASON = "binding_unavailable" as const;
+
+const PREPARATION_REASONS: readonly FamilyGrowthPreparationDenyReasonV1[] = [
+  "release_facts_unavailable",
+  "publication_policy_unavailable",
+  "media_facts_unavailable",
+  "display_content_unavailable",
+];
+
+/**
+ * Map a denial to its teacher-queue reason code: every resolution-chain
+ * denial collapses to `binding_unavailable` (the queue must not distinguish
+ * revoked from quarantined from expired — that would leak binding state
+ * detail through a class surface), while preparation denials keep their own
+ * stable keys.
+ */
+export const familyGrowthEmissionRejectionReasonCode = (
+  reason: FamilyGrowthEmissionDenyReasonV1,
+): string =>
+  (PREPARATION_REASONS as readonly string[]).includes(reason)
+    ? reason
+    : FAMILY_GROWTH_BINDING_UNAVAILABLE_REASON;

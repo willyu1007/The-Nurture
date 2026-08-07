@@ -99,6 +99,10 @@ export const parseAdmissionReceiptV1 = (value: unknown): FamilyGrowthAdmissionRe
     throw new FamilyGrowthReceiptError("source_scenario_key", "must be a stable key");
   }
 
+  const admissionRef = optionalRef(value, "admission_ref");
+  const materialRef = optionalRef(value, "material_ref");
+  const suppressionRef = optionalRef(value, "suppression_ref");
+  const reasonCode = optionalRef(value, "reason_code");
   const receipt: FamilyGrowthAdmissionReceiptV1 = {
     contract_key: FAMILY_GROWTH_RECEIPT_CONTRACT_KEY,
     contract_version: FAMILY_GROWTH_CONTRACT_VERSION,
@@ -110,18 +114,10 @@ export const parseAdmissionReceiptV1 = (value: unknown): FamilyGrowthAdmissionRe
     status: status as FamilyGrowthReceiptStatusV1,
     processed_at: value.processed_at,
     consumer_contract_version: FAMILY_GROWTH_CONTRACT_VERSION,
-    ...(optionalRef(value, "admission_ref") !== undefined
-      ? { admission_ref: optionalRef(value, "admission_ref") }
-      : {}),
-    ...(optionalRef(value, "material_ref") !== undefined
-      ? { material_ref: optionalRef(value, "material_ref") }
-      : {}),
-    ...(optionalRef(value, "suppression_ref") !== undefined
-      ? { suppression_ref: optionalRef(value, "suppression_ref") }
-      : {}),
-    ...(optionalRef(value, "reason_code") !== undefined
-      ? { reason_code: optionalRef(value, "reason_code") }
-      : {}),
+    ...(admissionRef !== undefined ? { admission_ref: admissionRef } : {}),
+    ...(materialRef !== undefined ? { material_ref: materialRef } : {}),
+    ...(suppressionRef !== undefined ? { suppression_ref: suppressionRef } : {}),
+    ...(reasonCode !== undefined ? { reason_code: reasonCode } : {}),
   };
 
   switch (receipt.status) {

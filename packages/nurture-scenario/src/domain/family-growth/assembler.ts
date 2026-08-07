@@ -72,16 +72,19 @@ export const assembleReleaseEventV1 = (
 ): FamilyGrowthReleaseEventV1 => {
   const body = {
     source: { scenario_key: NURTURE_SCENARIO_KEY, ...facts.source },
-    target: facts.target,
-    admission: facts.admission,
+    // Structured inputs are cloned: the envelope must not share object graphs
+    // with the caller, or a mutation after assembly would silently desync the
+    // stored envelope from the digest computed here.
+    target: structuredClone(facts.target),
+    admission: structuredClone(facts.admission),
     material: {
       material_kind: "photo" as const,
       data_class: "child_growth_record" as const,
       purpose_key: "child_growth_publication" as const,
       occurred_at: facts.material.occurredAt,
-      display_snapshot: facts.material.displaySnapshot,
-      attribution: facts.material.attribution,
-      media: facts.material.media,
+      display_snapshot: structuredClone(facts.material.displaySnapshot),
+      attribution: structuredClone(facts.material.attribution),
+      media: structuredClone(facts.material.media),
     },
     retention: {
       retention_mode: facts.retentionMode,

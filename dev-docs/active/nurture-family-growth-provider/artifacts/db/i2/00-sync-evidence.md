@@ -63,3 +63,11 @@ Repair (local dev data only):
 - `pnpm db:assert-boundary` → tables 63 / enums 93 (from 61 / 90).
 - `pnpm test:db` → 23 files / 238 tests green, including the new
   `t009-family-growth-outbox` and `t009-family-growth-binding` suites.
+
+## Addendum — 2026-08-07 I3c mime column
+
+`20260807120000_t009_media_mime_type` adds
+`nurture_media_asset_ref.content_mime_type` (TEXT NULL, format CHECK
+`ck_nurture_media_asset_mime_type`), same nullable/fail-closed posture as
+`content_digest`. Deployed to the same local dev target; `migrate diff`
+empty afterwards; boundary and full `pnpm test:db` re-verified green.
