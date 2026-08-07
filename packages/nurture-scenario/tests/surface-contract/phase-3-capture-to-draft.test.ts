@@ -188,7 +188,6 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
     // The G3-A topology queries are reserved in the topology table instead.
     for (const key of [
       "query_guardian_family_board",
-      "query_guardian_current_focus",
       "query_guardian_enrollment_activity",
       "query_caregiver_teacher_board",
       "query_caregiver_child_today",

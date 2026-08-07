@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-04T23:53:38.048Z",
+  "generatedAt": "2026-08-07T23:44:17.748Z",
   "sourceOpenapi": "docs/context/api/openapi.yaml",
-  "sourceChecksumSha256": "b3eee8c012b750470d782644d24198f3ccc79e76cad7d1c77bfac793fd9d866b",
+  "sourceChecksumSha256": "bcb99aab6d5e1ee77d2ea0ef011dd5f250b534790dc7ae6a5aed62706df70302",
   "stats": {
     "totalEndpoints": 7,
     "byTag": {

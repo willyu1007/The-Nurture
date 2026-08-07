@@ -156,12 +156,10 @@
         "capability:query_caregiver_child_today",
         "capability:query_caregiver_family_care_work",
         "capability:query_caregiver_teacher_board",
-        "capability:query_guardian_current_focus",
         "capability:query_guardian_enrollment_activity",
         "capability:query_guardian_family_board",
         "capability:query_teacher_publish_queue",
         "capability:record_caregiver_daily_care",
-        "capability:update_guardian_current_focus",
         "surface:caregiver_teacher_board",
         "surface:guardian_family_board"
       ],

@@ -157,16 +157,6 @@
       "jsonPointer": "/$defs/result"
     },
     {
-      "schemaRef": "schema:nurture.query-guardian-current-focus-input@1",
-      "artifactPath": "capabilities/contracts/query-guardian-current-focus.schema.json",
-      "jsonPointer": "/$defs/input"
-    },
-    {
-      "schemaRef": "schema:nurture.query-guardian-current-focus-result@1",
-      "artifactPath": "capabilities/contracts/query-guardian-current-focus.schema.json",
-      "jsonPointer": "/$defs/result"
-    },
-    {
       "schemaRef": "schema:nurture.query-guardian-enrollment-activity-input@1",
       "artifactPath": "capabilities/contracts/query-guardian-enrollment-activity.schema.json",
       "jsonPointer": "/$defs/input"
@@ -345,16 +335,6 @@
       "schemaRef": "schema:nurture.surface-operation-error@1",
       "artifactPath": "invocation/operation-error.schema.json",
       "jsonPointer": ""
-    },
-    {
-      "schemaRef": "schema:nurture.update-guardian-current-focus-input@1",
-      "artifactPath": "capabilities/contracts/update-guardian-current-focus.schema.json",
-      "jsonPointer": "/$defs/input"
-    },
-    {
-      "schemaRef": "schema:nurture.update-guardian-current-focus-result@1",
-      "artifactPath": "capabilities/contracts/update-guardian-current-focus.schema.json",
-      "jsonPointer": "/$defs/result"
     },
     {
       "schemaRef": "schema:nurture.withdraw-family-care-request-input@1",

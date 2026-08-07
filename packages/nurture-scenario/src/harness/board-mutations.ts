@@ -3,7 +3,6 @@ import type { NurtureCommandSpec } from "../domain/commands/command-kernel.js";
 import type { NurtureInteractionContextService } from "../domain/interactions/interaction-context.js";
 import type {
   NurtureCaregiverDailyCareFacts,
-  NurtureGuardianFocusGoalFacts,
 } from "../domain/institution/board-mutation-transaction.js";
 import { createBoardWriteSpec } from "./board-write-spec.js";
 import {
@@ -26,25 +25,15 @@ import { issueCapabilityResultRef } from "./keyed-refs.js";
  * snapshot, a derived projection or a unified child-state row, and neither is a
  * publication: recording an internal class fact never makes it family-visible.
  */
-export const UPDATE_GUARDIAN_CURRENT_FOCUS_CAPABILITY = {
-  key: "update_guardian_current_focus",
-  version: "1.0.0",
-} as const;
-
 export const RECORD_CAREGIVER_DAILY_CARE_CAPABILITY = {
   key: "record_caregiver_daily_care",
   version: "1.0.0",
 } as const;
 
-export const FOCUS_GOAL_TARGET_KIND = "focus_goal";
 export const CHILD_CARE_PROCESS_TARGET_KIND = "child_care_process";
 
-const MIN_LABEL_CHARS = 1;
-const MAX_LABEL_CHARS = 200;
 const MIN_SUMMARY_CHARS = 1;
 const MAX_SUMMARY_CHARS = 500;
-const MIN_PRIORITY = 1;
-const MAX_PRIORITY = 99;
 
 export const DAILY_CARE_KINDS = [
   "meal",
@@ -80,234 +69,6 @@ const closedRecord = (
   const record = value as Record<string, unknown>;
   return Object.keys(record).every((key) => allowed.includes(key)) ? record : null;
 };
-
-// ---------------------------------------------------------------------------
-// update_guardian_current_focus
-
-export type UpdateGuardianCurrentFocusInputV1 = { label: string; priority: number };
-
-export const parseUpdateGuardianCurrentFocusInputV1 = (
-  value: unknown,
-): ParsedInput<UpdateGuardianCurrentFocusInputV1> => {
-  const record = closedRecord(value, ["label", "priority"]);
-  if (!record) return { status: "invalid", fields: ["label", "priority"] };
-  const fields: string[] = [];
-  const label = typeof record.label === "string" ? record.label.trim() : "";
-  if (label.length < MIN_LABEL_CHARS || label.length > MAX_LABEL_CHARS) fields.push("label");
-  const priority = record.priority;
-  if (
-    typeof priority !== "number" ||
-    !Number.isSafeInteger(priority) ||
-    priority < MIN_PRIORITY ||
-    priority > MAX_PRIORITY
-  ) {
-    fields.push("priority");
-  }
-  if (fields.length > 0) return { status: "invalid", fields };
-  return { status: "ok", input: { label, priority: priority as number } };
-};
-
-export type UpdateGuardianCurrentFocusCommandV1 = {
-  label: string;
-  priority: number;
-  focus_goal_id: string;
-  focus_cycle_id: string;
-  expected_focus_cycle_version: number;
-  expected_focus_goal_version: number;
-};
-
-export const canonicalizeUpdateGuardianCurrentFocusCommand = (
-  input: UpdateGuardianCurrentFocusCommandV1,
-): unknown => ({
-  label: input.label,
-  priority: input.priority,
-  focus_goal_id: input.focus_goal_id,
-  focus_cycle_id: input.focus_cycle_id,
-  expected_focus_cycle_version: input.expected_focus_cycle_version,
-  expected_focus_goal_version: input.expected_focus_goal_version,
-});
-
-const focusGoalWritable = (facts: NurtureGuardianFocusGoalFacts): boolean =>
-  facts.participant_active &&
-  facts.guardian_authority_current &&
-  Boolean(facts.family_ref_key) &&
-  Boolean(facts.focus_cycle_id);
-
-export type GuardianFocusEligibilityReadPort = {
-  resolveGuardianFocusEligibility(input: {
-    workspace_id: string;
-    participant_id: string;
-  }): Promise<{
-    participant_active: boolean;
-    goals: Array<{
-      focus_goal_id: string;
-      focus_cycle_id: string;
-      display_label: string;
-      focus_cycle_version: number;
-      focus_goal_version: number;
-    }>;
-  }>;
-};
-
-export const prepareUpdateGuardianCurrentFocus = async (
-  deps: {
-    eligibility: GuardianFocusEligibilityReadPort;
-    contexts: NurtureInteractionContextService;
-    integrity_key: string;
-    create_command_id?: () => string;
-  },
-  request: BoardScopeV1 & {
-    surface: string;
-    host_conversation_ref?: string;
-    operation_input: unknown;
-    target_option_ref?: string;
-  },
-): Promise<BoardMutationPrepareDecision> => {
-  const parsed = parseUpdateGuardianCurrentFocusInputV1(request.operation_input);
-  if (parsed.status === "invalid") return { status: "needs_input", fields: parsed.fields };
-  if (!request.target_option_ref) return { status: "needs_input", fields: ["target"] };
-
-  const eligibility = await deps.eligibility.resolveGuardianFocusEligibility({
-    workspace_id: request.workspace_id,
-    participant_id: request.participant_id,
-  });
-  if (!eligibility.participant_active || eligibility.goals.length === 0) {
-    return { status: "denied", reason_code: "not_authorized" };
-  }
-  // Only an owner-issued, actor-bound ref selects the goal; a raw FocusGoal id
-  // never resolves, so it can never route a write.
-  // Resolved against the owner's current eligible set, so a goal the guardian
-  // has lost simply stops resolving. The ref itself carries no goal id.
-  const focusGoalId = resolveBoardSealedRef(
-    deps.integrity_key,
-    request,
-    FOCUS_GOAL_TARGET_KIND,
-    request.target_option_ref,
-    eligibility.goals.map((goal) => goal.focus_goal_id),
-  );
-  const target = eligibility.goals.find((goal) => goal.focus_goal_id === focusGoalId);
-  if (!target) return { status: "denied", reason_code: "not_authorized" };
-
-  const commandRequestId = (deps.create_command_id ?? (() => `command:${randomUUID()}`))();
-  const command: UpdateGuardianCurrentFocusCommandV1 = {
-    label: parsed.input.label,
-    priority: parsed.input.priority,
-    focus_goal_id: target.focus_goal_id,
-    focus_cycle_id: target.focus_cycle_id,
-    expected_focus_cycle_version: target.focus_cycle_version,
-    expected_focus_goal_version: target.focus_goal_version,
-  };
-  const issued = await issueHarnessConfirmation(deps.contexts, {
-    workspace_id: request.workspace_id,
-    participant_id: request.participant_id,
-    surface: request.surface,
-    ...(request.host_conversation_ref
-      ? { host_conversation_ref: request.host_conversation_ref }
-      : {}),
-    payload: {
-      capability_key: UPDATE_GUARDIAN_CURRENT_FOCUS_CAPABILITY.key,
-      capability_version: UPDATE_GUARDIAN_CURRENT_FOCUS_CAPABILITY.version,
-      command_request_id: commandRequestId,
-      target_refs: {
-        focus_goal: target.focus_goal_id,
-        focus_cycle: target.focus_cycle_id,
-      },
-      expected_heads: {
-        focus_cycle: command.expected_focus_cycle_version,
-        focus_goal: command.expected_focus_goal_version,
-      },
-      input_integrity_tag: computeHarnessInputIntegrityTag(
-        deps.integrity_key,
-        canonicalizeUpdateGuardianCurrentFocusCommand(command),
-      ),
-      integrity_tag_version: 1,
-    },
-  });
-  return {
-    status: "ready_to_confirm",
-    preview: {
-      normalized_label: command.label,
-      priority: command.priority,
-      target_label: target.display_label,
-      effect: "update_guardian_current_focus",
-    },
-    confirmation_ref: issued.token,
-    expires_at: issued.expires_at,
-    command_request_id: commandRequestId,
-  };
-};
-
-export const createUpdateGuardianCurrentFocusSpec = (deps: {
-  integrity_key: string;
-}): NurtureCommandSpec<UpdateGuardianCurrentFocusCommandV1> =>
-  createBoardWriteSpec({
-    capability: UPDATE_GUARDIAN_CURRENT_FOCUS_CAPABILITY,
-    command_scope: "board_focus",
-    contract_version: 1,
-    result_schema_version: 1,
-    canonicalize: canonicalizeUpdateGuardianCurrentFocusCommand,
-    port: {
-      select: (transaction) => transaction.boardMutations,
-      unavailable_reason_code: "board_mutation_port_unavailable",
-    },
-    revalidateInput: (input) => {
-      const parsed = parseUpdateGuardianCurrentFocusInputV1({
-        label: input.label,
-        priority: input.priority,
-      });
-      return parsed.status === "invalid" || parsed.input.label !== input.label
-        ? { status: "invalid", reason_code: "invalid_focus_input" }
-        : null;
-    },
-    // The owner is re-read inside the command transaction: a board snapshot,
-    // cache or optimistic client state is never the authority for the change.
-    loadFacts: (board, input, context) =>
-      board.loadGuardianFocusGoalFacts({
-        workspace_id: context.workspace_id,
-        participant_id: context.business_actor_ref,
-        focus_goal_id: input.focus_goal_id,
-      }),
-    facts_absent_reason_code: "not_authorized",
-    authorize: (facts, input) =>
-      focusGoalWritable(facts) && facts.focus_cycle_id === input.focus_cycle_id
-        ? // Explicit child scope stays an owner fact; this capability never
-          // promotes a family-scope goal into a child-scoped one by writing text.
-          { status: "authorized", write: { child_scope_explicit: facts.child_scope_explicit } }
-        : { status: "blocked", reason_code: "not_authorized" },
-    head_keys: ["focus_cycle", "focus_goal"],
-    expectedHeads: (input) => ({
-      focus_cycle: input.expected_focus_cycle_version,
-      focus_goal: input.expected_focus_goal_version,
-    }),
-    currentHeads: (facts) => ({
-      focus_cycle: facts.focus_cycle_version,
-      focus_goal: facts.focus_goal_version,
-    }),
-    apply: async (board, input, context, write) => {
-      const applied = await board.applyGuardianFocusGoalUpdate({
-        workspace_id: context.workspace_id,
-        participant_id: context.business_actor_ref,
-        focus_goal_id: input.focus_goal_id,
-        focus_cycle_id: input.focus_cycle_id,
-        label: input.label,
-        priority: input.priority,
-        expected_focus_goal_version: input.expected_focus_goal_version,
-      });
-      return {
-        output_refs: [applied.focus_goal_ref],
-        committed_result: {
-          focusGoalRef: issueCapabilityResultRef(
-            deps.integrity_key,
-            context,
-            "focus_goal",
-            applied.focus_goal_ref,
-          ),
-          revision: applied.revision,
-          scopeSource: write.child_scope_explicit ? "explicit_child_scope" : "family_scope",
-        },
-      };
-    },
-  });
 
 // ---------------------------------------------------------------------------
 // record_caregiver_daily_care
@@ -550,13 +311,6 @@ export const createRecordCaregiverDailyCareSpec = (deps: {
       };
     },
   });
-
-/** Owner-issued target refs the board hands to these two capabilities. */
-export const issueFocusGoalTargetRef = (
-  integrityKey: string,
-  scope: BoardScopeV1,
-  focusGoalId: string,
-): string => issueBoardSealedRef(integrityKey, scope, FOCUS_GOAL_TARGET_KIND, focusGoalId);
 
 export const issueChildCareProcessTargetRef = (
   integrityKey: string,

@@ -19,7 +19,6 @@ import {
   createGuardianReadPort,
   createPublishQueueReadPort,
   publishQueueRow,
-  focusGoal,
   guardianActivity,
   surfaceRegistrySource,
   workItem,
@@ -162,7 +161,6 @@ describe("G3-A guardian_family_board envelope", () => {
     const result = await presentGuardianFamilyBoard(
       guardianDeps(
         createGuardianReadPort({
-          goals: [focusGoal()],
           activityPages: [{ rows: [guardianActivity()], has_more: false }],
         }),
       ),
@@ -203,7 +201,7 @@ describe("G3-A guardian_family_board envelope", () => {
     expect(emitted).toEqual(
       guardianSurface.orderedContentKinds.filter((kind) => emitted.includes(kind)),
     );
-    expect(emitted).toEqual(["guardian_current_focus", "guardian_enrollment_activity"]);
+    expect(emitted).toEqual(["guardian_enrollment_activity"]);
     expect(envelope.content.every((module) => module.required)).toBe(true);
   });
 
@@ -211,15 +209,6 @@ describe("G3-A guardian_family_board envelope", () => {
     const result = await presentGuardianFamilyBoard(
       guardianDeps(
         createGuardianReadPort({
-          goals: [
-            focusGoal({ goal_id: "goal-1" }),
-            focusGoal({
-              goal_id: "goal-2",
-              child_scope_explicit: true,
-              child_care_process_id: "child-1",
-              child_safe_label: "Syn Child A",
-            }),
-          ],
           activityPages: [
             {
               rows: [
@@ -235,20 +224,16 @@ describe("G3-A guardian_family_board envelope", () => {
     );
     expect(result.status).toBe("ok");
     if (result.status !== "ok") return;
-    const [focus, activity] = result.output.content;
-    expect(focus?.count).toBe(2);
-    expect(focus?.itemRefs).toHaveLength(2);
+    const [activity] = result.output.content;
     expect(activity?.count).toBe(2);
     expect(activity?.pageInfo).toEqual({ hasMore: false });
     const serialized = JSON.stringify(result.output);
     expect(serialized).not.toContain("Syn Released Daily Care");
-    expect(serialized).not.toContain("Syn Child A");
-    expect(serialized).not.toContain("goal-1");
   });
 
   it("keeps the optional Workflow projection absent without a dependency NO-GO", async () => {
     const result = await presentGuardianFamilyBoard(
-      guardianDeps(createGuardianReadPort({ goals: [focusGoal()] })),
+      guardianDeps(createGuardianReadPort({})),
       guardianScope,
     );
     expect(result.status).toBe("ok");
@@ -275,7 +260,7 @@ describe("G3-A guardian_family_board envelope", () => {
     );
     expect(single.status).toBe("ok");
     if (single.status !== "ok") return;
-    expect(single.output.content[1]?.count).toBe(1);
+    expect(single.output.content[0]?.count).toBe(1);
 
     const port = createGuardianReadPort({
       scope: {
@@ -289,8 +274,8 @@ describe("G3-A guardian_family_board envelope", () => {
     const ambiguous = await presentGuardianFamilyBoard(guardianDeps(port), guardianScope);
     expect(ambiguous.status).toBe("ok");
     if (ambiguous.status !== "ok") return;
-    expect(ambiguous.output.content[1]?.count).toBe(0);
-    expect(ambiguous.output.content[1]?.itemRefs).toEqual([]);
+    expect(ambiguous.output.content[0]?.count).toBe(0);
+    expect(ambiguous.output.content[0]?.itemRefs).toEqual([]);
     expect(port.activityRequests).toEqual([]);
 
     const chosen = await presentGuardianFamilyBoard(guardianDeps(port), {
@@ -302,7 +287,7 @@ describe("G3-A guardian_family_board envelope", () => {
     });
     expect(chosen.status).toBe("ok");
     if (chosen.status !== "ok") return;
-    expect(chosen.output.content[1]?.count).toBe(1);
+    expect(chosen.output.content[0]?.count).toBe(1);
   });
 
   it("reports needs_setup with no eligible Enrollment and denies a non-current Guardian", async () => {
@@ -324,7 +309,7 @@ describe("G3-A guardian_family_board envelope", () => {
 
   it("projects module and surface actions only from owner eligibility", async () => {
     const withoutGrants = await presentGuardianFamilyBoard(
-      guardianDeps(createGuardianReadPort({ goals: [focusGoal()] })),
+      guardianDeps(createGuardianReadPort({})),
       guardianScope,
     );
     expect(withoutGrants.status).toBe("ok");
@@ -337,12 +322,11 @@ describe("G3-A guardian_family_board envelope", () => {
     const withGrants = await presentGuardianFamilyBoard(
       guardianDeps(
         createGuardianReadPort({
-          goals: [focusGoal()],
           scope: {
             module_action_grants: {
-              guardian_current_focus: [
+              guardian_enrollment_activity: [
                 {
-                  capability_key: "update_guardian_current_focus",
+                  capability_key: "query_guardian_enrollment_activity",
                   capability_version: "1.0.0",
                   availability: "available",
                 },
@@ -357,7 +341,7 @@ describe("G3-A guardian_family_board envelope", () => {
     if (withGrants.status !== "ok") return;
     expect(withGrants.output.content[0]?.actionRefs).toEqual([
       {
-        capabilityKey: "update_guardian_current_focus",
+        capabilityKey: "query_guardian_enrollment_activity",
         capabilityVersion: "1.0.0",
         availability: "available",
       },
@@ -464,7 +448,6 @@ describe("G3-A caregiver_teacher_board envelope", () => {
     const guardian = await presentGuardianFamilyBoard(
       guardianDeps(
         createGuardianReadPort({
-          goals: [focusGoal()],
           activityPages: [{ rows: [guardianActivity()], has_more: false }],
         }),
       ),

@@ -6,27 +6,12 @@ type DomainContextRef = CanonicalRef;
  * Canonical-owner write ports behind the two G3-A inline board mutations.
  *
  * The board is an operable projection, not a fact owner: an inline adjustment
- * must land through the owner of the fact it changes. Current focus belongs to
- * the FocusCycle/FocusGoal owner and daily care belongs to the DailyCareLog
- * owner, so each mutation re-reads that owner inside the command transaction
- * and never patches a board snapshot, cache or derived projection.
+ * must land through the owner of the fact it changes. Daily care belongs to
+ * the DailyCareLog owner, so the mutation re-reads that owner inside the
+ * command transaction and never patches a board snapshot, cache or derived
+ * projection. (The guardian current-focus mutation was ceded to My-Chat
+ * cultivation in surface contract 1.16.0 — D-T009-01.)
  */
-export type NurtureGuardianFocusGoalFacts = {
-  participant_active: boolean;
-  /** Current family Guardian authority for the exact family the goal belongs to. */
-  guardian_authority_current: boolean;
-  family_ref_key?: string;
-  focus_cycle_id?: string;
-  focus_cycle_version: number;
-  focus_goal_version: number;
-  /**
-   * A goal is child-scoped only through an explicit scope fact. G3-A never
-   * infers scope from `goalPayload`, so an unscoped goal stays family scope.
-   */
-  child_scope_explicit: boolean;
-  child_care_process_id?: string;
-};
-
 export type NurtureCaregiverDailyCareFacts = {
   participant_active: boolean;
   /** `caregiver | lead_caregiver` whose own RoleAssignment scope is the source CareGroup. */
@@ -43,20 +28,6 @@ export type NurtureCaregiverDailyCareFacts = {
 };
 
 export type NurtureBoardMutationTransaction = {
-  loadGuardianFocusGoalFacts(input: {
-    workspace_id: string;
-    participant_id: string;
-    focus_goal_id: string;
-  }): Promise<NurtureGuardianFocusGoalFacts>;
-  applyGuardianFocusGoalUpdate(input: {
-    workspace_id: string;
-    participant_id: string;
-    focus_goal_id: string;
-    focus_cycle_id: string;
-    label: string;
-    priority: number;
-    expected_focus_goal_version: number;
-  }): Promise<{ focus_goal_ref: DomainContextRef; revision: number }>;
   loadCaregiverDailyCareFacts(input: {
     workspace_id: string;
     participant_id: string;

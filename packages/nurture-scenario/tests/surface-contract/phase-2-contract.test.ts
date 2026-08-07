@@ -45,7 +45,6 @@ const expectedCapabilityVersions: Record<string, string> = {
   query_caregiver_family_care_work: "1.1.0",
   query_caregiver_teacher_board: "1.0.0",
   query_family_care_item: "1.1.0",
-  query_guardian_current_focus: "1.0.0",
   query_guardian_enrollment_activity: "1.0.0",
   query_guardian_family_board: "1.0.0",
   query_guardian_family_care_timeline: "1.1.0",
@@ -63,7 +62,6 @@ const expectedCapabilityVersions: Record<string, string> = {
   save_publish_process_draft: "1.0.0",
   submit_family_care_question: "1.0.0",
   supersede_child_media_attribution: "1.0.0",
-  update_guardian_current_focus: "1.0.0",
   withdraw_family_care_request: "1.0.0",
 };
 
@@ -85,10 +83,10 @@ const manifest = loadSurfaceContractManifest(
 );
 
 describe("Phase 2 exact surface contract", () => {
-  it("loads one exact, closed manifest with thirty-five capabilities and six surfaces", () => {
+  it("loads one exact, closed manifest with thirty-three capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.15.0",
+      version: "1.16.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -273,7 +271,7 @@ describe("Phase 2 exact surface contract", () => {
     const queries = manifest.capabilities
       .map((entry) => entry.descriptor)
       .filter((descriptor) => descriptor.executionClass === "query");
-    expect(queries).toHaveLength(9);
+    expect(queries).toHaveLength(8);
     for (const descriptor of queries) {
       expect(descriptor.confirmationPolicy).toBe("none");
       expect(descriptor.deliveryClass).toBe("none");
@@ -703,7 +701,6 @@ describe("board write commands conform to the registry's concurrency policy", ()
    * it, the list rejects it) nor silently vanish from it (the list demands it).
    */
   const EXPECTED_BOARD_WRITE_FACTORIES = [
-    "createUpdateGuardianCurrentFocusSpec",
     "createRecordCaregiverDailyCareSpec",
     "createCancelPublishProcessSpec",
     "createReschedulePublishProcessSpec",
@@ -730,7 +727,6 @@ describe("board write commands conform to the registry's concurrency policy", ()
    * skipped.
    */
   const REGISTRY_HEAD_TO_SPEC_HEAD: Record<string, Record<string, string>> = {
-    update_guardian_current_focus: { focus_cycle: "focus_cycle", focus_goal: "focus_goal" },
     record_caregiver_daily_care: { enrollment_lifecycle: "enrollment" },
     save_publish_process_draft: { draft_revision: "draft_revision" },
     acquire_publish_edit_hold: { publish_edit_hold: "publish_edit_hold" },

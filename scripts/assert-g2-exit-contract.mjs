@@ -24,7 +24,9 @@ const qualifiedInterface = {
     "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
 };
 const expectedSharedCoreHash =
-  "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2";
+  // Rotated by surface contract 1.16.0 (T-009 I6: guardian current-focus
+  // cession changed the shared envelope enum); re-verified in the same batch.
+  "sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d";
 /** Exact key@version plus the slice hash each one was qualified with. */
 const expectedCapabilitySlices = {
   "acknowledge_family_care_item@1.0.0":
@@ -147,12 +149,14 @@ const workflowPin = readJson(
 );
 assertEqual(
   workflowPin.myWorkflowBase?.revision,
-  "06303e9f404e4ccc0ba3054b763675efe81b5b15",
+  // Rotated once in the T-009 I6 batch (D-T009-04).
+  "8a3ea9028d414813994a57ef3501ecad3dd7c434",
   "My-Workflow-Base revision",
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  "a0195662228a2fc6323b9ea0cd327d3608d8cc17",
+  // Rotated once in the T-009 I6 batch (D-T009-04).
+  "df7a273bff65b965da45e2e9604cee3b6b8fc20b",
   "My-Chat revision",
 );
 assertEqual(

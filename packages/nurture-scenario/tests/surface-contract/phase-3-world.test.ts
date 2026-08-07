@@ -31,7 +31,7 @@ const manifest = record(
 // rotated exactly once, by the planned P3-4 canonicalization/manifest-schema
 // extension that introduced fixture slices; any further drift fails here.
 const frozenSharedCoreHash =
-  "sha256:042272641eb98cb934acfe902259ea93502be92ffa8e95257ddc63abf48c0ae2";
+  "sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d";
 const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["acknowledge_family_care_item", "sha256:6237365e4a1538de56f71abec0b1bf387180d29740c455a4246b5721a2a35cf7"],
   ["acquire_publish_edit_hold", "sha256:7f57a8b16247d0efe58f946533a241b61f8c09f8451bb2995474f53e4e0fd9d9"],
@@ -46,11 +46,10 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["policy_redact_family_care_message", "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"],
   ["query_caregiver_child_today", "sha256:bf1b9bd160bd6c962d7020cfb46074d902ddd2ec10efff6c9b3c895e2a94a5c0"],
   ["query_caregiver_family_care_work", "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"],
-  ["query_caregiver_teacher_board", "sha256:e54fd33fff1ca72ecfec7983a95bad58575d3696d053975f82d811a7e164de19"],
+  ["query_caregiver_teacher_board", "sha256:2d6b0b4c7e53a219b2581e86647332d31abfb35f0a08b26dec95ecc9539f2d13"],
   ["query_family_care_item", "sha256:1bfdbb7f79b68a929799fd8959d20e5c95b6bef7d517780a35f7d076286ef323"],
-  ["query_guardian_current_focus", "sha256:a38a1ec2a279af26295fc867ca8e66d8fda097139955acb247a32524e681947b"],
   ["query_guardian_enrollment_activity", "sha256:bad468244dd328c8efdccade21d9ade6bd7c2342bc777227547fcd1928156516"],
-  ["query_guardian_family_board", "sha256:3428ce684cb827ba2b6aa4383a184252338018a059d3d4f6022817a237158080"],
+  ["query_guardian_family_board", "sha256:b88ea18ac1e004fd85262c7a709fdc7275188933e2b0aa653a521ec60003e4b6"],
   ["query_guardian_family_care_timeline", "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"],
   ["query_teacher_publish_queue", "sha256:a30ee141327d0ba44098f59a42db612c4fa6ee9e9a3a7a2299db2de8b36a441c"],
   ["record_caregiver_daily_care", "sha256:e49064ae5691abfaae62ddb278ec31c8188f5bf30bde51d8b5b3c0825e0a02c8"],
@@ -66,13 +65,12 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["save_publish_process_draft", "sha256:ab39d1a6cea379996c7152436cb898ac10381970a186afcd8ea414f6e4d256df"],
   ["submit_family_care_question", "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"],
   ["supersede_child_media_attribution", "sha256:b4b9ea873c8dde19ecfb1a21e7f5524aba2bd02bb84ebd08d885c1e43e5e692f"],
-  ["update_guardian_current_focus", "sha256:b959809c1f0737be5ea71a0b08ce03a77286a409f079406d26573c3e37b9471b"],
   ["withdraw_family_care_request", "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b"],
 ];
 const frozenSurfaceSliceHashes: readonly (readonly [string, string])[] = [
   ["caregiver_nurture_chat", "sha256:34abcdaa268463807750ea5a8b4b6b6c73547aa644153db43a19271569247f4d"],
   ["caregiver_teacher_board", "sha256:f0b87088fcd2fcfc7569faefbbe6833c04269c009501f6f81f426ce47c8d1b61"],
-  ["guardian_family_board", "sha256:cf8dcc935baac9510ccd5aedfe5a3fbc32e0dde28a6168efbebacaa52e4caff8"],
+  ["guardian_family_board", "sha256:774ef0b8989b9aa758bbb7a514ffd2fea47881aac08876e617047eaec40c200a"],
   ["guardian_nurture_chat", "sha256:9350a5ae228f3844ce5d03e11722012480ee8e2b6813ae676c6ead00a5248256"],
   ["institution_board", "sha256:c2d5c98223fb399bf0e3b86fdf005106b88902e55cd307c0550a9481ce677cdc"],
   ["institution_workbench", "sha256:ed2ad109da46672fb394eb77ceb818b14d6f318ce7af55797a25d500120b220d"],
@@ -269,7 +267,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.15.0");
+    expect(contract.version).toBe("1.16.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

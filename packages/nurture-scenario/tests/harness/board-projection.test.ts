@@ -178,7 +178,7 @@ describe("G3-A shared board projection", () => {
     const reference = issueSnapshotRef(BOARD_INTEGRITY_KEY, scope, base);
     for (const drift of [
       { ...base, contractDigest: `sha256:${"b".repeat(64)}` },
-      { ...base, capabilityKey: "query_guardian_current_focus" },
+      { ...base, capabilityKey: "query_guardian_family_board" },
       { ...base, capabilityVersion: "1.0.1" },
       { ...base, scopeRef: "scope-ref-2" },
       { ...base, snapshotAt: "2026-08-02T00:00:01.000Z" },
@@ -201,9 +201,9 @@ describe("G3-A shared board projection", () => {
 
     for (const drifted of [
       { ...identity, contract_digest: `sha256:${"b".repeat(64)}` },
-      { ...identity, capability_key: "query_guardian_current_focus" },
+      { ...identity, capability_key: "query_guardian_family_board" },
       { ...identity, capability_version: "1.1.0" },
-      { ...identity, query_key: "guardian_current_focus" },
+      { ...identity, query_key: "guardian_family_board" },
       { ...identity, scope_ref: "scope-ref-2" },
       { ...identity, order: "occurred_at_asc,id_asc" },
       { ...identity, page_size: 19 },
@@ -281,7 +281,7 @@ describe("G3-A shared board projection", () => {
     expect(projectOwnerActions(BOARD_INTEGRITY_KEY, scope, [])).toEqual([]);
     const actions = projectOwnerActions(BOARD_INTEGRITY_KEY, scope, [
       {
-        capability_key: "update_guardian_current_focus",
+        capability_key: "record_caregiver_daily_care",
         capability_version: "1.0.0",
         availability: "available",
         target_kind: "focus_goal",

@@ -14,7 +14,6 @@ import {
   PUBLISH_PROCESS_TARGET_KIND,
   issuePublicationRef,
   createRecordCaregiverDailyCareSpec,
-  createUpdateGuardianCurrentFocusSpec,
 } from "../../src/index.js";
 import * as nurtureScenario from "../../src/index.js";
 import {
@@ -22,7 +21,6 @@ import {
   presentGuardianFamilyBoard,
 } from "../../src/harness/board-envelopes.js";
 import {
-  queryGuardianCurrentFocus,
   queryGuardianEnrollmentActivity,
 } from "../../src/harness/guardian-board-queries.js";
 import { queryCaregiverChildToday } from "../../src/harness/caregiver-board-queries.js";
@@ -63,7 +61,6 @@ import {
   createFamilyCareWorkDeps,
   createGuardianReadPort,
   createPublishQueueReadPort,
-  focusGoal,
   guardianActivity,
   publishQueueRow,
   surfaceRegistrySource,
@@ -285,26 +282,12 @@ const producers: Record<string, () => Promise<unknown>> = {
         now,
         surface: registration("guardian_family_board"),
         reads: createGuardianReadPort({
-          goals: [focusGoal()],
           activityPages: [{ rows: [guardianActivity()], has_more: false }],
         }),
       },
       guardianScope,
     );
     if (result.status !== "ok") throw new Error("guardian board fixture failed");
-    return result.output;
-  },
-  query_guardian_current_focus: async () => {
-    const result = await queryGuardianCurrentFocus(
-      {
-        contract: BOARD_CONTRACT,
-        integrity_key: BOARD_INTEGRITY_KEY,
-        now,
-        reads: createGuardianReadPort({ goals: [focusGoal()] }),
-      },
-      guardianScope,
-    );
-    if (result.status !== "ok") throw new Error("current focus fixture failed");
     return result.output;
   },
   query_guardian_enrollment_activity: async () => {
@@ -388,50 +371,6 @@ const producers: Record<string, () => Promise<unknown>> = {
     );
     if (result.status !== "ok") throw new Error("publish queue fixture failed");
     return result.output;
-  },
-  update_guardian_current_focus: async () => {
-    const spec = createUpdateGuardianCurrentFocusSpec({ integrity_key: BOARD_INTEGRITY_KEY });
-    const applied = await spec.apply(
-      {
-        boardMutations: {
-          loadGuardianFocusGoalFacts: async () => ({
-            participant_active: true,
-            guardian_authority_current: true,
-            family_ref_key: "family-1",
-            focus_cycle_id: "cycle-1",
-            focus_cycle_version: 3,
-            focus_goal_version: 4,
-            child_scope_explicit: false,
-          }),
-          applyGuardianFocusGoalUpdate: async () => ({
-            focus_goal_ref: {
-              schema_version: 1,
-              namespace: "nurture",
-              object_type: "focus_goal",
-              object_id: "goal-1",
-              version: 5,
-            },
-            revision: 5,
-          }),
-          loadCaregiverDailyCareFacts: async () => {
-            throw new Error("unused");
-          },
-          applyCaregiverDailyCareRecord: async () => {
-            throw new Error("unused");
-          },
-        },
-      } as never,
-      {
-        label: "Syn Updated Focus",
-        priority: 2,
-        focus_goal_id: "goal-1",
-        focus_cycle_id: "cycle-1",
-        expected_focus_cycle_version: 3,
-        expected_focus_goal_version: 4,
-      },
-      { workspace_id: "ws-1", business_actor_ref: "guardian-1", command_request_id: "command:fixture-1" },
-    );
-    return applied.committed_result;
   },
   record_caregiver_daily_care: async () => {
     const spec = createRecordCaregiverDailyCareSpec({ integrity_key: BOARD_INTEGRITY_KEY });

@@ -15,7 +15,6 @@ import {
   createGuardianReadPort,
   createPublishQueueReadPort,
   publishQueueRow,
-  focusGoal,
   guardianActivity,
   workItem,
 } from "../harness/board-fixtures.js";
@@ -198,7 +197,7 @@ describe("Phase 3 board module topology fixtures", () => {
         ).toContain(capability?.descriptor.executionClass);
       }
     }
-    expect(boardViews[0]?.view.writeActionKeys).toContain("update_guardian_current_focus");
+    expect(boardViews[0]?.view.writeActionKeys).not.toContain("update_guardian_current_focus");
     expect(boardViews[1]?.view.writeActionKeys).toContain("record_caregiver_daily_care");
   });
 
@@ -211,7 +210,6 @@ describe("Phase 3 board module topology fixtures", () => {
         now,
         surface: registration("guardian_family_board"),
         reads: createGuardianReadPort({
-          goals: [focusGoal()],
           activityPages: [{ rows: [guardianActivity()], has_more: false }],
         }),
       },
