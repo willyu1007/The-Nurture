@@ -2222,6 +2222,9 @@ model NurtureMediaAssetRef {
   // family-growth envelope requires a real digest, so a release without one
   // fails closed at assembly rather than shipping a placeholder.
   contentDigest              String?                     @map("content_digest") @db.Char(64)
+  // MIME type of the same bytes, required by the family-growth envelope with
+  // the same pre-T-009 nullability and the same fail-closed rule.
+  contentMimeType            String?                     @map("content_mime_type")
   aggregateVersion           Int                         @default(0) @map("aggregate_version")
   createdAt                  DateTime                    @default(now()) @map("created_at")
   updatedAt                  DateTime                    @updatedAt @map("updated_at")

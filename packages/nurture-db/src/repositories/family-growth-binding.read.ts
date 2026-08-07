@@ -28,7 +28,7 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
         subjectType,
         ...(subjectType === "child" ? { childAnchorId: anchorId } : { familyAnchorId: anchorId }),
       },
-      orderBy: { verifiedAt: "desc" },
+      orderBy: [{ verifiedAt: "desc" }, { id: "desc" }],
       select: { status: true, expiresAt: true },
     });
     return row ? { status: row.status, expiresAt: row.expiresAt } : null;
@@ -44,8 +44,9 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
         childCareProcessId: input.childCareProcessId,
       },
       // Latest state wins; the current row (if any) is also the newest by
-      // construction because revocation updates the row it clears.
-      orderBy: { updatedAt: "desc" },
+      // construction because revocation updates the row it clears. The id
+      // tiebreaker keeps same-instant rows deterministic.
+      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
       include: { familyAnchor: true, childAnchor: true },
     });
     if (!association) return null;
@@ -56,7 +57,7 @@ export class PrismaFamilyGrowthBindingReadPort implements FamilyGrowthBindingRea
         childAnchorId: association.childAnchorId,
         childId: association.childId,
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
       select: { status: true, currentKey: true },
     });
     if (!childAssociation) return null;

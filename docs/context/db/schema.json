@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-07T00:01:09.971Z",
+  "updatedAt": "2026-08-07T13:39:25.323Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -12199,6 +12199,17 @@
           "list": false,
           "dbName": "content_digest",
           "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentMimeType",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "content_mime_type",
+          "dbType": null,
           "default": null,
           "primaryKey": false,
           "unique": false

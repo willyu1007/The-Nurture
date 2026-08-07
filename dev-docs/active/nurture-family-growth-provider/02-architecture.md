@@ -115,6 +115,44 @@ executed in T-003's own docs when the handoff happens.
   stored correction body is sealed, but the envelope requires display-safe
   text and forbids protected envelopes.
 
+## D-T009-08 — v1 fact mappings for the prepared emission
+
+Fixed by the I3c fact preparer (`family-growth-emission.preparer.ts`); each
+line is a contract-visible choice:
+
+- `admission`: `mode=direct_family_release` under the SCHEDULE's frozen
+  policy identity (`schedulePolicyRef`/`schedulePolicyVersion` on the
+  process) — the exact identity the commit gate revalidates the current
+  policy against. Reading the current policy row at prepare time instead
+  would open a prepare-to-commit drift window the gate cannot see.
+  Guardian-confirmation admission is a consumer-side policy; the provider
+  never mints it in v1.
+- `retention_mode`: `family_retained` (grant-backed direct release; scene
+  unbinding must not remove the admitted family fact).
+- `family_rendition_ref`: `nurture_family_rendition_v1:<assetId>:<mediaRevision>`
+  — deterministic, parseable by the I5 exchange (which authorizes per target
+  family against the committed release), opaque to everyone else, and always
+  the exact unchanged original revision (D-T009-02).
+- `material.occurred_at`: earliest media `capturedAt`, else the revision's
+  assembly instant. `display_snapshot`: unsealed revision title (no key
+  material → deny, same posture as the queue's `safeTitle`) + care-group
+  name as `source_label`; summary/contributor label omitted in v1.
+- `attribution`: authorizing role assignment as contributor ref, institution
+  as organization ref, revision creation as `contributed_at`.
+- Media facts are fail-closed per item: lifecycle `ready`, composed revision
+  still current, real 64-hex `content_digest`, non-null `content_mime_type`
+  (column added by `20260807120000_t009_media_mime_type`); any gap denies
+  the target as `media_facts_unavailable`.
+- Deny reasons are two-tier: resolution-chain denials collapse to
+  `binding_unavailable` on the teacher queue (binding state detail must not
+  leak through a class surface); preparation denials keep their own stable
+  keys (`release_facts_unavailable`, `publication_policy_unavailable`,
+  `media_facts_unavailable`, `display_content_unavailable`).
+- `familyRefKey` on publish targets is the PREFIXED form
+  `<workspaceId>:<familyId>` on the production capture path; the preparer
+  strips the prefix before resolver comparison (a bare-id assumption
+  target-mismatched every production row — caught in the I3c review).
+
 ## Component map (target state)
 
 ```

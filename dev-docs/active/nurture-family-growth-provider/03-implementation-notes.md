@@ -2,6 +2,37 @@
 
 Running log; newest first.
 
+- 2026-08-07 (evening): I3c fact preparer + quality-review pass; stable
+  baseline commit.
+  - `PrismaFamilyGrowthEmissionPreparer` loads real canonical facts into the
+    prepared emission (mappings recorded as D-T009-08). End-to-end proof in
+    the suite: preparer output feeds the real `commitTargetRelease` and
+    commits with its outbox event. Additive migration
+    `20260807120000_t009_media_mime_type` adds the envelope-required MIME
+    column with the same nullable/fail-closed posture as the digest.
+  - Review findings, all fixed with regression coverage:
+    1. REAL BUG — `familyRefKey` is `<workspaceId>:<familyId>` on the
+       production capture path while the preparer compared it as a bare
+       family id: every production target would have denied as
+       `target_mismatch`. Test seeds had masked it by seeding bare ids; the
+       preparer now strips the workspace prefix and the preparer suite seeds
+       the production form.
+    2. Drift window — admission policy identity now comes from the process's
+       frozen schedule fields, not the current policy row, so the envelope
+       always names the identity the commit gate validated.
+    3. Assembler shared object graphs with caller input; a post-assembly
+       mutation could desync the stored envelope from its digest. Inputs are
+       now structured-cloned at assembly.
+    4. Binding/authorization reads ordered by timestamp only; same-instant
+       rows were nondeterministic. Id tiebreakers added.
+    5. Display truncation could cut a surrogate pair; now code-unit-capped
+       without dangling high surrogates. Receipt parsing double-called its
+       ref reader; single-pass now.
+  - Known I3b TODO (recorded, not fixed here): a worker that dies after
+    `claimDue` leaves rows in `delivering` with no lease/timeout; the I3b
+    worker needs a stale-claim recovery rule from the frozen addendum's
+    retry parameters.
+
 - 2026-08-07: I3 non-wire half landed (transactional emit; the wire half —
   delivery worker + ingress POST — still waits on the I0 transport freeze).
   - Release path: `commitTargetRelease` accepts an optional prepared

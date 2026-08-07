@@ -62,7 +62,8 @@ own DoD; nothing activates by default at any point.
 
 ## I3 — Transactional emit + delivery worker
 
-Split executed as I3a (non-wire, DONE 2026-08-07) and I3b (wire, after I0):
+Split executed as I3a (non-wire, DONE 2026-08-07), I3c (fact preparer,
+DONE 2026-08-07) and I3b (wire, after I0):
 
 - I3a: `commitTargetRelease` and the lifecycle finalize append the outbox
   row in the same transaction (N5). Resolution and fact loading run
@@ -73,11 +74,16 @@ Split executed as I3a (non-wire, DONE 2026-08-07) and I3b (wire, after I0):
   target (`binding_unavailable`) before any write. Lifecycle emission
   follows the release's own delivery (released outbox row present) and
   copies the stored envelope target rather than re-resolving.
+- I3c: `PrismaFamilyGrowthEmissionPreparer` fills the prepared emission
+  from real canonical facts (mappings in D-T009-08), fail-closed per gap
+  with two-tier deny reasons.
 - I3b (waits on I0): delivery worker in scenario-service claims pending
   rows, POSTs per the frozen addendum, records the synchronous receipt via
   I2's store, maps timeout/5xx to `outcome_unknown` and retries with the
   same event id + digest; terminal `rejected`/`conflict` stop retries and
-  surface to the queue.
+  surface to the queue. Must also define stale-claim recovery: rows left in
+  `delivering` by a dead worker need a lease/timeout rule from the frozen
+  addendum before they re-enter `claimDue`.
 - I3a DoD (met): DB integration tests for same-tx atomicity in both
   rollback directions, replay identity, default-off parity, lifecycle
   pairing/skip/fail-closed. I3b DoD: worker state transitions against a
