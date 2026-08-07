@@ -6,7 +6,7 @@
   },
   "myWorkflowBase": {
     "repository": "willyu1007/My-Workflow-Base",
-    "revision": "06303e9f404e4ccc0ba3054b763675efe81b5b15",
+    "revision": "8a3ea9028d414813994a57ef3501ecad3dd7c434",
     "contractRoot": "templates/host-runtime/packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -24,13 +24,13 @@
           "templates/web-workbench/src",
           "templates/web-workbench/lint"
         ],
-        "sha256": "d4642808ce1668f84ac31ae8a51aa31f408fadcb390602d037c0fd154f69d056"
+        "sha256": "815311f7b25b423c725a1f94fa46dbdd65abae84df10cff4c34664ed05db63ca"
       }
     ]
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "a0195662228a2fc6323b9ea0cd327d3608d8cc17",
+    "revision": "df7a273bff65b965da45e2e9604cee3b6b8fc20b",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -57,6 +57,7 @@
           "packages/domain/community-routing",
           "packages/domain/content",
           "packages/domain/domain-capabilities",
+          "packages/domain/family-growth",
           "packages/domain/forum",
           "packages/domain/growth-record",
           "packages/domain/identity",
@@ -76,7 +77,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "89a613555cab5bb1934c31b239b8d24b6f6a2ae14b0ff3e45b41542956dcca35"
+        "sha256": "30878ba3963c70e1c6a12f0e23b38fd73943fd38b43a6c1ca5665c7bb7af0d4c"
       },
       {
         "key": "wave4_binding_host",
@@ -99,7 +100,7 @@
           "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql",
           "prisma/schema.prisma"
         ],
-        "sha256": "960afb2c429ba4cfc946fd002706ebaf1e5745ae234eaef0616676b27fd8f4f1"
+        "sha256": "947b4857354b7b167048ba4c137c08c66cd9bb3071d2f4ebaab0d3385a5318b2"
       }
     ]
   },
@@ -131,6 +132,6 @@
       "prisma/migrations",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "b44f4fad985bf760b0bf1a6c4abac8badd7e91ea7999d829bb1fabcd2dfbf8c0"
+    "contractSha256": "479798497933b4be0cd86f137f8c1166d093648de0b960497af895f883ab5224"
   }
 }
