@@ -2,6 +2,28 @@
 
 Running log; newest first.
 
+- 2026-08-08 (I6 cession landed): `query/update_guardian_current_focus`
+  retired across all layers — contract sources (registries, two capability
+  schemas deleted, envelope/fixture enums, selection cases, gj-2 journey
+  view), harness (guardian query, board envelope assembly, board mutation
+  spec), scenario-service routing, owner read/write ports and eligibility
+  resolver, OpenAPI enums — and the manifest regenerated at
+  `nurture.surface-contract@1.16.0` (33 capabilities, digest `a6563819…`,
+  shared-core `7bd8a82d…`). Freeze registers updated deliberately: the
+  G3-0 assert now tracks the pair as reserved-but-RETIRED (identities can
+  never be silently reused), the phase-3 world register re-froze the
+  shared-core and two board slice hashes, the G2 exit assert carries the
+  rotated shared-core and owner pins, the persisted-table census declares
+  the two T-009 tables, and the test-routing census caught up
+  (57/26/11/14/1). Formal ingress: 25 actions / 8 queries, 0 unrouted.
+  Full gates green: 614 unit / 255 db / 66+64 scenario-service / 27
+  dev-host; deterministic conformance rebuild verified; pins re-frozen
+  (self `a24fa3d2…`).
+  - Batch remainder before the requalification record: I6.2 publish-queue
+    family-growth status vocabulary (display-only projection of the
+    receipt store) and I7b (the twelve N8 fixtures against the real
+    My-Chat consumer at the rotated pin, in detached worktrees).
+
 - 2026-08-07 (I6 opening — pin rotation): the My-Chat pin rotated
   `a019566` → `df7a273` and the Base pin `06303e9` → `8a3ea90` in one move
   (D-T009-04). The workflow-contracts population was verified UNCHANGED on
