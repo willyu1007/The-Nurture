@@ -33,9 +33,15 @@ import {
 import {
   createWorkflowHandoffDraftsFromScenarioSnapshots,
 } from "@my-chat/workflow-runtime";
+// NOTE(T-002): the T-009 pin rotation surfaced owner-path drift — My-Chat's
+// Dashboard interaction loop (8d508f1) replaced the route-only attention
+// resolution with typed dashboard items and an acknowledge contract, while
+// Nurture's user-attention owner endpoint still serves the route_key shape.
+// This lane compiles against the NEW contract and stays red until the
+// Nurture owner endpoint adopts it (tracked as T-002 follow-up work).
 import {
   createNurtureUserAttentionHttpSource,
-  resolveNurtureAttentionOpen,
+  resolveNurtureDashboardItem,
 } from "@my-chat/scenario-integrations";
 import {
   createNurtureUserAttentionOwner,
@@ -282,17 +288,17 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
       myChat.notification.count({ where: { workspaceId } }),
     ).resolves.toBe(1);
     await expect(
-      resolveNurtureAttentionOpen({
+      resolveNurtureDashboardItem({
         ledger,
         source,
         workspace_id: workspaceId,
         handoff_id: handoffId,
         actor_user_id: fixture.caregiver.myChatUserId,
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       status: "ready",
-      route_key: "teacher_attention_board",
       handoff_id: handoffId,
+      item: { presentation_type: "nurture_attention_v1" },
     });
 
     const revoked = await runner.execute({
@@ -312,7 +318,7 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
     });
     expect(revoked).toMatchObject({ status: "ok" });
     await expect(
-      resolveNurtureAttentionOpen({
+      resolveNurtureDashboardItem({
         ledger,
         source,
         workspace_id: workspaceId,
@@ -398,7 +404,7 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
       myChat.notification.count({ where: { workspaceId } }),
     ).resolves.toBe(0);
     await expect(
-      resolveNurtureAttentionOpen({
+      resolveNurtureDashboardItem({
         ledger,
         source: unreachableSource,
         workspace_id: workspaceId,
@@ -431,17 +437,17 @@ describe("X5 Nurture/My-Chat two-database acceptance", () => {
       myChat.notification.count({ where: { workspaceId } }),
     ).resolves.toBe(1);
     await expect(
-      resolveNurtureAttentionOpen({
+      resolveNurtureDashboardItem({
         ledger,
         source: liveSource,
         workspace_id: workspaceId,
         handoff_id: handoffId,
         actor_user_id: fixture.caregiver.myChatUserId,
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       status: "ready",
-      route_key: "teacher_attention_board",
       handoff_id: handoffId,
+      item: { presentation_type: "nurture_attention_v1" },
     });
   });
 

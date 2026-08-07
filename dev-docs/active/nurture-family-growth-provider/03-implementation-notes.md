@@ -2,6 +2,33 @@
 
 Running log; newest first.
 
+- 2026-08-07 (I6 opening — pin rotation): the My-Chat pin rotated
+  `a019566` → `df7a273` and the Base pin `06303e9` → `8a3ea90` in one move
+  (D-T009-04). The workflow-contracts population was verified UNCHANGED on
+  both sides across the rotation, so contract parity holds at the same
+  `8dd53be4…` digest; `x5_joint_api` re-pinned at 190 files now including
+  `packages/domain/family-growth` (the joint lane's new dependency), and
+  the Nurture self-pin re-froze at 185 files. `pnpm
+  verify:workflow-contract-pin` passes against live siblings for the first
+  time since the contract freeze.
+  - Drift surfaced by the rotation, routed OUT of T-009: My-Chat's
+    Dashboard interaction loop (`8d508f1`) replaced the route-only
+    attention path with typed dashboard items + an acknowledge contract,
+    while Nurture's user-attention owner still serves the `route_key`
+    shape. The x5 joint lane was adapted to compile against the NEW
+    contract (it stays red at runtime until the owner endpoint adopts it)
+    and the adoption is tracked as a T-002 follow-up task, not a T-009
+    item. Root `tsc --noEmit` is fully clean for the first time this task.
+  - Remaining I6+I7b closing work (next session-sized unit): the
+    `guardian_current_focus` cession removal spans 33 files (contract
+    sources incl. two capability schemas, registries, fixtures and
+    journey views; harness guardian-board/envelopes/mutations; the
+    scenario-service routing; guardian-board read; assert-script key
+    inventories; and the dependent suites), then the publish-queue
+    family-growth status vocabulary, the `1.16.0` manifest regeneration
+    via `scripts/surface-contract/build-surface-contract.mjs`, the joint
+    N8 run against real My-Chat, and the requalification record.
+
 - 2026-08-07 (I7a): N8 provider conformance landed
   (`apps/scenario-service/tests/family-growth-n8.db.e2e.test.ts`, 10 cases
   covering all twelve fixtures; 5/6/7 share one ordered case, 11 covers
