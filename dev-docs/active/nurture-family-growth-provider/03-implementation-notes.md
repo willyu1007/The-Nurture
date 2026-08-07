@@ -2,6 +2,16 @@
 
 Running log; newest first.
 
+- 2026-08-07 (late): consumer side landed at My-Chat `df7a273` — the
+  transport-frozen events ingress answers with synchronous wire receipts
+  (lifecycle results carry the original admission/material refs;
+  suppression maps to tombstoned), and the rendition importer implements
+  the §4 exchange trust-free (actual-digest reporting, mismatches become
+  rejected receipts via intake validation). Both ends of the wire now
+  exist: I7's twelve joint fixtures are unblocked. Remaining infra gaps on
+  both sides are the byte-storage adapters (deployment ports, fail-closed
+  absent).
+
 - 2026-08-07 (night): I0 frozen; I3b + I5 landed.
   - Transport addendum frozen at `family_growth_transport@1.0.0`
     (D-T009-09), mirrored to My-Chat with matching digest `38bc6239…`.
