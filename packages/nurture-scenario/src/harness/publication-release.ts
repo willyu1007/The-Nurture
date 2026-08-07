@@ -18,6 +18,11 @@ import {
 } from "./publish-process.js";
 import type { ResolvedPublishScheduleV1 } from "./publish-schedule.js";
 import { randomUUID } from "node:crypto";
+import {
+  FAMILY_GROWTH_BINDING_UNAVAILABLE_REASON,
+  type FamilyGrowthPreparedReleaseEmissionV1,
+  type FamilyGrowthReleaseEmissionPreparerV1,
+} from "../domain/family-growth/emission.js";
 import type { NurtureInteractionContextService } from "../domain/interactions/interaction-context.js";
 import {
   computeHarnessInputIntegrityTag,
@@ -140,12 +145,26 @@ export type PublicationReleasePort = {
     revision: number;
     command_request_id: string;
     trigger: ReleaseTriggerV1;
+    /**
+     * T-009: the prepared family-growth emission for this target. When
+     * present, the owner appends the outbox event inside the same
+     * transaction as the release and Receipt (N5); when absent, the commit
+     * behaves exactly as the qualified G3-D path.
+     */
+    family_growth?: FamilyGrowthPreparedReleaseEmissionV1;
   }): Promise<CommitTargetReleaseResultV1>;
 };
 
 export type PublicationReleaseDependencies = {
   integrity_key: string;
   reads: PublicationReleasePort;
+  /**
+   * T-009 pre-commit preparer (resolution + fact loading, both allowed to
+   * touch the network — which is exactly why they run before the commit
+   * transaction). Absent = family-growth delivery off; a denial rejects only
+   * that target, before any write.
+   */
+  family_growth?: FamilyGrowthReleaseEmissionPreparerV1;
   now?: () => Date;
 };
 
@@ -311,6 +330,29 @@ export const releasePublishProcess = async (
       });
       continue;
     }
+    // T-009: resolve and prepare the family-growth emission BEFORE the commit
+    // transaction (the owner exchange is a network call). A denied resolution
+    // rejects this one target and never reaches the owner; other targets keep
+    // their independence (N2).
+    let familyGrowth: FamilyGrowthPreparedReleaseEmissionV1 | undefined;
+    if (deps.family_growth) {
+      const prepared = await deps.family_growth.prepare({
+        workspace_id: scope.workspace_id,
+        process_key: processKey,
+        target_key: target.target_key,
+        child_care_process_id: target.child_care_process_id,
+      });
+      if (prepared.status === "denied") {
+        results.push({
+          targetRef,
+          outcome: "rejected",
+          reasonCode: FAMILY_GROWTH_BINDING_UNAVAILABLE_REASON,
+          blockingReasons: [],
+        });
+        continue;
+      }
+      familyGrowth = prepared.emission;
+    }
     const commit = await deps.reads.commitTargetRelease({
       ...scope,
       process_key: processKey,
@@ -318,6 +360,7 @@ export const releasePublishProcess = async (
       revision: releaseRevision,
       command_request_id: request.command_request_id,
       trigger: request.trigger,
+      ...(familyGrowth ? { family_growth: familyGrowth } : {}),
     });
     if (commit.status === "committed") {
       committed += 1;

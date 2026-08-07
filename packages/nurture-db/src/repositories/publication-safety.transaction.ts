@@ -1,14 +1,21 @@
-import type { Prisma } from "@prisma/client";
+import { randomUUID } from "node:crypto";
+import type { Prisma, PrismaClient } from "@prisma/client";
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   NurturePublicationSafetyTransaction,
   NurturePublicationSafetyWriteFacts,
 } from "@the-nurture/scenario/harness";
 import {
+  assembleLifecycleEventV1,
+  type FamilyGrowthCanonicalTargetV1,
+  type FamilyGrowthLifecycleReasonV1,
+} from "@the-nurture/scenario/family-growth";
+import {
   caregiverRowAuthority,
   resolveCaregiverReachFor,
   type BoardPrisma,
 } from "./board-read-support.js";
+import { appendFamilyGrowthOutboxEventWithin } from "./family-growth-outbox.transaction.js";
 
 type DomainContextRef = CanonicalRef;
 
@@ -123,29 +130,111 @@ export class PrismaPublicationSafetyTransaction implements NurturePublicationSaf
       source_release_revision: number;
       occurred_at: string;
       body_envelope?: unknown;
+      correction_display_safe_text?: string;
     }>;
   }): Promise<void> {
     for (const event of input.events) {
-      await this.prisma.nurturePublicationVisibilityEvent.create({
-        data: {
-          id: event.event_id,
-          workspaceId: input.workspace_id,
-          publicationReleaseId: event.publication_id,
+      // Each lineage row and its family-growth outbox event land as one
+      // pair: a lineage row whose lifecycle never leaves, or an outbox event
+      // for a lineage row that rolled back, are both defects (T-009 I3).
+      await this.runAtomic(async (tx) => {
+        await tx.nurturePublicationVisibilityEvent.create({
+          data: {
+            id: event.event_id,
+            workspaceId: input.workspace_id,
+            publicationReleaseId: event.publication_id,
+            kind: event.kind,
+            reasonKey: event.reason_key,
+            // The assignment the authorization validated, on the load-time
+            // clock — never a finalize-time re-resolution.
+            actorRoleAssignmentId: input.actor_role_assignment_id,
+            sourceReleaseRevision: event.source_release_revision,
+            // The lineage names the command behind it — the reason the append
+            // happens in finalize, after the execution row exists.
+            commandExecutionId: input.command_execution_id,
+            occurredAt: new Date(event.occurred_at),
+            ...(event.body_envelope !== undefined
+              ? { bodyProtectionPayload: asJson(event.body_envelope) }
+              : {}),
+          },
+        });
+
+        // Lifecycle delivery follows the release's own delivery: exactly the
+        // releases that emitted a `released` event propagate their lineage.
+        // A release My-Chat never admitted has nothing downstream to
+        // correct, remove or redact.
+        const releasedOutbox = await tx.nurtureFamilyGrowthOutboxEvent.findFirst({
+          where: {
+            workspaceId: input.workspace_id,
+            publicationReleaseId: event.publication_id,
+            kind: "released",
+          },
+          select: { envelopePayload: true },
+        });
+        if (!releasedOutbox) return;
+
+        // The lifecycle target is the exact target the release was delivered
+        // with — read back from the stored envelope, never re-resolved: a
+        // binding revoked after release must not stop a redaction cascade.
+        const envelope = assembleLifecycleEventV1({
+          eventId: randomUUID(),
+          occurredAt: event.occurred_at,
           kind: event.kind,
-          reasonKey: event.reason_key,
-          // The assignment the authorization validated, on the load-time
-          // clock — never a finalize-time re-resolution.
-          actorRoleAssignmentId: input.actor_role_assignment_id,
-          sourceReleaseRevision: event.source_release_revision,
-          // The lineage names the command behind it — the reason the append
-          // happens in finalize, after the execution row exists.
-          commandExecutionId: input.command_execution_id,
-          occurredAt: new Date(event.occurred_at),
-          ...(event.body_envelope !== undefined
-            ? { bodyProtectionPayload: asJson(event.body_envelope) }
+          source: {
+            publicationReleaseRef: event.publication_id,
+            eventRef: event.event_id,
+            sourceReleaseRevision: event.source_release_revision,
+            // Same closed taxonomy on both sides; the assembler re-validates
+            // and an out-of-taxonomy value aborts the pair (fail closed).
+            reasonKey: event.reason_key as FamilyGrowthLifecycleReasonV1,
+          },
+          target: readStoredEnvelopeTarget(releasedOutbox.envelopePayload),
+          ...(event.correction_display_safe_text !== undefined
+            ? { correctionDisplaySafeText: event.correction_display_safe_text }
             : {}),
-        },
+        });
+        await appendFamilyGrowthOutboxEventWithin(tx, {
+          workspaceId: input.workspace_id,
+          eventId: envelope.event_id,
+          kind: event.kind,
+          publicationReleaseId: event.publication_id,
+          visibilityEventId: event.event_id,
+          payloadDigest: envelope.payload_digest,
+          envelope,
+        });
       });
     }
   }
+
+  /**
+   * `BoardPrisma` may already be a transaction client; only open a new
+   * transaction when this port holds a root client.
+   */
+  private async runAtomic<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+    const maybeRoot = this.prisma as PrismaClient;
+    if (typeof maybeRoot.$transaction === "function") {
+      return maybeRoot.$transaction(fn);
+    }
+    return fn(this.prisma as Prisma.TransactionClient);
+  }
 }
+
+/** The canonical pair the release envelope committed with; malformed storage fails closed. */
+const readStoredEnvelopeTarget = (payload: unknown): FamilyGrowthCanonicalTargetV1 => {
+  const target =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? (payload as { target?: unknown }).target
+      : undefined;
+  const record =
+    target && typeof target === "object" && !Array.isArray(target)
+      ? (target as Record<string, unknown>)
+      : undefined;
+  const childId = record?.child_id;
+  const familyId = record?.family_id;
+  if (typeof childId !== "string" || childId.length === 0 || typeof familyId !== "string" || familyId.length === 0) {
+    throw new Error(
+      "nurture family growth lifecycle: stored release envelope carries no canonical target",
+    );
+  }
+  return { child_id: childId, family_id: familyId };
+};

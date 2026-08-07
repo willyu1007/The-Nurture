@@ -60,6 +60,7 @@ export * from "./domain/family-growth/jcs.js";
 export * from "./domain/family-growth/assembler.js";
 export * from "./domain/family-growth/receipt.js";
 export * from "./domain/family-growth/target-resolution.js";
+export * from "./domain/family-growth/emission.js";
 export * from "./adapters/derived-age-stage-http.js";
 export * from "./domain/resolution/candidate-kernel.js";
 export * from "./domain/institution/institution-context.js";

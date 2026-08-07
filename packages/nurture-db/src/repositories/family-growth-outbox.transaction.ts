@@ -58,6 +58,30 @@ export type FamilyGrowthReceiptRecordInputV1 = {
 const asJson = (value: unknown): Prisma.InputJsonValue =>
   JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 
+/**
+ * Append one outbox row inside the caller's open transaction. Standalone so
+ * the release and safety owners can call it with their own `tx` without
+ * constructing the port.
+ */
+export const appendFamilyGrowthOutboxEventWithin = async (
+  tx: Prisma.TransactionClient,
+  input: FamilyGrowthOutboxAppendInputV1,
+): Promise<void> => {
+  await tx.nurtureFamilyGrowthOutboxEvent.create({
+    data: {
+      id: input.eventId,
+      workspaceId: input.workspaceId,
+      kind: input.kind,
+      publicationReleaseId: input.publicationReleaseId,
+      ...(input.visibilityEventId !== undefined
+        ? { visibilityEventId: input.visibilityEventId }
+        : {}),
+      payloadDigest: input.payloadDigest,
+      envelopePayload: asJson(input.envelope),
+    },
+  });
+};
+
 export class PrismaFamilyGrowthOutboxPort {
   constructor(private readonly prisma: NurturePrismaClient) {}
 
@@ -66,19 +90,7 @@ export class PrismaFamilyGrowthOutboxPort {
     tx: Prisma.TransactionClient,
     input: FamilyGrowthOutboxAppendInputV1,
   ): Promise<void> {
-    await tx.nurtureFamilyGrowthOutboxEvent.create({
-      data: {
-        id: input.eventId,
-        workspaceId: input.workspaceId,
-        kind: input.kind,
-        publicationReleaseId: input.publicationReleaseId,
-        ...(input.visibilityEventId !== undefined
-          ? { visibilityEventId: input.visibilityEventId }
-          : {}),
-        payloadDigest: input.payloadDigest,
-        envelopePayload: asJson(input.envelope),
-      },
-    });
+    await appendFamilyGrowthOutboxEventWithin(tx, input);
   }
 
   /**

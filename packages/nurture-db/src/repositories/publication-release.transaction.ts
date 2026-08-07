@@ -1,7 +1,13 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { currentAttributionRowsPerChild } from "./media-safety.read.js";
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { deriveTargetPublishBlockingReasons } from "@the-nurture/scenario/harness";
+import {
+  assembleReleaseEventV1,
+  FamilyGrowthAssemblyError,
+  type FamilyGrowthPreparedReleaseEmissionV1,
+} from "@the-nurture/scenario/family-growth";
+import { appendFamilyGrowthOutboxEventWithin } from "./family-growth-outbox.transaction.js";
 import type {
   CaregiverFactAuthorityV1,
   CommitTargetReleaseResultV1,
@@ -38,6 +44,8 @@ type CommitTargetReleaseInput = {
   revision: number;
   command_request_id: string;
   trigger: ReleaseTriggerV1;
+  /** T-009 prepared emission; absent = the exact qualified G3-D behavior. */
+  family_growth?: FamilyGrowthPreparedReleaseEmissionV1;
 };
 
 const sha256 = (value: string): string =>
@@ -326,6 +334,12 @@ export class PrismaPublicationReleasePort
         if (isRetryableTransactionConflict(error) && attempt < MAX_SERIALIZABLE_ATTEMPTS) {
           continue;
         }
+        // An invalid prepared family-growth emission aborted write-free
+        // inside the transaction; the target rejects instead of releasing
+        // without its outbox event (N5 fail-closed).
+        if (error instanceof FamilyGrowthAssemblyError) {
+          return { status: "rejected", reason_code: "family_growth_emission_invalid" };
+        }
         if (isUniqueViolation(error)) {
           // A concurrent same-target winner is reconciled from the committed
           // row. A different unique-key collision is still a definite rollback,
@@ -546,10 +560,40 @@ export class PrismaPublicationReleasePort
           }
         }
 
+        // T-009: assemble the family-growth envelope BEFORE the first write
+        // this branch keeps (the freeze CAS above rolls back with the
+        // transaction). Identities are pre-generated so the envelope binds
+        // the exact rows about to commit; assembly is pure computation and
+        // an invalid prepared emission aborts write-free (fail closed, never
+        // a release without its outbox event).
+        const releaseId = randomUUID();
+        const receiptId = randomUUID();
+        const familyGrowthEnvelope = input.family_growth
+          ? assembleReleaseEventV1({
+              eventId: randomUUID(),
+              occurredAt: at.toISOString(),
+              source: {
+                publication_release_ref: releaseId,
+                publish_process_ref: process.id,
+                publish_revision_ref: revision.id,
+                publish_revision: revision.revision,
+                content_digest: input.family_growth.contentDigest,
+                receipt_ref: receiptId,
+                source_target_ref: target.id,
+                committed_at: at.toISOString(),
+              },
+              target: input.family_growth.target,
+              admission: input.family_growth.admission,
+              material: input.family_growth.material,
+              retentionMode: input.family_growth.retentionMode,
+            })
+          : undefined;
+
         // The T-005 receipt lifecycle CHECK governs this source type too: a
         // delivered publication Receipt must carry its whole routing identity.
         const receipt = await tx.nurtureChildLinkReceipt.create({
           data: {
+            id: receiptId,
             workspaceId: input.workspace_id,
             grantId: target.grantId,
             childCareProcessId: target.childCareProcessId,
@@ -568,6 +612,7 @@ export class PrismaPublicationReleasePort
 
         const release = await tx.nurturePublicationRelease.create({
           data: {
+            id: releaseId,
             workspaceId: input.workspace_id,
             publishProcessId: process.id,
             publishProcessTargetId: target.id,
@@ -578,6 +623,17 @@ export class PrismaPublicationReleasePort
             committedAt: at,
           },
         });
+
+        if (familyGrowthEnvelope) {
+          await appendFamilyGrowthOutboxEventWithin(tx, {
+            workspaceId: input.workspace_id,
+            eventId: familyGrowthEnvelope.event_id,
+            kind: "released",
+            publicationReleaseId: release.id,
+            payloadDigest: familyGrowthEnvelope.payload_digest,
+            envelope: familyGrowthEnvelope,
+          });
+        }
 
         await tx.nurtureCommandExecution.create({
           data: {
