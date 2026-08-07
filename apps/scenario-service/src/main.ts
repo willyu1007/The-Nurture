@@ -1,4 +1,10 @@
+import { createPrismaClient, PrismaFamilyGrowthOutboxPort } from "@the-nurture/db";
 import { createScenarioServiceApplication } from "./application.js";
+import {
+  createFamilyGrowthHttpTransport,
+  FamilyGrowthDeliveryWorker,
+} from "./family-growth-delivery.worker.js";
+import { loadFamilyGrowthDeliveryConfig } from "./family-growth-runtime.js";
 
 async function bootstrap(): Promise<void> {
   const { app, config, logger } = await createScenarioServiceApplication();
@@ -9,6 +15,32 @@ async function bootstrap(): Promise<void> {
     serviceName: config.serviceName,
     port: config.port,
   });
+
+  // T-009 I3b: the outbox delivery worker runs only when both delivery keys
+  // are configured (family_growth_transport@1.0.0 §1 — absence = off).
+  const deliveryConfig = loadFamilyGrowthDeliveryConfig();
+  if (deliveryConfig) {
+    const prisma = createPrismaClient();
+    const worker = new FamilyGrowthDeliveryWorker({
+      outbox: new PrismaFamilyGrowthOutboxPort(prisma),
+      transport: createFamilyGrowthHttpTransport({ config: deliveryConfig }),
+      log: (event, fields) =>
+        logger.familyGrowthDelivery(
+          event as Parameters<typeof logger.familyGrowthDelivery>[0],
+          Object.fromEntries(
+            Object.entries(fields).filter(
+              (entry): entry is [string, string | number] =>
+                typeof entry[1] === "string" || typeof entry[1] === "number",
+            ),
+          ),
+        ),
+    });
+    worker.start();
+    app.getHttpServer().once("close", () => {
+      worker.stop();
+      void prisma.$disconnect();
+    });
+  }
 }
 
 bootstrap().catch(() => {

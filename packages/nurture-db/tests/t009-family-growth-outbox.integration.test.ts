@@ -261,14 +261,14 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
     });
 
     const now = new Date();
-    const claimed = (await port().claimDue({ now, limit: 50 })).filter(
+    const claimed = (await port().claimDue({ now, limit: 50, workspaceId: world.workspaceId })).filter(
       (row) => row.workspaceId === world.workspaceId,
     );
     expect(claimed.map((row) => row.eventId)).toEqual([eventId]);
     expect(claimed[0]!.attemptCount).toBe(1);
     // A delivering row is not claimable again.
     expect(
-      (await port().claimDue({ now, limit: 50 })).filter(
+      (await port().claimDue({ now, limit: 50, workspaceId: world.workspaceId })).filter(
         (row) => row.workspaceId === world.workspaceId,
       ),
     ).toEqual([]);
@@ -277,12 +277,12 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
     const backoff = new Date(now.getTime() + 60_000);
     await port().recordTransportFailure({ outboxEventId: eventId, nextAttemptAt: backoff });
     expect(
-      (await port().claimDue({ now, limit: 50 })).filter(
+      (await port().claimDue({ now, limit: 50, workspaceId: world.workspaceId })).filter(
         (row) => row.workspaceId === world.workspaceId,
       ),
     ).toEqual([]);
     const reclaimed = (
-      await port().claimDue({ now: new Date(backoff.getTime() + 1), limit: 50 })
+      await port().claimDue({ now: new Date(backoff.getTime() + 1), limit: 50, workspaceId: world.workspaceId })
     ).filter((row) => row.workspaceId === world.workspaceId);
     expect(reclaimed.map((row) => row.eventId)).toEqual([eventId]);
     expect(reclaimed[0]!.attemptCount).toBe(2);
@@ -311,6 +311,54 @@ describe("T-009 I2: family-growth outbox schema and port", () => {
         where: { workspaceId: world.workspaceId, outboxEventId: eventId },
       }),
     ).toBe(1);
+  });
+
+  it("reclaims stale delivering rows only past the lease", async () => {
+    const world = await seedRelease();
+    const eventId = randomUUID();
+    await prisma.$transaction(async (tx) => {
+      await port().appendWithin(tx, {
+        workspaceId: world.workspaceId,
+        eventId,
+        kind: "released",
+        publicationReleaseId: world.release.id,
+        payloadDigest: DIGEST,
+        envelope: {},
+      });
+    });
+    const now = new Date();
+    const mine = (rows: Awaited<ReturnType<ReturnType<typeof port>["claimDue"]>>) =>
+      rows.filter((row) => row.workspaceId === world.workspaceId);
+
+    // First claim takes the row into delivering.
+    expect(
+      mine(await port().claimDue({ now, limit: 50, workspaceId: world.workspaceId })).map((row) => row.eventId),
+    ).toEqual([eventId]);
+
+    // A fresh delivering row is NOT reclaimable even with the stale window.
+    expect(
+      mine(
+        await port().claimDue({
+          now,
+          limit: 50,
+          workspaceId: world.workspaceId,
+          staleClaimBefore: new Date(now.getTime() - 600_000),
+        }),
+      ),
+    ).toEqual([]);
+
+    // Once the last attempt is older than the lease, a worker may reclaim it.
+    const later = new Date(now.getTime() + 601_000);
+    const reclaimed = mine(
+      await port().claimDue({
+        now: later,
+        limit: 50,
+        workspaceId: world.workspaceId,
+        staleClaimBefore: new Date(later.getTime() - 600_000),
+      }),
+    );
+    expect(reclaimed.map((row) => row.eventId)).toEqual([eventId]);
+    expect(reclaimed[0]!.attemptCount).toBe(2);
   });
 
   it("enforces receipt companion refs and settles rejections as failed", async () => {

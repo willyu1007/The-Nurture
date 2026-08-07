@@ -6,13 +6,13 @@ own DoD; nothing activates by default at any point.
 
 ## I0 — Joint transport freeze (with My-Chat)
 
-- Input: `artifacts/family-growth-transport-addendum-draft.md` (also mirrored
-  to My-Chat `dev-docs/active/growth-record/artifacts/`).
+- Frozen artifact: `artifacts/family-growth-transport-addendum.md` (identical
+  copy in My-Chat `dev-docs/active/growth-record/artifacts/`).
 - Settle: endpoint paths, service-auth mechanism, receipt-in-response rule,
   rendition exchange (short-lived URL TTL, digest verification), retry/backoff
   parameters, error taxonomy.
-- DoD: both repos record the same versioned addendum
-  (`family_growth_transport@1.0`); open-items list is empty.
+- DoD (MET 2026-08-07): both repos record `family_growth_transport@1.0.0`
+  with matching digest; open-items list is empty (D-T009-09).
 - Blocking: I3 wire delivery, I5 rendition endpoint. Not blocking: I1, I2.
 
 ## I1 — Domain envelope layer (no schema, no wire)
@@ -63,7 +63,7 @@ own DoD; nothing activates by default at any point.
 ## I3 — Transactional emit + delivery worker
 
 Split executed as I3a (non-wire, DONE 2026-08-07), I3c (fact preparer,
-DONE 2026-08-07) and I3b (wire, after I0):
+DONE 2026-08-07) and I3b (wire, DONE 2026-08-07 after the I0 freeze):
 
 - I3a: `commitTargetRelease` and the lifecycle finalize append the outbox
   row in the same transaction (N5). Resolution and fact loading run
@@ -77,17 +77,17 @@ DONE 2026-08-07) and I3b (wire, after I0):
 - I3c: `PrismaFamilyGrowthEmissionPreparer` fills the prepared emission
   from real canonical facts (mappings in D-T009-08), fail-closed per gap
   with two-tier deny reasons.
-- I3b (waits on I0): delivery worker in scenario-service claims pending
-  rows, POSTs per the frozen addendum, records the synchronous receipt via
-  I2's store, maps timeout/5xx to `outcome_unknown` and retries with the
-  same event id + digest; terminal `rejected`/`conflict` stop retries and
-  surface to the queue. Must also define stale-claim recovery: rows left in
-  `delivering` by a dead worker need a lease/timeout rule from the frozen
-  addendum before they re-enter `claimDue`.
+- I3b: the scenario-service worker claims due rows (including stale
+  `delivering` claims past the frozen 10-minute lease), POSTs per the
+  addendum, records the synchronous receipt via I2's store, and maps every
+  non-settling outcome to `outcome_unknown` with the frozen 30s→1h backoff
+  and the 8-attempt attention signal; terminal `rejected`/`conflict` stop
+  retries and surface to the queue.
 - I3a DoD (met): DB integration tests for same-tx atomicity in both
   rollback directions, replay identity, default-off parity, lifecycle
-  pairing/skip/fail-closed. I3b DoD: worker state transitions against a
-  fake consumer per the addendum.
+  pairing/skip/fail-closed. I3b DoD (met): engine and worker state
+  transitions against a fake consumer per the addendum, plus the DB
+  stale-claim reclaim test.
 
 ## I4 — Canonical target resolution (N1)
 
@@ -101,7 +101,7 @@ DONE 2026-08-07) and I3b (wire, after I0):
 - DoD: unit tests over an in-memory owner port covering every deny case;
   integration test proving a deny blocks the release before the transaction.
 
-## I5 — Rendition exchange (after I0)
+## I5 — Rendition exchange (DONE 2026-08-07)
 
 - Service-authenticated endpoint: `family_rendition_ref` → short-lived URL +
   digest for the exact unchanged original revision, authorized per target

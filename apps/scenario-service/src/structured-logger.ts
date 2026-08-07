@@ -31,7 +31,17 @@ export type ScenarioStructuredLogRecord =
       app_env: string;
       service_name: string;
       port: number;
-    }>;
+    }>
+  | Readonly<
+      {
+        schema: "nurture_scenario_service_log_v1";
+        event:
+          | "family_growth_delivery_settled"
+          | "family_growth_delivery_retry"
+          | "family_growth_delivery_attention"
+          | "family_growth_delivery_tick_failed";
+      } & Record<string, string | number>
+    >;
 
 export type ScenarioStructuredLogSink = (
   record: ScenarioStructuredLogRecord,
@@ -71,6 +81,22 @@ export class ScenarioStructuredLogger {
       event: "unhandled_exception",
       request_id: input.requestId,
       route_class: input.routeClass,
+    });
+  }
+
+  /** T-009 I3b delivery-worker events; fields carry ids and counts only. */
+  familyGrowthDelivery(
+    event:
+      | "family_growth_delivery_settled"
+      | "family_growth_delivery_retry"
+      | "family_growth_delivery_attention"
+      | "family_growth_delivery_tick_failed",
+    fields: Record<string, string | number>,
+  ): void {
+    this.sink({
+      schema: "nurture_scenario_service_log_v1",
+      event,
+      ...fields,
     });
   }
 

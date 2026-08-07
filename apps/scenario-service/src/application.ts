@@ -25,11 +25,16 @@ import {
   ScenarioStructuredLogger,
   type ScenarioStructuredLogSink,
 } from "./structured-logger.js";
+import {
+  createFamilyGrowthRenditionRuntime,
+  type FamilyGrowthRenditionRuntime,
+} from "./family-growth-runtime.js";
 
 export type ScenarioServiceApplication = Readonly<{
   app: NestExpressApplication;
   config: ScenarioServiceConfig;
   logger: ScenarioStructuredLogger;
+  familyGrowthRendition: FamilyGrowthRenditionRuntime;
 }>;
 
 export async function createScenarioServiceApplication(input?: {
@@ -39,6 +44,7 @@ export async function createScenarioServiceApplication(input?: {
   bindingOwnerRuntime?: BindingOwnerRuntime;
   bindingOwnerServiceAuth?: BindingOwnerServiceAuth;
   harnessRuntime?: HarnessRuntime;
+  familyGrowthRendition?: FamilyGrowthRenditionRuntime;
 }): Promise<ScenarioServiceApplication> {
   const config = input?.config ?? loadScenarioServiceConfig();
   const logger = new ScenarioStructuredLogger(input?.logSink);
@@ -59,6 +65,8 @@ export async function createScenarioServiceApplication(input?: {
       institutionBusinessCommunicationReadEnabled:
         config.institutionBusinessCommunicationReadEnabled,
     });
+  const familyGrowthRendition =
+    input?.familyGrowthRendition ?? createFamilyGrowthRenditionRuntime();
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.register({
       bindingOwner: {
@@ -69,6 +77,7 @@ export async function createScenarioServiceApplication(input?: {
         runtime: harnessRuntime,
         serviceAuth: bindingOwnerServiceAuth,
       },
+      familyGrowthRendition,
     }),
     {
       abortOnError: false,
@@ -91,5 +100,5 @@ export async function createScenarioServiceApplication(input?: {
   server.requestTimeout = config.requestTimeoutMs;
   server.headersTimeout = config.requestTimeoutMs;
 
-  return { app, config, logger };
+  return { app, config, logger, familyGrowthRendition };
 }

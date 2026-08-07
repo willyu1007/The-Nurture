@@ -2,6 +2,35 @@
 
 Running log; newest first.
 
+- 2026-08-07 (night): I0 frozen; I3b + I5 landed.
+  - Transport addendum frozen at `family_growth_transport@1.0.0`
+    (D-T009-09), mirrored to My-Chat with matching digest `38bc6239…`.
+  - I3b: pure delivery engine in the scenario domain
+    (`delivery.ts`: frozen backoff/settlement constants,
+    `decideFamilyGrowthDelivery` — only a valid 200 receipt naming the
+    exact event settles; mismatched receipts retry) + the scenario-service
+    worker (`family-growth-delivery.worker.ts`: claim with the 10-minute
+    stale lease, HTTP transport with 30s timeout, receipt recording,
+    attention log at 8 attempts). Worker starts only when
+    `MY_CHAT_INTERNAL_BASE_URL` + `FAMILY_GROWTH_EVENTS_SERVICE_TOKEN` are
+    both configured. `claimDue` gained stale-claim reclaim with a
+    staleness-re-checking conditional update, plus an optional workspace
+    scope (a global-claim test flaked against accumulated dev-DB debris —
+    claims in tests are now workspace-scoped; the production worker still
+    claims globally).
+  - I5: rendition exchange on scenario-service
+    (`family-growth-rendition.controller.ts` + `family-growth-runtime.ts`):
+    dual-token auth, stateless HMAC lease (key derived from the rendition
+    token, so rotation invalidates open leases — acceptable at 5-minute
+    TTL), per-call re-authorization on resolve AND download via
+    `PrismaFamilyGrowthRenditionReadPort` (jsonb containment against the
+    released envelope + release visibility + pinned-revision/digest/MIME
+    checks), frozen §5 error taxonomy registered in the safe-exception
+    whitelist. Byte storage is a deployment-infra port
+    (`FamilyGrowthRenditionStoragePort`); unbound storage answers 503,
+    never a false 404.
+  - New env keys registered in the env contract; context checksums synced.
+
 - 2026-08-07 (evening): I3c fact preparer + quality-review pass; stable
   baseline commit.
   - `PrismaFamilyGrowthEmissionPreparer` loads real canonical facts into the
