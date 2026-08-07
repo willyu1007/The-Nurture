@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   NurtureUserAttentionService,
   type NurtureUserAttentionFacts,
@@ -61,6 +61,10 @@ const facts = (overrides: Partial<NurtureUserAttentionFacts> = {}): NurtureUserA
     care_group_id: "group-1",
     grant_id: "grant-1",
     data_class: "family_care_question",
+    version: 0,
+    updated_at: "2026-07-15T07:00:00.000Z",
+    acknowledged: false,
+    acknowledgement: null,
   },
   current: {
     grant_active: true,
@@ -77,14 +81,66 @@ const facts = (overrides: Partial<NurtureUserAttentionFacts> = {}): NurtureUserA
   ...overrides,
 });
 
-const service = (value: NurtureUserAttentionFacts) =>
+const acknowledgedFacts = (): NurtureUserAttentionFacts =>
+  facts({
+    receipt: { ...facts().receipt!, status: "acknowledged" },
+    item: {
+      ...facts().item!,
+      status: "acknowledged",
+      version: 1,
+      acknowledged: true,
+      acknowledgement: {
+        receipt_id: "ack-event-1",
+        idempotency_key: "command-1",
+        item_version: 2,
+        acknowledged_at: "2026-07-15T07:30:00.000Z",
+      },
+    },
+  });
+
+const repository = (
+  value: NurtureUserAttentionFacts,
+  applyAcknowledgement: NurtureUserAttentionRepository["applyAcknowledgement"] = async () => ({
+    status: "conflict",
+  }),
+): NurtureUserAttentionRepository => ({
+  loadCurrentFacts: async () => value,
+  applyAcknowledgement,
+});
+
+const service = (
+  value: NurtureUserAttentionFacts,
+  applyAcknowledgement?: NurtureUserAttentionRepository["applyAcknowledgement"],
+) =>
   new NurtureUserAttentionService(
-    { loadCurrentFacts: async () => value } satisfies NurtureUserAttentionRepository,
+    repository(value, applyAcknowledgement),
     () => new Date("2026-07-15T08:00:00.000Z"),
   );
 
+const expectedItem = () => ({
+  contract_version: 1,
+  presentation_type: "nurture_attention_v1",
+  owner_ref: {
+    schema_version: 1,
+    namespace: "nurture",
+    object_type: "family_care_item",
+    object_id: "item-1",
+    version: 1,
+  },
+  title_display: "New family care item",
+  source_display: "The Nurture",
+  data_class: "family_private",
+  status: "attention",
+  item_version: 1,
+  updated_at: "2026-07-15T07:00:00.000Z",
+  detail_deep_link: "morethan://nurture/family-care/item-1",
+  available_actions: [
+    { key: "acknowledge", label_display: "Acknowledge", confirmation_required: false },
+  ],
+});
+
 describe("NurtureUserAttentionService", () => {
-  it("returns only current My-Chat recipient ids and generic display data", async () => {
+  it("returns only current My-Chat recipient ids and a generic dashboard item", async () => {
     await expect(
       service(facts()).resolve({
         workspace_id: "workspace-1",
@@ -93,9 +149,27 @@ describe("NurtureUserAttentionService", () => {
     ).resolves.toEqual({
       status: "ready",
       recipient_user_ids: ["user-1", "user-2"],
-      title_display: "New family care item",
-      body_display: "Open The Nurture to review the current item.",
-      route_key: "teacher_attention_board",
+      item: expectedItem(),
+    });
+  });
+
+  it("presents an acknowledged item with no available actions", async () => {
+    await expect(
+      service(acknowledgedFacts()).resolve({
+        workspace_id: "workspace-1",
+        source_context_refs: refs(),
+        actor_user_id: "user-1",
+      }),
+    ).resolves.toEqual({
+      status: "ready",
+      recipient_user_ids: ["user-1"],
+      item: {
+        ...expectedItem(),
+        owner_ref: { ...expectedItem().owner_ref, version: 2 },
+        status: "acknowledged",
+        item_version: 2,
+        available_actions: [],
+      },
     });
   });
 
@@ -168,7 +242,7 @@ describe("NurtureUserAttentionService", () => {
     ).resolves.toEqual({ status: "stopped", reason_code: "target_unavailable" });
   });
 
-  it("rejects partial, duplicate, unlinked, and no-longer-open sources", async () => {
+  it("rejects partial, duplicate, unlinked, and no-longer-current sources", async () => {
     await expect(
       service(facts()).resolve({
         workspace_id: "workspace-1",
@@ -182,10 +256,135 @@ describe("NurtureUserAttentionService", () => {
       }),
     ).resolves.toEqual({ status: "stopped", reason_code: "policy_blocked" });
     await expect(
-      service(facts({ item: { ...facts().item!, status: "resolved" } })).resolve({
+      service(facts({ item: { ...facts().item!, status: "closed" } })).resolve({
         workspace_id: "workspace-1",
         source_context_refs: refs(),
       }),
     ).resolves.toEqual({ status: "stopped", reason_code: "policy_blocked" });
+  });
+
+  describe("acknowledge", () => {
+    it("applies a fenced acknowledgement and returns the receipt", async () => {
+      const applyAcknowledgement = vi.fn(
+        async (): ReturnType<NurtureUserAttentionRepository["applyAcknowledgement"]> => ({
+          status: "applied",
+          receipt_id: "ack-event-1",
+          acknowledged_at: "2026-07-15T08:00:00.000Z",
+        }),
+      );
+      await expect(
+        service(facts(), applyAcknowledgement).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-1",
+          expected_item_version: 1,
+          idempotency_key: "command-1",
+        }),
+      ).resolves.toEqual({
+        status: "applied",
+        receipt_ref: {
+          schema_version: 1,
+          namespace: "nurture",
+          object_type: "user_attention_receipt",
+          object_id: "ack-event-1",
+          version: 2,
+        },
+        item_version: 2,
+        acknowledged_at: "2026-07-15T08:00:00.000Z",
+        replayed: false,
+      });
+      expect(applyAcknowledgement).toHaveBeenCalledWith({
+        workspace_id: "workspace-1",
+        item_id: "item-1",
+        receipt_id: "receipt-1",
+        actor_user_id: "user-1",
+        idempotency_key: "command-1",
+        expected_item_version: 0,
+        acknowledged_item_version: 2,
+        at: "2026-07-15T08:00:00.000Z",
+      });
+    });
+
+    it("replays the stored response for the same idempotency key", async () => {
+      await expect(
+        service(acknowledgedFacts()).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-1",
+          expected_item_version: 1,
+          idempotency_key: "command-1",
+        }),
+      ).resolves.toEqual({
+        status: "applied",
+        receipt_ref: {
+          schema_version: 1,
+          namespace: "nurture",
+          object_type: "user_attention_receipt",
+          object_id: "ack-event-1",
+          version: 2,
+        },
+        item_version: 2,
+        acknowledged_at: "2026-07-15T07:30:00.000Z",
+        replayed: true,
+      });
+    });
+
+    it("rejects an already-acknowledged item under a different idempotency key", async () => {
+      await expect(
+        service(acknowledgedFacts()).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-1",
+          expected_item_version: 2,
+          idempotency_key: "command-other",
+        }),
+      ).resolves.toEqual({ status: "rejected", reason_code: "version_conflict" });
+    });
+
+    it("rejects stale expected versions and lost write races as version_conflict", async () => {
+      await expect(
+        service(facts()).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-1",
+          expected_item_version: 7,
+          idempotency_key: "command-1",
+        }),
+      ).resolves.toEqual({ status: "rejected", reason_code: "version_conflict" });
+      await expect(
+        service(facts(), async () => ({ status: "conflict" })).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-1",
+          expected_item_version: 1,
+          idempotency_key: "command-1",
+        }),
+      ).resolves.toEqual({ status: "rejected", reason_code: "version_conflict" });
+    });
+
+    it("keeps the owner-reread and revocation fences on the action path", async () => {
+      await expect(
+        service(
+          facts({
+            current: { ...facts().current, grant_active: false, grant_revoked: true },
+          }),
+        ).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-1",
+          expected_item_version: 1,
+          idempotency_key: "command-1",
+        }),
+      ).resolves.toEqual({ status: "rejected", reason_code: "grant_revoked" });
+      await expect(
+        service(facts()).acknowledge({
+          workspace_id: "workspace-1",
+          source_context_refs: refs(),
+          actor_user_id: "user-other",
+          expected_item_version: 1,
+          idempotency_key: "command-1",
+        }),
+      ).resolves.toEqual({ status: "rejected", reason_code: "target_unavailable" });
+    });
   });
 });

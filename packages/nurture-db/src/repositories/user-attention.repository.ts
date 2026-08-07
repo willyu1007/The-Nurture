@@ -1,8 +1,39 @@
 import type { PrismaClient } from "@prisma/client";
 import type {
+  NurtureUserAttentionAcknowledgeApplied,
   NurtureUserAttentionFacts,
   NurtureUserAttentionRepository,
 } from "@the-nurture/scenario/harness";
+
+const OWNER_ACKNOWLEDGEMENT_SOURCE = "user_attention_owner";
+
+/**
+ * Owner-side acknowledgement records are persisted as `acknowledged` item
+ * events whose payload carries the idempotency key and the presented item
+ * version, so replays can restate the original response verbatim.
+ */
+const storedAcknowledgement = (event: {
+  id: string;
+  eventPayload: unknown;
+}): NonNullable<NonNullable<NurtureUserAttentionFacts["item"]>["acknowledgement"]> | null => {
+  const payload = event.eventPayload;
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
+  const record = payload as Record<string, unknown>;
+  if (
+    record.source !== OWNER_ACKNOWLEDGEMENT_SOURCE ||
+    typeof record.idempotency_key !== "string" ||
+    typeof record.item_version !== "number" ||
+    typeof record.acknowledged_at !== "string"
+  ) {
+    return null;
+  }
+  return {
+    receipt_id: event.id,
+    idempotency_key: record.idempotency_key,
+    item_version: record.item_version,
+    acknowledged_at: record.acknowledged_at,
+  };
+};
 
 const currentGrant = (
   grant: {
@@ -79,6 +110,9 @@ export class PrismaUserAttentionRepository implements NurtureUserAttentionReposi
           grantId: true,
           dataClass: true,
           expiresAt: true,
+          version: true,
+          updatedAt: true,
+          acknowledgementState: true,
           thread: { select: { status: true, deletedAt: true } },
           enrollment: {
             select: {
@@ -155,6 +189,21 @@ export class PrismaUserAttentionRepository implements NurtureUserAttentionReposi
         })
       : [];
 
+    const itemAcknowledged = Boolean(
+      item && (item.status === "acknowledged" || item.acknowledgementState === "acknowledged"),
+    );
+    const acknowledgementEvent = itemAcknowledged
+      ? await this.prisma.nurtureFamilyCareItemEvent.findFirst({
+          where: {
+            workspaceId: input.workspace_id,
+            itemId: input.item_id,
+            eventType: "acknowledged",
+          },
+          orderBy: { createdAt: "desc" },
+          select: { id: true, eventPayload: true },
+        })
+      : null;
+
     const grant = item?.grant ?? null;
     const grantTargetMatches = Boolean(
       grant &&
@@ -207,6 +256,12 @@ export class PrismaUserAttentionRepository implements NurtureUserAttentionReposi
             ...(item.grantId ? { grant_id: item.grantId } : {}),
             data_class: item.dataClass,
             ...(item.expiresAt ? { expires_at: item.expiresAt.toISOString() } : {}),
+            version: item.version,
+            updated_at: item.updatedAt.toISOString(),
+            acknowledged: itemAcknowledged,
+            acknowledgement: acknowledgementEvent
+              ? storedAcknowledgement(acknowledgementEvent)
+              : null,
           }
         : null,
       current: {
@@ -231,5 +286,89 @@ export class PrismaUserAttentionRepository implements NurtureUserAttentionReposi
       },
       recipient_user_ids: recipients.map((row) => row.participant.myChatUserId),
     };
+  }
+
+  async applyAcknowledgement(input: {
+    workspace_id: string;
+    item_id: string;
+    receipt_id: string;
+    actor_user_id: string;
+    idempotency_key: string;
+    expected_item_version: number;
+    acknowledged_item_version: number;
+    at: string;
+  }): Promise<NurtureUserAttentionAcknowledgeApplied | { status: "conflict" }> {
+    const at = new Date(input.at);
+    if (Number.isNaN(at.getTime())) throw new Error("invalid user-attention acknowledge time");
+    return this.prisma.$transaction(async (tx) => {
+      const actorParticipant = await tx.nurtureParticipant.findFirst({
+        where: {
+          workspaceId: input.workspace_id,
+          myChatUserId: input.actor_user_id,
+          status: "active",
+          deletedAt: null,
+        },
+        select: { id: true },
+      });
+      // Fence in the mutated channel: the conditional update loses against any
+      // concurrent acknowledge (version moved), lifecycle change (status left
+      // "open"), or grant revocation/expiry committed after the owner reread.
+      // Single-writer cutover (10-g2-schema-freeze.md C6/C8): this legacy-shape
+      // write must never mutate a harness-managed row, so it fails closed on
+      // any writer contract other than legacy_v1.
+      const updated = await tx.nurtureFamilyCareItem.updateMany({
+        where: {
+          id: input.item_id,
+          workspaceId: input.workspace_id,
+          version: input.expected_item_version,
+          status: "open",
+          writerContract: "legacy_v1",
+          grant: {
+            status: "active",
+            revokedAt: null,
+            deletedAt: null,
+            OR: [{ expiresAt: null }, { expiresAt: { gt: at } }],
+          },
+        },
+        data: {
+          status: "acknowledged",
+          ...(actorParticipant ? { ackedByParticipantId: actorParticipant.id } : {}),
+          ackedAt: at,
+          version: { increment: 1 },
+        },
+      });
+      if (updated.count !== 1) return { status: "conflict" as const };
+      await tx.nurtureChildLinkReceipt.updateMany({
+        where: {
+          id: input.receipt_id,
+          workspaceId: input.workspace_id,
+          status: { in: ["delivered", "read"] },
+        },
+        data: { status: "acknowledged", acknowledgedAt: at, version: { increment: 1 } },
+      });
+      const event = await tx.nurtureFamilyCareItemEvent.create({
+        data: {
+          workspaceId: input.workspace_id,
+          itemId: input.item_id,
+          ...(actorParticipant ? { actorParticipantId: actorParticipant.id } : {}),
+          eventType: "acknowledged",
+          fromStatus: "open",
+          toStatus: "acknowledged",
+          eventPayload: {
+            source: OWNER_ACKNOWLEDGEMENT_SOURCE,
+            idempotency_key: input.idempotency_key,
+            actor_user_id: input.actor_user_id,
+            acknowledged_at: input.at,
+            item_version: input.acknowledged_item_version,
+          },
+        },
+        select: { id: true },
+      });
+      return {
+        status: "applied" as const,
+        receipt_id: event.id,
+        acknowledged_at: input.at,
+      };
+    });
   }
 }

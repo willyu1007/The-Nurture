@@ -10,7 +10,9 @@ import {
 import type { CanonicalRef, WorkflowPresenters } from "@my-chat/workflow-contracts";
 import { createNurtureScenarioModule } from "@the-nurture/scenario";
 import {
+  acknowledgeNurtureUserAttention,
   resolveNurtureUserAttention,
+  type NurtureUserAttentionAcknowledgeOutcome,
   type NurtureUserAttentionResolution,
 } from "@the-nurture/scenario";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
@@ -42,6 +44,13 @@ export type NurtureApp = {
     source_context_refs: readonly DomainContextRef[];
     actor_user_id?: string;
   }): Promise<NurtureUserAttentionResolution>;
+  acknowledgeUserAttention(input: {
+    workspace_id: string;
+    source_context_refs: readonly DomainContextRef[];
+    actor_user_id: string;
+    expected_item_version: number;
+    idempotency_key: string;
+  }): Promise<NurtureUserAttentionAcknowledgeOutcome>;
   disconnect(): Promise<void>;
 };
 
@@ -103,6 +112,7 @@ export const createNurtureApp = (
     presenters,
     scenarioRepositories: createScenarioRepositories(nurturePrisma),
     resolveUserAttention: (input) => resolveNurtureUserAttention(handlerDeps, input),
+    acknowledgeUserAttention: (input) => acknowledgeNurtureUserAttention(handlerDeps, input),
     async disconnect() {
       await Promise.all([nurturePrisma.$disconnect(), devHostPrisma.$disconnect()]);
     },

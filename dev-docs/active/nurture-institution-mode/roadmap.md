@@ -17,6 +17,7 @@ My-Chat 拥有统一成人账号、受保护的平台 Child/Family identity、st
 | Nurture dependency boundary | T-002: Nurture leg of `X-2`, `RB-2`, `RB-3(a)` | Complete | Registry UI package, public My-Chat exports, exact source pin, strict scanner and X5 remain green. |
 | Wave 4 P1/P2/P3 repair and adoption | My-Chat/T-028 + The-Nurture/T-002 | Complete, default-deny | My-Chat `a4768fe`, Base `5c04dce`, and Nurture main `ab92fde` are adopted. Exact two-database X5 and Nurture main CI `30412303062` pass; Nurture source hash remains `354bb2...c83f`. |
 | Nurture remaining scope | T-002: `RB-6`, `DB-4(b)`, `ST-2`, `ST-4(c)`, `ST-6(b)` | Framework/governance complete; handoff open | Preserve the M4 API/env/port gates, complete T-004 Contract Boundary, then regenerate the exact M5 handoff. |
+| Typed user-attention Dashboard contract | T-002 owner-path follow-up (My-Chat `8d508f1` Dashboard loop; surfaced by the T-009 pin rotation) | Complete (2026-08-08) | `19-t002-user-attention-dashboard-contract.md`: owner resolve serves `nurture_attention_v1` items and the new acknowledge route enforces `expected_item_version`/`idempotency_key`; X5 joint lane green at My-Chat `df7a273b`. |
 | Enablement | Cross-repo | Closed | No staging, production, capability, provider, or external traffic activation from this overlay. |
 
 The Base publication -> My-Chat exact adoption/re-pin -> Nurture

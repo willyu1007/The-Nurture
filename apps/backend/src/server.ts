@@ -69,6 +69,46 @@ export const buildServer = (
     );
   });
 
+  fastify.post<{
+    Body: {
+      workspace_id?: string;
+      source_context_refs?: DomainContextRef[];
+      actor_user_id?: string;
+      expected_item_version?: number;
+      idempotency_key?: string;
+    };
+  }>("/internal/nurture/activation/user-attention/acknowledge", async (req, reply) => {
+    if (!options.internalServiceToken) {
+      return reply.code(503).send({ error: "activation_owner_disabled" });
+    }
+    if (!authorized(req.headers.authorization, options.internalServiceToken)) {
+      return reply.code(401).send({ error: "service_auth_required" });
+    }
+    const body = req.body;
+    if (
+      !body?.workspace_id ||
+      !Array.isArray(body.source_context_refs) ||
+      typeof body.actor_user_id !== "string" ||
+      body.actor_user_id.length === 0 ||
+      !Number.isSafeInteger(body.expected_item_version) ||
+      (body.expected_item_version as number) < 1 ||
+      typeof body.idempotency_key !== "string" ||
+      body.idempotency_key.length === 0 ||
+      body.idempotency_key.length > 200
+    ) {
+      return reply.code(400).send({ error: "invalid_owner_action_request" });
+    }
+    return reply.send(
+      await app.acknowledgeUserAttention({
+        workspace_id: body.workspace_id,
+        source_context_refs: body.source_context_refs,
+        actor_user_id: body.actor_user_id,
+        expected_item_version: body.expected_item_version as number,
+        idempotency_key: body.idempotency_key,
+      }),
+    );
+  });
+
   // POST /api/workflow/runs — start a run (persists run + seeds steps).
   fastify.post<{
     Body: {

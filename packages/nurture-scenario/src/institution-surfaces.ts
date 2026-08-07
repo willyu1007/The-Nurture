@@ -12,6 +12,7 @@ import {
 } from "./domain/institution/institution-resolver.js";
 import {
   NurtureUserAttentionService,
+  type NurtureUserAttentionAcknowledgeOutcome,
   type NurtureUserAttentionResolution,
 } from "./domain/institution/user-attention-activation.js";
 
@@ -251,6 +252,22 @@ export const resolveNurtureUserAttention = async (
     return { status: "stopped", reason_code: "target_unavailable" };
   }
   return new NurtureUserAttentionService(deps.repositories.userAttention).resolve(input);
+};
+
+export const acknowledgeNurtureUserAttention = async (
+  deps: NurtureHandlerDeps,
+  input: {
+    workspace_id: string;
+    source_context_refs: readonly DomainContextRef[];
+    actor_user_id: string;
+    expected_item_version: number;
+    idempotency_key: string;
+  },
+): Promise<NurtureUserAttentionAcknowledgeOutcome> => {
+  if (!deps.repositories.userAttention) {
+    return { status: "rejected", reason_code: "target_unavailable" };
+  }
+  return new NurtureUserAttentionService(deps.repositories.userAttention).acknowledge(input);
 };
 
 export const createInstitutionInternalApiHandlers = (

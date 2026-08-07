@@ -537,6 +537,92 @@ describe("N1 family-care Postgres journey", () => {
     ).resolves.toEqual({ status: "stopped", reason_code: "grant_revoked" });
   });
 
+  it("acknowledges through the owner action with idempotent replay and version fencing", async () => {
+    const fixture = await seedFixture();
+    const captured = await capture(fixture, randomUUID());
+    const owner = new NurtureUserAttentionService(repositories.userAttention!);
+    const source_context_refs = [
+      familyCareRef("family_care_message", captured.message.id, 1),
+      familyCareRef("child_link_receipt", captured.receipt.id, 1),
+      familyCareRef("family_care_item", captured.item.id, 1),
+    ];
+    const actor = { actor_user_id: fixture.caregiver.myChatUserId };
+
+    await expect(
+      owner.resolve({ workspace_id: fixture.workspaceId, source_context_refs, ...actor }),
+    ).resolves.toMatchObject({
+      status: "ready",
+      item: {
+        presentation_type: "nurture_attention_v1",
+        status: "attention",
+        item_version: 1,
+        available_actions: [{ key: "acknowledge" }],
+      },
+    });
+
+    await expect(
+      owner.acknowledge({
+        workspace_id: fixture.workspaceId,
+        source_context_refs,
+        ...actor,
+        expected_item_version: 5,
+        idempotency_key: "owner-ack-1",
+      }),
+    ).resolves.toEqual({ status: "rejected", reason_code: "version_conflict" });
+
+    const applied = await owner.acknowledge({
+      workspace_id: fixture.workspaceId,
+      source_context_refs,
+      ...actor,
+      expected_item_version: 1,
+      idempotency_key: "owner-ack-1",
+    });
+    expect(applied).toMatchObject({
+      status: "applied",
+      item_version: 2,
+      replayed: false,
+      receipt_ref: { object_type: "user_attention_receipt", version: 2 },
+    });
+
+    await expect(
+      owner.acknowledge({
+        workspace_id: fixture.workspaceId,
+        source_context_refs,
+        ...actor,
+        expected_item_version: 1,
+        idempotency_key: "owner-ack-1",
+      }),
+    ).resolves.toEqual({ ...applied, replayed: true });
+
+    await expect(
+      owner.acknowledge({
+        workspace_id: fixture.workspaceId,
+        source_context_refs,
+        ...actor,
+        expected_item_version: 2,
+        idempotency_key: "owner-ack-2",
+      }),
+    ).resolves.toEqual({ status: "rejected", reason_code: "version_conflict" });
+
+    await expect(
+      owner.resolve({ workspace_id: fixture.workspaceId, source_context_refs, ...actor }),
+    ).resolves.toMatchObject({
+      status: "ready",
+      item: { status: "acknowledged", item_version: 2, available_actions: [] },
+    });
+
+    await expect(
+      prisma.nurtureFamilyCareItem.findUniqueOrThrow({ where: { id: captured.item.id } }),
+    ).resolves.toMatchObject({
+      status: "acknowledged",
+      version: 1,
+      ackedByParticipantId: fixture.caregiver.id,
+    });
+    await expect(
+      prisma.nurtureChildLinkReceipt.findUniqueOrThrow({ where: { id: captured.receipt.id } }),
+    ).resolves.toMatchObject({ status: "acknowledged", version: 1 });
+  });
+
   it("acknowledges and writes a caregiver-confirmed family reply in the same private thread", async () => {
     const fixture = await seedFixture();
     const captured = await capture(fixture, randomUUID());
