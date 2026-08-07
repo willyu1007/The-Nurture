@@ -7,8 +7,6 @@ import type {
   ProtectedContentWritePort,
   RawBoardSourceHead,
   RawGuardianActivity,
-  RawGuardianCharter,
-  RawGuardianFocusGoal,
 } from "@the-nurture/scenario/harness";
 import { assertProtectedContentEnvelopeV1 } from "@the-nurture/scenario/harness";
 import {
@@ -47,24 +45,6 @@ const strictlyAfter = (before: BoardSortKeyV1, timeField: "committedAt" | "updat
  * The last rank in the frozen `priority` vocabulary (1..99). A goal the owner
  * never ranked sorts last, and says so, rather than being silently coalesced
  * into a rank the family never chose.
- */
-const UNRANKED_FOCUS_PRIORITY = 99;
-
-/** The family's own safe title for its charter, never a lifecycle column. */
-const readCharterLabel = (payload: unknown): string => {
-  if (typeof payload === "object" && payload !== null) {
-    const label = (payload as { safeLabel?: unknown }).safeLabel;
-    if (typeof label === "string" && label.length > 0) return label;
-  }
-  return "family_charter";
-};
-
-/**
- * The publishable data classes and the activity kinds the family board shows.
- * The mapping is explicit and total: the earlier fallback branch sent every
- * other class to `media`, so a released `daily_care_log` publication appeared
- * on the family board as a photo. Only publishable classes reach a release, so
- * the map is closed over exactly those two.
  */
 const PUBLISHABLE_DATA_CLASSES = ["daily_care_log", "child_growth_record"] as const;
 
@@ -389,189 +369,10 @@ export class PrismaGuardianBoardReadPort implements GuardianBoardReadPort {
         grant_head: censusHead("guardian.grant", grantCensus),
       },
       eligible_enrollments: allEligibleEnrollments,
-      // Owner-issued eligibility. The Guardian may adjust current focus because
-      // the focus owner accepts the write, not because the role reads "guardian".
+      // Owner-issued eligibility. (The guardian current-focus write was ceded
+      // to My-Chat cultivation in surface contract 1.16.0 — D-T009-01.)
       surface_action_grants: [],
-      module_action_grants: {
-        guardian_current_focus: [
-          {
-            capability_key: "update_guardian_current_focus",
-            capability_version: "1.0.0",
-            availability: "available",
-          },
-        ],
-      },
-    };
-  }
-
-  async loadGuardianCurrentFocus(input: {
-    workspace_id: string;
-    participant_id: string;
-    bind_family_id?: string;
-    snapshot_at: string;
-  }): Promise<{
-    authorized: boolean;
-    charter?: RawGuardianCharter;
-    goals: RawGuardianFocusGoal[];
-    heads: RawBoardSourceHead[];
-  }> {
-    const at = new Date(input.snapshot_at);
-    const reach = await this.resolveReach(
-      input.workspace_id,
-      input.participant_id,
-      at,
-      input.bind_family_id,
-    );
-    if (!reach) return { authorized: false, goals: [], heads: [] };
-
-    const grantCensus = await this.grantCensus(input.workspace_id, reach.child_care_process_id);
-    // The family charter and focus cycle are the family's own records: they
-    // never travelled through a Grant, so there is no Grant for them to be
-    // visible through. Gating them on the family's unrelated institution grants
-    // would hide a family's own goals the moment it left an institution.
-    const authority = {
-      guardian_authority_current: true,
-      child_association_exact: true,
-      enrollment_visible: true,
-      grant_visible: true,
-      purpose_allowed: true,
-    };
-
-    const charterRow = await this.prisma.nurtureFamilyCharter.findFirst({
-      where: {
-        workspaceId: input.workspace_id,
-        familyRefKey: reach.family_ref_key,
-        status: "active",
-        deletedAt: null,
-      },
-      include: { items: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] } },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    });
-
-    const cycles = await this.prisma.nurtureFocusCycle.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        familyRefKey: reach.family_ref_key,
-        status: "active",
-        deletedAt: null,
-      },
-      include: {
-        goals: {
-          include: {
-            childScopes: {
-              where: { deletedAt: null },
-              include: {
-                childCareProcess: { include: { child: { select: { displayName: true } } } },
-              },
-              orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-            },
-          },
-          orderBy: [{ priority: "asc" }, { createdAt: "desc" }, { id: "asc" }],
-        },
-      },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    });
-
-    const goals: RawGuardianFocusGoal[] = [];
-    for (const cycle of cycles) {
-      for (const goal of cycle.goals) {
-        // Child scope comes from the explicit scope fact only. A child hint
-        // inside `goalPayload` never becomes a child focus card.
-        const scope = goal.childScopes[0];
-        goals.push({
-          goal_id: goal.id,
-          cycle_id: cycle.id,
-          label: goal.goalKey ?? "",
-          // The owner's priority column is nullable and it is this lane's primary
-          // sort term. `?? 99` invented a rank; an unranked goal sorts last by
-          // being given the vocabulary's last value explicitly, and the reason
-          // is recorded rather than hidden in a coalesce.
-          priority: goal.priority ?? UNRANKED_FOCUS_PRIORITY,
-          occurred_at: goal.updatedAt.toISOString(),
-          source_label: "family_focus_cycle",
-          child_scope_explicit: Boolean(scope),
-          ...(scope
-            ? {
-                child_care_process_id: scope.childCareProcessId,
-                child_safe_label: scope.childCareProcess.child.displayName ?? "",
-              }
-            : {}),
-          authority,
-          action_grants: [
-            {
-              capability_key: "update_guardian_current_focus",
-              capability_version: "1.0.0",
-              availability: "available" as const,
-              target_option_id: goal.id,
-              target_kind: "focus_goal",
-            },
-          ],
-        });
-      }
-    }
-
-    const heads: RawBoardSourceHead[] = [
-      ...cycles.map((cycle) => ({
-        source_kind: "focus_cycle" as const,
-        source_id: cycle.id,
-        fact_version: cycle.aggregateVersion,
-        ...sourceHeadPair(
-          "focus_cycle",
-          [cycle.status, cycle.deletedAt?.toISOString() ?? null, cycle.updatedAt.toISOString()],
-          grantCensus,
-        ),
-      })),
-      ...(charterRow
-        ? [
-            {
-              source_kind: "family_charter" as const,
-              source_id: charterRow.id,
-              fact_version: charterRow.aggregateVersion,
-              ...sourceHeadPair(
-                "family_charter",
-                [
-                  charterRow.status,
-                  charterRow.deletedAt?.toISOString() ?? null,
-                  charterRow.updatedAt.toISOString(),
-                ],
-                grantCensus,
-              ),
-            },
-          ]
-        : []),
-    ];
-
-    // Exactly GUARDIAN_CURRENT_FOCUS_ORDER. The rows come from several cycles,
-    // so the database can only order within each one; emitting them cycle-major
-    // made two active cycles read 1, 2, 1, 2 against an advertised
-    // `priority_asc`. The lane is a single page, so the sort is total here.
-    goals.sort((left, right) =>
-      left.priority !== right.priority
-        ? left.priority - right.priority
-        : left.occurred_at !== right.occurred_at
-          ? right.occurred_at.localeCompare(left.occurred_at)
-          : left.goal_id.localeCompare(right.goal_id),
-    );
-
-    return {
-      authorized: true,
-      ...(charterRow
-        ? {
-            charter: {
-              charter_id: charterRow.id,
-              // A safe label, never the lifecycle column: families were shown a
-              // charter titled "active".
-              label: readCharterLabel(charterRow.charterPayload),
-              items: charterRow.items.map((item) => ({
-                item_id: item.id,
-                label: item.itemKey ?? "",
-              })),
-              authority,
-            },
-          }
-        : {}),
-      goals,
-      heads,
+      module_action_grants: {},
     };
   }
 

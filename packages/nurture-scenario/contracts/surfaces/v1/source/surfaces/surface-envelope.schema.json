@@ -332,7 +332,6 @@
         },
         "kind": {
           "enum": [
-            "guardian_current_focus",
             "guardian_enrollment_activity",
             "caregiver_child_today",
             "caregiver_family_care_work",

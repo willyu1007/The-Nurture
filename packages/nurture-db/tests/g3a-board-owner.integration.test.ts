@@ -7,7 +7,6 @@ import {
   PrismaCaregiverBoardReadPort,
   PrismaCaregiverDailyCareEligibilityReadPort,
   PrismaGuardianBoardReadPort,
-  PrismaGuardianFocusEligibilityReadPort,
 } from "../src/index.js";
 
 // Owner-side proof for the G3-A board ports (G3-E prerequisite B2). The domain
@@ -145,45 +144,6 @@ const seedWorld = async () => {
 
 type World = Awaited<ReturnType<typeof seedWorld>>;
 
-const seedFocus = async (world: World) => {
-  const cycle = await prisma.nurtureFocusCycle.create({
-    data: {
-      workspaceId: world.workspaceId,
-      familyRefKey: world.familyRefKey,
-      familyRef: { service: "my_chat", object_type: "family" },
-      status: "active",
-    },
-  });
-  const familyGoal = await prisma.nurtureFocusGoal.create({
-    data: {
-      workspaceId: world.workspaceId,
-      focusCycleId: cycle.id,
-      familyRefKey: world.familyRefKey,
-      goalKey: "family_rhythm",
-      priority: 1,
-      // A child hint in the payload is not a child scope fact.
-      goalPayload: { mentionsChild: world.process.id },
-    },
-  });
-  const childGoal = await prisma.nurtureFocusGoal.create({
-    data: {
-      workspaceId: world.workspaceId,
-      focusCycleId: cycle.id,
-      familyRefKey: world.familyRefKey,
-      goalKey: "child_sleep",
-      priority: 2,
-    },
-  });
-  await prisma.nurtureFocusGoalChildScope.create({
-    data: {
-      workspaceId: world.workspaceId,
-      focusGoalId: childGoal.id,
-      childCareProcessId: world.process.id,
-    },
-  });
-  return { cycle, familyGoal, childGoal };
-};
-
 describe("G3-A owner reads: guardian lane", () => {
   it("binds the family scope while offering every reachable family's enrollments", async () => {
     const world = await seedWorld();
@@ -304,24 +264,6 @@ describe("G3-A owner reads: guardian lane", () => {
       snapshot_at: SNAPSHOT_AT,
     });
     expect(scope.authorized).toBe(false);
-  });
-
-  it("makes a goal a child focus only through an explicit child scope row", async () => {
-    const world = await seedWorld();
-    const focus = await seedFocus(world);
-    const reads = new PrismaGuardianBoardReadPort(prisma);
-    const result = await reads.loadGuardianCurrentFocus({
-      workspace_id: world.workspaceId,
-      participant_id: world.guardian.id,
-      snapshot_at: SNAPSHOT_AT,
-    });
-    expect(result.authorized).toBe(true);
-    const byId = new Map(result.goals.map((goal) => [goal.goal_id, goal]));
-    expect(byId.get(focus.familyGoal.id)?.child_scope_explicit).toBe(false);
-    expect(byId.get(focus.familyGoal.id)?.child_care_process_id).toBeUndefined();
-    expect(byId.get(focus.childGoal.id)?.child_scope_explicit).toBe(true);
-    expect(byId.get(focus.childGoal.id)?.child_care_process_id).toBe(world.process.id);
-    expect(result.heads.map((head) => head.source_kind)).toContain("focus_cycle");
   });
 
   it("moves the grant drift head when a Grant is revoked and nothing else changes", async () => {
@@ -715,114 +657,6 @@ describe("G3-A owner reads: caregiver lane", () => {
 });
 
 describe("G3-A owner writes: inline board mutations", () => {
-  it("offers focus targets only to a guardian who currently holds that family", async () => {
-    const world = await seedWorld();
-    const focus = await seedFocus(world);
-    const eligibility = new PrismaGuardianFocusEligibilityReadPort(prisma);
-
-    const guardianView = await eligibility.resolveGuardianFocusEligibility({
-      workspace_id: world.workspaceId,
-      participant_id: world.guardian.id,
-    });
-    expect(guardianView.participant_active).toBe(true);
-    expect(guardianView.goals.map((goal) => goal.focus_goal_id).sort()).toEqual(
-      [focus.familyGoal.id, focus.childGoal.id].sort(),
-    );
-
-    const outsiderView = await eligibility.resolveGuardianFocusEligibility({
-      workspace_id: world.workspaceId,
-      participant_id: world.outsider.id,
-    });
-    expect(outsiderView).toEqual({ participant_active: true, goals: [] });
-  });
-
-  it("writes the focus goal owner row and refuses a stale expected version", async () => {
-    const world = await seedWorld();
-    const focus = await seedFocus(world);
-    const transaction = new PrismaBoardMutationTransaction(prisma);
-
-    const facts = await transaction.loadGuardianFocusGoalFacts({
-      workspace_id: world.workspaceId,
-      participant_id: world.guardian.id,
-      focus_goal_id: focus.familyGoal.id,
-    });
-    expect(facts.guardian_authority_current).toBe(true);
-    expect(facts.child_scope_explicit).toBe(false);
-
-    const applied = await transaction.applyGuardianFocusGoalUpdate({
-      workspace_id: world.workspaceId,
-      participant_id: world.guardian.id,
-      focus_goal_id: focus.familyGoal.id,
-      focus_cycle_id: focus.cycle.id,
-      label: "new rhythm",
-      priority: 3,
-      expected_focus_goal_version: facts.focus_goal_version,
-    });
-    expect(applied.revision).toBe(facts.focus_goal_version + 1);
-    const stored = await prisma.nurtureFocusGoal.findUniqueOrThrow({
-      where: { id: focus.familyGoal.id },
-    });
-    expect(stored.goalKey).toBe("new rhythm");
-    expect(stored.priority).toBe(3);
-
-    // The second write carries the version it read before the first one landed.
-    await expect(
-      transaction.applyGuardianFocusGoalUpdate({
-        workspace_id: world.workspaceId,
-        participant_id: world.guardian.id,
-        focus_goal_id: focus.familyGoal.id,
-        focus_cycle_id: focus.cycle.id,
-        label: "conflicting",
-        priority: 4,
-        expected_focus_goal_version: facts.focus_goal_version,
-      }),
-    ).rejects.toThrow(/version conflict/);
-    const unchanged = await prisma.nurtureFocusGoal.findUniqueOrThrow({
-      where: { id: focus.familyGoal.id },
-    });
-    expect(unchanged.goalKey).toBe("new rhythm");
-  });
-
-  it("denies a guardian of another family in the same workspace", async () => {
-    const world = await seedWorld();
-    const focus = await seedFocus(world);
-    // A second, unrelated family inside the same workspace. Its guardian is a
-    // current guardian — just not of the family this goal belongs to.
-    const siblingChild = await prisma.nurtureChild.create({
-      data: { workspaceId: world.workspaceId, displayName: "Child B", status: "active" },
-    });
-    const siblingProcess = await prisma.nurtureChildCareProcess.create({
-      data: { workspaceId: world.workspaceId, childId: siblingChild.id, status: "active" },
-    });
-    await prisma.nurtureFamily.create({
-      data: {
-        workspaceId: world.workspaceId,
-        childCareProcessId: siblingProcess.id,
-        displayName: "Family B",
-        status: "active",
-      },
-    });
-    await prisma.nurtureCareRoleAssignment.create({
-      data: {
-        workspaceId: world.workspaceId,
-        participantId: world.outsider.id,
-        role: "guardian",
-        scopeType: "child_care_process",
-        scopeId: siblingProcess.id,
-        status: "active",
-      },
-    });
-
-    const transaction = new PrismaBoardMutationTransaction(prisma);
-    const facts = await transaction.loadGuardianFocusGoalFacts({
-      workspace_id: world.workspaceId,
-      participant_id: world.outsider.id,
-      focus_goal_id: focus.familyGoal.id,
-    });
-    expect(facts.participant_active).toBe(true);
-    expect(facts.guardian_authority_current).toBe(false);
-  });
-
   it("records daily care on the owner table only for the exact CareGroup", async () => {
     const world = await seedWorld();
     const eligibility = new PrismaCaregiverDailyCareEligibilityReadPort(prisma);

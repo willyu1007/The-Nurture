@@ -21,7 +21,6 @@ import {
   parseReplyFamilyCareItemInputV1,
   parseRecordCaregiverDailyCareInputV1,
   parseSubmitFamilyCareQuestionInputV1,
-  parseUpdateGuardianCurrentFocusInputV1,
   parseCancelPublishProcessInputV1,
   parseRescheduleInputV1,
   parsePublishEditHoldInputV1,
@@ -34,7 +33,6 @@ import {
   prepareReplyFamilyCareItem,
   prepareRecordCaregiverDailyCare,
   prepareSubmitFamilyCareQuestion,
-  prepareUpdateGuardianCurrentFocus,
   prepareWithdrawFamilyCareRequest,
   preparePublishProcessCancel,
   prepareReschedulePublishProcess,
@@ -70,7 +68,6 @@ import {
   createCancelPublishProcessSpec,
   createReschedulePublishProcessSpec,
   createRecordCaregiverDailyCareSpec,
-  createUpdateGuardianCurrentFocusSpec,
   loadBoardSurfaceRegistration,
   loadSurfaceContractPin,
   presentCaregiverTeacherBoard,
@@ -78,7 +75,6 @@ import {
   queryCaregiverChildToday,
   queryCaregiverFamilyCareWork,
   queryFamilyCareItemDetail,
-  queryGuardianCurrentFocus,
   queryGuardianEnrollmentActivity,
   queryGuardianFamilyCareTimeline,
   issueBoardSealedRef,
@@ -114,7 +110,6 @@ import {
   PrismaCaregiverDirectMessageEligibilityReadPort,
   PrismaFamilyCareHarnessQueryReadPort,
   PrismaGuardianBoardReadPort,
-  PrismaGuardianFocusEligibilityReadPort,
   PrismaMediaSafetyReadPort,
   PrismaCareCaptureReadPort,
   PrismaPublicationReleasePort,
@@ -232,7 +227,6 @@ export function createHarnessEngine(input: {
   const guardianBoardReads = new PrismaGuardianBoardReadPort(input.prisma, protectedContent);
   // Prepare only reads: it enumerates the targets the fact owner would accept a
   // write for. The write itself happens inside the command transaction.
-  const guardianFocusEligibility = new PrismaGuardianFocusEligibilityReadPort(input.prisma);
   const caregiverDailyCareEligibility = new PrismaCaregiverDailyCareEligibilityReadPort(
     input.prisma,
   );
@@ -271,9 +265,6 @@ export function createHarnessEngine(input: {
     integrity_key: input.integrityKey,
   });
   const policyRedactSpec = createRedactFamilyCareMessageSpec("policy", {
-    integrity_key: input.integrityKey,
-  });
-  const updateGuardianFocusSpec = createUpdateGuardianCurrentFocusSpec({
     integrity_key: input.integrityKey,
   });
   const recordDailyCareSpec = createRecordCaregiverDailyCareSpec({
@@ -700,35 +691,6 @@ export function createHarnessEngine(input: {
         preparePolicyRedactFamilyCareMessage(lifecycleDeps, request),
       ),
       build: buildRedactCommand("policy"),
-    },
-    update_guardian_current_focus: {
-      prepare: optionalTarget((request) =>
-        prepareUpdateGuardianCurrentFocus(
-          {
-            eligibility: guardianFocusEligibility,
-            contexts,
-            integrity_key: input.integrityKey,
-          },
-          request,
-        ),
-      ),
-      build: (built) => {
-        const parsed = parseUpdateGuardianCurrentFocusInputV1(built.operation_input);
-        const focusGoalId = built.target_refs.focus_goal;
-        const focusCycleId = built.target_refs.focus_cycle;
-        if (parsed.status !== "ok" || !focusGoalId || !focusCycleId) return null;
-        return {
-          payload: {
-            label: parsed.input.label,
-            priority: parsed.input.priority,
-            focus_goal_id: focusGoalId,
-            focus_cycle_id: focusCycleId,
-            expected_focus_cycle_version: built.expected_heads.focus_cycle ?? 0,
-            expected_focus_goal_version: built.expected_heads.focus_goal ?? 0,
-          },
-          spec: updateGuardianFocusSpec as NurtureCommandSpec<never>,
-        };
-      },
     },
     record_caregiver_daily_care: {
       prepare: optionalTarget((request) =>
@@ -1243,14 +1205,6 @@ export function createHarnessEngine(input: {
             ...(request.page_size !== undefined ? { page_size: request.page_size } : {}),
           },
         );
-      }
-      if (request.capability_key === "query_guardian_current_focus") {
-        return queryGuardianCurrentFocus(guardianDeps, {
-          ...scope,
-          ...(request.target_option_ref
-            ? { enrollment_target_ref: request.target_option_ref }
-            : {}),
-        });
       }
       if (request.capability_key === "query_guardian_enrollment_activity") {
         if (!request.target_option_ref) {

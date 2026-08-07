@@ -28,12 +28,6 @@
   ],
   "boardModules": [
     {
-      "kind": "guardian_current_focus",
-      "required": true,
-      "capabilityKey": "query_guardian_current_focus",
-      "capabilityVersion": "1.0.0"
-    },
-    {
       "kind": "guardian_enrollment_activity",
       "required": true,
       "capabilityKey": "query_guardian_enrollment_activity",
@@ -48,7 +42,6 @@
     "submit_family_care_question",
     "withdraw_family_care_request",
     "correct_family_care_message",
-    "redact_family_care_message",
-    "update_guardian_current_focus"
+    "redact_family_care_message"
   ]
 }

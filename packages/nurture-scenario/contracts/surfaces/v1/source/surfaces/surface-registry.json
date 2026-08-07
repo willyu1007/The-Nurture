@@ -45,7 +45,6 @@
       "stateWhenDependenciesMissing": "needs_setup",
       "presenterBinding": "present_guardian_family_board",
       "orderedContentKinds": [
-        "guardian_current_focus",
         "guardian_enrollment_activity",
         "institution_workflow_projection"
       ],

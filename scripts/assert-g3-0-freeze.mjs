@@ -117,8 +117,9 @@ const expectedSurfaces = {
   guardian_family_board: {
     version: "1.0.0",
     presenter: "present_guardian_family_board",
+    // guardian_current_focus was ceded to My-Chat cultivation in surface
+    // contract 1.16.0 (T-009 D-T009-01).
     modules: [
-      "guardian_current_focus",
       "guardian_enrollment_activity",
       "institution_workflow_projection",
     ],
@@ -240,6 +241,10 @@ const dbContext = readJson("docs/context/db/schema.json");
 const requiredFactTables = [
   "NurtureFamilyCharter",
   "NurtureFamilyCharterItem",
+  // T-009 provider outbox + receipt store: outbound contract events and
+  // consumed admission receipts, never board rows (D-T009-07).
+  "NurtureFamilyGrowthAdmissionReceipt",
+  "NurtureFamilyGrowthOutboxEvent",
   "NurtureFocusCycle",
   "NurtureFocusGoal",
   "NurtureDailyCareLog",
@@ -307,6 +312,8 @@ const expectedTableCensus = [
   "NurtureFamilyCareThreadParticipant",
   "NurtureFamilyCharter",
   "NurtureFamilyCharterItem",
+  "NurtureFamilyGrowthAdmissionReceipt",
+  "NurtureFamilyGrowthOutboxEvent",
   "NurtureFamilyPolicy",
   "NurtureFamilyProfileSnapshot",
   "NurtureFamilyQuantificationSnapshot",
@@ -521,13 +528,13 @@ for (const requiredText of [
 // The adoption set reserves semantic identities; a key may only appear in the
 // registry once its checkpoint actually implemented it, and every new key
 // starts at 1.0.0.
+// query/update_guardian_current_focus were adopted in G3-A and RETIRED in
+// surface contract 1.16.0 (T-009 D-T009-01, cession to My-Chat cultivation).
 const adoptedInG3A = [
   "query_guardian_family_board",
-  "query_guardian_current_focus",
   "query_guardian_enrollment_activity",
   "query_caregiver_teacher_board",
   "query_caregiver_child_today",
-  "update_guardian_current_focus",
   "record_caregiver_daily_care",
 ];
 const adoptedInG3B1 = [
@@ -656,8 +663,17 @@ const reservedKeys = [
 // Exact, not a floor: `>= 18` let the adoption set grow without anyone
 // declaring it, which is the opposite of a closed set.
 assertEqual(reservedKeys.length, 19, "adoption set reserves exactly its declared capability keys");
+// Reserved by the G3-0 freeze, implemented in G3-A, then RETIRED in surface
+// contract 1.16.0: the guardian current-focus pair was ceded to My-Chat
+// cultivation (T-009 D-T009-01). The identities stay reserved so no future
+// capability can silently reuse them.
+const retiredInSurface1160 = [
+  "query_guardian_current_focus",
+  "update_guardian_current_focus",
+];
 const accountedFor = new Set([
   ...adoptedInG3A,
+  ...retiredInSurface1160,
   ...adoptedInG3B1,
   ...adoptedInG3C1,
   ...adoptedInG3D,

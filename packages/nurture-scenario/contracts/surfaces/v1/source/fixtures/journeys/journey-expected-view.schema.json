@@ -15,19 +15,34 @@
     "writeActionKeys"
   ],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "const": 1
+    },
     "journeyKey": {
       "$ref": "journey-initial-state.schema.json#/$defs/journeyKey"
     },
-    "stepKey": { "$ref": "journey-script.schema.json#/$defs/stepKey" },
-    "surfaceKey": { "$ref": "journey-script.schema.json#/$defs/surfaceKey" },
-    "actor": { "$ref": "journey-script.schema.json#/$defs/principalActor" },
+    "stepKey": {
+      "$ref": "journey-script.schema.json#/$defs/stepKey"
+    },
+    "surfaceKey": {
+      "$ref": "journey-script.schema.json#/$defs/surfaceKey"
+    },
+    "actor": {
+      "$ref": "journey-script.schema.json#/$defs/principalActor"
+    },
     "surfaceState": {
-      "enum": ["ready", "limited", "needs_setup", "unavailable"]
+      "enum": [
+        "ready",
+        "limited",
+        "needs_setup",
+        "unavailable"
+      ]
     },
     "careItems": {
       "type": "array",
-      "items": { "$ref": "#/$defs/careItemView" }
+      "items": {
+        "$ref": "#/$defs/careItemView"
+      }
     },
     "writeActionKeys": {
       "type": "array",
@@ -38,23 +53,28 @@
     "boardModules": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/boardModuleView" }
+      "items": {
+        "$ref": "#/$defs/boardModuleView"
+      }
     },
     "absentModuleKinds": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/boardModuleKind" }
+      "items": {
+        "$ref": "#/$defs/boardModuleKind"
+      }
     },
     "dependencyNoGos": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/dependencyNoGoView" }
+      "items": {
+        "$ref": "#/$defs/dependencyNoGoView"
+      }
     }
   },
   "$defs": {
     "boardModuleKind": {
       "enum": [
-        "guardian_current_focus",
         "guardian_enrollment_activity",
         "caregiver_child_today",
         "caregiver_family_care_work",
@@ -65,23 +85,40 @@
     "boardModuleView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "required", "capabilityKey", "capabilityVersion"],
+      "required": [
+        "kind",
+        "required",
+        "capabilityKey",
+        "capabilityVersion"
+      ],
       "properties": {
-        "kind": { "$ref": "#/$defs/boardModuleKind" },
-        "required": { "type": "boolean" },
+        "kind": {
+          "$ref": "#/$defs/boardModuleKind"
+        },
+        "required": {
+          "type": "boolean"
+        },
         "capabilityKey": {
           "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
         },
         "capabilityVersion": {
           "$ref": "../../interface/contract-primitives.schema.json#/$defs/semver"
         },
-        "count": { "type": "integer", "minimum": 0 }
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     "dependencyNoGoView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["dependencyKey", "requiredVersion", "reason", "retryHint"],
+      "required": [
+        "dependencyKey",
+        "requiredVersion",
+        "reason",
+        "retryHint"
+      ],
       "properties": {
         "dependencyKey": {
           "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
@@ -90,17 +127,33 @@
           "$ref": "../../interface/contract-primitives.schema.json#/$defs/semver"
         },
         "reason": {
-          "enum": ["missing", "unqualified", "unavailable", "contract_mismatch"]
+          "enum": [
+            "missing",
+            "unqualified",
+            "unavailable",
+            "contract_mismatch"
+          ]
         },
         "retryHint": {
-          "enum": ["retry", "setup", "required_upgrade", "contact_admin", "none"]
+          "enum": [
+            "retry",
+            "setup",
+            "required_upgrade",
+            "contact_admin",
+            "none"
+          ]
         }
       }
     },
     "careItemView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["itemRef", "acknowledgementState", "responseState", "lifecycle"],
+      "required": [
+        "itemRef",
+        "acknowledgementState",
+        "responseState",
+        "lifecycle"
+      ],
       "properties": {
         "itemRef": {
           "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
@@ -108,17 +161,41 @@
         "enrollmentRef": {
           "$ref": "../world/synthetic-world.schema.json#/$defs/syntheticId"
         },
-        "acknowledgementState": { "enum": ["pending", "acknowledged"] },
-        "responseState": { "enum": ["awaiting_reply", "responded"] },
-        "lifecycle": { "enum": ["active", "closed", "suppressed"] },
-        "attentionState": { "enum": ["active", "resolved", "suppressed"] },
+        "acknowledgementState": {
+          "enum": [
+            "pending",
+            "acknowledged"
+          ]
+        },
+        "responseState": {
+          "enum": [
+            "awaiting_reply",
+            "responded"
+          ]
+        },
+        "lifecycle": {
+          "enum": [
+            "active",
+            "closed",
+            "suppressed"
+          ]
+        },
+        "attentionState": {
+          "enum": [
+            "active",
+            "resolved",
+            "suppressed"
+          ]
+        },
         "messages": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "enum": [

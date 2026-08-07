@@ -263,20 +263,6 @@
       ]
     },
     {
-      "key": "query_guardian_current_focus_eligibility",
-      "version": "1.0.0",
-      "repositoryRefs": [
-        {
-          "key": "binding_owner_repository",
-          "version": "1.0.0"
-        },
-        {
-          "key": "board_projection_repository",
-          "version": "1.0.0"
-        }
-      ]
-    },
-    {
       "key": "query_guardian_enrollment_activity_eligibility",
       "version": "1.0.0",
       "repositoryRefs": [
@@ -510,20 +496,6 @@
         },
         {
           "key": "media_attribution_repository",
-          "version": "1.0.0"
-        }
-      ]
-    },
-    {
-      "key": "update_guardian_current_focus_eligibility",
-      "version": "1.0.0",
-      "repositoryRefs": [
-        {
-          "key": "binding_owner_repository",
-          "version": "1.0.0"
-        },
-        {
-          "key": "board_mutation_repository",
           "version": "1.0.0"
         }
       ]

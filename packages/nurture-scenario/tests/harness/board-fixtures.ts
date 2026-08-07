@@ -18,8 +18,6 @@ import type { PublishProcessStateV1 } from "../../src/harness/publish-process.js
 import type {
   GuardianBoardReadPort,
   GuardianBoardScopeFacts,
-  RawGuardianCharter,
-  RawGuardianFocusGoal,
   RawGuardianActivity,
 } from "../../src/harness/guardian-board-queries.js";
 import type {
@@ -110,21 +108,6 @@ export const sourceHead = (
   ...overrides,
 });
 
-export const focusGoal = (
-  overrides: Partial<RawGuardianFocusGoal> = {},
-): RawGuardianFocusGoal => ({
-  goal_id: "goal-1",
-  cycle_id: "cycle-1",
-  label: "Syn Focus Goal",
-  priority: 1,
-  occurred_at: "2026-08-01T09:00:00.000Z",
-  source_label: "Syn Family Focus",
-  child_scope_explicit: false,
-  authority: guardianAuthority(),
-  action_grants: [],
-  ...overrides,
-});
-
 export const guardianActivity = (
   overrides: Partial<RawGuardianActivity> = {},
 ): RawGuardianActivity => ({
@@ -156,16 +139,12 @@ export type GuardianPortConfig = {
   scope?: Partial<GuardianBoardScopeFacts>;
   /** Full scope facts served for an explicit `bind_family_id` request. */
   families?: Record<string, GuardianBoardScopeFacts>;
-  charter?: RawGuardianCharter;
-  goals?: RawGuardianFocusGoal[];
-  focusHeads?: RawBoardSourceHead[];
   activityPages?: Array<{
     authorized?: boolean;
     rows: RawGuardianActivity[];
     has_more: boolean;
     heads?: RawBoardSourceHead[];
   }>;
-  focusAuthorized?: boolean;
 };
 
 export const createGuardianReadPort = (
@@ -216,15 +195,6 @@ export const createGuardianReadPort = (
         surface_action_grants: [],
         module_action_grants: {},
         ...config.scope,
-      };
-    },
-    async loadGuardianCurrentFocus(input) {
-      snapshotInstants.push(input.snapshot_at);
-      return {
-        authorized: config.focusAuthorized ?? true,
-        ...(config.charter ? { charter: config.charter } : {}),
-        goals: config.goals ?? [],
-        heads: config.focusHeads ?? [sourceHead()],
       };
     },
     async listGuardianEnrollmentActivity(input) {

@@ -1,4 +1,5 @@
 import {
+  issueBoardOpaqueRef,
   issueSnapshotRef,
   projectOwnerActions,
   type BoardActionRefV1,
@@ -7,9 +8,7 @@ import {
   type BoardScopeV1,
 } from "./board-projection.js";
 import {
-  QUERY_GUARDIAN_CURRENT_FOCUS_CAPABILITY,
   QUERY_GUARDIAN_ENROLLMENT_ACTIVITY_CAPABILITY,
-  queryGuardianCurrentFocus,
   queryGuardianEnrollmentActivity,
   type GuardianBoardDependencies,
 } from "./guardian-board-queries.js";
@@ -113,7 +112,6 @@ export type BoardSurfaceRegistrationV1 = {
 const CAREGIVER_DENIED_MODULE_KINDS: readonly string[] = ["institution_workflow_projection"];
 
 const GUARDIAN_MODULE_POLICY: Record<string, { required: boolean }> = {
-  guardian_current_focus: { required: true },
   guardian_enrollment_activity: { required: true },
   institution_workflow_projection: { required: false },
 };
@@ -185,8 +183,6 @@ export const presentGuardianFamilyBoard = async (
 
   // One scope, one instant, shared by every module in this envelope.
   const resolvedScope = { facts: scopeFacts, snapshot_at: generatedAt };
-  const focus = await queryGuardianCurrentFocus(deps, { ...scope, resolved_scope: resolvedScope });
-  if (focus.status !== "ok") return focus;
 
   const enrollmentTargetRef =
     request.enrollment_target_ref ??
@@ -208,20 +204,6 @@ export const presentGuardianFamilyBoard = async (
   if (activity && activity.status !== "ok") return activity;
 
   const modules = new Map<string, BoardModuleV1>();
-  const focusItems = [...focus.output.childFocus, ...focus.output.familyFocus];
-  modules.set("guardian_current_focus", {
-    moduleKey: "guardian_current_focus",
-    kind: "guardian_current_focus",
-    required: true,
-    count: focusItems.length,
-    itemRefs: focusItems.map((card) => card.focusRef),
-    actionRefs: projectOwnerActions(
-      deps.integrity_key,
-      scope,
-      scopeFacts.module_action_grants.guardian_current_focus ?? [],
-    ),
-    pageInfo: focus.output.pageInfo,
-  });
   modules.set("guardian_enrollment_activity", {
     moduleKey: "guardian_enrollment_activity",
     kind: "guardian_enrollment_activity",
@@ -236,7 +218,12 @@ export const presentGuardianFamilyBoard = async (
     ...(activity ? { pageInfo: activity.output.pageInfo } : {}),
   });
 
-  const scopeRef = focus.output.binding.actor.scopeRef;
+  const scopeRef = issueBoardOpaqueRef(
+    deps.integrity_key,
+    scope,
+    "family",
+    scopeFacts.family_id,
+  );
   return {
     status: "ok",
     output: {
@@ -420,7 +407,6 @@ const dedupeActions = (actions: readonly BoardActionRefV1[]): BoardActionRefV1[]
 };
 
 export const BOARD_MODULE_CAPABILITY_BINDINGS = {
-  guardian_current_focus: QUERY_GUARDIAN_CURRENT_FOCUS_CAPABILITY,
   guardian_enrollment_activity: QUERY_GUARDIAN_ENROLLMENT_ACTIVITY_CAPABILITY,
   caregiver_child_today: QUERY_CAREGIVER_CHILD_TODAY_CAPABILITY,
   caregiver_family_care_work: QUERY_CAREGIVER_FAMILY_CARE_WORK_CAPABILITY,

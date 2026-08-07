@@ -1,10 +1,8 @@
 import type { CanonicalRef } from "@my-chat/workflow-contracts";
 import type {
   CaregiverDailyCareEligibilityReadPort,
-  GuardianFocusEligibilityReadPort,
   NurtureBoardMutationTransaction,
   NurtureCaregiverDailyCareFacts,
-  NurtureGuardianFocusGoalFacts,
 } from "@the-nurture/scenario/harness";
 import { activeRoleWindow, type BoardPrisma } from "./board-read-support.js";
 
@@ -18,14 +16,6 @@ const domainRef = (objectType: string, objectId: string, version = 1): DomainCon
   version,
 });
 
-const NO_GUARDIAN_FOCUS_FACTS: NurtureGuardianFocusGoalFacts = {
-  participant_active: false,
-  guardian_authority_current: false,
-  focus_cycle_version: 0,
-  focus_goal_version: 0,
-  child_scope_explicit: false,
-};
-
 const NO_DAILY_CARE_FACTS: NurtureCaregiverDailyCareFacts = {
   participant_active: false,
   caregiver_role: "",
@@ -36,75 +26,6 @@ const NO_DAILY_CARE_FACTS: NurtureCaregiverDailyCareFacts = {
   caregiver_role_version: 0,
   enrollment_version: 0,
 };
-
-/**
- * Prepare-step eligibility for the two G3-A inline board mutations. Prepare
- * only reads: it enumerates the targets the fact owner would currently accept a
- * write for, and the presenter turns those into action refs. A role that reads
- * "guardian" with nothing behind it yields an empty target list.
- */
-export class PrismaGuardianFocusEligibilityReadPort implements GuardianFocusEligibilityReadPort {
-  constructor(private readonly prisma: BoardPrisma) {}
-
-  async resolveGuardianFocusEligibility(input: {
-    workspace_id: string;
-    participant_id: string;
-  }): Promise<{
-    participant_active: boolean;
-    goals: Array<{
-      focus_goal_id: string;
-      focus_cycle_id: string;
-      display_label: string;
-      focus_cycle_version: number;
-      focus_goal_version: number;
-    }>;
-  }> {
-    const now = new Date();
-    const participant = await this.prisma.nurtureParticipant.findFirst({
-      where: {
-        id: input.participant_id,
-        workspaceId: input.workspace_id,
-        status: "active",
-        deletedAt: null,
-      },
-    });
-    if (!participant) return { participant_active: false, goals: [] };
-
-    const familyRefKeys = await guardianFamilyRefKeys(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      now,
-    );
-    if (familyRefKeys.length === 0) return { participant_active: true, goals: [] };
-
-    const cycles = await this.prisma.nurtureFocusCycle.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        familyRefKey: { in: familyRefKeys },
-        status: "active",
-        deletedAt: null,
-      },
-      include: {
-        goals: { orderBy: [{ priority: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
-      },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    });
-
-    return {
-      participant_active: true,
-      goals: cycles.flatMap((cycle) =>
-        cycle.goals.map((goal) => ({
-          focus_goal_id: goal.id,
-          focus_cycle_id: cycle.id,
-          display_label: goal.goalKey ?? "",
-          focus_cycle_version: cycle.aggregateVersion,
-          focus_goal_version: goal.aggregateVersion,
-        })),
-      ),
-    };
-  }
-}
 
 export class PrismaCaregiverDailyCareEligibilityReadPort
   implements CaregiverDailyCareEligibilityReadPort
@@ -196,86 +117,6 @@ export class PrismaCaregiverDailyCareEligibilityReadPort
  */
 export class PrismaBoardMutationTransaction implements NurtureBoardMutationTransaction {
   constructor(private readonly prisma: BoardPrisma) {}
-
-  async loadGuardianFocusGoalFacts(input: {
-    workspace_id: string;
-    participant_id: string;
-    focus_goal_id: string;
-  }): Promise<NurtureGuardianFocusGoalFacts> {
-    const now = new Date();
-    const participant = await this.prisma.nurtureParticipant.findFirst({
-      where: {
-        id: input.participant_id,
-        workspaceId: input.workspace_id,
-        status: "active",
-        deletedAt: null,
-      },
-    });
-    if (!participant) return NO_GUARDIAN_FOCUS_FACTS;
-
-    const goal = await this.prisma.nurtureFocusGoal.findFirst({
-      where: { id: input.focus_goal_id, workspaceId: input.workspace_id },
-      include: {
-        focusCycle: true,
-        childScopes: { where: { deletedAt: null }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
-      },
-    });
-    if (!goal) return { ...NO_GUARDIAN_FOCUS_FACTS, participant_active: true };
-
-    const familyRefKeys = await guardianFamilyRefKeys(
-      this.prisma,
-      input.workspace_id,
-      input.participant_id,
-      now,
-    );
-    const scope = goal.childScopes[0];
-    return {
-      participant_active: true,
-      // Authority is measured against the exact family the goal belongs to, not
-      // against "is this participant a guardian somewhere".
-      guardian_authority_current: familyRefKeys.includes(goal.familyRefKey),
-      family_ref_key: goal.familyRefKey,
-      focus_cycle_id: goal.focusCycleId,
-      focus_cycle_version: goal.focusCycle.aggregateVersion,
-      focus_goal_version: goal.aggregateVersion,
-      child_scope_explicit: Boolean(scope),
-      ...(scope ? { child_care_process_id: scope.childCareProcessId } : {}),
-    };
-  }
-
-  async applyGuardianFocusGoalUpdate(input: {
-    workspace_id: string;
-    participant_id: string;
-    focus_goal_id: string;
-    focus_cycle_id: string;
-    label: string;
-    priority: number;
-    expected_focus_goal_version: number;
-  }): Promise<{ focus_goal_ref: DomainContextRef; revision: number }> {
-    // The expected version is part of the filter, so a concurrent write makes
-    // this update match zero rows rather than silently winning.
-    const updated = await this.prisma.nurtureFocusGoal.updateMany({
-      where: {
-        id: input.focus_goal_id,
-        workspaceId: input.workspace_id,
-        focusCycleId: input.focus_cycle_id,
-        aggregateVersion: input.expected_focus_goal_version,
-      },
-      data: {
-        goalKey: input.label,
-        priority: input.priority,
-        aggregateVersion: { increment: 1 },
-      },
-    });
-    if (updated.count !== 1) {
-      throw new Error("nurture board mutation: focus goal version conflict");
-    }
-    const revision = input.expected_focus_goal_version + 1;
-    return {
-      focus_goal_ref: domainRef("focus_goal", input.focus_goal_id, revision),
-      revision,
-    };
-  }
 
   async loadCaregiverDailyCareFacts(input: {
     workspace_id: string;
@@ -431,34 +272,3 @@ const dailyCarePayload = (kind: string, summary: string) => {
   }
 };
 
-/** The family scope keys a guardian currently holds authority over. */
-const guardianFamilyRefKeys = async (
-  prisma: BoardPrisma,
-  workspaceId: string,
-  participantId: string,
-  at: Date,
-): Promise<string[]> => {
-  const roles = await prisma.nurtureCareRoleAssignment.findMany({
-    where: { workspaceId, participantId, role: "guardian", ...activeRoleWindow(at) },
-  });
-  const processIds = new Set<string>();
-  const familyIds = new Set<string>();
-  for (const role of roles) {
-    if (role.scopeType === "child_care_process") processIds.add(role.scopeId);
-    else if (role.scopeType === "family") familyIds.add(role.scopeId);
-  }
-  if (processIds.size === 0 && familyIds.size === 0) return [];
-  const families = await prisma.nurtureFamily.findMany({
-    where: {
-      workspaceId,
-      status: "active",
-      deletedAt: null,
-      OR: [
-        ...(processIds.size > 0 ? [{ childCareProcessId: { in: [...processIds] } }] : []),
-        ...(familyIds.size > 0 ? [{ id: { in: [...familyIds] } }] : []),
-      ],
-    },
-    select: { childCareProcessId: true },
-  });
-  return families.map((family) => `${workspaceId}:${family.childCareProcessId}`);
-};

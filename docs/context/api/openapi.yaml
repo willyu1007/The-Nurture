@@ -511,7 +511,6 @@ components:
             - withdraw_family_care_request
             - redact_family_care_message
             - policy_redact_family_care_message
-            - update_guardian_current_focus
             - record_caregiver_daily_care
             - cancel_publish_process
             - acquire_publish_edit_hold
@@ -615,7 +614,6 @@ components:
             - withdraw_family_care_request
             - redact_family_care_message
             - policy_redact_family_care_message
-            - update_guardian_current_focus
             - record_caregiver_daily_care
             - cancel_publish_process
             - acquire_publish_edit_hold
@@ -708,7 +706,6 @@ components:
             - query_caregiver_family_care_work
             - query_family_care_item
             - query_guardian_family_board
-            - query_guardian_current_focus
             - query_guardian_enrollment_activity
             - query_caregiver_teacher_board
             - query_caregiver_child_today

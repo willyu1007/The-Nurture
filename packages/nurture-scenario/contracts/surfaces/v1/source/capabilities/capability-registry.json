@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.15.0"
+    "version": "1.16.0"
   },
   "capabilities": [
     {
@@ -1026,83 +1026,6 @@
       ]
     },
     {
-      "capabilityKey": "query_guardian_current_focus",
-      "capabilityVersion": "1.0.0",
-      "domainClass": "read_model",
-      "executionClass": "query",
-      "deliveryClass": "none",
-      "intentKeys": [
-        "view_guardian_current_focus"
-      ],
-      "inputSchemaRef": "schema:nurture.query-guardian-current-focus-input@1",
-      "resultSchemaRef": "schema:nurture.query-guardian-current-focus-result@1",
-      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
-      "targetPolicy": {
-        "kind": "none",
-        "optionSchemaRef": null
-      },
-      "confirmationPolicy": "none",
-      "concurrencyPolicy": {
-        "class": "lifecycle_authority",
-        "headBindings": [
-          {
-            "headKey": "family_guardian_authority",
-            "mode": "must_satisfy",
-            "predicateRef": {
-              "key": "current_family_guardian_authority",
-              "version": "1.0.0"
-            }
-          },
-          {
-            "headKey": "focus_scope",
-            "mode": "must_satisfy",
-            "predicateRef": {
-              "key": "explicit_child_focus_scope",
-              "version": "1.0.0"
-            }
-          },
-          {
-            "headKey": "source_visibility",
-            "mode": "must_satisfy",
-            "predicateRef": {
-              "key": "current_board_fact_visibility",
-              "version": "1.0.0"
-            }
-          }
-        ]
-      },
-      "eligibilityPolicyRef": {
-        "key": "query_guardian_current_focus_eligibility",
-        "version": "1.0.0"
-      },
-      "handlerBinding": {
-        "bindingKey": "query_guardian_current_focus",
-        "bindingKind": "query"
-      },
-      "presenterBindings": [
-        {
-          "surfaceKey": "guardian_family_board",
-          "presenterKey": "present_guardian_family_board"
-        }
-      ],
-      "invalidationScopeKinds": [
-        "capability",
-        "surface",
-        "collection",
-        "subject"
-      ],
-      "dependencyGates": [
-        {
-          "dependencyKey": "t002_owner_integration",
-          "minimumVersion": "1.0.0",
-          "requiredGate": "owner_integration"
-        }
-      ],
-      "supportedRoles": [
-        "guardian"
-      ]
-    },
-    {
       "capabilityKey": "query_guardian_enrollment_activity",
       "capabilityVersion": "1.0.0",
       "domainClass": "read_model",
@@ -1322,75 +1245,6 @@
       "supportedRoles": [
         "caregiver",
         "lead_caregiver"
-      ]
-    },
-    {
-      "capabilityKey": "update_guardian_current_focus",
-      "capabilityVersion": "1.0.0",
-      "domainClass": "care_interaction",
-      "executionClass": "action_execution",
-      "deliveryClass": "none",
-      "intentKeys": [
-        "adjust_guardian_current_focus"
-      ],
-      "inputSchemaRef": "schema:nurture.update-guardian-current-focus-input@1",
-      "resultSchemaRef": "schema:nurture.update-guardian-current-focus-result@1",
-      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
-      "targetPolicy": {
-        "kind": "owner_option_required",
-        "optionSchemaRef": "schema:nurture.owner-target-option@1"
-      },
-      "confirmationPolicy": "direct_commit",
-      "concurrencyPolicy": {
-        "class": "exact_state",
-        "headBindings": [
-          {
-            "headKey": "focus_cycle",
-            "mode": "must_equal"
-          },
-          {
-            "headKey": "focus_goal",
-            "mode": "must_equal"
-          },
-          {
-            "headKey": "family_guardian_authority",
-            "mode": "must_satisfy",
-            "predicateRef": {
-              "key": "current_family_guardian_authority",
-              "version": "1.0.0"
-            }
-          }
-        ]
-      },
-      "eligibilityPolicyRef": {
-        "key": "update_guardian_current_focus_eligibility",
-        "version": "1.0.0"
-      },
-      "handlerBinding": {
-        "bindingKey": "update_guardian_current_focus",
-        "bindingKind": "action"
-      },
-      "presenterBindings": [
-        {
-          "surfaceKey": "guardian_family_board",
-          "presenterKey": "present_guardian_family_board"
-        }
-      ],
-      "invalidationScopeKinds": [
-        "capability",
-        "surface",
-        "target",
-        "subject"
-      ],
-      "dependencyGates": [
-        {
-          "dependencyKey": "t002_owner_integration",
-          "minimumVersion": "1.0.0",
-          "requiredGate": "owner_integration"
-        }
-      ],
-      "supportedRoles": [
-        "guardian"
       ]
     },
     {

@@ -67,15 +67,7 @@
             "reasonKind": "missing_target_context"
           },
           {
-            "capabilityKey": "query_guardian_current_focus",
-            "reasonKind": "missing_target_context"
-          },
-          {
             "capabilityKey": "query_guardian_enrollment_activity",
-            "reasonKind": "missing_target_context"
-          },
-          {
-            "capabilityKey": "update_guardian_current_focus",
             "reasonKind": "missing_target_context"
           },
           {
@@ -232,15 +224,7 @@
             "reasonKind": "role_unsupported"
           },
           {
-            "capabilityKey": "query_guardian_current_focus",
-            "reasonKind": "role_unsupported"
-          },
-          {
             "capabilityKey": "query_guardian_enrollment_activity",
-            "reasonKind": "role_unsupported"
-          },
-          {
-            "capabilityKey": "update_guardian_current_focus",
             "reasonKind": "role_unsupported"
           },
           {
