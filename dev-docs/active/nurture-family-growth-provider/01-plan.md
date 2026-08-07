@@ -123,15 +123,27 @@ DONE 2026-08-07) and I3b (wire, DONE 2026-08-07 after the I0 freeze):
 
 ## I7 — N8 fixtures + requalification
 
-- The twelve fixtures from requirements §二 N8, run provider-side against a
-  fake consumer and jointly against real My-Chat at the pinned commit
-  (fixtures 1, 2, 4, 8, 12 are the currently-missing ones; 3, 5, 6, 7, 9,
-  10, 11 extend existing G3 suites).
-- One requalification round in detached worktrees at exact pins (same
-  topology discipline as the G3 exit), refreshing evidence invalidated by
-  I6.
-- DoD: all twelve fixtures pass on both sides; requalification record
-  appended under this task; default-off census re-proven.
+Split as I7a (provider conformance, DONE 2026-08-07) and I7b (joint
+two-service run + requalification, rides with the I6 batch):
+
+- I7a (met): all twelve N8 fixtures run through the REAL provider chain —
+  fact preparer, release/lifecycle transactions, outbox, delivery worker
+  and the real HTTP transport — against a contract-faithful consumer
+  double (`family-growth-n8.db.e2e.test.ts`) that revalidates every
+  envelope with the frozen v1 schema plus recomputed payload digests and
+  implements the frozen consumer semantics: event-identity idempotency,
+  source-key uniqueness with digest conflict, pre-release suppression, and
+  per-status receipt companion refs. Model finding recorded in the notes:
+  under the qualified G3 privacy gate, fixture 9's both-families-succeed
+  variant requires the future derivative capability; today one family
+  succeeds and the other fails closed, independently.
+- I7b: the same fixtures against the real My-Chat consumer (ingress +
+  intake + real database) at the rotated pin, inside one requalification
+  round in detached worktrees at exact pins (G3 topology discipline),
+  refreshing evidence invalidated by I6.
+- DoD: I7a — twelve fixtures green with zero consumer-double contract
+  violations (met). I7b — the twelve fixtures pass on both real sides;
+  requalification record appended; default-off census re-proven.
 
 ## I8 — Teacher queue binding (requirements §三.8)
 

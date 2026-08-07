@@ -2,6 +2,30 @@
 
 Running log; newest first.
 
+- 2026-08-07 (I7a): N8 provider conformance landed
+  (`apps/scenario-service/tests/family-growth-n8.db.e2e.test.ts`, 10 cases
+  covering all twelve fixtures; 5/6/7 share one ordered case, 11 covers
+  both expired and missing bindings). The consumer double answers over a
+  real local HTTP listener through the worker's real transport, revalidates
+  every envelope with the frozen schema + recomputed digests (any
+  violation fails the suite), and implements the frozen semantics: ledger
+  idempotency (replay → duplicate with original refs), source-key digest
+  conflict, pre-release suppression with late-release tombstoning, per-
+  family policy (applied/pending/rejected), and full/targeted 503 modes.
+  Worker deliveries are workspace-scoped in tests via a wrapping outbox
+  port so shared-database debris cannot leak into fixtures.
+  - Model finding worth keeping: fixture 9 ("one photo to two families")
+    cannot mean both-families-succeed under the qualified G3 exposure gate
+    — a photo showing another family's child fails closed for that family
+    (that is the privacy model working, and exactly the D-T009-02 posture).
+    The realized fixture: family A commits and delivers `applied` while
+    family B rejects locally, provably independent. Both-families-succeed
+    arrives with the shared-infrastructure derivative capability;
+    the sanctioned multi-family route today is `split_process`.
+  - I7b (real My-Chat on both ends + requalification) rides with I6: the
+    joint lane needs the pin rotation anyway (the x5 joint test already
+    fails typecheck from live-sibling drift).
+
 - 2026-08-07 (late): consumer side landed at My-Chat `df7a273` — the
   transport-frozen events ingress answers with synchronous wire receipts
   (lifecycle results carry the original admission/material refs;
