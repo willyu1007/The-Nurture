@@ -2,6 +2,19 @@
 
 Running log; newest first.
 
+- 2026-08-08 (1.16.0 batch requalified — `REQUAL_PASS`): full record in
+  `06-i6-batch-requalification-record.md`. Exact detached topology (Nurture
+  `97b9afe`, My-Chat `df7a273`, Base `8a3ea90`, adjacent worktrees so the
+  `link:` deps and pin verifier load frozen sources), two disposable tmpfs
+  databases migrated from empty, every gate green including the x5 joint
+  lane (11 tests). Environmental facts worth keeping: My-Chat's schema
+  needs the `vector` extension (use `pgvector/pgvector:pg16`, plain
+  postgres fails deploy); `@my-chat/workflow-contracts` must be built in
+  the frozen My-Chat worktree before the Nurture unit lane resolves it;
+  the self-pin includes `packages/nurture-db/package.json`, so the I7b
+  dep addition forced one self-pin re-freeze (`48502f6d…`). Batch closed;
+  T-009 remainder is I8 only.
+
 - 2026-08-08 (I7b joint suite green): the N8 fixtures now run with the REAL
   My-Chat consumer on its own database
   (`packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts`,
