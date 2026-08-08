@@ -108,6 +108,14 @@ content is admitted only by the **original** grant terms, evaluated together:
 4. **Currency** — `status = active`, within `effectiveFrom`/`expiresAt`, not
    revoked.
 
+   > **Why this one is not the conjunction (0G finding 3).** The lifecycle
+   > decision's Stage 1 rule — current means `status = active` **and**
+   > `deletedAt IS NULL` — applies to the three entities that carry both
+   > fields: institution, care group, child care process.
+   > `NurtureChildLinkGrant` has `status` and no `deletedAt`, so its currency
+   > is `status` plus the effective window, and the difference is deliberate
+   > rather than an omission.
+
 "Original" is the operative word. A grant later widened does not retroactively
 admit content read under narrower terms, and a grant narrowed does not
 retroactively deny history already delivered — but every **new** read uses

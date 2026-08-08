@@ -22,7 +22,7 @@
 | --- | --- | --- |
 | Canonical owner of CareGroup, Enrollment, ChildCareProcess, ChildLinkGrant | Nurture / T-002 | current-pin owner path per `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md` |
 | Canonical owner of the platform child identity | My-Chat | `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c` |
-| Surface authority rules | T-004 | `visibility-matrix.json` at `1.17.0` / `sha256:d22851d9…` |
+| Surface authority rules | T-004 | `visibility-matrix.json` at `1.17.0` / `sha256:d22851d9…`, the artifact current when this unit froze; 0C-4 later rotated it to `1.18.0` additively with `sharedCoreHash` unchanged, so this evidence is preserved |
 | Consumers | 0C-4 (child-level content), 0C-5, G4-B, G4-C | — |
 
 This unit closes the **second half** of `institution_board`'s
@@ -39,9 +39,9 @@ purpose. Neither half is sufficient alone.
 - `NurtureEnrollment` — `childCareProcessId`, `careGroupId`, `institutionId`,
   `status`. The only edge that places a child in a class.
 - `NurtureChildCareProcess` — `childId`, `primaryFamilyId`, `status`.
-- `NurtureChildLinkGrant` — `directions`, `dataClasses`, `purposes`,
-  `status`. 0C-3 reads only `purposes` and `status`; direction and data class
-  belong to 0C-5.
+- `NurtureChildLinkGrant` — **not read by this unit.** The frozen purpose
+  vocabulary is defined here (§3), but every test against a grant — purposes,
+  directions, data classes and currency — belongs to 0C-5 (0G finding 1).
 
 **Derived (never persisted as authority):** `ChildScopeContextV1`, the
 per-request resolution of an institution scope plus a target into a class, an
@@ -100,7 +100,10 @@ Entry requires a resolved `InstitutionScopeContextV1`. Then, each step failing
 closed:
 
 1. **Class scope** — the target class exists, its `institutionId` equals the
-   scoped institution, and its status is current. A class in another
+   scoped institution, and it is current: `status = active` **and**
+   `deletedAt IS NULL`, the conjunction inherited from the lifecycle decision
+   ([`17`](./17-lifecycle-status-cleanup-decision.md)) because both fields
+   exist on this entity and readers have historically split on which to trust. A class in another
    institution was already denied by 0C-2 and must not be re-reachable here.
 2. **Child membership** — for a child-level read, a current
    `NurtureEnrollment` places that `childCareProcessId` in that **exact
@@ -113,10 +116,17 @@ closed:
    > this predicate** and cannot stand in for it. 0C-3 requires the
    > `careGroupId` match that the `care_group` branch already performs, applied
    > to institution-scoped admins as well.
-3. **Purpose** — `purposeKey` is present, is a member of the frozen
-   vocabulary, and is granted by a current `NurtureChildLinkGrant` for that
-   child. A child-level read with no declared purpose denies; it never
-   defaults to `care_coordination`.
+3. **Purpose is declared** — `purposeKey` is present and is a member of the
+   frozen vocabulary. A child-level read with no declared purpose denies; it
+   never defaults to `care_coordination`.
+
+   > **Ownership, fixed by 0G finding 1.** This unit checks only that a
+   > purpose was *declared and is recognized*. Whether the child's grant
+   > actually **permits** that purpose belongs to 0C-5, together with
+   > direction, data class and grant currency. Read as a sentence: 0C-3
+   > requires you to say why, 0C-5 decides whether the grant permits that why.
+   > A predicate that tests the grant here duplicates 0C-5 and will drift from
+   > it.
 4. **Visibility** — the fact is currently visible: `child_visible` holds and
    the source lifecycle is not redacted or suppressed.
 
@@ -129,7 +139,7 @@ narrower in two independent ways:
 | Axis | Today | Under 0C-3 |
 | --- | --- | --- |
 | **Class containment** | institution-scoped bindings reach any child with an active enrolment anywhere in the institution — `roleReachesChild` tests `institutionId` only | the enrolment must place the child in the **named class** |
-| **Purpose** | not tested at all for this key | a granted `purposeKey` from the frozen vocabulary is required |
+| **Purpose** | not tested at all for this key | a declared `purposeKey` from the frozen vocabulary is required; whether the grant permits it is 0C-5's narrowing |
 
 Narrowing is safe and is the intent. `02-architecture.md` already states that
 Admin Web authority is not authority to read all child facts, and that every
@@ -174,15 +184,14 @@ reopens this unit.
 | No current enrolment placing the child in that class | deny `scope_mismatch` |
 | Child-level read with no `purposeKey` | deny `purpose_required` |
 | `purposeKey` outside the frozen vocabulary | deny `purpose_not_honoured` |
-| Purpose not granted for this child | deny `purpose_not_granted` |
-| Grant missing or revoked | deny `grant_missing` / `grant_revoked` |
 | Fact redacted or suppressed | deny `child_not_visible` |
 | Owner unavailable | deny `unavailable`; never cached authority |
 | Contract version mismatch | deny `contract_mismatch` |
 
-`purpose_not_honoured` and `purpose_not_granted` are distinct on purpose: the
-first is a contract fault the caller can fix, the second is an authority fact
-it cannot. Neither reveals whether the child exists.
+`purpose_required` and `purpose_not_honoured` are both contract faults the
+caller can fix, which is why both live here. `purpose_not_granted` is an
+authority fact the caller cannot fix and belongs to 0C-5. Neither code here
+reveals whether the child exists.
 
 ## 7. Fixtures and downstream gates
 
@@ -194,8 +203,9 @@ it cannot. Neither reveals whether the child exists.
    default is applied;
 5. a stored purpose outside the frozen four denies `purpose_not_honoured`
    rather than acting as a wildcard;
-6. a purpose in the vocabulary but absent from the child's grant denies
-   `purpose_not_granted`;
+6. a `purposeKey` outside the frozen vocabulary denies `purpose_not_honoured`;
+   whether a *recognized* purpose is actually granted is 0C-5's fixture, not
+   this unit's;
 7. a child in two classes of one institution is reachable only through the
    named class, and the other enrolment appears in no count or ordering;
 8. an aggregate visible at class level does not change with a child fact the

@@ -25,6 +25,7 @@
 | Canonical owner of adult identity, contact details and invitation delivery | My-Chat | `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c` |
 | Canonical owner of Participant, RoleAssignment, Enrollment, Grant | Nurture / T-002 | current-pin owner path per `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md` |
 | Consumer | G4-C `people_operations` | — |
+| Surface contract | — | **no dependency.** This unit registers no capability and defines no surface shape, so it neither cites nor is invalidated by a contract rotation (0G finding 4). |
 
 **The ownership line is the whole point of this unit.** Contact details belong
 to the My-Chat invitation/contact owner; Nurture holds only a Host-owned opaque

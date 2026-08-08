@@ -19,7 +19,7 @@
 | --- | --- | --- |
 | Canonical owner of the authenticated principal | My-Chat | `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c` |
 | Canonical owner of participant, role assignment and scope | Nurture / T-002 | current-pin owner path per `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md` |
-| Surface contract baseline | T-004 | `nurture.surface-contract@1.17.0` / `sha256:d22851d9…` |
+| Surface contract baseline | T-004 | `nurture.surface-contract@1.17.0` / `sha256:d22851d9…`, the artifact current when this unit froze; 0C-4 later rotated it to `1.18.0` additively with `sharedCoreHash` unchanged, so this evidence is preserved |
 | Consumers | 0C-2…0C-6, G4-A, and every role-bound surface | — |
 
 My-Chat owns who the human is. Nurture owns what that human may act as. The

@@ -22,7 +22,7 @@
 | Role | Party | Exact ref |
 | --- | --- | --- |
 | Canonical owner of Institution, CareGroup, Enrollment | Nurture / T-002 | current-pin owner path per `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md` |
-| Surface authority rules being implemented | T-004 | `visibility-matrix.json` at `nurture.surface-contract@1.17.0` / `sha256:d22851d9…` |
+| Surface authority rules being implemented | T-004 | `visibility-matrix.json` at `nurture.surface-contract@1.17.0` / `sha256:d22851d9…`, the artifact current when this unit froze; 0C-4 later rotated it to `1.18.0` additively with `sharedCoreHash` unchanged, so this evidence is preserved |
 | Consumers | 0C-3, 0C-4, 0C-5, G4-A/B/C | — |
 
 The two Institution surfaces assert **different** scope rules, and the
@@ -101,7 +101,7 @@ closed:
    `institution_admin` assignment at a non-institution scope type denies
    rather than being reinterpreted.
 2. **Institution currency** — the institution row exists in this workspace and
-   is `active` (§5).
+   is current: `status = active` **and** `deletedAt IS NULL` (§5).
 3. **`exact_institution_scope`** — the target resolves to exactly the
    institution in `scopeRef`. Targets resolve through stored edges only:
    a class through `NurtureCareGroup.institutionId`, a child or enrollment
@@ -173,18 +173,21 @@ No idempotency, outbox or replay semantics: 0C-2 introduces no command.
 | Role kind is not `institution_admin` | deny `not_authorized` |
 | `institution_admin` at a non-institution scope type | deny `not_authorized` |
 | Institution row missing in this workspace | deny `not_authorized` — never `not_found` |
-| Institution `paused` | deny `institution_paused` |
-| Institution `archived` | deny `institution_archived` |
-| Institution `deleted` | deny `not_authorized`, indistinguishable from missing |
+| Institution not current — any of `paused`, `archived`, `deleted`, or `deletedAt` set | deny `not_authorized`, indistinguishable from missing |
 | Target resolves to another institution | deny `not_authorized` — never a "wrong institution" hint |
 | Target resolves to no institution | deny `not_authorized` |
 | Owner unavailable | deny `unavailable`; never cached authority |
 | Contract version mismatch | deny `contract_mismatch` |
 
-`deleted` and missing share one reason code on purpose: an Admin must not be
-able to probe which institution ids ever existed. `paused` and `archived` are
-distinguishable only because they are, by definition, institutions the Admin
-already had scope over.
+Every non-current institution shares one reason code on purpose: an Admin must
+not be able to probe which institution ids ever existed, nor which lifecycle
+state a given one is in.
+
+An earlier draft emitted distinct `institution_paused` and
+`institution_archived` codes. 0G finding 2 removed them: the lifecycle decision
+established that both states are unreachable and are to be removed from the
+enum, so codes for them are dead surface that would invite an implementer to
+build handling for states nothing can produce.
 
 ## 7. Fixtures and downstream gates
 
