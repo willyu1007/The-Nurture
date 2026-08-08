@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -208,8 +208,26 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
       "submit_family_care_question",
       "withdraw_family_care_request",
     ]);
+    // T-007 identities are reserved by their own G4-0C freeze records, not by
+    // the T-006 G3-0 adoption set. Listing them here keeps this guard exact:
+    // it still fails on an unreserved key, and adding one costs a deliberate
+    // edit naming the record that froze it.
+    const postG3Keys = new Map([
+      [
+        "query_institution_communication_review",
+        "dev-docs/active/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
+      ],
+    ]);
     for (const entry of manifest.capabilities) {
       if (preG3Keys.has(entry.capabilityKey)) continue;
+      if (postG3Keys.has(entry.capabilityKey)) {
+        const record = postG3Keys.get(entry.capabilityKey) as string;
+        expect(
+          existsSync(path.join(packageRoot, "../../", record)),
+          `${entry.capabilityKey} must cite an existing freeze record`,
+        ).toBe(true);
+        continue;
+      }
       expect(reserved.has(entry.capabilityKey), entry.capabilityKey).toBe(true);
     }
   });

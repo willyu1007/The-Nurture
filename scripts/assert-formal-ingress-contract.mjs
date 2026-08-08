@@ -61,7 +61,12 @@ const expectedHarnessActionKeys = [
  * neither routed nor listed here fails this guard, so coverage can never shrink
  * silently, and a key listed here after it is routed fails too.
  */
-const expectedUnroutedCapabilityKeys = [];
+const expectedUnroutedCapabilityKeys = [
+  // Frozen by G4-0C-4 but not implemented: 0C is a freeze stage and I1 has not
+  // opened, so this capability has a descriptor and no handler. It leaves this
+  // list the moment it is routed, and this guard fails if it does not.
+  "query_institution_communication_review",
+];
 const expectedOwnerRequiredFields = [
   "workspace_id",
   "acting_user_id",

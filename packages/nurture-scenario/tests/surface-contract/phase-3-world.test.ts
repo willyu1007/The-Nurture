@@ -51,6 +51,7 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["query_guardian_enrollment_activity", "sha256:bad468244dd328c8efdccade21d9ade6bd7c2342bc777227547fcd1928156516"],
   ["query_guardian_family_board", "sha256:b88ea18ac1e004fd85262c7a709fdc7275188933e2b0aa653a521ec60003e4b6"],
   ["query_guardian_family_care_timeline", "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"],
+  ["query_institution_communication_review", "sha256:b88fa7e9b7fdab6e67c1e0666976561ad7eed21bdd99fb5018dd27fa4f7d8891"],
   ["query_teacher_publish_queue", "sha256:abe0c1c9c60e573917b0843aa038526856111d9dd78928f6e382e019b72ed5cb"],
   ["record_caregiver_daily_care", "sha256:e49064ae5691abfaae62ddb278ec31c8188f5bf30bde51d8b5b3c0825e0a02c8"],
   ["redact_family_care_message", "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5"],
@@ -267,7 +268,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.17.0");
+    expect(contract.version).toBe("1.18.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

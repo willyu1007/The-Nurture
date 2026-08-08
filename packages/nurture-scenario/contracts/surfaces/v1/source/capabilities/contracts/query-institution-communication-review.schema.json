@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-institution-communication-review.schema.json",
+  "title": "QueryInstitutionCommunicationReviewV1",
+  "$defs": {
+    "input": {
+      "$ref": "board-types.schema.json#/$defs/pagedInput"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "institutionRef",
+        "items",
+        "pageInfo"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "board-types.schema.json#/$defs/moduleBinding"
+        },
+        "institutionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/communicationItem"
+          }
+        },
+        "pageInfo": {
+          "$ref": "board-types.schema.json#/$defs/snapshotPageInfo"
+        }
+      }
+    },
+    "communicationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "messageRef",
+        "occurredAt",
+        "businessScope",
+        "author",
+        "changeState",
+        "attachments",
+        "actions"
+      ],
+      "properties": {
+        "messageRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "businessScope": {
+          "$ref": "#/$defs/businessScope"
+        },
+        "author": {
+          "$ref": "#/$defs/author"
+        },
+        "changeState": {
+          "$ref": "#/$defs/changeState"
+        },
+        "content": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "body"
+          ],
+          "properties": {
+            "body": {
+              "type": "string"
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "maxItems": 0,
+          "items": false
+        }
+      }
+    },
+    "businessScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enrollmentRef",
+        "careGroupRef",
+        "institutionRef",
+        "dataClass",
+        "direction",
+        "purpose",
+        "adminSupervision"
+      ],
+      "properties": {
+        "enrollmentRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "careGroupRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "institutionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "dataClass": {
+          "type": "string",
+          "enum": [
+            "family_care_question",
+            "direct_care_communication"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "family_to_org",
+            "org_to_family"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "const": "family_care_workflow"
+        },
+        "adminSupervision": {
+          "type": "string",
+          "const": "pre_send_disclosed"
+        }
+      }
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side",
+        "role"
+      ],
+      "properties": {
+        "side": {
+          "type": "string",
+          "enum": [
+            "family",
+            "care_group"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "guardian",
+            "caregiver",
+            "lead_caregiver"
+          ]
+        }
+      }
+    },
+    "changeState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "content",
+        "lifecycle"
+      ],
+      "properties": {
+        "content": {
+          "type": "string",
+          "enum": [
+            "original",
+            "corrected",
+            "redacted"
+          ]
+        },
+        "lifecycle": {
+          "type": "string",
+          "enum": [
+            "active",
+            "closed",
+            "suppressed"
+          ]
+        },
+        "lifecycleReason": {
+          "type": "string",
+          "enum": [
+            "family_withdrawn",
+            "grant_revoked",
+            "source_redacted",
+            "expired"
+          ]
+        }
+      }
+    },
+    "attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attachmentRef",
+        "safeLabel"
+      ],
+      "properties": {
+        "attachmentRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "safeLabel": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

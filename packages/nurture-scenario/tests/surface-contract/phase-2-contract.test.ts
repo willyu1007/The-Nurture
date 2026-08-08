@@ -48,6 +48,7 @@ const expectedCapabilityVersions: Record<string, string> = {
   query_guardian_enrollment_activity: "1.0.0",
   query_guardian_family_board: "1.0.0",
   query_guardian_family_care_timeline: "1.1.0",
+  query_institution_communication_review: "1.0.0",
   query_teacher_publish_queue: "1.0.0",
   record_caregiver_daily_care: "1.0.0",
   redact_family_care_message: "1.0.0",
@@ -83,10 +84,10 @@ const manifest = loadSurfaceContractManifest(
 );
 
 describe("Phase 2 exact surface contract", () => {
-  it("loads one exact, closed manifest with thirty-three capabilities and six surfaces", () => {
+  it("loads one exact, closed manifest with thirty-four capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.17.0",
+      version: "1.18.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -327,7 +328,7 @@ describe("Phase 2 exact surface contract", () => {
     const queries = manifest.capabilities
       .map((entry) => entry.descriptor)
       .filter((descriptor) => descriptor.executionClass === "query");
-    expect(queries).toHaveLength(8);
+    expect(queries).toHaveLength(9);
     for (const descriptor of queries) {
       expect(descriptor.confirmationPolicy).toBe("none");
       expect(descriptor.deliveryClass).toBe("none");

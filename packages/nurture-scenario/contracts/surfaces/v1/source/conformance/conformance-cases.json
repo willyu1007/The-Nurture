@@ -3,75 +3,38 @@
   "qualificationLayer": "synthetic_contract_qualification",
   "cases": [
     {
-      "caseKey": "digest-rebuild-determinism",
-      "kind": "digest_rebuild",
+      "caseKey": "board-module-topology-and-role-safety",
+      "kind": "deterministic_fixtures",
       "covers": [
-        "all_slices"
-      ],
-      "suiteRef": {
-        "runner": "script",
-        "target": "scripts/surface-contract/verify-surface-contract.mjs"
-      }
-    },
-    {
-      "caseKey": "schema-strict-compilation-and-negatives",
-      "kind": "schema_compilation",
-      "covers": [
-        "all_slices"
-      ],
-      "suiteRef": {
-        "runner": "script",
-        "target": "scripts/surface-contract/validate-surface-contract-schemas.mjs"
-      }
-    },
-    {
-      "caseKey": "generator-rotation-and-output-guards",
-      "kind": "tooling_guard",
-      "covers": [
-        "shared_core"
-      ],
-      "suiteRef": {
-        "runner": "node_test",
-        "target": "scripts/surface-contract/contract-core.test.mjs"
-      }
-    },
-    {
-      "caseKey": "surface-visibility-and-source-hygiene",
-      "kind": "visibility",
-      "covers": [
-        "shared_core",
-        "surface:caregiver_nurture_chat",
+        "capability:query_caregiver_child_today",
+        "capability:query_caregiver_family_care_work",
+        "capability:query_caregiver_teacher_board",
+        "capability:query_guardian_enrollment_activity",
+        "capability:query_guardian_family_board",
+        "capability:query_teacher_publish_queue",
+        "capability:record_caregiver_daily_care",
         "surface:caregiver_teacher_board",
-        "surface:guardian_family_board",
-        "surface:guardian_nurture_chat",
-        "surface:institution_board",
-        "surface:institution_workbench"
+        "surface:guardian_family_board"
       ],
       "suiteRef": {
         "runner": "vitest",
-        "target": "packages/nurture-scenario/tests/surface-contract/phase-1-source.test.ts"
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-boards.test.ts"
       }
     },
     {
-      "caseKey": "descriptor-handler-presenter-consistency",
-      "kind": "descriptor_handler_presenter_consistency",
+      "caseKey": "capture-to-draft-deterministic-main-path",
+      "kind": "deterministic_fixtures",
       "covers": [
-        "all_slices"
+        "capability:acquire_publish_edit_hold",
+        "capability:cancel_publish_process",
+        "capability:organize_care_capture_batch",
+        "capability:release_publish_edit_hold",
+        "capability:renew_publish_edit_hold",
+        "capability:save_publish_process_draft"
       ],
       "suiteRef": {
         "runner": "vitest",
-        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
-      }
-    },
-    {
-      "caseKey": "exact-admission-and-trusted-pin",
-      "kind": "contract_admission",
-      "covers": [
-        "shared_core"
-      ],
-      "suiteRef": {
-        "runner": "vitest",
-        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-capture-to-draft.test.ts"
       }
     },
     {
@@ -96,14 +59,36 @@
       }
     },
     {
-      "caseKey": "fixture-world-determinism",
-      "kind": "deterministic_fixtures",
+      "caseKey": "descriptor-handler-presenter-consistency",
+      "kind": "descriptor_handler_presenter_consistency",
       "covers": [
-        "fixture:world"
+        "all_slices"
       ],
       "suiteRef": {
         "runner": "vitest",
-        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-world.test.ts"
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
+      }
+    },
+    {
+      "caseKey": "digest-rebuild-determinism",
+      "kind": "digest_rebuild",
+      "covers": [
+        "all_slices"
+      ],
+      "suiteRef": {
+        "runner": "script",
+        "target": "scripts/surface-contract/verify-surface-contract.mjs"
+      }
+    },
+    {
+      "caseKey": "exact-admission-and-trusted-pin",
+      "kind": "contract_admission",
+      "covers": [
+        "shared_core"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-2-contract.test.ts"
       }
     },
     {
@@ -150,38 +135,36 @@
       }
     },
     {
-      "caseKey": "board-module-topology-and-role-safety",
+      "caseKey": "fixture-world-determinism",
       "kind": "deterministic_fixtures",
       "covers": [
-        "capability:query_caregiver_child_today",
-        "capability:query_caregiver_family_care_work",
-        "capability:query_caregiver_teacher_board",
-        "capability:query_guardian_enrollment_activity",
-        "capability:query_guardian_family_board",
-        "capability:query_teacher_publish_queue",
-        "capability:record_caregiver_daily_care",
-        "surface:caregiver_teacher_board",
-        "surface:guardian_family_board"
+        "fixture:world"
       ],
       "suiteRef": {
         "runner": "vitest",
-        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-boards.test.ts"
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-world.test.ts"
       }
     },
     {
-      "caseKey": "capture-to-draft-deterministic-main-path",
+      "caseKey": "generator-rotation-and-output-guards",
+      "kind": "tooling_guard",
+      "covers": [
+        "shared_core"
+      ],
+      "suiteRef": {
+        "runner": "node_test",
+        "target": "scripts/surface-contract/contract-core.test.mjs"
+      }
+    },
+    {
+      "caseKey": "institution-communication-review-contract",
       "kind": "deterministic_fixtures",
       "covers": [
-        "capability:acquire_publish_edit_hold",
-        "capability:cancel_publish_process",
-        "capability:organize_care_capture_batch",
-        "capability:release_publish_edit_hold",
-        "capability:renew_publish_edit_hold",
-        "capability:save_publish_process_draft"
+        "capability:query_institution_communication_review"
       ],
       "suiteRef": {
         "runner": "vitest",
-        "target": "packages/nurture-scenario/tests/surface-contract/phase-3-capture-to-draft.test.ts"
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-4-institution-communication-review.test.ts"
       }
     },
     {
@@ -212,6 +195,34 @@
       "suiteRef": {
         "runner": "vitest",
         "target": "packages/nurture-scenario/tests/surface-contract/phase-3-release-loop.test.ts"
+      }
+    },
+    {
+      "caseKey": "schema-strict-compilation-and-negatives",
+      "kind": "schema_compilation",
+      "covers": [
+        "all_slices"
+      ],
+      "suiteRef": {
+        "runner": "script",
+        "target": "scripts/surface-contract/validate-surface-contract-schemas.mjs"
+      }
+    },
+    {
+      "caseKey": "surface-visibility-and-source-hygiene",
+      "kind": "visibility",
+      "covers": [
+        "shared_core",
+        "surface:caregiver_nurture_chat",
+        "surface:caregiver_teacher_board",
+        "surface:guardian_family_board",
+        "surface:guardian_nurture_chat",
+        "surface:institution_board",
+        "surface:institution_workbench"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-1-source.test.ts"
       }
     },
     {

@@ -33,6 +33,12 @@
       "requiredGate": "contract_boundary"
     },
     {
+      "key": "institution_communication_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "owner_integration"
+    },
+    {
       "key": "media_attribution_repository",
       "version": "1.0.0",
       "owner": "nurture",
@@ -300,6 +306,20 @@
         },
         {
           "key": "family_care_query_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_institution_communication_review_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "institution_communication_repository",
           "version": "1.0.0"
         }
       ]

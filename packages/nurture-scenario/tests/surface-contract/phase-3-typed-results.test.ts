@@ -691,9 +691,27 @@ const PRE_G3_KEYS = new Set([
   "withdraw_family_care_request",
 ]);
 
+/**
+ * Capabilities frozen by a T-007 G4-0C unit but deliberately not implemented.
+ *
+ * 0C is a freeze stage: I1 has not opened, so a registered descriptor with no
+ * runtime producer is the correct state, not a gap. Deriving "T-006 keys" as
+ * "everything that is not T-005" silently assumed every future capability
+ * would be T-006 and implemented; these keys are neither.
+ *
+ * Each entry names the record that froze it, so admitting one costs a
+ * deliberate edit rather than a filter that quietly absorbs anything new.
+ */
+const POST_G3_FREEZE_ONLY_KEYS = new Map([
+  [
+    "query_institution_communication_review",
+    "dev-docs/active/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
+  ],
+]);
+
 const t006Keys = manifest.capabilities
   .map((entry) => entry.capabilityKey)
-  .filter((key) => !PRE_G3_KEYS.has(key));
+  .filter((key) => !PRE_G3_KEYS.has(key) && !POST_G3_FREEZE_ONLY_KEYS.has(key));
 
 /**
  * Every runtime module declares its own `{key, version}` identity constant.

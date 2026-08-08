@@ -165,13 +165,14 @@
     },
     "queryCapabilityKey": {
       "enum": [
-        "query_guardian_family_care_timeline",
-        "query_caregiver_family_care_work",
-        "query_family_care_item",
-        "query_guardian_family_board",
-        "query_guardian_enrollment_activity",
-        "query_caregiver_teacher_board",
         "query_caregiver_child_today",
+        "query_caregiver_family_care_work",
+        "query_caregiver_teacher_board",
+        "query_family_care_item",
+        "query_guardian_enrollment_activity",
+        "query_guardian_family_board",
+        "query_guardian_family_care_timeline",
+        "query_institution_communication_review",
         "query_teacher_publish_queue"
       ]
     },

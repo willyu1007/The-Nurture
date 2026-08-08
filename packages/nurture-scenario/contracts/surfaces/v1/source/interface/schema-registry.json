@@ -187,6 +187,16 @@
       "jsonPointer": "/$defs/result"
     },
     {
+      "schemaRef": "schema:nurture.query-institution-communication-review-input@1",
+      "artifactPath": "capabilities/contracts/query-institution-communication-review.schema.json",
+      "jsonPointer": "/$defs/input"
+    },
+    {
+      "schemaRef": "schema:nurture.query-institution-communication-review-result@1",
+      "artifactPath": "capabilities/contracts/query-institution-communication-review.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
       "schemaRef": "schema:nurture.query-teacher-publish-queue-input@1",
       "artifactPath": "capabilities/contracts/query-teacher-publish-queue.schema.json",
       "jsonPointer": "/$defs/input"
