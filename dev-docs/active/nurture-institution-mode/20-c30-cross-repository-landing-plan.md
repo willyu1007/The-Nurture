@@ -34,7 +34,7 @@ are **not** the repository pins in
 
 | Repository | Branch | Head | Ahead / behind its main | Size | Dry-merge conflicts |
 | --- | --- | --- | --- | --- | --- |
-| My-Workflow-Base | `codex/T-002-c30-i0-base` | `4350086993d837baa8030564f4e19593dedd96b0` | 37 / 0 | 133 files, +19751/-91 | **0 — fast-forward** |
+| My-Workflow-Base | `codex/T-002-c30-i0-base` | `4350086993d837baa8030564f4e19593dedd96b0` | 37 / 0 | 133 files, +19751/-91 | **0 — landed 2026-08-08** |
 | My-Chat | `codex/T-035-scenario-host-adoption` | `cd7bbc2623dff8621c2c7155b04d1bf759e8404a` | 23 / 22 | 192 files, +26562/-698 | 11 (9 derived, 2 real) |
 | The Nurture | `codex/T-002-c30-i0` | `76ece1f` | 58 / — | 114 files, +25102/-1304 | 5 (3 derived, 2 small) |
 
@@ -77,11 +77,26 @@ work.
 
 Each step is a precondition for the next. Do not reorder.
 
-### Step 1 — My-Workflow-Base
+### Step 1 — My-Workflow-Base ✅ DONE 2026-08-08
 
-Fast-forward `main` to `codex/T-002-c30-i0-base`. Zero conflicts; Base main has
+Fast-forward `main` to `codex/T-002-c30-i0-base`. Zero conflicts; Base main had
 not moved since 2026-08-04. This is the neutral contract source that both
 other repositories adopt.
+
+Executed: branch pushed to `origin/codex/T-002-c30-i0-base` as a backup (it was
+local-only), then `main` fast-forwarded `8a3ea90 → 4350086` and pushed.
+
+`pnpm install --frozen-lockfile --ignore-scripts` was required first — the C30
+commits add `ajv`, which the primary worktree lacked; the lockfile was already
+current and unchanged. `pnpm verify:workflow-contracts` then passed: 441 tests
+pass / 0 fail, and `check:workflow-contract-source` reports lock
+`d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383`.
+
+That lock value is Base's own source hash over its own path set — it is not
+directly comparable to the `contractSha256` in Nurture's pin file, which uses
+Nurture's `sha256-path-content-v1` scheme over a different scope. It does
+confirm that Base's contract source moved, so Step 3's pin rotation is
+mandatory rather than optional.
 
 ### Step 2 — My-Chat
 
