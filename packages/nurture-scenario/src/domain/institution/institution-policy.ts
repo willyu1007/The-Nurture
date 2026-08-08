@@ -5,6 +5,7 @@ import type {
   NurturePolicyFacts,
   NurturePolicyReasonCode,
 } from "./institution-context.js";
+import { deriveInstitutionScopeChain } from "./institution-authority-chain.js";
 
 const decideReason = (
   input: NurturePolicyFactRequest,
@@ -85,45 +86,37 @@ const decideReason = (
         return "enrollment_inactive";
       }
       return "allowed";
-    case "nurture.institution_admin_scope":
-      // 0C-1 level: exactly one active institution_admin assignment. The role
-      // union admits five values; only this one reaches an Institution surface,
-      // and system_operator is never selectable (0C-1 §4).
-      if (facts.role_kind !== "institution_admin") return "not_authorized";
-      // 0C-2 level: the assignment must be AT institution scope. An admin
-      // assignment at care_group or enrollment scope is not widened to that
-      // scope's institution — it denies. This reads the actor's own resolved
-      // binding, which the repository derives from the stored assignment row.
-      if (input.resolved_context.actor.scope_type !== "institution") {
+    case "nurture.institution_admin_scope": {
+      // G4-A increment 2. Levels 0C-2 and 0C-3 now live in the chain module,
+      // so this key and `NurtureInstitutionAuthorityChain` share one
+      // implementation instead of growing a second copy that drifts apart.
+      //
+      // The actor context is built from the stored channel the repository
+      // echoed back — `actor_scope_type` / `actor_scope_ref` — not from
+      // `input.resolved_context.actor`, which the caller supplies. 0C-1 §3:
+      // a caller MUST NOT synthesize a role, a scope type or a scope id.
+      // Absent facts mean no binding resolved, which is itself a denial.
+      if (!facts.role_kind || !facts.actor_scope_type || !facts.actor_scope_ref) {
         return "not_authorized";
       }
-      // 0C-2 currency, using the conjunction from the lifecycle decision
-      // (0G finding 3): status = active AND deletedAt IS NULL.
-      if (!facts.institution_scope_current) return "not_authorized";
-      // 0C-2 target placement. Each state is handled explicitly so that a new
-      // state cannot fall through to allow: "absent" is an institution-level
-      // read with nothing to place, "out_of_scope" covers both another
-      // institution and a target that resolves to none — 0C-2 gives them one
-      // code so an Admin cannot tell them apart — and "class_not_current"
-      // carries 0C-3's own code.
-      switch (facts.target_scope_state) {
-        case "out_of_scope":
-          return "not_authorized";
-        case "class_not_current":
-          return "class_not_current";
-        case "absent":
-        case "in_scope":
-          break;
-      }
-      // 0C-3 level: a child-level target must sit in the NAMED class. The
-      // guard reads `child_target_resolved` — the same resolved channel the
-      // fact is computed from — because keying it off the caller-supplied
-      // `target.child_care_process_id` let an omitted field skip the check
-      // while the repository had already computed a denial.
-      if (facts.child_target_resolved) {
-        return facts.child_in_named_class ? "allowed" : "scope_mismatch";
-      }
-      return "allowed";
+      const result = deriveInstitutionScopeChain(
+        {
+          contract_version: "1.0.0",
+          participant_ref: input.resolved_context.actor.participant_id,
+          role_assignment_ref: input.resolved_context.actor.role_assignment_id,
+          role_kind: facts.role_kind,
+          scope_type: facts.actor_scope_type,
+          scope_ref: facts.actor_scope_ref,
+          // This entry point takes a named assignment on every call, so
+          // selection never ran. `explicit` states that plainly rather than
+          // claiming a uniqueness nothing checked.
+          selection_mode: "explicit",
+        },
+        facts,
+        { purpose_key: input.purpose_key },
+      );
+      return result.status === "resolved" ? "allowed" : result.reason_code;
+    }
     case "nurture.can_confirm_media_attribution":
       if (
         facts.role_kind !== "caregiver" &&

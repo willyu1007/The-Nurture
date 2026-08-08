@@ -44,7 +44,13 @@ export type NurtureActorBinding = {
 export type NurtureResolvedContext = {
   actor: {
     participant_id: string;
-    my_chat_user_id: string;
+    /**
+     * Optional since G4-A increment 2. No authority path reads it — the 0C
+     * chain identifies the actor by participant and assignment, both stored
+     * refs — and requiring it forced a caller with neither to synthesize an
+     * empty principal. Producers that have it still pass it.
+     */
+    my_chat_user_id?: string;
     role_assignment_id: string;
     role_kind: NurtureCareRole;
     scope_type: NurtureCareScopeType;
@@ -155,6 +161,13 @@ export type NurturePolicyFactRequest = {
   resolved_context: NurtureResolvedContext;
   data_class?: NurtureGrantDataClass;
   direction?: NurtureGrantDirection;
+  /**
+   * G4-A increment 2, frozen by 0C-3 §4 step 3. Typed as a plain string, not
+   * the closed union: an unrecognized purpose must reach the predicate and be
+   * denied `purpose_not_honoured`, and a union would make that state
+   * unreachable at the type level while callers on the wire can still send it.
+   */
+  purpose_key?: string;
 };
 
 export type NurturePolicyFacts = {
@@ -187,13 +200,36 @@ export type NurturePolicyFacts = {
     | "out_of_scope"
     | "class_not_current";
   /**
-   * Whether a child-level read was RESOLVED, not whether the caller supplied
-   * `target.child_care_process_id`. The predicate must gate on the same
-   * channel the fact is computed from; keying the guard off the raw optional
-   * field let an omitted field skip the check entirely.
+   * The refs the repository RESOLVED from stored rows — never what the caller
+   * supplied. The predicate must gate on the same channel the fact is computed
+   * from; keying the guard off the caller's optional
+   * `target.child_care_process_id` let an omitted field skip the check
+   * entirely (increment 1 audit, defect 2).
+   *
+   * These carry the value rather than a boolean because 0C-3's context type
+   * needs the refs themselves. A separate `child_target_resolved` boolean
+   * alongside them would be the same fact on two channels, which is the shape
+   * that keeps failing here.
    */
-  child_target_resolved: boolean;
+  resolved_care_group_ref?: string;
+  resolved_child_process_ref?: string;
   child_in_named_class: boolean;
+  /**
+   * G4-A increment 2. The actor's scope AS STORED, echoed from the resolved
+   * binding rather than from the caller's `resolved_context.actor`.
+   *
+   * 0C-1 §3 is explicit that a caller MUST NOT synthesize a role, a scope type
+   * or a scope id — every one is issued by Nurture from a stored row. The
+   * first predicate read `resolved_context.actor.scope_type`, a caller-supplied
+   * value, for the 0C-2 decision. That happened to fail closed only because
+   * `institution_scope_current` is computed from the binding and covered it;
+   * the safety was incidental, not designed. These fields give the predicate
+   * the stored channel directly, so the two can no longer disagree.
+   *
+   * Absent when no binding resolves, which is itself a denial.
+   */
+  actor_scope_type?: NurtureCareScopeType;
+  actor_scope_ref?: string;
   care_group_matches: boolean;
   child_visible: boolean;
   thread_state: "active" | "inactive" | "missing";
@@ -232,6 +268,15 @@ export type NurturePolicyReasonCode =
   // 0C-3 reserves a distinct code for a class inside the admin's own
   // institution that is not current, separate from missing/other-institution.
   | "class_not_current"
+  // G4-A increment 2, from the 0C-1 and 0C-3 default-safe tables.
+  // 0C-1 §6: several eligible assignments and none named. The chain never
+  // picks, merges or defaults to one.
+  | "role_selection_required"
+  // 0C-3 §6: both are contract faults the caller can fix, which is why they
+  // live at level 3. `purpose_not_granted` is an authority fact the caller
+  // cannot fix and belongs to 0C-5 — see 0G finding 1.
+  | "purpose_required"
+  | "purpose_not_honoured"
   | "child_not_enrolled"
   | "exposure_policy_missing";
 

@@ -180,7 +180,6 @@ const unavailablePolicyFacts = (): NurturePolicyFacts => ({
   scope_reaches_child: false,
   institution_scope_current: false,
   target_scope_state: "absent",
-  child_target_resolved: false,
   child_in_named_class: false,
   care_group_matches: false,
   child_visible: false,

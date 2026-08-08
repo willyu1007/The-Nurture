@@ -779,9 +779,11 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       // reporting a placement that was never evaluated.
       targetScopeState = targetSupplied ? "out_of_scope" : "absent";
     }
-    // Resolved, not caller-supplied: childCareProcessId is overwritten from
-    // stored rows above, and the predicate gates on this same channel.
-    const childTargetResolved = Boolean(childCareProcessId);
+    // Resolved, not caller-supplied: childCareProcessId and careGroupId are
+    // overwritten from stored rows above, and the predicate gates on this same
+    // channel. Emitted as the refs themselves rather than as booleans because
+    // 0C-3's context type carries them onward — a boolean beside the ref would
+    // be the same fact on two channels.
     const childInNamedClass =
       targetScopeState === "in_scope" && childCareProcessId && careGroupId
         ? Boolean(
@@ -854,8 +856,15 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       scope_reaches_child: scopeReachesChild,
       institution_scope_current: institutionScopeCurrent,
       target_scope_state: targetScopeState,
-      child_target_resolved: childTargetResolved,
+      ...(careGroupId ? { resolved_care_group_ref: careGroupId } : {}),
+      ...(childCareProcessId ? { resolved_child_process_ref: childCareProcessId } : {}),
       child_in_named_class: childInNamedClass,
+      // 0C-1 §3: the actor's scope is issued by Nurture from the stored
+      // assignment row. Echoed from the binding so the predicate never has to
+      // trust the caller's copy.
+      ...(binding
+        ? { actor_scope_type: binding.scope_type, actor_scope_ref: binding.scope_id }
+        : {}),
       care_group_matches: Boolean(
         binding &&
           careGroupId &&

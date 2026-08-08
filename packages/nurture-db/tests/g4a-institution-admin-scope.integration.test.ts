@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import {
+  NurtureInstitutionAuthorityChain,
   NurtureInstitutionPolicyService,
   type NurturePolicyFactRequest,
   type NurtureResolvedContext,
@@ -143,6 +144,10 @@ const request = (
 ): NurturePolicyFactRequest => ({
   workspace_id: scope.workspaceId,
   policy_key: "nurture.institution_admin_scope",
+  // These cases are about scope placement, so the purpose is declared and
+  // recognized throughout. Purpose itself is exercised by the chain suite
+  // below, where its absence and its vocabulary are the subject.
+  purpose_key: "care_coordination",
   resolved_context: {
     actor: {
       participant_id: scope.admin.id,
@@ -255,7 +260,7 @@ describe("T-007 G4-A institution_admin_scope facts (production DB lane)", () => 
     await expect(
       repository.loadPolicyFacts(request(scope, target(insiderThread.id))),
     ).resolves.toMatchObject({
-      child_target_resolved: true,
+      resolved_child_process_ref: expect.any(String),
       child_in_named_class: true,
       target_scope_state: "in_scope",
     });
@@ -270,7 +275,7 @@ describe("T-007 G4-A institution_admin_scope facts (production DB lane)", () => 
     const outsiderThread = await seedThread(scope, outsider, namedClass.id);
     await expect(
       repository.loadPolicyFacts(request(scope, target(outsiderThread.id))),
-    ).resolves.toMatchObject({ child_target_resolved: true, child_in_named_class: false });
+    ).resolves.toMatchObject({ resolved_child_process_ref: expect.any(String), child_in_named_class: false });
 
     // The guard must read the same channel the fact is computed from. Hold the
     // stored rows constant and vary only whether the caller supplied the
@@ -308,7 +313,7 @@ describe("T-007 G4-A institution_admin_scope facts (production DB lane)", () => 
       scope_reaches_child: true,
       // 0C-3 asks the narrower question, and answers it differently.
       child_in_named_class: false,
-      child_target_resolved: true,
+      resolved_child_process_ref: expect.any(String),
       target_scope_state: "in_scope",
       enrollment_state: "inactive",
     });
@@ -341,6 +346,204 @@ describe("T-007 G4-A institution_admin_scope facts (production DB lane)", () => 
     await expect(policy.evaluate(request(scope))).resolves.toMatchObject({
       allowed: false,
       reason_code: "not_authorized",
+    });
+  });
+});
+
+/**
+ * G4-A increment 2 — the chain over real rows.
+ *
+ * The unit tests drive `selectActiveRole` and `deriveInstitutionScopeChain`
+ * over hand-built bindings. What they cannot show is that the bindings a real
+ * `listActiveActorBindings` returns carry the shape selection depends on, or
+ * that the actor scope the predicate now trusts is genuinely the stored one.
+ */
+describe("T-007 G4-A authority chain over stored rows (production DB lane)", () => {
+  const chain = new NurtureInstitutionAuthorityChain(repository);
+  const at = "2026-08-09T00:00:00.000Z";
+
+  const seedAdminRole = (scope: Scope, institutionId: string) =>
+    prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        participantId: scope.admin.id,
+        role: "institution_admin",
+        scopeType: "institution",
+        scopeId: institutionId,
+        status: "active",
+      },
+    });
+
+  it("resolves a single stored assignment as unique and echoes its scope", async () => {
+    const scope = await seedScope();
+    const result = await chain.resolve({
+      workspace_id: scope.workspaceId,
+      participant_ref: scope.admin.id,
+      at,
+    });
+    expect(result).toMatchObject({
+      status: "resolved",
+      level: "institution_scope",
+      active_role: {
+        selection_mode: "unique",
+        role_assignment_ref: scope.adminRole.id,
+        role_kind: "institution_admin",
+        scope_type: "institution",
+        scope_ref: scope.home.id,
+      },
+      institution_scope: { institution_ref: scope.home.id, institution_state: "active" },
+    });
+  });
+
+  it("denies two stored assignments with none named, and resolves the named one exactly", async () => {
+    const scope = await seedScope();
+    const second = await seedAdminRole(scope, scope.other.id);
+
+    // 0C-1 §4: an ambiguous multi-role request never picks, merges or defaults.
+    await expect(
+      chain.resolve({ workspace_id: scope.workspaceId, participant_ref: scope.admin.id, at }),
+    ).resolves.toMatchObject({
+      status: "denied",
+      level: "active_role",
+      reason_code: "role_selection_required",
+    });
+
+    await expect(
+      chain.resolve({
+        workspace_id: scope.workspaceId,
+        participant_ref: scope.admin.id,
+        role_assignment_ref: second.id,
+        at,
+      }),
+    ).resolves.toMatchObject({
+      status: "resolved",
+      active_role: {
+        selection_mode: "explicit",
+        role_assignment_ref: second.id,
+        scope_ref: scope.other.id,
+      },
+    });
+  });
+
+  it("denies an assignment belonging to another participant with no fallback", async () => {
+    const scope = await seedScope();
+    const stranger = await prisma.nurtureParticipant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        myChatUserId: `stranger:${scope.workspaceId}`,
+        status: "active",
+      },
+    });
+    const strangerRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        participantId: stranger.id,
+        role: "institution_admin",
+        scopeType: "institution",
+        scopeId: scope.home.id,
+        status: "active",
+      },
+    });
+    // The caller's own assignment would resolve on its own, so falling back to
+    // it would look like a success.
+    await expect(
+      chain.resolve({
+        workspace_id: scope.workspaceId,
+        participant_ref: scope.admin.id,
+        role_assignment_ref: strangerRole.id,
+        at,
+      }),
+    ).resolves.toMatchObject({
+      status: "denied",
+      level: "active_role",
+      reason_code: "role_missing",
+    });
+  });
+
+  it("emits the actor scope from the assignment row, for the predicate to read", async () => {
+    const scope = await seedScope();
+    await expect(repository.loadPolicyFacts(request(scope))).resolves.toMatchObject({
+      actor_scope_type: "institution",
+      actor_scope_ref: scope.home.id,
+    });
+
+    // A care_group-scoped admin: the stored channel says care_group, and no
+    // claim the caller makes can widen it to the group's institution.
+    const groupScoped = await seedScope();
+    const groupClass = await seedClass(groupScoped.workspaceId, groupScoped.home.id, "Class");
+    const groupRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: groupScoped.workspaceId,
+        participantId: groupScoped.admin.id,
+        role: "institution_admin",
+        scopeType: "care_group",
+        scopeId: groupClass.id,
+        status: "active",
+      },
+    });
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: groupScoped.adminRole.id },
+      data: { status: "revoked" },
+    });
+    const claimed = {
+      ...request(groupScoped),
+      resolved_context: {
+        ...request(groupScoped).resolved_context,
+        actor: {
+          ...request(groupScoped).resolved_context.actor,
+          role_assignment_id: groupRole.id,
+        },
+      },
+    };
+    await expect(repository.loadPolicyFacts(claimed)).resolves.toMatchObject({
+      actor_scope_type: "care_group",
+      actor_scope_ref: groupClass.id,
+    });
+    // The caller's context still claims scope_type "institution".
+    await expect(policy.evaluate(claimed)).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "not_authorized",
+    });
+  });
+
+  it("requires a declared purpose from the frozen vocabulary for a child-level read", async () => {
+    const scope = await seedScope();
+    const namedClass = await seedClass(scope.workspaceId, scope.home.id, "Named Class");
+    const child = await seedChild(scope.workspaceId, "Child In Class");
+    await seedEnrollment(scope, child, namedClass.id);
+    const thread = await seedThread(scope, child, namedClass.id);
+    const base = {
+      workspace_id: scope.workspaceId,
+      participant_ref: scope.admin.id,
+      at,
+      target: {
+        object_type: "family_care_thread",
+        object_id: thread.id,
+        lifecycle_state: "active",
+      },
+    };
+
+    // The child is resolved from the thread row, so 0C-3 applies even though
+    // the caller named no child.
+    await expect(chain.resolve(base)).resolves.toMatchObject({
+      status: "denied",
+      level: "child_scope",
+      reason_code: "purpose_required",
+    });
+    await expect(
+      chain.resolve({ ...base, purpose_key: "attendance_review" }),
+    ).resolves.toMatchObject({ status: "denied", reason_code: "purpose_not_honoured" });
+
+    await expect(
+      chain.resolve({ ...base, purpose_key: "care_coordination" }),
+    ).resolves.toMatchObject({
+      status: "resolved",
+      level: "child_scope",
+      child_scope: {
+        care_group_ref: namedClass.id,
+        child_process_ref: child.process.id,
+        purpose_key: "care_coordination",
+      },
     });
   });
 });

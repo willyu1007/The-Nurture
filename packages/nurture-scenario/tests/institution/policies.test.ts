@@ -339,7 +339,8 @@ const baseFacts = (): NurturePolicyFacts => ({
   scope_reaches_child: true,
   institution_scope_current: true,
   target_scope_state: "in_scope",
-  child_target_resolved: true,
+  resolved_care_group_ref: "group-1",
+  resolved_child_process_ref: "process-1",
   child_in_named_class: true,
   care_group_matches: true,
   child_visible: true,
@@ -511,6 +512,11 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
       loadPolicyFacts: async () => ({
         ...baseFacts(),
         role_kind: "institution_admin",
+        // G4-A increment 2: the actor's scope now arrives on the STORED
+        // channel. These are what the repository echoes from the assignment
+        // row, and the predicate reads them instead of the caller's copy.
+        actor_scope_type: "institution",
+        actor_scope_ref: "institution-1",
         ...facts,
       }),
     });
@@ -518,12 +524,21 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
       workspace_id: "workspace-1",
       policy_key: "nurture.institution_admin_scope",
       resolved_context: context,
+      purpose_key: "care_coordination",
     } as Parameters<NurtureInstitutionPolicyService["evaluate"]>[0]);
     return decision;
   };
 
   it("allows a current admin whose target sits in the named class", async () => {
     expect(await decide({})).toMatchObject({ reason_code: "allowed" });
+  });
+
+  it("denies when no binding resolved, so no stored scope was issued at all", async () => {
+    const decision = await decide({
+      actor_scope_type: undefined,
+      actor_scope_ref: undefined,
+    });
+    expect(decision).toMatchObject({ reason_code: "not_authorized" });
   });
 
   it("denies every non-admin role with one indistinguishable code", async () => {
@@ -536,9 +551,31 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
 
   it("denies an admin assignment held at a non-institution scope", async () => {
     // 0C-2: an institution_admin at care_group scope is not widened to that
-    // group's institution.
-    const decision = await decide({}, adminContext({ scope_type: "care_group" }));
+    // group's institution. Since increment 2 the scope under test is the
+    // STORED one — the caller's copy no longer reaches this decision.
+    const decision = await decide({ actor_scope_type: "care_group" });
     expect(decision).toMatchObject({ reason_code: "not_authorized" });
+  });
+
+  /**
+   * G4-A increment 2, and the point of the stored channel.
+   *
+   * 0C-1 §3 is explicit that a caller MUST NOT synthesize a scope type, yet
+   * the increment 1 predicate read `resolved_context.actor.scope_type` for the
+   * 0C-2 decision. It happened to fail closed only because
+   * `institution_scope_current` is computed from the binding and covered it —
+   * incidental safety, not designed. This proves the caller's channel is now
+   * disconnected: they claim a scope the stored row contradicts, in the
+   * direction that would have denied, and the stored row still decides.
+   */
+  it("ignores the caller's claimed scope entirely, in both directions", async () => {
+    const claimsLess = await decide({}, adminContext({ scope_type: "care_group" }));
+    expect(claimsLess).toMatchObject({ reason_code: "allowed" });
+    const claimsMore = await decide(
+      { actor_scope_type: "care_group" },
+      adminContext({ scope_type: "institution" }),
+    );
+    expect(claimsMore).toMatchObject({ reason_code: "not_authorized" });
   });
 
   it("denies a non-current institution indistinguishably from a missing one", async () => {
@@ -594,7 +631,7 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
 
   it("allows a class-level read with no child target", async () => {
     const decision = await decide(
-      { child_target_resolved: false, child_in_named_class: false },
+      { resolved_child_process_ref: undefined, child_in_named_class: false },
       adminContext({}, null),
     );
     expect(decision).toMatchObject({ reason_code: "allowed" });
@@ -609,7 +646,7 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
    */
   it("denies a resolved child read even when the caller omitted the child field", async () => {
     const decision = await decide(
-      { child_target_resolved: true, child_in_named_class: false },
+      { resolved_child_process_ref: "process-1", child_in_named_class: false },
       adminContext({}, null), // caller supplies no target at all
     );
     expect(decision).toMatchObject({ reason_code: "scope_mismatch" });
