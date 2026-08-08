@@ -1,9 +1,10 @@
-# T-009 I6-Batch Requalification Record (surface contract 1.16.0)
+# T-009 Closing Requalification Record (surface contract 1.17.0)
 
 ## Verdict
 
-- Task: T-009 (family growth provider), 1.16.0 batch (I6 cession + I6.2 queue
-  vocabulary + I7b joint suite and lane wiring + post-requal quality pass)
+- Task: T-009 (family growth provider), closing qualification: the 1.16.0
+  batch (I6 cession + I6.2 queue vocabulary + I7b joint suite + quality pass)
+  and the I8 finale at `nurture.surface-contract@1.17.0`
 - Date: 2026-08-08
 - Verdict: `REQUAL_PASS` (refreshed — see history below)
 - Provider state: qualified, default-off
@@ -24,19 +25,21 @@ two-family independence proven only across separate workspaces, and
 happy-path-only digest-verification evidence — and fixed all four
 (`487a069`). Because the fix touched a pinned source
 (`publish-lane.read.ts`), the invalidation clause below applied to the first
-run, and THIS record is the fresh qualification at the fixed checkpoint; the
-`97b9afe` run is historical.
+run, and a second run qualified the fixed checkpoint `487a069`. I8 (teacher-queue
+lifecycle overlay) then rotated the contract to `1.17.0`; THIS record is the
+full re-run at the I8 checkpoint, closing T-009. The `97b9afe` and `487a069`
+runs are historical.
 
 ## Exact Bound Inputs
 
-1. Surface contract: `nurture.surface-contract@1.16.0` /
-   `sha256:4bc8eeefaedded811523395add3a6126c5efc4ac737609a51e3fc7df442f0ca5`,
-   shared core
+1. Surface contract: `nurture.surface-contract@1.17.0` /
+   `sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8`,
+   shared core (unchanged across the rotation)
    `sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d`,
    33 capabilities / 6 surfaces.
-2. Nurture checkpoint: `487a069` (main; self-pin
-   `48dbe2c1cf97a1ff9322538217b4d8127408f89d38f960151b27a63362f124d1`,
-   185 files).
+2. Nurture checkpoint: `4ed7724` (main; self-pin
+   `8717270f14c6…` — full value in
+   `docs/project/integrations/my-chat-workflow-contract.json`, 185 files).
 3. My-Chat: `df7a273bff65b965da45e2e9604cee3b6b8fc20b` (rotated once in this
    batch, D-T009-04).
 4. My-Workflow-Base: `8a3ea9028d414813994a57ef3501ecad3dd7c434` (rotated once
@@ -51,7 +54,7 @@ run, and THIS record is the fresh qualification at the fixed checkpoint; the
 ## Qualification Topology
 
 Three adjacent exact detached worktrees under a disposable parent directory
-(`The-Nurture` @ 97b9afe, `My-Chat` @ df7a273, `My-Workflow-Base` @ 8a3ea90),
+(`The-Nurture` @ 4ed7724, `My-Chat` @ df7a273, `My-Workflow-Base` @ 8a3ea90),
 so the `link:../My-Chat/...` package links, the pin verifier and every lane
 loaded the same frozen sources. Frozen installs used
 `pnpm install --ignore-scripts`; Prisma clients (Nurture, My-Chat, dev-host)
@@ -75,13 +78,13 @@ untouched):
 
 | Gate | Result |
 | --- | --- |
-| `verify-workflow-contract-pin` (sibling worktrees at exact pins) | ok — Base contract 11 files parity `8dd53be4…`; My-Chat `x5_joint_api` 190 files `30878ba3…`, `wave4_binding_host` 20 files `947b4857…`; Nurture self 185 files `48dbe2c1…`. (The LIVE My-Chat sibling has moved past the pin — another task's work; the exact-pin populations here are the binding evidence.) |
+| `verify-workflow-contract-pin` (sibling worktrees at exact pins) | ok — Base contract 11 files parity `8dd53be4…`; My-Chat `x5_joint_api` 190 files `30878ba3…`, `wave4_binding_host` 20 files `947b4857…`; Nurture self 185 files `8717270f…`. (The LIVE My-Chat sibling has moved past the pin — another task's work; the exact-pin populations here are the binding evidence.) |
 | assert scripts: test-routing, g3-0-freeze, g2-exit-contract, formal-ingress, port-topology, persistence-boundaries, n1-schema, x4-handoff-replay | all ok (routing census 57/26/11/14 + x5-joint=2; retired `guardian_current_focus` pair tracked reserved-RETIRED) |
 | `assert-g2-exit-db-census` + `assert-production-db-boundary` (fresh DB) | ok — census violations=0; 63 tables / 93 enums |
 | Deterministic surface-contract rebuild | zero drift in `generated/`; `verify:surface-contract` ok at the digest above; tooling tests 5 pass / 0 fail |
 | `tsc --noEmit` | clean |
-| `pnpm test:unit` | 57 files / 615 tests |
-| `pnpm test:db` (fresh empty DB) | 26 files / 256 tests |
+| `pnpm test:unit` | 57 files / 616 tests |
+| `pnpm test:db` (fresh empty DB) | 26 files / 257 tests |
 | scenario-service `test` + `test:db` (dist) | 11/66 + 3/64 |
 | `pnpm test:dev-host` (fresh empty DB) | 11/27 |
 | x5 lane (`vitest.x5.config.ts`, both fresh DBs) | 2 files / 12 tests — x5 joint acceptance + the eight T-009 I7b joint cases (seven N8-derived + the JX1 tampered-rendition hardening case) against the real My-Chat consumer |
@@ -94,5 +97,6 @@ files, and the census/boundary asserts ran against the empty replayed schema.
 
 Any surface digest, owner revision/source-pin hash, Nurture self-pin
 population, DB schema/migration, transport addendum or default-off posture
-drift invalidates the affected portion and requires requalification. I8
-(teacher queue UI binding) remains open and is not covered by this record.
+drift invalidates the affected portion and requires requalification. With I8
+landed and qualified here, every T-009 increment (I0-I8) is covered; the
+task is complete on the provider side.
