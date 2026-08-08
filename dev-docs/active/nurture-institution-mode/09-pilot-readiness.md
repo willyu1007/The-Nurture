@@ -316,10 +316,10 @@ The canonical product action identity is `(scenario_key, action_key)`. For Nurtu
 | Locked `action_key` | Workflow entrypoint/handler when applicable | Existing authoritative `command_key` | Current implementation fact |
 | --- | --- | --- | --- |
 | `submit_family_care_question` | Scenario domain action; C-3-0d driver `workflow_claimed_step_v1`. Historical `capture_family_input` remains a separate compatibility entrypoint. | `nurture.family_care.capture_and_route` | Command transaction scaffold exists; the authenticated protected domain-action handler does not. C-3-1 forbids alias/fallback to the historical entrypoint. |
-| `revoke_child_link_grant` | Scenario domain action; C-3-0d driver `nurture_direct_empty_v1` | `nurture.family_care.revoke_grant` | Command spec/transaction exist; authenticated surface action does not. |
-| `acknowledge_family_care_item` | Scenario domain action; C-3-0d driver `nurture_direct_empty_v1` | `nurture.family_care.acknowledge_item` | Command spec/transaction exist; authenticated surface action does not. |
+| `revoke_child_link_grant` | Scenario domain action; C-3-0d driver `scenario_direct_empty_v1` | `nurture.family_care.revoke_grant` | Command spec/transaction exist; authenticated surface action does not. |
+| `acknowledge_family_care_item` | Scenario domain action; C-3-0d driver `scenario_direct_empty_v1` | `nurture.family_care.acknowledge_item` | Command spec/transaction exist; authenticated surface action does not. |
 | `reply_family_care_item` | Scenario domain action; C-3-0d driver `workflow_claimed_step_v1` | `nurture.family_care.reply_item` | Command spec/transaction exist; authenticated surface action and reply Handoff wiring do not. |
-| `redact_family_care_message` | Scenario domain action; C-3-0d driver `nurture_direct_empty_v1` | `nurture.family_care.redact_message` | Command spec/transaction exist; authenticated surface action does not. |
+| `redact_family_care_message` | Scenario domain action; C-3-0d driver `scenario_direct_empty_v1` | `nurture.family_care.redact_message` | Command spec/transaction exist; authenticated surface action does not. |
 | `cancel_family_care_route` | Not declared in Pilot | `nurture.family_care.cancel_route` | Command scaffold exists, but B3-3d locks no Pilot cancel and C-3-0d forbids activation. |
 
 The key-layer boundary is exact:
@@ -2674,7 +2674,7 @@ The only ordinary Nurture domain-action drivers are:
 
 | Driver | Exact meaning |
 | --- | --- |
-| `nurture_direct_empty_v1` | No Workflow Run/Step. Nurture atomically consumes the owner context, commits the business effect and typed Execution, and persists explicit `[]` with null driver. |
+| `scenario_direct_empty_v1` | No Workflow Run/Step. Nurture atomically consumes the owner context, commits the business effect and typed Execution, and persists explicit `[]` with null driver. |
 | `workflow_claimed_step_v1` | My-Chat persists and binds the original content-free Step before claim; only that claimed Step may drive the Nurture transaction and later materialize Handoff/Outbox. |
 
 Driver is part of the action contract, not a surface or runtime result. The same action MUST retain the same driver across Chat/board/workbench, zero/one/many recipients, `applied|already_satisfied`, `executed|replayed`, provider outage, and latency. A path capable of any non-empty snapshot remains claimed when its current snapshot array is empty. No recipient-based, outcome-based, surface-based, or failure-based downgrade to direct is permitted.
@@ -2711,11 +2711,11 @@ The exact Pilot driver matrix is:
 | `propose_enrollment_transfer` | `workflow_claimed_step_v1`, inactive pending additive adoption | Future `guardian_relationship_attention` for every current exact-Family Guardian RoleAssignment. |
 | `withdraw_family_enrollment` | `workflow_claimed_step_v1`, inactive pending additive adoption | Future relationship attention for other current Guardians, excluding the actor. |
 | `close_enrollment` | `workflow_claimed_step_v1`, inactive pending additive adoption | Future relationship attention for every current Guardian. |
-| `acknowledge_family_care_item`, `redact_family_care_message` | `nurture_direct_empty_v1` | Current owner reread only; no new Host activation. |
-| Enrollment confirm/pause/resume, transfer cancel/decline/confirm, stage mutation | `nurture_direct_empty_v1` | Preserve the explicit-empty C-2d/C-2f matrix. |
-| Grant confirm/replace/revoke | `nurture_direct_empty_v1` | Preserve explicit empty/null-driver and current authorization fences. |
-| `exit_guardian_relationship` | `nurture_direct_empty_v1` | Exact-self accepted-role exit; explicit empty even though relationship attention has a Guardian-role source class. |
-| Ordinary Institution/CareGroup/staff/policy mutation without a Host delivery effect | `nurture_direct_empty_v1` | Institution surfaces reread owner state; no synthetic notification. |
+| `acknowledge_family_care_item`, `redact_family_care_message` | `scenario_direct_empty_v1` | Current owner reread only; no new Host activation. |
+| Enrollment confirm/pause/resume, transfer cancel/decline/confirm, stage mutation | `scenario_direct_empty_v1` | Preserve the explicit-empty C-2d/C-2f matrix. |
+| Grant confirm/replace/revoke | `scenario_direct_empty_v1` | Preserve explicit empty/null-driver and current authorization fences. |
+| `exit_guardian_relationship` | `scenario_direct_empty_v1` | Exact-self accepted-role exit; explicit empty even though relationship attention has a Guardian-role source class. |
+| Ordinary Institution/CareGroup/staff/policy mutation without a Host delivery effect | `scenario_direct_empty_v1` | Institution surfaces reread owner state; no synthetic notification. |
 | `cancel_family_care_route` | Not declared | B3-3d no-Pilot-cancel remains authoritative. |
 | `initiate_enrollment` | Inactive pending C-1/C-4 classification | C-1/C-4 must jointly close the Nurture business commit and existing Host Enrollment Invitation delivery/recovery; C-3-0d assigns no Handoff shortcut. |
 | Host adult/Guardian invitation continuation, C-0 bootstrap, Technical Operator, portability | Outside ordinary domain-action driver registry | Retain separately owned identity/onboarding, provisioning, operations, or future protocol. |
@@ -2726,7 +2726,7 @@ Nurture derives effect identity and never accepts a client command id:
 
 ```text
 direct  = H("nurture.domain-action.direct.v1",
-            workspace_id, action_key, interaction_context_id)
+            workspace_id, scenario_key, action_key, interaction_context_id)
 
 claimed = H("nurture.domain-action.claimed-step.v1",
             workspace_id, scenario_key, original_step_id, action_key)
@@ -2867,7 +2867,7 @@ C-3-0 is now complete only as a shared-baseline design and implementation-eviden
 1. The Guardian product unit is one child-scoped `family_care_question` work entry, not a direct chat, group chat, mutable conversation, or generic Workflow Run. One entry begins with one Guardian source Message and one `NurtureFamilyCareItem`; the entry may later observe one acknowledge and one caregiver reply. A correction, supplement, or follow-up is a new question, Item, protected object, command identity, and routing attempt.
 2. The existing `NurtureFamilyCareItem` is the internal composition root. Nurture may expose a scenario-local, non-persisted `GuardianFamilyCommunicationEntryV1` presenter projection composed from exact Message, Receipt, Item, ItemEvent, Attention, optional reply Message/Receipt, and original Grant facts. The projection is not a new table, Base shared type, Host canonical object, Handoff payload, or cross-repository business identity.
 3. `NurtureFamilyCareThread` remains the exact ChildCareProcess/Family/Enrollment communication container, neither product UI nor authorization. Optional `ThreadParticipant` remains a projection and cannot grant or deny submit, read, history, or redaction. Every operation re-resolves the current Participant/role/Family/ChildCareProcess/Enrollment/Thread/Grant/policy path from owner facts.
-4. C-3-1 owns only Guardian `submit_family_care_question` using `workflow_claimed_step_v1` and Guardian-source `redact_family_care_message` using `nurture_direct_empty_v1`. C-3-1 observes but does not implement caregiver acknowledge/reply/reply-redaction, which remain C-3-3. Enrollment, Grant, transfer, withdrawal, and stage writes remain C-3-2; Notification, deep link, and cross-surface continuation remain C-3-4.
+4. C-3-1 owns only Guardian `submit_family_care_question` using `workflow_claimed_step_v1` and Guardian-source `redact_family_care_message` using `scenario_direct_empty_v1`. C-3-1 observes but does not implement caregiver acknowledge/reply/reply-redaction, which remain C-3-3. Enrollment, Grant, transfer, withdrawal, and stage writes remain C-3-2; Notification, deep link, and cross-surface continuation remain C-3-4.
 5. Guardian Chat, Family board, and Family workbench use one Nurture subject resolver, presenter, action registry, protected prepare/read path, and current policy. Surface adapters may change layout and bounded view scope only; they cannot create separate state, commands, authorization, copy dictionaries, cached projections, or recovery paths.
 6. Guardian Chat is generic My-Chat AI Chat plus a semantic panel, not a Nurture-specific chat shell. The AI may explain only owner-produced display-safe presentation and may open the protected composer. The AI cannot see, draft, summarize, translate, transfer, or submit protected body text in Pilot-0.
 7. The C-3-0e decision supersedes earlier B3 shorthand such as `AI-assisted draft`, `editable_preview` body fields, or AI-produced family/caregiver draft text. `scenario_protected_ai_draft_v1` remains OFF. A business body accepted by the protected composer never enters the legacy `InteractionEnvelope`, ordinary Chat message/`ContentRevision`, `PublicDraft`, Workflow artifact draft, semantic block, or Host result summary. User-authored ordinary Chat text remains outside that protected-body guarantee and can never be automatically promoted into the protected lifecycle.
@@ -2926,7 +2926,7 @@ The presenter must validate a complete, unique fact graph. `replied` requires th
 
 **C-3-1d — redaction, revoke, failure, and race semantics (LOCKED)**
 
-1. Guardian source redaction is the existing `redact_family_care_message` action with `confirmation_class=explicit`, `nurture_direct_empty_v1`, exact author/Message, expected version, current family reachability, and explicit irreversible-consequence copy. Redaction creates no Workflow Step, Handoff, Outbox, Notification, replacement content, hard delete, or unredact route.
+1. Guardian source redaction is the existing `redact_family_care_message` action with `confirmation_class=explicit`, `scenario_direct_empty_v1`, exact author/Message, expected version, current family reachability, and explicit irreversible-consequence copy. Redaction creates no Workflow Step, Handoff, Outbox, Notification, replacement content, hard delete, or unredact route.
 2. Source redaction crypto-erases the question, terminalizes the source Receipt with the locked source-redacted reason, suppresses the Item and active Attention, blocks later caregiver acknowledge/reply, and invalidates every protected view/ref. The presenter retains the highest completely committed `sent|acknowledged|replied` progress and shows a question tombstone. An already committed caregiver reply is not automatically redacted and remains independently subject to its current original-Grant/receiver policy.
 3. Caregiver reply redaction remains C-3-3. Guardian presentation observes the result as a reply tombstone while source question, terminal `replied` Item, resolved Attention, and business progress remain. Reply redaction cannot suppress/reopen the source Item, make acknowledge/reply available, or permit a second reply.
 4. Original Grant revoke/expiry/replacement, Grant-owner terminal role loss, terminal Enrollment/transfer, or permanent scope drift performs the locked full dependent closure. The Item may become `suppressed`, but prior progress remains visible as an authorized body-free fact. Family-side question and cross-role reply visibility follow C-3-1c; a new Grant never revives either receiver authority or action.
@@ -2999,7 +2999,7 @@ Relationship onboarding uses a dedicated Host invitation boundary because raw re
 | `cancel_co_guardian_invitation` | `nurture.family_care.cancel_co_guardian_invitation` | `explicit` | Exact current inviter terminalizes only their still-pending Nurture intent. |
 | `decline_enrollment_invitation` | `nurture.family_care.decline_enrollment_invitation` | `explicit` | After exact Host acceptance/authentication but before Enrollment consumption, the recipient terminalizes the still-pending Nurture Enrollment invitation. The action creates no Institution/Enrollment linkage and does not revoke an independently committed Child/Process/Family/Guardian profile. |
 
-These keys are not `domain_action_contracts` entries and do not use `nurture_direct_empty_v1`, `workflow_claimed_step_v1`, or Workflow Handoff. They use the separately verified C-3-0b `invitation_continuation` path and one Host invitation orchestration. Institution-side `initiate_enrollment` and cancellation remain C-4.
+These keys are not `domain_action_contracts` entries and do not use `scenario_direct_empty_v1`, `workflow_claimed_step_v1`, or Workflow Handoff. They use the separately verified C-3-0b `invitation_continuation` path and one Host invitation orchestration. Institution-side `initiate_enrollment` and cancellation remain C-4.
 
 1. Co-Guardian issue is reachable from Guardian Chat, Family board, and Family workbench by opening one My-Chat-owned invitation panel. Ordinary Chat history, semantic blocks, PublicDraft, Nurture rows, logs, and analytics never receive raw contact. Nurture receives only the opaque exact-recipient Host invitation binding and owner-confirmed relationship metadata.
 2. My-Chat first creates a non-deliverable exact-recipient invitation shell. The Nurture command then validates the inviter or prospective recipient and atomically creates its intent/effect, `CommandExecution`, and opaque Host binding. Only after the Nurture response or exact replay may My-Chat activate delivery. A Nurture rollback stops the unused Host shell; response or activation loss resumes the same identities. Provider failure never creates authority or rolls back a Nurture fact.
@@ -3007,7 +3007,7 @@ These keys are not `domain_action_contracts` entries and do not use `nurture_dir
 4. First-Guardian establishment is the locked recoverable owner sequence, not one cross-database transaction: the adult explicitly creates/selects the current platform Child/Family pair; the coordinator reuses valid typed anchors and reserves only missing ones; My-Chat atomically creates or exact-replays every missing binding; then one Nurture transaction rereads signed current pair/workspace evidence and binds/reuses the Participant while creating or resolving the local Child, ChildCareProcess, child-scoped Family, first current Guardian RoleAssignment, and both workspace associations. The Host operation carries the locked terminal/unknown recovery state. Co-Guardian acceptance uses a separate stable membership operation followed by the stable Nurture role operation; a one-sided commit grants nothing and is never compensated by the other owner. Neither flow creates Enrollment, Grant, Thread, Message, history copies, or retrospective notifications.
 5. Accepted Guardians are equal for family authority. Join order and `father|mother|other_guardian` are display metadata only. Pre-accept, the recipient has no existence/history/action access; post-accept, current owner reads may return eligible retained facts from before acceptance without copying them.
 6. A Participant who later rejoins through a new invitation/new RoleAssignment regains current family-side access to retained, unredacted facts and may again redact Messages they exactly authored while current family reach exists. Rejoin never restores the terminal old RoleAssignment, old Grant ownership, old original-Grant cross-role body/action authority, old drafts/contexts, or historical notifications. This current-family rule supersedes any reading of C-3-1 that a new relationship can never expose an old family episode.
-7. Accepted-role offboarding is the ordinary action `exit_guardian_relationship -> nurture.family_care.exit_guardian_relationship`, with `strong_authorization`, all three Guardian surfaces, and `nurture_direct_empty_v1`. The action binds the actor's exact current RoleAssignment/version and cannot target a peer.
+7. Accepted-role offboarding is the ordinary action `exit_guardian_relationship -> nurture.family_care.exit_guardian_relationship`, with `strong_authorization`, all three Guardian surfaces, and `scenario_direct_empty_v1`. The action binds the actor's exact current RoleAssignment/version and cannot target a peer.
 8. Self-exit fails before write for the last current Guardian. Otherwise one transaction revokes the actor's exact RoleAssignment, cancels their pending Co-Guardian intents, revokes/fences actor-owned Grants and dependents, preserves other-owner Grants, and commits one Execution with explicit `[]`. The transaction creates no relationship-attention snapshot, notification, Handoff, ownership transfer, or forced-removal precedent.
 9. Self-exit versus another self-exit, Co-Guardian accept, invitation cancel, Grant action, or family-care action is serialized from the Family/Process/current-role root. Two Guardians cannot both pass the last-Guardian fence. A stale loser must reread and reauthorize; no peer, Institution, Technical Operator, service, or database repair path may remove an accepted role.
 10. Enrollment-invitation decline may occur before or after workspace-local relationship establishment, provided the exact invitation remains pending and no Enrollment transaction has consumed it. Decline terminalizes only that invitation, creates no Institution link, Roster link, Enrollment, Grant, or Thread, and never deletes or rolls back committed platform identity/bindings, anchors/associations, local Child/Process/Family, Participant, or Guardian RoleAssignment. Evidence MUST include `local relationship committed -> invitation declined -> owner facts retained -> Enrollment absent` plus response-loss and concurrent Enrollment-consume first-commit-wins.
@@ -3018,11 +3018,11 @@ The ordinary action matrix is exact and identical on Guardian Chat, Family board
 
 | Action | Command | Driver | Authority and result boundary |
 | --- | --- | --- | --- |
-| `confirm_family_enrollment` | `nurture.family_care.confirm_enrollment` | `nurture_direct_empty_v1` | Exact current invitation recipient only; atomic Enrollment/Roster link/invitation consume; no Grant. |
-| `suspend_family_enrollment` | `nurture.family_care.suspend_enrollment` | `nurture_direct_empty_v1` | Any current exact-Family Guardian places the shared family-side Hold. |
-| `resume_family_enrollment` | `nurture.family_care.resume_enrollment` | `nurture_direct_empty_v1` | Any current exact-Family Guardian releases only the family-side Hold. |
-| `confirm_enrollment_transfer` | `nurture.family_care.confirm_enrollment_transfer` | `nurture_direct_empty_v1` | Any current exact-Family Guardian confirms one current same-Institution transfer proposal. |
-| `decline_enrollment_transfer` | `nurture.family_care.decline_enrollment_transfer` | `nurture_direct_empty_v1` | Any current exact-Family Guardian terminally declines one current proposal. |
+| `confirm_family_enrollment` | `nurture.family_care.confirm_enrollment` | `scenario_direct_empty_v1` | Exact current invitation recipient only; atomic Enrollment/Roster link/invitation consume; no Grant. |
+| `suspend_family_enrollment` | `nurture.family_care.suspend_enrollment` | `scenario_direct_empty_v1` | Any current exact-Family Guardian places the shared family-side Hold. |
+| `resume_family_enrollment` | `nurture.family_care.resume_enrollment` | `scenario_direct_empty_v1` | Any current exact-Family Guardian releases only the family-side Hold. |
+| `confirm_enrollment_transfer` | `nurture.family_care.confirm_enrollment_transfer` | `scenario_direct_empty_v1` | Any current exact-Family Guardian confirms one current same-Institution transfer proposal. |
+| `decline_enrollment_transfer` | `nurture.family_care.decline_enrollment_transfer` | `scenario_direct_empty_v1` | Any current exact-Family Guardian terminally declines one current proposal. |
 | `withdraw_family_enrollment` | `nurture.family_care.withdraw_enrollment` | `workflow_claimed_step_v1` | Any current exact-Family Guardian ends the shared Enrollment and may seed other-Guardian relationship attention. |
 
 Every listed action uses `strong_authorization`, one five-minute submit context, exact episode/root versions, and complete consequence review. Pilot adds no password, OTP, biometric, or legal-verification ceremony beyond the current applicable My-Chat recent-authentication policy; the Host assertion never replaces Nurture current authority or explicit confirmation. Natural-language agreement, AI classification, item open, invitation receipt, join order, Grant ownership, or a second Guardian's response cannot execute or countersign an action.
@@ -3036,7 +3036,7 @@ Every listed action uses `strong_authorization`, one five-minute submit context,
 **C-3-2c — Grant review and exact-owner administration (LOCKED)**
 
 1. `family_care_grant_current` is the sole current Grant presenter. The presenter shows the safe child, exact Institution/CareGroup/Enrollment episode, fixed bidirectional `family_care_question` profile, duration, allowed users, owner relation, excluded uses, retention/revoke effects, and current action availability. The presenter exposes no raw owner, Grant/Thread ref, body, internal enum/hash, or editable policy payload.
-2. `confirm_child_link_grant -> nurture.family_care.confirm_grant` is available on all three Guardian surfaces, uses `strong_authorization` and `nurture_direct_empty_v1`, and accepts no free-form profile. Any current exact-Family Guardian may perform the complete fixed-profile review. The first valid commit becomes the sole exact owner bound by both Participant and RoleAssignment; a racing or later same-definition confirmer sees family-user `already_active`, never joint ownership.
+2. `confirm_child_link_grant -> nurture.family_care.confirm_grant` is available on all three Guardian surfaces, uses `strong_authorization` and `scenario_direct_empty_v1`, and accepts no free-form profile. Any current exact-Family Guardian may perform the complete fixed-profile review. The first valid commit becomes the sole exact owner bound by both Participant and RoleAssignment; a racing or later same-definition confirmer sees family-user `already_active`, never joint ownership.
 3. Another current Guardian may use and inspect the current active Grant, submit eligible questions, and later create a complete fresh future-only Grant after terminal owner loss. They cannot replace, revoke, transfer, extend, renew, or inherit the existing Grant while its exact owner role remains temporarily or currently eligible.
 4. `replace_child_link_grant -> nurture.family_care.replace_grant` and `revoke_child_link_grant -> nurture.family_care.revoke_grant` remain all-surface, strong, direct-empty actions for the exact stored Participant plus exact stored RoleAssignment owner only. Replacement choices are current Nurture-policy-produced fixed deltas; the user cannot freely edit directions, data classes, purposes, scope, target, expiry, owner, or topology.
 5. Replacement creates one successor identity under the locked single lineage, same owner, exact Enrollment-private Thread container, and complete old-Grant fence. Revoke is irreversible with server-owned reason and complete fence. Neither operation revives, adopts, or reauthorizes old Message/Receipt/Item/Attention/body; reused Thread is not authority.
@@ -3044,7 +3044,7 @@ Every listed action uses `strong_authorization`, one five-minute submit context,
 
 **C-3-2d — family-owned StageEpisode selection and longitudinal view (LOCKED)**
 
-1. `child_care_stage_current` remains the canonical current/history presenter and `update_child_care_stage -> nurture.family_care.update_child_care_stage` remains the single action/command pair. Any current exact-Family Guardian may independently set, change, correct, or clear the current StageEpisode using `strong_authorization` and `nurture_direct_empty_v1`.
+1. `child_care_stage_current` remains the canonical current/history presenter and `update_child_care_stage -> nurture.family_care.update_child_care_stage` remains the single action/command pair. Any current exact-Family Guardian may independently set, change, correct, or clear the current StageEpisode using `strong_authorization` and `scenario_direct_empty_v1`.
 2. Stage is family-owned longitudinal context, independent of Enrollment, CareGroup, Grant, Institution, roster, age clock, birthday, AI, pregnancy evaluation, and protected family-care workflow. A process with zero, one, or several Institution Enrollments uses the same StageEpisode chain, while Institution/Caregiver surfaces receive no stage visibility under the Pilot data classes.
 3. Stage selection uses only existing C-3-0c read and C-3-0d action primitives. The current Stage detail offers owner-issued navigation for the currently valid operation. Owner-paginated catalog/detail reads use `presentation_item_ref`; after an exact option is selected, a fresh owner read emits one `update_child_care_stage` action target bound to the operation, catalog version, exact coarse/fine tuple, Process/current-Episode versions, and actor/surface. The item ref itself never becomes action authority. `clear` may be offered directly from the current detail.
 4. The client never sends a raw StageEpisode id, arbitrary stage label, Institution stage, birth-derived value, or free-form catalog key. My-Chat renders the owner safe choices and does not maintain a Nurture catalog. Set is available only when unset; change/correct/clear only when a current leaf exists; correction applies only to that current leaf. Every preparation and submit rereads the catalog and current lineage.
@@ -3149,7 +3149,7 @@ Protected detail open is read-only. The read creates no Receipt read, Item ackno
 
 | Product action | Command | Confirmation | Driver |
 | --- | --- | --- | --- |
-| `acknowledge_family_care_item` | `nurture.family_care.acknowledge_item` | `explicit` | `nurture_direct_empty_v1` |
+| `acknowledge_family_care_item` | `nurture.family_care.acknowledge_item` | `explicit` | `scenario_direct_empty_v1` |
 
 The earlier B3 phrase “lightweight strong confirmation” means a structured explicit confirmation, not C-3-0d `strong_authorization` or a per-item recent-authentication step-up. The confirmation shows the safe child/Group, “confirm received”, that the family may see an acknowledged state, and that a separate reply is still required. The confirmation does not copy the question, expose the Guardian, or accept natural-language agreement, item open, Notification read, or a default control as confirmation.
 
@@ -3190,7 +3190,7 @@ The owner resolver is both producer-origin-aware and direction-aware. My-Chat de
 
 | Product action | Command | Confirmation | Driver |
 | --- | --- | --- | --- |
-| `redact_family_care_message` | `nurture.family_care.redact_message` | `explicit` | `nurture_direct_empty_v1` |
+| `redact_family_care_message` | `nurture.family_care.redact_message` | `explicit` | `scenario_direct_empty_v1` |
 
 Caregiver reply redaction is available only when the exact linked reply has `senderParticipantId` equal to the current Participant and `senderRoleAssignmentId` equal to the same still-current original operational Caregiver RoleAssignment reaching the original CareGroup. Redaction also requires expected Message version, retained author shell, current policy, and explicit irreversible copy. Historical RoleAssignment id is an authorship constraint, not client input. Unlike a Guardian's longitudinal family rejoin, staff offboarding/reinvite creates a new role episode and never restores old reply body or redaction authority.
 
@@ -3598,7 +3598,7 @@ The exact C-4 evidence Host activation profile is `nurture_institution_composite
 The following boundaries are fixed for later C-4 checkpoints:
 
 - first-Institution creation remains the single C0 bootstrap exception; ordinary `create_care_institution` is contract-reserved but product-inactive in Pilot-0 and cannot become a second bootstrap;
-- Host identity invitation coordination remains a separate signed lane, not `nurture_direct_empty_v1`, `workflow_claimed_step_v1`, a third generic action driver, or Workflow Handoff used as identity payload/authority;
+- Host identity invitation coordination remains a separate signed lane, not `scenario_direct_empty_v1`, `workflow_claimed_step_v1`, a third generic action driver, or Workflow Handoff used as identity payload/authority;
 - Institution transfer proposal and service close remain claimed-Step relationship-attention producers; ordinary topology/policy/hold/cancel mutations remain direct-empty unless a later locked C-4 rule names an unavoidable Host effect;
 - terminal claimant loss requires an Institution-authorized, body-free, no-takeover closure path before C-4 qualification; a new Caregiver role episode never inherits an old claim;
 - all C-4 evidence ends with every environment switch false, active Workspace rows `[]`, activation/bootstrap evidence authorities consumed or revoked, both resolvers inactive, disposable credentials destroyed, and no external traffic.
@@ -3620,17 +3620,17 @@ The active Pilot topology/policy domain actions are closed and workbench-only:
 
 | `action_key` | `command_key` | Driver | Pilot effect |
 | --- | --- | --- | --- |
-| `update_care_institution` | `nurture.institution.update_care_institution` | `nurture_direct_empty_v1` | Update only the allowlisted Institution display profile; no status, parent, legal identity, billing, registration, or arbitrary JSON patch. |
-| `create_care_group` | `nurture.institution.create_care_group` | `nurture_direct_empty_v1` | Create one Institution-owned group with typed name, optional age-band key, and bounded capacity. |
-| `update_care_group` | `nurture.institution.update_care_group` | `nurture_direct_empty_v1` | Update typed group profile fields only; Institution parent and lifecycle do not move through update. |
-| `suspend_care_group` | `nurture.institution.suspend_care_group` | `nurture_direct_empty_v1` | `active -> paused` reversible business fence with no cascade or time extension. |
-| `resume_care_group` | `nurture.institution.resume_care_group` | `nurture_direct_empty_v1` | `paused -> active` after current owner/topology/policy/Host-gate reread; readiness is still independently derived. |
-| `close_care_group` | `nurture.institution.close_care_group` | `nurture_direct_empty_v1` | Terminal `active|paused -> archived` only after the complete zero-dependent precondition. |
-| `update_institution_policy` | `nurture.institution.update_institution_policy` | `nurture_direct_empty_v1` | Create/select one immutable versioned allowlisted Institution Pilot policy revision. |
-| `update_care_group_policy` | `nurture.institution.update_care_group_policy` | `nurture_direct_empty_v1` | Bind the exact group to one current compatible Institution policy revision; Pilot has no free-form override. |
-| `assign_staff_role` | `nurture.institution.assign_staff_role` | `nurture_direct_empty_v1` | From one consumed Staff Invitation, create only one exact `caregiver + scopeType=care_group` role episode. |
-| `designate_lead_caregiver` | `nurture.institution.designate_lead_caregiver` | `nurture_direct_empty_v1` | Create/replace one Lead designation bound to one exact current same-group Caregiver role episode. |
-| `revoke_staff_role` | `nurture.institution.revoke_staff_role` | `nurture_direct_empty_v1` | Terminalize only the exact operational Caregiver role and any Lead designation bound to that episode. |
+| `update_care_institution` | `nurture.institution.update_care_institution` | `scenario_direct_empty_v1` | Update only the allowlisted Institution display profile; no status, parent, legal identity, billing, registration, or arbitrary JSON patch. |
+| `create_care_group` | `nurture.institution.create_care_group` | `scenario_direct_empty_v1` | Create one Institution-owned group with typed name, optional age-band key, and bounded capacity. |
+| `update_care_group` | `nurture.institution.update_care_group` | `scenario_direct_empty_v1` | Update typed group profile fields only; Institution parent and lifecycle do not move through update. |
+| `suspend_care_group` | `nurture.institution.suspend_care_group` | `scenario_direct_empty_v1` | `active -> paused` reversible business fence with no cascade or time extension. |
+| `resume_care_group` | `nurture.institution.resume_care_group` | `scenario_direct_empty_v1` | `paused -> active` after current owner/topology/policy/Host-gate reread; readiness is still independently derived. |
+| `close_care_group` | `nurture.institution.close_care_group` | `scenario_direct_empty_v1` | Terminal `active|paused -> archived` only after the complete zero-dependent precondition. |
+| `update_institution_policy` | `nurture.institution.update_institution_policy` | `scenario_direct_empty_v1` | Create/select one immutable versioned allowlisted Institution Pilot policy revision. |
+| `update_care_group_policy` | `nurture.institution.update_care_group_policy` | `scenario_direct_empty_v1` | Bind the exact group to one current compatible Institution policy revision; Pilot has no free-form override. |
+| `assign_staff_role` | `nurture.institution.assign_staff_role` | `scenario_direct_empty_v1` | From one consumed Staff Invitation, create only one exact `caregiver + scopeType=care_group` role episode. |
+| `designate_lead_caregiver` | `nurture.institution.designate_lead_caregiver` | `scenario_direct_empty_v1` | Create/replace one Lead designation bound to one exact current same-group Caregiver role episode. |
+| `revoke_staff_role` | `nurture.institution.revoke_staff_role` | `scenario_direct_empty_v1` | Terminalize only the exact operational Caregiver role and any Lead designation bound to that episode. |
 
 `create_care_institution`, Institution-admin role mutation, `system_operator`, generic role/scope assignment, generic suspend/resume-role, permission-override editing, `upsert_*`, `change_*_state`, self-service Institution registration, and board-card writes are product-inactive and absent from the C-4 Pilot fragment. C0 remains the only first-Institution/first-Admin create path. A planned but undeclared key cannot return runtime `not_implemented` from a real Pilot surface.
 
@@ -3703,9 +3703,9 @@ The ordinary Institution roster actions are exact and workbench-only:
 
 | `action_key` | `command_key` | Driver | Pilot effect |
 | --- | --- | --- | --- |
-| `create_institution_roster_entry` | `nurture.institution.create_roster_entry` | `nurture_direct_empty_v1` | Create one institution-local, unverified, unlinked intake record in an exact active CareGroup. |
-| `correct_institution_roster_entry` | `nurture.institution.correct_roster_entry` | `nurture_direct_empty_v1` | Correct only allowlisted unverified intake fields while the entry remains unlinked. |
-| `close_institution_roster_entry` | `nurture.institution.close_roster_entry` | `nurture_direct_empty_v1` | Terminalize only an unlinked entry with no effective Enrollment Invitation. |
+| `create_institution_roster_entry` | `nurture.institution.create_roster_entry` | `scenario_direct_empty_v1` | Create one institution-local, unverified, unlinked intake record in an exact active CareGroup. |
+| `correct_institution_roster_entry` | `nurture.institution.correct_roster_entry` | `scenario_direct_empty_v1` | Correct only allowlisted unverified intake fields while the entry remains unlinked. |
+| `close_institution_roster_entry` | `nurture.institution.close_roster_entry` | `scenario_direct_empty_v1` | Terminalize only an unlinked entry with no effective Enrollment Invitation. |
 
 `NurtureInstitutionRosterEntry` uses canonical `status=active|linked|closed` plus nullable typed `terminalReason`. `active` means institution-local intake only and is not an Enrollment-ready or authority state. `linked` may be written only by the C-3 `confirm_family_enrollment` transaction that creates the exact Enrollment, consumes its exact invitation, and writes the canonical ChildCareProcess link. `closed` is terminal and requires exactly one server-owned reason: `manual_unlinked_close|unverified_intake_retention_expired|enrollment_withdrawn|institution_service_ended|enrollment_transferred`. Manual/retention close requires no process/Enrollment link; the three Enrollment reasons require the retained exact process/Enrollment binding and may be written only by the owning Enrollment terminal transaction. This later normalization supersedes C-2f's historical shorthand that called those three reason/history classes Roster statuses `withdrawn|ended|transferred`; no such second status enum is implemented. No delete, reopen, merge, generic status mutation, move between Institution/Group, or duplicate-child resolution action exists in Pilot.
 
@@ -3717,7 +3717,7 @@ Family confirmation before that boundary atomically replaces the unverified disp
 
 Roster create/correct may occur before full invitation readiness, but issue requires the current C-4-1 readiness predicate. Correct is unavailable after linkage and cannot silently update a Guardian-owned child profile. Close requires the entry to remain unlinked, zero effective pending invitation, zero Enrollment, and no active confirmation context; a pending invitation must first be cancelled or superseded. A linked entry closes only through the owning Enrollment terminal transaction defined by C-2f/C-4-3. Institution label uniqueness is a local usability check at most and never identity, deduplication, existence disclosure, or authorization. Name, date, age, raw contact, or similarity matching across RosterEntries or child profiles is forbidden.
 
-Enrollment Invitation uses `scenario_identity_invitation_coordination_v1`, not an ordinary domain-action driver. The Institution operations are `initiate_enrollment`, `cancel_enrollment_invitation`, and `reissue_enrollment_invitation`; their Nurture owner commands are respectively `nurture.institution.initiate_enrollment`, `nurture.institution.cancel_enrollment_invitation`, and `nurture.institution.reissue_enrollment_invitation`. These keys live in the extension's identity-invitation coordination registry, not `domain_action_contracts`, and use neither `nurture_direct_empty_v1`, `workflow_claimed_step_v1`, Workflow Run/Step, Handoff, nor Outbox as business authority. Recipient-side `decline_enrollment_invitation` remains the already locked C-3 prospective operation and cannot be invoked by an Institution actor.
+Enrollment Invitation uses `scenario_identity_invitation_coordination_v1`, not an ordinary domain-action driver. The Institution operations are `initiate_enrollment`, `cancel_enrollment_invitation`, and `reissue_enrollment_invitation`; their Nurture owner commands are respectively `nurture.institution.initiate_enrollment`, `nurture.institution.cancel_enrollment_invitation`, and `nurture.institution.reissue_enrollment_invitation`. These keys live in the extension's identity-invitation coordination registry, not `domain_action_contracts`, and use neither `scenario_direct_empty_v1`, `workflow_claimed_step_v1`, Workflow Run/Step, Handoff, nor Outbox as business authority. Recipient-side `decline_enrollment_invitation` remains the already locked C-3 prospective operation and cannot be invoked by an Institution actor.
 
 The issue sequence is exact:
 
@@ -3752,10 +3752,10 @@ The Institution Enrollment matrix is exact and workbench-only:
 
 | `action_key` | `command_key` | Driver | Host effect |
 | --- | --- | --- | --- |
-| `suspend_enrollment` | `nurture.institution.suspend_enrollment` | `nurture_direct_empty_v1` | Place only the shared institution-side `NurtureEnrollmentPauseHold`; explicit `[]`. |
-| `resume_enrollment` | `nurture.institution.resume_enrollment` | `nurture_direct_empty_v1` | Release only the institution-side Hold; explicit `[]`, and aggregate may remain paused. |
+| `suspend_enrollment` | `nurture.institution.suspend_enrollment` | `scenario_direct_empty_v1` | Place only the shared institution-side `NurtureEnrollmentPauseHold`; explicit `[]`. |
+| `resume_enrollment` | `nurture.institution.resume_enrollment` | `scenario_direct_empty_v1` | Release only the institution-side Hold; explicit `[]`, and aggregate may remain paused. |
 | `propose_enrollment_transfer` | `nurture.institution.propose_enrollment_transfer` | `workflow_claimed_step_v1` | Commit one TransferIntent and one cohort-level `review_enrollment_transfer` draft containing the exact commit-time Guardian RoleAssignment set. |
-| `cancel_enrollment_transfer` | `nurture.institution.cancel_enrollment_transfer` | `nurture_direct_empty_v1` | Terminalize only the pending proposal; explicit `[]`. |
+| `cancel_enrollment_transfer` | `nurture.institution.cancel_enrollment_transfer` | `scenario_direct_empty_v1` | Terminalize only the pending proposal; explicit `[]`. |
 | `close_enrollment` | `nurture.institution.close_enrollment` | `workflow_claimed_step_v1` | Commit terminal Institution service end and one cohort-level `enrollment_relationship_changed` draft containing the exact commit-time Guardian RoleAssignment set. |
 
 No Institution board, Institution Chat, Caregiver/Lead/Operator/service/AI/raw-id path, generic `change_enrollment_status`, `pause_institution_enrollment`, direct `transfer_enrollment`, `end_enrollment`, Guardian countersignature, or alias is registered. `initiate_enrollment` remains the C-4-2 identity-invitation operation for first entry and exact same-Institution re-entry; the operation is not a lifecycle-domain driver and never reactivates a terminal row.

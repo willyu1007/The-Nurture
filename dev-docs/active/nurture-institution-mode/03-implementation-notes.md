@@ -3,9 +3,504 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-08-01
+- Last updated: 2026-08-06
+
+## Next concrete actions
+
+1. Await separate authorization for C30-I4 scope review only. After authorization,
+   run `node .ai/scripts/ctl-project-governance.mjs resume --task T-002 --json`,
+   then review `artifacts/53-c30-i3-scope-freeze.md`,
+   `artifacts/61-c30-i3-successor-quality-repair-qualification-record.md` and
+   `docs/project/integrations/c30-i3-owner-adoption-lock.json` before drafting
+   any I4 scope.
+2. At I4 review entry, rerun `pnpm verify:c30-i3-owner-adoption` and
+   `pnpm verify:c30-i3-default-off`; any source-lock or positive-population drift
+   blocks scope freeze until it is explained and requalified.
+3. Keep I4 implementation, C31-C35, T-008, persistent database apply,
+   capability/Workspace activation, deployment, Pilot and traffic closed. The
+   scope review may produce planning/governance artifacts only unless the user
+   separately authorizes implementation.
+
+The current handoff chain is repair source `48530be…`, successor lock
+`7db3129…` and reacceptance documentation `cc57b13…`. The worktree was clean at
+that checkpoint; this progress sync is documentation-only.
 
 ## What changed
+
+- 2026-08-06: Reaccepted cumulative C30-I3 after the successor quality repair in
+  artifact 61. Source `48530be…`, lock `7db3129…` and aggregate
+  `623da6fd…95d5` replace the first artifact-60 acceptance as current evidence.
+  The repair adds durable `provisioning|erasing` KMS coordination with all KMS
+  calls outside DB transactions, current-authority rereads for pair replay and
+  recovery, exact Participant/Process/Family result versions, and an
+  owner-verified foreground/carrier binding port. Fresh PostgreSQL applied
+  21/21 migrations after splitting enum creation into its own transaction;
+  both diffs are empty. Scenario 58/635, DB 24/259 and scenario-service 8/52
+  pass. The disposable target was zeroed and destroyed. I4 implementation,
+  C31-C35, activation, deployment, T-008 and Pilot remain closed.
+
+- 2026-08-06: Closed cumulative C30-I3 in artifact 60 at final source
+  `c8b9ce2…`, lock `15207ba…` and aggregate `5c08b542…c4ab6`. The exact
+  production two-capability prefix, isolated test-only complete graph and
+  maintained default-off census `448d37e1…3c3e` pass. Final qualification is
+  root TypeScript, Scenario 58 files/635 tests, DB 24 files/253 tests,
+  scenario-service 8 files/52 tests, direct package/service/frontend builds,
+  frontend lint, exact upstream/context/schema/portability checks and repeated
+  lock. It repaired the package test root, stale routing census and readonly
+  pair-fixture typing. A fresh 19/19 database had both schema diffs empty; C30
+  rows were cleared, `nurture-c30-i3` was destroyed and 55440 is free. Only I4
+  scope review is eligible next.
+
+- 2026-08-06: Accepted C30-I3-F in artifact 59 at runtime source `13285fd…`
+  and lock-tool source `ac049b4…`. The authoritative protected owner uses a
+  random per-content AES-256-GCM DEK wrapped through a production-default-deny
+  KMS port, rereads all current Participant/business/pair/process authority,
+  and owns retention, tombstone and crypto-erasure without durable plaintext or
+  unwrapped keys. Restored snapshots remain unreadable after external KMS-handle
+  destruction; the recursive no-copy suite pins legacy non-fallback. Focused
+  Scenario 5/5 and DB 8/8, complete Scenario 57 files/632 tests, DB 24 files/253
+  tests, builds, Prisma/context convergence, upstream verification and cumulative
+  lock `b251bb46…48a8` pass. I3-G is active.
+
+- 2026-08-06: Accepted C30-I3-E in artifact 58 at runtime source `9a59c51…`
+  and lock-tool source `25e7a78…`. One Base-neutral runner now owns prepare,
+  submit and status semantics for both direct and claimed drivers without any
+  production action declaration. The additive action-operation migration and
+  repository atomically bind current authority, effect, typed Execution,
+  refs-only audit/outbox and writer-fenced recovery. Focused Scenario 7/7 and
+  DB 6/6, complete Scenario 56 files/627 tests, DB 23 files/245 tests, builds,
+  Prisma/context convergence, upstream verification and cumulative lock
+  `7de36713…c085` pass. The full run also repaired a nondeterministic signature
+  tamper fixture by changing a significant Base64URL character.
+
+- 2026-08-06: Accepted C30-I3-D in artifact 57 at runtime source `cccdc6b…`
+  and lock-tool source `5bb260e…`. The exact declared provider/presenter use
+  sealed owner locators and reread typed Participant/business authority plus a
+  Serializable local role/pair/association/lifecycle snapshot and injected
+  current pair evidence on every operation. The presentation emits all six
+  closed Base block kinds, fixed safe copy, display-only navigation and no
+  actions. Scenario 55 files/620 tests, DB 22 files/239 tests, builds,
+  typechecks, upstream verification and cumulative lock `e40fb649…b404` pass.
+  No route, schema, capability or activation changed.
+
+- 2026-08-06: Accepted C30-I3-C in artifact 56 at source `bf3fee8…`. The
+  additive `20260806120000_c30_i3_pair_owner_foundation` migration adds
+  Scenario-private nonce, typed Participant binding, pair-operation, refs-only
+  audit/outbox and typed historical execution storage. One Serializable,
+  authority-rereading transaction owns local Child/Process/Family creation,
+  both canonical-anchor associations, role, execution, audit/outbox and exact
+  replay; deadline recovery writer-fences `confirmed_no_effect`. Prisma/schema
+  convergence, focused 10 tests, complete DB 234 tests, scenario 612 tests and
+  cumulative lock `c94ac5ed…158e` pass. The exact disposable target is isolated
+  on 55440 and remains alive only for ordered I3-F/G work; I3-G must destroy it.
+  Port 55439 was already occupied and was left entirely untouched.
+
+- 2026-08-06: Accepted C30-I3-B in artifact 55 at source `b8974bf…`. The new
+  Scenario-owned trust boundary verifies exact service credential, trust/key
+  state, detached Ed25519 signature, body digest, strict Base invocation,
+  declared route/time and one-time nonce before owner work; its response signer
+  binds the exact request. Typed Participant binding keeps account, Actor,
+  Workspace, represented organization and local Participant distinct and
+  always requires a separate current Nurture authority decision. Focused 33
+  tests, complete 54-file/612-test scenario population, typecheck and cumulative
+  lock `24080cc5…3d18` pass. No route, schema/database or capability was changed.
+
+- 2026-08-06: Accepted C30-I3-A in artifact 54. Source `3b7e2a6…` replaces the
+  hand-copied registry and dual module variants with one YAML-generated,
+  default-off canonical module using the exact trusted+presentation prefix.
+  Lock-tool source `0f1d456…` binds clean Base `4350086…`, clean My-Chat
+  `cd7bbc2…`, Nurture aggregate `a8453249…69fc` and the 15-file manifest profile
+  `9ca462c4…5bb2`. Upstream locks, typecheck, focused 28 tests, full scenario 579
+  tests, G2 regression and self-verifying lock pass. No schema/database,
+  capability, activation or downstream work occurred. I3-B is now active under
+  the user's ordered I3-A..G authorization.
+
+- 2026-08-06: Completed the authorized C30-I3 Scenario-owner scope review and
+  freeze in artifact 53. The review reuses Nurture T-002, pins accepted Base
+  `15ff031…` / lock `4350086…` and repaired My-Chat `658b897…` / replacement
+  lock `6725dc6…` / archive `cd7bbc2…`, and records Nurture entry
+  `eec87b9…`. It freezes I3-A..G across canonical generated manifest, detached
+  private trust/Participant binding, atomic pair anchors/local associations,
+  action-free `NurtureChildCareProcess` presentation, typed direct/claimed
+  execution, protected content/KMS/retention and cumulative default-off
+  convergence. The production manifest stops at the valid trusted+presentation
+  dependency-complete prefix; action/protected infrastructure is test-fixture
+  qualified without a production business declaration, leaving the first real
+  Guardian action to C31. No product source, manifest/module, schema, Prisma,
+  database, KMS secret, capability, deployment, activation, T-008, I4, Pilot or
+  traffic operation ran. Only separately authorized I3 implementation is next.
+
+- 2026-08-06: Reaccepted C30-I2 after My-Chat T-035 quality remediation closed
+  all nine findings: protected key/binary no-copy; recovery pre-dispatch state
+  and immutable-evidence fences; coherent Serializable current reads;
+  same-transaction recovery audit/outbox; locale-independent canonical signing;
+  bounded nonce retention; and maintained static/route/DB default-off evidence.
+  The replacement runtime is `658b897…`, lock commit `6725dc6…`, aggregate
+  `8172e370…10a5ad`, and reacceptance/archive `cd7bbc2…`. Remediated source
+  passes all 17-project typechecks, ESLint and 700 unit tests. A fresh exact
+  pgvector/PostgreSQL 16 target applied 27 migrations, passed 17 integration
+  tests and produced default-off census hash `989e8294…fdd`; it was destroyed
+  and port 55438 is free. The composed pair support route is explicitly
+  `hard_default_deny`; all positive registration/activation state is empty. No
+  existing DB, Nurture product source, consumer, capability/Workspace
+  activation, deployment, T-008, Pilot or traffic was touched.
+
+- 2026-08-06: Accepted the fully authorized C30-I2 generic My-Chat Host adoption
+  as `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF` in artifact 52. My-Chat
+  T-035 completed ordered I2-A..G, sealed runtime source `35a41e3…` with
+  downstream lock `890ff7d…` and aggregate `3da48ba0…b9646`, passed the full
+  17-project build, recursive typecheck, ESLint, 102-file/643-test unit suite,
+  contract/source/portability checks and 12-file/176-test runtime adoption suite,
+  then archived at `b262bfc…`. The exact disposable PostgreSQL target on
+  `127.0.0.1:55438` applied all 26 migrations, showed no SSOT drift, passed the
+  15/15 nonce/pair matrix three times, ended with all scoped row counts zero and
+  was destroyed. Base stayed clean at `4350086…`; Nurture product source was not
+  changed. No existing database, capability/Workspace activation, deployment,
+  T-008, Pilot or traffic was touched. Only a separately authorized C30-I3 scope
+  review is eligible next. This first acceptance chain is historical and was
+  superseded by the remediation entry above.
+
+- 2026-08-06: Completed the authorized C30-I2 generic Host adoption scope review
+  and freeze in artifact 51. The review pins accepted Base source `15ff031…`,
+  metadata lock `4350086…` and aggregate/named profiles; records My-Chat
+  `dc4a77b…` as an old C30-I0 consumer; and freezes exact adoption, public/
+  durable principal translation, detached signer/nonce, atomic Child/Family pair
+  owner, semantic presentation, direct/claimed action, protected Host and
+  default-off convergence as ordered I2-A..G units. It also resolves the task-ID
+  collision: Nurture T-002 remains the program record, but My-Chat's local T-002
+  is archived `content-events`, so a new local task is mandatory before any
+  My-Chat source commit. No Base/My-Chat product source, schema, database,
+  runtime, capability, deployment, activation, T-008, Pilot or traffic action
+  ran. At that scope-freeze checkpoint, only separately authorized I2-A was
+  eligible next; the preceding artifact-52 entry records its later completion.
+
+- 2026-08-06: Reaccepted cumulative Base `C30-I1-F` after closing artifact-49
+  F-R1 through F-R4. Source `15ff031…` separates the one
+  `prepare_domain_action` transport handler from unique per-action handlers,
+  enforces presentation-operation-local surface ingress, aligns runtime/Schema
+  array maxima at 64/64/128 and rejects symlink roots or ancestors. Metadata-only
+  lock `4350086…` binds aggregate hash `d17f2358…6383` and the four named
+  hashes recorded in artifact 50. Three full verifiers pass with 66 Schemas,
+  441 Node tests, runtime 35/35 and Scenario 10/10; isolated contracts 84,
+  runtime 92 and Scenario 56 file trees plus source manifests are deterministic.
+  Base and My-Chat finish clean; Nurture changes only governance evidence. No
+  Prisma/database/PostgreSQL, consumer/starter adoption, capability, deployment,
+  activation, C30-I2 implementation, T-008, Pilot or traffic action ran. Only a
+  separately authorized C30-I2 scope review/freeze is eligible next.
+
+- 2026-08-06: Reopened `C30-I1-F` acceptance after a read-only quality review
+  reproduced four gaps despite the green 435-test suite: multi-action handler
+  rules are mutually exclusive, presentation reachability is checked against a
+  global rather than operation-local ingress set, two declaration arrays are
+  unbounded, and source hashing accepts a symlinked physical root. Artifact 49
+  freezes the exact successor corrections and additionally bounds surface action
+  keys. The user authorized all four repairs. No Base source, build, database,
+  consumer, capability, deployment, activation, T-008, Pilot or traffic action
+  had occurred at the reopening checkpoint.
+
+- 2026-08-06: Completed the authorized `C30-I1-F` chain in strict F1→F4
+  order. F1 (`0ce22b6…`) adds the optional closed dependency/source graph; F2
+  (`c317795…`) adds trusted ingress, subject provider/presentation and product
+  surface declarations plus exact Host support/legacy no-alias gates; F3
+  (`f59f506…`) reuses the accepted I1-D/I1-E static contracts and closes
+  action/ingress/surface/handler/protected references; F4 source `3d91591…` adds
+  four deterministic named source profiles and exact portability/revision checks.
+  Metadata-only lock `afe47e8…` points to that source, preserves the aggregate
+  22-TypeScript-file meaning at hash `33df7df9…39cd` and publishes the four exact
+  profile hashes recorded in artifact 48. Three full Base verifiers pass with 66
+  Schemas, 435 Node tests, runtime 34/34 and Scenario 10/10; two isolated
+  contracts/runtime/Scenario builds and source manifests are byte-identical.
+  Artifacts 45-48 preserve unit evidence, cumulative qualification and rollback.
+  My-Chat remained clean at `dc4a77b…`; Nurture product source remained unchanged.
+  No database/Prisma/PostgreSQL, consumer, starter manifest, env/KMS, deployment,
+  capability/Workspace activation, T-008, Pilot or traffic action ran. C30-I1
+  neutral Base contracts are accepted; only a separately authorized C30-I2 scope
+  review/freeze is eligible next.
+
+- 2026-08-06: Reused T-002 and froze only the `C30-I1-F` neutral Base
+  dependency/source convergence scope in artifact 44. The current Base has one
+  umbrella source hash, no capability dependency graph, no manifest declaration
+  areas for the accepted I1-A..E wires and no named source profiles. The freeze
+  defines one optional closed `scenario_contracts` area, the exact four-capability
+  dependency graph and four source identities, structural Schema/runtime parity,
+  legacy/vNext no-alias rules, deterministic Base profiles and ordered F1-F4
+  units. No source, build, Prisma/database, capability, deployment, activation,
+  T-008, Pilot or traffic action ran. Only F1 may be separately authorized next.
+
+- 2026-08-06: Reaccepted cumulative Base `C30-I1-E` after closing E-R1 through
+  E-R4. Source `48fd3d6…` adds bounded representation/window no-copy detection,
+  low-entropy exact matching, resolved-current-time commit bounds and recursive
+  Schema/runtime forbidden-key parity; metadata-only lock `9abde2b…` binds source
+  hash `be6fd800…fb7d`. Three full verifiers pass with 66 Schemas, 376 Node tests,
+  runtime 28/28 and Scenario 10/10; isolated 84-file builds and source manifests
+  are deterministic. No public wire, consumer/runtime, manifest convergence, DB,
+  deployment, capability or activation changed. I1-F is eligible only for a
+  separate scope review/freeze.
+
+- 2026-08-06: Reopened cumulative Base `C30-I1-E` acceptance and froze E-R1
+  through E-R4 in artifact 42 before source work. Deterministic probes proved a
+  wrapped-fragment bypass plus low-entropy false positive, encoded protected-ref
+  bypass plus one-character version false positive, future commit timestamps and
+  prepare Schema/runtime forbidden-key drift. The prior `5433124…` / `3a08d1f…`
+  chain remains historical. Repair is limited to neutral Base validation, one
+  existing Schema, tests and later metadata resealing; I1-F, consumers, DB,
+  deployment, activation, T-008 and Pilot remain NO-GO.
+
+- 2026-08-06: Completed and accepted the authorized Base `C30-I1-E` chain in
+  strict E1→E5 order. E1-E4 add the dedicated protected plaintext carrier,
+  body-free prepare and committed controls, exact I1-D direct/claimed commit
+  composition, foreground-only detail read, closed tombstone/context/unavailable
+  results and recursive no-copy tests. The independent quality pass removed a
+  silent normalization transformer and public internal-evidence types, split exact
+  failure unions, bound request/Workspace/principal/surface/scenario/action and
+  original direct/Step execution identity, and expanded recursive/adversarial
+  leakage coverage. Exact source `5433124…` is sealed by metadata-only lock
+  `3a08d1f…` at source hash `7ba9458f…c126`. Repeated full verification passes
+  with 66 Schemas, 371 Node conformance tests, runtime 28/28 and Scenario 10/10;
+  two 84-file builds and source manifests are deterministic. Artifacts 37-41
+  preserve every checkpoint and rollback order. No manifest dependency/source
+  convergence, consumer/runtime, Prisma/database, KMS, deployment, capability,
+  activation, T-008 or Pilot work ran. Only a separately authorized I1-F scope
+  review/freeze is now eligible; I1-F implementation and C30-I2 remain closed.
+
+- 2026-08-06: Reused T-002 and froze only the `C30-I1-E` neutral Base
+  protected-interaction scope in artifact 36. The review separates the sole
+  body-bearing `ScenarioProtectedPlainTextCarrierV1` from I1-A body-free operation
+  input and all generic Host DTOs; freezes static, prepare, prepared/committed,
+  read-locator/result/tombstone and 60-second display-lease controls; and composes
+  commit with the accepted I1-D direct/claimed path without a third driver or
+  generic erase operation. T-029 remains zero-direct-merge. E1-E5 are ordered but
+  no implementation unit is authorized; manifest dependency/source convergence
+  remains I1-F. No Base/My-Chat/Nurture product source, build, Prisma/database,
+  KMS, capability, deployment, activation, T-008, Pilot or traffic action ran.
+
+- 2026-08-06: Reaccepted cumulative Base `C30-I1-D` after closing all five
+  artifact-34 findings. Successor source `3580a9b…` closes prepare Schema
+  branches, binds token/scenario/action to resolved submit context, preserves
+  stored rebind evidence/expiry, composes claimed driver and execution identity
+  through the original Step, and admits legitimate fail-closed binding outcomes.
+  Metadata-only lock `1cb5691…` binds source hash `5c5f2c53…99ef`. Repeated full
+  verification passes with 55 Schemas, 296 Node tests, runtime 28/28 and Scenario
+  10/10; isolated 76-file builds and source manifests are deterministic. Initial
+  literal trailer encoding was corrected in the unpushed commits, the lock was
+  rebound and the final exact chain was reverified twice. No public wire,
+  manifest/source convergence, consumer/runtime, DB, deployment, capability,
+  activation, T-008 or Pilot work ran. I1-E is eligible only for a separately
+  authorized scope review/freeze.
+
+- 2026-08-06: Reopened cumulative Base `C30-I1-D` acceptance and froze the
+  successor D5 repair in artifact 34 before source work. Independent executable
+  probes found five missed compositions: mixed prepare-result Schema branches,
+  an unbound submit token/resolved scenario-action context, mutable expiry/evidence
+  on exact rebind, separately valid but cross-Step claimed execution, and
+  success-only context requirements that blocked legitimate `unavailable` and
+  `request_conflict` outcomes. The prior `52c0dc2…` / `c179bb5…` chain remains
+  historical. Repair is limited to neutral Base Schema/private assertions/tests
+  and later metadata resealing; I1-E/I1-F, consumers, DB, deployment, activation,
+  T-008 and Pilot remain NO-GO.
+
+- 2026-08-05: Completed and accepted the authorized Base `C30-I1-D` chain.
+  D1-D4 add the neutral action contract, zero-effect prepare/exact submit echo,
+  detached Host assurance, scenario-bound direct/claimed identities, layered
+  private/public results and immutable original-Step binding/recovery. The D5
+  architecture review rejected non-JSON delegated inputs, non-committed exact
+  replays and an over-strict unavailable-lookup branch before sealing successor
+  source `52c0dc21c12b0f96741d4fe4c8a5439285479c6b` in metadata-only lock
+  `c179bb5fe914311a7a4fe9a59b898eeee53297a4`. Three full Base verifier rounds
+  pass with 55 Schemas, 291 Node tests, runtime 28/28, Scenario 10/10, source hash
+  `50c5fa16…f093` and deterministic 76-file builds. No manifest/source
+  convergence, consumer, runtime, DB, deployment, capability, activation, T-008
+  or Pilot work ran. I1-E is eligible only for a separate scope review/freeze.
+
+- 2026-08-05: Reused T-002 and froze only the `C30-I1-D` neutral Base
+  domain-action contract scope in artifact 28. The review separates client echo,
+  Host-private assurance, worker claim and server-only result zones; freezes
+  prepare/submit, direct result, claimed Step bind/recovery and effect-identity
+  inputs as D1-D5; normalizes the shared driver to
+  `scenario_direct_empty_v1|workflow_claimed_step_v1`; and adds `scenario_key` to
+  direct effect identity. Standalone I1-D wire/codec/schema/neutral conformance is
+  distinct from I1-F manifest dependency, legacy/vNext and source-identity
+  convergence. No Base/My-Chat/Nurture source, build, schema/database, runtime,
+  capability, deployment, activation, T-008, Pilot or traffic action ran. I1-D1
+  remains separately authorized.
+
+- 2026-08-05: Reaccepted cumulative Base `C30-I1-C` after closing all six quality
+  findings. Source `ae0c357…` adds structural URI/address negatives, deterministic
+  active-context assertions, stable locale errors, executable page defaults and
+  response-local item-key uniqueness; governance now accurately assigns localized
+  diagnostic/prescriptive and semantic Anti-Metric enforcement to the later
+  Scenario-owner adoption gate. Metadata-only lock `3c30337…` binds source hash
+  `fc35c6b…e5cf3`. Three full verifiers pass with 36 Schemas, 220 Node tests,
+  runtime 28/28 and Scenario 10/10; isolated build and manifest outputs are
+  deterministic. No consumer/runtime, DB, deployment, capability or activation
+  changed. I1-D remains unstarted pending separate scope authorization.
+
+- 2026-08-05: Reopened cumulative Base `C30-I1-C` acceptance after the quality
+  review and froze all six findings in artifact 26 before source work. Five are
+  executable Base gaps (URL/address detection, explicitly clocked current expiry,
+  stable locale failure, page-size default and presentation-wide item keys); one
+  corrects an overclaimed boundary by reserving localized diagnostic/prescriptive
+  and semantic Anti-Metric enforcement for the Scenario-owner disclosure gate.
+  The prior `d14bf31…` / `9d16810…` chain remains historical. I1-D, consumers,
+  database, deployment and activation remain NO-GO.
+
+- 2026-08-05: Accepted cumulative Base `C30-I1-C`. The C4 review aligned
+  portable SafeText exposure negatives in follow-up source `d14bf31…`, then sealed
+  that exact revision in metadata-only lock `9d16810…` with source hash
+  `9e18ae68…09ae`. `pnpm verify:workflow-contracts` passes twice before and once
+  after the lock commit: 36 Schemas, 206 Node tests, runtime 28/28 and Scenario
+  10/10. Two isolated 68-file builds and two source-manifest outputs are byte-tree
+  deterministic. No runtime/provider/consumer, database, capability, deployment or
+  activation changed. I1-D remains unstarted pending separate scope authorization.
+
+- 2026-08-05: Implemented and locally verified Base `C30-I1-C3` at
+  `13d207791d91b5efb168494af896c5f716d16c39`. Added the exact read-only
+  present input/four-state result, six flat semantic blocks, navigation offers,
+  prepare-only action offers and a copied safe-text-only narration projection.
+  Bounds, closed-union, authority-smuggling, Anti-Metrics, UTF-8 size and I1-A
+  composition negatives pass across 36 Schemas and 201 Node tests. Final review
+  repaired branch-level JSON Schema field closure, including the affected C2
+  selection union. No runtime/provider/consumer, DB, capability or activation was
+  added. I1-C4 cumulative qualification and source-lock sealing are next.
+
+- 2026-08-05: Implemented and locally verified Base `C30-I1-C2` at
+  `600faee233490a4d3110b24594474dd7ff79eae5`. Added distinct list/resolve
+  inputs, display-safe context options and closed discovery/resolution results;
+  enforced page/candidate bounds, unique refs, scope/route pairing, 30-minute
+  lifetime, current-version and resolved-time semantics. Full typecheck,
+  runtime/scenario regression, 30-Schema compilation and 160 Node tests pass
+  outside the intentionally deferred source lock. No Host selection/inference,
+  runtime/provider, consumer, database or activation work was added. I1-C3 is next.
+
+- 2026-08-05: Implemented and locally verified the authorized Base `C30-I1-C1`
+  checkpoint at `64533a66d2b95c9b31ff317920515962a0d3cb32`. Added neutral safe
+  text/label/reason, tone/narration and opaque subject/item/action/cursor/
+  continuation locator types, assertions, two strict Schemas and neutral fixtures.
+  Full typecheck, runtime/scenario regression, 25-Schema compilation and 129 Node
+  tests pass when the intentionally stale source-lock portability check is excluded;
+  I1-C4 owns that lock refresh. The initial checks exposed and fixed explicit
+  TypeScript assertion-signature and strict Ajv nested-type annotations without
+  weakening validation. No runtime/consumer/database/capability/deployment/
+  activation work ran. I1-C2 is next under the user's ordered I1-C authorization.
+
+- 2026-08-05: Reused T-002 and froze only the `C30-I1-C` subject-presentation
+  contract scope. The freeze retains distinct list/resolve operations, opaque
+  expiring subject/presentation locators, six closed semantic block variants,
+  read-only navigation, prepare-only action offers, safe owner-localized text,
+  bounded pagination/output and narration projection exclusions. It orders future
+  Base work as I1-C1 through I1-C4 and rejects reuse of Run-level
+  `WorkflowActionAvailability`, the broad My-Chat `InteractionEnvelope`, and
+  Nurture database-id `opaque_ref` strings. No Base/My-Chat/Nurture product source,
+  build, schema/database, runtime, capability, deployment, activation, T-007/T-008,
+  Pilot or traffic work ran. I1-C1 and C30-I2 remain separately unauthorized.
+
+- 2026-08-05: Completed only the separately authorized Base `C30-I1-B4`
+  cumulative qualification and exact source-lock seal. Full typecheck/build,
+  canonical-ref lint, runtime/scenario/conformance populations, all 23 Schemas,
+  107 Node tests, consumer-boundary execution and exact source-lock verification
+  pass repeatedly. Two builds produced the same 60-file digest
+  `e7195035…a9a1a`; two manifests were byte-identical. The metadata-only Base
+  commit `9a1586597a2eabd2876ad39e02c90491373595d0` binds source
+  `edbcd747eb50106b8f4967c3cb03b5480cbebc7f` at hash
+  `16be693c…2512`. I1-B is accepted. No wire/runtime/consumer/database/capability/
+  deployment/activation work ran; I1-C is ready but unstarted and C30-I2 remains
+  NO-GO.
+
+- 2026-08-05: Implemented only the separately authorized Base `C30-I1-B3`
+  current-owner evidence and writer-fenced status bodies at
+  `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`. Added exact two-owner current
+  evidence, status request and closed committed/confirmed-no-effect/unknown result
+  types/assertions, three Schemas and I1-A composition/variant/exposure fixtures.
+  Unknown remains nonterminal quarantine with four allowlisted reasons. The codec
+  proves shape and operation/command identity only; it does not prove a writer
+  fence or database absence. Corrected the freeze heading labels to B3a/B3b so B4
+  remains cumulative verification/source lock. No build/source-lock/runtime/
+  consumer/database/capability/deployment/activation work ran; I1-C and C30-I2
+  remain unstarted/NO-GO.
+
+- 2026-08-05: Interpreted the user's `I2-B2` text as the only eligible next gate,
+  `I1-B2`, without opening downstream C30-I2. Implemented the Base-only
+  Host-internal atomic pair contract at `445c23649c5177f6d10ebcb1456b8191ea928fb4`:
+  closed absent/bound heads, intents, exact two-member request/result, created/reused
+  effects, committed/exact-replay disposition, five Schemas and four-branch plus
+  cross-object parity tests. The codec enforces ordered distinct slots, exact
+  ID/hash/ref parity, expected-owner equality, head ref/version parity and
+  absent-created/bound-reused mapping. It performs no transaction or owner read.
+  No build/source-lock/runtime/consumer/database/capability/deployment/activation
+  work ran; B3-B4, I1-C and C30-I2 remain unstarted/NO-GO.
+
+- 2026-08-05: Implemented only the separately authorized Base `C30-I1-B1`
+  owner-binding reservation surface at `6a4378970246dc724b43a30b1f9b4c6fdfde494b`.
+  Added neutral owner-binding/request/result types, strict structural and exchange
+  parity assertions, three Schemas, typed/JSON fixtures, negative conformance cases
+  and package exports. No `any`, product object/slot value, Host runtime import,
+  raw canonical object in the private body or embedded credential/signature was
+  introduced. No build ran; source-mapped no-output typecheck, strict Schema and
+  in-memory codec execution cover B1 locally. `dist`, dependency metadata and the
+  cumulative source lock remain unchanged for B4. I1-B2-B4, I1-C, My-Chat/Nurture
+  adoption, database, capability, deployment, activation and Pilot remain unstarted.
+
+- 2026-08-05: Reused T-002 and froze the Base-only `C30-I1-B` canonical-object
+  binding envelope without starting implementation. The freeze separates
+  `host_owner_internal` canonical object/binding refs from `scenario_private`
+  typed owner refs and hashes; defines owner-endpoint reservation, atomic pair
+  request/result, current owner evidence and writer-fenced
+  `committed|confirmed_no_effect|unknown` lookup bodies; and orders implementation
+  as I1-B1 through I1-B4. It also resolves an older duplicate-signature design:
+  private I1-B requests are I1-A `operation.input`, so I1-A alone owns caller,
+  issuer, audience, route, time window and nonce while credentials/key/signatures
+  stay detached. The workflow context is synchronized to this boundary. No Base,
+  My-Chat or Nurture product source, manifest/module, schema/database, runtime,
+  capability, deployment, activation, T-007/T-008, Pilot or traffic changed.
+
+- 2026-08-05: Accepted the Base-only `C30-I1-A` trusted invocation spine. Base
+  commit `ce7118c…` adds neutral `ScenarioHumanPrincipalV1`,
+  `ScenarioIngressSurfaceV1`, `ScenarioPrivateInvocationV1`, strict structural
+  assertions, three JSON Schemas and matching neutral positive/negative fixtures;
+  `bd69d19…` binds the exact source lock at hash `8621c6cc…70b0c`. Full
+  `verify:workflow-contracts` passes. Detached signatures/service credentials stay
+  outside the JSON body, envelope-owned objects are closed, and only
+  `operation.input` delegates to a separately registered codec. I1-B is now eligible
+  for scope review but remains unauthorized and unstarted. No My-Chat/Nurture product
+  code, runtime, schema, database, capability, deployment, activation, T-007/T-008,
+  Pilot or traffic state changed.
+
+- 2026-08-05: Reused T-002 and froze the exact C30-I1 implementation
+  decomposition without changing product source. The cumulative Base gate is split
+  into ordered I1-A trusted invocation, I1-B canonical-object binding, I1-C subject
+  presentation, I1-D domain action, I1-E protected interaction and I1-F
+  dependency/source convergence. Only I1-A is ready: it owns neutral
+  `ScenarioHumanPrincipalV1`, `ScenarioIngressSurfaceV1` and
+  `ScenarioPrivateInvocationV1` types, strict codecs/Schemas/fixtures and no Host or
+  scenario adoption. C30-I2/I3/I4, database, capability, deployment, activation,
+  T-007/T-008, Pilot and traffic remain NO-GO.
+
+- 2026-08-05: Closed `C30-I0-D` after the explicitly authorized build-aware
+  canonical baseline. Base passed full contract verification with 28 runtime and
+  10 scenario tests plus all conformance gates. My-Chat passed Prisma generation
+  and validation with a non-connecting placeholder URL, all 17 workspace
+  typechecks, lint, and 89 files/504 unit tests (15 files/58 repository-declared
+  skips). Nurture passed both Prisma generations and schema validations,
+  build-aware typecheck, frontend lint, 52 files/579 unit tests, routing census,
+  persistence boundaries, N1 and X4 checks. The current exact three-Git lock and
+  repeated 18-source false/empty census passed. The historical G1 pin correctly
+  rejects C30 Base revision `20c4b7a…` because it remains locked to `06303e9…`;
+  it was not changed or misreported as the C30 joint pin. `C30-I1` is now
+  entry-eligible but remains unstarted. No database connection/apply, migration,
+  deployment, capability, activation, T-007/T-008, Pilot or traffic action ran.
+
+- 2026-08-05: Closed `C30-I0-C` with isolated clean branches at Base `20c4b7a…`
+  and My-Chat `dc4a77b…`, plus a Nurture branch created from runtime checkpoint
+  `882d80f…`; all pre-existing auxiliary worktrees remain untouched under their
+  original owners, and the dirty My-Chat primary `next-env.d.ts` was excluded.
+  Base's integration-lock verifier now requires exact
+  40-character commit ids for joint qualification, rejects package-path joint inputs,
+  detects checkout drift, resolves installed-bin symlinks and rejects unknown flags;
+  six focused tests pass. A one-time three-Git lock and 18-source false/empty census
+  passed with all three qualification worktrees clean. `C30-I0-D` remains partial
+  because full conformance/typecheck requires a contracts build that was not run
+  without explicit authorization. No schema, database, capability, deployment,
+  activation, Pilot or traffic effect occurred.
 
 - 2026-08-05: T-006 completed its exact G3 repair qualification and issued a
   default-off Beta Profile Handoff at Nurture checkpoint `0374087…`. This consumes
@@ -157,7 +652,7 @@
 
 - 2026-07-19: Locked Pilot-0-C3-0e after owner acceptance, completing the C-3-0 shared-baseline design while leaving implementation open. The atomic `scenario_protected_interaction_v1` depends on trusted ingress, subject presentation, and action execution and covers the complete protected input/store/read/redact/retention/draft/cache/offline path. Five data classes separate process-local unsubmitted draft, five-minute Nurture-encrypted prepared content, committed protected content, at-most-60-second foreground view, and body-free shell/audit. The additive design uses `NurtureProtectedContent`, per-content AES-256-GCM with KMS-wrapped DEK, keyed integrity, typed unique Message linkage, `body=null`, body-free Item/Receipt/Execution/Handoff/Host state, current `read_protected_detail`, and crypto-erasure. A distinct protected composer never uses ordinary Chat, `ContentRevision`, `PublicDraft`, artifacts, browser/PWA cache, or offline recovery. `scenario_protected_ai_draft_v1` is separately gated and off for Pilot-0. Internal Pilot retention is five-minute prepare/15-minute key cleanup, 30-day body, 365-day body-free evidence, zero durable AI content, and 30-day encrypted backup with erasure-ledger replay. `scenario_protected_interaction_source_v1` stays separate from interface/action/historical identities and adoption remains Base -> My-Chat -> Nurture -> joint evidence. Current synthetic refs, plaintext seams, Chat/PublicDraft persistence, and absent contracts/KMS/composer/leakage guards are recorded as blockers. C-3-0 is `DESIGN COMPLETE / IMPLEMENTATION OPEN`; actual adoption is delivered through C-3-1..5, beginning with Guardian family communication. No contract, manifest, source, schema, migration, KMS key, route, UI, renderer, runtime, cache, secret, capability, provider, database, environment, allowlist, or traffic changed.
 
-- 2026-07-19: Locked Pilot-0-C3-0d as one consolidated action-execution/recovery decision after owner acceptance. The atomic `scenario_domain_action_execution_v1` capability depends on trusted ingress and subject presentation and binds each product action to one static `nurture_direct_empty_v1|workflow_claimed_step_v1` driver. All actions use fresh owner prepare/submit contexts; claimed actions persist a content-free non-claimable Step, immutably bind the exact Step in Nurture, then allow only that Step to claim/commit/replay. `submit_family_care_question`, `reply_family_care_item`, transfer proposal, family withdrawal, and Institution service end are claimed; zero recipients or a new `already_satisfied` command cannot change driver or obtain the original seed. Direct-empty preserves the explicit-empty Enrollment/Grant/stage/topology paths. Client command ids are removed from authority; Nurture derives direct/context or claimed/original-Step identities, adds future typed Participant actor evidence without reinterpreting legacy `business_actor_ref`, and atomically consumes context with effect/Execution/snapshots. Results keep business outcome, replay disposition, current presenter, and Host progress distinct. A new `scenario_domain_action_source_v1` remains separate from presentation and historical handoff identities. The B3 `Direct domain action` ambiguity is repaired: the phrase meant non-Run action, while caregiver reply is now explicitly claimed-Step. Invitation, C-0, portability, and Technical Operator remain separate. C-3-0d is planning-complete only; C-3-0e retains protected/draft/cache/offline and actual adoption. No contract, manifest, source, schema, migration, route, runtime, capability, database, secret, provider, environment, allowlist, or traffic changed.
+- 2026-07-19: Locked Pilot-0-C3-0d as one consolidated action-execution/recovery decision after owner acceptance. The atomic `scenario_domain_action_execution_v1` capability depends on trusted ingress and subject presentation and binds each product action to one static `scenario_direct_empty_v1|workflow_claimed_step_v1` driver. All actions use fresh owner prepare/submit contexts; claimed actions persist a content-free non-claimable Step, immutably bind the exact Step in Nurture, then allow only that Step to claim/commit/replay. `submit_family_care_question`, `reply_family_care_item`, transfer proposal, family withdrawal, and Institution service end are claimed; zero recipients or a new `already_satisfied` command cannot change driver or obtain the original seed. Direct-empty preserves the explicit-empty Enrollment/Grant/stage/topology paths. Client command ids are removed from authority; Nurture derives direct/context or claimed/original-Step identities, adds future typed Participant actor evidence without reinterpreting legacy `business_actor_ref`, and atomically consumes context with effect/Execution/snapshots. Results keep business outcome, replay disposition, current presenter, and Host progress distinct. A new `scenario_domain_action_source_v1` remains separate from presentation and historical handoff identities. The B3 `Direct domain action` ambiguity is repaired: the phrase meant non-Run action, while caregiver reply is now explicitly claimed-Step. Invitation, C-0, portability, and Technical Operator remain separate. C-3-0d is planning-complete only; C-3-0e retains protected/draft/cache/offline and actual adoption. No contract, manifest, source, schema, migration, route, runtime, capability, database, secret, provider, environment, allowlist, or traffic changed.
 
 - 2026-07-19: Locked Pilot-0-C3-0c-4 after owner acceptance, completing subject-aware presentation planning. The additive implementation contract uses one atomic `scenario_subject_presentation_v1` Host capability that depends on `trusted_scenario_invocation_v1`; provider, semantic presentation, renderer/freshness/persistence compatibility cannot activate as partial independent paths. Base will add optional versioned provider/presentation registries, strict codecs/validators/bounds, and legacy/vNext/negative fixtures. Any vNext declaration makes missing/duplicate/unknown providers, surfaces, operations, route/reason/action references, Host support, or conflicting legacy operation fatal. Adoption is Base -> My-Chat -> Nurture -> joint conformance. The existing `0bd892...` and `a97a5b...` identities remain historical handoff evidence only; implementation must add `scenario_interface_source_v1`, keep the Nurture Scenario module hash and My-Chat renderer conformance revision separate, and pin exact revisions. A local pnpm `file:` link is not evidence. Nurture keeps one canonical manifest and only a mechanically derived disabled-capability projection. C-3-0c is complete as design/evidence specification, not actual adoption or enablement. C-3-0d action execution/recovery is next; C-3-0e retains protected/draft/offline and complete-IIB adoption. No contract, manifest, source, schema, migration, route, UI, renderer, runtime, cache, secret, capability, provider, database, or traffic changed.
 

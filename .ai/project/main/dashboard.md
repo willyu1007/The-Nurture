@@ -6,9 +6,11 @@ Project: `main`
 
 ### Current Focus
 
-- No primary active implementation task. F-004 (T-009) closed its provider
-  side on 2026-08-08; the next unit is a governance selection, not a
-  resumption.
+- Primary active feature: F-002 Institution ecology (T-002). The
+  `codex/T-002-c30-i0` branch is merged into `main` on 2026-08-08, carrying
+  `C30-I0` complete plus cumulative `C30-I1`, remediated `C30-I2` and
+  `C30-I3` accepted default-off. **The merged tree is not yet requalified** —
+  see the checkpoint below.
 - Completed checkpoints: T-009 provider is `done` at `860f73f` with closing
   `REQUAL_PASS`; T-006/G3 is `done` at `0374087…` (merged `447e646`).
   Both await separately approved archival.
@@ -17,21 +19,21 @@ Project: `main`
   6 surfaces), self-pin `c0f97aec…`, at My-Chat `df7a273…` / Base
   `8a3ea90…`, contract parity `8dd53be4…`. The `1.16.0` cession batch and
   the `1.17.0` queue-overlay rotation have both landed; no contract batch
-  is open.
+  is open. The T-002 merge does not touch the surface-contract registries.
 - Cross-repo posture: `family_growth_transport@1.0.0` is frozen and the
   N8 fixtures pass jointly against the real My-Chat consumer. My-Chat T-031
   owns the remaining consumer half; the guardian planning surface is ceded
   to My-Chat cultivation (D-T009-01), executed at `1.16.0`.
-- Other active tasks: T-002 — the real work lives on
-  `origin/codex/T-002-c30-i0` (tip `76ece1f`, 58 commits) carrying `C30-I0`
-  complete plus `C30-I1`, `C30-I2` and `C30-I3` accepted default-off, which
-  is well past this repository's `C30-I0-C/D pending` task doc. **It is not
-  independently mergeable**: a 2026-08-08 merge attempt was reverted
-  (`faee71d`) after producing 130 typecheck errors, 80 in `src`. C30 spans
-  three repositories and all three sides are unmerged — see
-  `dev-docs/active/nurture-institution-mode/05-pitfalls.md` 2026-08-08.
-  T-003 rescoped toward presenter-contract supply, artifacts hand to
-  My-Chat T-036 (D-T009-06).
+- Primary active task: T-002 — C30 landed on 2026-08-08 as one coordinated
+  three-repository sequence (plan and per-step evidence in
+  `dev-docs/active/nurture-institution-mode/20-c30-cross-repository-landing-plan.md`).
+  Base main `4350086…`, My-Chat main `dc3607e…`, Nurture pins rotated
+  (`d33276a`), Nurture merge restored. `C30-I0` through `C30-I3` are accepted
+  default-off on the branch's own evidence. **Step 5, the single
+  three-repository requalification, is outstanding** — until it passes, no
+  C30 acceptance is current-pin evidence.
+  T-003 handed its presenter/action contracts to My-Chat T-036 (D-T009-06)
+  and is `done`.
 - Planned chain: T-007 G4-0C is now the next unblocked unit (D-T009-05
   satisfied); T-008 still waits for the complete T-007 Exit.
 - Pin-rotation consequence: the T-007 G4-0A inventory record binds the
@@ -44,18 +46,16 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Decide how to land C30 as one coordinated three-repository sequence.**
-   2026-08-08: the `0C-min` proposal was answered with option C — prioritize
-   T-002, because its owner path is what both 0C options need re-established
-   at current pins. Resuming T-002 showed the work is far past this
-   repository's task doc, and a Nurture-only merge was attempted and
-   reverted. The three unmerged sides are Nurture `codex/T-002-c30-i0`
-   (`76ece1f`), My-Chat `codex/T-035-scenario-host-adoption` (`cd7bbc2`) and
-   Base `codex/T-002-c30-i0-base` (`4350086`). The branch's own gate
-   (`scripts/verify-c30-i3-upstream.mjs`) hardcodes those two sibling heads
-   rather than the repository pins, which is the mechanical signal that it is
-   not independently mergeable. Expected order: Base, then My-Chat host
-   adoption, then a pin rotation, then Nurture, then one requalification.
+1. **Run the single three-repository C30 requalification (step 5).** Steps 1-4
+   landed on 2026-08-08: Base fast-forward, My-Chat merge, Nurture pin
+   rotation, Nurture merge restore. Step 5 is the only remaining unit and
+   nothing about C30 counts as current-pin evidence without it. Scope and
+   discipline are in
+   `dev-docs/active/nurture-institution-mode/20-c30-cross-repository-landing-plan.md`:
+   detached worktrees at the exact new heads, disposable databases created
+   empty and destroyed, all migrations replayed with an empty `migrate diff`,
+   every lane at the merged census, the assert suite, the pin verifier, and
+   the branch's own `verify:c30-i3-*` gates.
 2. That requalification is also what restores the G4-0A owner-path row from
    `DEFINED_UNQUALIFIED` to `PRESENT_PINNED`. Until then no 0C freeze record
    may cite the T-002 G1 record as current-pin evidence.

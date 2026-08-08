@@ -4,6 +4,26 @@ This file exists to prevent repeating mistakes within this task.
 
 ## Do-not-repeat summary
 
+- Do not reuse a cross-repository task ID as though task IDs were global; resolve
+  the task independently in each repository before attaching a commit trailer.
+- TypeScript assertion helpers called by exported assertion functions require an
+  explicit assertion signature; inferred arrow-function assertions trigger TS2775.
+- Under strict Ajv, every nested `properties`/string constraint introduced through
+  `allOf` still needs its own explicit `type`; a referenced parent type is not a
+  sufficient strictTypes annotation.
+- A top-level `additionalProperties: false` closes only the union's combined field
+  vocabulary. It does not stop another branch's optional field from occupying the
+  current branch's optional slot when `minProperties`/`maxProperties` still pass.
+  Give every discriminated branch an exact `propertyNames.enum` allowlist and a
+  mixed-variant negative fixture.
+- Under strict Ajv, a nested `not.pattern` constraint must also declare
+  `type: string`; keep strict Schema compilation inside each implementation unit.
+- A TypeScript safe-copy codec may reject exposure that its JSON Schema still
+  accepts, especially case-insensitive URLs, single-line Markdown prefixes and
+  internal provider/database terms. Portable exposure negatives must assert both
+  layers; leave only non-portable semantic checks such as NFC normalization to the
+  codec/owner contract and record that distinction explicitly.
+
 - Do not implement a scenario-owner verifier without exact Workspace, acting User, Actor, and idempotency context, or return a receipt that is not Workspace-bound.
 - Do not treat a Nurture care role, anchor, association, or platform stewardship as owner authorization; the injected Nurture authority reader remains default-deny until a separately reviewed owner source is wired.
 - Do not let a service token stand in for the represented adult principal, or let
@@ -903,9 +923,54 @@ This file exists to prevent repeating mistakes within this task.
 - Context: B3 separated product action keys from legacy Workflow Run actions before C-3-0d selected exact execution drivers. C-2f-5 already requires every non-empty-capable path to be Host-first and preserves original-Step replay ownership.
 - What we tried: Reusing “direct” for both handler shape and empty Host effect, creating a Step only after Nurture returns snapshots, selecting driver from the current recipient list, or storing the submit token/target/body so a later worker could call Nurture.
 - Root cause: Product action identity, handler shape, business transaction, Host-effect capability, and durable recovery prove different facts. Data-dependent driver selection creates two command identities and lets a new Step acquire an old seed; raw token/body persistence violates the Host privacy boundary.
-- Fix / workaround: C-3-0d defines static `nurture_direct_empty_v1|workflow_claimed_step_v1` per action, makes question/reply/transfer-proposal/withdrawal/service-end claimed, and uses content-free non-claimable Step -> immutable Nurture binding -> claim. Nurture derives effect identity, consumes context with effect/Execution/snapshots atomically, and permits only original-Step replay. A different `already_satisfied` Step stores `[]` and cannot resend. Typed Participant evidence is additive and legacy `business_actor_ref` remains unchanged.
+- Fix / workaround: C-3-0d defines static `scenario_direct_empty_v1|workflow_claimed_step_v1` per action, makes question/reply/transfer-proposal/withdrawal/service-end claimed, and uses content-free non-claimable Step -> immutable Nurture binding -> claim. Nurture derives effect identity, consumes context with effect/Execution/snapshots atomically, and permits only original-Step replay. A different `already_satisfied` Step stores `[]` and cannot resend. Typed Participant evidence is additive and legacy `business_actor_ref` remains unchanged.
 - Prevention: Contract/manifest tests must assert one driver per action/surface, reject recipient/outcome-based switching and reply-as-direct, scan every Step/persistence destination for token/target/body/claim leakage, fault every pre-bind/post-bind seam, and deny different-Step seed transfer. Invitation, provisioning, portability, and Technical Operator remain separate protocols rather than a third catch-all driver.
 - References: `02-architecture.md` Pilot-0-C3-0d, `06-ib-nurture-schema-spec.md` C-3-0d refinement, `08-iia-schema-policy-test-design.md` C-3-0d test design, `09-pilot-readiness.md` C-3-0d.
+
+### 2026-08-05 — Carrying a Scenario-owner label into the neutral Base driver
+
+- Symptom: The locked C-3 design called the direct driver
+  `nurture_direct_empty_v1`, while C30-I1 requires Base types, Schemas and neutral
+  fixtures to contain no Nurture registry value. The direct identity tuple also
+  omitted the otherwise contract-defining `scenario_key` even though the claimed
+  branch included it.
+- Context: I1-D is the first Base slice that must encode the driver and
+  effect-identity inputs rather than merely describing Nurture product behavior.
+- What we tried: Preserving the earlier label as an exact shared enum, treating the
+  InteractionContext as an implicit substitute for `scenario_key`, or postponing
+  both inconsistencies until consumer adoption.
+- Root cause: Product-owner terminology, reusable Base contract vocabulary and
+  owner-internal hash derivation had been documented in one layer. An implicit
+  context invariant was also carrying part of the canonical contract identity.
+- Fix / workaround: Artifact 28 freezes
+  `scenario_direct_empty_v1|workflow_claimed_step_v1` for Base and explicitly
+  includes `scenario_key` in both server-only effect-identity input branches. The
+  Nurture-owned domain-separated hash implementation remains later owner work;
+  manifest dependency/source convergence remains I1-F.
+- Prevention: Base neutrality scans must reject Scenario product names in shared
+  enums/fixtures, identity parity tests must compare both driver branches field by
+  field, and future owner-specific implementation details must not silently become
+  reusable wire vocabulary.
+- References: `artifacts/28-c30-i1-d-scope-freeze.md`, `02-architecture.md`
+  Pilot-0-C3-0d, `06-ib-nurture-schema-spec.md` C-3-0d refinement.
+
+### 2026-08-05 — Treating JSON serialization and recovery parity as contract proof
+
+- Symptom: delegated `action_input` could admit non-JSON JavaScript values; exact
+  replay could compare a committed original with a non-committed replay; and a
+  stored binding plus an unavailable lookup could be rejected instead of remaining
+  safely unavailable.
+- Root cause: successful `JSON.stringify` was used as a JSON-domain proxy, result
+  parity did not first require terminal committed state, and recovery validation
+  coupled lookup availability to stored binding presence.
+- Fix / workaround: D5 added a recursive strict-JSON assertion, committed-state
+  preconditions for exact replay and an explicit fail-closed unavailable branch.
+  The repaired source is `52c0dc2…`, sealed by `c179bb5…`.
+- Prevention: delegated-value tests must include `undefined`, non-finite numbers,
+  dates, functions and cycles; replay tests must cross every terminal/nonterminal
+  state; recovery tests must keep storage evidence distinct from current lookup
+  availability.
+- References: `artifacts/33-c30-i1-d5-qualification-record.md`.
 
 ### 2026-07-19 — Treating encryption or a protected ref as the whole privacy boundary
 
@@ -1890,6 +1955,456 @@ This file exists to prevent repeating mistakes within this task.
 - Prevention: every port or URL-key change must run both env-contract
   validation and the consumer-level topology assertion.
 
+### 2026-08-05 — A source lock cannot bind uncommitted contract source
+
+- Symptom: contract conformance portability correctly failed after the I1-A source
+  changed, while the exact source-revision check could not be made green before an
+  implementation commit existed.
+- Root cause: the Base source lock stores both the current source manifest and an
+  exact Git commit that must already contain every current TypeScript contract file.
+  A single new commit cannot name its own not-yet-known commit id.
+- What we tried: ran source/type/schema tests independently, then refreshed the
+  deterministic manifest while retaining the historical revision long enough to
+  prove portability.
+- Fix: commit the verified source/test population first, update the lock to that exact
+  commit, run the complete verifier, then create one metadata-only lock commit. This
+  follows the repository's existing source-lock lineage.
+- Prevention: plan source-lock-bearing Base changes as an ordered two-commit logical
+  work unit and roll them back in reverse order; never weaken the exact-revision gate
+  or point it at a symbolic/mutable revision to force a nominal single commit.
+
+### 2026-08-05 — Presentation acceptance exceeded its executable invariants
+
+- Symptom: the accepted I1-C record claimed broad URL rejection, current locator
+  expiry, localized diagnostic/prescriptive safety, executable page defaults and
+  response-local item keys, while adversarial probes bypassed five structural
+  invariants and revealed that one semantic claim had no neutral implementation.
+- Root cause: positive Schema/codec parity and local-block tests were treated as
+  proof of broader cross-field, cross-block, current-time and natural-language
+  guarantees. Documentary defaults and owner responsibilities were also phrased as
+  if Base enforced them directly.
+- What we tried: replayed the original bypass values against both JSON Schema and
+  the built codec, separated portable shape checks from deterministic clocked and
+  cross-array assertions, and evaluated keyword matching for medical copy. Keyword
+  matching was rejected because it would be English-specific and unsafe across
+  locales.
+- Fix: reopen acceptance before source work; broaden structural locator rejection;
+  add explicit-clock active option/result assertions, stable locale error mapping,
+  exported/default-resolving page bounds and presentation-wide item/entry keys;
+  reapprove localized disclosure/Anti-Metric semantics as a mandatory executable
+  Scenario-owner adoption gate; then run three full verifiers, two isolated builds
+  and an exact successor source lock.
+- Prevention: every acceptance statement must name its executable owner and
+  falsification layer. Test generic-scheme/network-path/bare-address values,
+  expired/future clocks, duplicate keys across containers, omitted defaults and
+  runtime-library exceptions; never claim neutral localized semantic classification
+  without an owner-policy conformance suite.
+
+### 2026-08-06 — Green standalone validators did not prove cross-seam action identity
+
+- Symptom: 55 Schemas and 291 Node tests were green, yet mixed prepare-result
+  branches passed Schema validation, a shape-valid replacement submit token was
+  accepted, exact rebind could replace expiry/evidence, claimed driver/effect
+  identity could name different Steps, and legitimate bind failure outcomes had
+  no contextual validation path.
+- Root cause: branch-local closure and cross-seam composition were inferred from
+  independently green validators. Existing-binding context stored only the
+  assertion, while token/scenario/action and the execution Step join were absent
+  from the trusted private context.
+- What we tried: replayed concrete bypass values against the built codec and Ajv,
+  then paired independently valid Step-01/Step-02 objects. The first full
+  pre-lock conformance aggregate also stopped at portability because it correctly
+  still compared changed source with the historical lock.
+- Fix / workaround: independently close Schema branches; bind submit identity to
+  resolved private context; store and replay the full binding seal; add one
+  claimed-Step execution composition assertion; branch fail-closed outcomes
+  before success metadata; then reseal the committed source and requalify the
+  final exact chain.
+- Prevention: every union needs mixed-branch Schema/codec parity cases, and every
+  invariant spanning two validators needs a composed adversarial test. Rebind
+  tests must mutate both result and proposed new context while retaining an
+  immutable stored baseline. Treat pre-lock source mismatch as sequencing
+  evidence, never as permission to weaken the lock.
+
+### 2026-08-06 — Shape-valid protected controls did not prove carrier confinement
+
+- Symptom: the first E1-E4 implementation passed focused positive/negative tests,
+  but Base still exported owner-internal evidence types, offered a normalization
+  transformer, grouped distinct read failures, checked only shallow body fields,
+  and did not compose the exact request/Workspace/principal/surface or direct/Step
+  identity across every protected lifecycle seam.
+- Root cause: closed public wire shapes and keyed hashes were treated as sufficient
+  proof even though trust depends on independently verified context and the absence
+  of protected copies in recursively nested or adjacent generic objects. Hash shape
+  alone does not prove which request, field, carrier or execution produced it.
+- What we tried: mutated one contextual axis at a time while retaining valid hashes,
+  nested forbidden fields under generic action keys, paired a direct context or
+  claimed Step from another execution, and scanned high-entropy plaintext/ref/
+  version/integrity sentinels in exact, normalized, escaped, base64 and fragmented
+  forms across every generic Base fixture.
+- Fix / workaround: keep owner verification evidence private and closed; make Base
+  validate already-normalized text without transforming it; split each failure arm;
+  bind request, Workspace, principal, surface, scenario, action, field/direction,
+  carrier integrity and exact direct/original-Step execution; recursively reject
+  body-like action input; and add cumulative generic-fixture no-copy scans.
+- Prevention: protected-content review must test trust provenance, not just hash
+  syntax. Every carrier/control join needs cross-context substitution tests, every
+  generic value needs recursive forbidden-field checks, and every claimed no-copy
+  boundary needs encoded/fragmented sentinels plus an explicit statement of which
+  later runtime layers remain unproven.
+
+### 2026-08-06 — Naive substring scanning inverted protected-copy safety
+
+- Symptom: green I1-E tests still allowed a protected fragment when wrapped in a
+  longer control string and allowed a base64url protected ref, while one-character
+  carrier/version values rejected unrelated operation and driver strings.
+- Root cause: plaintext fragment matching tested whether the complete candidate
+  was inside the protected text, while ref/version scanning used only direct
+  substring inclusion. Neither algorithm separated high-entropy fragment evidence
+  from low-entropy coincidence. Commit time and forbidden property names also had
+  one-sided runtime/Schema checks rather than composed parity.
+- What we tried: replayed wrapped raw fragments, encoded refs, one-character values,
+  a post-expiry commit and case/separator/prefix property variants against the built
+  codec and Ajv. The first full aggregate then correctly stopped at the historical
+  source lock, confirming the two-commit reseal sequence was still required.
+- Fix / workaround: build one bounded representation/window profile per assertion;
+  use exact comparison below 16 code points and 16-code-point windows above it;
+  reuse it recursively for text/ref/version/integrity; bound commit time to resolved
+  `now`; mirror runtime property normalization in Schema; then commit source before
+  a metadata-only exact lock.
+- Prevention: every no-copy detector needs both false-negative and false-positive
+  adversarial cases, including wrapped, encoded and minimum-length values. Structural
+  scanners must state their entropy threshold and never be described as semantic
+  DLP. Every lifecycle time must be checked against both lower and current-time
+  bounds, and every runtime key normalization rule needs generated parity coverage.
+
+### 2026-08-06 — Generic fixtures can accidentally copy protected no-copy sentinels
+
+- Symptom: the first F1 dependency fixture made the existing I1-E E4 generic-
+  fixture scan fail even though the new manifest contained no protected body.
+- Root cause: placeholder hashes used repeated `a`/`b` values that exactly matched
+  high-entropy protected-control sentinels. The no-copy suite correctly treats an
+  exact byte copy as unsafe regardless of the field's apparent purpose.
+- What we tried: ran the focused F1 suite first, then the complete Node population;
+  only the latter exposed the cross-fixture collision.
+- Fix / workaround: replaced repeated-character placeholder hashes with varied,
+  valid lowercase SHA-256 values and reran E4 plus the full conformance population.
+- Prevention: new generic fixtures must run the cumulative no-copy suite before
+  commit and must not reuse opaque values from protected fixtures, even as hashes.
+
+### 2026-08-06 — Assertion narrowing and stale build output can hide the first real error
+
+- Symptom: F3 strict TypeScript reported validated action/protected values as
+  `unknown`; the immediately parallel Node tests then loaded the prior contracts
+  build and produced broad `unknown_field` failures unrelated to the new logic.
+- Root cause: TypeScript did not preserve assertion-function narrowing across the
+  surrounding `try/catch`, and package resolution intentionally targets built
+  contracts output. The failed typecheck prevented that output from refreshing.
+- What we tried: running typecheck, focused Node and runtime suites in parallel
+  amplified the stale-build cascade but preserved the actual TypeScript diagnostic.
+- Fix / workaround: retain explicit validated contract types, bind the required
+  prepare operation with a non-null `never` branch, complete the contracts build,
+  then rerun focused/runtime tests before the cumulative suite.
+- Prevention: when tests import built workspace packages, resolve compile errors
+  first and refresh the owning package before interpreting downstream failures.
+  Keep explicit checked locals at strict assertion/catch boundaries; never use
+  `any` or relax validation to silence the compiler.
+
+### 2026-08-06 — Shallow test fixtures can leak vNext mutations into legacy cases
+
+- Symptom: after adding the F3 legacy-action negative, later unrelated legacy v1/v2
+  runtime tests failed `WF-MAN-011` and registry loading.
+- Root cause: a shallow-spread federated fixture still shared the nested
+  `action_availability` object with the module baseline. Directly replacing its
+  `scenario_actions` array mutated the shared baseline for subsequent tests.
+- What we tried: verified that the new scenario-contract cases passed, inspected
+  later validation findings and traced the first shared nested write.
+- Fix / workaround: replace `action_availability` with a new object in the negative
+  fixture before changing `scenario_actions`; all 34 runtime tests then passed.
+- Prevention: mutation-based tests must clone every nested object they modify.
+  A negative-case helper must prove the baseline object is unchanged before later
+  compatibility/hash assertions depend on it.
+
+### 2026-08-06 — Source convergence must not bypass its historical lock
+
+- Symptom: full conformance stopped at source portability after each F1-F3 source
+  unit although all independent contract, Schema, runtime and Node tests passed.
+- Root cause: the immutable I1-E lock still named the prior 22-file source. That
+  mismatch was the intended sequencing gate, not a failing F1-F3 contract.
+- What we tried: ran every non-lock check independently, kept F1/F2/F3 as separate
+  green commits, then implemented deterministic named profiles and portability
+  checks without editing the historical lock early.
+- Fix / workaround: commit the complete F4 source/tooling first, generate one lock
+  naming that exact commit, and commit only the lock JSON. Three full verifiers and
+  two isolated build/manifest comparisons then passed.
+- Prevention: source-changing units precede one metadata-only seal. Record a
+  pre-lock mismatch as sequencing evidence; never weaken, skip or point the lock at
+  an uncommitted worktree. Any validator rule addition must also update the
+  mechanically checked normative inventory in the same source unit.
+
+### 2026-08-06 — Green declaration graphs can still be impossible or unreachable
+
+- Symptom: the accepted I1-F graph passed 435 Node tests while a second action
+  could satisfy neither handler rule, a product surface could name a presentation
+  unreachable from the presentation operation, large declaration arrays remained
+  unbounded and a symlinked source root reproduced trusted hashes.
+- Root cause: action transport and business-dispatch identities were conflated;
+  surface reachability was checked against a global ingress union; outer
+  population bounds were mistaken for inner-array bounds; source hashing checked
+  symlink leaves but not physical-root ancestry.
+- What we tried: added positive two-action graphs plus shared/cross-kind handler
+  negatives, split surfaces across trusted operations, exercised exact maxima and
+  maximum-plus-one values in runtime and Schema, and supplied a relocated
+  symbolic-link root to the source-hash tool.
+- Fix / workaround: separate transport and action handler namespaces while
+  retaining global uniqueness; resolve surface reachability through the exact
+  presentation operation; freeze 64/64/128 inner bounds; inspect every root and
+  file path segment with `lstat`; then reseal one committed source with a
+  metadata-only lock.
+- Prevention: graph conformance needs satisfiable multi-row positives and
+  operation-local reachability negatives, not only single-row dangling-reference
+  checks. Every collection needs an explicit size review, and every integrity
+  tool accepting path overrides needs root, ancestor and leaf symlink adversaries.
+
+### 2026-08-06 — Cross-repository task IDs are not global identities
+
+- Symptom: `resume --task T-002` resolved Nurture
+  `nurture-institution-mode`, but the same command in My-Chat resolved archived
+  `content-events` even though the shared isolated branch name also contained
+  `T-002`.
+- Root cause: project task IDs are repository-local. The worktree name preserved
+  the Nurture program ID while My-Chat had already assigned that number to a
+  different historical task.
+- What we tried: resolved continuity independently in both repositories instead
+  of trusting the branch name or copying the Nurture trailer.
+- Fix / workaround: artifact 51 keeps Nurture T-002 as the program record and
+  requires project orchestration to assign a new unused My-Chat local task before
+  any I2 source commit. My-Chat C30 commits must not use `Task: T-002`.
+- Prevention: resolve task identity against each repository's registry and task
+  bundle before a cross-repository commit; treat branch IDs and upstream task
+  references as context, never local trailer authority.
+
+### 2026-08-06 — Downstream acceptance must follow a repaired upstream lock
+
+- Symptom: Nurture still named My-Chat's first I2 runtime/aggregate/archive after
+  the upstream quality review had withdrawn that acceptance; the dashboard also
+  still said I2-A required authorization after I2 had completed.
+- Root cause: program-level handoff evidence and the manual project focus were
+  not treated as consumers of the My-Chat source lock lifecycle.
+- What we tried: exact-hash search across the active T-002 bundle and project hub
+  separated intentional historical rows from current acceptance claims.
+- Fix / workaround: pin the repaired runtime, replacement lock, seven profiles,
+  aggregate and reacceptance archive in artifact 52; mark the invalidated first
+  evidence historical; update overview, roadmap, verification and project focus.
+- Prevention: whenever an upstream acceptance is withdrawn or resealed, search
+  every downstream current-state surface for the old revision, lock, aggregate,
+  archive and successor gate before declaring cross-repository closure.
+
+### 2026-08-06 — A complete capability graph can force premature product semantics
+
+- Symptom: C30-I3 appeared to require a production action and protected
+  declaration even though C31 owns the first reviewed Guardian action.
+- Root cause: the complete four-capability Base fixture was mistaken for the only
+  legal manifest state. The accepted contract also permits dependency-complete
+  prefixes, while rejecting only partial, mixed or stale-source graphs.
+- What we tried: compared the I1-F graph rules, C30 implementation DAG, current
+  legacy action registry and C31 Guardian ownership rather than inventing a
+  placeholder or relabelling `capture_family_input`.
+- Fix / workaround: freeze I3 production at the exact trusted+presentation
+  complete prefix with no action offers. Implement and qualify generic
+  action/protected owner primitives through test-only neutral fixtures; let C31
+  add the first real declarations to the same canonical manifest.
+- Prevention: distinguish production declaration population, implementation
+  support and conformance fixtures. Never populate a manifest merely to prove
+  infrastructure; every production action must have an already reviewed product
+  intent, handler and protected lifecycle.
+
+### 2026-08-06 — A preselected disposable port can already belong to another target
+
+- Symptom: the planned I3 PostgreSQL port 55439 was already published by the
+  unrelated `codex-q4b5-mychat-pg` container.
+- Root cause: a prior exact port choice is not proof that the endpoint remains
+  unowned when implementation begins.
+- Fix / workaround: inspect the exact owner read-only, leave it untouched, then
+  select and prove-free 55440 before creating `nurture-c30-i3` there.
+- Prevention: resolve container name and loopback port immediately before every
+  disposable create; ownership mismatch changes the new target, never the
+  preexisting service.
+
+### 2026-08-06 — Workspace package tests can require built subpath artifacts
+
+- Symptom: the complete DB suite failed during module collection before any test
+  ran, while its focused source-imported C30 integration suite passed.
+- Root cause: historical workspace package subpath exports resolve to `dist`, and
+  the current Scenario/DB output had not yet been refreshed for the new exports.
+- Fix / workaround: run the authorized `build:binding-owner-runtime` prerequisite,
+  then rerun the whole DB population; all 22 files / 234 tests passed.
+- Prevention: refresh owning package artifacts before broad suites whose package
+  exports target `dist`; classify collection failure separately from a source or
+  database test failure.
+
+### 2026-08-06 — Prisma diff inputs need stable database endpoints
+
+- Symptom: a migration diff using a process-substitution `/dev/fd` datasource did
+  not provide Prisma a usable stable schema endpoint.
+- Root cause: Prisma's diff subprocess cannot rely on a shell-owned file
+  descriptor path remaining available through its own process lifecycle.
+- Fix / workaround: create a dedicated empty shadow database inside the exact
+  disposable I3 container and compare migrations, target and SSOT through normal
+  PostgreSQL URLs; both final diffs are empty.
+- Prevention: use an explicitly scoped disposable shadow database for migration
+  previews and validate its target identity before use; do not use transient file
+  descriptors as Prisma datasource authorities.
+
+### 2026-08-06 — Opaque locator encryption still needs a wire-size budget
+
+- Symptom: a valid encrypted subject locator passed short-ID unit tests but
+  exceeded Base's 512-character bound with UUID-shaped persisted identities.
+- Root cause: the first encrypted plaintext used verbose JSON field names; AEAD
+  overhead and base64url expansion made wire size depend unnecessarily on names.
+- Fix / workaround: retain the typed internal locator but encrypt a closed,
+  versioned positional tuple. UUID-shaped integration locators now remain within
+  the accepted 32..512 bound and still reveal no identifier.
+- Prevention: test opaque locators with maximum realistic IDs and account for
+  nonce, tag and encoding expansion; opacity, authenticity and bounded size are
+  separate acceptance properties.
+
+### 2026-08-06 — Lifecycle-negative fixtures must satisfy the lifecycle constraint
+
+- Symptom: a family-association revoke test was rejected by PostgreSQL before
+  the read path ran.
+- Root cause: the test cleared `current_key` but retained the current-child link,
+  creating an invalid mixed lifecycle row under the maintained constraint.
+- Fix / workaround: revoke atomically with `current_key` and
+  `current_child_association_id` both cleared and the revocation timestamp set;
+  the owner read then correctly failed closed.
+- Prevention: negative tests should transition persisted fixtures through a
+  legal lifecycle state before asserting consumer behavior; constraint failures
+  and consumer denials prove different boundaries.
+
+### 2026-08-06 — Base64URL last-character mutation may preserve decoded bytes
+
+- Symptom: the full Scenario suite intermittently accepted a test signature
+  whose encoded last character had supposedly been changed.
+- Root cause: for an unpadded Base64URL value, the final character can include
+  unused low-order bits; changing only those bits produces the same decoded
+  signature bytes and therefore is not cryptographic tampering.
+- Fix / workaround: mutate the first encoded character, which always changes a
+  significant byte, while keeping the encoded shape valid.
+- Prevention: signature-negative fixtures must alter a known significant byte
+  or decode/mutate/re-encode; do not assume every textual Base64URL change
+  changes the represented bytes.
+
+### 2026-08-06 — Crypto-erasure must survive database rollback and restoration
+
+- Symptom: clearing a wrapped DEK and KMS handle only inside a database
+  transaction can be undone by rollback or by restoring an older snapshot.
+- Root cause: database deletion is not authoritative erasure while an external
+  KMS can still unwrap a snapshotted key envelope.
+- What we tried: the first lifecycle destroyed the handle and cleared the row in
+  one surrounding database transaction; ambiguity testing showed that the two
+  systems could not share a commit outcome.
+- Fix / workaround: durably commit `erasing`, destroy the external KMS handle,
+  then clear all recoverable database material in a final transaction. A later
+  database restore is fail-closed because it cannot restore the destroyed handle.
+- Prevention: qualification must restore pre-erasure database material and
+  prove unwrap denial against the external KMS state; never equate row clearing
+  alone with cryptographic erasure.
+
+### 2026-08-06 — External KMS calls cannot share a database transaction boundary
+
+- Symptom: a successful DB commit with an ambiguous client response could run
+  cleanup and destroy the key referenced by the committed row; conversely, a
+  successful KMS destroy followed by DB rollback could leave an `active` row
+  pointing to a destroyed key.
+- Root cause: two independent commit authorities were treated as one atomic
+  transaction, and catch-based cleanup could not distinguish rollback from an
+  ambiguous committed outcome.
+- What we tried: injected ambiguous success after KMS provision and destroy,
+  then inspected the durable row and retried the same logical operation. The
+  former transaction-wrapped flow either risked key destruction or restored an
+  `active` row whose handle no longer existed.
+- Fix / workaround: persist `provisioning` before idempotent KMS provision and
+  `erasing` before idempotent KMS destroy. Run KMS outside DB transactions and
+  finalize through locked, replayable transitions; never destroy a provisioned
+  key merely because the DB client observed an error.
+- Prevention: every external side effect needs a durable operation identity,
+  non-active intermediate state, idempotent retry and ambiguity test.
+
+### 2026-08-06 — Binding revision is not canonical object version
+
+- Symptom: Participant refs used the principal-binding aggregate revision and
+  pair/action evidence hard-coded other refs to `v1`, so independently updated
+  objects could be denied or misrepresented.
+- Root cause: association lifecycle and canonical object lifecycle were treated
+  as one version clock.
+- What we tried: exercised a Participant at version 7 with binding revision 1,
+  Process version 5 and Family version 6 across pair commit, replay, Execution
+  and outbox evidence; the prior implementation emitted incorrect versions.
+- Fix / workaround: join the Participant when reading a binding, persist exact
+  Participant/Process/Family versions in the committed pair operation and reuse
+  them in result, Execution, outbox and replay.
+- Prevention: every typed ref version must come from that object's own aggregate;
+  binding revisions remain separate evidence fields.
+
+### 2026-08-06 — PostgreSQL enum values need a committed migration before use
+
+- Symptom: a fresh migration failed with `55P04 unsafe use of new value` when
+  one migration both added `provisioning|erasing` and referenced them in a
+  default/check constraint.
+- Root cause: PostgreSQL does not allow a new enum value to be used until the
+  transaction that creates it commits.
+- What we tried: Prisma validation and schema diffs passed, but replaying the
+  complete migration chain on an empty PostgreSQL 16 target failed at the new
+  default before application tests could start.
+- Fix / workaround: add enum values in `20260806225000`, then apply columns,
+  default and constraints in `20260806230000`.
+- Prevention: whenever a migration adds and immediately consumes enum values,
+  split it at the commit boundary and prove the full chain from an empty DB.
+
+### 2026-08-06 — A digest-shaped foreground value is not verified foreground state
+
+- Symptom: protected read accepted a caller-provided SHA-256 string as the
+  carrier binding and never used the claimed foreground-context hash.
+- Root cause: shape validation was mistaken for server-owned provenance and the
+  owner did not independently bind decrypted bytes to request/surface context.
+- What we tried: supplied a validly shaped but invented foreground digest and
+  revoked authority during the decrypt/bind interval; the first implementation
+  accepted both cases because it had no owner verifier or final reread.
+- Fix / workaround: remove the caller binding field; an injected default-deny
+  owner port verifies current foreground state and derives the keyed binding
+  from request identity, server-held surface/key context and exact carrier bytes.
+- Prevention: client or transport digests are evidence inputs only. Any value
+  that authorizes or binds plaintext must be independently recomputed or
+  verified by the owner before a final current-authority reread.
+
+### 2026-08-06 — Package-local Vitest can inherit repository-relative includes
+
+- Symptom: `pnpm --filter @the-nurture/scenario test` collected zero tests even
+  though the same files passed from the repository root.
+- Root cause: the shared Vitest include is repository-relative, while the
+  package command changed the test root to the package directory.
+- What we tried: the first filtered focused command reproduced the zero-file
+  result; a root invocation proved that discovery and test bodies were healthy.
+- Fix / workaround: the package script now passes `--root ../..`; its declared
+  command runs all 58 Scenario files / 635 tests.
+- Prevention: execute each package's public test script during convergence, not
+  only an equivalent root command, and pin the package script in the source lock.
+
+### 2026-08-06 — Package typechecks may miss integration-test wire mutability
+
+- Symptom: the final root TypeScript check rejected readonly binding tuples in
+  the C30 pair integration fixture although focused runtime tests were green.
+- Root cause: literal `as const` arrays were readonly, but the exact Base wire
+  uses mutable two-item tuples; narrower package build configurations had not
+  compiled that integration fixture.
+- What we tried: root typecheck located both request/result assignments before
+  any build compilation began.
+- Fix / workaround: contextually type both fixtures from
+  `NurtureC30PairAssociationCommandV1` and use mutable tuples; root typecheck and
+  the 14-test pair suite pass.
+- Prevention: cumulative qualification must include the root TypeScript graph
+  in addition to package builds and focused database execution.
 ### 2026-08-08 — C30 merged Nurture-only, but it is a three-repository change
 
 - Symptom: merging `codex/T-002-c30-i0` into Nurture `main` produced 130

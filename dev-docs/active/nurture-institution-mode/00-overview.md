@@ -3,26 +3,85 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（A/B complete；Nurture C complete；cross-repo C/D pending）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（quality-repaired and reaccepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-08-05
+- **Updated:** 2026-08-08
 - **Owner:** willyu1007
-- Next step: **land C30 as one coordinated three-repository sequence** —
+- **Landing status (2026-08-08):** C30 landed as one coordinated
+  three-repository sequence per
   [`20-c30-cross-repository-landing-plan.md`](./20-c30-cross-repository-landing-plan.md).
-  The `C30-I0-C/D pending` wording above the plan is superseded: the real work
-  lives on `origin/codex/T-002-c30-i0` (`76ece1f`, 58 commits) and reaches
-  `C30-I0` complete plus `C30-I1`, `C30-I2` and `C30-I3` accepted default-off.
-  That branch is **not independently mergeable** — a 2026-08-08 Nurture-only
-  merge produced 130 typecheck errors and was reverted (`faee71d`, root cause
-  in `05-pitfalls.md`), because the required contracts live on the unmerged
-  My-Chat `codex/T-035-scenario-host-adoption` (`cd7bbc2`) and
-  My-Workflow-Base `codex/T-002-c30-i0-base` (`4350086`) branches.
-  Order: Base fast-forward, My-Chat merge, Nurture pin rotation, Nurture
-  revert-the-revert, one three-repository requalification. That final record
-  is also what restores the G4-0A owner-path row to `PRESENT_PINNED`.
-  G1, T-005 G2 Exit and T-006 G3 Exit remain PASS. T-007 G4, T-008,
-  deployment, activation and Pilot remain separate decisions and are not
-  opened by the downstream G2/G3 handoffs or by this landing.
+  Base main is at `4350086…`, My-Chat main at `dc3607e…`, the Nurture pins are
+  rotated (`d33276a`) and this repository has restored the C30 merge. **Step 5,
+  the single three-repository requalification, is still outstanding** — until it
+  passes, the acceptances recorded below are the branch's own evidence at its
+  original topology, not current-pin evidence. The `Current gate` block further
+  down still cites the superseded `a019566` / `06303e9` pins for the same
+  reason.
+- Next step: C30-I3 is quality-repaired and reaccepted default-off. Only a
+  separately authorized C30-I4 scope review is eligible; begin that review by
+  resuming T-002 and reading artifacts 53 and 61 plus the exact Base/My-Chat
+  successor locks. I4 implementation, C31-C35, T-008, persistent database
+  apply, deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
+  Exit, T-006 G3 Exit, all `C30-I0` gates and `C30-I1-A` are PASS. `C30-I1`
+  remains decomposed into ordered I1-A through I1-F
+  slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock
+  `9a15865…`; I1-C is reaccepted at successor Base source `ae0c357…`, metadata
+  lock `3c30337…` and source hash `fc35c6b…e5cf3`. The prior source/lock remains
+  historical. I1-D is reaccepted by artifact 35 at successor Base source
+  `3580a9b…`, metadata lock `1cb5691…` and source hash `5c5f2c53…99ef` after
+  closing all five artifact-34 findings. The prior `52c0dc2…` / `c179bb5…` chain
+  remains historical. Artifacts 37-41 originally closed the ordered I1-E chain at Base
+  source `5433124…`, metadata-only lock `3a08d1f…` and source hash
+  `7ba9458f…c126`: the dedicated plaintext carrier, body-free prepare/commit/read
+  controls, exact I1-D submit reuse, foreground-only read and recursive no-copy
+  suite are reaccepted by artifact 43 at successor Base source `48fd3d6…`,
+  metadata-only lock `9abde2b…` and source hash `be6fd800…fb7d` after closing
+  E-R1..E-R4. The prior `5433124…` / `3a08d1f…` chain remains historical.
+  Artifact 44 froze I1-F dependency/source convergence as ordered F1-F4 units.
+  Artifacts 45-48 record the historical authorized completion at exact Base source
+  `3d91591…`, metadata-only lock `afe47e8…` and aggregate hash
+  `33df7df9…39cd`. Artifact 49 reopened acceptance after four reproduced defects.
+  Artifact 50 closes F-R1 through F-R4 at successor Base source `15ff031…`,
+  metadata-only lock `4350086…` and aggregate hash `d17f2358…6383`. The
+  My-Chat T-035 first closed ordered I2-A..G, then reopened its acceptance after
+  quality review and repaired all nine findings. The current immutable handoff
+  is runtime source `658b897…`, replacement lock `6725dc6…`, aggregate hash
+  `8172e370…10a5ad` and reacceptance/archive checkpoint `cd7bbc2…`; the first
+  `35a41e3…` / `3da48ba0…` chain is historical. Artifact 52 records the
+  cumulative replacement result. The current
+  state is `C30_I3_SCENARIO_OWNER_ADOPTION_REACCEPTED_DEFAULT_OFF /
+  I4_SCOPE_REVIEW_ELIGIBLE`.
+  Artifact 53 freezes exact Base/My-Chat inputs, the production
+  trusted+presentation dependency-complete prefix, owner trust/identity/binding/
+  authority/protected boundaries and ordered I3-A..G units. Artifact 54 accepts
+  the one YAML-generated canonical production module at source `3b7e2a6…`,
+  self-verifying lock source `0f1d456…` and aggregate `a8453249…69fc`. The user
+  authorized ordered I3-A..G implementation. Artifact 55 accepts private trust,
+  nonce, response signing and typed Participant authority at `b8974bf…` with
+  cumulative lock `24080cc5…3d18`. Artifact 56 accepts I3-C at source
+  `bf3fee8…`, migration `20260806120000_c30_i3_pair_owner_foundation` and
+  cumulative lock `c94ac5ed…158e`. Artifact 57 accepts I3-D at runtime source
+  `cccdc6b…`, lock-tool source `5bb260e…` and cumulative lock
+  `e40fb649…b404`. Artifact 58 accepts I3-E at runtime source `9a59c51…`,
+  lock-tool source `25e7a78…`, additive migration
+  `20260806130000_c30_i3_canonical_action_runtime` and cumulative lock
+  `7de36713…c085`. Artifact 59 accepts I3-F at runtime source `13285fd…`,
+  lock-tool source `ac049b4…`, additive migration
+  `20260806140000_c30_i3_protected_owner_lifecycle` and cumulative lock
+  `b251bb46…48a8`. Artifact 60 accepts cumulative I3-A..G at final source
+  `c8b9ce2…`, lock `15207ba…`, aggregate `5c08b542…c4ab6` and default-off
+  census `448d37e1…3c3e`; the disposable 55440 database is destroyed and only a
+  separately authorized I4 scope review is eligible. The later quality review
+  reopened that first acceptance. Artifact 61 closes all four findings plus the
+  fresh-migration enum defect at repair source `48530be…`, successor lock
+  `7db3129…` and aggregate `623da6fd…95d5`. KMS work is now coordinated by
+  durable `provisioning|erasing` states outside DB transactions, every pair
+  replay/recovery rereads current authority, canonical object versions are
+  independent from binding revision, and protected read binding is owner-derived.
+  The successor disposable database was also destroyed; only separately
+  authorized I4 scope review remains eligible.
+  T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
+  and are not opened by the downstream G2/G3 handoffs.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
   `06303e9` (workflow-contract parity `8dd53be4…a34d`, `x5_joint_api`
   `89a61355…`, `wave4_binding_host` `960afb2c…`); the Nurture self-pin is
@@ -34,6 +93,140 @@
   C31, C4, D implementation, Pilot-0-E, Pilot-1, persistent database apply,
   artifact publication, capability activation, and external traffic remain
   separately unauthorized.
+- C30-I0 exact topology: Base `20c4b7a…` (immutable joint-pin verifier repair),
+  My-Chat `dc4a77b…`, Nurture qualification input `cc8b034…` over runtime
+  checkpoint `882d80f…`. Joint Git pins/source hashes, the build-aware canonical
+  baseline and all 18 C-3 source-identity checks pass; Nurture umbrella admission
+  and the My-Chat activation model remain empty/absent.
+- C30-I1-A exact Base handoff: trusted-invocation source `ce7118c…`, source-lock
+  commit `bd69d19…`, contract source hash `8621c6cc…70b0c`. Full Base contract
+  verification passes. My-Chat and Nurture consumers have not adopted it; the later
+  I1-B source/lock chain is recorded below, while C30-I2/I3/I4 remain
+  unstarted/NO-GO.
+- C30-I1-B planning handoff: `artifacts/16-c30-i1-b-scope-freeze.md` freezes
+  Host-internal versus Scenario-private exposure, owner-endpoint reservation,
+  exact pair request/result, current owner evidence and writer-fenced three-state
+  status lookup. All B1-B4 checks now pass; all My-Chat/Nurture adoption remains absent.
+- C30-I1-B1 implementation record: `artifacts/17-c30-i1-b1-implementation-record.md`
+  pins Base `6a43789…`, its neutral reservation surface and no-output verification.
+  My-Chat/Nurture adoption and the cumulative I1-B source lock remain absent; the
+  later B2 checkpoint is recorded separately below.
+- C30-I1-B2 implementation record: `artifacts/18-c30-i1-b2-implementation-record.md`
+  pins Base `445c236…`, exact ordered-pair/head/effect parity and all four legal
+  resolution branches. B3 is recorded separately below; B4 and every
+  consumer/runtime adoption remain absent.
+- C30-I1-B3 implementation record: `artifacts/19-c30-i1-b3-implementation-record.md`
+  pins Base `edbcd74…`, I1-A-composed current evidence and closed three-state
+  recovery bodies. Its later cumulative seal is recorded separately below.
+- C30-I1-B4 qualification record: `artifacts/20-c30-i1-b4-qualification-record.md`
+  pins source `edbcd74…`, metadata-only lock `9a15865…`, source hash
+  `16be693c…2512` and the repeated full Base qualification. At that checkpoint
+  I1-C and every consumer/runtime adoption were still unstarted.
+- C30-I1-C planning handoff: `artifacts/21-c30-i1-c-scope-freeze.md` freezes the
+  neutral list/resolve provider, six closed semantic blocks, navigation and
+  prepare-only action offers, safe-copy rules, bounds, negatives and ordered C1-C4
+  gates. It began as planning-only scope; artifacts 22-25 record the later source.
+- C30-I1-C1 implementation record: `artifacts/22-c30-i1-c1-implementation-record.md`
+  pins Base `64533a6…`, safe-copy/ref primitives, 25-Schema compilation and 129
+  Node tests. The cumulative source lock remains deferred to I1-C4.
+- C30-I1-C2 implementation record: `artifacts/23-c30-i1-c2-implementation-record.md`
+  pins Base `600faee…`, distinct list/resolve provider contracts, 30-Schema
+  compilation and 160 Node tests.
+- C30-I1-C3 implementation record: `artifacts/24-c30-i1-c3-implementation-record.md`
+  pins Base `13d2077…`, six closed semantic blocks, read-only navigation,
+  prepare-only action offers, 36-Schema compilation and 201 Node tests.
+- C30-I1-C4 qualification record: `artifacts/25-c30-i1-c4-qualification-record.md`
+  pins cumulative source `d14bf31…`, metadata lock `9d16810…`, source hash
+  `9e18ae68…09ae`, three full verification rounds and deterministic build/manifest.
+  That qualification is now historical and superseded as current evidence.
+- C30-I1-C4 quality repair freeze: `artifacts/26-c30-i1-c4-quality-repair-freeze.md`
+  reopens acceptance and freezes URL/address detection, current-time expiry,
+  semantic-policy ownership, stable locale errors, executable page defaults and
+  response-local item-key uniqueness.
+- C30-I1-C4 successor qualification: `artifacts/27-c30-i1-c4-quality-repair-qualification-record.md`
+  closes all six findings at Base source `ae0c357…`, lock `3c30337…`, source hash
+  `fc35c6b…e5cf3`, three full verifier rounds and deterministic build/manifest.
+  I1-C was reaccepted there; the successor I1-D chain is recorded below.
+- C30-I1-D planning handoff: `artifacts/28-c30-i1-d-scope-freeze.md` froze
+  standalone Base action contract, prepare/submit, assurance separation,
+  direct/claimed identity and result/recovery wires as D1-D5. The exact neutral
+  drivers are `scenario_direct_empty_v1|workflow_claimed_step_v1`; both effect
+  identities include `scenario_key`. Manifest dependency/source convergence stays
+  I1-F.
+- C30-I1-D1 through D4 implementation records: artifacts
+  `29-c30-i1-d1-implementation-record.md` through
+  `32-c30-i1-d4-implementation-record.md` pin the separately attributable Base
+  core, prepare/submit/assurance, identity/result and claimed-Step recovery
+  checkpoints.
+- C30-I1-D5 qualification record:
+  `artifacts/33-c30-i1-d5-qualification-record.md` pins exact source `52c0dc2…`,
+  metadata lock `c179bb5…`, source hash `50c5fa16…f093`, 55 Schemas, 291 Node
+  tests and deterministic 76-file builds. That chain is historical.
+- C30-I1-D5 successor qualification:
+  `artifacts/35-c30-i1-d5-successor-quality-repair-qualification-record.md`
+  closes D-R1..D-R5 and pins source `3580a9b…`, metadata lock `1cb5691…`, source
+  hash `5c5f2c53…99ef`, 55 Schemas, 296 Node tests and deterministic 76-file
+  builds. I1-D is reaccepted.
+- C30-I1-E planning handoff: `artifacts/36-c30-i1-e-scope-freeze.md` froze the
+  dedicated `ScenarioProtectedPlainTextCarrierV1`, body-free static/prepare/
+  prepared/committed/read/tombstone controls, opaque locator and display-lease
+  rules, recursive no-copy negatives, donor disposition and E1-E5 ordering.
+- C30-I1-E1 through E4 implementation records: artifacts
+  `37-c30-i1-e1-implementation-record.md` through
+  `40-c30-i1-e4-implementation-record.md` pin the separately attributable Base
+  carrier, prepare, commit-composition and foreground-read checkpoints.
+- C30-I1-E5 qualification record:
+  `artifacts/41-c30-i1-e5-qualification-record.md` pins exact source `5433124…`,
+  metadata lock `3a08d1f…`, source hash `7ba9458f…c126`, 66 Schemas, 371 Node
+  conformance tests and deterministic 84-file builds. Protected bytes never enter
+  generic I1-A/I1-C/I1-D or durable Host payloads. This record is historical.
+- C30-I1-E5 successor quality repair freeze:
+  `artifacts/42-c30-i1-e5-quality-repair-freeze.md` reopens acceptance and freezes
+  E-R1..E-R4 before Base source changes.
+- C30-I1-E5 successor qualification:
+  `artifacts/43-c30-i1-e5-successor-quality-repair-qualification-record.md` closes
+  all four findings at Base source `48fd3d6…`, metadata lock `9abde2b…`, source
+  hash `be6fd800…fb7d`, 66 Schemas and 376 Node tests. I1-E is reaccepted; I1-F
+  implementation, C30-I2 and every consumer remain unstarted.
+- C30-I1-F planning handoff: `artifacts/44-c30-i1-f-scope-freeze.md` freezes the
+  optional closed `scenario_contracts` area, exact four-capability dependency graph,
+  four named source identities, Schema/runtime parity, legacy/vNext no-alias rules,
+  named Base profiles and ordered F1-F4 gates. It changes no source and authorizes
+  no implementation or downstream adoption.
+- C30-I1-F implementation checkpoints: artifacts
+  `45-c30-i1-f1-dependency-graph-implementation-record.md`,
+  `46-c30-i1-f2-interface-convergence-implementation-record.md` and
+  `47-c30-i1-f3-action-protected-convergence-implementation-record.md` pin the
+  separately attributable F1-F3 commits and verification populations.
+- C30-I1-F cumulative qualification:
+  `artifacts/48-c30-i1-f4-cumulative-qualification-record.md` pins F4 source
+  `3d91591…`, metadata-only lock `afe47e8…`, aggregate source hash
+  `33df7df9…39cd`, four named source profiles, three complete verifier passes and
+  deterministic isolated builds/manifests. That acceptance is historical after
+  the quality-review reopening in
+  `artifacts/49-c30-i1-f4-quality-repair-freeze.md`.
+- C30-I1-F successor quality-repair qualification:
+  `artifacts/50-c30-i1-f4-successor-quality-repair-qualification-record.md`
+  closes F-R1 through F-R4 at Base source `15ff031…`, metadata-only lock
+  `4350086…`, aggregate source hash `d17f2358…6383`, 66 Schemas, 441 Node
+  tests and deterministic isolated builds/manifests. I1-F is reaccepted; C30-I2,
+  consumers and every operational action remain unstarted.
+- C30-I2 planning handoff:
+  `artifacts/51-c30-i2-scope-freeze.md` freezes exact Base adoption, interactive/
+  durable principal translation, detached signer/nonce verification, atomic
+  Child/Family pair ownership, semantic presentation, direct/claimed actions,
+  protected Host runtime, default-off convergence and ordered I2-A..G gates.
+  The review also resolved the cross-repository task collision: Nurture T-002
+  remains the program record, while My-Chat registered T-035 rather than reusing
+  its archived local T-002.
+- C30-I2 default-off acceptance:
+  `artifacts/52-c30-i2-default-off-acceptance-record.md` records ordered I2-A..G,
+  the nine-finding remediation, replacement My-Chat source/lock/profile
+  identities, full type/lint/test/contract qualification, fresh disposable
+  PostgreSQL proof and maintained static/DB absent-off census. My-Chat T-035 is
+  reaccepted and archived at `cd7bbc2…`; Nurture product source is unchanged.
+  C30-I3 scope is frozen in artifact 53. Only separately authorized I3-A, or an
+  explicit broader ordered I3-A..G implementation mandate, is eligible next.
 
 ## Current Controlled-Parallel Development Decision (2026-07-30)
 

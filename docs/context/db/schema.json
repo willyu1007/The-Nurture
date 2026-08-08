@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-07T13:39:25.323Z",
+  "updatedAt": "2026-08-08T03:50:04.941Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -39,6 +39,36 @@
       "values": [
         "child",
         "family"
+      ]
+    },
+    {
+      "name": "NurtureC30ActionOperationState",
+      "values": [
+        "eligible",
+        "dispatching",
+        "committed",
+        "confirmed_no_effect",
+        "quarantined"
+      ]
+    },
+    {
+      "name": "NurtureC30PairOperationState",
+      "values": [
+        "eligible",
+        "dispatching",
+        "committed",
+        "confirmed_no_effect",
+        "quarantined"
+      ]
+    },
+    {
+      "name": "NurtureC30ProtectedContentLifecycle",
+      "values": [
+        "provisioning",
+        "active",
+        "erasing",
+        "tombstoned",
+        "erased"
       ]
     },
     {
@@ -812,6 +842,14 @@
       ]
     },
     {
+      "name": "NurturePrincipalBindingStatus",
+      "values": [
+        "active",
+        "suspended",
+        "revoked"
+      ]
+    },
+    {
       "name": "NurtureProjectStatus",
       "values": [
         "draft",
@@ -1154,6 +1192,2557 @@
           ],
           "name": null,
           "map": "ix_49"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ActionAuditRecord",
+      "dbName": "nurture_c30_action_audit_record",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actionOperationId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "action_operation_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correlationRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "correlation_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "executionRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "execution_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actionOperation",
+          "to": "NurtureC30ActionOperation",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actionOperationId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "actionOperationId",
+            "eventKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_action_audit_event"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ActionOperation",
+      "dbName": "nurture_c30_action_operation",
+      "schema": null,
+      "columns": [
+        {
+          "name": "accountObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "account_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actionContractHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "action_contract_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actionKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "action_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "attemptLedgerHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "attempt_ledger_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorityEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorityRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "businessOutcome",
+          "type": "NurtureCommandBusinessOutcome",
+          "nullable": true,
+          "list": false,
+          "dbName": "business_outcome",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "canonicalPayloadHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "canonical_payload_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "clientMutationIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "client_mutation_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commitEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "commit_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deadlineEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "deadline_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "driver",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectDeadlineAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effect_deadline_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectIdentityHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "effect_identity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "handoffRequestSnapshots",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "handoff_request_snapshots",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "hostIdentityEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "host_identity_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "noEffectFenceEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "no_effect_fence_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "originalWorkflowStepRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "original_workflow_step_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "outputRefs",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "output_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantBindingId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "primaryScopeRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "primary_scope_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalBindingHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_binding_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalProvenanceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_provenance_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "recoveryCheckedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "recovery_checked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "representedOrganizationObjectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "represented_organization_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestCorrelationHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_correlation_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestNonceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_nonce_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioCommandHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_command_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioCommandId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_command_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureC30ActionOperationState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "eligible",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "submitContextRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "submit_context_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetRefHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "writerFenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "writer_fence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "auditRecords",
+          "to": "NurtureC30ActionAuditRecord",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30ActionExecution",
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "outboxEvents",
+          "to": "NurtureC30ActionOutboxEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "participantBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "scenarioKey",
+            "actionKey",
+            "state",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_action_state"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "scenarioCommandId"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_action_command"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ActionOutboxEvent",
+      "dbName": "nurture_c30_action_outbox_event",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actionOperationId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "action_operation_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correlationRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "correlation_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventType",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "executionRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "execution_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "participantRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publishedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "published_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actionOperation",
+          "to": "NurtureC30ActionOperation",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actionOperationId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "publishedAt",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_action_outbox_delivery"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "actionOperationId",
+            "eventType"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_action_outbox_event"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30AuditRecord",
+      "dbName": "nurture_c30_audit_record",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correlationRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "correlation_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "executionRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "execution_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "operationId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "operation_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "operation",
+          "to": "NurtureC30PairOperation",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "operationId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "operationId",
+            "eventKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_audit_event"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30OutboxEvent",
+      "dbName": "nurture_c30_outbox_event",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correlationRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "correlation_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventType",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "executionRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "execution_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "operationId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "operation_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publishedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "published_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "operation",
+          "to": "NurtureC30PairOperation",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "operationId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "publishedAt",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_outbox_delivery"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "operationId",
+            "eventType"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_outbox_event"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30PairOperation",
+      "dbName": "nurture_c30_pair_operation",
+      "schema": null,
+      "columns": [
+        {
+          "name": "accountObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "account_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "associationExpectationHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "association_expectation_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "attemptLedgerHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "attempt_ledger_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authoritySourceRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_source_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authoritySourceVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_source_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "canonicalInputHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "canonical_input_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childAnchorId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childAssociationId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_association_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_care_process_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childOwnerVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_owner_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "continuationContextHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "continuation_context_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentOwnerEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "current_owner_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deadlineEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "deadline_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectDeadlineAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effect_deadline_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAnchorId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_anchor_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAssociationId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_association_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyOwnerVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_owner_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "family_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "hostIdentityEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "host_identity_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "noEffectFenceEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "no_effect_fence_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pairCommitEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "pair_commit_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pairRelationEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "pair_relation_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantBindingId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "participant_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "participant_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalProvenanceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_provenance_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "recoveryCheckedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "recovery_checked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "representedOrganizationObjectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "represented_organization_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestNonceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_nonce_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioCommandHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_command_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioCommandId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_command_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioCommitEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "scenario_commit_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureC30PairOperationState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "eligible",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "writerFenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "writer_fence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "auditRecords",
+          "to": "NurtureC30AuditRecord",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "childAnchor",
+          "to": "NurtureChildBindingAnchor",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "childAssociation",
+          "to": "NurtureChildAnchorAssociation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30ChildAssociation",
+          "fields": [
+            "childAssociationId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30PairExecution",
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "familyAnchor",
+          "to": "NurtureFamilyBindingAnchor",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "familyAnchorId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "familyAssociation",
+          "to": "NurtureFamilyAnchorAssociation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30FamilyAssociation",
+          "fields": [
+            "familyAssociationId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "outboxEvents",
+          "to": "NurtureC30OutboxEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "participantBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "scenarioKey",
+            "state",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_pair_state"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "scenarioCommandId"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_pair_command"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ProtectedContent",
+      "dbName": "nurture_c30_protected_content",
+      "schema": null,
+      "columns": [
+        {
+          "name": "acceptedCarrierBindingHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "accepted_carrier_binding_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actionKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "action_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authenticationTag",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": "authentication_tag",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorityEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorityRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "canonicalPayloadHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "canonical_payload_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ciphertext",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "committed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "committedContentVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "committed_content_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentKind",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "content_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorAccountObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_account_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorActorObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_actor_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorParticipantBindingId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_participant_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "creator_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "creatorRepresentedOrganizationObjectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "creator_represented_organization_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "encryptionAlgorithm",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "encryption_algorithm",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "encryptionContextHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "encryption_context_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "encryptionVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "encryption_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "erasedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "erased_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "erasureEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "erasure_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "keyedIntegrityHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "keyed_integrity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyDomain",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "kms_key_domain",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyHandle",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "kms_key_handle",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyHandleHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "kms_key_handle_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsKeyVersion",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "kms_key_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "kmsProvisioningKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "kms_provisioning_key",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionAuthorityRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_authority_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionParticipantBindingId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_participant_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTransitionParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_transition_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "NurtureC30ProtectedContentLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "provisioning",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nonce",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "owningActionRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "owning_action_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pairEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "pair_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyEvidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "preparedContentVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "prepared_content_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalBindingHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_binding_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "protectedContentRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "protected_content_ref",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "protectedFieldKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "protected_field_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "readableUntil",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "readable_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "requestIdentityHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_identity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "retentionUntil",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "retention_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scenario_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tombstonedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "tombstoned_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "tombstoneReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "tombstone_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "wrappedDek",
+          "type": "Bytes",
+          "nullable": true,
+          "list": false,
+          "dbName": "wrapped_dek",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "wrappingAlgorithm",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "wrapping_algorithm",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "auditRecords",
+          "to": "NurtureC30ProtectedContentAuditRecord",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "creatorParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentCreator",
+          "fields": [
+            "creatorParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "creatorParticipantBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentCreatorBinding",
+          "fields": [
+            "creatorParticipantBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "lastTransitionBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentTransitionBinding",
+          "fields": [
+            "lastTransitionParticipantBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "lastTransitionParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureC30ProtectedContentTransitionActor",
+          "fields": [
+            "lastTransitionParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "creatorParticipantId",
+            "lifecycle",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_protected_creator"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "lifecycle",
+            "retentionUntil"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_protected_retention"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "actionKey",
+            "requestIdentityHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_protected_request"
+        }
+      ]
+    },
+    {
+      "name": "NurtureC30ProtectedContentAuditRecord",
+      "dbName": "nurture_c30_protected_content_audit_record",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentRefHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "content_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "participantRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "principalBindingRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "principal_binding_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "protectedContentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "protected_content_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "protectedContent",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "protectedContentId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "protectedContentId",
+            "eventKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_protected_audit_event"
         }
       ]
     },
@@ -2750,6 +5339,15 @@
       ],
       "relations": [
         {
+          "field": "c30PairOperation",
+          "to": "NurtureC30PairOperation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30ChildAssociation",
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "child",
           "to": "NurtureChild",
           "optional": false,
@@ -2974,6 +5572,15 @@
           "references": []
         },
         {
+          "field": "c30PairOperations",
+          "to": "NurtureC30PairOperation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "familyLinks",
           "to": "NurtureFamilyAnchorAssociation",
           "optional": false,
@@ -3137,6 +5744,15 @@
         {
           "field": "attentionItems",
           "to": "NurtureTeacherAttentionItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30ActionOperations",
+          "to": "NurtureC30ActionOperation",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -4553,6 +7169,72 @@
       "schema": null,
       "columns": [
         {
+          "name": "actorAccountRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_account_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorBindingVersion",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_binding_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorPrincipalBindingId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_principal_binding_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorRepresentedOrganizationRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_represented_organization_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorWorkspaceRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_workspace_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "businessActorRef",
           "type": "String",
           "nullable": false,
@@ -4652,6 +7334,17 @@
           "unique": false
         },
         {
+          "name": "executionDriver",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "execution_driver",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "handoffDriverRef",
           "type": "Json",
           "nullable": true,
@@ -4693,6 +7386,17 @@
           "dbType": null,
           "default": "uuid()",
           "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "invocationProvenance",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "invocation_provenance",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
           "unique": false
         },
         {
@@ -4784,6 +7488,28 @@
           "unique": false
         },
         {
+          "name": "scenarioEffectIdentityHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "scenario_effect_identity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "scenario_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "targetRefs",
           "type": "Json",
           "nullable": true,
@@ -4807,6 +7533,37 @@
         }
       ],
       "relations": [
+        {
+          "field": "actorPrincipalBinding",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorPrincipalBindingId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "c30ActionOperation",
+          "to": "NurtureC30ActionOperation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30ActionExecution",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30PairOperation",
+          "to": "NurtureC30PairOperation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30PairExecution",
+          "fields": [],
+          "references": []
+        },
         {
           "field": "cascadeAudits",
           "to": "NurtureFamilyCareCascadeAudit",
@@ -4849,6 +7606,16 @@
         }
       ],
       "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "actorPrincipalBindingId",
+            "committedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_command_execution_actor_binding"
+        },
         {
           "type": "index",
           "fields": [
@@ -6994,6 +9761,15 @@
       ],
       "relations": [
         {
+          "field": "c30PairOperation",
+          "to": "NurtureC30PairOperation",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureC30FamilyAssociation",
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "childAnchor",
           "to": "NurtureChildBindingAnchor",
           "optional": false,
@@ -7250,6 +10026,15 @@
         {
           "field": "authorizations",
           "to": "NurtureScenarioBindingAuthorization",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30PairOperations",
+          "to": "NurtureC30PairOperation",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -13203,6 +15988,42 @@
       ],
       "relations": [
         {
+          "field": "c30ActionOperations",
+          "to": "NurtureC30ActionOperation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30PairOperations",
+          "to": "NurtureC30PairOperation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30ProtectedContentCreated",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentCreator",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "c30ProtectedContentTransitioned",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentTransitionActor",
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "interactionContexts",
           "to": "NurtureInteractionContext",
           "optional": false,
@@ -13239,6 +16060,15 @@
           "references": []
         },
         {
+          "field": "principalBindings",
+          "to": "NurtureParticipantPrincipalBinding",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "roleAssignments",
           "to": "NurtureCareRoleAssignment",
           "optional": false,
@@ -13267,6 +16097,260 @@
           ],
           "name": null,
           "map": "ix_nurture_participant_auth"
+        }
+      ]
+    },
+    {
+      "name": "NurtureParticipantPrincipalBinding",
+      "dbName": "nurture_participant_principal_binding",
+      "schema": null,
+      "columns": [
+        {
+          "name": "accountObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "account_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bindingVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "binding_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_key",
+          "dbType": null,
+          "default": "\"current\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "representedOrganizationObjectId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "represented_organization_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revokedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "revoked_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurturePrincipalBindingStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "active",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "suspendedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "suspended_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actionOperations",
+          "to": "NurtureC30ActionOperation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "commandExecutions",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "pairOperations",
+          "to": "NurtureC30PairOperation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "protectedContentCreated",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentCreatorBinding",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "protectedContentTransitioned",
+          "to": "NurtureC30ProtectedContent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureC30ProtectedContentTransitionBinding",
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "status",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_principal_status"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "accountObjectId",
+            "actorObjectId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_principal_current"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "participantId",
+            "currentKey"
+          ],
+          "name": null,
+          "map": "uq_nurture_c30_participant_current"
         }
       ]
     },
@@ -15669,6 +18753,90 @@
           ],
           "name": null,
           "map": "ix_nurture_binding_auth_current"
+        }
+      ]
+    },
+    {
+      "name": "NurtureScenarioInvocationNonce",
+      "dbName": "nurture_scenario_invocation_nonce",
+      "schema": null,
+      "columns": [
+        {
+          "name": "bodySha256",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "body_sha256",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "consumedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "consumed_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "requestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scopeHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "scope_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_c30_nonce_expiry"
         }
       ]
     },
