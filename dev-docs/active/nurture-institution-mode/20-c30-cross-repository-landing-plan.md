@@ -4,7 +4,10 @@
 
 - Date: 2026-08-08
 - Task: T-002
-- State: **PLAN — no step executed, no authority granted**
+- State: **COMPLETE — all five steps landed 2026-08-08**, closed by
+  `C30_LANDING_REQUAL_PASS` in
+  [`21-c30-landing-requalification-record.md`](./21-c30-landing-requalification-record.md).
+  Landing grants no activation, deployment or traffic authority.
 - Trigger: the reverted Nurture-only merge (`faee71d`, pitfall recorded in
   `05-pitfalls.md`)
 
@@ -244,7 +247,18 @@ For reference, the conflict resolution this step restored:
 Re-verify the census after restoring — if any repository gained test files in
 the interim, the numbers move.
 
-### Step 5 — One three-repository requalification
+### Step 5 — One three-repository requalification ✅ DONE 2026-08-08
+
+`C30_LANDING_REQUAL_PASS` — full record in
+[`21-c30-landing-requalification-record.md`](./21-c30-landing-requalification-record.md).
+Five pre-existing defects were found and fixed, all surfaced because this run
+executed gates the branch's own qualification never did. The 23 migrations
+replayed from empty with no diff, settling the interleaving question. One
+deviation from the T-009 discipline is recorded there: live checkouts were used
+instead of a detached topology, because all three were verified clean and at
+exactly the pinned heads.
+
+The plan as originally written, retained for reference:
 
 **Open its first task with the two lock re-freezes** deferred from step 4:
 regenerate `docs/project/integrations/c30-i3-owner-adoption-lock.json` from the
