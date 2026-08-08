@@ -13,6 +13,7 @@ import type {
   PublishProcessRescheduleFactsV1,
   RawBoardSourceHead,
   FamilyGrowthQueueStateV1,
+  FamilyGrowthLifecycleStateV1,
   RawPublishQueueRow,
   TeacherPublishQueueReadPort,
 } from "@the-nurture/scenario/harness";
@@ -231,39 +232,58 @@ export class PrismaPublishLaneReadPort
     // with no refresh signal. Buckets follow the display mapping — pending
     // and delivering render identically, so a claim transition between them
     // deliberately does not move the head.
+    const familyGrowthProcessScope = {
+      publishProcess: {
+        workspaceId: input.workspace_id,
+        careGroupId: reach.care_group_id,
+        dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] },
+      },
+    };
     const familyGrowthScope = {
       workspaceId: input.workspace_id,
       kind: "released" as const,
-      publicationRelease: {
-        publishProcess: {
-          workspaceId: input.workspace_id,
-          careGroupId: reach.care_group_id,
-          dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] },
-        },
-      },
+      publicationRelease: familyGrowthProcessScope,
     };
-    const [familyGrowthStates, familyGrowthReceipts] = await Promise.all([
-      this.prisma.nurtureFamilyGrowthOutboxEvent.groupBy({
-        by: ["deliveryState"],
-        where: familyGrowthScope,
-        _count: { _all: true },
-      }),
-      this.prisma.nurtureFamilyGrowthAdmissionReceipt.aggregate({
-        where: { workspaceId: input.workspace_id, outboxEvent: familyGrowthScope },
-        _count: { _all: true },
-        _max: { createdAt: true },
-      }),
-    ]);
+    const [familyGrowthStates, familyGrowthReceipts, familyGrowthLifecycle] =
+      await Promise.all([
+        this.prisma.nurtureFamilyGrowthOutboxEvent.groupBy({
+          by: ["deliveryState"],
+          where: familyGrowthScope,
+          _count: { _all: true },
+        }),
+        this.prisma.nurtureFamilyGrowthAdmissionReceipt.aggregate({
+          where: { workspaceId: input.workspace_id, outboxEvent: familyGrowthScope },
+          _count: { _all: true },
+          _max: { createdAt: true },
+        }),
+        // The I8 overlay is committed-lifecycle EXISTENCE, so its census is
+        // a per-kind row count — a landing correction/removal/redaction must
+        // move the head exactly like a landing receipt.
+        this.prisma.nurtureFamilyGrowthOutboxEvent.groupBy({
+          by: ["kind"],
+          where: {
+            workspaceId: input.workspace_id,
+            kind: { in: ["correction", "target_removal", "redaction"] },
+            publicationRelease: familyGrowthProcessScope,
+          },
+          _count: { _all: true },
+        }),
+      ]);
     const familyGrowthCount = (states: string[]): number =>
       familyGrowthStates
         .filter((row) => states.includes(row.deliveryState))
         .reduce((sum, row) => sum + row._count._all, 0);
+    const lifecycleCount = (kind: string): number =>
+      familyGrowthLifecycle.find((row) => row.kind === kind)?._count._all ?? 0;
     const familyGrowthHeadFacts: Array<string | number | null> = [
       familyGrowthCount(["pending", "delivering"]),
       familyGrowthCount(["outcome_unknown"]),
       familyGrowthCount(["delivered", "failed"]),
       familyGrowthReceipts._count._all,
       familyGrowthReceipts._max.createdAt?.toISOString() ?? null,
+      lifecycleCount("correction"),
+      lifecycleCount("target_removal"),
+      lifecycleCount("redaction"),
     ];
 
     const pageKeys = page.map((row) => row.process_key);
@@ -271,7 +291,6 @@ export class PrismaPublishLaneReadPort
       const outboxEvents = await this.prisma.nurtureFamilyGrowthOutboxEvent.findMany({
         where: {
           workspaceId: input.workspace_id,
-          kind: "released",
           publicationRelease: {
             publishProcess: {
               workspaceId: input.workspace_id,
@@ -280,6 +299,7 @@ export class PrismaPublishLaneReadPort
           },
         },
         select: {
+          kind: true,
           deliveryState: true,
           publicationRelease: {
             select: {
@@ -297,8 +317,32 @@ export class PrismaPublishLaneReadPort
           },
         },
       });
+      // I8 lifecycle overlay: committed lifecycle events per target, kept at
+      // the strongest precedence (redacted > target_removed >
+      // correction_appended).
+      const LIFECYCLE_DISPLAY: Record<string, FamilyGrowthLifecycleStateV1> = {
+        correction: "correction_appended",
+        target_removal: "target_removed",
+        redaction: "redacted",
+      };
+      const LIFECYCLE_RANK: Record<FamilyGrowthLifecycleStateV1, number> = {
+        correction_appended: 0,
+        target_removed: 1,
+        redacted: 2,
+      };
+      const lifecycleByTarget = new Map<string, FamilyGrowthLifecycleStateV1>();
+      for (const event of outboxEvents) {
+        const display = LIFECYCLE_DISPLAY[event.kind];
+        if (!display) continue;
+        const key = `${event.publicationRelease.publishProcess.processKey} ${event.publicationRelease.target.targetKey}`;
+        const current = lifecycleByTarget.get(key);
+        if (!current || LIFECYCLE_RANK[display] > LIFECYCLE_RANK[current]) {
+          lifecycleByTarget.set(key, display);
+        }
+      }
       const byProcess = new Map<string, NonNullable<RawPublishQueueRow["family_growth"]>>();
       for (const event of outboxEvents) {
+        if (event.kind !== "released") continue;
         const state: FamilyGrowthQueueStateV1 =
           event.deliveryState === "outcome_unknown"
             ? "outcome_unknown"
@@ -306,8 +350,14 @@ export class PrismaPublishLaneReadPort
               ? (event.receipts[0]?.status ?? "delivering")
               : "delivering";
         const processKey = event.publicationRelease.publishProcess.processKey;
+        const targetKey = event.publicationRelease.target.targetKey;
+        const lifecycle = lifecycleByTarget.get(`${processKey} ${targetKey}`);
         const entries = byProcess.get(processKey) ?? [];
-        entries.push({ target_key: event.publicationRelease.target.targetKey, state });
+        entries.push({
+          target_key: targetKey,
+          state,
+          ...(lifecycle ? { lifecycle } : {}),
+        });
         byProcess.set(processKey, entries);
       }
       for (const row of page) {

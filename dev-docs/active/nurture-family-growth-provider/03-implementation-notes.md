@@ -2,6 +2,28 @@
 
 Running log; newest first.
 
+- 2026-08-08 (I8 landed — T-009 complete): the teacher queue now binds every
+  §四 state to real provider results. Scoping fact worth keeping: the
+  transient states (per-target `binding_unavailable` + preparation reason
+  codes, process-level `publication_policy_drift`) were ALREADY bound —
+  they ride the release action's free `stableKey` reason codes since I3,
+  so no contract change was needed for them. The persistent gap was the
+  lifecycle overlay: `familyGrowthLifecycleState`
+  (`correction_appended`/`target_removed`/`redacted`) added at `1.17.0`
+  (proper rotation this time — content change WITH version bump; digest
+  `d22851d9…`, shared-core unchanged) as an optional field beside the
+  delivery state, projected from committed lifecycle outbox events
+  (committed IS the display truth — the pair lands atomically with the
+  visibility event) with precedence redacted > target_removed >
+  correction_appended, and its per-kind census folded into the queue
+  source head so an appended lifecycle event invalidates cursors exactly
+  like a landing receipt. The no-family-archive invariant became an
+  explicit phase-2 scan (queue/release contract text must not carry
+  family_id/child_id/companion refs/growth_material/cultivation/guardian —
+  with the frozen `pending_guardian_confirmation` status stripped first so
+  any OTHER guardian reference still fails). Lanes 616/257/66+64/27/12
+  green; self-pin `8717270f…`. T-009 increments I0–I8 all landed.
+
 - 2026-08-08 (post-requal quality pass — 4 findings fixed, requal refreshed):
   independent review (Codex gpt-5.6-sol) + self-review of the I6.2 + I7b
   range surfaced four real defects; all fixed and the batch requalified

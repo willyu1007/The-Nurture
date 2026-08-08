@@ -34,15 +34,15 @@ const frozenSharedCoreHash =
   "sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d";
 const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["acknowledge_family_care_item", "sha256:6237365e4a1538de56f71abec0b1bf387180d29740c455a4246b5721a2a35cf7"],
-  ["acquire_publish_edit_hold", "sha256:c19cec2a46c3db1ad852b07d332a86750b4b9646c08bee8f74a76e224bd8f5cc"],
-  ["cancel_publish_process", "sha256:d7bac490d117b6b009854c216495d1d4803050a00dd432e3dfe26165367d3fbf"],
+  ["acquire_publish_edit_hold", "sha256:30ad41e4500127e1063ba1349d8287960689654b88ca7f3b502803abcf7520d0"],
+  ["cancel_publish_process", "sha256:01e651c6e36e5e247379a88ad3fd0bb2bacb988bba398c47249aa7ec8c6d90b5"],
   ["confirm_child_media_attribution", "sha256:d160735c5b03fadd6d738e8026faa9784772dfd035d3a0553d97b0d5077e2a06"],
   ["correct_family_care_message", "sha256:111c258019da3988278ca94156436d38b2d1e3f002306e17cb8fec4ad8c856c3"],
-  ["correct_publication", "sha256:cb92123160d2fa4598627228972e028dd1d889ec9221e65ce646093c2ae6dd19"],
-  ["detach_publish_process_media", "sha256:0185c062236e00a19f454991954c1dfdea97a65c95e85b9e3fb747e95d5931b4"],
-  ["discard_media_asset", "sha256:38f74d9712fab74475fd480fbfa244c939b04a5a569c9af604261ceed18b2394"],
+  ["correct_publication", "sha256:a3f07378714ac822156568d52e30792fd7835f49692a28d6594d033f1b61ba35"],
+  ["detach_publish_process_media", "sha256:baab8383ce9159b3245ac0e855622619e0fc01a2fd71863cafab723358e21464"],
+  ["discard_media_asset", "sha256:88f554db8b702612f7a997685a6731df4ac6dbac72a7f408cca41b645df4f460"],
   ["initiate_caregiver_direct_message", "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"],
-  ["organize_care_capture_batch", "sha256:d2ddcec6b093e2e72b86547931d8069c908ff7ec3220e6316df6a32efdae383f"],
+  ["organize_care_capture_batch", "sha256:f9d2f060d323f4d4f7fd6d3e978d5e2ec2be3854d218ad2b1f92bee185049adb"],
   ["policy_redact_family_care_message", "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"],
   ["query_caregiver_child_today", "sha256:bf1b9bd160bd6c962d7020cfb46074d902ddd2ec10efff6c9b3c895e2a94a5c0"],
   ["query_caregiver_family_care_work", "sha256:c670fee50cee1cd814ac376c0f2933ba621deb3c1d6502c2253b4c956f32b9b7"],
@@ -51,18 +51,18 @@ const frozenCapabilitySliceHashes: readonly (readonly [string, string])[] = [
   ["query_guardian_enrollment_activity", "sha256:bad468244dd328c8efdccade21d9ade6bd7c2342bc777227547fcd1928156516"],
   ["query_guardian_family_board", "sha256:b88ea18ac1e004fd85262c7a709fdc7275188933e2b0aa653a521ec60003e4b6"],
   ["query_guardian_family_care_timeline", "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"],
-  ["query_teacher_publish_queue", "sha256:4255fc039a700ca21c57187c7653234593513dfdfa078f509993b6e4f7db7002"],
+  ["query_teacher_publish_queue", "sha256:abe0c1c9c60e573917b0843aa038526856111d9dd78928f6e382e019b72ed5cb"],
   ["record_caregiver_daily_care", "sha256:e49064ae5691abfaae62ddb278ec31c8188f5bf30bde51d8b5b3c0825e0a02c8"],
   ["redact_family_care_message", "sha256:136ad70d1d4f0eb84a3417cfc5c5274f95cb2d134a03551a13a48843204cbbe5"],
-  ["redact_publication", "sha256:12d3e19191a08b9ac1e2b339cf0b7322c67b524d2a680b165a329ebe8973e394"],
+  ["redact_publication", "sha256:1b1dd52157b9e62a19550e6ca6df67229ef34188b08f30e6ceb5260f0a9615d4"],
   ["reject_child_media_attribution", "sha256:04cd0965b4115b9531a448e887e214d021380fae20bb08d2d2057a6270d92044"],
-  ["release_publish_edit_hold", "sha256:0b6aab9403368359ee155ef540b3a4ec8313991ed4c9f98ce9000a6ec60fb350"],
-  ["release_publish_process", "sha256:1fe763e0536c3fe58a2cf980314ff7736775a9bdd89532940320dd6baaeca9cb"],
-  ["remove_publication_target_visibility", "sha256:5ddd53935ee44f66e2b8f5db74bedbb02c0d938435684878503677d22f6620ed"],
-  ["renew_publish_edit_hold", "sha256:e5d0c66bea21789429ee62f520c1fcaf34c38cca1f7e44afe61ec900a039ba96"],
+  ["release_publish_edit_hold", "sha256:b60dd9890a5cde79feeb142166b469abde2a1525bc6b83e4c1eefc4130eda48c"],
+  ["release_publish_process", "sha256:de6ed71e6ee03a3826a087dac2fa02543c1d87d684161bc2f5571837927087c8"],
+  ["remove_publication_target_visibility", "sha256:a7b29b0cbf34c16e6f60e9d597503b9fbfe5b80a3c9aad5de263c6ed5d8b12d3"],
+  ["renew_publish_edit_hold", "sha256:7f05f2f05ec7f7db2786b48efcd7d2438a1334650065b99a7e7902df19bd6479"],
   ["reply_family_care_item", "sha256:6b726c8e5aafd945c624c1b460aa1307b37a975119b43363a6d6579640d70da6"],
-  ["reschedule_publish_process", "sha256:c66cb0a3ab5db082161156a047e107a416ea07c6217df9b189f9ca9dbdc68c78"],
-  ["save_publish_process_draft", "sha256:3ca60fd005c49976590ffb55f196cefbb1d4517d97f47462e4e29ca837c30c31"],
+  ["reschedule_publish_process", "sha256:25c532267e03e1e74a8d7507f014e84b6d69b47b32d19cd67ce8f4f691374ac2"],
+  ["save_publish_process_draft", "sha256:9381bd57cf88cc5bc49db7669b7b4df81691da899f023e0382350eccc0248c5d"],
   ["submit_family_care_question", "sha256:1c85661fb834cbf937548f7bc28aa2df963a6c27b7ed4464598887b4e6a10d68"],
   ["supersede_child_media_attribution", "sha256:b4b9ea873c8dde19ecfb1a21e7f5524aba2bd02bb84ebd08d885c1e43e5e692f"],
   ["withdraw_family_care_request", "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b"],
@@ -267,7 +267,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.16.0");
+    expect(contract.version).toBe("1.17.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );

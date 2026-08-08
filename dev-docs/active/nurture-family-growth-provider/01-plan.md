@@ -145,13 +145,23 @@ two-service run + requalification, rides with the I6 batch):
   violations (met). I7b — the twelve fixtures pass on both real sides;
   requalification record appended; default-off census re-proven.
 
-## I8 — Teacher queue binding (requirements §三.8)
+## I8 — Teacher queue binding (requirements §三.8) — DONE 2026-08-08
 
 - Bind the already-reviewed publish-queue UI states to real provider results
   (receipt statuses, binding-unavailable, policy drift, correction appended,
   target removed, redacted).
-- DoD: surface conformance tests over the new states; no family-archive data
-  reachable from teacher surfaces (existing invariant re-asserted).
+- Executed as: the transient §四 states (per-target commit results with
+  `binding_unavailable`/preparation reason codes, process-level
+  `publication_policy_drift` denial) were already bound through the release
+  action contract (free `stableKey` reason codes) since I3; the missing
+  persistent half was the lifecycle overlay. Added
+  `familyGrowthLifecycleState` (`correction_appended`/`target_removed`/
+  `redacted`, precedence redacted > removed > correction) as an optional
+  field on the queue's `familyGrowth` entry at `1.17.0`, projected from
+  committed lifecycle outbox events and folded into the queue source head.
+- DoD (met): harness + DB regression tests over the new states incl. head
+  movement and precedence; the no-family-archive invariant is now an
+  explicit phase-2 conformance scan over the queue/release contract text.
 
 ## Sequencing summary
 

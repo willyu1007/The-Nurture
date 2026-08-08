@@ -367,6 +367,90 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
     ]);
     expect(page.heads).not.toEqual(headsMid);
   });
+
+  it("I8: overlays committed lifecycle events with precedence, moving the head each time", async () => {
+    const world = await seedWorld();
+    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    expect(committed.status).toBe("committed");
+    if (committed.status !== "committed") return;
+    const executionId = await (async () => {
+      const execution = await prisma.nurtureCommandExecution.create({
+        data: {
+          workspaceId: world.workspaceId,
+          commandRequestIdHash: sha256Hex(randomUUID()),
+          originInvocationRequestIdHash: sha256Hex(randomUUID()),
+          commandKey: "correct_publication",
+          commandScope: "board_publication",
+          commandContractVersion: 1,
+          payloadHash: sha256Hex("payload"),
+          businessActorRef: world.teacher.id,
+          targetRefs: [],
+          businessOutcome: "applied",
+          outputRefs: [],
+          handoffRequestSnapshotsPayload: [],
+          committedAt: new Date(),
+        },
+      });
+      return execution.id;
+    })();
+
+    const { PrismaPublishLaneReadPort } = await import(
+      "../src/repositories/publish-lane.read.js"
+    );
+    const lane = new PrismaPublishLaneReadPort(prisma);
+    const list = () =>
+      lane.listTeacherPublishQueue({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        care_group_id: world.process.careGroupId,
+        snapshot_at: new Date().toISOString(),
+        take: 10,
+      });
+    const append = (kind: "correction" | "target_removal" | "redaction") =>
+      new PrismaPublicationSafetyTransaction(prisma).appendPublicationVisibilityEvents({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        command_execution_id: executionId,
+        actor_role_assignment_id: world.teacherRole.id,
+        events: [
+          {
+            event_id: randomUUID(),
+            publication_id: committed.publication_ref,
+            kind,
+            reason_key: "content_error",
+            source_release_revision: 1,
+            occurred_at: new Date().toISOString(),
+            ...(kind === "correction"
+              ? { correction_display_safe_text: "活动时间更正" }
+              : {}),
+          },
+        ],
+      });
+
+    // No lifecycle yet: the entry carries no overlay.
+    let page = await list();
+    let row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth?.[0]?.lifecycle).toBeUndefined();
+    const headsBefore = structuredClone(page.heads);
+
+    // A committed correction appears as the overlay and moves the head.
+    await append("correction");
+    page = await list();
+    row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth?.[0]).toMatchObject({
+      state: "delivering",
+      lifecycle: "correction_appended",
+    });
+    expect(page.heads).not.toEqual(headsBefore);
+
+    // A later redaction outranks the correction and moves the head again.
+    const headsMid = structuredClone(page.heads);
+    await append("redaction");
+    page = await list();
+    row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth?.[0]?.lifecycle).toBe("redacted");
+    expect(page.heads).not.toEqual(headsMid);
+  });
 });
 
 describe("T-009 I3: lifecycle finalize emits paired outbox events", () => {

@@ -140,6 +140,14 @@
         "conflict",
         "outcome_unknown"
       ]
+    },
+    "familyGrowthLifecycleState": {
+      "description": "Display-only lifecycle overlay for a released target, projected from the provider's committed lifecycle outbox events (T-009 I8). Precedence when several exist: redacted over target_removed over correction_appended.",
+      "enum": [
+        "correction_appended",
+        "target_removed",
+        "redacted"
+      ]
     }
   }
 }

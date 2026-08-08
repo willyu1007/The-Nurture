@@ -168,7 +168,7 @@ describe("G3-B1 query_teacher_publish_queue", () => {
               publishQueueRow({
                 process_key: "process-1",
                 family_growth: [
-                  { target_key: "target:child-A", state: "applied" },
+                  { target_key: "target:child-A", state: "applied", lifecycle: "redacted" },
                   { target_key: "target:child-B", state: "outcome_unknown" },
                 ],
               }),
@@ -188,6 +188,12 @@ describe("G3-B1 query_teacher_publish_queue", () => {
     expect(withStates?.familyGrowth?.map((entry) => entry.state)).toEqual([
       "applied",
       "outcome_unknown",
+    ]);
+    // I8: the lifecycle overlay rides beside the delivery state, and only
+    // where the owner reported one.
+    expect(withStates?.familyGrowth?.map((entry) => entry.lifecycle)).toEqual([
+      "redacted",
+      undefined,
     ]);
     // Owner-issued sealed refs only: no raw target key crosses the surface.
     for (const entry of withStates?.familyGrowth ?? []) {

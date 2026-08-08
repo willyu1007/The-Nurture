@@ -86,7 +86,7 @@ describe("Phase 2 exact surface contract", () => {
   it("loads one exact, closed manifest with thirty-three capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.16.0",
+      version: "1.17.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -112,6 +112,42 @@ describe("Phase 2 exact surface contract", () => {
     });
     expect(Object.isFrozen(manifest)).toBe(true);
     expect(Object.isFrozen(manifest.capabilities[0]?.descriptor)).toBe(true);
+  });
+
+  it("keeps the teacher publish queue free of family-archive vocabulary (T-009 I8 invariant)", () => {
+    // The teacher surface shows scenario work results only — never the family
+    // growth archive, cultivation themes or guardian organization. The queue
+    // contract must therefore carry nothing that names or references those:
+    // states are closed enums, targets are opaque refs, and no canonical
+    // family/child identifier, admission/material companion ref or archive
+    // noun may appear anywhere in the contract text.
+    const contractText = [
+      "capabilities/contracts/query-teacher-publish-queue.schema.json",
+      "capabilities/contracts/publish-process-types.schema.json",
+      "capabilities/contracts/publication-release.schema.json",
+    ]
+      .map((relativePath) => JSON.stringify(readSource(relativePath)))
+      .join("\n")
+      // The one legitimate appearance: the frozen consumer receipt status.
+      // Removing the exact token first means any OTHER guardian reference
+      // still fails the scan.
+      .replaceAll("pending_guardian_confirmation", "");
+    for (const forbidden of [
+      "family_id",
+      "child_id",
+      "admission_ref",
+      "material_ref",
+      "suppression_ref",
+      "growth_material",
+      "growthMaterial",
+      "familyArchive",
+      "cultivation",
+      "guardian",
+    ]) {
+      expect(contractText, `queue contract must not carry ${forbidden}`).not.toContain(
+        forbidden,
+      );
+    }
   });
 
   it("rejects unknown manifest and descriptor fields", () => {
