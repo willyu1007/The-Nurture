@@ -5,9 +5,17 @@
 - Date: 2026-08-08
 - Task: T-007
 - Proposed contract identity: `nurture.institution-admin-authority@1.0.0`
-- Verdict: **PROPOSAL — awaiting a separate governance decision**
-- Effects if rejected: none; T-007 stays `planned` at G4-0C
-- Effects if accepted: opens design/freeze work for one narrow lane only
+- Verdict: **REJECTED 2026-08-08 in favour of full G4-0C** (option B)
+- Decision: lay the common authority foundation once rather than in two
+  passes. The deciding factor was coverage, not cost: `0C-min` takes four of
+  0C's seven items and unblocks only its own module, so G4-B (class/child
+  scope) and G4-D (Grant) would still wait. Since the next priority is the
+  shared foundation for G4-A through G4-E, a narrow lane would have bought
+  earlier evidence on one read module at the price of a second
+  requalification round and a predicate at risk of needing a breaking
+  reshape when 0C extended it.
+- Effect: T-007 starts at full G4-0C. This document is retained as the
+  analysis behind that choice, not as a live proposal.
 
 This is a scoping proposal, not a freeze record and not a PASS. It asks one
 question: should T-007 issue a narrow `0C-min` freeze that unblocks exactly

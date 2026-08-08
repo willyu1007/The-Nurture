@@ -60,17 +60,17 @@ Project: `main`
 <!-- AUTO-GENERATED:START dashboard -->
 ## Summary
 
-- Tasks: 9 (planned: 2, in-progress: 1, blocked: 0, done: 5, archived: 1)
+- Tasks: 9 (planned: 1, in-progress: 2, blocked: 0, done: 5, archived: 1)
 
 ## Recent tasks
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
 | T-003 nurture-uiux-pitch | done | F-002 | dev-docs/active/nurture-uiux-pitch |
+| T-007 nurture-institution-surfaces | in-progress | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-009 nurture-family-growth-provider | done | F-004 | dev-docs/active/nurture-family-growth-provider |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
 | T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
-| T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
 | T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |

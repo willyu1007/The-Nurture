@@ -16,7 +16,7 @@ Project: `main`
 | T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
-| T-007 nurture-institution-surfaces | planned | F-003 | dev-docs/active/nurture-institution-surfaces |
+| T-007 nurture-institution-surfaces | in-progress | F-003 | dev-docs/active/nurture-institution-surfaces |
 | T-008 nurture-store-beta-readiness | planned | F-003 | dev-docs/active/nurture-store-beta-readiness |
 | T-009 nurture-family-growth-provider | done | F-004 | dev-docs/active/nurture-family-growth-provider |
 <!-- AUTO-GENERATED:END task-index -->
