@@ -17,13 +17,14 @@ Project: `main`
   `REQUAL_PASS`; T-006/G3 is `done` at `0374087…` (merged `447e646`); T-003 is
   `done` after handing its presenter/action contracts to My-Chat T-036
   (D-T009-06). All three await separately approved archival.
-- Current exact identity: `nurture.surface-contract@1.17.0` /
-  `sha256:d22851d9…` (shared core `sha256:7bd8a82d…`, 33 capabilities /
-  6 surfaces), Nurture self-pin `c18ef2e0…`, at My-Chat `51ad97f…` / Base
-  `4350086…`, contract parity `98f6c241…` (21 files, both sides). The `1.16.0`
-  cession batch and the `1.17.0` queue-overlay rotation have both landed; no
-  contract batch is open, and C30 does not touch the surface-contract
-  registries.
+- Current exact identity: `nurture.surface-contract@1.18.0` /
+  `sha256:be84bb23…` (shared core `sha256:7bd8a82d…` unchanged, 34 capabilities
+  / 6 surfaces), at My-Chat `51ad97f…` / Base `4350086…`, contract parity
+  `98f6c241…` (21 files, both sides). The Nurture self-pin is re-frozen
+  whenever pinned source changes; its current value lives in
+  `docs/project/integrations/my-chat-workflow-contract.json`. G4-0C-4 rotated
+  `1.17.0` → `1.18.0` additively, so T-005 and T-006 slice evidence is
+  preserved; no contract batch is open.
 - Cross-repo posture: `family_growth_transport@1.0.0` is frozen and the N8
   fixtures pass jointly against the real My-Chat consumer. My-Chat T-031 owns
   the remaining consumer half; the guardian planning surface is ceded to
@@ -33,8 +34,9 @@ Project: `main`
   25 ingress actions, 8 queries, 0 unexercised and both joint journeys
   passing. 0C work must cite the C30 requalification record for that, never
   T-002's G1 record, which stays history at its own topology.
-- Planned chain: T-007 G4-0C is the next surface unit and is unblocked;
-  T-008 still waits for the complete T-007 Exit.
+- Planned chain: T-007 G4-0C is **complete** (`G4_0C_EXIT_PASS`), G4-A is under
+  way at increment 1, and 0D/0E/0F plus G4-B～F remain. T-008 still waits for
+  the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
   default-off.
