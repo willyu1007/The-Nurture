@@ -160,12 +160,36 @@ adds six `family_growth_material_*`, the branch adds
 Confirm rather than assume: replay all migrations from an empty database and
 require an empty `migrate diff`.
 
-### Step 3 — Rotate the Nurture pins
+### Step 3 — Rotate the Nurture pins ✅ DONE 2026-08-08
 
-Update `docs/project/integrations/my-chat-workflow-contract.json` to the new
-merged My-Chat and Base heads, refresh the contract parity hash and the
-`x5_joint_api` / `wave4_binding_host` source pins, and re-freeze the Nurture
-self-pin.
+Landed as `d33276a`, separately from step 4 — it verifies green on its own and
+gives a rollback point.
+
+| Pin | Old | New |
+| --- | --- | --- |
+| `myWorkflowBase.revision` | `8a3ea90…` | `4350086993d837baa8030564f4e19593dedd96b0` |
+| `myChat.revision` | `df7a273…` | `dc3607e74b01def9cf855d3eca14ebff7c3c492f` |
+| contract parity (both sides) | `8dd53be4…` (11 files) | `98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f` (21 files) |
+| `x5_joint_api` | `30878ba3…` (190 files) | `ba2a4f9fe0b9cf893bf1de40cfd27c404304e3bb38c3d41f4cf90189c211a3d4` (227 files) |
+| `wave4_binding_host` | `947b4857…` (20 files) | `604796160dd58230e022585006d0f9fcf608e4428e785ae51be2ca875f758e62` (22 files) |
+| `web_workbench` | `815311f7…` | unchanged — the UI kit did not move |
+| Nurture self-pin | `c0f97aec…` (185 files) | unchanged **for now**; must be re-frozen after step 4 |
+
+The contract source growing from 11 to 21 files is the C30 contract addition,
+and Base and My-Chat compute the **identical** parity hash. That agreement is
+the evidence that steps 1 and 2 are mutually consistent rather than two
+independent adoptions.
+
+Values were computed by importing `computeContractHash` from
+`scripts/verify-workflow-contract-pin.mjs` rather than by trial and error; the
+script itself is verify-only and has no update mode.
+
+Verification after rotation: pin verifier all green, prisma clients regenerate,
+typecheck 0 errors, routing census unchanged at 57/26/11/14/2, unit suite 616
+tests passed. Rotating the pins alone does not disturb existing Nurture main.
+
+This also answers the plan's second open question: a standalone step-3 commit
+works and is preferable, because it isolates the rotation from the restore.
 
 ### Step 4 — The Nurture
 
