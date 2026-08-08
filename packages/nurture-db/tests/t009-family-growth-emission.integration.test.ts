@@ -12,6 +12,7 @@ import {
 } from "@the-nurture/scenario/family-growth";
 import { createPrismaClient } from "../src/client.js";
 import {
+  PrismaFamilyGrowthOutboxPort,
   PrismaPublicationReleasePort,
   PrismaPublicationSafetyTransaction,
 } from "../src/index.js";
@@ -291,6 +292,56 @@ describe("T-009 I3: release commit emits the family-growth outbox event", () => 
         where: { workspaceId: world.workspaceId },
       }),
     ).toBe(0);
+  });
+});
+
+describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
+  it("shows the receipt-backed state per target and stays silent without evidence", async () => {
+    const world = await seedWorld();
+    const committed = await commit(world, { familyGrowth: preparedEmission() });
+    expect(committed.status).toBe("committed");
+    if (committed.status !== "committed") return;
+
+    const { PrismaPublishLaneReadPort } = await import(
+      "../src/repositories/publish-lane.read.js"
+    );
+    const lane = new PrismaPublishLaneReadPort(prisma);
+    const list = () =>
+      lane.listTeacherPublishQueue({
+        workspace_id: world.workspaceId,
+        participant_id: world.teacher.id,
+        care_group_id: world.process.careGroupId,
+        snapshot_at: new Date().toISOString(),
+        take: 10,
+      });
+
+    // Outbox pending, no receipt: the queue reports "delivering".
+    let page = await list();
+    expect(page.authorized).toBe(true);
+    let row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth).toEqual([
+      { target_key: world.target.targetKey, state: "delivering" },
+    ]);
+
+    // A recorded receipt flips the display to its exact status.
+    const [outboxRow] = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+      where: { workspaceId: world.workspaceId, kind: "released" },
+    });
+    await new PrismaFamilyGrowthOutboxPort(prisma).recordReceipt({
+      workspaceId: world.workspaceId,
+      outboxEventId: outboxRow!.id,
+      receiptId: "rcpt-queue-1",
+      status: "applied",
+      admissionRef: "adm-1",
+      materialRef: "mat-1",
+      processedAt: new Date(),
+      receiptPayload: {},
+    });
+    page = await list();
+    row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth).toEqual([
+      { target_key: world.target.targetKey, state: "applied" },
+    ]);
   });
 });
 
