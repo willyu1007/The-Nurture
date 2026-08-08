@@ -113,8 +113,8 @@ tasks:
     updated: 2026-08-05
   - id: T-009
     slug: nurture-family-growth-provider
-    status: in-progress
+    status: done
     milestone_id: M-003
     feature_id: F-004
     dev_docs_path: dev-docs/active/nurture-family-growth-provider
-    updated: 2026-08-07
+    updated: 2026-08-08

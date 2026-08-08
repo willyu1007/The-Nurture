@@ -76,9 +76,64 @@ This is the N1–N8 delivery list from
   remains default-off.
 - T-007 G4-0C+ and T-008 are unchanged and separately gated.
 
+## Acceptance Criteria
+
+Per-increment DoD lines live in `01-plan.md`; per-increment evidence lives in
+`04-verification.md`. These are the task-level criteria.
+
+- [x] N1 — canonical child/family targets resolve only at envelope assembly
+  time, every deny reason fails closed, the canonical exchange is never
+  called for a locally denied chain, and no canonical ID is persisted into a
+  Nurture business table.
+- [x] N2 — per-family independence holds inside one workspace: a denied or
+  membership-less family cannot suppress or contaminate a sibling family's
+  release.
+- [x] N3 — `family_growth_material_release@1.0.0` envelopes are assembled
+  deterministically from canonical facts, with RFC 8785 (JCS) canonicalization
+  and SHA-256 `payload_digest` over the consumer's exact digest scope (not the
+  whole envelope); the frozen `1.0.0` schema is never copied-and-extended.
+- [x] N4 — the v1 family rendition is a short-lived protected handle to the
+  exact unchanged original media revision; no permanent public URL, no
+  derivative generation, and revision drift or lifecycle change denies.
+- [x] N5 — provider outbox rows are appended inside the existing per-target
+  release transaction; atomicity holds in both rollback directions and an
+  exact replay appends nothing.
+- [x] N6 — correction, target-removal and redaction propagate as
+  `family_growth_material_lifecycle@1.0.0` in order, with lifecycle-first
+  suppression tombstoning a late release.
+- [x] N7 — `family_growth_material_admission_receipt@1.0.0` is consumed and
+  persisted, `outcome_unknown` stays retriable on the frozen backoff, and a
+  receipt is never treated as authorization.
+- [x] N8 — all twelve conformance fixtures pass against the contract-faithful
+  double and jointly against the real My-Chat consumer at the exact pins.
+- [x] Surface contract batches land as planned: the `1.16.0` cession batch
+  (guardian planning surface ceded per D-T009-01) and the `1.17.0`
+  teacher-queue lifecycle overlay, each with contract tooling, conformance
+  suite and deterministic rebuild green.
+- [x] The teacher publish queue projects real provider delivery and lifecycle
+  state, and carries no family-archive vocabulary or reachable family-archive
+  data.
+- [x] Closing requalification runs on an exact detached three-repo topology
+  with empty disposable databases, and the default-off census is re-proven —
+  no deployment, activation, Candidate or traffic effect.
+
 ## Status
 
-- State: in-progress
+- State: done
+- 2026-08-08: **provider side complete**. I0–I8 all PASS (evidence table in
+  `04-verification.md`). Closing requalification `REQUAL_PASS` at checkpoint
+  `860f73f` on an exact three-repo detached topology with empty disposable
+  databases — record in `06-i6-batch-requalification-record.md`.
+  Exact qualified identity: `nurture.surface-contract@1.17.0` /
+  `sha256:d22851d9…` (shared core unchanged `sha256:7bd8a82d…`,
+  33 capabilities / 6 surfaces), self-pin `c0f97aec…` (185 files), at
+  My-Chat `df7a273…` / Base `8a3ea90…` (both rotated once per D-T009-04,
+  contract parity `8dd53be4…`). Two independent quality passes (Codex
+  gpt-5.6-sol + self review) closed 4+4 findings before the closing run.
+  Everything remains default-off; this is a provider-side handoff, not
+  Candidate Freeze, deployment, activation or traffic authority.
+  My-Chat T-031 owns the consumer half and is tracked separately.
+  Archival awaits explicit approval.
 - 2026-08-07: task created. Conflict-resolution decisions D-T009-01…07
   recorded in `02-architecture.md`. T-006 branch merged to `main`.
   Implementation starts with the transport-independent domain increment (I1).
