@@ -158,7 +158,7 @@ assertEqual(
   workflowPin.myChat?.revision,
   // Rotated once in the T-009 I6 batch (D-T009-04), then again on 2026-08-08
   // by the C30 cross-repository landing.
-  "8228c2ab6bcf48a18499b094699e272633d5d3af",
+  "51ad97f721bf74cced3ec75d24f3066c4ef6ab1c",
   "My-Chat revision",
 );
 assertEqual(
