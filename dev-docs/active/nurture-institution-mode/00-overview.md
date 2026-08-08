@@ -7,11 +7,22 @@
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
 - **Updated:** 2026-08-05
 - **Owner:** willyu1007
-- Next step: G1, T-005 G2 Exit and T-006 G3 Exit are PASS. T-002's existing
-  implementation mainline returns to `C30-I0`: finish the Base/My-Chat portion
-  of C and the immutable-pin/false-empty proof in D before opening C30-I1.
-  T-007 G4, T-008, deployment, activation and Pilot remain separate decisions
-  and are not opened by the downstream G2/G3 handoffs.
+- Next step: **land C30 as one coordinated three-repository sequence** —
+  [`20-c30-cross-repository-landing-plan.md`](./20-c30-cross-repository-landing-plan.md).
+  The `C30-I0-C/D pending` wording above the plan is superseded: the real work
+  lives on `origin/codex/T-002-c30-i0` (`76ece1f`, 58 commits) and reaches
+  `C30-I0` complete plus `C30-I1`, `C30-I2` and `C30-I3` accepted default-off.
+  That branch is **not independently mergeable** — a 2026-08-08 Nurture-only
+  merge produced 130 typecheck errors and was reverted (`faee71d`, root cause
+  in `05-pitfalls.md`), because the required contracts live on the unmerged
+  My-Chat `codex/T-035-scenario-host-adoption` (`cd7bbc2`) and
+  My-Workflow-Base `codex/T-002-c30-i0-base` (`4350086`) branches.
+  Order: Base fast-forward, My-Chat merge, Nurture pin rotation, Nurture
+  revert-the-revert, one three-repository requalification. That final record
+  is also what restores the G4-0A owner-path row to `PRESENT_PINNED`.
+  G1, T-005 G2 Exit and T-006 G3 Exit remain PASS. T-007 G4, T-008,
+  deployment, activation and Pilot remain separate decisions and are not
+  opened by the downstream G2/G3 handoffs or by this landing.
 - Current gate: The exact T-002 G1 handoff remains pinned to My-Chat `a019566` / Base
   `06303e9` (workflow-contract parity `8dd53be4…a34d`, `x5_joint_api`
   `89a61355…`, `wave4_binding_host` `960afb2c…`); the Nurture self-pin is
