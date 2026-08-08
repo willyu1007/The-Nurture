@@ -414,7 +414,7 @@ Project: `main`
 | Task | Status | Dev Docs |
 | --- | --- | --- |
 | T-002 nurture-institution-mode | in-progress | dev-docs/active/nurture-institution-mode |
-| T-003 nurture-uiux-pitch | in-progress | dev-docs/active/nurture-uiux-pitch |
+| T-003 nurture-uiux-pitch | done | dev-docs/active/nurture-uiux-pitch |
 
 ### F-003 Six-surface store-beta readiness
 

@@ -35,7 +35,7 @@ are **not** the repository pins in
 | Repository | Branch | Head | Ahead / behind its main | Size | Dry-merge conflicts |
 | --- | --- | --- | --- | --- | --- |
 | My-Workflow-Base | `codex/T-002-c30-i0-base` | `4350086993d837baa8030564f4e19593dedd96b0` | 37 / 0 | 133 files, +19751/-91 | **0 — landed 2026-08-08** |
-| My-Chat | `codex/T-035-scenario-host-adoption` | `cd7bbc2623dff8621c2c7155b04d1bf759e8404a` | 23 / 22 | 192 files, +26562/-698 | 11 (9 derived, 2 real) |
+| My-Chat | `codex/T-035-scenario-host-adoption` | `cd7bbc2623dff8621c2c7155b04d1bf759e8404a` | 23 / 22 | 192 files, +26562/-698 | 11 (9 derived, 2 real) — **landed 2026-08-08 as `dc3607e`** |
 | The Nurture | `codex/T-002-c30-i0` | `76ece1f` | 58 / — | 114 files, +25102/-1304 | 5 (3 derived, 2 small) |
 
 Fork points: Base at `8a3ea90` (its current main), My-Chat at `dc4a77b`
@@ -98,9 +98,41 @@ Nurture's `sha256-path-content-v1` scheme over a different scope. It does
 confirm that Base's contract source moved, so Step 3's pin rotation is
 mandatory rather than optional.
 
-### Step 2 — My-Chat
+### Step 2 — My-Chat ✅ DONE 2026-08-08
 
-Merge `codex/T-035-scenario-host-adoption`. Eleven conflicts:
+Executed: branch pushed to `origin/codex/T-035-scenario-host-adoption` as a
+backup (local-only, like the other two), merged as `dc3607e`, pushed. My-Chat
+main was `8e2be84`.
+
+Conflict resolution matched the prediction exactly. The nine derived files were
+regenerated with My-Chat's own tooling — `ctl-project-governance sync` for
+`.ai/project/main/`, `ctl-db-ssot sync-to-context` for the DB contract,
+`ctl-api-index generate` for the API index, `ctl-context touch` for the
+registry — except `changelog.md`, which is append-only and was hand-merged so
+the two T-035 status entries survived taking ours. The two real conflicts were
+small: `packages/db/package.json` (both sides added one script, kept both) and
+`prisma/schema.prisma` (four hunks, all the same shape — main's field set is a
+superset, the branch adds one `identityOperations` relation on `Child`,
+`Family`, `FamilyStewardship` and `FamilyChildMembership`).
+
+Verification: `prisma format` + `validate` pass; typecheck green across all 17
+workspace projects; unit suite 109 files / 769 tests passed (19 files / 115
+tests skipped); **every migration replayed from an empty disposable pgvector
+database**, confirming the interleaved ordering is safe rather than assumed.
+The disposable container was destroyed after the run and the existing
+`nurture-postgres` (5433) and `codex-q4b5-mychat-pg` (55439) were untouched.
+
+`pnpm install --frozen-lockfile --ignore-scripts` was required first, same
+`ajv` cause as Base; the lockfile was already current.
+
+**Pre-existing drift found, not introduced by the merge and not fixed here:**
+`migrate diff` reports one difference on `guardian_current_focus` — an index
+renamed between what `20260808060000_family_growth_cultivation_wave2` wrote and
+what the model derives. That migration is main's own, dated 2026-08-08, and the
+C30 branch has zero references to that table. It belongs to whoever owns the
+cultivation wave.
+
+The original prediction, retained for reference — eleven conflicts:
 
 - Nine are derived or governance files — `.ai/project/main/` (`changelog.md`,
   `dashboard.md`, `feature-map.md`, `registry.yaml`, `task-index.md`) and

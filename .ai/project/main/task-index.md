@@ -12,7 +12,7 @@ Project: `main`
 | --- | --- | --- | --- |
 | T-001 nurture-mvp | done | F-001 | dev-docs/active/nurture-mvp |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
-| T-003 nurture-uiux-pitch | in-progress | F-002 | dev-docs/active/nurture-uiux-pitch |
+| T-003 nurture-uiux-pitch | done | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-004 nurture-surface-contract-foundation | done | F-003 | dev-docs/active/nurture-surface-contract-foundation |
 | T-005 nurture-family-care-conversation | archived | F-003 | dev-docs/archive/nurture-family-care-conversation |
 | T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |
