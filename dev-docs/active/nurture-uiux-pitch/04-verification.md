@@ -1,5 +1,30 @@
 # Verification
 
+## 2026-08-08 — Presenter/action handoff
+
+- Exact identity: generated manifest reports `nurture.surface-contract@1.17.0`, digest
+  `sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8`,
+  33 capabilities and 6 surfaces.
+- Registry trace: all six product surfaces map one-to-one to their presenter binding; teacher board order is
+  `caregiver_child_today` → `caregiver_family_care_work` → `teacher_publish_queue`.
+- Fixture trace: `teacher-release-presenter-fixture.v1.json` is deterministic output from the production
+  `queryTeacherPublishQueue` harness against the exact contract pin; schema validation and focused presenter tests pass.
+- Provider evidence: T-009 verification records the real DB/provider projection, receipt join, lifecycle precedence,
+  no-family-archive scan and joint My-Chat suite as PASS. The handoff therefore maps proven provider states rather
+  than inventing UI-only delivery states.
+- Receiver safety: My-Chat T-036 was inspected read-only; its dirty/conflicted worktree was not modified. The
+  sender artifact is self-contained and receiver adoption is explicitly separate.
+- Deck limitation: the in-app browser security policy rejects direct `file://` navigation, so the old deck's
+  final keyboard/touch interaction pass was not repeated. Its existing static 9-slide verification remains the
+  evidence; this non-blocking design-artifact limitation does not weaken the typed handoff or reopen T-003.
+- Closing verification:
+  - standalone teacher-release fixture validates against
+    `schema:nurture.query-teacher-publish-queue-result@1`;
+  - `pnpm verify:surface-contract` and `pnpm verify:surface-contract-schemas`: PASS;
+  - focused board/queue presenter tests: 2 files, 23 tests PASS;
+  - `pnpm verify:surface-conformance`: 11 files, 109 tests PASS; 16 cases cover 48/48 slices;
+  - task-doc lint and `git diff --check`: PASS.
+
 ## 2026-07-30
 
 - 静态复核当前正式 `artifacts/nurture-deck-v1.html`：共 9 个 `.slide`

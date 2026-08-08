@@ -1,0 +1,78 @@
+{
+  "binding": {
+    "contract": {
+      "digest": "sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8",
+      "key": "nurture.surface-contract",
+      "version": "1.17.0"
+    },
+    "capability": {
+      "key": "query_teacher_publish_queue",
+      "version": "1.0.0"
+    },
+    "actor": {
+      "role": "caregiver",
+      "scopeKind": "care_group",
+      "scopeRef": "1.416e72d2febee62a169e1baeea2c26e3"
+    },
+    "snapshot": {
+      "snapshotRef": "1.b4f070985400c2039f97c8ee5f89f1ab",
+      "snapshotVersion": 11
+    },
+    "order": "state_rank_asc,occurred_at_desc,id_desc",
+    "sourceHeads": [
+      {
+        "sourceKind": "daily_care_log",
+        "sourceRef": "1.649fd32d793090731d2c9160f2cfabbc",
+        "factVersion": 1,
+        "lifecycleHead": "active",
+        "visibilityHead": "visible"
+      }
+    ]
+  },
+  "careGroupRef": "1.416e72d2febee62a169e1baeea2c26e3",
+  "counts": {
+    "draft": 0,
+    "needs_review": 0,
+    "pending_release": 0,
+    "released": 1,
+    "cancelled": 0
+  },
+  "items": [
+    {
+      "processRef": "1.63be135d820ccea6f3d4f171f766d28d",
+      "state": "released",
+      "dataClass": "child_growth_record",
+      "title": "户外活动记录",
+      "revision": 3,
+      "targetSummary": {
+        "total": 2,
+        "released": 2
+      },
+      "occurredAt": "2026-08-08T08:30:00.000Z",
+      "scheduledAt": "2026-08-08T09:00:00.000Z",
+      "editHoldActive": false,
+      "actions": [
+        {
+          "capabilityKey": "correct_publication",
+          "capabilityVersion": "1.0.0",
+          "targetOptionRef": "1.63be135d820ccea6f3d4f171f766d28d",
+          "availability": "available"
+        }
+      ],
+      "familyGrowth": [
+        {
+          "targetRef": "1.7ed43a16ce7fb77784b9681e353d2cce",
+          "state": "applied"
+        },
+        {
+          "targetRef": "1.c4d1f185595a067911920e0a7f6ac59d",
+          "state": "outcome_unknown",
+          "lifecycle": "correction_appended"
+        }
+      ]
+    }
+  ],
+  "pageInfo": {
+    "hasMore": false
+  }
+}

@@ -261,3 +261,18 @@ AI 按角色+场景上下文自动判断内容处理方式（Nurture 场景 hand
 11. 音频不作为数据形态保留，一律转写文字。
 12. 合照双路由：1-2 主角→家庭；群像→班级群/班级相册；AI 预判可改；机构可配更严政策（共创问题）。
 13. 养育视图为轻看板（关注重点+快捷操作），重数据/配置在家庭网页工作台（不入 demo，留跳转提示）。
+
+## 9. Presenter / Action handoff 决策（2026-08-08）
+
+T-003 不再向 My-Chat 交付“照着 HTML 实现”的页面规格，而是交付
+`artifacts/presenter-action-contract-handoff.md`：六界面产品意图必须通过当前
+`nurture.surface-contract@1.17.0` 的 presenter、模块查询、action descriptor 与
+dependency NO-GO 落地。HTML 和本文件中的历史交互只保留视觉/共创价值。
+
+老师“发布到家庭”以 `present_caregiver_teacher_board` 为入口，按 registry 顺序加载
+`caregiver_child_today`、`caregiver_family_care_work`、`teacher_publish_queue`；详细发布行由
+`query_teacher_publish_queue@1.0.0` 提供。投递/生命周期状态是 T-009 provider 的只读投影，
+不授予老师访问 My-Chat 家庭档案或培养功能。
+
+My-Chat T-036 负责接收后的组件、缓存和交互冻结。Institution workbench 的实现与能力可用性
+仍由 T-007 及其前置合同负责，T-003 handoff 不启动 Web Admin 开发。

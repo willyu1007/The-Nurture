@@ -1,6 +1,6 @@
 # Plan — Nurture 六界面 UIUX 初稿 + 共创演示 HTML
 
-## Phase A — 内容对齐（进行中）
+## Phase A — 内容对齐（已完成）
 
 对齐六界面各自的定位、模块构成、关键交互与开放问题；锁定贯穿故事线。
 
@@ -11,7 +11,7 @@
 - 每界面的模块清单 + 关键交互 + 开放问题三段齐备。
 - 用户逐界面确认（本任务不引入未讨论的模块）。
 
-## Phase B — 六界面 UIUX 初稿
+## Phase B — 六界面 UIUX 初稿（已完成）
 
 逐界面细化：布局线框、示例文案（全部演示数据）、交互状态（默认/展开/确认/回执）。
 顺序建议：家长 Chat → 家长看板 → 老师看板 → 老师 Chat → 机构 mobile → 机构 Web
@@ -19,7 +19,7 @@
 
 验收：每界面一节"最终稿"设计描述，含文案与状态清单，直接可供 HTML 制作与后续 IIB 设计引用。
 
-## Phase C — HTML 制作
+## Phase C — HTML 制作（已完成）
 
 沿用已验证的 deck 骨架（16:9 缩放舞台/左右翻页/顶部进度）。
 先做 1-2 个界面样张让用户确认新标准，再铺全套（约 10-12 页：
@@ -30,9 +30,22 @@
 - 全文无人名、无开发向词汇；健康相关文案守非诊断边界；无任何排名/评分元素。
 - 发布为私有 artifact 并在浏览器实际验证渲染与交互。
 
-## Phase D — 迭代与交付
+## Phase D — 迭代与交付（已完成）
 
 按用户试讲反馈迭代；确定最终交付形态（artifact 链接 + 自包含 HTML 文件可离线双击打开）。
+
+## Phase E — Presenter / Action contract handoff（已完成）
+
+将六界面设计意图映射到 `nurture.surface-contract@1.17.0` 的精确
+surface/presenter/capability 身份，并向 My-Chat T-036 提供老师发布队列的生产 presenter
+harness 样例。
+
+验收：
+
+- 六个 surface 均有明确 presenter、内容边界与 receiver 规则。
+- 老师发布流程的展示字段、动作、投递状态与生命周期状态逐项映射到注册 schema。
+- HTML 历史语义与当前合同冲突处列入 superseded 清单，不得作为实现输入。
+- sender artifact 已落地并验证；receiver adoption 留在 T-036，不阻塞 T-003 完成。
 
 ## 风险 / 注意
 

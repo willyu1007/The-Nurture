@@ -1,5 +1,18 @@
 # Implementation Notes
 
+## 2026-08-08 — T-003 presenter/action contract handoff
+
+- 新增 `artifacts/presenter-action-contract-handoff.md`，将六个 T-003 surface 绑定到
+  `nurture.surface-contract@1.17.0`（digest `d22851d9…`）的 exact presenter/capability
+  身份，并明确 HTML supersession 与 receiver acceptance checklist。
+- 新增 `artifacts/teacher-release-presenter-fixture.v1.json`：由生产
+  `queryTeacherPublishQueue` presenter harness 生成，覆盖队列 census、partial-safe target
+  summary、current-eligibility action、`applied`/`outcome_unknown` delivery 与
+  `correction_appended` lifecycle overlay。数据均为 synthetic，refs 均为 owner-issued opaque refs。
+- My-Chat T-036 已确认为接收任务；其当前 worktree 有未解决 merge conflict，因此本次遵守
+  sender-owned handoff，不写接收仓。接收后的组件冻结与 contract admission 继续由 T-036 跟踪。
+- T-003 到此完成；Institution Web workbench 不在本 handoff 中启动实现，继续受 T-007 门禁约束。
+
 ## 2026-07-29 — Product terminology supersession
 
 - 本任务保留为 T-003 设计/共创历史，不再作为 Workflow、跨角色 Chat 或实现边界 SSOT。

@@ -2,14 +2,20 @@
 
 ## Status
 
-- State: in-progress
-- **Phase:** C deck 组装（v1 已产出，待用户试用反馈）；A/B 已完成
+- State: done
+- **Phase:** E presenter/action contract handoff 已完成；A～D 已完成
 - **Milestone/Feature:** M-002 / F-002（Institution ecology 的产品表面具象化与对外共创材料）
-- **Updated:** 2026-07-30
+- **Updated:** 2026-08-08
 - **Owner:** willyu1007
-- Next step: 对当前 9 页正式 artifact 做一次最终渲染/交互核验并记录用户反馈去向；
-  该收尾与后续共创反馈均为非阻塞设计轨，不构成 T-004～T-008 的开发入口、
-  owner-integration 或验收门禁。
+- Next step: My-Chat T-036 按
+  `artifacts/presenter-action-contract-handoff.md` 消费精确 presenter/action 映射并冻结组件；
+  receiver adoption 不属于 T-003 的剩余工作。后续共创反馈仍为非阻塞设计轨。
+
+Receiver next actions:
+
+1. T-036 admit 精确 contract key/version/digest，并读取 teacher board envelope。
+2. 将 handoff fixture 的 queue/target/action 字段映射到 typed components，不补造字段或按钮。
+3. 运行 receiver conformance，完成 privacy/product review 后冻结组件与 receipt states。
 
 ## Goal
 
@@ -54,6 +60,14 @@ T-003 是设计输入，不是产品/实现 SSOT。当前 Workflow、对话和 s
 - 机构侧两个 surface 不做完整设计（信息不足），以框架+共创提问呈现。
 - demo 不承诺产品能力；开场定调"产品设想 · 共创讨论"。
 
+## Acceptance criteria
+
+- [x] 六个产品 surface 的 UIUX 初稿与 9 页自包含 HTML 已交付。
+- [x] 当前有效设计决策已沉淀到 mobile UX contract，并与后续产品语义明确分层。
+- [x] 六个 surface 已映射到 exact presenter/action contract，老师发布样例通过注册 schema。
+- [x] My-Chat T-036 接收边界、superseded 语义和后续 adoption 责任均已明确。
+- [x] handoff contract、focused presenter tests、surface conformance、文档与治理校验通过。
+
 ## Locked decisions
 
 **当前有效规格的 SSOT 是 `docs/context/product/nurture-mobile-ux-contract.md`**（九轮拍板的
@@ -75,3 +89,5 @@ T-003 是设计输入，不是产品/实现 SSOT。当前 Workflow、对话和 s
 - 当前产品语义基准：`docs/context/product/workflow-product-design-contract.md`
   （Workflow/Action/Projection/Surface ownership）
 - 机构生态设计包：`dev-docs/active/nurture-institution-mode/`（surface 锁定见 09/10）
+- T-036 正式交接：`artifacts/presenter-action-contract-handoff.md`
+- 老师发布 presenter 样例：`artifacts/teacher-release-presenter-fixture.v1.json`
