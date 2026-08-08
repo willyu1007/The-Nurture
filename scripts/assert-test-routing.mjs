@@ -21,7 +21,10 @@ const files = [...(await collect(path.join(repoRoot, 'packages'))), ...(await co
 const routes = { unit: [], productionDb: [], devHost: [], scenarioService: [], x5Joint: [], unclassified: [] };
 for (const file of files.sort()) {
   if (file.startsWith('packages/nurture-scenario/')) routes.unit.push(file);
-  else if (file === 'packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts') routes.x5Joint.push(file);
+  else if (
+    file === 'packages/nurture-db/tests/x5-joint-acceptance.integration.test.ts' ||
+    file === 'packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts'
+  ) routes.x5Joint.push(file);
   else if (file.startsWith('packages/nurture-db/')) routes.productionDb.push(file);
   else if (file.startsWith('apps/backend/') && file.endsWith('.e2e.test.ts')) routes.devHost.push(file);
   else if (file.startsWith('apps/scenario-service/')) routes.scenarioService.push(file);
@@ -34,10 +37,10 @@ if (
   routes.productionDb.length !== 26 ||
   routes.devHost.length !== 11 ||
   routes.scenarioService.length !== 14 ||
-  routes.x5Joint.length !== 1
+  routes.x5Joint.length !== 2
 ) {
   throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/57 productionDb=${routes.productionDb.length}/26 devHost=${routes.devHost.length}/11 scenarioService=${routes.scenarioService.length}/14 x5Joint=${routes.x5Joint.length}/1`,
+    `Test file census changed: unit=${routes.unit.length}/57 productionDb=${routes.productionDb.length}/26 devHost=${routes.devHost.length}/11 scenarioService=${routes.scenarioService.length}/14 x5Joint=${routes.x5Joint.length}/2`,
   );
 }
 process.stdout.write(

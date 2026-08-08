@@ -157,6 +157,9 @@ importers:
       '@my-chat/db':
         specifier: link:../../../My-Chat/packages/db
         version: link:../../../My-Chat/packages/db
+      '@my-chat/domain':
+        specifier: link:../../../My-Chat/packages/domain
+        version: link:../../../My-Chat/packages/domain
       '@my-chat/scenario-integrations':
         specifier: link:../../../My-Chat/packages/scenario-integrations
         version: link:../../../My-Chat/packages/scenario-integrations

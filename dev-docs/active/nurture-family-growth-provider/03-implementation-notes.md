@@ -2,6 +2,55 @@
 
 Running log; newest first.
 
+- 2026-08-08 (I7b joint suite green): the N8 fixtures now run with the REAL
+  My-Chat consumer on its own database
+  (`packages/nurture-db/tests/t009-family-growth-joint.integration.test.ts`,
+  x5 lane, env `X5_NURTURE_DATABASE_URL` + `X5_MY_CHAT_DATABASE_URL`). Real
+  on both ends: provider side uses the actual preparer, release/lifecycle
+  transactions, outbox port and `decideFamilyGrowthDelivery`; consumer side
+  wraps the real `FamilyGrowthIntakeService` + intake/lifecycle repositories
+  + wire-receipt builder behind a thin HTTP shim (My-Chat's `apps/api` layer
+  is not linkable from this workspace — the shim is transport plumbing only,
+  noted in the file header). Rendition exchange serves real bytes through
+  the real `PrismaFamilyGrowthRenditionReadPort` with per-download
+  re-authorization, and the consumer verifies the blob digest end-to-end.
+  Seven joint cases (J1+J3, J2, J4, J5/6/7, J8, J9, J12); fixtures 10/11
+  remain I7a-proven as noted in the header. Facts learned against the real
+  consumer worth keeping:
+  - Intake requires the source scenario REGISTERED (`scenarios` row,
+    status pilot/active) — `scenario_not_available` otherwise; the joint
+    seed upserts `scenarioKey: "nurture"`.
+  - Consumer receipt identity is deterministic per ingress event
+    (`family-growth-receipt:<ingressId>`), so a replayed release answers
+    `duplicate` under the ORIGINAL receipt id; the provider's append-only
+    store keeps exactly the applied row (skipDuplicates no-op) while the
+    outbox still settles — replay identity holds at the store level, and
+    the wire-level duplicate (original admission/material refs) is
+    asserted by direct POST.
+  - My-Chat's Prisma 7 client factory takes no URL argument (adapter reads
+    `DATABASE_URL`), so the suite uses the x5 lane's env-swap construction
+    pattern.
+  Lane wiring: `vitest.x5.config.ts` includes / `vitest.db.config.ts`
+  excludes the suite; routing census now 57/26/11/14 + x5-joint=2;
+  `@my-chat/domain` added as a dev-visible dep of `nurture-db`. Gates all
+  green: 615 unit / 256 db / 66+64 scenario-service / joint 7/7; freeze
+  asserts unchanged (no pinned sources touched). Remaining for the 1.16.0
+  batch close: the requalification record (detached worktrees at exact
+  pins, fresh DBs, full gates), then I8.
+
+- 2026-08-08 (I6.2 landed, merge `6cbf32d` — logged retroactively): the
+  teacher publish queue now projects per-target family-growth delivery
+  state as a display-only projection of the receipt store.
+  `familyGrowthQueueState` vocabulary (delivering / applied /
+  pending_guardian_confirmation / duplicate / tombstoned / rejected /
+  conflict / outcome_unknown) added to `publish-process-types.schema.json`,
+  optional `familyGrowth` array on the queue item, harness projection via
+  `issuePublishTargetRef`, and `publish-lane.read.ts` joins outbox
+  (kind=released) → latest receipt after the page slice. Fourteen
+  publish-family slice hashes re-frozen in the phase-3 world register;
+  manifest stayed at `1.16.0` via the restore-generated-to-baseline
+  rotation discipline.
+
 - 2026-08-08 (I6 cession landed): `query/update_guardian_current_focus`
   retired across all layers — contract sources (registries, two capability
   schemas deleted, envelope/fixture enums, selection cases, gj-2 journey
