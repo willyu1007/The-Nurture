@@ -1889,3 +1889,37 @@ This file exists to prevent repeating mistakes within this task.
   covering the complete `8000/3001/3200/3201` topology and consumer variables.
 - Prevention: every port or URL-key change must run both env-contract
   validation and the consumer-level topology assertion.
+
+### 2026-08-08 — C30 merged Nurture-only, but it is a three-repository change
+
+- Symptom: merging `codex/T-002-c30-i0` into Nurture `main` produced 130
+  typecheck errors, 80 of them in `src` (71 in
+  `packages/nurture-scenario/src/c30`, 9 in `packages/nurture-db/src/c30`).
+  Every error was a missing `@my-chat/workflow-contracts` export:
+  `ScenarioContractManifestV1`, the `scenario_contracts` manifest field,
+  `ScenarioHumanPrincipalV1`, `ScenarioProtectedInteractionContractV1`,
+  `ScenarioPrivateInvocationV1` and four `assertScenario*` helpers.
+- Root cause: C30 spans three repositories and all three sides sat on
+  unmerged branches — Nurture `codex/T-002-c30-i0` (`76ece1f`), My-Chat
+  `codex/T-035-scenario-host-adoption` (`cd7bbc2`) and My-Workflow-Base
+  `codex/T-002-c30-i0-base` (`4350086`). The missing exports are introduced by
+  My-Chat `470fc86`, which is contained in no repository pin and in no
+  mainline; My-Chat mainline carries a differently shaped `ScenarioManifestV2`
+  instead. Merging one third of a three-repository change cannot typecheck
+  against any available sibling state.
+- What was checked and still missed it: the merge conflict set (5, all small),
+  `prisma/schema.prisma` (merged clean, `prisma validate` passed), migration
+  object disjointness (C30's 2026-08-06 migrations and T-009's 2026-08-07
+  migrations share no table, enum or altered column) and the recomputed test
+  census. None of those inspect cross-repository symbol availability.
+- Fix: revert the merge (`faee71d`), restoring 0 typecheck errors. The branch
+  is preserved at `origin/codex/T-002-c30-i0`; reverting the revert later
+  restores the merge together with its conflict resolution.
+- Prevention: before merging any branch, read its own upstream gate. This one
+  ships `scripts/verify-c30-i3-upstream.mjs`, which hardcodes the two sibling
+  heads it requires — and those are not the repository pins in
+  `docs/project/integrations/my-chat-workflow-contract.json`. A branch whose
+  gate pins sibling revisions different from the repository pins is by
+  definition not independently mergeable. Land C30 as one coordinated
+  three-repository sequence: Base, then My-Chat host adoption, then a pin
+  rotation, then Nurture.

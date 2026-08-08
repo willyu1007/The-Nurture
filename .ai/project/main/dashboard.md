@@ -22,14 +22,14 @@ Project: `main`
   N8 fixtures pass jointly against the real My-Chat consumer. My-Chat T-031
   owns the remaining consumer half; the guardian planning surface is ceded
   to My-Chat cultivation (D-T009-01), executed at `1.16.0`.
-- Other active tasks: T-002 — **status contested, do not cite either side as
-  current**. `main`'s task doc (updated 2026-08-05) reports `C30-I0-C`
-  partial / `C30-I0-D` pending, but the local-only branch
-  `codex/T-002-c30-i0` (tip `76ece1f`, 2026-08-06, 58 commits, unpushed)
-  reports `C30-I0` complete plus `C30-I1`, `C30-I2` and `C30-I3` accepted
-  default-off. The branch forked at `882d80f`, before the T-006 merge and
-  all of T-009, so integration — not implementation — is the open question.
-  See "T-002 integration decision" below.
+- Other active tasks: T-002 — the real work lives on
+  `origin/codex/T-002-c30-i0` (tip `76ece1f`, 58 commits) carrying `C30-I0`
+  complete plus `C30-I1`, `C30-I2` and `C30-I3` accepted default-off, which
+  is well past this repository's `C30-I0-C/D pending` task doc. **It is not
+  independently mergeable**: a 2026-08-08 merge attempt was reverted
+  (`faee71d`) after producing 130 typecheck errors, 80 in `src`. C30 spans
+  three repositories and all three sides are unmerged — see
+  `dev-docs/active/nurture-institution-mode/05-pitfalls.md` 2026-08-08.
   T-003 rescoped toward presenter-contract supply, artifacts hand to
   My-Chat T-036 (D-T009-06).
 - Planned chain: T-007 G4-0C is now the next unblocked unit (D-T009-05
@@ -44,23 +44,25 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **T-002 integration decision (now the critical path).** 2026-08-08: the
-   `0C-min` proposal was answered with option C — prioritize T-002, because
-   the T-002 owner path is what both 0C options need re-established at
-   current pins. Resuming T-002 then revealed that the work is not where
-   `main` says: 58 unpushed commits carry `C30-I0` through `C30-I3`. Decide
-   how to integrate that branch before any further T-002 implementation.
-   Sub-decisions: reconcile the two status claims, resolve the migration
-   ordering (5 branch migrations dated 2026-08-06 versus T-009's two dated
-   2026-08-07, an order neither side qualified), and re-establish T-002's
-   gate evidence at current pins rather than the superseded
-   `a019566`/`06303e9`.
-2. G4-0A's exact inputs were rebound on 2026-08-08; the T-002 owner path is
-   now correctly `DEFINED_UNQUALIFIED`. No 0C freeze record may cite the
-   T-002 G1 record as current-pin evidence.
-3. T-007 G4-0C remains the deferred next surface unit; the `0C-min` proposal
-   in `dev-docs/active/nurture-institution-surfaces/09-0c-min-fast-lane-proposal.md`
-   stays open behind the T-002 work.
+1. **Decide how to land C30 as one coordinated three-repository sequence.**
+   2026-08-08: the `0C-min` proposal was answered with option C — prioritize
+   T-002, because its owner path is what both 0C options need re-established
+   at current pins. Resuming T-002 showed the work is far past this
+   repository's task doc, and a Nurture-only merge was attempted and
+   reverted. The three unmerged sides are Nurture `codex/T-002-c30-i0`
+   (`76ece1f`), My-Chat `codex/T-035-scenario-host-adoption` (`cd7bbc2`) and
+   Base `codex/T-002-c30-i0-base` (`4350086`). The branch's own gate
+   (`scripts/verify-c30-i3-upstream.mjs`) hardcodes those two sibling heads
+   rather than the repository pins, which is the mechanical signal that it is
+   not independently mergeable. Expected order: Base, then My-Chat host
+   adoption, then a pin rotation, then Nurture, then one requalification.
+2. That requalification is also what restores the G4-0A owner-path row from
+   `DEFINED_UNQUALIFIED` to `PRESENT_PINNED`. Until then no 0C freeze record
+   may cite the T-002 G1 record as current-pin evidence.
+3. T-007 G4-0C and the `0C-min` proposal in
+   `dev-docs/active/nurture-institution-surfaces/09-0c-min-fast-lane-proposal.md`
+   stay open behind the T-002 work. Note that option C is now known to be
+   larger than it appeared when chosen.
 4. Preserve T-006 and T-009 as done and archive them only after explicit
    approval.
 
