@@ -12,6 +12,7 @@ export default defineConfig({
       "**/node_modules/**",
       "**/dist/**",
       "**/x5-joint-acceptance.integration.test.ts",
+      "**/t009-family-growth-joint.integration.test.ts",
     ],
     // The suite shares one disposable database and the command kernel runs
     // Serializable transactions; parallel files trigger SSI false conflicts.
