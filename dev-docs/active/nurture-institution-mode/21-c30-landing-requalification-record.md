@@ -57,6 +57,7 @@ such.
 | Gate | Result |
 | --- | --- |
 | `verify:workflow-contract-pin` | ok — all six entries |
+| `verify:owner-integration` | ok — `nurture.surface-contract@1.17.0` / `sha256:d22851d9…`, ingress-actions 25 / ingress-queries 8 / **unexercised 0**, formal scenario-service HTTP against real PostgreSQL with runtime-recorded per-key evidence, and both joint journeys PASS (`t007-t006=publication`, `t005-t006=direct-interaction`). Run on a fresh disposable database; an earlier attempt after teardown reached the local development database and failed on its pre-existing rows, which is a topology error and not a defect. |
 | `verify:c30-i3-upstream` | ok — exact heads on both siblings plus both source profiles |
 | `verify:c30-i3-owner-adoption` | ok — `41d310a2…` |
 | `verify:c30-i3-default-off` | ok — census `448d37e1…`, every positive count zero |

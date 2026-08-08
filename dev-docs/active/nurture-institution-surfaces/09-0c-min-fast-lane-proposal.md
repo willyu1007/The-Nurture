@@ -102,24 +102,29 @@ private lane into a public capability is precisely what `0C-min` proposes.
 
 0A's exact-input table pinned inputs that the T-009 rotations superseded. The
 rebind is recorded in `07-g4-0a-inventory-record.md` ("Pin Rebind") with the
-0A-1 ledger rows updated; current inputs are `nurture.surface-contract@1.17.0`
-/ `sha256:d22851d9…` (shared core `sha256:7bd8a82d…`, 33 capabilities /
-6 surfaces), Nurture self-pin `c0f97aec…`, My-Chat `df7a273…`, Base
-`8a3ea90…`, parity `8dd53be4…`. This step was required whether or not
-`0C-min` is accepted; full 0C needs it too.
+0A-1 ledger rows updated. It bound the post-T-009 values, which the C30
+landing later advanced again the same day — the authoritative current set is
+the one listed below, not that intermediate one. This step was required
+whether or not `0C-min` is accepted; full 0C needed it too.
 
-**The rebind changed one state, and that change affects this proposal.** The
-T-002 owner/source path moved from `PRESENT_PINNED` to `DEFINED_UNQUALIFIED`.
-The M5 handoff and the G1 Joint Conformance record were produced at My-Chat
-`a019566` / Base `06303e9` / self-pin `b2c53eb7…` — all three now rotated —
-and T-009's closing requalification re-ran neither the owner-integration lane
-nor the G1 joint fixtures. The T-002 G1 PASS is not revoked and remains exact
-at its own topology, but no 0C branch may inherit that record as current-pin
-evidence.
+**The rebind briefly downgraded the T-002 owner path, and the C30 landing has
+since restored it.** For a few hours on 2026-08-08 the row was
+`DEFINED_UNQUALIFIED`, because the M5 handoff and G1 Joint Conformance record
+were produced at pins that had rotated away. The C30 cross-repository landing
+then re-established the owner path at current pins
+(`21-c30-landing-requalification-record.md`, `C30_LANDING_REQUAL_PASS`), with
+`verify:owner-integration` green at `1.17.0`: 25 ingress actions, 8 queries,
+0 unexercised, over formal scenario-service HTTP against real PostgreSQL, both
+joint journeys passing.
 
-For `0C-min` the consequence is that **I3 Owner Integration Readiness must
-re-establish the owner path at current pins rather than cite T-002's record**.
-That is real added cost, accounted for below, and full 0C carries it too.
+Current inputs are Base `4350086…`, My-Chat `51ad97f…`, parity `98f6c241…`,
+Nurture self-pin `c18ef2e0…`, surface contract unchanged at `1.17.0` /
+`sha256:d22851d9…`.
+
+**So the cost this section previously warned about is already paid.** I3 Owner
+Integration Readiness can cite the current-pin owner path instead of
+re-establishing it — but it must cite the requalification record, not T-002's
+G1 record, which remains history at its own topology.
 
 ## Proposed scope
 
@@ -179,7 +184,7 @@ lane:
 | I0 Design/Synthetic | admin predicate state machine, envelope shape, synthetic fixtures |
 | I1 Branch Freeze | the `0C-min` freeze record itself; opens lane implementation |
 | I2 Contract Boundary | capability/presenter/descriptor against the exact `1.18.0` digest |
-| I3 Owner Integration Readiness | T-002 owner path **re-established at current pins** (not inherited) plus T-005 adapters, on disposable PostgreSQL |
+| I3 Owner Integration Readiness | cite the current-pin owner path from the C30 requalification record, plus T-005 adapters, on disposable PostgreSQL |
 | I4 Joint Conformance | protected qualification through the formal NestJS ingress |
 
 Exit is a **branch Freeze PASS for the communication-review lane only**,
@@ -195,8 +200,8 @@ open T-008. Everything stays default-off behind the existing runtime flag.
 | The `0C-min` admin predicate forks from full 0C | Freeze it as the exact predicate 0C extends; widening it requires a 0C record, never a `0C-min` amendment |
 | Read authority drifts into action authority | Preserve `actions: []` / `action_authority: none`; the lane adds no command capability at all |
 | A half-built workbench reads as a broken product to My-Chat | The contract's own per-kind `unavailable` state carries this; My-Chat renders declared unavailability, not missing responses |
-| 0A's stale pins silently invalidate the record | Rebound 2026-08-08; the T-002 owner path is now correctly `DEFINED_UNQUALIFIED` instead of falsely `PRESENT_PINNED` |
-| I3 quietly inherits T-002's out-of-topology G1 evidence | The ledger row now denies it explicitly; I3 must re-establish the owner path at current pins |
+| 0A's stale pins silently invalidate the record | Rebound 2026-08-08, then restored the same day once the C30 landing re-established the owner path at current pins |
+| I3 quietly inherits T-002's out-of-topology G1 evidence | I3 must cite `21-c30-landing-requalification-record.md`, which is current-pin, never the G1 record, which is history at its own topology |
 | Slice creep into 0D/0E facts | The no-migration constraint makes creep mechanically visible |
 
 ## Honest cost/benefit
@@ -236,20 +241,18 @@ narrowest possible lane.
 
 ## Decision requested
 
-The 0A rebind is done, so all three options start from the same rebound
-inputs. One of:
+Option C was chosen on 2026-08-08 and is now complete: the C30 landing closed
+across all three repositories and restored the owner path at current pins. Both
+remaining options therefore start from the same qualified inputs, with the
+owner-path cost already paid. One of:
 
 - **A — Accept `0C-min`.** Run the lane through I0→I4 to a branch Freeze PASS
-  at `1.18.0`, re-establishing the T-002 owner path at I3.
-- **B — Reject and run full 0C.** Freeze the complete Authority & Surface
-  contract before any implementation. Longer to first evidence, one
-  requalification instead of two, same owner-path cost.
-- **C — Defer T-007 entirely.** Prioritize T-002 `C30-I0-C/D` — which would
-  also be the natural place to re-establish the owner path at current pins —
-  or T-009 archival first; revisit after.
+  at `1.18.0`, citing the C30 requalification record at I3.
+- **B — Run full 0C.** Freeze the complete Authority & Surface contract before
+  any implementation. Longer to first evidence, one requalification instead of
+  two.
 
-Note that option C has become more attractive than it looked before the
-rebind: the owner-path re-establishment that A and B both need is T-002's own
-work, and T-002 is already the task that owns `C30-I0-C/D`.
+The original option C — defer T-007 in favour of T-002 — has been executed and
+is no longer on the table.
 
 No option is executed by this document.

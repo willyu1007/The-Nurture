@@ -74,7 +74,37 @@ implementation and grants no authority.
 | My-Workflow-Base | `8a3ea9028d414813994a57ef3501ecad3dd7c434`; contract parity `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d` (11 files, both sides) | `PRESENT_PINNED` | same record |
 | T-002 owner/source path | M5 `16-owner-integration-handoff-m5.md` + G1 `18-g1-joint-conformance-record.md`, produced at My-Chat `a019566` / Base `06303e9` / Nurture self-pin `b2c53eb7…` | **`DEFINED_UNQUALIFIED`** (was `PRESENT_PINNED`) | see below |
 
-### The one state change
+### Superseded the same day — the owner path is restored
+
+The state change described below was correct when written and lasted a few
+hours. The C30 cross-repository landing then re-established the owner path at
+current pins, so the row is `PRESENT_PINNED` again and 0C may cite it.
+
+Current inputs after that landing: Base `4350086993d837baa8030564f4e19593dedd96b0`,
+My-Chat `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c`, parity
+`98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f`, Nurture
+self-pin `c18ef2e070de91a401aa374e09e5b0f914bc8f497382e9c0bc48901e0f1b2e38`.
+The surface contract is unchanged at `1.17.0` / `sha256:d22851d9…`; C30 does
+not touch it.
+
+Evidence:
+`dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md`
+(`C30_LANDING_REQUAL_PASS`). The specific gate that closes this row is
+`verify:owner-integration` — 25 ingress actions, 8 queries, **0 unexercised**,
+over the formal scenario-service HTTP surface against real PostgreSQL, with
+both joint journeys passing (`t007-t006=publication`,
+`t005-t006=direct-interaction`).
+
+Scope, stated precisely: that gate re-establishes the owner path itself at
+current pins. It is not a re-run of T-002's original G1 Joint Conformance
+record, which remains exact history at its own topology. A 0C branch may
+therefore cite the current-pin owner path as `PRESENT_PINNED`, and must cite
+the requalification record rather than the G1 record when it does.
+
+The original finding is kept below unedited, because the reasoning is what
+matters if the pins rotate again.
+
+### The one state change (2026-08-08, since superseded)
 
 The T-002 owner path is the only row that does more than change numbers, and
 it must not be silently rebound.

@@ -10,6 +10,11 @@
   [`07-g4-0a-inventory-record.md`](./07-g4-0a-inventory-record.md) "Pin Rebind".
   The T-002 owner-path row moved from `PRESENT_PINNED` to
   `DEFINED_UNQUALIFIED` as a result; every other rebound row kept its state.
+- Restored the same day: the C30 cross-repository landing re-established the
+  owner path at current pins, so that row is `PRESENT_PINNED` again. Evidence
+  is `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md`.
+  Pins advanced once more in that landing — Base `4350086…`, My-Chat
+  `51ad97f…`, parity `98f6c241…`, Nurture self-pin `c18ef2e0…`.
 - This ledger records planning/readiness truth only. It is not an Owner Integration
   Handoff, Joint Conformance record, Beta Profile Handoff or activation authority.
 
@@ -29,7 +34,7 @@ Documentation acceptance alone cannot produce `PRESENT_PINNED`.
 
 | Input | Owner | Required artifact/ref | Current state | Consumer | Drift/invalidation |
 | --- | --- | --- | --- | --- | --- |
-| Owner/source path | T-002 | M5 `16-owner-integration-handoff-m5.md` + G1 `18-g1-joint-conformance-record.md`, produced at My-Chat `a019566`, Base `06303e9`, Nurture self-pin `b2c53eb7…` | `DEFINED_UNQUALIFIED` (2026-08-08; the drift rule fired — those three pins rotated and T-009's requalification did not re-run the owner-integration or G1 joint lanes) | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
+| Owner/source path | T-002 | Re-established at current pins by `21-c30-landing-requalification-record.md` (`C30_LANDING_REQUAL_PASS`): `verify:owner-integration` green at `1.17.0` / `sha256:d22851d9…` with 25 ingress actions, 8 queries, **0 unexercised**, over formal scenario-service HTTP against real PostgreSQL, both joint journeys PASS. The original M5/G1 records at My-Chat `a019566` / Base `06303e9` / self-pin `b2c53eb7…` remain exact history at their own topology. | `PRESENT_PINNED` (restored 2026-08-08; was `DEFINED_UNQUALIFIED` between the T-009 rotation and this requalification) | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
 | Public Surface baseline | T-004 | `nurture.surface-contract@1.17.0` / `sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8`; shared core `sha256:7bd8a82d…`; 33 capabilities / 6 surfaces (rebound 2026-08-08 from `1.7.0` / `sha256:b7691a81…`) | `PRESENT_PINNED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
 | Owner revisions | My-Chat / My-Workflow-Base | My-Chat `df7a273bff65b965da45e2e9604cee3b6b8fc20b` (`x5_joint_api` `30878ba3…`, `wave4_binding_host` `947b4857…`), Base `8a3ea9028d414813994a57ef3501ecad3dd7c434`, parity `8dd53be4…`, Nurture self-pin `c0f97aec…` (rebound 2026-08-08 per D-T009-04) | `PRESENT_PINNED` | 0C～0F, G4-F | any revision/source-pin/parity drift invalidates the affected branch evidence |
 | Care interaction | T-005 | exact `CareInteraction`/owner-read/direct-interaction contracts used by Institution consumers | `DEFINED_UNQUALIFIED` | 0C/0D, G4-C/F | provider/version/source lifecycle drift invalidates affected consumer qualification |
