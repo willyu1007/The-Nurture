@@ -149,19 +149,22 @@ const workflowPin = readJson(
 );
 assertEqual(
   workflowPin.myWorkflowBase?.revision,
-  // Rotated once in the T-009 I6 batch (D-T009-04).
-  "8a3ea9028d414813994a57ef3501ecad3dd7c434",
+  // Rotated once in the T-009 I6 batch (D-T009-04), then again on 2026-08-08
+  // by the C30 cross-repository landing.
+  "4350086993d837baa8030564f4e19593dedd96b0",
   "My-Workflow-Base revision",
 );
 assertEqual(
   workflowPin.myChat?.revision,
-  // Rotated once in the T-009 I6 batch (D-T009-04).
-  "df7a273bff65b965da45e2e9604cee3b6b8fc20b",
+  // Rotated once in the T-009 I6 batch (D-T009-04), then again on 2026-08-08
+  // by the C30 cross-repository landing.
+  "dc3607e74b01def9cf855d3eca14ebff7c3c492f",
   "My-Chat revision",
 );
 assertEqual(
   workflowPin.myWorkflowBase?.contractSha256,
-  "8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d",
+  // 11 files -> 21: C30 adds the neutral scenario contracts on both sides.
+  "98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f",
   "My-Workflow-Base workflow contract hash",
 );
 assertEqual(

@@ -276,10 +276,28 @@ for (const tableName of requiredFactTables) {
  * Pinning the whole set turns that into a real gate: a new persisted table is a
  * deliberate declaration here, reviewed against this claim, rather than a
  * silent addition.
+ *
+ * 2026-08-08 — the C30 cross-repository landing adds ten tables, declared here
+ * after review against the claim above. None is a board envelope or a unified
+ * child-state row: eight `NurtureC30*` tables cover canonical-action operation
+ * state, its outbox and three audit trails, pair-operation state and protected
+ * content; `NurtureParticipantPrincipalBinding` is an identity binding; and
+ * `NurtureScenarioInvocationNonce` is a replay-prevention nonce store. The C30
+ * branch never updated this census, so the gate had been failing on that branch
+ * — its own qualification ran typecheck, lint, unit, routing, persistence, N1
+ * and X4 but not this one.
  */
 const expectedTableCensus = [
   "NurtureActivityComparisonDraft",
   "NurtureActivityOption",
+  "NurtureC30ActionAuditRecord",
+  "NurtureC30ActionOperation",
+  "NurtureC30ActionOutboxEvent",
+  "NurtureC30AuditRecord",
+  "NurtureC30OutboxEvent",
+  "NurtureC30PairOperation",
+  "NurtureC30ProtectedContent",
+  "NurtureC30ProtectedContentAuditRecord",
   "NurtureCareCapture",
   "NurtureCareCaptureBatch",
   "NurtureCareGroup",
@@ -327,6 +345,7 @@ const expectedTableCensus = [
   "NurtureMetricDefinition",
   "NurtureMetricObservation",
   "NurtureParticipant",
+  "NurtureParticipantPrincipalBinding",
   "NurtureProfileProjection",
   "NurturePublicationRelease",
   "NurturePublicationVisibilityEvent",
@@ -336,6 +355,7 @@ const expectedTableCensus = [
   "NurturePublishProcessTarget",
   "NurtureRuntimeContextPack",
   "NurtureScenarioBindingAuthorization",
+  "NurtureScenarioInvocationNonce",
   "NurtureTeacherAttentionItem",
   "NurtureWorkflowCapture",
   "NurtureWorkflowCheckpoint",
