@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "13cc4e7f136f56e42c3fffe940bc585b495863c1",
+  "source_revision": "84702d2add90468b9a8df746d6dd6e542682c2ae",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
@@ -12,7 +12,7 @@
     "runtime_revision": "8228c2ab6bcf48a18499b094699e272633d5d3af",
     "aggregate_source_hash": "a95bb9835ad27081336628764b1fbfa86402dd27adb3aa88ce3404d424402029"
   },
-  "source_hash": "961537641dc3f5fee2954e5b959c6f1af5a8ccc79a4735e5e9e797bee0c640c8",
+  "source_hash": "2f5f4182ff8729a67a3ff508496bed2913c91864467bde9d8dcdf1615a5da6d1",
   "source_profiles": [
     {
       "source_identity": "nurture_c30_manifest_foundation_v1",
@@ -113,7 +113,7 @@
     },
     {
       "source_identity": "nurture_c30_cumulative_convergence_v1",
-      "source_hash": "9ab86c1d632585159fa801e6743e60b0b05a8a410c8e38ecbea505ded896a0e6",
+      "source_hash": "22a5c3a24d4e7472cef5911a41fcab871b936570eaaebeec7fe236fad47f6fd9",
       "files": [
         "package.json",
         "packages/nurture-scenario/scenario.manifest.yaml",
