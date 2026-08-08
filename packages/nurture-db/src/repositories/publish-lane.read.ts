@@ -288,38 +288,57 @@ export class PrismaPublishLaneReadPort
 
     const pageKeys = page.map((row) => row.process_key);
     if (pageKeys.length > 0) {
-      const outboxEvents = await this.prisma.nurtureFamilyGrowthOutboxEvent.findMany({
-        where: {
+      const pageProcessScope = {
+        publishProcess: {
           workspaceId: input.workspace_id,
-          publicationRelease: {
-            publishProcess: {
-              workspaceId: input.workspace_id,
-              processKey: { in: pageKeys },
+          processKey: { in: pageKeys },
+        },
+      };
+      // Two bounded reads instead of the full outbox history: released rows
+      // (exactly one per delivered target) carry the delivery state and their
+      // latest receipt; lifecycle kinds collapse to at most three groups per
+      // release, however many corrections have accumulated.
+      const [releasedEvents, lifecycleGroups] = await Promise.all([
+        this.prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+          where: {
+            workspaceId: input.workspace_id,
+            kind: "released",
+            publicationRelease: pageProcessScope,
+          },
+          select: {
+            publicationReleaseId: true,
+            deliveryState: true,
+            publicationRelease: {
+              select: {
+                publishProcess: { select: { processKey: true } },
+                target: { select: { targetKey: true } },
+              },
+            },
+            receipts: {
+              // The consumer's processing instant is the meaningful order (a
+              // guardian confirmation post-dates the pending receipt it
+              // resolves); createdAt/id only break exact ties
+              // deterministically.
+              orderBy: [{ processedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+              take: 1,
+              select: { status: true },
             },
           },
-        },
-        select: {
-          kind: true,
-          deliveryState: true,
-          publicationRelease: {
-            select: {
-              publishProcess: { select: { processKey: true } },
-              target: { select: { targetKey: true } },
-            },
+        }),
+        this.prisma.nurtureFamilyGrowthOutboxEvent.groupBy({
+          by: ["publicationReleaseId", "kind"],
+          where: {
+            workspaceId: input.workspace_id,
+            kind: { in: ["correction", "target_removal", "redaction"] },
+            publicationRelease: pageProcessScope,
           },
-          receipts: {
-            // The consumer's processing instant is the meaningful order (a
-            // guardian confirmation post-dates the pending receipt it
-            // resolves); createdAt/id only break exact ties deterministically.
-            orderBy: [{ processedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
-            take: 1,
-            select: { status: true },
-          },
-        },
-      });
-      // I8 lifecycle overlay: committed lifecycle events per target, kept at
-      // the strongest precedence (redacted > target_removed >
-      // correction_appended).
+        }),
+      ]);
+      // I8 lifecycle overlay: committed lifecycle events per released target,
+      // kept at the strongest precedence (redacted > target_removed >
+      // correction_appended). Lifecycle events share the release's
+      // publicationReleaseId, which is the association key — no composite
+      // string keys.
       const LIFECYCLE_DISPLAY: Record<string, FamilyGrowthLifecycleStateV1> = {
         correction: "correction_appended",
         target_removal: "target_removed",
@@ -330,19 +349,17 @@ export class PrismaPublishLaneReadPort
         target_removed: 1,
         redacted: 2,
       };
-      const lifecycleByTarget = new Map<string, FamilyGrowthLifecycleStateV1>();
-      for (const event of outboxEvents) {
-        const display = LIFECYCLE_DISPLAY[event.kind];
-        if (!display) continue;
-        const key = `${event.publicationRelease.publishProcess.processKey} ${event.publicationRelease.target.targetKey}`;
-        const current = lifecycleByTarget.get(key);
+      const lifecycleByRelease = new Map<string, FamilyGrowthLifecycleStateV1>();
+      for (const group of lifecycleGroups) {
+        const display = LIFECYCLE_DISPLAY[group.kind];
+        if (!display || group.publicationReleaseId === null) continue;
+        const current = lifecycleByRelease.get(group.publicationReleaseId);
         if (!current || LIFECYCLE_RANK[display] > LIFECYCLE_RANK[current]) {
-          lifecycleByTarget.set(key, display);
+          lifecycleByRelease.set(group.publicationReleaseId, display);
         }
       }
       const byProcess = new Map<string, NonNullable<RawPublishQueueRow["family_growth"]>>();
-      for (const event of outboxEvents) {
-        if (event.kind !== "released") continue;
+      for (const event of releasedEvents) {
         const state: FamilyGrowthQueueStateV1 =
           event.deliveryState === "outcome_unknown"
             ? "outcome_unknown"
@@ -350,11 +367,13 @@ export class PrismaPublishLaneReadPort
               ? (event.receipts[0]?.status ?? "delivering")
               : "delivering";
         const processKey = event.publicationRelease.publishProcess.processKey;
-        const targetKey = event.publicationRelease.target.targetKey;
-        const lifecycle = lifecycleByTarget.get(`${processKey} ${targetKey}`);
+        const lifecycle =
+          event.publicationReleaseId === null
+            ? undefined
+            : lifecycleByRelease.get(event.publicationReleaseId);
         const entries = byProcess.get(processKey) ?? [];
         entries.push({
-          target_key: targetKey,
+          target_key: event.publicationRelease.target.targetKey,
           state,
           ...(lifecycle ? { lifecycle } : {}),
         });
