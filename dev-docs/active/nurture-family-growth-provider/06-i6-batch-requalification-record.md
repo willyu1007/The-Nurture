@@ -26,9 +26,11 @@ happy-path-only digest-verification evidence — and fixed all four
 (`487a069`). Because the fix touched a pinned source
 (`publish-lane.read.ts`), the invalidation clause below applied to the first
 run, and a second run qualified the fixed checkpoint `487a069`. I8 (teacher-queue
-lifecycle overlay) then rotated the contract to `1.17.0`; THIS record is the
-full re-run at the I8 checkpoint, closing T-009. The `97b9afe` and `487a069`
-runs are historical.
+lifecycle overlay) then rotated the contract to `1.17.0` and was qualified at
+`4ed7724`; an I8 quality pass (Codex review: bounded page join, hardened
+tests and vocabulary scan) fixed the findings at `860f73f`, and THIS record
+is the full re-run at that fixed checkpoint, closing T-009. The `97b9afe`,
+`487a069` and `4ed7724` runs are historical.
 
 ## Exact Bound Inputs
 
@@ -37,8 +39,8 @@ runs are historical.
    shared core (unchanged across the rotation)
    `sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d`,
    33 capabilities / 6 surfaces.
-2. Nurture checkpoint: `4ed7724` (main; self-pin
-   `8717270f14c6…` — full value in
+2. Nurture checkpoint: `860f73f` (main; self-pin
+   `c0f97aec808a…` — full value in
    `docs/project/integrations/my-chat-workflow-contract.json`, 185 files).
 3. My-Chat: `df7a273bff65b965da45e2e9604cee3b6b8fc20b` (rotated once in this
    batch, D-T009-04).
@@ -54,7 +56,7 @@ runs are historical.
 ## Qualification Topology
 
 Three adjacent exact detached worktrees under a disposable parent directory
-(`The-Nurture` @ 4ed7724, `My-Chat` @ df7a273, `My-Workflow-Base` @ 8a3ea90),
+(`The-Nurture` @ 860f73f, `My-Chat` @ df7a273, `My-Workflow-Base` @ 8a3ea90),
 so the `link:../My-Chat/...` package links, the pin verifier and every lane
 loaded the same frozen sources. Frozen installs used
 `pnpm install --ignore-scripts`; Prisma clients (Nurture, My-Chat, dev-host)
@@ -78,7 +80,7 @@ untouched):
 
 | Gate | Result |
 | --- | --- |
-| `verify-workflow-contract-pin` (sibling worktrees at exact pins) | ok — Base contract 11 files parity `8dd53be4…`; My-Chat `x5_joint_api` 190 files `30878ba3…`, `wave4_binding_host` 20 files `947b4857…`; Nurture self 185 files `8717270f…`. (The LIVE My-Chat sibling has moved past the pin — another task's work; the exact-pin populations here are the binding evidence.) |
+| `verify-workflow-contract-pin` (sibling worktrees at exact pins) | ok — Base contract 11 files parity `8dd53be4…`; My-Chat `x5_joint_api` 190 files `30878ba3…`, `wave4_binding_host` 20 files `947b4857…`; Nurture self 185 files `c0f97aec…`. (The LIVE My-Chat sibling has moved past the pin — another task's work; the exact-pin populations here are the binding evidence.) |
 | assert scripts: test-routing, g3-0-freeze, g2-exit-contract, formal-ingress, port-topology, persistence-boundaries, n1-schema, x4-handoff-replay | all ok (routing census 57/26/11/14 + x5-joint=2; retired `guardian_current_focus` pair tracked reserved-RETIRED) |
 | `assert-g2-exit-db-census` + `assert-production-db-boundary` (fresh DB) | ok — census violations=0; 63 tables / 93 enums |
 | Deterministic surface-contract rebuild | zero drift in `generated/`; `verify:surface-contract` ok at the digest above; tooling tests 5 pass / 0 fail |
