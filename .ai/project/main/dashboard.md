@@ -42,14 +42,23 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Answer the T-007 `0C-min` proposal** in
-   `dev-docs/active/nurture-institution-surfaces/09-0c-min-fast-lane-proposal.md`.
-   Its option C — defer T-007 in favour of T-002 — was chosen on 2026-08-08
-   and is now complete, so the live choice is A (narrow `0C-min` lane at
-   `1.18.0`, two requalification rounds) or B (full 0C, one round, later first
-   evidence). The owner-path cost that previously separated them is paid.
-2. Only a separately authorized `C30-I4` scope review is eligible for T-002.
-3. Preserve T-006, T-009 and T-003 as done and archive them only after
+1. **Continue G4-A, or freeze 0D.** `G4_0C_EXIT_PASS` is issued and G4-A
+   increment 1 has executed the first slice of the authority chain
+   (`nurture.institution_admin_scope`, 34 tests). Remaining G4-A increments:
+   the context types as a passed chain, purpose evaluation across the 0C-3 /
+   0C-5 split, and the full-coverage aggregate rule. 0D is the alternative and
+   unblocks G4-B/C; 0E and 0F remain unstarted.
+2. **Read `21-g4-a-increment-1-audit-record.md` before extending the
+   predicate.** Auditing increment 1 found three fail-open defects that 31
+   passing tests could not see, because the tests hand-supplied facts and never
+   exercised the Prisma computation. The same gap applies to every later
+   increment until repository-level tests exist for these facts — that is the
+   highest-value next piece of test work.
+3. `NurtureInstitutionPolicyService` has **no production caller**. 0C is
+   validated as buildable as frozen, not as running; real requests wait for
+   I2/I3/I4.
+4. Only a separately authorized `C30-I4` scope review is eligible for T-002.
+5. Preserve T-006, T-009 and T-003 as done and archive them only after
    explicit approval.
 
 ## Notes (manual)
