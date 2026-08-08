@@ -86,12 +86,12 @@ itself reopens 0C rather than amending a unit.
 
 0C Exit requires all six units to hold an exact freeze record with owner, pin,
 version, default and negative fixtures, plus a rolling branch release through
-0G. It opens G4-A implementation and supplies the common authority base to
-G4-B/C/D/E. It is not Owner Readiness, Joint Conformance, a Beta Profile
-Handoff, Candidate Freeze, activation or traffic authority, and it does not
-start or complete T-007.
+0G. Reaching that Exit opens G4-A implementation and supplies the common
+authority base to G4-B/C/D/E. The Exit is not Owner Readiness, Joint
+Conformance, a Beta Profile Handoff, Candidate Freeze, activation or traffic
+authority, and 0C alone neither starts nor completes T-007.
 
 ## Non-effects of this document
 
 Accepting this scope changes no code, schema, manifest, capability, database,
-secret or configuration. It authorizes authoring 0C-1 next, nothing further.
+secret or configuration. The only thing authorized here is authoring 0C-1.
