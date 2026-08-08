@@ -337,6 +337,9 @@ const baseFacts = (): NurturePolicyFacts => ({
   role_state: "active",
   role_kind: "caregiver",
   scope_reaches_child: true,
+  institution_scope_current: true,
+  target_in_institution_scope: true,
+  child_in_named_class: true,
   care_group_matches: true,
   child_visible: true,
   thread_state: "active",
@@ -466,5 +469,110 @@ describe("institution structured policy", () => {
       },
     );
     expect(decision).toMatchObject({ allowed: true, reason_code: "allowed" });
+  });
+});
+
+/**
+ * G4-A increment 1 — the 0C authority chain, executed.
+ *
+ * 0C froze six records and no predicate. These are the first tests that run
+ * one, and they exist to catch the specific ways an implementation could
+ * satisfy the letter of the freeze while widening it.
+ */
+describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
+  const adminContext = (
+    overrides: Partial<NurtureResolvedContext["actor"]> = {},
+    // `null` rather than `undefined`: passing undefined would trigger the
+    // default parameter and silently restore the target.
+    target: NurtureResolvedContext["target"] | null = resolvedContext.target,
+  ): NurtureResolvedContext => {
+    // Spreading resolvedContext carries its target, so omitting one has to be
+    // an explicit delete rather than a conditional spread.
+    const { target: _ignored, ...rest } = resolvedContext;
+    return {
+      ...rest,
+      actor: {
+        ...resolvedContext.actor,
+        role_kind: "institution_admin",
+        scope_type: "institution",
+        scope_id: "institution-1",
+        ...overrides,
+      },
+      ...(target ? { target } : {}),
+    };
+  };
+
+  const decide = async (
+    facts: Partial<NurturePolicyFacts>,
+    context: NurtureResolvedContext = adminContext(),
+  ) => {
+    const repository = createInMemoryInstitutionContextRepository({
+      loadPolicyFacts: async () => ({
+        ...baseFacts(),
+        role_kind: "institution_admin",
+        ...facts,
+      }),
+    });
+    const decision = await new NurtureInstitutionPolicyService(repository).evaluate({
+      workspace_id: "workspace-1",
+      policy_key: "nurture.institution_admin_scope",
+      resolved_context: context,
+    } as Parameters<NurtureInstitutionPolicyService["evaluate"]>[0]);
+    return decision;
+  };
+
+  it("allows a current admin whose target sits in the named class", async () => {
+    expect(await decide({})).toMatchObject({ reason_code: "allowed" });
+  });
+
+  it("denies every non-admin role with one indistinguishable code", async () => {
+    for (const role of ["guardian", "caregiver", "lead_caregiver", "system_operator"] as const) {
+      expect(await decide({ role_kind: role }), role).toMatchObject({
+        reason_code: "not_authorized",
+      });
+    }
+  });
+
+  it("denies an admin assignment held at a non-institution scope", async () => {
+    // 0C-2: an institution_admin at care_group scope is not widened to that
+    // group's institution.
+    const decision = await decide({}, adminContext({ scope_type: "care_group" }));
+    expect(decision).toMatchObject({ reason_code: "not_authorized" });
+  });
+
+  it("denies a non-current institution indistinguishably from a missing one", async () => {
+    // 0C-2 collapses paused, archived, deleted, soft-deleted and absent into
+    // one code so an Admin cannot probe which ids exist or what state one is
+    // in. The repository applies the status/deletedAt conjunction; the
+    // predicate sees one boolean.
+    expect(await decide({ institution_scope_current: false })).toMatchObject({
+      reason_code: "not_authorized",
+    });
+  });
+
+  it("denies a target outside the scoped institution", async () => {
+    expect(await decide({ target_in_institution_scope: false })).toMatchObject({
+      reason_code: "not_authorized",
+    });
+  });
+
+  /**
+   * The case 0C-3 was written to prevent, and the reason this increment exists.
+   *
+   * `scope_reaches_child` matches institutionId alone for an institution-scoped
+   * binding, so it is TRUE for a child enrolled in a different class of the
+   * same institution. An implementation that reused it would admit this read.
+   */
+  it("denies a child in another class of the same institution, which the looser fact admits", async () => {
+    const decision = await decide({
+      scope_reaches_child: true, // the looser existing fact says yes
+      child_in_named_class: false, // 0C-3's exact-class fact says no
+    });
+    expect(decision).toMatchObject({ reason_code: "scope_mismatch" });
+  });
+
+  it("allows a class-level read with no child target", async () => {
+    const decision = await decide({ child_in_named_class: false }, adminContext({}, null));
+    expect(decision).toMatchObject({ reason_code: "allowed" });
   });
 });

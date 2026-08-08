@@ -144,7 +144,10 @@ export type NurturePolicyKey =
   | "nurture.can_receive_family_context"
   | "nurture.can_share_to_family"
   | "nurture.caregiver_scope"
-  | "nurture.can_confirm_media_attribution";
+  | "nurture.can_confirm_media_attribution"
+  // G4-A increment 1: the 0C-1/0C-2/0C-3 authority chain for Institution
+  // surfaces. Frozen by 11-g4-0c-1, 12-g4-0c-2 and 13-g4-0c-3.
+  | "nurture.institution_admin_scope";
 
 export type NurturePolicyFactRequest = {
   workspace_id: string;
@@ -159,6 +162,17 @@ export type NurturePolicyFacts = {
   role_state: "active" | "missing" | "revoked";
   role_kind?: NurtureCareRole;
   scope_reaches_child: boolean;
+  /**
+   * G4-A increment 1, frozen by 0C-2 and 0C-3.
+   *
+   * These are deliberately separate from `scope_reaches_child`, which for an
+   * institution-scoped binding matches `institutionId` alone and therefore
+   * admits any child enrolled anywhere in the institution. 0C-3 requires the
+   * exact class, so reusing that fact here would silently widen the predicate.
+   */
+  institution_scope_current: boolean;
+  target_in_institution_scope: boolean;
+  child_in_named_class: boolean;
   care_group_matches: boolean;
   child_visible: boolean;
   thread_state: "active" | "inactive" | "missing";
@@ -191,6 +205,9 @@ export type NurturePolicyReasonCode =
   | "enrollment_inactive"
   | "message_redacted"
   | "asset_scope_mismatch"
+  // 0C-2 freezes every non-current or out-of-scope institution to one code, so
+  // an Admin cannot probe which institution ids exist or what state one is in.
+  | "not_authorized"
   | "child_not_enrolled"
   | "exposure_policy_missing";
 

@@ -85,6 +85,31 @@ const decideReason = (
         return "enrollment_inactive";
       }
       return "allowed";
+    case "nurture.institution_admin_scope":
+      // 0C-1 level: exactly one active institution_admin assignment. The role
+      // union admits five values; only this one reaches an Institution surface,
+      // and system_operator is never selectable (0C-1 §4).
+      if (facts.role_kind !== "institution_admin") return "not_authorized";
+      // 0C-2 level: the assignment must be AT institution scope. An admin
+      // assignment at care_group or enrollment scope is not widened to that
+      // scope's institution — it denies.
+      if (input.resolved_context.actor.scope_type !== "institution") {
+        return "not_authorized";
+      }
+      // 0C-2 currency, using the conjunction from the lifecycle decision
+      // (0G finding 3): status = active AND deletedAt IS NULL. Every
+      // non-current institution shares one code so an Admin cannot probe which
+      // ids exist or what state one is in.
+      if (!facts.institution_scope_current) return "not_authorized";
+      if (!facts.target_in_institution_scope) return "not_authorized";
+      // 0C-3 level: a child-level target must sit in the NAMED class. This is
+      // deliberately not `scope_reaches_child`, which matches institutionId
+      // alone for institution-scoped bindings and would admit any child
+      // enrolled anywhere in the institution.
+      if (input.resolved_context.target?.child_care_process_id) {
+        return facts.child_in_named_class ? "allowed" : "scope_mismatch";
+      }
+      return "allowed";
     case "nurture.can_confirm_media_attribution":
       if (
         facts.role_kind !== "caregiver" &&

@@ -719,6 +719,64 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
     const scopeReachesChild = binding
       ? await this.roleReachesChild(input.workspace_id, binding, childCareProcessId)
       : false;
+
+    // G4-A increment 1 (0C-2, 0C-3). Computed separately from
+    // scopeReachesChild on purpose: that helper matches institutionId alone for
+    // an institution-scoped binding, so it admits any child enrolled anywhere
+    // in the institution. 0C-3 requires the exact class.
+    const scopedInstitutionId =
+      binding?.scope_type === "institution" ? binding.scope_id : undefined;
+    const institutionScopeCurrent = scopedInstitutionId
+      ? Boolean(
+          await this.prisma.nurtureCareInstitution.findFirst({
+            // The conjunction from the lifecycle decision (0G finding 3): the
+            // two fields can disagree and readers have historically split on
+            // which to trust.
+            where: {
+              id: scopedInstitutionId,
+              workspaceId: input.workspace_id,
+              status: "active",
+              deletedAt: null,
+            },
+            select: { id: true },
+          }),
+        )
+      : false;
+    const targetInInstitutionScope =
+      institutionScopeCurrent && scopedInstitutionId
+        ? careGroupId
+          ? Boolean(
+              await this.prisma.nurtureCareGroup.findFirst({
+                where: {
+                  id: careGroupId,
+                  workspaceId: input.workspace_id,
+                  institutionId: scopedInstitutionId,
+                  status: "active",
+                  deletedAt: null,
+                },
+                select: { id: true },
+              }),
+            )
+          : enrollment
+            ? enrollment.institutionId === scopedInstitutionId
+            : true
+        : false;
+    const childInNamedClass =
+      targetInInstitutionScope && childCareProcessId && careGroupId
+        ? Boolean(
+            await this.prisma.nurtureEnrollment.findFirst({
+              where: {
+                workspaceId: input.workspace_id,
+                childCareProcessId,
+                careGroupId,
+                institutionId: scopedInstitutionId,
+                status: "active",
+                deletedAt: null,
+              },
+              select: { id: true },
+            }),
+          )
+        : false;
     const childVisible = childCareProcessId
       ? Boolean(
           await this.prisma.nurtureChildCareProcess.findFirst({
@@ -773,6 +831,9 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
             : "revoked",
       ...(role ? { role_kind: role.role } : {}),
       scope_reaches_child: scopeReachesChild,
+      institution_scope_current: institutionScopeCurrent,
+      target_in_institution_scope: targetInInstitutionScope,
+      child_in_named_class: childInNamedClass,
       care_group_matches: Boolean(
         binding &&
           careGroupId &&
