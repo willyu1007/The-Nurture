@@ -2,6 +2,41 @@
 
 Running log; newest first.
 
+- 2026-08-08 (I8 quality pass — 3 findings + 1 self-found, all fixed):
+  independent review (Codex gpt-5.6-sol) + self-review of the I8 range;
+  the batch requalified again at the fixed checkpoint:
+  1. (Major) The page join fetched the FULL outbox history for page
+     processes — corrections accumulate forever, and the receipts
+     subquery ran for lifecycle rows that never use it. Rewritten as two
+     bounded reads: released rows (one per delivered target) with their
+     latest receipt, plus a `groupBy(publicationReleaseId, kind)` that
+     caps lifecycle data at three groups per release regardless of how
+     many corrections exist. The association key is now the release id —
+     the composite string key is gone entirely.
+  2. (Self-found) The committed overlay code carried two RAW NUL BYTES
+     inside the template-literal delimiter (invisible in every normal
+     view — the file read as a space). Functionally correct, but a
+     tooling landmine; superseded by fix 1 removing the key scheme.
+  3. (Medium) The I8 integration test could not catch last-wins
+     precedence, per-process (vs per-target) keying, an unmapped
+     `target_removal`, or an existence-bit census. Now: two targets on
+     one process, overlay lands on A alone; a correction AFTER the
+     redaction leaves `redacted` (precedence, not last-wins) and still
+     moves the head (count, not boolean); `target_removal` lands on B
+     alone. Domain fact surfaced: one visibility event per
+     (release, command, kind) is unique — each append is its own
+     command execution.
+  4. (Medium) The vocabulary scan was bypassable by naming variants
+     (`materialRef`, `FamilyArchive`, spaced forms) and its global
+     token-strip whitelisted the frozen status anywhere. Now: the status
+     is removed from ENUM ARRAYS structurally (anywhere else still
+     fails), and the scan runs over lowercase text with separators
+     collapsed, so snake/camel/spaced variants reduce to the same
+     forbidden token.
+  Lanes 616 unit / 257 db / 66+64 scenario-service / 12 x5 green;
+  deterministic rebuild unchanged (`d22851d9…`); self-pin re-frozen
+  (`c0f97aec…`).
+
 - 2026-08-08 (I8 landed — T-009 complete): the teacher queue now binds every
   §四 state to real provider results. Scoping fact worth keeping: the
   transient states (per-target `binding_unavailable` + preparation reason

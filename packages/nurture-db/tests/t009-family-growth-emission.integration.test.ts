@@ -373,7 +373,9 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
     const committed = await commit(world, { familyGrowth: preparedEmission() });
     expect(committed.status).toBe("committed");
     if (committed.status !== "committed") return;
-    const executionId = await (async () => {
+    // One visibility event per (release, command, kind) is a domain unique —
+    // every append below is its own teacher command.
+    const newExecutionId = async () => {
       const execution = await prisma.nurtureCommandExecution.create({
         data: {
           workspaceId: world.workspaceId,
@@ -392,7 +394,7 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
         },
       });
       return execution.id;
-    })();
+    };
 
     const { PrismaPublishLaneReadPort } = await import(
       "../src/repositories/publish-lane.read.js"
@@ -406,16 +408,19 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
         snapshot_at: new Date().toISOString(),
         take: 10,
       });
-    const append = (kind: "correction" | "target_removal" | "redaction") =>
+    const append = async (
+      kind: "correction" | "target_removal" | "redaction",
+      publicationRef: string = committed.publication_ref,
+    ) =>
       new PrismaPublicationSafetyTransaction(prisma).appendPublicationVisibilityEvents({
         workspace_id: world.workspaceId,
         participant_id: world.teacher.id,
-        command_execution_id: executionId,
+        command_execution_id: await newExecutionId(),
         actor_role_assignment_id: world.teacherRole.id,
         events: [
           {
             event_id: randomUUID(),
-            publication_id: committed.publication_ref,
+            publication_id: publicationRef,
             kind,
             reason_key: "content_error",
             source_release_revision: 1,
@@ -427,29 +432,91 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
         ],
       });
 
-    // No lifecycle yet: the entry carries no overlay.
+    // A SECOND target on the same process, committed with its own emission:
+    // the overlay must discriminate per target, not per process.
+    const targetB = await prisma.nurturePublishProcessTarget.create({
+      data: {
+        workspaceId: world.workspaceId,
+        publishProcessId: world.process.id,
+        targetKey: "target:child-B",
+        childCareProcessId: world.target.childCareProcessId,
+        enrollmentId: world.target.enrollmentId,
+        familyRefKey: world.target.familyRefKey,
+        grantId: world.target.grantId,
+      },
+    });
+    const committedB = await port().commitTargetRelease({
+      workspace_id: world.workspaceId,
+      participant_id: world.teacher.id,
+      process_key: world.process.processKey,
+      target_key: targetB.targetKey,
+      revision: 1,
+      command_request_id: `cmd:${randomUUID()}`,
+      trigger: "immediate",
+      family_growth: {
+        ...preparedEmission(),
+        target: { child_id: "mc-child-2", family_id: "mc-family-2" },
+      },
+    });
+    expect(committedB.status).toBe("committed");
+
+    // No lifecycle yet: the entries carry no overlay.
     let page = await list();
     let row = page.rows.find((entry) => entry.process_key === world.process.processKey);
-    expect(row?.family_growth?.[0]?.lifecycle).toBeUndefined();
+    expect(row?.family_growth?.map((entry) => entry.lifecycle)).toEqual([
+      undefined,
+      undefined,
+    ]);
     const headsBefore = structuredClone(page.heads);
 
-    // A committed correction appears as the overlay and moves the head.
+    // A committed correction on target A appears as A's overlay — and ONLY
+    // A's (target B on the same process stays clean) — and moves the head.
     await append("correction");
     page = await list();
     row = page.rows.find((entry) => entry.process_key === world.process.processKey);
-    expect(row?.family_growth?.[0]).toMatchObject({
-      state: "delivering",
-      lifecycle: "correction_appended",
-    });
+    expect(row?.family_growth).toEqual([
+      {
+        target_key: world.target.targetKey,
+        state: "delivering",
+        lifecycle: "correction_appended",
+      },
+      { target_key: targetB.targetKey, state: "delivering" },
+    ]);
     expect(page.heads).not.toEqual(headsBefore);
 
-    // A later redaction outranks the correction and moves the head again.
+    // A later redaction on A outranks the correction and moves the head
+    // again; B still carries no overlay.
     const headsMid = structuredClone(page.heads);
     await append("redaction");
     page = await list();
     row = page.rows.find((entry) => entry.process_key === world.process.processKey);
-    expect(row?.family_growth?.[0]?.lifecycle).toBe("redacted");
+    expect(row?.family_growth?.map((entry) => entry.lifecycle)).toEqual([
+      "redacted",
+      undefined,
+    ]);
     expect(page.heads).not.toEqual(headsMid);
+
+    // Precedence, not last-wins: a SECOND correction after the redaction
+    // leaves the display redacted — and still moves the head (the census is
+    // a count, not an existence bit).
+    const headsAfterRedaction = structuredClone(page.heads);
+    await append("correction");
+    page = await list();
+    row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth?.[0]?.lifecycle).toBe("redacted");
+    expect(page.heads).not.toEqual(headsAfterRedaction);
+
+    // target_removal maps too, and lands on B alone.
+    if (committedB.status !== "committed") return;
+    const headsBeforeRemoval = structuredClone(page.heads);
+    await append("target_removal", committedB.publication_ref);
+    page = await list();
+    row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth?.map((entry) => entry.lifecycle)).toEqual([
+      "redacted",
+      "target_removed",
+    ]);
+    expect(page.heads).not.toEqual(headsBeforeRemoval);
   });
 });
 

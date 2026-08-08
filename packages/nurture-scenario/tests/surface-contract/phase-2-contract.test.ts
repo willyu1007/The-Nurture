@@ -121,30 +121,50 @@ describe("Phase 2 exact surface contract", () => {
     // states are closed enums, targets are opaque refs, and no canonical
     // family/child identifier, admission/material companion ref or archive
     // noun may appear anywhere in the contract text.
-    const contractText = [
+    // Structural whitelist: the frozen consumer receipt status is removed
+    // from ENUM ARRAYS only — the same token anywhere else (a property name,
+    // a description) still fails the scan.
+    const stripFrozenStatus = (node: unknown): unknown => {
+      if (Array.isArray(node)) {
+        return node
+          .filter((entry) => entry !== "pending_guardian_confirmation")
+          .map(stripFrozenStatus);
+      }
+      if (node !== null && typeof node === "object") {
+        return Object.fromEntries(
+          Object.entries(node as Record<string, unknown>).map(([key, value]) => [
+            key,
+            stripFrozenStatus(value),
+          ]),
+        );
+      }
+      return node;
+    };
+    // Normalized scan: lowercase with separators collapsed, so snake_case,
+    // camelCase and spaced variants of a forbidden noun all reduce to the
+    // same token ("material_ref", "materialRef", "material ref" →
+    // "materialref").
+    const normalized = [
       "capabilities/contracts/query-teacher-publish-queue.schema.json",
       "capabilities/contracts/publish-process-types.schema.json",
       "capabilities/contracts/publication-release.schema.json",
     ]
-      .map((relativePath) => JSON.stringify(readSource(relativePath)))
+      .map((relativePath) => JSON.stringify(stripFrozenStatus(readSource(relativePath))))
       .join("\n")
-      // The one legitimate appearance: the frozen consumer receipt status.
-      // Removing the exact token first means any OTHER guardian reference
-      // still fails the scan.
-      .replaceAll("pending_guardian_confirmation", "");
+      .toLowerCase()
+      .replace(/[_\s-]/g, "");
     for (const forbidden of [
-      "family_id",
-      "child_id",
-      "admission_ref",
-      "material_ref",
-      "suppression_ref",
-      "growth_material",
-      "growthMaterial",
-      "familyArchive",
+      "familyid",
+      "childid",
+      "admissionref",
+      "materialref",
+      "suppressionref",
+      "growthmaterial",
+      "familyarchive",
       "cultivation",
       "guardian",
     ]) {
-      expect(contractText, `queue contract must not carry ${forbidden}`).not.toContain(
+      expect(normalized, `queue contract must not carry ${forbidden}`).not.toContain(
         forbidden,
       );
     }
