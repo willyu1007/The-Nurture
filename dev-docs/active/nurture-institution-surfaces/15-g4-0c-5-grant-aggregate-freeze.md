@@ -11,7 +11,8 @@
   ([`13-g4-0c-3-class-child-scope-freeze.md`](./13-g4-0c-3-class-child-scope-freeze.md))
 - Verdict: `G4_0C_5_FREEZE_PASS`
 - Releases: 0C-6, G4-A, G4-D
-- Open points frozen conservative: two, flagged in §5 and §6
+- Open points: §5's is **closed** 2026-08-08 (full coverage or nothing);
+  §6's remains, flagged for review before 0C Exit
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
 
@@ -116,24 +117,72 @@ way; 0C-5 adds purpose and freezes the conjunction.
 
 ## 5. Aggregate privacy
 
-An aggregate is a projection over facts the requester may already read, and
-nothing more.
+An aggregate here means any value that compresses several members' facts into
+one number, badge or marker shown to an Admin — a class card's pending count, a
+support-signal level, a cross-class exception summary, an attendance roll-up.
+None exists in code today; all are G4-A and G4-B work for which this unit is
+the foundation.
+
+### Full coverage or nothing
+
+**The counted population comes from scope, not from protected facts.** Who is
+in a class is visible to the Admin through enrolment; what is gated is a fact
+class *about* each member. So the predicate runs per (member, fact class) pair,
+and the population size itself is never the secret.
+
+An aggregate is returned only when the grant predicate admits the fact class
+for **every** member of the counted population. Three outcomes, and the third
+must stay distinguishable from the second:
+
+| Situation | Returned |
+| --- | --- |
+| Population non-empty, every member readable | the value |
+| Population non-empty, **any** member not readable | `unavailable` with a reason code |
+| Population genuinely empty | `0` |
+
+`0` means "there is nothing"; `unavailable` means "I cannot tell you". An
+implementation that returns `0` for a denied population destroys the
+distinction an Admin needs to know they are looking at a partial view.
+
+**A filtered count is forbidden.** The rejected alternative — drop the
+unreadable members and return a number computed over the rest — was what an
+earlier draft of this record froze. It is worse than refusing, for two
+independent reasons.
+
+### Why a filtered count is worse than refusing
+
+**It silently under-reports.** An Admin responsible for safety oversight who
+sees `2` when the true figure is `5` has been given a wrong number with no
+signal that it is wrong. "I cannot see all of this" is actionable; a confident
+wrong number is not.
+
+**It leaks through differential observation, and no threshold fixes that.**
+The readable set changes over time as grants are given and revoked and as
+enrolments start and end. An Admin watching a filtered count move from 1 to 2
+learns that one member transitioned, even for a fact class they may not read
+per-member — and in a small class the inference is close to certain.
+
+This is why the open point's original framing, "should we add a numeric
+suppression threshold (a k-anonymity floor)", was the wrong question. A
+threshold defends static small cells. It does not defend a time series, which
+is the only real attack surface here. Adding one would have bought a
+configuration knob and a false sense of protection while leaving the actual
+leak open.
+
+Full coverage closes it structurally: with no partially-visible population,
+there is no membership delta to observe.
+
+### The correct remedy when an aggregate is refused
+
+Widen the authority, not the disclosure. If a count is genuinely needed for
+operations, the answer is to establish a legitimate purpose and grant for that
+fact class across the population — not to publish a partial figure. That keeps
+the decision where it belongs, with the Guardian who grants.
 
 - **No aggregate bypass.** A count, badge, ordering or trend MUST NOT change
   with a fact the requester would be denied on direct read. This is 0C-3's rule
-  restated at grant granularity: aggregation happens after the grant predicate,
-  never before it.
-- **No small-cell inference.** An aggregate over a set small enough to identify
-  its members is a child-level read wearing a different shape. Frozen
-  conservative: aggregates are computed only over the scoped-and-granted set,
-  and a surface that would display a single-member aggregate as a group
-  statistic reopens this unit.
-
-  > **Open point.** Whether a numeric suppression threshold (a k-anonymity
-  > floor) is required is a product question 0A did not settle. It is frozen
-  > shut in the sense that no aggregate may be published that a direct read
-  > would deny; no threshold is invented. Flagged for review before 0C Exit.
-
+  restated at grant granularity: the predicate runs before aggregation, never
+  after.
 - **No cross-institution term.** Inherited from 0C-2 without exception.
 
 ## 6. No scoring, no ranking
@@ -170,6 +219,8 @@ configuration. Introducing any of them reopens 0C.
 | Purpose outside the grant or outside 0C-3's vocabulary | deny `purpose_not_granted` / `purpose_not_honoured` |
 | Read of a non-`pending` grant row from a workbench surface | deny `not_authorized` |
 | Write attempting to set `active` from an Institution surface | deny `not_authorized` |
+| Aggregate population partially readable | `unavailable` — never a filtered count |
+| Aggregate population empty and fully readable | `0`, distinguishable from `unavailable` |
 | Owner unavailable | deny `unavailable`; never cached authority |
 
 Direction and data-class faults share one reason code deliberately: telling
@@ -193,8 +244,13 @@ them apart would let an Admin probe a grant's exact terms by elimination.
 8. an aggregate does not change with a fact denied on direct read;
 9. no response carries a score, band, rank or performance field under any
    name;
-10. an aggregate over a single-member set is not published as a group
-    statistic.
+10. an aggregate whose population is fully readable returns its value;
+11. the same aggregate with **one** member unreadable returns `unavailable`,
+    never a count over the remaining members;
+12. a genuinely empty population returns `0`, and `0` is distinguishable from
+    `unavailable` in the response;
+13. repeating 11 after a grant is added or revoked yields no observable delta —
+    both calls are `unavailable`, so no membership change leaks.
 
 Isolated synthetic fixtures under I0. Real owner paths stay behind I3, joint
 conformance behind I4.
