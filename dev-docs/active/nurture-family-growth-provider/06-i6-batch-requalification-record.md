@@ -3,9 +3,9 @@
 ## Verdict
 
 - Task: T-009 (family growth provider), 1.16.0 batch (I6 cession + I6.2 queue
-  vocabulary + I7b joint suite and lane wiring)
+  vocabulary + I7b joint suite and lane wiring + post-requal quality pass)
 - Date: 2026-08-08
-- Verdict: `REQUAL_PASS`
+- Verdict: `REQUAL_PASS` (refreshed — see history below)
 - Provider state: qualified, default-off
 - Non-effects: no existing database access (fresh disposable databases only),
   no persistent qualification database, no deployment, no capability
@@ -16,6 +16,17 @@ This record refreshes the evidence invalidated by the 1.16.0 batch (surface
 digest rotation, owner-pin rotation, the two T-009 persisted tables and the
 new x5 joint lane) on an exact detached topology with empty databases.
 
+History: the first `REQUAL_PASS` bound checkpoint `97b9afe`. A post-requal
+quality pass (independent Codex gpt-5.6-sol review + self review) then found
+four defects in the I6.2/I7b increment — queue delivery states outside the
+source-head drift contract, non-deterministic latest-receipt selection, J9's
+two-family independence proven only across separate workspaces, and
+happy-path-only digest-verification evidence — and fixed all four
+(`487a069`). Because the fix touched a pinned source
+(`publish-lane.read.ts`), the invalidation clause below applied to the first
+run, and THIS record is the fresh qualification at the fixed checkpoint; the
+`97b9afe` run is historical.
+
 ## Exact Bound Inputs
 
 1. Surface contract: `nurture.surface-contract@1.16.0` /
@@ -23,8 +34,8 @@ new x5 joint lane) on an exact detached topology with empty databases.
    shared core
    `sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d`,
    33 capabilities / 6 surfaces.
-2. Nurture checkpoint: `97b9afe` (main; self-pin
-   `48502f6df25285e94279e3ecfed18b1d07c29358313bd92f1238dede2ddc6413`,
+2. Nurture checkpoint: `487a069` (main; self-pin
+   `48dbe2c1cf97a1ff9322538217b4d8127408f89d38f960151b27a63362f124d1`,
    185 files).
 3. My-Chat: `df7a273bff65b965da45e2e9604cee3b6b8fc20b` (rotated once in this
    batch, D-T009-04).
@@ -64,7 +75,7 @@ untouched):
 
 | Gate | Result |
 | --- | --- |
-| `verify-workflow-contract-pin` (sibling worktrees at exact pins) | ok — Base contract 11 files parity `8dd53be4…`; My-Chat `x5_joint_api` 190 files `30878ba3…`, `wave4_binding_host` 20 files `947b4857…`; Nurture self 185 files `48502f6d…` |
+| `verify-workflow-contract-pin` (sibling worktrees at exact pins) | ok — Base contract 11 files parity `8dd53be4…`; My-Chat `x5_joint_api` 190 files `30878ba3…`, `wave4_binding_host` 20 files `947b4857…`; Nurture self 185 files `48dbe2c1…`. (The LIVE My-Chat sibling has moved past the pin — another task's work; the exact-pin populations here are the binding evidence.) |
 | assert scripts: test-routing, g3-0-freeze, g2-exit-contract, formal-ingress, port-topology, persistence-boundaries, n1-schema, x4-handoff-replay | all ok (routing census 57/26/11/14 + x5-joint=2; retired `guardian_current_focus` pair tracked reserved-RETIRED) |
 | `assert-g2-exit-db-census` + `assert-production-db-boundary` (fresh DB) | ok — census violations=0; 63 tables / 93 enums |
 | Deterministic surface-contract rebuild | zero drift in `generated/`; `verify:surface-contract` ok at the digest above; tooling tests 5 pass / 0 fail |
@@ -73,7 +84,7 @@ untouched):
 | `pnpm test:db` (fresh empty DB) | 26 files / 256 tests |
 | scenario-service `test` + `test:db` (dist) | 11/66 + 3/64 |
 | `pnpm test:dev-host` (fresh empty DB) | 11/27 |
-| x5 lane (`vitest.x5.config.ts`, both fresh DBs) | 2 files / 11 tests — x5 joint acceptance + the seven T-009 I7b joint N8 cases against the real My-Chat consumer |
+| x5 lane (`vitest.x5.config.ts`, both fresh DBs) | 2 files / 12 tests — x5 joint acceptance + the eight T-009 I7b joint cases (seven N8-derived + the JX1 tampered-rendition hardening case) against the real My-Chat consumer |
 
 Default-off posture re-proven: the G2 exit assert checks the protected gate
 variables remain optional/secret/unactivated across dev/staging/prod value
