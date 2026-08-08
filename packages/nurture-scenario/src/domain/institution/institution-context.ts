@@ -171,7 +171,28 @@ export type NurturePolicyFacts = {
    * exact class, so reusing that fact here would silently widen the predicate.
    */
   institution_scope_current: boolean;
-  target_in_institution_scope: boolean;
+  /**
+   * Four states, not a boolean, because a boolean conflated two cases the
+   * 0C-2 freeze separates: no target supplied (a legitimate institution-level
+   * read) and a target supplied that resolves to no institution (frozen as
+   * deny). The first version returned `true` for both and failed open.
+   *
+   * `class_not_current` is separate again because 0C-3 reserves its own code
+   * for it, distinct from the `not_authorized` that a missing or
+   * other-institution class must return.
+   */
+  target_scope_state:
+    | "absent"
+    | "in_scope"
+    | "out_of_scope"
+    | "class_not_current";
+  /**
+   * Whether a child-level read was RESOLVED, not whether the caller supplied
+   * `target.child_care_process_id`. The predicate must gate on the same
+   * channel the fact is computed from; keying the guard off the raw optional
+   * field let an omitted field skip the check entirely.
+   */
+  child_target_resolved: boolean;
   child_in_named_class: boolean;
   care_group_matches: boolean;
   child_visible: boolean;
@@ -208,6 +229,9 @@ export type NurturePolicyReasonCode =
   // 0C-2 freezes every non-current or out-of-scope institution to one code, so
   // an Admin cannot probe which institution ids exist or what state one is in.
   | "not_authorized"
+  // 0C-3 reserves a distinct code for a class inside the admin's own
+  // institution that is not current, separate from missing/other-institution.
+  | "class_not_current"
   | "child_not_enrolled"
   | "exposure_policy_missing";
 

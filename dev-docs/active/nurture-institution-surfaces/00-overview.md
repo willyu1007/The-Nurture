@@ -17,10 +17,16 @@
   `nurture.surface-contract@1.18.0` / `sha256:be84bb23…` additively, with
   `sharedCoreHash` unchanged, so T-005 and T-006 slice evidence is preserved.
   0C-6 carries the only schema delta, authored as a plan and not applied.
-  **Nothing in 0C has been executed** — six freeze records and zero predicate
-  implementation — so the choice ahead is whether to validate 0C by
-  implementing G4-A, or to freeze 0D/0E/0F on predicates no runtime has yet
-  exercised.
+  G4-A increment 1 has since executed the first slice of that chain
+  ([`20-g4-a-i1-branch-freeze.md`](./20-g4-a-i1-branch-freeze.md)):
+  `nurture.institution_admin_scope` implements the 0C-1/0C-2/0C-3 levels with
+  34 tests. It is exercised by tests only — `NurtureInstitutionPolicyService`
+  has no production caller — so 0C is validated as *buildable as frozen*, not
+  as running. An audit of that increment found and fixed three fail-open
+  defects and one missing reason code, which is the evidence that implementing
+  before freezing further was the right order.
+  Next: continue G4-A's remaining increments, or freeze 0D for daily
+  operations. 0E and 0F remain unstarted.
   Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.

@@ -27,7 +27,7 @@ requalification round and a predicate likely to need a breaking reshape when
 
 | Input | Identity | State |
 | --- | --- | --- |
-| Surface contract | `nurture.surface-contract@1.17.0` / `sha256:d22851d9…` (shared core `sha256:7bd8a82d…`, 33 capabilities / 6 surfaces) | `PRESENT_PINNED` |
+| Surface contract | `nurture.surface-contract@1.17.0` / `sha256:d22851d9…` at scope-freeze time; **rotated additively to `1.18.0` / `sha256:be84bb23…` by 0C-4** (34 capabilities / 6 surfaces, `sharedCoreHash` unchanged) | `PRESENT_PINNED` |
 | My-Workflow-Base | `4350086993d837baa8030564f4e19593dedd96b0` | `PRESENT_PINNED` |
 | My-Chat | `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c` | `PRESENT_PINNED` |
 | Base/My-Chat parity | `98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f` (21 files) | `PRESENT_PINNED` |

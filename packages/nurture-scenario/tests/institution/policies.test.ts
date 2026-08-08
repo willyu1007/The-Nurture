@@ -338,7 +338,8 @@ const baseFacts = (): NurturePolicyFacts => ({
   role_kind: "caregiver",
   scope_reaches_child: true,
   institution_scope_current: true,
-  target_in_institution_scope: true,
+  target_scope_state: "in_scope",
+  child_target_resolved: true,
   child_in_named_class: true,
   care_group_matches: true,
   child_visible: true,
@@ -551,8 +552,28 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
   });
 
   it("denies a target outside the scoped institution", async () => {
-    expect(await decide({ target_in_institution_scope: false })).toMatchObject({
+    expect(await decide({ target_scope_state: "out_of_scope" })).toMatchObject({
       reason_code: "not_authorized",
+    });
+  });
+
+  /**
+   * Regression for the first version's fail-open. `target_scope_state` was a
+   * boolean whose fallback returned true whenever no institution edge
+   * resolved, so a target that placed nowhere was ALLOWED — the inverse of
+   * 0C-2's frozen row. An audit reproduced it at runtime.
+   */
+  it("denies a supplied target that resolves to no institution", async () => {
+    expect(await decide({ target_scope_state: "out_of_scope" })).toMatchObject({
+      reason_code: "not_authorized",
+    });
+  });
+
+  it("denies a class in the admin's own institution that is not current, with its own code", async () => {
+    // 0C-3 reserves class_not_current, distinct from the not_authorized that
+    // a missing or other-institution class returns.
+    expect(await decide({ target_scope_state: "class_not_current" })).toMatchObject({
+      reason_code: "class_not_current",
     });
   });
 
@@ -572,7 +593,25 @@ describe("nurture.institution_admin_scope (G4-A increment 1)", () => {
   });
 
   it("allows a class-level read with no child target", async () => {
-    const decision = await decide({ child_in_named_class: false }, adminContext({}, null));
+    const decision = await decide(
+      { child_target_resolved: false, child_in_named_class: false },
+      adminContext({}, null),
+    );
     expect(decision).toMatchObject({ reason_code: "allowed" });
+  });
+
+  /**
+   * Regression for the guard/signal channel mismatch. The first version gated
+   * the class check on the caller-supplied `target.child_care_process_id`,
+   * while the fact was computed from a childCareProcessId the repository
+   * resolves from stored rows. Omitting the optional field skipped the check
+   * even though the repository had already computed a denial.
+   */
+  it("denies a resolved child read even when the caller omitted the child field", async () => {
+    const decision = await decide(
+      { child_target_resolved: true, child_in_named_class: false },
+      adminContext({}, null), // caller supplies no target at all
+    );
+    expect(decision).toMatchObject({ reason_code: "scope_mismatch" });
   });
 });

@@ -742,27 +742,48 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
           }),
         )
       : false;
-    const targetInInstitutionScope =
-      institutionScopeCurrent && scopedInstitutionId
-        ? careGroupId
-          ? Boolean(
-              await this.prisma.nurtureCareGroup.findFirst({
-                where: {
-                  id: careGroupId,
-                  workspaceId: input.workspace_id,
-                  institutionId: scopedInstitutionId,
-                  status: "active",
-                  deletedAt: null,
-                },
-                select: { id: true },
-              }),
-            )
-          : enrollment
-            ? enrollment.institutionId === scopedInstitutionId
-            : true
-        : false;
+    // 0C-2 target placement, as four explicit states. The first version was a
+    // boolean whose `: true` fallback fired whenever no institution edge
+    // resolved, so a class in another institution — 0C-2 fixture 2 — was
+    // ALLOWED. A target that cannot be placed now denies.
+    const targetSupplied = Boolean(context.target);
+    let targetScopeState: NurturePolicyFacts["target_scope_state"] = "absent";
+    if (institutionScopeCurrent && scopedInstitutionId) {
+      if (careGroupId) {
+        const inScope = await this.prisma.nurtureCareGroup.findFirst({
+          where: {
+            id: careGroupId,
+            workspaceId: input.workspace_id,
+            institutionId: scopedInstitutionId,
+          },
+          select: { status: true, deletedAt: true },
+        });
+        targetScopeState = !inScope
+          ? "out_of_scope"
+          : inScope.status === "active" && !inScope.deletedAt
+            ? "in_scope"
+            : "class_not_current";
+      } else if (enrollment) {
+        targetScopeState =
+          enrollment.institutionId === scopedInstitutionId ? "in_scope" : "out_of_scope";
+      } else {
+        // No care group and no enrollment resolved. Only legitimate when the
+        // caller supplied no target at all; a supplied target that resolves to
+        // nothing is the case 0C-2 freezes as deny.
+        targetScopeState = targetSupplied ? "out_of_scope" : "absent";
+      }
+    } else if (institutionScopeCurrent) {
+      targetScopeState = "out_of_scope";
+    } else {
+      // Institution currency already denies; keep the state honest rather than
+      // reporting a placement that was never evaluated.
+      targetScopeState = targetSupplied ? "out_of_scope" : "absent";
+    }
+    // Resolved, not caller-supplied: childCareProcessId is overwritten from
+    // stored rows above, and the predicate gates on this same channel.
+    const childTargetResolved = Boolean(childCareProcessId);
     const childInNamedClass =
-      targetInInstitutionScope && childCareProcessId && careGroupId
+      targetScopeState === "in_scope" && childCareProcessId && careGroupId
         ? Boolean(
             await this.prisma.nurtureEnrollment.findFirst({
               where: {
@@ -832,7 +853,8 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       ...(role ? { role_kind: role.role } : {}),
       scope_reaches_child: scopeReachesChild,
       institution_scope_current: institutionScopeCurrent,
-      target_in_institution_scope: targetInInstitutionScope,
+      target_scope_state: targetScopeState,
+      child_target_resolved: childTargetResolved,
       child_in_named_class: childInNamedClass,
       care_group_matches: Boolean(
         binding &&

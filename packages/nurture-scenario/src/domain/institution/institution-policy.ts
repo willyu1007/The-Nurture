@@ -92,21 +92,35 @@ const decideReason = (
       if (facts.role_kind !== "institution_admin") return "not_authorized";
       // 0C-2 level: the assignment must be AT institution scope. An admin
       // assignment at care_group or enrollment scope is not widened to that
-      // scope's institution — it denies.
+      // scope's institution — it denies. This reads the actor's own resolved
+      // binding, which the repository derives from the stored assignment row.
       if (input.resolved_context.actor.scope_type !== "institution") {
         return "not_authorized";
       }
       // 0C-2 currency, using the conjunction from the lifecycle decision
-      // (0G finding 3): status = active AND deletedAt IS NULL. Every
-      // non-current institution shares one code so an Admin cannot probe which
-      // ids exist or what state one is in.
+      // (0G finding 3): status = active AND deletedAt IS NULL.
       if (!facts.institution_scope_current) return "not_authorized";
-      if (!facts.target_in_institution_scope) return "not_authorized";
-      // 0C-3 level: a child-level target must sit in the NAMED class. This is
-      // deliberately not `scope_reaches_child`, which matches institutionId
-      // alone for institution-scoped bindings and would admit any child
-      // enrolled anywhere in the institution.
-      if (input.resolved_context.target?.child_care_process_id) {
+      // 0C-2 target placement. Each state is handled explicitly so that a new
+      // state cannot fall through to allow: "absent" is an institution-level
+      // read with nothing to place, "out_of_scope" covers both another
+      // institution and a target that resolves to none — 0C-2 gives them one
+      // code so an Admin cannot tell them apart — and "class_not_current"
+      // carries 0C-3's own code.
+      switch (facts.target_scope_state) {
+        case "out_of_scope":
+          return "not_authorized";
+        case "class_not_current":
+          return "class_not_current";
+        case "absent":
+        case "in_scope":
+          break;
+      }
+      // 0C-3 level: a child-level target must sit in the NAMED class. The
+      // guard reads `child_target_resolved` — the same resolved channel the
+      // fact is computed from — because keying it off the caller-supplied
+      // `target.child_care_process_id` let an omitted field skip the check
+      // while the repository had already computed a denial.
+      if (facts.child_target_resolved) {
         return facts.child_in_named_class ? "allowed" : "scope_mismatch";
       }
       return "allowed";

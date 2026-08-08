@@ -68,10 +68,10 @@ implementation and grants no authority.
 
 | Input | Exact identity | State | Evidence |
 | --- | --- | --- | --- |
-| Public Surface baseline | `nurture.surface-contract@1.17.0` / `sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8`; shared core `sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d`; 33 capabilities / 6 surfaces | `PRESENT_PINNED` | T-009 `06-i6-batch-requalification-record.md`; deterministic rebuild with zero `generated/` drift |
-| Nurture self-pin | `c0f97aec808a5eed825938bb611c762e4386c5ee02b29ae90718bcd7c4abd096` (185 files) | `PRESENT_PINNED` | same record, `verify-workflow-contract-pin` gate |
-| My-Chat | `df7a273bff65b965da45e2e9604cee3b6b8fc20b`; source pins `x5_joint_api` `30878ba3…` (190 files), `wave4_binding_host` `947b4857…` (20 files) | `PRESENT_PINNED` | same record |
-| My-Workflow-Base | `8a3ea9028d414813994a57ef3501ecad3dd7c434`; contract parity `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d` (11 files, both sides) | `PRESENT_PINNED` | same record |
+| Public Surface baseline | `nurture.surface-contract@1.18.0` / `sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0`; shared core `sha256:7bd8a82d…` (unchanged); 34 capabilities / 6 surfaces; rotated additively by G4-0C-4 | `PRESENT_PINNED` | T-009 `06-i6-batch-requalification-record.md`; deterministic rebuild with zero `generated/` drift |
+| Nurture self-pin | advanced repeatedly since; the current value lives in `docs/project/integrations/my-chat-workflow-contract.json` and is re-frozen whenever pinned source changes | `PRESENT_PINNED` | `verify-workflow-contract-pin` gate |
+| My-Chat | `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c` after the C30 landing (was `df7a273…` at the T-009 rebind) | `PRESENT_PINNED` | `21-c30-landing-requalification-record.md` |
+| My-Workflow-Base | `4350086993d837baa8030564f4e19593dedd96b0`; parity `98f6c241…` (21 files, both sides) after the C30 landing (was `8a3ea90…` / `8dd53be4…`) | `PRESENT_PINNED` | `21-c30-landing-requalification-record.md` |
 | T-002 owner/source path | M5 `16-owner-integration-handoff-m5.md` + G1 `18-g1-joint-conformance-record.md`, produced at My-Chat `a019566` / Base `06303e9` / Nurture self-pin `b2c53eb7…` | **`DEFINED_UNQUALIFIED`** (was `PRESENT_PINNED`) | see below |
 
 ### Superseded the same day — the owner path is restored
@@ -84,8 +84,9 @@ Current inputs after that landing: Base `4350086993d837baa8030564f4e19593dedd96b
 My-Chat `51ad97f721bf74cced3ec75d24f3066c4ef6ab1c`, parity
 `98f6c24115e02e4abf0e3c9d855849f1c7993974e2ed9bcc72c868c642433d2f`, Nurture
 self-pin `c18ef2e070de91a401aa374e09e5b0f914bc8f497382e9c0bc48901e0f1b2e38`.
-The surface contract is unchanged at `1.17.0` / `sha256:d22851d9…`; C30 does
-not touch it.
+The surface contract was `1.17.0` / `sha256:d22851d9…` at the C30 landing, which
+does not touch it; G4-0C-4 later rotated it additively to `1.18.0` /
+`sha256:be84bb23…`, `sharedCoreHash` unchanged.
 
 Evidence:
 `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md`
