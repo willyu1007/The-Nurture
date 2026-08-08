@@ -6,6 +6,10 @@
 - Stage: G4-0A Freeze Protocol & Fact Inventory
 - State: `G4_0A_INVENTORY_PASS` on 2026-08-01; branch implementation and
   qualification remain pending
+- Pins rebound on 2026-08-08 after the T-009 rotations — see
+  [`07-g4-0a-inventory-record.md`](./07-g4-0a-inventory-record.md) "Pin Rebind".
+  The T-002 owner-path row moved from `PRESENT_PINNED` to
+  `DEFINED_UNQUALIFIED` as a result; every other rebound row kept its state.
 - This ledger records planning/readiness truth only. It is not an Owner Integration
   Handoff, Joint Conformance record, Beta Profile Handoff or activation authority.
 
@@ -25,8 +29,9 @@ Documentation acceptance alone cannot produce `PRESENT_PINNED`.
 
 | Input | Owner | Required artifact/ref | Current state | Consumer | Drift/invalidation |
 | --- | --- | --- | --- | --- | --- |
-| Owner/source path | T-002 | M5 `16-owner-integration-handoff-m5.md` + G1 `18-g1-joint-conformance-record.md`; My-Chat `a019566`, Base `06303e9`, Nurture self-pin `b2c53eb7…` | `PRESENT_PINNED` | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
-| Public Surface baseline | T-004 | `nurture.surface-contract@1.7.0` / `sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641`; Phase 4 handoff + G1 record | `PRESENT_PINNED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
+| Owner/source path | T-002 | M5 `16-owner-integration-handoff-m5.md` + G1 `18-g1-joint-conformance-record.md`, produced at My-Chat `a019566`, Base `06303e9`, Nurture self-pin `b2c53eb7…` | `DEFINED_UNQUALIFIED` (2026-08-08; the drift rule fired — those three pins rotated and T-009's requalification did not re-run the owner-integration or G1 joint lanes) | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
+| Public Surface baseline | T-004 | `nurture.surface-contract@1.17.0` / `sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8`; shared core `sha256:7bd8a82d…`; 33 capabilities / 6 surfaces (rebound 2026-08-08 from `1.7.0` / `sha256:b7691a81…`) | `PRESENT_PINNED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
+| Owner revisions | My-Chat / My-Workflow-Base | My-Chat `df7a273bff65b965da45e2e9604cee3b6b8fc20b` (`x5_joint_api` `30878ba3…`, `wave4_binding_host` `947b4857…`), Base `8a3ea9028d414813994a57ef3501ecad3dd7c434`, parity `8dd53be4…`, Nurture self-pin `c0f97aec…` (rebound 2026-08-08 per D-T009-04) | `PRESENT_PINNED` | 0C～0F, G4-F | any revision/source-pin/parity drift invalidates the affected branch evidence |
 | Care interaction | T-005 | exact `CareInteraction`/owner-read/direct-interaction contracts used by Institution consumers | `DEFINED_UNQUALIFIED` | 0C/0D, G4-C/F | provider/version/source lifecycle drift invalidates affected consumer qualification |
 | Care/media/publication | T-006 | exact care facts, activity attribution, Board and `PublishProcess` contracts | `DEFINED_UNQUALIFIED` | 0B/0D, G4-B/C/F | fact/schema/policy/source-head drift invalidates affected projections and release evidence |
 | Generic Workflow runtime | My-Workflow-Base / My-Chat | pinned Run/Step/worker/ledger/private-carrier contract | `DEFINED_UNQUALIFIED` | 0E, G4-D/F | carrier/runtime/interface drift invalidates Workflow integration evidence |

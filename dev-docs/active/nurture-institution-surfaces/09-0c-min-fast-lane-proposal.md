@@ -98,28 +98,28 @@ private lane into a public capability is precisely what `0C-min` proposes.
 5. **`t007_institution_workbench`** dependency gate is therefore unsatisfiable,
    which is why the surface's only legal state today is `unavailable`.
 
-## Mandatory prerequisite — rebind 0A
+## Prerequisite — 0A rebind (completed 2026-08-08)
 
-`07-g4-0a-inventory-record.md` and the `06-g4-0-freeze-ledger.md` 0A-1 row pin
-the T-004 baseline as `nurture.surface-contract@1.7.0` /
-`sha256:b7691a81…` at My-Chat `a019566` / Base `06303e9` / Nurture self-pin
-`b2c53eb7…`, marked `PRESENT_PINNED`.
+0A's exact-input table pinned inputs that the T-009 rotations superseded. The
+rebind is recorded in `07-g4-0a-inventory-record.md` ("Pin Rebind") with the
+0A-1 ledger rows updated; current inputs are `nurture.surface-contract@1.17.0`
+/ `sha256:d22851d9…` (shared core `sha256:7bd8a82d…`, 33 capabilities /
+6 surfaces), Nurture self-pin `c0f97aec…`, My-Chat `df7a273…`, Base
+`8a3ea90…`, parity `8dd53be4…`. This step was required whether or not
+`0C-min` is accepted; full 0C needs it too.
 
-Every one of those is superseded. Current exact inputs are:
+**The rebind changed one state, and that change affects this proposal.** The
+T-002 owner/source path moved from `PRESENT_PINNED` to `DEFINED_UNQUALIFIED`.
+The M5 handoff and the G1 Joint Conformance record were produced at My-Chat
+`a019566` / Base `06303e9` / self-pin `b2c53eb7…` — all three now rotated —
+and T-009's closing requalification re-ran neither the owner-integration lane
+nor the G1 joint fixtures. The T-002 G1 PASS is not revoked and remains exact
+at its own topology, but no 0C branch may inherit that record as current-pin
+evidence.
 
-| Input | Current identity |
-| --- | --- |
-| Surface contract | `nurture.surface-contract@1.17.0` / `sha256:d22851d98a55299fb4a90f4ff461f6dbeb7ed3f075669ffb19cccb93018acdf8` |
-| Shared core | `sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d` |
-| Nurture self-pin | `c0f97aec…` (185 files) |
-| My-Chat | `df7a273bff65b965da45e2e9604cee3b6b8fc20b` |
-| My-Workflow-Base | `8a3ea9028d414813994a57ef3501ecad3dd7c434` |
-| Base/My-Chat parity | `8dd53be4ba392c6eb254c462066d9c7e65b239bc79142911de4ef58faf3da34d` |
-
-The T-009 D-T009-04 rotation moved these; 0A cannot know that on its own.
-**No `0C-min` freeze record may be issued before 0A's exact-input table is
-rebound.** This step is required whether or not `0C-min` is accepted — full
-0C needs it too.
+For `0C-min` the consequence is that **I3 Owner Integration Readiness must
+re-establish the owner path at current pins rather than cite T-002's record**.
+That is real added cost, accounted for below, and full 0C carries it too.
 
 ## Proposed scope
 
@@ -179,7 +179,7 @@ lane:
 | I0 Design/Synthetic | admin predicate state machine, envelope shape, synthetic fixtures |
 | I1 Branch Freeze | the `0C-min` freeze record itself; opens lane implementation |
 | I2 Contract Boundary | capability/presenter/descriptor against the exact `1.18.0` digest |
-| I3 Owner Integration Readiness | pinned T-002/T-005 adapters on disposable PostgreSQL |
+| I3 Owner Integration Readiness | T-002 owner path **re-established at current pins** (not inherited) plus T-005 adapters, on disposable PostgreSQL |
 | I4 Joint Conformance | protected qualification through the formal NestJS ingress |
 
 Exit is a **branch Freeze PASS for the communication-review lane only**,
@@ -195,7 +195,8 @@ open T-008. Everything stays default-off behind the existing runtime flag.
 | The `0C-min` admin predicate forks from full 0C | Freeze it as the exact predicate 0C extends; widening it requires a 0C record, never a `0C-min` amendment |
 | Read authority drifts into action authority | Preserve `actions: []` / `action_authority: none`; the lane adds no command capability at all |
 | A half-built workbench reads as a broken product to My-Chat | The contract's own per-kind `unavailable` state carries this; My-Chat renders declared unavailability, not missing responses |
-| 0A's stale pins silently invalidate the record | Rebinding 0A is a hard prerequisite, listed above |
+| 0A's stale pins silently invalidate the record | Rebound 2026-08-08; the T-002 owner path is now correctly `DEFINED_UNQUALIFIED` instead of falsely `PRESENT_PINNED` |
+| I3 quietly inherits T-002's out-of-topology G1 evidence | The ledger row now denies it explicitly; I3 must re-establish the owner path at current pins |
 | Slice creep into 0D/0E facts | The no-migration constraint makes creep mechanically visible |
 
 ## Honest cost/benefit
@@ -212,25 +213,43 @@ What it does buy:
    blast radius.
 2. It gives My-Chat T-036 a real, versioned surface to design the workbench
    shell against, instead of a contract stub.
-3. It rebinds 0A to current pins as a required side effect, which full 0C
-   needs regardless.
+3. Scoping this slice forced the 0A rebind, which surfaced the stale T-002
+   owner-path evidence before any branch could silently inherit it. Full 0C
+   needed that rebind regardless; the finding is now banked for every option.
 
 What it costs: one contract rotation (`1.18.0`) and its requalification round,
-plus the freeze-record authoring. If the decision is instead to run full 0C
-directly, none of this work is wasted — `0C-min`'s predicate and envelope are
-the first two items of full 0C either way. The only real trade is whether to
-requalify twice.
+the freeze-record authoring, and — newly surfaced by the 0A rebind —
+re-establishing the T-002 owner path at current pins, since the G1 evidence no
+longer binds this topology.
+
+The owner-path re-establishment is the largest single cost and is **not**
+`0C-min`-specific: full 0C incurs the same work. That changes the shape of the
+trade. `0C-min` no longer sits far below full 0C on effort, because most of
+the delta is now shared owner-path work. What `0C-min` still saves is
+implementation and review surface, not gate cost.
+
+If the decision is to run full 0C directly, none of this analysis is wasted:
+`0C-min`'s predicate and envelope are the first two items of full 0C either
+way, and the owner-path finding applies unchanged. The real trade is whether
+to requalify twice in exchange for earlier end-to-end evidence on the
+narrowest possible lane.
 
 ## Decision requested
 
-One of:
+The 0A rebind is done, so all three options start from the same rebound
+inputs. One of:
 
-- **A — Accept `0C-min`.** Rebind 0A, then run the lane through I0→I4 to a
-  branch Freeze PASS at `1.18.0`.
-- **B — Reject and run full 0C.** Rebind 0A, then freeze the complete
-  Authority & Surface contract before any implementation. Longer to first
-  evidence, one requalification instead of two.
-- **C — Defer T-007 entirely.** Prioritize T-002 `C30-I0-C/D` or T-009
-  archival first; revisit after.
+- **A — Accept `0C-min`.** Run the lane through I0→I4 to a branch Freeze PASS
+  at `1.18.0`, re-establishing the T-002 owner path at I3.
+- **B — Reject and run full 0C.** Freeze the complete Authority & Surface
+  contract before any implementation. Longer to first evidence, one
+  requalification instead of two, same owner-path cost.
+- **C — Defer T-007 entirely.** Prioritize T-002 `C30-I0-C/D` — which would
+  also be the natural place to re-establish the owner path at current pins —
+  or T-009 archival first; revisit after.
+
+Note that option C has become more attractive than it looked before the
+rebind: the owner-path re-establishment that A and B both need is T-002's own
+work, and T-002 is already the task that owns `C30-I0-C/D`.
 
 No option is executed by this document.
