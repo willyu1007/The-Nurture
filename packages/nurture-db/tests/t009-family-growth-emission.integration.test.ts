@@ -322,8 +322,11 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
     expect(row?.family_growth).toEqual([
       { target_key: world.target.targetKey, state: "delivering" },
     ]);
+    const headsBefore = structuredClone(page.heads);
 
-    // A recorded receipt flips the display to its exact status.
+    // A recorded receipt flips the display to its exact status — and moves
+    // the queue source head, so a cursor from before the receipt cannot
+    // stitch pages across the change without a refresh signal.
     const [outboxRow] = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
       where: { workspaceId: world.workspaceId, kind: "released" },
     });
@@ -331,10 +334,30 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
       workspaceId: world.workspaceId,
       outboxEventId: outboxRow!.id,
       receiptId: "rcpt-queue-1",
+      status: "pending_guardian_confirmation",
+      admissionRef: "adm-1",
+      processedAt: new Date("2026-08-08T10:00:00.000Z"),
+      receiptPayload: {},
+    });
+    page = await list();
+    row = page.rows.find((entry) => entry.process_key === world.process.processKey);
+    expect(row?.family_growth).toEqual([
+      { target_key: world.target.targetKey, state: "pending_guardian_confirmation" },
+    ]);
+    expect(page.heads).not.toEqual(headsBefore);
+
+    // A later receipt for the same event (the guardian confirmed) wins the
+    // display deterministically, even at an identical createdAt millisecond
+    // (id is the tiebreaker), and moves the head again.
+    const headsMid = structuredClone(page.heads);
+    await new PrismaFamilyGrowthOutboxPort(prisma).recordReceipt({
+      workspaceId: world.workspaceId,
+      outboxEventId: outboxRow!.id,
+      receiptId: "rcpt-queue-2",
       status: "applied",
       admissionRef: "adm-1",
       materialRef: "mat-1",
-      processedAt: new Date(),
+      processedAt: new Date("2026-08-08T10:05:00.000Z"),
       receiptPayload: {},
     });
     page = await list();
@@ -342,6 +365,7 @@ describe("T-009 I6.2: the teacher queue projects family-growth states", () => {
     expect(row?.family_growth).toEqual([
       { target_key: world.target.targetKey, state: "applied" },
     ]);
+    expect(page.heads).not.toEqual(headsMid);
   });
 });
 

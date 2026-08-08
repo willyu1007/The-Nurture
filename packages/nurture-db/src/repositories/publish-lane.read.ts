@@ -224,6 +224,48 @@ export class PrismaPublishLaneReadPort
     // projection of the provider outbox and its recorded receipts. A settled
     // row without receipt evidence stays "delivering" — the queue never
     // claims a status no receipt proves.
+    //
+    // The queue-wide census below feeds the source head: a receipt landing
+    // (or a delivery-state transition the display can see) must move the
+    // head, or a cursor could stitch pages from different delivery worlds
+    // with no refresh signal. Buckets follow the display mapping — pending
+    // and delivering render identically, so a claim transition between them
+    // deliberately does not move the head.
+    const familyGrowthScope = {
+      workspaceId: input.workspace_id,
+      kind: "released" as const,
+      publicationRelease: {
+        publishProcess: {
+          workspaceId: input.workspace_id,
+          careGroupId: reach.care_group_id,
+          dataClass: { in: [...PUBLISHABLE_DATA_CLASSES] },
+        },
+      },
+    };
+    const [familyGrowthStates, familyGrowthReceipts] = await Promise.all([
+      this.prisma.nurtureFamilyGrowthOutboxEvent.groupBy({
+        by: ["deliveryState"],
+        where: familyGrowthScope,
+        _count: { _all: true },
+      }),
+      this.prisma.nurtureFamilyGrowthAdmissionReceipt.aggregate({
+        where: { workspaceId: input.workspace_id, outboxEvent: familyGrowthScope },
+        _count: { _all: true },
+        _max: { createdAt: true },
+      }),
+    ]);
+    const familyGrowthCount = (states: string[]): number =>
+      familyGrowthStates
+        .filter((row) => states.includes(row.deliveryState))
+        .reduce((sum, row) => sum + row._count._all, 0);
+    const familyGrowthHeadFacts: Array<string | number | null> = [
+      familyGrowthCount(["pending", "delivering"]),
+      familyGrowthCount(["outcome_unknown"]),
+      familyGrowthCount(["delivered", "failed"]),
+      familyGrowthReceipts._count._all,
+      familyGrowthReceipts._max.createdAt?.toISOString() ?? null,
+    ];
+
     const pageKeys = page.map((row) => row.process_key);
     if (pageKeys.length > 0) {
       const outboxEvents = await this.prisma.nurtureFamilyGrowthOutboxEvent.findMany({
@@ -246,7 +288,10 @@ export class PrismaPublishLaneReadPort
             },
           },
           receipts: {
-            orderBy: { createdAt: "desc" },
+            // The consumer's processing instant is the meaningful order (a
+            // guardian confirmation post-dates the pending receipt it
+            // resolves); createdAt/id only break exact ties deterministically.
+            orderBy: [{ processedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
             take: 1,
             select: { status: true },
           },
@@ -287,7 +332,12 @@ export class PrismaPublishLaneReadPort
           // page size did, which is not a change in the source.
           ...sourceHeadPair(
             "publish_queue",
-            [reach.care_group_id, queueCensus.count, queueCensus.newest],
+            [
+              reach.care_group_id,
+              queueCensus.count,
+              queueCensus.newest,
+              ...familyGrowthHeadFacts,
+            ],
             censusOf(grants),
           ),
         },
