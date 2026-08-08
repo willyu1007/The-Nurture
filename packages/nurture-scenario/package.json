@@ -29,11 +29,9 @@
   },
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "generate:manifest": "node ../../scripts/generate-nurture-scenario-manifest.mjs",
-    "check:manifest": "node ../../scripts/generate-nurture-scenario-manifest.mjs --check",
-    "build": "pnpm run check:manifest && pnpm run clean && tsc -p tsconfig.build.json",
-    "typecheck": "pnpm run check:manifest && tsc --noEmit -p tsconfig.json",
-    "test": "vitest run --root ../.."
+    "build": "pnpm run clean && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
   },
   "dependencies": {
     "@my-chat/workflow-contracts": "0.1.0"

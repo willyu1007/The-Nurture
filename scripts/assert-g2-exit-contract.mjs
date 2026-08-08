@@ -246,13 +246,8 @@ for (const variable of [
 const scenarioModule = read("packages/nurture-scenario/src/module.ts");
 assertIncludes(
   scenarioModule,
-  "export const nurtureScenarioModule: WorkflowScenarioModule = {",
-  "canonical default-off scenario module",
-);
-assertTruthy(
-  !scenarioModule.includes("createNurtureActivationScenarioModule") &&
-    !scenarioModule.includes("nurturePreActivationScenarioModule"),
-  "C30-I3 removes activation/pre-activation module aliases",
+  "export const nurtureScenarioModule = nurturePreActivationScenarioModule;",
+  "default scenario module pre-activation alias",
 );
 
 const migration = read(

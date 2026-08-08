@@ -11,6 +11,7 @@ import {
   familyCareRef,
   hashCommandRequestId,
   makeCaptureFamilyInput,
+  nurturePreActivationScenarioManifest,
   nurtureScenarioManifest,
   type FamilyCareCurrentGrant,
   type FamilyInputRouteFacts,
@@ -323,21 +324,26 @@ describe("claimed-Step family input workflow handler", () => {
     expect(harness.routeEffects).toBe(0);
   });
 
-  it("keeps the legacy family-input path explicitly disabled in the canonical manifest", () => {
+  it("keeps pre-activation unreachable while the canonical activation manifest declares it", () => {
     const harness = makeHarness();
     const handlers = createNurtureHandlers(harness.deps);
-    const handlerKeys = nurtureScenarioManifest.capabilities.flatMap((capability) =>
+    const preActivationHandlerKeys = nurturePreActivationScenarioManifest.capabilities.flatMap((capability) =>
       capability.entrypoints.flatMap((entrypoint) =>
         entrypoint.steps.map((step) => step.handler_key),
       ),
     );
-    const familyInbox = nurtureScenarioManifest.capabilities.find(
-      (capability) => capability.capability_key === "class_family_inbox",
+    const activationHandlerKeys = nurtureScenarioManifest.capabilities.flatMap((capability) =>
+      capability.entrypoints.flatMap((entrypoint) =>
+        entrypoint.steps.map((step) => step.handler_key),
+      ),
     );
 
     expect(handlers["nurture.capture_family_input"]).toBeTypeOf("function");
-    expect(handlerKeys).toContain("nurture.capture_family_input");
-    expect(familyInbox?.enablement_policy).toBe("disabled");
+    expect(preActivationHandlerKeys).not.toContain("nurture.capture_family_input");
+    expect(nurturePreActivationScenarioManifest.handoffs).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ handoff_key: "user_attention" })]),
+    );
+    expect(activationHandlerKeys).toContain("nurture.capture_family_input");
     expect(nurtureScenarioManifest.handoffs).toEqual(
       expect.arrayContaining([expect.objectContaining({ handoff_key: "user_attention" })]),
     );

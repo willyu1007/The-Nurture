@@ -625,7 +625,7 @@ refreshed pin/source hashes, and native CI pass. Formal joint owner/PR adoption
 review remains. The resulting revision is not a C30 component candidate,
 qualified Pilot artifact, applied migration, or release approval.
 
-## C30-I0 — Implementation baseline isolation（已完成）
+## C30-I0 — Implementation baseline isolation（进行中）
 
 `C30-I0` 只建立可归属、可回放、不可变的实施入口，不实现 C30-I1
 合同，也不修改 schema/runtime/database/gate。详细证据见
@@ -635,169 +635,12 @@ qualified Pilot artifact, applied migration, or release approval.
 | --- | --- | --- |
 | `C30-I0-A` 三仓/worktree/依赖/schema/gate census | Complete | 精确 revision、dirty ownership、重叠路径、migration/source/gate 和验证状态已记录。 |
 | `C30-I0-B` T-029 donor disposition | Complete | `artifacts/13-c30-i0-b-t029-disposition.md` 覆盖 Base 57、My-Chat 79、Nurture 40 个候选文件；无文件可原样合并，可抽取机制全部标为 `REWORK`，直接平台 ref、umbrella source、双 manifest/Execution track 和跨节点混合迁移均已排除。 |
-| `C30-I0-C` scoped commits and clean worktrees | Complete | Exact isolated branches exist at Base `20c4b7a…` and My-Chat `dc4a77b…`; the Nurture branch was created from runtime checkpoint `882d80f…` and may advance only through T-002 evidence documentation. Historical X5/Q4B5/T-029/T-027/Claude worktrees are clean and retained under their owners; the dirty My-Chat primary `next-env.d.ts` is excluded and untouched. |
-| `C30-I0-D` immutable pins and false/empty proof | Complete | Base verifier rejects symbolic revisions, mutable package-path joint candidates, checkout drift and symlink-entry no-ops. Exact three-Git pins/source hashes, repository false/empty census, Base conformance, My-Chat type/lint/unit/schema and Nurture type/lint/unit/static/schema populations pass in the isolated topology. |
+| `C30-I0-C` scoped commits and clean worktrees | Partial: Nurture complete | Nurture has one clean local/remote `main` at `ab92fde`; T-002/T-003/environment work is committed and stale donors are removed. Base and My-Chat still have auxiliary branches/worktrees that require separate owner-scoped disposition before a clean C30 worktree starts. |
+| `C30-I0-D` immutable pins and false/empty proof | Pending | 可变 local path 不再作为 evidence；clean-install verifier、exact revision/source pins、C-3 gate false/empty 和 canonical baseline suite 全绿。 |
 
-`C30-I0-A/B/C/D` 现已全部完成；`C30-I1` 已按独立小片推进到 I1-A～I1-F
-验收。I1-F 的 F1-F4 已按顺序闭环，C30-I2 范围已经冻结，下一步仅可另行授权 I2-A。数据库 apply、环境 row census、
-capability/Workspace activation、artifact/cloud/secret/traffic 仍需各自的单独授权。
-
-Current execution record:
-[`artifacts/14-c30-i0-cd-baseline-record.md`](./artifacts/14-c30-i0-cd-baseline-record.md).
-
-## C30-I1 — Neutral shared contracts（I1-A～I1-F 已验收）
-
-The complete Base gate remains cumulative, but execution is ordered into six
-reviewable slices so one broad contract change cannot silently mix authorities:
-
-| Slice | State | Boundary |
-| --- | --- | --- |
-| `C30-I1-A` trusted invocation contract spine | Accepted | Base `ce7118c…` plus source lock `bd69d19…`; principal, ingress and private envelope types/codecs/Schemas/fixtures only. |
-| `C30-I1-B` canonical-object binding envelope | Accepted | B1-B3 source `edbcd74…` plus B4 lock `9a15865…`; cumulative Schema/codec/exposure/build/conformance and exact source hash `16be693c…2512` pass. No consumer adoption. |
-| `C30-I1-C` subject presentation | Accepted | Successor source `ae0c357…` plus lock `3c30337…`; R1-R6 and repeated Schema/codec/exposure/build/conformance pass at hash `fc35c6b…e5cf3`. No consumer adoption. |
-| `C30-I1-D` domain action | Reaccepted | Artifact 35 closes D-R1..D-R5 at source `3580a9b…` plus metadata lock `1cb5691…`; 55 Schemas, 296 Node tests and deterministic build/source evidence pass. Manifest dependency/source convergence remains I1-F. |
-| `C30-I1-E` protected interaction | Reaccepted | Artifact 43 closes E-R1..E-R4 at source `48fd3d6…` plus metadata lock `9abde2b…`; 66 Schemas, 376 Node tests and deterministic build/source evidence pass. The artifact-41 chain is historical. |
-| `C30-I1-F` dependency/source convergence | Reaccepted | Artifact 50 closes F-R1..F-R4 at source `15ff031…` plus metadata lock `4350086…`; 66 Schemas, 441 Node tests and deterministic contract/runtime/Scenario build plus source-manifest evidence pass. Artifact 48 is historical. |
-
-I1-A's exact wire names, fields, validation rules, file-impact preview, acceptance
-criteria and non-goals are frozen in
-[`artifacts/15-c30-i1-scope-freeze.md`](./artifacts/15-c30-i1-scope-freeze.md).
-I1-B's exposure classes, wire families, validation/fixture matrix, impact preview
-and four ordered implementation units are frozen in
-[`artifacts/16-c30-i1-b-scope-freeze.md`](./artifacts/16-c30-i1-b-scope-freeze.md).
-The exact I1-B1 source and verification checkpoint is recorded in
-[`artifacts/17-c30-i1-b1-implementation-record.md`](./artifacts/17-c30-i1-b1-implementation-record.md).
-The exact I1-B2 source and verification checkpoint is recorded in
-[`artifacts/18-c30-i1-b2-implementation-record.md`](./artifacts/18-c30-i1-b2-implementation-record.md).
-The exact I1-B3 source and verification checkpoint is recorded in
-[`artifacts/19-c30-i1-b3-implementation-record.md`](./artifacts/19-c30-i1-b3-implementation-record.md).
-The cumulative I1-B4 qualification and exact source-lock checkpoint is recorded in
-[`artifacts/20-c30-i1-b4-qualification-record.md`](./artifacts/20-c30-i1-b4-qualification-record.md).
-I1-C's exact provider/presentation wires, bounds, validation matrix, donor
-disposition, Base impact and four ordered implementation units are frozen in
-[`artifacts/21-c30-i1-c-scope-freeze.md`](./artifacts/21-c30-i1-c-scope-freeze.md).
-The exact I1-C1 source and local verification checkpoint is recorded in
-[`artifacts/22-c30-i1-c1-implementation-record.md`](./artifacts/22-c30-i1-c1-implementation-record.md).
-The exact I1-C2 source and local verification checkpoint is recorded in
-[`artifacts/23-c30-i1-c2-implementation-record.md`](./artifacts/23-c30-i1-c2-implementation-record.md).
-The exact I1-C3 source and local verification checkpoint is recorded in
-[`artifacts/24-c30-i1-c3-implementation-record.md`](./artifacts/24-c30-i1-c3-implementation-record.md).
-The cumulative I1-C4 qualification and exact source-lock checkpoint is recorded in
-[`artifacts/25-c30-i1-c4-qualification-record.md`](./artifacts/25-c30-i1-c4-qualification-record.md).
-Its quality-review reopening and bounded successor-repair scope are recorded in
-[`artifacts/26-c30-i1-c4-quality-repair-freeze.md`](./artifacts/26-c30-i1-c4-quality-repair-freeze.md).
-The successor repair qualification and source-lock checkpoint are recorded in
-[`artifacts/27-c30-i1-c4-quality-repair-qualification-record.md`](./artifacts/27-c30-i1-c4-quality-repair-qualification-record.md).
-I1-D's exact standalone action contract, exposure zones, prepare/submit and
-assurance wires, direct/claimed identity/result/recovery rules, bounds, negatives
-and five ordered implementation units are frozen in
-[`artifacts/28-c30-i1-d-scope-freeze.md`](./artifacts/28-c30-i1-d-scope-freeze.md).
-The four source checkpoints are recorded in artifacts
-[`29`](./artifacts/29-c30-i1-d1-implementation-record.md),
-[`30`](./artifacts/30-c30-i1-d2-implementation-record.md),
-[`31`](./artifacts/31-c30-i1-d3-implementation-record.md) and
-[`32`](./artifacts/32-c30-i1-d4-implementation-record.md). The cumulative quality
-review, exact source and metadata lock are recorded in
-[`artifact 33`](./artifacts/33-c30-i1-d5-qualification-record.md).
-Its acceptance reopening and bounded successor-repair scope are recorded in
-[`artifact 34`](./artifacts/34-c30-i1-d5-quality-repair-freeze.md).
-The successor repair qualification and source-lock checkpoint are recorded in
-[`artifact 35`](./artifacts/35-c30-i1-d5-successor-quality-repair-qualification-record.md).
-I1-E's dedicated carrier/body-free control split, exact wire families, exposure
-zones, content/lease bounds, lifecycle composition, no-copy negatives, zero-direct-
-merge donor disposition and five ordered implementation units were frozen in
-[`artifact 36`](./artifacts/36-c30-i1-e-scope-freeze.md). E1-E4 source checkpoints
-are recorded in artifacts [`37`](./artifacts/37-c30-i1-e1-implementation-record.md),
-[`38`](./artifacts/38-c30-i1-e2-implementation-record.md),
-[`39`](./artifacts/39-c30-i1-e3-implementation-record.md) and
-[`40`](./artifacts/40-c30-i1-e4-implementation-record.md). The cumulative quality
-review, exact source and metadata lock are recorded in
-[`artifact 41`](./artifacts/41-c30-i1-e5-qualification-record.md). Its acceptance
-reopening and bounded successor-repair scope are recorded in
-[`artifact 42`](./artifacts/42-c30-i1-e5-quality-repair-freeze.md). Artifact 41 is
-historical. The successor repair qualification and source-lock checkpoint are
-recorded in [`artifact 43`](./artifacts/43-c30-i1-e5-successor-quality-repair-qualification-record.md).
-I1-E is reaccepted. I1-F dependency/source convergence and ordered F1-F4 gates
-were frozen in [`artifact 44`](./artifacts/44-c30-i1-f-scope-freeze.md).
-Artifacts [`45`](./artifacts/45-c30-i1-f1-dependency-graph-implementation-record.md),
-[`46`](./artifacts/46-c30-i1-f2-interface-convergence-implementation-record.md),
-[`47`](./artifacts/47-c30-i1-f3-action-protected-convergence-implementation-record.md)
-and [`48`](./artifacts/48-c30-i1-f4-cumulative-qualification-record.md) record the
-historical implementation and Base handoff. Artifact
-[`49`](./artifacts/49-c30-i1-f4-quality-repair-freeze.md) reopens acceptance and
-freezes the authorized successor repair. Artifact
-[`50`](./artifacts/50-c30-i1-f4-successor-quality-repair-qualification-record.md)
-closes all four findings and reaccepts cumulative C30-I1. C30-I2 scope and its
-ordered I2-A..G implementation gates were frozen in
-[`artifact 51`](./artifacts/51-c30-i2-scope-freeze.md); the complete default-off
-Host adoption is accepted in
-[`artifact 52`](./artifacts/52-c30-i2-default-off-acceptance-record.md). C30-I3
-scope, ownership, exact two-capability production prefix and ordered I3-A..G
-implementation gates are frozen in
-[`artifact 53`](./artifacts/53-c30-i3-scope-freeze.md). Every I3 implementation
-unit is now complete under the successor qualification described below; I4
-implementation and every operational action remain separately closed.
-
-## C30-I2 — Generic My-Chat Host adoption（已验收，default-off）
-
-The cumulative I2 exit remains one default-off Host adoption, but implementation
-is split into seven reviewable units:
-
-| Unit | State | Boundary |
-| --- | --- | --- |
-| `C30-I2-A` adoption preflight/exact Base import | Accepted | My-Chat T-035 adopted exact I1-A..F TypeScript/Schemas/validator and sealed its downstream source lock. |
-| `C30-I2-B` trusted ingress/signer/nonce | Accepted | Public interactive and durable Run-actor translation plus detached outbound signer, inbound/response verifier and Host-private atomic nonce pass default-off qualification. |
-| `C30-I2-C` canonical pair owner | Accepted | Atomic Child/Family binding, current evidence and writer-fenced three-state recovery pass against a fresh disposable database. |
-| `C30-I2-D` subject/presentation registry | Accepted | Exact provider/presenter/surface registry, renderer, navigation and prepare-only action offers pass. |
-| `C30-I2-E` generic actions | Accepted | Exact direct-empty and claimed-original-Step prepare/submit/recovery orchestration passes. |
-| `C30-I2-F` protected Host runtime | Accepted | Dedicated transient carrier, composer/read foreground lifecycle and recursive leakage/cache/offline controls pass. |
-| `C30-I2-G` default-off convergence | Accepted | Exact manifest/registry/source convergence, no legacy fallback and cumulative qualification pass; all capabilities remain absent/off. |
-
-The My-Chat implementation did not reuse its archived local `T-002
-content-events` identity. Project orchestration assigned T-035 and cross-linked
-it to Nurture T-002 before source changes; all I2 commits use the corrected local
-task identity.
-
-Artifact 51 remains normative for ownership, signer/nonce order, pair-binding and
-recovery semantics, presentation/action/protected runtime, donor disposition,
-database boundary, acceptance and NO-GO. Artifact 52 records the exact accepted
-implementation and qualification. Its current handoff is the remediated My-Chat
-runtime `658b897…`, replacement lock `6725dc6…`, aggregate
-`8172e370…10a5ad` and archive `cd7bbc2…`; the first I2-G lock is historical.
-The successful I2 exit opened the now-completed I3 scope review; it did not
-authorize Nurture adoption, joint conformance, C31-C35, T-008, deployment,
-activation or Pilot.
-
-## C30-I3 — Nurture Scenario-owner adoption（已闭环，default-off）
-
-Artifact 53 is normative. C30-I3 remains one cumulative default-off owner
-adoption, decomposed into seven ordered units:
-
-| Unit | State | Boundary |
-| --- | --- | --- |
-| `C30-I3-A` exact adoption/canonical manifest | Accepted | Exact Base/My-Chat lock plus one YAML-generated production module using the valid trusted+presentation prefix. Artifact 54 records source `3b7e2a6…`, self-verifying lock source `0f1d456…` and aggregate `a8453249…69fc`. |
-| `C30-I3-B` private trust/Participant binding | Accepted | Artifact 55 pins source `b8974bf…`, exact detached trust/nonce/response and identity-separated current Participant authority. |
-| `C30-I3-C` pair anchors/local association | Accepted | Artifact 56 pins source `bf3fee8…`, the additive migration, atomic local association and writer-fenced recovery on the isolated disposable DB. |
-| `C30-I3-D` subject/presentation | Accepted | Artifact 57 pins current owner-resolved `NurtureChildCareProcess`, sealed locators and the safe six-block action-free baseline. |
-| `C30-I3-E` canonical action runtime | Accepted | Artifact 58 pins the fixture-only direct/claimed runner, typed Execution provenance, atomic effect/audit/outbox transaction and writer-fenced recovery; production actions remain absent. |
-| `C30-I3-F` protected owner lifecycle | Reaccepted after repair | Artifact 59 is historical. Artifact 61 pins durable `provisioning|erasing` KMS coordination outside DB transactions, final current-authority reread, owner-derived foreground binding, retention/tombstone/crypto-erasure, restored-snapshot denial and recursive no-copy. |
-| `C30-I3-G` convergence/qualification | Reaccepted after repair | Artifact 60 is historical. Artifact 61 pins successor source `48530be…`, lock `7db3129…`, aggregate `623da6fd…95d5`, fresh 21-migration DB qualification, unchanged zero-positive census and destroyed 55440 target. |
-
-The production I3 manifest deliberately stops at the Base-permitted
-dependency-complete `trusted_scenario_invocation_v1 +
-scenario_subject_presentation_v1` prefix with no action offers. Generic action
-and protected owner primitives are implemented and fixture-qualified in I3, but
-the first real action/protected declaration remains C31. Placeholder actions,
-legacy `capture_family_input` aliases and premature
-`submit_family_care_question` adoption are forbidden.
-
-The user authorized ordered I3-A..G implementation. I3-A through I3-G are
-reaccepted default-off by
-[`artifact 61`](./artifacts/61-c30-i3-successor-quality-repair-qualification-record.md),
-which supersedes artifacts 59 and 60 for current implementation and cumulative
-qualification claims. Only a separately authorized I4 scope review is eligible.
-I4 implementation, C31-C35, T-008,
-deployment, activation, Pilot and traffic remain closed.
+`C30-I1` 仅在 I0-B/C/D 全部完成后进入 `in_progress`。数据库 apply、
+环境 row census、capability/Workspace activation、artifact/cloud/secret/traffic
+仍需各自的单独授权。
 
 ---
 

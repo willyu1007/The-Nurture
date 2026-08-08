@@ -14,12 +14,7 @@ const ap = nurtureScenarioManifest.artifact_policy;
 const handoffsByType = new Map(
   nurtureScenarioManifest.handoffs
     .filter((handoff) => handoff.materialization_mode === undefined)
-    .map((handoff) => [
-      handoff.policy_key === "nurture.can_create_knowledge_candidate_handoff"
-        ? "knowledge_candidate"
-        : handoff.handoff_type,
-      handoff,
-    ]),
+    .map((handoff) => [handoff.handoff_type, handoff]),
 );
 const HANDOFF_BUCKET: Record<string, string> = { public_draft: "public_draft", knowledge_candidate: "indexing", notification: "notification" };
 const EXTERNALIZING = new Set(["public_draft", "knowledge_candidate"]);

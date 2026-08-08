@@ -1,4 +1,4 @@
-manifest_version: 2
+manifest_version: 1
 scenario_key: nurture
 scenario_record:
   display_name: The Nurture
@@ -6,50 +6,17 @@ scenario_record:
   owner_team: the-nurture
   policy_version: 1
 owner: the-nurture
-contract:
-  base_contract_version: 1.0.0
-  host_sdk_version: 1.0.0
-  host_abi_range: ^1.0.0
-  source_hash: d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383
-step_type_registry:
-  - step_type: nurture.context_binding
-    runtime_kind: scenario_action
-    owner: scenario
-  - step_type: nurture.domain_action
-    runtime_kind: scenario_action
-    owner: scenario
-  - step_type: nurture.safety_gate
-    runtime_kind: scenario_action
-    owner: scenario
-    policy_flags:
-      - policy_gate
-  - step_type: nurture.approval
-    runtime_kind: human_gate
-    owner: scenario
-    policy_flags:
-      - policy_gate
-  - step_type: nurture.artifact_write
-    runtime_kind: artifact_write
-    owner: scenario
-  - step_type: nurture.handoff
-    runtime_kind: event_emit
-    owner: scenario
-owner_integration:
-  command_contract: scenario-command-envelope-v1
-  event_contract: scenario-event-envelope-v1
-  receipt_contract: scenario-command-receipt-v1
-  status_lookup_required: true
-  auth_mode: service_authenticated
 launch_phase: dev
 allowed_user_classes:
-  - teacher
-  - admin
+  - my_chat_member
+  - family_guardian
+  - internal_admin
 
 capabilities:
   - capability_key: pregnancy_stage_management
     label: Pregnancy stage management
     description: Support expectant mothers with stage-aware preparation, evidence capture, and non-medical safety prompts.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: create_pregnancy_stage_plan
         label: Create pregnancy stage plan
@@ -58,35 +25,29 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.context_binding
-          - nurture.domain_action
-          - nurture.safety_gate
-          - nurture.artifact_write
+          - context_binding
+          - domain_action
+          - safety_gate
+          - artifact_write
         steps:
           - step_key: collect_context
-            step_type: nurture.context_binding
-            runtime_kind: scenario_action
+            step_type: context_binding
             order: 10
             handler_key: nurture.collect_context
             retry_policy: none
           - step_key: evaluate_pregnancy_stage
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 20
             handler_key: nurture.evaluate_pregnancy_stage
             retry_policy: bounded_exponential
             timeout_ms: 30000
           - step_key: apply_medical_safety_gate
-            step_type: nurture.safety_gate
-            runtime_kind: scenario_action
-            policy_flags:
-              - policy_gate
+            step_type: safety_gate
             order: 30
             handler_key: nurture.apply_medical_safety_gate
             retry_policy: none
           - step_key: write_artifact
-            step_type: nurture.artifact_write
-            runtime_kind: artifact_write
+            step_type: artifact_write
             order: 40
             handler_key: nurture.write_artifact
             retry_policy: bounded_exponential
@@ -94,7 +55,7 @@ capabilities:
   - capability_key: family_strategy
     label: Family strategy and long-term goals
     description: Convert parenting values, child development constraints, and family resources into a reviewable strategy workflow.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: calibrate_family_strategy
         label: Calibrate family strategy
@@ -103,34 +64,28 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.context_binding
-          - nurture.domain_action
-          - nurture.approval
-          - nurture.artifact_write
+          - context_binding
+          - domain_action
+          - approval
+          - artifact_write
         steps:
           - step_key: collect_context
-            step_type: nurture.context_binding
-            runtime_kind: scenario_action
+            step_type: context_binding
             order: 10
             handler_key: nurture.collect_context
             retry_policy: none
           - step_key: calibrate_family_strategy
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 20
             handler_key: nurture.calibrate_family_strategy
             retry_policy: bounded_exponential
           - step_key: request_approval
-            step_type: nurture.approval
-            runtime_kind: human_gate
-            policy_flags:
-              - policy_gate
+            step_type: approval
             order: 30
             handler_key: nurture.request_approval
             retry_policy: none
           - step_key: write_artifact
-            step_type: nurture.artifact_write
-            runtime_kind: artifact_write
+            step_type: artifact_write
             order: 40
             handler_key: nurture.write_artifact
             retry_policy: bounded_exponential
@@ -138,7 +93,7 @@ capabilities:
   - capability_key: care_plan
     label: Short-term care plan
     description: Build week-level or month-level care plans connected to child, parent, family, and health-state context refs.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: generate_short_term_plan
         label: Generate short-term care plan
@@ -147,34 +102,28 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.context_binding
-          - nurture.domain_action
-          - nurture.safety_gate
-          - nurture.artifact_write
+          - context_binding
+          - domain_action
+          - safety_gate
+          - artifact_write
         steps:
           - step_key: collect_context
-            step_type: nurture.context_binding
-            runtime_kind: scenario_action
+            step_type: context_binding
             order: 10
             handler_key: nurture.collect_context
             retry_policy: none
           - step_key: generate_care_plan
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 20
             handler_key: nurture.generate_care_plan
             retry_policy: bounded_exponential
           - step_key: apply_medical_safety_gate
-            step_type: nurture.safety_gate
-            runtime_kind: scenario_action
-            policy_flags:
-              - policy_gate
+            step_type: safety_gate
             order: 30
             handler_key: nurture.apply_medical_safety_gate
             retry_policy: none
           - step_key: write_artifact
-            step_type: nurture.artifact_write
-            runtime_kind: artifact_write
+            step_type: artifact_write
             order: 40
             handler_key: nurture.write_artifact
             retry_policy: bounded_exponential
@@ -182,7 +131,7 @@ capabilities:
   - capability_key: activity_comparison
     label: Activity comparison and modeling
     description: Compare parenting, education, growth, and family activities against goals, constraints, cost, burden, and evidence.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: compare_activity_options
         label: Compare activity options
@@ -191,34 +140,28 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.context_binding
-          - nurture.domain_action
-          - nurture.approval
-          - nurture.artifact_write
+          - context_binding
+          - domain_action
+          - approval
+          - artifact_write
         steps:
           - step_key: collect_context
-            step_type: nurture.context_binding
-            runtime_kind: scenario_action
+            step_type: context_binding
             order: 10
             handler_key: nurture.collect_context
             retry_policy: none
           - step_key: compare_activities
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 20
             handler_key: nurture.compare_activities
             retry_policy: bounded_exponential
           - step_key: request_approval
-            step_type: nurture.approval
-            runtime_kind: human_gate
-            policy_flags:
-              - policy_gate
+            step_type: approval
             order: 30
             handler_key: nurture.request_approval
             retry_policy: none
           - step_key: write_artifact
-            step_type: nurture.artifact_write
-            runtime_kind: artifact_write
+            step_type: artifact_write
             order: 40
             handler_key: nurture.write_artifact
             retry_policy: bounded_exponential
@@ -226,7 +169,7 @@ capabilities:
   - capability_key: execution_review
     label: Execution review and learning
     description: Capture evidence, review outcomes, update scenario-local profile projections, and request handoffs when outputs are publishable.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: record_execution_review
         label: Record execution review
@@ -235,32 +178,28 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.context_binding
-          - nurture.domain_action
-          - nurture.artifact_write
-          - nurture.handoff
+          - context_binding
+          - domain_action
+          - artifact_write
+          - handoff
         steps:
           - step_key: collect_context
-            step_type: nurture.context_binding
-            runtime_kind: scenario_action
+            step_type: context_binding
             order: 10
             handler_key: nurture.collect_context
             retry_policy: none
           - step_key: record_review
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 20
             handler_key: nurture.record_review
             retry_policy: bounded_exponential
           - step_key: write_artifact
-            step_type: nurture.artifact_write
-            runtime_kind: artifact_write
+            step_type: artifact_write
             order: 30
             handler_key: nurture.write_artifact
             retry_policy: bounded_exponential
           - step_key: request_handoff
-            step_type: nurture.handoff
-            runtime_kind: event_emit
+            step_type: handoff
             order: 40
             handler_key: nurture.request_handoff
             retry_policy: none
@@ -268,7 +207,7 @@ capabilities:
   - capability_key: class_family_inbox
     label: Class family inbox
     description: Resolve the current caregiver scope and open the current class-level family-care work collection.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: open_class_family_inbox
         label: Open class family inbox
@@ -277,11 +216,10 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.domain_action
+          - domain_action
         steps:
           - step_key: open_class_family_inbox
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 10
             handler_key: nurture.open_class_family_inbox
             retry_policy: bounded_exponential
@@ -292,11 +230,10 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.domain_action
+          - domain_action
         steps:
           - step_key: capture_family_input
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 10
             handler_key: nurture.capture_family_input
             retry_policy: bounded_exponential
@@ -304,7 +241,7 @@ capabilities:
   - capability_key: teacher_attention_board
     label: Teacher attention board
     description: Resolve the current caregiver scope and open the current teacher attention collection.
-    enablement_policy: disabled
+    enablement_policy: workspace_enabled
     entrypoints:
       - entrypoint_key: open_today_attention_board
         label: Open today's attention board
@@ -313,11 +250,10 @@ capabilities:
         input_schema_version: 1
         output_schema_version: 1
         allowed_step_types:
-          - nurture.domain_action
+          - domain_action
         steps:
           - step_key: open_today_attention_board
-            step_type: nurture.domain_action
-            runtime_kind: scenario_action
+            step_type: domain_action
             order: 10
             handler_key: nurture.open_today_attention_board
             retry_policy: bounded_exponential
@@ -493,7 +429,7 @@ handoffs:
     downstream_owner: my_chat.forum
     policy_key: nurture.can_create_public_draft_handoff
     receipt_required: true
-  - handoff_type: indexing
+  - handoff_type: knowledge_candidate
     source_artifact_types:
       - family_strategy_summary
       - activity_comparison_summary
@@ -550,7 +486,7 @@ surface_mapping:
     handoff_type: public_draft
     downstream_owner: my_chat.forum
   rag_knowledge:
-    handoff_type: indexing
+    handoff_type: knowledge_candidate
     downstream_owner: my_chat.knowledge_base
   notification_push:
     handoff_type: notification
@@ -711,86 +647,3 @@ verification:
     - activity comparison happy path
     - medical safety escalation path
   journey_harness: nurture-p0-first-journey
-
-scenario_contracts:
-  scenario_contracts_version: 1
-  source_dependencies:
-    - source_identity: platform_child_family_identity_source_v1
-      source_hash: 81d9fb9db244b8e56bc85e8770eb13915ca87b6053bb3411420b569d59d8fed4
-    - source_identity: scenario_interface_source_v1
-      source_hash: 37f0cdae3ad8807073dd250a51f4de990dcccf40952c127b2340161db2e28eaf
-  capability_dependencies:
-    - capability_key: trusted_scenario_invocation_v1
-      requires_capabilities: []
-      requires_sources:
-        - scenario_interface_source_v1
-    - capability_key: scenario_subject_presentation_v1
-      requires_capabilities:
-        - trusted_scenario_invocation_v1
-      requires_sources:
-        - platform_child_family_identity_source_v1
-        - scenario_interface_source_v1
-  trusted_invocation:
-    trusted_invocation_version: 1
-    invocation_contract: scenario-private-invocation-v1
-    operations:
-      - endpoint_key: nurture.subject_context.list
-        method: POST
-        operation_key: list_subject_contexts
-        input_schema_key: nurture.list_subject_contexts.input
-        input_schema_version: 1
-        handler_key: nurture.c30.list_subject_contexts.transport
-        ingress:
-          - ingress_category: host_transition
-            ingress_key: nurture.subject_context.list
-            principal_origins:
-              - interactive_session
-      - endpoint_key: nurture.subject_context.resolve
-        method: POST
-        operation_key: resolve_subject_context
-        input_schema_key: nurture.resolve_subject_context.input
-        input_schema_version: 1
-        handler_key: nurture.c30.resolve_subject_context.transport
-        ingress:
-          - ingress_category: host_transition
-            ingress_key: nurture.subject_context.resolve
-            principal_origins:
-              - interactive_session
-      - endpoint_key: nurture.subject_context.present
-        method: POST
-        operation_key: present_subject_context
-        input_schema_key: nurture.present_subject_context.input
-        input_schema_version: 1
-        handler_key: nurture.c30.present_subject_context.transport
-        ingress:
-          - ingress_category: product_surface
-            ingress_key: nurture.child_care_process_overview_v1
-            principal_origins:
-              - interactive_session
-  subject_context_providers:
-    - provider_key: nurture.child_care_process_v1
-      provider_version: 1
-      list_operation_key: list_subject_contexts
-      resolve_operation_key: resolve_subject_context
-      handler_key: nurture.c30.child_care_process.provider
-  semantic_presentations:
-    - presentation_key: nurture.child_care_process_overview_v1
-      presentation_version: 1
-      provider_key: nurture.child_care_process_v1
-      operation_key: present_subject_context
-      handler_key: nurture.c30.child_care_process_overview.presenter
-      safe_reason_codes:
-        - subject_available
-        - subject_unavailable
-        - authority_changed
-  product_surfaces:
-    - product_surface_key: nurture.child_care_process_overview_v1
-      presentation_key: nurture.child_care_process_overview_v1
-      view_modes:
-        - current
-      route_classes:
-        - scenario_overview
-      action_offer_policy: none
-      action_keys: []
-  domain_action_contracts: []
-  protected_interaction_contracts: []

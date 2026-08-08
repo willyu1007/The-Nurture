@@ -28,36 +28,10 @@ Project: `main`
 - Risks: confusing `DR-*` design findings with `TR-*` traffic blockers, treating green CI/design completion/X5 PASS or superseded exact-claimant evidence as source/deployment authority, issuing a receipt after its authority source changed, exposing stable anchors through Host clients, widening CareGroup responsibility to same-Institution access, bypassing the opaque My-Chat Child/Family binding chain, publishing mutable artifacts, or weakening owner-reread/revoke/privacy fences for pilot convenience.
 - Success Signal: Pilot-0-C and D remain internally consistent at `DR-P0=0 / DR-P1=0 / DR-P2=0`; current C-3/C-4 qualification plus D inputs produce one immutable undeployed complete candidate with zero `QR-P0/QR-P1`; required `TR-*` blockers close; E signs one exact decision; every capability remains default-off until separately authorized Pilot-2.
 - Related Tasks: T-002 nurture-institution-mode (`in-progress`).
-- Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs. `C30-I0`
-  and Base-only I1-A are complete; C30-I1 remains split into ordered I1-A..F.
-  I1-B scope is frozen around neutral reservation/pair/evidence/recovery wires;
-  Base-only I1-B is accepted at source `edbcd74…` plus lock `9a15865…` after
-  cumulative qualification. I1-C subject-context/presentation is reaccepted at
-  successor Base source `ae0c357…` plus lock `3c30337…` after artifact 26-27
-  quality repair; the earlier chain is historical. Artifacts 34-35 reaccept I1-D
-  at successor Base source `3580a9b…` plus lock `1cb5691…` after closing five
-  composition findings; the artifact-33 chain is historical. Neutral direct/claimed
-  names stay unchanged and manifest/source convergence remains I1-F. Artifact 36
-  froze I1-E as a dedicated plaintext carrier plus body-free lifecycle controls,
-  no-copy negatives and five ordered E1-E5 units. Artifacts 42-43 reaccept I1-E at
-  successor Base source `48fd3d6…` plus metadata lock `9abde2b…` after closing four
-  deterministic validation/composition findings; artifacts 37-41 and their
-  source/lock remain historical. Artifacts 44-50 complete and reaccept I1-F at
-  successor Base source `15ff031…` plus lock `4350086…`. Artifact 51 freezes
-  C30-I2 generic My-Chat adoption as ordered I2-A..G. Artifact 52 accepts that
-  chain plus its nine-finding remediation at My-Chat runtime `658b897…`,
-  replacement lock `6725dc6…`, aggregate `8172e370…10a5ad` and archive
-  `cd7bbc2…`; the first I2-G lock is historical. Artifact 53 freezes C30-I3 as
-  ordered I3-A..G, with exact upstream pins, a production trusted+presentation
-  complete prefix, detached owner trust, typed Participant/pair association,
-  canonical action runtime, protected KMS/retention lifecycle and default-off
-  convergence. Artifacts 54-60 record ordered I3-A..G and final acceptance at
-  Nurture source `c8b9ce2…`, lock `15207ba…`, aggregate `5c08b542…c4ab6` and
-  default-off census `448d37e1…3c3e`; the fresh 19-migration database was
-  destroyed and 55440 is free. The next eligible decision is only a separately
-  authorized C30-I4 scope review. I4 implementation, C31-C35, C40-C45, D,
-  Pilot-0-E and Pilot-1 remain unstarted, and no downstream PASS is deployment
-  or traffic authority.
+- Next Checkpoint: preserve the exact T-005 G2 and T-006 G3 handoffs while resuming
+  T-002 at the remaining `C30-I0-C/D` baseline-isolation gate. C30-C35, C40-C45,
+  D, Pilot-0-E and Pilot-1 remain separate; no downstream PASS is deployment or
+  traffic authority.
 
 ### F-003 Six-surface store-beta readiness
 - Intent: turn the six-surface T-003 design into a qualified, default-off Nurture Service Candidate and versioned interface that My-Chat can integrate through authenticated API calls and validate on iOS and Android internal-testing channels.

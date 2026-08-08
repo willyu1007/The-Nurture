@@ -1,6 +1,6 @@
 # Nurture Scenario Contract
 
-Status: G2 provider qualified; C30-I1-A..F neutral Base contracts accepted; C30-I2 generic Host adoption accepted default-off; C30-I3 scope frozen; I3-A, joint adoption and activation require separate authorization
+Status: G2 Nurture-side provider qualified; consumer adoption and activation pending
 
 ## Product Terminology Compatibility
 
@@ -20,90 +20,6 @@ used to broaden product Workflow scope. No new family-care action may be classif
 Workflow merely because it is asynchronous, cross-owner, retried, or delivered through
 Handoff/Outbox. Existing family-care claimed-Step activation remains a compatibility gap
 and MUST stay default-off until the owner contract is reconciled with the product semantics.
-
-The C30-I1-D Base contract uses the neutral static drivers
-`scenario_direct_empty_v1|workflow_claimed_step_v1`. Both server-only effect
-identity input branches explicitly bind `scenario_key`; the direct branch binds
-Workspace/scenario/action/submit context and the claimed branch binds
-Workspace/scenario/action/original Step. I1-D defines standalone wire/codec/schema
-conformance. Its historical standalone source is
-`3580a9be74bd6ebe81d00c9fe99ccdf98d147664`, sealed by
-metadata lock `1cb56910f32ab5e13f9d378af3b3043dfc94b180` at source hash
-`5c5f2c5380773ccb651925199d403f267edb60bfbb0512bb0779218d074a99ef`.
-Artifact 35 closes the artifact-34 findings by adding private resolved-submit,
-stored rebind-seal and claimed-Step execution composition assertions plus closed
-prepare branches and legitimate fail-closed outcomes. The public wires and neutral
-driver names remain unchanged. I1-F now registers this exact static action contract
-in the closed neutral Base manifest graph, but no My-Chat/Nurture consumer,
-execution runtime or activation exists.
-
-The C30-I1-E scope frozen in artifact 36 was implemented by artifacts 37-41 and
-is currently accepted by successor artifact 43. The neutral split is one dedicated
-`ScenarioProtectedPlainTextCarrierV1` plus body-free static, prepare,
-prepared/committed and read/tombstone controls. Carrier bytes never enter I1-A
-`operation.input`, I1-D `action_input`/result/Step, I1-C semantic output or a
-durable Host DTO; a keyed request/response binding joins the separately transported
-carrier to the body-free control. Submit and commit continue to use the accepted
-I1-D direct/claimed path, and no generic commit/erase operation is introduced.
-Foreground reads require exact current context and a no-store lease of at most 60
-seconds; non-ready results are carrier-free. Historical Base source
-`5433124506ca8d48a536a283796765209b93d808` is sealed by metadata-only lock
-`3a08d1f117aad0ba8440df75f5e68dad392e8e45` at source hash
-`7ba9458f0e1a91f6fda1a47e5682064020017c41731b1016f8bdad962664c126`.
-Artifacts 42-43 close bounded no-copy, current-time and Schema/runtime parity
-repairs at successor Base source `48fd3d65b34a1dd7a6b1e85713fca81f7c9da171`,
-metadata-only lock `9abde2b994f6528fc5afb26125eb029ed6027237` and source
-hash `be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d`.
-The cited artifact-41 source/lock is historical.
-I1-F now registers the exact protected static contract and
-`scenario_protected_interaction_source_v1` profile in the closed neutral Base
-manifest graph. No My-Chat/Nurture consumer, protected route/store/KMS, capability
-or activation exists.
-
-Artifact 44 froze I1-F dependency/source convergence. Artifacts 45-48 implement
-and accept one optional, closed Base `scenario_contracts`
-area with the exact capabilities `trusted_scenario_invocation_v1`,
-`scenario_subject_presentation_v1`, `scenario_domain_action_execution_v1` and
-`scenario_protected_interaction_v1`, their exact dependency graph, and the exact
-source identities `platform_child_family_identity_source_v1`,
-`scenario_interface_source_v1`, `scenario_domain_action_source_v1` and
-`scenario_protected_interaction_source_v1`. The freeze covers structural Schema/runtime
-parity, contextual DAG/reference/Host checks, legacy/vNext no-alias rules, named
-Base source profiles and ordered F1-F4 gates. Artifact 50 reaccepts exact
-successor source `15ff031ed16897920c13fe24c9849531d98607ad`, sealed by
-metadata-only lock `4350086993d837baa8030564f4e19593dedd96b0` at aggregate
-source hash `d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383`.
-The earlier artifact-48 source/lock/hash remains historical.
-The named identity/interface/action/protected profile hashes are respectively
-`81d9fb9d…fed4`, `37f0cdae…eaf`, `b7c35259…e48d` and
-`78eadaf4…efb`. This is `C30_I1_BASE_CONTRACTS_ACCEPTED`, not
-My-Chat/Nurture adoption or a completed downstream source identity. Artifact 51
-freezes My-Chat adoption as ordered I2-A..G units; artifact 52 accepts the
-repaired default-off implementation at My-Chat runtime `658b897…`, replacement
-lock `6725dc6…`, aggregate `8172e370…10a5ad` and archive `cd7bbc2…`.
-
-The accepted C30-I2 Host boundary is exact Base adoption, interactive/durable human
-principal translation, detached private signing and one-time nonce verification,
-one atomic canonical Child/Family pair owner, semantic provider/presentation
-registry, direct/claimed action orchestration, protected transient carrier/read
-guards and cumulative default-off convergence. My-Chat used repository-local
-T-035; its archived local `T-002 content-events` remains unrelated.
-
-Artifact 53 freezes C30-I3 as ordered I3-A..G. Its production manifest exit is
-the Base-permitted dependency-complete trusted+presentation prefix with an
-action-free `NurtureChildCareProcess` baseline presentation. Generic action and
-protected owner primitives are implemented only behind isolated conformance
-fixtures during I3; the first real Guardian action/protected declaration remains
-C31. I3 additionally owns detached request verification/response signing,
-private nonce consumption, typed Participant and actor provenance, exact pair
-anchors/local associations, one canonical runner and authoritative encrypted
-protected-content/KMS/retention/crypto-erasure lifecycle. The old G1 pin remains
-historical and separate from the new C30 downstream lock.
-
-All four C30 capabilities remain absent/off at Host activation level. Nurture I3
-implementation requires separate authorization; joint adoption remains I4;
-product composition, Notification, invitation, admission, activation, T-008 and
-Pilot remain later gates.
 
 ## Decision
 
@@ -291,14 +207,11 @@ responsibilities:
 2. Commit or exact-replay every missing Child/Family scenario binding in one
    My-Chat transaction against expected heads and typed Nurture owner refs.
 3. Issue short-lived, signed, audience-bound current binding evidence to the
-   Nurture private boundary. The transport is the accepted I1-A
-   `ScenarioPrivateInvocationV1`; its operation input is the I1-B
-   `ScenarioCurrentOwnerBindingPairEvidenceV1`. The composed body contains only
-   the trusted principal/Workspace/scenario/operation/purpose context, typed
-   Child/Family anchor refs and non-reversible current-owner/pair hashes. Key
-   metadata and signature remain detached transport metadata. Neither layer
-   contains a raw platform id, binding id/head, membership id, PII, role, Grant,
-   policy decision or dossier field.
+   Nurture private boundary. The evidence contains only schema/version,
+   Workspace/scenario, operation/purpose, typed Child/Family anchor refs, one
+   non-reversible current-owner evidence hash, issue/expiry time, key id, and
+   signature. It contains no raw platform id, binding id, membership id, PII,
+   role, Grant, or dossier field.
 4. Recheck the current Child binding, Family binding, exact pair membership,
    and required adult Family membership before every Host route, delivery,
    retry, and open. Cached evidence never fills an owner outage or extends
@@ -308,13 +221,11 @@ responsibilities:
    signature/key failure, expiry, or owner outage is unavailable and MUST NOT
    trigger an alternate-id, PII-match, or legacy fallback.
 
-The exact reusable Base wire names, exposure classes, fields and structural
-rules are frozen in
-`dev-docs/active/nurture-institution-mode/artifacts/16-c30-i1-b-scope-freeze.md`.
-Concrete My-Chat HTTP/port, registry and runtime semantics remain C30-I2
-implementation deliverables. C-3 cannot freeze or qualify a candidate until the
-Base contracts, My-Chat runtime/APIs, Nurture anchor/association adapters, and
-joint conformance are implemented, immutable, and pinned under
+The exact reusable Base envelope/type names and concrete My-Chat HTTP or port
+shape are C30-I1/I2 implementation deliverables. They are not left to a later
+product decision: C-3 cannot freeze or qualify a candidate until the owner
+contracts, My-Chat runtime/APIs, Nurture anchor/association adapters, and joint
+conformance are implemented, immutable, and pinned under
 `platform_child_family_identity_source_v1`.
 
 ### Parent-owned creation and recoverable binding
@@ -365,41 +276,63 @@ lookup that shares the local writer fence and returns
 `committed|confirmed_no_effect|unknown`; `unknown` blocks a replacement
 operation, Enrollment, Grant, delivery, and cleanup until resolved.
 
-The status wire is the I1-B
-`ScenarioIdentityOperationStatusLookupRequestV1` /
-`ScenarioIdentityOperationStatusLookupResultV1` pair. The request is the
-registered `operation.input` of an I1-A `ScenarioPrivateInvocationV1`; I1-A is
-the sole source of caller, issuer, audience, Workspace/scenario route,
-operation, issued/expiry time and nonce. Credential, key and signature metadata
-remain detached and MUST NOT be repeated inside the I1-B body.
+The lookup wire contract is versioned `ScenarioIdentityOperationStatusLookupV1`.
+Its closed transport identity is caller `my-chat-identity-recovery`, issuer
+`my-chat.identity-recovery`, audience `nurture.identity-recovery.v1`, operation
+`scenario_identity_operation_status_lookup_v1`, and endpoint
+`POST /private/v1/identity-operations/status:lookup`. It uses an isolated
+credential/signing-key/verifier/revocation domain and a fresh single-use nonce.
+The request is strict canonical JSON with exactly these fields and no unknown,
+duplicate, missing, or null-substituted member:
 
-Immediately before issuing the I1-A invocation, My-Chat validates the raw
-platform Child/Family pair, `FamilyChildMembership` and both binding heads
-internally. None of those raw ids, binding refs/heads, membership refs or
-protected identity fields crosses the private boundary. The private request
-carries only the exact typed owner-ref pair, association expectation,
-operation/command identities and non-reversible principal/Host/deadline/attempt
-evidence hashes frozen by the I1-B contract.
+```text
+schema = "scenario_identity_operation_status_lookup_request_v1"
+caller, issuer, audience, operation
+hostIdentityOperationId, workspaceId, scenarioKey = "nurture"
+childAnchorRef = { kind: "nurture_child_binding_anchor_v1", anchorId }
+familyAnchorRef = { kind: "nurture_family_binding_anchor_v1", anchorId }
+associationExpectationHash, localCommandId, localCommandHash
+principalProvenanceHash, hostIdentityEvidenceHash
+deadlineEvidenceHash, attemptLedgerHash
+issuedAt, expiresAt, nonce, keyId, signature
+```
 
-After transport and frozen-field validation, the strict result body returns
-only the matching operation/command identities, canonical check time,
-originating request nonce hash and one closed status variant:
+The signature covers the canonical request excluding `signature`, including
+the exact HTTP method and path. My-Chat validates the raw platform Child/Family
+pair, `FamilyChildMembership`, and both binding heads internally immediately
+before signing. None of those raw ids, binding ids, head values, membership
+refs, or protected identity fields crosses this endpoint. Their exact frozen
+tuple contributes only to the non-reversible keyed canonical
+`hostIdentityEvidenceHash`; Nurture treats that digest as opaque evidence and
+resolves status only from the Nurture-owned typed anchor refs, association
+expectation hash, local command identity, locally recorded attempt/deadline
+evidence, and the shared writer fence.
 
-- `committed`: typed Scenario execution ref plus commit evidence hash;
-- `confirmed_no_effect`: writer-fence evidence hash;
-- `unknown`: `lock_timeout|possible_inflight|owner_unavailable|compatible_evidence_ambiguous`.
+Only after transport and frozen-field validation may the endpoint return strict
+canonical JSON with common fields
+`schema="scenario_identity_operation_status_lookup_result_v1"`,
+`hostIdentityOperationId`, `workspaceId`, `localCommandId`, `status`, and
+`checkedAt`, `requestNonceHash`, `keyId`, and `signature`, plus exactly one
+status-specific shape:
 
-Each variant forbids fields owned by another variant and every business or
-protected body. Response authentication/signing uses the isolated I2/I3
-response transport and detached signature metadata. Authentication, codec,
-nonce, signature or frozen-binding failure returns one generic transport
-denial/unavailable response outside the result union and before the writer
-fence or status resolver. `confirmed_no_effect` additionally requires every
-issued attempt terminal, deadline plus skew elapsed, the exact writer fence,
-and absence of the `CommandExecution` plus both associations under that fence.
-Lock timeout, possible inflight work, owner/store outage or compatible ambiguity
-remains `unknown`. The endpoint performs no business command, Participant/policy
-read, presenter, protected read, binding mutation, association cleanup or new
+- `committed`: `commandExecutionRef` and `localCommitEvidenceHash`;
+- `confirmed_no_effect`: `noEffectFenceEvidenceHash`;
+- `unknown`: `reasonCode`, allowlisted to
+  `lock_timeout|possible_inflight|owner_unavailable|compatible_evidence_ambiguous`.
+
+Each result variant forbids the other variants' fields, all unknown fields, and
+all business/protected bodies. The Nurture recovery-service signature covers
+the canonical result excluding `signature`, the exact method/path, and the
+originating request nonce hash; My-Chat verifies it through the isolated
+response-verifier/revocation set. Authentication, codec, nonce, signature, or
+frozen-binding failure returns one generic transport denial/unavailable
+response outside this result union and before the writer fence or status
+resolver. `confirmed_no_effect` additionally requires every issued attempt
+terminal, deadline plus skew elapsed, the exact writer fence, and absence of the
+CommandExecution plus both associations under that fence. Lock timeout,
+possible in-flight work, owner/store outage, or compatible ambiguity remains
+`unknown`. The endpoint performs no business command, Participant/policy read,
+presenter, protected read, binding mutation, association cleanup, or new
 operation creation.
 
 A binding whose anchor has no workspace association is an invisible

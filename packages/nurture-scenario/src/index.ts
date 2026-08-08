@@ -1,9 +1,15 @@
 export {
   nurtureScenarioModule,
+  nurturePreActivationScenarioModule,
   createNurtureScenarioModule,
+  createNurtureActivationScenarioModule,
   type NurtureScenarioModuleDeps,
+  type NurtureActivationScenarioModuleDeps,
 } from "./module.js";
-export { nurtureScenarioManifest } from "./registry.js";
+export {
+  nurtureScenarioManifest,
+  nurturePreActivationScenarioManifest,
+} from "./registry.js";
 export { nurtureActions } from "./actions/shared-actions.js";
 export { nurtureAdapters } from "./adapters/chat-workflow.adapter.js";
 export { nurtureHandlers, createNurtureHandlers } from "./handlers/p0-handlers.js";
@@ -75,11 +81,4 @@ export * from "./institution-surfaces.js";
 export * from "./observability/institution-workflow-telemetry.js";
 export * from "./domain/testing/in-memory-institution-ports.js";
 export * from "./surface-contract/index.js";
-export * from "./c30/canonical-json.js";
-export * from "./c30/trusted-invocation.js";
-export * from "./c30/participant-binding.js";
-export * from "./c30/pair-association.js";
-export * from "./c30/subject-presentation.js";
-export * from "./c30/canonical-action.js";
-export * from "./c30/protected-content.js";
 export type * from "@my-chat/workflow-contracts";
