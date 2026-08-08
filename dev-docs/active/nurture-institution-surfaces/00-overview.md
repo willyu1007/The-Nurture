@@ -5,12 +5,20 @@
 - State: planned
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-05
-- Next step: **由单独治理决定是否启动 G4-0C Authority/Surface freeze。** G4-0A
-  exact inventory 已完成；G4-0B 的
+- Updated: 2026-08-08
+- Next step: **由单独治理决定是否启动 G4-0C Authority/Surface freeze，以及是否先走
+  窄的 `0C-min` 快线。** 提案见
+  [`09-0c-min-fast-lane-proposal.md`](./09-0c-min-fast-lane-proposal.md)（A 接受
+  `0C-min` / B 直接走完整 0C / C 继续延后 T-007）；该文档只提出选项，不执行任何一个。
+  G4-0A exact inventory 已完成，但其 exact-input 表钉的
+  `1.7.0` / My-Chat `a019566` / Base `06303e9` 已被 T-009 D-T009-04 轮换取代，
+  **任何 0C 冻结记录发出前必须先重新绑定 0A**（当前为 `1.17.0` /
+  `sha256:d22851d9…` / My-Chat `df7a273…` / Base `8a3ea90…`）。G4-0B 的
   `nurture.institution-publication-policy@1.0.0` 已作为窄、default-off 依赖完成
   provider/consumer qualification，并随 T-006/G3 exact handoff 关闭。该早期子集不
   等于 T-007 启动或完成；完整 G4-0C～G4-F 仍未实施，T-008 继续等待 T-007 Exit。
+  T-009 完成解除了排期与契约批次两项软阻塞（D-T009-05 已满足，`1.16.0`/`1.17.0`
+  均已关闭），但 0C/0D/0E/0F 的事实与权限缺口不变。
   当前未产生 persistent schema apply、activation、deployment 或 traffic。
 
 ## Goal
