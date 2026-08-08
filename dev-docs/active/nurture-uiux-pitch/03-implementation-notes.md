@@ -1,5 +1,13 @@
 # Implementation Notes
 
+## 2026-08-08 — Pre-launch deck cleanup
+
+- 删除 `artifacts/nurture-deck-v1.html`。项目尚未上线，旧 deck 含已 supersede 的交互语义，
+  保留可执行副本只会增加误用和维护成本。
+- 保留 `nurture-uiux-mockups-r4.html` 作为设计过程素材；它没有 contract authority，不能作为
+  实现输入。正式入口仍是 mobile UX contract、presenter/action handoff 与 teacher fixture。
+- 历史迭代记录不删除；下方提到的 deck 文件只描述当时产物，不表示文件当前仍存在。
+
 ## 2026-08-08 — T-003 presenter/action contract handoff
 
 - 新增 `artifacts/presenter-action-contract-handoff.md`，将六个 T-003 surface 绑定到
@@ -105,7 +113,8 @@ EDIT_KEY 升 v3（防旧结构编辑覆盖新结构，用户旧编辑失效需�
 ## 2026-07-22 — deck v2：角色整机可操作 + 全文可编辑
 
 同 URL 重发布 https://claude.ai/code/artifact/88bb7267-bb84-428f-b89b-5b3f8710ed48 ；
-离线副本（UTF-8 骨架包裹）同步重建于 artifacts/nurture-deck-v1.html。
+离线副本（UTF-8 骨架包裹）当时同步重建于 `artifacts/nurture-deck-v1.html`；该文件已在
+2026-08-08 的 pre-launch cleanup 中删除。
 
 结构 12 页 → **9 页**：6 个单界面 demo 页收拢为 2 个"角色视角"整机页（用户方向）。
 

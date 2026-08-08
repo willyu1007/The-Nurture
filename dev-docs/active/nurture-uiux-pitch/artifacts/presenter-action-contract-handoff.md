@@ -29,7 +29,8 @@ T-036 must consume sources in this order:
    `docs/context/product/workflow-product-design-contract.md`.
 4. Current mobile design input in
    `docs/context/product/nurture-mobile-ux-contract.md`.
-5. T-003 HTML and historical mockups as visual discussion material only.
+5. T-003 historical decision notes and mockups as visual discussion material only; the old deck file was
+   removed during pre-launch cleanup.
 
 The receiver must never infer fields, actions, authority, navigation or success
 from the HTML. It renders owner-projected content and current-eligibility action
@@ -127,7 +128,7 @@ from the capability descriptor.
 
 ## Superseded demo semantics
 
-The following T-003 HTML/history is not implementation input:
+The following T-003 historical demo semantics are not implementation input:
 
 - guardian/caregiver shared human rooms, class-group chat or direct-message UX;
 - countdown/automatic family publication or any role-derived release button;

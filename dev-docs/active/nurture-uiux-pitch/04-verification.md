@@ -1,5 +1,13 @@
 # Verification
 
+## 2026-08-08 — Pre-launch deck cleanup
+
+- `artifacts/nurture-deck-v1.html` 已删除；artifact 目录只保留设计过程 mockup、正式
+  presenter/action handoff 与 schema-valid teacher fixture。
+- 全仓引用扫描确认没有文档继续把被删 deck 描述为当前正式 artifact 或实现入口；历史验证记录
+  明确标注为“删除前证据”。
+- Task docs lint、project governance lint 与 `git diff --check` 在清理后重新执行并通过。
+
 ## 2026-08-08 — Presenter/action handoff
 
 - Exact identity: generated manifest reports `nurture.surface-contract@1.17.0`, digest
@@ -15,8 +23,8 @@
 - Receiver safety: My-Chat T-036 was inspected read-only; its dirty/conflicted worktree was not modified. The
   sender artifact is self-contained and receiver adoption is explicitly separate.
 - Deck limitation: the in-app browser security policy rejects direct `file://` navigation, so the old deck's
-  final keyboard/touch interaction pass was not repeated. Its existing static 9-slide verification remains the
-  evidence; this non-blocking design-artifact limitation does not weaken the typed handoff or reopen T-003.
+  final keyboard/touch interaction pass was not repeated. The file was subsequently deleted in pre-launch cleanup;
+  this closed design-artifact limitation does not weaken the typed handoff or reopen T-003.
 - Closing verification:
   - standalone teacher-release fixture validates against
     `schema:nurture.query-teacher-publish-queue-result@1`;
@@ -25,14 +33,14 @@
   - `pnpm verify:surface-conformance`: 11 files, 109 tests PASS; 16 cases cover 48/48 slices;
   - task-doc lint and `git diff --check`: PASS.
 
-## 2026-07-30
+## 2026-07-30 — 删除前的历史证据
 
-- 静态复核当前正式 `artifacts/nurture-deck-v1.html`：共 9 个 `.slide`
+- 当时静态复核 `artifacts/nurture-deck-v1.html`：共 9 个 `.slide`
   section，页码初始化为 `01 / 09`，与当前 mobile UX contract 和 overview 的 9 页
-  口径一致。
+  口径一致。该文件已于 2026-08-08 的 pre-launch cleanup 中删除。
 - 2026-07-21 记录中的“Phase C v1（deck 12 页）”属于当时的历史组装状态，不再代表
-  当前正式 artifact。最终浏览器渲染、键盘/触控和全部交互仍待一次用户侧或可用浏览器
-  实链核验；该核验不阻塞 T-004 contract baseline。
+  后来的 9 页 artifact。删除前没有完成最终键盘/触控实链核验；文件现已主动清理，
+  该历史验证缺口已关闭且不阻塞任何 contract baseline。
 
 ## 2026-07-21
 

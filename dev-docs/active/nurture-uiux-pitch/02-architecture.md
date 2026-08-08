@@ -276,3 +276,10 @@ dependency NO-GO 落地。HTML 和本文件中的历史交互只保留视觉/共
 
 My-Chat T-036 负责接收后的组件、缓存和交互冻结。Institution workbench 的实现与能力可用性
 仍由 T-007 及其前置合同负责，T-003 handoff 不启动 Web Admin 开发。
+
+### Pre-launch artifact cleanup（2026-08-08）
+
+项目尚未上线，当前目标是推进正式 contract-driven 实现。旧
+`artifacts/nurture-deck-v1.html` 含已 supersede 的共享聊天、自动发布等演示语义，继续保留
+可执行副本的误用风险高于历史价值，因此删除该文件。设计决策历史继续保留在本任务文档；
+当前 UI 实现入口仅为 UX contract、presenter/action handoff 和 typed fixture。
