@@ -6,35 +6,23 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-08
-- Next step: **G4-0C Exit** — all six ordered units are frozen
-  (`11`…`16`), so what remains is 0G's rolling cross-contract audit over them
-  — **all three open points are now closed**. Class-list ordering was answered
-  by removing system-produced ordering entirely: the list keeps a fixed order
-  from stable class attributes, so the marker does triage and the position does
-  location, which is also better for daily use than a list that re-sorts
-  itself. Small-cell aggregate
-  suppression was answered by a stronger rule than the threshold it asked
-  about: an aggregate is returned only when every member of the counted
-  population is readable, otherwise `unavailable` rather than a filtered
-  count, which also removes the differential-observation leak a threshold
-  would have left open. Institution wind-down read was mis-posed, and the
-  investigation instead produced
-  [`17-lifecycle-status-cleanup-decision.md`](./17-lifecycle-status-cleanup-decision.md),
-  which routes a schema convergence to T-002 and gives 0C its contract-level
-  currency rule.
-  Scope contract: [`10-g4-0c-scope-freeze.md`](./10-g4-0c-scope-freeze.md).
-  Full 0C was chosen over the narrow `0C-min` fast lane
-  ([`09-0c-min-fast-lane-proposal.md`](./09-0c-min-fast-lane-proposal.md),
-  rejected with its reasoning retained).
+- Next step: **decide what follows G4-0C** — `G4_0C_EXIT_PASS` is issued
+  ([`19-g4-0c-exit-record.md`](./19-g4-0c-exit-record.md)). Six units frozen
+  (`11`…`16`), three open points closed, 0G cross-contract audit passed after
+  four repairs ([`18`](./18-g4-0g-0c-audit-record.md)).
+  Exit opens G4-A implementation and the common authority base G4-B/C/D/E
+  consume; each of those branches still needs its own domain freeze — 0D daily
+  operations, 0E Workflow and Enrollment, 0F knowledge and RAG.
   0C-4 rotated the published contract to
-  `nurture.surface-contract@1.18.0` / `sha256:be84bb23…`, additively —
-  `sharedCoreHash` is unchanged, so T-005 and T-006 slice evidence is
-  preserved. 0C-6 carries the only schema delta, authored as a plan and not
-  applied.
-  Reaching 0C Exit opens G4-A implementation and supplies the common authority
-  base to G4-B/C/D/E. It is not Owner Readiness, Joint Conformance, a Beta
-  Profile Handoff, Candidate Freeze, activation or traffic, and it neither
-  starts nor completes the rest of T-007; T-008 continues to wait for the
+  `nurture.surface-contract@1.18.0` / `sha256:be84bb23…` additively, with
+  `sharedCoreHash` unchanged, so T-005 and T-006 slice evidence is preserved.
+  0C-6 carries the only schema delta, authored as a plan and not applied.
+  **Nothing in 0C has been executed** — six freeze records and zero predicate
+  implementation — so the choice ahead is whether to validate 0C by
+  implementing G4-A, or to freeze 0D/0E/0F on predicates no runtime has yet
+  exercised.
+  Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
+  Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.
 
 ## Goal
