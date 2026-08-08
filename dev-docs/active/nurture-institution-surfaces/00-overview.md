@@ -6,21 +6,25 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-08
-- Next step: **author the G4-0C-1 Active role & actor context freeze record.**
-  Full G4-0C was chosen on 2026-08-08 over the narrow `0C-min` fast lane
+- Next step: **G4-0C Exit** — all six ordered units are frozen
+  (`11`…`16`), so what remains is 0G's rolling cross-contract audit over them
+  plus review of three open points that were frozen conservative rather than
+  invented: institution wind-down read (0C-2), small-cell aggregate
+  suppression and workload-magnitude ordering (0C-5).
+  Scope contract: [`10-g4-0c-scope-freeze.md`](./10-g4-0c-scope-freeze.md).
+  Full 0C was chosen over the narrow `0C-min` fast lane
   ([`09-0c-min-fast-lane-proposal.md`](./09-0c-min-fast-lane-proposal.md),
-  rejected with its reasoning retained); the scope contract is
-  [`10-g4-0c-scope-freeze.md`](./10-g4-0c-scope-freeze.md), which decomposes
-  0C's seven items into six ordered units and fixes the authority-predicate
-  order up front.
-  Prerequisites are met: G4-0A's inputs were rebound and the T-002 owner path
-  is `PRESENT_PINNED` again on current-pin evidence
-  (`dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md`
-  — `verify:owner-integration` at `1.17.0`, 0 unexercised keys, both joint
-  journeys PASS). G4-0B's publication-policy lane remains closed from the
-  T-006 handoff.
-  Starting 0C does not open G4-A～F implementation, schema apply, activation,
-  deployment or traffic; T-008 continues to wait for the complete T-007 Exit.
+  rejected with its reasoning retained).
+  0C-4 rotated the published contract to
+  `nurture.surface-contract@1.18.0` / `sha256:be84bb23…`, additively —
+  `sharedCoreHash` is unchanged, so T-005 and T-006 slice evidence is
+  preserved. 0C-6 carries the only schema delta, authored as a plan and not
+  applied.
+  Reaching 0C Exit opens G4-A implementation and supplies the common authority
+  base to G4-B/C/D/E. It is not Owner Readiness, Joint Conformance, a Beta
+  Profile Handoff, Candidate Freeze, activation or traffic, and it neither
+  starts nor completes the rest of T-007; T-008 continues to wait for the
+  complete T-007 Exit.
 
 ## Goal
 
