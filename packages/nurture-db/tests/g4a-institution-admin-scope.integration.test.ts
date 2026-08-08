@@ -1,0 +1,346 @@
+import { randomUUID } from "node:crypto";
+import { afterAll, describe, expect, it } from "vitest";
+import {
+  NurtureInstitutionPolicyService,
+  type NurturePolicyFactRequest,
+  type NurtureResolvedContext,
+} from "@the-nurture/scenario";
+import { createPrismaClient } from "../src/client.js";
+import { PrismaInstitutionContextRepository } from "../src/repositories/institution-context.repository.js";
+
+/**
+ * G4-A increment 1 — the 0C authority chain against real rows.
+ *
+ * Increment 1 shipped with 31 passing tests that all hand-supplied facts
+ * through the in-memory repository, so none of them executed the Prisma
+ * computation that produces those facts. All three fail-open defects the audit
+ * found (21-g4-a-increment-1-audit-record.md) lived in exactly that blind spot.
+ * These tests close it: every fact below is computed by
+ * `PrismaInstitutionContextRepository.loadPolicyFacts` from stored rows, and
+ * the decisions come from the real predicate reading them.
+ */
+
+const prisma = createPrismaClient();
+const repository = new PrismaInstitutionContextRepository(prisma);
+const policy = new NurtureInstitutionPolicyService(repository);
+
+afterAll(async () => {
+  await prisma.$disconnect();
+});
+
+type Scope = Awaited<ReturnType<typeof seedScope>>;
+type Child = Awaited<ReturnType<typeof seedChild>>;
+
+const seedInstitution = (workspaceId: string, displayName: string, status: "active" | "paused") =>
+  prisma.nurtureCareInstitution.create({ data: { workspaceId, displayName, status } });
+
+const seedClass = (
+  workspaceId: string,
+  institutionId: string,
+  name: string,
+  overrides: { status?: "active" | "archived"; deletedAt?: Date } = {},
+) =>
+  prisma.nurtureCareGroup.create({
+    data: { workspaceId, institutionId, name, status: "active", ...overrides },
+  });
+
+const seedChild = async (workspaceId: string, displayName: string) => {
+  const child = await prisma.nurtureChild.create({
+    data: { workspaceId, displayName, status: "active" },
+  });
+  const process = await prisma.nurtureChildCareProcess.create({
+    data: { workspaceId, childId: child.id, status: "active" },
+  });
+  const family = await prisma.nurtureFamily.create({
+    data: {
+      workspaceId,
+      childCareProcessId: process.id,
+      displayName: `${displayName} family`,
+      status: "active",
+    },
+  });
+  return { process, family };
+};
+
+const seedEnrollment = (
+  scope: Scope,
+  child: Child,
+  careGroupId: string,
+  status: "active" | "ended" = "active",
+) =>
+  prisma.nurtureEnrollment.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: child.process.id,
+      institutionId: scope.home.id,
+      careGroupId,
+      status,
+    },
+  });
+
+/**
+ * The lightest target the repository actually resolves. `family_care_thread`
+ * sends `loadPolicyFacts` down the branch that reads `careGroupId`,
+ * `enrollmentId` and `childCareProcessId` off the stored row — the resolution
+ * the in-memory tests skipped entirely.
+ */
+const seedThread = (
+  scope: Scope,
+  child: Child,
+  careGroupId: string | null,
+  enrollmentId: string | null = null,
+) =>
+  prisma.nurtureFamilyCareThread.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: child.process.id,
+      familyId: child.family.id,
+      careGroupId,
+      enrollmentId,
+      visibilityScope: "enrollment_private",
+      status: "active",
+    },
+  });
+
+const seedScope = async (homeStatus: "active" | "paused" = "active") => {
+  const workspaceId = randomUUID();
+  const admin = await prisma.nurtureParticipant.create({
+    data: {
+      workspaceId,
+      myChatUserId: `admin:${workspaceId}`,
+      displayName: "Institution Admin",
+      status: "active",
+    },
+  });
+  const home = await seedInstitution(workspaceId, "Home Institution", homeStatus);
+  const other = await seedInstitution(workspaceId, "Other Institution", "active");
+  const adminRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId,
+      participantId: admin.id,
+      role: "institution_admin",
+      scopeType: "institution",
+      scopeId: home.id,
+      status: "active",
+    },
+  });
+  return { workspaceId, admin, adminRole, home, other };
+};
+
+const target = (
+  threadId: string,
+  childCareProcessId?: string,
+): NonNullable<NurtureResolvedContext["target"]> => ({
+  object_type: "family_care_thread",
+  object_id: threadId,
+  lifecycle_state: "active",
+  ...(childCareProcessId ? { child_care_process_id: childCareProcessId } : {}),
+});
+
+const request = (
+  scope: Scope,
+  targetRef?: NurtureResolvedContext["target"],
+): NurturePolicyFactRequest => ({
+  workspace_id: scope.workspaceId,
+  policy_key: "nurture.institution_admin_scope",
+  resolved_context: {
+    actor: {
+      participant_id: scope.admin.id,
+      my_chat_user_id: scope.admin.myChatUserId,
+      role_assignment_id: scope.adminRole.id,
+      role_kind: "institution_admin",
+      scope_type: "institution",
+      scope_id: scope.home.id,
+    },
+    // An institution-scoped admin's work scope carries no care_group_id — the
+    // shape that let the original `: true` fallback fire.
+    work_scope: { kind: "institution", institution_id: scope.home.id },
+    ...(targetRef ? { target: targetRef } : {}),
+    continuity: {},
+    policy_seed: { action_key: "nurture.institution_admin_scope" },
+  },
+});
+
+describe("T-007 G4-A institution_admin_scope facts (production DB lane)", () => {
+  it("places a target against the admin's own institution in four explicit states", async () => {
+    const scope = await seedScope();
+    const currentClass = await seedClass(scope.workspaceId, scope.home.id, "Home Class");
+    const archivedClass = await seedClass(scope.workspaceId, scope.home.id, "Archived Class", {
+      status: "archived",
+    });
+    const softDeletedClass = await seedClass(scope.workspaceId, scope.home.id, "Deleted Class", {
+      deletedAt: new Date(),
+    });
+    const foreignClass = await seedClass(scope.workspaceId, scope.other.id, "Foreign Class");
+    // One child per case: a child may hold only one enrollment-private thread.
+    const enrolled = await seedChild(scope.workspaceId, "Enrolled Child");
+    await seedEnrollment(scope, enrolled, currentClass.id);
+
+    // No target: an institution-level read with nothing to place.
+    await expect(repository.loadPolicyFacts(request(scope))).resolves.toMatchObject({
+      target_scope_state: "absent",
+      institution_scope_current: true,
+    });
+    await expect(policy.evaluate(request(scope))).resolves.toMatchObject({
+      allowed: true,
+      reason_code: "allowed",
+    });
+
+    const inScope = await seedThread(scope, enrolled, currentClass.id);
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(inScope.id))),
+    ).resolves.toMatchObject({ target_scope_state: "in_scope" });
+
+    // 0C-2 fixture 2. Pre-repair this reached the `: true` fallback and the
+    // Admin was ALLOWED onto another institution's class.
+    const foreign = await seedThread(
+      scope,
+      await seedChild(scope.workspaceId, "Foreign Class Child"),
+      foreignClass.id,
+    );
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(foreign.id))),
+    ).resolves.toMatchObject({ target_scope_state: "out_of_scope" });
+    await expect(policy.evaluate(request(scope, target(foreign.id)))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "not_authorized",
+    });
+
+    // A supplied target that resolves to no institution edge at all. This is
+    // `out_of_scope`, NOT `absent`: conflating the two is what failed open,
+    // because "absent" is the legitimate no-target read.
+    const unplaceable = target(randomUUID());
+    await expect(
+      repository.loadPolicyFacts(request(scope, { ...unplaceable, object_type: "care_group" })),
+    ).resolves.toMatchObject({ target_scope_state: "out_of_scope" });
+    await expect(
+      policy.evaluate(request(scope, { ...unplaceable, object_type: "care_group" })),
+    ).resolves.toMatchObject({ allowed: false, reason_code: "not_authorized" });
+
+    // 0C-3's own code, for a class inside the admin's institution that is not
+    // current — under either half of the status/deletedAt conjunction.
+    const archived = await seedThread(
+      scope,
+      await seedChild(scope.workspaceId, "Archived Class Child"),
+      archivedClass.id,
+    );
+    const softDeleted = await seedThread(
+      scope,
+      await seedChild(scope.workspaceId, "Deleted Class Child"),
+      softDeletedClass.id,
+    );
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(archived.id))),
+    ).resolves.toMatchObject({ target_scope_state: "class_not_current" });
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(softDeleted.id))),
+    ).resolves.toMatchObject({ target_scope_state: "class_not_current" });
+    await expect(policy.evaluate(request(scope, target(archived.id)))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "class_not_current",
+    });
+  });
+
+  it("resolves the child target from stored rows when the caller omits the field", async () => {
+    const scope = await seedScope();
+    const namedClass = await seedClass(scope.workspaceId, scope.home.id, "Named Class");
+    const siblingClass = await seedClass(scope.workspaceId, scope.home.id, "Sibling Class");
+
+    const insider = await seedChild(scope.workspaceId, "Child In Class");
+    await seedEnrollment(scope, insider, namedClass.id);
+    const insiderThread = await seedThread(scope, insider, namedClass.id);
+
+    // The caller supplies no `target.child_care_process_id`; the repository
+    // resolves it off the thread row, so the fact is true either way.
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(insiderThread.id))),
+    ).resolves.toMatchObject({
+      child_target_resolved: true,
+      child_in_named_class: true,
+      target_scope_state: "in_scope",
+    });
+    await expect(policy.evaluate(request(scope, target(insiderThread.id)))).resolves.toMatchObject({
+      allowed: true,
+      reason_code: "allowed",
+    });
+
+    // Same omission, but the child is not in the class the target names.
+    const outsider = await seedChild(scope.workspaceId, "Child In Sibling Class");
+    await seedEnrollment(scope, outsider, siblingClass.id);
+    const outsiderThread = await seedThread(scope, outsider, namedClass.id);
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(outsiderThread.id))),
+    ).resolves.toMatchObject({ child_target_resolved: true, child_in_named_class: false });
+
+    // The guard must read the same channel the fact is computed from. Hold the
+    // stored rows constant and vary only whether the caller supplied the
+    // optional field: both must deny. Pre-repair the omitted form was ALLOWED
+    // while the repository had already computed `child_in_named_class: false`.
+    const supplied = target(outsiderThread.id, outsider.process.id);
+    const omitted = target(outsiderThread.id);
+    await expect(policy.evaluate(request(scope, supplied))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "scope_mismatch",
+    });
+    await expect(policy.evaluate(request(scope, omitted))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "scope_mismatch",
+    });
+  });
+
+  it("keeps child_in_named_class narrower than scope_reaches_child inside one institution", async () => {
+    const scope = await seedScope();
+    const fromClass = await seedClass(scope.workspaceId, scope.home.id, "Former Class");
+    const toClass = await seedClass(scope.workspaceId, scope.home.id, "Current Class");
+    const child = await seedChild(scope.workspaceId, "Transferred Child");
+
+    // A child who moved classes inside the institution: the old enrollment is
+    // ended, the new one is active, and a thread still anchors to the old class.
+    const endedEnrollment = await seedEnrollment(scope, child, fromClass.id, "ended");
+    await seedEnrollment(scope, child, toClass.id);
+    const thread = await seedThread(scope, child, fromClass.id, endedEnrollment.id);
+
+    const facts = await repository.loadPolicyFacts(request(scope, target(thread.id)));
+    expect(facts).toMatchObject({
+      // Institution-scoped, so `scope_reaches_child` matches on institutionId
+      // alone and admits the child through the *other* class. Reusing it for
+      // 0C-3 would widen the predicate to the whole institution.
+      scope_reaches_child: true,
+      // 0C-3 asks the narrower question, and answers it differently.
+      child_in_named_class: false,
+      child_target_resolved: true,
+      target_scope_state: "in_scope",
+      enrollment_state: "inactive",
+    });
+    await expect(policy.evaluate(request(scope, target(thread.id)))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "scope_mismatch",
+    });
+  });
+
+  it("denies every target state when the institution scope is not current", async () => {
+    const scope = await seedScope("paused");
+    const child = await seedChild(scope.workspaceId, "Child A");
+    const homeClass = await seedClass(scope.workspaceId, scope.home.id, "Home Class");
+    await seedEnrollment(scope, child, homeClass.id);
+    const thread = await seedThread(scope, child, homeClass.id);
+
+    await expect(
+      repository.loadPolicyFacts(request(scope, target(thread.id))),
+    ).resolves.toMatchObject({
+      role_kind: "institution_admin",
+      institution_scope_current: false,
+      // Placement was never evaluated; the state stays honest rather than
+      // reporting an `in_scope` the code did not establish.
+      target_scope_state: "out_of_scope",
+    });
+    await expect(policy.evaluate(request(scope, target(thread.id)))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "not_authorized",
+    });
+    await expect(policy.evaluate(request(scope))).resolves.toMatchObject({
+      allowed: false,
+      reason_code: "not_authorized",
+    });
+  });
+});
