@@ -178,9 +178,11 @@ const computeLock = () => {
       aggregate_source_hash: "d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383",
     },
     host: {
-      head_revision: "cd7bbc2623dff8621c2c7155b04d1bf759e8404a",
-      runtime_revision: "658b897360734dfa916ce25abda7a8db5fb3f27d",
-      aggregate_source_hash: "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad",
+      // Advanced 2026-08-08 by the C30 landing: the host adoption is merged
+      // into My-Chat main and its own lock was re-frozen at 51ad97f.
+      head_revision: "51ad97f721bf74cced3ec75d24f3066c4ef6ab1c",
+      runtime_revision: "8228c2ab6bcf48a18499b094699e272633d5d3af",
+      aggregate_source_hash: "a95bb9835ad27081336628764b1fbfa86402dd27adb3aa88ce3404d424402029",
     },
     source_hash: sha256(
       sourceProfiles.map(({ source_identity, source_hash }) =>
