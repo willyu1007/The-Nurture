@@ -17,6 +17,7 @@ import {
 } from "@the-nurture/scenario";
 import { createNurtureRepositories, createPrismaClient, createScenarioRepositories, type NurturePrismaClient } from "@the-nurture/db";
 import { createDevHostPrismaClient, type DevHostPrismaClient } from "./db/dev-host-client.js";
+import { createDevHostRunBindingVerifier } from "./runtime/run-binding.verifier.js";
 import { MockCanonicalObjectResolver, PgArtifactPreviewPort, PgRunContextPort } from "./deps/mock-deps.js";
 import { PgWorkflowRuntimePort } from "./runtime/pg-workflow-runtime.port.js";
 import { PgWorkflowLedgerRepository } from "./ledger/pg-workflow-ledger.repository.js";
@@ -97,7 +98,11 @@ export const createNurtureApp = (
   const command = new WorkflowCommandService(ledger);
   const query = new WorkflowQueryService(ledger);
   const actions = new WorkflowActionService(devHostPrisma);
-  const worker = new WorkflowWorker(registry, workerRuntime);
+  const worker = new WorkflowWorker(
+    registry,
+    workerRuntime,
+    createDevHostRunBindingVerifier(devHostPrisma),
+  );
   const dispatcher = new StepDispatcher(devHostPrisma, registry, worker);
 
   return {

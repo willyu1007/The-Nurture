@@ -773,7 +773,15 @@ describe("T-009 I7b: joint N8 against the real My-Chat consumer", () => {
     ).toBe(1);
   });
 
-  it("J2: a guardian-confirmation envelope fails closed until the consumer implements it", async () => {
+  // Rewritten 2026-08-08 by the C30 cross-repository landing. The original
+  // asserted `rejected`/`contract_invalid` "until the consumer implements it";
+  // the pin rotation brought in the My-Chat commits that implement it, so the
+  // premise expired. `pending_guardian_confirmation` was already the frozen
+  // contract's answer here — the receipt parser, the outbox transaction and the
+  // Prisma delivery-state enum all model it — so this now asserts the
+  // implemented path and its companion rule (admission_ref, never
+  // material_ref) instead of the absence.
+  it("J2: a guardian-confirmation envelope is admitted as pending, with no material yet", async () => {
     const anchors = await seedMyChatAnchors();
     const world = await seedNurtureWorld([
       { tag: "A", myChat: { familyId: anchors.family.id, childId: anchors.child.id } },
@@ -796,10 +804,16 @@ describe("T-009 I7b: joint N8 against the real My-Chat consumer", () => {
       body: JSON.stringify(envelope),
     });
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({
-      status: "rejected",
-      reason_code: "contract_invalid",
-    });
+    const receipt = (await response.json()) as Record<string, unknown>;
+    expect(receipt).toMatchObject({ status: "pending_guardian_confirmation" });
+    // The frozen per-status companion rule: an admission exists to confirm
+    // against, but no material until the guardian actually confirms.
+    expect(receipt.admission_ref).toEqual(expect.any(String));
+    expect(receipt.material_ref).toBeUndefined();
+    // And nothing was materialized for the family while it is pending.
+    expect(
+      await myChat.growthMaterial.count({ where: { familyId: anchors.family.id } }),
+    ).toBe(0);
   });
 
   it("J4: the same source release key with different content conflicts", async () => {
