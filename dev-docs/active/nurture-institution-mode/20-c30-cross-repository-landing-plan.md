@@ -191,10 +191,47 @@ tests passed. Rotating the pins alone does not disturb existing Nurture main.
 This also answers the plan's second open question: a standalone step-3 commit
 works and is preferable, because it isolates the rotation from the restore.
 
-### Step 4 — The Nurture
+### Step 4 — The Nurture ✅ DONE 2026-08-08
 
-Revert the revert. `git revert faee71d` restores merge `915fa4c` together with
-its already-completed conflict resolution:
+Landed as `846c307`. **Typecheck reports 0 errors** — the same tree that
+produced 130 errors, 80 in `src`, before steps 1-3. The landing order was the
+entire problem.
+
+Three doc conflicts arose from work written after the revert, none from code.
+`05-pitfalls.md` is a union, branch entries first and the 2026-08-08 entry
+last. `00-overview.md` keeps the branch's per-artifact record as T-002's
+authoritative evidence and gains a landing-status block. `dashboard.md` was
+rewritten around the landed state.
+
+Self-pin re-frozen: `c0f97aec…` over 185 files → `fdb0eb75653ddb3162906665343f6712d40055425639f16f55ef20eb190d42b1`
+over 204. `verify-c30-i3-upstream.mjs` advanced from host `cd7bbc2` to
+`dc3607e`; its base head was already exact because Base fast-forwarded to that
+branch tip. Only head identities moved — the source-profile checks are
+untouched.
+
+Verified: pin verifier all six green, prisma clients regenerate, typecheck 0
+errors, routing census back to 63/29/11/14/2 with 0 unclassified, unit suite
+63 files / 672 tests passed, `verify:c30-i3-default-off` green at census
+`448d37e1…` with every positive count zero.
+
+**Two gates deliberately left unsatisfied, and neither was weakened to pass:**
+
+`verify:c30-i3-upstream` requires clean sibling worktrees; My-Chat's primary
+checkout carries unrelated work in progress. The gate is right to refuse — it
+is built for step 5's detached topology, not a live checkout.
+
+`verify:c30-i3-owner-adoption` fails because merged bytes differ from what the
+branch locked. Nine of 51 locked files differ and all nine are accounted for:
+four auto-merged by git (`nurture-scenario` `package.json` and `index.ts`,
+`assert-g2-exit-contract.mjs`, `prisma/schema.prisma`), two regenerated
+(`docs/context/db/schema.json`, `docs/context/registry.json`), two
+hand-resolved (`nurture-db/src/index.ts` kept both sides' exports,
+`assert-test-routing.mjs` took the recomputed census), one the upstream head
+advance. Re-freezing needs a post-commit `source_revision` plus the tool's own
+hardcoded host head, so **it is the first task of step 5**, not something to
+hide inside step 4.
+
+For reference, the conflict resolution this step restored:
 
 | File | Resolution already applied |
 | --- | --- |
@@ -209,7 +246,18 @@ the interim, the numbers move.
 
 ### Step 5 — One three-repository requalification
 
-Scope, following the T-009 closing-requalification discipline:
+**Open its first task with the two lock re-freezes** deferred from step 4:
+regenerate `docs/project/integrations/c30-i3-owner-adoption-lock.json` from the
+committed tree (the tool prints the new lock to stdout when run without
+`--check`, and its `assertSourceRevision` requires a `source_revision` where the
+locked files already have their landed content), and advance the hardcoded
+`host.head_revision` inside
+`scripts/compute-c30-i3-owner-adoption-hash.mjs` from `cd7bbc2` to `dc3607e`.
+Re-freeze because the bytes intentionally changed, never to make a red gate
+green — the nine differing files are enumerated under step 4 and each one must
+stay explainable.
+
+Then the full scope, following the T-009 closing-requalification discipline:
 
 - three adjacent detached worktrees at the exact new heads, so package links,
   the pin verifier and every lane load the same frozen sources;
