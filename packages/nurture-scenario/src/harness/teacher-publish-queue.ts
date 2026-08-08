@@ -25,6 +25,7 @@ import type { CaregiverBoardScopeFacts } from "./caregiver-board-queries.js";
 import {
   PUBLISH_PROCESS_STATES,
   PUBLISH_PROCESS_TARGET_KIND,
+  issuePublishTargetRef,
   type PublishDataClassV1,
   type PublishProcessStateV1,
 } from "./publish-process.js";
@@ -53,6 +54,26 @@ export const TEACHER_PUBLISH_QUEUE_ORDER = "state_rank_asc,occurred_at_desc,id_d
 export const publishStateRank = (state: PublishProcessStateV1): string =>
   String(PUBLISH_PROCESS_STATES.indexOf(state)).padStart(2, "0");
 
+/**
+ * Requirements §四 display vocabulary for per-target family-growth delivery
+ * (T-009 I6.2). A display-only projection of the provider outbox and receipt
+ * store: `delivering` covers rows not yet settled (including not-yet-
+ * attempted), `outcome_unknown` stays its own visible state, and the six
+ * receipt statuses appear only with a recorded receipt behind them.
+ */
+export const FAMILY_GROWTH_QUEUE_STATES = [
+  "delivering",
+  "applied",
+  "pending_guardian_confirmation",
+  "duplicate",
+  "tombstoned",
+  "rejected",
+  "conflict",
+  "outcome_unknown",
+] as const;
+
+export type FamilyGrowthQueueStateV1 = (typeof FAMILY_GROWTH_QUEUE_STATES)[number];
+
 export type RawPublishQueueRow = {
   process_key: string;
   state: PublishProcessStateV1;
@@ -68,6 +89,8 @@ export type RawPublishQueueRow = {
   edit_hold_active: boolean;
   authority: CaregiverFactAuthorityV1;
   action_grants: OwnerEligibilityGrantV1[];
+  /** Present only for targets whose release entered family-growth delivery. */
+  family_growth?: Array<{ target_key: string; state: FamilyGrowthQueueStateV1 }>;
 };
 
 export type TeacherPublishQueueReadPort = {
@@ -107,6 +130,8 @@ export type TeacherPublishQueueItemV1 = {
   scheduledAt?: string;
   editHoldActive: boolean;
   actions: BoardActionRefV1[];
+  /** Per-target family-growth delivery states, owner-issued refs only. */
+  familyGrowth?: Array<{ targetRef: string; state: FamilyGrowthQueueStateV1 }>;
 };
 
 export type TeacherPublishQueueOutputV1 = {
@@ -236,6 +261,14 @@ export const queryTeacherPublishQueue = async (
         ...(row.scheduled_at ? { scheduledAt: row.scheduled_at } : {}),
         editHoldActive: row.edit_hold_active,
         actions: projectOwnerActions(deps.integrity_key, scope, row.action_grants),
+        ...(row.family_growth && row.family_growth.length > 0
+          ? {
+              familyGrowth: row.family_growth.map((entry) => ({
+                targetRef: issuePublishTargetRef(deps.integrity_key, scope, entry.target_key),
+                state: entry.state,
+              })),
+            }
+          : {}),
       };
     },
   });

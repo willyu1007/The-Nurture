@@ -12,6 +12,7 @@ import type {
   PublishProcessStateV1,
   PublishProcessRescheduleFactsV1,
   RawBoardSourceHead,
+  FamilyGrowthQueueStateV1,
   RawPublishQueueRow,
   TeacherPublishQueueReadPort,
 } from "@the-nurture/scenario/harness";
@@ -218,6 +219,60 @@ export class PrismaPublishLaneReadPort
     }));
 
     const page = rows.slice(0, input.take);
+
+    // T-009 I6.2: per-target family-growth delivery states, a display-only
+    // projection of the provider outbox and its recorded receipts. A settled
+    // row without receipt evidence stays "delivering" — the queue never
+    // claims a status no receipt proves.
+    const pageKeys = page.map((row) => row.process_key);
+    if (pageKeys.length > 0) {
+      const outboxEvents = await this.prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          kind: "released",
+          publicationRelease: {
+            publishProcess: {
+              workspaceId: input.workspace_id,
+              processKey: { in: pageKeys },
+            },
+          },
+        },
+        select: {
+          deliveryState: true,
+          publicationRelease: {
+            select: {
+              publishProcess: { select: { processKey: true } },
+              target: { select: { targetKey: true } },
+            },
+          },
+          receipts: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { status: true },
+          },
+        },
+      });
+      const byProcess = new Map<string, NonNullable<RawPublishQueueRow["family_growth"]>>();
+      for (const event of outboxEvents) {
+        const state: FamilyGrowthQueueStateV1 =
+          event.deliveryState === "outcome_unknown"
+            ? "outcome_unknown"
+            : event.deliveryState === "delivered" || event.deliveryState === "failed"
+              ? (event.receipts[0]?.status ?? "delivering")
+              : "delivering";
+        const processKey = event.publicationRelease.publishProcess.processKey;
+        const entries = byProcess.get(processKey) ?? [];
+        entries.push({ target_key: event.publicationRelease.target.targetKey, state });
+        byProcess.set(processKey, entries);
+      }
+      for (const row of page) {
+        const entries = byProcess.get(row.process_key);
+        if (entries && entries.length > 0) {
+          entries.sort((left, right) => left.target_key.localeCompare(right.target_key));
+          row.family_growth = entries;
+        }
+      }
+    }
 
     return {
       authorized: true,

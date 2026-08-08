@@ -159,6 +159,43 @@ describe("G3-B1 query_teacher_publish_queue", () => {
     expect(scheduled.output.items[0]?.scheduledAt).toBe("2026-08-01T09:00:00.000Z");
   });
 
+  it("projects per-target family-growth states behind owner-issued refs only", async () => {
+    const result = await queryTeacherPublishQueue(
+      deps(
+        createPublishQueueReadPort([
+          {
+            rows: [
+              publishQueueRow({
+                process_key: "process-1",
+                family_growth: [
+                  { target_key: "target:child-A", state: "applied" },
+                  { target_key: "target:child-B", state: "outcome_unknown" },
+                ],
+              }),
+              publishQueueRow({ process_key: "process-2" }),
+            ],
+            has_more: false,
+          },
+        ]),
+      ),
+      scopeFacts(),
+      scope,
+    );
+    expect(result.status).toBe("ok");
+    if (result.status !== "ok") return;
+    const [withStates, without] = result.output.items;
+    expect(withStates?.familyGrowth).toHaveLength(2);
+    expect(withStates?.familyGrowth?.map((entry) => entry.state)).toEqual([
+      "applied",
+      "outcome_unknown",
+    ]);
+    // Owner-issued sealed refs only: no raw target key crosses the surface.
+    for (const entry of withStates?.familyGrowth ?? []) {
+      expect(entry.targetRef).not.toContain("target:child");
+    }
+    expect(without?.familyGrowth).toBeUndefined();
+  });
+
   it("refuses every identity that is not an exact-CareGroup caregiver", async () => {
     for (const authority of [
       caregiverAuthority({ role: "institution_admin" }),

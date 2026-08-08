@@ -83,6 +83,26 @@
         },
         "actions": {
           "$ref": "board-types.schema.json#/$defs/boardActionRefs"
+        },
+        "familyGrowth": {
+          "description": "Per-target family-growth delivery states; absent until a release enters delivery.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "targetRef",
+              "state"
+            ],
+            "properties": {
+              "targetRef": {
+                "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+              },
+              "state": {
+                "$ref": "publish-process-types.schema.json#/$defs/familyGrowthQueueState"
+              }
+            }
+          }
         }
       }
     }
