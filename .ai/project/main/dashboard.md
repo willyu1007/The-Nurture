@@ -22,7 +22,14 @@ Project: `main`
   N8 fixtures pass jointly against the real My-Chat consumer. My-Chat T-031
   owns the remaining consumer half; the guardian planning surface is ceded
   to My-Chat cultivation (D-T009-01), executed at `1.16.0`.
-- Other active tasks: T-002 (`C30-I0` cross-repository C/D pending);
+- Other active tasks: T-002 — **status contested, do not cite either side as
+  current**. `main`'s task doc (updated 2026-08-05) reports `C30-I0-C`
+  partial / `C30-I0-D` pending, but the local-only branch
+  `codex/T-002-c30-i0` (tip `76ece1f`, 2026-08-06, 58 commits, unpushed)
+  reports `C30-I0` complete plus `C30-I1`, `C30-I2` and `C30-I3` accepted
+  default-off. The branch forked at `882d80f`, before the T-006 merge and
+  all of T-009, so integration — not implementation — is the open question.
+  See "T-002 integration decision" below.
   T-003 rescoped toward presenter-contract supply, artifacts hand to
   My-Chat T-036 (D-T009-06).
 - Planned chain: T-007 G4-0C is now the next unblocked unit (D-T009-05
@@ -37,15 +44,25 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. Select the next implementation unit. T-007 G4-0C (Authority & Surface
-   Contracts) is the unblocked candidate; a narrower `0C-min` fast lane is
-   proposed in
-   `dev-docs/active/nurture-institution-surfaces/09-0c-min-fast-lane-proposal.md`
-   and requires a separate decision.
-2. Rebind G4-0A's exact-input table to `1.17.0` / My-Chat `df7a273…` /
-   Base `8a3ea90…` before any 0C freeze record is issued.
-3. Preserve T-006 and T-009 as done and archive them only after explicit
-   approval; resume T-002 `C30-I0-C/D` when prioritized.
+1. **T-002 integration decision (now the critical path).** 2026-08-08: the
+   `0C-min` proposal was answered with option C — prioritize T-002, because
+   the T-002 owner path is what both 0C options need re-established at
+   current pins. Resuming T-002 then revealed that the work is not where
+   `main` says: 58 unpushed commits carry `C30-I0` through `C30-I3`. Decide
+   how to integrate that branch before any further T-002 implementation.
+   Sub-decisions: reconcile the two status claims, resolve the migration
+   ordering (5 branch migrations dated 2026-08-06 versus T-009's two dated
+   2026-08-07, an order neither side qualified), and re-establish T-002's
+   gate evidence at current pins rather than the superseded
+   `a019566`/`06303e9`.
+2. G4-0A's exact inputs were rebound on 2026-08-08; the T-002 owner path is
+   now correctly `DEFINED_UNQUALIFIED`. No 0C freeze record may cite the
+   T-002 G1 record as current-pin evidence.
+3. T-007 G4-0C remains the deferred next surface unit; the `0C-min` proposal
+   in `dev-docs/active/nurture-institution-surfaces/09-0c-min-fast-lane-proposal.md`
+   stays open behind the T-002 work.
+4. Preserve T-006 and T-009 as done and archive them only after explicit
+   approval.
 
 ## Notes (manual)
 
