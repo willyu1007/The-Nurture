@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "dc3607e74b01def9cf855d3eca14ebff7c3c492f",
+    "revision": "8228c2ab6bcf48a18499b094699e272633d5d3af",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"

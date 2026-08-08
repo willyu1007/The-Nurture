@@ -6,13 +6,15 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const baseRoot = resolve(repositoryRoot, "../My-Workflow-Base");
 const hostRoot = resolve(repositoryRoot, "../My-Chat");
 
-// Advanced 2026-08-08 by the C30 cross-repository landing: Base main
-// fast-forwarded to exactly this branch tip, and My-Chat main merged the
-// host adoption as dc3607e. The source-profile checks below are unchanged and
-// remain the substantive gate — only the head identities moved.
+// Advanced 2026-08-08 by the C30 cross-repository landing. Base main
+// fast-forwarded to exactly this branch tip. My-Chat merged the host adoption
+// as dc3607e and then took one further commit, 8228c2a, which is content-inert
+// for every pinned path set — the contract and both source pins hash
+// identically across it. The source-profile checks below are unchanged and
+// remain the substantive gate; only the head identities moved.
 const expected = {
   baseHead: "4350086993d837baa8030564f4e19593dedd96b0",
-  hostHead: "dc3607e74b01def9cf855d3eca14ebff7c3c492f",
+  hostHead: "8228c2ab6bcf48a18499b094699e272633d5d3af",
 };
 
 const run = (command, args, cwd) =>
