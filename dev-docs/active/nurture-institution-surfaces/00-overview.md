@@ -8,9 +8,13 @@
 - Updated: 2026-08-08
 - Next step: **G4-0C Exit** — all six ordered units are frozen
   (`11`…`16`), so what remains is 0G's rolling cross-contract audit over them
-  plus review of three open points that were frozen conservative rather than
-  invented: institution wind-down read (0C-2), small-cell aggregate
-  suppression and workload-magnitude ordering (0C-5).
+  plus review of the two remaining open points frozen conservative rather than
+  invented — small-cell aggregate suppression and workload-magnitude ordering,
+  both 0C-5. The third, institution wind-down read, is **closed**: it was
+  mis-posed, and the investigation instead produced
+  [`17-lifecycle-status-cleanup-decision.md`](./17-lifecycle-status-cleanup-decision.md),
+  which routes a schema convergence to T-002 and gives 0C its contract-level
+  currency rule.
   Scope contract: [`10-g4-0c-scope-freeze.md`](./10-g4-0c-scope-freeze.md).
   Full 0C was chosen over the narrow `0C-min` fast lane
   ([`09-0c-min-fast-lane-proposal.md`](./09-0c-min-fast-lane-proposal.md),

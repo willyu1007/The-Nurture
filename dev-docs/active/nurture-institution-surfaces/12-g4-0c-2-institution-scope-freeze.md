@@ -12,7 +12,8 @@
   unchanged
 - Verdict: `G4_0C_2_FREEZE_PASS`
 - Releases: 0C-3, 0C-4, and the G4-A authority foundation
-- Open point for review: institution lifecycle states — see §5
+- Open point: **closed** 2026-08-08 by
+  [`17-lifecycle-status-cleanup-decision.md`](./17-lifecycle-status-cleanup-decision.md)
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
 
@@ -75,7 +76,7 @@ InstitutionScopeContextV1
   contractVersion     "1.0.0"
 ```
 
-`institutionState` is a single-member union by construction: a non-active
+`institutionState` is a single-member union by construction: a non-current
 institution never yields a context (§5). It is present so a later widening is
 a visible union change rather than a silent behavioural one.
 
@@ -130,18 +131,37 @@ Two invariants frozen here:
 ## 5. Lifecycle and currency
 
 `NurtureCareInstitutionStatus` is `active | paused | archived | deleted`.
-**Only `active` grants institution scope.** The other three deny with distinct
-reason codes so an operator can tell a paused institution from a deleted one.
+**Only `active` grants institution scope** — behaviour T-005 already
+implemented, not a choice made here. `paused` and `archived` are unreachable:
+no production code sets them, and the accepted cleanup decision removes them.
 
 Authority is reread per request, inheriting 0C-1's no-cache, no-grace-window
-rule. An institution paused between two requests denies the second.
+rule. A row that stops being current between two requests denies the second.
 
-> **Open point, deliberately frozen conservative.** Whether a wind-down read
-> path should exist for `paused` or `archived` institutions is a product
-> question 0A did not settle and this unit does not invent. It is frozen shut:
-> no read, no exception. Opening one later is an explicit amendment to this
-> record with its own fixtures, not an implicit widening of
-> `institutionState`. Flagged for review before 0C Exit.
+> **Open point CLOSED 2026-08-08** —
+> [`17-lifecycle-status-cleanup-decision.md`](./17-lifecycle-status-cleanup-decision.md).
+>
+> The original framing was wrong. Denying on non-active is not a conservative
+> choice this unit made: it is behaviour T-005 already implemented and
+> qualified through G2 Exit, in `care-capture.read.ts`,
+> `care-capture.transaction.ts` and `institution-business-communication.read.ts`.
+> This record describes that behaviour rather than deciding it.
+>
+> Nor was there a wind-down question to answer. No production code sets
+> `paused` or `archived` on any institution — the values are unreachable, so no
+> business event can produce the state whose handling was being debated.
+>
+> What the investigation did find is a live defect: `status` and `deletedAt`
+> both encode deletion, and call sites have already split on which they trust.
+> The accepted decision removes `paused`/`archived` and converges `status` on
+> `deletedAt`, with schema execution routed to T-002. 0C adopts only the
+> contract-level half, below.
+
+**Currency rule (Stage 1 of that decision), frozen here:** an institution,
+care group or child care process counts as current only when
+`status = active` **and** `deletedAt IS NULL`. The conjunction is required
+because the two fields can disagree, and today some readers check one and some
+check both. Every 0C predicate uses the conjunction.
 
 No idempotency, outbox or replay semantics: 0C-2 introduces no command.
 
