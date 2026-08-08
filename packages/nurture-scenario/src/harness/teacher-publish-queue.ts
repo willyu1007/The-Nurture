@@ -74,6 +74,23 @@ export const FAMILY_GROWTH_QUEUE_STATES = [
 
 export type FamilyGrowthQueueStateV1 = (typeof FAMILY_GROWTH_QUEUE_STATES)[number];
 
+/**
+ * Requirements §四 lifecycle overlay (T-009 I8): a released target whose
+ * provider has COMMITTED a lifecycle event shows it alongside the delivery
+ * state ("correction 已追加" / "target removed" / "redacted"). Committed is
+ * the display truth — the pair lands atomically with the visibility event;
+ * the family-side receipt continues to live in the delivery state.
+ * Precedence when several exist: redacted over target_removed over
+ * correction_appended.
+ */
+export const FAMILY_GROWTH_LIFECYCLE_STATES = [
+  "correction_appended",
+  "target_removed",
+  "redacted",
+] as const;
+
+export type FamilyGrowthLifecycleStateV1 = (typeof FAMILY_GROWTH_LIFECYCLE_STATES)[number];
+
 export type RawPublishQueueRow = {
   process_key: string;
   state: PublishProcessStateV1;
@@ -90,7 +107,11 @@ export type RawPublishQueueRow = {
   authority: CaregiverFactAuthorityV1;
   action_grants: OwnerEligibilityGrantV1[];
   /** Present only for targets whose release entered family-growth delivery. */
-  family_growth?: Array<{ target_key: string; state: FamilyGrowthQueueStateV1 }>;
+  family_growth?: Array<{
+    target_key: string;
+    state: FamilyGrowthQueueStateV1;
+    lifecycle?: FamilyGrowthLifecycleStateV1;
+  }>;
 };
 
 export type TeacherPublishQueueReadPort = {
@@ -131,7 +152,11 @@ export type TeacherPublishQueueItemV1 = {
   editHoldActive: boolean;
   actions: BoardActionRefV1[];
   /** Per-target family-growth delivery states, owner-issued refs only. */
-  familyGrowth?: Array<{ targetRef: string; state: FamilyGrowthQueueStateV1 }>;
+  familyGrowth?: Array<{
+    targetRef: string;
+    state: FamilyGrowthQueueStateV1;
+    lifecycle?: FamilyGrowthLifecycleStateV1;
+  }>;
 };
 
 export type TeacherPublishQueueOutputV1 = {
@@ -266,6 +291,7 @@ export const queryTeacherPublishQueue = async (
               familyGrowth: row.family_growth.map((entry) => ({
                 targetRef: issuePublishTargetRef(deps.integrity_key, scope, entry.target_key),
                 state: entry.state,
+                ...(entry.lifecycle ? { lifecycle: entry.lifecycle } : {}),
               })),
             }
           : {}),

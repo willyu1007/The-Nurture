@@ -1,5 +1,12 @@
 # T-009 Nurture Family Growth Provider
 
+Status (2026-08-08): **all increments I0–I8 landed**; the N1–N8 provider
+delivery is complete and jointly verified against the real My-Chat consumer.
+Contract at `nurture.surface-contract@1.17.0`; batch requalification record in
+`06-i6-batch-requalification-record.md` (refreshed at the I8 checkpoint).
+Remaining work is consumer-side (My-Chat Phase 3–6) and deployment-infra
+ports; see `04-verification.md` for the evidence rows.
+
 ## Goal
 
 Implement the Nurture provider side of the frozen My-Chat
