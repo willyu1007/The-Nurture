@@ -48,7 +48,9 @@ import {
 // Fixtures 10 and 11 are provider-local (no consumer involvement) and stay
 // proven by the I7a conformance suite; fixture 2's pending path awaits the
 // consumer's guardian-confirmation implementation and is asserted here as
-// the fail-closed rejected receipt the current consumer answers.
+// the fail-closed rejected receipt the current consumer answers. JX1 is a
+// joint-only hardening case beyond the N8 set: a tampered rendition must
+// fail the consumer's own digest verification.
 const NURTURE_DATABASE_URL = process.env.X5_NURTURE_DATABASE_URL;
 const MY_CHAT_DATABASE_URL = process.env.X5_MY_CHAT_DATABASE_URL;
 if (!NURTURE_DATABASE_URL || !MY_CHAT_DATABASE_URL) {
@@ -72,6 +74,10 @@ const EVENTS_TOKEN = "joint-events-service-token-32ch!";
 const RENDITION_TOKEN = "joint-rendition-service-token-32";
 const MEDIA_BYTES = Buffer.from("joint-family-growth-jpeg-bytes", "utf8");
 const MEDIA_DIGEST = createHash("sha256").update(MEDIA_BYTES).digest("hex");
+// What the rendition endpoint actually serves, per asset. Normally the bytes
+// behind the asset's contentDigest; a test may register different bytes to
+// prove the consumer's own digest verification rejects a tampered download.
+const servedBytesByAssetId = new Map<string, Buffer>();
 
 const protectedContent = createAesGcmProtectedContentPort({
   keyRef: "joint-key",
@@ -147,7 +153,9 @@ class NurtureRenditionServer {
       if (!resolved) {
         return { status: 404, body: JSON.stringify({ error: "rendition_unavailable" }) };
       }
-      return { status: 200, body: MEDIA_BYTES, contentType: resolved.contentMimeType };
+      const assetId = ref.split(":")[1] ?? "";
+      const bytes = servedBytesByAssetId.get(assetId) ?? MEDIA_BYTES;
+      return { status: 200, body: bytes, contentType: resolved.contentMimeType };
     }
     return { status: 404, body: JSON.stringify({ error: "rendition_unavailable" }) };
   }
@@ -159,6 +167,8 @@ class MyChatConsumerServer {
   server: Server | null = null;
   baseUrl = "";
   available = true;
+  /** Every staged-media discard the intake requested, in order. */
+  discards: Array<{ cleanupRef: string; reason: string }> = [];
 
   async start(nurtureBaseUrl: string): Promise<void> {
     // Thin importer shim per addendum §4 over Nurture's REAL rendition
@@ -207,7 +217,10 @@ class MyChatConsumerServer {
         }
         return { cleanupRef, items };
       },
-      discardReleasedMedia: async () => ({ status: "discarded" as const }),
+      discardReleasedMedia: async (input) => {
+        this.discards.push({ cleanupRef: input.cleanupRef, reason: input.reason });
+        return { status: "discarded" as const };
+      },
     };
     const service = new FamilyGrowthIntakeService(
       new PrismaFamilyGrowthIntakeRepository(myChat),
@@ -291,7 +304,14 @@ const seedMyChatAnchors = async (options: { membership?: boolean } = {}) => {
   return { family, child };
 };
 
-type ChildSpec = { tag: string; myChat: { familyId: string; childId: string } };
+type ChildSpec = {
+  tag: string;
+  myChat: { familyId: string; childId: string };
+  /** Bytes behind this child's media asset; the asset digest is theirs. */
+  mediaBytes?: Buffer;
+  /** Served instead of mediaBytes to simulate a tampered rendition. */
+  servedBytes?: Buffer;
+};
 
 const seedNurtureWorld = async (children: ChildSpec[]) => {
   const workspaceId = randomUUID();
@@ -336,28 +356,33 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
       effectiveFrom: new Date("2026-08-01T00:00:00.000Z"),
     },
   });
-  const process = await prisma.nurturePublishProcess.create({
-    data: {
-      workspaceId,
-      careGroupId: group.id,
-      processKey: `publish:${randomUUID()}`,
-      state: "pending_release",
-      dataClass: "child_growth_record",
-      purposeKey: "child_growth_publication",
-      authorizingRoleAssignmentId: teacherRole.id,
-      ...SCHEDULE,
-    },
-  });
-
+  // One publish process PER child — the split_process route the qualified
+  // privacy gate sanctions for multi-family content: a shared composition
+  // would expose each child's photo to the other family's target and fail
+  // closed (the fixture-9 model finding).
   const seeded = [] as Array<{
     tag: string;
     careProcessId: string;
     familyId: string;
+    processKey: string;
     targetKey: string;
     assetId: string;
+    mediaDigest: string;
     canonical: { familyId: string; childId: string };
   }>;
   for (const spec of children) {
+    const process = await prisma.nurturePublishProcess.create({
+      data: {
+        workspaceId,
+        careGroupId: group.id,
+        processKey: `publish:${randomUUID()}`,
+        state: "pending_release",
+        dataClass: "child_growth_record",
+        purposeKey: "child_growth_publication",
+        authorizingRoleAssignmentId: teacherRole.id,
+        ...SCHEDULE,
+      },
+    });
     const child = await prisma.nurtureChild.create({
       data: { workspaceId, displayName: `Child ${spec.tag}`, status: "active" },
     });
@@ -395,6 +420,8 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
         status: "active",
       },
     });
+    const mediaBytes = spec.mediaBytes ?? MEDIA_BYTES;
+    const mediaDigest = createHash("sha256").update(mediaBytes).digest("hex");
     const asset = await prisma.nurtureMediaAssetRef.create({
       data: {
         workspaceId,
@@ -405,10 +432,11 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
         lifecycle: "ready",
         mediaRevision: 1,
         capturedAt: new Date("2026-08-07T02:15:00.000Z"),
-        contentDigest: MEDIA_DIGEST,
+        contentDigest: mediaDigest,
         contentMimeType: "image/jpeg",
       },
     });
+    servedBytesByAssetId.set(asset.id, spec.servedBytes ?? mediaBytes);
     await prisma.nurtureChildMediaAttribution.create({
       data: {
         workspaceId,
@@ -486,34 +514,36 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
         },
       });
     }
+    const revision = await prisma.nurturePublishProcessRevision.create({
+      data: {
+        workspaceId,
+        publishProcessId: process.id,
+        revision: 1,
+        contentDigest: hash(`content:${workspaceId}:${spec.tag}`),
+        organizerInputRevision: "organizer:1",
+        titleProtectionPayload: protectedContent.seal("户外写生活动") as never,
+        mediaCompositionPayload: {
+          media: [{ mediaAssetId: asset.id, mediaRevision: 1 }],
+        },
+      },
+    });
+    await prisma.nurturePublishProcess.update({
+      where: { id: process.id },
+      data: { currentRevisionId: revision.id },
+    });
     seeded.push({
       tag: spec.tag,
       careProcessId: careProcess.id,
       familyId: family.id,
+      processKey: process.processKey,
       targetKey: target.targetKey,
       assetId: asset.id,
+      mediaDigest,
       canonical: spec.myChat,
     });
   }
 
-  const revision = await prisma.nurturePublishProcessRevision.create({
-    data: {
-      workspaceId,
-      publishProcessId: process.id,
-      revision: 1,
-      contentDigest: hash(`content:${workspaceId}`),
-      organizerInputRevision: "organizer:1",
-      titleProtectionPayload: protectedContent.seal("户外写生活动") as never,
-      mediaCompositionPayload: {
-        media: seeded.map((entry) => ({ mediaAssetId: entry.assetId, mediaRevision: 1 })),
-      },
-    },
-  });
-  await prisma.nurturePublishProcess.update({
-    where: { id: process.id },
-    data: { currentRevisionId: revision.id },
-  });
-  return { workspaceId, teacher: teacher!, teacherRole, process, revision, children: seeded };
+  return { workspaceId, teacher: teacher!, teacherRole, children: seeded };
 };
 
 // --- provider chain --------------------------------------------------------
@@ -559,7 +589,7 @@ const prepareAndCommit = async (
   });
   const prep = await preparer.prepare({
     workspace_id: world.workspaceId,
-    process_key: world.process.processKey,
+    process_key: child.processKey,
     target_key: child.targetKey,
     child_care_process_id: child.careProcessId,
     revision: 1,
@@ -568,7 +598,7 @@ const prepareAndCommit = async (
   const commit = await new PrismaPublicationReleasePort(prisma).commitTargetRelease({
     workspace_id: world.workspaceId,
     participant_id: world.teacher.id,
-    process_key: world.process.processKey,
+    process_key: child.processKey,
     target_key: child.targetKey,
     revision: 1,
     command_request_id: options.commandRequestId ?? `cmd:${randomUUID()}`,
@@ -936,30 +966,107 @@ describe("T-009 I7b: joint N8 against the real My-Chat consumer", () => {
     ).toBe(0);
   });
 
-  it("J9: two families stay independent — no membership means rejected, the other applies", async () => {
+  it("J9: two families in ONE workspace stay independent — no membership rejects alone, with zero side effects", async () => {
     const anchorsA = await seedMyChatAnchors();
     const anchorsB = await seedMyChatAnchors({ membership: false });
-    // One process per family (the sanctioned split_process route under the
-    // privacy gate): each release commits independently, and the consumer
+    // One shared workspace/care group/process with two targets and DISTINCT
+    // media bytes per child: a bug that mixed targets or media inside a
+    // workspace could not hide behind per-test isolation. The consumer
     // decides each family on its own facts — A has a current membership and
-    // applies; B has none and rejects. Neither outcome touches the other.
-    const worldA = await seedNurtureWorld([
-      { tag: "A", myChat: { familyId: anchorsA.family.id, childId: anchorsA.child.id } },
+    // applies; B has none and rejects — delivered together in one tick.
+    const bytesA = Buffer.from("joint-family-a-distinct-jpeg-bytes", "utf8");
+    const bytesB = Buffer.from("joint-family-b-distinct-jpeg-bytes", "utf8");
+    const world = await seedNurtureWorld([
+      {
+        tag: "A",
+        myChat: { familyId: anchorsA.family.id, childId: anchorsA.child.id },
+        mediaBytes: bytesA,
+      },
+      {
+        tag: "B",
+        myChat: { familyId: anchorsB.family.id, childId: anchorsB.child.id },
+        mediaBytes: bytesB,
+      },
     ]);
-    const worldB = await seedNurtureWorld([
-      { tag: "B", myChat: { familyId: anchorsB.family.id, childId: anchorsB.child.id } },
-    ]);
-    const a = await prepareAndCommit(worldA, worldA.children[0]!);
-    const b = await prepareAndCommit(worldB, worldB.children[0]!);
+    const [childA, childB] = world.children;
+    const a = await prepareAndCommit(world, childA!);
+    const b = await prepareAndCommit(world, childB!);
     expect(a.commit?.status).toBe("committed");
     expect(b.commit?.status).toBe("committed");
-    expect((await tick(worldA)).settled).toBe(1);
-    expect((await tick(worldB)).settled).toBe(1);
-    expect((await receipts(worldA.workspaceId))[0]).toMatchObject({ status: "applied" });
-    expect((await receipts(worldB.workspaceId))[0]).toMatchObject({
-      status: "rejected",
+    expect(await tick(world)).toEqual({ claimed: 2, settled: 2, retried: 0 });
+
+    const stored = await receipts(world.workspaceId);
+    expect(stored.map((entry) => entry.status).sort()).toEqual(["applied", "rejected"]);
+    expect(stored.find((entry) => entry.status === "rejected")).toMatchObject({
       reasonCode: "family_membership_required",
     });
+
+    // A holds exactly one material carrying exactly A's bytes.
+    const materialsA = await myChat.growthMaterial.findMany({
+      where: { familyId: anchorsA.family.id },
+      include: { media: { include: { familyMediaAsset: { include: { blob: true } } } } },
+    });
+    expect(materialsA).toHaveLength(1);
+    expect(materialsA[0]!.childId).toBe(anchorsA.child.id);
+    expect(
+      materialsA[0]!.media.map((link) => link.familyMediaAsset.blob.sha256),
+    ).toEqual([childA!.mediaDigest]);
+
+    // B's rejection left NOTHING behind: no material, admission, family
+    // media asset, or blob of B's bytes anywhere.
+    expect(
+      await myChat.growthMaterial.count({ where: { familyId: anchorsB.family.id } }),
+    ).toBe(0);
+    expect(
+      await myChat.growthMaterialAdmission.count({
+        where: { familyId: anchorsB.family.id },
+      }),
+    ).toBe(0);
+    expect(
+      await myChat.familyMediaAsset.count({ where: { familyId: anchorsB.family.id } }),
+    ).toBe(0);
+    expect(await myChat.mediaBlob.count({ where: { sha256: childB!.mediaDigest } })).toBe(0);
+  });
+
+  it("JX1: tampered rendition bytes fail the consumer's digest verification and stage nothing", async () => {
+    const anchors = await seedMyChatAnchors();
+    const tampered = Buffer.from("joint-tampered-bytes-wrong-digest", "utf8");
+    // The asset's contentDigest describes the true bytes; the rendition
+    // endpoint serves different ones. Only the consumer's own comparison of
+    // downloaded-bytes digest vs the envelope can catch this.
+    const world = await seedNurtureWorld([
+      {
+        tag: "A",
+        myChat: { familyId: anchors.family.id, childId: anchors.child.id },
+        servedBytes: tampered,
+      },
+    ]);
+    const { commit } = await prepareAndCommit(world, world.children[0]!);
+    expect(commit?.status).toBe("committed");
+
+    const discardsBefore = consumer.discards.length;
+    expect(await tick(world)).toEqual({ claimed: 1, settled: 1, retried: 0 });
+    const [receipt] = await receipts(world.workspaceId);
+    expect(receipt).toMatchObject({
+      status: "rejected",
+      reasonCode: "media_import_mismatch",
+    });
+    // The staged download was discarded, the provider settled terminally,
+    // and nothing reached the family archive.
+    expect(consumer.discards.length).toBe(discardsBefore + 1);
+    expect(consumer.discards.at(-1)).toMatchObject({ reason: "validation_failed" });
+    const [row] = await prisma.nurtureFamilyGrowthOutboxEvent.findMany({
+      where: { workspaceId: world.workspaceId },
+    });
+    expect(row!.deliveryState).toBe("failed");
+    expect(
+      await myChat.growthMaterial.count({ where: { familyId: anchors.family.id } }),
+    ).toBe(0);
+    expect(
+      await myChat.familyMediaAsset.count({ where: { familyId: anchors.family.id } }),
+    ).toBe(0);
+    const tamperedDigest = createHash("sha256").update(tampered).digest("hex");
+    expect(await myChat.mediaBlob.count({ where: { sha256: tamperedDigest } })).toBe(0);
   });
 
   it("J12: consumer downtime keeps the event retriable until it succeeds", async () => {

@@ -2,6 +2,47 @@
 
 Running log; newest first.
 
+- 2026-08-08 (post-requal quality pass — 4 findings fixed, requal refreshed):
+  independent review (Codex gpt-5.6-sol) + self-review of the I6.2 + I7b
+  range surfaced four real defects; all fixed and the batch requalified
+  again at the new checkpoint:
+  1. The queue's family-growth states lived OUTSIDE the source-head drift
+     contract: a receipt landing moved no head, so a cursor could stitch
+     pages from different delivery worlds with no refresh signal. Fixed by
+     folding a queue-wide family-growth census into the `publish_queue`
+     source head — bucketed by DISPLAY state (pending+delivering share a
+     bucket, so claim transitions deliberately do not churn the head) plus
+     receipt count/newest. Test proves heads move on each receipt.
+  2. "Latest receipt" selection ordered by `createdAt` only — same-ms
+     receipts picked arbitrarily (and uuid ids are random, so id alone is
+     not insertion order). Now ordered by `processedAt` (the consumer's
+     meaningful instant — a guardian confirmation post-dates the pending
+     receipt it resolves), then createdAt/id as deterministic tiebreaks.
+     Test: pending_guardian_confirmation → applied wins the display.
+  3. J9 isolated its two families into separate WORKSPACES, so cross-family
+     mixing inside one workspace was untested, and it never asserted the
+     rejected family's zero side effects. Rewritten: one workspace/care
+     group, split processes (the sanctioned multi-family route — a shared
+     composition fails the privacy gate for the other target, re-confirmed
+     while reworking), DISTINCT media bytes per child, one delivery tick
+     for both; asserts A has exactly one material carrying exactly A's
+     bytes and B has zero materials/admissions/media assets/blobs.
+  4. The digest-verification evidence was happy-path only (expected digest
+     and served bytes came from the same constant). New JX1: the rendition
+     endpoint serves TAMPERED bytes for an asset whose envelope digest
+     describes the true ones — the real consumer rejects
+     `media_import_mismatch`, discards the staged download
+     (`validation_failed`), the provider settles `failed`, and no
+     material/asset/blob lands family-side.
+  Seeder consequence worth keeping: the joint world now creates one publish
+  process PER child (split_process); a shared two-child composition is
+  unrepresentable in the suite, matching the qualified privacy gate.
+  Lanes after fixes: 615 unit / 256 db / 66+64 scenario-service / 12 x5
+  (was 11). Self-pin re-frozen (`48dbe2c1…`). Environmental note: the live
+  My-Chat sibling moved past the pin (`8b2f3ae` > `df7a273`, another
+  session's work); pin-population checks for the record run in detached
+  worktrees at the exact pin, where they pass.
+
 - 2026-08-08 (1.16.0 batch requalified — `REQUAL_PASS`): full record in
   `06-i6-batch-requalification-record.md`. Exact detached topology (Nurture
   `97b9afe`, My-Chat `df7a273`, Base `8a3ea90`, adjacent worktrees so the
