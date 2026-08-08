@@ -8,9 +8,11 @@
 - Updated: 2026-08-08
 - Next step: **G4-0C Exit** — all six ordered units are frozen
   (`11`…`16`), so what remains is 0G's rolling cross-contract audit over them
-  plus review of the one remaining open point — whether ordering classes by
-  workload magnitude is permitted, given it is not a score but reads as one
-  (0C-5 §6). Two of the original three are closed. Small-cell aggregate
+  — **all three open points are now closed**. Class-list ordering was answered
+  by removing system-produced ordering entirely: the list keeps a fixed order
+  from stable class attributes, so the marker does triage and the position does
+  location, which is also better for daily use than a list that re-sorts
+  itself. Small-cell aggregate
   suppression was answered by a stronger rule than the threshold it asked
   about: an aggregate is returned only when every member of the counted
   population is readable, otherwise `unavailable` rather than a filtered

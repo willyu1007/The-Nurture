@@ -11,8 +11,8 @@
   ([`13-g4-0c-3-class-child-scope-freeze.md`](./13-g4-0c-3-class-child-scope-freeze.md))
 - Verdict: `G4_0C_5_FREEZE_PASS`
 - Releases: 0C-6, G4-A, G4-D
-- Open points: §5's is **closed** 2026-08-08 (full coverage or nothing);
-  §6's remains, flagged for review before 0C Exit
+- Open points: **both closed** 2026-08-08 — §5 by full-coverage-or-nothing,
+  §6 by a fixed class-list order with no system-produced ordering
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
 
@@ -200,11 +200,56 @@ Frozen from `02-architecture.md`, which states these in six separate places:
 These are invariants, not defaults: a later unit cannot enable scoring by
 configuration. Introducing any of them reopens 0C.
 
-> **Open point.** Whether an Admin may see per-class counts ordered by size —
-> which is not a score but can be read as one — is unsettled. Frozen
-> conservative: ordering by a support-signal or workload magnitude is not
-> frozen as permitted here, and a branch that wants it must amend this record.
-> Flagged for review before 0C Exit.
+### Class list order is fixed, and the system produces no ordering
+
+**Open point CLOSED 2026-08-08.** The question was whether an Admin may see
+classes ordered by workload magnitude — not a score, but readable as one. The
+answer is stronger than permitting or forbidding a particular sort key: **the
+system produces no state-derived ordering at all.**
+
+The class list is presented in a **fixed order derived from stable class
+attributes** — today `ageBandKey` then `name`, both already stored; later an
+explicit display order if a product decision adds one. The order MUST NOT
+change as state changes.
+
+Two reasons, and the second is the one that decided it.
+
+**It removes the question rather than answering it.** With no system-produced
+ordering, there is no sequence to argue about, no artifact that can be
+screenshotted as a ranking, and nothing that accumulates authority as "the list
+that says which class is worst". An earlier draft would have permitted ordering
+by support-signal level then by age — formally inside the invariant, but still
+a system-asserted sequence. Fixed order makes the no-comparison property
+structural instead of formal.
+
+**A stable list is better for daily use.** An Admin opens this many times a
+day. A list that re-sorts itself destroys spatial memory: every visit requires
+re-reading each card to find the one you wanted. A fixed order lets position
+become muscle memory.
+
+Triage does not suffer, because triage and location are different jobs. The
+card already carries the frozen two-level support signal, so scanning for
+"needs handling" is immediate; the order only tells you where things are. **The
+marker does triage, the position does location.**
+
+Explicitly forbidden, as consequences of the same rule:
+
+- ordering by any count, magnitude, urgency, deadline or signal level;
+- any cross-class numeric comparison, banding, colour grading or trend;
+- any ordering derived from a computed score or from AI.
+
+> **Tension recorded rather than hidden.** The class card displays its own
+> counts — awaiting response, new parent feedback, institution-pending — so an
+> Admin can compare classes by reading them. This rule constrains what the
+> system asserts, not what a person can compute, and it does not pretend
+> otherwise. Those counts measure the Admin's own outstanding work at that
+> entry point, not the class's or the teacher's performance, which is why they
+> stay. If the invariant is ever to be airtight, the card's raw counts are
+> where to look — a G4-B card-design decision, not this unit's.
+
+The governing sentence is the architecture's own: **the class card is an entry
+point to current state, not a KPI panel.** Ordering by volume is the act that
+turns one into the other.
 
 ## 7. Default-safe behavior
 
@@ -250,7 +295,11 @@ them apart would let an Admin probe a grant's exact terms by elimination.
 12. a genuinely empty population returns `0`, and `0` is distinguishable from
     `unavailable` in the response;
 13. repeating 11 after a grant is added or revoked yields no observable delta —
-    both calls are `unavailable`, so no membership change leaks.
+    both calls are `unavailable`, so no membership change leaks;
+14. the class list order is identical before and after a state change that
+    alters counts and support-signal levels;
+15. no response carries an ordering derived from a count, magnitude, urgency,
+    deadline, signal level or computed score.
 
 Isolated synthetic fixtures under I0. Real owner paths stay behind I3, joint
 conformance behind I4.
