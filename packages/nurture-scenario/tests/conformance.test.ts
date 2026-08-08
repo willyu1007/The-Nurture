@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { WorkflowHostValidationSnapshot } from "@my-chat/workflow-contracts";
-import { standardWorkflowEvents } from "@my-chat/workflow-contracts";
+import {
+  assertScenarioManifestV2,
+  standardWorkflowEvents,
+} from "@my-chat/workflow-contracts";
 import { loadWorkflowRegistry, validateWorkflowModule } from "@my-chat/workflow-runtime";
 import { nurtureScenarioModule } from "../src/module.js";
+import { nurtureScenarioManifest } from "../src/registry.js";
 
 // A dev-phase host snapshot that declares everything the real My-Chat module
 // validator (validateWorkflowModule) requires for the nurture scenario.
@@ -24,7 +28,12 @@ const hostSnapshot: WorkflowHostValidationSnapshot = {
     "nurture.activity_option",
     "nurture.health_state_summary",
   ],
-  downstream_owners: ["my_chat.forum", "my_chat.knowledge_base", "my_chat.notification"],
+  downstream_owners: [
+    "my_chat.forum",
+    "my_chat.knowledge_base",
+    "my_chat.notification",
+    "user_attention",
+  ],
   standard_events: [...standardWorkflowEvents],
   platform_events: [],
   allowed_surfaces: [
@@ -41,9 +50,31 @@ const hostSnapshot: WorkflowHostValidationSnapshot = {
     "worker_runtime",
   ],
   projection_reviews: [],
+  host_capabilities: [
+    "scenario_federation_v1",
+    "workflow_handoff_materialization_v1",
+    "trusted_scenario_invocation_v1",
+    "scenario_subject_presentation_v1",
+  ],
 };
 
 describe("nurture scenario module conformance", () => {
+  it("uses the strict v2 manifest and exact default-off contract prefix", () => {
+    expect(() => assertScenarioManifestV2(nurtureScenarioModule.manifest)).not.toThrow();
+    expect(
+      nurtureScenarioModule.manifest.capabilities.every(
+        (capability) => capability.enablement_policy === "disabled",
+      ),
+    ).toBe(true);
+    expect(
+      nurtureScenarioManifest.scenario_contracts?.capability_dependencies
+        .map(({ capability_key }) => capability_key),
+    ).toEqual([
+      "trusted_scenario_invocation_v1",
+      "scenario_subject_presentation_v1",
+    ]);
+  });
+
   it("passes the real My-Chat module validator", () => {
     const report = validateWorkflowModule({
       module: nurtureScenarioModule,

@@ -10,8 +10,17 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-08-01
-- Current phase: NestJS ingress M0-M5 is complete and G1 Joint Conformance is
+- Last updated: 2026-08-06
+- Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
+  `C30-I0-A/B/C/D` gates remain complete. Artifact 50 reaccepts C30-I1-F after
+  the successor repair closes all four artifact-49 findings. Artifact 48 remains
+  historical. Artifact 44 remains the original F1-F4 scope freeze, artifact 49
+  is the repair freeze and artifact 50 is the current exact qualification.
+  Artifact 51 freezes C30-I2 as ordered I2-A..G, artifact 52 accepts the
+  complete repaired My-Chat implementation default-off, and artifact 53 freezes
+  Nurture C30-I3 as ordered I3-A..G. The current state is
+  `C30_I3_SCENARIO_OWNER_ADOPTION_REACCEPTED_DEFAULT_OFF /
+  I4_SCOPE_REVIEW_ELIGIBLE`. G1 is
   **PASS** (`18-g1-joint-conformance-record.md`): the exact T-004
   `nurture.surface-contract@1.7.0` fixtures ran against the M5-pinned owner
   path (My-Chat `a019566` / Base `06303e9`) through the formal NestJS
@@ -20,18 +29,643 @@
   default-off. Pilot-0-C decision complete; Pilot-0-D
   `PILOT0_D_DESIGN_LOCKED / C3_C4_D_IMPLEMENTATION_PENDING /
   EXTERNAL_TRAFFIC_NO_GO`; no complete C30/Pilot candidate exists.
-- Code/config/schema impact: the current source includes the formal NestJS
-  binding-owner route, compiled shared runtime boundaries and production
-  Prisma/Guardian authority composition. The quality repair makes anchor
-  reservation and receipt issuance one owner transaction and cleans build
-  outputs before compilation. No schema/migration, persistent database,
-  Base/My-Chat source, secret/KMS/environment value, capability, deployment or
-  traffic is changed.
+- Code/config/schema impact: Base includes accepted neutral I1-A..F, the
+  optional closed `scenario_contracts` manifest area, contextual module gates,
+  exact named source profiles and source lock. Base adds validation only, not a
+  consumer runtime or starter adoption. My-Chat now contains accepted generic
+  Host runtime support and the narrow nonce/pair schema under T-035, all
+  default-off. Nurture I3-A has one generated canonical manifest/module and
+  I3-B adds private trust/nonce/response-signing and typed Participant authority
+  primitives without registering a route. I3-C through I3-F add only
+  Nurture-owned local pair, presentation, generic action persistence and
+  protected-owner persistence on an
+  isolated disposable target; no production action, existing database,
+  secret/KMS/environment value,
+  capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## Current handoff verification commands — 2026-08-06
+
+```bash
+pnpm verify:c30-i3-owner-adoption
+pnpm verify:c30-i3-default-off
+node .ai/skills/features/context-awareness/scripts/ctl-context.mjs verify --repo-root . --strict
+node .ai/scripts/ctl-project-governance.mjs lint --strict
+node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --check-anchors
+git diff --check
+```
+
+All commands pass at the C30-I3 successor handoff. The source lock is
+`623da6fd…95d5`; the default-off census remains `448d37e1…3c3e` with every
+positive population zero. Task-doc lint checks 91 files with zero errors and
+zero warnings. The exact disposable database is destroyed, port 55440 has no
+listener, and the repository worktree was clean at `cc57b13…` before this
+documentation-only progress sync.
+
+## C30-I3 cumulative default-off qualification — 2026-08-06
+
+The first artifact-60 acceptance below is historical. Artifact 61 is the current
+successor qualification.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Quality findings | PASS | I3-QR1 through I3-QR4 close: recoverable KMS coordination, current-authority replay/recovery, exact canonical object versions and owner-derived read carrier binding. |
+| Migration repair | PASS | Enum states commit in `20260806225000`; schema/constraint changes follow in `20260806230000`. Fresh 21/21 deploy and both diffs pass. |
+| Verification | PASS | Root typecheck; Scenario 58/635; DB 24/259; focused 3/34; scenario-service 8/52; package builds; default-off/upstream/routing/persistence gates. |
+| Documentation/governance | PASS | All 91 task Markdown files, local links and anchors have zero errors/warnings; strict context and governance lint pass. |
+| Successor identity | PASS | Source `48530be…`; lock `7db3129…`; aggregate `623da6fd…95d5`; pair `6afeedef…b1d0`; protected owner `adecec17…3487`. |
+| Cleanup/boundary | PASS | Eight C30 tables plus nonce zero; exact container destroyed; 55440 free; no existing DB, activation, deployment, I4 implementation, T-008 or Pilot operation. |
+
+Current verdict: `C30_I3_SCENARIO_OWNER_ADOPTION_REACCEPTED_DEFAULT_OFF /
+I4_SCOPE_REVIEW_ELIGIBLE`.
+Normative record: `artifacts/61-c30-i3-successor-quality-repair-qualification-record.md`.
+
+### Historical first acceptance
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact convergence | PASS | Final source `c8b9ce2…`; seven-profile lock `15207ba…`; aggregate `5c08b542…c4ab6`; exact clean Base/My-Chat inputs. |
+| Production/test separation | PASS | Production is the exact action-free two-capability prefix; Base accepts the isolated full graph containing both neutral drivers and protected declaration. |
+| Default-off census | PASS | Hash `448d37e1…3c3e`; enabled/action/protected/offer/positive-route/Workspace-activation populations all zero. |
+| Static and build gates | PASS | Root typecheck; direct Scenario/DB/scenario-service/frontend builds; frontend ESLint/Stylelint; manifest, routing, persistence and G2 checks. |
+| Regression populations | PASS | At the historical checkpoint: Scenario 58 files / 635 tests; scenario-service 8 files / 52 tests; DB 24 files / 253 tests. |
+| Fresh database | PASS | Exact 55440 target recreated empty, 19/19 migrations, Prisma validate/generate, DB-to-SSOT and migrations-to-SSOT empty. |
+| Final data/target cleanup | PASS | Eight C30 tables proved zero; exact container destroyed; 55440 absent/free; unrelated 55439 owner untouched. |
+| Qualification repairs | PASS | Fixed package-local zero-test command, stale 52/21 routing census and readonly Base pair-wire test tuples. |
+| Historical umbrella build | EXPECTED PRE-COMPILE REJECTION | Root `pnpm build` first enforces historical G1 Base `06303e9…` and rejected current C30 Base `4350086…`; that old pin was preserved, and direct current-topology builds pass. |
+| Effect boundary | PASS | No existing DB, product declaration/route, secret, capability, deployment, activation, I4, C31-C35, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_SCENARIO_OWNER_ADOPTION_ACCEPTED_DEFAULT_OFF /
+I4_SCOPE_REVIEW_ELIGIBLE`.
+Normative record: `artifacts/60-c30-i3-default-off-acceptance-record.md`.
+
+## C30-I3-F protected owner lifecycle — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Fixture-only declaration | PASS | Production action/protected arrays remain empty and no positive route/handler was added. |
+| Current owner authority | PASS | Every commit/read/erase rereads typed Participant, separate business authority, local process/role/pair association and injected canonical pair evidence. |
+| Encryption/KMS boundary | PASS | Random per-content AES-256-GCM DEK, KMS-wrapped key only, production-default-deny port and no durable plaintext/unwrapped key/display lease. |
+| Lifecycle and restoration | PASS | Retention expiry, explicit tombstone and crypto-erasure clear all recoverable material; destroyed external KMS handle denies a restored database snapshot. |
+| Replay/integrity/no-copy | PASS | Exact replay, changed-plaintext conflict, GCM tamper, revoke/expiry and recursive generic/legacy destination census all pass. |
+| Additive SSOT migration | PASS | Migration `20260806140000_c30_i3_protected_owner_lifecycle`, SHA-256 `fd371d8f…3c8`; 19/19 on exact disposable 55440; both schema diffs empty and strict context passes. |
+| Verification | PASS | Focused Scenario 5/5 + DB 8/8; complete Scenario 57 files / 632 tests; complete DB 24 files / 253 tests; Scenario/DB typecheck and production build. |
+| Cumulative lock | PASS | Runtime `13285fd…`; lock-tool `ac049b4…`; aggregate `b251bb46…48a8`; protected profile `5e48ea10…3c15`. |
+| Effect boundary | PASS | Synthetic neutral ciphertext only; no production declaration, existing DB, route, secret, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_F_ACCEPTED / I3_G_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/59-c30-i3-f-implementation-record.md`.
+
+## C30-I3-E canonical action owner runtime — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Fixture-only declarations | PASS | Both Base-neutral drivers are supplied only by tests; production action/protected arrays remain empty and no positive route/handler was added. |
+| Prepare/submit/status | PASS | Exact Base validators, fresh Participant/authority/target rereads, scenario-bound direct identity and original-Step claimed identity; claim token is excluded from the execution command. |
+| Atomic execution | PASS | One Serializable transaction writes the injected neutral effect, typed `CommandExecution`, committed result, refs-only audit/outbox and operation terminal state. |
+| Replay/recovery/fault | PASS | Concurrent exact replay creates one effect; changed immutable payload conflicts; revoked current authority denies committed replay; faulting effects roll back and deadline recovery writer-fences `confirmed_no_effect`. |
+| Additive SSOT migration | PASS | Migration `20260806130000_c30_i3_canonical_action_runtime`, SHA-256 `e72636eb…eb0f`; 18/18 on exact disposable 55440; migrations-to-SSOT and DB-to-SSOT are empty; strict context passes. |
+| Verification | PASS | Focused Scenario 7/7 + DB 6/6; complete Scenario 56 files / 627 tests; complete DB 23 files / 245 tests; Scenario/DB typecheck and production build. |
+| Cumulative lock | PASS | Runtime `9a59c51…`; lock-tool `25e7a78…`; aggregate `7de36713…c085`; canonical-action profile `9af217ee…1008`. |
+| Effect boundary | PASS | Synthetic neutral fixture data only; no product action/body/claim-token persistence, existing DB, route, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_E_ACCEPTED / I3_F_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/58-c30-i3-e-implementation-record.md`.
+
+## C30-I3-D subject provider and baseline presentation — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Stable declarations | PASS | Exact provider/presentation/surface keys match the generated manifest; production actions/protected declarations remain empty. |
+| Current owner resolution | PASS | Every list/resolve/present rereads Participant/business authority and one Serializable binding/role/pair/association/lifecycle snapshot plus injected current pair evidence. |
+| Opaque locators | PASS | Bounded AES-256-GCM subject refs/cursors bind Workspace, Participant, target/version and expiry without exposing local IDs. |
+| Safe presentation | PASS | Exactly six closed block kinds, fixed role-neutral safe copy, display-only navigation and `actions=[]`; stale context returns `context_changed`. |
+| Negative matrix | PASS | Cross-Workspace, tamper, expiry, durable origin, undeclared presentation, role/association revoke, aggregate drift and default-deny evidence all fail closed. |
+| Verification | PASS | Scenario/DB typecheck and build; focused 8 + 14 tests; complete Scenario 55 files / 620 tests; complete DB 22 files / 239 tests. |
+| Cumulative lock | PASS | Runtime `cccdc6b…`; lock source `5bb260e…`; aggregate `e40fb649…b404`; presentation profile `76c95797…b339`. |
+| Effect boundary | PASS | No route, schema/migration, existing DB, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_D_ACCEPTED / I3_E_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/57-c30-i3-d-implementation-record.md`.
+
+## C30-I3-C canonical pair/local association — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Additive SSOT migration | PASS | Source `bf3fee8…`; migration `20260806120000_c30_i3_pair_owner_foundation`, SHA-256 `42e022de…dd3`; migrations-to-SSOT and DB-to-SSOT show no difference. |
+| Exact isolated target | PASS | Preexisting 55439 owner was not touched; empty `nurture-c30-i3` was created on loopback 55440 and applied 17/17 migrations. |
+| Atomic association | PASS | Serializable transaction rereads local authority and atomically writes binding, local Child/Process/Family, role, both associations, typed execution and refs-only audit/outbox. |
+| Replay/recovery | PASS | Exact replay is stable; changed input, revoke, owner drift, local conflict and concurrent loser fail closed; deadline no-effect is writer-fenced against late commit. |
+| Verification | PASS | Prisma format/validate/generate; focused 10 tests; full DB 22 files / 234 tests; complete scenario 54 files / 612 tests; Scenario/DB production build. |
+| Cumulative lock | PASS | Aggregate `c94ac5ed…158e`; pair/local profile `99916dcb…4cc`. |
+| Effect boundary | PASS | Synthetic disposable data only; no existing DB, route, capability, deployment, activation, I4, C31, T-008, Pilot or traffic operation. |
+
+Verdict: `C30_I3_C_ACCEPTED / I3_D_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/56-c30-i3-c-implementation-record.md`.
+
+## C30-I3-B private trust and Participant binding — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Detached request trust | PASS | Exact credential/issuer/audience/caller/key selection, Ed25519 verification, body hash, Base contract, declaration, clock and nonce order; missing/duplicate/revoked/stale inputs fail closed. |
+| Replay/concurrency | PASS | Atomic bounded Scenario-private nonce permits one consumer; replay, concurrency loser and capacity exhaustion fail before owner work. |
+| Response binding | PASS | Signed result reverses the verified trust direction and binds request ID, nonce digest, route, operation, status, body digest and expiry. |
+| Typed Participant | PASS | Canonical account/Actor/Workspace/organization/local Participant refs remain distinct; current business authority is separately mandatory. |
+| Verification | PASS | Typecheck; focused 2 files / 33 tests; complete 54 files / 612 tests; no Host-runtime/Prisma production import. |
+| Cumulative lock | PASS | Source `b8974bf…`; aggregate `24080cc5…3d18`; private-trust profile `8a3e86aa…e2a8`. |
+| Effect boundary | PASS | No route registration, schema/database, capability, deployment, activation or downstream operation. |
+
+Verdict: `C30_I3_B_ACCEPTED / I3_C_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/55-c30-i3-b-implementation-record.md`.
+
+## C30-I3-A exact adoption and canonical manifest — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Canonical source | PASS | Source `3b7e2a6…` makes YAML the only editable manifest source and emits one typed default-off module; former activation/preactivation variants are absent. |
+| Production capability prefix | PASS | Exact ordered trusted-invocation + subject-presentation graph; presentation is action-free and production action/protected declarations are empty. |
+| Upstream identity | PASS | Base `4350086…` / aggregate `d17f2358…6383` and My-Chat `cd7bbc2…` / aggregate `8172e370…10a5ad` are exact and clean. |
+| Nurture source lock | PASS | Tool source `0f1d456…`; aggregate `a8453249…69fc`; profile `nurture_c30_manifest_foundation_v1` hashes 15 exact files to `9ca462c4…5bb2`. |
+| Verification | PASS | Upstream source locks, scenario typecheck, focused 5 files / 28 tests, full 52 files / 579 tests, G2 exit assertion, generated parity and lock self-check. |
+| Effect boundary | PASS | No schema, Prisma, database, KMS, capability, deployment, activation, I4, C31, T-008, Pilot or traffic action. |
+
+Verdict: `C30_I3_A_ACCEPTED / I3_B_AUTHORIZED_IN_PROGRESS`.
+Normative record: `artifacts/54-c30-i3-a-implementation-record.md`.
+
+## C30-I3 Scenario-owner adoption scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance continuity | PASS | `resume --task T-002 --json` and triage reuse active `M-002 > F-002 > T-002 nurture-institution-mode`; no new task is created. |
+| Exact entry inputs | PASS | Base `15ff031…` / lock `4350086…` / aggregate `d17f2358…6383`; My-Chat runtime `658b897…` / replacement lock `6725dc6…` / aggregate `8172e370…10a5ad` / archive `cd7bbc2…`; Nurture entry `eec87b9…`. |
+| Manifest/module gap | PASS | Current YAML plus hand-copied registry and preactivation/activation module variants are explicitly rejected as I3 parity evidence; one YAML-generated default-off production module is frozen. |
+| Capability boundary | PASS | Production exit is the valid trusted+presentation dependency-complete prefix with `action_offer_policy=none`; action/protected primitives use test-only fixtures, while first real declarations remain C31. |
+| Trust/identity boundary | PASS | Detached verifier/response signer, private nonce, typed Participant binding, exact pair evidence, atomic local associations and business-authority rereads are frozen without identity-as-permission or service-token fallback. |
+| Action/protected boundary | PASS | One typed direct/claimed runner plus authoritative ciphertext/per-content wrapped-DEK/KMS-port/retention/crypto-erasure lifecycle is frozen; legacy action/protected paths cannot alias or fall back. |
+| Donor and impact boundary | PASS | T-029 N01-N12 are individually rework/reject/defer/regenerate dispositions. Base/My-Chat source, Host runtime/ORM/worker ownership, C31 product semantics and existing DBs remain out of scope. |
+| Implementation decomposition | PASS | I3-A exact adoption → B trust/Participant → C pair/local transaction → D subject/presentation → E action runtime → F protected lifecycle → G convergence/qualification. |
+| Acceptance/rollback/NO-GO | PASS | Exact locks, generated parity, fresh disposable DB, no-copy, concurrency/fault, KMS failure, default-off and non-destructive rollback gates are explicit. I4 opens only after cumulative I3 acceptance. |
+| Exact topology | PASS | Base is clean at metadata lock `4350086…`; My-Chat is clean at repaired T-035 archive `cd7bbc2…`; Nurture entered at `eec87b9…` and changes only the bounded scope/governance/context files. |
+| Governance/context/docs | PASS | Project sync and governance lint pass; workflow-context checksum `7a05eda2…401bd78c` and strict context verification pass; strict Markdown/anchor lint passes 83 task files, 1 workflow-context file and 4 project files with zero warnings/errors; `git diff --check` passes. |
+| Effect boundary | PASS | Planning/context only. No product code, manifest/module, Prisma/schema/migration, build, database, KMS secret, capability, deployment, activation, I4, C31, T-008, Pilot or traffic action ran. |
+
+Current verdict: `C30_I3_SCOPE_FROZEN /
+I3_A_SEPARATE_AUTHORIZATION_REQUIRED`.
+Normative record: `artifacts/53-c30-i3-scope-freeze.md`.
+
+## C30-I2 generic Host adoption default-off acceptance — 2026-08-06
+
+The current acceptance is the remediated replacement below. The original
+I2-A..G rows that follow remain historical execution evidence.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Quality findings | PASS | All nine findings close: protected key/binary no-copy, recovery pre-dispatch eligibility and immutable binding, coherent current reads, recovery audit/outbox, canonical Unicode order, bounded nonce cleanup and collector-backed default-off evidence. |
+| Replacement identity | PASS | My-Chat runtime `658b897360734dfa916ce25abda7a8db5fb3f27d`, lock `6725dc68fb8c23da2ff39651b6d825a159a8a8b1`, aggregate `8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad`, reacceptance/archive `cd7bbc2623dff8621c2c7155b04d1bf759e8404a`. |
+| Remediated workspace | PASS | Recursive typecheck passes 17 projects; full ESLint passes; unit population passes 103 files / 700 tests with 17 files / 75 environment-gated tests skipped; Base and downstream source locks pass. |
+| Fresh database | PASS | Exact `mychat-c30-i2-remediation` target on loopback 55438 applied 27/27 migrations, reported current/empty DB-to-SSOT diff and passed 2 files / 17 integration tests. The container was destroyed and the port is free; no existing DB was touched. |
+| Mechanical default-off | PASS | Maintained static/route/DB collector hash `989e8294b47a980adcdc10ca35848c19891ca825beae80ffccc8d73271a63fdd`; positive registration/activation/private-state populations are empty and the composed pair support route is explicitly `hard_default_deny`. |
+| Governance boundary | PASS | T-035 is archived; Nurture changes only program evidence. No I3 implementation, Nurture consumer, capability/Workspace activation, deployment, T-008, Pilot or traffic action occurred. |
+
+Historical I2 exit verdict: `C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
+C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`. Artifact 53 records the
+completed successor scope review.
+
+### Historical first acceptance evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance continuity | HISTORICAL | Nurture T-002 remains the program record. This row ends at My-Chat's first T-035 archive `b262bfc…`; current closure is `cd7bbc2…` above. |
+| Exact Base input | PASS | Base remains clean at source `15ff031…`, metadata lock `4350086…` and aggregate `d17f2358…6383`; no accepted neutral contract byte changed during I2. |
+| Ordered implementation | PASS | My-Chat I2-A `470fc86…` → B `7aca47f…` → C `5fd7b08…` → D `82f97f3…` → E `1ef31d4…` → F `979ba42…` → G runtime `35a41e3…` and downstream lock `890ff7d…` are separately attributable. |
+| Trusted invocation | PASS | Interactive/durable principal translation, detached outbound signing, inbound/response verification and atomic one-time Host-private nonce pass exact-origin and replay negatives. |
+| Canonical pair owner | HISTORICAL / SUPERSEDED | Initial atomic pair tests passed, but later review found missing pre-dispatch state and immutable evidence fences plus mixed current reads. The replacement row above is authoritative. |
+| Presentation/actions | PASS | Exact provider/presenter/surface registry, semantic rendering and prepare-only offers pass; direct-empty and claimed-original-Step action orchestration use exact scenario-bound effect identities. |
+| Protected boundary | HISTORICAL / SUPERSEDED | Initial value-oriented 22-destination census passed but missed object-key and binary representations. The replacement row above is authoritative. |
+| Manifest/source convergence | HISTORICAL | Runtime revision `35a41e3…` and aggregate `3da48ba0…b9646` were mechanically valid for the first source population but are not a current handoff pin. |
+| Workspace qualification | PASS | Full 17-project build, recursive typecheck, full ESLint, 102 files / 643 unit tests, workflow contract/66-Schema/source-lock/portability checks and runtime 12 files / 176 tests pass. |
+| Disposable database | PASS x3 | On exact `127.0.0.1:55438`, all 26 migrations, Prisma format/validate/generate, no-drift diff and 15/15 nonce/pair integration pass three consecutive times. Final scoped row counts are zero; the container is destroyed and the port is free. No existing DB was read or written. |
+| Default-off census | INVALIDATED | The first qualifier accepted caller-supplied empty evidence and incorrectly claimed no composed route. Current collector-backed evidence records the pair support route as `hard_default_deny`. |
+| Repository boundary | PASS | Base is clean at `4350086…`; My-Chat closes and archives T-035; Nurture changes governance evidence only. No Nurture consumer, deployment, activation, T-008, Pilot or traffic action occurred. |
+| Detailed record | PASS | `artifacts/52-c30-i2-default-off-acceptance-record.md` pins all repository revisions, source/profile hashes, qualification populations, disposable-DB lifecycle and downstream NO-GO. |
+
+Historical verdict, superseded by the replacement acceptance above:
+`C30_I2_GENERIC_HOST_ADOPTION_ACCEPTED_DEFAULT_OFF /
+C30_I3_SCOPE_REVIEW_SEPARATE_AUTHORIZATION_REQUIRED`. I3 implementation, I4,
+C31-C35, consumer activation, deployment, T-008, Pilot and traffic remain
+closed.
+
+## C30-I2 generic Host adoption scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance continuity | PASS | Nurture `resume --task T-002 --json` resolves the active `nurture-institution-mode` bundle and exact isolated worktree. |
+| Cross-repository task identity | PASS / CORRECTION FROZEN | My-Chat `T-002` resolves archived `content-events`; artifact 51 forbids that trailer and requires a new unused My-Chat task before source changes. |
+| Base input pin | PASS | Exact accepted source `15ff031…`, metadata lock `4350086…`, aggregate hash `d17f2358…6383` and all four named profile hashes are recorded. |
+| My-Chat contract gap | PASS | Current My-Chat lock is schema v1 at local source `042b880…`, upstream Base `eb19433…`, hash `caebe85d…b2e`; no I1-A..F modules/Schemas exist. |
+| Identity/binding gap | PASS | Canonical Child/Family facts exist, but current service/repository performs separate subject writes; no exact I1-B atomic pair/current evidence/status protocol exists. |
+| Ingress/runtime gap | PASS | Interactive API auth and historical Workflow registry/claimed-Step mechanisms exist; accepted detached signer/nonce, vNext manifest registry, I1-C/D/E runtime do not. |
+| Ownership and security freeze | PASS | Human principal origins, signer/verifier order, no-fallback, pair writer fences, current reread, semantic rendering, exact two drivers and protected no-copy boundary are explicit. |
+| Donor disposition | PASS | Exact Base adoption, bounded My-Chat reuse/rework and zero direct T-029 merge are assigned without importing Nurture facts or widening Host ownership. |
+| Implementation decomposition | PASS | I2-A exact adoption → B trusted ingress → C pair owner → D presentation → E actions → F protected → G default-off qualification. Each successor stays closed. |
+| DB/operations boundary | PASS | Scope review ran no build, Prisma generate, schema change, database, capability, deployment, activation, T-008, Pilot or traffic action. I2-C requires its own disposable-target gate. |
+| Exact topology/read-only consumers | PASS | Base remains clean at `4350086…`; My-Chat remains clean at `dc4a77b…`; Nurture changes only the 12 task/project/context documentation paths listed by Git. |
+| Governance/context/docs checks | PASS | `ctl-project-governance sync --apply` and `lint --check`; context `touch` and `verify --strict`; strict docs lint over the 81-file task bundle and workflow context; `git diff --check`. All pass with zero warnings/errors. |
+| Downstream NO-GO | PASS | I2-A requires separate authorization; C30-I3/I4, C31-C35, T-008, activation and Pilot remain closed. |
+
+Historical scope-freeze state:
+`C30_I2_SCOPE_FROZEN / I2_A_SEPARATE_AUTHORIZATION_REQUIRED`.
+Normative record: `artifacts/51-c30-i2-scope-freeze.md`.
+
+## C30-I1-F successor quality-repair qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `15ff031ed16897920c13fe24c9849531d98607ad`; following metadata-only lock `4350086993d837baa8030564f4e19593dedd96b0`. |
+| Multi-action semantics | PASS | One neutral manifest with two unique action handlers passes; shared and cross-kind handlers fail. Every action still requires the exact `prepare_domain_action` operation and its entitled ingress. |
+| Presentation reachability | PASS | A surface outside the exact presentation operation fails `missing_surface_presentation_ingress`; global ingress presence cannot substitute. |
+| Runtime/Schema bounds | PASS | Exact 64 safe reasons, 64 route classes and 128 action keys pass; each maximum plus one fails in runtime and strict Schema. |
+| Source-path ancestry | PASS | Symlinked physical roots fail with the symbolic-link rule; relocation, import aliases, BOM/CRLF, sorted populations and exact committed bytes remain green. |
+| Focused regressions | PASS 46/46 | F2/F3 positive and adversarial manifest population passes. |
+| Full Base verifier | PASS x3 | All TypeScript/build, canonical-ref, runtime/Scenario/conformance, Schema/docs/boundary, portability and exact lock checks pass in three complete rounds. |
+| Runtime / Scenario | PASS | 35/35 and 10/10. |
+| Schema / Node conformance | PASS | 66 strict Schemas and 441/441 Node tests. |
+| Aggregate source lock | PASS | Exact source revision `15ff031…`; 22 normalized TypeScript files; aggregate hash `d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383`. |
+| Named source profiles | PASS | Identity `81d9fb9d…fed4` (27), interface `37f0cdae…eaf` (29), action `b7c35259…e48d` (45), protected `78eadaf4…0efb` (58). |
+| Deterministic output | PASS | Two isolated builds: contracts 84 files `984d4fab…5f6`, runtime 92 `26b9a84c…961`, Scenario 56 `8b361719…b54`; source manifest `02d8bec5…6a6b`. Temporary outputs were destroyed. |
+| Metadata-only seal | PASS | `4350086…` changes only the lock JSON and points to committed source `15ff031…`. |
+| Scope/effect boundary | PASS | Base is clean at `4350086…`; My-Chat remains clean at `dc4a77b…`; Nurture product source is unchanged. No public I1-A through I1-E wire, capability/source graph vocabulary, package version, consumer/starter, Prisma/database, deployment, activation, C30-I2 implementation, T-008, Pilot or traffic action changed. |
+| Detailed evidence | PASS | Artifact 49 freezes the four repairs; artifact 50 records closure, hashes, qualification and rollback. |
+| Context/governance/docs | PASS | Workflow-context checksum `7f62af97…02af16`; strict Context/project-state/project-governance checks and T-002 query pass; strict task/repository Markdown and anchor lint cover 80/446 files with zero warnings/errors. |
+
+Verdict: `I1_F_REACCEPTED / C30_I1_BASE_CONTRACTS_ACCEPTED /
+C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. Only a separately authorized C30-I2
+scope review/freeze is eligible next. C30-I2 implementation, consumer adoption
+and every operational action remain closed.
+
+## C30-I1-F post-implementation quality review and reopening — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Existing focused/full evidence | PASS BUT INSUFFICIENT | F1-F4 focused 59/59, full conformance 435/435 and exact source-lock check pass. The defects are uncovered paths, not unexplained baseline failures. |
+| Multi-action adversarial probe | REPRODUCED / P1 | A second unique handler fails `missing_domain_action_handler`; sharing the prepare handler fails `duplicate_scenario_handler`. |
+| Presentation-ingress probe | REPRODUCED / P1 | Two surfaces split across list/resolve versus present operations are accepted although one declared surface cannot invoke its presentation. |
+| Bound probe | REPRODUCED / P2 | Runtime and strict JSON Schema accept 10,000 safe reason codes plus 10,000 route classes. |
+| Symlink-root probe | REPRODUCED / P2 | Existing workspace symlink roots reproduce the trusted aggregate and all four named hashes. |
+| Repository/effect boundary | PASS | Three repositories stayed clean; no build, source mutation, Prisma/database, consumer, capability, deployment, activation, T-008, Pilot or traffic action ran during review. |
+
+Verdict: artifact 48 is historical; artifact 49 authorizes only F-R1..F-R4 and
+keeps C30-I2 plus every downstream/operational action closed.
+
+## C30-I1-F cumulative implementation and qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Ordered source chain | PASS | F1 `0ce22b6…` → F2 `c317795…` → F3 `f59f506…` → F4 source `3d91591…` → metadata-only lock `afe47e8…`. |
+| Manifest dependency graph | PASS | Exact four-capability dependency-complete prefixes and exact four sources reject missing/stale/duplicate/cyclic/reordered/umbrella substitutions. |
+| Interface convergence | PASS | Trusted ingress, providers, presentations and product surfaces close exact operation/provider/surface references, Host support and legacy aliases. |
+| Action/protected convergence | PASS | Exact I1-D/I1-E static contracts close scenario/action/ingress/surface/handler/driver/prepare/read references; third driver, body, generic commit/erase and legacy action aliases fail. |
+| Full Base verifier | PASS x3 | All TypeScript/build, canonical-ref, runtime/Scenario/conformance, Schema/docs/boundary, portability and exact lock checks pass in three complete rounds. |
+| Runtime / Scenario | PASS | 34/34 and 10/10. |
+| Schema / Node conformance | PASS | 66 Schemas and 435/435 Node tests. |
+| Aggregate source lock | PASS | Exact source revision `3d91591…`; 22 normalized TypeScript files; aggregate hash `33df7df95e614104465c2fa93078b897e96538a765b050246a6b4f7ccd9139cd`. |
+| Named source profiles | PASS | Identity `3a438edc…9ec1a` (27), interface `52aeaa1a…40a17` (29), action `0e4b185c…634e6` (45), protected `7f00570e…f9800` (58). |
+| Portability and exact bytes | PASS | Relocated paths, `@host|@my-chat` alias normalization, BOM/CRLF normalization, sorted/closed populations, symlink rejection and exact committed TypeScript/Schema/tool bytes pass. |
+| Deterministic output | PASS | Two isolated builds: contracts 84 files `6a9f004c…33de7`, runtime 92 `a0d9729e…2af1f`, Scenario 56 `7136af38…3117`; source manifest `6229c69b…f5fd`. |
+| Metadata-only seal | PASS | `afe47e8…` changes only the lock JSON and points to committed source `3d91591…`. |
+| Repository/effect boundary | PASS | Base clean at `afe47e8…`; My-Chat unchanged/clean at `dc4a77b…`; Nurture product source unchanged before governance-only closure. No DB/Prisma/PostgreSQL, consumer, capability, deployment, activation, T-008, Pilot or traffic action. |
+| Detailed evidence | PASS | Artifacts 45-48 record unit checkpoints, exact hashes, qualification, rollback and immutable I1 handoff. |
+| Context/governance/docs | PASS | Context checksum `7f62af978bb5ef252b1a5655659622f9774153c0908e7d0781dd2e95e902af16`; strict Context/project-state/project-governance checks and T-002 query pass; task 78/78 and repository 444/444 Markdown/anchor checks pass with zero warnings/errors. |
+
+Verdict: `C30_I1_BASE_CONTRACTS_ACCEPTED /
+C30_I2_SEPARATE_AUTHORIZATION_REQUIRED`. The only eligible next decision is a
+separately authorized C30-I2 scope review/freeze. No C30-I2 implementation,
+consumer adoption or operational action is authorized.
+
+## C30-I1-F dependency/source convergence scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; existing `M-002 > F-002 > T-002` and task bundle remain the SSOT. |
+| Accepted-input trace | PASS | Artifact 44 consumes current accepted I1-A..E source/lock evidence without changing their public wires, validators or exposure. |
+| Current-gap review | PASS | Base has one umbrella source hash, no scenario capability DAG, no manifest areas for I1-A..E and no named C30 source profiles; Nurture's v1/manual projection is negative donor evidence only. |
+| Atomic graph | PASS | Exact four reusable capabilities, dependency-complete prefixes and the exact four source identities are frozen; missing, stale, duplicate, cyclic, umbrella and partial rows are fatal. |
+| Source-identity boundary | PASS | Named Base profiles cover only Base contribution bytes. My-Chat/Nurture adoption, completed platform identity, joint conformance and readiness remain C30-I2/I3/I4. |
+| Parity and legacy boundary | PASS | Structural JSON Schema/runtime parity is separated from contextual DAG/reference/Host checks; manifests omitting `scenario_contracts` remain unchanged, while mixed legacy/vNext aliases fail closed. |
+| Implementation decomposition | PASS | F1 primitives → F2 ingress/presentation → F3 action/protected convergence → F4 cumulative qualification/source lock. No unit starts automatically. |
+| Repository/effect boundary | PASS | Base is clean at metadata lock `9abde2b994f6528fc5afb26125eb029ed6027237`; My-Chat is clean at `dc4a77b257f952e2c0f0aede9521e16ac274de9d`; Nurture changes from `369fc8a…` are documentation/context only. No source, build, Prisma/database/PostgreSQL, runtime, capability, deployment, activation, T-008, Pilot or traffic action. |
+| Context/governance/docs | PASS AFTER WORDING CORRECTION | Context checksum `9b65ccd506af049ee1f079956f216020b07d2f4ad2fea6f0683d9ed4bd9dea2a`; strict Context/project-state/governance checks and T-002 query pass. Initial strict Markdown scans found only two vague-pronoun warnings; explicit object names closed both, then task 74/74 and repository 440/440 Markdown/anchor checks passed with zero warnings/errors. |
+
+The only eligible next action is separate I1-F1 authorization. I1-F2..F4,
+C30-I2 and every downstream consumer or operational action remain closed.
+
+## C30-I1-E5 successor repair qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `48fd3d65b34a1dd7a6b1e85713fca81f7c9da171`; metadata-only lock `9abde2b994f6528fc5afb26125eb029ed6027237`. |
+| Finding closure | PASS | E-R1..E-R4 close wrapped fragments/short-value false positives, encoded refs/short versions, future commit time and Schema/runtime forbidden-key parity. |
+| Focused regression | PASS 80/80 | E1-E4 includes both negative bypasses and positive low-entropy controls/versions plus direct/claimed time checks and all 18 normalized forbidden forms. |
+| Full Base verifier | PASS x3 | 66 Schemas, 376 Node tests, runtime 28/28 and Scenario 10/10; all typecheck/build, canonical-ref, exposure, portability and exact source-lock gates pass. |
+| Source identity | PASS | Hash `be6fd80042a2998688dbeeaa6b4161ef80482d51eac413cfc0a53eaf2491fb7d`; 22 normalized TypeScript files. |
+| Deterministic output | PASS | Two 84-file builds: `1e03ea30…34749`; two byte-identical manifests: `6ae16f44…633c3`; temporary directories destroyed. |
+| Metadata-only seal | PASS | `9abde2b…` changes only the source-lock JSON and names committed source `48fd3d6…`. |
+| Expected pre-lock rejection | PASS / SEQUENCING EVIDENCE | The first full aggregate stopped at portability against the historical lock; all independent checks passed, then the exact two-commit reseal made the full aggregate green without weakening the gate. |
+| Repository/effect boundary | PASS | Base/My-Chat are clean; Nurture closes governance only. No public wire, manifest/source convergence, consumer/runtime, DB, deployment, capability, activation, T-008, Pilot or traffic change. |
+| Detailed evidence | PASS | Artifact 42 freezes the repair; artifact 43 records exact closure, qualification and rollback. |
+| Context/governance/docs | PASS | Context checksum `672d4bf7…74dce6`; strict Context/project-state/governance checks and T-002 query pass; strict task/repository Markdown and anchor lint cover 73/439 files with zero warnings/errors. |
+
+I1-E is reaccepted. I1-F scope review requires separate authorization and I1-F
+implementation remains unauthorized.
+
+## C30-I1-E successor quality-review reopening — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Existing regression populations | PASS but insufficient | Contract and conformance typechecks, 66 strict Schemas, 371 Node tests and the historical source lock remain green. |
+| Plaintext copy detection | FINDING E-R1 | A protected 24-character fragment wrapped by safe-looking prefix/suffix passes; a one-character carrier causes unrelated control strings containing that character to fail. |
+| Ref/version/integrity copy detection | FINDING E-R2 | A base64url protected ref in I1-D `output_refs` passes; a one-character prepared version rejects unrelated driver/control strings. |
+| Commit current-time bound | FINDING E-R3 | `committed_at=01:00` passes with resolved `now=00:02` and submit expiry `00:05`; only the before-prepare direction is checked. |
+| Prepare Schema/runtime parity | FINDING E-R4 | Schema accepts `action_input.PlainText` while the runtime rejects its case/separator-normalized forbidden prefix. |
+| Scope/effect census | PASS | Review and freeze changed Nurture governance/context evidence only. Base and My-Chat remain clean; no runtime/consumer, DB, manifest convergence, deployment, activation, T-008, Pilot or traffic action ran. |
+
+The exact repair/falsification matrix is frozen in artifact 42. Artifact 41 is
+historical until successor source, repeated qualification and a new metadata lock
+are recorded.
+
+## C30-I1-E cumulative implementation and qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User authorized all I1-E operations through closure. E1-E5 changed only Base standalone contracts/Schemas/fixtures/tests and the final source lock. |
+| Exact chain | PASS | E1 `7571553…`; E2 `066dcf1…`; E3 `4b23c79…`; E4 `7506eb7…`; quality source `5433124…`; metadata lock `3a08d1f…`. |
+| Quality review | PASS / ALL FIXED | Exact failure unions, validation-only normalization, closed internal evidence, full contextual/direct-or-Step binding, recursive body-free validation and cumulative no-copy/adversarial coverage are repaired; no finding remains. |
+| Full Base verifier | PASS repeated | 66 Schemas, 371 Node conformance tests, runtime 28/28 and Scenario 10/10; all typecheck/build, canonical-ref, exposure, portability and exact source-lock gates pass. |
+| Source identity | PASS | 22 normalized TypeScript files; hash `7ba9458f0e1a91f6fda1a47e5682064020017c41731b1016f8bdad962664c126`; lock names exact committed source `5433124…`. |
+| Determinism | PASS | Two 84-file builds: `1020dbb6…b99`; two byte-identical source manifests: `42549108…98a`. |
+| Scope audit | PASS | No Base runtime/Scenario starter/manifest dependency/source identity/package version, `any`, product vocabulary, consumer source, DB, deployment, capability or activation change. |
+| Detailed evidence | PASS | Artifacts 37-40 record E1-E4; artifact 41 records cumulative E5 qualification, finding closure, exact lock and rollback chain. |
+| Downstream boundary | PASS | I1-F manifest dependency/source convergence, C30-I2, My-Chat/Nurture consumers, T-008, Pilot, deployment and activation remain unauthorized/unstarted. |
+| Context/governance/docs | PASS | Context checksum `9d01a1ecd5c911228daabd47220f3197314ba7f984c5d4356bcce9b35a1bdea1`; strict Context/project-state/governance checks and T-002 query pass; strict task/repository Markdown and anchor lint cover 71/437 files with zero warnings/errors. |
+
+I1-E is accepted. The only eligible next T-002 decision is separate I1-F scope
+review and freeze; this does not authorize I1-F implementation.
+
+## C30-I1-E protected-interaction scope review and freeze — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; existing `M-002 > F-002 > T-002` and task bundle remain the SSOT. |
+| Accepted-input trace | PASS | Artifact 36 consumes current I1-A..D source/lock, C-3-0e decisions and T-029 disposition without changing accepted wire semantics. |
+| Carrier/control separation | PASS | Protected plaintext exists only in `ScenarioProtectedPlainTextCarrierV1`; I1-A operation input, I1-D action/result/Step, I1-C presentation and durable Host DTOs remain body-free. |
+| Lifecycle completeness | PASS | Static contract, keyed carrier binding, prepare result, prepared/committed controls, read locator/input, `ready|tombstone|context_changed|unavailable` and 60-second no-store lease are frozen. Submit remains I1-D; no third driver or generic erase operation exists. |
+| Donor and convergence boundary | PASS | Zero T-029/My-Chat/Nurture file is directly mergeable; manifest dependency, legacy/vNext exclusion and `scenario_protected_interaction_source_v1` remain I1-F. |
+| Implementation decomposition | PASS | E1 primitives → E2 prepare → E3 commit composition → E4 read/no-copy → E5 cumulative qualification/source lock. No unit starts automatically. |
+| Context/governance/docs | PASS | Context checksum `3e862779743e801abb498cc6ee8990104c05819cf09bd8037ab211f61a5bf93d`; strict Context/project-state/governance checks and T-002 query pass. Task 66/66 and repository 432/432 Markdown/anchor checks pass with zero warnings/errors. |
+| Repository boundary | PASS | Base is clean at `1cb56910f32ab5e13f9d378af3b3043dfc94b180`; My-Chat is clean at `dc4a77b257f952e2c0f0aede9521e16ac274de9d`; Nurture changes from `daae1ff…` are restricted to task/project/context documentation and `git diff --check` passes. |
+| Effect boundary | PASS | Documentation/governance only; no Base/My-Chat/Nurture product source, build, Prisma generate, database/PostgreSQL, KMS, runtime, capability, deployment, activation, T-008, Pilot or traffic action. |
+
+## C30-I1-D successor quality repair qualification — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `3580a9be74bd6ebe81d00c9fe99ccdf98d147664`; metadata-only lock `1cb56910f32ab5e13f9d378af3b3043dfc94b180`. |
+| Finding closure | PASS | D-R1..D-R5 close prepare branch parity, resolved submit identity, stored exact-rebind seal, original-Step execution composition and legitimate bind failure outcomes. |
+| Full verifier | PASS | Repaired content passed repeated cumulative qualification and the final exact source/lock chain passed twice after commit metadata correction: 55 Schemas, 296 Node tests, runtime 28/28 and Scenario 10/10. |
+| Source identity | PASS | 20 normalized TypeScript files; source hash `5c5f2c5380773ccb651925199d403f267edb60bfbb0512bb0779218d074a99ef`; exact revision, committed bytes and alias portability pass. |
+| Determinism | PASS | Two isolated 76-file builds: `e702757a…ca8d`; two source manifests: `cb42c393…c068`; temporary outputs destroyed. |
+| Commit/document correction | PASS AFTER CORRECTION | Literal `\n\nTask:` text was replaced by real trailers in all three unpushed commits; the Base lock was rebound and the final exact chain reverified. The first documentation-lint command used nonexistent legacy names; canonical strict scans passed. |
+| Scope audit | PASS | No Base runtime/Scenario starter/manifest, public wire/result/driver/package, consumer/product source, `any`, DB, deployment, capability, activation, T-008, Pilot or traffic change. |
+| Detailed evidence | PASS | Artifact 34 is the pre-source repair freeze; artifact 35 records finding closure, exact chain, verification, rollback and next gate. |
+| Context/governance/docs | PASS | Context checksum `7ff6f13e9410ce7d0601dce4762f5e51e9684b2e8d3db13cac816387f767b701`; strict Context/project governance, T-002 query and document/anchor lint pass for 65 task and 431 repository Markdown files. |
+
+One pre-lock conformance aggregate stopped at the intentionally historical source
+lock after the non-locking population passed. Updating the candidate lock to the
+committed source made the complete portability/revision gate pass; no check was
+disabled. I1-D is reaccepted only by artifact 35, not by the historical artifact 33.
+
+## C30-I1-D successor quality-review reopening — 2026-08-06
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Existing regression populations | PASS but insufficient | Direct contract typecheck, runtime 28/28, Scenario 10/10, conformance 291/291, 55 strict Schemas and the historical source lock remain green. |
+| Prepare Schema/codec parity | FINDING D-R1 | Ajv accepts `prepared` plus `safe_reason`, and `context_changed` plus `submit_token`; the runtime codec rejects both mixed branches. |
+| Resolved submit identity | FINDING D-R2 | Replacing a shape-valid submit token while retaining principal/expiry context passes the current assertion; scenario/action are absent from that private context. |
+| Exact rebind immutability | FINDING D-R3 | An exact assertion replay can replace the evidence hash and extend expiry because the existing-binding context stores neither value. |
+| Claimed-Step execution composition | FINDING D-R4 | A Step-01 driver and a Step-02 effect identity pass their respective assertions because no composed assertion joins them. |
+| Bind failure outcomes | FINDING D-R5 | Structural `unavailable` passes, but contextual fresh-bind validation demands success metadata; differing-request `request_conflict` has no accepted contextual path. |
+| Scope/effect census | PASS | Review and freeze changed Nurture governance/context evidence only. Base and My-Chat remain clean; no runtime/consumer, DB, manifest convergence, deployment, activation, T-008, Pilot or traffic action ran. |
+| Context/governance | PASS | Context touch/strict verify, project sync/lint and T-002 query pass; the registered workflow-context checksum is `fb601c44…37f2`. |
+| Documentation lint | PASS AFTER COMMAND CORRECTION | An initial call referenced three nonexistent legacy script names and stopped with `MODULE_NOT_FOUND`; no repository state changed. The canonical `lint-docs.mjs` task scan passes 64/64 and the repository scan passes 430/430 with strict anchor checking and zero warnings/errors. |
+
+The exact repair and falsification matrix is frozen in artifact 34. Artifact 33
+is historical evidence until successor source, repeated qualification and a new
+metadata source lock are recorded.
+
+## C30-I1-D cumulative implementation and qualification — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User authorized all I1-D operations through closure. D1-D5 changed only Base standalone contracts/Schemas/fixtures/tests and the final source lock. |
+| Exact chain | PASS | D1 `57c0be0…`; D2 `9a35757…`; D3 `818b983…`; D4 `6fc07bd…`; review source `52c0dc2…`; metadata lock `c179bb5…`. |
+| Quality review | PASS / 3 FIXED | Strict JSON delegated input, committed-only exact replay and fail-closed unavailable lookup gaps were repaired; no finding remains open. |
+| Full Base verifier | PASS x3 | 55 Schemas, 291 Node tests, runtime 28/28 and Scenario 10/10; typecheck/build, exposure/consumer, canonical-ref and exact source-lock checks pass. |
+| Source identity | PASS | 20 normalized TypeScript files; hash `50c5fa162aa2c9f81b1eb053ebe48f1df90d8a14984e0f715af13224a3c7f093`; lock names exact source `52c0dc2…`. |
+| Determinism | PASS | Two 76-file builds: `2caf4603…70b7`; two manifests: `4553ffbf…1d70`; temporary outputs destroyed. |
+| Scope audit | PASS | No Base runtime/Scenario starter/manifest diff, `any`, product vocabulary, consumer source, DB, deployment, capability or activation change. |
+| Detailed evidence | PASS | Artifacts 29-32 record D1-D4; artifact 33 records the cumulative D5 qualification and rollback chain. |
+| Context/governance/docs | PASS | Context checksum `f51f331b061bdb67718a70ef1038b03850a9619d03a792aba3066facff1198bc`; strict Context/project-state/governance checks and T-002 query pass; 63 task and 429 repository Markdown files pass strict anchor lint. |
+
+## C30-I1-D domain-action scope freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | Reused `T-002 / M-002 > F-002`; task remains `in-progress` and I1-D implementation is not open. |
+| Contract completeness | PASS | Artifact 28 freezes standalone action declaration, exposure zones, prepare/submit, Host assurance, direct result, claimed Step bind/recovery, effect identity and public/private result layering. |
+| Neutrality and identity repair | PASS | Shared enum is exactly `scenario_direct_empty_v1|workflow_claimed_step_v1`; both direct and claimed effect-identity input branches include `scenario_key`. |
+| Slice boundary | PASS | D1-D5 are separately gated; manifest dependency/capability, legacy/vNext exclusion and `scenario_domain_action_source_v1` remain I1-F. |
+| Task-doc lint | PASS | `node .ai/scripts/lint-docs.mjs --path dev-docs/active/nurture-institution-mode --strict --check-anchors`: 58 files, zero errors/warnings. |
+| Repository-doc lint | PASS | `node .ai/scripts/lint-docs.mjs --strict --check-anchors`: 424 files, zero errors/warnings. |
+| Context | PASS | `ctl-context touch` refreshed `workflow-nurture-scenario-contract` to `f0231d72cbde31d0acc6e8b9ed3cebb935a7f9da7b109c7faa70fab8c428132d`; strict verification passes. |
+| Project governance/state | PASS | Governance sync/lint/query pass; T-002 resolves under F-002/M-002; project Context mode remains enabled/contract. |
+| Repository boundary | PASS | My-Workflow-Base remains clean at `3c30337…`; My-Chat remains clean at `dc4a77b…`; Nurture changes are limited to task/project/context documentation. |
+| Effect boundary | PASS | No Base/My-Chat/Nurture product source, build, Prisma generate, database connection/apply, one-time PostgreSQL, deployment, capability, activation, T-008, Pilot or traffic action ran. |
+
+## C30-I1-C4 quality repair qualification and successor lock — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Base source `ae0c35709f0798abb7b0a2a365805b76ba9f5cd4`; metadata-only lock `3c30337eabe012eb936e91eec5c9d421463e67c7`. |
+| Finding closure | PASS | R1-R6 close structural locator bypasses, current expiry, semantic-policy ownership, locale stability, page default and response-local item keys. |
+| Full verifier | PASS x3 | 36 Schemas, 220 Node tests, runtime 28/28 and Scenario 10/10; typecheck/build, consumer/exposure, source portability/revision and canonical-ref gates pass. |
+| Source identity | PASS | Hash `fc35c6b8aec9e7d7c01a336884f49e4f0821626d72846449e2b186a6102e5cf3`; 18 normalized TypeScript files. |
+| Deterministic output | PASS | Two 68-file builds: `3770474a…c0dbf`; two manifests: `35861319…e925d`; temporary directories destroyed. |
+| Context/governance/docs | PASS | Context checksum `6e77aab9f6482b805163d5682bf3831eb3328ecec3f2341408747602bafeca52`; strict checks and 423-file document/anchor lint pass. |
+| Repository boundary | PASS | Base and My-Chat worktrees clean; My-Chat remains `dc4a77b257f952e2c0f0aede9521e16ac274de9d`. No consumer/runtime/DB/deploy/activation/I1-D. |
+
+## C30-I1-C4 quality repair scope freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | Reused `T-002 / M-002 > F-002`; prior accepted source/lock retained as historical evidence. |
+| Repair completeness | PASS | R1-R6 cover every review finding: URL/address text, current expiry, semantic-policy ownership, locale errors, page default and response-local item keys. |
+| Pre-source gate | PASS | Artifact 26 freezes exact Base exports/assertions/Schemas/tests plus successor qualification/reseal before any source change. |
+| Context/governance/docs | PASS | Context checksum `fb872e597b272b170f312e5603be0c200287b80bc0c42818bf77c429adf674e6`; strict Context/governance checks and 422-file document/anchor lint pass. |
+| Boundary | PASS | No I1-D, consumer/runtime/provider, My-Chat/Nurture product source, DB, capability, deployment, activation, T-008, Pilot or traffic work is authorized. |
+
+## C30-I1-C4 cumulative qualification and source lock — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source/lock | PASS | Cumulative Base source `d14bf31da957ed42e6ce0dfecc3299c42b7c6a51`; metadata lock `9d168105ea8ccdf701c0b527764ede4de1f25a82`. |
+| Full verifier | PASS x3 | `pnpm verify:workflow-contracts` passes twice before and once after the lock commit. |
+| Schema/conformance | PASS | 36 Schemas compile; 206 Node tests, runtime 28/28 and Scenario 10/10 pass. |
+| Source identity | PASS | Hash `9e18ae68fb4541ab562ee8209edf497f58af0a09daa31783e5099ce8364609ae`; 18 normalized files; exact reachable revision and byte comparison pass. |
+| Deterministic build | PASS | Two isolated 68-file builds produce tree digest `2b504b48c934f74798fcef42bac62360828651e1c854cb763eeda3574ca759d1`. |
+| Deterministic manifest | PASS | Two source-manifest outputs produce digest `9a9b0aefdd072585334aa60f64b272202ac280b77b5932589f9c0813092f14f6`. |
+| Boundary review | PASS | Closed union, exposure, canonical-ref, actual consumer-boundary, portability, documentation alignment and UI-token checks pass. |
+| Context/governance/docs | PASS | Context checksum `3fac79261f7fe8a8d5671dd11a016b68e4be734184a3e2c71744d324a36a02dd`; strict checks and document/anchor lint pass. |
+| Effect boundary | PASS | No runtime/provider/consumer, My-Chat/Nurture product source, DB, capability, deployment, activation, I1-D or C30-I2. |
+
+## C30-I1-C3 semantic-presentation implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source | PASS | Base `13d207791d91b5efb168494af896c5f716d16c39`; 14 scoped files over C2. |
+| Type safety/build | PASS | Full Base typecheck and contract build pass. |
+| Presentation Schema/codec | PASS | 36 Schemas compile; read input, six blocks, navigation/action offers and four result variants pass parity/semantic negatives. |
+| Regression population | PASS | Runtime 28/28, Scenario 10/10 and 201 Node tests pass outside the intentionally stale source-lock step. |
+| Privacy/authority | PASS | Raw/canonical ids, recursive/UI/protected blocks, URLs, Run/server-action/command/submit fields, mixed union variants and Anti-Metrics are rejected. |
+| AI projection | PASS | Only copied `narration=allowed` safe text remains; refs, versions, codes, cursors, action targets and display-only values are absent. |
+| Deferred source lock | EXPECTED / I1-C4 | I1-B lock remains unchanged until cumulative C1-C3 source qualification completes. |
+| Context/governance/docs | PASS | Context checksum `35f2808ae58a1bfc9f846d4ff171cdc6c58c14442f1afb6a9d85a23eefce20dd`; strict checks and document/anchor lint pass. |
+| Effect boundary | PASS | No runtime/provider/consumer, My-Chat/Nurture product source, DB, capability, deployment or activation. |
+
+## C30-I1-C2 subject-context provider implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source | PASS | Base `600faee233490a4d3110b24594474dd7ff79eae5`; 11 scoped files over C1. |
+| Type safety/build | PASS | Full Base typecheck and contract build pass. |
+| Provider Schema/codec | PASS | 30 Schemas compile; list/resolve inputs, options and every closed result variant pass parity/semantic negatives. |
+| Regression population | PASS | Runtime 28/28, Scenario 10/10 and 160 Node tests pass outside the intentionally stale source-lock step. |
+| Privacy/authority | PASS | Raw ids/refs, member expansion/count, action/role/policy, Host sort/filter/selection and mutation expected-version smuggling are rejected. |
+| Deferred source lock | EXPECTED / I1-C4 | I1-B lock remains unchanged until C3 source stabilizes. |
+| Context/governance/docs | PASS | Context checksum `281f12a9b0a6a72dd9c049b1eec6c36dd27a209149b0c76fc3b334d289104ecb`; strict checks and 419-file document/anchor lint pass. |
+| Effect boundary | PASS | No runtime/provider/consumer, My-Chat/Nurture product source, DB, capability, deployment or activation. |
+
+## C30-I1-C1 safe-copy/ref implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact source | PASS | Base `64533a66d2b95c9b31ff317920515962a0d3cb32`; nine scoped files; no runtime or consumer source. |
+| Type safety/build | PASS | Full Base typecheck passes; the contract package builds with no `any` or Host/Scenario imports. |
+| Schema/codec | PASS | 25 Schemas compile; strict safe-copy/reason and opaque-locator positive/negative cases pass. |
+| Regression population | PASS | Runtime 28/28, Scenario example 10/10 and 129 Node tests pass when the intentionally stale source-lock portability step is excluded. |
+| Deferred source lock | EXPECTED / I1-C4 | The existing I1-B lock rejects the new C1 source population. No verifier weakening or premature lock refresh was made. |
+| Boundary checks | PASS | Canonical-ref, consumer, contract-doc, semantic, diff and credential-pattern checks pass. |
+| Context/governance/docs | PASS | Context checksum `19924622e39bc9f8e48d96e146ca44897a333fbba9d51e8fe272a3f9e74e34fe`; strict Context/project-state/governance checks and 418-file document/anchor lint pass. |
+| Effect boundary | PASS | No My-Chat/Nurture product source, runtime/provider, Prisma/database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
+## C30-I1-C subject-presentation scope review and freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; M-002/F-002/T-002. Existing task and roadmap remain SSOT. |
+| Accepted-input trace | PASS | I1-C composes as I1-A `operation.input`, consumes rather than redefines I1-B, and preserves the locked C-3-0c-1/2 presentation decisions. |
+| Provider boundary | PASS | Distinct list/resolve operations, opaque expiring subject contexts, no Host ranking/inference/auto-selection and closed resolved/selection/change/unavailable results are frozen. |
+| Presentation boundary | PASS | Safe owner text, six flat semantic blocks, read-only navigation, prepare-only action offers, bounded output and stripped AI narration projection are frozen. |
+| Donor disposition | PASS | T-029 remains zero-direct-merge; current Run-level Base action availability, broad My-Chat interaction envelope and Nurture database-id refs are negative donors. |
+| Implementation decomposition | PASS | C1 safe-copy/ref → C2 provider → C3 presentation → C4 cumulative qualification/source lock. Every unit requires separate authorization and none opens I1-D or C30-I2. |
+| Context/governance/docs | PASS | Workflow Context checksum `46c566a0123a9e555b5b6bc0142bb3fef9938612d314e643eb5916563ab244dd`; strict Context/project-state/governance checks and T-002 query pass. Repository document/anchor lint checks 417 Markdown files with zero errors/warnings. |
+| Effect boundary | PASS | Planning/docs only. No Base/My-Chat/Nurture product source, build, Prisma/database, runtime, capability, deployment, activation, T-007/T-008, Pilot or traffic action ran. |
   Earlier P0/P1/P2/M1/M2/M3-baseline `OPEN`, `BLOCKED`, counts and hashes remain
   point-in-time evidence, not current status. The latest matching closure row
   controls. `10-pilot0-c-current-decision-index.md` controls C;
   `11-pilot0-d-topology-operations-contract.md` controls D.
+
+## C30-I1-B4 cumulative qualification — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User separately authorized I1-B4 only. Base change is one metadata source-lock file; no I1-C/C30-I2 or consumer/runtime work entered scope. |
+| Exact source/lock chain | PASS | Source `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`; metadata-only lock commit `9a1586597a2eabd2876ad39e02c90491373595d0`; source hash `16be693cd877bfac3638a615b391614cddccbf219ef6a115a450ff5f47eb2512`. |
+| Full Base verifier | PASS x3 | After refreshing the stale I1-A lock, `pnpm verify:workflow-contracts` passes twice before the lock commit and once after it. |
+| Type/build populations | PASS | Four package typechecks pass; runtime 28/28 and scenario 10/10 tests pass. The contract build emits 60 ignored files. |
+| Schema/codec/conformance | PASS | All 23 Schemas compile; 107 Node tests cover I1-A, B1 reservation replay, all four B2 branches, B3 three-state recovery, exposure negatives and integration-lock behavior. |
+| Determinism | PASS | Two contract builds produce digest `e7195035c4c9e062aee26f2b759aca7c48167dcb2119713c4fe12913fd5a9a1a`; two manifest outputs produce identical digest `76eeb87a…d876`. |
+| Source-lock negative/positive | PASS | The pre-refresh portability gate rejects the stale I1-A lock as expected; the unchanged verifier then accepts the exact B1-B3 source manifest and committed revision. |
+| Boundaries | PASS | Canonical-ref lint, actual consumer-boundary check, contract-doc alignment, semantic lint, source-hash portability and source-lock exact-revision checks pass. |
+| Context/governance/docs | PASS | Context checksum `040f9bd16ee83667dcbc73b712fef8bfdc2c7a7017ed868fe71fbdbfdbdcbf91`; strict Context/project-state/governance checks, T-002 query and 416-file document/anchor lint pass. |
+| Effect boundary | PASS | No new wire/source test, dependency, package version, My-Chat/Nurture product source, manifest/module, Prisma/database, C30-I2, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
+## C30-I1-B3 implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User separately authorized I1-B3 only. Base change is limited to private current evidence/status types/assertions, three Schemas, fixtures/tests and schema-package registration. |
+| Exact source | PASS | Base `edbcd747eb50106b8f4967c3cb03b5480cbebc7f`, parent B2 `445c236…`; worktree clean after commit. Detailed record: `artifacts/19-c30-i1-b3-implementation-record.md`. |
+| Type/Schema closure | PASS | Contract `tsc --noEmit`, seven source-mapped fixtures, 23-Schema package twice and strict Ajv execution pass. |
+| Three-state closure | PASS | Committed/confirmed-no-effect/unknown and four unknown reasons pass; mixed variants, invalid reasons, noncanonical times and null/unknown fields fail. |
+| I1-A/exposure boundary | PASS | Private bodies compose as I1-A operation inputs, reject duplicated transport/raw platform fields and reject B2 Host-internal pair bodies. |
+| Exchange/runtime truth | PASS / RUNTIME DEFERRED | Operation/command identities are cross-checked. Base makes no writer-fence, terminal-attempt, deadline, absence or database truth claim. |
+| Boundary checks | PASS | Canonical-ref lint, consumer boundary, contract/doc alignment, semantic-lint wrapper, diff/secret scan and test syntax checks pass. |
+| Context/governance/docs | PASS | Context checksum `ae0dcf183fb7222fd662077943bc99466862c3e3572cc7c78ea66e45e0fba9df`; strict Context/project-state/governance checks, T-002 query and 415-file document/anchor lint pass. |
+| Deferred cumulative checks | EXPECTED / B4 | No build was requested; generated `dist`, normal package tests, cumulative exposure audit, deterministic build and exact source lock remain B4. |
+| Effect boundary | PASS | No runtime, source lock, dependency/package version, My-Chat/Nurture source, manifest/module, Prisma/database, C30-I2, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
+## C30-I1-B2 implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User text `I2-B2` was resolved to sequential `I1-B2`; C30-I2 remained NO-GO. Base change is limited to Host-internal pair types/assertions, five Schemas, fixtures/tests and schema-package registration. |
+| Exact source | PASS | Base `445c23649c5177f6d10ebcb1456b8191ea928fb4`, parent B1 `6a437897…`; worktree clean after commit. Detailed record: `artifacts/18-c30-i1-b2-implementation-record.md`. |
+| Type/Schema closure | PASS | Contract `tsc --noEmit`, six source-mapped fixture files, 20-Schema package twice and strict Ajv execution pass. |
+| Four legal branches | PASS | Reuse/reuse, reuse/create, create/reuse and create/create plus exact replay pass Schema and in-memory codec execution. |
+| Cross-object parity | PASS | Duplicate/unsorted slots, wrong bound owner, operation/hash/slot/canonical/owner/head/version/effect drift and partial pairs are rejected. B2 bodies also fail B1 private codecs. |
+| Boundary checks | PASS | Canonical-ref lint, consumer boundary, contract/doc alignment, semantic-lint wrapper, diff/secret scan and test syntax checks pass. |
+| Deferred cumulative checks | EXPECTED / B4 | No build was requested; generated `dist`, normal built-package conformance, deterministic build and final source lock remain B4 responsibilities. |
+| Context/governance/docs | PASS | Context checksum `69b891e3dff190976a1f31ef4318ae2326806540c7186e4097537afff82bbf33`; strict Context/project-state/governance checks and 414-file document/anchor lint pass. |
+| Effect boundary | PASS | No runtime transaction, source lock, dependency/package version, My-Chat/Nurture source, manifest/module, Prisma/database, C30-I2, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
+## C30-I1-B1 implementation — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Authorization/scope | PASS | User separately authorized I1-B1 only. Base change is limited to owner-binding ref, reservation request/result, strict assertions/Schemas, fixtures/tests and exports. |
+| Exact source | PASS | Base `6a4378970246dc724b43a30b1f9b4c6fdfde494b`; worktree clean after commit. Detailed record: `artifacts/17-c30-i1-b1-implementation-record.md`. |
+| Source type safety | PASS | Contract package `tsc --noEmit` and source-mapped conformance fixture typecheck pass; no `any` or Host/Scenario runtime imports. |
+| Schema/codec behavior | PASS | 15-Schema package compiles twice; request/result positives, exact replay, strict exposure negatives and exchange identity/slot drift execute successfully through no-output Schema/codec harnesses. |
+| Boundary checks | PASS | Canonical-ref lint, consumer boundary, contract/doc alignment, semantic-lint wrapper, diff check and secret scan pass. |
+| Deferred cumulative checks | EXPECTED / B4 | Repository instruction forbids an unrequested build, so generated `dist` and normal built-package conformance remain unchanged. I1-B4 owns full build/conformance/deterministic/source-lock closure. Bare `pnpm semantic-lint` requires descriptor arguments; the suite wrapper passes and no out-of-scope script repair was made. |
+| Context/governance/docs | PASS | Context checksum `8bc3dc50abd1d285b60d45a4dfedd4d1877a04895bd5a226a0eac374f5b65cbc`; strict Context/project-state/governance checks and 413-file document/anchor lint pass. |
+| Effect boundary | PASS | No final source lock, dependency/package version, runtime, My-Chat/Nurture source, manifest/module, Prisma/database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |
+
+## C30-I1-B scope review and freeze — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Task/governance routing | PASS | Project Orchestrator reused `M-002 > F-002 > T-002`; no task, bundle or parallel roadmap was created. Existing `roadmap.md` remains the planning SSOT in Default mode. |
+| Accepted-input review | PASS | Reviewed accepted I1-A source/types, Pilot-0-C identity boundary, workflow context, current manifest/module and T-029 donor disposition before choosing wire fields. |
+| Ownership neutrality | PASS | Base wire uses registered slots and `CanonicalRef` only. No Child, Family, stewardship, membership, Nurture anchor kind, role, Grant, policy or concrete issuer/audience/endpoint value is hard-coded. |
+| Exposure boundary | PASS | `host_owner_internal` alone may carry canonical object/binding refs. Scenario-private reservation/evidence/status bodies carry typed owner refs and non-reversible hashes only; raw platform/binding/membership identity and protected bodies are forbidden. |
+| I1-A composition | PASS | Private I1-B requests are I1-A operation inputs. Duplicate caller/issuer/audience/route/time/nonce/key/signature fields were removed from the frozen body; detached signing remains I2/I3 transport work. |
+| Pair/recovery closure | PASS | The freeze covers reservation replay, all four legal reuse/create pair branches, atomic all-or-none result parity and the closed writer-fenced `committed|confirmed_no_effect|unknown` union. `unknown` remains nonterminal quarantine. |
+| Implementation readiness | PASS / NOT AUTHORIZED | Exact names, fields, validation rules, legal/illegal fixture matrix, planned Base paths, four ordered units, acceptance and rollback are frozen in `artifacts/16-c30-i1-b-scope-freeze.md`. No source implementation began. |
+| Context/governance/docs | PASS | Context checksum refreshed to `b4494a9229a5eb107502bfc26a033219f7c2a32df4dd346db09a479a313599f6`; strict context and project-state verification pass. Repository document/anchor lint checks 412 Markdown files with zero errors/warnings; governance sync/lint passes. |
+| Effect boundary | PASS | Documentation/context only. No manifest/module/product source, package/lock, Prisma/schema/migration, PostgreSQL, runtime, capability, deployment, activation, T-007/T-008, Pilot or traffic action ran. |
+
+## C30-I1-A trusted invocation acceptance — 2026-08-05
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Initial TypeScript check | FAIL, REPAIRED | The first contracts typecheck found two `unknown` narrowing errors in the new validator. Explicitly typing the failure helper as a `never` function repaired control-flow narrowing without a cast or `any`; contracts build and conformance fixture typecheck then passed. |
+| Executable JSON Schema | PASS AFTER COMPATIBILITY REPAIR | Ajv strict compilation first exposed a pre-existing `strictRequired` annotation issue in legacy `integration-lock-v3`, not a wire validation failure. The package-wide check now executes all 12 legacy/current schemas with Ajv compatibility mode, while the canonical-ref plus three I1-A schemas compile separately under strict mode. |
+| Schema/codec parity | PASS | One neutral positive is accepted by both. Eleven closed-envelope mutations are rejected by both, covering embedded signature/body, authority field, wrong ref, origin/category/method/hash/identifier/time/input failures. Three cross-field lifetime negatives are rejected by the runtime codec; opaque delegated input is accepted by the envelope validators. |
+| Source-lock portability pre-seal | EXPECTED FAIL, CLOSED | Conformance initially stopped because the intentionally stale source lock did not yet contain the new source manifest. After the source population stabilized, the deterministic manifest was refreshed, implementation commit `ce7118c…` created, and lock commit `bd69d19…` bound that exact source revision. |
+| Full Base verification | PASS | `pnpm verify:workflow-contracts`: all four typecheck populations and required contracts build pass; runtime 28/28, scenario 10/10 and Node conformance 21/21 pass; canonical-ref lint has zero findings; consumer boundaries, all 12 schemas and exact source lock pass. Source hash `8621c6cc6e81e99450f42d7b0879da9e029f90a350c11bb4a0d64f341c370b0c`. |
+| Hygiene and determinism | PASS | Repeated schema/conformance/full verification changed no tracked output; `git diff --check` and the credential/connection-string scan pass. Base worktree is clean after the two commits. |
+| Effect boundary | PASS | No PostgreSQL was started or contacted. No My-Chat/Nurture product source, Prisma/schema/migration, runtime adoption, capability, deployment, activation, T-007/T-008, Pilot or traffic operation ran. |
 
 ## Documentation warning remediation — 2026-07-31
 
@@ -1358,3 +1992,33 @@ the rejected checkpoint and are historical.
 | legacy 单写入面 | PASS | acknowledge/reply/redact 三个 legacy 变更器加 `writerContract` 前置,打 harness 行零写入 |
 | x5 联合套件(pinned 物化) | PASS 4/4 | My-Chat `a019566` / Base `06303e9` detached worktree + disposable pgvector PG;pin 全部核对一致;运行后销毁 |
 | 效果边界 | PASS | 无 schema/migration、无持久化 DB apply、无 capability/secret/激活/流量变更 |
+
+## 2026-08-05 — C30-I0-C/D closure
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Task continuity | PASS | Governance recovery selected existing T-002; decision is `REUSE_TASK`, M-002/F-002/T-002. |
+| Current three-repository census | PASS | Base primary and four auxiliary worktrees are clean; My-Chat auxiliary worktrees are clean, while its primary has one excluded user-owned `next-env.d.ts`; Nurture primary and retained Claude worktree are clean. No existing worktree was removed or modified. |
+| Isolated C30 topology | PASS | New clean branches: Base `20c4b7a…`, My-Chat `dc4a77b…`; Nurture was created from qualified runtime input `882d80f…` and may advance only through T-002 evidence documentation. |
+| Integration-lock negative tests | PASS | 6/6: exact public package/version, unknown lock field, package-path joint rejection, exact commit + checkout drift, installed-bin symlink entry and unknown CLI flag. |
+| Base frozen install | PASS | `pnpm install --frozen-lockfile --ignore-scripts`; 48 packages reused locally, lockfile unchanged, no lifecycle/build scripts. |
+| Exact joint lock | PASS | Git-only joint lock verifies all three exact HEADs and normalized source hashes: Base `e2276404…`, My-Chat `f675d505…`, Nurture `d47648e5…`. The temporary lock was deleted after the run. |
+| Repository false/empty census | PASS | 18 exact source-identity checks are absent; Nurture manifest omits `scenario_federation_v1`; My-Chat canonical Prisma omits `ScenarioWorkspaceActivation`. No environment DB census was claimed. |
+| Full Base canonical baseline | PASS | After the authorized contract build, `pnpm verify:workflow-contracts` passes all typechecks, canonical-ref lint, 28 runtime tests, 10 scenario tests, conformance scripts, 6 integration-lock tests and the source lock. |
+| My-Chat canonical baseline | PASS | Frozen scripts-disabled install; Prisma generate/validate with a non-connecting placeholder URL; all 17 workspace typechecks; full lint; 89 files/504 unit tests pass, with 15 files/58 repository-declared skips. |
+| Nurture canonical baseline | PASS | Both Prisma Clients generate; both schemas validate with non-connecting placeholder URLs; build-aware typecheck, frontend lint, 52 files/579 unit tests, routing census (95 files), persistence boundaries, N1 schema and X4 replay checks pass. |
+| Historical G1 pin | EXPECTED REJECTION / PRESERVED | Nurture's existing G1 verifier remains locked to Base `06303e9…` and correctly rejects C30 Base `20c4b7a…`. It was not changed or counted as the C30 joint pin; the exact three-Git C30 lock passes separately. |
+| Repeated exact joint lock and false/empty census | PASS | Current Nurture input `cc8b034…` retains source hash `d47648e5…`; the temporary lock passes and is deleted. All 18 source-identity checks plus umbrella admission and activation-model checks remain absent. |
+| C30-I0 verdict | `I0_COMPLETE / C30_I1_READY_NOT_STARTED` | All I0 entry gates are closed; no C30-I1 implementation was started. |
+| Effect boundary | PASS | No schema/migration, database, secret, capability, deployment, activation, T-007/T-008, Pilot or traffic action. |
+
+## 2026-08-05 — C30-I1 scope freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance routing | PASS | `REUSE_TASK`; M-002/F-002/T-002. Existing task and roadmap remain SSOT. |
+| Cumulative ledger trace | PASS | The accepted C30-I1 output in `09-pilot-readiness.md` remains unchanged and is decomposed without dropping trusted ingress, binding, presentation, action, protected interaction, dependency or source-identity obligations. |
+| Donor boundary trace | PASS | I1-A follows B01/B02/B05/B07 `REWORK` rules; it imports no T-029 file as-is and excludes B03/B06/B08-B14. |
+| I1-A exact scope | PASS | Three named neutral wire types, closed envelope-owned fields, delegated operation input, 60-second bound, exact canonical refs and schema/codec parity acceptance are frozen in artifact 15. |
+| Downstream isolation | PASS | I1-B..F remain ordered and unstarted; C30-I2/I3/I4 remain NO-GO. |
+| Effect boundary | PASS | Planning/docs only; no Base/My-Chat/Nurture application source, schema, runtime, manifest, package, database, capability, deployment, activation, T-007/T-008, Pilot or traffic change. |

@@ -752,17 +752,17 @@ Nurture retains one canonical vNext manifest. A pre-activation manifest MAY be a
 
 C-3-0c-4 completes the presentation design and implementation-evidence specification only. It does not claim the shared contracts, providers, presenters, renderers, hashes, fixtures, capability, or allowlist exist. The now-locked C-3-0e supplies the complete-adoption evidence contract after C-3-0d action/driver and C-3-0e protected body/draft/cache/offline decisions; actual adoption remains unsatisfied.
 
-Pilot-0-C3-0d closes action execution and recovery around one static action contract. The reusable `ScenarioDomainActionContractV1` binds `(scenario_key, action_key)` to one exact input schema, target-ref class, confirmation class, surface set, authenticated handler, command contract, and driver. The driver is exactly `nurture_direct_empty_v1|workflow_claimed_step_v1` and is invariant across surface, recipient count, business outcome, replay disposition, and transient failure. The atomic Host capability is `scenario_domain_action_execution_v1`; it depends on both `trusted_scenario_invocation_v1` and `scenario_subject_presentation_v1`. A partial prepare-only, submit-only, direct-only, claimed-only, handler-only, or legacy fallback path cannot activate the Pilot action set.
+Pilot-0-C3-0d closes action execution and recovery around one static action contract. The reusable `ScenarioDomainActionContractV1` binds `(scenario_key, action_key)` to one exact input schema, target-ref class, confirmation class, surface set, authenticated handler, command contract, and driver. The driver is exactly `scenario_direct_empty_v1|workflow_claimed_step_v1` and is invariant across surface, recipient count, business outcome, replay disposition, and transient failure. The atomic Host capability is `scenario_domain_action_execution_v1`; it depends on both `trusted_scenario_invocation_v1` and `scenario_subject_presentation_v1`. A partial prepare-only, submit-only, direct-only, claimed-only, handler-only, or legacy fallback path cannot activate the Pilot action set.
 
 Every action follows owner preparation before submission. `prepare_domain_action` accepts only the registered action key, owner-issued prepare target, optional opaque expected version, and exact operation input, then repeats Host and Nurture owner resolution and issues a five-minute `submit_action` context. Preparation creates no CommandExecution, Workflow Step, Handoff, Outbox, or business fact. `submit_domain_action` accepts only the owner-issued submit token, exact confirmation, and bounded `client_mutation_id`; the client cannot repeat or replace action, target, version, actor, driver, command identity, Step, or Handoff facts. Strong authentication assurance is Host-established ceremony evidence only. Nurture still makes the strong-authorization decision from current Participant, role, scope, target, lifecycle, policy, owner context, and explicit confirmation.
 
-`nurture_direct_empty_v1` creates no Workflow Run or Step. Nurture atomically validates and consumes the InteractionContext, commits the business effect and typed CommandExecution, and persists `handoffRequestSnapshotsPayload=[]` with no driver. `workflow_claimed_step_v1` uses a Host-first pre-claim binding: My-Chat idempotently persists a content-free original Step in a non-claimable `awaiting_scenario_binding` state; Nurture verifies the still-active submit context and immutably binds that exact Step without consuming the context or committing the business effect; My-Chat then makes only that Step claimable. The claimed worker invocation atomically consumes the context and commits the Nurture effect, CommandExecution, and snapshots. My-Chat later uses its existing `complete_step` transaction to complete the Step and materialize Handoff plus Outbox. Raw submit tokens, claim tokens, owner targets/versions, and protected bodies never enter the Step, logs, traces, metrics, Handoff, or Outbox.
+`scenario_direct_empty_v1` creates no Workflow Run or Step. Nurture atomically validates and consumes the InteractionContext, commits the business effect and typed CommandExecution, and persists `handoffRequestSnapshotsPayload=[]` with no driver. `workflow_claimed_step_v1` uses a Host-first pre-claim binding: My-Chat idempotently persists a content-free original Step in a non-claimable `awaiting_scenario_binding` state; Nurture verifies the still-active submit context and immutably binds that exact Step without consuming the context or committing the business effect; My-Chat then makes only that Step claimable. The claimed worker invocation atomically consumes the context and commits the Nurture effect, CommandExecution, and snapshots. My-Chat later uses its existing `complete_step` transaction to complete the Step and materialize Handoff plus Outbox. Raw submit tokens, claim tokens, owner targets/versions, and protected bodies never enter the Step, logs, traces, metrics, Handoff, or Outbox.
 
 Binding does not extend the original five-minute context. A Step persisted but never bound remains non-claimable and is stopped after expiry. A bound Step lost before publication is recovered by exact Step-to-context binding lookup. First execution after expiry fails closed and requires new preparation; an effect committed before expiry remains recoverable after expiry because Execution lookup precedes consumed/expired-context rejection. Same-Step reclaim may rotate transient claim evidence and return the original Execution/snapshots. A different Step cannot bind the consumed context, obtain the original seed, or finish the original effect.
 
 The fixed claimed-Step set is `submit_family_care_question`, `reply_family_care_item`, `propose_enrollment_transfer`, `withdraw_family_enrollment`, and `close_enrollment`. The latter three remain inactive until the additive `guardian_relationship_attention` contract is implemented and adopted. Every other current Pilot domain action with no durable Host effect is direct-empty, including acknowledge/redaction, Enrollment confirmation and non-notifying lifecycle transitions, Guardian self-exit, stage mutation, Grant confirmation/replacement/revoke, and ordinary Institution/CareGroup/staff/policy mutations. `cancel_family_care_route` remains absent from Pilot. `initiate_enrollment` remains inactive until C-1/C-4 jointly classify the Nurture commit and existing Host Enrollment Invitation delivery/recovery. Host participant/Guardian invitation, C-0 provisioning, Technical Operator recovery, and cross-workspace portability retain their separately owned protocols and cannot become a third generic domain-action driver.
 
-Nurture derives canonical effect identity instead of accepting client `command_request_id`. Direct identity binds the Workspace, action, and InteractionContext under `nurture.domain-action.direct.v1`; claimed identity binds Workspace, scenario, original Step, and action under `nurture.domain-action.claimed-step.v1`. Canonical payload hashing covers command contract, typed Participant, owner target/scope/versions, canonical input, context, driver, and original Step where applicable. Claim/lease/version evidence, surface, client mutation, transport nonce, and tracing never become effect identity. Existing polymorphic `business_actor_ref` remains legacy historical evidence; activated C3 writes require an additive versioned Participant FK/kind, while My-Chat User/Actor remains separately named Host provenance.
+Nurture derives canonical effect identity instead of accepting client `command_request_id`. Direct identity binds the Workspace, scenario, action, and InteractionContext under `nurture.domain-action.direct.v1`; claimed identity binds Workspace, scenario, original Step, and action under `nurture.domain-action.claimed-step.v1`. Canonical payload hashing covers command contract, typed Participant, owner target/scope/versions, canonical input, context, driver, and original Step where applicable. Claim/lease/version evidence, surface, client mutation, transport nonce, and tracing never become effect identity. Existing polymorphic `business_actor_ref` remains legacy historical evidence; activated C3 writes require an additive versioned Participant FK/kind, while My-Chat User/Actor remains separately named Host provenance.
 
 Results preserve three owners: persisted `businessOutcome=applied|already_satisfied`, internal `disposition=executed|replayed`, and current presenter `changed|already_current|processed_but_unavailable`. Direct submit returns completed only after the Nurture transaction. Claimed submit consistently returns Host-owned accepted/processing after binding and durable scheduling, then rehydrates current completion; it does not race between synchronous and asynchronous public semantics. Exact original-Step replay returns byte-equivalent snapshots. A different newly authorized Step that observes `already_satisfied` creates no fresh replay seed and returns explicit `[]`. Presenter, worker, Handoff, Outbox, Notification, or provider failure never compensates or rewrites the committed Nurture fact.
 
@@ -773,6 +773,22 @@ Pilot-0-C3-0e locks one atomic protected-interaction data plane. `scenario_prote
 Nurture adds an authoritative `NurtureProtectedContent` aggregate with `prepared|committed|erased`, typed owner/context/Message binding, per-content AES-256-GCM key, approved KMS-wrapped DEK, keyed integrity evidence, and Restrict Message relation. Activated Message writes keep `body=null`; synthetic refs, JSON protection payloads, and `plain_text_dev|protected` scaffold states are not authority. `read_protected_detail` accepts only an owner-issued opaque locator and rereads current Participant/role/subject/thread/enrollment/grant/source/lifecycle/policy before returning `ready|tombstone|context_changed|unavailable`. Ready plaintext is no-store foreground memory for at most 60 seconds; owner outage and stale/offline paths return no body.
 
 My-Chat must render a distinct protected composer that never calls ordinary Chat persistence or durable draft/artifact paths. Nurture Chat warns before soliciting private detail and opens an empty composer from an intent-only conversation. Text entered into ordinary Chat remains under My-Chat transcript/provider/deletion policy, is never automatically copied/summarized into the protected lifecycle, and is not covered by the composer's no-Chat-persistence claim. Drafts have only current Participant + surface + foreground-process scope; deliberate leave is `stay|discard_and_navigate`, while background/lock/logout/context change clears them. `scenario_protected_ai_draft_v1` is a separate dependent capability and is off for Pilot-0; generic AI may narrate display-safe presentation but cannot receive protected bodies. Pilot retention is five-minute prepared authority with wrapped-key cleanup by 15 minutes, 30-day committed body, 365-day body-free business/audit evidence, zero durable AI prompt/output, and at-most-30-day encrypted backup with erasure-ledger replay before reads. Redaction/expiry crypto-erases the per-content key; Grant revoke stops unauthorized access but is not automatic global deletion.
+
+C30-I3 realizes the generic owner primitive with durable coordination states
+around the external KMS boundary. A database transaction first reserves
+`provisioning`; an idempotent, operation-keyed KMS provision then runs outside
+the transaction; a second locked transaction rereads current Participant,
+business and canonical-pair authority before activating ciphertext. Erasure
+first commits `erasing`, then idempotently destroys the external handle outside
+the transaction, and finally clears every recoverable cryptographic field.
+Retry or internal erasure reconciliation resumes these durable states without
+inventing a second key or representing destroyed material as readable. Read
+decrypts and derives the foreground carrier binding outside the transaction,
+then performs a final locked authority/lifecycle reread before returning
+caller-owned plaintext bytes. Canonical Participant/Process/Family versions
+come from their own aggregates and never from principal-binding revision. This
+quality-repaired generic primitive remains fixture-only and default-off; it
+does not add a production protected declaration or route.
 
 Complete adoption adds `scenario_protected_interaction_source_v1` beside interface/action source identities and separately pins Nurture storage-crypto plus My-Chat protected-runtime conformance revisions and the retention policy. Order remains Base contracts -> My-Chat Host/privacy adoption -> Nurture schema/KMS/owner services -> joint fault/privacy/restore evidence. C-3-0 is `DESIGN COMPLETE / IMPLEMENTATION OPEN`; current synthetic refs, plaintext-copy seams, missing enforceable separation between the protected composer and ordinary Chat/`PublicDraft`, absent contracts/KMS/composer/leakage scanner, and default-off capabilities keep traffic NO-GO. Actual adoption is delivered through C-3-1..5, beginning with Guardian family communication.
 
@@ -1744,3 +1760,85 @@ success status is `C4_QUALIFIED_DEFAULT_OFF / PILOT0_D_DESIGN_LOCKED /
 COMPLETE_PILOT_CANDIDATE_PENDING / EXTERNAL_TRAFFIC_NO_GO`; D implementation,
 candidate assembly, Pilot-0-E, and every deployment/activation stage stay
 separate.
+
+## C30-I0 joint qualification evidence boundary
+
+Joint Base/My-Chat/Nurture qualification accepts only immutable Git inputs. Each
+participant is identified by an exact lowercase 40-character commit id, the verifier
+resolves that id to a commit, and the isolated checkout HEAD must equal the resolved
+commit. A normalized source-population SHA-256 binds the files that supply each
+contract or scenario role. Mutable package paths remain valid only for ordinary
+single-package development checks and cannot satisfy a joint candidate.
+
+A clean isolated worktree is part of the evidence boundary: user-owned primary-tree
+changes and historical auxiliary worktrees are excluded rather than rewritten. The
+installed verifier entry compares real paths so a package-manager symlink cannot
+silently bypass CLI execution. Exact lock verification and repository false/empty
+census prove only source state; they do not imply compiled baseline success,
+database/environment emptiness, schema authority, capability admission, deployment,
+activation, Pilot or traffic authority.
+
+## C30-I1 neutral Base manifest convergence boundary
+
+The accepted I1-F Base extension is one optional, closed
+`ScenarioManifestV2.scenario_contracts` envelope. Omission preserves historical
+manifest v2 behavior; presence is all-or-fatal and cannot reinterpret legacy
+capabilities, actions, routes, handlers or surface mappings. The exact dependency
+chain is trusted invocation → subject presentation → domain action → protected
+interaction. Each node declares its exact source set, and only a complete prefix
+is valid.
+
+The declaration graph is bidirectionally closed: trusted operation/ingress,
+provider, presentation, product surface, I1-D action and I1-E protected rows must
+resolve their exact counterparts. The action path binds one static driver,
+scenario, handler, entitled ingress, offering surface and command metadata;
+protected declarations reuse that action plus the exact prepare/read pair and add
+no body, third driver or generic commit/erase operation. Base validates graph and
+availability only. It performs no dispatch, authorization, rendering, persistence,
+carrier handling or activation.
+
+F4 retains the aggregate Base source hash as a separate existing identity and adds
+four explicit profiles: platform child/family identity, Scenario interface,
+domain action and protected interaction. Each profile hashes only normalized Base
+contract TypeScript, exported Schemas and common manifest/module validation bytes.
+My-Chat adoption/runtime, Nurture owner/domain adapters and joint qualification
+must create their own exact downstream identities in a separately authorized
+C30-I2+ sequence. The accepted Base lock therefore makes I2 review eligible; it
+does not make any consumer or capability eligible for activation.
+
+## C30-I2 generic Host adoption boundary
+
+Artifact 51 freezes My-Chat adoption as seven ordered units: exact Base import,
+trusted ingress/signing/nonce, atomic canonical pair ownership, semantic
+presentation, direct/claimed actions, protected Host transport and cumulative
+default-off convergence. The architecture has one public-to-private trust
+transition: My-Chat resolves a current human User/Actor/Workspace from either an
+interactive session or the original durable Run actor and constructs I1-A server
+side. It signs outbound private calls; for declared Host-private inbound calls it
+verifies the detached signature and atomically consumes the nonce before dispatch.
+Ordinary API auth, a worker identity or an unsigned in-process call cannot
+substitute for that transition. Production Nurture request verification and
+response signing remain I3; I2 qualifies those Host roles against synthetic peers.
+
+The identity writer is one pair aggregate, not two endpoint calls. It fences the
+current Child, Family, family-child relation, adult authority and both expected
+binding heads in one PostgreSQL transaction, records exact replay and emits only
+refs/body-free audit/outbox. Response-loss recovery is the I1-B
+`committed|confirmed_no_effect|unknown` protocol and is entered only after a
+transport-ambiguous submitted request. Current pair evidence expires with its
+private invocation and never grants Nurture authority.
+
+Host presentation, action and protected components are generic consumers of the
+exact manifest declarations. Presenters render only I1-C semantic objects;
+action offers open prepare only; I1-D supports only `scenario_direct_empty_v1`
+and `workflow_claimed_step_v1` with `scenario_key` in both effect identities;
+I1-E plaintext exists only in a separate bounded carrier and foreground no-store
+display lease. Nurture remains the business fact, protected store/KMS and current
+Scenario-authority owner.
+
+The C30-I2 implementation is owned by a new My-Chat local task because My-Chat's
+historical `T-002` is already archived as `content-events`. Nurture T-002 remains
+the cross-repository program record, but its trailer must never be attached to
+My-Chat C30 commits. Every I2 capability remains absent/off; positive activation,
+admission, invitation, Notification, product-specific composition and all I3+
+work remain later gates.

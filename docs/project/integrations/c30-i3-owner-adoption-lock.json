@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
+  "source_revision": "48530bec7219b88b3e1f580a57eb6879e083da36",
+  "base": {
+    "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
+    "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
+    "aggregate_source_hash": "d17f23585bb90ab607eb0fc80af629d8ab13ceb4508118de28162e4fd8846383"
+  },
+  "host": {
+    "head_revision": "cd7bbc2623dff8621c2c7155b04d1bf759e8404a",
+    "runtime_revision": "658b897360734dfa916ce25abda7a8db5fb3f27d",
+    "aggregate_source_hash": "8172e370dfb5db0876709c6f7a01999314ac266bf71ba166854f9effa510a5ad"
+  },
+  "source_hash": "623da6fdb447531d84bafafe90865f32b4886827c2c13b7eb2d425f3c39c95d5",
+  "source_profiles": [
+    {
+      "source_identity": "nurture_c30_manifest_foundation_v1",
+      "source_hash": "2ae5866f359d702fc348121d635e1f5f059b8538198b1f5b57d64ba4838711ea",
+      "files": [
+        "package.json",
+        "packages/nurture-scenario/package.json",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/src/index.ts",
+        "packages/nurture-scenario/src/module.ts",
+        "packages/nurture-scenario/src/policies.ts",
+        "packages/nurture-scenario/src/registry.ts",
+        "packages/nurture-scenario/tests/conformance.test.ts",
+        "packages/nurture-scenario/tests/institution/family-input-workflow-handler.test.ts",
+        "packages/nurture-scenario/tests/module-factory.test.ts",
+        "scripts/assert-g2-exit-contract.mjs",
+        "scripts/compute-c30-i3-owner-adoption-hash.mjs",
+        "scripts/generate-nurture-scenario-manifest.mjs",
+        "scripts/verify-c30-i3-upstream.mjs"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_private_trust_participant_v1",
+      "source_hash": "c471077990939365d0f47280fc4a6a9e19ae6b6c11185dcc80ad7dc408ae649b",
+      "files": [
+        "packages/nurture-scenario/src/c30/canonical-json.ts",
+        "packages/nurture-scenario/src/c30/participant-binding.ts",
+        "packages/nurture-scenario/src/c30/trusted-invocation.ts",
+        "packages/nurture-scenario/tests/c30/participant-binding.test.ts",
+        "packages/nurture-scenario/tests/c30/trusted-invocation.test.ts"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_pair_local_persistence_v1",
+      "source_hash": "6afeedef091cd995fc2f61332317c14fbadb8bf3f3dfc36538c3c4a43f72b1d0",
+      "files": [
+        "docs/context/db/schema.json",
+        "docs/context/registry.json",
+        "packages/nurture-db/src/c30/nonce-store.ts",
+        "packages/nurture-db/src/c30/pair-association.repository.ts",
+        "packages/nurture-db/src/c30/participant-binding.ts",
+        "packages/nurture-db/src/index.ts",
+        "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
+        "packages/nurture-scenario/src/c30/pair-association.ts",
+        "prisma/migrations/20260806120000_c30_i3_pair_owner_foundation/migration.sql",
+        "prisma/migrations/20260806230000_c30_i3_quality_repair/migration.sql",
+        "prisma/schema.prisma"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_subject_presentation_v1",
+      "source_hash": "d621726a9090e4d2fee622ad154c6a344f5885ecac32390314bc23ca33d10b13",
+      "files": [
+        "packages/nurture-db/src/c30/subject-presentation.repository.ts",
+        "packages/nurture-db/tests/c30-pair-owner.integration.test.ts",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/c30/subject-presentation.ts",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/tests/c30/subject-presentation.test.ts"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_canonical_action_v1",
+      "source_hash": "b40ffa6c6e0a07f94a754386c29d8cfa93b2d3998ccc9f29aa6a2ad5b707b1a0",
+      "files": [
+        "docs/context/db/schema.json",
+        "docs/context/registry.json",
+        "packages/nurture-db/src/c30/canonical-action.repository.ts",
+        "packages/nurture-db/tests/c30-canonical-action.integration.test.ts",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/c30/canonical-action.ts",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/tests/c30/canonical-action.test.ts",
+        "prisma/migrations/20260806130000_c30_i3_canonical_action_runtime/migration.sql",
+        "prisma/schema.prisma"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_protected_owner_lifecycle_v1",
+      "source_hash": "adecec17bc5f33379d9f699c1c1933fca76fef81aefb45c270a8829c885b3487",
+      "files": [
+        "docs/context/db/schema.json",
+        "docs/context/registry.json",
+        "packages/nurture-db/src/c30/protected-content.repository.ts",
+        "packages/nurture-db/src/protected-content.ts",
+        "packages/nurture-db/tests/c30-protected-content.integration.test.ts",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/c30/protected-content.ts",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/src/harness/protected-content.ts",
+        "packages/nurture-scenario/tests/c30/protected-content.test.ts",
+        "prisma/migrations/20260806140000_c30_i3_protected_owner_lifecycle/migration.sql",
+        "prisma/migrations/20260806225000_c30_i3_protected_coordination_states/migration.sql",
+        "prisma/migrations/20260806230000_c30_i3_quality_repair/migration.sql",
+        "prisma/schema.prisma"
+      ]
+    },
+    {
+      "source_identity": "nurture_c30_cumulative_convergence_v1",
+      "source_hash": "939f4a944572a295d58388f58080cb14b9d75eebd1f2303ae16b1a1d7120f415",
+      "files": [
+        "package.json",
+        "packages/nurture-scenario/scenario.manifest.yaml",
+        "packages/nurture-scenario/src/generated/manifest.generated.ts",
+        "packages/nurture-scenario/src/module.ts",
+        "packages/nurture-scenario/tests/c30/cumulative-convergence.test.ts",
+        "packages/nurture-scenario/tests/c30/full-graph.fixture.ts",
+        "prisma/schema.prisma",
+        "scripts/assert-test-routing.mjs",
+        "scripts/compute-c30-i3-owner-adoption-hash.mjs",
+        "scripts/generate-nurture-scenario-manifest.mjs",
+        "scripts/verify-c30-i3-default-off.mjs",
+        "scripts/verify-c30-i3-upstream.mjs"
+      ]
+    }
+  ]
+}
