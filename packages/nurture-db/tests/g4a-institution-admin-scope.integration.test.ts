@@ -546,4 +546,145 @@ describe("T-007 G4-A authority chain over stored rows (production DB lane)", () 
       },
     });
   });
+
+  /**
+   * G4-A increment 3 — 0C-5's level over stored grant rows.
+   *
+   * The unit tests hand `grant_terms` straight to the predicate. What they
+   * cannot show is that the repository builds those terms from the right rows:
+   * only current ones, with the grant currency rule that is deliberately NOT
+   * the lifecycle conjunction, and one entry per grant so the axes cannot be
+   * satisfied across two.
+   */
+  it("evaluates direction, data class and purpose together over stored grants", async () => {
+    const scope = await seedScope();
+    const namedClass = await seedClass(scope.workspaceId, scope.home.id, "Named Class");
+    const child = await seedChild(scope.workspaceId, "Granted Child");
+    const enrollment = await seedEnrollment(scope, child, namedClass.id);
+    const thread = await seedThread(scope, child, namedClass.id, enrollment.id);
+    const grant = (
+      overrides: Partial<{
+        directions: ("family_to_org" | "org_to_family")[];
+        dataClasses: ("daily_care_log" | "child_growth_record")[];
+        purposes: string[];
+        status: "active" | "revoked" | "expired";
+        expiresAt: Date;
+        revokedAt: Date;
+      }> = {},
+    ) =>
+      prisma.nurtureChildLinkGrant.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          childCareProcessId: child.process.id,
+          enrollmentId: enrollment.id,
+          grantedByParticipantId: scope.admin.id,
+          grantedToScopeType: "institution",
+          grantedToScopeId: scope.home.id,
+          directions: ["family_to_org"],
+          dataClasses: ["daily_care_log"],
+          purposes: ["care_coordination"],
+          status: "active",
+          ...overrides,
+        },
+      });
+
+    const base = {
+      workspace_id: scope.workspaceId,
+      participant_ref: scope.admin.id,
+      at,
+      purpose_key: "care_coordination",
+      direction: "family_to_org" as const,
+      data_class: "daily_care_log" as const,
+      target: {
+        object_type: "family_care_thread",
+        object_id: thread.id,
+        lifecycle_state: "active",
+      },
+    };
+
+    // No grant at all.
+    await expect(chain.resolve(base)).resolves.toMatchObject({
+      status: "denied",
+      level: "grant_scope",
+      reason_code: "grant_missing",
+    });
+
+    const full = await grant();
+    await expect(chain.resolve(base)).resolves.toMatchObject({
+      status: "resolved",
+      level: "grant_scope",
+    });
+    await expect(chain.resolve({ ...base, data_class: "child_growth_record" })).resolves.toMatchObject(
+      { reason_code: "data_class_mismatch" },
+    );
+    await expect(chain.resolve({ ...base, purpose_key: "safety_response" })).resolves.toMatchObject({
+      reason_code: "purpose_not_granted",
+    });
+
+    // Expired is folded into `missing`: the caller learns no lifecycle detail.
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: full.id },
+      data: { expiresAt: new Date("2026-01-01T00:00:00.000Z") },
+    });
+    await expect(chain.resolve(base)).resolves.toMatchObject({ reason_code: "grant_missing" });
+
+    // Revoked keeps its own code. `ck_nurture_grant_scope` requires the
+    // revoker alongside the timestamp, so a half-set revocation cannot exist.
+    await prisma.nurtureChildLinkGrant.update({
+      where: { id: full.id },
+      data: {
+        status: "revoked",
+        revokedAt: new Date("2026-02-01T00:00:00.000Z"),
+        revokedByParticipantId: scope.admin.id,
+        expiresAt: null,
+      },
+    });
+    await expect(chain.resolve(base)).resolves.toMatchObject({ reason_code: "grant_revoked" });
+  });
+
+  it("never satisfies the axes across two stored grants", async () => {
+    const scope = await seedScope();
+    const namedClass = await seedClass(scope.workspaceId, scope.home.id, "Named Class");
+    const child = await seedChild(scope.workspaceId, "Split Grant Child");
+    const enrollment = await seedEnrollment(scope, child, namedClass.id);
+    const thread = await seedThread(scope, child, namedClass.id, enrollment.id);
+    const common = {
+      workspaceId: scope.workspaceId,
+      childCareProcessId: child.process.id,
+      enrollmentId: enrollment.id,
+      grantedByParticipantId: scope.admin.id,
+      grantedToScopeType: "institution" as const,
+      grantedToScopeId: scope.home.id,
+      purposes: ["care_coordination"],
+      status: "active" as const,
+    };
+    // One grant carries the direction, the other the data class. Together they
+    // look like coverage; 0C-5 §4 requires them on the same grant.
+    await prisma.nurtureChildLinkGrant.create({
+      data: { ...common, directions: ["family_to_org"], dataClasses: ["child_growth_record"] },
+    });
+    await prisma.nurtureChildLinkGrant.create({
+      data: { ...common, directions: ["org_to_family"], dataClasses: ["daily_care_log"] },
+    });
+
+    await expect(
+      chain.resolve({
+        workspace_id: scope.workspaceId,
+        participant_ref: scope.admin.id,
+        at,
+        purpose_key: "care_coordination",
+        direction: "family_to_org",
+        data_class: "daily_care_log",
+        target: {
+          object_type: "family_care_thread",
+          object_id: thread.id,
+          lifecycle_state: "active",
+        },
+      }),
+    ).resolves.toMatchObject({
+      status: "denied",
+      level: "grant_scope",
+      reason_code: "data_class_mismatch",
+    });
+  });
 });

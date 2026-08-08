@@ -3,6 +3,7 @@ import {
   NurtureInstitutionAuthorityChain,
   createInMemoryInstitutionContextRepository,
   deriveInstitutionScopeChain,
+  grantAdmits,
   selectActiveRole,
   type NurtureActiveRoleContextV1,
   type NurtureActorBinding,
@@ -51,8 +52,13 @@ const facts = (overrides: Partial<NurturePolicyFacts> = {}): NurturePolicyFacts 
   message_state: "sent",
   enrollment_state: "active",
   grant_state: "active",
-  grant_directions: ["family_to_org"],
-  grant_data_classes: ["daily_care_log"],
+  grant_terms: [
+    {
+      directions: ["family_to_org"],
+      data_classes: ["daily_care_log"],
+      purposes: ["care_coordination"],
+    },
+  ],
   family_thread_visible: true,
   asset_scope_matches: true,
   child_enrolled: true,
@@ -281,7 +287,7 @@ describe("0C-2 and 0C-3 levels (G4-A increment 2)", () => {
     for (const grant_state of ["revoked", "missing"] as const) {
       expect(derive({ grant_state }), grant_state).toMatchObject({ status: "resolved" });
     }
-    expect(derive({ grant_data_classes: [], grant_directions: [] })).toMatchObject({
+    expect(derive({ grant_terms: [] })).toMatchObject({
       status: "resolved",
     });
   });
@@ -291,6 +297,12 @@ describe("0C-2 and 0C-3 levels (G4-A increment 2)", () => {
       level: "child_scope",
       reason_code: "child_not_visible",
     });
+  });
+
+  it("stops at the child scope when the caller names no content axes", () => {
+    // A scope question, answered without a grant verdict. Asking one here
+    // would deny reads 0C-3 already settled.
+    expect(derive()).toMatchObject({ status: "resolved", level: "child_scope" });
   });
 
   it("emits a child scope carrying the refs the predicate actually tested", () => {
@@ -304,6 +316,125 @@ describe("0C-2 and 0C-3 levels (G4-A increment 2)", () => {
         child_process_ref: "process-1",
         purpose_key: "care_coordination",
       },
+    });
+  });
+});
+
+/**
+ * G4-A increment 3 — 0C-5's level.
+ *
+ * The freeze's operative phrase is "evaluated together": direction, data class
+ * and purpose must hold on ONE grant, and matching two of three denies. That
+ * is why the facts carry every current grant's terms rather than one grant's.
+ */
+describe("0C-5 grant level (G4-A increment 3)", () => {
+  type Term = NurturePolicyFacts["grant_terms"][number];
+  type Ask = Pick<NurtureAuthorityChainRequest, "purpose_key" | "direction" | "data_class">;
+
+  const term = (overrides: Partial<Term> = {}): Term => ({
+    directions: ["family_to_org"],
+    data_classes: ["daily_care_log"],
+    purposes: ["care_coordination"],
+    ...overrides,
+  });
+
+  /** The full three-axis ask, satisfied by the default single grant. */
+  const ask = (overrides: Partial<Ask> = {}, factOverrides: Partial<NurturePolicyFacts> = {}) =>
+    deriveInstitutionScopeChain(activeRole(), facts({ grant_terms: [term()], ...factOverrides }), {
+      purpose_key: "care_coordination",
+      direction: "family_to_org",
+      data_class: "daily_care_log",
+      ...overrides,
+    });
+
+  it("admits a read whose direction, data class and purpose all hold on one grant", () => {
+    expect(ask()).toMatchObject({ status: "resolved", level: "grant_scope" });
+  });
+
+  it("denies when two of three match on one grant", () => {
+    // Each case keeps the other two axes satisfied, so only the named axis
+    // decides. Direction and data class share a code by design (0C-5 section 7).
+    expect(ask({ direction: "org_to_family" })).toMatchObject({
+      level: "grant_scope",
+      reason_code: "data_class_mismatch",
+    });
+    expect(ask({ data_class: "child_growth_record" })).toMatchObject({
+      reason_code: "data_class_mismatch",
+    });
+    expect(ask({}, { grant_terms: [term({ purposes: ["family_communication"] })] })).toMatchObject({
+      level: "grant_scope",
+      reason_code: "purpose_not_granted",
+    });
+  });
+
+  /**
+   * The reason the fact shape changed. Two grants that BETWEEN them cover the
+   * asked axes admit nothing — with the old single-grant arrays, whether this
+   * denied depended on which grant the `[0]` fallback landed on.
+   */
+  it("never combines two grants to satisfy the axes between them", () => {
+    const split = [
+      term({ data_classes: ["child_growth_record"] }),
+      term({ directions: ["org_to_family"] }),
+    ];
+    expect(ask({}, { grant_terms: split })).toMatchObject({
+      level: "grant_scope",
+      reason_code: "data_class_mismatch",
+    });
+  });
+
+  it("does not let a stored purpose outside the vocabulary widen the grant", () => {
+    // The column is an open String[]. A grant carrying "*" or "analytics" must
+    // not become a wildcard for a purpose it never named.
+    expect(ask({}, { grant_terms: [term({ purposes: ["*", "analytics"] })] })).toMatchObject({
+      level: "grant_scope",
+      reason_code: "purpose_not_granted",
+    });
+  });
+
+  /**
+   * 0C-5 §4 step 3 requires the purpose to be a member of the grant's
+   * `purposes` AND of 0C-3's vocabulary. Through the chain the second half is
+   * unreachable, because 0C-3 already rejected an unrecognized ask — so it is
+   * asserted directly on the exported helper, whose contract carries both
+   * halves for any caller that does not come through 0C-3.
+   */
+  it("filters the grant's stored purposes to the vocabulary in grantAdmits itself", () => {
+    const stored = [term({ purposes: ["analytics"] })];
+    expect(grantAdmits(stored, { purpose_key: "analytics" })).toBe(false);
+    expect(grantAdmits([term({ purposes: ["care_coordination"] })], {
+      purpose_key: "care_coordination",
+    })).toBe(true);
+  });
+
+  it("reports revoked distinctly and every other terminal state as missing", () => {
+    // 0C-5 section 7: expired, replaced and deleted tell the caller no
+    // lifecycle detail, so only revoked keeps its own code.
+    expect(ask({}, { grant_state: "revoked" })).toMatchObject({
+      level: "grant_scope",
+      reason_code: "grant_revoked",
+    });
+    expect(ask({}, { grant_state: "missing" })).toMatchObject({
+      level: "grant_scope",
+      reason_code: "grant_missing",
+    });
+  });
+
+  it("names purpose only when the other two axes are satisfied", () => {
+    // Otherwise the code itself would tell an Admin that direction and data
+    // class were fine — the elimination probe the shared code prevents.
+    const neither = [term({ data_classes: ["child_growth_record"], purposes: ["safety_response"] })];
+    expect(ask({}, { grant_terms: neither })).toMatchObject({
+      reason_code: "data_class_mismatch",
+    });
+  });
+
+  it("still denies at 0C-3 before the grant level is reached", () => {
+    // 0G invariant 2: a level denies at itself. A child outside the named
+    // class must not get a grant verdict instead of a scope one.
+    expect(ask({}, { child_in_named_class: false })).toMatchObject({
+      level: "child_scope",
+      reason_code: "scope_mismatch",
     });
   });
 });

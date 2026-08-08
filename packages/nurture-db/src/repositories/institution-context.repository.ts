@@ -707,12 +707,19 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
         (!grant.effectiveFrom || grant.effectiveFrom <= now) &&
         (!grant.expiresAt || grant.expiresAt > now),
     );
-    const matchingGrant = currentGrants.find(
-      (grant) =>
-        (!input.direction || grant.directions.includes(input.direction)) &&
-        (!input.data_class || grant.dataClasses.includes(input.data_class)),
-    );
-    const activeGrant = matchingGrant ?? currentGrants[0];
+    // G4-A increment 3 (0C-5 §4). Every current grant's terms, not one picked
+    // grant's: the freeze requires direction, data class and purpose to hold
+    // TOGETHER on a single grant, and picking one here would decide that
+    // question before the predicate sees it.
+    //
+    // Currency is deliberately NOT the lifecycle conjunction (0G finding 3):
+    // NurtureChildLinkGrant has `status` and no `deletedAt`, so it is
+    // `status = active`, not revoked, inside the effective window.
+    const grantTerms = currentGrants.map((grant) => ({
+      directions: grant.directions,
+      data_classes: grant.dataClasses,
+      purposes: grant.purposes,
+    }));
     const revokedGrant = grantsForBinding.find(
       (grant) => grant.status === "revoked" || grant.revokedAt,
     );
@@ -877,9 +884,10 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       thread_membership_active: Boolean(membership),
       message_state: messageState,
       enrollment_state: !enrollment ? "missing" : enrollment.status === "active" ? "active" : "inactive",
-      grant_state: activeGrant ? "active" : revokedGrant ? "revoked" : "missing",
-      grant_directions: activeGrant?.directions ?? [],
-      grant_data_classes: activeGrant?.dataClasses ?? [],
+      // 0C-5 §7: expired, replaced and deleted all report as "missing" — the
+      // caller learns no lifecycle detail beyond revoked-or-not.
+      grant_state: currentGrants.length > 0 ? "active" : revokedGrant ? "revoked" : "missing",
+      grant_terms: grantTerms,
       family_thread_visible: thread?.status === "active" && Boolean(membership),
       asset_scope_matches: assetScopeMatches,
       child_enrolled: childEnrolled,

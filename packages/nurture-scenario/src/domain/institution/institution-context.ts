@@ -237,8 +237,28 @@ export type NurturePolicyFacts = {
   message_state: "sent" | "redacted" | "failed" | "missing";
   enrollment_state: "active" | "inactive" | "missing";
   grant_state: "active" | "revoked" | "missing";
-  grant_directions: NurtureGrantDirection[];
-  grant_data_classes: NurtureGrantDataClass[];
+  /**
+   * G4-A increment 3, frozen by 0C-5 §4. Every CURRENT grant's terms, not one
+   * grant's.
+   *
+   * The previous shape emitted `grant_directions` and `grant_data_classes`
+   * from a single grant picked as `matchingGrant ?? currentGrants[0]`. With
+   * two axes that was safe, because the match already required both together
+   * and the fallback could only deny. Purpose makes it three axes, and the
+   * freeze requires them "evaluated together": matching two of three must
+   * deny. A single picked grant cannot express that without the reason code
+   * depending on which grant the `[0]` happened to land on.
+   *
+   * So the repository emits the terms and the predicate asks the existence
+   * question. `purposes` stays `string[]` because the column is an open
+   * `String[]`: an unrecognized stored purpose must reach the predicate and
+   * deny, never widen.
+   */
+  grant_terms: Array<{
+    directions: NurtureGrantDirection[];
+    data_classes: NurtureGrantDataClass[];
+    purposes: string[];
+  }>;
   family_thread_visible: boolean;
   asset_scope_matches: boolean;
   child_enrolled: boolean;
@@ -277,6 +297,11 @@ export type NurturePolicyReasonCode =
   // cannot fix and belongs to 0C-5 — see 0G finding 1.
   | "purpose_required"
   | "purpose_not_honoured"
+  // G4-A increment 3, from 0C-5 §7. Separate from `purpose_not_honoured`
+  // because 0G finding 1 split them: the vocabulary is a contract fault the
+  // caller can fix, whereas a purpose the grant never carried is an authority
+  // fact they cannot.
+  | "purpose_not_granted"
   | "child_not_enrolled"
   | "exposure_policy_missing";
 

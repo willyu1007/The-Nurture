@@ -5,7 +5,7 @@ import type {
   NurturePolicyFacts,
   NurturePolicyReasonCode,
 } from "./institution-context.js";
-import { deriveInstitutionScopeChain } from "./institution-authority-chain.js";
+import { deriveInstitutionScopeChain, grantAdmits } from "./institution-authority-chain.js";
 
 const decideReason = (
   input: NurturePolicyFactRequest,
@@ -44,11 +44,18 @@ const decideReason = (
       if (facts.enrollment_state !== "active") return "enrollment_inactive";
       if (facts.grant_state === "revoked") return "grant_revoked";
       if (facts.grant_state !== "active") return "grant_missing";
+      // G4-A increment 3: direction and data class must hold on ONE grant.
+      // The previous form read them off a single picked grant's two arrays,
+      // which agreed with this whenever a grant matched both; where it could
+      // differ is two grants that between them cover the axes, and 0C-5 §4
+      // freezes that as a denial.
       if (
         input.direction !== "family_to_org" ||
-        !facts.grant_directions.includes("family_to_org") ||
         !input.data_class ||
-        !facts.grant_data_classes.includes(input.data_class)
+        !grantAdmits(facts.grant_terms, {
+          direction: "family_to_org",
+          data_class: input.data_class,
+        })
       ) {
         return "data_class_mismatch";
       }
@@ -65,9 +72,11 @@ const decideReason = (
       if (facts.grant_state !== "active") return "grant_missing";
       if (
         input.direction !== "org_to_family" ||
-        !facts.grant_directions.includes("org_to_family") ||
         !input.data_class ||
-        !facts.grant_data_classes.includes(input.data_class)
+        !grantAdmits(facts.grant_terms, {
+          direction: "org_to_family",
+          data_class: input.data_class,
+        })
       ) {
         return "data_class_mismatch";
       }
@@ -113,7 +122,11 @@ const decideReason = (
           selection_mode: "explicit",
         },
         facts,
-        { purpose_key: input.purpose_key },
+        {
+          ...(input.purpose_key ? { purpose_key: input.purpose_key } : {}),
+          ...(input.direction ? { direction: input.direction } : {}),
+          ...(input.data_class ? { data_class: input.data_class } : {}),
+        },
       );
       return result.status === "resolved" ? "allowed" : result.reason_code;
     }

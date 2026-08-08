@@ -349,8 +349,13 @@ const baseFacts = (): NurturePolicyFacts => ({
   message_state: "sent",
   enrollment_state: "active",
   grant_state: "active",
-  grant_directions: ["family_to_org", "org_to_family"],
-  grant_data_classes: ["family_care_question"],
+  grant_terms: [
+    {
+      directions: ["family_to_org", "org_to_family"],
+      data_classes: ["family_care_question"],
+      purposes: ["care_coordination"],
+    },
+  ],
   family_thread_visible: true,
   asset_scope_matches: true,
   child_enrolled: true,
@@ -429,7 +434,29 @@ describe("institution structured policy", () => {
     [{ role_state: "revoked" }, "role_revoked"],
     [{ enrollment_state: "inactive" }, "enrollment_inactive"],
     [{ grant_state: "revoked" }, "grant_revoked"],
-    [{ grant_data_classes: [] as NurturePolicyFacts["grant_data_classes"] }, "data_class_mismatch"],
+    [{ grant_terms: [] as NurturePolicyFacts["grant_terms"] }, "data_class_mismatch"],
+    /**
+     * G4-A increment 3. Two grants that between them carry the direction and
+     * the data class admit nothing — 0C-5 §4 requires both on ONE grant, and
+     * the previous single-grant fact shape could not express the difference.
+     */
+    [
+      {
+        grant_terms: [
+          {
+            directions: ["family_to_org"],
+            data_classes: ["care_day_note"],
+            purposes: ["care_coordination"],
+          },
+          {
+            directions: ["org_to_family"],
+            data_classes: ["family_care_question"],
+            purposes: ["care_coordination"],
+          },
+        ] as NurturePolicyFacts["grant_terms"],
+      },
+      "data_class_mismatch",
+    ],
     [{ care_group_matches: false }, "care_group_mismatch"],
   ] as const)("fails closed with %s", async (factOverride, reasonCode) => {
     const decision = await evaluate({ ...baseFacts(), ...factOverride });
