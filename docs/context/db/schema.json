@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-08T03:50:04.941Z",
+  "updatedAt": "2026-08-09T10:11:41.320Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -15,6 +15,39 @@
     "schemas": []
   },
   "enums": [
+    {
+      "name": "NurtureActivityPlacementDecidedBy",
+      "values": [
+        "source_binding",
+        "day_override",
+        "schedule_window",
+        "assisted",
+        "admin"
+      ]
+    },
+    {
+      "name": "NurtureActivityPlacementState",
+      "values": [
+        "placed",
+        "unplaced"
+      ]
+    },
+    {
+      "name": "NurtureAttendanceEntryState",
+      "values": [
+        "present",
+        "absent",
+        "excused_absent",
+        "not_expected"
+      ]
+    },
+    {
+      "name": "NurtureAttendanceSubmissionState",
+      "values": [
+        "submitted",
+        "reopened"
+      ]
+    },
     {
       "name": "NurtureBindingAnchorAssociationStatus",
       "values": [
@@ -282,6 +315,13 @@
         "archived",
         "merged",
         "deleted"
+      ]
+    },
+    {
+      "name": "NurtureClassScheduleLayer",
+      "values": [
+        "institution_default",
+        "class_standing"
       ]
     },
     {
@@ -612,6 +652,18 @@
       "values": [
         "family_to_org",
         "org_to_family"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionSupportSignalCategory",
+      "values": [
+        "attendance_submission_overdue",
+        "business_response_overdue",
+        "review_backlog_threshold",
+        "authority_or_source_blocked",
+        "work_item_or_workflow_blocked",
+        "configured_load_threshold",
+        "ai_attention_candidate"
       ]
     },
     {
@@ -1192,6 +1244,472 @@
           ],
           "name": null,
           "map": "ix_49"
+        }
+      ]
+    },
+    {
+      "name": "NurtureActivityPlacement",
+      "dbName": "nurture_activity_placement",
+      "schema": null,
+      "columns": [
+        {
+          "name": "activityRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "activity_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "decidedBy",
+          "type": "NurtureActivityPlacementDecidedBy",
+          "nullable": false,
+          "list": false,
+          "dbName": "decided_by",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "localDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "local_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "placementHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "placement_head",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceKind",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureActivityPlacementState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "localDate",
+            "state"
+          ],
+          "name": null,
+          "map": "ix_nurture_activity_placement_class_day"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "sourceKind",
+            "sourceId"
+          ],
+          "name": null,
+          "map": "uq_nurture_activity_placement_source"
+        }
+      ]
+    },
+    {
+      "name": "NurtureAttendanceEntry",
+      "dbName": "nurture_attendance_entry",
+      "schema": null,
+      "columns": [
+        {
+          "name": "adjustedFromInference",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": "adjusted_from_inference",
+          "dbType": null,
+          "default": "false",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureAttendanceEntryState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "submissionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "submission_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "submission",
+          "to": "NurtureDailyAttendanceSubmission",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "submissionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "childCareProcessId",
+            "state"
+          ],
+          "name": null,
+          "map": "ix_nurture_attendance_entry_child"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "submissionId",
+            "childCareProcessId"
+          ],
+          "name": null,
+          "map": "uq_nurture_attendance_entry_child"
+        }
+      ]
+    },
+    {
+      "name": "NurtureAttendanceInferenceRun",
+      "dbName": "nurture_attendance_inference_run",
+      "schema": null,
+      "columns": [
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceRefsPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "evidence_refs_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "generatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "generated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "localDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "local_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "localDate"
+          ],
+          "name": null,
+          "map": "ix_nurture_attendance_inference_class"
         }
       ]
     },
@@ -4395,6 +4913,33 @@
       ],
       "relations": [
         {
+          "field": "activityPlacements",
+          "to": "NurtureActivityPlacement",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "attendanceInferenceRuns",
+          "to": "NurtureAttendanceInferenceRun",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "attendanceSubmissions",
+          "to": "NurtureDailyAttendanceSubmission",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "attentionItems",
           "to": "NurtureTeacherAttentionItem",
           "optional": false,
@@ -4491,6 +5036,33 @@
         {
           "field": "publishProcesses",
           "to": "NurturePublishProcess",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "scheduleDayOverrides",
+          "to": "NurtureClassScheduleDayOverride",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "scheduleTemplates",
+          "to": "NurtureClassScheduleTemplate",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "supportSignalPolicies",
+          "to": "NurtureInstitutionSupportSignalPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -4700,6 +5272,24 @@
         {
           "field": "publicationPolicies",
           "to": "NurtureInstitutionPublicationPolicy",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "scheduleTemplates",
+          "to": "NurtureClassScheduleTemplate",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "supportSignalPolicies",
+          "to": "NurtureInstitutionSupportSignalPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -4922,6 +5512,24 @@
           "references": []
         },
         {
+          "field": "attendanceReopened",
+          "to": "NurtureDailyAttendanceSubmission",
+          "optional": false,
+          "list": true,
+          "relationName": "AttendanceReopenedBy",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "attendanceSubmitted",
+          "to": "NurtureDailyAttendanceSubmission",
+          "optional": false,
+          "list": true,
+          "relationName": "AttendanceSubmittedBy",
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "authoredCorrections",
           "to": "NurtureFamilyCareMessageCorrection",
           "optional": false,
@@ -4991,6 +5599,15 @@
         {
           "field": "publishEditHolds",
           "to": "NurturePublishEditHold",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "supportSignalPolicies",
+          "to": "NurtureInstitutionSupportSignalPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -5741,6 +6358,15 @@
         }
       ],
       "relations": [
+        {
+          "field": "attendanceEntries",
+          "to": "NurtureAttendanceEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
         {
           "field": "attentionItems",
           "to": "NurtureTeacherAttentionItem",
@@ -7164,6 +7790,296 @@
       ]
     },
     {
+      "name": "NurtureClassScheduleDayOverride",
+      "dbName": "nurture_class_schedule_day_override",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "localDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "local_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "slotsPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "slots_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "localDate"
+          ],
+          "name": null,
+          "map": "uq_nurture_class_schedule_day_override"
+        }
+      ]
+    },
+    {
+      "name": "NurtureClassScheduleTemplate",
+      "dbName": "nurture_class_schedule_template",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "layer",
+          "type": "NurtureClassScheduleLayer",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "slotsPayload",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "slots_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "layer"
+          ],
+          "name": null,
+          "map": "ix_nurture_class_schedule_template_scope"
+        }
+      ]
+    },
+    {
       "name": "NurtureCommandExecution",
       "dbName": "nurture_command_execution",
       "schema": null,
@@ -8521,6 +9437,262 @@
           ],
           "name": null,
           "map": "uq_2"
+        }
+      ]
+    },
+    {
+      "name": "NurtureDailyAttendanceSubmission",
+      "dbName": "nurture_daily_attendance_submission",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "0",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deletedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "deleted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "localDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "local_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reopenedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "reopened_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reopenedByRoleAssignmentId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "reopened_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureAttendanceSubmissionState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "submissionHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "submission_head",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "submittedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "submitted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "submittedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "submitted_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "watermarkSourceKind",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "watermark_source_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "watermarkSourceSequence",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "watermark_source_sequence",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "entries",
+          "to": "NurtureAttendanceEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "reopenedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": true,
+          "list": false,
+          "relationName": "AttendanceReopenedBy",
+          "fields": [
+            "reopenedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "submittedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": "AttendanceSubmittedBy",
+          "fields": [
+            "submittedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "localDate",
+            "state"
+          ],
+          "name": null,
+          "map": "ix_nurture_attendance_submission_class"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "localDate"
+          ],
+          "name": null,
+          "map": "uq_nurture_attendance_submission_class_day"
         }
       ]
     },
@@ -14694,6 +15866,267 @@
           ],
           "name": null,
           "map": "uq_nurture_publication_policy_version"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionSupportSignalPolicy",
+      "dbName": "nurture_institution_support_signal_policy",
+      "schema": null,
+      "columns": [
+        {
+          "name": "absoluteThreshold",
+          "type": "Int",
+          "nullable": true,
+          "list": false,
+          "dbName": "absolute_threshold",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "category",
+          "type": "NurtureInstitutionSupportSignalCategory",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "changedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "changed_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "changeReason",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "change_reason",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "checkpointRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "checkpoint_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contractVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "contract_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveTo",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "effective_to",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enabled",
+          "type": "Boolean",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "windowKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "window_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "changedByRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "changedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "careGroupId",
+            "category",
+            "effectiveFrom",
+            "effectiveTo"
+          ],
+          "name": null,
+          "map": "ix_nurture_support_signal_policy_class_effective"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "category",
+            "effectiveFrom",
+            "effectiveTo"
+          ],
+          "name": null,
+          "map": "ix_nurture_support_signal_policy_effective"
         }
       ]
     },

@@ -66,6 +66,7 @@ export * from "./domain/institution/attendance-closeout.js";
 export * from "./domain/institution/attendance-preview.js";
 export * from "./domain/institution/institution-class-list.js";
 export * from "./domain/institution/institution-class-day-detail.js";
+export * from "./domain/institution/institution-support-signal.js";
 export * from "./domain/institution/class-schedule-placement.js";
 export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";

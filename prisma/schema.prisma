@@ -655,6 +655,16 @@ enum NurtureActivityPlacementState {
   unplaced
 }
 
+enum NurtureInstitutionSupportSignalCategory {
+  attendance_submission_overdue
+  business_response_overdue
+  review_backlog_threshold
+  authority_or_source_blocked
+  work_item_or_workflow_blocked
+  configured_load_threshold
+  ai_attention_candidate
+}
+
 // G4-B increment 1, frozen by 0D-1. `unsubmitted` is deliberately ABSENT:
 // 0D-1 makes it the state of a day with no valid submission, which is the
 // absence of a row rather than a value stored in one. A member no row can
@@ -2118,11 +2128,12 @@ model NurtureCareInstitution {
   updatedAt              DateTime                     @updatedAt @map("updated_at")
   deletedAt              DateTime?                    @map("deleted_at")
 
-  careGroups          NurtureCareGroup[]
-  enrollments         NurtureEnrollment[]
-  scheduleTemplates   NurtureClassScheduleTemplate[]
-  mediaAssets         NurtureMediaAssetRef[]
-  publicationPolicies NurtureInstitutionPublicationPolicy[]
+  careGroups            NurtureCareGroup[]
+  enrollments           NurtureEnrollment[]
+  scheduleTemplates     NurtureClassScheduleTemplate[]
+  mediaAssets           NurtureMediaAssetRef[]
+  publicationPolicies   NurtureInstitutionPublicationPolicy[]
+  supportSignalPolicies NurtureInstitutionSupportSignalPolicy[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -2158,6 +2169,36 @@ model NurtureInstitutionPublicationPolicy {
   @@map("nurture_institution_publication_policy")
 }
 
+// 0D-5 stores only versioned policy. InstitutionSupportSignalProjectionV1 is
+// recomputed per request and deliberately has no persistence model.
+model NurtureInstitutionSupportSignalPolicy {
+  id                        String                                  @id @default(uuid())
+  workspaceId               String                                  @map("workspace_id")
+  institutionId             String                                  @map("institution_id")
+  careGroupId               String?                                 @map("care_group_id")
+  contractVersion           String                                  @map("contract_version")
+  policyRef                 String                                  @map("policy_ref")
+  category                  NurtureInstitutionSupportSignalCategory
+  absoluteThreshold         Int?                                    @map("absolute_threshold")
+  windowKey                 String                                  @map("window_key")
+  checkpointRef             String                                  @map("checkpoint_ref")
+  enabled                   Boolean
+  policyRevision            Int                                     @map("policy_revision")
+  effectiveFrom             DateTime                                @map("effective_from")
+  effectiveTo               DateTime?                               @map("effective_to")
+  changedByRoleAssignmentId String                                  @map("changed_by_role_assignment_id")
+  changeReason              String                                  @map("change_reason")
+  createdAt                 DateTime                                @default(now()) @map("created_at")
+
+  institution             NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup               NurtureCareGroup?         @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  changedByRoleAssignment NurtureCareRoleAssignment @relation(fields: [changedByRoleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, institutionId, category, effectiveFrom, effectiveTo], map: "ix_nurture_support_signal_policy_effective")
+  @@index([workspaceId, careGroupId, category, effectiveFrom, effectiveTo], map: "ix_nurture_support_signal_policy_class_effective")
+  @@map("nurture_institution_support_signal_policy")
+}
+
 model NurtureCareGroup {
   id                  String                 @id @default(uuid())
   workspaceId         String                 @map("workspace_id")
@@ -2172,7 +2213,7 @@ model NurtureCareGroup {
   updatedAt           DateTime               @updatedAt @map("updated_at")
   deletedAt           DateTime?              @map("deleted_at")
 
-  institution              NurtureCareInstitution           @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  institution              NurtureCareInstitution                  @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   enrollments              NurtureEnrollment[]
   threads                  NurtureFamilyCareThread[]
   items                    NurtureFamilyCareItem[]
@@ -2189,6 +2230,7 @@ model NurtureCareGroup {
   activityPlacements       NurtureActivityPlacement[]
   publishProcesses         NurturePublishProcess[]
   contentSafetyAssessments NurtureContentSafetyAssessment[]
+  supportSignalPolicies    NurtureInstitutionSupportSignalPolicy[]
 
   @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
   @@map("nurture_care_group")
@@ -2243,11 +2285,11 @@ model NurtureCareRoleAssignment {
   updatedAt              DateTime                        @updatedAt @map("updated_at")
   deletedAt              DateTime?                       @map("deleted_at")
 
-  participant           NurtureParticipant                   @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  participant           NurtureParticipant                      @relation(fields: [participantId], references: [id], onDelete: Restrict)
   threadMemberships     NurtureFamilyCareThreadParticipant[]
   messages              NurtureFamilyCareMessage[]
-  assignedItems         NurtureFamilyCareItem[]              @relation("ItemAssignedRole")
-  ackedItems            NurtureFamilyCareItem[]              @relation("ItemAckedRole")
+  assignedItems         NurtureFamilyCareItem[]                 @relation("ItemAssignedRole")
+  ackedItems            NurtureFamilyCareItem[]                 @relation("ItemAckedRole")
   authoredCorrections   NurtureFamilyCareMessageCorrection[]
   dailyCareLogs         NurtureDailyCareLog[]
   uploadedAssets        NurtureMediaAssetRef[]
@@ -2255,8 +2297,9 @@ model NurtureCareRoleAssignment {
   captures              NurtureCareCapture[]
   publishEditHolds      NurturePublishEditHold[]
   publicationReleases   NurturePublicationRelease[]
-  attendanceSubmitted   NurtureDailyAttendanceSubmission[]   @relation("AttendanceSubmittedBy")
-  attendanceReopened    NurtureDailyAttendanceSubmission[]   @relation("AttendanceReopenedBy")
+  attendanceSubmitted   NurtureDailyAttendanceSubmission[]      @relation("AttendanceSubmittedBy")
+  attendanceReopened    NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
+  supportSignalPolicies NurtureInstitutionSupportSignalPolicy[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -3190,19 +3233,19 @@ model NurtureFamilyGrowthAdmissionReceipt {
 // and the unique constraint below is what makes two concurrent submits
 // resolve as one winner rather than two rows.
 model NurtureDailyAttendanceSubmission {
-  id          String                           @id @default(uuid())
-  workspaceId String                           @map("workspace_id")
-  careGroupId String                           @map("care_group_id")
-  localDate   DateTime                         @map("local_date") @db.Date
-  state       NurtureAttendanceSubmissionState
+  id                      String                           @id @default(uuid())
+  workspaceId             String                           @map("workspace_id")
+  careGroupId             String                           @map("care_group_id")
+  localDate               DateTime                         @map("local_date") @db.Date
+  state                   NurtureAttendanceSubmissionState
   // Monotonic. Every submit, revise and reopen increments it; a caller carries
   // the value it expects and is refused rather than merged on mismatch.
-  submissionHead Int @default(1) @map("submission_head")
+  submissionHead          Int                              @default(1) @map("submission_head")
   // The stable prefix the preview cut at, in the same shape
   // `NurtureCareCaptureBatch` already uses. Nullable until G4-B builds preview:
   // a submission made without one is honest about having none.
-  watermarkSourceKind     String? @map("watermark_source_kind")
-  watermarkSourceSequence Int?    @map("watermark_source_sequence")
+  watermarkSourceKind     String?                          @map("watermark_source_kind")
+  watermarkSourceSequence Int?                             @map("watermark_source_sequence")
 
   submittedByRoleAssignmentId String    @map("submitted_by_role_assignment_id")
   submittedAt                 DateTime  @map("submitted_at")
@@ -3214,10 +3257,10 @@ model NurtureDailyAttendanceSubmission {
   updatedAt        DateTime  @updatedAt @map("updated_at")
   deletedAt        DateTime? @map("deleted_at")
 
-  careGroup    NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  submittedBy  NurtureCareRoleAssignment @relation("AttendanceSubmittedBy", fields: [submittedByRoleAssignmentId], references: [id], onDelete: Restrict)
-  reopenedBy   NurtureCareRoleAssignment? @relation("AttendanceReopenedBy", fields: [reopenedByRoleAssignmentId], references: [id], onDelete: Restrict)
-  entries      NurtureAttendanceEntry[]
+  careGroup   NurtureCareGroup           @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  submittedBy NurtureCareRoleAssignment  @relation("AttendanceSubmittedBy", fields: [submittedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  reopenedBy  NurtureCareRoleAssignment? @relation("AttendanceReopenedBy", fields: [reopenedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  entries     NurtureAttendanceEntry[]
 
   // One submission per class-day. This is the concurrency rule at the storage
   // layer: the second of two racing submits loses here even if both read
@@ -3328,27 +3371,27 @@ model NurtureClassScheduleDayOverride {
 // Where a source sits. Its own row rather than a column on the capture, so a
 // source can be re-placed without touching the teacher's original (0D-3).
 model NurtureActivityPlacement {
-  id          String @id @default(uuid())
-  workspaceId String @map("workspace_id")
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
   // Polymorphic by design: 0D-2 places captures and daily care logs, which
   // have no common parent. The pair is unique so one source has one placement.
-  sourceKind  String @map("source_kind")
-  sourceId    String @map("source_id")
+  sourceKind  String   @map("source_kind")
+  sourceId    String   @map("source_id")
   // Always the source's own class. An uncertain source stays here as
   // `unplaced` rather than moving anywhere.
-  careGroupId String @map("care_group_id")
+  careGroupId String   @map("care_group_id")
   localDate   DateTime @map("local_date") @db.Date
 
-  state       NurtureActivityPlacementState
+  state         NurtureActivityPlacementState
   // The slot the source sits in. NULL exactly when state is `unplaced`.
-  activityRef String?                           @map("activity_ref")
-  decidedBy   NurtureActivityPlacementDecidedBy @map("decided_by")
+  activityRef   String?                           @map("activity_ref")
+  decidedBy     NurtureActivityPlacementDecidedBy @map("decided_by")
   // Monotonic; every change increments, including a move to `unplaced`.
-  placementHead Int                             @default(1) @map("placement_head")
+  placementHead Int                               @default(1) @map("placement_head")
 
-  aggregateVersion Int       @default(0) @map("aggregate_version")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
+  aggregateVersion Int      @default(0) @map("aggregate_version")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   careGroup NurtureCareGroup @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
 
