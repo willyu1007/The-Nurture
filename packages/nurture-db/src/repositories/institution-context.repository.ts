@@ -754,6 +754,13 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
         threadId = message.threadId;
         childCareProcessId = message.childCareProcessId;
       }
+    } else if (target?.object_type === "care_group") {
+      // 0C-3 class-scope reads do not need to invent a child-shaped target.
+      // The class ref is still only a locator: `classStateIn` below places it
+      // inside the selected Admin's current Institution before any detail is
+      // read. A missing or foreign class therefore becomes `out_of_scope`,
+      // never the legitimate no-target `absent` state.
+      careGroupId = target.object_id;
     }
 
     const thread = threadId

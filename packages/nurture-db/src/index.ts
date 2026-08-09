@@ -8,6 +8,7 @@ export * from "./repositories/institution-context.repository.js";
 export * from "./repositories/attendance-closeout.repository.js";
 export * from "./repositories/attendance-preview.repository.js";
 export * from "./repositories/institution-class-list.repository.js";
+export * from "./repositories/institution-class-day-detail.repository.js";
 export * from "./repositories/class-schedule-placement.repository.js";
 export * from "./repositories/family-care-query.repository.js";
 export * from "./repositories/user-attention.repository.js";
