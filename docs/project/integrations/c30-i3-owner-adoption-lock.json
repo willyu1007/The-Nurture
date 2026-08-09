@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "algorithm": "sha256(path_nul_bytes_nul_sha256_lf)_v1",
-  "source_revision": "32a3d6817636b46455d52bda63c0eadcca0f3a23",
+  "source_revision": "dfe1bc37eb6acd83b1ca0a882766228b8b3c7d3b",
   "base": {
     "head_revision": "4350086993d837baa8030564f4e19593dedd96b0",
     "source_revision": "15ff031ed16897920c13fe24c9849531d98607ad",
