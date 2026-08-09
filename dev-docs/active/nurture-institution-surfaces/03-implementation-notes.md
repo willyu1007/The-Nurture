@@ -1,5 +1,26 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — G4-B increment 8: class-day detail at I1
+
+- Added the framework-free `NurtureInstitutionClassDayDetailService` and its
+  Prisma repository in commits `d82895f` and `74f3fc2`. The projection composes
+  the effective schedule, placed and unplaced photo/text timeline, formal
+  attendance state, body-free communication target refs, family/institution
+  response state and an optional purpose/grant-gated child drill-down.
+- A class target now traverses the existing 0C authority chain directly as a
+  `care_group`; the detail does not fabricate a child-shaped target. Protected
+  capture bodies are opened only after that scope resolves, and one missing or
+  invalid envelope refuses the whole projection rather than returning a
+  plausible partial day.
+- Today's communication list delegates every candidate to the existing exact
+  Institution Admin owner-read predicate. Pagination applies `limit` after
+  authorization, so an undisclosed earlier candidate cannot hide a later
+  authorized one. The list carries no body; opening the issued target ref must
+  re-run the existing single-message owner-read.
+- No schema or migration was added. The increment remains I1: no production
+  caller, capability registration, contract rotation, durable database apply,
+  deployment, activation or traffic.
+
 ## 2026-08-09 — G4-0C/0D frozen and executed; G4-A and G4-B at I1
 
 - G4-0C exited with six frozen units, and G4-A executed the authority chain in

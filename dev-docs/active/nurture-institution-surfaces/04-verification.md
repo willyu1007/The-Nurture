@@ -260,18 +260,36 @@
 | Check | Result | Evidence |
 | --- | --- | --- |
 | G4-A 0C chain executed | PASS | Four increments; the increment-1 audit found and repaired three fail-open defects and one missing reason code (`21`–`24`). |
-| G4-B 0D-1/0D-2 executed | PASS | Seven increments, attendance write path through the Admin class card (`34`–`40`). |
+| G4-B 0D-1/0D-2/detail executed | PASS | Eight increments, attendance write path through the Admin class card and its authorized class-day detail (`34`–`42`). |
 | Typecheck | PASS | Zero errors from this repository. |
-| Unit lane | PASS | 803 passed across 70 files. |
-| Production-db lane | PASS | 344 passed across 34 files, on a disposable PostgreSQL. |
+| Unit lane | PASS | 807 passed across 71 files. |
+| Production-db lane | PASS | 346 passed across 35 files, on a disposable PostgreSQL. |
 | `verify:test-routing` / `verify:surface-conformance` | PASS | Both green. |
 | `verify:g2-exit-contract` / `verify:g3-0-freeze` | PASS | Both green. |
-| `verify:c30-i3-owner-adoption` | PASS | Lock re-frozen after each increment that touched pinned paths. |
+| `verify:c30-i3-owner-adoption` | PASS | Lock re-frozen at implementation revision `74f3fc2`; aggregate source hash `24975fe8…`. |
 | `verify:workflow-contract-pin` | **FAIL, attributed** | Nurture self-pin matches. My-Chat's head moved and its pinned `x5_joint_api` set changed; advancing is an adoption of another task's work — G-09 in `41-t007-gap-and-next-register.md`. |
 | Effect boundary | PASS | I1 only: implementation plus migration authoring on a disposable database. No shared/persistent apply, capability registration, contract rotation, activation or traffic. |
 
 Falsification evidence is per-increment and lives in each record's
 "Falsification" table rather than being copied here.
+
+## 2026-08-09 — G4-B increment 8 class-day detail
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `pnpm exec tsc --noEmit` | PASS | Zero TypeScript errors after the service and Prisma repository increments. |
+| Targeted unit | PASS | `institution-class-day-detail.test.ts`: 4/4. |
+| Targeted production DB | PASS | `g4b-class-day-detail.integration.test.ts`: 2/2 on the local disposable PostgreSQL lane. |
+| `pnpm test:unit:ci` + population | PASS | 807/807 across 71 files; minimum gate 458. |
+| Direct full DB config + population | PASS | 346/346 across 35 files; minimum gate 180. The direct config avoided the repository-forbidden build wrapper. |
+| `verify:test-routing` | PASS | 133 files: unit 71, production DB 35, dev host 11, scenario service 14, X5 joint 2. |
+| Persistence/surface/G2/G3 gates | PASS | `verify:persistence-boundaries`, `verify:surface-conformance` (121/121), `verify:g2-exit-contract` and `verify:g3-0-freeze`. |
+| Frontend lint | PASS | Direct package ESLint and stylelint pass. Root `pnpm lint` stops at the external My-Chat pin check before running lint or a build; no build was run. |
+| C30-I3 lock | PASS after re-freeze | The pre-freeze check correctly detected changed index/census bytes; after committing implementation revision `74f3fc2`, source hash `24975fe8…` passes. |
+| Nurture self-pin | PASS | `d34a2252…`, 218 files. |
+| `verify:workflow-contract-pin` | **FAIL, attributed** | My-Chat pinned `567b96c`, observed `ca782b6`; no external adoption was performed. |
+| Docs/governance | PASS | Project sync, project lint and strict docs/anchor lint over all 43 task Markdown files; 0 errors, 0 warnings. |
+| Whitespace | PASS | `git diff --check`. |
 
 ## Required Evidence
 

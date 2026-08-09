@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`40` are history: each says what was true when it was
+numbered records `06`…`42` are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -19,7 +19,7 @@ places drifts in one of them.
 | 0A inventory | `G4_0A_INVENTORY_PASS` | n/a | [`07`](./07-g4-0a-inventory-record.md) |
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
-| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, seven increments — 0D-1 and 0D-2 only** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`40`](./40-g4-b-increment-7-record.md) |
+| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, eight increments — 0D-1, 0D-2 and class-day detail** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`42`](./42-g4-b-increment-8-record.md) |
 | 0E Workflow & Enrollment Journey | **not started** | none | — |
 | 0F knowledge & RAG | **not started** | none | — |
 
@@ -35,7 +35,8 @@ capability registration, no activation, no traffic.
 Every unit G4-A and G4-B built is exercised by tests only.
 `NurtureInstitutionPolicyService`, `NurtureInstitutionAuthorityChain`, the
 attendance specs, the preview service, the schedule service and the class-list
-service have no ingress route, no handler and no registered capability.
+and class-day-detail services have no ingress route, no handler and no
+registered capability.
 
 That is I1 as frozen, not an oversight — but it bounds every claim made so far:
 0C and 0D are validated as **buildable as frozen**, never as running. Wiring is
@@ -77,14 +78,6 @@ whichever increment owns intake.
 
 Cited by: [`37`](./37-g4-b-increment-4-record.md), [`40`](./40-g4-b-increment-7-record.md).
 
-### G-06 — `InstitutionClassDayDetailProjectionV1` is untouched
-
-The card exists; the detail behind it does not — activity timeline,
-communication owner-read, family feedback, and the purpose-gated child
-drill-down. This is the largest single remaining piece of G4-B.
-
-Cited by: [`36`](./36-g4-b-increment-3-record.md), [`39`](./39-g4-b-increment-6-record.md).
-
 ### G-07 — Placement level 4 (assisted semantic judgement) is frozen and disabled
 
 Present in the union, emitted by no code path, with a test asserting that. Not a
@@ -103,16 +96,17 @@ only. Shared or persistent apply is not authorized at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
-`verify:workflow-contract-pin` is red. My-Chat's head has moved to `66d8c087`
-and the pinned `x5_joint_api` set now differs: a new
-`family-growth/family-material` domain, media access and GC repositories, and a
-`prisma/schema.prisma` reshuffle.
+`verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
+`567b96c`; its active checkout has continued moving since the earlier recorded
+`x5_joint_api` divergence. The latest observed revision is recorded in
+[`42`](./42-g4-b-increment-8-record.md), rather than treated as a Nurture pin.
 
 Advancing the pin is an **adoption** of another task's work, not a refresh, and
 it needs whoever owns that work to qualify it. Until then this gate stays red
 for a stated reason rather than being made green by copying a hash.
 
-Cited by: [`40`](./40-g4-b-increment-7-record.md).
+Cited by: [`40`](./40-g4-b-increment-7-record.md),
+[`42`](./42-g4-b-increment-8-record.md).
 
 ## Closed since the 0D Exit
 
@@ -124,16 +118,21 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md).
   ([`40`](./40-g4-b-increment-7-record.md)).
 - **0C-5 §6 fixture 14** — closed by the class list
   ([`36`](./36-g4-b-increment-3-record.md)).
+- **G-06, `InstitutionClassDayDetailProjectionV1`** — closed at I1 by the
+  class-scope authority, actor-safe timeline, exact communication owner-read,
+  formal attendance and purpose/grant-gated child drill-down
+  ([`42`](./42-g4-b-increment-8-record.md)).
 
 ## Next steps, in dependency order
 
-1. **`InstitutionClassDayDetailProjectionV1`** (G-06). The largest piece, it
-   needs no new freeze — 0C-5, 0D-1 and 0D-2 already cover its authority,
-   attendance and schedule inputs — and it is what makes the card lead
-   somewhere.
-2. **0D-3 and 0D-5 implementation** (G-02, G-03), which also closes fixture 16.
-   0D-5 first if the work-item ordering matters sooner than revision history.
-3. **0D-4's correction candidate** (G-04), the smallest of the three.
+1. **0D-5 `InstitutionSupportSignalProjectionV1`** (G-03). It supplies the
+   still-missing cross-class/class-card deterministic signals and closes
+   0C-5 §6 fixture 16 without depending on the revision write path.
+2. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
+   automatic placement pass to capture intake as its own bounded increment
+   (G-05). Keep those commits separate: one owns Admin history/downscope, the
+   other owns deterministic intake placement.
+3. **0D-4's correction candidate** (G-04), the smallest remaining 0D unit.
 4. **0E Workflow and Enrollment Journey freeze**, then **0F knowledge and RAG**.
    Both are unstarted at the freeze stage, so each is a 0-branch of its own
    before any implementation.

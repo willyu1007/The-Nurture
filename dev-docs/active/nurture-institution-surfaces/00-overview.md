@@ -6,11 +6,15 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-09
-- Next step: **build `InstitutionClassDayDetailProjectionV1`** — the detail
-  behind the class card. 0C and 0D are both frozen and exited
+- Next step: **implement `InstitutionSupportSignalProjectionV1` (0D-5)** — it
+  supplies the deterministic cross-class/class-card signals and closes the
+  deferred 0C-5 §6 fixture 16. `InstitutionClassDayDetailProjectionV1`, the
+  detail behind the class card, is now implemented at I1. 0C and 0D are both
+  frozen and exited
   ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)); G4-A
-  executed 0C's authority chain in four increments and G4-B executed 0D-1 and
-  0D-2 in seven ([`34`](./34-g4-b-increment-1-record.md)–[`40`](./40-g4-b-increment-7-record.md)).
+  executed 0C's authority chain in four increments and G4-B executed 0D-1,
+  0D-2 and the class-day detail in eight
+  ([`34`](./34-g4-b-increment-1-record.md)–[`42`](./42-g4-b-increment-8-record.md)).
   0D-3, 0D-4's correction candidate and 0D-5 are frozen and unbuilt; 0E and 0F
   are unstarted at the freeze stage.
 - **Live branch state, gaps and next steps:**

@@ -38,9 +38,10 @@
   ([`21`](./21-g4-a-increment-1-audit-record.md)). That is the evidence for the
   accepted order: implement a freeze before freezing further on top of it.
 - G4-0D froze five daily-operations units and exited
-  ([`32`](./32-g4-0d-exit-record.md)); **G4-B** executed 0D-1 and 0D-2 in seven
-  increments ([`34`](./34-g4-b-increment-1-record.md)–[`40`](./40-g4-b-increment-7-record.md)),
-  ending at the Admin class card and its photo/schedule fields.
+  ([`32`](./32-g4-0d-exit-record.md)); **G4-B** executed 0D-1, 0D-2 and the
+  class-day detail in eight increments
+  ([`34`](./34-g4-b-increment-1-record.md)–[`42`](./42-g4-b-increment-8-record.md)),
+  ending at the authorized detail behind the Admin class card.
 - 0D-3, 0D-5 and 0D-4's correction candidate remain frozen and unbuilt; 0E and
   0F have not reached the freeze stage.
 - All of it is **I1**: exact implementation plus migration authoring, qualified
