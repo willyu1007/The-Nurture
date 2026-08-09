@@ -2,8 +2,11 @@ import type { PrismaClient } from "@prisma/client";
 import type {
   NurtureAggregateMember,
   NurtureClassPendingCounts,
+  NurtureClassPhotoCandidate,
+  NurtureEffectiveSchedule,
   NurtureInstitutionClassListRepository,
 } from "@the-nurture/scenario/harness";
+import { PrismaClassSchedulePlacementRepository } from "./class-schedule-placement.repository.js";
 
 /**
  * G4-B increment 3 — the Admin class list read, over stored rows.
@@ -14,7 +17,104 @@ import type {
 export class PrismaInstitutionClassListRepository
   implements NurtureInstitutionClassListRepository
 {
-  constructor(private readonly prisma: PrismaClient) {}
+  /**
+   * The schedule layers come from the placement repository rather than being
+   * re-queried here: two readers of the same three tables would be two chances
+   * to disagree about which layer is in force.
+   */
+  private readonly placements: PrismaClassSchedulePlacementRepository;
+
+  constructor(
+    private readonly prisma: PrismaClient,
+    /** Resolution is the domain's; this only needs the layers it reads. */
+    private readonly resolveSchedule: (
+      layers: Awaited<
+        ReturnType<PrismaClassSchedulePlacementRepository["loadScheduleLayers"]>
+      >,
+      careGroupRef: string,
+      localDate: string,
+    ) => NurtureEffectiveSchedule | null,
+  ) {
+    this.placements = new PrismaClassSchedulePlacementRepository(prisma);
+  }
+
+  async loadClassSchedule(input: {
+    workspace_id: string;
+    institution_ref: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<NurtureEffectiveSchedule | null> {
+    const layers = await this.placements.loadScheduleLayers(input);
+    return this.resolveSchedule(layers, input.care_group_ref, input.local_date);
+  }
+
+  /**
+   * Class-level qualification: the asset belongs to this class and its
+   * lifecycle is live. Child-level attribution is a different question and
+   * does not gate a class photo — a photo of the room is not a photo of a
+   * child.
+   */
+  async loadPhotoCandidates(input: {
+    workspace_id: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<NurtureClassPhotoCandidate[]> {
+    const day = PrismaInstitutionClassListRepository.day(input.local_date);
+    const rows = await this.prisma.nurtureActivityPlacement.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: input.care_group_ref,
+        localDate: day,
+        sourceKind: "care_capture",
+      },
+    });
+    if (rows.length === 0) return [];
+    const captures = await this.prisma.nurtureCareCapture.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        id: { in: rows.map((row) => row.sourceId) },
+        kind: "media",
+        deletedAt: null,
+        mediaAssetRef: { lifecycle: "ready", deletedAt: null },
+      },
+      select: { id: true, mediaAssetRefId: true, occurredAt: true },
+    });
+    const placementBySource = new Map(rows.map((row) => [row.sourceId, row]));
+    return captures.flatMap((capture) => {
+      if (!capture.mediaAssetRefId) return [];
+      const placement = placementBySource.get(capture.id);
+      return [
+        {
+          media_ref: capture.mediaAssetRefId,
+          ...(placement?.activityRef ? { activity_ref: placement.activityRef } : {}),
+          captured_at_ms: capture.occurredAt.getTime(),
+        },
+      ];
+    });
+  }
+
+  async loadLatestTextAt(input: {
+    workspace_id: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<number | null> {
+    const day = PrismaInstitutionClassListRepository.day(input.local_date);
+    const dayEnd = new Date(day.getTime() + 86_400_000);
+    const row = await this.prisma.nurtureCareCapture.findFirst({
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: input.care_group_ref,
+        kind: { in: ["text", "voice_transcript"] },
+        occurredAt: { gte: day, lt: dayEnd },
+        deletedAt: null,
+      },
+      orderBy: { occurredAt: "desc" },
+      select: { occurredAt: true },
+    });
+    // The timestamp only. The capture's text is `bodyProtectionPayload`, whose
+    // release is an authority decision this projection does not make.
+    return row ? row.occurredAt.getTime() : null;
+  }
 
   private static day(localDate: string): Date {
     return new Date(`${localDate}T00:00:00.000Z`);

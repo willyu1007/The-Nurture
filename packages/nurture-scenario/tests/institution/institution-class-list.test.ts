@@ -52,6 +52,9 @@ const repository = (
     new_family_feedback: 0,
     institution_action_needed: 0,
   }),
+  loadClassSchedule: async () => null,
+  loadPhotoCandidates: async () => [],
+  loadLatestTextAt: async () => null,
   ...overrides,
 });
 
@@ -60,6 +63,8 @@ const compose = (overrides: Partial<NurtureInstitutionClassListRepository> = {})
     workspace_id: "workspace-1",
     institution_ref: "institution-1",
     local_date: "2026-08-09",
+    // Mid-morning, so a schedule with a 09:00-11:00 slot has a current one.
+    at_minute: 600,
     ask,
   });
 
@@ -201,17 +206,129 @@ describe("class list attendance and counts (G4-B increment 3)", () => {
 
   it("carries no score, band, rank, freshness or teacher figure under any name", async () => {
     const list = await compose();
+    // The full card surface. A new field here is a deliberate decision, and
+    // this assertion is what makes adding one visible in review.
     expect(Object.keys(list.entries[0]!).sort()).toEqual([
       "attendance",
       "care_group_ref",
       "contract_version",
       "pending",
+      "projection_version",
       "safe_class_label",
+      "schedule",
     ]);
     expect(Object.keys(list.entries[0]!.pending).sort()).toEqual([
       "awaiting_response",
       "institution_action_needed",
       "new_family_feedback",
     ]);
+  });
+});
+
+/**
+ * G4-B increment 6 — the card fields that needed 0D-2.
+ */
+describe("class card schedule, photo and text (G4-B increment 6)", () => {
+  const daySlots = [
+    { slot_ref: "morning", label: "Morning", starts_at_minute: 540, ends_at_minute: 660 },
+    { slot_ref: "afternoon", label: "Afternoon", starts_at_minute: 840, ends_at_minute: 960 },
+  ];
+  const schedule = (
+    resolved_from: "day_override" | "class_standing" | "institution_default" = "class_standing",
+  ) => ({
+    contract_version: "1.0.0" as const,
+    care_group_ref: "a",
+    local_date: "2026-08-09",
+    schedule_version: 42,
+    resolved_from,
+    slots: daySlots,
+  });
+
+  it("reports the schedule version and which layer produced it", async () => {
+    const list = await compose({ loadClassSchedule: async () => schedule() });
+    expect(list.entries[0]!.schedule).toMatchObject({
+      schedule_version: 42,
+      resolved_from: "class_standing",
+      has_temporary_override: false,
+    });
+  });
+
+  it("flags a day override as temporary", async () => {
+    const list = await compose({ loadClassSchedule: async () => schedule("day_override") });
+    expect(list.entries[0]!.schedule).toMatchObject({ has_temporary_override: true });
+  });
+
+  it("names the current and next activity at the given minute", async () => {
+    const list = await compose({ loadClassSchedule: async () => schedule() });
+    expect(list.entries[0]!.schedule).toMatchObject({
+      current_activity: { activity_ref: "morning", label: "Morning" },
+      next_activity: { activity_ref: "afternoon", label: "Afternoon" },
+    });
+  });
+
+  /**
+   * A gap in the day means there is a next activity while no current one —
+   * "next" is the earliest slot starting after now, not the one after the
+   * current slot.
+   */
+  it("reports a next activity during a gap, with no current one", async () => {
+    const service = new NurtureInstitutionClassListService(
+      repository({ loadClassSchedule: async () => schedule() }),
+    );
+    const midday = await service.compose({
+      workspace_id: "workspace-1",
+      institution_ref: "institution-1",
+      local_date: "2026-08-09",
+      at_minute: 700,
+      ask,
+    });
+    expect(midday.entries[0]!.schedule).toMatchObject({
+      next_activity: { activity_ref: "afternoon" },
+    });
+    expect(midday.entries[0]!.schedule).not.toHaveProperty("current_activity");
+  });
+
+  it("shows no schedule at all when the class has none", async () => {
+    const list = await compose();
+    expect(list.entries[0]!.schedule).toBeNull();
+    // And no invented default day.
+    expect(list.entries[0]!.schedule).not.toMatchObject({ resolved_from: expect.anything() });
+  });
+
+  it("selects the latest photo through 0D-2's ordering", async () => {
+    const list = await compose({
+      loadClassSchedule: async () => schedule(),
+      loadPhotoCandidates: async () => [
+        { media_ref: "morning-photo", activity_ref: "morning", captured_at_ms: 100 },
+        { media_ref: "afternoon-photo", activity_ref: "afternoon", captured_at_ms: 900 },
+      ],
+    });
+    // 600 minutes is inside the morning slot, so the current activity wins
+    // over the newer afternoon photo.
+    expect(list.entries[0]!.latest_photo).toMatchObject({
+      media_ref: "morning-photo",
+      selected_by: "current_activity",
+    });
+  });
+
+  it("omits the photo entirely when nothing qualifies", async () => {
+    const list = await compose({ loadClassSchedule: async () => schedule() });
+    expect(list.entries[0]).not.toHaveProperty("latest_photo");
+  });
+
+  /**
+   * The card carries when the newest text was captured and nothing else. A
+   * capture's text is protected content, and releasing it is an authority
+   * decision this projection does not make.
+   */
+  it("carries a text timestamp with no body", async () => {
+    const list = await compose({ loadLatestTextAt: async () => 1234 });
+    expect(list.entries[0]!.latest_text).toEqual({ source_timestamp_ms: 1234 });
+    expect(Object.keys(list.entries[0]!.latest_text!)).toEqual(["source_timestamp_ms"]);
+  });
+
+  it("omits the text field when the class has none today", async () => {
+    const list = await compose();
+    expect(list.entries[0]).not.toHaveProperty("latest_text");
   });
 });

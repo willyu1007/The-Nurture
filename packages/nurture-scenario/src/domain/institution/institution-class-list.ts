@@ -1,4 +1,10 @@
 import { resolveAggregate, type NurtureAggregateResult } from "./institution-aggregate.js";
+import {
+  selectLatestPhoto,
+  type NurtureClassPhotoCandidate,
+  type NurtureEffectiveSchedule,
+  type NurtureLatestPhotoSelection,
+} from "./class-schedule-placement.js";
 import type { NurtureAggregateMember, NurturePolicyReasonCode } from "./institution-context.js";
 
 /**
@@ -69,19 +75,82 @@ export type NurtureClassPendingCounts = {
   institution_action_needed: number;
 };
 
-export type NurtureInstitutionClassListEntry = {
+/**
+ * The schedule facts a card shows. Absent when the class has no layer at any
+ * level — an empty state, never an invented default day.
+ */
+export type NurtureClassScheduleSummary = {
+  schedule_version: number;
+  resolved_from: NurtureEffectiveSchedule["resolved_from"];
+  /** 0D-2 §3's indicator: today's schedule is a one-day override. */
+  has_temporary_override: boolean;
+  current_activity?: { activity_ref: string; label: string };
+  next_activity?: { activity_ref: string; label: string };
+};
+
+/**
+ * `InstitutionClassCardProjectionV1` — `02-architecture.md` D-05.
+ *
+ * The card is an entry point to current state, not a KPI panel. What it must
+ * never carry, and has no field for: communication bodies, child rosters,
+ * automatic-match confidence, raw biometrics, teacher-level statistics, and any
+ * freshness or performance score. Source timestamps are the business record's
+ * own capture time, never compressed into a freshness figure.
+ */
+export type NurtureInstitutionClassCard = {
   contract_version: "1.0.0";
   care_group_ref: string;
   safe_class_label: string;
+  schedule: NurtureClassScheduleSummary | null;
   attendance: NurtureClassAttendanceSummary;
+  latest_photo?: NurtureLatestPhotoSelection;
+  /**
+   * Presence and time only.
+   *
+   * `02-architecture.md` names a "latest text excerpt", but the only stored
+   * text a class capture carries is `bodyProtectionPayload` — protected
+   * content, whose release is an authority decision this projection does not
+   * make. Emitting a timestamp without a body is the honest half; the excerpt
+   * waits for an actor-safe summary that a capture does not yet have.
+   */
+  latest_text?: { source_timestamp_ms: number };
   pending: NurtureClassPendingCounts;
+  projection_version: 1;
 };
+
+/** Kept as the list-level alias so existing consumers do not break. */
+export type NurtureInstitutionClassListEntry = NurtureInstitutionClassCard;
 
 export type NurtureInstitutionClassList = {
   contract_version: "1.0.0";
   institution_ref: string;
   local_date: string;
-  entries: NurtureInstitutionClassListEntry[];
+  entries: NurtureInstitutionClassCard[];
+};
+
+/**
+ * Which slot is running and which is next, at a given minute of the class's
+ * own day.
+ *
+ * "Next" is the earliest slot that starts after now, which is not always the
+ * one after the current slot — a gap in the day means there is a next activity
+ * while no current one.
+ */
+export const activityWindowAt = (
+  schedule: NurtureEffectiveSchedule | null,
+  at_minute: number,
+): { current?: { activity_ref: string; label: string }; next?: { activity_ref: string; label: string } } => {
+  if (!schedule) return {};
+  const current = schedule.slots.find(
+    (slot) => at_minute >= slot.starts_at_minute && at_minute < slot.ends_at_minute,
+  );
+  const next = [...schedule.slots]
+    .filter((slot) => slot.starts_at_minute > at_minute)
+    .sort((left, right) => left.starts_at_minute - right.starts_at_minute)[0];
+  return {
+    ...(current ? { current: { activity_ref: current.slot_ref, label: current.label } } : {}),
+    ...(next ? { next: { activity_ref: next.slot_ref, label: next.label } } : {}),
+  };
 };
 
 /**
@@ -112,6 +181,29 @@ export type NurtureInstitutionClassListRepository = {
     care_group_ref: string;
     local_date: string;
   }): Promise<NurtureClassPendingCounts>;
+  /** The class's effective schedule for the day, or null when it has none. */
+  loadClassSchedule(input: {
+    workspace_id: string;
+    institution_ref: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<NurtureEffectiveSchedule | null>;
+  /**
+   * Photos that already pass the reader's chain at CLASS level — the asset
+   * belongs to this class and its lifecycle is live. Child-level attribution
+   * is a different question and does not gate a class photo.
+   */
+  loadPhotoCandidates(input: {
+    workspace_id: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<NurtureClassPhotoCandidate[]>;
+  /** When the class's newest text record was captured, or null if none. */
+  loadLatestTextAt(input: {
+    workspace_id: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<number | null>;
 };
 
 /**
@@ -130,6 +222,12 @@ export class NurtureInstitutionClassListService {
     workspace_id: string;
     institution_ref: string;
     local_date: string;
+    /**
+     * Minutes from the class's local midnight. Passed in rather than read from
+     * the clock so the whole projection is a pure function of its inputs and a
+     * test can place "now" anywhere in the day.
+     */
+    at_minute: number;
     ask: Parameters<typeof resolveAggregate>[1];
   }): Promise<NurtureInstitutionClassList> {
     const classes = await this.repository.listClasses({
@@ -139,20 +237,45 @@ export class NurtureInstitutionClassListService {
 
     const entries = await Promise.all(
       orderClassList(classes).map(async (klass) => {
-        const [attendance, pending] = await Promise.all([
+        const scope = {
+          workspace_id: input.workspace_id,
+          care_group_ref: klass.care_group_ref,
+          local_date: input.local_date,
+        };
+        const [attendance, pending, schedule, candidates, latestTextAt] = await Promise.all([
           this.attendanceFor(input, klass.care_group_ref),
-          this.repository.loadPendingCounts({
-            workspace_id: input.workspace_id,
-            care_group_ref: klass.care_group_ref,
-            local_date: input.local_date,
+          this.repository.loadPendingCounts(scope),
+          this.repository.loadClassSchedule({
+            ...scope,
+            institution_ref: input.institution_ref,
           }),
+          this.repository.loadPhotoCandidates(scope),
+          this.repository.loadLatestTextAt(scope),
         ]);
+        const window = activityWindowAt(schedule, input.at_minute);
+        const photo = selectLatestPhoto({
+          schedule,
+          candidates,
+          ...(window.current ? { current_activity_ref: window.current.activity_ref } : {}),
+        });
         return {
           contract_version: "1.0.0" as const,
           care_group_ref: klass.care_group_ref,
           safe_class_label: klass.safe_class_label,
+          schedule: schedule
+            ? {
+                schedule_version: schedule.schedule_version,
+                resolved_from: schedule.resolved_from,
+                has_temporary_override: schedule.resolved_from === "day_override",
+                ...(window.current ? { current_activity: window.current } : {}),
+                ...(window.next ? { next_activity: window.next } : {}),
+              }
+            : null,
           attendance,
+          ...(photo ? { latest_photo: photo } : {}),
+          ...(latestTextAt !== null ? { latest_text: { source_timestamp_ms: latestTextAt } } : {}),
           pending,
+          projection_version: 1 as const,
         };
       }),
     );
