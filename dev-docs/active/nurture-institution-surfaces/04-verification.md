@@ -389,6 +389,23 @@ Falsification evidence is per-increment and lives in each record's
 | Architecture review | PASS after fixes | Removed the invalid `source_redacted -> blocked` mapping, prevented unreadable placement timestamps from influencing a fact, bounded owner reads and retained explicit unavailable behavior for missing canonical owner facts. |
 | Effect boundary | PASS | I1 repository/provider code and disposable qualification only; no shared/persistent apply, production caller, capability, contract rotation, deployment, activation or traffic. |
 
+## 2026-08-09 — G4-C increment 1 append-only revision/downscope
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | Reused one effective-schedule owner, fenced stale automatic writes under the DB predicate and removed the direct Admin placement port. |
+| Scenario + DB typechecks | PASS | Scenario manifest current; zero TypeScript errors. |
+| Full unit lane | PASS | 836/836 across 74 files. |
+| Targeted production DB | PASS | 22/22 across the 0D-3 owner and replaced 0D-2 write path. |
+| Full production-DB lane | PASS | 370/370 across 38 files. |
+| Migration / constraints | PASS, disposable only | Clean 28/28 deploy, final status up to date; lane, reason, hash, chain and immutable-write probes passed. |
+| DB context / boundary | PASS | Prisma validate, context checksum refresh, persistence boundary and database feature suite passed. |
+| Test routing / C30 default-off | PASS | 139 routed files; default-off census unchanged. |
+| Local qualification locks | PASS after re-freeze | C30 source revision `3a93140`, source hash `cd08fd61…`; Nurture exact runtime `667bde3d…` over 230 files. |
+| External My-Chat pin | **FAIL, attributed** | Expected `567b96c`, observed `65b2ccb`; no external adoption was performed. |
+| Cleanup / dual-track scan | PASS | No temporary artifacts or `adjustPlacement` path; exact disposable DB destroyed with zero sessions and confirmed absent. |
+| Effect boundary | PASS | I1 source/schema/migration and disposable qualification only; no shared/persistent apply, caller, capability, deployment, activation or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

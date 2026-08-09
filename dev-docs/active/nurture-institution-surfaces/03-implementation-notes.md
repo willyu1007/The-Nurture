@@ -539,3 +539,20 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - 0B is a planning/contract freeze only. No policy repository, admin command,
   schema/migration, capability, database, activation or traffic effect exists;
   provider/consumer implementation and qualification remain pending.
+
+## 2026-08-09 — G4-C increment 1 append-only revision/downscope
+
+- Added `nurture.content-revision-downscope@1.0.0` with exact 0C Admin
+  authority, complete-chain reads and three closed commands: placement adjust,
+  monotone visibility downscope and protected institution note.
+- Added one append-only Prisma owner and migration. Placement projection and
+  revision commit atomically; visibility/note have no mutable shadow column.
+  The old direct Admin placement port is removed.
+- Quality review replaced a three-layer schedule union with the existing
+  single effective-schedule owner and added a storage-time fence so a stale
+  automatic pass cannot overwrite Admin.
+- The approved disposable PostgreSQL qualified all 28 migrations, 22/22
+  targeted regressions, direct constraints and 370/370 full DB tests; the
+  exact target is destroyed and confirmed absent.
+- G-02 is closed at I1. G-05 intake wiring is next, then 0D-4. No caller,
+  capability, durable apply, deployment, activation or traffic was added.

@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`46` are history: each says what was true when it was
+numbered records `06`…`47` are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -19,13 +19,13 @@ places drifts in one of them.
 | 0A inventory | `G4_0A_INVENTORY_PASS` | n/a | [`07`](./07-g4-0a-inventory-record.md) |
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
-| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and the 0D-5 policy/composition/adapters/consumers/providers** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`46`](./46-g4-b-increment-12-record.md) |
+| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increment 1 — 0D-3 revision/downscope** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`47`](./47-g4-c-increment-1-record.md) |
 | 0E Workflow & Enrollment Journey | **not started** | none | — |
 | 0F knowledge & RAG | **not started** | none | — |
 
 Everything implemented sits at **I1**: exact schema, policy, repository and
-service code plus migration authoring. All four G4-B table paths are qualified
-on a disposable PostgreSQL. No I2
+service code plus migration authoring. All five daily-operations table paths
+are qualified on a disposable PostgreSQL. No I2
 contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
 
@@ -33,7 +33,7 @@ capability registration, no activation, no traffic.
 
 ### G-01 — Nothing has a production caller
 
-Every unit G4-A and G4-B built is exercised by tests only.
+Every unit G4-A, G4-B and G4-C built is exercised by tests only.
 `NurtureInstitutionPolicyService`, `NurtureInstitutionAuthorityChain`, the
 attendance specs, the preview service, the schedule service and the class-list
 and class-day-detail services have no ingress route, no handler and no
@@ -44,12 +44,6 @@ That is I1 as frozen, not an oversight — but it bounds every claim made so far
 I2's additive capability rotation.
 
 Cited by: [`20`](./20-g4-a-i1-branch-freeze.md), [`33`](./33-g4-b-i1-branch-freeze.md).
-
-### G-02 — 0D-3 append-only revision and downscope: unimplemented
-
-Frozen in [`28`](./28-g4-0d-3-revision-downscope-freeze.md); no schema, no
-domain module, no repository. Nothing in the code references a revision chain or
-a downscope decision.
 
 ### G-03 — 0D-5 exact deterministic owner integration: partial
 
@@ -115,7 +109,10 @@ therefore exist only when something writes them explicitly.
 
 [`40`](./40-g4-b-increment-7-record.md)'s level 4 reduces the visible harm — an
 unplaced photo now reaches the card — but the pass itself still belongs to
-whichever increment owns intake.
+whichever increment owns intake. [`47`](./47-g4-c-increment-1-record.md) closes
+the adjacent race: the repository repeats exact class/date and non-Admin
+eligibility under the write, so a stale automatic pass cannot overwrite an
+Admin revision. It does not create the missing intake caller.
 
 Cited by: [`37`](./37-g4-b-increment-4-record.md), [`40`](./40-g4-b-increment-7-record.md).
 
@@ -137,15 +134,18 @@ only. `20260809180000_g4b_institution_support_signal_policy` has now also passed
 clean migrate-deploy, real-row constraint and full DB-suite qualification on an
 explicitly approved disposable database. That target was destroyed after the
 run. `20260809210000_g4b_attendance_checkpoint_policy` passed the same clean
-disposable-only qualification with the full 360-test DB lane. Every target was
-destroyed afterward. Shared or persistent apply remains unauthorized at I1.
+disposable-only qualification with the full 360-test DB lane.
+`20260809230000_g4c_content_revision_downscope` passed a clean 28-migration
+deploy, direct constraint probes and the full 370-test DB lane. Every target
+was destroyed afterward. Shared or persistent apply remains unauthorized at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. Increment 12 observed `c174414`; C30's independent
-upstream lock still expects `51ad97f` ([`46`](./46-g4-b-increment-12-record.md)).
+`x5_joint_api` divergence. G4-C increment 1 observed `65b2ccb`; C30's independent
+upstream lock still expects `51ad97f`
+([`46`](./46-g4-b-increment-12-record.md), [`47`](./47-g4-c-increment-1-record.md)).
 Neither external head is treated as a Nurture pin.
 
 Advancing the pin is an **adoption** of another task's work, not a refresh, and
@@ -158,6 +158,10 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Closed since the 0D Exit
 
+- **G-02, 0D-3 append-only revision/downscope** — closed at I1 by the canonical
+  revision chain, atomic placement projection, monotone visibility downscope,
+  protected note envelope and database-level append-only/continuity guards
+  ([`47`](./47-g4-c-increment-1-record.md)).
 - **A class with no schedule showed no photo** — closed by 0D-2 §4's level 4
   ([`40`](./40-g4-b-increment-7-record.md)).
 - **D-05's "latest text excerpt"** — closed by correcting the architecture to
@@ -173,11 +177,10 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Next steps, in dependency order
 
-1. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
-   automatic placement pass to capture intake as its own bounded increment
-   (G-05). Keep those commits separate: one owns Admin history/downscope, the
-   other owns deterministic intake placement.
-2. **0D-4's correction candidate** (G-04), the smallest remaining 0D unit.
+1. Wire the already-frozen **automatic placement pass to capture intake** as
+   its own bounded increment (G-05). Reuse the existing exact class/date
+   provider and storage-time write fence; do not reopen 0D-3's Admin writer.
+2. Implement **0D-4's correction candidate** (G-04), the smallest remaining 0D unit.
 3. **0E Workflow and Enrollment Journey freeze**, then **0F knowledge and RAG**.
    Both are unstarted at the freeze stage, so each is a 0-branch of its own
    before any implementation.

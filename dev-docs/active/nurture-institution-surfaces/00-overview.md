@@ -6,39 +6,24 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-09
-- Next step: **implement 0D-3 while keeping the one externally gated 0D-5
-  owner-fact gap explicit**. Attendance now exposes its configured checkpoint
-  instant from a versioned exact-class 0D-1 policy, reusing the sole local-day
-  timezone owner and never storing a signal-local deadline
-  ([`46`](./46-g4-b-increment-12-record.md)). The authority/source port remains
-  unavailable because the repo has no currently readable canonical blocker
-  fact; terminal/revoked/redacted sources cannot be translated into one. All
-  six ports are bound to concrete Prisma owner
-  providers and the policy migration is qualified on an approved disposable
-  PostgreSQL ([`45`](./45-g4-b-increment-11-record.md)). The follow-up quality
-  pass removes request-object authority caching and grant-only configured-load
-  admission and is now requalified at current head on a fresh disposable
-  PostgreSQL: exact-owner regressions 9/9 and the full DB lane 357/357. The
-  checkpoint increment then passed exact-owner 12/12 and full DB 360/360 on a
-  separate clean disposable target. Missing facts still
-  return `unavailable`, never a guessed deadline/blocker or complete empty list.
-  `InstitutionClassDayDetailProjectionV1`, the detail behind the class card,
-  is implemented and quality-repaired at I1. 0C and 0D are both
-  frozen and exited
-  ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)); G4-A
-  executed 0C's authority chain in four increments and G4-B executed 0D-1,
-  0D-2, the class-day detail and the 0D-5 core/adapters/consumers/providers in
-  twelve
-  ([`34`](./34-g4-b-increment-1-record.md)–[`46`](./46-g4-b-increment-12-record.md)).
-  0D-3 and 0D-4's correction candidate are frozen and unbuilt; 0D-5's real
-  owner-source path is partial; 0E and 0F are unstarted at the freeze stage.
+- Next step: **wire the deterministic automatic placement pass to capture
+  intake as a separate bounded increment, then implement 0D-4's correction
+  candidate**. 0D-3 now owns one append-only chain for Admin placement,
+  visibility downscope and protected institution notes; its direct Admin
+  placement predecessor was removed, and stale automatic writes are fenced at
+  storage. The clean 28-migration deploy, 22/22 exact regression and 370/370
+  full DB lane passed on the approved disposable PostgreSQL, which is destroyed
+  and confirmed absent ([`47`](./47-g4-c-increment-1-record.md)). 0D-5's one
+  externally gated authority/source blocker stays explicitly `unavailable`;
+  no signal-local blocker or deadline was introduced. 0D-4 remains frozen and
+  unbuilt; 0E and 0F remain unstarted at the freeze stage.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
   records are history and are not edited to stay current.
 - Everything built sits at **I1** — implementation and migration authoring.
-  All four G4-B table paths, including 0D-5 policy and the 0D-1 checkpoint
-  policy, are qualified on a
+  All five daily-operations table paths, including 0D-3 revision/downscope,
+  0D-5 policy and the 0D-1 checkpoint policy, are qualified on a
   disposable PostgreSQL. Nothing has a production caller, no capability is
   registered, and no schema is applied anywhere durable. 0C and 0D are
   therefore validated as *buildable as frozen*, not as running.

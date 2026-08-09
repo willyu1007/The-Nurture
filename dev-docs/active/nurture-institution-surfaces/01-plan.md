@@ -49,12 +49,14 @@
   by its versioned exact-class 0D-1 owner policy and qualified on a second
   disposable target. One canonical fact remains absent: a currently readable
   authority/source blocker. It remains `unavailable`; no signal-local blocker
-  exists. 0D-3
-  and 0D-4's correction candidate remain frozen and unbuilt; 0E and 0F have
-  not reached the freeze stage.
-- All of it is **I1**: exact implementation plus migration authoring. All four
-  G4-B table paths are qualified on disposable PostgreSQL. No shared or
-  persistent apply, no capability
+  exists. **G4-C increment 1** now executes 0D-3's append-only placement,
+  visibility-downscope and institution-note owner, including the one effective
+  schedule source and storage-time automatic-write fence
+  ([`47`](./47-g4-c-increment-1-record.md)). 0D-4's correction candidate remains
+  frozen and unbuilt; 0E and 0F have not reached the freeze stage.
+- All of it is **I1**: exact implementation plus migration authoring. All five
+  daily-operations table paths are qualified on disposable PostgreSQL. No
+  shared or persistent apply, no capability
   registration, no contract rotation, no activation, no traffic. Nothing has a
   production caller.
 - Live gaps and the ordered next steps are
