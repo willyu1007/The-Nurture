@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`44` are history: each says what was true when it was
+numbered records `06`…`45` are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -19,13 +19,13 @@ places drifts in one of them.
 | 0A inventory | `G4_0A_INVENTORY_PASS` | n/a | [`07`](./07-g4-0a-inventory-record.md) |
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
-| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, ten increments — 0D-1, 0D-2, class-day detail and the 0D-5 policy/composition/adapters/consumers** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`44`](./44-g4-b-increment-10-record.md) |
+| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, eleven increments — 0D-1, 0D-2, class-day detail and the 0D-5 policy/composition/adapters/consumers/providers** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`45`](./45-g4-b-increment-11-record.md) |
 | 0E Workflow & Enrollment Journey | **not started** | none | — |
 | 0F knowledge & RAG | **not started** | none | — |
 
 Everything implemented sits at **I1**: exact schema, policy, repository and
-service code plus migration authoring. Applied table paths are qualified on a
-disposable PostgreSQL; the 0D-5 policy migration remains apply-gated. No I2
+service code plus migration authoring. All three G4-B table paths are qualified
+on a disposable PostgreSQL. No I2
 contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
 
@@ -63,14 +63,23 @@ the resolved active role and effective policy to exact owners, fails the whole
 deterministic read closed on one owner outage, and wires class/home consumers
 without adding a second ordering or body-bearing card shape.
 
-What remains is owner integration rather than another signal-local mapping:
-the eventual ingress MUST bind all six ports to concrete attendance,
-business-communication, review/load, authority, WorkItem and Workflow owners.
-The current repo has no permission to invent the attendance checkpoint instant
-or an InstitutionWorkflow blocker that its owner does not yet expose. The
-policy migration also remains unqualified on an approved disposable database.
-Until both gates pass, G-03 is not closed and unavailable consumers MUST NOT be
-presented as an empty complete signal list.
+[`45`](./45-g4-b-increment-11-record.md) binds all six ports to concrete Prisma
+owner providers. Every provider rechecks the exact selected Admin role and
+Institution, resolves the policy-backed local day and returns actor-bound
+opaque refs. Business response, review backlog, a literal blocked
+WorkItem/Workflow-driver receipt and configured load are proven through real
+owner rows. Reads are bounded and return `unavailable` rather than a partial
+result. The 0D-5 policy migration is also qualified on an approved disposable
+database and that database has been destroyed.
+
+Two owner facts remain unavailable by design. The current attendance owner has
+no configured checkpoint instant, so an enabled unsubmitted day cannot become
+overdue. The current authority/source schemas expose no currently readable
+canonical blocker fact; in particular `source_redacted` must disappear and is
+not translated to `blocked`. These are owner-contract gaps, not permission to
+add signal-local deadline or blocker state. Until both exact owners expose the
+required facts, G-03 remains partial and consumers MUST retain their explicit
+unavailable arm.
 
 ### G-04 — 0D-4 child-attribution authority: partial
 
@@ -106,17 +115,17 @@ orderings, same number.
 
 `20260809120000_g4b_daily_attendance_closeout` and
 `20260809140000_g4b_class_schedule_placement` have run on a disposable database
-only. `20260809180000_g4b_institution_support_signal_policy` is authored and
-has not been applied even to the current local test database because no target
-and apply approval were supplied. Shared or persistent apply is not authorized
-at I1.
+only. `20260809180000_g4b_institution_support_signal_policy` has now also passed
+clean migrate-deploy, real-row constraint and full DB-suite qualification on an
+explicitly approved disposable database. That target was destroyed after the
+run. Shared or persistent apply remains unauthorized at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. Increment 10 observed `ebc7605`; C30's independent
-upstream lock still expects `51ad97f` ([`44`](./44-g4-b-increment-10-record.md)).
+`x5_joint_api` divergence. Increment 11 observed `9674886`; C30's independent
+upstream lock still expects `51ad97f` ([`45`](./45-g4-b-increment-11-record.md)).
 Neither external head is treated as a Nurture pin.
 
 Advancing the pin is an **adoption** of another task's work, not a refresh, and
@@ -144,10 +153,11 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Next steps, in dependency order
 
-1. **Bind 0D-5's six adapters to concrete exact-owner providers** (G-03), then
-   qualify the authored policy migration on an explicitly approved disposable
-   database. The I1 class/home consumers already fail unavailable; they MUST
-   not be activated or described as complete before this real path passes.
+1. **Close 0D-5's two remaining owner-fact gaps** (G-03): expose the attendance
+   owner's configured checkpoint instant and a currently readable canonical
+   authority/source blocker fact. The signal layer MUST continue to refuse
+   synthesis; the existing six-port composition and class/home unavailable arm
+   remain the integration boundary.
 2. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
    automatic placement pass to capture intake as its own bounded increment
    (G-05). Keep those commits separate: one owns Admin history/downscope, the

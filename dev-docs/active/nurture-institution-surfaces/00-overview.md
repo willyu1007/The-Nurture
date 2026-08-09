@@ -6,18 +6,21 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-09
-- Next step: **bind 0D-5's six typed adapters to concrete exact-owner
-  providers and qualify its policy migration on an explicitly approved
-  disposable DB**. The adapter boundary and class/home consumers now exist at
-  I1 ([`44`](./44-g4-b-increment-10-record.md)); no consumer treats a missing
-  owner as an empty complete signal list.
+- Next step: **close the two remaining 0D-5 owner-fact gaps without creating
+  signal-local state**: attendance must expose its configured checkpoint
+  instant, and the authority/source owner must expose a currently readable
+  canonical blocker fact. All six ports are bound to concrete Prisma owner
+  providers and the policy migration is qualified on an approved disposable
+  PostgreSQL ([`45`](./45-g4-b-increment-11-record.md)); missing facts still
+  return `unavailable`, never a guessed deadline/blocker or complete empty list.
   `InstitutionClassDayDetailProjectionV1`, the detail behind the class card,
   is implemented and quality-repaired at I1. 0C and 0D are both
   frozen and exited
   ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)); G4-A
   executed 0C's authority chain in four increments and G4-B executed 0D-1,
-  0D-2, the class-day detail and the 0D-5 core/adapters/consumers in ten
-  ([`34`](./34-g4-b-increment-1-record.md)–[`44`](./44-g4-b-increment-10-record.md)).
+  0D-2, the class-day detail and the 0D-5 core/adapters/consumers/providers in
+  eleven
+  ([`34`](./34-g4-b-increment-1-record.md)–[`45`](./45-g4-b-increment-11-record.md)).
   0D-3 and 0D-4's correction candidate are frozen and unbuilt; 0D-5's real
   owner-source path is partial; 0E and 0F are unstarted at the freeze stage.
 - **Live branch state, gaps and next steps:**
@@ -25,10 +28,10 @@
   That register is the single answer to "where is T-007 now"; the numbered
   records are history and are not edited to stay current.
 - Everything built sits at **I1** — implementation and migration authoring.
-  Applied table paths are qualified on a disposable PostgreSQL; the 0D-5
-  policy migration remains explicitly apply-gated. Nothing has a production caller, no
-  capability is registered, and no schema is applied anywhere durable. 0C and 0D
-  are therefore validated as *buildable as frozen*, not as running.
+  All three G4-B table paths, including 0D-5 policy, are qualified on a
+  disposable PostgreSQL. Nothing has a production caller, no capability is
+  registered, and no schema is applied anywhere durable. 0C and 0D are
+  therefore validated as *buildable as frozen*, not as running.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.

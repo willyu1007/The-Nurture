@@ -1,5 +1,30 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — G4-B increment 11: concrete owners and disposable qualification
+
+- Commit `598926e` adds one production composition factory for the policy SSOT
+  and all six exact-owner ports. Providers recheck exact Workspace,
+  participant, selected current Institution Admin role and Institution; resolve
+  one publication-policy-backed local day; and issue actor-bound HMAC refs.
+- Real owner rows now prove business response, review backlog, a literal
+  blocked receipt driven by `item_action|workflow_step`, and configured load.
+  Threshold categories require the complete authorized class population. Every
+  potentially large owner read is bounded at 100 and becomes `unavailable`
+  rather than truncated.
+- Attendance is available-empty only when a formal submission exists. An
+  unsubmitted day remains unavailable because the current owner schema has no
+  checkpoint instant. The authority/source provider likewise remains
+  unavailable for an enabled scope because no readable canonical blocker fact
+  exists; `source_redacted` is explicitly not translated to `blocked`.
+- The 0D-5 policy migration passed clean deploy, real-row/constraint probes and
+  the full 353-test DB lane on the explicitly approved disposable database.
+  The exact database was then destroyed and confirmed absent. See
+  [`45`](./45-g4-b-increment-11-record.md) and the
+  [`DB evidence`](./artifacts/db/0d5-support-signal-policy/03-execution-log.md).
+- No durable database apply, production caller, capability, deployment,
+  activation or traffic was added. G-03 remains partial only at the two owner
+  fact contracts above.
+
 ## 2026-08-09 — G4-B increment 10: exact-owner adapters and consumers
 
 - Commit `5cc2097` adds one typed adapter per deterministic signal category and

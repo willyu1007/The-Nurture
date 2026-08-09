@@ -24,4 +24,5 @@ Reviewed migration:
 
 `pnpm exec prisma format --schema prisma/schema.prisma` and
 `pnpm exec prisma validate --schema prisma/schema.prisma` pass. The migration
-has not been applied to a database.
+was subsequently applied only to the approved disposable database and is
+recorded in [`03-execution-log.md`](./03-execution-log.md).

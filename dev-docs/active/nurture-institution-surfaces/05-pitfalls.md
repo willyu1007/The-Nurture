@@ -1,5 +1,23 @@
 # Pitfalls — 机构端双 Surface
 
+## 2026-08-09 — A targeted DB test initially inherited the shared local URL
+
+- **Symptom:** the first exact-owner integration runs created 16 workspaces in
+  the repository's default local database instead of the approved disposable
+  target. No migration was applied there.
+- **Root cause:** the new test was invoked directly before its child process
+  rewrote `DATABASE_URL` to the exact disposable database.
+- **What was tried:** the affected rows were first enumerated read-only by the
+  unique fixture Institution label and creation window; no broad workspace or
+  database cleanup was attempted.
+- **Fix/workaround:** exactly those 16 fixture workspaces and dependent rows
+  were transactionally deleted, then the test gained per-workspace `afterEach`
+  cleanup. All later DB commands used the repository environment loader plus an
+  exact database-name rewrite and validation.
+- **Prevention:** a disposable DB test command MUST validate and replace the
+  database pathname before spawning Vitest. A test that can write owner rows
+  MUST own deterministic cleanup even when the runner fails between cases.
+
 ## Known Guardrails
 
 - 不要把 G4-0 实现成等待全部 freeze rows PASS 的单体串行阶段；只等待当前分支

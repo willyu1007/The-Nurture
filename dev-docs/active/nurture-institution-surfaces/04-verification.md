@@ -323,6 +323,27 @@ Falsification evidence is per-increment and lives in each record's
 | External My-Chat pins | **FAIL, attributed** | Workflow expected `567b96c`, C30 expected `51ad97f`, observed `ebc7605`; no cross-repo adoption was performed. |
 | Effect boundary | PASS | I1 adapter/consumer code only; no migration apply, concrete owner activation, capability/contract rotation, deployment or traffic. |
 
+## 2026-08-09 — G4-B increment 11 owner providers and policy qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Scenario + DB package typechecks | PASS | Zero TypeScript errors; Scenario manifest remains current. |
+| Full unit lane | PASS | 826/826 across 73 files. |
+| Exact-owner integration | PASS | 5/5 on the approved disposable DB: missing attendance checkpoint refuses synthesis, redaction is not translated to blocker, owner scope over 100 refuses truncation, four currently provable source families use real rows and opaque refs, and every owner rechecks the exact selected Admin role. |
+| Full production-DB lane | PASS | 353/353 across 37 files on the approved disposable database. |
+| Policy migration | PASS, disposable only | Clean `migrate deploy` applied 26/26 migrations including `20260809180000_g4b_institution_support_signal_policy`; final status was up to date. |
+| Real policy/constraint probe | PASS | Repository loaded one real effective policy row; PostgreSQL rejected invalid revision, missing threshold, invalid window and duplicate partial-unique revision. |
+| DB context/tooling | PASS | `ctl-db-ssot sync-to-context` reported current checksums; `.ai` database suite passed with optional Convex checks skipped because that feature pack is absent. |
+| `verify:test-routing` | PASS after census update | 137 files: unit 73, production DB 37, dev host 11, scenario service 14, X5 joint 2. |
+| Persistence/G2/G3/C30 default-off | PASS | Persistence boundary, G2 Exit DB census, G3-0 freeze and C30 default-off all green. |
+| C30-I3 Nurture source lock | PASS after re-freeze | Implementation revision `598926e`; source hash `138062fb…`. |
+| Nurture exact runtime self-pin | PASS by direct recomputation | `ae8e201e…` over 224 files. |
+| External My-Chat pins | **FAIL, attributed** | Workflow expected `567b96c`, C30 expected `51ad97f`, observed `9674886`; no cross-repository adoption was performed. |
+| Disposable cleanup | PASS | Exact target existed before cleanup, zero sessions were terminated, and the maintenance query returned `exists_after=false` after drop. |
+| Corrective cleanup | PASS | The first pre-wrapper test runs wrote only disposable fixtures to the default local DB. Exactly 16 identified fixture workspaces and their dependent rows were removed; the test now owns per-workspace cleanup. No migration had been applied there. |
+| Architecture review | PASS after fixes | Removed the invalid `source_redacted -> blocked` mapping, prevented unreadable placement timestamps from influencing a fact, bounded owner reads and retained explicit unavailable behavior for missing canonical owner facts. |
+| Effect boundary | PASS | I1 repository/provider code and disposable qualification only; no shared/persistent apply, production caller, capability, contract rotation, deployment, activation or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

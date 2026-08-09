@@ -8,16 +8,20 @@ Use the authored versioned Prisma migration. Do not use `prisma db push`.
 
 Before any apply, obtain explicit approval naming the target environment and
 database, confirm that the additive migration is acceptable, and record
-snapshot/backup posture. No target has been selected in this increment.
+snapshot/backup posture. This gate passed for the new empty disposable database
+`nurture_t007_0d5_20260809_1132_a71c9e4d`; it remains closed for every shared or
+persistent database.
 
 ## Rollout
 
-1. Re-run Prisma validation and review the SQL at the approved revision.
-2. Apply with `prisma migrate dev` only to an explicitly approved disposable
-   development database, or `prisma migrate deploy` to an explicitly approved
-   non-development target.
-3. Run migration status, DB integration tests and the database public suite.
-4. Refresh `docs/context/db/schema.json` from the Prisma SSOT.
+1. Re-run Prisma validation and review the SQL at the approved revision. PASS.
+2. Apply the authored migration chain with `prisma migrate deploy`; do not use
+   `prisma db push`. PASS on the approved disposable target.
+3. Run migration status, real-row/constraint probes and the full production-DB
+   suite. PASS.
+4. Refresh `docs/context/db/schema.json` from the Prisma SSOT. PASS; checksums
+   were current.
+5. Destroy the exact disposable database and verify it is absent. PASS.
 
 ## Rollback expectation
 
@@ -28,5 +32,5 @@ not drop audit history ad hoc.
 
 ## Non-effects
 
-This plan does not authorize shared/persistent apply, capability rotation,
-activation, deployment or traffic.
+Execution of this plan did not authorize or perform shared/persistent apply,
+capability rotation, activation, deployment or traffic.
