@@ -631,6 +631,30 @@ enum NurtureFamilyCareCascadeClosureState {
   failed
 }
 
+// G4-B increment 4, frozen by 0D-2 §3. Which of the three levels produced the
+// effective schedule. No merging across levels: one wins entirely.
+enum NurtureClassScheduleLayer {
+  institution_default
+  class_standing
+}
+
+// 0D-2 §3. `assisted` is in the union but disabled in the first increment
+// (0D-2 §4, open point closed): keeping the member means enabling level 4
+// later is a gate rather than a shape change, and a fixture asserts nothing
+// currently emits it.
+enum NurtureActivityPlacementDecidedBy {
+  source_binding
+  day_override
+  schedule_window
+  assisted
+  admin
+}
+
+enum NurtureActivityPlacementState {
+  placed
+  unplaced
+}
+
 // G4-B increment 1, frozen by 0D-1. `unsubmitted` is deliberately ABSENT:
 // 0D-1 makes it the state of a day with no valid submission, which is the
 // absence of a row rather than a value stored in one. A member no row can
@@ -2096,6 +2120,7 @@ model NurtureCareInstitution {
 
   careGroups          NurtureCareGroup[]
   enrollments         NurtureEnrollment[]
+  scheduleTemplates   NurtureClassScheduleTemplate[]
   mediaAssets         NurtureMediaAssetRef[]
   publicationPolicies NurtureInstitutionPublicationPolicy[]
 
@@ -2159,6 +2184,9 @@ model NurtureCareGroup {
   captureBatches           NurtureCareCaptureBatch[]
   attendanceSubmissions    NurtureDailyAttendanceSubmission[]
   attendanceInferenceRuns  NurtureAttendanceInferenceRun[]
+  scheduleTemplates        NurtureClassScheduleTemplate[]
+  scheduleDayOverrides     NurtureClassScheduleDayOverride[]
+  activityPlacements       NurtureActivityPlacement[]
   publishProcesses         NurturePublishProcess[]
   contentSafetyAssessments NurtureContentSafetyAssessment[]
 
@@ -3239,4 +3267,92 @@ model NurtureAttendanceInferenceRun {
 
   @@index([workspaceId, careGroupId, localDate], map: "ix_nurture_attendance_inference_class")
   @@map("nurture_attendance_inference_run")
+}
+
+// G4-B increment 4 — class schedule and activity placement, frozen by 0D-2.
+//
+// The institution default and the class standing override share one table:
+// they differ only in whether `careGroupId` is set, and splitting them would
+// duplicate the slot shape and let the two drift.
+//
+// Slots live in JSON because they are a list whose only consumer is the
+// resolver, and because a slot is not addressable on its own — 0D-2 resolves a
+// whole layer or none of it.
+model NurtureClassScheduleTemplate {
+  id            String                    @id @default(uuid())
+  workspaceId   String                    @map("workspace_id")
+  institutionId String                    @map("institution_id")
+  // NULL means the institution default; set means that class's standing
+  // override. The partial unique indexes below keep exactly one live row per
+  // scope.
+  careGroupId   String?                   @map("care_group_id")
+  layer         NurtureClassScheduleLayer
+  // [{ slotRef, label, startsAt, endsAt, activityRef? }] — see 0D-2 §3.
+  slotsPayload  Json                      @map("slots_payload")
+
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  // Part of the effective schedule's version, which is the max updatedAt over
+  // the layers that could resolve. Soft deletion touches this too, so removing
+  // a layer advances the version rather than moving it backwards.
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  institution NurtureCareInstitution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup   NurtureCareGroup?      @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, institutionId, layer], map: "ix_nurture_class_schedule_template_scope")
+  @@map("nurture_class_schedule_template")
+}
+
+// The day's override — the highest-precedence layer, and the only one keyed to
+// a date.
+model NurtureClassScheduleDayOverride {
+  id           String   @id @default(uuid())
+  workspaceId  String   @map("workspace_id")
+  careGroupId  String   @map("care_group_id")
+  localDate    DateTime @map("local_date") @db.Date
+  slotsPayload Json     @map("slots_payload")
+
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  careGroup NurtureCareGroup @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, careGroupId, localDate], map: "uq_nurture_class_schedule_day_override")
+  @@map("nurture_class_schedule_day_override")
+}
+
+// Where a source sits. Its own row rather than a column on the capture, so a
+// source can be re-placed without touching the teacher's original (0D-3).
+model NurtureActivityPlacement {
+  id          String @id @default(uuid())
+  workspaceId String @map("workspace_id")
+  // Polymorphic by design: 0D-2 places captures and daily care logs, which
+  // have no common parent. The pair is unique so one source has one placement.
+  sourceKind  String @map("source_kind")
+  sourceId    String @map("source_id")
+  // Always the source's own class. An uncertain source stays here as
+  // `unplaced` rather than moving anywhere.
+  careGroupId String @map("care_group_id")
+  localDate   DateTime @map("local_date") @db.Date
+
+  state       NurtureActivityPlacementState
+  // The slot the source sits in. NULL exactly when state is `unplaced`.
+  activityRef String?                           @map("activity_ref")
+  decidedBy   NurtureActivityPlacementDecidedBy @map("decided_by")
+  // Monotonic; every change increments, including a move to `unplaced`.
+  placementHead Int                             @default(1) @map("placement_head")
+
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  careGroup NurtureCareGroup @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, sourceKind, sourceId], map: "uq_nurture_activity_placement_source")
+  @@index([workspaceId, careGroupId, localDate, state], map: "ix_nurture_activity_placement_class_day")
+  @@map("nurture_activity_placement")
 }
