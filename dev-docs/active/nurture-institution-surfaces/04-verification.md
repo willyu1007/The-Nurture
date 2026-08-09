@@ -468,6 +468,8 @@ Falsification evidence is per-increment and lives in each record's
 | Conflict decisions | PASS | Apply-time uniqueness/head races map to stable conflict codes; post-precondition authorization loss maps to blocked. |
 | Falsification coverage | PASS | Existing 27 targeted cases now include contradictory terminal state, closed role, owner-fact scope drift, source-time validation, apply-time decision mapping, duplicate Run binding and strict output refs; the three authored DB cases add empty/expanded carriers, predated correction, orphan-head and invalid/cumulative state probes. |
 | Local exact-runtime self-pin | PASS by direct recomputation | `fdb2f9d9…` over 239 files; no My-Chat revision was adopted. |
+| C30-I3 local source lock | PASS after re-freeze | Implementation revision `695630d`; aggregate source hash `273abb78…`; upstream Base/Host pins unchanged. |
+| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `05e8331`; the unrelated upstream work is not adopted by this increment. |
 | PostgreSQL execution | NOT RUN | No exact disposable target was newly approved; all SQL conclusions remain static until the planned disposable qualification. |
 
 ## Required Evidence

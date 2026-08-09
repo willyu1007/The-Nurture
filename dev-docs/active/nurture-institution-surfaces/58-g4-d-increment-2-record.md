@@ -95,6 +95,8 @@ gaps:
 | Persistence / port / formal ingress / test routing | PASS |
 | G2 DB census / G3 no-board-row census / C30 default-off | PASS |
 | Nurture exact-runtime self-pin | PASS — `fdb2f9d9…`, 239 files |
+| C30-I3 local source lock | PASS — `695630d` / `273abb78…` |
+| External My-Chat pin | KNOWN RED — expected `567b96c`, observed `05e8331`; no adoption |
 | Database feature suite | PASS — SQLite; optional Convex checks skipped |
 | Task docs / project state / governance | PASS |
 | Manifest/module and legacy-carrier absence | PASS |

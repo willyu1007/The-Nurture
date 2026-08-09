@@ -660,3 +660,6 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Refreshed only the local Nurture exact-runtime self-pin to
   `fdb2f9d9…` over 239 files. This does not adopt or conceal the independently
   divergent My-Chat revision.
+- Re-froze the affected C30-I3 local profiles at implementation revision
+  `695630d`, aggregate hash `273abb78…`; unchanged upstream Base/Host fields
+  remain untouched.
