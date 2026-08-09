@@ -824,6 +824,80 @@ enum NurtureCommandBusinessOutcome {
   already_satisfied
 }
 
+// G4-D EnrollmentJourneyWorkflowV1. These values are the private durable
+// carrier vocabulary; My-Chat continues to own the shared workflow runtime.
+enum NurtureInstitutionWorkflowStage {
+  inquiry
+  intent_conversation
+  visit_or_consultation
+  capacity_waitlist
+  trial_preparation
+  trial_in_progress
+  trial_review
+  formal_enrollment_confirmation
+  completed
+  closed
+}
+
+enum NurtureInstitutionWorkflowWaitingState {
+  ready
+  waiting_on_guardian
+  waiting_on_caregiver
+  waiting_on_system
+  scheduled_future
+  blocked
+}
+
+enum NurtureInstitutionWorkflowPendingTransition {
+  none
+  trial_start_pending
+  formalization_pending
+  exit_pending
+}
+
+enum NurtureInstitutionWorkflowLifecycle {
+  active
+  completed
+  closed_without_formalization
+}
+
+enum NurtureInstitutionWorkflowTerminalOutcome {
+  none
+  formalized
+  inquiry_closed
+  waitlist_withdrawn
+  preparation_cancelled
+  trial_ended
+}
+
+enum NurtureEnrollmentJourneyMilestone {
+  inquiry_started
+  intent_confirmed
+  visit_recorded
+  waitlist_qualified
+  trial_offer_accepted
+  trial_started
+  trial_review_reached
+  trial_extended
+  formal_proposed
+  guardian_formal_acceptance_recorded
+  preparation_cancelled
+  trial_ended
+  formal_enrollment_committed
+  journey_completed
+}
+
+enum NurtureEnrollmentTouchpointSourceKind {
+  native_business_communication
+  external_structured_summary
+}
+
+enum NurtureEnrollmentVisitDisposition {
+  not_decided
+  recorded
+  skipped
+}
+
 // T-009 family-growth provider delivery (N5/N6). Event kinds mirror the
 // frozen v1 contract vocabulary exactly.
 enum NurtureFamilyGrowthEventKind {
@@ -2089,6 +2163,7 @@ model NurtureChildCareProcess {
   focusGoalScopes          NurtureFocusGoalChildScope[]
   publishTargets           NurturePublishProcessTarget[]
   commandExecutions        NurtureCommandExecution[]
+  institutionWorkflows     NurtureInstitutionWorkflow[]
   c30ActionOperations      NurtureC30ActionOperation[]
   familyAnchorAssociations NurtureFamilyAnchorAssociation[]
   attendanceEntries        NurtureAttendanceEntry[]
@@ -2143,6 +2218,7 @@ model NurtureCareInstitution {
   publicationPolicies        NurtureInstitutionPublicationPolicy[]
   attendanceCloseoutPolicies NurtureAttendanceCloseoutPolicy[]
   supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
+  institutionWorkflows       NurtureInstitutionWorkflow[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -2268,6 +2344,7 @@ model NurtureCareGroup {
   publishProcesses           NurturePublishProcess[]
   contentSafetyAssessments   NurtureContentSafetyAssessment[]
   supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
+  targetEnrollmentInquiries  NurtureEnrollmentInquiry[]
 
   @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
   @@map("nurture_care_group")
@@ -2340,6 +2417,8 @@ model NurtureCareRoleAssignment {
   supportSignalPolicies           NurtureInstitutionSupportSignalPolicy[]
   contentRevisions                NurtureContentRevision[]
   attributionCorrectionCandidates NurtureAttributionCorrectionCandidate[]
+  enrollmentTouchpoints           NurtureEnrollmentTouchpoint[]
+  institutionWorkflowTransitions  NurtureInstitutionWorkflowTransition[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -2871,19 +2950,155 @@ model NurtureCommandExecution {
   committedResultPayload          Json?                         @map("committed_result_payload")
   committedAt                     DateTime                      @default(now()) @map("committed_at")
 
-  childCareProcess      NurtureChildCareProcess?             @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  corrections           NurtureFamilyCareMessageCorrection[]
-  cascadeAudits         NurtureFamilyCareCascadeAudit[]
-  visibilityEvents      NurturePublicationVisibilityEvent[]
-  actorPrincipalBinding NurtureParticipantPrincipalBinding?  @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
-  c30PairOperation      NurtureC30PairOperation?             @relation("NurtureC30PairExecution")
-  c30ActionOperation    NurtureC30ActionOperation?           @relation("NurtureC30ActionExecution")
+  childCareProcess              NurtureChildCareProcess?              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  corrections                   NurtureFamilyCareMessageCorrection[]
+  cascadeAudits                 NurtureFamilyCareCascadeAudit[]
+  visibilityEvents              NurturePublicationVisibilityEvent[]
+  actorPrincipalBinding         NurtureParticipantPrincipalBinding?   @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
+  c30PairOperation              NurtureC30PairOperation?              @relation("NurtureC30PairExecution")
+  c30ActionOperation            NurtureC30ActionOperation?            @relation("NurtureC30ActionExecution")
+  institutionWorkflowTransition NurtureInstitutionWorkflowTransition?
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
   @@index([workspaceId, childCareProcessId, committedAt], map: "ix_nurture_command_execution_process")
   @@index([workspaceId, actorPrincipalBindingId, committedAt], map: "ix_nurture_command_execution_actor_binding")
   @@map("nurture_command_execution")
+}
+
+// G4-D increment 2: private inquiry carrier for EnrollmentJourneyWorkflowV1.
+// It deliberately does not register a scenario capability or create a second
+// workflow outbox; NurtureCommandExecution remains the single command ledger.
+model NurtureInstitutionWorkflow {
+  id                    String                                      @id @default(uuid())
+  workspaceId           String                                      @map("workspace_id")
+  institutionId         String                                      @map("institution_id")
+  workflowRunRef        Json                                        @map("workflow_run_ref")
+  workflowRunObjectId   String                                      @map("workflow_run_object_id")
+  workflowType          String                                      @default("EnrollmentJourneyWorkflowV1") @map("workflow_type")
+  provisionalSubjectRef String                                      @default(uuid()) @map("provisional_subject_ref")
+  childCareProcessId    String?                                     @map("child_care_process_id")
+  lifecycle             NurtureInstitutionWorkflowLifecycle
+  currentStage          NurtureInstitutionWorkflowStage             @map("current_stage")
+  waitingState          NurtureInstitutionWorkflowWaitingState      @map("waiting_state")
+  pendingTransition     NurtureInstitutionWorkflowPendingTransition @map("pending_transition")
+  terminalOutcome       NurtureInstitutionWorkflowTerminalOutcome   @map("terminal_outcome")
+  completedMilestones   NurtureEnrollmentJourneyMilestone[]         @map("completed_milestones")
+  dueAt                 DateTime?                                   @map("due_at")
+  workflowHead          Int                                         @map("workflow_head")
+  startedAt             DateTime                                    @default(now()) @map("started_at")
+  updatedAt             DateTime                                    @updatedAt @map("updated_at")
+
+  institution      NurtureCareInstitution                 @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_institution_workflow_institution_id_fkey")
+  childCareProcess NurtureChildCareProcess?               @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict, map: "nurture_institution_workflow_child_process_id_fkey")
+  inquiry          NurtureEnrollmentInquiry?
+  touchpoints      NurtureEnrollmentTouchpoint[]
+  transitions      NurtureInstitutionWorkflowTransition[]
+
+  @@unique([workspaceId, workflowRunObjectId], map: "uq_nurture_institution_workflow_run")
+  @@unique([workspaceId, provisionalSubjectRef], map: "uq_nurture_institution_workflow_subject")
+  @@index([workspaceId, institutionId, lifecycle, currentStage], map: "ix_nurture_institution_workflow_stage")
+  @@index([workspaceId, institutionId, updatedAt], map: "ix_nurture_institution_workflow_updated")
+  @@map("nurture_institution_workflow")
+}
+
+model NurtureEnrollmentInquiry {
+  id                              String                            @id @default(uuid())
+  workspaceId                     String                            @map("workspace_id")
+  institutionId                   String                            @map("institution_id")
+  workflowId                      String                            @unique(map: "uq_nurture_enrollment_inquiry_workflow") @map("workflow_id")
+  preferredLabel                  String                            @map("preferred_label")
+  birthYearMonthProtectionPayload Json?                             @map("birth_year_month_protection_payload")
+  ageBandKey                      String?                           @map("age_band_key")
+  expectedEntryStartDate          DateTime                          @map("expected_entry_start_date") @db.Date
+  expectedEntryEndDate            DateTime                          @map("expected_entry_end_date") @db.Date
+  targetClassTypeKey              String                            @map("target_class_type_key")
+  targetAgeBandKey                String                            @map("target_age_band_key")
+  targetCareGroupId               String?                           @map("target_care_group_id")
+  careScheduleNeedKeys            String[]                          @map("care_schedule_need_keys")
+  sourceChannel                   String                            @map("source_channel")
+  hostContactRef                  Json                              @map("host_contact_ref")
+  contactSafeLabel                String                            @map("contact_safe_label")
+  safetyLabelKeys                 String[]                          @map("safety_label_keys")
+  lastTouchpointAt                DateTime                          @map("last_touchpoint_at")
+  nextTouchpointAt                DateTime                          @map("next_touchpoint_at")
+  visitDisposition                NurtureEnrollmentVisitDisposition @default(not_decided) @map("visit_disposition")
+  createdAt                       DateTime                          @default(now()) @map("created_at")
+  updatedAt                       DateTime                          @updatedAt @map("updated_at")
+
+  workflow        NurtureInstitutionWorkflow    @relation(fields: [workflowId], references: [id], onDelete: Restrict, map: "nurture_enrollment_inquiry_workflow_id_fkey")
+  targetCareGroup NurtureCareGroup?             @relation(fields: [targetCareGroupId], references: [id], onDelete: Restrict, map: "nurture_enrollment_inquiry_target_group_id_fkey")
+  touchpoints     NurtureEnrollmentTouchpoint[]
+
+  @@index([workspaceId, institutionId, nextTouchpointAt], map: "ix_nurture_enrollment_inquiry_next_touchpoint")
+  @@index([workspaceId, targetCareGroupId, expectedEntryStartDate], map: "ix_nurture_enrollment_inquiry_target_group")
+  @@map("nurture_enrollment_inquiry")
+}
+
+model NurtureEnrollmentTouchpoint {
+  id                          String                                @id @default(uuid())
+  workspaceId                 String                                @map("workspace_id")
+  institutionId               String                                @map("institution_id")
+  workflowId                  String                                @map("workflow_id")
+  inquiryId                   String                                @map("inquiry_id")
+  sourceKind                  NurtureEnrollmentTouchpointSourceKind @map("source_kind")
+  sourceChannel               String                                @map("source_channel")
+  nativeSourceRef             Json?                                 @map("native_source_ref")
+  externalSummaryBodyEnvelope Json?                                 @map("external_summary_body_envelope")
+  confirmedNeedKeys           String[]                              @map("confirmed_need_keys")
+  safetyLabelKeys             String[]                              @map("safety_label_keys")
+  nextActionKey               String                                @map("next_action_key")
+  responsibleRole             String                                @map("responsible_role")
+  occurredAt                  DateTime                              @map("occurred_at")
+  dueAt                       DateTime                              @map("due_at")
+  nextTouchpointAt            DateTime                              @map("next_touchpoint_at")
+  actorRoleAssignmentId       String                                @map("actor_role_assignment_id")
+  supersedesTouchpointId      String?                               @unique(map: "uq_nurture_enrollment_touchpoint_supersedes") @map("supersedes_touchpoint_id")
+  correctionReason            String?                               @map("correction_reason") @db.Text
+  createdAt                   DateTime                              @default(now()) @map("created_at")
+
+  workflow            NurtureInstitutionWorkflow   @relation(fields: [workflowId], references: [id], onDelete: Restrict, map: "nurture_enrollment_touchpoint_workflow_id_fkey")
+  inquiry             NurtureEnrollmentInquiry     @relation(fields: [inquiryId], references: [id], onDelete: Restrict, map: "nurture_enrollment_touchpoint_inquiry_id_fkey")
+  actorRoleAssignment NurtureCareRoleAssignment    @relation(fields: [actorRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_enrollment_touchpoint_actor_role_id_fkey")
+  supersedes          NurtureEnrollmentTouchpoint? @relation("NurtureEnrollmentTouchpointCorrection", fields: [supersedesTouchpointId], references: [id], onDelete: Restrict, map: "nurture_enrollment_touchpoint_supersedes_id_fkey")
+  correction          NurtureEnrollmentTouchpoint? @relation("NurtureEnrollmentTouchpointCorrection")
+
+  @@index([workspaceId, institutionId, occurredAt], map: "ix_nurture_enrollment_touchpoint_occurred")
+  @@index([workspaceId, workflowId, createdAt], map: "ix_nurture_enrollment_touchpoint_workflow")
+  @@map("nurture_enrollment_touchpoint")
+}
+
+model NurtureInstitutionWorkflowTransition {
+  id                      String                                       @id @default(uuid())
+  workspaceId             String                                       @map("workspace_id")
+  institutionId           String                                       @map("institution_id")
+  workflowId              String                                       @map("workflow_id")
+  commandExecutionId      String                                       @unique(map: "uq_nurture_institution_workflow_transition_execution") @map("command_execution_id")
+  workflowHeadBefore      Int                                          @map("workflow_head_before")
+  workflowHeadAfter       Int                                          @map("workflow_head_after")
+  stageBefore             NurtureInstitutionWorkflowStage?             @map("stage_before")
+  stageAfter              NurtureInstitutionWorkflowStage              @map("stage_after")
+  waitingStateBefore      NurtureInstitutionWorkflowWaitingState?      @map("waiting_state_before")
+  waitingStateAfter       NurtureInstitutionWorkflowWaitingState       @map("waiting_state_after")
+  pendingTransitionBefore NurtureInstitutionWorkflowPendingTransition? @map("pending_transition_before")
+  pendingTransitionAfter  NurtureInstitutionWorkflowPendingTransition  @map("pending_transition_after")
+  lifecycleBefore         NurtureInstitutionWorkflowLifecycle?         @map("lifecycle_before")
+  lifecycleAfter          NurtureInstitutionWorkflowLifecycle          @map("lifecycle_after")
+  terminalOutcomeBefore   NurtureInstitutionWorkflowTerminalOutcome?   @map("terminal_outcome_before")
+  terminalOutcomeAfter    NurtureInstitutionWorkflowTerminalOutcome    @map("terminal_outcome_after")
+  addedMilestones         NurtureEnrollmentJourneyMilestone[]          @map("added_milestones")
+  commandKey              String                                       @map("command_key")
+  actorRoleAssignmentId   String                                       @map("actor_role_assignment_id")
+  reasonKey               String                                       @map("reason_key")
+  occurredAt              DateTime                                     @default(now()) @map("occurred_at")
+
+  workflow            NurtureInstitutionWorkflow @relation(fields: [workflowId], references: [id], onDelete: Restrict, map: "nurture_workflow_transition_workflow_id_fkey")
+  commandExecution    NurtureCommandExecution    @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict, map: "nurture_workflow_transition_execution_id_fkey")
+  actorRoleAssignment NurtureCareRoleAssignment  @relation(fields: [actorRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_workflow_transition_actor_role_id_fkey")
+
+  @@unique([workflowId, workflowHeadAfter], map: "uq_nurture_institution_workflow_transition_head")
+  @@index([workspaceId, institutionId, workflowId, occurredAt], map: "ix_nurture_institution_workflow_transition")
+  @@map("nurture_institution_workflow_transition")
 }
 
 // ============================================================================

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-09T14:08:53.509Z",
+  "updatedAt": "2026-08-09T16:20:15.975Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -372,6 +372,25 @@
       ]
     },
     {
+      "name": "NurtureEnrollmentJourneyMilestone",
+      "values": [
+        "inquiry_started",
+        "intent_confirmed",
+        "visit_recorded",
+        "waitlist_qualified",
+        "trial_offer_accepted",
+        "trial_started",
+        "trial_review_reached",
+        "trial_extended",
+        "formal_proposed",
+        "guardian_formal_acceptance_recorded",
+        "preparation_cancelled",
+        "trial_ended",
+        "formal_enrollment_committed",
+        "journey_completed"
+      ]
+    },
+    {
       "name": "NurtureEnrollmentStatus",
       "values": [
         "pending",
@@ -380,6 +399,21 @@
         "ended",
         "withdrawn",
         "deleted"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentTouchpointSourceKind",
+      "values": [
+        "native_business_communication",
+        "external_structured_summary"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentVisitDisposition",
+      "values": [
+        "not_decided",
+        "recorded",
+        "skipped"
       ]
     },
     {
@@ -672,6 +706,60 @@
         "work_item_or_workflow_blocked",
         "configured_load_threshold",
         "ai_attention_candidate"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflowLifecycle",
+      "values": [
+        "active",
+        "completed",
+        "closed_without_formalization"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflowPendingTransition",
+      "values": [
+        "none",
+        "trial_start_pending",
+        "formalization_pending",
+        "exit_pending"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflowStage",
+      "values": [
+        "inquiry",
+        "intent_conversation",
+        "visit_or_consultation",
+        "capacity_waitlist",
+        "trial_preparation",
+        "trial_in_progress",
+        "trial_review",
+        "formal_enrollment_confirmation",
+        "completed",
+        "closed"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflowTerminalOutcome",
+      "values": [
+        "none",
+        "formalized",
+        "inquiry_closed",
+        "waitlist_withdrawn",
+        "preparation_cancelled",
+        "trial_ended"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflowWaitingState",
+      "values": [
+        "ready",
+        "waiting_on_guardian",
+        "waiting_on_caregiver",
+        "waiting_on_system",
+        "scheduled_future",
+        "blocked"
       ]
     },
     {
@@ -5456,6 +5544,15 @@
           "references": []
         },
         {
+          "field": "targetEnrollmentInquiries",
+          "to": "NurtureEnrollmentInquiry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "threads",
           "to": "NurtureFamilyCareThread",
           "optional": false,
@@ -5649,6 +5746,15 @@
         {
           "field": "enrollments",
           "to": "NurtureEnrollment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionWorkflows",
+          "to": "NurtureInstitutionWorkflow",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -5981,6 +6087,24 @@
         {
           "field": "dailyCareLogs",
           "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentTouchpoints",
+          "to": "NurtureEnrollmentTouchpoint",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionWorkflowTransitions",
+          "to": "NurtureInstitutionWorkflowTransition",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -6877,6 +7001,15 @@
         {
           "field": "grants",
           "to": "NurtureChildLinkGrant",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionWorkflows",
+          "to": "NurtureInstitutionWorkflow",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -8943,6 +9076,15 @@
           "references": []
         },
         {
+          "field": "institutionWorkflowTransition",
+          "to": "NurtureInstitutionWorkflowTransition",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "visibilityEvents",
           "to": "NurturePublicationVisibilityEvent",
           "optional": false,
@@ -10972,6 +11114,626 @@
           ],
           "name": null,
           "map": "ix_nurture_enrollment_process"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentInquiry",
+      "dbName": "nurture_enrollment_inquiry",
+      "schema": null,
+      "columns": [
+        {
+          "name": "ageBandKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "age_band_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "birthYearMonthProtectionPayload",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "birth_year_month_protection_payload",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careScheduleNeedKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "care_schedule_need_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contactSafeLabel",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "contact_safe_label",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expectedEntryEndDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expected_entry_end_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expectedEntryStartDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expected_entry_start_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "hostContactRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "host_contact_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastTouchpointAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_touchpoint_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextTouchpointAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "next_touchpoint_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "preferredLabel",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "preferred_label",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyLabelKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "safety_label_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceChannel",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_channel",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetAgeBandKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_age_band_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetCareGroupId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "target_care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetClassTypeKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_class_type_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "visitDisposition",
+          "type": "NurtureEnrollmentVisitDisposition",
+          "nullable": false,
+          "list": false,
+          "dbName": "visit_disposition",
+          "dbType": null,
+          "default": "not_decided",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "targetCareGroup",
+          "to": "NurtureCareGroup",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "targetCareGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "touchpoints",
+          "to": "NurtureEnrollmentTouchpoint",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "nextTouchpointAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_enrollment_inquiry_next_touchpoint"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "targetCareGroupId",
+            "expectedEntryStartDate"
+          ],
+          "name": null,
+          "map": "ix_nurture_enrollment_inquiry_target_group"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentTouchpoint",
+      "dbName": "nurture_enrollment_touchpoint",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "confirmedNeedKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "confirmed_need_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "correctionReason",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "correction_reason",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dueAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "due_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "externalSummaryBodyEnvelope",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "external_summary_body_envelope",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "inquiryId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "inquiry_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nativeSourceRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "native_source_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextActionKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "next_action_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextTouchpointAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "next_touchpoint_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "responsibleRole",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "responsible_role",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyLabelKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "safety_label_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceChannel",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_channel",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceKind",
+          "type": "NurtureEnrollmentTouchpointSourceKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesTouchpointId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_touchpoint_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "correction",
+          "to": "NurtureEnrollmentTouchpoint",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureEnrollmentTouchpointCorrection",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "inquiry",
+          "to": "NurtureEnrollmentInquiry",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "inquiryId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "supersedes",
+          "to": "NurtureEnrollmentTouchpoint",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureEnrollmentTouchpointCorrection",
+          "fields": [
+            "supersedesTouchpointId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_enrollment_touchpoint_occurred"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "workflowId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_enrollment_touchpoint_workflow"
         }
       ]
     },
@@ -16799,6 +17561,619 @@
           ],
           "name": null,
           "map": "ix_nurture_support_signal_policy_effective"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflow",
+      "dbName": "nurture_institution_workflow",
+      "schema": null,
+      "columns": [
+        {
+          "name": "childCareProcessId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "child_care_process_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "completedMilestones",
+          "type": "NurtureEnrollmentJourneyMilestone",
+          "nullable": false,
+          "list": true,
+          "dbName": "completed_milestones",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentStage",
+          "type": "NurtureInstitutionWorkflowStage",
+          "nullable": false,
+          "list": false,
+          "dbName": "current_stage",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "dueAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "due_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "NurtureInstitutionWorkflowLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pendingTransition",
+          "type": "NurtureInstitutionWorkflowPendingTransition",
+          "nullable": false,
+          "list": false,
+          "dbName": "pending_transition",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "provisionalSubjectRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "provisional_subject_ref",
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "startedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "started_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "terminalOutcome",
+          "type": "NurtureInstitutionWorkflowTerminalOutcome",
+          "nullable": false,
+          "list": false,
+          "dbName": "terminal_outcome",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "waitingState",
+          "type": "NurtureInstitutionWorkflowWaitingState",
+          "nullable": false,
+          "list": false,
+          "dbName": "waiting_state",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunObjectId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_run_object_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowRunRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_run_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowType",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_type",
+          "dbType": null,
+          "default": "\"EnrollmentJourneyWorkflowV1\"",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "childCareProcess",
+          "to": "NurtureChildCareProcess",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "childCareProcessId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "inquiry",
+          "to": "NurtureEnrollmentInquiry",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "touchpoints",
+          "to": "NurtureEnrollmentTouchpoint",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "transitions",
+          "to": "NurtureInstitutionWorkflowTransition",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "lifecycle",
+            "currentStage"
+          ],
+          "name": null,
+          "map": "ix_nurture_institution_workflow_stage"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_institution_workflow_updated"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "provisionalSubjectRef"
+          ],
+          "name": null,
+          "map": "uq_nurture_institution_workflow_subject"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "workflowRunObjectId"
+          ],
+          "name": null,
+          "map": "uq_nurture_institution_workflow_run"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionWorkflowTransition",
+      "dbName": "nurture_institution_workflow_transition",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "addedMilestones",
+          "type": "NurtureEnrollmentJourneyMilestone",
+          "nullable": false,
+          "list": true,
+          "dbName": "added_milestones",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycleAfter",
+          "type": "NurtureInstitutionWorkflowLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": "lifecycle_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycleBefore",
+          "type": "NurtureInstitutionWorkflowLifecycle",
+          "nullable": true,
+          "list": false,
+          "dbName": "lifecycle_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pendingTransitionAfter",
+          "type": "NurtureInstitutionWorkflowPendingTransition",
+          "nullable": false,
+          "list": false,
+          "dbName": "pending_transition_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "pendingTransitionBefore",
+          "type": "NurtureInstitutionWorkflowPendingTransition",
+          "nullable": true,
+          "list": false,
+          "dbName": "pending_transition_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "stageAfter",
+          "type": "NurtureInstitutionWorkflowStage",
+          "nullable": false,
+          "list": false,
+          "dbName": "stage_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "stageBefore",
+          "type": "NurtureInstitutionWorkflowStage",
+          "nullable": true,
+          "list": false,
+          "dbName": "stage_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "terminalOutcomeAfter",
+          "type": "NurtureInstitutionWorkflowTerminalOutcome",
+          "nullable": false,
+          "list": false,
+          "dbName": "terminal_outcome_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "terminalOutcomeBefore",
+          "type": "NurtureInstitutionWorkflowTerminalOutcome",
+          "nullable": true,
+          "list": false,
+          "dbName": "terminal_outcome_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "waitingStateAfter",
+          "type": "NurtureInstitutionWorkflowWaitingState",
+          "nullable": false,
+          "list": false,
+          "dbName": "waiting_state_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "waitingStateBefore",
+          "type": "NurtureInstitutionWorkflowWaitingState",
+          "nullable": true,
+          "list": false,
+          "dbName": "waiting_state_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowHeadAfter",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_head_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowHeadBefore",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_head_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "workflowId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_institution_workflow_transition"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workflowId",
+            "workflowHeadAfter"
+          ],
+          "name": null,
+          "map": "uq_nurture_institution_workflow_transition_head"
         }
       ]
     },

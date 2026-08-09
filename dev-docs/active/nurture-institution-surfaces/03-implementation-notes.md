@@ -613,3 +613,50 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Next is the private workflow/inquiry/touchpoint carrier plus command,
   repository and migration authoring under the DB-SSOT gate. No database apply
   is authorized by this increment.
+
+## 2026-08-09 — G4-D increment 2 source and migration artifact
+
+- Quality-reviewed increment 1 and added exact Workspace/Institution/Admin
+  projection admission, strict runtime shape/time/ref checks, milestone/stage/
+  terminal consistency and the legal skipped-visit path.
+- Added six inquiry commands over `NurtureCommandExecution`; exact owner refs,
+  not mutable owner labels/timestamps, form request identity for replay.
+- Added one private Prisma repository inside the existing serializable command
+  transaction and four carrier tables with append-only/scope/head/protected
+  storage fences. No workflow outbox or legacy project path was added.
+- Added a body-free query composition service. It does not return the private
+  workflow ref or inquiry/contact facts and does not register a capability.
+- Prisma SSOT/context, migration and three production-DB cases are authored.
+  No database was connected or applied; the DB suite remains explicitly
+  unexecuted pending a new exact disposable target approval.
+- Scenario/DB/direct TypeScript checks, 27/27 targeted, 869/869 full unit,
+  persistence, port, formal-ingress, routing, manifest/module absence and diff
+  hygiene pass. See [`58`](./58-g4-d-increment-2-record.md).
+
+## 2026-08-10 — G4-D increment 2 final quality pass
+
+- Replaced the persisted workflow-run hash with the exact canonical
+  `workflowRunRef.object_id`, constrained it against the JSON ref and made it
+  Workspace-unique. One My-Chat Run can no longer bind two local Institution
+  workflows, and no second derived identity can drift.
+- Made canonical refs and protected envelopes exact-key checks whose helpers
+  return `FALSE`, not SQL `NULL`, for missing shapes. Closed responsible roles
+  now use one domain vocabulary shared by command validation and persistence.
+- Mirrored lifecycle/stage/prerequisite and terminal milestone invariants into
+  PostgreSQL functions. Transition finalization now proves the exact command
+  scope, current Institution Admin actor, no milestone re-addition and the
+  cumulative transition state before advancing the head. A deferred constraint
+  also requires every committed workflow head to have its exact transition.
+- Mapped deterministic apply-time write races to stable conflict/blocked
+  decisions instead of reporting every rollback as a technical error.
+  Command results expose only local workflow and transition refs; inquiry and
+  touchpoint carriers remain private repository facts.
+- Expanded unit and authored PostgreSQL falsification coverage without adding
+  a parallel model, compatibility path or temporary artifact. The migration
+  remains unapplied pending a newly approved exact disposable target.
+- Rechecked exact owner facts at the command boundary, rejected native owner
+  verification before source occurrence and rejected external corrections
+  whose recorded occurrence predates the source touchpoint.
+- Refreshed only the local Nurture exact-runtime self-pin to
+  `fdb2f9d9…` over 239 files. This does not adopt or conceal the independently
+  divergent My-Chat revision.

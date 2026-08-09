@@ -2,6 +2,9 @@ import {
   assertCanonicalRef,
   type CanonicalRef,
 } from "@my-chat/workflow-contracts";
+import type {
+  NurtureInstitutionScopeContextV1,
+} from "./institution-authority-chain.js";
 
 export const NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION =
   "1.0.0" as const;
@@ -66,17 +69,14 @@ export const NURTURE_ENROLLMENT_JOURNEY_MILESTONES = [
 export type NurtureEnrollmentJourneyMilestone =
   (typeof NURTURE_ENROLLMENT_JOURNEY_MILESTONES)[number];
 
-export type NurtureEnrollmentJourneyLifecycle =
-  (typeof NURTURE_ENROLLMENT_JOURNEY_LIFECYCLES)[number];
-
 export const NURTURE_ENROLLMENT_JOURNEY_LIFECYCLES = [
   "active",
   "completed",
   "closed_without_formalization",
 ] as const;
 
-export type NurtureEnrollmentJourneyTerminalOutcome =
-  (typeof NURTURE_ENROLLMENT_JOURNEY_TERMINAL_OUTCOMES)[number];
+export type NurtureEnrollmentJourneyLifecycle =
+  (typeof NURTURE_ENROLLMENT_JOURNEY_LIFECYCLES)[number];
 
 export const NURTURE_ENROLLMENT_JOURNEY_TERMINAL_OUTCOMES = [
   "none",
@@ -86,6 +86,9 @@ export const NURTURE_ENROLLMENT_JOURNEY_TERMINAL_OUTCOMES = [
   "preparation_cancelled",
   "trial_ended",
 ] as const;
+
+export type NurtureEnrollmentJourneyTerminalOutcome =
+  (typeof NURTURE_ENROLLMENT_JOURNEY_TERMINAL_OUTCOMES)[number];
 
 export type NurtureInstitutionWorkflowDefinitionV1 = {
   contract_version: typeof NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION;
@@ -128,6 +131,8 @@ export const findNurtureInstitutionWorkflowDefinitionV1 = (
  */
 export type NurtureEnrollmentJourneyWorkflowSnapshotV1 = {
   contract_version: string;
+  workspace_id: string;
+  institution_ref: string;
   workflow_ref: string;
   workflow_run_ref: CanonicalRef;
   workflow_type: string;
@@ -147,12 +152,26 @@ export type NurtureInstitutionWorkflowProjectionSurface =
   | "institution_admin_mobile"
   | "institution_admin_web";
 
+export const NURTURE_INSTITUTION_WORKFLOW_PROJECTION_SURFACES = [
+  "institution_admin_mobile",
+  "institution_admin_web",
+] as const satisfies readonly NurtureInstitutionWorkflowProjectionSurface[];
+
+export type NurtureInstitutionWorkflowProjectionContextV1 = {
+  workspace_id: string;
+  institution_scope: NurtureInstitutionScopeContextV1;
+};
+
+export const NURTURE_INSTITUTION_WORKFLOW_RESPONSIBLE_ROLES = [
+  "institution_admin",
+  "guardian",
+  "caregiver",
+  "system_owner",
+  "none",
+] as const;
+
 export type NurtureInstitutionWorkflowResponsibleRole =
-  | "institution_admin"
-  | "guardian"
-  | "caregiver"
-  | "system_owner"
-  | "none";
+  (typeof NURTURE_INSTITUTION_WORKFLOW_RESPONSIBLE_ROLES)[number];
 
 export type NurtureInstitutionWorkflowProjectionState =
   | "active"
@@ -191,13 +210,17 @@ export type NurtureInstitutionWorkflowProjectionDecision =
       reason_code:
         | "contract_mismatch"
         | "unsupported_workflow_type"
+        | "unsupported_surface"
+        | "scope_mismatch"
         | "invalid_snapshot"
         | "invalid_lifecycle"
         | "invalid_pending_transition";
     };
 
-const validInstant = (value: string): boolean =>
-  value.length > 0 && !Number.isNaN(new Date(value).getTime());
+const validInstant = (value: string): boolean => {
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString() === value;
+};
 
 const isWorkflowRunRef = (ref: unknown): ref is CanonicalRef => {
   try {
@@ -213,6 +236,60 @@ const isMember = <Member extends string>(
   value: unknown,
 ): value is Member =>
   typeof value === "string" && (values as readonly string[]).includes(value);
+
+const SNAPSHOT_KEYS = new Set<keyof NurtureEnrollmentJourneyWorkflowSnapshotV1>([
+  "contract_version",
+  "workspace_id",
+  "institution_ref",
+  "workflow_ref",
+  "workflow_run_ref",
+  "workflow_type",
+  "workflow_head",
+  "lifecycle",
+  "current_stage",
+  "waiting_state",
+  "pending_transition",
+  "terminal_outcome",
+  "completed_milestones",
+  "due_at",
+  "started_at",
+  "updated_at",
+]);
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" &&
+  value !== null &&
+  !Array.isArray(value);
+
+const isExactSnapshotObject = (value: unknown): value is Record<string, unknown> =>
+  isRecord(value) &&
+  Object.keys(value).every((key) =>
+    SNAPSHOT_KEYS.has(
+      key as keyof NurtureEnrollmentJourneyWorkflowSnapshotV1,
+    ),
+  );
+
+const scopeMatchesSnapshot = (
+  context: unknown,
+  snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1,
+): boolean => {
+  if (!isRecord(context) || !isRecord(context.institution_scope)) return false;
+  const scope = context.institution_scope;
+  if (!isRecord(scope.active_role)) return false;
+  const role = scope.active_role;
+  return (
+    typeof context.workspace_id === "string" &&
+    context.workspace_id.length > 0 &&
+    context.workspace_id === snapshot.workspace_id &&
+    scope.contract_version === "1.0.0" &&
+    scope.institution_state === "active" &&
+    scope.institution_ref === snapshot.institution_ref &&
+    role.contract_version === "1.0.0" &&
+    role.role_kind === "institution_admin" &&
+    role.scope_type === "institution" &&
+    role.scope_ref === snapshot.institution_ref
+  );
+};
 
 const snapshotVocabularyIsKnown = (
   snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1,
@@ -287,6 +364,108 @@ const hasMilestone = (
   milestone: NurtureEnrollmentJourneyMilestone,
 ): boolean => snapshot.completed_milestones.includes(milestone);
 
+const MILESTONE_PREREQUISITES: Readonly<
+  Partial<
+    Record<
+      NurtureEnrollmentJourneyMilestone,
+      readonly NurtureEnrollmentJourneyMilestone[]
+    >
+  >
+> = {
+  intent_confirmed: ["inquiry_started"],
+  visit_recorded: ["intent_confirmed"],
+  waitlist_qualified: ["intent_confirmed"],
+  trial_offer_accepted: ["intent_confirmed"],
+  trial_started: ["trial_offer_accepted"],
+  trial_review_reached: ["trial_started"],
+  trial_extended: ["trial_review_reached"],
+  formal_proposed: ["trial_review_reached"],
+  guardian_formal_acceptance_recorded: ["formal_proposed"],
+  preparation_cancelled: ["trial_offer_accepted"],
+  trial_ended: ["trial_started"],
+  formal_enrollment_committed: ["guardian_formal_acceptance_recorded"],
+  journey_completed: ["formal_enrollment_committed"],
+};
+
+const milestoneDependenciesAreValid = (
+  snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1,
+): boolean =>
+  snapshot.completed_milestones.every((milestone) =>
+    (MILESTONE_PREREQUISITES[milestone] ?? []).every((required) =>
+      hasMilestone(snapshot, required),
+    ),
+  );
+
+const milestonesAreSubsetOf = (
+  snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1,
+  allowed: readonly NurtureEnrollmentJourneyMilestone[],
+): boolean =>
+  snapshot.completed_milestones.every((milestone) =>
+    allowed.includes(milestone),
+  );
+
+const ACTIVE_STAGE_MILESTONES: Readonly<
+  Record<
+    NurtureEnrollmentJourneyStage,
+    readonly NurtureEnrollmentJourneyMilestone[]
+  >
+> = {
+  inquiry: ["inquiry_started"],
+  intent_conversation: ["inquiry_started", "intent_confirmed"],
+  visit_or_consultation: [
+    "inquiry_started",
+    "intent_confirmed",
+    "visit_recorded",
+  ],
+  capacity_waitlist: [
+    "inquiry_started",
+    "intent_confirmed",
+    "visit_recorded",
+    "waitlist_qualified",
+  ],
+  trial_preparation: [
+    "inquiry_started",
+    "intent_confirmed",
+    "visit_recorded",
+    "waitlist_qualified",
+    "trial_offer_accepted",
+  ],
+  trial_in_progress: [
+    "inquiry_started",
+    "intent_confirmed",
+    "visit_recorded",
+    "waitlist_qualified",
+    "trial_offer_accepted",
+    "trial_started",
+    "trial_review_reached",
+    "trial_extended",
+  ],
+  trial_review: [
+    "inquiry_started",
+    "intent_confirmed",
+    "visit_recorded",
+    "waitlist_qualified",
+    "trial_offer_accepted",
+    "trial_started",
+    "trial_review_reached",
+    "trial_extended",
+  ],
+  formal_enrollment_confirmation: [
+    "inquiry_started",
+    "intent_confirmed",
+    "visit_recorded",
+    "waitlist_qualified",
+    "trial_offer_accepted",
+    "trial_started",
+    "trial_review_reached",
+    "trial_extended",
+    "formal_proposed",
+    "guardian_formal_acceptance_recorded",
+  ],
+  completed: NURTURE_ENROLLMENT_JOURNEY_MILESTONES,
+  closed: NURTURE_ENROLLMENT_JOURNEY_MILESTONES,
+};
+
 const lifecycleIsValid = (
   snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1,
 ): boolean => {
@@ -300,7 +479,11 @@ const lifecycleIsValid = (
         !hasMilestone(snapshot, "preparation_cancelled") &&
         !hasMilestone(snapshot, "trial_ended") &&
         !hasMilestone(snapshot, "formal_enrollment_committed") &&
-        !hasMilestone(snapshot, "journey_completed")
+        !hasMilestone(snapshot, "journey_completed") &&
+        milestonesAreSubsetOf(
+          snapshot,
+          ACTIVE_STAGE_MILESTONES[snapshot.current_stage],
+        )
       );
     case "completed":
       return (
@@ -315,7 +498,9 @@ const lifecycleIsValid = (
         hasMilestone(snapshot, "formal_proposed") &&
         hasMilestone(snapshot, "guardian_formal_acceptance_recorded") &&
         hasMilestone(snapshot, "formal_enrollment_committed") &&
-        hasMilestone(snapshot, "journey_completed")
+        hasMilestone(snapshot, "journey_completed") &&
+        !hasMilestone(snapshot, "preparation_cancelled") &&
+        !hasMilestone(snapshot, "trial_ended")
       );
     case "closed_without_formalization": {
       if (
@@ -335,20 +520,53 @@ const lifecycleIsValid = (
           hasMilestone(snapshot, "trial_offer_accepted") &&
           hasMilestone(snapshot, "preparation_cancelled") &&
           !hasMilestone(snapshot, "trial_started") &&
-          !hasMilestone(snapshot, "trial_ended")
+          !hasMilestone(snapshot, "trial_ended") &&
+          milestonesAreSubsetOf(snapshot, [
+            "inquiry_started",
+            "intent_confirmed",
+            "visit_recorded",
+            "waitlist_qualified",
+            "trial_offer_accepted",
+            "preparation_cancelled",
+          ])
         );
       }
       if (snapshot.terminal_outcome === "trial_ended") {
         return (
           hasMilestone(snapshot, "trial_started") &&
           hasMilestone(snapshot, "trial_ended") &&
-          !hasMilestone(snapshot, "preparation_cancelled")
+          !hasMilestone(snapshot, "preparation_cancelled") &&
+          milestonesAreSubsetOf(snapshot, [
+            "inquiry_started",
+            "intent_confirmed",
+            "visit_recorded",
+            "waitlist_qualified",
+            "trial_offer_accepted",
+            "trial_started",
+            "trial_review_reached",
+            "trial_extended",
+            "formal_proposed",
+            "guardian_formal_acceptance_recorded",
+            "trial_ended",
+          ])
         );
       }
       if (snapshot.terminal_outcome === "waitlist_withdrawn") {
-        return hasMilestone(snapshot, "waitlist_qualified");
+        return (
+          hasMilestone(snapshot, "waitlist_qualified") &&
+          milestonesAreSubsetOf(snapshot, [
+            "inquiry_started",
+            "intent_confirmed",
+            "visit_recorded",
+            "waitlist_qualified",
+          ])
+        );
       }
-      return true;
+      return milestonesAreSubsetOf(snapshot, [
+        "inquiry_started",
+        "intent_confirmed",
+        "visit_recorded",
+      ]);
     }
   }
 };
@@ -362,10 +580,7 @@ const stageHasRequiredMilestones = (
     case "intent_conversation":
       return hasMilestone(snapshot, "intent_confirmed");
     case "visit_or_consultation":
-      return (
-        hasMilestone(snapshot, "intent_confirmed") &&
-        hasMilestone(snapshot, "visit_recorded")
-      );
+      return hasMilestone(snapshot, "intent_confirmed");
     case "capacity_waitlist":
       return (
         hasMilestone(snapshot, "intent_confirmed") &&
@@ -515,8 +730,31 @@ const projectionStateFor = (
 export const projectNurtureEnrollmentJourneyWorkflowV1 = (input: {
   snapshot: NurtureEnrollmentJourneyWorkflowSnapshotV1;
   surface: NurtureInstitutionWorkflowProjectionSurface;
+  context: NurtureInstitutionWorkflowProjectionContextV1;
 }): NurtureInstitutionWorkflowProjectionDecision => {
-  const { snapshot } = input;
+  const runtimeInput: {
+    snapshot?: unknown;
+    surface?: unknown;
+    context?: unknown;
+  } = isRecord(input) ? input : {};
+  if (
+    !isMember(
+      NURTURE_INSTITUTION_WORKFLOW_PROJECTION_SURFACES,
+      runtimeInput.surface,
+    )
+  ) {
+    return { status: "unavailable", reason_code: "unsupported_surface" };
+  }
+  if (!isExactSnapshotObject(runtimeInput.snapshot)) {
+    return { status: "unavailable", reason_code: "invalid_snapshot" };
+  }
+  const snapshot =
+    runtimeInput.snapshot as NurtureEnrollmentJourneyWorkflowSnapshotV1;
+  if (
+    !scopeMatchesSnapshot(runtimeInput.context, snapshot)
+  ) {
+    return { status: "unavailable", reason_code: "scope_mismatch" };
+  }
   if (
     snapshot.contract_version !==
     NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION
@@ -531,6 +769,12 @@ export const projectNurtureEnrollmentJourneyWorkflowV1 = (input: {
   if (
     typeof snapshot.workflow_ref !== "string" ||
     snapshot.workflow_ref.length === 0 ||
+    snapshot.workflow_ref.length > 256 ||
+    snapshot.workflow_ref.trim() !== snapshot.workflow_ref ||
+    typeof snapshot.workspace_id !== "string" ||
+    snapshot.workspace_id.length === 0 ||
+    typeof snapshot.institution_ref !== "string" ||
+    snapshot.institution_ref.length === 0 ||
     !isWorkflowRunRef(snapshot.workflow_run_ref) ||
     !snapshotVocabularyIsKnown(snapshot) ||
     !Number.isSafeInteger(snapshot.workflow_head) ||
@@ -558,7 +802,11 @@ export const projectNurtureEnrollmentJourneyWorkflowV1 = (input: {
       reason_code: "invalid_pending_transition",
     };
   }
-  if (!lifecycleIsValid(snapshot) || !stageHasRequiredMilestones(snapshot)) {
+  if (
+    !milestoneDependenciesAreValid(snapshot) ||
+    !lifecycleIsValid(snapshot) ||
+    !stageHasRequiredMilestones(snapshot)
+  ) {
     return { status: "unavailable", reason_code: "invalid_lifecycle" };
   }
 

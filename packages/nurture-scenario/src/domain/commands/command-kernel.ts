@@ -13,6 +13,7 @@ import type { NurtureCareCaptureTransaction } from "../institution/care-capture-
 import type { NurtureAttendanceCommandTransaction } from "../institution/attendance-closeout.js";
 import type { NurtureContentRevisionTransaction } from "../institution/content-revision.js";
 import type { NurtureAttributionCorrectionCandidateTransaction } from "../institution/attribution-correction-candidate.js";
+import type { NurtureEnrollmentJourneyTransaction } from "../institution/enrollment-journey-command.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
   buildNurtureHandoffRequestSnapshots,
@@ -82,6 +83,8 @@ export type NurtureCommandTransaction = {
   contentRevisions?: NurtureContentRevisionTransaction;
   /** Present when the G4-C 0D-4 non-canonical correction owner is wired. */
   attributionCorrections?: NurtureAttributionCorrectionCandidateTransaction;
+  /** Present when the G4-D Enrollment Journey private owner is wired. */
+  enrollmentJourney?: NurtureEnrollmentJourneyTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {
@@ -246,6 +249,11 @@ export type NurtureCommandResult =
   | NurtureCommandNotCommitted
   | NurtureCommandOutcomeUnknown;
 
+export type NurtureDeterministicRollbackDecision = Extract<
+  NurtureCommandNotCommitted["decision"],
+  "invalid" | "blocked" | "conflict" | "technical_error"
+>;
+
 /**
  * A failure that is known to have rolled back: a guard inside the operation,
  * or a write conflict the driver reports as a rollback. It is thrown so the
@@ -253,7 +261,10 @@ export type NurtureCommandResult =
  * not-committed instead of the honest-but-useless outcome_unknown.
  */
 export class NurtureDeterministicRollback extends Error {
-  constructor(readonly reason_code: string) {
+  constructor(
+    readonly reason_code: string,
+    readonly decision: NurtureDeterministicRollbackDecision = "technical_error",
+  ) {
     super(`nurture deterministic rollback: ${reason_code}`);
     this.name = "NurtureDeterministicRollback";
   }
@@ -643,7 +654,7 @@ export class NurtureCommandRunner {
       if (error instanceof NurtureDeterministicRollback) {
         return {
           status: "not_committed",
-          decision: "technical_error",
+          decision: error.decision,
           reason_code: error.reason_code,
         };
       }

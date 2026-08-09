@@ -74,6 +74,7 @@ export * from "./domain/institution/care-capture-placement-intake.js";
 export * from "./domain/institution/content-revision.js";
 export * from "./domain/institution/attribution-correction-candidate.js";
 export * from "./domain/institution/enrollment-journey-workflow.js";
+export * from "./domain/institution/enrollment-journey-command.js";
 export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/board-mutation-transaction.js";

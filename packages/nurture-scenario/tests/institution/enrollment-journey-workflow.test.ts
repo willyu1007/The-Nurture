@@ -5,7 +5,8 @@ import {
   NURTURE_INSTITUTION_WORKFLOW_REGISTRY_V1,
   findNurtureInstitutionWorkflowDefinitionV1,
   nurtureScenarioManifest,
-  projectNurtureEnrollmentJourneyWorkflowV1,
+  projectNurtureEnrollmentJourneyWorkflowV1 as projectWorkflow,
+  type NurtureEnrollmentJourneyMilestone,
   type NurtureEnrollmentJourneyWorkflowSnapshotV1,
 } from "../../src/index.js";
 
@@ -13,6 +14,8 @@ const snapshot = (
   overrides: Partial<NurtureEnrollmentJourneyWorkflowSnapshotV1> = {},
 ): NurtureEnrollmentJourneyWorkflowSnapshotV1 => ({
   contract_version: "1.0.0",
+  workspace_id: "workspace-01",
+  institution_ref: "institution-01",
   workflow_ref: "workflow:enrollment-journey:01",
   workflow_run_ref: {
     schema_version: 1,
@@ -33,6 +36,36 @@ const snapshot = (
   updated_at: "2026-08-09T12:00:00.000Z",
   ...overrides,
 });
+
+type ProjectionInput = Parameters<typeof projectWorkflow>[0];
+
+const projectionContext = (): ProjectionInput["context"] => ({
+  workspace_id: "workspace-01",
+  institution_scope: {
+    contract_version: "1.0.0",
+    active_role: {
+      contract_version: "1.0.0",
+      participant_ref: "participant-admin-01",
+      role_assignment_ref: "role-admin-01",
+      role_kind: "institution_admin",
+      scope_type: "institution",
+      scope_ref: "institution-01",
+      selection_mode: "unique",
+    },
+    institution_ref: "institution-01",
+    institution_state: "active",
+  },
+});
+
+const projectNurtureEnrollmentJourneyWorkflowV1 = (
+  input: Omit<ProjectionInput, "context"> & {
+    context?: ProjectionInput["context"];
+  },
+) =>
+  projectWorkflow({
+    ...input,
+    context: input.context ?? projectionContext(),
+  });
 
 describe("EnrollmentJourneyWorkflowV1 registry", () => {
   it("contains exactly one product Workflow and rejects ordinary work types", () => {
@@ -118,6 +151,65 @@ describe("EnrollmentJourneyWorkflowV1 projection", () => {
     });
   });
 
+  it("rejects an unknown runtime surface", () => {
+    expect(
+      projectNurtureEnrollmentJourneyWorkflowV1({
+        snapshot: snapshot(),
+        surface: "guardian_mobile" as ProjectionInput["surface"],
+      }),
+    ).toEqual({
+      status: "unavailable",
+      reason_code: "unsupported_surface",
+    });
+  });
+
+  it("binds the projection to the exact resolved Workspace and Institution Admin scope", () => {
+    const wrongInstitution = projectionContext();
+    expect(
+      projectNurtureEnrollmentJourneyWorkflowV1({
+        snapshot: snapshot(),
+        surface: "institution_admin_web",
+        context: {
+          ...wrongInstitution,
+          institution_scope: {
+            ...wrongInstitution.institution_scope,
+            institution_ref: "institution-02",
+          },
+        },
+      }),
+    ).toEqual({ status: "unavailable", reason_code: "scope_mismatch" });
+
+    const wrongRole = projectionContext();
+    expect(
+      projectNurtureEnrollmentJourneyWorkflowV1({
+        snapshot: snapshot(),
+        surface: "institution_admin_web",
+        context: {
+          ...wrongRole,
+          institution_scope: {
+            ...wrongRole.institution_scope,
+            active_role: {
+              ...wrongRole.institution_scope.active_role,
+              role_kind: "caregiver",
+            },
+          },
+        },
+      }),
+    ).toEqual({ status: "unavailable", reason_code: "scope_mismatch" });
+  });
+
+  it("rejects an expanded or body-bearing private snapshot", () => {
+    expect(
+      projectNurtureEnrollmentJourneyWorkflowV1({
+        snapshot: {
+          ...snapshot(),
+          raw_contact: "must-not-enter-the-projection-boundary",
+        } as NurtureEnrollmentJourneyWorkflowSnapshotV1,
+        surface: "institution_admin_web",
+      }),
+    ).toEqual({ status: "unavailable", reason_code: "invalid_snapshot" });
+  });
+
   it("requires formalization and completion milestones to commit together", () => {
     expect(
       projectNurtureEnrollmentJourneyWorkflowV1({
@@ -163,6 +255,40 @@ describe("EnrollmentJourneyWorkflowV1 projection", () => {
     expect(committed.output.state).toBe("waiting");
     expect(committed.output.waitingState).toBe("waiting_on_system");
     expect(committed.output.responsibleRole).toBe("system_owner");
+
+    for (const contradictoryMilestone of [
+      "preparation_cancelled",
+      "trial_ended",
+    ] as const) {
+      const completedMilestones: NurtureEnrollmentJourneyMilestone[] = [
+        "inquiry_started",
+        "intent_confirmed",
+        "trial_offer_accepted",
+        "trial_started",
+        "trial_review_reached",
+        "formal_proposed",
+        "guardian_formal_acceptance_recorded",
+        contradictoryMilestone,
+        "formal_enrollment_committed",
+        "journey_completed",
+      ];
+      completedMilestones.sort(
+        (left, right) =>
+          NURTURE_INSTITUTION_WORKFLOW_REGISTRY_V1[0].milestones.indexOf(left) -
+          NURTURE_INSTITUTION_WORKFLOW_REGISTRY_V1[0].milestones.indexOf(right),
+      );
+      expect(
+        projectNurtureEnrollmentJourneyWorkflowV1({
+          snapshot: snapshot({
+            lifecycle: "completed",
+            current_stage: "completed",
+            terminal_outcome: "formalized",
+            completed_milestones: completedMilestones,
+          }),
+          surface: "institution_admin_mobile",
+        }),
+      ).toEqual({ status: "unavailable", reason_code: "invalid_lifecycle" });
+    }
   });
 
   it("rejects duplicate or out-of-order milestone histories", () => {
@@ -224,6 +350,67 @@ describe("EnrollmentJourneyWorkflowV1 projection", () => {
       projectNurtureEnrollmentJourneyWorkflowV1({
         snapshot: snapshot({
           current_stage: "trial_review",
+          completed_milestones: [
+            "inquiry_started",
+            "intent_confirmed",
+            "trial_offer_accepted",
+            "trial_started",
+          ],
+        }),
+        surface: "institution_admin_web",
+      }),
+    ).toEqual({ status: "unavailable", reason_code: "invalid_lifecycle" });
+  });
+
+  it("allows an explicitly skipped optional visit without inventing a visit milestone", () => {
+    expect(
+      projectNurtureEnrollmentJourneyWorkflowV1({
+        snapshot: snapshot({
+          current_stage: "visit_or_consultation",
+          completed_milestones: ["inquiry_started", "intent_confirmed"],
+        }),
+        surface: "institution_admin_web",
+      }).status,
+    ).toBe("ok");
+  });
+
+  it("rejects missing milestone prerequisites and stage regression", () => {
+    for (const candidate of [
+      snapshot({
+        current_stage: "trial_review",
+        completed_milestones: [
+          "inquiry_started",
+          "intent_confirmed",
+          "trial_started",
+          "trial_review_reached",
+        ],
+      }),
+      snapshot({
+        current_stage: "inquiry",
+        completed_milestones: [
+          "inquiry_started",
+          "intent_confirmed",
+          "trial_offer_accepted",
+          "trial_started",
+        ],
+      }),
+    ]) {
+      expect(
+        projectNurtureEnrollmentJourneyWorkflowV1({
+          snapshot: candidate,
+          surface: "institution_admin_web",
+        }),
+      ).toEqual({ status: "unavailable", reason_code: "invalid_lifecycle" });
+    }
+  });
+
+  it("rejects a terminal outcome that mislabels a later journey", () => {
+    expect(
+      projectNurtureEnrollmentJourneyWorkflowV1({
+        snapshot: snapshot({
+          lifecycle: "closed_without_formalization",
+          current_stage: "closed",
+          terminal_outcome: "inquiry_closed",
           completed_milestones: [
             "inquiry_started",
             "intent_confirmed",
@@ -333,6 +520,20 @@ describe("EnrollmentJourneyWorkflowV1 projection", () => {
         surface: "institution_admin_mobile",
       }),
     ).toEqual({ status: "unavailable", reason_code: "invalid_snapshot" });
+  });
+
+  it("requires canonical ISO instants and an opaque bounded workflow ref", () => {
+    for (const candidate of [
+      snapshot({ started_at: "2026-08-09" }),
+      snapshot({ workflow_ref: "  workflow-01" }),
+    ]) {
+      expect(
+        projectNurtureEnrollmentJourneyWorkflowV1({
+          snapshot: candidate,
+          surface: "institution_admin_mobile",
+        }),
+      ).toEqual({ status: "unavailable", reason_code: "invalid_snapshot" });
+    }
   });
 
   it("allows only ready or technical system waiting on terminal workflows", () => {

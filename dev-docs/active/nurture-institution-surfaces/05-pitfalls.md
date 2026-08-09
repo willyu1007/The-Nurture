@@ -1,5 +1,43 @@
 # Pitfalls — 机构端双 Surface
 
+## 2026-08-10 — SQL three-valued checks and derived identity admitted drift
+
+- **Symptom:** an empty JSON carrier could make the exact-key helper return SQL
+  `NULL`, while a separately stored workflow-ref hash and shallow lifecycle
+  checks allowed the database carrier to become weaker than the domain model.
+- **Root cause:** PostgreSQL `CHECK` accepts expressions that are not `FALSE`,
+  and the first migration draft checked presence/format without proving exact
+  canonical-ref identity or cumulative transition state.
+- **What was tried:** regex-checking the hash and validating lifecycle only at
+  the command/projector layer; both left a second representation or a direct
+  SQL-write gap.
+- **Fix/workaround:** exact-key helpers now coalesce missing shapes to `FALSE`;
+  the checked canonical `object_id` replaces the hash; SQL mirrors milestone
+  and lifecycle rules, reconstructs cumulative state from immutable
+  transitions and defers a one-head/one-transition check until transaction
+  commit.
+- **Prevention:** every persisted derivative must be constrained equal to its
+  canonical source, JSON helpers must falsify empty/malformed values, and each
+  domain carrier invariant needs a database-level falsification probe before
+  migration qualification.
+
+## 2026-08-09 — G4-D schema vocabulary must follow the exact freeze
+
+- **Symptom:** the first local Prisma enum draft used plausible but nonexistent
+  enrollment milestone names such as `capacity_confirmed` and
+  `process_completed`.
+- **Root cause:** the schema draft followed an implementation summary instead
+  of mechanically comparing with the exact increment-1 domain registry and
+  0E-1 freeze vocabulary.
+- **What was tried:** Prisma validation alone passed because the invented enum
+  was internally well formed; it could not detect semantic vocabulary drift.
+- **Fix/workaround:** replaced every value with the exact 14-item registry,
+  regenerated Prisma, and compared domain source, Prisma schema and migration
+  SQL together.
+- **Prevention:** for frozen closed vocabularies, run a three-source exact-value
+  comparison before authoring adapters or migration evidence; schema syntax
+  validation is not semantic contract validation.
+
 ## 2026-08-09 — Request caching and grant-only counting weakened owner rechecks
 
 - **Symptom:** reusing the same owner-read request object could retain a prior

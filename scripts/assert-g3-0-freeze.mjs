@@ -290,6 +290,12 @@ for (const tableName of requiredFactTables) {
  * 2026-08-09 — T-007 G4-B increment 12 adds
  * `NurtureAttendanceCloseoutPolicy`. It is 0D-1's exact-class, versioned
  * checkpoint owner policy; the signal and board projections remain unstored.
+ *
+ * 2026-08-09 — T-007 G4-C declares `NurtureContentRevision` and
+ * `NurtureAttributionCorrectionCandidate`: append-only owner/audit facts, not
+ * board snapshots. G4-D increment 2 declares the private
+ * `NurtureInstitutionWorkflow`, inquiry, touchpoint and transition carriers.
+ * The public Workflow projection remains request-composed and unstored.
  */
 const expectedTableCensus = [
   "NurtureActivityComparisonDraft",
@@ -298,6 +304,7 @@ const expectedTableCensus = [
   "NurtureAttendanceCloseoutPolicy",
   "NurtureAttendanceEntry",
   "NurtureAttendanceInferenceRun",
+  "NurtureAttributionCorrectionCandidate",
   "NurtureC30ActionAuditRecord",
   "NurtureC30ActionOperation",
   "NurtureC30ActionOutboxEvent",
@@ -322,11 +329,14 @@ const expectedTableCensus = [
   "NurtureClassScheduleDayOverride",
   "NurtureClassScheduleTemplate",
   "NurtureCommandExecution",
+  "NurtureContentRevision",
   "NurtureContentSafetyAssessment",
   "NurtureContextMaterial",
   "NurtureDailyAttendanceSubmission",
   "NurtureDailyCareLog",
   "NurtureEnrollment",
+  "NurtureEnrollmentInquiry",
+  "NurtureEnrollmentTouchpoint",
   "NurtureEvidence",
   "NurtureEvidenceRef",
   "NurtureFamily",
@@ -352,6 +362,8 @@ const expectedTableCensus = [
   "NurtureHealthStateSummary",
   "NurtureInstitutionPublicationPolicy",
   "NurtureInstitutionSupportSignalPolicy",
+  "NurtureInstitutionWorkflow",
+  "NurtureInstitutionWorkflowTransition",
   "NurtureInteractionContext",
   "NurtureMediaAssetRef",
   "NurtureMetricDefinition",

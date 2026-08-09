@@ -29,6 +29,7 @@ import { PrismaAttributionCorrectionCandidateRepository } from "./attribution-co
 import { PrismaPublicationSafetyTransaction } from "./publication-safety.transaction.js";
 import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
+import { PrismaEnrollmentJourneyRepository } from "./enrollment-journey.repository.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -122,6 +123,8 @@ const toInteraction = (row: PrismaInteractionContext): NurtureInteractionContext
 });
 
 class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
+  /** G4-D private workflow/inquiry writes, in the one command-ledger tx. */
+  readonly enrollmentJourney: PrismaEnrollmentJourneyRepository;
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
   /**
@@ -167,6 +170,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly careCapture: PrismaCareCaptureTransaction;
 
   constructor(private readonly transaction: Prisma.TransactionClient) {
+    this.enrollmentJourney = new PrismaEnrollmentJourneyRepository(transaction);
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);

@@ -2,7 +2,7 @@
 
 ## Status
 
-- Date: 2026-08-09
+- Date: 2026-08-10
 - Task: T-007
 - Purpose: the **live** list of what is not built and what comes next.
 
@@ -20,18 +20,23 @@ places drifts in one of them.
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
-| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increment 1 — one-item registry, exact state guard and body-free Admin projection** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md) |
+| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–2 — registry/state/projection plus private inquiry carrier, six commands, repository and unapplied migration** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md), [`58`](./58-g4-d-increment-2-record.md) |
 | 0F knowledge & RAG | **not started** | none | — |
 
 All implementation work remains at **I1**. Persistence increments carry exact
 schema, policy, repository/service code and migration authoring, and all
 implemented daily-operations persistence paths are qualified on disposable
+PostgreSQL. G4-D increment 2's migration is authored but not yet qualified on
 PostgreSQL. No I2
 contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
 
-G4-D increment 1 is deliberately smaller than the persistence increments: it
-is pure registry/state/projection source plus tests. It carries no DB claim.
+G4-D increment 2 adds persistence source and a migration artifact, but carries
+no DB-apply claim until a newly approved exact disposable target is qualified.
+Its final quality pass removes the derived workflow-ref hash path, constrains
+the canonical Run object identity directly, aligns SQL carrier/state/actor
+guards with the domain and keeps private inquiry/touchpoint refs out of command
+results.
 
 ## Gap register
 
@@ -121,7 +126,10 @@ deploy, direct constraint probes and the full 370-test DB lane. Every target
 was destroyed afterward. `20260810010000_g4c_attribution_correction_candidate`
 passed a clean 29-migration deploy, append-only/same-Workspace qualification,
 zero datasource-to-SSOT drift and the full 377-test DB lane; its target was
-also destroyed. Shared or persistent apply remains unauthorized at I1.
+also destroyed. `20260810030000_g4d_enrollment_journey_inquiry` is authored,
+Prisma-validated and statically diffed only; no target was connected or
+migrated because no new exact approval exists. Shared or persistent apply
+remains unauthorized at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
@@ -140,17 +148,29 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 [`42`](./42-g4-b-increment-8-record.md),
 [`44`](./44-g4-b-increment-10-record.md).
 
-### G-10 — Enrollment Journey has no private carrier or command path yet
+### G-10 — Enrollment Journey carrier exists; DB and owner qualification remain
 
-0E is frozen, but the first G4-D increment intentionally implements only the
-closed one-item registry, combination guard and role-safe body-free projection.
-No inquiry/touchpoint/workflow row, repository, command, migration, Host bridge
-or production caller exists. `workflowRunRef` accepts only an exact
-My-Chat-owned `CanonicalRef`; the Nurture private workflow ref cannot substitute
-for it, and capability refs remain empty until I2.
+G4-D increment 2 now supplies the private workflow/inquiry/touchpoint/
+transition carrier, six explicit commands, same-ledger Prisma transaction,
+body-free query composition and a versioned migration artifact. It does not
+yet prove PostgreSQL deployment: the three production-DB cases are authored
+and typechecked but unexecuted without a new exact disposable target approval.
 
-Cited by: [`55`](./55-g4-0e-exit-record.md),
-[`57`](./57-g4-d-increment-1-record.md).
+The final quality pass removes the derived workflow hash identity, makes one
+canonical My-Chat Run object unique per Workspace, closes canonical-ref/role/
+milestone shapes and makes transition finalization re-prove exact command
+scope, active Institution Admin authority, command-specific state change and
+cumulative state; a deferred guard prevents a committed head without its exact
+transition. Command output now contains only local workflow/transition refs;
+inquiry/touchpoint refs stay private. These repairs are source-qualified only
+until the same three cases run against PostgreSQL.
+
+Real prospective-contact and native business-message source adapters remain
+I3 gates. No Host bridge, public caller, capability registration or traffic
+exists; `workflowRunRef` still accepts only the exact My-Chat-owned canonical
+ref and the private workflow ref is never projected.
+
+Cited by: [`58`](./58-g4-d-increment-2-record.md).
 
 ## Closed since the 0D Exit
 
@@ -181,9 +201,9 @@ Cited by: [`55`](./55-g4-0e-exit-record.md),
 
 ## Next steps, in dependency order
 
-1. **G4-D increment 2** — implement 0E-1's private workflow/inquiry/touchpoint
-   carrier, command/repository and migration artifact. Use the DB-SSOT workflow;
-   do not apply it without a separately approved disposable target.
+1. **G4-D increment 2 qualification** — after a new exact disposable target is
+   explicitly approved, deploy the migration history, run the three new cases
+   and full DB lane, prove zero datasource drift and destroy that exact target.
 2. **G4-D remaining I1 units** — 0E-2 waitlist/reservation/cancel, 0E-3 phase
    migration and trial lifecycle, then 0E-4 formalization/completion. G-09 must
    be resolved before claiming the real My-Chat owner adapter at I3.

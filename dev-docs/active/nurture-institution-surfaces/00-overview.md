@@ -5,16 +5,20 @@
 - State: in-progress
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-09
-- Next step: **G4-D increment 2 — 0E-1 private workflow/inquiry/touchpoint
-  carrier, command/repository and migration authoring; no DB apply without a
-  new explicit disposable-target approval**. 0E's four contract units and 0G
-  audit now hold `G4_0E_EXIT_PASS` ([`55`](./55-g4-0e-exit-record.md)). G4-D
-  increment 1 implements only the one-item registry, exact state guard and
-  body-free Admin projection, with 15/15 targeted and 857/857 full unit tests
-  passing ([`57`](./57-g4-d-increment-1-record.md)). The Workflow remains
-  absent from the manifest/module, has no caller or persistence, and 0F
-  Knowledge/RAG remains unstarted.
+- Updated: 2026-08-10
+- Next step: **qualify G4-D increment 2 on one newly approved exact disposable
+  PostgreSQL target, then start increment 3 waitlist/policy/offer/reservation/
+  preparation**. Increment 2 now has the private workflow/inquiry/touchpoint/
+  transition carrier, six commands, same-ledger Prisma repository, migration
+  artifact and body-free query service. The final quality pass removes a
+  derived workflow identity/hash track, aligns SQL state/actor/ref invariants
+  with the domain and keeps private inquiry/touchpoint refs out of command
+  output; 27/27 targeted and 869/869 full unit tests pass
+  ([`58`](./58-g4-d-increment-2-record.md)). No database was
+  connected or migrated because no new exact target approval exists. Real
+  contact/native-source adapters, manifest/module registration, caller,
+  capability and activation remain absent; 0F Knowledge/RAG remains
+  unstarted.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
@@ -24,9 +28,9 @@
   revision/downscope, 0D-4 correction reports, 0D-5 policy and the 0D-1
   checkpoint policy, are qualified on disposable PostgreSQL. Nothing has a
   production caller, no capability is registered, and no schema is applied
-  anywhere durable. G4-D increment 1 is pure source/tests and creates no new
-  persistence. 0C, 0D and the first 0E slice are therefore validated as
-  *buildable as frozen*, not as running.
+  anywhere durable. G4-D increment 2 has authored persistence and a migration
+  artifact but has not applied it. 0C, 0D and the first 0E slice are therefore
+  validated as *buildable as frozen*, not as running.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.

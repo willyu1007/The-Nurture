@@ -440,6 +440,36 @@ Falsification evidence is per-increment and lives in each record's
 | External owner posture | KNOWN RED GATE | Base is at pinned `4350086…`; My-Chat expected `567b96c`, observed `05e8331`; no adoption claimed. |
 | Effect boundary | PASS | Pure I1 source/tests/docs only; no Prisma, migration, DB, owner adapter, capability, deployment, activation or traffic. |
 
+## 2026-08-09 — G4-D increment 2 source and migration artifact
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Quality review | PASS after repair | Exact projection scope/surface, strict snapshots, prerequisite/stage/terminal guards, skipped visit, owner-ref replay identity and body-free query composition. |
+| Targeted journey tests | PASS | 27/27 across workflow and command files. |
+| Full unit lane | PASS | 869/869 across 78 files. |
+| TypeScript | PASS | Scenario, DB package and direct root `tsc --noEmit`; the latter includes the authored DB suite. |
+| Prisma SSOT | PASS statically | Format, validate, generate, from-empty enum/table diff and DB context refresh. |
+| Structural gates | PASS | Persistence boundaries, port topology, formal ingress, 146-file test routing and `git diff --check`. |
+| Historical freeze gates | PASS | G2 DB census, G3 no-board-row census after explicit owner/carrier declaration, and C30 default-off. |
+| Docs / project governance | PASS | 89-file strict docs lint, project-state verify, governance sync/lint and database feature suite. |
+| Manifest/module / legacy carrier | PASS | No public Workflow registration and no `NurtureWorkflowProject` reference in the new path. |
+| Production-DB lane | NOT RUN | No newly approved exact disposable target; three cases are authored/typechecked only. |
+| Effect boundary | PASS | Source/schema/migration/tests/docs only; no DB connection/apply, real owner adapter, public caller/capability, deployment, activation or traffic. |
+
+## 2026-08-10 — G4-D increment 2 final quality pass
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Identity / replay | PASS statically | Canonical workflow Run `object_id` is checked against the exact ref and unique per Workspace; derived hash storage/output was removed. |
+| Carrier shape | PASS statically | Exact canonical-ref keys/version/schema, exact protected-envelope keys, closed roles and unique/token-safe arrays; missing shape fails rather than yielding an admissible SQL `NULL`. |
+| State parity | PASS statically | SQL validates milestone prerequisites, lifecycle/stage/terminal combinations, per-command transition shape, cumulative reconstruction, no milestone re-addition and a deferred one-head/one-transition invariant. |
+| Actor / scope | PASS statically | Touchpoint and transition triggers bind the exact active Institution Admin; transition also proves exact command scope and Institution. |
+| Result privacy | PASS | Command output refs are limited to local workflow and transition refs; private inquiry/touchpoint refs stay behind the repository. |
+| Conflict decisions | PASS | Apply-time uniqueness/head races map to stable conflict codes; post-precondition authorization loss maps to blocked. |
+| Falsification coverage | PASS | Existing 27 targeted cases now include contradictory terminal state, closed role, owner-fact scope drift, source-time validation, apply-time decision mapping, duplicate Run binding and strict output refs; the three authored DB cases add empty/expanded carriers, predated correction, orphan-head and invalid/cumulative state probes. |
+| Local exact-runtime self-pin | PASS by direct recomputation | `fdb2f9d9…` over 239 files; no My-Chat revision was adopted. |
+| PostgreSQL execution | NOT RUN | No exact disposable target was newly approved; all SQL conclusions remain static until the planned disposable qualification. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
