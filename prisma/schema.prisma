@@ -631,6 +631,24 @@ enum NurtureFamilyCareCascadeClosureState {
   failed
 }
 
+// G4-B increment 1, frozen by 0D-1. `unsubmitted` is deliberately ABSENT:
+// 0D-1 makes it the state of a day with no valid submission, which is the
+// absence of a row rather than a value stored in one. A member no row can
+// carry would be dead surface an implementer builds handling for.
+enum NurtureAttendanceSubmissionState {
+  submitted
+  reopened
+}
+
+// 0D-1 §3. `not_expected` exists so a child with no enrolment on that date is
+// distinct from one marked absent.
+enum NurtureAttendanceEntryState {
+  present
+  absent
+  excused_absent
+  not_expected
+}
+
 enum NurtureDailyCareLogStatus {
   draft
   recorded
@@ -2031,6 +2049,7 @@ model NurtureChildCareProcess {
   commandExecutions        NurtureCommandExecution[]
   c30ActionOperations      NurtureC30ActionOperation[]
   familyAnchorAssociations NurtureFamilyAnchorAssociation[]
+  attendanceEntries        NurtureAttendanceEntry[]
 
   @@unique([workspaceId, id, childId], map: "uq_nurture_child_process_integrity")
   @@index([workspaceId, childId, status], map: "ix_nurture_child_process_child")
@@ -2138,6 +2157,8 @@ model NurtureCareGroup {
   mediaAssets              NurtureMediaAssetRef[]
   captures                 NurtureCareCapture[]
   captureBatches           NurtureCareCaptureBatch[]
+  attendanceSubmissions    NurtureDailyAttendanceSubmission[]
+  attendanceInferenceRuns  NurtureAttendanceInferenceRun[]
   publishProcesses         NurturePublishProcess[]
   contentSafetyAssessments NurtureContentSafetyAssessment[]
 
@@ -2206,6 +2227,8 @@ model NurtureCareRoleAssignment {
   captures              NurtureCareCapture[]
   publishEditHolds      NurturePublishEditHold[]
   publicationReleases   NurturePublicationRelease[]
+  attendanceSubmitted   NurtureDailyAttendanceSubmission[]   @relation("AttendanceSubmittedBy")
+  attendanceReopened    NurtureDailyAttendanceSubmission[]   @relation("AttendanceReopenedBy")
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -3128,4 +3151,92 @@ model NurtureFamilyGrowthAdmissionReceipt {
   @@unique([workspaceId, outboxEventId, receiptId], map: "uq_nurture_family_growth_receipt_identity")
   @@index([workspaceId, status, processedAt], map: "ix_nurture_family_growth_receipt_status")
   @@map("nurture_family_growth_admission_receipt")
+}
+
+// G4-B increment 1 — the daily attendance closeout, frozen by 0D-1.
+//
+// One row per (class, date). The absence of a row IS `unsubmitted`, which is
+// why the state enum carries only the two states a stored row can hold and why
+// `submissionHead` starts at 1 on the first submit: a caller supplying
+// `expectedSubmissionHead: 0` is asserting "this day is still unsubmitted",
+// and the unique constraint below is what makes two concurrent submits
+// resolve as one winner rather than two rows.
+model NurtureDailyAttendanceSubmission {
+  id          String                           @id @default(uuid())
+  workspaceId String                           @map("workspace_id")
+  careGroupId String                           @map("care_group_id")
+  localDate   DateTime                         @map("local_date") @db.Date
+  state       NurtureAttendanceSubmissionState
+  // Monotonic. Every submit, revise and reopen increments it; a caller carries
+  // the value it expects and is refused rather than merged on mismatch.
+  submissionHead Int @default(1) @map("submission_head")
+  // The stable prefix the preview cut at, in the same shape
+  // `NurtureCareCaptureBatch` already uses. Nullable until G4-B builds preview:
+  // a submission made without one is honest about having none.
+  watermarkSourceKind     String? @map("watermark_source_kind")
+  watermarkSourceSequence Int?    @map("watermark_source_sequence")
+
+  submittedByRoleAssignmentId String    @map("submitted_by_role_assignment_id")
+  submittedAt                 DateTime  @map("submitted_at")
+  reopenedByRoleAssignmentId  String?   @map("reopened_by_role_assignment_id")
+  reopenedAt                  DateTime? @map("reopened_at")
+
+  aggregateVersion Int       @default(0) @map("aggregate_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  careGroup    NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  submittedBy  NurtureCareRoleAssignment @relation("AttendanceSubmittedBy", fields: [submittedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  reopenedBy   NurtureCareRoleAssignment? @relation("AttendanceReopenedBy", fields: [reopenedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  entries      NurtureAttendanceEntry[]
+
+  // One submission per class-day. This is the concurrency rule at the storage
+  // layer: the second of two racing submits loses here even if both read
+  // "no row" a moment earlier.
+  @@unique([workspaceId, careGroupId, localDate], map: "uq_nurture_attendance_submission_class_day")
+  @@index([workspaceId, careGroupId, localDate, state], map: "ix_nurture_attendance_submission_class")
+  @@map("nurture_daily_attendance_submission")
+}
+
+// One child's state within a submission. `adjustedFromInference` records that
+// the teacher changed what an inference proposed — audit of the correction,
+// never of the inference's accuracy.
+model NurtureAttendanceEntry {
+  id                    String                      @id @default(uuid())
+  workspaceId           String                      @map("workspace_id")
+  submissionId          String                      @map("submission_id")
+  childCareProcessId    String                      @map("child_care_process_id")
+  state                 NurtureAttendanceEntryState
+  adjustedFromInference Boolean                     @default(false) @map("adjusted_from_inference")
+
+  aggregateVersion Int      @default(0) @map("aggregate_version")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  submission       NurtureDailyAttendanceSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  childCareProcess NurtureChildCareProcess          @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, submissionId, childCareProcessId], map: "uq_nurture_attendance_entry_child")
+  @@index([workspaceId, childCareProcessId, state], map: "ix_nurture_attendance_entry_child")
+  @@map("nurture_attendance_entry")
+}
+
+// Audit of a non-canonical inference run. It records what was read and under
+// which policy; it never holds an attendance state, because 0D-1 forbids an
+// inference from producing one.
+model NurtureAttendanceInferenceRun {
+  id                  String   @id @default(uuid())
+  workspaceId         String   @map("workspace_id")
+  careGroupId         String   @map("care_group_id")
+  localDate           DateTime @map("local_date") @db.Date
+  policyVersion       String   @map("policy_version")
+  evidenceRefsPayload Json?    @map("evidence_refs_payload")
+  generatedAt         DateTime @map("generated_at")
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  careGroup NurtureCareGroup @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, careGroupId, localDate], map: "ix_nurture_attendance_inference_class")
+  @@map("nurture_attendance_inference_run")
 }
