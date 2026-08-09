@@ -25,6 +25,7 @@ import { PrismaPublishProcessTransaction } from "./publish-process.transaction.j
 import { PrismaMediaAttributionTransaction } from "./media-attribution.transaction.js";
 import { PrismaAttendanceTransaction } from "./attendance-closeout.repository.js";
 import { PrismaContentRevisionRepository } from "./content-revision.repository.js";
+import { PrismaAttributionCorrectionCandidateRepository } from "./attribution-correction-candidate.repository.js";
 import { PrismaPublicationSafetyTransaction } from "./publication-safety.transaction.js";
 import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
@@ -154,6 +155,9 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   /** G4-C 0D-3 append-only placement/note/downscope revisions. */
   readonly contentRevisions: PrismaContentRevisionRepository;
 
+  /** G4-C 0D-4 append-only, non-canonical attribution reports. */
+  readonly attributionCorrections: PrismaAttributionCorrectionCandidateRepository;
+
   /**
    * The G3-D post-release safety writes: monotone visibility in apply, the
    * command-naming lineage rows in finalize, one transaction throughout.
@@ -170,6 +174,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     this.mediaAttribution = new PrismaMediaAttributionTransaction(transaction);
     this.attendance = new PrismaAttendanceTransaction(transaction);
     this.contentRevisions = new PrismaContentRevisionRepository(transaction);
+    this.attributionCorrections = new PrismaAttributionCorrectionCandidateRepository(transaction);
     this.publicationSafety = new PrismaPublicationSafetyTransaction(transaction);
     this.careCapture = new PrismaCareCaptureTransaction(transaction);
   }

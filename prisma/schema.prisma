@@ -2198,7 +2198,7 @@ model NurtureAttendanceCloseoutPolicy {
 
   institution             NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   careGroup               NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  changedByRoleAssignment NurtureCareRoleAssignment @relation(fields: [changedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  changedByRoleAssignment NurtureCareRoleAssignment @relation(fields: [changedByRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_attendance_closeout_policy_changed_by_role_assignment_i")
 
   @@unique([workspaceId, careGroupId, policyRevision], map: "uq_nurture_attendance_closeout_policy_revision")
   @@index([workspaceId, institutionId, careGroupId, effectiveFrom, effectiveTo], map: "ix_nurture_attendance_closeout_policy_effective")
@@ -2226,9 +2226,9 @@ model NurtureInstitutionSupportSignalPolicy {
   changeReason              String                                  @map("change_reason")
   createdAt                 DateTime                                @default(now()) @map("created_at")
 
-  institution             NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  careGroup               NurtureCareGroup?         @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  changedByRoleAssignment NurtureCareRoleAssignment @relation(fields: [changedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  institution             NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_support_signal_policy_institution_id_fkey")
+  careGroup               NurtureCareGroup?         @relation(fields: [careGroupId], references: [id], onDelete: Restrict, map: "nurture_support_signal_policy_care_group_id_fkey")
+  changedByRoleAssignment NurtureCareRoleAssignment @relation(fields: [changedByRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_support_signal_policy_changed_by_role_assignment_id_fke")
 
   @@index([workspaceId, institutionId, category, effectiveFrom, effectiveTo], map: "ix_nurture_support_signal_policy_effective")
   @@index([workspaceId, careGroupId, category, effectiveFrom, effectiveTo], map: "ix_nurture_support_signal_policy_class_effective")
@@ -2322,23 +2322,24 @@ model NurtureCareRoleAssignment {
   updatedAt              DateTime                        @updatedAt @map("updated_at")
   deletedAt              DateTime?                       @map("deleted_at")
 
-  participant                NurtureParticipant                      @relation(fields: [participantId], references: [id], onDelete: Restrict)
-  threadMemberships          NurtureFamilyCareThreadParticipant[]
-  messages                   NurtureFamilyCareMessage[]
-  assignedItems              NurtureFamilyCareItem[]                 @relation("ItemAssignedRole")
-  ackedItems                 NurtureFamilyCareItem[]                 @relation("ItemAckedRole")
-  authoredCorrections        NurtureFamilyCareMessageCorrection[]
-  dailyCareLogs              NurtureDailyCareLog[]
-  uploadedAssets             NurtureMediaAssetRef[]
-  confirmedAttributions      NurtureChildMediaAttribution[]
-  captures                   NurtureCareCapture[]
-  publishEditHolds           NurturePublishEditHold[]
-  publicationReleases        NurturePublicationRelease[]
-  attendanceSubmitted        NurtureDailyAttendanceSubmission[]      @relation("AttendanceSubmittedBy")
-  attendanceReopened         NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
-  attendanceCloseoutPolicies NurtureAttendanceCloseoutPolicy[]
-  supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
-  contentRevisions           NurtureContentRevision[]
+  participant                     NurtureParticipant                      @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  threadMemberships               NurtureFamilyCareThreadParticipant[]
+  messages                        NurtureFamilyCareMessage[]
+  assignedItems                   NurtureFamilyCareItem[]                 @relation("ItemAssignedRole")
+  ackedItems                      NurtureFamilyCareItem[]                 @relation("ItemAckedRole")
+  authoredCorrections             NurtureFamilyCareMessageCorrection[]
+  dailyCareLogs                   NurtureDailyCareLog[]
+  uploadedAssets                  NurtureMediaAssetRef[]
+  confirmedAttributions           NurtureChildMediaAttribution[]
+  captures                        NurtureCareCapture[]
+  publishEditHolds                NurturePublishEditHold[]
+  publicationReleases             NurturePublicationRelease[]
+  attendanceSubmitted             NurtureDailyAttendanceSubmission[]      @relation("AttendanceSubmittedBy")
+  attendanceReopened              NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
+  attendanceCloseoutPolicies      NurtureAttendanceCloseoutPolicy[]
+  supportSignalPolicies           NurtureInstitutionSupportSignalPolicy[]
+  contentRevisions                NurtureContentRevision[]
+  attributionCorrectionCandidates NurtureAttributionCorrectionCandidate[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -2747,11 +2748,12 @@ model NurtureChildMediaAttribution {
   updatedAt                   DateTime                      @updatedAt @map("updated_at")
   deletedAt                   DateTime?                     @map("deleted_at")
 
-  mediaAssetRef    NurtureMediaAssetRef           @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
-  childCareProcess NurtureChildCareProcess        @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  confirmedBy      NurtureCareRoleAssignment?     @relation(fields: [confirmedByRoleAssignmentId], references: [id], onDelete: Restrict)
-  supersededBy     NurtureChildMediaAttribution?  @relation("AttributionSupersession", fields: [supersededByAttributionId], references: [id], onDelete: Restrict)
-  supersedes       NurtureChildMediaAttribution[] @relation("AttributionSupersession")
+  mediaAssetRef        NurtureMediaAssetRef                    @relation(fields: [mediaAssetRefId], references: [id], onDelete: Restrict)
+  childCareProcess     NurtureChildCareProcess                 @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  confirmedBy          NurtureCareRoleAssignment?              @relation(fields: [confirmedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  supersededBy         NurtureChildMediaAttribution?           @relation("AttributionSupersession", fields: [supersededByAttributionId], references: [id], onDelete: Restrict)
+  supersedes           NurtureChildMediaAttribution[]          @relation("AttributionSupersession")
+  correctionCandidates NurtureAttributionCorrectionCandidate[]
 
   @@unique([workspaceId, mediaAssetRefId, childCareProcessId, attributionRevision], map: "uq_nurture_media_attribution_revision")
   @@index([workspaceId, mediaAssetRefId, state], map: "ix_nurture_media_attribution_asset")
@@ -3297,8 +3299,8 @@ model NurtureDailyAttendanceSubmission {
   deletedAt        DateTime? @map("deleted_at")
 
   careGroup   NurtureCareGroup           @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
-  submittedBy NurtureCareRoleAssignment  @relation("AttendanceSubmittedBy", fields: [submittedByRoleAssignmentId], references: [id], onDelete: Restrict)
-  reopenedBy  NurtureCareRoleAssignment? @relation("AttendanceReopenedBy", fields: [reopenedByRoleAssignmentId], references: [id], onDelete: Restrict)
+  submittedBy NurtureCareRoleAssignment  @relation("AttendanceSubmittedBy", fields: [submittedByRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_daily_attendance_submission_submitted_by_fkey")
+  reopenedBy  NurtureCareRoleAssignment? @relation("AttendanceReopenedBy", fields: [reopenedByRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_daily_attendance_submission_reopened_by_fkey")
   entries     NurtureAttendanceEntry[]
 
   // One submission per class-day. This is the concurrency rule at the storage
@@ -3471,4 +3473,27 @@ model NurtureContentRevision {
   @@index([workspaceId, subjectKind, subjectRef, occurredAt], map: "ix_nurture_content_revision_subject")
   @@index([workspaceId, actorRoleAssignmentId, occurredAt], map: "ix_nurture_content_revision_actor")
   @@map("nurture_content_revision")
+}
+
+// G4-C 0D-4 — a non-canonical, append-only report that one exact attribution
+// revision may be wrong. It has deliberately no status, head, expiry,
+// resolution or proposed-child field: only a current exact caregiver may act,
+// and they do so through T-006's canonical attribution capability.
+model NurtureAttributionCorrectionCandidate {
+  id                       String   @id @default(uuid())
+  workspaceId              String   @map("workspace_id")
+  sourceAttributionId      String   @map("source_attribution_id")
+  raisedByRoleAssignmentId String   @map("raised_by_role_assignment_id")
+  reason                   String   @db.Text
+  commandRequestIdHash     String   @map("command_request_id_hash") @db.Char(64)
+  contractVersion          String   @map("contract_version")
+  occurredAt               DateTime @default(now()) @map("occurred_at")
+
+  sourceAttribution NurtureChildMediaAttribution @relation(fields: [sourceAttributionId], references: [id], onDelete: Restrict)
+  raisedBy          NurtureCareRoleAssignment    @relation(fields: [raisedByRoleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_attribution_correction_request")
+  @@index([workspaceId, sourceAttributionId, occurredAt], map: "ix_nurture_attribution_correction_source")
+  @@index([workspaceId, raisedByRoleAssignmentId, occurredAt], map: "ix_nurture_attribution_correction_actor")
+  @@map("nurture_attribution_correction_candidate")
 }

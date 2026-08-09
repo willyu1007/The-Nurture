@@ -2,7 +2,7 @@ import {
   zonedInstantToLocalDateTime,
   zonedLocalTimeToInstant,
   type NurtureInstitutionLocalDay,
-} from "@the-nurture/scenario/harness";
+} from "@the-nurture/scenario";
 import type { BoardPrisma } from "./board-read-support.js";
 import { loadCurrentInstitutionPublicationPolicy } from "./institution-publication-policy.read.js";
 

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-09T13:21:17.727Z",
+  "updatedAt": "2026-08-09T14:08:53.509Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -1933,6 +1933,160 @@
           ],
           "name": null,
           "map": "ix_nurture_attendance_inference_class"
+        }
+      ]
+    },
+    {
+      "name": "NurtureAttributionCorrectionCandidate",
+      "dbName": "nurture_attribution_correction_candidate",
+      "schema": null,
+      "columns": [
+        {
+          "name": "commandRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contractVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "contract_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "raisedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "raised_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reason",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceAttributionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_attribution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "raisedBy",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "raisedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "sourceAttribution",
+          "to": "NurtureChildMediaAttribution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "sourceAttributionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "raisedByRoleAssignmentId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_attribution_correction_actor"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "sourceAttributionId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_attribution_correction_source"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "commandRequestIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_attribution_correction_request"
         }
       ]
     },
@@ -5780,6 +5934,15 @@
           "references": []
         },
         {
+          "field": "attributionCorrectionCandidates",
+          "to": "NurtureAttributionCorrectionCandidate",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "authoredCorrections",
           "to": "NurtureFamilyCareMessageCorrection",
           "optional": false,
@@ -7813,6 +7976,15 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "correctionCandidates",
+          "to": "NurtureAttributionCorrectionCandidate",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         },
         {
           "field": "mediaAssetRef",

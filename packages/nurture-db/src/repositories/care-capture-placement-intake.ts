@@ -4,7 +4,7 @@ import {
   NurtureClassScheduleService,
   type NurtureCareCapturePlacementIntakeResult,
   type NurtureCareCapturePlacementSourcePort,
-} from "@the-nurture/scenario/harness";
+} from "@the-nurture/scenario";
 import { PrismaClassSchedulePlacementRepository } from "./class-schedule-placement.repository.js";
 import { loadInstitutionLocalDayAtInstant } from "./institution-local-day.js";
 
