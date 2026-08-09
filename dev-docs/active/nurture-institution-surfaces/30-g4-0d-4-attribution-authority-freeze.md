@@ -128,6 +128,12 @@ predicate**. That is implementation work under G4-C's gate, not 0D — but a
 G4-C increment that wires an attribution surface without making this change
 ships an Admin path the contract denies.
 
+> **Repaired 2026-08-09, ahead of that gate.** Under an explicit instruction to
+> fix all found problems, both halves were removed and fixture 3 — written to
+> fail — now passes. The assignment above is superseded by the repair rather
+> than still outstanding. What the record froze is unchanged; only the timing
+> of the fix moved.
+
 Recorded here rather than fixed here because 0D authorizes no code. Recorded at
 all because a freeze record that stated the rule and stayed silent about the
 code contradicting it would be exactly the documentation drift the increment 1
