@@ -336,6 +336,8 @@ Falsification evidence is per-increment and lives in each record's
 | Full production-DB lane | PASS | 360/360 across 37 files. |
 | Migration and cleanup | PASS, disposable only | Clean 27/27 deploy, final status up to date, zero sessions, exact target destroyed and confirmed absent. |
 | Authority/source blocker audit | PASS, remains unavailable | No readable canonical blocker exists; terminal/revoked/redacted sources were not translated and no signal-local state was added. |
+| C30-I3 / Nurture self-pin | PASS after re-freeze | C30 source revision `a3e3740`, source hash `e3b06914…`; default-off census unchanged. Nurture exact runtime hash `814938cd…` over 227 files. |
+| External My-Chat pin | FAIL, attributed | Workflow expected `567b96c`, observed `c174414`; no cross-repository adoption was performed. |
 | Effect boundary | PASS | I1 code, schema/migration authoring and disposable qualification only; no shared/persistent apply, production caller, capability, contract rotation, deployment, activation or traffic. |
 
 ## 2026-08-09 — Current-head owner-quality DB requalification

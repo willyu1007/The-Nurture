@@ -144,8 +144,8 @@ destroyed afterward. Shared or persistent apply remains unauthorized at I1.
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. Increment 11 observed `9674886`; C30's independent
-upstream lock still expects `51ad97f` ([`45`](./45-g4-b-increment-11-record.md)).
+`x5_joint_api` divergence. Increment 12 observed `c174414`; C30's independent
+upstream lock still expects `51ad97f` ([`46`](./46-g4-b-increment-12-record.md)).
 Neither external head is treated as a Nurture pin.
 
 Advancing the pin is an **adoption** of another task's work, not a refresh, and

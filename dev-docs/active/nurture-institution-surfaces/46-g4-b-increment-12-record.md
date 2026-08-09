@@ -67,6 +67,11 @@ reason.
 - Clean disposable deploy: 27/27 migrations; final status up to date.
 - PostgreSQL constraints, overlapping-owner refusal, shared-timezone resolution
   and no-retroactive-deadline fixtures: PASS.
+- C30-I3 local source lock: PASS after re-freeze at `a3e3740`, hash
+  `e3b06914…`; default-off census unchanged. Nurture exact runtime self-pin:
+  `814938cd…` over 227 files.
+- External My-Chat workflow pin: attributed FAIL — expected `567b96c`, observed
+  `c174414`; no cross-repository adoption was performed.
 - Exact disposable target destroyed with zero sessions and confirmed absent.
 
 Evidence:
