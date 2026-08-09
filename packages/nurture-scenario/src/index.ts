@@ -64,6 +64,7 @@ export * from "./domain/institution/institution-authority-chain.js";
 export * from "./domain/institution/institution-aggregate.js";
 export * from "./domain/institution/attendance-closeout.js";
 export * from "./domain/institution/attendance-preview.js";
+export * from "./domain/institution/institution-class-list.js";
 export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/board-mutation-transaction.js";

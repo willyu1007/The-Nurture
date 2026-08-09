@@ -7,6 +7,7 @@ export * from "./repositories/institution-core.repositories.js";
 export * from "./repositories/institution-context.repository.js";
 export * from "./repositories/attendance-closeout.repository.js";
 export * from "./repositories/attendance-preview.repository.js";
+export * from "./repositories/institution-class-list.repository.js";
 export * from "./repositories/family-care-query.repository.js";
 export * from "./repositories/user-attention.repository.js";
 export * from "./repositories/family-care-command.transaction.js";
