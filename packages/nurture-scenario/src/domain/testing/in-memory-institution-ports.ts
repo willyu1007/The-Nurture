@@ -22,7 +22,7 @@ type CommandTransactionOverrides = Partial<
     "getWorkflowProjectById" | "updateWorkflowProjectStrategy" | "appendEvidenceRef"
   >
 > &
-  Pick<NurtureCommandTransaction, "enrollmentJourney"> & {
+  Pick<NurtureCommandTransaction, "enrollmentJourney" | "enrollmentWaitlist"> & {
     familyCare?: NurtureFamilyCareCommandTransaction;
   };
 
@@ -70,6 +70,9 @@ export const createInMemoryNurtureCommandRepository = (
           ...(overrides.familyCare ? { familyCare: overrides.familyCare } : {}),
           ...(overrides.enrollmentJourney
             ? { enrollmentJourney: overrides.enrollmentJourney }
+            : {}),
+          ...(overrides.enrollmentWaitlist
+            ? { enrollmentWaitlist: overrides.enrollmentWaitlist }
             : {}),
           findCommitted: transactionalFind,
           createExecution: transactionalCreate,

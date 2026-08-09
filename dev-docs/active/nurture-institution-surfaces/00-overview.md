@@ -6,30 +6,31 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **qualify G4-D increment 2 on one newly approved exact disposable
-  PostgreSQL target, then start increment 3 waitlist/policy/offer/reservation/
-  preparation**. Increment 2 now has the private workflow/inquiry/touchpoint/
-  transition carrier, six commands, same-ledger Prisma repository, migration
-  artifact and body-free query service. The final quality pass removes a
-  derived workflow identity/hash track, aligns SQL state/actor/ref invariants
-  with the domain and keeps private inquiry/touchpoint refs out of command
-  output; 27/27 targeted and 869/869 full unit tests pass
-  ([`58`](./58-g4-d-increment-2-record.md)). No database was
-  connected or migrated because no new exact target approval exists. Real
-  contact/native-source adapters, manifest/module registration, caller,
-  capability and activation remain absent; 0F Knowledge/RAG remains
-  unstarted.
+- Next step: **start G4-D increment 4, the frozen 0E-3 phase-migration and
+  trial-lifecycle slice**. Increments 2 and 3 are now qualified on destroyed
+  disposable PostgreSQL targets. Increment 3 adds exact-class waitlist policy/
+  FIFO entry, append-only override, explicit offer, held reservation,
+  preparation cancellation, separate Admin/family queries and eight commands
+  without automatic timer/deadline/blocker behavior. Concurrent acceptance is
+  capacity-safe and same-command retry is limited to explicit infrastructure
+  rollback ([`59`](./59-g4-d-increment-3-record.md)). Full unit 874/874 and
+  production-DB 385/385 pass. The final audit also made canonical action
+  identity object-type-aware, fenced held capacity against direct class
+  downscope, corrected family preparation timing and bounded the Admin queue
+  read with explicit fail-closed overflow. Real contact/native-source and My-Chat identity/
+  binding adapters, manifest/module registration, caller, capability and
+  activation remain absent; 0F Knowledge/RAG remains unstarted.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
   records are history and are not edited to stay current.
 - Everything built sits at **I1** — implementation and migration authoring.
   All implemented daily-operations persistence paths, including 0D-3
-  revision/downscope, 0D-4 correction reports, 0D-5 policy and the 0D-1
-  checkpoint policy, are qualified on disposable PostgreSQL. Nothing has a
+  revision/downscope, 0D-4 correction reports, 0D-5 policy, the 0D-1
+  checkpoint policy and G4-D inquiry/waitlist/preparation, are qualified on
+  disposable PostgreSQL. Nothing has a
   production caller, no capability is registered, and no schema is applied
-  anywhere durable. G4-D increment 2 has authored persistence and a migration
-  artifact but has not applied it. 0C, 0D and the first 0E slice are therefore
+  anywhere durable. 0C, 0D and the first two 0E persistence slices are therefore
   validated as *buildable as frozen*, not as running.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the

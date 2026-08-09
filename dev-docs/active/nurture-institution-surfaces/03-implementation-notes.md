@@ -663,3 +663,44 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Re-froze the affected C30-I3 local profiles at implementation revision
   `695630d`, aggregate hash `273abb78…`; unchanged upstream Base/Host fields
   remain untouched.
+
+## 2026-08-10 — G4-D increment 2 DB qualification and increment 3
+
+- Qualified increment 2 on an exact approved disposable PostgreSQL target:
+  all 30 migrations, targeted 3/3, full DB 380/380, current migration status,
+  zero drift and zero-session destruction passed.
+- Implemented 0E-2 with eight closed commands and five private carriers for
+  policy, FIFO entry, append-only override, explicit trial offer and held
+  exact-class reservation. Default policy is standard-only FIFO; entry order
+  remains pinned until an explicit Admin override.
+- Kept Admin ordering facts separate from the family-safe status projection.
+  Guardian acceptance locks and recounts the exact class; preparation
+  cancellation releases capacity without Enrollment, Grant or My-Chat effects.
+- Quality review fixed open policy supersession, permanent reservation
+  uniqueness, missing Guardian actor retention and stale accepted-family
+  projection admission. A final temporal pass also rejects Guardian review,
+  decline, withdrawal and cancellation actions predating the state they mutate.
+- The release audit fixed four further boundary defects: canonical action
+  uniqueness now includes `object_type`; held reservations fence direct
+  CareGroup capacity/status/deletion downscope; accepted preparation uses the
+  current offer review time; and Admin queue reads select only required fields,
+  cap at 500 and fail unavailable rather than silently truncating.
+- True concurrent acceptance exposed a finalizer-stage PostgreSQL serialization
+  abort. Added a repository rollback-classification port and one shared
+  retryability helper: only infrastructure outcomes and explicit
+  `command_write_conflict` retry with the same command identity; ordinary
+  business conflicts remain terminal.
+- Qualified all 31 migrations on approved disposable targets. The final exact
+  target `nurture_t007_g4d_i3_release_20260810_05` passed targeted
+  inquiry/waitlist DB 8/8 and full DB 385/385 across 42 files; full
+  unit passed 874/874 across 79 files; status and datasource drift are clean.
+  Every diff, qualification and rerun target was destroyed and confirmed absent.
+- The initial behavior-preserving simplification checkpoint removed 114 lines
+  from the three largest increment-3 files. Required release-audit guards and
+  falsification tests brought the final comparison to 3,239 -> 3,214 lines
+  (net -25): no dead compatibility path or duplicate runtime was retained.
+- Refreshed the DB context and Nurture exact-runtime hash (`f03b75fb…`, 242
+  files). C30 default-off remains green. Its revision-bearing local adoption
+  lock intentionally waits for a commit boundary; current bytes recompute to
+  `57e4759f…`. My-Chat remains unadopted at observed `fd2a213c` versus expected
+  `567b96c`.

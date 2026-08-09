@@ -5,8 +5,9 @@
 - Date: 2026-08-10
 - Task: T-007
 - Input: G4-D increment 1 ([`57`](./57-g4-d-increment-1-record.md))
-- Verdict: `G4_D_INCREMENT_2_SOURCE_PASS_DB_PENDING`
-- Database effect: none; no target selected, connected or migrated
+- Verdict: `G4_D_INCREMENT_2_DB_QUALIFIED`
+- Database effect: one exact local disposable target was created, qualified and
+  destroyed; no shared or persistent database was touched
 
 ## Implemented slice
 
@@ -101,15 +102,18 @@ gaps:
 | Task docs / project state / governance | PASS |
 | Manifest/module and legacy-carrier absence | PASS |
 | DB context refresh / diff whitespace | PASS |
-| PostgreSQL migration apply and DB tests | NOT RUN — no new exact approval |
+| PostgreSQL migration apply | PASS — all 30 migrations on an empty disposable target |
+| Targeted PostgreSQL suite | PASS — 3/3 |
+| Full PostgreSQL DB lane | PASS — 380/380, 41 files |
+| Migration status / datasource-to-SSOT drift | PASS — current / zero difference |
+| Disposable cleanup | PASS — zero sessions, target destroyed and absent |
 
 Detailed DB gate evidence is under
 [`artifacts/db/0e1-enrollment-journey-inquiry`](./artifacts/db/0e1-enrollment-journey-inquiry/00-connection-check.md).
 
 ## Next gate
 
-Obtain a new approval naming one exact disposable PostgreSQL target, apply the
-complete migration history there, execute the three new cases plus the full DB
-lane, prove datasource-to-SSOT zero drift and destroy that exact target. Only
-after that qualification should G4-D increment 3 start the frozen
-waitlist/policy/offer/reservation/preparation slice.
+G4-D increment 3 may now implement the frozen
+waitlist/policy/offer/reservation/preparation slice. Its schema is authored from
+the repo Prisma SSOT and remains non-operational until its own disposable-DB
+qualification and consumer/capability release gates pass.

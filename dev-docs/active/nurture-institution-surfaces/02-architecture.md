@@ -188,6 +188,22 @@ Workflow 或 owner unavailable 时返回合法 absent/empty，不影响 publicat
 - 精确 category allowlist、policy revision 对既有候补的影响、offer command/schema
   和 expiry transition 仍在 contract 阶段冻结，本决定不授权调用方自定义排序字段。
 
+### Implemented 0E-2 integrity boundary
+
+- My-Chat canonical actions are deduplicated by the fixed `my_chat` namespace
+  plus `object_type + object_id`. The same opaque ID in two different canonical
+  object types is not the same action; version changes of one logical action do
+  not create a second decision.
+- An active held reservation is part of exact-class capacity ownership. Direct
+  `CareGroup` capacity/status/deletion writes must preserve an active class and
+  `active occupancy + held reservations <= capacity`; the same exact class row
+  lock serializes those writes with offer acceptance.
+- An accepted family preparation projection derives its next expected contact
+  from the accepted offer's current `reviewAt`, not from the closed waitlist
+  entry. Admin ordering reads select only required fields, are capped at 500
+  entries, and fail unavailable on overflow until an explicit pagination
+  contract exists; they never silently truncate or expose a second queue.
+
 ### D-07C — Trial as normal My-Chat-bound care
 
 - local provisional subject 只允许存在于 inquiry、intent、visit 和 waitlist。实际

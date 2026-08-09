@@ -16,6 +16,7 @@ export * from "./repositories/care-capture-placement-intake.js";
 export * from "./repositories/content-revision.repository.js";
 export * from "./repositories/attribution-correction-candidate.repository.js";
 export * from "./repositories/enrollment-journey.repository.js";
+export * from "./repositories/enrollment-waitlist.repository.js";
 export * from "./repositories/family-care-query.repository.js";
 export * from "./repositories/user-attention.repository.js";
 export * from "./repositories/family-care-command.transaction.js";

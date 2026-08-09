@@ -14,7 +14,10 @@ import { classifySafetyIntent } from "../domain/safety-classifier.js";
 import { type ActivityOption, type ComparisonCriterion, rankActivities } from "../domain/comparison-scoring.js";
 import { deriveCarePlan, type IssueType } from "../domain/plan-derivation.js";
 import { evaluatePregnancyStage as derivePregnancyStage } from "../domain/pregnancy-stage.js";
-import { NurtureCommandRunner } from "../domain/commands/command-kernel.js";
+import {
+  NurtureCommandRunner,
+  isNurtureCommandRetryable,
+} from "../domain/commands/command-kernel.js";
 import {
   calibrateFamilyStrategyCommand,
   workflowProjectRef,
@@ -237,7 +240,7 @@ export const makeCalibrateFamilyStrategy = (deps: NurtureHandlerDeps): WorkflowS
     };
   }
   if (command.status === "not_committed") {
-    if (command.decision === "command_busy" || command.decision === "technical_error") {
+    if (isNurtureCommandRetryable(command)) {
       return {
         status: "retry_requested",
         output_refs: [workflowRunRef(input)],

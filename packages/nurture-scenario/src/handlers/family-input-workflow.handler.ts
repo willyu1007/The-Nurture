@@ -9,7 +9,10 @@ import type {
   NurtureHandlerDeps,
   NurtureScenarioCommandBridgePort,
 } from "../deps.js";
-import { NurtureCommandRunner } from "../domain/commands/command-kernel.js";
+import {
+  NurtureCommandRunner,
+  isNurtureCommandRetryable,
+} from "../domain/commands/command-kernel.js";
 import {
   familyInputRouteCommandKey,
   familyInputRouteSpec,
@@ -163,9 +166,7 @@ export const makeCaptureFamilyInput = (deps: NurtureHandlerDeps): WorkflowStepHa
       }
 
       if (result.status === "not_committed") {
-        const retryable =
-          result.decision === "command_busy" ||
-          result.decision === "technical_error";
+        const retryable = isNurtureCommandRetryable(result);
         return finish(
           workflowResult(
             retryable ? "retry_requested" : "manual_review_required",

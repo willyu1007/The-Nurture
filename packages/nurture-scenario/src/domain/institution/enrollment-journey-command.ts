@@ -33,6 +33,14 @@ export const NURTURE_ENROLLMENT_JOURNEY_COMMAND_KEYS = [
   "confirm_intent_conversation",
   "record_or_skip_visit",
   "close_inquiry",
+  "qualify_capacity_waitlist",
+  "review_waitlist_interest",
+  "override_waitlist_category",
+  "issue_trial_offer",
+  "accept_trial_offer",
+  "decline_or_expire_trial_offer",
+  "withdraw_from_waitlist",
+  "cancel_trial_preparation",
 ] as const;
 
 export type NurtureEnrollmentJourneyCommandKey =
@@ -112,7 +120,9 @@ export type NurtureEnrollmentJourneyTransitionDraftV1 = {
   terminal_outcome_after: NurtureEnrollmentJourneyWorkflowSnapshotV1["terminal_outcome"];
   added_milestones: readonly NurtureEnrollmentJourneyMilestone[];
   command_key: NurtureEnrollmentJourneyCommandKey;
-  actor_role_assignment_ref: string;
+  actor_role_assignment_ref?: string;
+  actor_ref?: CanonicalRef;
+  owner_action_ref?: CanonicalRef;
   reason_key: string;
 };
 

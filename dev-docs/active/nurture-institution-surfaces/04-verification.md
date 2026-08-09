@@ -472,6 +472,32 @@ Falsification evidence is per-increment and lives in each record's
 | External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `05e8331`; the unrelated upstream work is not adopted by this increment. |
 | PostgreSQL execution | NOT RUN | No exact disposable target was newly approved; all SQL conclusions remain static until the planned disposable qualification. |
 
+## 2026-08-10 — G4-D increment 2 DB qualification and increment 3
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Increment 2 DB qualification | PASS | Empty 30-migration deploy, targeted 3/3, full DB 380/380, current status, zero drift and destroyed target. |
+| 0E-2 domain/owner review | PASS after repair | Monotone policy revisions, pinned entry order, append-only override, Guardian actor retention, active preparation family admission and reusable post-cancellation qualification. |
+| Exact capacity serialization | PASS | Two truly concurrent accepts yield one held reservation and one definite conflict; only a driver serialization abort is same-identity retryable. No class overbook. |
+| Retry semantics | PASS after repair | Repository classifies finalizer-stage serialization rollback; only `command_write_conflict` joins existing infrastructure retry outcomes, and business conflicts remain terminal. |
+| Targeted unit | PASS | 21/21 across command-kernel and waitlist files. |
+| Full unit lane | PASS | 874/874 across 79 files. |
+| TypeScript / Prisma | PASS | Scenario, DB and direct root typechecks; format, validate and generate. |
+| Targeted PostgreSQL | PASS | Inquiry regression plus waitlist/preparation 8/8 across 2 files. |
+| Full PostgreSQL lane | PASS | 385/385 across 42 files. |
+| Migration / drift | PASS | All 31 migrations current; datasource-to-Prisma reports no difference. |
+| Structural gates | PASS | Persistence, port topology, formal ingress, 148-file test routing, G2 census, G3 exact table census and C30 default-off. |
+| Context / DB feature | PASS | DB context checksum `b09d1d06…`; strict context and database SQLite suite pass; optional Convex checks skip. |
+| Guardian action chronology | PASS after repair | Review, decline, withdrawal and cancellation reject owner actions predating the exact entry/offer/reservation state; expanded PostgreSQL probes pass. |
+| Canonical action identity | PASS after repair | The fixed `my_chat` namespace plus object type and object ID deduplicate one logical action without colliding different canonical object types. |
+| Reverse capacity guard | PASS after repair | An active held reservation rejects direct class capacity/status/deletion downscope that would invalidate the seat; exact-class locking preserves acceptance serialization. |
+| Family preparation time | PASS after repair | Accepted preparation projects the current offer `reviewAt`, not the closed waitlist entry's stale review time. |
+| Admin queue bound | PASS after repair | Required-field query is capped at 501 probes for a 500-entry contract and fails unavailable on overflow; it never silently truncates. |
+| Nurture exact-runtime | PASS | Local hash refreshed to `f03b75fb…` over 242 files. The pure simplification checkpoint was -114 lines; required audit guards/tests leave the final three-file comparison at net -25. |
+| C30 local lock | DEFERRED, explicit | Current affected bytes recompute to `57e4759f…`; revision-bearing lock cannot truthfully re-freeze before an implementation commit. Default-off remains PASS. |
+| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `fd2a213c`; no external adoption performed. |
+| Cleanup / effect boundary | PASS | Diff shadow and all exact qualification/simplification/release DBs, including `nurture_t007_g4d_i3_release_20260810_05`, were destroyed with zero sessions and confirmed absent. No shared apply, caller, capability, deployment, activation or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

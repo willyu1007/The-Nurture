@@ -30,6 +30,7 @@ import { PrismaPublicationSafetyTransaction } from "./publication-safety.transac
 import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 import { PrismaEnrollmentJourneyRepository } from "./enrollment-journey.repository.js";
+import { PrismaEnrollmentWaitlistRepository } from "./enrollment-waitlist.repository.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -125,6 +126,7 @@ const toInteraction = (row: PrismaInteractionContext): NurtureInteractionContext
 class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   /** G4-D private workflow/inquiry writes, in the one command-ledger tx. */
   readonly enrollmentJourney: PrismaEnrollmentJourneyRepository;
+  readonly enrollmentWaitlist: PrismaEnrollmentWaitlistRepository;
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
   /**
@@ -169,8 +171,12 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   /** G3-B1 organize-cut owner writes, same transaction. */
   readonly careCapture: PrismaCareCaptureTransaction;
 
-  constructor(private readonly transaction: Prisma.TransactionClient) {
+  constructor(
+    private readonly transaction: Prisma.TransactionClient,
+    now: () => Date,
+  ) {
     this.enrollmentJourney = new PrismaEnrollmentJourneyRepository(transaction);
+    this.enrollmentWaitlist = new PrismaEnrollmentWaitlistRepository(transaction, now);
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
@@ -295,7 +301,10 @@ const advisoryKey = (workspaceId: string, commandHash: string): bigint => {
 };
 
 export class PrismaNurtureCommandRepository implements NurtureCommandRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly now: () => Date = () => new Date(),
+  ) {}
 
   async findCommitted(input: {
     workspace_id: string;
@@ -322,12 +331,25 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
     } catch (error) {
       // P2034 / 40001: the driver aborted the transaction, so no effect
       // landed. Report it as a certain rollback rather than an unknown one.
-      const code = (error as { code?: string } | null)?.code;
-      if (code === "P2034" || code === "40001") {
-        throw new NurtureDeterministicRollback("command_write_conflict");
+      const classified = this.classifyRollback(error);
+      if (classified) {
+        throw new NurtureDeterministicRollback(
+          classified.reason_code,
+          classified.decision,
+        );
       }
       throw error;
     }
+  }
+
+  classifyRollback(error: unknown): {
+    decision: "conflict";
+    reason_code: "command_write_conflict";
+  } | null {
+    const code = (error as { code?: string } | null)?.code;
+    return code === "P2034" || code === "40001"
+      ? { decision: "conflict", reason_code: "command_write_conflict" }
+      : null;
   }
 
   private runLocked<T>(input: {
@@ -344,7 +366,9 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
           )}) AS acquired`,
         );
         if (rows[0]?.acquired !== true) return { acquired: false };
-        const value = await input.operation(new PrismaNurtureCommandTransaction(transaction));
+        const value = await input.operation(
+          new PrismaNurtureCommandTransaction(transaction, this.now),
+        );
         return { acquired: true, value };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },

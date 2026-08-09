@@ -4,14 +4,16 @@
 - SSOT mode: `repo-prisma`
 - Direction: code to database through a versioned Prisma migration
 - Dialect: PostgreSQL
-- Target environment: none selected
-- Endpoint: not inspected
-- Exact database: not selected
-- Approval: no new exact disposable target approval exists for this increment
-- Connection attempt: none
-- Schema apply: none
+- Target environment: local disposable PostgreSQL
+- Endpoint: `localhost:5433`
+- Exact database: `nurture_t007_g4d_i2_qual_20260810_01`
+- Approval: explicit user approval received before the write
+- Preflight: exact target confirmed absent, then created with zero user tables
+- Schema apply: complete 30-migration history applied successfully
 - Secrets recorded: none
 
-Earlier disposable approvals were target-specific and those databases were
-destroyed. They do not authorize this migration. No default, shared,
-persistent or previously used database was connected or modified.
+The target URL was derived inside the child process and was never printed.
+The default configured database, shared databases, persistent databases and
+previously used disposable databases were not modified. After qualification,
+the exact target had zero active sessions, was dropped and was confirmed
+absent.

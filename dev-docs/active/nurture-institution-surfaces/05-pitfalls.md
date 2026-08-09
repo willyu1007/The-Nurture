@@ -378,3 +378,52 @@
   后才使用 end-trial。
 - Prevention：waitlist offer、capacity reservation、trial preparation、trial-start
   relationship 必须有独立状态与取消/重放测试。
+
+### 2026-08-10 — Serialization abort occurred inside the command finalizer
+
+- Symptom: concurrent acceptance preserved capacity but returned
+  `command_execution_failed/technical_error` instead of a stable write
+  conflict; after correcting the classification, an older bounded-retry DB
+  test stopped retrying it.
+- Root cause: PostgreSQL raised the serialization abort during the same-ledger
+  transition finalizer. The scenario kernel intentionally wrapped unknown
+  finalizer errors, so the outer Prisma repository never saw the driver code.
+  Retryability was also duplicated in callers as a technical-error check.
+- What was tried: classifying `P2034` only around the outer transaction did not
+  reach finalizer-stage errors; merely accepting the generic technical result
+  would have kept infrastructure and business failures conflated.
+- Fix: add a repository rollback-classification port used inside apply and
+  finalizer catches, then centralize same-command retryability. Only explicit
+  `command_write_conflict` joins busy/technical/unknown infrastructure
+  outcomes; ordinary business conflicts remain terminal.
+- Prevention: every serializable command with an in-transaction finalizer must
+  include true concurrent DB coverage, and callers must use the shared
+  retryability predicate rather than reconstructing decision lists.
+
+### 2026-08-10 — Opaque object ID alone was not canonical action identity
+
+- Symptom: two approved My-Chat canonical action object types with the same
+  opaque `object_id` could collide in the waitlist uniqueness indexes.
+- Root cause: the first index treated the object ID as globally typed even
+  though the owner contract defines identity as namespace, object type and ID.
+- What was tried: including the action version would avoid some collisions but
+  would also let a new version of the same logical decision execute twice.
+- Fix: enforce the fixed `my_chat` namespace and index `object_type + object_id`;
+  omit version deliberately so one logical action stays idempotent.
+- Prevention: every persisted canonical-ref dedupe must derive its exact owner
+  identity tuple from the contract, never from an opaque ID alone.
+
+### 2026-08-10 — Reservation safety must fence the capacity source
+
+- Symptom: offer acceptance respected held reservations, but a direct
+  `CareGroup` capacity/status/deletion update could later make the class
+  overcommitted or inactive underneath an existing hold.
+- Root cause: the invariant was enforced only on reservation writes, not on
+  the capacity owner's reverse mutation path.
+- What was tried: relying on application order and acceptance recounts could
+  not protect later direct class updates or concurrent transactions.
+- Fix: a database trigger requires an active, nondeleted class with nonnull
+  capacity and `active occupancy + held reservations <= capacity`; the existing
+  exact-class row lock serializes both sides.
+- Prevention: capacity invariants need forward and reverse write guards on
+  every canonical source that can invalidate them.

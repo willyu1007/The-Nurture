@@ -20,23 +20,21 @@ places drifts in one of them.
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
-| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–2 — registry/state/projection plus private inquiry carrier, six commands, repository and unapplied migration** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md), [`58`](./58-g4-d-increment-2-record.md) |
+| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–3 — registry/state/projection, qualified inquiry carrier and qualified waitlist/policy/offer/reservation/preparation** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`59`](./59-g4-d-increment-3-record.md) |
 | 0F knowledge & RAG | **not started** | none | — |
 
 All implementation work remains at **I1**. Persistence increments carry exact
 schema, policy, repository/service code and migration authoring, and all
-implemented daily-operations persistence paths are qualified on disposable
-PostgreSQL. G4-D increment 2's migration is authored but not yet qualified on
-PostgreSQL. No I2
+implemented daily-operations and G4-D inquiry/waitlist/preparation persistence
+paths are qualified on disposable PostgreSQL. No I2
 contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
 
-G4-D increment 2 adds persistence source and a migration artifact, but carries
-no DB-apply claim until a newly approved exact disposable target is qualified.
-Its final quality pass removes the derived workflow-ref hash path, constrains
-the canonical Run object identity directly, aligns SQL carrier/state/actor
-guards with the domain and keeps private inquiry/touchpoint refs out of command
-results.
+G4-D increments 2–3 have clean disposable-only DB qualification. Increment 3
+adds explicit policy/FIFO/override/offer/reservation/cancellation semantics and
+keeps rank/category facts out of the family projection. It introduces no
+automatic timer, deadline/blocker lifecycle, Enrollment/Grant side effect or
+parallel trial-care path.
 
 ## Gap register
 
@@ -126,16 +124,20 @@ deploy, direct constraint probes and the full 370-test DB lane. Every target
 was destroyed afterward. `20260810010000_g4c_attribution_correction_candidate`
 passed a clean 29-migration deploy, append-only/same-Workspace qualification,
 zero datasource-to-SSOT drift and the full 377-test DB lane; its target was
-also destroyed. `20260810030000_g4d_enrollment_journey_inquiry` is authored,
-Prisma-validated and statically diffed only; no target was connected or
-migrated because no new exact approval exists. Shared or persistent apply
-remains unauthorized at I1.
+also destroyed. `20260810030000_g4d_enrollment_journey_inquiry` passed a clean
+30-migration deploy, targeted 3/3 and full 380/380 DB lane.
+`20260810050000_g4d_waitlist_trial_preparation` passed a clean 31-migration
+deploy, targeted inquiry/waitlist 8/8, concurrent/reverse capacity
+falsification and full 385/385 DB lane. The final bounded-query release rerun
+used `nurture_t007_g4d_i3_release_20260810_05`; all exact qualification/rerun
+targets were destroyed with zero sessions and zero datasource drift. Shared or
+persistent apply remains unauthorized at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. G4-C increment 2 observed `05e8331`; C30's independent
+`x5_joint_api` divergence. The simplification rerun observed `fd2a213c`; C30's independent
 upstream lock still expects `51ad97f`
 ([`46`](./46-g4-b-increment-12-record.md), [`48`](./48-g4-c-increment-2-record.md)).
 Neither external head is treated as a Nurture pin.
@@ -148,29 +150,29 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 [`42`](./42-g4-b-increment-8-record.md),
 [`44`](./44-g4-b-increment-10-record.md).
 
-### G-10 — Enrollment Journey carrier exists; DB and owner qualification remain
+### G-10 — Enrollment Journey I1 is partial; trial/formal units remain
 
-G4-D increment 2 now supplies the private workflow/inquiry/touchpoint/
-transition carrier, six explicit commands, same-ledger Prisma transaction,
-body-free query composition and a versioned migration artifact. It does not
-yet prove PostgreSQL deployment: the three production-DB cases are authored
-and typechecked but unexecuted without a new exact disposable target approval.
+G4-D increments 2–3 now supply DB-qualified private inquiry and capacity
+waitlist/preparation owners. The latter provides standard-only FIFO by default,
+version-pinned policy/category ordering, append-only Admin override, family-
+safe no-rank projection, explicit offer, exact-class held reservation and
+pre-trial cancellation. All state changes use the existing command ledger and
+immutable transition audit; concurrent accepts and direct class capacity
+downscope cannot overbook. Admin ordering reads are bounded and fail unavailable
+above 500 entries until an explicit pagination contract is frozen.
 
-The final quality pass removes the derived workflow hash identity, makes one
-canonical My-Chat Run object unique per Workspace, closes canonical-ref/role/
-milestone shapes and makes transition finalization re-prove exact command
-scope, active Institution Admin authority, command-specific state change and
-cumulative state; a deferred guard prevents a committed head without its exact
-transition. Command output now contains only local workflow/transition refs;
-inquiry/touchpoint refs stay private. These repairs are source-qualified only
-until the same three cases run against PostgreSQL.
+0E-3 trial phase migration/lifecycle and 0E-4 formalization/completion are not
+implemented. No current My-Chat Child/Family binding revalidation, pending
+Enrollment/Grant/CareGroup preparation, trial-start transaction, trial review,
+formal phase commit or trial exit transaction exists yet.
 
 Real prospective-contact and native business-message source adapters remain
 I3 gates. No Host bridge, public caller, capability registration or traffic
 exists; `workflowRunRef` still accepts only the exact My-Chat-owned canonical
 ref and the private workflow ref is never projected.
 
-Cited by: [`58`](./58-g4-d-increment-2-record.md).
+Cited by: [`58`](./58-g4-d-increment-2-record.md),
+[`59`](./59-g4-d-increment-3-record.md).
 
 ## Closed since the 0D Exit
 
@@ -201,15 +203,19 @@ Cited by: [`58`](./58-g4-d-increment-2-record.md).
 
 ## Next steps, in dependency order
 
-1. **G4-D increment 2 qualification** — after a new exact disposable target is
-   explicitly approved, deploy the migration history, run the three new cases
-   and full DB lane, prove zero datasource drift and destroy that exact target.
-2. **G4-D remaining I1 units** — 0E-2 waitlist/reservation/cancel, 0E-3 phase
-   migration and trial lifecycle, then 0E-4 formalization/completion. G-09 must
-   be resolved before claiming the real My-Chat owner adapter at I3.
-3. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
+1. **G4-D increment 4 / 0E-3** — implement phase migration and trial lifecycle
+   from the existing freeze, reusing exact-class capacity and canonical
+   Enrollment/Grant/CareGroup paths without a TrialChild or parallel care
+   pipeline.
+2. **G4-D increment 5 / 0E-4** — formalization, exit and completion after 0E-3
+   is DB-qualified. G-09 must be resolved before claiming real My-Chat owner
+   integration at I3.
+3. **Commit-boundary local lock refresh** — after the implementation receives
+   an exact commit, re-freeze the affected C30 profiles from recomputed
+   `57e4759f…`; do not invent a revision for dirty working-tree bytes.
+4. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
    any required G4-D path.
-4. **I2** — capability registration and contract rotation — which is what turns
+5. **I2** — capability registration and contract rotation — which is what turns
    G-01 from a bound into a completed step. Not before the branch it publishes
    is done.
 

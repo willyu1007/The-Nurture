@@ -583,7 +583,18 @@ export class PrismaEnrollmentJourneyRepository
         terminalOutcomeAfter: input.transition.terminal_outcome_after,
         addedMilestones: [...input.transition.added_milestones],
         commandKey: input.transition.command_key,
-        actorRoleAssignmentId: input.transition.actor_role_assignment_ref,
+        ...(input.transition.actor_role_assignment_ref
+          ? {
+              actorRoleAssignmentId:
+                input.transition.actor_role_assignment_ref,
+            }
+          : {}),
+        ...(input.transition.actor_ref
+          ? { actorRef: asJson(input.transition.actor_ref) }
+          : {}),
+        ...(input.transition.owner_action_ref
+          ? { ownerActionRef: asJson(input.transition.owner_action_ref) }
+          : {}),
         reasonKey: input.transition.reason_key,
         occurredAt: execution.committedAt,
       },

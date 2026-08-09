@@ -9,6 +9,7 @@ import {
   hashCommandPayload,
   hashCommandRequestId,
   hashInvocationRequestId,
+  isNurtureCommandRetryable,
   type NurtureCommandInput,
   type NurtureCommandRepository,
   type NurtureCommandSpec,
@@ -92,6 +93,23 @@ const command = (
   });
 
 describe("Nurture command canonicalization", () => {
+  it("retries only infrastructure outcomes and explicit write conflicts", () => {
+    expect(
+      isNurtureCommandRetryable({
+        status: "not_committed",
+        decision: "conflict",
+        reason_code: "command_write_conflict",
+      }),
+    ).toBe(true);
+    expect(
+      isNurtureCommandRetryable({
+        status: "not_committed",
+        decision: "conflict",
+        reason_code: "business_head_conflict",
+      }),
+    ).toBe(false);
+  });
+
   it("sorts object keys, preserves array order, and distinguishes null from omission", () => {
     expect(canonicalJsonV1({ b: 2, a: 1 })).toBe(canonicalJsonV1({ a: 1, b: 2 }));
     expect(hashCommandPayload({ values: [1, 2] })).not.toBe(hashCommandPayload({ values: [2, 1] }));
@@ -405,6 +423,37 @@ describe("NurtureCommandRunner", () => {
       status: "not_committed",
       decision: "technical_error",
       reason_code: "command_execution_failed",
+    });
+    await expect(
+      repository.findCommitted({
+        workspace_id: workspaceId,
+        command_request_id_hash: hashCommandRequestId(workspaceId, "command-1"),
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it("lets the repository classify a known infrastructure rollback inside a finalizer", async () => {
+    const base = createInMemoryNurtureCommandRepository();
+    const repository: NurtureCommandRepository = {
+      ...base,
+      classifyRollback: (error) =>
+        (error as { code?: string } | null)?.code === "SERIALIZATION_ABORT"
+          ? { decision: "conflict", reason_code: "command_write_conflict" }
+          : null,
+    };
+    const commandSpec: NurtureCommandSpec<{ value: number }> = {
+      ...spec(() => undefined),
+      afterExecutionCreated: async () => {
+        throw Object.assign(new Error("serialization aborted"), {
+          code: "SERIALIZATION_ABORT",
+        });
+      },
+    };
+
+    expect(await command(repository, commandSpec)).toEqual({
+      status: "not_committed",
+      decision: "conflict",
+      reason_code: "command_write_conflict",
     });
     await expect(
       repository.findCommitted({

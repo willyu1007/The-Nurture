@@ -65,6 +65,22 @@
 - Live gaps and the ordered next steps are
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
 
+## Execution checkpoint — 2026-08-10 G4-D increments 2–3 qualified at I1
+
+- The private inquiry/touchpoint owner and the capacity waitlist/policy/offer/
+  reservation/preparation owner are implemented and qualified through all 31
+  migrations on destroyed disposable PostgreSQL targets. The final release
+  rerun passed targeted 8/8 and full 385/385 DB lanes with zero drift.
+- Increment 3 reuses the existing command ledger and exact-class capacity
+  owner. Canonical action identity includes object type, a held reservation
+  fences direct class capacity/status downscope, and family/Admin projections
+  remain separate and bounded. No automatic deadline, blocker lifecycle,
+  Enrollment/Grant mutation, public caller or activation was added.
+- The next dependent unit is G4-D increment 4 / frozen 0E-3 trial lifecycle;
+  0E-4 follows only after 0E-3 DB qualification. The independent 0F freeze may
+  proceed in parallel. The live order remains in
+  [`41`](./41-t007-gap-and-next-register.md).
+
 ## Stage G4 Delivery Structure — Accepted
 
 ### Overall goal

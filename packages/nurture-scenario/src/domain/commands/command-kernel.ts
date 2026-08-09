@@ -14,6 +14,7 @@ import type { NurtureAttendanceCommandTransaction } from "../institution/attenda
 import type { NurtureContentRevisionTransaction } from "../institution/content-revision.js";
 import type { NurtureAttributionCorrectionCandidateTransaction } from "../institution/attribution-correction-candidate.js";
 import type { NurtureEnrollmentJourneyTransaction } from "../institution/enrollment-journey-command.js";
+import type { NurtureEnrollmentWaitlistTransaction } from "../institution/enrollment-waitlist.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
   buildNurtureHandoffRequestSnapshots,
@@ -85,6 +86,8 @@ export type NurtureCommandTransaction = {
   attributionCorrections?: NurtureAttributionCorrectionCandidateTransaction;
   /** Present when the G4-D Enrollment Journey private owner is wired. */
   enrollmentJourney?: NurtureEnrollmentJourneyTransaction;
+  /** Present when the G4-D exact-class waitlist/preparation owner is wired. */
+  enrollmentWaitlist?: NurtureEnrollmentWaitlistTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {
@@ -121,6 +124,15 @@ export type NurtureCommandRepository = {
     command_request_id_hash: string;
     operation: (transaction: NurtureCommandTransaction) => Promise<T>;
   }): Promise<{ acquired: true; value: T } | { acquired: false }>;
+  /**
+   * Maps infrastructure errors that prove the transaction rolled back (for
+   * example a PostgreSQL serialization abort) without leaking driver-specific
+   * codes into the scenario command kernel.
+   */
+  classifyRollback?(error: unknown): {
+    decision: NurtureDeterministicRollbackDecision;
+    reason_code: string;
+  } | null;
 };
 
 export type NurtureCommandPreconditionDecision =
@@ -248,6 +260,21 @@ export type NurtureCommandResult =
   | NurtureCommandSuccess
   | NurtureCommandNotCommitted
   | NurtureCommandOutcomeUnknown;
+
+/**
+ * Retry only with the same command identity. Business conflicts remain
+ * terminal; the repository's explicit write-conflict classification denotes
+ * a transaction that certainly rolled back and is safe to retry.
+ */
+export const isNurtureCommandRetryable = (
+  result: NurtureCommandResult,
+): boolean =>
+  result.status === "outcome_unknown" ||
+  (result.status === "not_committed" &&
+    (result.decision === "command_busy" ||
+      result.decision === "technical_error" ||
+      (result.decision === "conflict" &&
+        result.reason_code === "command_write_conflict")));
 
 export type NurtureDeterministicRollbackDecision = Extract<
   NurtureCommandNotCommitted["decision"],
@@ -399,6 +426,17 @@ const compareReplay = (input: {
 
 export class NurtureCommandRunner {
   constructor(private readonly repository: NurtureCommandRepository) {}
+
+  private deterministicRollback(
+    error: unknown,
+    fallbackReasonCode: string,
+  ): NurtureDeterministicRollback {
+    if (error instanceof NurtureDeterministicRollback) return error;
+    const classified = this.repository.classifyRollback?.(error);
+    return classified
+      ? new NurtureDeterministicRollback(classified.reason_code, classified.decision)
+      : new NurtureDeterministicRollback(fallbackReasonCode);
+  }
 
   async execute<Input>(input: NurtureCommandInput<Input>): Promise<NurtureCommandResult> {
     for (const [label, requestId] of [
@@ -578,9 +616,7 @@ export class NurtureCommandRunner {
           } catch (error) {
             // The operation body threw, so this transaction definitely rolls
             // back; rethrow tagged so the outcome is reported as certain.
-            throw error instanceof NurtureDeterministicRollback
-              ? error
-              : new NurtureDeterministicRollback("command_execution_failed");
+            throw this.deterministicRollback(error, "command_execution_failed");
           }
           const handoffRequestSnapshots = activation
             ? buildNurtureHandoffRequestSnapshots({
@@ -632,9 +668,7 @@ export class NurtureCommandRunner {
               // The finalizer is part of the same database transaction as the
               // business writes and CommandExecution. A throw here therefore
               // proves rollback just as surely as a throw from apply().
-              throw error instanceof NurtureDeterministicRollback
-                ? error
-                : new NurtureDeterministicRollback("command_execution_failed");
+              throw this.deterministicRollback(error, "command_execution_failed");
             }
           }
           return {

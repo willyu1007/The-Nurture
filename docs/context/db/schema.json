@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-09T16:20:15.975Z",
+  "updatedAt": "2026-08-09T22:46:14.926Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -409,11 +409,45 @@
       ]
     },
     {
+      "name": "NurtureEnrollmentTrialOfferLifecycle",
+      "values": [
+        "open",
+        "accepted",
+        "declined",
+        "expired",
+        "withdrawn"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentTrialReservationState",
+      "values": [
+        "held",
+        "converted_to_occupancy",
+        "released"
+      ]
+    },
+    {
       "name": "NurtureEnrollmentVisitDisposition",
       "values": [
         "not_decided",
         "recorded",
         "skipped"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentWaitlistEntryLifecycle",
+      "values": [
+        "active",
+        "offer_open",
+        "accepted",
+        "withdrawn"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentWaitlistInterestState",
+      "values": [
+        "confirmed",
+        "waiting_on_guardian"
       ]
     },
     {
@@ -5468,6 +5502,33 @@
           "references": []
         },
         {
+          "field": "enrollmentTrialOffers",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentTrialReservations",
+          "to": "NurtureEnrollmentTrialReservation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentWaitlistEntries",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "institution",
           "to": "NurtureCareInstitution",
           "optional": false,
@@ -5746,6 +5807,51 @@
         {
           "field": "enrollments",
           "to": "NurtureEnrollment",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentTrialOffers",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentTrialReservations",
+          "to": "NurtureEnrollmentTrialReservation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentWaitlistEntries",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentWaitlistOverrides",
+          "to": "NurtureEnrollmentWaitlistOverride",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentWaitlistPolicies",
+          "to": "NurtureEnrollmentWaitlistPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -6096,6 +6202,33 @@
         {
           "field": "enrollmentTouchpoints",
           "to": "NurtureEnrollmentTouchpoint",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentTrialOffers",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentWaitlistOverrides",
+          "to": "NurtureEnrollmentWaitlistOverride",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentWaitlistPolicies",
+          "to": "NurtureEnrollmentWaitlistPolicy",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -9076,6 +9209,15 @@
           "references": []
         },
         {
+          "field": "enrollmentWaitlistOverride",
+          "to": "NurtureEnrollmentWaitlistOverride",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "institutionWorkflowTransition",
           "to": "NurtureInstitutionWorkflowTransition",
           "optional": true,
@@ -11389,6 +11531,15 @@
           "references": []
         },
         {
+          "field": "waitlistEntries",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "workflow",
           "to": "NurtureInstitutionWorkflow",
           "optional": false,
@@ -11734,6 +11885,1642 @@
           ],
           "name": null,
           "map": "ix_nurture_enrollment_touchpoint_workflow"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentTrialOffer",
+      "dbName": "nurture_enrollment_trial_offer",
+      "schema": null,
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "decidedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "decided_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "decisionReasonKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "decision_reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "entryId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "entry_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "issuedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "issued_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "issuedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "issued_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "NurtureEnrollmentTrialOfferLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "offerHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "offer_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "review_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetCareGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "trialEndsAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "trial_ends_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "trialStartsAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "trial_starts_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "currentForEntry",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": true,
+          "list": false,
+          "relationName": "CurrentWaitlistOffer",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "entry",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": false,
+          "relationName": "WaitlistEntryOffers",
+          "fields": [
+            "entryId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "issuedByRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "issuedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "reservation",
+          "to": "NurtureEnrollmentTrialReservation",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "targetCareGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "targetCareGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "targetCareGroupId",
+            "lifecycle",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_trial_offer_class_state"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "workflowId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_trial_offer_workflow"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentTrialReservation",
+      "dbName": "nurture_enrollment_trial_reservation",
+      "schema": null,
+      "columns": [
+        {
+          "name": "acceptedActionRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "accepted_action_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "acceptedActorRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "accepted_actor_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "convertedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "converted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "entryId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "entry_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "heldAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "held_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "offerId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "offer_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "releasedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "released_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "releaseReasonKey",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "release_reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reservationHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "reservation_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "review_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "state",
+          "type": "NurtureEnrollmentTrialReservationState",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetCareGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "trialEndsAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "trial_ends_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "trialStartsAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "trial_starts_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "entry",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "entryId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "offer",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "offerId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "targetCareGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "targetCareGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "targetCareGroupId",
+            "state",
+            "trialStartsAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_trial_reservation_class_state"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentWaitlistEntry",
+      "dbName": "nurture_enrollment_waitlist_entry",
+      "schema": null,
+      "columns": [
+        {
+          "name": "capacitySourceRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "capacity_source_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "categoryBasisKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "category_basis_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "categoryKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "category_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "categoryOrder",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "category_order",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentOfferId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_offer_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "entryHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "entry_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expectedEntryEndDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expected_entry_end_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expectedEntryStartDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expected_entry_start_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAcceptanceActionRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_acceptance_action_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAcceptanceActorRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_acceptance_actor_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyAcceptedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_accepted_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "familyContactRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "family_contact_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "inquiryId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "inquiry_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "interestState",
+          "type": "NurtureEnrollmentWaitlistInterestState",
+          "nullable": false,
+          "list": false,
+          "dbName": "interest_state",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastConfirmedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "last_confirmed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lastReviewedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "last_reviewed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "lifecycle",
+          "type": "NurtureEnrollmentWaitlistEntryLifecycle",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "nextReviewAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "next_review_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "orderKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "order_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "policy_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "qualifiedOccupancyCount",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "qualified_occupancy_count",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetCareGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "target_care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "waitlistQualifiedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "waitlist_qualified_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "currentOffer",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": true,
+          "list": false,
+          "relationName": "CurrentWaitlistOffer",
+          "fields": [
+            "currentOfferId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "inquiry",
+          "to": "NurtureEnrollmentInquiry",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "inquiryId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "offers",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": false,
+          "list": true,
+          "relationName": "WaitlistEntryOffers",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "overrides",
+          "to": "NurtureEnrollmentWaitlistOverride",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "policy",
+          "to": "NurtureEnrollmentWaitlistPolicy",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "policyId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "reservations",
+          "to": "NurtureEnrollmentTrialReservation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "targetCareGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "targetCareGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "targetCareGroupId",
+            "lifecycle",
+            "categoryOrder",
+            "waitlistQualifiedAt",
+            "orderKey"
+          ],
+          "name": null,
+          "map": "ix_nurture_waitlist_entry_order"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "workflowId",
+            "entryHead"
+          ],
+          "name": null,
+          "map": "ix_nurture_waitlist_entry_workflow"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentWaitlistOverride",
+      "dbName": "nurture_enrollment_waitlist_override",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "afterCategoryBasisKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "after_category_basis_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "afterCategoryKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "after_category_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "afterCategoryOrder",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "after_category_order",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "afterPolicyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "after_policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "afterPolicyRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "after_policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "beforeCategoryKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "before_category_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "beforeCategoryOrder",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "before_category_order",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "beforePolicyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "before_policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "beforePolicyRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "before_policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "entryHeadAfter",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "entry_head_after",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "entryHeadBefore",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "entry_head_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "entryId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "entry_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "entry",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "entryId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "entryId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_waitlist_override_entry"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "entryId",
+            "entryHeadAfter"
+          ],
+          "name": null,
+          "map": "uq_nurture_waitlist_override_entry_head"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentWaitlistPolicy",
+      "dbName": "nurture_enrollment_waitlist_policy",
+      "schema": null,
+      "columns": [
+        {
+          "name": "categoryKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "category_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "changedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "changed_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "changeReason",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "change_reason",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contractVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "contract_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveFrom",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "effective_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "effectiveTo",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "effective_to",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "offerValidityMaxMinutes",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "offer_validity_max_minutes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "offerValidityMinMinutes",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "offer_validity_min_minutes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "policyRevision",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "policy_revision",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewDeadlineMinutes",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "review_deadline_minutes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reviewReminderMinutes",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "review_reminder_minutes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "changedByRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "changedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "entries",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "effectiveFrom",
+            "effectiveTo"
+          ],
+          "name": null,
+          "map": "ix_nurture_waitlist_policy_effective"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "policyRevision"
+          ],
+          "name": null,
+          "map": "uq_nurture_waitlist_policy_revision"
         }
       ]
     },
@@ -17821,6 +19608,33 @@
           "relationName": null,
           "fields": [],
           "references": []
+        },
+        {
+          "field": "trialOffers",
+          "to": "NurtureEnrollmentTrialOffer",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "trialReservations",
+          "to": "NurtureEnrollmentTrialReservation",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "waitlistEntries",
+          "to": "NurtureEnrollmentWaitlistEntry",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         }
       ],
       "indexes": [
@@ -17871,9 +19685,20 @@
       "schema": null,
       "columns": [
         {
+          "name": "actorRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "actor_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "actorRoleAssignmentId",
           "type": "String",
-          "nullable": false,
+          "nullable": true,
           "list": false,
           "dbName": "actor_role_assignment_id",
           "dbType": null,
@@ -17966,6 +19791,17 @@
           "dbName": "occurred_at",
           "dbType": null,
           "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ownerActionRef",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "owner_action_ref",
+          "dbType": null,
+          "default": null,
           "primaryKey": false,
           "unique": false
         },
@@ -18117,7 +19953,7 @@
         {
           "field": "actorRoleAssignment",
           "to": "NurtureCareRoleAssignment",
-          "optional": false,
+          "optional": true,
           "list": false,
           "relationName": null,
           "fields": [

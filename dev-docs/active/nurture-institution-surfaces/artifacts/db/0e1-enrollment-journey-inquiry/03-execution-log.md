@@ -2,9 +2,20 @@
 
 ## Apply
 
-Not executed. No exact disposable database has been selected or approved for
-this increment, so no connection, create, migration deploy, probe or database
-destruction command was run.
+Executed on the explicitly approved exact local disposable database
+`nurture_t007_g4d_i2_qual_20260810_01` at `localhost:5433`:
+
+1. confirmed the exact database was absent;
+2. created it and confirmed zero user tables;
+3. applied all 30 versioned migrations with `prisma migrate deploy`;
+4. ran the targeted inquiry carrier DB suite: 3/3 PASS;
+5. ran the complete production DB lane: 380/380 PASS across 41 files;
+6. confirmed migration status current and datasource-to-Prisma diff empty;
+7. confirmed zero active sessions, dropped only the exact target and confirmed
+   it absent.
+
+No credential value was printed or recorded. No shared or persistent database
+was changed.
 
 ## Static qualification
 
@@ -31,5 +42,8 @@ destruction command was run.
   source/correction time ordering, deterministic conflict decisions and
   body-free command result refs. Its expanded DB probes remain unexecuted.
 
-The new production-DB suite is authored and typechecked but deliberately not
-reported as executed.
+The new production-DB suite was executed on PostgreSQL and passed 3/3. Its SQL
+probes exercised replay, owner/actor/scope fencing, exact carrier shapes,
+transition reconstruction, deferred head/transition linkage, correction
+ordering and update/delete rejection. The complete production DB lane passed
+380/380, so the new migration also preserves all earlier database contracts.

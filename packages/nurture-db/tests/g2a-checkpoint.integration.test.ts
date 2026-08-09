@@ -6,6 +6,7 @@ import {
   createReplyFamilyCareItemSpec,
   createSubmitFamilyCareQuestionSpec,
   issueCareItemTargetRef,
+  isNurtureCommandRetryable,
   prepareAcknowledgeFamilyCareItem,
   prepareReplyFamilyCareItem,
   prepareSubmitFamilyCareQuestion,
@@ -323,10 +324,7 @@ describe("G2-A checkpoint gap closure", () => {
     let retries = 0;
     const run = (actorId: string, ready: typeof readyA, body: string) =>
       executeReply(scope, actorId, item.id, ready, body).then(async (result) => {
-        if (
-          (result.status === "not_committed" && result.decision === "technical_error") ||
-          result.status === "outcome_unknown"
-        ) {
+        if (isNurtureCommandRetryable(result)) {
           retries += 1;
           return executeReply(scope, actorId, item.id, ready, body, ":retry");
         }
@@ -371,11 +369,7 @@ describe("G2-A checkpoint gap closure", () => {
     let duplicateRetries = 0;
     const outcomes = await Promise.all(
       settled.map(async (result) => {
-        if (
-          result.status === "outcome_unknown" ||
-          (result.status === "not_committed" &&
-            (result.reason_code === "command_busy" || result.decision === "technical_error"))
-        ) {
+        if (isNurtureCommandRetryable(result)) {
           duplicateRetries += 1;
           return attempt();
         }

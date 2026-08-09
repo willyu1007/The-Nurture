@@ -13,15 +13,18 @@
 | Manifest/module absence | PASS |
 | Legacy workflow carrier absence | PASS |
 | DB context refresh | PASS |
-| Production-DB suite authored/typechecked | PASS — 3 cases; not executed |
-| Canonical Run single-binding / exact carrier probes | AUTHORED — not executed |
-| Milestone/command/cumulative transition/actor probes | AUTHORED — not executed |
-| Deferred orphan-head / correction-time probes | AUTHORED — not executed |
-| Disposable target connection/apply | NOT RUN — no new exact approval |
-| Datasource-to-SSOT drift | PENDING disposable apply |
-| PostgreSQL constraint/trigger probes | PENDING disposable apply |
+| Production-DB suite | PASS — 3/3 |
+| Complete production DB lane | PASS — 380/380, 41 files |
+| Canonical Run single-binding / exact carrier probes | PASS |
+| Milestone/command/cumulative transition/actor probes | PASS |
+| Deferred orphan-head / correction-time probes | PASS |
+| Disposable target connection/apply | PASS — all 30 migrations from empty |
+| Migration status | PASS — database schema current |
+| Datasource-to-SSOT drift | PASS — no difference detected |
+| PostgreSQL constraint/trigger probes | PASS |
+| Disposable target cleanup | PASS — zero sessions, destroyed, absent |
 | Shared/persistent DB effect | NONE |
 
-This evidence qualifies the increment's source and migration artifact only. It
-does not claim a successful PostgreSQL apply, real contact/native-source owner
-readiness, public capability registration, deployment, activation or traffic.
+This evidence qualifies increment 2's source, migration and PostgreSQL
+behavior. It does not claim real contact/native-source owner readiness, public
+capability registration, deployment, activation or traffic.
