@@ -1,6 +1,9 @@
 import { createHmac } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
-import { NurtureExactOwnerSupportSignalSourceReader } from "@the-nurture/scenario";
+import {
+  INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION,
+  NurtureExactOwnerSupportSignalSourceReader,
+} from "@the-nurture/scenario";
 import {
   type NurtureAttendanceSubmissionOwnerFactV1,
   type NurtureAttendanceSubmissionSignalOwner,
@@ -34,10 +37,6 @@ export const PRISMA_INSTITUTION_SUPPORT_SIGNAL_CHECKPOINTS = {
   configured_load: "family-care:pending-work",
 } as const;
 
-// The provider is a consumer of the frozen wire contract. Keep this literal
-// beside its checkpoint vocabulary instead of importing a runtime value from
-// the scenario package's separately built `./harness` entry.
-const SUPPORT_SIGNAL_CONTRACT_VERSION = "1.0.0" as const;
 const MAX_EXACT_OWNER_ROWS = 100;
 
 const REVIEW_ASK = {
@@ -114,23 +113,9 @@ const sourceBase = (
   occurred_at: occurredAt,
 });
 
-/**
- * Shared request-time owner context. Its WeakMap caches live only as long as
- * the exact request object passed to the six providers, so no authority or
- * source result survives into another request.
- */
+/** Stateless request-time owner context. Every provider invocation rechecks
+ * the exact current role and source authority before returning facts. */
 class PrismaInstitutionSupportSignalOwnerContext {
-  private readonly scopes = new WeakMap<object, Promise<OwnerScope | null>>();
-  private readonly localDays = new WeakMap<object, Map<string, Promise<LocalDay | null>>>();
-  private readonly communications = new WeakMap<
-    object,
-    Map<string, Promise<BusinessRows | null>>
-  >();
-  private readonly populations = new WeakMap<
-    object,
-    Map<string, Promise<Awaited<ReturnType<PrismaInstitutionContextRepository["loadAggregatePopulation"]>> | null>>
-  >();
-
   private readonly communicationOwner: PrismaInstitutionBusinessCommunicationReadPort;
   private readonly institutionContext: PrismaInstitutionContextRepository;
 
@@ -148,9 +133,7 @@ class PrismaInstitutionSupportSignalOwnerContext {
   private loadScope(
     input: NurtureInstitutionSupportSignalOwnerReadRequest,
   ): Promise<OwnerScope | null> {
-    const cached = this.scopes.get(input);
-    if (cached) return cached;
-    const loaded = (async () => {
+    return (async () => {
       const at = new Date(input.snapshot_at);
       if (Number.isNaN(at.getTime())) return null;
       const [participant, role, institution, classes] = await Promise.all([
@@ -200,30 +183,6 @@ class PrismaInstitutionSupportSignalOwnerContext {
         ? { at, classes }
         : null;
     })();
-    this.scopes.set(input, loaded);
-    return loaded;
-  }
-
-  private loadLocalDay(
-    input: NurtureInstitutionSupportSignalOwnerReadRequest,
-    localDate: string,
-    at: Date,
-  ): Promise<LocalDay | null> {
-    let cache = this.localDays.get(input);
-    if (!cache) {
-      cache = new Map();
-      this.localDays.set(input, cache);
-    }
-    const cached = cache.get(localDate);
-    if (cached) return cached;
-    const loaded = loadInstitutionLocalDay(this.prisma, {
-      workspace_id: input.workspace_id,
-      institution_id: input.institution_ref,
-      local_date: localDate,
-      at,
-    });
-    cache.set(localDate, loaded);
-    return loaded;
   }
 
   async select(
@@ -245,6 +204,7 @@ class PrismaInstitutionSupportSignalOwnerContext {
     }
 
     const selections: OwnerSelection[] = [];
+    const localDays = new Map<string, Promise<LocalDay | null>>();
     for (const careGroup of scope.classes) {
       const classPolicies = policies.filter(
         (policy) => policy.care_group_ref === careGroup.id,
@@ -259,13 +219,23 @@ class PrismaInstitutionSupportSignalOwnerContext {
       if (!policy.enabled) continue;
       const localDate = localDateFromWindow(policy.window_key);
       if (
-        policy.contract_version !== SUPPORT_SIGNAL_CONTRACT_VERSION ||
+        policy.contract_version !== INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION ||
         policy.checkpoint_ref !== checkpointRef ||
         !localDate
       ) {
         return { status: "unavailable" };
       }
-      const localDay = await this.loadLocalDay(input, localDate, scope.at);
+      let localDayRead = localDays.get(localDate);
+      if (!localDayRead) {
+        localDayRead = loadInstitutionLocalDay(this.prisma, {
+          workspace_id: input.workspace_id,
+          institution_id: input.institution_ref,
+          local_date: localDate,
+          at: scope.at,
+        });
+        localDays.set(localDate, localDayRead);
+      }
+      const localDay = await localDayRead;
       if (!localDay) return { status: "unavailable" };
       selections.push({ care_group: careGroup, policy, local_day: localDay });
     }
@@ -276,79 +246,56 @@ class PrismaInstitutionSupportSignalOwnerContext {
     input: NurtureInstitutionSupportSignalOwnerReadRequest,
     selection: OwnerSelection,
   ): Promise<BusinessRows | null> {
-    let cache = this.communications.get(input);
-    if (!cache) {
-      cache = new Map();
-      this.communications.set(input, cache);
-    }
-    const key = `${selection.care_group.id}\0${selection.local_day.occurred_from}\0${selection.local_day.occurred_before}`;
-    const cached = cache.get(key);
-    if (cached) return cached;
-    const loaded = (async () => {
-      const candidateCount = await this.prisma.nurtureFamilyCareMessage.count({
-        where: {
-          workspaceId: input.workspace_id,
-          careGroupId: selection.care_group.id,
-          writerContract: "harness_g2_v1",
-          status: { in: ["sent", "redacted"] },
-          createdAt: {
-            gte: new Date(selection.local_day.occurred_from),
-            lt: new Date(selection.local_day.occurred_before),
-            lte: new Date(input.snapshot_at),
-          },
+    const candidateCount = await this.prisma.nurtureFamilyCareMessage.count({
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: selection.care_group.id,
+        writerContract: "harness_g2_v1",
+        status: { in: ["sent", "redacted"] },
+        createdAt: {
+          gte: new Date(selection.local_day.occurred_from),
+          lt: new Date(selection.local_day.occurred_before),
+          lte: new Date(input.snapshot_at),
         },
-      });
-      if (candidateCount > MAX_EXACT_OWNER_ROWS) return null;
-      const page = await this.communicationOwner.listInstitutionBusinessCommunications({
-        workspace_id: input.workspace_id,
-        participant_id: input.participant_ref,
-        care_group_id: selection.care_group.id,
-        occurred_from: selection.local_day.occurred_from,
-        occurred_before: selection.local_day.occurred_before,
-        snapshot_at: input.snapshot_at,
-        limit: MAX_EXACT_OWNER_ROWS,
-      });
-      return page.has_more ? null : page.rows;
-    })();
-    cache.set(key, loaded);
-    return loaded;
+      },
+    });
+    if (candidateCount > MAX_EXACT_OWNER_ROWS) return null;
+    const page = await this.communicationOwner.listInstitutionBusinessCommunications({
+      workspace_id: input.workspace_id,
+      participant_id: input.participant_ref,
+      care_group_id: selection.care_group.id,
+      occurred_from: selection.local_day.occurred_from,
+      occurred_before: selection.local_day.occurred_before,
+      snapshot_at: input.snapshot_at,
+      limit: MAX_EXACT_OWNER_ROWS,
+    });
+    return page.has_more ? null : page.rows;
   }
 
   async loadPopulation(
     input: NurtureInstitutionSupportSignalOwnerReadRequest,
     selection: OwnerSelection,
   ) {
-    let cache = this.populations.get(input);
-    if (!cache) {
-      cache = new Map();
-      this.populations.set(input, cache);
-    }
-    const cached = cache.get(selection.care_group.id);
-    if (cached) return cached;
-    const loaded = (async () => {
-      const count = await this.prisma.nurtureEnrollment.count({
-        where: {
-          workspaceId: input.workspace_id,
-          institutionId: input.institution_ref,
-          careGroupId: selection.care_group.id,
-          status: "active",
-          deletedAt: null,
-        },
-      });
-      if (count > MAX_EXACT_OWNER_ROWS) return null;
-      const population = await this.institutionContext.loadAggregatePopulation({
-        workspace_id: input.workspace_id,
-        institution_ref: input.institution_ref,
-        care_group_ref: selection.care_group.id,
-        at: input.snapshot_at,
-        limit: count + 1,
-      });
-      return population.class_state === "in_scope" && population.members.length === count
-        ? population
-        : null;
-    })();
-    cache.set(selection.care_group.id, loaded);
-    return loaded;
+    const count = await this.prisma.nurtureEnrollment.count({
+      where: {
+        workspaceId: input.workspace_id,
+        institutionId: input.institution_ref,
+        careGroupId: selection.care_group.id,
+        status: "active",
+        deletedAt: null,
+      },
+    });
+    if (count > MAX_EXACT_OWNER_ROWS) return null;
+    const population = await this.institutionContext.loadAggregatePopulation({
+      workspace_id: input.workspace_id,
+      institution_ref: input.institution_ref,
+      care_group_ref: selection.care_group.id,
+      at: input.snapshot_at,
+      limit: count + 1,
+    });
+    return population.class_state === "in_scope" && population.members.length === count
+      ? population
+      : null;
   }
 
   async hasAttendanceSubmission(
@@ -663,10 +610,17 @@ class PrismaConfiguredLoadSignalOwner implements NurtureConfiguredLoadSignalOwne
     if (read.status === "unavailable") return unavailable<NurtureConfiguredLoadOwnerFactV1>();
     const facts: NurtureConfiguredLoadOwnerFactV1[] = [];
     for (const selection of read.selections) {
+      const businessRows = await this.context.loadBusinessRows(input, selection);
+      if (!businessRows) return unavailable();
+      const authorizedMessageIds = businessRows
+        .filter((row) => row.data_class === "family_care_question")
+        .map((row) => row.message_id);
+      if (authorizedMessageIds.length === 0) continue;
       const items = await this.prisma.nurtureFamilyCareItem.findMany({
         where: {
           workspaceId: input.workspace_id,
           careGroupId: selection.care_group.id,
+          sourceMessageId: { in: authorizedMessageIds },
           dataClass: "family_care_question",
           writerContract: "harness_g2_v1",
           lifecycleState: "active",
@@ -679,29 +633,20 @@ class PrismaConfiguredLoadSignalOwner implements NurtureConfiguredLoadSignalOwne
           },
           updatedAt: { lte: read.scope.at },
         },
-        include: { grant: true },
         take: MAX_EXACT_OWNER_ROWS + 1,
       });
       if (items.length > MAX_EXACT_OWNER_ROWS) return unavailable();
-      const readableItems = items.filter((item) =>
-        grantAllows(item.grant, LOAD_ASK, read.scope.at, {
-          institution_id: input.institution_ref,
-          care_group_id: selection.care_group.id,
-          enrollment_id: item.enrollmentId,
-          child_care_process_id: item.childCareProcessId,
-        }),
-      );
-      if (readableItems.length === 0) continue;
+      if (items.length === 0) continue;
       const population = await this.context.loadPopulation(input, selection);
       if (!population) return unavailable();
       const countByMember = new Map<string, number>();
-      for (const item of readableItems) {
+      for (const item of items) {
         countByMember.set(
           item.childCareProcessId,
           (countByMember.get(item.childCareProcessId) ?? 0) + 1,
         );
       }
-      const occurredAt = readableItems
+      const occurredAt = items
         .map((item) => item.updatedAt.toISOString())
         .sort()
         .at(-1)!;

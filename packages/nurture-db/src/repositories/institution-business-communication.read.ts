@@ -174,15 +174,23 @@ export class PrismaInstitutionBusinessCommunicationReadPort
     });
     if (!currentRole(adminRole, at)) return { authorized: false };
 
-    const item =
+    const familyItems =
       message.messageKind === "family_message"
-        ? await this.prisma.nurtureFamilyCareItem.findFirst({
+        ? await this.prisma.nurtureFamilyCareItem.findMany({
             where: {
               workspaceId: input.workspace_id,
               sourceMessageId: message.id,
               writerContract: "harness_g2_v1",
             },
+            orderBy: { id: "asc" },
+            take: 2,
           })
+        : [];
+    const item =
+      message.messageKind === "family_message"
+        ? familyItems.length === 1
+          ? familyItems[0]!
+          : null
         : message.sourceItemId
           ? await this.prisma.nurtureFamilyCareItem.findFirst({
               where: {

@@ -15,9 +15,8 @@ import { loadInstitutionLocalDay } from "../src/repositories/institution-local-d
 const prisma = createPrismaClient();
 const testWorkspaceIds = new Set<string>();
 
-afterEach(async () => {
+const cleanupTestWorkspaces = async () => {
   const workspaceIds = [...testWorkspaceIds];
-  testWorkspaceIds.clear();
   if (workspaceIds.length === 0) return;
   await prisma.$transaction(async (tx) => {
     const where = { workspaceId: { in: workspaceIds } };
@@ -40,13 +39,20 @@ afterEach(async () => {
     await tx.nurtureChild.deleteMany({ where });
     await tx.nurtureParticipant.deleteMany({ where });
   });
-});
+  for (const workspaceId of workspaceIds) testWorkspaceIds.delete(workspaceId);
+};
+
+afterEach(cleanupTestWorkspaces);
 
 afterAll(async () => {
-  await prisma.$disconnect();
+  try {
+    await cleanupTestWorkspaces();
+  } finally {
+    await prisma.$disconnect();
+  }
 });
 
-const localDate = "2026-08-09";
+const localDate = "2099-08-09";
 const day = new Date(`${localDate}T00:00:00.000Z`);
 const snapshotAt = `${localDate}T23:59:59.999Z`;
 
@@ -270,8 +276,13 @@ const allPolicies = (scope: Scope): NurtureInstitutionSupportSignalPolicyV1[] =>
 
 const createQuestion = async (
   scope: Scope,
-  input: { lifecycle?: "active" | "suppressed"; sourceRedacted?: boolean },
+  input: {
+    lifecycle?: "active" | "suppressed";
+    sourceRedacted?: boolean;
+    grant?: Scope["grant"];
+  },
 ) => {
+  const grant = input.grant ?? scope.grant;
   const message = await prisma.nurtureFamilyCareMessage.create({
     data: {
       workspaceId: scope.workspaceId,
@@ -284,7 +295,7 @@ const createQuestion = async (
       bodyFormat: "plain_text",
       bodyStorageMode: input.sourceRedacted ? "redacted" : "protected",
       sourceSurface: "mobile",
-      grantId: scope.grant.id,
+      grantId: grant.id,
       status: input.sourceRedacted ? "redacted" : "sent",
       ...(input.sourceRedacted
         ? {
@@ -316,7 +327,7 @@ const createQuestion = async (
       requiresReply: true,
       status: input.sourceRedacted ? "suppressed" : "open",
       classificationSource: "system",
-      grantId: scope.grant.id,
+      grantId: grant.id,
       writerContract: "harness_g2_v1",
       responseState: "awaiting_reply",
       lifecycleState: input.lifecycle ?? "active",
@@ -329,6 +340,7 @@ const createQuestion = async (
         : {}),
       dueAt: new Date(`${localDate}T09:00:00.000Z`),
       createdAt: new Date(`${localDate}T08:00:00.000Z`),
+      updatedAt: new Date(`${localDate}T08:00:00.000Z`),
     },
   });
   return { message, item };
@@ -564,5 +576,64 @@ describe("T-007 G4-B exact support-signal owner providers", () => {
       bindings.configured_load.loadConfiguredLoadFacts(wrongRoleRequest),
     ]);
     expect(reads.every((read) => read.status === "unavailable")).toBe(true);
+  });
+
+  it("does not cache authority when the same request object is reused", async () => {
+    const scope = await seedScope();
+    await prisma.nurtureDailyAttendanceSubmission.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        careGroupId: scope.careGroup.id,
+        localDate: day,
+        state: "submitted",
+        submittedByRoleAssignmentId: scope.caregiverRole.id,
+        submittedAt: new Date(`${localDate}T10:00:00.000Z`),
+      },
+    });
+    const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
+      prisma,
+      owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
+    });
+    const sameRequest = request(scope, [allPolicies(scope)[0]!]);
+
+    await expect(
+      bindings.attendance.loadAttendanceSubmissionFacts(sameRequest),
+    ).resolves.toEqual({ status: "available", facts: [] });
+    await prisma.nurtureCareRoleAssignment.update({
+      where: { id: scope.adminRole.id },
+      data: { status: "revoked" },
+    });
+    await expect(
+      bindings.attendance.loadAttendanceSubmissionFacts(sameRequest),
+    ).resolves.toEqual({ status: "unavailable" });
+  });
+
+  it("excludes pending work whose owner disclosure is not authorized", async () => {
+    const scope = await seedScope();
+    const undisclosedGrant = await prisma.nurtureChildLinkGrant.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        grantedByParticipantId: scope.guardian.id,
+        grantedToScopeType: "care_group",
+        grantedToScopeId: scope.careGroup.id,
+        directions: ["family_to_org"],
+        dataClasses: ["family_care_question"],
+        purposes: ["family_care_workflow", "family_communication"],
+        status: "active",
+      },
+    });
+    await createQuestion(scope, { grant: undisclosedGrant });
+    const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
+      prisma,
+      owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
+    });
+
+    await expect(
+      bindings.configured_load.loadConfiguredLoadFacts(
+        request(scope, [allPolicies(scope)[5]!]),
+      ),
+    ).resolves.toEqual({ status: "available", facts: [] });
   });
 });
