@@ -2,6 +2,7 @@ import type { Prisma, PrismaClient } from "@prisma/client";
 import {
   institutionAdminDisclosureAuthorizes,
   type InstitutionBusinessCommunicationRawV1,
+  type InstitutionBusinessCommunicationListPort,
   type InstitutionBusinessCommunicationReadPort,
 } from "@the-nurture/scenario/harness";
 
@@ -23,7 +24,7 @@ const currentRole = (
  * projection. Every locator and policy fact stays inside the Nurture owner.
  */
 export class PrismaInstitutionBusinessCommunicationReadPort
-  implements InstitutionBusinessCommunicationReadPort
+  implements InstitutionBusinessCommunicationReadPort, InstitutionBusinessCommunicationListPort
 {
   constructor(private readonly prisma: PrismaClient | Prisma.TransactionClient) {}
 
@@ -189,6 +190,7 @@ export class PrismaInstitutionBusinessCommunicationReadPort
       authorized: true,
       communication: {
         message_id: message.id,
+        child_care_process_id: message.childCareProcessId,
         enrollment_id: message.enrollmentId,
         care_group_id: message.careGroupId,
         institution_id: institutionId,
@@ -202,6 +204,13 @@ export class PrismaInstitutionBusinessCommunicationReadPort
         redacted: message.status === "redacted",
         lifecycle: item?.lifecycleState ?? "active",
         ...(item?.lifecycleReason ? { lifecycle_reason: item.lifecycleReason } : {}),
+        ...(item
+          ? {
+              acknowledgement_state: item.acknowledgementState,
+              response_state: item.responseState,
+              ...(item.dueAt ? { due_at: item.dueAt.toISOString() } : {}),
+            }
+          : {}),
         ...(message.bodyProtectionPayload
           ? { body_envelope: message.bodyProtectionPayload }
           : {}),
@@ -210,5 +219,56 @@ export class PrismaInstitutionBusinessCommunicationReadPort
           : {}),
       },
     };
+  }
+
+  async listInstitutionBusinessCommunications(input: {
+    workspace_id: string;
+    participant_id: string;
+    care_group_id: string;
+    local_date: string;
+    snapshot_at: string;
+    limit: number;
+  }): Promise<InstitutionBusinessCommunicationRawV1[]> {
+    const limit = Math.max(0, Math.min(input.limit, 100));
+    if (limit === 0) return [];
+    const day = new Date(`${input.local_date}T00:00:00.000Z`);
+    const dayEnd = new Date(day.getTime() + 86_400_000);
+    const snapshot = new Date(input.snapshot_at);
+    const pageSize = Math.min(Math.max(limit * 2, 20), 200);
+    const authorized: InstitutionBusinessCommunicationRawV1[] = [];
+    let cursor: string | undefined;
+    while (authorized.length < limit) {
+      const rows = await this.prisma.nurtureFamilyCareMessage.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          careGroupId: input.care_group_id,
+          writerContract: "harness_g2_v1",
+          status: { in: ["sent", "redacted"] },
+          createdAt: { gte: day, lt: dayEnd, lte: snapshot },
+        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        take: pageSize,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        select: { id: true },
+      });
+      if (rows.length === 0) break;
+      const loaded = await Promise.all(
+        rows.map((row) =>
+          this.loadInstitutionBusinessCommunication({
+            workspace_id: input.workspace_id,
+            participant_id: input.participant_id,
+            message_id: row.id,
+          }),
+        ),
+      );
+      authorized.push(
+        ...loaded.flatMap((result) =>
+          result.authorized ? [result.communication] : [],
+        ),
+      );
+      cursor = rows.at(-1)!.id;
+      if (rows.length < pageSize) break;
+    }
+    return authorized.slice(0, limit);
   }
 }

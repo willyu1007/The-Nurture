@@ -99,6 +99,7 @@ export const institutionAdminDisclosureAuthorizes = (
 
 export type InstitutionBusinessCommunicationRawV1 = {
   message_id: string;
+  child_care_process_id: string;
   enrollment_id: string;
   care_group_id: string;
   institution_id: string;
@@ -112,6 +113,9 @@ export type InstitutionBusinessCommunicationRawV1 = {
   redacted: boolean;
   lifecycle: "active" | "closed" | "suppressed";
   lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
+  acknowledgement_state?: "pending" | "acknowledged";
+  response_state?: "awaiting_reply" | "responded" | "not_applicable";
+  due_at?: string;
   body_envelope?: unknown;
   correction_body_envelope?: unknown;
 };
@@ -125,6 +129,24 @@ export type InstitutionBusinessCommunicationReadPort = {
     | { authorized: true; communication: InstitutionBusinessCommunicationRawV1 }
     | { authorized: false }
   >;
+};
+
+/**
+ * Body-free candidate list for a class-day detail projection.
+ *
+ * Implementations MUST run the same per-message owner-read predicate as the
+ * single-message port before returning a row. The list is not cached authority:
+ * opening one of its target refs re-runs the single-message read.
+ */
+export type InstitutionBusinessCommunicationListPort = {
+  listInstitutionBusinessCommunications(input: {
+    workspace_id: string;
+    participant_id: string;
+    care_group_id: string;
+    local_date: string;
+    snapshot_at: string;
+    limit: number;
+  }): Promise<InstitutionBusinessCommunicationRawV1[]>;
 };
 
 export type InstitutionBusinessCommunicationProjectionV1 = {
