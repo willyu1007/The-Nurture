@@ -132,6 +132,6 @@
       "prisma/migrations",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "923cef7e5e6566f7fe353d274ede8edff04db1b1e9e73112e99df4516febfbc9"
+    "contractSha256": "3608c7a7e0580dbcd0b32b30769af09cbcef4380122dd52e8beb22e2f36dbd2d"
   }
 }
