@@ -23,6 +23,7 @@ import type {
 import { PrismaBoardMutationTransaction } from "./board-mutation.transaction.js";
 import { PrismaPublishProcessTransaction } from "./publish-process.transaction.js";
 import { PrismaMediaAttributionTransaction } from "./media-attribution.transaction.js";
+import { PrismaAttendanceTransaction } from "./attendance-closeout.repository.js";
 import { PrismaPublicationSafetyTransaction } from "./publication-safety.transaction.js";
 import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
@@ -142,6 +143,14 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly mediaAttribution: PrismaMediaAttributionTransaction;
 
   /**
+   * G4-B attendance writes its submission and entries inside this same
+   * command transaction. That is what makes the read the decision was made
+   * against and the write that follows it atomic — the alternative leaves a
+   * window another writer can enter between them.
+   */
+  readonly attendance: PrismaAttendanceTransaction;
+
+  /**
    * The G3-D post-release safety writes: monotone visibility in apply, the
    * command-naming lineage rows in finalize, one transaction throughout.
    */
@@ -155,6 +164,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);
     this.publishProcess = new PrismaPublishProcessTransaction(transaction);
     this.mediaAttribution = new PrismaMediaAttributionTransaction(transaction);
+    this.attendance = new PrismaAttendanceTransaction(transaction);
     this.publicationSafety = new PrismaPublicationSafetyTransaction(transaction);
     this.careCapture = new PrismaCareCaptureTransaction(transaction);
   }

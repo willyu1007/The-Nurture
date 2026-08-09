@@ -98,15 +98,49 @@ Three checks, in the same posture as `ck_nurture_grant_scope`:
 | Admin admitted to `submit` | 3 unit, 1 db red |
 | assignment tested against now instead of the closed day | 1 db red |
 | `apply` drops its conditional head | **0 red at first** — gap closed by a concurrent-revision test, then 1 db red |
+| `canonicalize` stops sorting entries | 1 db red |
+| `canonicalize` drops `expected_head` | **0 red at first** — gap closed by a payload-mismatch test, then 1 db red |
+| `canonicalize` drops `role_assignment_ref` | 1 db red |
+| `nextAttendanceHead` stops incrementing | 4 unit, 5 db red |
+| `apply` re-decides after the precondition | **0 red, correctly** — the branch was unreachable and was removed rather than covered |
+
+## Idempotency, added 2026-08-09
+
+The first version of this increment shipped without it and recorded the gap.
+It is now built, and the shape of the fix mattered more than its size.
+
+**The three commands are `NurtureCommandSpec`s and there is no second write
+path.** The pre-kernel service and its repository were deleted rather than kept
+alongside — a direct writer beside a kernel writer is a route without
+idempotency beside one with it, which is the dual track these increments keep
+removing.
+
+`checkPreconditions` and `apply` run inside one Serializable transaction under
+one advisory lock, so 0D-1 fixture 9 now holds: a replayed request id returns
+the first execution's result and writes nothing further. The kernel keeps two
+things separate that are easy to conflate, and the test asserts both —
+`disposition: "replayed"` describes **this** call, while
+`business_outcome: "applied"` reports what the **original** execution did.
+`already_satisfied` means something else again: a precondition that found the
+work already done.
+
+**Command identity covers every field a caller can vary.** `canonicalize`
+sorts entries by child ref, so a client retrying with a reordered list gets the
+replay rather than a second write; and it includes `expected_head`,
+`local_date` and `role_assignment_ref`, so the same request id carrying a
+different command is refused `idempotency_conflict` rather than silently
+answered with the first command's result.
+
+**One dead branch was found and removed.** `apply` originally re-read
+authority and re-ran the decision, commented as "only a fresh read can say it
+still holds at write time". That claim was wrong: both halves run in the same
+transaction under the same lock, so nothing can move between them. Falsifying
+the re-decision turned no test red — correctly, because the state that branch
+guarded against is unreachable. The branch gave way to `nextAttendanceHead`,
+shared by the decision and the write so neither can drift about what "next"
+means, and the extra authority round-trip is gone.
 
 ## What is owed
-
-**Idempotency is not built.** 0D-1 §5 requires `submit`, `revise` and `reopen`
-to carry a request id and be exact-replay safe, which is the command kernel's
-job and not this increment's. Fixture 9 of 0D-1 — replaying a submit request id
-returns the first result and creates no second submission — is therefore not
-satisfied. The unique index makes a replayed submit fail rather than duplicate,
-which is safe but is a conflict where the freeze requires the original result.
 
 **Preview and the inference boundary** (0D-1 §2) are increment 2. Entries are
 supplied by the caller until then, and `NurtureAttendanceInferenceRun` exists
@@ -118,11 +152,11 @@ with no writer.
 ## Verification
 
 Typecheck clean; unit 750 passed across 67 files, 12 in the attendance decision
-suite; production-db 313 passed across 31 files, 9 in the attendance lane.
+suite; production-db 317 passed across 31 files, 13 in the attendance lane.
 Census unit 66 → 67, production-db 30 → 31.
 
 ## Exit
 
-Increment 1 completes 0D-1's write path minus idempotency. Increment 2 takes
+Increment 1 completes 0D-1's write path, idempotency included. Increment 2 takes
 preview and the inference type boundary, which is what makes the watermark
 columns meaningful and gives `NurtureAttendanceInferenceRun` its writer.

@@ -1,3 +1,4 @@
+import type { NurtureCommandSpec } from "../commands/command-kernel.js";
 import type { NurturePolicyReasonCode } from "./institution-context.js";
 
 /**
@@ -91,6 +92,25 @@ const denyConflict = (): NurtureAttendanceDecision => ({
 });
 
 /**
+ * The head and state a legal command lands on.
+ *
+ * Shared by the decision and the write so the two cannot disagree about what
+ * "next" means. The write runs inside the same Serializable transaction as the
+ * decision, so re-deciding there would be a second copy of the rule rather
+ * than a safety check — and a copy is what drifts.
+ */
+export const nextAttendanceHead = (
+  command: NurtureAttendanceCommand,
+  current: NurtureAttendanceCurrentState,
+): { next_head: number; next_state: "submitted" | "reopened" } => ({
+  next_head: current.kind === "unsubmitted" ? 1 : current.submission_head + 1,
+  next_state:
+    command.kind === "reopen" || (command.kind === "revise" && current.kind === "reopened")
+      ? "reopened"
+      : "submitted",
+});
+
+/**
  * 0D-1 §4 and §5.
  *
  * `expected_head` is carried by all three commands, `submit` supplying `0` to
@@ -133,7 +153,7 @@ export const decideAttendanceCommand = (input: {
       // Reaching here with a stored row means the head matched, so the caller
       // knows the row exists and still called the wrong command.
       if (current.kind !== "unsubmitted") return denyConflict();
-      return { status: "allowed", next_head: 1, next_state: "submitted" };
+      return { status: "allowed", ...nextAttendanceHead(command, current) };
 
     case "revise":
       if (current.kind === "unsubmitted") return denyAuthority("not_authorized");
@@ -143,126 +163,175 @@ export const decideAttendanceCommand = (input: {
       if (!authority.is_same_day && current.kind !== "reopened") {
         return denyAuthority("not_authorized");
       }
-      return {
-        status: "allowed",
-        next_head: current.submission_head + 1,
-        next_state: current.kind === "reopened" ? "reopened" : "submitted",
-      };
+      return { status: "allowed", ...nextAttendanceHead(command, current) };
 
     case "reopen":
       if (current.kind === "unsubmitted") return denyAuthority("not_authorized");
       // Reopen changes no entry. It increments the head so a client holding
       // the pre-reopen value is refused and must reload — without that,
       // reopening would silently widen the window a stale client can write in.
-      return {
-        status: "allowed",
-        next_head: current.submission_head + 1,
-        next_state: "reopened",
-      };
+      return { status: "allowed", ...nextAttendanceHead(command, current) };
   }
 };
 
+
 /**
- * The write port. `loadCurrent` and `apply` are separate so the decision above
- * runs between them on facts the repository read, never on facts a caller
- * supplied.
+ * The owner write port, inside the command transaction.
+ *
+ * Reads and the write live in one transaction on purpose: the decision above
+ * is made against state read inside the same Serializable transaction that
+ * writes, so no window exists between them for another writer to slip into.
  */
-export type NurtureAttendanceRepository = {
-  loadCurrent(input: {
-    workspace_id: string;
-    care_group_ref: string;
-    local_date: string;
-  }): Promise<NurtureAttendanceCurrentState>;
-  /**
-   * Reads the authority facts for this actor against this class AND this date.
-   * The date is a parameter rather than "now" because 0D-1 §4 tests the
-   * assignment as it stood on the day being closed out.
-   */
-  loadAuthority(input: {
+export type NurtureAttendanceCommandTransaction = {
+  loadAttendanceAuthority(input: {
     workspace_id: string;
     role_assignment_ref: string;
     care_group_ref: string;
     local_date: string;
   }): Promise<NurtureAttendanceAuthority | null>;
-  apply(input: {
+  loadAttendanceCurrent(input: {
+    workspace_id: string;
+    care_group_ref: string;
+    local_date: string;
+  }): Promise<NurtureAttendanceCurrentState>;
+  applyAttendanceCommand(input: {
     workspace_id: string;
     care_group_ref: string;
     local_date: string;
     role_assignment_ref: string;
     command: NurtureAttendanceCommand;
-    decision: Extract<NurtureAttendanceDecision, { status: "allowed" }>;
+    next_head: number;
+    next_state: "submitted" | "reopened";
     expected_head: number;
-  }): Promise<{ committed: boolean; submission_head: number }>;
+  }): Promise<{ committed: boolean; submission_ref: string; submission_head: number }>;
 };
 
-export type NurtureAttendanceRequest = {
+export type NurtureAttendanceCommandPayload = {
   workspace_id: string;
   care_group_ref: string;
   local_date: string;
   role_assignment_ref: string;
   expected_head: number;
-  command: NurtureAttendanceCommand;
+  /** Absent for `reopen`, which changes no entry. */
+  entries?: NurtureAttendanceEntryInput[];
 };
 
-export type NurtureAttendanceOutcome =
-  | { status: "committed"; submission_head: number; state: "submitted" | "reopened" }
-  | { status: "denied"; layer: "authority"; reason_code: NurturePolicyReasonCode }
-  | { status: "denied"; layer: "concurrency"; reason_code: "conflict" };
+const attendanceCommandOf = (
+  kind: "submit" | "revise" | "reopen",
+  payload: NurtureAttendanceCommandPayload,
+): NurtureAttendanceCommand =>
+  kind === "reopen" ? { kind } : { kind, entries: payload.entries ?? [] };
 
 /**
- * The service. Reads, decides, writes — and treats a rejected write as a
- * conflict rather than an error.
+ * Builds one of the three specs. They differ only in the command they carry,
+ * so the authority, concurrency and write rules exist once — three specs with
+ * three copies of the same precondition would be three chances to drift.
  *
- * `apply` returning `committed: false` is the storage layer refusing on the
- * (class, date) unique constraint or on a head that moved between the read and
- * the write. Both mean another writer won the race, which is the same answer
- * `decideAttendanceCommand` gives for a stale head — so it is reported
- * identically rather than as a distinct failure a caller would have to handle
- * twice.
+ * Idempotency is the runner's, not this spec's: the same
+ * `command_request_id` returns the first execution's result and writes
+ * nothing further, which is 0D-1 §5's exact-replay requirement.
  */
-export class NurtureAttendanceCloseoutService {
-  constructor(private readonly repository: NurtureAttendanceRepository) {}
-
-  async execute(request: NurtureAttendanceRequest): Promise<NurtureAttendanceOutcome> {
-    const authority = await this.repository.loadAuthority({
-      workspace_id: request.workspace_id,
-      role_assignment_ref: request.role_assignment_ref,
-      care_group_ref: request.care_group_ref,
-      local_date: request.local_date,
+const attendanceCommandSpec = (
+  kind: "submit" | "revise" | "reopen",
+): NurtureCommandSpec<NurtureAttendanceCommandPayload> => ({
+  command_key: `nurture.${kind}_daily_attendance`,
+  command_scope: "care_group",
+  contract_version: 1,
+  canonicalize: (input) => ({
+    care_group_ref: input.care_group_ref,
+    local_date: input.local_date,
+    role_assignment_ref: input.role_assignment_ref,
+    expected_head: input.expected_head,
+    // Entry order must not change the command identity: the same set of
+    // per-child states is the same command however the client listed them.
+    entries: [...(input.entries ?? [])]
+      .map((entry) => ({
+        child_process_ref: entry.child_process_ref,
+        state: entry.state,
+        adjusted_from_inference: entry.adjusted_from_inference ?? false,
+      }))
+      .sort((left, right) => left.child_process_ref.localeCompare(right.child_process_ref)),
+  }),
+  async checkPreconditions(transaction, input) {
+    const attendance = transaction.attendance;
+    if (!attendance) return { status: "invalid", reason_code: "attendance_owner_unavailable" };
+    const authority = await attendance.loadAttendanceAuthority({
+      workspace_id: input.workspace_id,
+      role_assignment_ref: input.role_assignment_ref,
+      care_group_ref: input.care_group_ref,
+      local_date: input.local_date,
     });
     // No resolvable assignment is indistinguishable from one that does not
     // cover this class on this date.
-    if (!authority) return { status: "denied", layer: "authority", reason_code: "not_authorized" };
-
-    const current = await this.repository.loadCurrent({
-      workspace_id: request.workspace_id,
-      care_group_ref: request.care_group_ref,
-      local_date: request.local_date,
+    if (!authority) return { status: "blocked", reason_code: "not_authorized" };
+    const current = await attendance.loadAttendanceCurrent({
+      workspace_id: input.workspace_id,
+      care_group_ref: input.care_group_ref,
+      local_date: input.local_date,
     });
     const decision = decideAttendanceCommand({
-      command: request.command,
+      command: attendanceCommandOf(kind, input),
       current,
-      expected_head: request.expected_head,
+      expected_head: input.expected_head,
       authority,
     });
-    if (decision.status === "denied") return decision;
-
-    const applied = await this.repository.apply({
-      workspace_id: request.workspace_id,
-      care_group_ref: request.care_group_ref,
-      local_date: request.local_date,
-      role_assignment_ref: request.role_assignment_ref,
-      command: request.command,
-      decision,
-      expected_head: request.expected_head,
-    });
-    if (!applied.committed) {
-      return { status: "denied", layer: "concurrency", reason_code: "conflict" };
+    if (decision.status === "denied") {
+      // The refusal layer maps onto the kernel's own classes: an authority
+      // refusal is `blocked`, a stale head is `conflict`. Neither is
+      // `invalid`, which the kernel reserves for a malformed envelope.
+      return decision.layer === "authority"
+        ? { status: "blocked", reason_code: decision.reason_code }
+        : { status: "conflict", reason_code: decision.reason_code };
     }
+    return { status: "ready" };
+  },
+  async apply(transaction, input) {
+    const attendance = transaction.attendance;
+    if (!attendance) throw new Error("attendance owner adapter is not wired");
+    // No re-decision here. `checkPreconditions` ran inside this same
+    // Serializable transaction under the same advisory lock, so authority and
+    // head cannot have moved between the two — a second authority read would
+    // be a check for a state nothing can produce, which is the dead surface
+    // 0G finding 2 warns about. The current state is read once because the
+    // head to write is derived from it.
+    const current = await attendance.loadAttendanceCurrent({
+      workspace_id: input.workspace_id,
+      care_group_ref: input.care_group_ref,
+      local_date: input.local_date,
+    });
+    const command = attendanceCommandOf(kind, input);
+    const next = nextAttendanceHead(command, current);
+    const applied = await attendance.applyAttendanceCommand({
+      workspace_id: input.workspace_id,
+      care_group_ref: input.care_group_ref,
+      local_date: input.local_date,
+      role_assignment_ref: input.role_assignment_ref,
+      command,
+      next_head: next.next_head,
+      next_state: next.next_state,
+      expected_head: input.expected_head,
+    });
+    if (!applied.committed) throw new Error("attendance_write_conflict");
     return {
-      status: "committed",
-      submission_head: applied.submission_head,
-      state: decision.next_state,
+      output_refs: [
+        {
+          schema_version: 1,
+          namespace: "nurture",
+          object_type: "daily_attendance_submission",
+          object_id: applied.submission_ref,
+          version: applied.submission_head,
+        },
+      ],
+      result_schema_version: 1,
+      // Replay-stable: the same request id returns this, not a recomputation.
+      committed_result: {
+        submission_head: applied.submission_head,
+        state: next.next_state,
+      },
     };
-  }
-}
+  },
+});
+
+export const submitDailyAttendanceSpec = attendanceCommandSpec("submit");
+export const reviseDailyAttendanceSpec = attendanceCommandSpec("revise");
+export const reopenDailyAttendanceSpec = attendanceCommandSpec("reopen");
