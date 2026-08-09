@@ -118,6 +118,7 @@ export type NurtureConfiguredLoadSignalOwner = {
 };
 
 type SourceAdapter = {
+  category: NurtureInstitutionSupportSignalSourceV1["category"];
   loadAuthorizedSources(
     input: NurtureInstitutionSupportSignalOwnerReadRequest,
   ): Promise<{
@@ -148,6 +149,8 @@ const unavailable = (): Awaited<ReturnType<SourceAdapter["loadAuthorizedSources"
 
 /** Maps only the formal submission state and the owner's checkpoint instant. */
 export class NurtureAttendanceSubmissionSignalSourceAdapter implements SourceAdapter {
+  readonly category = "attendance_submission_overdue" as const;
+
   constructor(private readonly owner: NurtureAttendanceSubmissionSignalOwner) {}
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
@@ -167,6 +170,8 @@ export class NurtureAttendanceSubmissionSignalSourceAdapter implements SourceAda
 
 /** Maps the communication owner's response/lifecycle/deadline facts unchanged. */
 export class NurtureBusinessResponseSignalSourceAdapter implements SourceAdapter {
+  readonly category = "business_response_overdue" as const;
+
   constructor(private readonly owner: NurtureBusinessResponseSignalOwner) {}
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
@@ -189,6 +194,8 @@ export class NurtureBusinessResponseSignalSourceAdapter implements SourceAdapter
 
 /** The backlog owner supplies both current state and the full-coverage aggregate. */
 export class NurtureReviewBacklogSignalSourceAdapter implements SourceAdapter {
+  readonly category = "review_backlog_threshold" as const;
+
   constructor(private readonly owner: NurtureReviewBacklogSignalOwner) {}
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
@@ -208,6 +215,8 @@ export class NurtureReviewBacklogSignalSourceAdapter implements SourceAdapter {
 
 /** No status-to-blocker translation exists here: the owner supplies condition. */
 export class NurtureAuthoritySourceBlockedSignalSourceAdapter implements SourceAdapter {
+  readonly category = "authority_or_source_blocked" as const;
+
   constructor(private readonly owner: NurtureAuthoritySourceBlockerSignalOwner) {}
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
@@ -227,6 +236,8 @@ export class NurtureAuthoritySourceBlockedSignalSourceAdapter implements SourceA
 
 /** WorkItem/Workflow owns its blocker; this adapter only changes projection shape. */
 export class NurtureWorkItemWorkflowBlockedSignalSourceAdapter implements SourceAdapter {
+  readonly category = "work_item_or_workflow_blocked" as const;
+
   constructor(private readonly owner: NurtureWorkItemWorkflowBlockerSignalOwner) {}
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
@@ -246,6 +257,8 @@ export class NurtureWorkItemWorkflowBlockedSignalSourceAdapter implements Source
 
 /** The configured-load owner supplies current counts per authorized member. */
 export class NurtureConfiguredLoadSignalSourceAdapter implements SourceAdapter {
+  readonly category = "configured_load_threshold" as const;
+
   constructor(private readonly owner: NurtureConfiguredLoadSignalOwner) {}
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
@@ -293,8 +306,16 @@ export class NurtureExactOwnerSupportSignalSourceReader
 
   async loadAuthorizedSources(input: NurtureInstitutionSupportSignalOwnerReadRequest) {
     try {
+      // An absent or wholly disabled category has no owner read to perform.
+      // Calling an unavailable owner anyway would turn the frozen
+      // "unconfigured means disabled" rule into a cross-category outage.
+      const enabledCategories = new Set(
+        input.policies.filter((policy) => policy.enabled).map((policy) => policy.category),
+      );
       const reads = await Promise.all(
-        this.adapters.map((adapter) => adapter.loadAuthorizedSources(input)),
+        this.adapters
+          .filter((adapter) => enabledCategories.has(adapter.category))
+          .map((adapter) => adapter.loadAuthorizedSources(input)),
       );
       if (reads.some((read) => read.status === "unavailable")) return unavailable();
       return {

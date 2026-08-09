@@ -10,13 +10,38 @@ import {
   type NurtureWorkItemWorkflowBlockerOwnerFactV1,
 } from "../../src/index.js";
 
+const deterministicCategories = [
+  "attendance_submission_overdue",
+  "business_response_overdue",
+  "review_backlog_threshold",
+  "authority_or_source_blocked",
+  "work_item_or_workflow_blocked",
+  "configured_load_threshold",
+] as const;
+
 const request: NurtureInstitutionSupportSignalOwnerReadRequest = {
   workspace_id: "workspace-1",
   participant_ref: "admin-1",
   role_assignment_ref: "admin-role-1",
   institution_ref: "institution-1",
   snapshot_at: "2026-08-09T12:00:00.000Z",
-  policies: [],
+  policies: deterministicCategories.map((category, index) => ({
+    contract_version: "1.0.0",
+    policy_ref: `policy-${category}`,
+    workspace_id: "workspace-1",
+    institution_ref: "institution-1",
+    category,
+    ...(category === "review_backlog_threshold" || category === "configured_load_threshold"
+      ? { absolute_threshold: 1 }
+      : {}),
+    window_key: "local-day:2026-08-09",
+    checkpoint_ref: `checkpoint-${index}`,
+    enabled: true,
+    policy_revision: 1,
+    effective_from: "2026-08-01T00:00:00.000Z",
+    changed_by_role_assignment_ref: "admin-role-1",
+    change_reason: "test",
+  })),
 };
 
 const common = {
@@ -202,6 +227,18 @@ describe("six deterministic exact-owner source adapters", () => {
       status: "unavailable",
       sources: [],
     });
+  });
+
+  it("does not call an owner for an absent or disabled category", async () => {
+    const exactOwners = owners({ workItemRead: { status: "unavailable" } });
+    const noPolicies = { ...request, policies: [] };
+    await expect(
+      new NurtureExactOwnerSupportSignalSourceReader(exactOwners).loadAuthorizedSources(
+        noPolicies,
+      ),
+    ).resolves.toEqual({ status: "available", sources: [] });
+    expect(exactOwners.work_item_workflow_blocker.loadWorkItemWorkflowBlockerFacts)
+      .not.toHaveBeenCalled();
   });
 
   it("does not let one owner exception expose a partial list", async () => {
