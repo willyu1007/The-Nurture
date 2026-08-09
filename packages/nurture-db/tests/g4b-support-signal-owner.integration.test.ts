@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
+import {
+  DAILY_ATTENDANCE_CLOSEOUT_CONTRACT,
+  DAILY_ATTENDANCE_CLOSEOUT_POLICY_REF,
+} from "@the-nurture/scenario";
 import type {
   NurtureInstitutionSupportSignalOwnerReadRequest,
   NurtureInstitutionSupportSignalPolicyV1,
@@ -29,6 +33,7 @@ const cleanupTestWorkspaces = async () => {
     await tx.nurtureAttendanceEntry.deleteMany({ where });
     await tx.nurtureDailyAttendanceSubmission.deleteMany({ where });
     await tx.nurtureChildLinkGrant.deleteMany({ where });
+    await tx.nurtureAttendanceCloseoutPolicy.deleteMany({ where });
     await tx.nurtureCareRoleAssignment.deleteMany({ where });
     await tx.nurtureEnrollment.deleteMany({ where });
     await tx.nurtureFamily.deleteMany({ where });
@@ -207,6 +212,34 @@ const seedScope = async () => {
 
 type Scope = Awaited<ReturnType<typeof seedScope>>;
 
+type AttendancePolicyOverrides = Partial<{
+  policyRevision: number;
+  checkpointLocalTime: string;
+  effectiveFrom: Date;
+  effectiveTo: Date | null;
+  changeReason: string;
+}>;
+
+const createAttendanceCloseoutPolicy = (
+  scope: Scope,
+  overrides: AttendancePolicyOverrides = {},
+) =>
+  prisma.nurtureAttendanceCloseoutPolicy.create({
+    data: {
+      workspaceId: scope.workspaceId,
+      institutionId: scope.institution.id,
+      careGroupId: scope.careGroup.id,
+      contractVersion: DAILY_ATTENDANCE_CLOSEOUT_CONTRACT.version,
+      policyRef: DAILY_ATTENDANCE_CLOSEOUT_POLICY_REF,
+      policyRevision: 1,
+      checkpointLocalTime: "17:30",
+      effectiveFrom: new Date("2026-01-01T00:00:00.000Z"),
+      changedByRoleAssignmentId: scope.adminRole.id,
+      changeReason: "owner integration fixture",
+      ...overrides,
+    },
+  });
+
 const policy = (
   scope: Scope,
   category: NurtureInstitutionSupportSignalPolicyV1["category"],
@@ -351,7 +384,7 @@ const createQuestion = async (
 };
 
 describe("T-007 G4-B exact support-signal owner providers", () => {
-  it("refuses an enabled unsubmitted attendance policy without inventing a checkpoint", async () => {
+  it("uses only the attendance owner's configured checkpoint for an unsubmitted day", async () => {
     const scope = await seedScope();
     const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
       prisma,
@@ -363,6 +396,30 @@ describe("T-007 G4-B exact support-signal owner providers", () => {
         request(scope, [attendancePolicy]),
       ),
     ).resolves.toEqual({ status: "unavailable" });
+
+    await prisma.nurtureInstitutionPublicationPolicy.updateMany({
+      where: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+      },
+      data: { timeZone: "Asia/Shanghai" },
+    });
+    await createAttendanceCloseoutPolicy(scope);
+    await expect(
+      bindings.attendance.loadAttendanceSubmissionFacts(
+        request(scope, [attendancePolicy]),
+      ),
+    ).resolves.toEqual({
+      status: "available",
+      facts: [
+        expect.objectContaining({
+          source_type: "daily_attendance_closeout",
+          submission_state: "unsubmitted",
+          checkpoint_deadline_at: `${localDate}T09:30:00.000Z`,
+          occurred_at: `${localDate}T09:30:00.000Z`,
+        }),
+      ],
+    });
 
     await prisma.nurtureDailyAttendanceSubmission.create({
       data: {
@@ -398,6 +455,63 @@ describe("T-007 G4-B exact support-signal owner providers", () => {
         request(scope, [attendancePolicy]),
       ),
     ).resolves.toEqual({ status: "available", facts: [] });
+  });
+
+  it("fails closed when two attendance checkpoint policies overlap", async () => {
+    const scope = await seedScope();
+    await createAttendanceCloseoutPolicy(scope);
+    await createAttendanceCloseoutPolicy(scope, {
+      policyRevision: 2,
+      checkpointLocalTime: "18:00",
+    });
+    const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
+      prisma,
+      owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
+    });
+    await expect(
+      bindings.attendance.loadAttendanceSubmissionFacts(
+        request(scope, [allPolicies(scope)[0]!]),
+      ),
+    ).resolves.toEqual({ status: "unavailable" });
+  });
+
+  it("does not retroactively apply a policy first effective after the local day began", async () => {
+    const scope = await seedScope();
+    await createAttendanceCloseoutPolicy(scope, {
+      effectiveFrom: new Date(`${localDate}T08:00:00.000Z`),
+    });
+    const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
+      prisma,
+      owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
+    });
+    await expect(
+      bindings.attendance.loadAttendanceSubmissionFacts(
+        request(scope, [allPolicies(scope)[0]!]),
+      ),
+    ).resolves.toEqual({ status: "unavailable" });
+  });
+
+  it("enforces attendance checkpoint policy constraints in PostgreSQL", async () => {
+    const scope = await seedScope();
+    await expect(
+      createAttendanceCloseoutPolicy(scope, { policyRevision: 0 }),
+    ).rejects.toThrow();
+    await expect(
+      createAttendanceCloseoutPolicy(scope, { checkpointLocalTime: "24:00" }),
+    ).rejects.toThrow();
+    await expect(
+      createAttendanceCloseoutPolicy(scope, {
+        effectiveTo: new Date("2025-12-31T23:59:59.999Z"),
+      }),
+    ).rejects.toThrow();
+    await expect(
+      createAttendanceCloseoutPolicy(scope, { changeReason: "" }),
+    ).rejects.toThrow();
+    expect(
+      await prisma.nurtureAttendanceCloseoutPolicy.count({
+        where: { workspaceId: scope.workspaceId },
+      }),
+    ).toBe(0);
   });
 
   it("does not translate a redacted source into an authority/source blocker", async () => {

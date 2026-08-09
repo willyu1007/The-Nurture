@@ -1,5 +1,26 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — G4-B increment 12: attendance checkpoint owner
+
+- Added one versioned exact-class `NurtureAttendanceCloseoutPolicy` under the
+  0D-1 contract. The owner resolves its configured wall clock to one instant
+  and supplies that fact to the existing attendance adapter; the signal policy
+  stores no deadline and parses no local time.
+- Architecture review removed a proposed second timezone field. Checkpoint
+  resolution now reuses the existing Institution local-day owner's timezone
+  and the same shared wall-clock utility as publication scheduling. A policy
+  first effective after local-day start cannot create a retroactive deadline.
+- Missing, invalid, expired, overlapping or non-monotonic policy history fails
+  the exact owner read closed. A valid unsubmitted day produces an actor-bound
+  source; a stored submission remains resolved and absent.
+- A repo-wide blocker audit found no readable canonical fact for
+  `authority_or_source_blocked`. Revoked/redacted/withdrawn/cancelled receipts
+  are unreadable or terminal; item/workflow-driver blockers already belong to
+  the separate WorkItem/Workflow category. No blocker state was added.
+- The additive 27th migration passed exact-owner 12/12 and full DB 360/360 on
+  the approved disposable target, which was destroyed and confirmed absent.
+  See [`46`](./46-g4-b-increment-12-record.md).
+
 ## 2026-08-09 — Current-head disposable DB requalification
 
 - The user approved one new empty local disposable PostgreSQL target for the

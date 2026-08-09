@@ -63,6 +63,7 @@ export * from "./domain/institution/institution-policy.js";
 export * from "./domain/institution/institution-authority-chain.js";
 export * from "./domain/institution/institution-aggregate.js";
 export * from "./domain/institution/attendance-closeout.js";
+export * from "./domain/institution/zoned-time.js";
 export * from "./domain/institution/attendance-preview.js";
 export * from "./domain/institution/institution-class-list.js";
 export * from "./domain/institution/institution-class-day-detail.js";

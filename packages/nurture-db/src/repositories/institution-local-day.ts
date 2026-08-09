@@ -42,7 +42,7 @@ export const loadInstitutionLocalDay = async (
     local_date: string;
     at: Date;
   },
-): Promise<NurtureInstitutionLocalDay | null> => {
+): Promise<(NurtureInstitutionLocalDay & { time_zone: string }) | null> => {
   const date = parseLocalDate(input.local_date);
   if (!date || Number.isNaN(input.at.getTime())) return null;
   const policy = await loadCurrentInstitutionPublicationPolicy(prisma, {
@@ -55,5 +55,6 @@ export const loadInstitutionLocalDay = async (
     storage_date: new Date(Date.UTC(date.year, date.month - 1, date.day)).toISOString(),
     occurred_from: zonedLocalTimeToInstant(date, 0, policy.time_zone).toISOString(),
     occurred_before: zonedLocalTimeToInstant(nextDay(date), 0, policy.time_zone).toISOString(),
+    time_zone: policy.time_zone,
   };
 };

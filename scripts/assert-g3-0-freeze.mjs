@@ -286,11 +286,16 @@ for (const tableName of requiredFactTables) {
  * branch never updated this census, so the gate had been failing on that branch
  * — its own qualification ran typecheck, lint, unit, routing, persistence, N1
  * and X4 but not this one.
+ *
+ * 2026-08-09 — T-007 G4-B increment 12 adds
+ * `NurtureAttendanceCloseoutPolicy`. It is 0D-1's exact-class, versioned
+ * checkpoint owner policy; the signal and board projections remain unstored.
  */
 const expectedTableCensus = [
   "NurtureActivityComparisonDraft",
   "NurtureActivityOption",
   "NurtureActivityPlacement",
+  "NurtureAttendanceCloseoutPolicy",
   "NurtureAttendanceEntry",
   "NurtureAttendanceInferenceRun",
   "NurtureC30ActionAuditRecord",

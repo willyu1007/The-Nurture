@@ -323,6 +323,21 @@ Falsification evidence is per-increment and lives in each record's
 | External My-Chat pins | **FAIL, attributed** | Workflow expected `567b96c`, C30 expected `51ad97f`, observed `ebc7605`; no cross-repo adoption was performed. |
 | Effect boundary | PASS | I1 adapter/consumer code only; no migration apply, concrete owner activation, capability/contract rotation, deployment or traffic. |
 
+## 2026-08-09 — G4-B increment 12 attendance checkpoint owner
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | Removed the duplicate checkpoint timezone; reused the sole local-day owner and shared wall-clock conversion. Policies first effective after day start cannot backdate a deadline. |
+| Prisma SSOT | PASS | Format, validate, client generation, 27th additive migration and generated DB context refresh all pass. |
+| Scenario + DB typechecks | PASS | Root TypeScript and `@the-nurture/db` report zero errors. |
+| Targeted units | PASS | Attendance checkpoint and publication schedule: 27/27. |
+| Full unit lane | PASS | 828/828 across 73 files. |
+| Exact-owner DB | PASS | 12/12: missing/configured/ambiguous/retroactive policy paths and real PostgreSQL constraints included. |
+| Full production-DB lane | PASS | 360/360 across 37 files. |
+| Migration and cleanup | PASS, disposable only | Clean 27/27 deploy, final status up to date, zero sessions, exact target destroyed and confirmed absent. |
+| Authority/source blocker audit | PASS, remains unavailable | No readable canonical blocker exists; terminal/revoked/redacted sources were not translated and no signal-local state was added. |
+| Effect boundary | PASS | I1 code, schema/migration authoring and disposable qualification only; no shared/persistent apply, production caller, capability, contract rotation, deployment, activation or traffic. |
+
 ## 2026-08-09 — Current-head owner-quality DB requalification
 
 | Check | Result | Evidence |

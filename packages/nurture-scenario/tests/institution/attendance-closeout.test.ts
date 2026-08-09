@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  DAILY_ATTENDANCE_CLOSEOUT_POLICY_REF,
   decideAttendanceCommand,
+  resolveAttendanceCheckpoint,
   type NurtureAttendanceAuthority,
   type NurtureAttendanceCommand,
   type NurtureAttendanceCurrentState,
@@ -167,5 +169,64 @@ describe("0D-1 attendance closeout decision (G4-B increment 1)", () => {
     const concurrencyDenial = decide(revise, submitted(2), 1);
     expect(authorityDenial).toMatchObject({ layer: "authority" });
     expect(concurrencyDenial).toMatchObject({ layer: "concurrency" });
+  });
+});
+
+describe("0D-1 attendance checkpoint owner policy", () => {
+  const policy = {
+    contract_version: "1.0.0" as const,
+    policy_ref: DAILY_ATTENDANCE_CLOSEOUT_POLICY_REF,
+    policy_revision: 1,
+    workspace_id: "workspace-1",
+    institution_ref: "institution-1",
+    care_group_ref: "class-1",
+    checkpoint_local_time: "17:30",
+    effective_from: "2026-01-01T00:00:00.000Z",
+    changed_by_role_assignment_ref: "role-1",
+    change_reason: "Set the daily closeout checkpoint.",
+  };
+
+  it("resolves the configured class/date wall clock to one canonical instant", () => {
+    expect(
+      resolveAttendanceCheckpoint({
+        policy,
+        local_date: "2026-08-09",
+        time_zone: "Asia/Shanghai",
+        at: new Date("2026-08-09T12:00:00.000Z"),
+      }),
+    ).toEqual({ status: "resolved", checkpoint_at: "2026-08-09T09:30:00.000Z" });
+  });
+
+  it("refuses malformed, expired and nonexistent wall-clock configurations", () => {
+    expect(
+      resolveAttendanceCheckpoint({
+        policy: { ...policy, checkpoint_local_time: "24:00" },
+        local_date: "2026-08-09",
+        time_zone: "Asia/Shanghai",
+        at: new Date("2026-08-09T12:00:00.000Z"),
+      }),
+    ).toMatchObject({ status: "unavailable" });
+    expect(
+      resolveAttendanceCheckpoint({
+        policy: { ...policy, effective_to: "2026-08-09T11:00:00.000Z" },
+        local_date: "2026-08-09",
+        time_zone: "Asia/Shanghai",
+        at: new Date("2026-08-09T12:00:00.000Z"),
+      }),
+    ).toMatchObject({ status: "unavailable" });
+    expect(
+      resolveAttendanceCheckpoint({
+        policy: {
+          ...policy,
+          checkpoint_local_time: "02:30",
+        },
+        local_date: "2026-03-08",
+        time_zone: "America/New_York",
+        at: new Date("2026-03-08T12:00:00.000Z"),
+      }),
+    ).toEqual({
+      status: "unavailable",
+      reason_code: "checkpoint_wall_clock_unavailable",
+    });
   });
 });

@@ -1,6 +1,10 @@
 import { createHmac } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
-import { INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION } from "@the-nurture/scenario";
+import {
+  INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION,
+  resolveAttendanceCheckpoint,
+  type NurtureAttendanceCloseoutPolicyV1,
+} from "@the-nurture/scenario";
 import type {
   NurtureInstitutionSupportSignalOwnerReadRequest,
   NurtureInstitutionSupportSignalPolicyV1,
@@ -29,6 +33,11 @@ export type OwnerSelection = {
   care_group: OwnerClass;
   policy: NurtureInstitutionSupportSignalPolicyV1;
   local_day: LocalDay;
+};
+
+export type AttendanceCheckpoint = {
+  checkpoint_at: string;
+  policy_revision: number;
 };
 
 type SelectionRead =
@@ -243,6 +252,80 @@ export class PrismaInstitutionSupportSignalOwnerContext {
       select: { id: true },
     });
     return Boolean(row);
+  }
+
+  async loadAttendanceCheckpoint(
+    input: NurtureInstitutionSupportSignalOwnerReadRequest,
+    selection: OwnerSelection,
+    at: Date,
+  ): Promise<AttendanceCheckpoint | null> {
+    const dayStart = new Date(selection.local_day.occurred_from);
+    const policyAt = dayStart <= at ? dayStart : at;
+    const [rows, history] = await Promise.all([
+      this.prisma.nurtureAttendanceCloseoutPolicy.findMany({
+        where: {
+          workspaceId: input.workspace_id,
+          institutionId: input.institution_ref,
+          careGroupId: selection.care_group.id,
+          effectiveFrom: { lte: policyAt },
+          OR: [{ effectiveTo: null }, { effectiveTo: { gt: policyAt } }],
+          careGroup: {
+            institutionId: input.institution_ref,
+            status: "active",
+            deletedAt: null,
+          },
+          changedByRoleAssignment: {
+            workspaceId: input.workspace_id,
+            role: "institution_admin",
+            scopeType: "institution",
+            scopeId: input.institution_ref,
+          },
+        },
+        orderBy: [{ effectiveFrom: "desc" }, { policyRevision: "desc" }],
+        take: 2,
+      }),
+      this.prisma.nurtureAttendanceCloseoutPolicy.aggregate({
+        where: {
+          workspaceId: input.workspace_id,
+          institutionId: input.institution_ref,
+          careGroupId: selection.care_group.id,
+          effectiveFrom: { lte: policyAt },
+        },
+        _max: { policyRevision: true },
+      }),
+    ]);
+    if (
+      rows.length !== 1 ||
+      rows[0]!.policyRevision !== history._max.policyRevision
+    ) {
+      return null;
+    }
+    const row = rows[0]!;
+    const policy: NurtureAttendanceCloseoutPolicyV1 = {
+      contract_version: row.contractVersion,
+      policy_ref: row.policyRef,
+      policy_revision: row.policyRevision,
+      workspace_id: row.workspaceId,
+      institution_ref: row.institutionId,
+      care_group_ref: row.careGroupId,
+      checkpoint_local_time: row.checkpointLocalTime,
+      effective_from: row.effectiveFrom.toISOString(),
+      ...(row.effectiveTo ? { effective_to: row.effectiveTo.toISOString() } : {}),
+      changed_by_role_assignment_ref: row.changedByRoleAssignmentId,
+      change_reason: row.changeReason,
+    };
+    const checkpoint = resolveAttendanceCheckpoint({
+      policy,
+      local_date: selection.local_day.storage_date.slice(0, 10),
+      time_zone: selection.local_day.time_zone,
+      at: policyAt,
+    });
+    return checkpoint.status === "resolved"
+      ? {
+          checkpoint_at: checkpoint.checkpoint_at,
+          policy_revision: policy.policy_revision,
+        }
+      : null;
   }
 
   issueRef(

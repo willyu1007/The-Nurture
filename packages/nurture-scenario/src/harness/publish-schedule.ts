@@ -8,6 +8,12 @@ import {
   type PublishProcessStateV1,
   type QuickAdjustPostureV1,
 } from "./publish-process.js";
+import {
+  matchesZonedWallClock,
+  zonedLocalTimeToInstant,
+} from "../domain/institution/zoned-time.js";
+
+export { zonedLocalTimeToInstant } from "../domain/institution/zoned-time.js";
 
 /**
  * G3-D schedule resolution (02-architecture.md D-09).
@@ -123,53 +129,6 @@ const zonedParts = (instant: Date, timeZone: string): ZonedParts => {
   return { year: read("year"), month: read("month"), day: read("day") };
 };
 
-const zonedOffsetMs = (instant: Date, timeZone: string): number => {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  }).formatToParts(instant);
-  const read = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? "0");
-  const asUtc = Date.UTC(
-    read("year"),
-    read("month") - 1,
-    read("day"),
-    read("hour") % 24,
-    read("minute"),
-    read("second"),
-  );
-  return asUtc - instant.getTime();
-};
-
-/**
- * Turns an institution-local wall-clock time into a UTC instant. The offset is
- * applied twice so a send window that straddles a DST change still lands on the
- * wall-clock time the institution configured.
- */
-export const zonedLocalTimeToInstant = (
-  date: ZonedParts,
-  minutesOfDay: number,
-  timeZone: string,
-): Date => {
-  const naive = Date.UTC(
-    date.year,
-    date.month - 1,
-    date.day,
-    Math.floor(minutesOfDay / 60),
-    minutesOfDay % 60,
-  );
-  let instant = naive;
-  for (let pass = 0; pass < 2; pass += 1) {
-    instant = naive - zonedOffsetMs(new Date(instant), timeZone);
-  }
-  return new Date(instant);
-};
-
 const addDays = (date: ZonedParts, days: number): ZonedParts => {
   const shifted = new Date(Date.UTC(date.year, date.month - 1, date.day + days));
   return {
@@ -177,31 +136,6 @@ const addDays = (date: ZonedParts, days: number): ZonedParts => {
     month: shifted.getUTCMonth() + 1,
     day: shifted.getUTCDate(),
   };
-};
-
-const matchesZonedWallClock = (
-  instant: Date,
-  date: ZonedParts,
-  minutesOfDay: number,
-  timeZone: string,
-): boolean => {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).formatToParts(instant);
-  const read = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? "0");
-  return (
-    read("year") === date.year &&
-    read("month") === date.month &&
-    read("day") === date.day &&
-    read("hour") % 24 === Math.floor(minutesOfDay / 60) &&
-    read("minute") === minutesOfDay % 60
-  );
 };
 
 /** The frozen schedule a process carries for its whole life. */

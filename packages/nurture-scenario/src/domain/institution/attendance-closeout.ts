@@ -1,5 +1,6 @@
 import type { NurtureCommandSpec } from "../commands/command-kernel.js";
 import type { NurturePolicyReasonCode } from "./institution-context.js";
+import { matchesZonedWallClock, zonedLocalTimeToInstant } from "./zoned-time.js";
 
 /**
  * G4-B increment 1 — the daily attendance closeout write path, frozen by 0D-1
@@ -9,6 +10,103 @@ import type { NurturePolicyReasonCode } from "./institution-context.js";
  * and so the repository holds no rule of its own. The repository reads current
  * state and writes the outcome; which outcome is legal is decided here.
  */
+
+export const DAILY_ATTENDANCE_CLOSEOUT_CONTRACT = {
+  key: "nurture.daily-attendance-closeout",
+  version: "1.0.0",
+} as const;
+
+export const DAILY_ATTENDANCE_CLOSEOUT_POLICY_REF =
+  `${DAILY_ATTENDANCE_CLOSEOUT_CONTRACT.key}@${DAILY_ATTENDANCE_CLOSEOUT_CONTRACT.version}`;
+
+export const DAILY_ATTENDANCE_CLOSEOUT_CHECKPOINT_REF =
+  "attendance:class-day-closeout" as const;
+
+/** Immutable exact-class policy version owned by 0D-1, not by 0D-5. */
+export type NurtureAttendanceCloseoutPolicyV1 = {
+  contract_version: string;
+  policy_ref: string;
+  policy_revision: number;
+  workspace_id: string;
+  institution_ref: string;
+  care_group_ref: string;
+  checkpoint_local_time: string;
+  effective_from: string;
+  effective_to?: string;
+  changed_by_role_assignment_ref: string;
+  change_reason: string;
+};
+
+export type NurtureAttendanceCheckpointResolution =
+  | { status: "resolved"; checkpoint_at: string }
+  | { status: "unavailable"; reason_code: string };
+
+const LOCAL_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const LOCAL_TIME_PATTERN = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+
+const parseLocalDate = (value: string) => {
+  const match = LOCAL_DATE_PATTERN.exec(value);
+  if (!match) return null;
+  const date = { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+  const roundTrip = new Date(Date.UTC(date.year, date.month - 1, date.day));
+  return roundTrip.getUTCFullYear() === date.year &&
+    roundTrip.getUTCMonth() === date.month - 1 &&
+    roundTrip.getUTCDate() === date.day
+    ? date
+    : null;
+};
+
+const validTimeZone = (value: string): boolean => {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value }).format(new Date(0));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Resolves the owner policy's wall-clock checkpoint for one class/date. No
+ * support-signal policy or local-day boundary can substitute for this fact.
+ */
+export const resolveAttendanceCheckpoint = (input: {
+  policy: NurtureAttendanceCloseoutPolicyV1;
+  local_date: string;
+  time_zone: string;
+  at: Date;
+}): NurtureAttendanceCheckpointResolution => {
+  const { policy, at } = input;
+  if (
+    policy.contract_version !== DAILY_ATTENDANCE_CLOSEOUT_CONTRACT.version ||
+    policy.policy_ref !== DAILY_ATTENDANCE_CLOSEOUT_POLICY_REF
+  ) {
+    return { status: "unavailable", reason_code: "unsupported_policy_contract" };
+  }
+  if (!Number.isSafeInteger(policy.policy_revision) || policy.policy_revision < 1) {
+    return { status: "unavailable", reason_code: "invalid_policy_revision" };
+  }
+  const effectiveFrom = Date.parse(policy.effective_from);
+  const effectiveTo = policy.effective_to ? Date.parse(policy.effective_to) : undefined;
+  if (
+    Number.isNaN(at.getTime()) ||
+    Number.isNaN(effectiveFrom) ||
+    effectiveFrom > at.getTime() ||
+    (effectiveTo !== undefined &&
+      (Number.isNaN(effectiveTo) || effectiveTo <= effectiveFrom || effectiveTo <= at.getTime()))
+  ) {
+    return { status: "unavailable", reason_code: "policy_not_effective" };
+  }
+  const date = parseLocalDate(input.local_date);
+  const localTime = LOCAL_TIME_PATTERN.exec(policy.checkpoint_local_time);
+  if (!date || !localTime || !validTimeZone(input.time_zone)) {
+    return { status: "unavailable", reason_code: "invalid_checkpoint_configuration" };
+  }
+  const minutesOfDay = Number(localTime[1]) * 60 + Number(localTime[2]);
+  const checkpoint = zonedLocalTimeToInstant(date, minutesOfDay, input.time_zone);
+  return matchesZonedWallClock(checkpoint, date, minutesOfDay, input.time_zone)
+    ? { status: "resolved", checkpoint_at: checkpoint.toISOString() }
+    : { status: "unavailable", reason_code: "checkpoint_wall_clock_unavailable" };
+};
 
 /** 0D-1 §3. Four states, closed. */
 export const NURTURE_ATTENDANCE_ENTRY_STATES = [

@@ -40,16 +40,19 @@
 - G4-0D froze five daily-operations units and exited
   ([`32`](./32-g4-0d-exit-record.md)); **G4-B** executed 0D-1, 0D-2 and the
   class-day detail and the 0D-5 policy/composition core, six typed exact-owner
-  adapters, class/home consumers and concrete Prisma owner providers in eleven
+  adapters, class/home consumers, concrete Prisma owner providers and the
+  attendance checkpoint owner in twelve
   increments
-  ([`34`](./34-g4-b-increment-1-record.md)–[`45`](./45-g4-b-increment-11-record.md)).
+  ([`34`](./34-g4-b-increment-1-record.md)–[`46`](./46-g4-b-increment-12-record.md)).
 - 0D-5's policy migration and concrete owner bindings are qualified on an
-  approved disposable PostgreSQL. Two canonical owner facts remain absent:
-  the attendance checkpoint instant and a readable authority/source blocker.
-  They remain `unavailable`; no signal-local deadline or blocker exists. 0D-3
+  approved disposable PostgreSQL. The attendance checkpoint is now supplied
+  by its versioned exact-class 0D-1 owner policy and qualified on a second
+  disposable target. One canonical fact remains absent: a currently readable
+  authority/source blocker. It remains `unavailable`; no signal-local blocker
+  exists. 0D-3
   and 0D-4's correction candidate remain frozen and unbuilt; 0E and 0F have
   not reached the freeze stage.
-- All of it is **I1**: exact implementation plus migration authoring. All three
+- All of it is **I1**: exact implementation plus migration authoring. All four
   G4-B table paths are qualified on disposable PostgreSQL. No shared or
   persistent apply, no capability
   registration, no contract rotation, no activation, no traffic. Nothing has a

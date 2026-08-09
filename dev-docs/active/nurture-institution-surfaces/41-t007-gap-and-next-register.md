@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`45` are history: each says what was true when it was
+numbered records `06`…`46` are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -19,12 +19,12 @@ places drifts in one of them.
 | 0A inventory | `G4_0A_INVENTORY_PASS` | n/a | [`07`](./07-g4-0a-inventory-record.md) |
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
-| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, eleven increments — 0D-1, 0D-2, class-day detail and the 0D-5 policy/composition/adapters/consumers/providers** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`45`](./45-g4-b-increment-11-record.md) |
+| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and the 0D-5 policy/composition/adapters/consumers/providers** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`46`](./46-g4-b-increment-12-record.md) |
 | 0E Workflow & Enrollment Journey | **not started** | none | — |
 | 0F knowledge & RAG | **not started** | none | — |
 
 Everything implemented sits at **I1**: exact schema, policy, repository and
-service code plus migration authoring. All three G4-B table paths are qualified
+service code plus migration authoring. All four G4-B table paths are qualified
 on a disposable PostgreSQL. No I2
 contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
@@ -82,14 +82,22 @@ subsequently qualified these repairs at current head: the exact-owner suite
 passed 9/9 and the full production-DB lane passed 357/357 across 37 files. The
 target was destroyed and confirmed absent.
 
-Two owner facts remain unavailable by design. The current attendance owner has
-no configured checkpoint instant, so an enabled unsubmitted day cannot become
-overdue. The current authority/source schemas expose no currently readable
-canonical blocker fact; in particular `source_redacted` must disappear and is
-not translated to `blocked`. These are owner-contract gaps, not permission to
-add signal-local deadline or blocker state. Until both exact owners expose the
-required facts, G-03 remains partial and consumers MUST retain their explicit
-unavailable arm.
+[`46`](./46-g4-b-increment-12-record.md) closes the attendance fact gap with a
+versioned exact-class 0D-1 policy. The attendance owner, not the signal layer,
+resolves its local-time checkpoint through the existing local-day timezone
+owner. Missing/ambiguous history remains unavailable, and a policy first
+effective after day start cannot backdate a deadline. The clean 27-migration
+deploy, exact-owner 12/12 and full DB 360/360 passed on a destroyed disposable
+target.
+
+One owner fact remains unavailable by design. The current authority/source
+schemas expose no currently readable canonical blocker fact; in particular
+revoked, withdrawn, redacted and cancelled sources are unreadable or terminal,
+while literal item/workflow-driver blockers belong to the separate
+WorkItem/Workflow category. These are owner-contract facts, not permission to
+add signal-local blocker state. Until an exact owner exposes a readable
+canonical fact for its own business reason, G-03 remains partial and consumers
+MUST retain their explicit unavailable arm.
 
 ### G-04 — 0D-4 child-attribution authority: partial
 
@@ -128,7 +136,9 @@ orderings, same number.
 only. `20260809180000_g4b_institution_support_signal_policy` has now also passed
 clean migrate-deploy, real-row constraint and full DB-suite qualification on an
 explicitly approved disposable database. That target was destroyed after the
-run. Shared or persistent apply remains unauthorized at I1.
+run. `20260809210000_g4b_attendance_checkpoint_policy` passed the same clean
+disposable-only qualification with the full 360-test DB lane. Every target was
+destroyed afterward. Shared or persistent apply remains unauthorized at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
@@ -163,22 +173,22 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Next steps, in dependency order
 
-1. **Close 0D-5's two remaining owner-fact gaps** (G-03): expose the attendance
-   owner's configured checkpoint instant and a currently readable canonical
-   authority/source blocker fact. The signal layer MUST continue to refuse
-   synthesis; the existing six-port composition and class/home unavailable arm
-   remain the integration boundary.
-2. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
+1. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
    automatic placement pass to capture intake as its own bounded increment
    (G-05). Keep those commits separate: one owns Admin history/downscope, the
    other owns deterministic intake placement.
-3. **0D-4's correction candidate** (G-04), the smallest remaining 0D unit.
-4. **0E Workflow and Enrollment Journey freeze**, then **0F knowledge and RAG**.
+2. **0D-4's correction candidate** (G-04), the smallest remaining 0D unit.
+3. **0E Workflow and Enrollment Journey freeze**, then **0F knowledge and RAG**.
    Both are unstarted at the freeze stage, so each is a 0-branch of its own
    before any implementation.
-5. **I2** — capability registration and contract rotation — which is what turns
+4. **I2** — capability registration and contract rotation — which is what turns
    G-01 from a bound into a completed step. Not before the branch it publishes
    is done.
+
+G-03's remaining authority/source fact is an external owner gate, not an
+actionable implementation step in the current schema. Resume it only when a
+business owner exposes a currently readable canonical blocker; do not hold the
+independent 0D-3/0D-4 work behind a signal-local invention.
 
 G-09 sits outside this order: it is a cross-repository decision, not T-007 work,
 and it blocks the pin gate rather than any of the steps above.

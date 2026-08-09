@@ -2128,12 +2128,13 @@ model NurtureCareInstitution {
   updatedAt              DateTime                     @updatedAt @map("updated_at")
   deletedAt              DateTime?                    @map("deleted_at")
 
-  careGroups            NurtureCareGroup[]
-  enrollments           NurtureEnrollment[]
-  scheduleTemplates     NurtureClassScheduleTemplate[]
-  mediaAssets           NurtureMediaAssetRef[]
-  publicationPolicies   NurtureInstitutionPublicationPolicy[]
-  supportSignalPolicies NurtureInstitutionSupportSignalPolicy[]
+  careGroups                 NurtureCareGroup[]
+  enrollments                NurtureEnrollment[]
+  scheduleTemplates          NurtureClassScheduleTemplate[]
+  mediaAssets                NurtureMediaAssetRef[]
+  publicationPolicies        NurtureInstitutionPublicationPolicy[]
+  attendanceCloseoutPolicies NurtureAttendanceCloseoutPolicy[]
+  supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -2167,6 +2168,33 @@ model NurtureInstitutionPublicationPolicy {
   @@unique([workspaceId, institutionId, policyHead], map: "uq_nurture_publication_policy_head")
   @@index([workspaceId, institutionId, effectiveFrom, supersededAt], map: "ix_nurture_publication_policy_effective")
   @@map("nurture_institution_publication_policy")
+}
+
+// 0D-1 owns the exact-class daily attendance checkpoint. Rows are immutable
+// policy versions; the support-signal layer receives only the resolved instant
+// and never parses this wall-clock configuration or stores another deadline.
+model NurtureAttendanceCloseoutPolicy {
+  id                        String    @id @default(uuid())
+  workspaceId               String    @map("workspace_id")
+  institutionId             String    @map("institution_id")
+  careGroupId               String    @map("care_group_id")
+  contractVersion           String    @map("contract_version")
+  policyRef                 String    @map("policy_ref")
+  policyRevision            Int       @map("policy_revision")
+  checkpointLocalTime       String    @map("checkpoint_local_time")
+  effectiveFrom             DateTime  @map("effective_from")
+  effectiveTo               DateTime? @map("effective_to")
+  changedByRoleAssignmentId String    @map("changed_by_role_assignment_id")
+  changeReason              String    @map("change_reason")
+  createdAt                 DateTime  @default(now()) @map("created_at")
+
+  institution             NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  careGroup               NurtureCareGroup          @relation(fields: [careGroupId], references: [id], onDelete: Restrict)
+  changedByRoleAssignment NurtureCareRoleAssignment @relation(fields: [changedByRoleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, careGroupId, policyRevision], map: "uq_nurture_attendance_closeout_policy_revision")
+  @@index([workspaceId, institutionId, careGroupId, effectiveFrom, effectiveTo], map: "ix_nurture_attendance_closeout_policy_effective")
+  @@map("nurture_attendance_closeout_policy")
 }
 
 // 0D-5 stores only versioned policy. InstitutionSupportSignalProjectionV1 is
@@ -2213,24 +2241,25 @@ model NurtureCareGroup {
   updatedAt           DateTime               @updatedAt @map("updated_at")
   deletedAt           DateTime?              @map("deleted_at")
 
-  institution              NurtureCareInstitution                  @relation(fields: [institutionId], references: [id], onDelete: Restrict)
-  enrollments              NurtureEnrollment[]
-  threads                  NurtureFamilyCareThread[]
-  items                    NurtureFamilyCareItem[]
-  messages                 NurtureFamilyCareMessage[]
-  dailyCareLogs            NurtureDailyCareLog[]
-  attentionItems           NurtureTeacherAttentionItem[]
-  mediaAssets              NurtureMediaAssetRef[]
-  captures                 NurtureCareCapture[]
-  captureBatches           NurtureCareCaptureBatch[]
-  attendanceSubmissions    NurtureDailyAttendanceSubmission[]
-  attendanceInferenceRuns  NurtureAttendanceInferenceRun[]
-  scheduleTemplates        NurtureClassScheduleTemplate[]
-  scheduleDayOverrides     NurtureClassScheduleDayOverride[]
-  activityPlacements       NurtureActivityPlacement[]
-  publishProcesses         NurturePublishProcess[]
-  contentSafetyAssessments NurtureContentSafetyAssessment[]
-  supportSignalPolicies    NurtureInstitutionSupportSignalPolicy[]
+  institution                NurtureCareInstitution                  @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  enrollments                NurtureEnrollment[]
+  threads                    NurtureFamilyCareThread[]
+  items                      NurtureFamilyCareItem[]
+  messages                   NurtureFamilyCareMessage[]
+  dailyCareLogs              NurtureDailyCareLog[]
+  attentionItems             NurtureTeacherAttentionItem[]
+  mediaAssets                NurtureMediaAssetRef[]
+  captures                   NurtureCareCapture[]
+  captureBatches             NurtureCareCaptureBatch[]
+  attendanceSubmissions      NurtureDailyAttendanceSubmission[]
+  attendanceInferenceRuns    NurtureAttendanceInferenceRun[]
+  attendanceCloseoutPolicies NurtureAttendanceCloseoutPolicy[]
+  scheduleTemplates          NurtureClassScheduleTemplate[]
+  scheduleDayOverrides       NurtureClassScheduleDayOverride[]
+  activityPlacements         NurtureActivityPlacement[]
+  publishProcesses           NurturePublishProcess[]
+  contentSafetyAssessments   NurtureContentSafetyAssessment[]
+  supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
 
   @@index([workspaceId, institutionId, status], map: "ix_nurture_care_group_institution")
   @@map("nurture_care_group")
@@ -2285,21 +2314,22 @@ model NurtureCareRoleAssignment {
   updatedAt              DateTime                        @updatedAt @map("updated_at")
   deletedAt              DateTime?                       @map("deleted_at")
 
-  participant           NurtureParticipant                      @relation(fields: [participantId], references: [id], onDelete: Restrict)
-  threadMemberships     NurtureFamilyCareThreadParticipant[]
-  messages              NurtureFamilyCareMessage[]
-  assignedItems         NurtureFamilyCareItem[]                 @relation("ItemAssignedRole")
-  ackedItems            NurtureFamilyCareItem[]                 @relation("ItemAckedRole")
-  authoredCorrections   NurtureFamilyCareMessageCorrection[]
-  dailyCareLogs         NurtureDailyCareLog[]
-  uploadedAssets        NurtureMediaAssetRef[]
-  confirmedAttributions NurtureChildMediaAttribution[]
-  captures              NurtureCareCapture[]
-  publishEditHolds      NurturePublishEditHold[]
-  publicationReleases   NurturePublicationRelease[]
-  attendanceSubmitted   NurtureDailyAttendanceSubmission[]      @relation("AttendanceSubmittedBy")
-  attendanceReopened    NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
-  supportSignalPolicies NurtureInstitutionSupportSignalPolicy[]
+  participant                NurtureParticipant                      @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  threadMemberships          NurtureFamilyCareThreadParticipant[]
+  messages                   NurtureFamilyCareMessage[]
+  assignedItems              NurtureFamilyCareItem[]                 @relation("ItemAssignedRole")
+  ackedItems                 NurtureFamilyCareItem[]                 @relation("ItemAckedRole")
+  authoredCorrections        NurtureFamilyCareMessageCorrection[]
+  dailyCareLogs              NurtureDailyCareLog[]
+  uploadedAssets             NurtureMediaAssetRef[]
+  confirmedAttributions      NurtureChildMediaAttribution[]
+  captures                   NurtureCareCapture[]
+  publishEditHolds           NurturePublishEditHold[]
+  publicationReleases        NurturePublicationRelease[]
+  attendanceSubmitted        NurtureDailyAttendanceSubmission[]      @relation("AttendanceSubmittedBy")
+  attendanceReopened         NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
+  attendanceCloseoutPolicies NurtureAttendanceCloseoutPolicy[]
+  supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")

@@ -1,5 +1,8 @@
 import type { PrismaClient } from "@prisma/client";
-import { NurtureExactOwnerSupportSignalSourceReader } from "@the-nurture/scenario";
+import {
+  DAILY_ATTENDANCE_CLOSEOUT_CHECKPOINT_REF,
+  NurtureExactOwnerSupportSignalSourceReader,
+} from "@the-nurture/scenario";
 import {
   type NurtureAttendanceSubmissionOwnerFactV1,
   type NurtureAttendanceSubmissionSignalOwner,
@@ -25,7 +28,7 @@ import {
 import { PrismaInstitutionSupportSignalRepository } from "./institution-support-signal.repository.js";
 
 export const PRISMA_INSTITUTION_SUPPORT_SIGNAL_CHECKPOINTS = {
-  attendance: "attendance:class-day-closeout",
+  attendance: DAILY_ATTENDANCE_CLOSEOUT_CHECKPOINT_REF,
   business_response: "family-care:response",
   review_backlog: "placement:daily-review",
   authority_source_blocker: "family-care:source-lifecycle",
@@ -91,18 +94,37 @@ class PrismaAttendanceSubmissionSignalOwner
       PRISMA_INSTITUTION_SUPPORT_SIGNAL_CHECKPOINTS.attendance,
     );
     if (read.status === "unavailable") return unavailable();
+    const facts: NurtureAttendanceSubmissionOwnerFactV1[] = [];
     for (const selection of read.selections) {
       const submission = await this.context.hasAttendanceSubmission(
         input,
         selection,
         read.scope.at,
       );
-      // A stored submission is already resolved and therefore absent from the
-      // projection. For an unsubmitted day this schema has no owner checkpoint
-      // instant, so claiming either overdue or not-overdue would invent one.
-      if (!submission) return unavailable();
+      if (submission) continue;
+      const checkpoint = await this.context.loadAttendanceCheckpoint(
+        input,
+        selection,
+        read.scope.at,
+      );
+      if (!checkpoint) return unavailable();
+      facts.push({
+        ...sourceBase(
+          input,
+          selection,
+          "daily_attendance_closeout",
+          this.context.issueRef(
+            input,
+            "daily-attendance-closeout",
+            `${selection.care_group.id}:${selection.local_day.storage_date}:${checkpoint.policy_revision}`,
+          ),
+          checkpoint.checkpoint_at,
+        ),
+        submission_state: "unsubmitted",
+        checkpoint_deadline_at: checkpoint.checkpoint_at,
+      });
     }
-    return available([]);
+    return available(facts);
   }
 }
 
