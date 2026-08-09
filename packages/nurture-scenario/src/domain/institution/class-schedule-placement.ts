@@ -333,7 +333,15 @@ export type NurtureClassPhotoCandidate = {
 export type NurtureLatestPhotoSelection = {
   media_ref: string;
   captured_at_ms: number;
-  selected_by: "explicit_cover" | "current_activity" | "most_recent_activity";
+  /**
+   * `class_latest` is level 4 and carries no activity — a consumer can tell a
+   * photo that belongs to an activity from one that does not.
+   */
+  selected_by:
+    | "explicit_cover"
+    | "current_activity"
+    | "most_recent_activity"
+    | "class_latest";
 };
 
 const newestOf = (
@@ -426,14 +434,26 @@ export const selectLatestPhoto = (input: {
     }
   }
 
-  // Level 4 — no image. The card falls back to its newest text or to an empty
-  // state, which is the card's decision and not this function's.
+  // Level 4 — the class's newest qualifying photo, placed or not.
   //
-  // Note the consequence, recorded rather than papered over: a class with no
-  // schedule places every source as `unplaced`, and an unplaced photo belongs
-  // to no activity, so levels 2 and 3 cannot reach it. Such a class shows no
-  // photo even when it has one. That follows from 0D-2 as written; whether it
-  // is the intended product behaviour is a question for the freeze, not a gap
-  // to fill with an undeclared fallback here.
+  // Added by 0D-2 §4's amendment of 2026-08-09, after implementing levels 1-3
+  // showed that a class with **no schedule** places every source as
+  // `unplaced`, and an unplaced photo belongs to no activity — so such a class
+  // showed nothing even when it had photos, and "see your class photos" had
+  // acquired an undeclared dependency on "configure a schedule first".
+  //
+  // Deterministic like every level above it, and deliberately BELOW them: a
+  // scheduled class whose activities hold photos never reaches here.
+  const anyPhoto = newestOf(input.candidates);
+  if (anyPhoto) {
+    return {
+      media_ref: anyPhoto.media_ref,
+      captured_at_ms: anyPhoto.captured_at_ms,
+      selected_by: "class_latest",
+    };
+  }
+
+  // Level 5 — no image. The card falls back to its newest text or to an empty
+  // state, which is the card's decision and not this function's.
   return null;
 };

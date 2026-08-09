@@ -450,7 +450,7 @@ Institution Admin mobile
 - current activity、next activity 与 temporary-override indicator；
 - canonical attendance submission state 与已确认人数；未提交只显示“待老师确认”，
   不返回 Admin-facing AI inference count；
-- optional latest-photo preview、latest text excerpt 和 source timestamp；
+- optional latest-photo preview、latest text presence 和 source timestamp；
 - awaiting-response、new-family-feedback 和 institution-action-needed counts；
 - actor-safe projection version 与 source watermark。
 

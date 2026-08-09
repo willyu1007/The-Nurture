@@ -9,8 +9,11 @@
 - Consumes: class scope (0C-3) unchanged
 - Verdict: `G4_0D_2_FREEZE_PASS`
 - Releases: G4-B (class-first board), G4-C (activity records in Web), 0D-3
-- Open points: **closed** 2026-08-09 — §4 by shipping levels 1-3-5 and leaving
-  assisted placement disabled until `unplaced` is measured
+- Open points: **closed** 2026-08-09 — §4 by shipping the deterministic levels
+  and leaving assisted placement disabled until `unplaced` is measured
+- Amendments: **2026-08-09**, §4 gains a level 4 for a class photo with no
+  activity, raised by G4-B increments 5 and 6; to be confirmed by 0G on its
+  next pass over this branch
 - Schema delta: **`DELTA`** — planned below, not applied
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
@@ -149,11 +152,38 @@ Resolved within a single frozen class-day snapshot, in this order:
 2. the newest qualifying photo in the current activity;
 3. the newest qualifying photo in this class's most recent activity that has
    one, today;
-4. no image — the card falls back to the newest text, or to an empty state.
+4. the newest qualifying photo in this class today, **placed or not**;
+5. no image — the card falls back to the newest text, or to an empty state.
 
 "Qualifying" means it passes the reader's own 0C chain. A photo the reader
 could not open directly is never selected as a cover, which is 0C-5 §5's
 no-bypass rule restated for a single-item selection.
+
+### Level 4 — amended 2026-08-09, after 0D Exit
+
+The original ordering ran 1-2-3 and then straight to "no image". Implementing
+it ([`38`](./38-g4-b-increment-5-record.md)) and then rendering it on a card
+([`39`](./39-g4-b-increment-6-record.md)) made the consequence visible: a class
+with **no schedule** places every source as `unplaced`, an unplaced photo
+belongs to no activity, and so levels 2 and 3 cannot reach it. Such a class
+showed no photo even when it had one — and since the schedule is something an
+Admin configures, "see your class photos" had acquired an undeclared dependency
+on "configure a schedule first".
+
+Two things settled it. `02-architecture.md` D-05 asks for the newest qualifying
+**class** photo — the class is the subject, and activity ordering was the
+implementation of "newest", not the goal. And §2 of this record already makes
+an `unplaced` source **visible** in its own class; nothing here ever said it
+was unshowable.
+
+The new level is deterministic — newest capture time, ties broken on the media
+ref — so it introduces no aesthetic or generative judgement. It sits **below**
+the activity levels, so a scheduled class behaves exactly as before: 1-3 win
+first, and level 4 is reached only when no activity holds a photo. The
+selection reports which level chose it, so a consumer can tell a photo with no
+activity from one that has an activity.
+
+Additive: levels 1-3 are unchanged and the old level 4 is renumbered 5.
 
 ### Capabilities
 
@@ -231,11 +261,15 @@ records shows *no schedule and no records*, not "no activities today".
 9. `expectedPlacementHead` mismatch denies rather than merging;
 10. a cover whose media fails the reader's chain falls through instead of being
     returned;
-11. a class with no records renders as no records, and no presenter path emits
+11. a scheduled class whose activities all hold photos never reaches level 4 —
+    the activity levels win first, so the amendment changes nothing for it;
+12. a class with no schedule still returns its newest qualifying photo, and the
+    selection reports that the photo has no activity;
+13. a class with no records renders as no records, and no presenter path emits
     "activity not held";
-12. an unplaced backlog is visible in its own class and countable only through
+14. an unplaced backlog is visible in its own class and countable only through
     0C-5 §5's aggregate rule;
-13. no response carries an ordering derived from counts, recency or backlog.
+15. no response carries an ordering derived from counts, recency or backlog.
 
 Synthetic fixtures under I0. Real owner paths stay behind I3, joint conformance
 behind I4.

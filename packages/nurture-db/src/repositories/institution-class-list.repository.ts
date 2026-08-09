@@ -53,6 +53,13 @@ export class PrismaInstitutionClassListRepository
    * lifecycle is live. Child-level attribution is a different question and
    * does not gate a class photo — a photo of the room is not a photo of a
    * child.
+   *
+   * Driven by the **captures**, with placement joined on where it exists.
+   * Reading the placement rows first — the shape this had until 0D-2 §4's
+   * level 4 was added — made a photo invisible until something placed it, so a
+   * class with no schedule (nothing to place against) showed nothing at all.
+   * "Placed or not" is level 4's premise, and it has to hold in the loader for
+   * the level to be reachable.
    */
   async loadPhotoCandidates(input: {
     workspace_id: string;
@@ -60,24 +67,27 @@ export class PrismaInstitutionClassListRepository
     local_date: string;
   }): Promise<NurtureClassPhotoCandidate[]> {
     const day = PrismaInstitutionClassListRepository.day(input.local_date);
+    const dayEnd = new Date(day.getTime() + 86_400_000);
+    const captures = await this.prisma.nurtureCareCapture.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        careGroupId: input.care_group_ref,
+        kind: "media",
+        occurredAt: { gte: day, lt: dayEnd },
+        deletedAt: null,
+        mediaAssetRef: { lifecycle: "ready", deletedAt: null },
+      },
+      select: { id: true, mediaAssetRefId: true, occurredAt: true },
+    });
+    if (captures.length === 0) return [];
     const rows = await this.prisma.nurtureActivityPlacement.findMany({
       where: {
         workspaceId: input.workspace_id,
         careGroupId: input.care_group_ref,
         localDate: day,
         sourceKind: "care_capture",
+        sourceId: { in: captures.map((capture) => capture.id) },
       },
-    });
-    if (rows.length === 0) return [];
-    const captures = await this.prisma.nurtureCareCapture.findMany({
-      where: {
-        workspaceId: input.workspace_id,
-        id: { in: rows.map((row) => row.sourceId) },
-        kind: "media",
-        deletedAt: null,
-        mediaAssetRef: { lifecycle: "ready", deletedAt: null },
-      },
-      select: { id: true, mediaAssetRefId: true, occurredAt: true },
     });
     const placementBySource = new Map(rows.map((row) => [row.sourceId, row]));
     return captures.flatMap((capture) => {

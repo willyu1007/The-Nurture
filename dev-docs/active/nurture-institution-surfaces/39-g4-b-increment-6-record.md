@@ -89,16 +89,19 @@ untouched: the full activity timeline, the communication owner-read, family
 feedback, and the purpose-gated child drill-down.
 
 **A `latest text excerpt` needs an actor-safe summary** that a capture does not
-carry today. Either the capture gains one, or the architecture's field means a
-different source than the class capture.
+carry today. **Closed 2026-08-09**: `02-architecture.md` D-05 now reads "latest
+text presence 和 source timestamp", which is what the projection returns. An
+excerpt would need a summary the capture does not hold, and naming a field the
+implementation cannot honour is how a spec starts describing a different system
+than the one that runs.
 
 **The automatic placement pass is still unwired to intake**, unchanged from
 [`37`](./37-g4-b-increment-4-record.md).
 
-**0D-2's unscheduled-class photo consequence** stands as recorded in
-[`38`](./38-g4-b-increment-5-record.md), and the card now makes that
-consequence visible: a class with no schedule shows no photo even when one
-exists.
+**0D-2's unscheduled-class photo consequence**, recorded in
+[`38`](./38-g4-b-increment-5-record.md) and made visible by this card, is
+**resolved 2026-08-09** by 0D-2 §4's level 4 — see
+[`40`](./40-g4-b-increment-7-record.md).
 
 ## Verification
 

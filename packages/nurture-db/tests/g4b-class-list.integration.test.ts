@@ -424,6 +424,63 @@ describe("T-007 G4-B class list (production DB lane)", () => {
     expect(JSON.stringify(card)).not.toContain("must-not-appear");
   });
 
+  /**
+   * 0D-2 §4 level 4, added by the amendment of 2026-08-09. A class with no
+   * schedule has nothing to place a photo against, so before this level such a
+   * class showed no photo at all — "see your class photos" had acquired an
+   * undeclared dependency on "configure a schedule first".
+   */
+  it("shows a class's newest photo even with no schedule and no placement", async () => {
+    const scope = await seed();
+    const klass = await addClass(scope, "Unscheduled", "infant");
+    const teacherRole = await prisma.nurtureCareRoleAssignment.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        participantId: scope.teacher.id,
+        role: "caregiver",
+        scopeType: "care_group",
+        scopeId: klass.id,
+        status: "active",
+      },
+    });
+    const photo = async (hour: string) => {
+      const asset = await prisma.nurtureMediaAssetRef.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          institutionId: scope.institution.id,
+          careGroupId: klass.id,
+          uploadedByRoleAssignmentId: teacherRole.id,
+          sourceKind: "class_album",
+          lifecycle: "ready",
+          storageRefPayload: { ref: randomUUID() },
+        },
+      });
+      await prisma.nurtureCareCapture.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          careGroupId: klass.id,
+          capturedByRoleAssignmentId: teacherRole.id,
+          kind: "media",
+          sourceSequence: Number(hour),
+          stable: true,
+          mediaAssetRefId: asset.id,
+          occurredAt: new Date(`${today}T0${hour}:00:00.000Z`),
+        },
+      });
+      return asset.id;
+    };
+    await photo("2");
+    const newer = await photo("5");
+
+    const card = (await compose(scope)).entries[0]!;
+    expect(card.schedule).toBeNull();
+    expect(card.latest_photo).toEqual({
+      media_ref: newer,
+      captured_at_ms: new Date(`${today}T05:00:00.000Z`).getTime(),
+      selected_by: "class_latest",
+    });
+  });
+
   it("scopes the list to one institution", async () => {
     const scope = await seed();
     const other = await seed();

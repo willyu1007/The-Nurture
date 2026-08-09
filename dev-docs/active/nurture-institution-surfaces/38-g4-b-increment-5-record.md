@@ -64,6 +64,9 @@ frozen ordering stops meaning anything.
 **Recommendation:** 0D-2 §4 should either state that an unscheduled class shows
 no card photo, or add an explicit unplaced fallback with its own level number.
 
+**Resolved 2026-08-09** by 0D-2 §4's amendment, the second option: an explicit
+level 4. See [`40`](./40-g4-b-increment-7-record.md).
+
 ## Falsification
 
 | Reverted | Result |

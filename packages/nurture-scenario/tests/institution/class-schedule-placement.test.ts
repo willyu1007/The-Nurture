@@ -308,12 +308,35 @@ describe("0D-2 latest photo selection (G4-B increment 5)", () => {
     });
   });
 
-  it("level 4 — returns nothing rather than an unqualified or unplaced photo", () => {
+  /**
+   * Level 4, added by 0D-2's amendment. A class with no schedule places every
+   * source as unplaced, and without this level it showed nothing even when it
+   * had photos — an undeclared dependency on configuring a schedule first.
+   */
+  it("level 4 — returns the class's newest photo when no activity holds one", () => {
+    expect(select([photo("unplaced", undefined, 100)])).toEqual({
+      media_ref: "unplaced",
+      captured_at_ms: 100,
+      selected_by: "class_latest",
+    });
+    // With no schedule at all there are no activities to walk, and level 4 is
+    // what makes the class visible anyway.
+    expect(select([photo("orphan", "morning", 100)], {}, null)).toMatchObject({
+      media_ref: "orphan",
+      selected_by: "class_latest",
+    });
+  });
+
+  it("level 4 sits below the activity levels and is not reached when they hit", () => {
+    // A scheduled class whose activity holds a photo behaves exactly as before
+    // the amendment.
+    expect(select([photo("in-morning", "morning", 100), photo("stray", undefined, 900)])).toMatchObject(
+      { media_ref: "in-morning", selected_by: "most_recent_activity" },
+    );
+  });
+
+  it("level 5 — returns nothing only when there is no qualifying photo at all", () => {
     expect(select([])).toBeNull();
-    // An unplaced photo belongs to no activity, so no level reaches it.
-    expect(select([photo("unplaced", undefined, 100)])).toBeNull();
-    // And with no schedule there are no activities to walk.
-    expect(select([photo("orphan", "morning", 100)], {}, null)).toBeNull();
   });
 
   it("honours an explicit cover only while it still qualifies", () => {
