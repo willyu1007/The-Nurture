@@ -52,10 +52,13 @@
   exists. **G4-C increment 1** now executes 0D-3's append-only placement,
   visibility-downscope and institution-note owner, including the one effective
   schedule source and storage-time automatic-write fence
-  ([`47`](./47-g4-c-increment-1-record.md)). 0D-4's correction candidate remains
-  frozen and unbuilt; 0E and 0F have not reached the freeze stage.
-- All of it is **I1**: exact implementation plus migration authoring. All five
-  daily-operations table paths are qualified on disposable PostgreSQL. No
+  ([`47`](./47-g4-c-increment-1-record.md)). **G4-C increment 2** wires the
+  automatic pass to capture intake and implements 0D-4's sourced,
+  non-canonical correction candidate without adding lifecycle/deadline state
+  ([`48`](./48-g4-c-increment-2-record.md)). 0E and 0F have not reached the
+  freeze stage.
+- All of it is **I1**: exact implementation plus migration authoring. All
+  implemented daily-operations persistence paths are qualified on disposable PostgreSQL. No
   shared or persistent apply, no capability
   registration, no contract rotation, no activation, no traffic. Nothing has a
   production caller.

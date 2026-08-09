@@ -554,5 +554,29 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - The approved disposable PostgreSQL qualified all 28 migrations, 22/22
   targeted regressions, direct constraints and 370/370 full DB tests; the
   exact target is destroyed and confirmed absent.
-- G-02 is closed at I1. G-05 intake wiring is next, then 0D-4. No caller,
-  capability, durable apply, deployment, activation or traffic was added.
+- At the increment-1 boundary, G-02 was closed and G-05/0D-4 were the next
+  units. No caller, capability, durable apply, deployment, activation or
+  traffic was added.
+
+## 2026-08-09 — G4-C increment 2 capture intake and attribution correction
+
+- Connected stored care-capture intake to the existing deterministic placement
+  pass. Exact class, Institution-local date and minute come from stored owner
+  facts; the existing schedule provider and storage-time Admin precedence fence
+  remain the only placement path.
+- Added `nurture.child-attribution-authority@1.0.0` and an append-only
+  `NurtureAttributionCorrectionCandidate`. Only the exact selected current
+  Institution Admin can append a sourced report; exact-class caregivers can
+  read it and continue to use T-006 for canonical attribution decisions.
+- The candidate has no status, head, expiry, deadline, resolution,
+  proposed-child or publishability state. It changes neither canonical
+  attribution nor exposure.
+- Quality review moved fresh runtime imports off stale `dist/harness`, added a
+  domain-level exact role-assignment assertion and mapped six existing physical
+  FK names so whole-schema diff is zero.
+- The approved disposable PostgreSQL applied all 29 migrations, passed 7/7
+  exact-owner and 377/377 full DB tests, then was destroyed with zero sessions.
+  Full unit tests passed 842/842.
+- G-04 and G-05 are closed at I1. Next is 0E Workflow/Enrollment Journey
+  freeze, then 0F Knowledge/RAG; G-03's missing blocker remains an external
+  owner gate.

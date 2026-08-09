@@ -406,6 +406,25 @@ Falsification evidence is per-increment and lives in each record's
 | Cleanup / dual-track scan | PASS | No temporary artifacts or `adjustPlacement` path; exact disposable DB destroyed with zero sessions and confirmed absent. |
 | Effect boundary | PASS | I1 source/schema/migration and disposable qualification only; no shared/persistent apply, caller, capability, deployment, activation or traffic. |
 
+## 2026-08-09 — G4-C increment 2 capture intake and attribution correction
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture/security review | PASS after repair | Exact source and selected role are reasserted in domain/repository layers; candidate cannot mutate attribution/exposure or grow lifecycle/deadline state. |
+| Scenario + DB typechecks | PASS | Scenario manifest current; zero TypeScript errors. |
+| Full unit lane | PASS | 842/842 across 76 files. |
+| Exact-owner production DB | PASS | G-05 plus 0D-4: 7/7 across 2 files. |
+| Full production-DB lane | PASS | 377/377 across 40 files. |
+| Flaky-failure isolation | PASS | Existing G2-A file passed three consecutive 6/6 runs; an isolated full DB lane then passed 377/377. No reproducible behavior defect. |
+| Migration / storage fences | PASS, disposable only | Clean 29/29 deploy; append-only, same-Workspace composition, contract/hash/reason and replay behavior passed; final status up to date. |
+| Schema drift | PASS | Six older physical FK names were bound with Prisma relation maps; final datasource-to-datamodel diff reports no difference. |
+| DB context / boundary | PASS | Prisma validate, context checksum refresh, persistence boundary and database feature suite passed. |
+| Static routing / ingress | PASS | 143 routed files; formal ingress and port topology checks pass. |
+| Local qualification locks | PASS after re-freeze | C30 source revision `ef2d63c`, source hash `201047da…`; Nurture exact runtime `aaef3952…` over 235 files; default-off census unchanged. |
+| External My-Chat pin | **FAIL, attributed** | Expected `567b96c`, observed `05e8331`; no external adoption was performed. |
+| Cleanup | PASS | No debug instrumentation or alternate runtime/candidate path; exact disposable DB destroyed with zero sessions and confirmed absent. |
+| Effect boundary | PASS | I1 source/schema/migration and disposable qualification only; no shared/persistent apply, caller, capability, deployment, activation or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

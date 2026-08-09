@@ -6,27 +6,27 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-09
-- Next step: **wire the deterministic automatic placement pass to capture
-  intake as a separate bounded increment, then implement 0D-4's correction
-  candidate**. 0D-3 now owns one append-only chain for Admin placement,
-  visibility downscope and protected institution notes; its direct Admin
-  placement predecessor was removed, and stale automatic writes are fenced at
-  storage. The clean 28-migration deploy, 22/22 exact regression and 370/370
-  full DB lane passed on the approved disposable PostgreSQL, which is destroyed
-  and confirmed absent ([`47`](./47-g4-c-increment-1-record.md)). 0D-5's one
-  externally gated authority/source blocker stays explicitly `unavailable`;
-  no signal-local blocker or deadline was introduced. 0D-4 remains frozen and
-  unbuilt; 0E and 0F remain unstarted at the freeze stage.
+- Next step: **freeze 0E Workflow/Enrollment Journey, then 0F Knowledge/RAG**.
+  G4-C increment 2 connected the deterministic automatic placement pass to
+  capture intake and implemented 0D-4's sourced, Admin-only, non-canonical
+  attribution correction candidate. The clean 29-migration deploy, 842/842
+  unit lane and 377/377 full DB lane passed on the approved disposable
+  PostgreSQL, which is destroyed and confirmed absent
+  ([`48`](./48-g4-c-increment-2-record.md)). 0D-5's one externally gated
+  authority/source blocker stays explicitly `unavailable`; no signal-local
+  blocker or deadline was introduced. 0E and 0F remain unstarted at the freeze
+  stage.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
   records are history and are not edited to stay current.
 - Everything built sits at **I1** — implementation and migration authoring.
-  All five daily-operations table paths, including 0D-3 revision/downscope,
-  0D-5 policy and the 0D-1 checkpoint policy, are qualified on a
-  disposable PostgreSQL. Nothing has a production caller, no capability is
-  registered, and no schema is applied anywhere durable. 0C and 0D are
-  therefore validated as *buildable as frozen*, not as running.
+  All implemented daily-operations persistence paths, including 0D-3
+  revision/downscope, 0D-4 correction reports, 0D-5 policy and the 0D-1
+  checkpoint policy, are qualified on disposable PostgreSQL. Nothing has a
+  production caller, no capability is registered, and no schema is applied
+  anywhere durable. 0C and 0D are therefore validated as *buildable as
+  frozen*, not as running.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.

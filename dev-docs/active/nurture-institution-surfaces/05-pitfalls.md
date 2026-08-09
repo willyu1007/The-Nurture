@@ -220,6 +220,35 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-09 — Fresh runtime exports were loaded from stale harness output
+
+- Symptom: production-DB tests typechecked but failed at runtime because the
+  new intake constructor and zoned-instant helper were not functions.
+- Root cause: DB adapters imported new values through the `./harness` package
+  subpath, whose runtime target was a checked-in `dist` tree older than the
+  source declarations TypeScript used.
+- What was tried: changing only the new intake adapter exposed the same defect
+  in the shared local-day helper.
+- Fix: runtime consumers added by this increment import the scenario package's
+  source-backed root entry; exact integration tests exercise both values.
+- Prevention: a typecheck is insufficient for conditional package exports.
+  New runtime exports MUST be tested through the same entrypoint production-DB
+  tests load, and no second stale import route should be retained.
+
+### 2026-08-09 — Existing foreign-key names appeared as schema drift
+
+- Symptom: the clean 29-migration database was up to date, but Prisma proposed
+  six foreign-key renames on older attendance and support-signal tables.
+- Root cause: hand-written migrations used stable physical constraint names
+  that their Prisma relations did not declare; generated names differed only
+  textually.
+- What was tried: migration status alone passed but could not detect the
+  datasource-to-datamodel naming mismatch.
+- Fix: bind each existing physical name with relation `map`; no constraint or
+  data was rewritten, and the final schema diff is empty.
+- Prevention: every disposable migration qualification MUST include a final
+  datasource-to-SSOT diff, not only `migrate status`.
+
 ### 2026-08-09 — Body-free list reused a protected single-message DTO
 
 - Symptom: the Institution business-communication list was documented as
