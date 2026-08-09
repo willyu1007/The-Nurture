@@ -66,17 +66,32 @@ The consequence is not a fail-open, it is improvisation. An implementer reading
 plausibly under a different name in each unit — or reuse a semantically
 different one, which silently discards the distinction the record drew.
 
-**Repair.** The mapping is fixed here, as the single authority:
+**Repair, corrected 2026-08-09.** The first repair issued here proposed adding
+`contract_mismatch` and `conflict` to `NurturePolicyReasonCode` as additive
+members. **That was wrong**, and acting on it would have created three dual
+tracks rather than closing one. Checking the implementation before adding
+anything showed all three words already exist — in different layers, where they
+belong:
 
-| Record vocabulary | Implementation | Status |
+| Record word | Layer | Implementation |
 | --- | --- | --- |
-| `unavailable` | `policy_unavailable` | existing; the record name is the product term and the union name is the code term for **the same outcome** |
-| `contract_mismatch` | — | **planned additive union member** |
-| `conflict` | — | **planned additive union member** |
+| `contract_mismatch` | **contract admission**, which runs *before* any authority decision | `ContractAdmissionV1.error.code` in `surface-contract/types.ts` |
+| `unavailable` | **dependency or owner state** | `policy_unavailable` on the authority path; `BoardDependencyNoGoV1.reason` on a board projection |
+| `conflict` | **command execution**, optimistic concurrency | `status: "conflict"` with its own `reason_code`, in `command-kernel.ts` |
 
-Both additions are additive to a union that has taken additive members twice
-already (increments 2 and 3). Neither may be introduced with a different
-spelling per unit, and neither is added by this audit — 0G authorizes no code.
+So the defect is real and its shape was misread. 0D's records use one sentence
+form — "deny X" — for failures belonging to three layers, and the union it
+looked like they targeted is only one of them. A `contract_mismatch` member on
+`NurturePolicyReasonCode` would be a fourth spelling of a concept the admission
+layer already owns, and a `conflict` member would duplicate a command status.
+
+**No union member is added.** What an implementer needs is the layer, and the
+table above is that. `NurturePolicyReasonCode` stays the authority-decision
+vocabulary, which is what every one of its existing members is.
+
+The correction is recorded rather than silently applied because the first
+version of this finding was published, and a repair that reverses one already
+issued is exactly the kind of thing a later reader must be able to see.
 
 ## Finding 2 — two units under-declared what they consume
 

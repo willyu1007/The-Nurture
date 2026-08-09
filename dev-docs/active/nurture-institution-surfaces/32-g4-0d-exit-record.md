@@ -87,11 +87,13 @@ continues to wait for the complete T-007 Exit.
 These are not caveats; they are work someone must do, recorded so it is not
 rediscovered.
 
-1. **The reason-code vocabulary needs two additive union members.**
-   `contract_mismatch` and `conflict` appear across the freeze records and
-   exist nowhere in `NurturePolicyReasonCode`; `unavailable` in the records is
-   `policy_unavailable` in code. The mapping is fixed in
-   [`31`](./31-g4-0g-0d-audit-record.md) §Finding 1 as the single authority.
+1. **The reason-code vocabulary spans three layers, and needs no new union
+   member.** 0D's records use one sentence form — "deny X" — for failures that
+   belong to contract admission, dependency state and command concurrency
+   respectively. Each already has its own implementation vocabulary. The
+   layer-by-layer mapping is fixed in
+   [`31`](./31-g4-0g-0d-audit-record.md) §Finding 1 as the single authority;
+   an implementer must read it before adding a code anywhere.
 2. **0C-5 §6's ordering fixtures 14 and 16 still need a surface to observe.**
    Fixture 14 waits on a class list, which is G4-B's board. Fixture 16 is
    0D-5's rule and needs the signal list.
