@@ -46,9 +46,21 @@ export type NurtureClassDayCommunicationRow = {
   corrected: boolean;
   redacted: boolean;
   lifecycle: "active" | "closed" | "suppressed";
+  lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
   acknowledgement_state?: "pending" | "acknowledged";
   response_state?: "awaiting_reply" | "responded" | "not_applicable";
   due_at?: string;
+};
+
+export type NurtureInstitutionLocalDay = {
+  storage_date: string;
+  occurred_from: string;
+  occurred_before: string;
+};
+
+export type NurtureClassDayCommunicationPage = {
+  rows: NurtureClassDayCommunicationRow[];
+  has_more: boolean;
 };
 
 export type NurtureChildDayEvidenceRow =
@@ -75,6 +87,12 @@ export type NurtureChildDayEvidenceRow =
     };
 
 export type NurtureInstitutionClassDayDetailRepository = {
+  loadInstitutionLocalDay(input: {
+    workspace_id: string;
+    institution_ref: string;
+    local_date: string;
+    snapshot_at: string;
+  }): Promise<NurtureInstitutionLocalDay | null>;
   loadEffectiveSchedule(input: {
     workspace_id: string;
     institution_ref: string;
@@ -86,12 +104,14 @@ export type NurtureInstitutionClassDayDetailRepository = {
     care_group_ref: string;
     local_date: string;
     snapshot_at: string;
+    local_day: NurtureInstitutionLocalDay;
   }): Promise<NurtureClassDayCaptureRow[]>;
   loadAttendanceState(input: {
     workspace_id: string;
     care_group_ref: string;
     local_date: string;
     snapshot_at: string;
+    local_day: NurtureInstitutionLocalDay;
   }): Promise<NurtureClassDayAttendance>;
   listAuthorizedCommunications(input: {
     workspace_id: string;
@@ -100,7 +120,8 @@ export type NurtureInstitutionClassDayDetailRepository = {
     local_date: string;
     snapshot_at: string;
     limit: number;
-  }): Promise<NurtureClassDayCommunicationRow[]>;
+    local_day: NurtureInstitutionLocalDay;
+  }): Promise<NurtureClassDayCommunicationPage>;
   loadChildDayEvidence(input: {
     workspace_id: string;
     participant_id: string;
@@ -110,7 +131,8 @@ export type NurtureInstitutionClassDayDetailRepository = {
     snapshot_at: string;
     direction: NurtureGrantDirection;
     data_class: NurtureGrantDataClass;
-  }): Promise<NurtureChildDayEvidenceRow[]>;
+    local_day: NurtureInstitutionLocalDay;
+  }): Promise<{ rows: NurtureChildDayEvidenceRow[]; has_more: boolean }>;
 };
 
 export type NurtureClassDayTimelineEntry =
@@ -135,6 +157,7 @@ export type NurtureClassDayCommunication = {
   author_side: "family" | "care_group";
   content_state: "original" | "corrected" | "redacted";
   lifecycle: "active" | "closed" | "suppressed";
+  lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
   acknowledgement_state?: "pending" | "acknowledged";
   response_state?: "awaiting_reply" | "responded" | "not_applicable";
   due_at?: string;
@@ -179,6 +202,7 @@ export type NurtureInstitutionClassDayDetailProjectionV1 = {
   }>;
   unplaced: NurtureClassDayTimelineEntry[];
   communications: NurtureClassDayCommunication[];
+  communications_has_more: boolean;
   home_institution_dynamics: {
     institution_outreach: NurtureClassDayCommunication[];
     family_feedback: NurtureClassDayCommunication[];
@@ -193,6 +217,7 @@ export type NurtureInstitutionClassDayDetailProjectionV1 = {
         direction: NurtureGrantDirection;
         data_class: NurtureGrantDataClass;
         evidence: NurtureChildDayEvidence[];
+        evidence_has_more: boolean;
       };
   projection_version: 1;
 };
@@ -278,16 +303,16 @@ export class NurtureInstitutionClassDayDetailService {
     }
 
     try {
-      const [schedule, captureRows, attendance, communicationRows] = await Promise.all([
+      const localDay = await this.repository.loadInstitutionLocalDay(request);
+      if (!localDay) throw new Error("institution-local day is unavailable");
+      const dayScope = { ...request, local_day: localDay };
+      const [schedule, captureRows, attendance, communicationPage] = await Promise.all([
         this.repository.loadEffectiveSchedule(request),
-        this.repository.loadClassDayCaptures(request),
-        this.repository.loadAttendanceState(request),
+        this.repository.loadClassDayCaptures(dayScope),
+        this.repository.loadAttendanceState(dayScope),
         this.repository.listAuthorizedCommunications({
-          workspace_id: request.workspace_id,
+          ...dayScope,
           participant_id: request.participant_ref,
-          care_group_ref: request.care_group_ref,
-          local_date: request.local_date,
-          snapshot_at: request.snapshot_at,
           limit: 100,
         }),
       ]);
@@ -359,7 +384,7 @@ export class NurtureInstitutionClassDayDetailService {
           )
           .map((row) => row.entry),
       );
-      const communications = communicationRows.map((row): NurtureClassDayCommunication => ({
+      const communications = communicationPage.rows.map((row): NurtureClassDayCommunication => ({
         message_target_ref: this.issueRef({
           workspace_id: request.workspace_id,
           participant_id: request.participant_ref,
@@ -372,6 +397,7 @@ export class NurtureInstitutionClassDayDetailService {
         author_side: row.author_side,
         content_state: row.redacted ? "redacted" : row.corrected ? "corrected" : "original",
         lifecycle: row.lifecycle,
+        ...(row.lifecycle_reason ? { lifecycle_reason: row.lifecycle_reason } : {}),
         ...(row.acknowledgement_state
           ? { acknowledgement_state: row.acknowledgement_state }
           : {}),
@@ -379,7 +405,7 @@ export class NurtureInstitutionClassDayDetailService {
         ...(row.due_at ? { due_at: row.due_at } : {}),
       }));
       const childDrilldown = request.child_drilldown
-        ? await this.composeChildDrilldown(request, request.child_drilldown)
+        ? await this.composeChildDrilldown(request, request.child_drilldown, localDay)
         : undefined;
 
       return {
@@ -394,6 +420,7 @@ export class NurtureInstitutionClassDayDetailService {
           activities,
           unplaced,
           communications,
+          communications_has_more: communicationPage.has_more,
           home_institution_dynamics: {
             institution_outreach: communications.filter(
               (row) => row.direction === "org_to_family",
@@ -421,6 +448,7 @@ export class NurtureInstitutionClassDayDetailService {
   private async composeChildDrilldown(
     request: NurtureInstitutionClassDayDetailRequest,
     child: NonNullable<NurtureInstitutionClassDayDetailRequest["child_drilldown"]>,
+    localDay: NurtureInstitutionLocalDay,
   ): Promise<NonNullable<NurtureInstitutionClassDayDetailProjectionV1["child_drilldown"]>> {
     const authority = await this.authority.resolve({
       workspace_id: request.workspace_id,
@@ -447,7 +475,7 @@ export class NurtureInstitutionClassDayDetailService {
       };
     }
     const childProcessRef = authority.child_scope.child_process_ref;
-    const evidenceRows = await this.repository.loadChildDayEvidence({
+    const evidencePage = await this.repository.loadChildDayEvidence({
       workspace_id: request.workspace_id,
       participant_id: request.participant_ref,
       child_process_ref: childProcessRef,
@@ -456,6 +484,7 @@ export class NurtureInstitutionClassDayDetailService {
       snapshot_at: request.snapshot_at,
       direction: child.direction,
       data_class: child.data_class,
+      local_day: localDay,
     });
     return {
       status: "available",
@@ -463,7 +492,7 @@ export class NurtureInstitutionClassDayDetailService {
       purpose_key: child.purpose_key,
       direction: child.direction,
       data_class: child.data_class,
-      evidence: evidenceRows.map((row): NurtureChildDayEvidence => {
+      evidence: evidencePage.rows.map((row): NurtureChildDayEvidence => {
         const sourceRef = this.issueRef({
           workspace_id: request.workspace_id,
           participant_id: request.participant_ref,
@@ -502,6 +531,7 @@ export class NurtureInstitutionClassDayDetailService {
             };
         }
       }),
+      evidence_has_more: evidencePage.has_more,
     };
   }
 }

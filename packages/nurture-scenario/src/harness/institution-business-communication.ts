@@ -99,7 +99,6 @@ export const institutionAdminDisclosureAuthorizes = (
 
 export type InstitutionBusinessCommunicationRawV1 = {
   message_id: string;
-  child_care_process_id: string;
   enrollment_id: string;
   care_group_id: string;
   institution_id: string;
@@ -113,11 +112,34 @@ export type InstitutionBusinessCommunicationRawV1 = {
   redacted: boolean;
   lifecycle: "active" | "closed" | "suppressed";
   lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
+  body_envelope?: unknown;
+  correction_body_envelope?: unknown;
+};
+
+/**
+ * Actor-safe list row. Protected bodies have no representable field here, so
+ * a list implementation cannot accidentally widen into the single-message
+ * content projection.
+ */
+export type InstitutionBusinessCommunicationListRowV1 = {
+  message_id: string;
+  child_care_process_id: string;
+  direction: "family_to_org" | "org_to_family";
+  data_class: "family_care_question" | "direct_care_communication";
+  author_side: "family" | "care_group";
+  occurred_at: string;
+  corrected: boolean;
+  redacted: boolean;
+  lifecycle: "active" | "closed" | "suppressed";
+  lifecycle_reason?: "family_withdrawn" | "grant_revoked" | "source_redacted" | "expired";
   acknowledgement_state?: "pending" | "acknowledged";
   response_state?: "awaiting_reply" | "responded" | "not_applicable";
   due_at?: string;
-  body_envelope?: unknown;
-  correction_body_envelope?: unknown;
+};
+
+export type InstitutionBusinessCommunicationListPageV1 = {
+  rows: InstitutionBusinessCommunicationListRowV1[];
+  has_more: boolean;
 };
 
 export type InstitutionBusinessCommunicationReadPort = {
@@ -143,10 +165,14 @@ export type InstitutionBusinessCommunicationListPort = {
     workspace_id: string;
     participant_id: string;
     care_group_id: string;
-    local_date: string;
+    occurred_from: string;
+    occurred_before: string;
     snapshot_at: string;
     limit: number;
-  }): Promise<InstitutionBusinessCommunicationRawV1[]>;
+    child_care_process_id?: string;
+    direction?: "family_to_org" | "org_to_family";
+    data_class?: "family_care_question" | "direct_care_communication";
+  }): Promise<InstitutionBusinessCommunicationListPageV1>;
 };
 
 export type InstitutionBusinessCommunicationProjectionV1 = {

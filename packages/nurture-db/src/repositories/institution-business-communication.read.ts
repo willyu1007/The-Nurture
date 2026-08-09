@@ -1,12 +1,65 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import {
   institutionAdminDisclosureAuthorizes,
+  type InstitutionBusinessCommunicationListPageV1,
+  type InstitutionBusinessCommunicationListRowV1,
   type InstitutionBusinessCommunicationRawV1,
   type InstitutionBusinessCommunicationListPort,
   type InstitutionBusinessCommunicationReadPort,
 } from "@the-nurture/scenario/harness";
 
 const FAMILY_CARE_PURPOSE = "family_care_workflow" as const;
+const AUTHORIZATION_PAGE_SIZE = 20;
+
+type AuthorizedCommunicationFacts = InstitutionBusinessCommunicationRawV1 & {
+  child_care_process_id: string;
+  acknowledgement_state?: "pending" | "acknowledged";
+  response_state?: "awaiting_reply" | "responded" | "not_applicable";
+  due_at?: string;
+};
+
+const toSingleMessageRaw = (
+  facts: AuthorizedCommunicationFacts,
+): InstitutionBusinessCommunicationRawV1 => ({
+  message_id: facts.message_id,
+  enrollment_id: facts.enrollment_id,
+  care_group_id: facts.care_group_id,
+  institution_id: facts.institution_id,
+  direction: facts.direction,
+  data_class: facts.data_class,
+  purpose: facts.purpose,
+  author_side: facts.author_side,
+  author_role: facts.author_role,
+  occurred_at: facts.occurred_at,
+  corrected: facts.corrected,
+  redacted: facts.redacted,
+  lifecycle: facts.lifecycle,
+  ...(facts.lifecycle_reason ? { lifecycle_reason: facts.lifecycle_reason } : {}),
+  ...(facts.body_envelope ? { body_envelope: facts.body_envelope } : {}),
+  ...(facts.correction_body_envelope
+    ? { correction_body_envelope: facts.correction_body_envelope }
+    : {}),
+});
+
+const toListRow = (
+  facts: AuthorizedCommunicationFacts,
+): InstitutionBusinessCommunicationListRowV1 => ({
+  message_id: facts.message_id,
+  child_care_process_id: facts.child_care_process_id,
+  direction: facts.direction,
+  data_class: facts.data_class,
+  author_side: facts.author_side,
+  occurred_at: facts.occurred_at,
+  corrected: facts.corrected,
+  redacted: facts.redacted,
+  lifecycle: facts.lifecycle,
+  ...(facts.lifecycle_reason ? { lifecycle_reason: facts.lifecycle_reason } : {}),
+  ...(facts.acknowledgement_state
+    ? { acknowledgement_state: facts.acknowledgement_state }
+    : {}),
+  ...(facts.response_state ? { response_state: facts.response_state } : {}),
+  ...(facts.due_at ? { due_at: facts.due_at } : {}),
+});
 
 const currentRole = (
   role: { status: string; startsAt: Date | null; endsAt: Date | null } | null,
@@ -36,7 +89,23 @@ export class PrismaInstitutionBusinessCommunicationReadPort
     | { authorized: true; communication: InstitutionBusinessCommunicationRawV1 }
     | { authorized: false }
   > {
-    const now = new Date();
+    const loaded = await this.loadAuthorizedCommunicationAt(input, new Date());
+    return loaded.authorized
+      ? { authorized: true, communication: toSingleMessageRaw(loaded.communication) }
+      : loaded;
+  }
+
+  private async loadAuthorizedCommunicationAt(
+    input: {
+      workspace_id: string;
+      participant_id: string;
+      message_id: string;
+    },
+    at: Date,
+  ): Promise<
+    | { authorized: true; communication: AuthorizedCommunicationFacts }
+    | { authorized: false }
+  > {
     const participant = await this.prisma.nurtureParticipant.findFirst({
       where: {
         id: input.participant_id,
@@ -97,13 +166,13 @@ export class PrismaInstitutionBusinessCommunicationReadPort
         status: "active",
         deletedAt: null,
         AND: [
-          { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
-          { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
+          { OR: [{ startsAt: null }, { startsAt: { lte: at } }] },
+          { OR: [{ endsAt: null }, { endsAt: { gt: at } }] },
         ],
       },
       orderBy: { id: "asc" },
     });
-    if (!currentRole(adminRole, now)) return { authorized: false };
+    if (!currentRole(adminRole, at)) return { authorized: false };
 
     const item =
       message.messageKind === "family_message"
@@ -153,8 +222,8 @@ export class PrismaInstitutionBusinessCommunicationReadPort
       grant.status === "active" &&
       grant.revokedAt === null &&
       grant.deletedAt === null &&
-      (!grant.effectiveFrom || grant.effectiveFrom <= now) &&
-      (!grant.expiresAt || grant.expiresAt > now) &&
+      (!grant.effectiveFrom || grant.effectiveFrom <= at) &&
+      (!grant.expiresAt || grant.expiresAt > at) &&
       grant.childCareProcessId === message.childCareProcessId &&
       grant.enrollmentId === message.enrollmentId &&
       exactGrantTarget &&
@@ -225,50 +294,69 @@ export class PrismaInstitutionBusinessCommunicationReadPort
     workspace_id: string;
     participant_id: string;
     care_group_id: string;
-    local_date: string;
+    occurred_from: string;
+    occurred_before: string;
     snapshot_at: string;
     limit: number;
-  }): Promise<InstitutionBusinessCommunicationRawV1[]> {
+    child_care_process_id?: string;
+    direction?: "family_to_org" | "org_to_family";
+    data_class?: "family_care_question" | "direct_care_communication";
+  }): Promise<InstitutionBusinessCommunicationListPageV1> {
     const limit = Math.max(0, Math.min(input.limit, 100));
-    if (limit === 0) return [];
-    const day = new Date(`${input.local_date}T00:00:00.000Z`);
-    const dayEnd = new Date(day.getTime() + 86_400_000);
+    if (limit === 0) return { rows: [], has_more: false };
+    const occurredFrom = new Date(input.occurred_from);
+    const occurredBefore = new Date(input.occurred_before);
     const snapshot = new Date(input.snapshot_at);
-    const pageSize = Math.min(Math.max(limit * 2, 20), 200);
-    const authorized: InstitutionBusinessCommunicationRawV1[] = [];
+    if (
+      [occurredFrom, occurredBefore, snapshot].some((value) => Number.isNaN(value.getTime())) ||
+      occurredFrom >= occurredBefore
+    ) {
+      throw new RangeError("invalid business-communication list window");
+    }
+    const authorized: InstitutionBusinessCommunicationListRowV1[] = [];
     let cursor: string | undefined;
-    while (authorized.length < limit) {
+    while (authorized.length <= limit) {
       const rows = await this.prisma.nurtureFamilyCareMessage.findMany({
         where: {
           workspaceId: input.workspace_id,
           careGroupId: input.care_group_id,
+          ...(input.child_care_process_id
+            ? { childCareProcessId: input.child_care_process_id }
+            : {}),
+          ...(input.direction ? { direction: input.direction } : {}),
           writerContract: "harness_g2_v1",
           status: { in: ["sent", "redacted"] },
-          createdAt: { gte: day, lt: dayEnd, lte: snapshot },
+          createdAt: { gte: occurredFrom, lt: occurredBefore, lte: snapshot },
         },
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-        take: pageSize,
+        take: AUTHORIZATION_PAGE_SIZE,
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         select: { id: true },
       });
       if (rows.length === 0) break;
       const loaded = await Promise.all(
         rows.map((row) =>
-          this.loadInstitutionBusinessCommunication({
-            workspace_id: input.workspace_id,
-            participant_id: input.participant_id,
-            message_id: row.id,
-          }),
+          this.loadAuthorizedCommunicationAt(
+            {
+              workspace_id: input.workspace_id,
+              participant_id: input.participant_id,
+              message_id: row.id,
+            },
+            snapshot,
+          ),
         ),
       );
       authorized.push(
         ...loaded.flatMap((result) =>
-          result.authorized ? [result.communication] : [],
+          result.authorized &&
+          (!input.data_class || result.communication.data_class === input.data_class)
+            ? [toListRow(result.communication)]
+            : [],
         ),
       );
       cursor = rows.at(-1)!.id;
-      if (rows.length < pageSize) break;
+      if (rows.length < AUTHORIZATION_PAGE_SIZE) break;
     }
-    return authorized.slice(0, limit);
+    return { rows: authorized.slice(0, limit), has_more: authorized.length > limit };
   }
 }

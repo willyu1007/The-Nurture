@@ -53,6 +53,11 @@ const resolvedChildScope = (): NurtureAuthorityChainResult => {
 const repository = (
   overrides: Partial<NurtureInstitutionClassDayDetailRepository> = {},
 ): NurtureInstitutionClassDayDetailRepository => ({
+  loadInstitutionLocalDay: async () => ({
+    storage_date: "2026-08-09T00:00:00.000Z",
+    occurred_from: "2026-08-09T00:00:00.000Z",
+    occurred_before: "2026-08-10T00:00:00.000Z",
+  }),
   loadEffectiveSchedule: async () => ({
     contract_version: "1.0.0",
     care_group_ref: "class-1",
@@ -70,8 +75,8 @@ const repository = (
   }),
   loadClassDayCaptures: async () => [],
   loadAttendanceState: async () => ({ state: "unsubmitted" }),
-  listAuthorizedCommunications: async () => [],
-  loadChildDayEvidence: async () => [],
+  listAuthorizedCommunications: async () => ({ rows: [], has_more: false }),
+  loadChildDayEvidence: async () => ({ rows: [], has_more: false }),
   ...overrides,
 });
 
@@ -132,21 +137,25 @@ describe("InstitutionClassDayDetailProjectionV1", () => {
           submitted_at: "2026-08-09T10:00:00.000Z",
           reopened_at: "2026-08-09T11:00:00.000Z",
         }),
-        listAuthorizedCommunications: async () => [
-          {
-            message_id: "message-1",
-            child_process_ref: "child-process-1",
-            direction: "family_to_org",
-            data_class: "family_care_question",
-            author_side: "family",
-            occurred_at: "2026-08-09T10:30:00.000Z",
-            corrected: false,
-            redacted: false,
-            lifecycle: "active",
-            acknowledgement_state: "acknowledged",
-            response_state: "awaiting_reply",
-          },
-        ],
+        listAuthorizedCommunications: async () => ({
+          rows: [
+            {
+              message_id: "message-1",
+              child_process_ref: "child-process-1",
+              direction: "family_to_org",
+              data_class: "family_care_question",
+              author_side: "family",
+              occurred_at: "2026-08-09T10:30:00.000Z",
+              corrected: false,
+              redacted: false,
+              lifecycle: "closed",
+              lifecycle_reason: "expired",
+              acknowledgement_state: "acknowledged",
+              response_state: "awaiting_reply",
+            },
+          ],
+          has_more: true,
+        }),
       }),
       { resolve: async () => resolvedClassScope() },
       unseal,
@@ -175,9 +184,12 @@ describe("InstitutionClassDayDetailProjectionV1", () => {
     expect(decision.output.communications[0]).toMatchObject({
       message_target_ref: "sealed:communication:message-1",
       response_state: "awaiting_reply",
+      lifecycle: "closed",
+      lifecycle_reason: "expired",
     });
     expect(decision.output.home_institution_dynamics.family_feedback).toHaveLength(1);
     expect(decision.output.home_institution_dynamics.institution_outreach).toHaveLength(0);
+    expect(decision.output.communications_has_more).toBe(true);
     expect(decision.output.attendance).toMatchObject({ state: "reopened", submission_head: 2 });
     expect(JSON.stringify(decision.output)).not.toContain("body_envelope");
   });
@@ -228,15 +240,18 @@ describe("InstitutionClassDayDetailProjectionV1", () => {
   });
 
   it("loads child evidence only after the exact purpose and grant scope resolve", async () => {
-    const loadChildDayEvidence = vi.fn(async () => [
-      {
-        kind: "daily_care_log" as const,
-        source_id: "log-1",
-        occurred_at: "2026-08-09T10:00:00.000Z",
-        status: "recorded" as const,
-        summary: "Ate lunch",
-      },
-    ]);
+    const loadChildDayEvidence = vi.fn(async () => ({
+      rows: [
+        {
+          kind: "daily_care_log" as const,
+          source_id: "log-1",
+          occurred_at: "2026-08-09T10:00:00.000Z",
+          status: "recorded" as const,
+          summary: "Ate lunch",
+        },
+      ],
+      has_more: true,
+    }));
     const service = new NurtureInstitutionClassDayDetailService(
       repository({ loadChildDayEvidence }),
       {
@@ -279,6 +294,7 @@ describe("InstitutionClassDayDetailProjectionV1", () => {
           summary: "Ate lunch",
         },
       ],
+      evidence_has_more: true,
     });
     expect(loadChildDayEvidence).toHaveBeenCalledOnce();
   });
