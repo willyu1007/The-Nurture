@@ -190,7 +190,7 @@ describe("aggregate through the chain (G4-A increment 4)", () => {
       createInMemoryInstitutionContextRepository({
         listActiveActorBindings: async () => [binding],
         loadPolicyFacts: async () => policyFacts,
-        loadAggregatePopulation: async () => population,
+        loadAggregatePopulation: async () => ({ class_state: "in_scope" as const, members: population }),
       }),
     );
 
@@ -214,7 +214,10 @@ describe("aggregate through the chain (G4-A increment 4)", () => {
    * scope — and the population is never read at all.
    */
   it("denies at the scope level before any population is read", async () => {
-    const loadAggregatePopulation = vi.fn(async () => [member("a")]);
+    const loadAggregatePopulation = vi.fn(async () => ({
+      class_state: "in_scope" as const,
+      members: [member("a")],
+    }));
     const chain = new NurtureInstitutionAuthorityChain(
       createInMemoryInstitutionContextRepository({
         listActiveActorBindings: async () => [binding],
@@ -227,6 +230,37 @@ describe("aggregate through the chain (G4-A increment 4)", () => {
       reason_code: "not_authorized",
     });
     expect(loadAggregatePopulation).not.toHaveBeenCalled();
+  });
+
+  /**
+   * The class reference is caller-supplied and must be placed before it is
+   * counted. An out-of-scope class yields no members, and an empty population
+   * is `0` per 0C-5 §5 — so without the placement the caller received a number
+   * where 0C-2 requires a denial, and the two cases were indistinguishable by
+   * member count alone.
+   */
+  it("denies a class reference the repository could not place, rather than counting 0", async () => {
+    const chain = (class_state: "out_of_scope" | "class_not_current" | "in_scope") =>
+      new NurtureInstitutionAuthorityChain(
+        createInMemoryInstitutionContextRepository({
+          listActiveActorBindings: async () => [binding],
+          loadPolicyFacts: async () => facts(),
+          loadAggregatePopulation: async () => ({ class_state, members: [] }),
+        }),
+      );
+    await expect(chain("out_of_scope").aggregate(request, () => 1)).resolves.toEqual({
+      status: "denied",
+      reason_code: "not_authorized",
+    });
+    await expect(chain("class_not_current").aggregate(request, () => 1)).resolves.toEqual({
+      status: "denied",
+      reason_code: "class_not_current",
+    });
+    // Only a class that was actually placed reports the empty population as 0.
+    await expect(chain("in_scope").aggregate(request, () => 1)).resolves.toEqual({
+      status: "available",
+      value: 0,
+    });
   });
 
   it("reports the owner being unavailable rather than counting what it has", async () => {

@@ -1,10 +1,7 @@
-import {
-  resolveAggregate,
-  type NurtureAggregateMember,
-  type NurtureAggregateResult,
-} from "./institution-aggregate.js";
+import { resolveAggregate, type NurtureAggregateResult } from "./institution-aggregate.js";
 import type {
   NurtureActorBinding,
+  NurtureAggregateMember,
   NurtureCareRole,
   NurtureCareScopeType,
   NurtureGrantDataClass,
@@ -172,10 +169,11 @@ export const grantAdmits = (
       (!ask.data_class || term.data_classes.includes(ask.data_class)) &&
       // 0C-5 §4 step 3: a member of the grant's purposes AND of 0C-3's frozen
       // vocabulary. The stored column is an open String[], so a purpose it
-      // carries that the vocabulary does not recognize is filtered out here
-      // rather than widening what the grant admits.
+      // carries that the vocabulary does not recognize cannot widen what the
+      // grant admits. Both halves are asserted on the stored value, so no cast
+      // is needed to reconcile an open column with a closed union.
       (!ask.purpose_key ||
-        term.purposes.filter(isPurposeKey).includes(ask.purpose_key as NurturePurposeKey)),
+        term.purposes.some((stored) => stored === ask.purpose_key && isPurposeKey(stored))),
   );
 
 /**
@@ -384,6 +382,11 @@ export class NurtureInstitutionAuthorityChain {
   ) {}
 
   async resolve(request: NurtureAuthorityChainRequest): Promise<NurtureAuthorityChainResult> {
+    // Tracks how far the chain got, so an owner outage denies at the level it
+    // actually reached rather than always blaming the first one. A denial that
+    // misreports its level makes the audit trail say the wrong thing about
+    // where authority stopped.
+    let reached: NurtureAuthorityChainLevel = "active_role";
     try {
       const bindings = await this.repository.listActiveActorBindings({
         workspace_id: request.workspace_id,
@@ -399,6 +402,7 @@ export class NurtureInstitutionAuthorityChain {
         return deny("active_role", selection.reason_code);
       }
       const active_role = activeRoleContextFrom(selection.binding, selection.selection_mode);
+      reached = "institution_scope";
       const facts = await this.repository.loadPolicyFacts({
         workspace_id: request.workspace_id,
         policy_key: "nurture.institution_admin_scope",
@@ -409,7 +413,7 @@ export class NurtureInstitutionAuthorityChain {
       });
       return deriveInstitutionScopeChain(active_role, facts, request);
     } catch {
-      return deny("active_role", "policy_unavailable");
+      return deny(reached, "policy_unavailable");
     }
   }
 
@@ -468,15 +472,26 @@ export class NurtureInstitutionAuthorityChain {
       return { status: "denied", reason_code: scope.reason_code };
     }
     try {
-      const members = await this.repository.loadAggregatePopulation({
+      const population = await this.repository.loadAggregatePopulation({
         workspace_id: request.workspace_id,
         institution_ref: scope.institution_scope.institution_ref,
         care_group_ref: request.care_group_ref,
         at: request.at,
         limit: this.options.population_limit ?? 200,
       });
+      // The class reference is placed before it is counted. Without this an
+      // out-of-scope class yields no members, and an empty population is `0`
+      // per 0C-5 §5 — so the caller would receive a number where 0C-2 requires
+      // a denial. The two cases are indistinguishable by member count alone,
+      // which is exactly why the repository reports the placement separately.
+      if (population.class_state === "out_of_scope") {
+        return { status: "denied", reason_code: "not_authorized" };
+      }
+      if (population.class_state === "class_not_current") {
+        return { status: "denied", reason_code: "class_not_current" };
+      }
       return resolveAggregate(
-        members,
+        population.members,
         {
           ...(request.direction ? { direction: request.direction } : {}),
           ...(request.data_class ? { data_class: request.data_class } : {}),

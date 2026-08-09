@@ -463,6 +463,32 @@ describe("institution structured policy", () => {
     expect(decision).toMatchObject({ allowed: false, reason_code: reasonCode });
   });
 
+  /**
+   * 0D-4 fixture 3. Attribution decides which family sees a photo, so only the
+   * current exact CareGroup caregiver may confirm one. `institution_admin` was
+   * admitted here while all three T-006 capabilities declare
+   * `supportedRoles: [caregiver, lead_caregiver]` — the contract denied what
+   * this predicate allowed, and nothing but the capability filter's position
+   * kept that from mattering.
+   */
+  it("denies an institution_admin confirming a child media attribution", async () => {
+    const decision = await evaluate(
+      { ...baseFacts(), role_kind: "institution_admin" },
+      { policy_key: "nurture.can_confirm_media_attribution" },
+    );
+    expect(decision).toMatchObject({ allowed: false, reason_code: "role_missing" });
+    // The two roles the contract does support still pass.
+    for (const role_kind of ["caregiver", "lead_caregiver"] as const) {
+      expect(
+        await evaluate(
+          { ...baseFacts(), role_kind },
+          { policy_key: "nurture.can_confirm_media_attribution" },
+        ),
+        role_kind,
+      ).toMatchObject({ allowed: true });
+    }
+  });
+
   it("rechecks redaction before allowing a family-care message write", async () => {
     const decision = await evaluate(
       { ...baseFacts(), message_state: "redacted" },

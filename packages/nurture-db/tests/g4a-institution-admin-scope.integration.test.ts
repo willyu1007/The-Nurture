@@ -787,4 +787,49 @@ describe("T-007 G4-A authority chain over stored rows (production DB lane)", () 
       reason_code: "grant_missing",
     });
   });
+
+  /**
+   * The class reference is caller-supplied, so it is placed before it is
+   * counted. A class in another institution has no members, and an empty
+   * population is `0` per 0C-5 §5 — so an unplaced reference would be answered
+   * with a number where 0C-2 requires a denial, and a real empty class would
+   * be indistinguishable from a foreign one.
+   */
+  it("places a caller-supplied class reference before counting it", async () => {
+    const scope = await seedScope();
+    const ownClass = await seedClass(scope.workspaceId, scope.home.id, "Own Class");
+    const foreignClass = await seedClass(scope.workspaceId, scope.other.id, "Foreign Class");
+    const archivedClass = await seedClass(scope.workspaceId, scope.home.id, "Archived", {
+      status: "archived",
+    });
+    const base = {
+      workspace_id: scope.workspaceId,
+      participant_ref: scope.admin.id,
+      at,
+      purpose_key: "care_coordination",
+      direction: "family_to_org" as const,
+      data_class: "daily_care_log" as const,
+    };
+    const chainForClass = new NurtureInstitutionAuthorityChain(repository);
+
+    // Own class, genuinely empty: 0, and reached without consulting a grant.
+    await expect(
+      chainForClass.aggregate({ ...base, care_group_ref: ownClass.id }, () => 1),
+    ).resolves.toEqual({ status: "available", value: 0 });
+
+    // Another institution's class: denied, not counted as 0.
+    await expect(
+      chainForClass.aggregate({ ...base, care_group_ref: foreignClass.id }, () => 1),
+    ).resolves.toEqual({ status: "denied", reason_code: "not_authorized" });
+
+    // A class that never existed denies identically to a foreign one.
+    await expect(
+      chainForClass.aggregate({ ...base, care_group_ref: randomUUID() }, () => 1),
+    ).resolves.toEqual({ status: "denied", reason_code: "not_authorized" });
+
+    // Own institution but not current: 0C-3's own code.
+    await expect(
+      chainForClass.aggregate({ ...base, care_group_ref: archivedClass.id }, () => 1),
+    ).resolves.toEqual({ status: "denied", reason_code: "class_not_current" });
+  });
 });

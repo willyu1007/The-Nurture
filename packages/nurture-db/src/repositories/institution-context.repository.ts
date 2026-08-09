@@ -1,7 +1,8 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type {
   NurtureActorBinding,
-  NurtureAggregatePopulationMember,
+  NurtureAggregateMember,
+  NurtureAggregatePopulation,
   NurtureInstitutionContextRepository,
   NurtureParticipantFact,
   NurturePolicyFacts,
@@ -594,6 +595,29 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
   }
 
   /**
+   * Where a class sits relative to an institution scope, as 0C-2/0C-3 froze it:
+   * a row that is not there or belongs elsewhere is `out_of_scope`, and one
+   * that is there but not current carries 0C-3's own code. Currency is the
+   * lifecycle conjunction, since a care group has both fields.
+   *
+   * Shared by `loadPolicyFacts` and `loadAggregatePopulation` on purpose. Two
+   * copies of this three-way answer would be two chances to disagree about
+   * whether an Admin may see a class.
+   */
+  private async classStateIn(
+    workspaceId: string,
+    institutionId: string,
+    careGroupId: string,
+  ): Promise<"in_scope" | "out_of_scope" | "class_not_current"> {
+    const row = await this.prisma.nurtureCareGroup.findFirst({
+      where: { id: careGroupId, workspaceId, institutionId },
+      select: { status: true, deletedAt: true },
+    });
+    if (!row) return "out_of_scope";
+    return row.status === "active" && !row.deletedAt ? "in_scope" : "class_not_current";
+  }
+
+  /**
    * G4-A increment 4 (0C-5 §5). The class's counted population with each
    * member's grant facts.
    *
@@ -613,8 +637,19 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
     care_group_ref: string;
     at: string;
     limit: number;
-  }): Promise<NurtureAggregatePopulationMember[]> {
+  }): Promise<NurtureAggregatePopulation> {
     const at = new Date(input.at);
+    // The class reference is a caller-supplied ref like any target, so it is
+    // placed before it is used. Skipping this made a class in another
+    // institution return an empty population, which 0C-5 §5 answers with `0` —
+    // a number where 0C-2 requires a denial.
+    const class_state = await this.classStateIn(
+      input.workspace_id,
+      input.institution_ref,
+      input.care_group_ref,
+    );
+    if (class_state !== "in_scope") return { class_state, members: [] };
+
     const enrollments = await this.prisma.nurtureEnrollment.findMany({
       where: {
         workspaceId: input.workspace_id,
@@ -626,7 +661,7 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       orderBy: { id: "asc" },
       take: input.limit,
     });
-    if (enrollments.length === 0) return [];
+    if (enrollments.length === 0) return { class_state, members: [] };
 
     const grants = await this.prisma.nurtureChildLinkGrant.findMany({
       where: {
@@ -637,7 +672,7 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       orderBy: { updatedAt: "desc" },
     });
 
-    return enrollments.map((enrollment) => {
+    const members = enrollments.map((enrollment) => {
       const scoped = grants.filter(
         (grant) =>
           grant.childCareProcessId === enrollment.childCareProcessId &&
@@ -668,8 +703,9 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
           data_classes: grant.dataClasses,
           purposes: grant.purposes,
         })),
-      };
+      } satisfies NurtureAggregateMember;
     });
+    return { class_state, members };
   }
 
   async loadPolicyFacts(input: NurturePolicyFactRequest): Promise<NurturePolicyFacts> {
@@ -837,19 +873,11 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
     let targetScopeState: NurturePolicyFacts["target_scope_state"] = "absent";
     if (institutionScopeCurrent && scopedInstitutionId) {
       if (careGroupId) {
-        const inScope = await this.prisma.nurtureCareGroup.findFirst({
-          where: {
-            id: careGroupId,
-            workspaceId: input.workspace_id,
-            institutionId: scopedInstitutionId,
-          },
-          select: { status: true, deletedAt: true },
-        });
-        targetScopeState = !inScope
-          ? "out_of_scope"
-          : inScope.status === "active" && !inScope.deletedAt
-            ? "in_scope"
-            : "class_not_current";
+        targetScopeState = await this.classStateIn(
+          input.workspace_id,
+          scopedInstitutionId,
+          careGroupId,
+        );
       } else if (enrollment) {
         targetScopeState =
           enrollment.institutionId === scopedInstitutionId ? "in_scope" : "out_of_scope";
@@ -912,9 +940,13 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       if (attribution && binding) {
         exposurePolicyPresent = attribution.exposurePolicyPayload !== null;
         const asset = attribution.mediaAssetRef;
+        // 0D-4: attribution is a class-level authority. The institution branch
+        // that used to sit here was the fact half of the same widening the
+        // predicate carried — an institution-scoped actor matched any asset in
+        // the institution. Removing it leaves no fact that could readmit an
+        // Admin if the role test were ever loosened again.
         assetScopeMatches =
           (binding.scope_type === "care_group" && binding.scope_id === asset.careGroupId) ||
-          (binding.scope_type === "institution" && binding.scope_id === asset.institutionId) ||
           (binding.scope_type === "enrollment" && scopeReachesChild);
         childEnrolled = Boolean(
           await this.prisma.nurtureEnrollment.findFirst({

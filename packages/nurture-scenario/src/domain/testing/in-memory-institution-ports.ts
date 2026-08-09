@@ -205,10 +205,12 @@ export const createInMemoryInstitutionContextRepository = (
     overrides.revalidateResolutionCandidate ??
     (async () => ({ current: false, reason_code: "participant_missing" })),
   loadPolicyFacts: overrides.loadPolicyFacts ?? (async () => unavailablePolicyFacts()),
-  // Empty rather than a stub member: an unset population is "no one", which
-  // aggregates to 0 without consulting a grant. A default member would make
-  // every unconfigured test assert against an invented enrolment.
-  loadAggregatePopulation: overrides.loadAggregatePopulation ?? (async () => []),
+  // Fail closed: an unconfigured port has not placed the class, so it cannot
+  // report an empty population — which 0C-5 §5 would answer with `0`. A test
+  // that wants a real empty class configures `class_state: "in_scope"`.
+  loadAggregatePopulation:
+    overrides.loadAggregatePopulation ??
+    (async () => ({ class_state: "out_of_scope" as const, members: [] })),
 });
 
 export const createInMemoryFamilyCareQueryRepository = (

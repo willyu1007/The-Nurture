@@ -156,13 +156,28 @@ export type NurtureInstitutionContextRepository = {
     care_group_ref: string;
     at: string;
     limit: number;
-  }): Promise<NurtureAggregatePopulationMember[]>;
+  }): Promise<NurtureAggregatePopulation>;
 };
 
-export type NurtureAggregatePopulationMember = {
+export type NurtureAggregateMember = {
   member_ref: string;
   grant_state: NurturePolicyFacts["grant_state"];
   grant_terms: NurturePolicyFacts["grant_terms"];
+};
+
+/**
+ * The class's placement AND its population, from one read.
+ *
+ * `class_state` reuses the vocabulary `target_scope_state` already carries,
+ * because it answers the same question about the same row. Without it the
+ * caller could not tell an empty class from one in another institution: both
+ * yield no members, and 0C-5 §5 says an empty population is `0` — so an
+ * unverified class reference would be answered with a number instead of a
+ * denial.
+ */
+export type NurtureAggregatePopulation = {
+  class_state: "in_scope" | "out_of_scope" | "class_not_current";
+  members: NurtureAggregateMember[];
 };
 
 export type NurturePolicyKey =

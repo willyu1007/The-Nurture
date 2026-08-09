@@ -131,11 +131,17 @@ const decideReason = (
       return result.status === "resolved" ? "allowed" : result.reason_code;
     }
     case "nurture.can_confirm_media_attribution":
-      if (
-        facts.role_kind !== "caregiver" &&
-        facts.role_kind !== "lead_caregiver" &&
-        facts.role_kind !== "institution_admin"
-      ) {
+      // 0D-4: only the current exact CareGroup caregiver may confirm, reject or
+      // supersede a child attribution. `institution_admin` was admitted here
+      // while all three T-006 capabilities declare
+      // `supportedRoles: [caregiver, lead_caregiver]` — the contract denied
+      // what this predicate allowed, and the safety was positional (the
+      // capability filter stands in front) rather than designed.
+      //
+      // Attribution decides which family sees a photo, so a wrong confirmation
+      // is a disclosure. An Admin may raise a sourced correction candidate; the
+      // caregiver who was in the room resolves it.
+      if (facts.role_kind !== "caregiver" && facts.role_kind !== "lead_caregiver") {
         return "role_missing";
       }
       if (!facts.asset_scope_matches) return "asset_scope_mismatch";

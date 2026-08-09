@@ -1,5 +1,5 @@
 import { grantAdmits, type NurtureGrantAsk } from "./institution-authority-chain.js";
-import type { NurturePolicyFacts, NurturePolicyReasonCode } from "./institution-context.js";
+import type { NurtureAggregateMember, NurturePolicyReasonCode } from "./institution-context.js";
 
 /**
  * G4-A increment 4 — 0C-5 §5, full coverage or nothing.
@@ -25,16 +25,16 @@ import type { NurturePolicyFacts, NurturePolicyReasonCode } from "./institution-
  */
 
 /**
- * One member of a counted population, with the grant facts the predicate needs
- * for it. The population itself comes from SCOPE — who is enrolled in the
- * class — never from the protected facts, so its size is not the secret and
- * membership is not what the rule hides.
+ * `NurtureAggregateMember` — one member of a counted population, with the
+ * grant facts the predicate needs for it — is defined beside the port that
+ * produces it, in `institution-context.ts`. One definition rather than a
+ * matching pair: two structurally identical types interoperate today and drift
+ * independently tomorrow.
+ *
+ * The population itself comes from SCOPE — who is enrolled in the class —
+ * never from the protected facts, so its size is not the secret and membership
+ * is not what the rule hides.
  */
-export type NurtureAggregateMember = {
-  member_ref: string;
-  grant_state: NurturePolicyFacts["grant_state"];
-  grant_terms: NurturePolicyFacts["grant_terms"];
-};
 
 /**
  * Deliberately two states and no third. `0` arrives as `available` with value
