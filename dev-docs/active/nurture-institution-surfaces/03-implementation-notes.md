@@ -1,5 +1,33 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — Post-increment-11 owner quality repair
+
+- Commit `a982aed` removes request-object authority/source caches. Reusing the
+  same request object after the selected Admin role is revoked now forces a
+  fresh exact-role read instead of returning cached authority.
+- Configured load now obtains its source-message set from the canonical
+  Institution business-communication owner, including disclosure policy,
+  before reading pending items. A grant alone no longer creates an Admin-visible
+  count. Ambiguous family-message-to-item mappings fail closed.
+- The local `"1.0.0"` support-signal version literal was removed; the provider
+  consumes `INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION` from the scenario SSOT.
+  Integration cleanup retains workspace IDs until deletion succeeds, repeats
+  in `afterAll`, and uses a stable future snapshot rather than a date that ages
+  into nondeterminism.
+- Commit `e1c93ed` moves scope, local-day, communication, population and opaque
+  ref handling into one internal owner-context module. The original provider
+  module remains the sole public composition path; no compatibility wrapper or
+  second provider track was added. Commit `acbf9eb` adds the ambiguous-source
+  regression to the disposable-DB lane.
+- Commit `260174a` removes the last legacy pending-work shortcut: configured
+  load now follows canonical acknowledgement/response axes rather than coarse
+  `status` plus requirement flags. Literal blocked receipts must also match the
+  authorized source message's child process, direction and data class.
+- No disposable database was newly approved for this quality pass, so the new
+  DB regressions were typechecked but not executed against an unapproved target.
+  The previously recorded 353/353 qualification remains evidence for commit
+  `598926e`, not for these later repairs.
+
 ## 2026-08-09 — G4-B increment 11: concrete owners and disposable qualification
 
 - Commit `598926e` adds one production composition factory for the policy SSOT

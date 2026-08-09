@@ -11,7 +11,9 @@
   instant, and the authority/source owner must expose a currently readable
   canonical blocker fact. All six ports are bound to concrete Prisma owner
   providers and the policy migration is qualified on an approved disposable
-  PostgreSQL ([`45`](./45-g4-b-increment-11-record.md)); missing facts still
+  PostgreSQL ([`45`](./45-g4-b-increment-11-record.md)). The follow-up quality
+  pass removes request-object authority caching and grant-only configured-load
+  admission; missing facts still
   return `unavailable`, never a guessed deadline/blocker or complete empty list.
   `InstitutionClassDayDetailProjectionV1`, the detail behind the class card,
   is implemented and quality-repaired at I1. 0C and 0D are both

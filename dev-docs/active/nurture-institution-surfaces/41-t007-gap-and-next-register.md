@@ -72,6 +72,15 @@ owner rows. Reads are bounded and return `unavailable` rather than a partial
 result. The 0D-5 policy migration is also qualified on an approved disposable
 database and that database has been destroyed.
 
+The post-binding quality pass (`a982aed`, `e1c93ed`, `acbf9eb`, `260174a`) removes
+request-object authority caching, requires the disclosure-aware communication
+owner before configured-load counting, rejects ambiguous source-item mappings,
+uses canonical pending axes, matches blocked receipts to their authorized
+source dimensions, and isolates one internal shared owner context without
+changing the sole public composition path. The new DB regressions are
+typechecked; they still require a new explicitly approved disposable target
+before execution.
+
 Two owner facts remain unavailable by design. The current attendance owner has
 no configured checkpoint instant, so an enabled unsubmitted day cannot become
 overdue. The current authority/source schemas expose no currently readable

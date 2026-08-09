@@ -323,6 +323,23 @@ Falsification evidence is per-increment and lives in each record's
 | External My-Chat pins | **FAIL, attributed** | Workflow expected `567b96c`, C30 expected `51ad97f`, observed `ebc7605`; no cross-repo adoption was performed. |
 | Effect boundary | PASS | I1 adapter/consumer code only; no migration apply, concrete owner activation, capability/contract rotation, deployment or traffic. |
 
+## 2026-08-09 — Post-increment-11 owner quality repair
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture/security review | PASS after repair | Removed cross-invocation request caches, routed configured-load source admission through the canonical disclosure-aware communication owner, rejected ambiguous family-message source-item mappings, used canonical pending axes, and matched blocked-receipt dimensions to its authorized source. |
+| Root TypeScript check | PASS | `pnpm exec tsc --noEmit`; includes the new DB regressions. |
+| DB package typecheck | PASS | `pnpm --filter @the-nurture/db typecheck`. |
+| Full unit lane | PASS | `pnpm test:unit`: 826/826 across 73 files, both before and after the internal context extraction. |
+| Structural verification | PASS | Public `institution-support-signal.owner-providers` composition path and exports are unchanged; shared owner context is one internal module. `git diff --check` passes. |
+| Disposable PostgreSQL regression lane | NOT RUN | The prior approved target was destroyed and no new disposable target was approved for this pass. New revoke-cache, undisclosed-load and ambiguous-source regressions are compiled but not claimed as executed. |
+| C30-I3 source lock | PASS | `pnpm verify:c30-i3-owner-adoption`; changed files are outside the frozen C30 profiles. |
+| Nurture exact runtime self-pin | PASS by direct recomputation | `a9991928…` over 225 files; the local pin is updated without adopting the divergent My-Chat head. |
+| Boundary/static gates | PASS except attributed external pin | Persistence boundary, test routing (137 files), G2 DB census, G3-0 freeze, C30 default-off and C30 source lock pass. `verify:workflow-contract-pin` stops only on My-Chat expected `567b96c` versus observed `9674886`; no adoption was made. |
+| Governance/docs | PASS | Governance lint and sync, 51-file task-doc link/anchor lint, strict context verification and project-state verification all pass. |
+| Cleanup/dual-track scan | PASS | No tracked or untracked temp/backup/reject artifacts; no duplicate support-signal contract literal, request WeakMap cache, coarse-status pending shortcut or alternate owner-provider composition path remains. |
+| Effect boundary | PASS | Source/test/docs and local self-pin only; no DB apply, capability, contract rotation, deployment, activation or traffic. |
+
 ## 2026-08-09 — G4-B increment 11 owner providers and policy qualification
 
 | Check | Result | Evidence |

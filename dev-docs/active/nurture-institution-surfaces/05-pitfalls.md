@@ -1,5 +1,34 @@
 # Pitfalls — 机构端双 Surface
 
+## 2026-08-09 — Request caching and grant-only counting weakened owner rechecks
+
+- **Symptom:** reusing the same owner-read request object could retain a prior
+  successful role/source read after authority changed. Configured load also
+  counted pending items from grant terms without requiring the exact
+  Institution Admin disclosure owner, and a family message with multiple source
+  items could be resolved by an arbitrary `findFirst` row.
+- **Root cause:** request identity was incorrectly treated as a request-lifetime
+  boundary, while the provider object is longer-lived. Configured load copied a
+  partial grant predicate instead of consuming the existing exact communication
+  owner, and the source-message relation is indexed but not unique.
+- **What was tried:** the architecture audit traced every provider's incoming
+  and outgoing dependencies, then compared its predicates with the canonical
+  communication read port and the frozen no-cache/no-partial rules. No schema
+  uniqueness was assumed or added during the repair.
+- **Fix/workaround:** all cross-invocation caches were removed; only a
+  method-local local-day cache remains. Configured load now derives authorized
+  message IDs from the disclosure-aware owner read. Family messages require
+  exactly one matching source item, otherwise the read fails closed. Pending
+  work follows the canonical acknowledgement/response axes, and blocked
+  receipts must match their authorized source dimensions. Regression fixtures
+  cover revoke-after-first-read, undisclosed work, duplicate items, completed
+  acknowledgement-only items and mismatched receipts.
+- **Prevention:** cache immutable parsing or method-local repeated lookups only;
+  never cache authority/source results on caller object identity. Protected
+  aggregates must reuse their exact direct-read owner rather than a similar
+  local predicate. Non-unique source links must be cardinality-checked, and
+  legacy coarse status must not replace canonical independent state axes.
+
 ## 2026-08-09 — A targeted DB test initially inherited the shared local URL
 
 - **Symptom:** the first exact-owner integration runs created 16 workspaces in
@@ -84,8 +113,8 @@
 - 不要在园区未配置绝对 count/window 时猜测负荷阈值；该类 signal 应保持 disabled。
 - 不要让 signal adapter 解析 `checkpoint_ref`/`window_key`，或拿 local date、
   `occurredAt`、`updatedAt`、普通 status 猜 deadline/blocker；这些事实必须由 exact
-  owner 显式提供。缺少 owner binding 时返回 unavailable，不能用恒空 placeholder
-  冒充完整列表。
+  owner 显式提供。缺少 canonical owner fact 时返回 unavailable，不能用恒空
+  placeholder 冒充完整列表。
 - 不要让 AI 决定“需要处理”。只有明确 canonical overdue/blocker 可以进入该级别；
   未来 AI candidate 最多是“建议关注”。
 - 不要仅因缺少照片/文字生成 support signal；无记录不等于活动未开展。
