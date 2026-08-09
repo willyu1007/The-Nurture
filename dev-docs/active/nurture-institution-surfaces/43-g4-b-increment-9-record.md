@@ -89,9 +89,11 @@ future apply plan are under
 - Test routing, persistence boundaries, surface conformance (121/121), G2 Exit
   and G3-0 freeze gates pass. DB context refresh exposed and repaired the G3
   census's previously missing attendance/schedule tables.
+- C30-I3 was re-frozen at implementation revision `3ee0b78`, source hash
+  `3fc97907…`; the Nurture exact runtime self-pin is `4c5bd58d…` over 222 files.
 
 The known external My-Chat workflow pin mismatch remains G-09 and was not
-adopted.
+adopted: pinned `567b96c`, observed `ca782b6`.
 
 ## Non-effects and next step
 

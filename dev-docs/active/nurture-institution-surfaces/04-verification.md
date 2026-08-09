@@ -303,6 +303,8 @@ Falsification evidence is per-increment and lives in each record's
 | Persistence/surface/G2/G3 | PASS | Persistence boundary, synthetic surface conformance 121/121, G2 Exit and G3-0 freeze. |
 | Prisma SSOT | PASS for authoring | `prisma format`, `prisma validate`, client generation and DB context refresh pass. Migration SQL is additive and unapplied. |
 | Quality negatives | PASS | Body-free communication list, post-authorization pagination, explicit `has_more`, Institution-timezone UTC-boundary inclusion/exclusion, exact-source disappearance, no invented deadline, aggregate refusal and fixed-order fallback. |
+| C30-I3 / Nurture self-pin | PASS after re-freeze | C30 source revision `3ee0b78`, source hash `3fc97907…`; Nurture exact runtime hash `4c5bd58d…`, 222 files. |
+| `verify:workflow-contract-pin` | **FAIL, attributed** | Nurture self-pin was recomputed; external My-Chat remains pinned `567b96c`, observed `ca782b6` (G-09). |
 | Effect boundary | PASS | I1 code/migration authoring only; no database apply, source-owner activation, capability, deployment or traffic. |
 
 ## Required Evidence
