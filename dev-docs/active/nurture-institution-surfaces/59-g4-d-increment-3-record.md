@@ -108,7 +108,7 @@
 | Disposable cleanup | PASS — zero sessions, targets destroyed and absent |
 | Nurture exact-runtime self-pin | PASS — `f03b75fb…`, 242 files |
 | C30 default-off | PASS — no production action/capability activation |
-| C30 local adoption lock | PENDING COMMIT BOUNDARY — current bytes recompute to `57e4759f…`; no false source revision recorded |
+| C30 local adoption lock | PASS — exact implementation revision `e7604ec`, aggregate hash `57e4759f…`; Base/Host fields unchanged |
 | External My-Chat pin | KNOWN RED — expected `567b96c`, observed `fd2a213c`; no adoption |
 
 Detailed disposable-DB evidence is under

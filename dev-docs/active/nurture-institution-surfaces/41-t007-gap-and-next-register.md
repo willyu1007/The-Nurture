@@ -171,6 +171,10 @@ I3 gates. No Host bridge, public caller, capability registration or traffic
 exists; `workflowRunRef` still accepts only the exact My-Chat-owned canonical
 ref and the private workflow ref is never projected.
 
+The revision-bearing local C30 adoption lock is current at implementation
+revision `e7604ec`, aggregate source hash `57e4759f…`; this closes the local
+commit-boundary maintenance step without adopting the divergent My-Chat head.
+
 Cited by: [`58`](./58-g4-d-increment-2-record.md),
 [`59`](./59-g4-d-increment-3-record.md).
 
@@ -210,12 +214,9 @@ Cited by: [`58`](./58-g4-d-increment-2-record.md),
 2. **G4-D increment 5 / 0E-4** — formalization, exit and completion after 0E-3
    is DB-qualified. G-09 must be resolved before claiming real My-Chat owner
    integration at I3.
-3. **Commit-boundary local lock refresh** — after the implementation receives
-   an exact commit, re-freeze the affected C30 profiles from recomputed
-   `57e4759f…`; do not invent a revision for dirty working-tree bytes.
-4. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
+3. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
    any required G4-D path.
-5. **I2** — capability registration and contract rotation — which is what turns
+4. **I2** — capability registration and contract rotation — which is what turns
    G-01 from a bound into a completed step. Not before the branch it publishes
    is done.
 

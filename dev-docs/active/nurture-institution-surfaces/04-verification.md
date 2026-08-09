@@ -494,7 +494,7 @@ Falsification evidence is per-increment and lives in each record's
 | Family preparation time | PASS after repair | Accepted preparation projects the current offer `reviewAt`, not the closed waitlist entry's stale review time. |
 | Admin queue bound | PASS after repair | Required-field query is capped at 501 probes for a 500-entry contract and fails unavailable on overflow; it never silently truncates. |
 | Nurture exact-runtime | PASS | Local hash refreshed to `f03b75fb…` over 242 files. The pure simplification checkpoint was -114 lines; required audit guards/tests leave the final three-file comparison at net -25. |
-| C30 local lock | DEFERRED, explicit | Current affected bytes recompute to `57e4759f…`; revision-bearing lock cannot truthfully re-freeze before an implementation commit. Default-off remains PASS. |
+| C30 local lock | PASS after commit boundary | Affected profiles are re-frozen at exact implementation revision `e7604ec`, aggregate hash `57e4759f…`; Base/Host lock fields are unchanged. Default-off remains PASS. |
 | External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `fd2a213c`; no external adoption performed. |
 | Cleanup / effect boundary | PASS | Diff shadow and all exact qualification/simplification/release DBs, including `nurture_t007_g4d_i3_release_20260810_05`, were destroyed with zero sessions and confirmed absent. No shared apply, caller, capability, deployment, activation or traffic. |
 

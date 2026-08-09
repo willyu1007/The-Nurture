@@ -700,7 +700,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   falsification tests brought the final comparison to 3,239 -> 3,214 lines
   (net -25): no dead compatibility path or duplicate runtime was retained.
 - Refreshed the DB context and Nurture exact-runtime hash (`f03b75fb…`, 242
-  files). C30 default-off remains green. Its revision-bearing local adoption
-  lock intentionally waits for a commit boundary; current bytes recompute to
-  `57e4759f…`. My-Chat remains unadopted at observed `fd2a213c` versus expected
-  `567b96c`.
+  files). C30 default-off remains green. After the implementation commit,
+  affected local profiles were re-frozen at exact revision `e7604ec` and
+  aggregate hash `57e4759f…`; unchanged Base/Host fields were retained. My-Chat
+  remains unadopted at observed `fd2a213c` versus expected `567b96c`.
