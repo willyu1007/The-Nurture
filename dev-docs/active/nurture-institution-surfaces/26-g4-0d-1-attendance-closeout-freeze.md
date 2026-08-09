@@ -7,7 +7,7 @@
 - Unit: 0D-1, first of 0D ([`25-g4-0d-scope-freeze.md`](./25-g4-0d-scope-freeze.md))
 - Contract identity: `nurture.daily-attendance-closeout@1.0.0`
 - Consumes: the 0C chain unchanged — `ActiveRoleContextV1` (0C-1) through class
-  scope (0C-3)
+  scope (0C-3) — **and 0C-5 §5**, for the Admin class aggregate in §4
 - Verdict: `G4_0D_1_FREEZE_PASS`
 - Releases: G4-B (caregiver submit/revise, Admin oversight), 0D-5
   (`attendance_submission_overdue`)

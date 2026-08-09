@@ -6,7 +6,8 @@
 - Task: T-007
 - Unit: 0D-5, after 0D-1 ([`25-g4-0d-scope-freeze.md`](./25-g4-0d-scope-freeze.md))
 - Contract identity: `nurture.institution-support-signal@1.0.0`
-- Consumes: 0C-5 §5 aggregate privacy, 0D-1's submission state
+- Consumes: **the 0C chain unchanged** — every signal's source is read through
+  it, per §6 — plus 0C-5 §5 aggregate privacy and 0D-1's submission state
 - Verdict: `G4_0D_5_FREEZE_PASS`
 - Releases: G4-B, G4-C
 - Open points: **closed** 2026-08-09 — §4 by scoping 0C-5 §6's prohibition to
@@ -185,8 +186,9 @@ at noon does not retroactively re-describe the morning's signals, and a reader
 comparing two snapshots can see that the policy moved rather than the work.
 
 **Concurrency is not a concern for the projection** — it is composed per
-request and stored nowhere. Policy edits follow the same
-`expectedRevision`/`conflict` rule as 0D-1 and 0D-3.
+request and stored nowhere. Policy edits carry `expectedPolicyRevision` and
+deny `conflict` on mismatch, the same precondition 0D-1, 0D-2 and 0D-3 apply
+under their own subject's name.
 
 ## 6. Default-safe behavior
 

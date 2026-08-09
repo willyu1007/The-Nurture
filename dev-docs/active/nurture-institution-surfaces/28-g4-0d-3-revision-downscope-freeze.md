@@ -73,12 +73,19 @@ result. This is an invariant, not a default.
 
 | Capability | Actor | May change |
 | --- | --- | --- |
-| `adjust_activity_placement` | `institution_admin` | placement within the same class ([`27`](./27-g4-0d-2-schedule-placement-freeze.md) §4) |
 | `add_institution_note` | `institution_admin` | appends an institution-authored note beside the original |
 | `downscope_content_visibility` | `institution_admin` | narrows visibility, or suspends publication eligibility |
 | `raise_attribution_correction` | `institution_admin` | creates a **candidate** only |
 
 All resolve through the 0C chain in its fixed order.
+
+**`adjust_activity_placement` is 0D-2's capability, not this unit's.** 0D-2 §4
+owns the actor, what may move, and the precedence and concurrency rules. This
+unit owns the **form the write takes** — a placement change is appended as a
+`ContentRevision` with `subjectKind: "placement"` and `decidedByBefore`, never
+applied in place. One capability, two units, split as rule-versus-record rather
+than as two overlapping definitions. Listing the capability in both tables was
+the ownership ambiguity 0G's audit of this branch removed.
 
 ### Downscope is one-directional, and that is the load-bearing rule
 

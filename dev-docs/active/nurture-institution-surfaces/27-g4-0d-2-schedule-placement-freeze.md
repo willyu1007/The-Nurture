@@ -163,10 +163,12 @@ no-bypass rule restated for a single-item selection.
 | `query_class_activity_timeline` | `institution_admin`, class caregiver | 0C-3 class scope |
 | `adjust_activity_placement` | `institution_admin` | 0C-3 class scope |
 
-`adjust_activity_placement` is an Admin capability **and writes through 0D-3's
-append-only revision** — it never edits a placement in place. Admin may move a
-source between activities of the same class; moving it to another class, or
-changing its author, capture time or body, is outside every capability here.
+`adjust_activity_placement` is **owned by this unit** — its actor, its
+precedence effect and its concurrency rule are frozen here. Its write **takes
+0D-3's form**: appended as a `ContentRevision` with `subjectKind: "placement"`,
+never applied in place. Admin may move a source between activities of the same
+class; moving it to another class, or changing its author, capture time or
+body, is outside every capability here.
 
 **This unit emits no ordering** beyond the schedule's own start times, which
 are stable class attributes rather than state. Nothing here derives an order
