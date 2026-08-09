@@ -136,7 +136,7 @@ export type NurtureInstitutionClassList = {
  * one after the current slot — a gap in the day means there is a next activity
  * while no current one.
  */
-export const activityWindowAt = (
+const activityWindowAt = (
   schedule: NurtureEffectiveSchedule | null,
   at_minute: number,
 ): { current?: { activity_ref: string; label: string }; next?: { activity_ref: string; label: string } } => {

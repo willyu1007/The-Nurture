@@ -5,29 +5,23 @@
 - State: in-progress
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
-- Updated: 2026-08-08
-- Next step: **decide what follows G4-0C** — `G4_0C_EXIT_PASS` is issued
-  ([`19-g4-0c-exit-record.md`](./19-g4-0c-exit-record.md)). Six units frozen
-  (`11`…`16`), three open points closed, 0G cross-contract audit passed after
-  four repairs ([`18`](./18-g4-0g-0c-audit-record.md)).
-  Exit opens G4-A implementation and the common authority base G4-B/C/D/E
-  consume; each of those branches still needs its own domain freeze — 0D daily
-  operations, 0E Workflow and Enrollment, 0F knowledge and RAG.
-  0C-4 rotated the published contract to
-  `nurture.surface-contract@1.18.0` / `sha256:be84bb23…` additively, with
-  `sharedCoreHash` unchanged, so T-005 and T-006 slice evidence is preserved.
-  0C-6 carries the only schema delta, authored as a plan and not applied.
-  G4-A increment 1 has since executed the first slice of that chain
-  ([`20-g4-a-i1-branch-freeze.md`](./20-g4-a-i1-branch-freeze.md)):
-  `nurture.institution_admin_scope` implements the 0C-1/0C-2/0C-3 levels with
-  34 tests. It is exercised by tests only — `NurtureInstitutionPolicyService`
-  has no production caller — so 0C is validated as *buildable as frozen*, not
-  as running. An audit of that increment found and fixed three fail-open
-  defects and one missing reason code, which is the evidence that implementing
-  before freezing further was the right order.
-  Next: continue G4-A's remaining increments, or freeze 0D for daily
-  operations. 0E and 0F remain unstarted.
-  Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
+- Updated: 2026-08-09
+- Next step: **build `InstitutionClassDayDetailProjectionV1`** — the detail
+  behind the class card. 0C and 0D are both frozen and exited
+  ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)); G4-A
+  executed 0C's authority chain in four increments and G4-B executed 0D-1 and
+  0D-2 in seven ([`34`](./34-g4-b-increment-1-record.md)–[`40`](./40-g4-b-increment-7-record.md)).
+  0D-3, 0D-4's correction candidate and 0D-5 are frozen and unbuilt; 0E and 0F
+  are unstarted at the freeze stage.
+- **Live branch state, gaps and next steps:**
+  [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
+  That register is the single answer to "where is T-007 now"; the numbered
+  records are history and are not edited to stay current.
+- Everything built sits at **I1** — implementation and migration authoring,
+  qualified on a disposable PostgreSQL. Nothing has a production caller, no
+  capability is registered, and no schema is applied anywhere durable. 0C and 0D
+  are therefore validated as *buildable as frozen*, not as running.
+- Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.
 
@@ -407,9 +401,9 @@ T-006 依赖；0C 是 G4 自身公共基础，0D/0E/0F 按域并行，0G 滚动�
 - [ ] 顶层产品问题已收口；所有实现前 contract/schema 项均在 freeze register 中
   标明 owner、启用门和默认安全行为。
 
+
 ## Next Step
 
-继续执行 G4-0C Authority/Surface freeze；随后 0D/0E/0F dependency-aware 推进。
-0B 已向 T-006 提供 exact publication-policy planning contract，但只有 provider/
-consumer implementation 与 qualification 通过后才可满足 G3-D/E。所有分支在各自
-qualification 前保持 absent/default-off。
+See [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md)
+"Next steps, in dependency order". It is kept there rather than here so there is
+one list to update instead of two that disagree.

@@ -24,16 +24,16 @@ activity, and 0D-2 §4's levels 2 and 3 walk activities. Such a class showed
 **no photo even when it had one**, and [`39`](./39-g4-b-increment-6-record.md)
 made that visible on the card.
 
-Stated in product terms it is worse than it looks in code terms: "see your
+Stated in product terms the gap is worse than it looks in code terms: "see your
 class's photos" had acquired an undeclared dependency on "configure a schedule
-first". Nothing in the surface tells an Admin that, and nothing in the freeze
-claimed it.
+first". Nothing in the surface tells an Admin so, and nothing in the freeze made
+that claim.
 
 **Decision: 0D-2 §4 gains an explicit level 4** — the class's newest qualifying
 photo today, **placed or not**. Additive: the existing levels are unmoved and a
-scheduled class whose activities hold photos never reaches it. A fixture asserts
-exactly that non-effect, because "additive" is a claim about behaviour, not
-about diff shape.
+scheduled class whose activities hold photos never reaches the new level. A
+fixture asserts exactly that non-effect, because "additive" is a claim about
+behaviour, not about diff shape.
 
 `selected_by: "class_latest"` distinguishes it, so a consumer can tell a photo
 that belongs to an activity from one that does not, rather than having to guess
@@ -115,12 +115,12 @@ its head has moved to `66d8c087`, and inside the pinned `x5_joint_api` set that
 range lands a new `family-growth/family-material` domain, media access and GC
 repositories, and a `prisma/schema.prisma` reshuffle — roughly 2,400 lines.
 
-Advancing the pin over that is an **adoption**, not a refresh, and it is
-another task's work. Commit `65de105` advanced this pin once before, after
-auditing the change down to a single comment byte; the same audit here would be
-a review of T-009's family-growth increment, and recording it under T-007 would
-say this branch qualified code it never read. Left red, with the reason, for
-whoever owns that adoption.
+Advancing the pin over that change is an **adoption**, not a refresh, and the
+work belongs to another task. Commit `65de105` advanced this pin once before,
+after auditing the diff down to a single comment byte; the equivalent audit here
+would be a review of T-009's family-growth increment, and recording that review
+under T-007 would say this branch qualified code it never read. Left red, with
+the reason stated, for whoever owns the adoption.
 
 ## Exit
 

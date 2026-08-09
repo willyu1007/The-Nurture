@@ -185,7 +185,7 @@ export const grantAdmits = (
  * applies that when it builds `grant_terms`, which is why this function sees
  * only current grants.
  */
-export const deriveGrantScope = (
+const deriveGrantScope = (
   facts: NurturePolicyFacts,
   ask: NurtureGrantAsk,
 ): { status: "resolved" } | { status: "denied"; reason_code: NurturePolicyReasonCode } => {
@@ -354,7 +354,7 @@ export const deriveInstitutionScopeChain = (
  * the row; nothing is synthesized and nothing is read from the request beyond
  * the selection mode the caller's naming produced.
  */
-export const activeRoleContextFrom = (
+const activeRoleContextFrom = (
   binding: NurtureActorBinding,
   selection_mode: "explicit" | "unique",
 ): NurtureActiveRoleContextV1 => ({

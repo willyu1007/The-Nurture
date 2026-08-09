@@ -99,7 +99,7 @@ const denyConflict = (): NurtureAttendanceDecision => ({
  * decision, so re-deciding there would be a second copy of the rule rather
  * than a safety check — and a copy is what drifts.
  */
-export const nextAttendanceHead = (
+const nextAttendanceHead = (
   command: NurtureAttendanceCommand,
   current: NurtureAttendanceCurrentState,
 ): { next_head: number; next_state: "submitted" | "reopened" } => ({

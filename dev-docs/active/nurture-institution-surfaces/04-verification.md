@@ -255,6 +255,24 @@
 | Documentation and whitespace | PASS | Scoped docs/anchor lint checks 9 files with 0 errors and 0 warnings; `git diff --check` passes. |
 | Effect boundary | PASS | Planning/freeze artifacts only. No schema, migration, database, provider, route, capability, secret, environment, activation or traffic effect occurred. |
 
+## 2026-08-09 — G4-A and G4-B I1 qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| G4-A 0C chain executed | PASS | Four increments; the increment-1 audit found and repaired three fail-open defects and one missing reason code (`21`–`24`). |
+| G4-B 0D-1/0D-2 executed | PASS | Seven increments, attendance write path through the Admin class card (`34`–`40`). |
+| Typecheck | PASS | Zero errors from this repository. |
+| Unit lane | PASS | 803 passed across 70 files. |
+| Production-db lane | PASS | 344 passed across 34 files, on a disposable PostgreSQL. |
+| `verify:test-routing` / `verify:surface-conformance` | PASS | Both green. |
+| `verify:g2-exit-contract` / `verify:g3-0-freeze` | PASS | Both green. |
+| `verify:c30-i3-owner-adoption` | PASS | Lock re-frozen after each increment that touched pinned paths. |
+| `verify:workflow-contract-pin` | **FAIL, attributed** | Nurture self-pin matches. My-Chat's head moved and its pinned `x5_joint_api` set changed; advancing is an adoption of another task's work — G-09 in `41-t007-gap-and-next-register.md`. |
+| Effect boundary | PASS | I1 only: implementation plus migration authoring on a disposable database. No shared/persistent apply, capability registration, contract rotation, activation or traffic. |
+
+Falsification evidence is per-increment and lives in each record's
+"Falsification" table rather than being copied here.
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

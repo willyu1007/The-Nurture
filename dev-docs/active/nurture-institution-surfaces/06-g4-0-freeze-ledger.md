@@ -4,17 +4,20 @@
 
 - Task: T-007
 - Stage: G4-0A Freeze Protocol & Fact Inventory
-- State: `G4_0A_INVENTORY_PASS` on 2026-08-01; branch implementation and
-  qualification remain pending
-- Pins rebound on 2026-08-08 after the T-009 rotations — see
-  [`07-g4-0a-inventory-record.md`](./07-g4-0a-inventory-record.md) "Pin Rebind".
-  The T-002 owner-path row moved from `PRESENT_PINNED` to
-  `DEFINED_UNQUALIFIED` as a result; every other rebound row kept its state.
-- Restored the same day: the C30 cross-repository landing re-established the
-  owner path at current pins, so that row is `PRESENT_PINNED` again. Evidence
-  is `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md`.
-  Pins advanced once more in that landing — Base `4350086…`, My-Chat
-  `51ad97f…`, parity `98f6c241…`, Nurture self-pin `c18ef2e0…`.
+- State: `G4_0A_INVENTORY_PASS` on 2026-08-01. 0B, 0C and 0D have since frozen
+  and exited; 0E and 0F are unstarted. Live branch state is
+  [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
+- **Exact pin values are not recorded here.** The SSOT is
+  `docs/project/integrations/my-chat-workflow-contract.json`, enforced by
+  `verify:workflow-contract-pin`. This ledger carried two different and both
+  stale sets of hashes until 2026-08-09; a hash copied into prose has no gate
+  behind it and silently becomes a second, wrong answer. Pin *history* stays in
+  the records that made each rebind —
+  [`07-g4-0a-inventory-record.md`](./07-g4-0a-inventory-record.md) "Pin Rebind"
+  and `dev-docs/active/nurture-institution-mode/21-c30-landing-requalification-record.md`.
+- The T-002 owner-path row moved to `DEFINED_UNQUALIFIED` at the T-009 rotation
+  and back to `PRESENT_PINNED` the same day, when the C30 cross-repository
+  landing re-established the owner path.
 - This ledger records planning/readiness truth only. It is not an Owner Integration
   Handoff, Joint Conformance record, Beta Profile Handoff or activation authority.
 
@@ -36,12 +39,12 @@ Documentation acceptance alone cannot produce `PRESENT_PINNED`.
 | --- | --- | --- | --- | --- | --- |
 | Owner/source path | T-002 | Re-established at current pins by `21-c30-landing-requalification-record.md` (`C30_LANDING_REQUAL_PASS`): `verify:owner-integration` green at `1.17.0` / `sha256:d22851d9…` with 25 ingress actions, 8 queries, **0 unexercised**, over formal scenario-service HTTP against real PostgreSQL, both joint journeys PASS. The original M5/G1 records at My-Chat `a019566` / Base `06303e9` / self-pin `b2c53eb7…` remain exact history at their own topology. | `PRESENT_PINNED` (restored 2026-08-08; was `DEFINED_UNQUALIFIED` between the T-009 rotation and this requalification) | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
 | Public Surface baseline | T-004 | `nurture.surface-contract@1.18.0` / `sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0`; shared core `sha256:7bd8a82d…` (unchanged); 34 capabilities / 6 surfaces; rotated additively by G4-0C-4 | `PRESENT_PINNED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
-| Owner revisions | My-Chat / My-Workflow-Base | My-Chat `df7a273bff65b965da45e2e9604cee3b6b8fc20b` (`x5_joint_api` `30878ba3…`, `wave4_binding_host` `947b4857…`), Base `8a3ea9028d414813994a57ef3501ecad3dd7c434`, parity `8dd53be4…`, Nurture self-pin `c0f97aec…` (rebound 2026-08-08 per D-T009-04) | `PRESENT_PINNED` | 0C～0F, G4-F | any revision/source-pin/parity drift invalidates the affected branch evidence |
+| Owner revisions | My-Chat / My-Workflow-Base | The exact revisions, source pins and parity hash in `docs/project/integrations/my-chat-workflow-contract.json`, whatever they currently are; `verify:workflow-contract-pin` is what makes that row true or false | `PRESENT_PINNED` when the gate is green | 0C～0F, G4-F | any revision/source-pin/parity drift invalidates the affected branch evidence |
 | Care interaction | T-005 | exact `CareInteraction`/owner-read/direct-interaction contracts used by Institution consumers | `DEFINED_UNQUALIFIED` | 0C/0D, G4-C/F | provider/version/source lifecycle drift invalidates affected consumer qualification |
 | Care/media/publication | T-006 | exact care facts, activity attribution, Board and `PublishProcess` contracts | `DEFINED_UNQUALIFIED` | 0B/0D, G4-B/C/F | fact/schema/policy/source-head drift invalidates affected projections and release evidence |
 | Generic Workflow runtime | My-Workflow-Base / My-Chat | pinned Run/Step/worker/ledger/private-carrier contract | `DEFINED_UNQUALIFIED` | 0E, G4-D/F | carrier/runtime/interface drift invalidates Workflow integration evidence |
 | Host identity/contact/RAG | My-Chat | pinned auth/session/active-role, Child/Family/contact and generic RAG owner contracts | `DEFINED_UNQUALIFIED` | 0C/0E/0F, G4-A/D/E/F | identity/contact/RAG owner drift invalidates affected owner and joint evidence |
-| Institution capability set | T-007 | 0A inventory current; 0B policy contract frozen; 0C～0F exact branch records/outputs missing | `GAP` | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
+| Institution capability set | T-007 | 0A inventory current; 0B policy contract frozen; 0C and 0D frozen and exited ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)) with G4-A and G4-B implemented at I1; 0E and 0F records missing | `DEFINED_UNQUALIFIED` for 0C/0D, `GAP` for 0E/0F | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
 
 0A may cite only exact artifacts already qualified by their owner. T-005/T-006 and
 the T-007 branch set remain non-pinned until their own implementation/qualification;

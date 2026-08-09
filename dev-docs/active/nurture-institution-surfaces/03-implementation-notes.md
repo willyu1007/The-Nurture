@@ -1,5 +1,20 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — G4-0C/0D frozen and executed; G4-A and G4-B at I1
+
+- G4-0C exited with six frozen units, and G4-A executed the authority chain in
+  four increments; G4-0D exited with five, and G4-B executed 0D-1 and 0D-2 in
+  seven. Each increment has its own record, `19`–`24` and `32`–`40`, and this
+  entry deliberately does **not** restate them: one increment described in two
+  places is one that will disagree with itself later.
+- Effect boundary unchanged from the branch freezes: implementation and
+  migration authoring only, qualified on a disposable PostgreSQL. No shared or
+  persistent database apply, no capability registration, no contract rotation,
+  no deployment, no activation, no traffic. No unit has a production caller.
+- Live gaps and the ordered next steps live in
+  `41-t007-gap-and-next-register.md`, which is the only doc in this package that
+  is edited to stay current.
+
 ## 2026-08-05 — G4-0B bounded provider/consumer dependency qualified
 
 - The exact `nurture.institution-publication-policy@1.0.0` owner provider was

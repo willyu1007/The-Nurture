@@ -162,26 +162,26 @@ no-bypass rule restated for a single-item selection.
 ### Level 4 — amended 2026-08-09, after 0D Exit
 
 The original ordering ran 1-2-3 and then straight to "no image". Implementing
-it ([`38`](./38-g4-b-increment-5-record.md)) and then rendering it on a card
-([`39`](./39-g4-b-increment-6-record.md)) made the consequence visible: a class
-with **no schedule** places every source as `unplaced`, an unplaced photo
-belongs to no activity, and so levels 2 and 3 cannot reach it. Such a class
-showed no photo even when it had one — and since the schedule is something an
-Admin configures, "see your class photos" had acquired an undeclared dependency
-on "configure a schedule first".
+that ordering ([`38`](./38-g4-b-increment-5-record.md)) and then rendering the
+result on a card ([`39`](./39-g4-b-increment-6-record.md)) made the consequence
+visible: a class with **no schedule** places every source as `unplaced`, an
+unplaced photo belongs to no activity, and so levels 2 and 3 cannot reach any
+photo. Such a class showed none even when it had one — and since the schedule
+is something an Admin configures, "see your class photos" had acquired an
+undeclared dependency on "configure a schedule first".
 
-Two things settled it. `02-architecture.md` D-05 asks for the newest qualifying
-**class** photo — the class is the subject, and activity ordering was the
-implementation of "newest", not the goal. And §2 of this record already makes
-an `unplaced` source **visible** in its own class; nothing here ever said it
-was unshowable.
+Two things settled the question. `02-architecture.md` D-05 asks for the newest
+qualifying **class** photo — the class is the subject, and activity ordering
+was the implementation of "newest", not the goal. And §2 of this record already
+makes an `unplaced` source **visible** in its own class; nothing here ever
+called such a source unshowable.
 
 The new level is deterministic — newest capture time, ties broken on the media
-ref — so it introduces no aesthetic or generative judgement. It sits **below**
-the activity levels, so a scheduled class behaves exactly as before: 1-3 win
-first, and level 4 is reached only when no activity holds a photo. The
-selection reports which level chose it, so a consumer can tell a photo with no
-activity from one that has an activity.
+ref — so no aesthetic or generative judgement enters the ordering. Level 4 sits
+**below** the activity levels, so a scheduled class behaves exactly as before:
+1-3 win first, and level 4 is reached only when no activity holds a photo. The
+selection reports which level chose the photo, so a consumer can tell a photo
+with no activity from one that belongs to an activity.
 
 Additive: levels 1-3 are unchanged and the old level 4 is renumbered 5.
 

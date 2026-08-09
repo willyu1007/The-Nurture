@@ -29,6 +29,27 @@
 - If T-007 is separately selected as the next implementation task, resume from
   G4-0C Authority & Surface Contracts and revalidate the exact upstream handoffs.
 
+## Execution checkpoint — 2026-08-09 0C and 0D executed at I1
+
+- G4-0C froze six authority/surface units and exited
+  ([`19`](./19-g4-0c-exit-record.md)); **G4-A** executed that chain in four
+  increments, whose first-increment audit found three fail-open defects and one
+  missing reason code that 31 passing tests had not
+  ([`21`](./21-g4-a-increment-1-audit-record.md)). That is the evidence for the
+  accepted order: implement a freeze before freezing further on top of it.
+- G4-0D froze five daily-operations units and exited
+  ([`32`](./32-g4-0d-exit-record.md)); **G4-B** executed 0D-1 and 0D-2 in seven
+  increments ([`34`](./34-g4-b-increment-1-record.md)–[`40`](./40-g4-b-increment-7-record.md)),
+  ending at the Admin class card and its photo/schedule fields.
+- 0D-3, 0D-5 and 0D-4's correction candidate remain frozen and unbuilt; 0E and
+  0F have not reached the freeze stage.
+- All of it is **I1**: exact implementation plus migration authoring, qualified
+  on a disposable PostgreSQL. No shared or persistent apply, no capability
+  registration, no contract rotation, no activation, no traffic. Nothing has a
+  production caller.
+- Live gaps and the ordered next steps are
+  [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
+
 ## Stage G4 Delivery Structure — Accepted
 
 ### Overall goal

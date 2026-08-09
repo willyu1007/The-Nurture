@@ -97,12 +97,12 @@ froze it as **consumed unchanged, digest unrotated**
 (`sha256:dd1b63fe6c7975bafb4170aff3dccc92463dfaf3e5ea7e5bd3c80f1298d6c921`).
 
 Any Stage 2 edit to lines 78 or 82 rotates that interface digest, which
-invalidates the T-005 G2-B evidence referencing it and requires requalifying
-the affected slice. Stage 2 is therefore not a local schema tidy: it is a
-change with cross-task evidence consequences, and whoever schedules it should
-plan the requalification alongside.
+invalidates the T-005 G2-B evidence referencing the digest and requires
+requalifying the affected slice. Stage 2 is therefore not a local schema tidy
+but a change with cross-task evidence consequences, and whoever schedules the
+work should plan the requalification alongside.
 
-Stage 1 avoids this entirely — it is a predicate rule, not an edit to that
+Stage 1 avoids all of that — Stage 1 is a predicate rule, not an edit to that
 file.
 
 ## Effect on G4-0C
