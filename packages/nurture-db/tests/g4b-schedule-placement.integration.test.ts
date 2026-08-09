@@ -1,7 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
-import { NurtureClassScheduleService } from "@the-nurture/scenario";
+import {
+  NurtureClassScheduleService,
+  NurtureCommandRunner,
+  adjustActivityPlacementSpec,
+  type NurtureAdjustActivityPlacementPayload,
+} from "@the-nurture/scenario";
 import { createPrismaClient } from "../src/client.js";
+import { createNurtureRepositories } from "../src/index.js";
 import { PrismaClassSchedulePlacementRepository } from "../src/repositories/class-schedule-placement.repository.js";
 
 /**
@@ -17,6 +23,7 @@ const prisma = createPrismaClient();
 // The repository is IO; the service owns resolution and the automatic pass.
 const repo = new PrismaClassSchedulePlacementRepository(prisma);
 const service = new NurtureClassScheduleService(repo);
+const commandRunner = new NurtureCommandRunner(createNurtureRepositories(prisma).commands);
 
 afterAll(async () => {
   await prisma.$disconnect();
@@ -41,7 +48,20 @@ const seed = async () => {
   const careGroup = await prisma.nurtureCareGroup.create({
     data: { workspaceId, institutionId: institution.id, name: "Class", status: "active" },
   });
-  return { workspaceId, institution, careGroup };
+  const admin = await prisma.nurtureParticipant.create({
+    data: { workspaceId, myChatUserId: `admin:${randomUUID()}`, status: "active" },
+  });
+  const adminRole = await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      workspaceId,
+      participantId: admin.id,
+      role: "institution_admin",
+      scopeType: "institution",
+      scopeId: institution.id,
+      status: "active",
+    },
+  });
+  return { workspaceId, institution, careGroup, admin, adminRole };
 };
 
 type Scope = Awaited<ReturnType<typeof seed>>;
@@ -59,6 +79,33 @@ const source = (id: string, occurred_at_minute: number, bound?: string) => ({
   occurred_at_minute,
   ...(bound ? { bound_activity_ref: bound } : {}),
 });
+
+let adjustmentSequence = 0;
+const adjust = (
+  scope: Scope,
+  overrides: Partial<NurtureAdjustActivityPlacementPayload> = {},
+) => {
+  const payload: NurtureAdjustActivityPlacementPayload = {
+    workspace_id: scope.workspaceId,
+    role_assignment_ref: scope.adminRole.id,
+    source_kind: "care_capture",
+    source_ref: "s",
+    activity_ref: "afternoon",
+    expected_placement_head: 1,
+    expected_revision_head: 0,
+    reason: "Correct the class activity",
+    ...overrides,
+  };
+  const commandId = `placement-adjust-${++adjustmentSequence}-${randomUUID()}`;
+  return commandRunner.execute({
+    workspace_id: scope.workspaceId,
+    invocation_request_id: `invocation-${commandId}`,
+    command_request_id: commandId,
+    business_actor_ref: scope.admin.id,
+    payload,
+    spec: adjustActivityPlacementSpec,
+  });
+};
 
 describe("T-007 G4-B schedule resolution (production DB lane)", () => {
   it("resolves the three layers in precedence order, with no merging", async () => {
@@ -207,21 +254,32 @@ describe("T-007 G4-B activity placement (production DB lane)", () => {
   it("never lets a later automatic pass overwrite an Admin adjustment", async () => {
     const scope = await withSchedule();
     await service.runAutomaticPass({ ...scopeOf(scope), sources: [source("s", 600)] });
-    const adjusted = await repo.adjustPlacement({
-      workspace_id: scope.workspaceId,
-      source_kind: "care_capture",
-      source_id: "s",
-      care_group_ref: scope.careGroup.id,
-      activity_ref: "afternoon",
-      expected_head: 1,
+    const adjusted = await adjust(scope);
+    expect(adjusted).toMatchObject({
+      status: "ok",
+      committed_result: { placement_head: 2, revision_head: 1 },
     });
-    expect(adjusted).toEqual({ committed: true, placement_head: 2 });
 
     const rerun = await service.runAutomaticPass({
       ...scopeOf(scope),
       sources: [source("s", 600)],
     });
     expect(rerun).toEqual({ applied: 0, skipped: 1 });
+
+    // Simulate a pass that read the old automatic row before the Admin write
+    // committed. The repository must repeat the guard at write time.
+    await expect(
+      repo.writePlacement({
+        workspace_id: scope.workspaceId,
+        source_kind: "care_capture",
+        source_id: "s",
+        care_group_ref: scope.careGroup.id,
+        local_date: today,
+        state: "placed",
+        activity_ref: "morning",
+        decided_by: "schedule_window",
+      }),
+    ).resolves.toBe(false);
     const row = await prisma.nurtureActivityPlacement.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId },
     });
@@ -236,14 +294,9 @@ describe("T-007 G4-B activity placement (production DB lane)", () => {
   it("never re-places a source the Admin deliberately unplaced", async () => {
     const scope = await withSchedule();
     await service.runAutomaticPass({ ...scopeOf(scope), sources: [source("s", 600)] });
-    await repo.adjustPlacement({
-      workspace_id: scope.workspaceId,
-      source_kind: "care_capture",
-      source_id: "s",
-      care_group_ref: scope.careGroup.id,
+    await adjust(scope, {
       // Unplaced on purpose.
       activity_ref: null,
-      expected_head: 1,
     });
     const stored = await prisma.nurtureActivityPlacement.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId },
@@ -320,24 +373,14 @@ describe("T-007 G4-B activity placement (production DB lane)", () => {
   it("refuses an adjustment whose expected head has moved", async () => {
     const scope = await withSchedule();
     await service.runAutomaticPass({ ...scopeOf(scope), sources: [source("s", 600)] });
-    await repo.adjustPlacement({
-      workspace_id: scope.workspaceId,
-      source_kind: "care_capture",
-      source_id: "s",
-      care_group_ref: scope.careGroup.id,
-      activity_ref: "afternoon",
-      expected_head: 1,
-    });
+    await adjust(scope);
     await expect(
-      repo.adjustPlacement({
-        workspace_id: scope.workspaceId,
-        source_kind: "care_capture",
-        source_id: "s",
-        care_group_ref: scope.careGroup.id,
+      adjust(scope, {
         activity_ref: "morning",
-        expected_head: 1,
+        expected_placement_head: 1,
+        expected_revision_head: 1,
       }),
-    ).resolves.toMatchObject({ committed: false });
+    ).resolves.toMatchObject({ status: "not_committed", decision: "conflict" });
   });
 
   /**
@@ -346,18 +389,31 @@ describe("T-007 G4-B activity placement (production DB lane)", () => {
    */
   it("cannot move a source into another class", async () => {
     const scope = await withSchedule();
-    const other = await seed();
+    const otherCareGroup = await prisma.nurtureCareGroup.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        name: "Other Class",
+        status: "active",
+      },
+    });
+    await prisma.nurtureClassScheduleTemplate.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        institutionId: scope.institution.id,
+        careGroupId: otherCareGroup.id,
+        layer: "class_standing",
+        slotsPayload: slots(["other-only", 540, 660]),
+      },
+    });
     await service.runAutomaticPass({ ...scopeOf(scope), sources: [source("s", 600)] });
     await expect(
-      repo.adjustPlacement({
-        workspace_id: scope.workspaceId,
-        source_kind: "care_capture",
-        source_id: "s",
-        care_group_ref: other.careGroup.id,
-        activity_ref: "anything",
-        expected_head: 1,
-      }),
-    ).resolves.toMatchObject({ committed: false });
+      adjust(scope, { activity_ref: "other-only" }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      decision: "blocked",
+      reason_code: "not_authorized",
+    });
     const row = await prisma.nurtureActivityPlacement.findFirstOrThrow({
       where: { workspaceId: scope.workspaceId },
     });

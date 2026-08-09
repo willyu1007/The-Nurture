@@ -1,11 +1,11 @@
-import type { PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
 // Type-only, like every other repository here. Importing the domain's runtime
 // values would pull its whole module graph into this package's compilation —
 // which is how a typecheck of this repo started compiling a sibling
 // repository's half-finished files. Orchestration lives in
 // `NurtureClassScheduleService`; this file is IO.
 import type {
-  NurtureActivityPlacementDecidedBy,
+  NurtureAutomaticActivityPlacementDecidedBy,
   NurtureClassSchedulePlacementRepository,
   NurtureScheduleLayer,
   NurtureScheduleSlot,
@@ -22,7 +22,7 @@ import type {
 export class PrismaClassSchedulePlacementRepository
   implements NurtureClassSchedulePlacementRepository
 {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient | Prisma.TransactionClient) {}
 
   private static day(localDate: string): Date {
     return new Date(`${localDate}T00:00:00.000Z`);
@@ -114,12 +114,16 @@ export class PrismaClassSchedulePlacementRepository
     workspace_id: string;
     source_kind: string;
     source_id: string;
+    care_group_ref: string;
+    local_date: string;
   }): Promise<NurtureStoredPlacement | null> {
     const row = await this.prisma.nurtureActivityPlacement.findFirst({
       where: {
         workspaceId: input.workspace_id,
         sourceKind: input.source_kind,
         sourceId: input.source_id,
+        careGroupId: input.care_group_ref,
+        localDate: PrismaClassSchedulePlacementRepository.day(input.local_date),
       },
     });
     if (!row) return null;
@@ -132,9 +136,11 @@ export class PrismaClassSchedulePlacementRepository
   }
 
   /**
-   * Writes one placement decision. Creating starts the head at 1; updating
-   * increments it, so every change — including a move to `unplaced` — advances
-   * the head a caller may have been holding.
+   * Writes one automatic placement decision. The update predicate repeats the
+   * owner boundary under the write: only an unplaced, non-Admin row in this
+   * exact class/day may move. That closes the stale-read window in which an
+   * automatic pass could otherwise overwrite a concurrent Admin adjustment.
+   * A concurrent insert or an existing out-of-scope row returns false.
    */
   async writePlacement(input: {
     workspace_id: string;
@@ -144,9 +150,29 @@ export class PrismaClassSchedulePlacementRepository
     local_date: string;
     state: "placed" | "unplaced";
     activity_ref: string | null;
-    decided_by: NurtureActivityPlacementDecidedBy;
-  }): Promise<void> {
-    await this.prisma.nurtureActivityPlacement.upsert({
+    decided_by: NurtureAutomaticActivityPlacementDecidedBy;
+  }): Promise<boolean> {
+    const localDate = PrismaClassSchedulePlacementRepository.day(input.local_date);
+    const updated = await this.prisma.nurtureActivityPlacement.updateMany({
+      where: {
+        workspaceId: input.workspace_id,
+        sourceKind: input.source_kind,
+        sourceId: input.source_id,
+        careGroupId: input.care_group_ref,
+        localDate,
+        state: "unplaced",
+        decidedBy: { not: "admin" },
+      },
+      data: {
+        state: input.state,
+        activityRef: input.activity_ref,
+        decidedBy: input.decided_by,
+        placementHead: { increment: 1 },
+      },
+    });
+    if (updated.count === 1) return true;
+
+    const existing = await this.prisma.nurtureActivityPlacement.findUnique({
       where: {
         workspaceId_sourceKind_sourceId: {
           workspaceId: input.workspace_id,
@@ -154,59 +180,30 @@ export class PrismaClassSchedulePlacementRepository
           sourceId: input.source_id,
         },
       },
-      create: {
-        workspaceId: input.workspace_id,
-        sourceKind: input.source_kind,
-        sourceId: input.source_id,
-        careGroupId: input.care_group_ref,
-        localDate: PrismaClassSchedulePlacementRepository.day(input.local_date),
-        state: input.state,
-        activityRef: input.activity_ref,
-        decidedBy: input.decided_by,
-        placementHead: 1,
-      },
-      update: {
-        state: input.state,
-        activityRef: input.activity_ref,
-        decidedBy: input.decided_by,
-        placementHead: { increment: 1 },
-      },
+      select: { id: true },
     });
-  }
+    if (existing) return false;
 
-  /**
-   * The Admin adjustment. Conditional on the head that was read, so a
-   * concurrent write is refused rather than merged — and it may only move a
-   * source between activities of its **own** class.
-   */
-  async adjustPlacement(input: {
-    workspace_id: string;
-    source_kind: string;
-    source_id: string;
-    care_group_ref: string;
-    activity_ref: string | null;
-    expected_head: number;
-  }): Promise<{ committed: boolean; placement_head: number }> {
-    const updated = await this.prisma.nurtureActivityPlacement.updateMany({
-      where: {
-        workspaceId: input.workspace_id,
-        sourceKind: input.source_kind,
-        sourceId: input.source_id,
-        // Scoping the write to the class is what makes a cross-class move
-        // impossible rather than merely denied by a check above it.
-        careGroupId: input.care_group_ref,
-        placementHead: input.expected_head,
-      },
-      data: {
-        state: input.activity_ref ? "placed" : "unplaced",
-        activityRef: input.activity_ref,
-        decidedBy: "admin",
-        placementHead: { increment: 1 },
-      },
-    });
-    return {
-      committed: updated.count > 0,
-      placement_head: updated.count > 0 ? input.expected_head + 1 : input.expected_head,
-    };
+    try {
+      await this.prisma.nurtureActivityPlacement.create({
+        data: {
+          workspaceId: input.workspace_id,
+          sourceKind: input.source_kind,
+          sourceId: input.source_id,
+          careGroupId: input.care_group_ref,
+          localDate,
+          state: input.state,
+          activityRef: input.activity_ref,
+          decidedBy: input.decided_by,
+          placementHead: 1,
+        },
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        return false;
+      }
+      throw error;
+    }
   }
 }

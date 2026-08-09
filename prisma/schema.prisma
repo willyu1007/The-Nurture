@@ -655,6 +655,14 @@ enum NurtureActivityPlacementState {
   unplaced
 }
 
+// G4-C 0D-3. These are revision lanes, not content object types: one source
+// can have an independent placement, visibility and institution-note chain.
+enum NurtureContentRevisionSubjectKind {
+  placement
+  visibility
+  institution_note
+}
+
 enum NurtureInstitutionSupportSignalCategory {
   attendance_submission_overdue
   business_response_overdue
@@ -2330,6 +2338,7 @@ model NurtureCareRoleAssignment {
   attendanceReopened         NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
   attendanceCloseoutPolicies NurtureAttendanceCloseoutPolicy[]
   supportSignalPolicies      NurtureInstitutionSupportSignalPolicy[]
+  contentRevisions           NurtureContentRevision[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -3428,4 +3437,38 @@ model NurtureActivityPlacement {
   @@unique([workspaceId, sourceKind, sourceId], map: "uq_nurture_activity_placement_source")
   @@index([workspaceId, careGroupId, localDate, state], map: "ix_nurture_activity_placement_class_day")
   @@map("nurture_activity_placement")
+}
+
+// G4-C 0D-3 — the append-only Admin revision chain. The teacher's original
+// body, media, author and source time remain on their canonical owner rows and
+// are never copied here. Placement keeps a mutable current projection for
+// 0D-2 reads, but its only Admin writer appends one of these rows atomically
+// with advancing that projection.
+model NurtureContentRevision {
+  id                    String                             @id @default(uuid())
+  workspaceId           String                             @map("workspace_id")
+  // A typed canonical string issued by the repository, never a caller value:
+  // nurture:<care_capture|media_asset_ref|activity_placement>:<id>.
+  subjectRef            String                             @map("subject_ref")
+  subjectKind           NurtureContentRevisionSubjectKind  @map("subject_kind")
+  previousValue         Json                               @map("previous_value")
+  newValue              Json                               @map("new_value")
+  decidedByBefore       NurtureActivityPlacementDecidedBy? @map("decided_by_before")
+  actorRoleAssignmentId String                             @map("actor_role_assignment_id")
+  reason                String                             @db.Text
+  supersedesRef         String?                            @unique(map: "uq_nurture_content_revision_supersedes") @map("supersedes_ref")
+  revisionHead          Int                                @map("revision_head")
+  commandRequestIdHash  String                             @map("command_request_id_hash") @db.Char(64)
+  contractVersion       String                             @map("contract_version")
+  occurredAt            DateTime                           @default(now()) @map("occurred_at")
+
+  actorRoleAssignment NurtureCareRoleAssignment @relation(fields: [actorRoleAssignmentId], references: [id], onDelete: Restrict)
+  supersedes          NurtureContentRevision?   @relation("ContentRevisionSupersession", fields: [supersedesRef], references: [id], onDelete: Restrict)
+  supersededBy        NurtureContentRevision[]  @relation("ContentRevisionSupersession")
+
+  @@unique([workspaceId, subjectKind, subjectRef, revisionHead], map: "uq_nurture_content_revision_head")
+  @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_content_revision_request")
+  @@index([workspaceId, subjectKind, subjectRef, occurredAt], map: "ix_nurture_content_revision_subject")
+  @@index([workspaceId, actorRoleAssignmentId, occurredAt], map: "ix_nurture_content_revision_actor")
+  @@map("nurture_content_revision")
 }

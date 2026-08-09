@@ -41,7 +41,7 @@ const sourceMatch = (
 };
 
 export class PrismaInstitutionContextRepository implements NurtureInstitutionContextRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient | Prisma.TransactionClient) {}
 
   async listActiveParticipants(input: {
     workspace_id?: string;

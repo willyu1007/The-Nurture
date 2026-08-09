@@ -11,6 +11,7 @@ import type { NurturePublicationSafetyTransaction } from "../institution/publica
 import type { NurtureFamilyCareCommandTransaction } from "../institution/family-care-transaction.js";
 import type { NurtureCareCaptureTransaction } from "../institution/care-capture-transaction.js";
 import type { NurtureAttendanceCommandTransaction } from "../institution/attendance-closeout.js";
+import type { NurtureContentRevisionTransaction } from "../institution/content-revision.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
   buildNurtureHandoffRequestSnapshots,
@@ -76,6 +77,8 @@ export type NurtureCommandTransaction = {
   careCapture?: NurtureCareCaptureTransaction;
   /** Present when the G4-B attendance closeout owner write adapter is wired. */
   attendance?: NurtureAttendanceCommandTransaction;
+  /** Present when the G4-C append-only content revision owner is wired. */
+  contentRevisions?: NurtureContentRevisionTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {

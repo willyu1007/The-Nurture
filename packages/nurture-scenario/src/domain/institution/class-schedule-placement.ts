@@ -88,9 +88,15 @@ export type NurtureActivityPlacementDecidedBy =
   | "assisted"
   | "admin";
 
+/** Automatic intake may never synthesize the Admin precedence level. */
+export type NurtureAutomaticActivityPlacementDecidedBy = Exclude<
+  NurtureActivityPlacementDecidedBy,
+  "admin"
+>;
+
 export type NurtureActivityPlacementResult =
-  | { state: "placed"; activity_ref: string; decided_by: NurtureActivityPlacementDecidedBy }
-  | { state: "unplaced"; decided_by: NurtureActivityPlacementDecidedBy };
+  | { state: "placed"; activity_ref: string; decided_by: NurtureAutomaticActivityPlacementDecidedBy }
+  | { state: "unplaced"; decided_by: NurtureAutomaticActivityPlacementDecidedBy };
 
 export type NurturePlacementSource = {
   source_kind: string;
@@ -220,7 +226,10 @@ export type NurtureClassSchedulePlacementRepository = {
     workspace_id: string;
     source_kind: string;
     source_id: string;
+    care_group_ref: string;
+    local_date: string;
   }): Promise<NurtureStoredPlacement | null>;
+  /** False when a concurrent or out-of-scope placement already owns the source. */
   writePlacement(input: {
     workspace_id: string;
     source_kind: string;
@@ -229,16 +238,8 @@ export type NurtureClassSchedulePlacementRepository = {
     local_date: string;
     state: "placed" | "unplaced";
     activity_ref: string | null;
-    decided_by: NurtureActivityPlacementDecidedBy;
-  }): Promise<void>;
-  adjustPlacement(input: {
-    workspace_id: string;
-    source_kind: string;
-    source_id: string;
-    care_group_ref: string;
-    activity_ref: string | null;
-    expected_head: number;
-  }): Promise<{ committed: boolean; placement_head: number }>;
+    decided_by: NurtureAutomaticActivityPlacementDecidedBy;
+  }): Promise<boolean>;
 };
 
 /**
@@ -288,6 +289,8 @@ export class NurtureClassScheduleService {
         workspace_id: input.workspace_id,
         source_kind: source.source_kind,
         source_id: source.source_id,
+        care_group_ref: input.care_group_ref,
+        local_date: input.local_date,
       });
       if (!isEligibleForAutomaticPass(current)) {
         skipped += 1;
@@ -298,7 +301,7 @@ export class NurtureClassScheduleService {
         skipped += 1;
         continue;
       }
-      await this.repository.writePlacement({
+      const written = await this.repository.writePlacement({
         workspace_id: input.workspace_id,
         source_kind: source.source_kind,
         source_id: source.source_id,
@@ -308,7 +311,8 @@ export class NurtureClassScheduleService {
         activity_ref: decision.state === "placed" ? decision.activity_ref : null,
         decided_by: decision.decided_by,
       });
-      applied += 1;
+      if (written) applied += 1;
+      else skipped += 1;
     }
     return { applied, skipped };
   }

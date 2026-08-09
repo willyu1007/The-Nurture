@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-09T12:48:09.253Z",
+  "updatedAt": "2026-08-09T13:21:17.727Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -329,6 +329,14 @@
       "values": [
         "applied",
         "already_satisfied"
+      ]
+    },
+    {
+      "name": "NurtureContentRevisionSubjectKind",
+      "values": [
+        "placement",
+        "visibility",
+        "institution_note"
       ]
     },
     {
@@ -5799,6 +5807,15 @@
           "references": []
         },
         {
+          "field": "contentRevisions",
+          "to": "NurtureContentRevision",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "dailyCareLogs",
           "to": "NurtureDailyCareLog",
           "optional": false,
@@ -8802,6 +8819,247 @@
           ],
           "name": null,
           "map": "uq_nurture_command_execution_identity"
+        }
+      ]
+    },
+    {
+      "name": "NurtureContentRevision",
+      "dbName": "nurture_content_revision",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contractVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "contract_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "decidedByBefore",
+          "type": "NurtureActivityPlacementDecidedBy",
+          "nullable": true,
+          "list": false,
+          "dbName": "decided_by_before",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "newValue",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "new_value",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "previousValue",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "previous_value",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reason",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revisionHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "revision_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectKind",
+          "type": "NurtureContentRevisionSubjectKind",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_kind",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "subjectRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "subject_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "supersedesRef",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "supersedes_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "supersededBy",
+          "to": "NurtureContentRevision",
+          "optional": false,
+          "list": true,
+          "relationName": "ContentRevisionSupersession",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "supersedes",
+          "to": "NurtureContentRevision",
+          "optional": true,
+          "list": false,
+          "relationName": "ContentRevisionSupersession",
+          "fields": [
+            "supersedesRef"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "actorRoleAssignmentId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_content_revision_actor"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "subjectKind",
+            "subjectRef",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_content_revision_subject"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "commandRequestIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_content_revision_request"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "subjectKind",
+            "subjectRef",
+            "revisionHead"
+          ],
+          "name": null,
+          "map": "uq_nurture_content_revision_head"
         }
       ]
     },
