@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`42` are history: each says what was true when it was
+numbered records `06`…`43` are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -19,7 +19,7 @@ places drifts in one of them.
 | 0A inventory | `G4_0A_INVENTORY_PASS` | n/a | [`07`](./07-g4-0a-inventory-record.md) |
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
-| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, eight increments — 0D-1, 0D-2 and class-day detail** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`42`](./42-g4-b-increment-8-record.md) |
+| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, nine increments — 0D-1, 0D-2, class-day detail and the 0D-5 policy/composition core** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`43`](./43-g4-b-increment-9-record.md) |
 | 0E Workflow & Enrollment Journey | **not started** | none | — |
 | 0F knowledge & RAG | **not started** | none | — |
 
@@ -50,13 +50,19 @@ Frozen in [`28`](./28-g4-0d-3-revision-downscope-freeze.md); no schema, no
 domain module, no repository. Nothing in the code references a revision chain or
 a downscope decision.
 
-### G-03 — 0D-5 institution support signals: unimplemented
+### G-03 — 0D-5 exact deterministic source adapters: partial
 
-Frozen in [`29`](./29-g4-0d-5-support-signal-freeze.md); no implementation.
-This blocks **0C-5 §6 fixture 16** — work-item lists ordered by explicit
-deadline with a fixed-order fallback — which has been owed since
-[`36`](./36-g4-b-increment-3-record.md) because the fixture needs a signal list
-that does not exist.
+The policy schema/migration, actor-safe projection composer, 0C-5 aggregate
+guard, stable dedupe, fixed tier/reason and deadline/fixed-subject ordering are
+implemented by [`43`](./43-g4-b-increment-9-record.md). This executes 0C-5 §6
+fixture 16 synthetically.
+
+What remains is the required real path: six deterministic source adapters must
+reuse the exact attendance, business-communication, WorkItem and Workflow
+owners. No placeholder adapter is allowed to guess a checkpoint, deadline or
+blocker state. Until those adapters and the policy migration are qualified on
+an approved disposable database, G-03 is not closed and no class/home consumer
+may claim a complete signal list.
 
 ### G-04 — 0D-4 child-attribution authority: partial
 
@@ -92,7 +98,10 @@ orderings, same number.
 
 `20260809120000_g4b_daily_attendance_closeout` and
 `20260809140000_g4b_class_schedule_placement` have run on a disposable database
-only. Shared or persistent apply is not authorized at I1.
+only. `20260809180000_g4b_institution_support_signal_policy` is authored and
+has not been applied even to the current local test database because no target
+and apply approval were supplied. Shared or persistent apply is not authorized
+at I1.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
@@ -125,9 +134,9 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Next steps, in dependency order
 
-1. **0D-5 `InstitutionSupportSignalProjectionV1`** (G-03). It supplies the
-   still-missing cross-class/class-card deterministic signals and closes
-   0C-5 §6 fixture 16 without depending on the revision write path.
+1. **Finish 0D-5's exact deterministic owner-source adapters** (G-03), then
+   qualify the authored policy migration on an explicitly approved disposable
+   database. Wire class/home consumers only after that real source path passes.
 2. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
    automatic placement pass to capture intake as its own bounded increment
    (G-05). Keep those commits separate: one owns Admin history/downscope, the

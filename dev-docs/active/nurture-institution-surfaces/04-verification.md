@@ -291,6 +291,20 @@ Falsification evidence is per-increment and lives in each record's
 | Docs/governance | PASS | Project sync, project lint and strict docs/anchor lint over all 43 task Markdown files; 0 errors, 0 warnings. |
 | Whitespace | PASS | `git diff --check`. |
 
+## 2026-08-09 — G4-B increment 9 quality repair and 0D-5 core
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `pnpm exec tsc --noEmit` | PASS | Zero TypeScript errors after the read-path repair, signal core and generated Prisma client. |
+| Full unit lane | PASS | 818/818 across 72 files. |
+| Targeted data layer | PASS | 4/4: repaired class-day owner integration and support-policy repository mapping. |
+| Full production-DB lane | **347/348, apply-gated** | The only failure is `schema-constraint-survival`: four CHECK constraints are declared by the new migration but absent from the deliberately unapplied local test DB. No assertion in an applied table path failed. |
+| `verify:test-routing` | PASS | 135 files: unit 72, production DB 36, dev host 11, scenario service 14, X5 joint 2. |
+| Persistence/surface/G2/G3 | PASS | Persistence boundary, synthetic surface conformance 121/121, G2 Exit and G3-0 freeze. |
+| Prisma SSOT | PASS for authoring | `prisma format`, `prisma validate`, client generation and DB context refresh pass. Migration SQL is additive and unapplied. |
+| Quality negatives | PASS | Body-free communication list, post-authorization pagination, explicit `has_more`, Institution-timezone UTC-boundary inclusion/exclusion, exact-source disappearance, no invented deadline, aggregate refusal and fixed-order fallback. |
+| Effect boundary | PASS | I1 code/migration authoring only; no database apply, source-owner activation, capability, deployment or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

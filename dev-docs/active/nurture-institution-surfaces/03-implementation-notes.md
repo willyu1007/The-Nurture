@@ -1,5 +1,20 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — G4-B increment 9: detail-read repair and 0D-5 core
+
+- Commit `3b9ca9a` makes the class-day communication list structurally
+  body-free, snapshot-consistent and bounded; exposes pagination instead of
+  silent truncation; and resolves one Institution-timezone day for all detail
+  facts.
+- Commit `3ee0b78` adds the pure 0D-5 signal composer, authority-first service,
+  policy-only Prisma adapter, one versioned policy table/migration and the
+  generated DB context. The signal itself remains unstored.
+- Exact deterministic source adapters are deliberately still open. They must
+  reuse attendance/communication/WorkItem/Workflow owners; the signal layer
+  does not invent their checkpoints, deadlines or blocker states.
+- The migration is authored and validated but unapplied because no database
+  target/apply approval was supplied. See [`43`](./43-g4-b-increment-9-record.md).
+
 ## 2026-08-09 — G4-B increment 8: class-day detail at I1
 
 - Added the framework-free `NurtureInstitutionClassDayDetailService` and its

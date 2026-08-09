@@ -169,6 +169,27 @@
 
 ## Resolved Pitfalls
 
+### 2026-08-09 — Body-free list reused a protected single-message DTO
+
+- Symptom: the Institution business-communication list was documented as
+  body-free but returned a type that could carry protected body envelopes.
+- Root cause: exact authorization reuse was conflated with DTO reuse.
+- Fix: retain one internal authorized-fact predicate, then present either the
+  exact single-message raw DTO or a list DTO with no body field.
+- Prevention: protected single-object reads and body-free lists may share
+  authorization facts, never their outward DTO.
+
+### 2026-08-09 — Institution local date was interpreted as UTC
+
+- Symptom: captures and communications near midnight could land on the wrong
+  class day outside UTC institutions.
+- Root cause: several readers created `localDateT00:00Z` independently instead
+  of resolving the Institution publication policy's timezone once.
+- Fix: resolve one policy-backed local-day context and pass its storage date
+  and instant bounds to all detail readers; missing policy is unavailable.
+- Prevention: a local date is not an instant. Do not add another UTC day helper
+  to an Institution projection or guess UTC when timezone policy is absent.
+
 ### 2026-07-30 — 出勤覆盖率被误读为正式出勤
 
 - Symptom：最初讨论可能把“当天有几个孩子存在业务记录”直接呈现为出勤。

@@ -6,17 +6,20 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-09
-- Next step: **implement `InstitutionSupportSignalProjectionV1` (0D-5)** — it
-  supplies the deterministic cross-class/class-card signals and closes the
-  deferred 0C-5 §6 fixture 16. `InstitutionClassDayDetailProjectionV1`, the
-  detail behind the class card, is now implemented at I1. 0C and 0D are both
+- Next step: **finish 0D-5's exact deterministic owner-source adapters and
+  qualify its policy migration on an explicitly approved disposable DB**.
+  The policy/composition core and synthetic 0C-5 §6 fixture 16 now exist;
+  attendance/communication/WorkItem/Workflow facts still need exact owner
+  adapters before class/home consumers can claim a complete signal list.
+  `InstitutionClassDayDetailProjectionV1`, the detail behind the class card,
+  is implemented and quality-repaired at I1. 0C and 0D are both
   frozen and exited
   ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)); G4-A
   executed 0C's authority chain in four increments and G4-B executed 0D-1,
-  0D-2 and the class-day detail in eight
-  ([`34`](./34-g4-b-increment-1-record.md)–[`42`](./42-g4-b-increment-8-record.md)).
-  0D-3, 0D-4's correction candidate and 0D-5 are frozen and unbuilt; 0E and 0F
-  are unstarted at the freeze stage.
+  0D-2, the class-day detail and the 0D-5 core in nine
+  ([`34`](./34-g4-b-increment-1-record.md)–[`43`](./43-g4-b-increment-9-record.md)).
+  0D-3 and 0D-4's correction candidate are frozen and unbuilt; 0D-5's real
+  owner-source path is partial; 0E and 0F are unstarted at the freeze stage.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
