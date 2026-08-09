@@ -467,6 +467,22 @@ describe("T-007 G4-B exact support-signal owner providers", () => {
         reasonCode: "owner_blocked_fixture",
       },
     });
+    await prisma.nurtureChildLinkReceipt.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        grantId: scope.grant.id,
+        childCareProcessId: scope.process.id,
+        enrollmentId: scope.enrollment.id,
+        direction: "org_to_family",
+        dataClass: "daily_care_log",
+        sourceType: "family_care_message",
+        sourceId: activeQuestion.message.id,
+        routingAttemptKey: randomUUID(),
+        status: "blocked",
+        driverType: "workflow_step",
+        reasonCode: "mismatched_owner_source_fixture",
+      },
+    });
     const dailyLog = await prisma.nurtureDailyCareLog.create({
       data: {
         workspaceId: scope.workspaceId,
@@ -644,6 +660,30 @@ describe("T-007 G4-B exact support-signal owner providers", () => {
   it("fails closed when one family message maps to multiple source items", async () => {
     const scope = await seedScope();
     await createQuestion(scope, { duplicateSourceItem: true });
+    const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
+      prisma,
+      owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
+    });
+
+    await expect(
+      bindings.configured_load.loadConfiguredLoadFacts(
+        request(scope, [allPolicies(scope)[5]!]),
+      ),
+    ).resolves.toEqual({ status: "available", facts: [] });
+  });
+
+  it("does not count a completed acknowledgement-only item as pending work", async () => {
+    const scope = await seedScope();
+    const question = await createQuestion(scope, {});
+    await prisma.nurtureFamilyCareItem.update({
+      where: { id: question.item.id },
+      data: {
+        requiresReply: false,
+        acknowledgementState: "acknowledged",
+        status: "acknowledged",
+        updatedAt: new Date(`${localDate}T10:00:00.000Z`),
+      },
+    });
     const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
       prisma,
       owner_ref_integrity_key: "g4b-support-signal-owner-test-key",

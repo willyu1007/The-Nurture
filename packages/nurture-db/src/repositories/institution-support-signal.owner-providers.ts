@@ -316,7 +316,14 @@ class PrismaWorkItemWorkflowBlockerSignalOwner
       if (receipts.length > MAX_EXACT_OWNER_ROWS) return unavailable();
       for (const receipt of receipts) {
         const message = messageById.get(receipt.sourceId);
-        if (!message || message.child_care_process_id !== receipt.childCareProcessId) continue;
+        if (
+          !message ||
+          message.child_care_process_id !== receipt.childCareProcessId ||
+          message.direction !== receipt.direction ||
+          message.data_class !== receipt.dataClass
+        ) {
+          continue;
+        }
         facts.push({
           ...sourceBase(
             input,
@@ -368,8 +375,10 @@ class PrismaConfiguredLoadSignalOwner implements NurtureConfiguredLoadSignalOwne
           dataClass: "family_care_question",
           writerContract: "harness_g2_v1",
           lifecycleState: "active",
-          status: { in: ["open", "acknowledged"] },
-          OR: [{ requiresAck: true }, { requiresReply: true }],
+          OR: [
+            { requiresAck: true, acknowledgementState: "pending" },
+            { requiresReply: true, responseState: "awaiting_reply" },
+          ],
           createdAt: {
             gte: new Date(selection.local_day.occurred_from),
             lt: new Date(selection.local_day.occurred_before),
