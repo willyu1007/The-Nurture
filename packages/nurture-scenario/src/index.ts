@@ -70,6 +70,7 @@ export * from "./domain/institution/institution-class-day-detail.js";
 export * from "./domain/institution/institution-support-signal.js";
 export * from "./domain/institution/institution-support-signal-source-adapters.js";
 export * from "./domain/institution/class-schedule-placement.js";
+export * from "./domain/institution/care-capture-placement-intake.js";
 export * from "./domain/institution/content-revision.js";
 export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";

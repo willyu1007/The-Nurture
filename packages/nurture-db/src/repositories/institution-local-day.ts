@@ -1,4 +1,5 @@
 import {
+  zonedInstantToLocalDateTime,
   zonedLocalTimeToInstant,
   type NurtureInstitutionLocalDay,
 } from "@the-nurture/scenario/harness";
@@ -30,6 +31,16 @@ const nextDay = (date: { year: number; month: number; day: number }) => {
   };
 };
 
+const buildInstitutionLocalDay = (
+  date: { year: number; month: number; day: number },
+  timeZone: string,
+): NurtureInstitutionLocalDay & { time_zone: string } => ({
+  storage_date: new Date(Date.UTC(date.year, date.month - 1, date.day)).toISOString(),
+  occurred_from: zonedLocalTimeToInstant(date, 0, timeZone).toISOString(),
+  occurred_before: zonedLocalTimeToInstant(nextDay(date), 0, timeZone).toISOString(),
+  time_zone: timeZone,
+});
+
 /**
  * Resolves one policy-backed institution-local day. Missing or malformed
  * policy/date input is unavailable; UTC is never guessed as a fallback.
@@ -51,10 +62,41 @@ export const loadInstitutionLocalDay = async (
     at: input.at,
   });
   if (!policy) return null;
+  return buildInstitutionLocalDay(date, policy.time_zone);
+};
+
+/**
+ * Resolves the exact local class/date facts for a stored source instant. The
+ * effective publication policy remains the sole timezone owner; callers do
+ * not supply either the local date or the minute used by placement.
+ */
+export const loadInstitutionLocalDayAtInstant = async (
+  prisma: BoardPrisma,
+  input: {
+    workspace_id: string;
+    institution_id: string;
+    instant: Date;
+  },
+): Promise<
+  | (NurtureInstitutionLocalDay & {
+      time_zone: string;
+      local_date: string;
+      occurred_at_minute: number;
+    })
+  | null
+> => {
+  if (Number.isNaN(input.instant.getTime())) return null;
+  const policy = await loadCurrentInstitutionPublicationPolicy(prisma, {
+    workspace_id: input.workspace_id,
+    institution_id: input.institution_id,
+    at: input.instant,
+  });
+  if (!policy) return null;
+  const local = zonedInstantToLocalDateTime(input.instant, policy.time_zone);
+  if (!local) return null;
   return {
-    storage_date: new Date(Date.UTC(date.year, date.month - 1, date.day)).toISOString(),
-    occurred_from: zonedLocalTimeToInstant(date, 0, policy.time_zone).toISOString(),
-    occurred_before: zonedLocalTimeToInstant(nextDay(date), 0, policy.time_zone).toISOString(),
-    time_zone: policy.time_zone,
+    ...buildInstitutionLocalDay(local, policy.time_zone),
+    local_date: local.local_date,
+    occurred_at_minute: local.minutes_of_day,
   };
 };

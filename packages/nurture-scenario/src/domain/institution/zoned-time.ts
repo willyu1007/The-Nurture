@@ -1,5 +1,51 @@
 export type NurtureZonedDate = { year: number; month: number; day: number };
 
+export type NurtureZonedDateTime = NurtureZonedDate & {
+  local_date: string;
+  minutes_of_day: number;
+};
+
+/**
+ * Resolves an instant into one Institution-local date/minute pair. Keeping the
+ * conversion here gives every exact-owner adapter the same DST and midnight
+ * behavior instead of letting each repository rebuild `Intl` parsing.
+ */
+export const zonedInstantToLocalDateTime = (
+  instant: Date,
+  timeZone: string,
+): NurtureZonedDateTime | null => {
+  if (Number.isNaN(instant.getTime())) return null;
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).formatToParts(instant);
+    const read = (type: string) =>
+      Number(parts.find((part) => part.type === type)?.value ?? "0");
+    const year = read("year");
+    const month = read("month");
+    const day = read("day");
+    const hour = read("hour") % 24;
+    const minute = read("minute");
+    if (!year || !month || !day || minute < 0 || minute > 59) return null;
+    return {
+      year,
+      month,
+      day,
+      local_date: `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+      minutes_of_day: hour * 60 + minute,
+    };
+  } catch (error) {
+    if (error instanceof RangeError) return null;
+    throw error;
+  }
+};
+
 const zonedOffsetMs = (instant: Date, timeZone: string): number => {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone,
