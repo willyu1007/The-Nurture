@@ -9,8 +9,8 @@
 - Consumes: class scope (0C-3) unchanged
 - Verdict: `G4_0D_2_FREEZE_PASS`
 - Releases: G4-B (class-first board), G4-C (activity records in Web), 0D-3
-- Open points: **one**, §4 whether AI-assisted placement is enabled at all in
-  the first increment
+- Open points: **closed** 2026-08-09 — §4 by shipping levels 1-3-5 and leaving
+  assisted placement disabled until `unplaced` is measured
 - Schema delta: **`DELTA`** — planned below, not applied
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
@@ -103,17 +103,42 @@ this order:
 1. the activity the source is already bound to;
 2. the day's override;
 3. the class's effective schedule and its time window;
-4. assisted semantic judgement over the content — **see the open point**;
+4. assisted semantic judgement over the content — **frozen in the union but
+   not enabled in the first increment**, see below;
 5. otherwise `unplaced`, in this class.
 
-**Open point.** Level 4 is written into the architecture as a later AI aid.
-Whether the first increment enables it at all, or ships levels 1-3-5 only and
-adds 4 behind its own gate, is not settled here. Two considerations pull apart:
-an assisted placement is a *canonical* placement under this shape, so a wrong
-one needs 0D-3's revision to undo; but level 4 is also the only level that can
-reduce a large `unplaced` backlog. **This must close before 0D Exit.** Levels
-1, 2, 3 and 5 are frozen regardless, and `decidedBy` already carries
-`"assisted"` so enabling it later is not a shape change.
+**Open point CLOSED 2026-08-09: level 4 is not enabled in the first
+increment.** Levels 1, 2, 3 and 5 ship; `decidedBy` keeps `"assisted"` in its
+union so enabling level 4 later is a gate, not a shape change.
+
+Three reasons, and the first reframes what was originally posed as a risk
+trade-off.
+
+**A wrong placement is a presentation error, not a disclosure.** Placement
+decides which activity a source sits in; it does not change who may see the
+source — that is attribution and publication. This is a materially smaller risk
+than 0D-4's child attribution, where a wrong answer misroutes a child's photo
+to another family, and it should not be weighed with the same caution.
+
+**The backlog level 4 would relieve is assumed, not measured.** Level 3 matches
+the class's effective schedule against a source's capture time, which should
+absorb most photos in any class that has a schedule. What it cannot place is
+what was captured outside every window, and classes with no schedule at all —
+and level 4 cannot place the second group either, because with no schedule
+there is no activity to place into. Shipping 1-3-5 turns the `unplaced` rate
+into an observed number, after which enabling level 4 is a decision with
+evidence rather than an estimate.
+
+**Levels 1-3 are deterministic and level 4 is not.** A wrong deterministic
+placement can be explained from the rule and the inputs; a wrong semantic
+judgement can only be found by a person looking. Introducing an error source
+that only human review can catch, before there is any production use or review
+capacity, spends a real cost against a hypothetical gain.
+
+It also keeps 0D internally consistent: 0D-1 holds that an AI inference never
+writes a canonical fact without a teacher confirming it. Level 4 producing a
+canonical placement directly would give two adjacent units in one branch two
+different postures toward AI.
 
 ### Latest photo, inside one snapshot
 
@@ -197,16 +222,18 @@ records shows *no schedule and no records*, not "no activities today".
 4. a source already bound to an activity ignores every later level;
 5. a source outside all windows is `unplaced` in its own class, never moved to
    another class;
-6. an Admin adjustment survives a subsequent automatic placement pass;
-7. a schedule version change does not re-place already-placed sources;
-8. `expectedPlacementHead` mismatch denies rather than merging;
-9. a cover whose media fails the reader's chain falls through instead of being
-   returned;
-10. a class with no records renders as no records, and no presenter path emits
+6. no placement in the first increment carries `decidedBy: "assisted"`, so
+   enabling level 4 is a visible change rather than a drift;
+7. an Admin adjustment survives a subsequent automatic placement pass;
+8. a schedule version change does not re-place already-placed sources;
+9. `expectedPlacementHead` mismatch denies rather than merging;
+10. a cover whose media fails the reader's chain falls through instead of being
+    returned;
+11. a class with no records renders as no records, and no presenter path emits
     "activity not held";
-11. an unplaced backlog is visible in its own class and countable only through
+12. an unplaced backlog is visible in its own class and countable only through
     0C-5 §5's aggregate rule;
-12. no response carries an ordering derived from counts, recency or backlog.
+13. no response carries an ordering derived from counts, recency or backlog.
 
 Synthetic fixtures under I0. Real owner paths stay behind I3, joint conformance
 behind I4.
@@ -240,5 +267,5 @@ executes no apply.
 `G4_0D_2_FREEZE_PASS` releases G4-B's class-first board, G4-C's Web activity
 records, and 0D-3, which turns this unit's Admin adjustments into an
 append-only chain. It does not open implementation, schema apply, capability
-rotation, activation, deployment or traffic. The §4 open point must close
-before 0D Exit.
+rotation, activation, deployment or traffic. The unit's single open point
+closed on the day it was raised, so 0D-2 carries none into 0D Exit.

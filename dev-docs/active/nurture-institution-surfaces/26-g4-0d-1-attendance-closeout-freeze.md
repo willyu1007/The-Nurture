@@ -11,7 +11,8 @@
 - Verdict: `G4_0D_1_FREEZE_PASS`
 - Releases: G4-B (caregiver submit/revise, Admin oversight), 0D-5
   (`attendance_submission_overdue`)
-- Open points: **one**, §5 concurrent submission by two current caregivers
+- Open points: **closed** 2026-08-09 — §5 by first-writer-wins, reached by
+  giving `submit` the precondition `revise` already had
 - Schema delta: **`DELTA`** — planned below, not applied
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
@@ -134,10 +135,34 @@ drift against the first would be undetectable.
 `reopen` moves the submission to `reopened`, and only then may a current class
 caregiver revise. Reopen never itself changes an entry.
 
-**Idempotency.** `submit` and `reopen` carry a request id and are exact-replay
-safe: the same identity returns the same result and creates no second
-submission. `revise` carries `expectedSubmissionHead` and rejects on mismatch
-rather than merging.
+**Idempotency.** `submit`, `revise` and `reopen` each carry a request id and are
+exact-replay safe: the same identity returns the same result and creates no
+second submission.
+
+**Concurrency: first-writer-wins, and it is not a second rule.** All three
+commands carry `expectedSubmissionHead` and reject on mismatch rather than
+merging. `submit` supplies `0` — "I believe this day is still unsubmitted" —
+which is the same precondition `revise` already had, applied at the one entry
+point that lacked it. Two teachers submitting concurrently therefore resolve as
+the first succeeding and the second denying `conflict`.
+
+`reopen` **increments the head**, so a client holding a pre-reopen head is
+denied and must reload. Without that, reopening would silently widen the window
+in which a stale client can write.
+
+**Why the first writer wins, rather than the last.** The second teacher's
+preview was composed before the first submission existed, so they are not
+disagreeing with a colleague's judgement — they cannot see it. Accepting their
+write would let a teacher who merely accepted the inference wholesale erase
+another's per-entry adjustments, with no one having made the decision to change
+them. That is the same shape this unit already rejects for late evidence: if a
+background process may not revoke a teacher's confirmation, a colleague who
+never saw it may not either.
+
+A refusal is recoverable and a silent overwrite is not. The second teacher
+reloads, sees the first submission, and revises with a correct head — now
+knowingly changing a colleague's confirmation, and the audit chain records the
+`A → B` order that actually happened.
 
 **Source drift after the watermark.** Evidence arriving after the cut does not
 retroactively change a submitted fact and does not silently re-open one. Late
@@ -146,12 +171,12 @@ design that auto-adjusts a submitted fact from late evidence reopens this unit,
 because the teacher's confirmation would become revocable by a background
 process.
 
-**Open point.** Two current caregivers submitting the same (class, date)
-concurrently. Two candidate rules — last-writer-wins on `submissionHead`, or
-first-writer-wins with the second rejected as a conflict — differ in whether a
-teacher can silently overwrite a colleague's confirmation. **This must close
-before 0D Exit.** 0D-5's `attendance_submission_overdue` does not depend on the
-answer.
+**Open point CLOSED 2026-08-09.** The question was posed as a choice between
+last-writer-wins and first-writer-wins. It was neither: `revise` already
+carried a precondition and `submit` did not, so the two entry points had
+different concurrency semantics — the same one-fact-two-channels shape the G4-A
+increments repeatedly had to repair. Giving `submit` the precondition it was
+missing settles the behaviour and removes a rule rather than adding one.
 
 ## 6. Default-safe behavior
 
@@ -163,7 +188,8 @@ answer.
 | Class scope unresolved | inherit 0C-3's deny |
 | Admin attempts to submit or edit an entry | deny `not_authorized` |
 | Cross-day revision without reopen | deny `not_authorized` |
-| `expectedSubmissionHead` mismatch | deny `conflict`; never a merge |
+| `expectedSubmissionHead` mismatch, on any of the three commands | deny `conflict`; never a merge, never an overwrite |
+| Second of two concurrent submits | deny `conflict` — the first confirmation stands |
 | Contract version mismatch | deny `contract_mismatch` |
 
 `unsubmitted` is the load-bearing default. It is the state an absent teacher
@@ -182,16 +208,22 @@ closeout that settles itself removes the only signal that nobody checked.
 6. same-day revision by a current class caregiver succeeds and increments the
    head;
 7. cross-day revision denies without a reopen and succeeds after one;
-8. a reopen changes no entry by itself;
+8. a reopen changes no entry by itself, and increments the head so a client
+   holding the pre-reopen head is denied;
 9. replaying a submit request id returns the first result and creates no second
    submission;
-10. evidence arriving after the watermark does not alter a submitted fact;
-11. `insufficient_evidence` survives to the teacher rather than being resolved
+10. two concurrent submits leave the first confirmation intact and deny the
+    second `conflict`, with no second submission created and no entry of the
+    first altered;
+11. the second teacher then revises with a correct head, and the audit chain
+    shows both confirmations in order;
+12. evidence arriving after the watermark does not alter a submitted fact;
+13. `insufficient_evidence` survives to the teacher rather than being resolved
     into a guess;
-12. a coverage projection is never rendered as an attendance count;
-13. an Admin class aggregate over a partially readable population returns
+14. a coverage projection is never rendered as an attendance count;
+15. an Admin class aggregate over a partially readable population returns
     `unavailable`, not a count over the readable members;
-14. no response carries a score, band, rank, percentile or ordering.
+16. no response carries a score, band, rank, percentile or ordering.
 
 Synthetic fixtures under I0. Real owner paths stay behind I3, joint conformance
 behind I4.
@@ -217,6 +249,7 @@ apply.
 ## Exit
 
 `G4_0D_1_FREEZE_PASS` releases G4-B's attendance work and supplies 0D-5's
-`attendance_submission_overdue` its checkpoint. It does not open implementation,
-schema apply, capability rotation, activation, deployment or traffic, and it
-does not complete 0D. The §5 open point must close before 0D Exit.
+`attendance_submission_overdue` its checkpoint. This record opens no
+implementation, schema apply, capability rotation, activation, deployment or
+traffic, and does not complete 0D. The unit's single open point closed on the
+day it was raised, so 0D-1 carries none into 0D Exit.
