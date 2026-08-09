@@ -323,6 +323,17 @@ Falsification evidence is per-increment and lives in each record's
 | External My-Chat pins | **FAIL, attributed** | Workflow expected `567b96c`, C30 expected `51ad97f`, observed `ebc7605`; no cross-repo adoption was performed. |
 | Effect boundary | PASS | I1 adapter/consumer code only; no migration apply, concrete owner activation, capability/contract rotation, deployment or traffic. |
 
+## 2026-08-09 — Current-head owner-quality DB requalification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Target isolation | PASS | A new empty local database, `nurture_t007_owner_qa_20260809_2030_cd8757ae`, was created only after approval; the child process forced that exact pathname and validated `localhost:5433`. |
+| Existing migration history | PASS | Clean `prisma migrate deploy` applied 26/26 migrations and final status was up to date. |
+| Exact-owner regressions | PASS | `g4b-support-signal-owner.integration.test.ts`: 9/9, including revoke recheck, undisclosed-source exclusion and ambiguous-source refusal. |
+| Full production-DB lane | PASS | 357/357 across 37 files. |
+| Destruction | PASS | Zero target sessions; exact database dropped and confirmed absent. |
+| Effect boundary | PASS | Disposable qualification only; no shared/persistent apply, schema change, capability, contract rotation, deployment, activation or traffic. |
+
 ## 2026-08-09 — Post-increment-11 owner quality repair
 
 | Check | Result | Evidence |

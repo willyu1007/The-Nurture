@@ -77,9 +77,10 @@ request-object authority caching, requires the disclosure-aware communication
 owner before configured-load counting, rejects ambiguous source-item mappings,
 uses canonical pending axes, matches blocked receipts to their authorized
 source dimensions, and isolates one internal shared owner context without
-changing the sole public composition path. The new DB regressions are
-typechecked; they still require a new explicitly approved disposable target
-before execution.
+changing the sole public composition path. A fresh approved disposable target
+subsequently qualified these repairs at current head: the exact-owner suite
+passed 9/9 and the full production-DB lane passed 357/357 across 37 files. The
+target was destroyed and confirmed absent.
 
 Two owner facts remain unavailable by design. The current attendance owner has
 no configured checkpoint instant, so an enabled unsubmitted day cannot become

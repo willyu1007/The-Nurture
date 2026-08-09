@@ -13,7 +13,9 @@
   providers and the policy migration is qualified on an approved disposable
   PostgreSQL ([`45`](./45-g4-b-increment-11-record.md)). The follow-up quality
   pass removes request-object authority caching and grant-only configured-load
-  admission; missing facts still
+  admission and is now requalified at current head on a fresh disposable
+  PostgreSQL: exact-owner regressions 9/9 and the full DB lane 357/357. Missing
+  facts still
   return `unavailable`, never a guessed deadline/blocker or complete empty list.
   `InstitutionClassDayDetailProjectionV1`, the detail behind the class card,
   is implemented and quality-repaired at I1. 0C and 0D are both

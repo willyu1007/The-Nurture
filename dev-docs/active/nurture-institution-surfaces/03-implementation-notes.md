@@ -1,5 +1,21 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — Current-head disposable DB requalification
+
+- The user approved one new empty local disposable PostgreSQL target for the
+  previously typechecked owner-quality regressions. The child process replaced
+  only the database pathname and validated `localhost:5433` before any write.
+- Clean `prisma migrate deploy` applied the complete 26-migration history. The
+  exact-owner suite passed 9/9 and the full production-DB lane passed 357/357
+  across 37 files; migration status was current afterward.
+- The exact target had zero sessions before deletion, was dropped, and was
+  confirmed absent. No shared or persistent database was selected or changed.
+  See the
+  [`rerun evidence`](./artifacts/db/0d5-owner-quality-rerun/03-execution-log.md).
+- This closes the execution-evidence gap for the post-increment-11 repairs. It
+  does not pre-approve or qualify a future attendance/source-owner schema or
+  contract change.
+
 ## 2026-08-09 — Post-increment-11 owner quality repair
 
 - Commit `a982aed` removes request-object authority/source caches. Reusing the
