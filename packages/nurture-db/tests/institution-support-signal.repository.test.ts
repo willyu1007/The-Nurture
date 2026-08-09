@@ -79,8 +79,10 @@ describe("PrismaInstitutionSupportSignalRepository", () => {
     const request = {
       workspace_id: "workspace-1",
       participant_ref: "admin-1",
+      role_assignment_ref: "admin-role-1",
       institution_ref: "institution-1",
       snapshot_at: "2026-08-09T12:00:00.000Z",
+      policies: [],
     };
     await fixture.value.loadAuthorizedSources(request);
     expect(fixture.sources.loadAuthorizedSources).toHaveBeenCalledWith(request);

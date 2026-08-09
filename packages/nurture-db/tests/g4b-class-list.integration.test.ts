@@ -22,6 +22,18 @@ const service = new NurtureInstitutionClassListService(
   new PrismaInstitutionClassListRepository(prisma, (layers, care_group_ref, local_date) =>
     resolveEffectiveSchedule({ care_group_ref, local_date, layers }),
   ),
+  {
+    compose: async (request) => ({
+      status: "ok",
+      output: {
+        contract_version: "1.0.0",
+        institution_ref: request.institution_ref,
+        snapshot_at: request.snapshot_at,
+        signals: [],
+        projection_version: 1,
+      },
+    }),
+  },
 );
 
 afterAll(async () => {
@@ -102,8 +114,10 @@ const grantFor = (
 const compose = (scope: Scope) =>
   service.compose({
     workspace_id: scope.workspaceId,
+    participant_ref: "qualified-admin-fixture",
     institution_ref: scope.institution.id,
     local_date: today,
+    snapshot_at: new Date().toISOString(),
     at_minute: 600,
     ask,
   });

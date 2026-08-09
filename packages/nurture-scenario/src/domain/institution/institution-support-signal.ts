@@ -380,18 +380,27 @@ export const decideInstitutionSupportSignalPolicyRevision = (input: {
     : { status: "conflict", reason_code: "conflict" };
 };
 
+export type NurtureInstitutionSupportSignalSourceRequest = {
+  workspace_id: string;
+  participant_ref: string;
+  /** The exact active role selected by the authority chain. */
+  role_assignment_ref: string;
+  institution_ref: string;
+  snapshot_at: string;
+  /**
+   * Exact owners resolve their own checkpoint/window vocabulary. The signal
+   * layer passes policies through and never parses refs into business facts.
+   */
+  policies: NurtureInstitutionSupportSignalPolicyV1[];
+};
+
 export type NurtureInstitutionSupportSignalRepository = {
   loadEffectivePolicies(input: {
     workspace_id: string;
     institution_ref: string;
     snapshot_at: string;
   }): Promise<NurtureInstitutionSupportSignalPolicyV1[]>;
-  loadAuthorizedSources(input: {
-    workspace_id: string;
-    participant_ref: string;
-    institution_ref: string;
-    snapshot_at: string;
-  }): Promise<{
+  loadAuthorizedSources(input: NurtureInstitutionSupportSignalSourceRequest): Promise<{
     status: "available" | "unavailable";
     sources: NurtureInstitutionSupportSignalSourceV1[];
   }>;
@@ -430,10 +439,15 @@ export class NurtureInstitutionSupportSignalService {
       return { status: "denied", reason_code: "not_authorized" };
     }
     try {
-      const [policies, sources] = await Promise.all([
-        this.repository.loadEffectivePolicies(request),
-        this.repository.loadAuthorizedSources(request),
-      ]);
+      const policies = await this.repository.loadEffectivePolicies(request);
+      const sources = await this.repository.loadAuthorizedSources({
+        workspace_id: request.workspace_id,
+        participant_ref: request.participant_ref,
+        role_assignment_ref: scope.active_role.role_assignment_ref,
+        institution_ref: request.institution_ref,
+        snapshot_at: request.snapshot_at,
+        policies,
+      });
       return composeInstitutionSupportSignals({
         workspace_id: request.workspace_id,
         institution_ref: request.institution_ref,
@@ -445,5 +459,47 @@ export class NurtureInstitutionSupportSignalService {
     } catch {
       return { status: "unavailable", reason_code: "source_unavailable" };
     }
+  }
+}
+
+export type NurtureInstitutionSupportSignalQuery = Pick<
+  NurtureInstitutionSupportSignalService,
+  "compose"
+>;
+
+export type NurtureInstitutionHomeSupportSignalProjectionV1 = {
+  contract_version: typeof INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION;
+  institution_ref: string;
+  snapshot_at: string;
+  /** Already ordered by the signal composer; the home highlights at most 3. */
+  support_signals: NurtureInstitutionSupportSignalV1[];
+  support_signals_has_more: boolean;
+  projection_version: 1;
+};
+
+export type NurtureInstitutionHomeSupportSignalDecision =
+  | { status: "ok"; output: NurtureInstitutionHomeSupportSignalProjectionV1 }
+  | Exclude<NurtureInstitutionSupportSignalComposeDecision, { status: "ok" }>;
+
+/** Read-only Institution-home consumer. It does not create a second ordering. */
+export class NurtureInstitutionHomeSupportSignalService {
+  constructor(private readonly supportSignals: NurtureInstitutionSupportSignalQuery) {}
+
+  async compose(
+    request: Parameters<NurtureInstitutionSupportSignalQuery["compose"]>[0],
+  ): Promise<NurtureInstitutionHomeSupportSignalDecision> {
+    const decision = await this.supportSignals.compose(request);
+    if (decision.status !== "ok") return decision;
+    return {
+      status: "ok",
+      output: {
+        contract_version: INSTITUTION_SUPPORT_SIGNAL_CONTRACT_VERSION,
+        institution_ref: request.institution_ref,
+        snapshot_at: request.snapshot_at,
+        support_signals: decision.output.signals.slice(0, 3),
+        support_signals_has_more: decision.output.signals.length > 3,
+        projection_version: 1,
+      },
+    };
   }
 }

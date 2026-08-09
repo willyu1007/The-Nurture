@@ -4,6 +4,7 @@ import {
   orderClassList,
   type NurtureAggregateMember,
   type NurtureInstitutionClassListRepository,
+  type NurtureInstitutionSupportSignalV1,
 } from "../../src/index.js";
 
 /**
@@ -58,11 +59,29 @@ const repository = (
   ...overrides,
 });
 
+const supportSignalQuery = (signals: NurtureInstitutionSupportSignalV1[] = []) => ({
+  compose: async () => ({
+    status: "ok" as const,
+    output: {
+      contract_version: "1.0.0" as const,
+      institution_ref: "institution-1",
+      snapshot_at: "2026-08-09T12:00:00.000Z",
+      signals,
+      projection_version: 1 as const,
+    },
+  }),
+});
+
 const compose = (overrides: Partial<NurtureInstitutionClassListRepository> = {}) =>
-  new NurtureInstitutionClassListService(repository(overrides)).compose({
+  new NurtureInstitutionClassListService(
+    repository(overrides),
+    supportSignalQuery(),
+  ).compose({
     workspace_id: "workspace-1",
+    participant_ref: "admin-1",
     institution_ref: "institution-1",
     local_date: "2026-08-09",
+    snapshot_at: "2026-08-09T12:00:00.000Z",
     // Mid-morning, so a schedule with a 09:00-11:00 slot has a current one.
     at_minute: 600,
     ask,
@@ -216,6 +235,7 @@ describe("class list attendance and counts (G4-B increment 3)", () => {
       "projection_version",
       "safe_class_label",
       "schedule",
+      "support_signals",
     ]);
     expect(Object.keys(list.entries[0]!.pending).sort()).toEqual([
       "awaiting_response",
@@ -274,11 +294,14 @@ describe("class card schedule, photo and text (G4-B increment 6)", () => {
   it("reports a next activity during a gap, with no current one", async () => {
     const service = new NurtureInstitutionClassListService(
       repository({ loadClassSchedule: async () => schedule() }),
+      supportSignalQuery(),
     );
     const midday = await service.compose({
       workspace_id: "workspace-1",
+      participant_ref: "admin-1",
       institution_ref: "institution-1",
       local_date: "2026-08-09",
+      snapshot_at: "2026-08-09T12:00:00.000Z",
       at_minute: 700,
       ask,
     });
@@ -330,5 +353,60 @@ describe("class card schedule, photo and text (G4-B increment 6)", () => {
   it("omits the text field when the class has none today", async () => {
     const list = await compose();
     expect(list.entries[0]).not.toHaveProperty("latest_text");
+  });
+
+  it("projects only the frozen body-free signal fields for its own class", async () => {
+    const service = new NurtureInstitutionClassListService(
+      repository(),
+      supportSignalQuery([
+        {
+          category: "business_response_overdue",
+          tier: "action_required",
+          scopeRef: "a",
+          sourceRef: "opaque-source-a",
+          safeReason: "A business response is past its explicit deadline.",
+          deadlineAt: "2026-08-09T11:00:00.000Z",
+          occurredAt: "2026-08-09T08:00:00.000Z",
+          policyRevision: 2,
+          contractVersion: "1.0.0",
+        },
+        {
+          category: "configured_load_threshold",
+          tier: "attention_suggested",
+          scopeRef: "b",
+          sourceRef: "opaque-source-b",
+          safeReason: "The configured pending-work threshold is reached.",
+          currentCount: 4,
+          occurredAt: "2026-08-09T09:00:00.000Z",
+          policyRevision: 3,
+          contractVersion: "1.0.0",
+        },
+      ]),
+    );
+    const list = await service.compose({
+      workspace_id: "workspace-1",
+      participant_ref: "admin-1",
+      institution_ref: "institution-1",
+      local_date: "2026-08-09",
+      snapshot_at: "2026-08-09T12:00:00.000Z",
+      at_minute: 600,
+      ask,
+    });
+    const classA = list.entries.find((entry) => entry.care_group_ref === "a")!;
+    expect(classA.support_signals).toEqual({
+      status: "available",
+      items: [
+        {
+          tier: "action_required",
+          sourceRef: "opaque-source-a",
+          safeReason: "A business response is past its explicit deadline.",
+          deadlineAt: "2026-08-09T11:00:00.000Z",
+          occurredAt: "2026-08-09T08:00:00.000Z",
+        },
+      ],
+    });
+    expect(JSON.stringify(classA.support_signals)).not.toMatch(
+      /category|scopeRef|policyRevision|contractVersion|body|child/i,
+    );
   });
 });

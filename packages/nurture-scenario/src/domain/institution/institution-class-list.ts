@@ -6,6 +6,11 @@ import {
   type NurtureLatestPhotoSelection,
 } from "./class-schedule-placement.js";
 import type { NurtureAggregateMember, NurturePolicyReasonCode } from "./institution-context.js";
+import type {
+  NurtureInstitutionSupportSignalComposeDecision,
+  NurtureInstitutionSupportSignalQuery,
+  NurtureInstitutionSupportSignalV1,
+} from "./institution-support-signal.js";
 
 /**
  * G4-B increment 3 — the Admin class list, read-only.
@@ -76,6 +81,25 @@ export type NurtureClassPendingCounts = {
 };
 
 /**
+ * The body-free subset frozen for a class card. Category/scope/policy internals
+ * remain in the Institution projection; a card shows only its safe work cue.
+ */
+export type NurtureInstitutionClassSupportSignalV1 = Pick<
+  NurtureInstitutionSupportSignalV1,
+  "tier" | "sourceRef" | "safeReason" | "occurredAt"
+> &
+  Partial<Pick<NurtureInstitutionSupportSignalV1, "currentCount" | "deadlineAt">>;
+
+type SupportSignalFailure = Exclude<
+  NurtureInstitutionSupportSignalComposeDecision,
+  { status: "ok" }
+>;
+
+export type NurtureInstitutionClassSupportSignalsV1 =
+  | { status: "available"; items: NurtureInstitutionClassSupportSignalV1[] }
+  | { status: "unavailable"; reason_code: SupportSignalFailure["reason_code"] };
+
+/**
  * The schedule facts a card shows. Absent when the class has no layer at any
  * level — an empty state, never an invented default day.
  */
@@ -115,6 +139,7 @@ export type NurtureInstitutionClassCard = {
    */
   latest_text?: { source_timestamp_ms: number };
   pending: NurtureClassPendingCounts;
+  support_signals: NurtureInstitutionClassSupportSignalsV1;
   projection_version: 1;
 };
 
@@ -216,12 +241,18 @@ export type NurtureInstitutionClassListRepository = {
  * that has a class list to say it about.
  */
 export class NurtureInstitutionClassListService {
-  constructor(private readonly repository: NurtureInstitutionClassListRepository) {}
+  constructor(
+    private readonly repository: NurtureInstitutionClassListRepository,
+    private readonly supportSignals: NurtureInstitutionSupportSignalQuery,
+  ) {}
 
   async compose(input: {
     workspace_id: string;
+    participant_ref: string;
+    role_assignment_ref?: string;
     institution_ref: string;
     local_date: string;
+    snapshot_at: string;
     /**
      * Minutes from the class's local midnight. Passed in rather than read from
      * the clock so the whole projection is a pure function of its inputs and a
@@ -230,10 +261,21 @@ export class NurtureInstitutionClassListService {
     at_minute: number;
     ask: Parameters<typeof resolveAggregate>[1];
   }): Promise<NurtureInstitutionClassList> {
-    const classes = await this.repository.listClasses({
-      workspace_id: input.workspace_id,
-      institution_ref: input.institution_ref,
-    });
+    const [classes, supportSignalDecision] = await Promise.all([
+      this.repository.listClasses({
+        workspace_id: input.workspace_id,
+        institution_ref: input.institution_ref,
+      }),
+      this.supportSignals.compose({
+        workspace_id: input.workspace_id,
+        participant_ref: input.participant_ref,
+        ...(input.role_assignment_ref
+          ? { role_assignment_ref: input.role_assignment_ref }
+          : {}),
+        institution_ref: input.institution_ref,
+        snapshot_at: input.snapshot_at,
+      }),
+    ]);
 
     const entries = await Promise.all(
       orderClassList(classes).map(async (klass) => {
@@ -275,6 +317,10 @@ export class NurtureInstitutionClassListService {
           ...(photo ? { latest_photo: photo } : {}),
           ...(latestTextAt !== null ? { latest_text: { source_timestamp_ms: latestTextAt } } : {}),
           pending,
+          support_signals: this.classSupportSignals(
+            supportSignalDecision,
+            klass.care_group_ref,
+          ),
           projection_version: 1 as const,
         };
       }),
@@ -287,6 +333,30 @@ export class NurtureInstitutionClassListService {
       // Ordered once, above. Composing per class must not reorder — the whole
       // point is that the sequence does not depend on what was found.
       entries,
+    };
+  }
+
+  private classSupportSignals(
+    decision: NurtureInstitutionSupportSignalComposeDecision,
+    careGroupRef: string,
+  ): NurtureInstitutionClassSupportSignalsV1 {
+    if (decision.status !== "ok") {
+      return { status: "unavailable", reason_code: decision.reason_code };
+    }
+    return {
+      status: "available",
+      items: decision.output.signals
+        .filter((signal) => signal.scopeRef === careGroupRef)
+        .map((signal) => ({
+          tier: signal.tier,
+          sourceRef: signal.sourceRef,
+          safeReason: signal.safeReason,
+          ...(signal.currentCount !== undefined
+            ? { currentCount: signal.currentCount }
+            : {}),
+          ...(signal.deadlineAt ? { deadlineAt: signal.deadlineAt } : {}),
+          occurredAt: signal.occurredAt,
+        })),
     };
   }
 

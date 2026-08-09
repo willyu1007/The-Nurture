@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  NurtureInstitutionHomeSupportSignalService,
   NurtureInstitutionSupportSignalService,
   composeInstitutionSupportSignals,
   decideInstitutionSupportSignalPolicyRevision,
@@ -7,6 +8,7 @@ import {
   type NurtureInstitutionSupportSignalAggregateMember,
   type NurtureInstitutionSupportSignalPolicyV1,
   type NurtureInstitutionSupportSignalSourceV1,
+  type NurtureInstitutionSupportSignalV1,
 } from "../../src/index.js";
 
 const at = "2026-08-09T12:00:00.000Z";
@@ -112,6 +114,69 @@ describe("InstitutionSupportSignalProjectionV1", () => {
     ).resolves.toEqual({ status: "denied", reason_code: "not_authorized" });
     expect(loadEffectivePolicies).not.toHaveBeenCalled();
     expect(loadAuthorizedSources).not.toHaveBeenCalled();
+  });
+
+  it("passes policies to exact owners instead of interpreting checkpoint refs itself", async () => {
+    const configured = policy("business_response_overdue");
+    const loadAuthorizedSources = vi.fn(async () => ({
+      status: "available" as const,
+      sources: [
+        source("business_response_overdue", {
+          deadline_at: "2026-08-09T11:00:00.000Z",
+        }),
+      ],
+    }));
+    const service = new NurtureInstitutionSupportSignalService(
+      {
+        loadEffectivePolicies: async () => [configured],
+        loadAuthorizedSources,
+      },
+      {
+        resolve: async () => ({
+          status: "resolved" as const,
+          level: "institution_scope" as const,
+          active_role: {
+            contract_version: "1.0.0" as const,
+            participant_ref: "admin-1",
+            role_assignment_ref: "admin-role-1",
+            role_kind: "institution_admin" as const,
+            scope_type: "institution" as const,
+            scope_ref: "institution-1",
+            selection_mode: "unique" as const,
+          },
+          institution_scope: {
+            contract_version: "1.0.0" as const,
+            active_role: {
+              contract_version: "1.0.0" as const,
+              participant_ref: "admin-1",
+              role_assignment_ref: "admin-role-1",
+              role_kind: "institution_admin" as const,
+              scope_type: "institution" as const,
+              scope_ref: "institution-1",
+              selection_mode: "unique" as const,
+            },
+            institution_ref: "institution-1",
+            institution_state: "active" as const,
+          },
+        }),
+      },
+    );
+    await expect(
+      service.compose({
+        workspace_id: "workspace-1",
+        participant_ref: "admin-1",
+        institution_ref: "institution-1",
+        snapshot_at: at,
+      }),
+    ).resolves.toMatchObject({ status: "ok", output: { signals: [{ sourceRef: expect.any(String) }] } });
+    expect(loadAuthorizedSources).toHaveBeenCalledWith({
+      workspace_id: "workspace-1",
+      participant_ref: "admin-1",
+      role_assignment_ref: "admin-role-1",
+      institution_ref: "institution-1",
+      snapshot_at: at,
+      policies: [configured],
+    });
   });
 
   it("recomputes source lifecycle and never emits a closure record", () => {
@@ -362,5 +427,45 @@ describe("InstitutionSupportSignalProjectionV1", () => {
         contract_version: "1.0.0",
       }),
     ).toEqual({ status: "allowed", next_revision: 4 });
+  });
+
+  it("feeds the Institution home in composer order, caps at three and exposes overflow", async () => {
+    const signals = ["a", "b", "c", "d"].map(
+      (sourceRef, index): NurtureInstitutionSupportSignalV1 => ({
+        category: "authority_or_source_blocked",
+        tier: "action_required",
+        scopeRef: `class-${sourceRef}`,
+        sourceRef,
+        safeReason: "Current authority or source state blocks this work.",
+        occurredAt: `2026-08-09T0${index + 1}:00:00.000Z`,
+        policyRevision: 1,
+        contractVersion: "1.0.0",
+      }),
+    );
+    const home = new NurtureInstitutionHomeSupportSignalService({
+      compose: async (request) => ({
+        status: "ok",
+        output: {
+          contract_version: "1.0.0",
+          institution_ref: request.institution_ref,
+          snapshot_at: request.snapshot_at,
+          signals,
+          projection_version: 1,
+        },
+      }),
+    });
+    const decision = await home.compose({
+      workspace_id: "workspace-1",
+      participant_ref: "admin-1",
+      institution_ref: "institution-1",
+      snapshot_at: at,
+    });
+    expect(decision).toMatchObject({
+      status: "ok",
+      output: {
+        support_signals: [{ sourceRef: "a" }, { sourceRef: "b" }, { sourceRef: "c" }],
+        support_signals_has_more: true,
+      },
+    });
   });
 });
