@@ -280,6 +280,7 @@ const createQuestion = async (
     lifecycle?: "active" | "suppressed";
     sourceRedacted?: boolean;
     grant?: Scope["grant"];
+    duplicateSourceItem?: boolean;
   },
 ) => {
   const grant = input.grant ?? scope.grant;
@@ -310,39 +311,42 @@ const createQuestion = async (
       createdAt: new Date(`${localDate}T08:00:00.000Z`),
     },
   });
-  const item = await prisma.nurtureFamilyCareItem.create({
-    data: {
-      workspaceId: scope.workspaceId,
-      sourceMessageId: message.id,
-      threadId: scope.thread.id,
-      childCareProcessId: scope.process.id,
-      familyId: scope.family.id,
-      enrollmentId: scope.enrollment.id,
-      careGroupId: scope.careGroup.id,
-      dataClass: "family_care_question",
-      category: "question",
-      summary: "Question",
-      urgency: "normal",
-      requiresAck: true,
-      requiresReply: true,
-      status: input.sourceRedacted ? "suppressed" : "open",
-      classificationSource: "system",
-      grantId: grant.id,
-      writerContract: "harness_g2_v1",
-      responseState: "awaiting_reply",
-      lifecycleState: input.lifecycle ?? "active",
-      ...(input.sourceRedacted ? { lifecycleReason: "source_redacted" as const } : {}),
-      ...(input.sourceRedacted
-        ? {
-            suppressedAt: new Date(`${localDate}T10:00:00.000Z`),
-            suppressionReason: "source redacted owner fixture",
-          }
-        : {}),
-      dueAt: new Date(`${localDate}T09:00:00.000Z`),
-      createdAt: new Date(`${localDate}T08:00:00.000Z`),
-      updatedAt: new Date(`${localDate}T08:00:00.000Z`),
-    },
-  });
+  const createItem = () =>
+    prisma.nurtureFamilyCareItem.create({
+      data: {
+        workspaceId: scope.workspaceId,
+        sourceMessageId: message.id,
+        threadId: scope.thread.id,
+        childCareProcessId: scope.process.id,
+        familyId: scope.family.id,
+        enrollmentId: scope.enrollment.id,
+        careGroupId: scope.careGroup.id,
+        dataClass: "family_care_question",
+        category: "question",
+        summary: "Question",
+        urgency: "normal",
+        requiresAck: true,
+        requiresReply: true,
+        status: input.sourceRedacted ? "suppressed" : "open",
+        classificationSource: "system",
+        grantId: grant.id,
+        writerContract: "harness_g2_v1",
+        responseState: "awaiting_reply",
+        lifecycleState: input.lifecycle ?? "active",
+        ...(input.sourceRedacted ? { lifecycleReason: "source_redacted" as const } : {}),
+        ...(input.sourceRedacted
+          ? {
+              suppressedAt: new Date(`${localDate}T10:00:00.000Z`),
+              suppressionReason: "source redacted owner fixture",
+            }
+          : {}),
+        dueAt: new Date(`${localDate}T09:00:00.000Z`),
+        createdAt: new Date(`${localDate}T08:00:00.000Z`),
+        updatedAt: new Date(`${localDate}T08:00:00.000Z`),
+      },
+    });
+  const item = await createItem();
+  if (input.duplicateSourceItem) await createItem();
   return { message, item };
 };
 
@@ -625,6 +629,21 @@ describe("T-007 G4-B exact support-signal owner providers", () => {
       },
     });
     await createQuestion(scope, { grant: undisclosedGrant });
+    const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
+      prisma,
+      owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
+    });
+
+    await expect(
+      bindings.configured_load.loadConfiguredLoadFacts(
+        request(scope, [allPolicies(scope)[5]!]),
+      ),
+    ).resolves.toEqual({ status: "available", facts: [] });
+  });
+
+  it("fails closed when one family message maps to multiple source items", async () => {
+    const scope = await seedScope();
+    await createQuestion(scope, { duplicateSourceItem: true });
     const bindings = createPrismaInstitutionSupportSignalOwnerBindings({
       prisma,
       owner_ref_integrity_key: "g4b-support-signal-owner-test-key",
