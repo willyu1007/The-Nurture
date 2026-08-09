@@ -307,6 +307,22 @@ Falsification evidence is per-increment and lives in each record's
 | `verify:workflow-contract-pin` | **FAIL, attributed** | Nurture self-pin was recomputed; external My-Chat remains pinned `567b96c`, observed `ca782b6` (G-09). |
 | Effect boundary | PASS | I1 code/migration authoring only; no database apply, source-owner activation, capability, deployment or traffic. |
 
+## 2026-08-09 — G4-B increment 10 exact-owner adapters and consumers
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Scenario + DB package typechecks | PASS | Zero TypeScript errors; Scenario manifest remains current. |
+| Targeted signal/class unit | PASS | 37/37 across the six-adapter, composer/home and class-card suites. |
+| Full unit lane | PASS | 825/825 across 73 files. |
+| Targeted production DB | PASS | 12/12: class-list real rows and support-policy repository compatibility. |
+| Full production-DB lane | **347/348, apply-gated** | The only failure remains the four CHECK constraints declared by the deliberately unapplied 0D-5 policy migration. |
+| `verify:test-routing` | PASS | 136 files: unit 73, production DB 36, dev host 11, scenario service 14, X5 joint 2. |
+| Persistence/G2/G3 | PASS | Persistence boundary, G2 Exit DB census and G3-0 freeze. |
+| Exact-owner negatives | PASS | No inferred checkpoint/deadline, no status-derived blocker, one-owner outage refuses partial results, class scope is exact and home overflow is explicit. |
+| C30-I3 / Nurture self-pin | PASS after re-freeze | Source revision `5cc2097`, C30 hash `0b00f2ee…`; exact runtime hash `e8b827a1…` over 223 files. |
+| External My-Chat pins | **FAIL, attributed** | Workflow expected `567b96c`, C30 expected `51ad97f`, observed `ebc7605`; no cross-repo adoption was performed. |
+| Effect boundary | PASS | I1 adapter/consumer code only; no migration apply, concrete owner activation, capability/contract rotation, deployment or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

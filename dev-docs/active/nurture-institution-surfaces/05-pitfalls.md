@@ -64,6 +64,10 @@
 - 不要使用红黄绿班级状态、跨班/跨老师百分位、历史异常基线或隐藏 AI risk score
   生成 support signal。
 - 不要在园区未配置绝对 count/window 时猜测负荷阈值；该类 signal 应保持 disabled。
+- 不要让 signal adapter 解析 `checkpoint_ref`/`window_key`，或拿 local date、
+  `occurredAt`、`updatedAt`、普通 status 猜 deadline/blocker；这些事实必须由 exact
+  owner 显式提供。缺少 owner binding 时返回 unavailable，不能用恒空 placeholder
+  冒充完整列表。
 - 不要让 AI 决定“需要处理”。只有明确 canonical overdue/blocker 可以进入该级别；
   未来 AI candidate 最多是“建议关注”。
 - 不要仅因缺少照片/文字生成 support signal；无记录不等于活动未开展。

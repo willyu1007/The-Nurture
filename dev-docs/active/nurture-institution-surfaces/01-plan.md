@@ -39,13 +39,15 @@
   accepted order: implement a freeze before freezing further on top of it.
 - G4-0D froze five daily-operations units and exited
   ([`32`](./32-g4-0d-exit-record.md)); **G4-B** executed 0D-1, 0D-2 and the
-  class-day detail and the 0D-5 policy/composition core in nine increments
-  ([`34`](./34-g4-b-increment-1-record.md)–[`43`](./43-g4-b-increment-9-record.md)).
-- 0D-5 still needs exact deterministic owner-source adapters and an approved
-  disposable migration qualification. 0D-3 and 0D-4's correction candidate
+  class-day detail and the 0D-5 policy/composition core, six typed exact-owner
+  adapters and class/home consumers in ten increments
+  ([`34`](./34-g4-b-increment-1-record.md)–[`44`](./44-g4-b-increment-10-record.md)).
+- 0D-5 still needs concrete owner-provider binding and an approved disposable
+  migration qualification. 0D-3 and 0D-4's correction candidate
   remain frozen and unbuilt; 0E and 0F have not reached the freeze stage.
-- All of it is **I1**: exact implementation plus migration authoring, qualified
-  on a disposable PostgreSQL. No shared or persistent apply, no capability
+- All of it is **I1**: exact implementation plus migration authoring. Applied
+  table paths are qualified on a disposable PostgreSQL; 0D-5's policy table is
+  still apply-gated. No shared or persistent apply, no capability
   registration, no contract rotation, no activation, no traffic. Nothing has a
   production caller.
 - Live gaps and the ordered next steps are

@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`43` are history: each says what was true when it was
+numbered records `06`…`44` are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -19,13 +19,14 @@ places drifts in one of them.
 | 0A inventory | `G4_0A_INVENTORY_PASS` | n/a | [`07`](./07-g4-0a-inventory-record.md) |
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
-| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, nine increments — 0D-1, 0D-2, class-day detail and the 0D-5 policy/composition core** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`43`](./43-g4-b-increment-9-record.md) |
+| 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, ten increments — 0D-1, 0D-2, class-day detail and the 0D-5 policy/composition/adapters/consumers** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`44`](./44-g4-b-increment-10-record.md) |
 | 0E Workflow & Enrollment Journey | **not started** | none | — |
 | 0F knowledge & RAG | **not started** | none | — |
 
 Everything implemented sits at **I1**: exact schema, policy, repository and
-service code plus migration authoring, qualified on a disposable PostgreSQL.
-No I2 contract release, no I3 owner integration, no I4 joint conformance, no
+service code plus migration authoring. Applied table paths are qualified on a
+disposable PostgreSQL; the 0D-5 policy migration remains apply-gated. No I2
+contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
 
 ## Gap register
@@ -50,19 +51,26 @@ Frozen in [`28`](./28-g4-0d-3-revision-downscope-freeze.md); no schema, no
 domain module, no repository. Nothing in the code references a revision chain or
 a downscope decision.
 
-### G-03 — 0D-5 exact deterministic source adapters: partial
+### G-03 — 0D-5 exact deterministic owner integration: partial
 
 The policy schema/migration, actor-safe projection composer, 0C-5 aggregate
 guard, stable dedupe, fixed tier/reason and deadline/fixed-subject ordering are
 implemented by [`43`](./43-g4-b-increment-9-record.md). This executes 0C-5 §6
 fixture 16 synthetically.
 
-What remains is the required real path: six deterministic source adapters must
-reuse the exact attendance, business-communication, WorkItem and Workflow
-owners. No placeholder adapter is allowed to guess a checkpoint, deadline or
-blocker state. Until those adapters and the policy migration are qualified on
-an approved disposable database, G-03 is not closed and no class/home consumer
-may claim a complete signal list.
+[`44`](./44-g4-b-increment-10-record.md) implements six typed adapters, passes
+the resolved active role and effective policy to exact owners, fails the whole
+deterministic read closed on one owner outage, and wires class/home consumers
+without adding a second ordering or body-bearing card shape.
+
+What remains is owner integration rather than another signal-local mapping:
+the eventual ingress MUST bind all six ports to concrete attendance,
+business-communication, review/load, authority, WorkItem and Workflow owners.
+The current repo has no permission to invent the attendance checkpoint instant
+or an InstitutionWorkflow blocker that its owner does not yet expose. The
+policy migration also remains unqualified on an approved disposable database.
+Until both gates pass, G-03 is not closed and unavailable consumers MUST NOT be
+presented as an empty complete signal list.
 
 ### G-04 — 0D-4 child-attribution authority: partial
 
@@ -107,15 +115,17 @@ at I1.
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. The latest observed revision is recorded in
-[`42`](./42-g4-b-increment-8-record.md), rather than treated as a Nurture pin.
+`x5_joint_api` divergence. Increment 10 observed `ebc7605`; C30's independent
+upstream lock still expects `51ad97f` ([`44`](./44-g4-b-increment-10-record.md)).
+Neither external head is treated as a Nurture pin.
 
 Advancing the pin is an **adoption** of another task's work, not a refresh, and
 it needs whoever owns that work to qualify it. Until then this gate stays red
 for a stated reason rather than being made green by copying a hash.
 
 Cited by: [`40`](./40-g4-b-increment-7-record.md),
-[`42`](./42-g4-b-increment-8-record.md).
+[`42`](./42-g4-b-increment-8-record.md),
+[`44`](./44-g4-b-increment-10-record.md).
 
 ## Closed since the 0D Exit
 
@@ -134,9 +144,10 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Next steps, in dependency order
 
-1. **Finish 0D-5's exact deterministic owner-source adapters** (G-03), then
+1. **Bind 0D-5's six adapters to concrete exact-owner providers** (G-03), then
    qualify the authored policy migration on an explicitly approved disposable
-   database. Wire class/home consumers only after that real source path passes.
+   database. The I1 class/home consumers already fail unavailable; they MUST
+   not be activated or described as complete before this real path passes.
 2. **0D-3 append-only revision/downscope** (G-02), then wire the already-frozen
    automatic placement pass to capture intake as its own bounded increment
    (G-05). Keep those commits separate: one owns Admin history/downscope, the

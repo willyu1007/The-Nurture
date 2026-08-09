@@ -1,5 +1,18 @@
 # Implementation Notes — 机构端双 Surface
 
+## 2026-08-09 — G4-B increment 10: exact-owner adapters and consumers
+
+- Commit `5cc2097` adds one typed adapter per deterministic signal category and
+  one fail-closed combined reader. Owners receive the resolved active role,
+  request snapshot and effective policies and MUST provide their own deadline,
+  blocker or full-coverage aggregate facts.
+- The Institution home consumes the composer order, returns at most three and
+  exposes overflow. Class cards consume the same projection by exact class and
+  carry only the frozen body-free subset.
+- No concrete owner is substituted with an empty or inferred implementation.
+  Owner-provider binding and the apply-gated policy migration remain open, so
+  G-03 is still partial. See [`44`](./44-g4-b-increment-10-record.md).
+
 ## 2026-08-09 — G4-B increment 9: detail-read repair and 0D-5 core
 
 - Commit `3b9ca9a` makes the class-day communication list structurally
