@@ -45,4 +45,3 @@ It may not yet:
 This pass proves that implementation inputs are explicit and non-overlapping.
 It executes no predicate or transaction. My-Chat checkout drift is a named
 later owner gate, not evidence that the pinned contract was adopted.
-

@@ -66,4 +66,3 @@ freeze pass, but it prevents any later I3 claim based on the unadopted checkout.
 
 All four records satisfy the eight-part freeze-record contract and their
 capability/fact ownership does not overlap. 0E Exit is reachable.
-

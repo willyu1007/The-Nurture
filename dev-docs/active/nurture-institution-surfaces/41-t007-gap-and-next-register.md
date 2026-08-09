@@ -7,7 +7,7 @@
 - Purpose: the **live** list of what is not built and what comes next.
 
 This register is the single place that answers "where is T-007 now". The
-numbered records `06`…`48` are history: each says what was true when it was
+other numbered records are history: each says what was true when it was
 written and is never edited to stay current. Each row below cites the record
 that found the gap rather than restating its reasoning — a gap described in two
 places drifts in one of them.
@@ -20,14 +20,18 @@ places drifts in one of them.
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
-| 0E Workflow & Enrollment Journey | **not started** | none | — |
+| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increment 1 — one-item registry, exact state guard and body-free Admin projection** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md) |
 | 0F knowledge & RAG | **not started** | none | — |
 
-Everything implemented sits at **I1**: exact schema, policy, repository and
-service code plus migration authoring. All implemented daily-operations
-persistence paths are qualified on disposable PostgreSQL. No I2
+All implementation work remains at **I1**. Persistence increments carry exact
+schema, policy, repository/service code and migration authoring, and all
+implemented daily-operations persistence paths are qualified on disposable
+PostgreSQL. No I2
 contract release, no I3 owner integration, no I4 joint conformance, no
 capability registration, no activation, no traffic.
+
+G4-D increment 1 is deliberately smaller than the persistence increments: it
+is pure registry/state/projection source plus tests. It carries no DB claim.
 
 ## Gap register
 
@@ -136,6 +140,18 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 [`42`](./42-g4-b-increment-8-record.md),
 [`44`](./44-g4-b-increment-10-record.md).
 
+### G-10 — Enrollment Journey has no private carrier or command path yet
+
+0E is frozen, but the first G4-D increment intentionally implements only the
+closed one-item registry, combination guard and role-safe body-free projection.
+No inquiry/touchpoint/workflow row, repository, command, migration, Host bridge
+or production caller exists. `workflowRunRef` accepts only an exact
+My-Chat-owned `CanonicalRef`; the Nurture private workflow ref cannot substitute
+for it, and capability refs remain empty until I2.
+
+Cited by: [`55`](./55-g4-0e-exit-record.md),
+[`57`](./57-g4-d-increment-1-record.md).
+
 ## Closed since the 0D Exit
 
 - **G-04, 0D-4 child-attribution authority** — closed at I1 by the sourced,
@@ -165,10 +181,15 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 
 ## Next steps, in dependency order
 
-1. **0E Workflow and Enrollment Journey freeze**, then **0F knowledge and RAG**.
-   Both are unstarted at the freeze stage, so each is a 0-branch of its own
-   before any implementation.
-2. **I2** — capability registration and contract rotation — which is what turns
+1. **G4-D increment 2** — implement 0E-1's private workflow/inquiry/touchpoint
+   carrier, command/repository and migration artifact. Use the DB-SSOT workflow;
+   do not apply it without a separately approved disposable target.
+2. **G4-D remaining I1 units** — 0E-2 waitlist/reservation/cancel, 0E-3 phase
+   migration and trial lifecycle, then 0E-4 formalization/completion. G-09 must
+   be resolved before claiming the real My-Chat owner adapter at I3.
+3. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
+   any required G4-D path.
+4. **I2** — capability registration and contract rotation — which is what turns
    G-01 from a bound into a completed step. Not before the branch it publishes
    is done.
 

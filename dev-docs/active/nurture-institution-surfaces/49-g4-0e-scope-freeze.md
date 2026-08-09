@@ -89,4 +89,3 @@ predicates or writes.
 release. It opens G4-D I1 implementation and nothing above it: no shared or
 persistent database apply, I2 capability rotation, I3 owner claim, I4 joint
 conformance, activation, deployment or traffic.
-

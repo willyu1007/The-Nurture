@@ -143,4 +143,3 @@ apply needs separate disposable-target approval.
 ## Exit
 
 `G4_0E_2_FREEZE_PASS` releases 0E-3. It does not create or operate a waitlist.
-

@@ -120,4 +120,3 @@ verification metadata allowlist. No Host Run/Step/outbox table is added.
 
 `G4_0E_4_FREEZE_PASS` completes the four 0E unit freezes. It does not qualify a
 My-Chat owner adapter, register a capability or apply a migration.
-

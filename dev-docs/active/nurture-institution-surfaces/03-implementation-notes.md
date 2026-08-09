@@ -580,3 +580,36 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - G-04 and G-05 are closed at I1. Next is 0E Workflow/Enrollment Journey
   freeze, then 0F Knowledge/RAG; G-03's missing blocker remains an external
   owner gate.
+
+## 2026-08-09 — 0E freeze and G4-D increment 1
+
+- Issued the four 0E unit freezes, 0G audit and `G4_0E_EXIT_PASS`: one
+  Enrollment Journey registry/inquiry carrier, capacity-only waitlist and
+  preparation reservation, status+phase trial lifecycle, and current-owner
+  formalization/completion.
+- The audit assigned inquiry to the single Journey instead of a CRM Workflow,
+  made formal Enrollment a milestone committed atomically with `completed`,
+  and kept shared Run/Step/ledger/outbox replay in My-Chat.
+- Implemented only the released pure slice: one local domain registry, exact
+  stage/waiting/pending/lifecycle/outcome/milestone vocabularies, fail-closed
+  combination validation and a body-free Admin mobile/Web projection with no
+  capability refs.
+- Quality review replaced a Nurture-ref masquerade with an exact My-Chat-owned
+  workflow Run `CanonicalRef`, rejects unknown/extra ref fields and vocabulary
+  drift, allowlists the projected ref fields, and constrains pending/terminal/
+  milestone combinations. Completed business state may retain only technical
+  `waiting_on_system`; no Guardian/Caregiver wait survives terminal state.
+- The canonical manifest/module remain unchanged and contain no
+  `EnrollmentJourneyWorkflowV1`. No Prisma, migration, DB, owner adapter,
+  production caller, capability, activation or traffic was added.
+- Targeted tests passed 15/15; full unit passed 857/857 across 77 files;
+  scenario typecheck, manifest check, persistence boundary, port topology,
+  governance lint and `git diff --check` passed.
+- The exact implementation commit is `17c0b97`. C30-I3's local source lock was
+  refreshed to `50361da1…`, and the Nurture exact runtime self-pin to
+  `c5b57c06…` over 236 files. The external My-Chat revision remains the
+  attributed expected `567b96c` versus observed `05e8331` failure; no adoption
+  was performed.
+- Next is the private workflow/inquiry/touchpoint carrier plus command,
+  repository and migration authoring under the DB-SSOT gate. No database apply
+  is authorized by this increment.

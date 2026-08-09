@@ -131,4 +131,3 @@ Enrollment/Grant/reservation/workflow heads. A conflict writes no partial fact.
 
 `G4_0E_3_FREEZE_PASS` releases 0E-4. It neither starts a real trial nor applies
 the phase migration.
-

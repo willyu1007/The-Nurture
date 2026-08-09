@@ -425,6 +425,21 @@ Falsification evidence is per-increment and lives in each record's
 | Cleanup | PASS | No debug instrumentation or alternate runtime/candidate path; exact disposable DB destroyed with zero sessions and confirmed absent. |
 | Effect boundary | PASS | I1 source/schema/migration and disposable qualification only; no shared/persistent apply, caller, capability, deployment, activation or traffic. |
 
+## 2026-08-09 — 0E freeze and G4-D increment 1
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| 0E four-unit freeze + 0G audit | PASS | Records 49–55; inquiry ownership, formal-completion and replay/outbox collisions resolved; `G4_0E_EXIT_PASS`. |
+| Targeted registry/state/projection | PASS | 15/15: one-item registry, ordinary-work rejection, stage/wait separation, canonical Host Run ref, extra-field rejection, milestone/pending/terminal guards and body-free Admin projection. |
+| Scenario typecheck / manifest | PASS | `pnpm --filter @the-nurture/scenario typecheck`; generated manifest current, zero TypeScript errors. |
+| Full unit lane | PASS | `pnpm test:unit`: 857/857 across 77 files. |
+| Persistence and port boundaries | PASS | `pnpm verify:persistence-boundaries`; `pnpm verify:port-topology`. |
+| Local source locks | PASS after refresh | C30-I3 source revision `17c0b97`, hash `50361da1…`; Nurture exact runtime `c5b57c06…` over 236 files. |
+| Governance / diff hygiene | PASS | project governance lint and `git diff --check`. |
+| Manifest/module absence | PASS | canonical manifest serialization contains no `EnrollmentJourneyWorkflowV1`; no module registration or caller added. |
+| External owner posture | KNOWN RED GATE | Base is at pinned `4350086…`; My-Chat expected `567b96c`, observed `05e8331`; no adoption claimed. |
+| Effect boundary | PASS | Pure I1 source/tests/docs only; no Prisma, migration, DB, owner adapter, capability, deployment, activation or traffic. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
