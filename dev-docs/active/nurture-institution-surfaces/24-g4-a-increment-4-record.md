@@ -82,6 +82,12 @@ freeze — a fixed order from stable class attributes, `ageBandKey` then `name` 
 belongs with whichever increment first returns a class list, and is recorded
 here as owed rather than done.
 
+> **Later note, 2026-08-09.** 0C-5 §6 was amended after this record: fixture 15
+> was split, with the prohibition scoped to subject lists and a narrower rule
+> added for work-item lists (0C-5 §6, "Scope of the prohibition", raised by
+> 0D-5). The assignment above still holds for fixture 14 and for the subject
+> half; the work-item half is 0D-5's and no longer waits on a class list.
+
 **0C-5 §2's `grant_request` / `grant` data-class boundary**, unchanged from
 increment 3: a surface read/write boundary, not a level of the chain, and
 nothing reads grant rows from a surface yet.

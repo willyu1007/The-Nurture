@@ -9,7 +9,9 @@
 - Consumes: 0C-5 §5 aggregate privacy, 0D-1's submission state
 - Verdict: `G4_0D_5_FREEZE_PASS`
 - Releases: G4-B, G4-C
-- Open points: **one**, §4 cross-class signal ordering against 0C-5 §6
+- Open points: **closed** 2026-08-09 — §4 by scoping 0C-5 §6's prohibition to
+  subject lists, which amends [`15`](./15-g4-0c-5-grant-aggregate-freeze.md)
+  rather than overriding it here
 - Schema delta: **`DELTA`** — planned below, not applied
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
@@ -115,38 +117,48 @@ never a figure over the readable ones, and never a suppressed signal that would
 be indistinguishable from "below threshold". This unit is the first consumer of
 G4-A increment 4 and uses its rule rather than restating one.
 
-### Open point — cross-class ordering against 0C-5 §6
+### Ordering — open point CLOSED 2026-08-09
 
-`02-architecture.md` specifies that the Institution home returns at most three
-cross-class signals ordered by explicit deadline, then business state, then
-`occurredAt`. **0C-5 §6 fixture 15 forbids an ordering derived from "a count,
-magnitude, urgency, deadline, signal level or computed score", and names
-deadline explicitly.** The two cannot both hold as written.
+`02-architecture.md` orders the Institution home's cross-class signals by
+explicit deadline, then business state, then `occurredAt`. 0C-5 §6's
+prohibition named deadline, so the two could not both hold as written.
 
-The tension is real rather than editorial. Ordering *items within one class* —
-"what is due first in my class" — compares no subjects. Ordering *items across
-classes* and labelling each with its class produces a de facto ranking of
-classes, which is exactly the "readable as one" outcome 0C-5 §6 closed the
-class-list question to avoid. A three-item cross-class list is a short ranking
-of classes wearing a different name.
+**Resolved by scoping the prohibition, not by overriding it.** 0C-5 §6 is
+amended (see [`15`](./15-g4-0c-5-grant-aggregate-freeze.md) §6, "Scope of the
+prohibition") to govern **subject** lists — classes, teachers, families,
+institutions — with a narrower rule for **work-item** lists. A unit quietly
+widening a rule another unit narrowed would violate 0G invariant 5, so the
+change lives in the record that owns the rule.
 
-Three candidate resolutions, none chosen here:
+What the re-check found: 0C-5 §6 gives two reasons and calls the second
+decisive, and **the decisive one does not hold for a signal list**. Its force
+is that a re-sorting list destroys spatial memory across many visits a day —
+but a signal list has no stable membership to remember, because §5 recomputes
+it per read and a resolved source is simply gone next time. "The marker does
+triage, the position does location" does not carry over either: a signal *is*
+the marker, with no card underneath it for position to locate.
 
-1. **Within-class only.** The home surfaces a per-class entry point and orders
-   nothing across classes. Safest, and loses the "what needs me first today"
-   view the architecture intended.
-2. **Cross-class, unordered.** Return the signals with no order at all, in the
-   fixed class order 0C-5 §6 already fixes (`ageBandKey`, then `name`). Keeps
-   the cross-class view, drops the triage.
-3. **Amend 0C-5 §6 to scope fixture 15 to subject ordering.** Explicitly permit
-   ordering *work items* by their own explicit deadline while continuing to
-   forbid ordering *subjects* by anything. Most useful, and requires reopening
-   0C-5 rather than deciding here.
+The first reason does carry over, and the rule below preserves it.
 
-**This must close before 0D Exit**, and if the answer is (3) it closes by
-amending [`15`](./15-g4-0c-5-grant-aggregate-freeze.md), not by 0D-5 overriding
-it. A unit that quietly widened a rule another unit narrowed would violate 0G
-invariant 5.
+**The ordering rule for signals:**
+
+1. by an **explicit deadline the source itself carries** — permitted, because a
+   deadline is an external fact on the business object rather than an
+   assessment of anyone, and §4 already forbids inventing a second one;
+2. on ties, and for signals with no deadline, **fall back to the fixed subject
+   order** (`ageBandKey`, then `name`);
+3. **never** by `tier`, `currentCount`, magnitude, or any computed or
+   AI-derived value.
+
+Rule 2 is the guard, not a formality: without it a deadline-ordered list
+becomes a level-ordered one every time deadlines coincide, which is the ranking
+0C-5 §6 exists to prevent.
+
+**Truncation is deferred to G4-B.** Returning "at most three" itself requires a
+selection, and selecting by deadline hides the classes that did not make the
+cut. That is a card-design decision in the same sense 0C-5 §6 assigned raw
+counts to G4-B; whatever G4-B chooses, the existence of further signals must
+not be concealed.
 
 ### Reads change nothing
 
@@ -216,7 +228,11 @@ distinguish those from ones their policy produced.
 13. a policy revision change does not re-describe signals produced under the
     previous revision;
 14. the same underlying condition yields a stable dedupe identity across reads;
-15. an ordinary signal cannot start `EnrollmentJourneyWorkflowV1`.
+15. an ordinary signal cannot start `EnrollmentJourneyWorkflowV1`;
+16. two signals with equal deadlines, and two with none, both fall back to the
+    fixed subject order — not to tier, and not to `currentCount`;
+17. a tier or count change with every deadline held constant leaves the order
+    unchanged.
 
 Synthetic fixtures under I0. Real owner paths stay behind I3, joint conformance
 behind I4.
@@ -240,6 +256,7 @@ apply.
 
 `G4_0D_5_FREEZE_PASS` releases the support-signal surfaces of G4-B and G4-C.
 This record opens no implementation, schema apply, capability rotation,
-activation, deployment or traffic. The §4 ordering open point must close before
-0D Exit, and closing it in favour of cross-class ordering requires amending
-0C-5 §6 rather than overriding that record here.
+activation, deployment or traffic. The §4 ordering open point closed on the day
+it was raised, by amending 0C-5 §6, so 0D-5 carries none into 0D Exit. 0G's 0D
+branch audit should confirm that amendment rather than reading 0C-5 §6 as
+unrevised.

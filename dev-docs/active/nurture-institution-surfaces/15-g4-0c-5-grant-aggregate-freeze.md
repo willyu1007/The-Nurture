@@ -13,6 +13,10 @@
 - Releases: 0C-6, G4-A, G4-D
 - Open points: **both closed** 2026-08-08 — §5 by full-coverage-or-nothing,
   §6 by a fixed class-list order with no system-produced ordering
+- Amendments: **2026-08-09**, §6 prohibition scoped to subject lists, with a
+  narrower rule for work-item lists. Raised by 0D-5
+  ([`29`](./29-g4-0d-5-support-signal-freeze.md)); to be confirmed by 0G's 0D
+  branch audit.
 - Non-effects: no code, schema apply, migration, capability, manifest, secret,
   deployment, activation or traffic.
 
@@ -246,6 +250,50 @@ Explicitly forbidden, as consequences of the same rule:
 - any cross-class numeric comparison, banding, colour grading or trend;
 - any ordering derived from a computed score or from AI.
 
+### Scope of the prohibition — amended 2026-08-09
+
+**The prohibition above governs SUBJECT lists** — lists of classes, teachers,
+families or institutions. **Work-item lists** — support signals, WorkItems —
+are ordered by the unit that owns them, under the narrower rule below.
+
+The amendment was raised by 0D-5 ([`29`](./29-g4-0d-5-support-signal-freeze.md)),
+which found that `02-architecture.md` orders the Institution home's cross-class
+signals by explicit deadline while the list above names deadline. That
+scenario was outside this section's view: the section is titled for the class
+list, and its prohibitions were written as consequences of the class-list rule.
+
+The two reasons above were re-checked against a work-item list, and **the one
+this section calls decisive does not hold there**. A signal list has no stable
+membership — 0D-5 recomputes it per read and a resolved source is simply absent
+next time — so there is no spatial memory for a re-sort to destroy. Nor does
+"the marker does triage, the position does location" carry over: on a class
+card the marker sits on the card, whereas a signal **is** the marker, so the
+sentence has no second layer to refer to.
+
+The first reason does carry over, and is what the narrower rule preserves:
+
+**A work-item list MUST NOT be ordered by signal level, count, magnitude, or
+any computed or AI-derived value.** Those are system assertions about which
+subject needs attention, and ordering by them is the ranking this section
+forbids, whatever the list is nominally of.
+
+**A work-item list MAY be ordered by an explicit deadline the business object
+itself carries.** A deadline is an external fact on the source, not an
+assessment of anyone — 0D-5 §4 requires it to be the object's own and forbids
+inventing a second one. Ordering by it asserts which item comes due first, not
+which class is worse.
+
+**Ties and missing deadlines fall back to the fixed subject order**
+(`ageBandKey`, then `name`), never to level or count. Without that, a
+deadline-ordered list would quietly become a level-ordered one whenever
+deadlines coincide.
+
+What this amendment does **not** change: the class list's own order, the
+no-scoring invariants, the cross-class comparison ban, or anything in §5. It
+narrows the scope of one sentence to the scope of the argument that produced
+it. The 0G audit of the 0D branch should confirm the narrowing rather than
+treat this section as unrevised.
+
 > **Tension recorded rather than hidden.** The class card displays its own
 > counts — awaiting response, new parent feedback, institution-pending — so an
 > Admin can compare classes by reading them. This rule constrains what the
@@ -306,8 +354,16 @@ them apart would let an Admin probe a grant's exact terms by elimination.
     both calls are `unavailable`, so no membership change leaks;
 14. the class list order is identical before and after a state change that
     alters counts and support-signal levels;
-15. no response carries an ordering derived from a count, magnitude, urgency,
-    deadline, signal level or computed score.
+15. no **subject** list carries an ordering derived from a count, magnitude,
+    urgency, deadline, signal level or computed score;
+16. no **work-item** list is ordered by signal level, count, magnitude or any
+    computed or AI-derived value, and one ordered by an explicit deadline falls
+    back to the fixed subject order on ties and on missing deadlines, never to
+    level or count.
+
+Fixtures 15 and 16 replace the single fixture 15 frozen on 2026-08-08, per the
+§6 amendment of 2026-08-09. The original wording is preserved there as the
+sentence being narrowed.
 
 Isolated synthetic fixtures under I0. Real owner paths stay behind I3, joint
 conformance behind I4.

@@ -102,6 +102,17 @@ The fixtures therefore belong to the board's own freeze, not to a 0D unit. 0D-2
 and 0D-5 must each state that they emit no ordering, so the board has nothing
 to inherit one from.
 
+> **Amended 2026-08-09 by 0D-5.** Writing 0D-5 established that the assignment
+> above is right for the class list and wrong for a signal list.
+> `02-architecture.md` orders the home's cross-class signals by explicit
+> deadline, which fixture 15 named — but 0C-5 §6's decisive reason, that a
+> re-sorting list destroys spatial memory, does not hold for a list whose
+> membership is recomputed on every read. 0C-5 §6 is therefore amended to scope
+> its prohibition to **subject** lists, with a narrower rule for **work-item**
+> lists, and fixture 15 is split accordingly. 0D-2 still emits no ordering;
+> 0D-5 now owns the signal ordering rule and is not silent on it. Confirming
+> the amendment belongs to 0G's audit of this branch.
+
 ## Explicitly deferred
 
 - **AI attention.** `ai_attention_candidate` is the seventh signal category and
