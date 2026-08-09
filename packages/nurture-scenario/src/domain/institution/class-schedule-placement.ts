@@ -313,3 +313,127 @@ export class NurtureClassScheduleService {
     return { applied, skipped };
   }
 }
+
+/**
+ * A photo that has ALREADY passed the reader's own 0C chain.
+ *
+ * The filter is the caller's, deliberately: "qualifying" is reader-specific,
+ * and a selection function that took unfiltered candidates would have to be
+ * trusted to apply authority it does not own. 0D-2 §4 restates 0C-5 §5's
+ * no-bypass rule for exactly this — a photo the reader could not open directly
+ * is never selected as a cover.
+ */
+export type NurtureClassPhotoCandidate = {
+  media_ref: string;
+  /** The activity it was placed into, or absent when it is `unplaced`. */
+  activity_ref?: string;
+  captured_at_ms: number;
+};
+
+export type NurtureLatestPhotoSelection = {
+  media_ref: string;
+  captured_at_ms: number;
+  selected_by: "explicit_cover" | "current_activity" | "most_recent_activity";
+};
+
+const newestOf = (
+  candidates: NurtureClassPhotoCandidate[],
+): NurtureClassPhotoCandidate | undefined =>
+  candidates.reduce<NurtureClassPhotoCandidate | undefined>(
+    (newest, candidate) =>
+      // Ties break on media_ref so the selection is deterministic: two photos
+      // sharing a capture instant must not alternate between reads.
+      !newest ||
+      candidate.captured_at_ms > newest.captured_at_ms ||
+      (candidate.captured_at_ms === newest.captured_at_ms &&
+        candidate.media_ref.localeCompare(newest.media_ref) > 0)
+        ? candidate
+        : newest,
+    undefined,
+  );
+
+/**
+ * 0D-2 §4's latest-photo selection, resolved inside one class-day snapshot.
+ *
+ * Deterministic throughout: no aesthetic judgement, no generative model, no
+ * cropping or face framing, and no asking a teacher to pick. The card gets
+ * whichever photo the ordering names, or none.
+ *
+ * **Level 1 has no writer yet.** The explicit cover is set from the Admin
+ * workbench, which is G4-C's surface, and 0D-2 planned no table for it. The
+ * parameter exists so adding that capability is a gate rather than a shape
+ * change — and a cover is honoured only if it is among the candidates, which
+ * is how "its source, authority and lifecycle are all still valid" is enforced
+ * without a second check that could disagree.
+ */
+export const selectLatestPhoto = (input: {
+  schedule: NurtureEffectiveSchedule | null;
+  current_activity_ref?: string;
+  candidates: NurtureClassPhotoCandidate[];
+  cover_media_ref?: string;
+}): NurtureLatestPhotoSelection | null => {
+  // Level 1.
+  if (input.cover_media_ref) {
+    const cover = input.candidates.find(
+      (candidate) => candidate.media_ref === input.cover_media_ref,
+    );
+    if (cover) {
+      return {
+        media_ref: cover.media_ref,
+        captured_at_ms: cover.captured_at_ms,
+        selected_by: "explicit_cover",
+      };
+    }
+    // A cover whose media no longer qualifies falls through rather than
+    // blocking the card — 0D-2 §6.
+  }
+
+  // Level 2.
+  if (input.current_activity_ref) {
+    const inCurrent = newestOf(
+      input.candidates.filter(
+        (candidate) => candidate.activity_ref === input.current_activity_ref,
+      ),
+    );
+    if (inCurrent) {
+      return {
+        media_ref: inCurrent.media_ref,
+        captured_at_ms: inCurrent.captured_at_ms,
+        selected_by: "current_activity",
+      };
+    }
+  }
+
+  // Level 3 — the class's most recent ACTIVITY that has a photo, walked in
+  // schedule order rather than by capture time. A late upload does not make
+  // its activity the most recent one, and 0D-2 says "most recent activity",
+  // not "most recent photo".
+  if (input.schedule) {
+    const byLatestFirst = [...input.schedule.slots].sort(
+      (left, right) => right.starts_at_minute - left.starts_at_minute,
+    );
+    for (const candidateSlot of byLatestFirst) {
+      const inSlot = newestOf(
+        input.candidates.filter((candidate) => candidate.activity_ref === candidateSlot.slot_ref),
+      );
+      if (inSlot) {
+        return {
+          media_ref: inSlot.media_ref,
+          captured_at_ms: inSlot.captured_at_ms,
+          selected_by: "most_recent_activity",
+        };
+      }
+    }
+  }
+
+  // Level 4 — no image. The card falls back to its newest text or to an empty
+  // state, which is the card's decision and not this function's.
+  //
+  // Note the consequence, recorded rather than papered over: a class with no
+  // schedule places every source as `unplaced`, and an unplaced photo belongs
+  // to no activity, so levels 2 and 3 cannot reach it. Such a class shows no
+  // photo even when it has one. That follows from 0D-2 as written; whether it
+  // is the intended product behaviour is a question for the freeze, not a gap
+  // to fill with an undeclared fallback here.
+  return null;
+};

@@ -3,6 +3,7 @@ import {
   decideActivityPlacement,
   isEligibleForAutomaticPass,
   resolveEffectiveSchedule,
+  selectLatestPhoto,
   shouldApplyAutomaticPlacement,
   type NurtureScheduleLayer,
   type NurtureScheduleSlot,
@@ -227,5 +228,112 @@ describe("0D-2 placement concurrency (G4-B increment 4)", () => {
       true,
     );
     expect(isEligibleForAutomaticPass(stored())).toBe(false);
+  });
+});
+
+
+/**
+ * 0D-2 §4's latest-photo selection. Deterministic throughout — the point is
+ * that no aesthetic or generative judgement enters, and that a photo the
+ * reader could not open is never chosen.
+ */
+describe("0D-2 latest photo selection (G4-B increment 5)", () => {
+  const daySchedule = resolve([
+    layer("class_standing", [
+      slot("morning", 540, 660),
+      slot("midday", 660, 780),
+      slot("afternoon", 840, 960),
+    ]),
+  ]);
+
+  const photo = (media_ref: string, activity_ref: string | undefined, captured_at_ms: number) => ({
+    media_ref,
+    ...(activity_ref ? { activity_ref } : {}),
+    captured_at_ms,
+  });
+
+  const select = (
+    candidates: ReturnType<typeof photo>[],
+    extras: { current_activity_ref?: string; cover_media_ref?: string } = {},
+    sched = daySchedule,
+  ) => selectLatestPhoto({ schedule: sched, candidates, ...extras });
+
+  it("level 2 — the newest photo in the current activity", () => {
+    const chosen = select(
+      [
+        photo("old-morning", "morning", 100),
+        photo("new-morning", "morning", 200),
+        photo("afternoon-one", "afternoon", 999),
+      ],
+      { current_activity_ref: "morning" },
+    );
+    // The afternoon photo is newer, but the current activity wins.
+    expect(chosen).toEqual({
+      media_ref: "new-morning",
+      captured_at_ms: 200,
+      selected_by: "current_activity",
+    });
+  });
+
+  /**
+   * "Most recent ACTIVITY", not "most recent photo". A late upload does not
+   * make its activity the most recent one.
+   */
+  it("level 3 — walks activities in schedule order, not by capture time", () => {
+    const chosen = select([
+      // Uploaded latest, but belongs to the morning.
+      photo("late-upload-morning", "morning", 5000),
+      photo("afternoon-photo", "afternoon", 100),
+    ]);
+    expect(chosen).toEqual({
+      media_ref: "afternoon-photo",
+      captured_at_ms: 100,
+      selected_by: "most_recent_activity",
+    });
+  });
+
+  it("level 3 — skips activities that have no photo", () => {
+    const chosen = select([photo("only-morning", "morning", 100)]);
+    expect(chosen).toMatchObject({ media_ref: "only-morning" });
+  });
+
+  it("falls from the current activity to the most recent one that has a photo", () => {
+    const chosen = select([photo("morning-photo", "morning", 100)], {
+      // The current activity has no photo at all.
+      current_activity_ref: "midday",
+    });
+    expect(chosen).toMatchObject({
+      media_ref: "morning-photo",
+      selected_by: "most_recent_activity",
+    });
+  });
+
+  it("level 4 — returns nothing rather than an unqualified or unplaced photo", () => {
+    expect(select([])).toBeNull();
+    // An unplaced photo belongs to no activity, so no level reaches it.
+    expect(select([photo("unplaced", undefined, 100)])).toBeNull();
+    // And with no schedule there are no activities to walk.
+    expect(select([photo("orphan", "morning", 100)], {}, null)).toBeNull();
+  });
+
+  it("honours an explicit cover only while it still qualifies", () => {
+    const candidates = [photo("cover", "morning", 100), photo("newer", "afternoon", 900)];
+    expect(select(candidates, { cover_media_ref: "cover" })).toMatchObject({
+      media_ref: "cover",
+      selected_by: "explicit_cover",
+    });
+    // A cover whose media is no longer among the qualifying candidates falls
+    // through rather than blocking the card.
+    expect(select(candidates, { cover_media_ref: "revoked" })).toMatchObject({
+      media_ref: "newer",
+      selected_by: "most_recent_activity",
+    });
+  });
+
+  it("is deterministic when two photos share a capture instant", () => {
+    const tied = [photo("b-ref", "morning", 100), photo("a-ref", "morning", 100)];
+    const first = select(tied, { current_activity_ref: "morning" });
+    const reversed = select([...tied].reverse(), { current_activity_ref: "morning" });
+    expect(first).toEqual(reversed);
   });
 });
