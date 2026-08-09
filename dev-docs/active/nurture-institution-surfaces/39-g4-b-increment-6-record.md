@@ -95,9 +95,10 @@ different source than the class capture.
 **The automatic placement pass is still unwired to intake**, unchanged from
 [`37`](./37-g4-b-increment-4-record.md).
 
-**0D-2's unscheduled-class photo consequence** stands as
-[`38`](./38-g4-b-increment-5-record.md) recorded it, and the card now makes it
-visible: a class with no schedule shows no photo even when it has one.
+**0D-2's unscheduled-class photo consequence** stands as recorded in
+[`38`](./38-g4-b-increment-5-record.md), and the card now makes that
+consequence visible: a class with no schedule shows no photo even when one
+exists.
 
 ## Verification
 
