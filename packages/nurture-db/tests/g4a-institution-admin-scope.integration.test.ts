@@ -687,4 +687,104 @@ describe("T-007 G4-A authority chain over stored rows (production DB lane)", () 
       reason_code: "data_class_mismatch",
     });
   });
+
+  /**
+   * G4-A increment 4 — 0C-5 §5 over a real class.
+   *
+   * The unit tests hand the population straight to the rule. What they cannot
+   * show is that the repository builds it from scope rather than from
+   * protected facts, or that a member counts as readable here on exactly the
+   * grant terms a direct read would require.
+   */
+  it("aggregates a class only when every enrolled member is readable", async () => {
+    const scope = await seedScope();
+    const namedClass = await seedClass(scope.workspaceId, scope.home.id, "Counted Class");
+    const otherClass = await seedClass(scope.workspaceId, scope.home.id, "Other Class");
+    const grantFor = (childProcessId: string, enrollmentId: string, purposes = ["care_coordination"]) =>
+      prisma.nurtureChildLinkGrant.create({
+        data: {
+          workspaceId: scope.workspaceId,
+          childCareProcessId: childProcessId,
+          enrollmentId,
+          grantedByParticipantId: scope.admin.id,
+          grantedToScopeType: "institution",
+          grantedToScopeId: scope.home.id,
+          directions: ["family_to_org"],
+          dataClasses: ["daily_care_log"],
+          purposes,
+          status: "active",
+        },
+      });
+
+    const request = {
+      workspace_id: scope.workspaceId,
+      participant_ref: scope.admin.id,
+      care_group_ref: namedClass.id,
+      at,
+      purpose_key: "care_coordination",
+      direction: "family_to_org" as const,
+      data_class: "daily_care_log" as const,
+    };
+    const chainForClass = new NurtureInstitutionAuthorityChain(repository);
+
+    // A class with nobody in it is 0, reached without consulting any grant.
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "available",
+      value: 0,
+    });
+
+    const first = await seedChild(scope.workspaceId, "Counted A");
+    const firstEnrollment = await seedEnrollment(scope, first, namedClass.id);
+    const second = await seedChild(scope.workspaceId, "Counted B");
+    const secondEnrollment = await seedEnrollment(scope, second, namedClass.id);
+
+    // Population is non-empty and nobody has granted: refuse, never 0.
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "grant_missing",
+    });
+
+    await grantFor(first.process.id, firstEnrollment.id);
+    // One of two readable — still a refusal, and byte-identical to the
+    // refusal above, so the grant that was just added is not observable.
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "grant_missing",
+    });
+
+    await grantFor(second.process.id, secondEnrollment.id);
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "available",
+      value: 2,
+    });
+
+    // A child in another class of the same institution is not in this
+    // population, so their missing grant cannot refuse this class's count.
+    const outsider = await seedChild(scope.workspaceId, "Other Class Child");
+    await seedEnrollment(scope, outsider, otherClass.id);
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "available",
+      value: 2,
+    });
+
+    // An ended enrolment leaves the population: scope defines membership.
+    await prisma.nurtureEnrollment.update({
+      where: { id: secondEnrollment.id },
+      data: { status: "ended" },
+    });
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "available",
+      value: 1,
+    });
+
+    // A grant whose purpose does not cover the ask refuses the whole class,
+    // on the same axis a direct read would refuse.
+    const third = await seedChild(scope.workspaceId, "Counted C");
+    const thirdEnrollment = await seedEnrollment(scope, third, namedClass.id);
+    await grantFor(third.process.id, thirdEnrollment.id, ["safety_response"]);
+    await expect(chainForClass.aggregate(request, () => 1)).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "grant_missing",
+    });
+  });
 });

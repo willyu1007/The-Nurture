@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type {
   NurtureActorBinding,
+  NurtureAggregatePopulationMember,
   NurtureInstitutionContextRepository,
   NurtureParticipantFact,
   NurturePolicyFacts,
@@ -590,6 +591,85 @@ export class PrismaInstitutionContextRepository implements NurtureInstitutionCon
       actor_binding: binding,
       candidate: currentCandidate,
     };
+  }
+
+  /**
+   * G4-A increment 4 (0C-5 §5). The class's counted population with each
+   * member's grant facts.
+   *
+   * Population is scope, not protected fact: a current enrolment in that exact
+   * care group within that institution. `status = active` and `deletedAt IS
+   * NULL` is the lifecycle conjunction, which applies here because enrolment
+   * carries both fields.
+   *
+   * Grant currency is the other rule (0G finding 3) — status plus the
+   * effective window, no `deletedAt` — kept identical to `loadPolicyFacts` so
+   * a member cannot count as readable in the aggregate while denying on a
+   * direct read.
+   */
+  async loadAggregatePopulation(input: {
+    workspace_id: string;
+    institution_ref: string;
+    care_group_ref: string;
+    at: string;
+    limit: number;
+  }): Promise<NurtureAggregatePopulationMember[]> {
+    const at = new Date(input.at);
+    const enrollments = await this.prisma.nurtureEnrollment.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        institutionId: input.institution_ref,
+        careGroupId: input.care_group_ref,
+        status: "active",
+        deletedAt: null,
+      },
+      orderBy: { id: "asc" },
+      take: input.limit,
+    });
+    if (enrollments.length === 0) return [];
+
+    const grants = await this.prisma.nurtureChildLinkGrant.findMany({
+      where: {
+        workspaceId: input.workspace_id,
+        childCareProcessId: { in: enrollments.map((row) => row.childCareProcessId) },
+        deletedAt: null,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return enrollments.map((enrollment) => {
+      const scoped = grants.filter(
+        (grant) =>
+          grant.childCareProcessId === enrollment.childCareProcessId &&
+          ((grant.grantedToScopeType === "care_group" &&
+            grant.grantedToScopeId === enrollment.careGroupId) ||
+            (grant.grantedToScopeType === "institution" &&
+              grant.grantedToScopeId === enrollment.institutionId) ||
+            (grant.grantedToScopeType === "enrollment" &&
+              grant.grantedToScopeId === enrollment.id)),
+      );
+      const current = scoped.filter(
+        (grant) =>
+          grant.status === "active" &&
+          !grant.revokedAt &&
+          (!grant.effectiveFrom || grant.effectiveFrom <= at) &&
+          (!grant.expiresAt || grant.expiresAt > at),
+      );
+      const revoked = scoped.find((grant) => grant.status === "revoked" || grant.revokedAt);
+      return {
+        member_ref: enrollment.childCareProcessId,
+        grant_state: (current.length > 0
+          ? "active"
+          : revoked
+            ? "revoked"
+            : "missing") as NurturePolicyFacts["grant_state"],
+        grant_terms: current.map((grant) => ({
+          directions: grant.directions,
+          data_classes: grant.dataClasses,
+          purposes: grant.purposes,
+        })),
+      };
+    });
   }
 
   async loadPolicyFacts(input: NurturePolicyFactRequest): Promise<NurturePolicyFacts> {

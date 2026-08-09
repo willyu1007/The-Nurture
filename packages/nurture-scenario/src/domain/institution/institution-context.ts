@@ -142,6 +142,27 @@ export type NurtureInstitutionContextRepository = {
       }
   >;
   loadPolicyFacts(input: NurturePolicyFactRequest): Promise<NurturePolicyFacts>;
+  /**
+   * G4-A increment 4, for 0C-5 §5. The counted population of a class, with the
+   * grant facts each member's own enrolment resolves.
+   *
+   * The population comes from SCOPE — a current enrolment in that exact class
+   * within that institution — never from the protected facts. Its size is not
+   * the secret; what is gated is a fact class about each member.
+   */
+  loadAggregatePopulation(input: {
+    workspace_id: string;
+    institution_ref: string;
+    care_group_ref: string;
+    at: string;
+    limit: number;
+  }): Promise<NurtureAggregatePopulationMember[]>;
+};
+
+export type NurtureAggregatePopulationMember = {
+  member_ref: string;
+  grant_state: NurturePolicyFacts["grant_state"];
+  grant_terms: NurturePolicyFacts["grant_terms"];
 };
 
 export type NurturePolicyKey =

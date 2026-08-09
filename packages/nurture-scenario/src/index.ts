@@ -61,6 +61,7 @@ export * from "./domain/resolution/candidate-kernel.js";
 export * from "./domain/institution/institution-context.js";
 export * from "./domain/institution/institution-policy.js";
 export * from "./domain/institution/institution-authority-chain.js";
+export * from "./domain/institution/institution-aggregate.js";
 export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/board-mutation-transaction.js";

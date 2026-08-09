@@ -1,3 +1,8 @@
+import {
+  resolveAggregate,
+  type NurtureAggregateMember,
+  type NurtureAggregateResult,
+} from "./institution-aggregate.js";
 import type {
   NurtureActorBinding,
   NurtureCareRole,
@@ -375,7 +380,7 @@ export const activeRoleContextFrom = (
 export class NurtureInstitutionAuthorityChain {
   constructor(
     private readonly repository: NurtureInstitutionContextRepository,
-    private readonly options: { binding_limit?: number } = {},
+    private readonly options: { binding_limit?: number; population_limit?: number } = {},
   ) {}
 
   async resolve(request: NurtureAuthorityChainRequest): Promise<NurtureAuthorityChainResult> {
@@ -430,5 +435,57 @@ export class NurtureInstitutionAuthorityChain {
       continuity: {},
       policy_seed: { action_key: "nurture.institution_admin_scope" },
     };
+  }
+
+  /**
+   * G4-A increment 4 — an aggregate over a class, 0C-5 §5.
+   *
+   * The chain runs first and to the class level: an Admin who cannot reach the
+   * class gets the scope denial, not an aggregate verdict, so the aggregate
+   * never becomes a way to probe scope. Only then is the population read.
+   *
+   * `countFor` is passed through to `resolveAggregate`, which invokes it only
+   * after every member is admitted. No aggregate exists in the product yet —
+   * this is the path the class cards and roll-ups of G4-A and G4-B must use.
+   */
+  async aggregate(
+    request: NurtureAuthorityChainRequest & { care_group_ref: string },
+    countFor: (member: NurtureAggregateMember) => number,
+  ): Promise<NurtureAggregateResult | { status: "denied"; reason_code: NurturePolicyReasonCode }> {
+    // The scope question is asked WITHOUT the content axes: reaching the class
+    // is 0C-2/0C-3's decision, and the grant level belongs per member below.
+    const scope = await this.resolve({
+      workspace_id: request.workspace_id,
+      participant_ref: request.participant_ref,
+      ...(request.role_assignment_ref
+        ? { role_assignment_ref: request.role_assignment_ref }
+        : {}),
+      at: request.at,
+      ...(request.target ? { target: request.target } : {}),
+      ...(request.purpose_key ? { purpose_key: request.purpose_key } : {}),
+    });
+    if (scope.status === "denied") {
+      return { status: "denied", reason_code: scope.reason_code };
+    }
+    try {
+      const members = await this.repository.loadAggregatePopulation({
+        workspace_id: request.workspace_id,
+        institution_ref: scope.institution_scope.institution_ref,
+        care_group_ref: request.care_group_ref,
+        at: request.at,
+        limit: this.options.population_limit ?? 200,
+      });
+      return resolveAggregate(
+        members,
+        {
+          ...(request.direction ? { direction: request.direction } : {}),
+          ...(request.data_class ? { data_class: request.data_class } : {}),
+          ...(request.purpose_key ? { purpose_key: request.purpose_key } : {}),
+        },
+        countFor,
+      );
+    } catch {
+      return { status: "unavailable", reason_code: "policy_unavailable" };
+    }
   }
 }
