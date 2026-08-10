@@ -1092,3 +1092,24 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   database or public runtime was touched.
 - Detailed evidence: [`73`](./73-g4-e-i1-audit-qualification-record.md). E5
   I2-A public Surface artifact is next; Q2–Q4 still block E7/E8.
+
+## 2026-08-10 — G4-E I2-A public Surface artifact
+
+- Rotated the deterministic artifact to `nurture.surface-contract@1.20.0` /
+  `sha256:35d6340f…`, 65 capabilities and 6 unchanged surfaces. The shared core
+  remains `sha256:7bd8a82d…`.
+- Added one read-only Admin editor preview, one effectful online-answer action
+  and the five lifecycle actions. The answer lane is not a query because Host
+  generation replay and immutable conflict-candidate append are explicit I1
+  effects.
+- Public authoring carries bounded content/metadata plus opaque authority-
+  source option refs. Trusted scope, role, item head and source/provenance
+  snapshots stay in the later server adapter.
+- Quality review also routed the seven source-only descriptors out of the
+  historical T-006 runtime-producer censuses by their unique default-off gate;
+  it added no copied capability inventory or runtime placeholder.
+- Surface tooling/schema/conformance, full unit/typecheck and structural gates
+  pass. Manifest/module/formal ingress, database, owner/model/index runtime,
+  deployment, activation and traffic remain unchanged.
+- Detailed evidence: [`74`](./74-g4-e-i2-a-contract-artifact-record.md). E6
+  exact validators/presenters/adapters is next; Q2–Q4 still block E7/E8.

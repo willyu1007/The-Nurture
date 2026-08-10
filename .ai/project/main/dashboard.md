@@ -17,8 +17,8 @@ Project: `main`
   `REQUAL_PASS`; T-006/G3 is `done` at `0374087…` (merged `447e646`); T-003 is
   `done` after handing its presenter/action contracts to My-Chat T-036
   (D-T009-06). All three await separately approved archival.
-- Current Nurture surface identity: `nurture.surface-contract@1.19.0` /
-  `sha256:6f67d49c…` (shared core `sha256:7bd8a82d…` unchanged, 58 capabilities
+- Current Nurture surface identity: `nurture.surface-contract@1.20.0` /
+  `sha256:35d6340f…` (shared core `sha256:7bd8a82d…` unchanged, 65 capabilities
   / 6 surfaces). I2-A added the default-off Enrollment Journey wire boundary;
   I2-B adds fail-closed adapters without changing that artifact. The external
   My-Chat pin remains a stated G-09 adoption gate; it was not floated or copied
@@ -45,7 +45,8 @@ Project: `main`
   strict claims/citations, deterministic safety/final-currentness and one
   immutable fifth-table candidate. E4 now qualifies the combined private I1
   through all 35 migrations and 391/391 DB tests on a destroyed disposable
-  target. E5 I2-A is next; I3 waits for exact external owner/safety adoption.
+  target. E5 now adds the source-only seven-capability Knowledge wire artifact;
+  E6 default-off adapters are next. I3 waits for exact external owner/safety adoption.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -54,9 +55,9 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Execute G4-E roadmap E5.** Publish the exact additive Knowledge Surface
-   artifact and fixtures without adding a caller; E6 default-off adapters
-   follow only after the E5 quality/commit boundary.
+1. **Execute G4-E roadmap E6.** Map all seven Knowledge descriptors through
+   exact validators/presenters/I1 adapters behind one disabled runtime gate;
+   do not add a formal caller.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.

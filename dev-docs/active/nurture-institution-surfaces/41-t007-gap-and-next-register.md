@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A Surface artifact next** | [`64`](./64-g4-0f-scope-freeze.md)–[`73`](./73-g4-e-i1-audit-qualification-record.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A exact public wire artifact; I2-B next** | [`64`](./64-g4-0f-scope-freeze.md)–[`74`](./74-g4-e-i2-a-contract-artifact-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -36,8 +36,8 @@ currentness bridge and cited-answer/safety/conflict-candidate contract. The 0G
 audit removes candidate-as-hold and lifecycle-command ambiguity, and 0F exits
 with `G4_0F_EXIT_PASS`. G4-E now has private lifecycle/provenance,
 retrieval/currentness/preview and answer-safety/conflict-candidate domain plus
-five tables qualified on a destroyed disposable PostgreSQL target. It still
-has no public Surface, real model/
+five tables qualified on a destroyed disposable PostgreSQL target. E5 adds the
+exact source-only `1.20.0` public wire artifact; it still has no caller, real model/
 safety owner binding, Host index runtime, formal ingress, activation or traffic.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
@@ -259,8 +259,10 @@ model, safety provider, Surface or candidate lifecycle is bound.
 [`73`](./73-g4-e-i1-audit-qualification-record.md) closes E4/Q1 after real
 PostgreSQL repaired the first-publication nullable CAS and stale conditional
 export path. All 35 migrations, the 43-file DB lane, current status, zero drift
-and destroyed-target evidence pass. E5/E6 must now add the exact public
-contract and default-off adapters. I3/I4 remain closed on the adopted My-Chat
+and destroyed-target evidence pass. [`74`](./74-g4-e-i2-a-contract-artifact-record.md)
+now adds the exact seven-capability I2-A artifact without a caller: one
+read-only preview, one effectful answer action and five lifecycle actions.
+E6 must now add the default-off adapters. I3/I4 remain closed on the adopted My-Chat
 scenario deltas and deterministic answer-safety owner/rule pin; synthetic
 compatibility mappings cannot close them.
 
@@ -293,9 +295,9 @@ compatibility mappings cannot close them.
 
 ## Next steps, in dependency order
 
-1. **G4-E I2-A/I2-B** — rotate the exact additive Knowledge Surface artifact,
-   then map every descriptor to the qualified private I1 behavior behind one
-   explicit default-off gate. Do not add a caller or compatibility owner.
+1. **G4-E I2-B** — map each of the seven I2-A descriptors to one qualified
+   private I1 behavior behind the explicit default-off gate. Preserve answer
+   as an effectful action and do not add a caller or compatibility owner.
 2. **G4-E I3/I4** — only after Q2–Q4 adopt the exact My-Chat scenario deltas,
    deterministic safety owner/rule pin and sibling-repository authority, bind
    real owners/formal ingress and run joint conformance/Exit.

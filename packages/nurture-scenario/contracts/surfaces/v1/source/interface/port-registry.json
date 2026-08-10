@@ -39,6 +39,12 @@
       "requiredGate": "owner_integration"
     },
     {
+      "key": "institution_knowledge_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "owner_integration"
+    },
+    {
       "key": "enrollment_journey_repository",
       "version": "1.0.0",
       "owner": "nurture",
@@ -638,6 +644,48 @@
         },
         {
           "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "institution_knowledge_action_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "institution_knowledge_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "institution_knowledge_answer_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "institution_knowledge_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "institution_knowledge_preview_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "institution_knowledge_repository",
           "version": "1.0.0"
         }
       ]

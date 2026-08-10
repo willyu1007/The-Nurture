@@ -123,7 +123,7 @@ describe("G4-D I2-A enrollment journey wire contract", () => {
   it("rotates one exact contract with the complete I1 query and command inventory", () => {
     expect(capabilityRegistry.contract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.19.0",
+      version: "1.20.0",
     });
     expect(capabilities.map((capability) => capability.capabilityKey).sort()).toEqual(
       [...I2_A_KEYS].sort(),

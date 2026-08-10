@@ -168,6 +168,23 @@
       }
     },
     {
+      "caseKey": "institution-knowledge-i2-a-wire-contract",
+      "kind": "visibility",
+      "covers": [
+        "capability:create_institution_knowledge_item",
+        "capability:create_institution_knowledge_revision",
+        "capability:publish_institution_knowledge_revision",
+        "capability:answer_institution_knowledge",
+        "capability:query_institution_knowledge_preview",
+        "capability:record_institution_knowledge_review",
+        "capability:revoke_institution_knowledge_revision"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-6-institution-knowledge-contract.test.ts"
+      }
+    },
+    {
       "caseKey": "enrollment-journey-i2-a-wire-contract",
       "kind": "visibility",
       "covers": [

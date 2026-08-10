@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/institution-knowledge-operations.schema.json",
+  "title": "InstitutionKnowledgeOperationsV1",
+  "$defs": {
+    "previewInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revisionOptionRefs"
+      ],
+      "properties": {
+        "revisionOptionRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+          }
+        }
+      }
+    },
+    "previewResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "options"
+      ],
+      "properties": {
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "institution-knowledge-types.schema.json#/$defs/previewOption"
+          }
+        }
+      }
+    },
+    "answerInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question"
+      ],
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "ageBandKeys": {
+          "$ref": "institution-knowledge-types.schema.json#/$defs/tokenList"
+        },
+        "scenarioKeys": {
+          "$ref": "institution-knowledge-types.schema.json#/$defs/tokenList"
+        }
+      }
+    },
+    "answeredResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "contractVersion",
+        "generationRef",
+        "generatedAt",
+        "assistanceKind",
+        "claims",
+        "citations"
+      ],
+      "properties": {
+        "status": { "const": "answered" },
+        "contractVersion": { "const": "1.0.0" },
+        "generationRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "assistanceKind": { "const": "ai_generated_with_retrieved_sources" },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "institution-knowledge-types.schema.json#/$defs/claim"
+          }
+        },
+        "citations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "institution-knowledge-types.schema.json#/$defs/citation"
+          }
+        },
+        "safetyNotice": {
+          "$ref": "institution-knowledge-types.schema.json#/$defs/safetyNotice"
+        }
+      }
+    },
+    "emptyAbstentionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "contractVersion"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "abstained_no_source",
+            "abstained_source_changed"
+          ]
+        },
+        "contractVersion": { "const": "1.0.0" }
+      }
+    },
+    "conflictAbstentionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "contractVersion",
+        "conflicts",
+        "citations",
+        "safetyNotice"
+      ],
+      "properties": {
+        "status": { "const": "abstained_medical_conflict" },
+        "contractVersion": { "const": "1.0.0" },
+        "conflicts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "institution-knowledge-types.schema.json#/$defs/conflict"
+          }
+        },
+        "citations": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 16,
+          "items": {
+            "$ref": "institution-knowledge-types.schema.json#/$defs/citation"
+          }
+        },
+        "safetyNotice": {
+          "$ref": "institution-knowledge-types.schema.json#/$defs/safetyNotice"
+        }
+      }
+    },
+    "safetyAbstentionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "contractVersion",
+        "reasonCodes",
+        "safetyNotice"
+      ],
+      "properties": {
+        "status": { "const": "abstained_safety" },
+        "contractVersion": { "const": "1.0.0" },
+        "reasonCodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "institution-knowledge-types.schema.json#/$defs/safetyReason"
+          }
+        },
+        "safetyNotice": {
+          "$ref": "institution-knowledge-types.schema.json#/$defs/safetyNotice"
+        }
+      }
+    },
+    "answerResult": {
+      "oneOf": [
+        { "$ref": "#/$defs/answeredResult" },
+        { "$ref": "#/$defs/emptyAbstentionResult" },
+        { "$ref": "#/$defs/conflictAbstentionResult" },
+        { "$ref": "#/$defs/safetyAbstentionResult" }
+      ]
+    }
+  }
+}

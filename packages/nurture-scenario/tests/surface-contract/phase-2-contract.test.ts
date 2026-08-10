@@ -88,6 +88,13 @@ const expectedCapabilityVersions: Record<string, string> = {
   propose_formal_enrollment: "1.0.0",
   formalize_enrollment: "1.0.0",
   end_trial: "1.0.0",
+  create_institution_knowledge_item: "1.0.0",
+  create_institution_knowledge_revision: "1.0.0",
+  publish_institution_knowledge_revision: "1.0.0",
+  answer_institution_knowledge: "1.0.0",
+  query_institution_knowledge_preview: "1.0.0",
+  record_institution_knowledge_review: "1.0.0",
+  revoke_institution_knowledge_revision: "1.0.0",
 };
 
 const expectedCapabilityKeys = Object.keys(expectedCapabilityVersions).sort();
@@ -108,10 +115,10 @@ const manifest = loadSurfaceContractManifest(
 );
 
 describe("Phase 2 exact surface contract", () => {
-  it("loads one exact, closed manifest with fifty-eight capabilities and six surfaces", () => {
+  it("loads one exact, closed manifest with sixty-five capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.19.0",
+      version: "1.20.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -352,7 +359,7 @@ describe("Phase 2 exact surface contract", () => {
     const queries = manifest.capabilities
       .map((entry) => entry.descriptor)
       .filter((descriptor) => descriptor.executionClass === "query");
-    expect(queries).toHaveLength(12);
+    expect(queries).toHaveLength(13);
     for (const descriptor of queries) {
       expect(descriptor.confirmationPolicy).toBe("none");
       expect(descriptor.deliveryClass).toBe("none");
@@ -857,15 +864,17 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "policy_redact_family_care_message",
   ];
 
-  // Enrollment Journey specs predate this board-write factory census and are
-  // bound one-for-one by the dedicated I2-B adapter suite. Derive that exact
-  // group from its unique gate instead of copying its inventory here.
-  const I2_B_BOUND_SPECS = manifest.capabilities
+  // Enrollment Journey I2-B and Institution Knowledge I2-A are owned by their
+  // dedicated suites, not this historical board-write factory census. Derive
+  // both groups from their unique gates instead of copying their inventories.
+  const SEPARATELY_QUALIFIED_SPECS = manifest.capabilities
     .filter(
       (entry) =>
         entry.descriptor.executionClass !== "query" &&
         entry.descriptor.dependencyGates.some(
-          (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+          (gate) =>
+            gate.dependencyKey === "t007_enrollment_journey_runtime" ||
+            gate.dependencyKey === "t007_institution_knowledge_runtime",
         ) &&
         entry.descriptor.concurrencyPolicy.headBindings.some(
           (binding) => binding.mode === "must_equal",
@@ -952,7 +961,7 @@ describe("board write commands conform to the registry's concurrency policy", ()
       if (
         specKeys.has(key) ||
         HAND_BUILT_SPECS.includes(key) ||
-        I2_B_BOUND_SPECS.includes(key)
+        SEPARATELY_QUALIFIED_SPECS.includes(key)
       ) continue;
       expect(
         MUST_EQUAL_WITHOUT_SPEC,
@@ -966,7 +975,7 @@ describe("board write commands conform to the registry's concurrency policy", ()
         false,
       );
     }
-    for (const key of I2_B_BOUND_SPECS) {
+    for (const key of SEPARATELY_QUALIFIED_SPECS) {
       expect(specKeys.has(key), `${key} must stay outside the T-006 factory census`).toBe(false);
       expect(mustEqualKeys, `${key} must retain its registered equality head`).toContain(key);
     }

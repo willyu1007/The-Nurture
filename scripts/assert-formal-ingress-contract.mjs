@@ -280,15 +280,19 @@ const registeredQueryKeys = new Set(
     .filter((capability) => capability.executionClass === "query")
     .map((capability) => capability.capabilityKey),
 );
-// I2-B's exact inventory is owned by the dedicated contract suite. Formal
-// ingress derives the still-unrouted set from its unique default-off gate so a
-// second hand-maintained 24-key list cannot drift.
+// Each I2 artifact's exact inventory is owned by its dedicated contract suite.
+// Formal ingress derives the still-unrouted set from the artifact's unique
+// default-off runtime gate so a second hand-maintained key list cannot drift.
+const explicitlyUnroutedRuntimeGates = new Set([
+  "t007_enrollment_journey_runtime",
+  "t007_institution_knowledge_runtime",
+]);
 const expectedUnroutedCapabilityKeys = [
   ...explicitlyUnroutedCapabilityKeys,
   ...capabilityRegistry.capabilities
     .filter((capability) =>
       capability.dependencyGates?.some(
-        (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+        (gate) => explicitlyUnroutedRuntimeGates.has(gate.dependencyKey),
       ),
     )
     .map((capability) => capability.capabilityKey),

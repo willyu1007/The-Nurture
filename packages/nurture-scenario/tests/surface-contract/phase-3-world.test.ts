@@ -268,7 +268,7 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.19.0");
+    expect(contract.version).toBe("1.20.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );
@@ -282,7 +282,7 @@ describe("Phase 3 synthetic world", () => {
     for (const [key, hash] of frozenCapabilitySliceHashes) {
       expect(capabilityHashes.get(key), key).toBe(hash);
     }
-    expect(capabilityHashes.size).toBe(frozenCapabilitySliceHashes.length + 24);
+    expect(capabilityHashes.size).toBe(frozenCapabilitySliceHashes.length + 31);
 
     // I2-A intentionally rotates the two Guardian slices to admit their exact
     // Workflow write class. Caregiver and Institution slice evidence remains

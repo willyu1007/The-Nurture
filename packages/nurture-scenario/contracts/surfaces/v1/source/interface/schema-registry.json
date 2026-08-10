@@ -432,6 +432,56 @@
       "jsonPointer": "/$defs/visitInput"
     },
     {
+      "schemaRef": "schema:nurture.create-institution-knowledge-item-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-actions.schema.json",
+      "jsonPointer": "/$defs/createItemInput"
+    },
+    {
+      "schemaRef": "schema:nurture.create-institution-knowledge-revision-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-actions.schema.json",
+      "jsonPointer": "/$defs/createRevisionInput"
+    },
+    {
+      "schemaRef": "schema:nurture.institution-knowledge-action-result@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-actions.schema.json",
+      "jsonPointer": "/$defs/actionResult"
+    },
+    {
+      "schemaRef": "schema:nurture.publish-institution-knowledge-revision-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-actions.schema.json",
+      "jsonPointer": "/$defs/publishInput"
+    },
+    {
+      "schemaRef": "schema:nurture.answer-institution-knowledge-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-operations.schema.json",
+      "jsonPointer": "/$defs/answerInput"
+    },
+    {
+      "schemaRef": "schema:nurture.answer-institution-knowledge-result@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-operations.schema.json",
+      "jsonPointer": "/$defs/answerResult"
+    },
+    {
+      "schemaRef": "schema:nurture.query-institution-knowledge-preview-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-operations.schema.json",
+      "jsonPointer": "/$defs/previewInput"
+    },
+    {
+      "schemaRef": "schema:nurture.query-institution-knowledge-preview-result@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-operations.schema.json",
+      "jsonPointer": "/$defs/previewResult"
+    },
+    {
+      "schemaRef": "schema:nurture.record-institution-knowledge-review-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-actions.schema.json",
+      "jsonPointer": "/$defs/reviewInput"
+    },
+    {
+      "schemaRef": "schema:nurture.revoke-institution-knowledge-revision-input@1",
+      "artifactPath": "capabilities/contracts/institution-knowledge-actions.schema.json",
+      "jsonPointer": "/$defs/revokeInput"
+    },
+    {
       "schemaRef": "schema:nurture.withdraw-family-care-request-input@1",
       "artifactPath": "capabilities/contracts/withdraw-family-care-request.schema.json",
       "jsonPointer": "/$defs/input"

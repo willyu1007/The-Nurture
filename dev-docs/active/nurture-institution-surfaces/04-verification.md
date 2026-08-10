@@ -734,6 +734,23 @@ Detailed evidence: [`72`](./72-g4-e-increment-3-record.md).
 Detailed evidence: [`73`](./73-g4-e-i1-audit-qualification-record.md) and
 [`artifacts/db/g4e-i1-qualification`](./artifacts/db/g4e-i1-qualification/).
 
+## 2026-08-10 — G4-E I2-A public Surface artifact
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | [`74`](./74-g4-e-i2-a-contract-artifact-record.md) records effectful-answer classification, trusted source-snapshot exclusion, historical census routing and neutral operation-schema naming repairs. |
+| Exact artifact | PASS | `nurture.surface-contract@1.20.0` rebuilds at `sha256:35d6340f…` / manifest `sha256:4b75c648…`, 65 capabilities / 6 surfaces; shared core remains `sha256:7bd8a82d…`. |
+| I2-A boundary | PASS | Dedicated phase-6 suite 9/9 covers the exact seven descriptors, one query/six effectful actions, Admin/Workbench-only presentation, private prepared heads, trusted-input exclusion, closed lifecycle effects and absent caller/runtime. |
+| Synthetic Surface Contract | PASS | Tooling 5/5; 61 schemas and 35 fixtures validate; Vitest 139/139 across 14 files; 19 conformance cases cover 80/80 slices with seven negatives. Owner Integration remains NO-GO and Joint Conformance was not run. |
+| Full unit lane | PASS | `pnpm test:unit`: 944/944 across 85 files. |
+| TypeScript | PASS after repair | Root direct `tsc --noEmit` and scenario package typecheck pass after removing one unused test census left by the effectful-answer repair. |
+| Structural gates | PASS after repair | Test routing 155 files (85 unit / 43 DB / 11 dev-host / 14 scenario-service / 2 joint); persistence, port topology, formal ingress, G2 exit/census and G3 freeze pass. Formal ingress explicitly retains 32 default-off descriptors, including the seven E5 keys. |
+| Generic owner pin | PASS | Eight committed My-Chat Knowledge/RAG source files remain exact at `567b96c` / `554e79d4…`; observed checkout drift is informational and no adoption is claimed. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 126/126 with zero warnings; Context, project-state, governance sync/lint and `git diff --check` pass. |
+| Runtime / DB effect | NOT RUN / PASS | `scenario.manifest.yaml` and `src/module.ts` are unchanged. No DB connection/write, provider/model/index, formal caller, deployment, activation or traffic occurred. |
+
+Detailed evidence: [`74`](./74-g4-e-i2-a-contract-artifact-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

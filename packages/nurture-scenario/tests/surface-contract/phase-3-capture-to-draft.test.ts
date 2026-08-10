@@ -228,6 +228,16 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
           entry.capabilityKey,
           "dev-docs/active/nurture-institution-surfaces/63-g4-d-i2-b-surface-adapter-record.md",
         ] as const),
+      ...manifest.capabilities
+        .filter((entry) =>
+          entry.descriptor.dependencyGates.some(
+            (gate) => gate.dependencyKey === "t007_institution_knowledge_runtime",
+          ),
+        )
+        .map((entry) => [
+          entry.capabilityKey,
+          "dev-docs/active/nurture-institution-surfaces/74-g4-e-i2-a-contract-artifact-record.md",
+        ] as const),
     ]);
     for (const entry of manifest.capabilities) {
       if (preG3Keys.has(entry.capabilityKey)) continue;

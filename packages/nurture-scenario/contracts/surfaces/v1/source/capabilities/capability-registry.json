@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.19.0"
+    "version": "1.20.0"
   },
   "capabilities": [
     {
@@ -4654,6 +4654,529 @@
         },
         {
           "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "query_institution_knowledge_preview",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "query_institution_knowledge_preview"
+      ],
+      "inputSchemaRef": "schema:nurture.query-institution-knowledge-preview-input@1",
+      "resultSchemaRef": "schema:nurture.query-institution-knowledge-preview-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "exact_bound",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "knowledge_preview_options",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_knowledge_preview_options",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_preview_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_institution_knowledge_preview",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "answer_institution_knowledge",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "answer_institution_knowledge"
+      ],
+      "inputSchemaRef": "schema:nurture.answer-institution-knowledge-input@1",
+      "resultSchemaRef": "schema:nurture.answer-institution-knowledge-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "exact_bound",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "knowledge_source_currentness",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_knowledge_sources",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_answer_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "answer_institution_knowledge",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "create_institution_knowledge_item",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "create_institution_knowledge_item"
+      ],
+      "inputSchemaRef": "schema:nurture.create-institution-knowledge-item-input@1",
+      "resultSchemaRef": "schema:nurture.institution-knowledge-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "exact_bound",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "append_compatible",
+        "headBindings": [
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "create_institution_knowledge_item",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "collection",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "create_institution_knowledge_revision",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "create_institution_knowledge_revision"
+      ],
+      "inputSchemaRef": "schema:nurture.create-institution-knowledge-revision-input@1",
+      "resultSchemaRef": "schema:nurture.institution-knowledge-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "knowledge_item_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "create_institution_knowledge_revision",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "collection",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "record_institution_knowledge_review",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "record_institution_knowledge_review"
+      ],
+      "inputSchemaRef": "schema:nurture.record-institution-knowledge-review-input@1",
+      "resultSchemaRef": "schema:nurture.institution-knowledge-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "knowledge_item_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "record_institution_knowledge_review",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "publish_institution_knowledge_revision",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "publish_institution_knowledge_revision"
+      ],
+      "inputSchemaRef": "schema:nurture.publish-institution-knowledge-revision-input@1",
+      "resultSchemaRef": "schema:nurture.institution-knowledge-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "knowledge_item_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "publish_institution_knowledge_revision",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "revoke_institution_knowledge_revision",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "action_execution",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "revoke_institution_knowledge_revision"
+      ],
+      "inputSchemaRef": "schema:nurture.revoke-institution-knowledge-revision-input@1",
+      "resultSchemaRef": "schema:nurture.institution-knowledge-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "knowledge_item_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_knowledge_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "revoke_institution_knowledge_revision",
+        "bindingKind": "action"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_institution_knowledge_runtime",
           "minimumVersion": "1.0.0",
           "requiredGate": "owner_integration"
         }

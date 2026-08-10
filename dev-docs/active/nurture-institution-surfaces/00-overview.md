@@ -6,7 +6,7 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **execute roadmap E5, the G4-E I2-A public Surface artifact;
+- Next step: **execute roadmap E6, the G4-E I2-B default-off Surface adapters;
   after G-09 and exact Q2–Q4 owner/safety adoption, G4-D/G4-E I3 may proceed
   independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
@@ -42,7 +42,7 @@
   with `G4_E_I1_PASS_QUALIFIED`: all 35 migrations, targeted/full PostgreSQL,
   status/drift and exact destroyed-target checks pass
   ([`73`](./73-g4-e-i1-audit-qualification-record.md)). I2-A
-  rotated the exact public wire artifact to
+  for G4-D rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,
   owner evidence, private Workflow refs or caller-supplied heads
@@ -54,8 +54,12 @@
   source and authenticated My-Chat owner adapters remain I3 work blocked by
   G-09. All three 0F unit contracts, their 0G audit and branch Exit pass. E1
   through E4 remain private/default-off: no model call, indexing, public
-  capability, activation or traffic, and the only G4-E DB operation was the
-  destroyed disposable qualification.
+  caller, activation or traffic, and the only G4-E DB operation was the
+  destroyed disposable qualification. G4-E E5 now rotates the additive
+  Institution Knowledge wire artifact to `nurture.surface-contract@1.20.0` /
+  `sha256:35d6340f…` with one read-only preview, one effectful answer action and
+  five lifecycle actions ([`74`](./74-g4-e-i2-a-contract-artifact-record.md)).
+  All seven remain source-only behind one unqualified runtime gate.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered

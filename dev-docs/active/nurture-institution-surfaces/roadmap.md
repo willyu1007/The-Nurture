@@ -23,7 +23,11 @@
   [`73`](./73-g4-e-i1-audit-qualification-record.md). All 35 migrations,
   targeted/full PostgreSQL lanes, status/drift and destroyed-target evidence
   pass on the exact approved disposable target.
-- Current node: E5 I2-A public Surface Contract.
+- E5 I2-A Surface Contract: `G4_E_I2_A_CONTRACT_QUALIFIED`; see
+  [`74`](./74-g4-e-i2-a-contract-artifact-record.md). The exact additive
+  `1.20.0` artifact exposes one preview query, one effectful answer action and
+  five lifecycle actions without a caller.
+- Current node: E6 I2-B default-off Surface adapters.
 - I3/I4 gates Q2–Q4 remain unresolved; no compatibility fallback is allowed.
 
 ## Planning-mode context and merge policy

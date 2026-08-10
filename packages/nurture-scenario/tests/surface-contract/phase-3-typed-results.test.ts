@@ -717,11 +717,13 @@ const POST_G3_FREEZE_ONLY_KEYS = new Map([
  * into this historical T-006 producer census would create a second runtime
  * inventory with the wrong dependency boundary.
  */
-const enrollmentJourneyI2BSeparateRuntimeKeys = new Set(
+const separateT007RuntimeKeys = new Set(
   manifest.capabilities
     .filter((entry) =>
       entry.descriptor.dependencyGates.some(
-        (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+        (gate) =>
+          gate.dependencyKey === "t007_enrollment_journey_runtime" ||
+          gate.dependencyKey === "t007_institution_knowledge_runtime",
       ),
     )
     .map((entry) => entry.capabilityKey),
@@ -733,7 +735,7 @@ const t006Keys = manifest.capabilities
     (key) =>
       !PRE_G3_KEYS.has(key) &&
       !POST_G3_FREEZE_ONLY_KEYS.has(key) &&
-      !enrollmentJourneyI2BSeparateRuntimeKeys.has(key),
+      !separateT007RuntimeKeys.has(key),
   );
 
 /**

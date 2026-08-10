@@ -50,7 +50,7 @@ const capability = capabilityRegistry.capabilities.find(
 
 describe("G4-0C-4 institution communication review capability", () => {
   it("is registered at the rotated contract version", () => {
-    expect(capabilityRegistry.contract.version).toBe("1.19.0");
+    expect(capabilityRegistry.contract.version).toBe("1.20.0");
     expect(capability).toBeDefined();
     expect(capability?.capabilityVersion).toBe("1.0.0");
   });
