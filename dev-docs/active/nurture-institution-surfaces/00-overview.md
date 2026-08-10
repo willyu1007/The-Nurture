@@ -6,8 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **execute roadmap E1, the G4-E I1.1 0F-1 pure
-  domain/persistence increment;
+- Next step: **execute roadmap E2, the G4-E I1.2 0F-2 pure
+  retrieval/currentness increment;
   after G-09 adoption, G4-D I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
@@ -26,7 +26,10 @@
   `G4_0F_EXIT_PASS`, opening G4-E I1 only
   ([`69`](./69-g4-0f-exit-record.md)). The macro sequence, per-node quality
   gates and I3 external/DB prerequisites are fixed in
-  [`roadmap.md`](./roadmap.md). I2-A
+  [`roadmap.md`](./roadmap.md). E1 now implements the strict private lifecycle,
+  sealed revision/provenance facts, exact-replay commands and four-table
+  unapplied migration artifact with `G4_E_I1_1_PASS_STATIC`
+  ([`70`](./70-g4-e-increment-1-record.md)); no database was touched. I2-A
   rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,
@@ -37,9 +40,9 @@
   ([`63`](./63-g4-d-i2-b-surface-adapter-record.md)). Every descriptor remains
   behind the unqualified Enrollment Journey runtime gate. Real contact/native-
   source and authenticated My-Chat owner adapters remain I3 work blocked by
-  G-09. All three 0F unit contracts, their 0G audit and branch Exit pass. The
-  records create no knowledge aggregate, model call, indexing, database
-  operation, activation or traffic.
+  G-09. All three 0F unit contracts, their 0G audit and branch Exit pass. E1
+  creates private source/schema/migration artifacts only: no model call,
+  indexing, database operation, public capability, activation or traffic.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
@@ -53,7 +56,9 @@
   formalization persistence slices are qualified on
   disposable PostgreSQL. Nothing has a
   production caller, no runtime capability is registered, and no schema is applied
-  anywhere durable. 0C, 0D and all four 0E persistence slices are therefore
+  anywhere durable. G4-E's four-table lifecycle migration is statically
+  qualified but has not run even on a disposable target. 0C, 0D and all four
+  0E persistence slices are therefore
   validated as *buildable as frozen*, not as running. The 24 descriptors and
   two fail-closed internal adapter lanes are default-off and do not change that
   runtime posture.

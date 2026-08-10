@@ -667,6 +667,23 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Docs / context / governance | PASS | Strict task-doc lint passes 116/116 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
 | Runtime / DB effect | NOT RUN / PASS | Planning/docs only. No application source, config, Prisma, migration, DB, owner, model, capability, activation or traffic effect. |
 
+## 2026-08-10 — G4-E increment 1 lifecycle/provenance
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | [`70`](./70-g4-e-increment-1-record.md) records closed concurrency, publication-pointer, history completeness, DB event-binding, date and redundant-state findings. |
+| Targeted lifecycle/command/static | PASS | 10/10 covers closed shapes, provenance hash, stale head/role denial, older-publication/new-draft, publish/revoke, denial-before-seal, exact replay, protected-content failure and four-table artifact boundaries. |
+| Full unit lane | PASS | `pnpm test:unit`: 911/911 across 82 files. |
+| TypeScript | PASS | Root `pnpm typecheck` plus scenario/DB package checks. |
+| Prisma SSOT | PASS statically | Format, validate, generate and old-to-new datamodel diff show three additive enums/four tables; DB context checksum `d38ed5ac…` refreshed. |
+| Structural gates | PASS | Persistence, port topology, 151-file test routing, formal ingress, G2 contracts/census and updated G3 persisted-table census. |
+| Authority/privacy/replay | PASS | Current explicit Admin/Institution before aggregate/seal, bounded complete history, body-free result/events, exact ledger replay and no child/family/model fields. |
+| Generic owner / LLM boundary | PASS with existing warning | Eight-file My-Chat pin remains `567b96c` / `554e79d4…`; zero in-scope LLM config keys. Template registry warning is unchanged and no model/provider code exists. |
+| Context / governance / diff | PASS | Strict Context, project-state, task/project governance and `git diff --check`. |
+| PostgreSQL / effect boundary | NOT RUN / PASS | No G4-E disposable target is approved. Migration remains unapplied; no DB connection/write, model/index/source, Surface, deployment, activation or traffic occurred. |
+
+Detailed evidence: [`70`](./70-g4-e-increment-1-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

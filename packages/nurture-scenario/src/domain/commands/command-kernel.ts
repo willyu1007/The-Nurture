@@ -17,6 +17,7 @@ import type { NurtureEnrollmentJourneyTransaction } from "../institution/enrollm
 import type { NurtureEnrollmentWaitlistTransaction } from "../institution/enrollment-waitlist.js";
 import type { NurtureEnrollmentTrialLifecycleTransaction } from "../institution/enrollment-trial-lifecycle.js";
 import type { NurtureEnrollmentFormalizationTransaction } from "../institution/enrollment-formalization.js";
+import type { NurtureInstitutionKnowledgeTransaction } from "../institution/institution-knowledge-commands.js";
 import type { NurtureInteractionContextTransactionPort } from "../interactions/interaction-context.js";
 import {
   buildNurtureHandoffRequestSnapshots,
@@ -94,6 +95,8 @@ export type NurtureCommandTransaction = {
   enrollmentTrialLifecycle?: NurtureEnrollmentTrialLifecycleTransaction;
   /** Present when the G4-D formal proposal completion owner is wired. */
   enrollmentFormalization?: NurtureEnrollmentFormalizationTransaction;
+  /** Present when the G4-E Institution Knowledge lifecycle owner is wired. */
+  institutionKnowledge?: NurtureInstitutionKnowledgeTransaction;
   /** Present when the G2 Harness confirmation consumer is wired. */
   interactionContexts?: NurtureInteractionContextTransactionPort;
   findCommitted(input: {

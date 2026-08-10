@@ -875,6 +875,31 @@ enum NurtureInstitutionWorkflowTerminalOutcome {
   trial_ended
 }
 
+enum NurtureInstitutionKnowledgeCategory {
+  child_communication_development
+  daily_care_safety
+  institution_policy
+  activity_resource
+  guardian_communication
+  basic_health_first_aid
+}
+
+enum NurtureInstitutionKnowledgeSafetyClass {
+  general_guidance
+  care_safety
+  basic_health_first_aid
+}
+
+enum NurtureInstitutionKnowledgeRevisionEventType {
+  revision_created
+  revision_superseded
+  reviewed
+  changes_requested
+  published
+  publication_superseded
+  revoked
+}
+
 enum NurtureEnrollmentJourneyMilestone {
   inquiry_started
   intent_confirmed
@@ -1827,8 +1852,10 @@ model NurtureParticipant {
   principalBindings               NurtureParticipantPrincipalBinding[]
   c30PairOperations               NurtureC30PairOperation[]
   c30ActionOperations             NurtureC30ActionOperation[]
-  c30ProtectedContentCreated      NurtureC30ProtectedContent[]         @relation("NurtureC30ProtectedContentCreator")
-  c30ProtectedContentTransitioned NurtureC30ProtectedContent[]         @relation("NurtureC30ProtectedContentTransitionActor")
+  c30ProtectedContentCreated      NurtureC30ProtectedContent[]               @relation("NurtureC30ProtectedContentCreator")
+  c30ProtectedContentTransitioned NurtureC30ProtectedContent[]               @relation("NurtureC30ProtectedContentTransitionActor")
+  institutionKnowledgeRevisions   NurtureInstitutionKnowledgeRevision[]      @relation("NurtureKnowledgeRevisionAuthor")
+  institutionKnowledgeEvents      NurtureInstitutionKnowledgeRevisionEvent[] @relation("NurtureKnowledgeEventActor")
 
   @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
   @@map("nurture_participant")
@@ -2242,20 +2269,24 @@ model NurtureCareInstitution {
   updatedAt              DateTime                     @updatedAt @map("updated_at")
   deletedAt              DateTime?                    @map("deleted_at")
 
-  careGroups                  NurtureCareGroup[]
-  enrollments                 NurtureEnrollment[]
-  scheduleTemplates           NurtureClassScheduleTemplate[]
-  mediaAssets                 NurtureMediaAssetRef[]
-  publicationPolicies         NurtureInstitutionPublicationPolicy[]
-  attendanceCloseoutPolicies  NurtureAttendanceCloseoutPolicy[]
-  supportSignalPolicies       NurtureInstitutionSupportSignalPolicy[]
-  institutionWorkflows        NurtureInstitutionWorkflow[]
-  enrollmentWaitlistPolicies  NurtureEnrollmentWaitlistPolicy[]
-  enrollmentWaitlistEntries   NurtureEnrollmentWaitlistEntry[]
-  enrollmentWaitlistOverrides NurtureEnrollmentWaitlistOverride[]
-  enrollmentTrialOffers       NurtureEnrollmentTrialOffer[]
-  enrollmentTrialReservations NurtureEnrollmentTrialReservation[]
-  enrollmentFormalProposals   NurtureEnrollmentFormalProposal[]
+  careGroups                         NurtureCareGroup[]
+  enrollments                        NurtureEnrollment[]
+  scheduleTemplates                  NurtureClassScheduleTemplate[]
+  mediaAssets                        NurtureMediaAssetRef[]
+  publicationPolicies                NurtureInstitutionPublicationPolicy[]
+  attendanceCloseoutPolicies         NurtureAttendanceCloseoutPolicy[]
+  supportSignalPolicies              NurtureInstitutionSupportSignalPolicy[]
+  institutionWorkflows               NurtureInstitutionWorkflow[]
+  enrollmentWaitlistPolicies         NurtureEnrollmentWaitlistPolicy[]
+  enrollmentWaitlistEntries          NurtureEnrollmentWaitlistEntry[]
+  enrollmentWaitlistOverrides        NurtureEnrollmentWaitlistOverride[]
+  enrollmentTrialOffers              NurtureEnrollmentTrialOffer[]
+  enrollmentTrialReservations        NurtureEnrollmentTrialReservation[]
+  enrollmentFormalProposals          NurtureEnrollmentFormalProposal[]
+  institutionKnowledgeItems          NurtureInstitutionKnowledgeItem[]
+  institutionKnowledgeRevisions      NurtureInstitutionKnowledgeRevision[]
+  institutionKnowledgeAuthorityLinks NurtureInstitutionKnowledgeAuthorityLink[]
+  institutionKnowledgeEvents         NurtureInstitutionKnowledgeRevisionEvent[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -2442,11 +2473,11 @@ model NurtureCareRoleAssignment {
   updatedAt              DateTime                        @updatedAt @map("updated_at")
   deletedAt              DateTime?                       @map("deleted_at")
 
-  participant                     NurtureParticipant                      @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  participant                     NurtureParticipant                         @relation(fields: [participantId], references: [id], onDelete: Restrict)
   threadMemberships               NurtureFamilyCareThreadParticipant[]
   messages                        NurtureFamilyCareMessage[]
-  assignedItems                   NurtureFamilyCareItem[]                 @relation("ItemAssignedRole")
-  ackedItems                      NurtureFamilyCareItem[]                 @relation("ItemAckedRole")
+  assignedItems                   NurtureFamilyCareItem[]                    @relation("ItemAssignedRole")
+  ackedItems                      NurtureFamilyCareItem[]                    @relation("ItemAckedRole")
   authoredCorrections             NurtureFamilyCareMessageCorrection[]
   dailyCareLogs                   NurtureDailyCareLog[]
   uploadedAssets                  NurtureMediaAssetRef[]
@@ -2454,8 +2485,8 @@ model NurtureCareRoleAssignment {
   captures                        NurtureCareCapture[]
   publishEditHolds                NurturePublishEditHold[]
   publicationReleases             NurturePublicationRelease[]
-  attendanceSubmitted             NurtureDailyAttendanceSubmission[]      @relation("AttendanceSubmittedBy")
-  attendanceReopened              NurtureDailyAttendanceSubmission[]      @relation("AttendanceReopenedBy")
+  attendanceSubmitted             NurtureDailyAttendanceSubmission[]         @relation("AttendanceSubmittedBy")
+  attendanceReopened              NurtureDailyAttendanceSubmission[]         @relation("AttendanceReopenedBy")
   attendanceCloseoutPolicies      NurtureAttendanceCloseoutPolicy[]
   supportSignalPolicies           NurtureInstitutionSupportSignalPolicy[]
   contentRevisions                NurtureContentRevision[]
@@ -2466,6 +2497,8 @@ model NurtureCareRoleAssignment {
   enrollmentWaitlistOverrides     NurtureEnrollmentWaitlistOverride[]
   enrollmentTrialOffers           NurtureEnrollmentTrialOffer[]
   enrollmentFormalProposals       NurtureEnrollmentFormalProposal[]
+  institutionKnowledgeRevisions   NurtureInstitutionKnowledgeRevision[]
+  institutionKnowledgeEvents      NurtureInstitutionKnowledgeRevisionEvent[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -2998,21 +3031,134 @@ model NurtureCommandExecution {
   committedResultPayload          Json?                         @map("committed_result_payload")
   committedAt                     DateTime                      @default(now()) @map("committed_at")
 
-  childCareProcess              NurtureChildCareProcess?              @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  childCareProcess              NurtureChildCareProcess?                   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
   corrections                   NurtureFamilyCareMessageCorrection[]
   cascadeAudits                 NurtureFamilyCareCascadeAudit[]
   visibilityEvents              NurturePublicationVisibilityEvent[]
-  actorPrincipalBinding         NurtureParticipantPrincipalBinding?   @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
-  c30PairOperation              NurtureC30PairOperation?              @relation("NurtureC30PairExecution")
-  c30ActionOperation            NurtureC30ActionOperation?            @relation("NurtureC30ActionExecution")
+  actorPrincipalBinding         NurtureParticipantPrincipalBinding?        @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
+  c30PairOperation              NurtureC30PairOperation?                   @relation("NurtureC30PairExecution")
+  c30ActionOperation            NurtureC30ActionOperation?                 @relation("NurtureC30ActionExecution")
   institutionWorkflowTransition NurtureInstitutionWorkflowTransition?
   enrollmentWaitlistOverride    NurtureEnrollmentWaitlistOverride?
+  institutionKnowledgeEvents    NurtureInstitutionKnowledgeRevisionEvent[]
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
   @@index([workspaceId, childCareProcessId, committedAt], map: "ix_nurture_command_execution_process")
   @@index([workspaceId, actorPrincipalBindingId, committedAt], map: "ix_nurture_command_execution_actor_binding")
   @@map("nurture_command_execution")
+}
+
+// G4-E increment 1: private Institution Knowledge lifecycle/provenance owner.
+// Bodies remain sealed, revisions/links/events are append-only, and
+// NurtureCommandExecution remains the sole idempotency ledger.
+model NurtureInstitutionKnowledgeItem {
+  id                         String                              @id @default(uuid())
+  workspaceId                String                              @map("workspace_id")
+  institutionId              String                              @map("institution_id")
+  category                   NurtureInstitutionKnowledgeCategory
+  itemHead                   Int                                 @map("item_head")
+  latestRevisionId           String?                             @map("latest_revision_id")
+  currentPublishedRevisionId String?                             @map("current_published_revision_id")
+  createdAt                  DateTime                            @default(now()) @map("created_at")
+  updatedAt                  DateTime                            @updatedAt @map("updated_at")
+
+  institution              NurtureCareInstitution                     @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_item_institution_id_fkey")
+  revisions                NurtureInstitutionKnowledgeRevision[]      @relation("NurtureKnowledgeItemRevisions")
+  latestRevision           NurtureInstitutionKnowledgeRevision?       @relation("NurtureKnowledgeLatestRevision", fields: [latestRevisionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_item_latest_revision_id_fkey")
+  currentPublishedRevision NurtureInstitutionKnowledgeRevision?       @relation("NurtureKnowledgePublishedRevision", fields: [currentPublishedRevisionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_item_published_revision_id_fkey")
+  events                   NurtureInstitutionKnowledgeRevisionEvent[]
+
+  @@unique([workspaceId, id, institutionId], map: "uq_nurture_knowledge_item_scope")
+  @@index([workspaceId, institutionId, category, updatedAt], map: "ix_nurture_knowledge_item_category")
+  @@map("nurture_institution_knowledge_item")
+}
+
+model NurtureInstitutionKnowledgeRevision {
+  id                     String                                 @id @default(uuid())
+  workspaceId            String                                 @map("workspace_id")
+  institutionId          String                                 @map("institution_id")
+  itemId                 String                                 @map("item_id")
+  revisionNumber         Int                                    @map("revision_number")
+  bodyEnvelope           Json                                   @map("body_envelope")
+  contentHash            String                                 @map("content_hash") @db.Char(64)
+  intendedAudiences      String[]                               @map("intended_audiences")
+  ageBandKeys            String[]                               @map("age_band_keys")
+  scenarioKeys           String[]                               @map("scenario_keys")
+  safetyClass            NurtureInstitutionKnowledgeSafetyClass @map("safety_class")
+  validFrom              DateTime?                              @map("valid_from")
+  validUntil             DateTime?                              @map("valid_until")
+  authorParticipantId    String                                 @map("author_participant_id")
+  authorRoleAssignmentId String                                 @map("author_role_assignment_id")
+  createdAt              DateTime                               @default(now()) @map("created_at")
+
+  institution          NurtureCareInstitution                     @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_revision_institution_id_fkey")
+  item                 NurtureInstitutionKnowledgeItem            @relation("NurtureKnowledgeItemRevisions", fields: [itemId], references: [id], onDelete: Restrict, map: "nurture_knowledge_revision_item_id_fkey")
+  latestForItems       NurtureInstitutionKnowledgeItem[]          @relation("NurtureKnowledgeLatestRevision")
+  publishedForItems    NurtureInstitutionKnowledgeItem[]          @relation("NurtureKnowledgePublishedRevision")
+  authorParticipant    NurtureParticipant                         @relation("NurtureKnowledgeRevisionAuthor", fields: [authorParticipantId], references: [id], onDelete: Restrict, map: "nurture_knowledge_revision_author_id_fkey")
+  authorRoleAssignment NurtureCareRoleAssignment                  @relation(fields: [authorRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_knowledge_revision_author_role_id_fkey")
+  authorityLinks       NurtureInstitutionKnowledgeAuthorityLink[]
+  events               NurtureInstitutionKnowledgeRevisionEvent[]
+
+  @@unique([itemId, revisionNumber], map: "uq_nurture_knowledge_revision_number")
+  @@unique([workspaceId, id, itemId], map: "uq_nurture_knowledge_revision_scope")
+  @@index([workspaceId, institutionId, safetyClass, createdAt], map: "ix_nurture_knowledge_revision_safety")
+  @@map("nurture_institution_knowledge_revision")
+}
+
+model NurtureInstitutionKnowledgeAuthorityLink {
+  id                 String   @id @default(uuid())
+  workspaceId        String   @map("workspace_id")
+  institutionId      String   @map("institution_id")
+  revisionId         String   @map("revision_id")
+  authoritySourceRef Json     @map("authority_source_ref")
+  sourceRefHash      String   @map("source_ref_hash") @db.Char(64)
+  sourceVersion      String   @map("source_version")
+  publisher          String
+  title              String
+  sourceDate         DateTime @map("source_date") @db.Date
+  deepLink           String   @map("deep_link")
+  excerpt            String   @db.Text
+  verifiedAt         DateTime @map("verified_at")
+  snapshotHash       String   @map("snapshot_hash") @db.Char(64)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  institution NurtureCareInstitution              @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_link_institution_id_fkey")
+  revision    NurtureInstitutionKnowledgeRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_link_revision_id_fkey")
+
+  @@unique([revisionId, sourceRefHash, sourceVersion], map: "uq_nurture_knowledge_link_source")
+  @@index([workspaceId, institutionId, sourceRefHash], map: "ix_nurture_knowledge_link_source")
+  @@map("nurture_institution_knowledge_authority_link")
+}
+
+model NurtureInstitutionKnowledgeRevisionEvent {
+  id                    String                                       @id @default(uuid())
+  workspaceId           String                                       @map("workspace_id")
+  institutionId         String                                       @map("institution_id")
+  itemId                String                                       @map("item_id")
+  revisionId            String                                       @map("revision_id")
+  commandExecutionId    String                                       @map("command_execution_id")
+  eventType             NurtureInstitutionKnowledgeRevisionEventType @map("event_type")
+  itemHead              Int                                          @map("item_head")
+  eventOrdinal          Int                                          @map("event_ordinal")
+  actorParticipantId    String                                       @map("actor_participant_id")
+  actorRoleAssignmentId String                                       @map("actor_role_assignment_id")
+  reasonKey             String                                       @map("reason_key")
+  occurredAt            DateTime                                     @map("occurred_at")
+
+  institution         NurtureCareInstitution              @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_event_institution_id_fkey")
+  item                NurtureInstitutionKnowledgeItem     @relation(fields: [itemId], references: [id], onDelete: Restrict, map: "nurture_knowledge_event_item_id_fkey")
+  revision            NurtureInstitutionKnowledgeRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_event_revision_id_fkey")
+  commandExecution    NurtureCommandExecution             @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_event_execution_id_fkey")
+  actorParticipant    NurtureParticipant                  @relation("NurtureKnowledgeEventActor", fields: [actorParticipantId], references: [id], onDelete: Restrict, map: "nurture_knowledge_event_actor_id_fkey")
+  actorRoleAssignment NurtureCareRoleAssignment           @relation(fields: [actorRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_knowledge_event_actor_role_id_fkey")
+
+  @@unique([itemId, itemHead, eventOrdinal], map: "uq_nurture_knowledge_event_head_ordinal")
+  @@unique([commandExecutionId, eventOrdinal], map: "uq_nurture_knowledge_event_execution_ordinal")
+  @@index([workspaceId, institutionId, occurredAt], map: "ix_nurture_knowledge_event_occurred")
+  @@index([revisionId, itemHead, eventOrdinal], map: "ix_nurture_knowledge_event_revision")
+  @@map("nurture_institution_knowledge_revision_event")
 }
 
 // G4-D increment 2: private inquiry carrier for EnrollmentJourneyWorkflowV1.

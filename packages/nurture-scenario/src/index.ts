@@ -78,6 +78,8 @@ export * from "./domain/institution/enrollment-journey-command.js";
 export * from "./domain/institution/enrollment-waitlist.js";
 export * from "./domain/institution/enrollment-trial-lifecycle.js";
 export * from "./domain/institution/enrollment-formalization.js";
+export * from "./domain/institution/institution-knowledge-lifecycle.js";
+export * from "./domain/institution/institution-knowledge-commands.js";
 export * from "./domain/institution/institution-resolver.js";
 export * from "./domain/institution/family-care-transaction.js";
 export * from "./domain/institution/board-mutation-transaction.js";

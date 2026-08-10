@@ -997,3 +997,23 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   Missing gates stop their phase rather than creating compatibility fallbacks.
 - Each node requires architecture review, full repair, task/project sync and a
   dedicated `Task: T-007` commit from a clean worktree.
+
+## 2026-08-10 — G4-E increment 1 lifecycle/provenance
+
+- Implemented the strict 0F-1 item, sealed immutable revision, authority-link
+  and append-only event domain with exactly five private lifecycle commands.
+- Reused the current 0C Admin authority chain, protected-content port and
+  `NurtureCommandExecution`; no second authorization, plaintext storage,
+  lifecycle, idempotency ledger or outbox exists.
+- Added the four planned Prisma models, an unapplied migration with exact-scope,
+  append-only and deferred committed-state guards, the Prisma transaction owner
+  and refreshed DB context.
+- Quality review repaired revision allocation races, preserved the legal older-
+  publication/new-draft state, strengthened event-chain completeness and bound
+  database events to exact command/actor/role evidence. A redundant persisted
+  authorship constant was removed.
+- Targeted 10/10, full unit 911/911, root typecheck, Prisma/static/structural and
+  context/governance gates pass. No PostgreSQL target was connected or changed;
+  disposable migration/DB qualification remains E4/Q1.
+- Detailed evidence: [`70`](./70-g4-e-increment-1-record.md). E2 retrieval and
+  currentness is next; it must add no table or local Host RAG runtime.

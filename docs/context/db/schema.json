@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-10T04:27:42.126Z",
+  "updatedAt": "2026-08-10T09:48:44.431Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -735,6 +735,37 @@
       "values": [
         "family_to_org",
         "org_to_family"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeCategory",
+      "values": [
+        "child_communication_development",
+        "daily_care_safety",
+        "institution_policy",
+        "activity_resource",
+        "guardian_communication",
+        "basic_health_first_aid"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeRevisionEventType",
+      "values": [
+        "revision_created",
+        "revision_superseded",
+        "reviewed",
+        "changes_requested",
+        "published",
+        "publication_superseded",
+        "revoked"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeSafetyClass",
+      "values": [
+        "general_guidance",
+        "care_safety",
+        "basic_health_first_aid"
       ]
     },
     {
@@ -5884,6 +5915,42 @@
           "references": []
         },
         {
+          "field": "institutionKnowledgeAuthorityLinks",
+          "to": "NurtureInstitutionKnowledgeAuthorityLink",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeEvents",
+          "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeItems",
+          "to": "NurtureInstitutionKnowledgeItem",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeRevisions",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "institutionWorkflows",
           "to": "NurtureInstitutionWorkflow",
           "optional": false,
@@ -6263,6 +6330,24 @@
         {
           "field": "enrollmentWaitlistPolicies",
           "to": "NurtureEnrollmentWaitlistPolicy",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeEvents",
+          "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeRevisions",
+          "to": "NurtureInstitutionKnowledgeRevision",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -9256,6 +9341,15 @@
           "to": "NurtureEnrollmentWaitlistOverride",
           "optional": true,
           "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeEvents",
+          "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
           "relationName": null,
           "fields": [],
           "references": []
@@ -19251,6 +19345,992 @@
       ]
     },
     {
+      "name": "NurtureInstitutionKnowledgeAuthorityLink",
+      "dbName": "nurture_institution_knowledge_authority_link",
+      "schema": null,
+      "columns": [
+        {
+          "name": "authoritySourceRef",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "authority_source_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "deepLink",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "deep_link",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "excerpt",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "publisher",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revisionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "snapshotHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "snapshot_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceDate",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_date",
+          "dbType": "Date",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceRefHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "title",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "verifiedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "verified_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "revision",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "revisionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "sourceRefHash"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_link_source"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "revisionId",
+            "sourceRefHash",
+            "sourceVersion"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_link_source"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeItem",
+      "dbName": "nurture_institution_knowledge_item",
+      "schema": null,
+      "columns": [
+        {
+          "name": "category",
+          "type": "NurtureInstitutionKnowledgeCategory",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "currentPublishedRevisionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "current_published_revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "itemHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "item_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "latestRevisionId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "latest_revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "currentPublishedRevision",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureKnowledgePublishedRevision",
+          "fields": [
+            "currentPublishedRevisionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "events",
+          "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "latestRevision",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": true,
+          "list": false,
+          "relationName": "NurtureKnowledgeLatestRevision",
+          "fields": [
+            "latestRevisionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "revisions",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureKnowledgeItemRevisions",
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "category",
+            "updatedAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_item_category"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id",
+            "institutionId"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_item_scope"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeRevision",
+      "dbName": "nurture_institution_knowledge_revision",
+      "schema": null,
+      "columns": [
+        {
+          "name": "ageBandKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "age_band_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "author_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "authorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "author_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "bodyEnvelope",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "body_envelope",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "contentHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "content_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "intendedAudiences",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "intended_audiences",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "itemId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "item_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revisionNumber",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "revision_number",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safetyClass",
+          "type": "NurtureInstitutionKnowledgeSafetyClass",
+          "nullable": false,
+          "list": false,
+          "dbName": "safety_class",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "scenarioKeys",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "scenario_keys",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "validFrom",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "valid_from",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "validUntil",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "valid_until",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "authorityLinks",
+          "to": "NurtureInstitutionKnowledgeAuthorityLink",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "authorParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureKnowledgeRevisionAuthor",
+          "fields": [
+            "authorParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "authorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "authorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "events",
+          "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "item",
+          "to": "NurtureInstitutionKnowledgeItem",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureKnowledgeItemRevisions",
+          "fields": [
+            "itemId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "latestForItems",
+          "to": "NurtureInstitutionKnowledgeItem",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureKnowledgeLatestRevision",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "publishedForItems",
+          "to": "NurtureInstitutionKnowledgeItem",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureKnowledgePublishedRevision",
+          "fields": [],
+          "references": []
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "safetyClass",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_revision_safety"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "itemId",
+            "revisionNumber"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_revision_number"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "id",
+            "itemId"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_revision_scope"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeRevisionEvent",
+      "dbName": "nurture_institution_knowledge_revision_event",
+      "schema": null,
+      "columns": [
+        {
+          "name": "actorParticipantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "actorRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "actor_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventOrdinal",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_ordinal",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "eventType",
+          "type": "NurtureInstitutionKnowledgeRevisionEventType",
+          "nullable": false,
+          "list": false,
+          "dbName": "event_type",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "itemHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "item_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "itemId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "item_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "occurred_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reasonKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "revisionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "revision_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "actorParticipant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": "NurtureKnowledgeEventActor",
+          "fields": [
+            "actorParticipantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "actorRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "actorRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "item",
+          "to": "NurtureInstitutionKnowledgeItem",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "itemId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "revision",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "revisionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "revisionId",
+            "itemHead",
+            "eventOrdinal"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_event_revision"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "occurredAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_event_occurred"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "commandExecutionId",
+            "eventOrdinal"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_event_execution_ordinal"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "itemId",
+            "itemHead",
+            "eventOrdinal"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_event_head_ordinal"
+        }
+      ]
+    },
+    {
       "name": "NurtureInstitutionPublicationPolicy",
       "dbName": "nurture_institution_publication_policy",
       "schema": null,
@@ -21801,6 +22881,24 @@
           "optional": false,
           "list": true,
           "relationName": "NurtureC30ProtectedContentTransitionActor",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeEvents",
+          "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureKnowledgeEventActor",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeRevisions",
+          "to": "NurtureInstitutionKnowledgeRevision",
+          "optional": false,
+          "list": true,
+          "relationName": "NurtureKnowledgeRevisionAuthor",
           "fields": [],
           "references": []
         },

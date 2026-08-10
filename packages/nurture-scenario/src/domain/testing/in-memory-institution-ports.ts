@@ -28,6 +28,7 @@ type CommandTransactionOverrides = Partial<
     | "enrollmentWaitlist"
     | "enrollmentTrialLifecycle"
     | "enrollmentFormalization"
+    | "institutionKnowledge"
   > & {
     familyCare?: NurtureFamilyCareCommandTransaction;
   };
@@ -85,6 +86,9 @@ export const createInMemoryNurtureCommandRepository = (
             : {}),
           ...(overrides.enrollmentFormalization
             ? { enrollmentFormalization: overrides.enrollmentFormalization }
+            : {}),
+          ...(overrides.institutionKnowledge
+            ? { institutionKnowledge: overrides.institutionKnowledge }
             : {}),
           findCommitted: transactionalFind,
           createExecution: transactionalCreate,
