@@ -894,3 +894,28 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Planned four new Nurture tables only. Legacy family corpus/runtime tables and
   all My-Chat model/vector/index facts remain excluded; no schema was authored
   or applied.
+
+## 2026-08-10 — G4-0F-2 retrieval and owner bridge freeze
+
+- Froze `nurture.institution-knowledge-retrieval@1.0.0` with three closed
+  purposes: Host indexing, Admin online answer and exact Admin editor preview.
+  Generic `public_rag_answer` and unqualified reserved-source mappings are not
+  compatibility fallbacks.
+- Split Host index admission from request-time online eligibility. Future
+  effective reviewed material may be indexed, but current Admin authority,
+  applicability, time and source currentness must pass before any candidate
+  enters model context.
+- Defined bounded Nurture source-change/current-source pull, My-Chat candidate
+  retrieval and Nurture final-currentness ports. Host owns cursors/index/retry;
+  Nurture owns source truth and never imports Host ORM/RAG/provider code.
+- Added current-source reconciliation because lifecycle events alone cannot
+  rediscover time-window, authority-source or safety-hold changes. Index/cache
+  presence remains non-authoritative, and used citations require a later 0F-3
+  revalidation after generation.
+- Admin preview is all-or-nothing, same-Institution, exact-revision and
+  in-memory only. It can display explicit draft warnings but cannot index,
+  publish, export or leak into online answer.
+- 0F-2 itself plans no Nurture table beyond 0F-1; 0F-3 still owns any exact
+  conflict-review/safety fact. No source, model, index or DB operation was
+  executed. The Institution-specific My-Chat delta remains defined but
+  unqualified.

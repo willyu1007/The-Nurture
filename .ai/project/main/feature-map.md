@@ -182,8 +182,9 @@ Project: `main`
   `nurture.institution-publication-policy@1.0.0` bounded provider/consumer path is
   qualified through the T-006 handoff and remains default-off. 0C～0E are now frozen
   and exited; the G4-D branch has private I1 plus default-off I2. 0F has accepted its
-  exact generic owner source pin, three-unit scope and lifecycle/provenance contract;
-  0F-2/3 and G4-E implementation remain open. None of these checkpoints completes T-007.
+  exact generic owner source pin, three-unit scope, lifecycle/provenance contract and
+  retrieval/owner bridge; 0F-3 and G4-E implementation remain open. None of these
+  checkpoints completes T-007.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
   has its own DoD; overall acceptance covers contract/ownership, required product
@@ -372,9 +373,9 @@ Project: `main`
   fail-closed, explicitly disabled module/manifest adapters. No formal ingress,
   real owner provider, capability activation or durable database apply exists.
   0F has an exact generic Knowledge/PBR/RAG source pin, accepted three-unit
-  scope and frozen lifecycle/provenance unit; retrieval and citation/safety
-  remain open.
-- Next Checkpoint: complete 0F-2/0F-3 and its audit/Exit, then enter G4-E I1;
+  scope and frozen lifecycle/provenance plus retrieval/owner bridge units;
+  citation/safety remains open.
+- Next Checkpoint: complete 0F-3 and its audit/Exit, then enter G4-E I1;
   independently, explicit G-09 adoption may open G4-D I3 authenticated
   prospective-contact/native-source/current-owner and formal-ingress binding.
   I4 joint conformance follows only after I3 qualifies.

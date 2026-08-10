@@ -599,6 +599,20 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Docs / context / governance | PASS | Strict task-doc lint passes 111/111 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
 | Database / runtime effect | NOT RUN / PASS | 0F-1 is a freeze record only. No Prisma, migration, repository, Surface, model, index, deployment, activation or traffic effect exists. |
 
+## 2026-08-10 — G4-0F-2 retrieval and owner bridge freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Index versus online eligibility | PASS after repair | [`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md) separates rebuildable index admission from request-time Admin/time/applicability currentness. The original fixture that incorrectly required a current `validFrom` for indexing was corrected. |
+| Source discovery / reconciliation | PASS after repair | Body-free event pull is paired with a bounded full reconciliation over every current publication. One opaque snapshot, stable canonical-ref order and explicit terminal page prevent deletion from partial or mixed scans; absent entries require exact source confirmation. |
+| Owner and source boundaries | PASS | Nurture owns source admission/currentness; My-Chat owns consumer cursors, index/vector/cache/retries. Generic public-answer, unqualified ingestion and reserved external-source mappings are rejected. |
+| Query / preview boundaries | PASS | Online input has exact question/applicability limits and no trusted fields or child facts. Preview is 1..8 exact same-Institution revisions, all-or-nothing, ephemeral and cannot feed index/online/export. |
+| Candidate / final-currentness bounds | PASS | Retrieval returns at most 16 bounded candidates; currentness validates at most 32 exact source/version/hash tuples with a closed denial vocabulary. 0F-3 must revalidate only citations actually used after generation. |
+| Generic owner pin | PASS | Eight-file My-Chat Knowledge/PBR/RAG source and package-export pin remains exact at `567b96c` / `554e79d4…`; observed checkout drift is informational and was not adopted. |
+| LLM/config boundary | PASS | Zero in-scope LLM env/config references; no local provider, prompt, model profile, vector or telemetry implementation was added. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 112/112 after removing an ambiguous pronoun warning; Context, project-state, governance lint and `git diff --check` pass. |
+| Database / runtime effect | NOT RUN / PASS | 0F-2 adds only frozen ports/policies and no table beyond the 0F-1 plan. No Prisma, migration, DB, source ingestion, index, model, owner adoption, activation or traffic effect exists. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

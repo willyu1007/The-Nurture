@@ -550,3 +550,24 @@
 - **Prevention:** freeze records that reuse a security/storage port must cite
   its concrete size and atomicity constraints. Optional enrichment may be
   omitted only when the caller did not request it.
+
+## 2026-08-10 — Lifecycle events alone cannot maintain retrieval discovery
+
+- **Symptom:** the first 0F-2 draft used one predicate for indexing and online
+  answer, then relied only on publish/supersede/revoke events. A future
+  `validFrom`, review change or cleared safety hold could remain undiscovered
+  forever after an initial ineligible read.
+- **Root cause:** index admission, request-time authorization and source-change
+  discovery were conflated. Not every eligibility change is or should be a
+  lifecycle write.
+- **What was tried:** traced future-effective, expired, authority-revoked and
+  safety-held sources through publish, pull, index, retrieval and final
+  validation without inventing timer-authored business states.
+- **Fix/workaround:** separate index admission from online eligibility, include
+  review changes in the event feed and add bounded current-indexable-source
+  reconciliation. Future sources may be indexed, but cannot enter model context
+  until request-time currentness passes.
+- **Prevention:** every derived index fed by canonical owner facts needs both
+  incremental changes and full reconciliation. Cache/index presence never
+  replaces owner validation, and time passage must not require a fake
+  lifecycle transition.
