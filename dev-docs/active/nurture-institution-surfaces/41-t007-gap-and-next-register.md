@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A exact public wire artifact; I2-B next** | [`64`](./64-g4-0f-scope-freeze.md)–[`74`](./74-g4-e-i2-a-contract-artifact-record.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; I3/I4 gated** | [`64`](./64-g4-0f-scope-freeze.md)–[`75`](./75-g4-e-i2-b-surface-adapter-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -235,7 +235,7 @@ maintenance step without adopting the divergent My-Chat head.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
-### G-11 — G4-E private I1 is qualified; I2–I4 remain
+### G-11 — G4-E I1/I2 are qualified; I3–I4 remain
 
 [`70`](./70-g4-e-increment-1-record.md) implements the frozen 0F-1 private
 item, sealed immutable revision, atomic authority links, append-only events and
@@ -260,11 +260,12 @@ model, safety provider, Surface or candidate lifecycle is bound.
 PostgreSQL repaired the first-publication nullable CAS and stale conditional
 export path. All 35 migrations, the 43-file DB lane, current status, zero drift
 and destroyed-target evidence pass. [`74`](./74-g4-e-i2-a-contract-artifact-record.md)
-now adds the exact seven-capability I2-A artifact without a caller: one
-read-only preview, one effectful answer action and five lifecycle actions.
-E6 must now add the default-off adapters. I3/I4 remain closed on the adopted My-Chat
-scenario deltas and deterministic answer-safety owner/rule pin; synthetic
-compatibility mappings cannot close them.
+adds the exact seven-capability I2-A artifact without a caller: one read-only
+preview, one effectful answer action and five lifecycle actions. [`75`](./75-g4-e-i2-b-surface-adapter-record.md)
+maps all seven to existing I1 behavior through exact validators/presenters and
+two disabled internal Workbench handlers. I3/I4 remain closed on the adopted
+My-Chat scenario deltas and deterministic answer-safety owner/rule pin;
+synthetic compatibility mappings cannot close them.
 
 ## Closed since the 0D Exit
 
@@ -295,12 +296,10 @@ compatibility mappings cannot close them.
 
 ## Next steps, in dependency order
 
-1. **G4-E I2-B** — map each of the seven I2-A descriptors to one qualified
-   private I1 behavior behind the explicit default-off gate. Preserve answer
-   as an effectful action and do not add a caller or compatibility owner.
-2. **G4-E I3/I4** — only after Q2–Q4 adopt the exact My-Chat scenario deltas,
-   deterministic safety owner/rule pin and sibling-repository authority, bind
-   real owners/formal ingress and run joint conformance/Exit.
+1. **Resolve G4-E Q2–Q4** — identify the adopted My-Chat revision, qualified
+   deterministic safety owner/rule pin and sibling-repository change authority.
+2. **G4-E I3/I4** — only after those gates close, bind the exact real owner
+   adapters and formal ingress, then run joint conformance/Exit.
 3. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the

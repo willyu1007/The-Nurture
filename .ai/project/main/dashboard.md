@@ -46,7 +46,9 @@ Project: `main`
   immutable fifth-table candidate. E4 now qualifies the combined private I1
   through all 35 migrations and 391/391 DB tests on a destroyed disposable
   target. E5 now adds the source-only seven-capability Knowledge wire artifact;
-  E6 default-off adapters are next. I3 waits for exact external owner/safety adoption.
+  E6 maps all seven to existing I1 behavior through exact validators,
+  presenters and disabled internal Workbench handlers. I3 waits for exact
+  Q2–Q4 external owner/safety adoption.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -55,10 +57,10 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Execute G4-E roadmap E6.** Map all seven Knowledge descriptors through
-   exact validators/presenters/I1 adapters behind one disabled runtime gate;
-   do not add a formal caller.
-2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
+1. **Resolve G4-E Q2–Q4.** Identify the adopted My-Chat revision, qualified
+   deterministic safety owner/rule pin and sibling-repository authority before
+   any I3 code or formal caller.
+2. **Keep I3/I4 closed on G-09/Q2–Q4.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.
 3. `NurtureInstitutionPolicyService` and the G4-D commands still have **no

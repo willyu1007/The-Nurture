@@ -751,6 +751,23 @@ Detailed evidence: [`73`](./73-g4-e-i1-audit-qualification-record.md) and
 
 Detailed evidence: [`74`](./74-g4-e-i2-a-contract-artifact-record.md).
 
+## 2026-08-10 — G4-E I2-B default-off Surface adapters
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | [`75`](./75-g4-e-i2-b-surface-adapter-record.md) records UTC-instant alignment, action-confirmation binding, citation item-option semantics, stale E5 assertion and duplicate body-validator repairs. |
+| Exact adapter mapping | PASS | Dedicated suite 7/7 covers pre-binding validation, all five lifecycle command specs, exact authority snapshots, preview/answer I1 delegation, cited presenter, denial/drift and immutable defaults. |
+| Full unit lane | PASS | `pnpm test:unit`: 951/951 across 86 files. |
+| TypeScript | PASS | Root direct `tsc --noEmit` and scenario package typecheck pass; generated manifest is current. |
+| Synthetic Surface Contract | PASS | Tooling 5/5 and Vitest 139/139 across 14 files; 19 cases cover 80/80 slices with seven negatives. Owner Integration remains NO-GO and Joint Conformance was not run. |
+| Structural gates | PASS | Test routing 156 files (86 unit / 43 DB / 11 dev-host / 14 scenario-service / 2 joint); persistence, port topology, formal ingress, G2 exit/census and G3 freeze pass. All 32 deferred descriptors remain formally unrouted. |
+| Default-off / privacy | PASS | Only two internal handler keys and one disabled Web Workbench composition were added. Chat/mobile/formal routes, public barrel export, caller-trusted scope/head/source fields and private item/revision presenter refs remain absent. |
+| Generic owner pin | PASS | Eight committed My-Chat Knowledge/RAG files remain exact at `567b96c` / `554e79d4…`; checkout drift is informational and no adoption is claimed. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 127/127 with zero warnings; Context, project-state, governance sync/lint and `git diff --check` pass. |
+| Database / external effect | NOT RUN / PASS | No schema/repository delta or DB target was needed. No owner/model/safety call, deployment, activation or traffic occurred. |
+
+Detailed evidence: [`75`](./75-g4-e-i2-b-surface-adapter-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

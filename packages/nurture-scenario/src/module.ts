@@ -22,6 +22,11 @@ import {
   defaultNurtureEnrollmentJourneySurfaceDeps,
   type NurtureEnrollmentJourneySurfaceDeps,
 } from "./enrollment-journey-surfaces.js";
+import {
+  createNurtureInstitutionKnowledgeInternalApiHandlers,
+  defaultNurtureInstitutionKnowledgeSurfaceDeps,
+  type NurtureInstitutionKnowledgeSurfaceDeps,
+} from "./institution-knowledge-surfaces.js";
 
 /**
  * Canonical default-off production module. The manifest contains no activation
@@ -40,6 +45,9 @@ export const nurtureScenarioModule: WorkflowScenarioModule = {
     ...createNurtureEnrollmentJourneyInternalApiHandlers(
       defaultNurtureEnrollmentJourneySurfaceDeps,
     ),
+    ...createNurtureInstitutionKnowledgeInternalApiHandlers(
+      defaultNurtureInstitutionKnowledgeSurfaceDeps,
+    ),
   },
 };
 
@@ -49,6 +57,8 @@ export type NurtureScenarioModuleDeps = {
   workerRuntime: WorkflowRuntimePort;
   /** I2-B is fail-closed unless an explicit synthetic or future I3 owner set is supplied. */
   enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
+  /** G4-E I2-B uses the same fail-closed composition boundary. */
+  institutionKnowledgeSurfaceDeps?: NurtureInstitutionKnowledgeSurfaceDeps;
 };
 
 /**
@@ -73,6 +83,10 @@ export const createNurtureScenarioModule = (
     ...createNurtureEnrollmentJourneyInternalApiHandlers(
       deps.enrollmentJourneySurfaceDeps ??
         defaultNurtureEnrollmentJourneySurfaceDeps,
+    ),
+    ...createNurtureInstitutionKnowledgeInternalApiHandlers(
+      deps.institutionKnowledgeSurfaceDeps ??
+        defaultNurtureInstitutionKnowledgeSurfaceDeps,
     ),
   },
 });

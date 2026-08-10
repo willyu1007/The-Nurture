@@ -1113,3 +1113,21 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   deployment, activation and traffic remain unchanged.
 - Detailed evidence: [`74`](./74-g4-e-i2-a-contract-artifact-record.md). E6
   exact validators/presenters/adapters is next; Q2–Q4 still block E7/E8.
+
+## 2026-08-10 — G4-E I2-B default-off Surface adapters
+
+- Added one closed seven-capability adapter union, pre-binding validation,
+  exact target/confirmation/scope binding and role-safe presenters. Five
+  lifecycle actions receive their existing I1 command specs; preview and answer
+  delegate to the existing I1 providers/orchestration.
+- The module now owns exactly two internal Knowledge handler keys. Only Web
+  Workbench declares them, with disabled enablement; no internal HTTP route or
+  formal scenario-service caller was added.
+- Quality review repaired UTC-instant validation, confirmation round-trip,
+  citation item-option version semantics and the stale E5 handler-absence
+  assertion. Duplicate body validation was removed in favor of the I1 SSOT.
+- Dedicated 7/7, full unit 951/951, TypeScript, Surface 139/139 and all
+  structural/default-off gates pass. No DB, real owner/model/safety provider,
+  deployment, activation or traffic effect occurred.
+- Detailed evidence: [`75`](./75-g4-e-i2-b-surface-adapter-record.md). E7/E8
+  remain blocked on Q2–Q4; no compatibility owner may substitute for adoption.

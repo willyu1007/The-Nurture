@@ -6,9 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **execute roadmap E6, the G4-E I2-B default-off Surface adapters;
-  after G-09 and exact Q2–Q4 owner/safety adoption, G4-D/G4-E I3 may proceed
-  independently**. The exact generic
+- Next step: **resolve G4-E Q2–Q4 exact owner/safety adoption gates; after G-09
+  and Q2–Q4 close, G4-D/G4-E I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
   ([`64`](./64-g4-0f-scope-freeze.md)); 0F-1 freezes the Nurture-owned item,
@@ -59,12 +58,15 @@
   Institution Knowledge wire artifact to `nurture.surface-contract@1.20.0` /
   `sha256:35d6340f…` with one read-only preview, one effectful answer action and
   five lifecycle actions ([`74`](./74-g4-e-i2-a-contract-artifact-record.md)).
-  All seven remain source-only behind one unqualified runtime gate.
+  E6 now maps all seven through exact public validation, trusted target/
+  confirmation/scope binding, existing I1 services/specs and role-safe presenters.
+  Exactly two internal Workbench handlers are declared disabled; no formal
+  caller exists ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)).
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
   records are history and are not edited to stay current.
-- Domain and persistence owners remain qualified at **I1**; G4-D now also has
+- Domain and persistence owners remain qualified at **I1**; G4-D and G4-E now have
   an **I2-A wire-contract artifact and I2-B synthetic/default-off surface
   composition**. All implemented
   daily-operations persistence paths, including 0D-3

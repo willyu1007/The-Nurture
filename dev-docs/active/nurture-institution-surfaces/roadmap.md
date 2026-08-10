@@ -27,8 +27,12 @@
   [`74`](./74-g4-e-i2-a-contract-artifact-record.md). The exact additive
   `1.20.0` artifact exposes one preview query, one effectful answer action and
   five lifecycle actions without a caller.
-- Current node: E6 I2-B default-off Surface adapters.
-- I3/I4 gates Q2–Q4 remain unresolved; no compatibility fallback is allowed.
+- E6 I2-B Surface adapters: `G4_E_I2_B_SURFACE_ADAPTER_QUALIFIED`; see
+  [`75`](./75-g4-e-i2-b-surface-adapter-record.md). Exact validators,
+  presenters and I1 adapters are composed only through disabled internal
+  Workbench handlers.
+- Current node: E7 I3 owner-integration gate, blocked on unresolved Q2–Q4.
+- I3/I4 cannot start from synthetic compatibility owners or the moving checkout.
 
 ## Planning-mode context and merge policy
 

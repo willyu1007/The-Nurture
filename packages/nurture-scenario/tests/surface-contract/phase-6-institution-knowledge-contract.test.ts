@@ -224,14 +224,30 @@ describe("G4-E I2-A institution knowledge wire contract", () => {
     }
   });
 
-  it("keeps I2-A source-only with no module or manifest caller", () => {
+  it("admits only the E6 disabled internal composition and no formal caller", () => {
     expect(
       Object.keys(nurtureScenarioModule.internal_api_handlers).filter((key) =>
         key.includes("institution_knowledge"),
       ),
-    ).toEqual([]);
-    expect(JSON.stringify(nurtureScenarioManifest.surface_mapping)).not.toContain(
-      "institution_knowledge",
-    );
+    ).toEqual([
+      "nurture.internal.query_institution_knowledge",
+      "nurture.internal.execute_institution_knowledge",
+    ]);
+    expect(
+      nurtureScenarioManifest.surface_mapping.web_run_workbench.institution_knowledge,
+    ).toMatchObject({
+      contract_version: "1.0.0",
+      enablement_policy: "disabled",
+    });
+    expect(nurtureScenarioManifest.surface_mapping.chat_workflow_control)
+      .not.toHaveProperty("institution_knowledge");
+    expect(nurtureScenarioManifest.surface_mapping.mobile_dashboard)
+      .not.toHaveProperty("institution_knowledge");
+    expect(
+      nurtureScenarioManifest.internal_api.routes.map((route) => route.handler_key),
+    ).not.toContain("nurture.internal.query_institution_knowledge");
+    expect(
+      nurtureScenarioManifest.internal_api.routes.map((route) => route.handler_key),
+    ).not.toContain("nurture.internal.execute_institution_knowledge");
   });
 });
