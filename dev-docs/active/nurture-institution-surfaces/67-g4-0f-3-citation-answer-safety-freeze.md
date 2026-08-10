@@ -218,8 +218,10 @@ answer.
 
 ## 5. Immutable conflict-review candidate
 
-`InstitutionKnowledgeConflictReviewCandidateV1` is an immutable, noncanonical
-review input. A stable candidate identity hashes the exact Workspace,
+`InstitutionKnowledgeConflictReviewCandidateV1` is an immutable canonical
+candidate fact and non-authoritative review input. It is not a knowledge
+source, review decision or retrieval-eligibility fact. A stable candidate
+identity hashes the exact Workspace,
 Institution, rule-set/version, conflict class, deterministic finding
 fingerprint, sorted source ref/version/hash tuples and sorted targeted Nurture
 revision refs. Question text, actor identity, invocation identity and model
@@ -232,7 +234,8 @@ Before writing, every evidence tuple is finally current. The internal
 `NurtureCommandExecution`; exact replay or a uniqueness race returns the one
 candidate, while changed evidence cannot merge. The command is reachable only
 from the deterministic answer-safety service, never as a public capability or
-model action.
+model action. It appends a candidate fact and is not a sixth 0F-1 knowledge-
+lifecycle mutation.
 
 The candidate stores exact scope, finding/rule identity, source tuples,
 optional targeted revision refs, created time, command execution and one
@@ -244,17 +247,17 @@ no question, child/family/private-care fact, generated answer, prompt/provider
 payload or credential.
 
 There is no candidate status, deadline, blocker, mutable resolution field or
-second knowledge review lifecycle. A candidate creates a monotone safety hold
-only for the exact targeted Nurture revision/source version. Admin review uses
-the 0F-1 create-revision, review, publish or revoke commands; a new published
-revision is re-evaluated independently. The candidate itself cannot edit,
-review, publish, revoke, dismiss or restore knowledge. Historical evidence is
-retained even after the targeted revision is superseded or revoked.
+second knowledge review lifecycle. A candidate creates no safety hold and
+cannot grant or deny indexing/retrieval; every online invocation re-evaluates
+the current source set through the one deterministic answer-safety owner.
+Admin review uses the 0F-1 create-revision, review, publish or revoke commands,
+and a new published revision is evaluated independently. The candidate itself
+cannot edit, review, publish, revoke, dismiss or restore knowledge. Historical
+evidence is retained even after a targeted revision is superseded or revoked.
 
 An authority-only conflict still creates an Institution-scoped review
-candidate but cannot mutate or hold the authority owner source. The exact
-source combination is rejected for the invocation and reevaluated on later
-requests.
+candidate but cannot mutate the authority owner source. The exact source
+combination is rejected for the invocation and reevaluated on later requests.
 
 ## 6. Concurrency, replay and drift
 
@@ -262,8 +265,10 @@ requests.
   identity belongs to Nurture. Neither side copies the other's ledger.
 - Response loss after generation reuses the same Host draft, then reruns all
   currentness and safety gates. A stale replayed draft is never returned.
-- Response loss after candidate commit returns the one immutable candidate;
-  concurrent invocations with the same conflict identity cannot create two.
+- Response loss after candidate commit resolves the same immutable candidate;
+  the enclosing answer still reruns currentness/safety and may return source
+  drift rather than stale conflict evidence. Concurrent invocations with the
+  same conflict identity cannot create two candidates.
 - Source version/content hash drift between retrieval, safety, generation and
   presentation removes the exact source. It never substitutes a newer revision
   or blends old/new excerpts.
@@ -325,10 +330,9 @@ Required fixtures:
    changed source version/hash/rule cannot merge;
 8. candidate evidence is sealed, <=8,192 bytes and excludes question,
    child/family/private facts, model/provider data and credentials;
-9. conflict candidate is immutable; a targeted revision can be made irrelevant
-   only by the ordinary 0F-1 publication lifecycle, while an authority-only
-   tuple changes only through owner source currentness, never candidate-state
-   mutation;
+9. conflict candidate is immutable but never becomes an eligibility/review
+   decision; ordinary 0F-1 lifecycle or authority-owner currentness may change
+   the source set while the candidate remains historical evidence;
 10. authority-only conflict cannot mutate the external source;
 11. copy/export preserves all claims, citations, safety notice and AI
     provenance and opens no family/external delivery;

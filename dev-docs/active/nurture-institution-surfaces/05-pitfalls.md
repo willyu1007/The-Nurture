@@ -555,19 +555,18 @@
 
 - **Symptom:** the first 0F-2 draft used one predicate for indexing and online
   answer, then relied only on publish/supersede/revoke events. A future
-  `validFrom`, authority-source currentness change or newly appended exact-
-  revision safety hold could remain undiscovered after an initial read.
+  `validFrom`/`validUntil` passage or authority-source currentness change could
+  remain undiscovered after an initial read.
 - **Root cause:** index admission, request-time authorization and source-change
   discovery were conflated. Not every eligibility change is or should be a
   lifecycle write.
-- **What was tried:** traced future-effective, expired, authority-revoked and
-  safety-held sources through publish, pull, index, retrieval and final
-  validation without inventing timer-authored business states.
+- **What was tried:** traced future-effective, expired and authority-revoked
+  sources through publish, pull, index, retrieval and final validation without
+  inventing timer-authored business states.
 - **Fix/workaround:** separate index admission from online eligibility, include
   review changes in the event feed and add bounded current-source-state
   reconciliation. Future sources may be indexed, but cannot enter model
-  context until request-time currentness passes; an exact-revision hold is
-  monotone and remediation uses a later ordinary revision/publication.
+  context until request-time currentness passes.
 - **Prevention:** every derived index fed by canonical owner facts needs both
   incremental changes and full reconciliation. Cache/index presence never
   replaces owner validation, and time passage must not require a fake
@@ -592,3 +591,23 @@
 - **Prevention:** free-text contracts need semantic privacy/safety gates in
   addition to closed object schemas. If a required classifier is unqualified,
   the caller cannot safely infer the request belongs to an allowed subset.
+
+## 2026-08-10 — A review candidate is not an eligibility decision
+
+- **Symptom:** the first combined 0F-2/0F-3 contract made a newly appended
+  conflict candidate an active retrieval hold. An invocation could return
+  conflict, lose its response, then replay as no-source because its own side
+  effect filtered the source.
+- **Root cause:** “fail closed” was applied by adding another persistent policy
+  input instead of preserving the one deterministic answer-safety owner.
+  Candidate review evidence and online adjudication were conflated.
+- **What was tried:** replayed the exact source set through retrieve, safety,
+  candidate commit, response loss and currentness. Actor/invocation exemptions
+  and a candidate dismiss state were rejected because both add a second path.
+- **Fix/workaround:** the immutable candidate is canonical review evidence but
+  non-authoritative for index/retrieval. Every request re-evaluates current
+  sources through the answer-safety owner; candidate replay only deduplicates
+  the review fact.
+- **Prevention:** a candidate may inform human work without becoming a status,
+  permission, hold or lifecycle. Any candidate side effect must be replayed
+  through the enclosing operation to prove the result class stays coherent.

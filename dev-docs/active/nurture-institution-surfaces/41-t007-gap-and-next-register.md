@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **scope + all three units frozen; audit/Exit open** | none | [`64`](./64-g4-0f-scope-freeze.md)–[`67`](./67-g4-0f-3-citation-answer-safety-freeze.md) |
+| 0F knowledge & RAG | **scope + all three units frozen; 0G audit passes; Exit open** | none | [`64`](./64-g4-0f-scope-freeze.md)–[`68`](./68-g4-0g-0f-audit-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -32,9 +32,10 @@ formal ingress, I3 owner integration, I4 joint conformance, runtime capability
 activation or traffic exists. 0F now has a mechanically verified generic
 My-Chat Knowledge/PBR/RAG source pin, an accepted three-unit decomposition,
 the exact Nurture-owned lifecycle/provenance contract, retrieval/source/
-currentness bridge and cited-answer/safety/conflict-candidate contract. The
-cross-contract audit/Exit remains open. 0F has no domain, persistence, Surface,
-model or indexing implementation.
+currentness bridge and cited-answer/safety/conflict-candidate contract. The 0G
+audit passes after removing candidate-as-hold and lifecycle-command ambiguity;
+Exit remains open. 0F has no domain, persistence, Surface, model or indexing
+implementation.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
 adds explicit policy/FIFO/override/offer/reservation/cancellation semantics and
@@ -254,9 +255,9 @@ Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surfac
 
 ## Next steps, in dependency order
 
-1. **Complete the rolling 0G audit and 0F Exit.** Audit lifecycle/retrieval/
-   answer ownership, currentness, preview/export, conflict-candidate and
-   external-provider collisions before releasing G4-E I1.
+1. **Sign the 0F Exit.** The unit records and 0G cross-contract audit now pass;
+   branch release must preserve external scenario/safety bridges as
+   `DEFINED_UNQUALIFIED` and open only G4-E I1.
 2. **G4-E I1** — after 0F Exit, implement the frozen Nurture facts and pure
    policy incrementally; keep the My-Chat model/vector/RAG runtime absent.
 3. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat

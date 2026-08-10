@@ -909,7 +909,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   retrieval and Nurture final-currentness ports. Host owns cursors/index/retry;
   Nurture owns source truth and never imports Host ORM/RAG/provider code.
 - Added current-source reconciliation because lifecycle events alone cannot
-  rediscover time-window, authority-source or safety-hold creation. Index/cache
+  rediscover time-window or authority-source currentness changes. Index/cache
   presence remains non-authoritative, and used citations require a later 0F-3
   revalidation after generation.
 - Admin preview is all-or-nothing, same-Institution, exact-revision and
@@ -948,3 +948,20 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   plus protected-content port. No schema, DB, model, source, export or runtime
   operation was executed; all scenario generation/safety bridges remain
   defined but unqualified.
+
+## 2026-08-10 — G4-0G audit of the 0F branch
+
+- Issued `G4_0G_0F_AUDIT_PASS_AFTER_REPAIR` over records 64–67.
+- Removed the persisted conflict candidate from 0F-2 retrieval currentness.
+  Treating the candidate as an eligibility hold changed an exact retry from
+  conflict abstention to no-source and created a second safety-policy SSOT.
+  Every invocation now reuses the one deterministic answer-safety owner;
+  candidate append remains immutable/deduplicated review evidence only.
+- Clarified that 0F-1 owns exactly five knowledge-lifecycle mutations. The
+  internal 0F-3 candidate append uses the shared command ledger but is not a
+  sixth lifecycle command, public capability or review decision.
+- Reconfirmed five non-overlapping planned tables: four 0F-1 Knowledge facts,
+  none for 0F-2 and one 0F-3 candidate fact. No schema or DB operation occurred.
+- Recomputed nested bounds and verified that 16 final citations fit both owner
+  currentness paths without truncation. Generic owner pin remains exact; all
+  Institution generation/currentness/safety bridges remain unqualified.

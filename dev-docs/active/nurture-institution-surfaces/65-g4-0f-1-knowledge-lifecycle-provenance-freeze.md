@@ -117,7 +117,7 @@ Dates affect eligibility only and never mutate revision state by themselves.
 
 ## 4. Commands and authority
 
-0F-1 owns exactly five mutations:
+0F-1 owns exactly five knowledge-lifecycle mutations:
 
 ```text
 create_institution_knowledge_item

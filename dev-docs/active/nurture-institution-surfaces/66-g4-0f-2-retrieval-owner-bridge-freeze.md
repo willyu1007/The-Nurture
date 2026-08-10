@@ -75,8 +75,7 @@ of the following are true at the current read:
 6. `validUntil` is absent or still future, using the repository/owner clock
    rather than caller time; a future `validFrom` may be indexed ahead of use;
 7. protected body unseals and its canonical content hash still matches;
-8. no active safety/conflict hold from 0F-3 applies;
-9. for `basic_health_first_aid`, at least one linked authority source resolves
+8. for `basic_health_first_aid`, at least one linked authority source resolves
     at the exact stored owner version and remains currently readable/eligible;
 
 Online answer eligibility adds all of these request-time predicates:
@@ -122,8 +121,7 @@ the authenticated My-Chat consumer:
   content hash and `indexable | ineligible` decision. The terminal page is
   explicit, so the Host may compare its inventory only after one complete
   snapshot. This recovers changes that are not 0F-1 lifecycle writes,
-  including time-window passage, authority-source currentness and a newly
-  appended 0F-3 exact-revision safety hold;
+  including time-window passage and authority-source currentness;
 - source snapshot contains canonical source ref/version/content hash,
   `sourceKind=nurture_institution_revision`,
   `provenanceKind=institution_authored`, title/summary/sections, category,
@@ -134,9 +132,10 @@ the authenticated My-Chat consumer:
 
 The 0F-1 append-only event sequence is the change cursor source; current-source
 reconciliation is a bounded snapshot over the same canonical item/revision
-facts plus later safety facts. A row becoming `ineligible` is an explicit
-removal signal; an index entry absent from a completed snapshot is removable
-only after an exact read confirms it is no longer a current publication.
+facts plus current authority-source evidence. A row becoming `ineligible` is
+an explicit removal signal; an index entry absent from a completed snapshot is
+removable only after an exact read confirms it is no longer a current
+publication.
 Nurture adds no knowledge outbox or consumer cursor table. My-Chat owns its
 durable cursors, ingestion ledger, index lifecycle and retries. A missed
 notification or non-event eligibility change is recoverable by
@@ -163,7 +162,7 @@ fallback.
 
 `InstitutionKnowledgeSourceCurrentnessProviderV1` validates at most 32 exact
 Nurture source ref/version/content-hash tuples in one bounded call. It rereads
-the current publication/review/applicability/safety facts under the trusted
+the current publication/review/applicability facts under the trusted
 answer context and returns an ordered decision per input:
 
 ```text
@@ -174,7 +173,7 @@ Denied reasons are closed in v1:
 
 ```text
 scope_denied | not_published | review_incomplete | audience_denied
-| not_yet_valid | expired | applicability_mismatch | safety_hold
+| not_yet_valid | expired | applicability_mismatch
 | authority_source_invalid | content_drift
 ```
 
@@ -198,8 +197,8 @@ Editor preview is deliberately not online retrieval:
 - preview context is constructed in memory for one invocation and is neither
   indexed nor reusable by online answer, export or another actor.
 
-Preview cannot publish, review, revoke, create a source, clear a safety hold or
-execute any attendance/Workflow action.
+Preview cannot publish, review, revoke, create a source, create/alter a conflict
+candidate or execute any attendance/Workflow action.
 
 ## 6. Concurrency, cache and replay
 
@@ -256,7 +255,7 @@ Required fixtures:
 7. retrieval owner denial is empty while owner/technical failure is
    unavailable;
 8. stale item head, source version, content hash, revoke, review change and
-   safety hold fail currentness;
+   authority-source drift fail currentness;
 9. post-retrieval and post-generation validation both remove drifted sources;
 10. limits of 100 source changes/reconciliation rows, 16 candidates, 32
     validations and 8 preview revisions reject overflow instead of truncating
@@ -274,9 +273,9 @@ not advance the external pin or invent a compatibility mapping.
 
 0F-2 plans no new Nurture table beyond the 0F-1 facts. Provider cursors derive
 from its event table; candidate packages and preview context are noncanonical
-in-memory values. 0F-3 separately owns any conflict-review/safety fact it
-freezes. My-Chat owns index, vector, cache, consumer cursor and generic runtime
-persistence.
+in-memory values. 0F-3 separately owns its immutable conflict-review candidate,
+which is not a retrieval-eligibility fact. My-Chat owns index, vector, cache,
+consumer cursor and generic runtime persistence.
 
 ## Exit
 

@@ -6,7 +6,7 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **complete the 0F cross-contract audit and branch Exit;
+- Next step: **sign the 0F branch Exit after the passed cross-contract audit;
   after G-09 adoption, G4-D I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
@@ -18,7 +18,10 @@
   ([`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md)); 0F-3 freezes
   structured cited answers, source/medical safety abstention, final citation
   validation, portable provenance and one immutable conflict-review candidate
-  ([`67`](./67-g4-0f-3-citation-answer-safety-freeze.md)). I2-A
+  ([`67`](./67-g4-0f-3-citation-answer-safety-freeze.md)); the 0G audit repaired
+  candidate-as-hold replay/SSOT ambiguity and separated the internal candidate
+  append from the five knowledge-lifecycle commands
+  ([`68`](./68-g4-0g-0f-audit-record.md)). I2-A
   rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,
@@ -29,9 +32,9 @@
   ([`63`](./63-g4-d-i2-b-surface-adapter-record.md)). Every descriptor remains
   behind the unqualified Enrollment Journey runtime gate. Real contact/native-
   source and authenticated My-Chat owner adapters remain I3 work blocked by
-  G-09. All three 0F unit contracts are frozen, but 0G audit/Exit is still
-  required. The records create no knowledge aggregate, model call, indexing,
-  database operation, activation or traffic.
+  G-09. All three 0F unit contracts and their 0G audit pass; the branch Exit is
+  still required. The records create no knowledge aggregate, model call,
+  indexing, database operation, activation or traffic.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered

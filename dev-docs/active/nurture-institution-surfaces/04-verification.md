@@ -628,6 +628,20 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Docs / context / governance | PASS | Strict task-doc lint passes 113/113 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
 | Database / runtime effect | NOT RUN / PASS | Freeze/docs only. No Prisma, migration, DB, candidate, model, source, copy/export route, owner adoption, activation or traffic effect exists. |
 
+## 2026-08-10 — G4-0G audit of the 0F branch
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Cross-contract audit | `G4_0G_0F_AUDIT_PASS_AFTER_REPAIR` | [`68`](./68-g4-0g-0f-audit-record.md) audits scope plus all three unit records; two ownership/replay collisions were repaired and none deferred. |
+| Candidate replay / SSOT | PASS after repair | Candidate-as-eligibility-hold was removed. It no longer changes an exact retry from conflict to no-source or duplicates the deterministic answer-safety decision. |
+| Mutation ownership | PASS after repair | 0F-1 owns five knowledge-lifecycle mutations; the internal 0F-3 candidate append is a separate candidate fact, not a public/sixth lifecycle command. |
+| Ownership / lifecycle matrix | PASS | Item/revision, retrieval/currentness, Host runtime, answer presenter, safety decision and candidate each have one owner; candidate has no status/deadline/blocker/dismiss or eligibility effect. |
+| Nested bounds | PASS | 8 claims × 4 refs remains capped at 16 distinct final citations, fitting both owner validators; answer/evidence aggregate limits and all-or-none excerpts prohibit silent truncation. |
+| Schema overlap | PASS statically | Five planned tables: four in 0F-1, none in 0F-2 and one in 0F-3. Command/protected-content infrastructure is reused; no answer/index/model table is planned. |
+| Generic versus scenario qualification | PASS | Exact generic pin remains `PRESENT_PINNED`; scenario source/currentness/generation and answer-safety bridges remain `DEFINED_UNQUALIFIED`, with no fingerprint/hash compatibility mapping. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 114/114 with zero warnings; LLM config, Context, project-state, governance lint and `git diff --check` pass. |
+| Database / runtime effect | NOT RUN / PASS | Audit/docs only. No Prisma, migration, DB, model, candidate, source, owner adoption, capability, activation or traffic effect exists. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
