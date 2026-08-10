@@ -31,7 +31,10 @@
   [`75`](./75-g4-e-i2-b-surface-adapter-record.md). Exact validators,
   presenters and I1 adapters are composed only through disabled internal
   Workbench handlers.
-- Current node: E7 I3 owner-integration gate, blocked on unresolved Q2–Q4.
+- E7 I3 gate audit: `G4_E_I3_NOT_READY_EXTERNAL_GATES`; see
+  [`76`](./76-g4-e-i3-owner-gate-audit.md). My-Chat checkout `4d22aab` contains
+  no adopted scenario delta or qualified deterministic answer-safety owner.
+- Current node: E7 I3 owner-integration gate, waiting on Q2–Q4 evidence/authority.
 - I3/I4 cannot start from synthetic compatibility owners or the moving checkout.
 
 ## Planning-mode context and merge policy

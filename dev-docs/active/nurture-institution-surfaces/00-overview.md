@@ -6,7 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **resolve G4-E Q2–Q4 exact owner/safety adoption gates; after G-09
+- Next step: **resolve G4-E Q2–Q4 exact owner/safety adoption gates
+  ([`76`](./76-g4-e-i3-owner-gate-audit.md)); after G-09
   and Q2–Q4 close, G4-D/G4-E I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
@@ -62,6 +63,10 @@
   confirmation/scope binding, existing I1 services/specs and role-safe presenters.
   Exactly two internal Workbench handlers are declared disabled; no formal
   caller exists ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)).
+  The E7 audit confirms that My-Chat `4d22aab` has no adopted Institution
+  Knowledge delta or qualified deterministic safety owner; sibling mutation
+  authority is also absent, so I3/I4 remain closed
+  ([`76`](./76-g4-e-i3-owner-gate-audit.md)).
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered

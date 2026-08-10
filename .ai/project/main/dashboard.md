@@ -48,7 +48,8 @@ Project: `main`
   target. E5 now adds the source-only seven-capability Knowledge wire artifact;
   E6 maps all seven to existing I1 behavior through exact validators,
   presenters and disabled internal Workbench handlers. I3 waits for exact
-  Q2–Q4 external owner/safety adoption.
+  Q2–Q4 external owner/safety adoption; the read-only E7 audit found no adopted
+  scenario delta or deterministic safety owner at My-Chat `4d22aab`.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays

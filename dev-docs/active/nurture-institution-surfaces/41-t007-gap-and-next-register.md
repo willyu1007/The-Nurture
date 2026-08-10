@@ -265,7 +265,8 @@ preview, one effectful answer action and five lifecycle actions. [`75`](./75-g4-
 maps all seven to existing I1 behavior through exact validators/presenters and
 two disabled internal Workbench handlers. I3/I4 remain closed on the adopted
 My-Chat scenario deltas and deterministic answer-safety owner/rule pin;
-synthetic compatibility mappings cannot close them.
+synthetic compatibility mappings cannot close them. [`76`](./76-g4-e-i3-owner-gate-audit.md)
+confirms the current My-Chat checkout still supplies neither adoption.
 
 ## Closed since the 0D Exit
 

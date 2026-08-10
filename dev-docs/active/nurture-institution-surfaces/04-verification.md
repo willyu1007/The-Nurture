@@ -768,6 +768,21 @@ Detailed evidence: [`74`](./74-g4-e-i2-a-contract-artifact-record.md).
 
 Detailed evidence: [`75`](./75-g4-e-i2-b-surface-adapter-record.md).
 
+## 2026-08-10 — G4-E I3 owner gate audit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Generic Knowledge/RAG pin | PASS | The eight-file My-Chat pin remains exact at `567b96c` / `554e79d4…`. |
+| My-Chat revision census | OBSERVED, NOT ADOPTED | Sibling HEAD is `4d22aab`; `origin/main` is `2dc365e`. Neither is named by a Nurture I3 adoption artifact. |
+| Q2 scenario-owner search | OPEN | Targeted search across My-Chat context/project/task/package surfaces found no Institution Knowledge source/retrieval/currentness/replayable-generation scenario contract. |
+| Q3 safety-owner search | OPEN | The same bounded search found no qualified deterministic answer-safety owner and rule-set/version. |
+| Q4 mutation authority | OPEN | Current authorization covers database operations, not My-Chat/Base sibling writes. No external adopted artifact was supplied. |
+| Worktree safety | PASS | The unrelated My-Chat untracked mobile env-local artifact was preserved and untouched; The Nurture implementation worktree was clean at audit start. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 128/128 with zero warnings; Context, project-state and governance sync/lint pass. |
+| Effect boundary | READ ONLY | No source/config/schema/DB/sibling/deployment/activation/traffic mutation occurred. |
+
+Verdict: `G4_E_I3_NOT_READY_EXTERNAL_GATES`. Detailed evidence: [`76`](./76-g4-e-i3-owner-gate-audit.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
