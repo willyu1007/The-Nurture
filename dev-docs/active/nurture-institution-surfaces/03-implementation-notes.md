@@ -875,3 +875,22 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   `NurtureRuntimeContextPack` models, child-specific/private facts and all
   local provider/vector/prompt/model runtime work. Scope freeze creates no
   knowledge fact, database change, model call, index, capability or traffic.
+
+## 2026-08-10 — G4-0F-1 lifecycle and provenance freeze
+
+- Froze `nurture.institution-knowledge-lifecycle@1.0.0`: one stable
+  Institution item, immutable structured revisions, append-only source links
+  and events, explicit review/publish/revoke, expected-head concurrency and
+  the existing command ledger.
+- Kept authorship and authority provenance separate. Every revision remains
+  `institution_authored`; a verified authority link is a separate source and
+  never upgrades the Institution statement.
+- Publication, current time and retrieval eligibility remain independent.
+  Admin may publish medical-class content without an authority link, but 0F-2
+  must keep it out of online retrieval until its stricter predicates pass.
+- Reused the existing protected-content port and its exact 8 KiB plaintext
+  limit. Requested authority links are atomic with revision creation; an owner
+  failure cannot silently save a partial revision without the requested link.
+- Planned four new Nurture tables only. Legacy family corpus/runtime tables and
+  all My-Chat model/vector/index facts remain excluded; no schema was authored
+  or applied.

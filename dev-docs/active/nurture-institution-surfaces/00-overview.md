@@ -6,11 +6,14 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **issue the three 0F Knowledge/RAG unit freezes and branch audit;
+- Next step: **issue 0F-2 retrieval/owner bridge, 0F-3 citation/safety and the
+  branch audit;
   after G-09 adoption, G4-D I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
-  ([`64`](./64-g4-0f-scope-freeze.md)). I2-A
+  ([`64`](./64-g4-0f-scope-freeze.md)); 0F-1 freezes the Nurture-owned item,
+  immutable revision, provenance, review and explicit publish/revoke contract
+  ([`65`](./65-g4-0f-1-knowledge-lifecycle-provenance-freeze.md)). I2-A
   rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,
@@ -21,7 +24,7 @@
   ([`63`](./63-g4-d-i2-b-surface-adapter-record.md)). Every descriptor remains
   behind the unqualified Enrollment Journey runtime gate. Real contact/native-
   source and authenticated My-Chat owner adapters remain I3 work blocked by
-  G-09. The 0F scope change creates no knowledge aggregate, model call,
+  G-09. The 0F freeze records create no knowledge aggregate, model call,
   indexing, database operation, activation or traffic.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).

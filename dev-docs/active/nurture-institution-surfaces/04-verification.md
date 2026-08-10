@@ -585,6 +585,20 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Project state / governance | PASS | Project-state verification and governance lint pass before sync. |
 | Database / runtime effect | NOT RUN / PASS | Scope freeze changes no Prisma, migration, repository, Surface, model or index implementation. No DB operation, owner adoption, activation, deployment or traffic occurred. |
 
+## 2026-08-10 — G4-0F-1 lifecycle and provenance freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Owner/fact boundary | PASS | [`65`](./65-g4-0f-1-knowledge-lifecycle-provenance-freeze.md) assigns item/revision/publication/review facts only to Nurture and excludes legacy family corpus plus all host chunk/vector/model facts. |
+| Protected body feasibility | PASS after repair | Canonical UTF-8 body JSON is capped at the existing 8,192-byte protected-content limit; the initial oversized 64-section shape was removed before schema authoring. |
+| Atomic source linkage | PASS after repair | Every requested authority-source option resolves or the whole revision command is unavailable; no silent partial revision can omit requested provenance. |
+| Lifecycle/concurrency/replay | PASS statically | Five closed mutations, immutable revisions/events, current publication pointer, expected item head and `NurtureCommandExecution` exact replay have one writer and no timer-authored state. |
+| Medical publication boundary | PASS statically | Admin publication remains distinct from 0F-2 retrieval eligibility; authority links do not upgrade Institution authorship or medical authority. |
+| Generic owner pin | PASS | Eight-file My-Chat Knowledge/PBR/RAG source and package-export pin remains exact; checkout drift is reported live and not adopted. |
+| LLM/config boundary | PASS | Zero in-scope LLM env/config references; no provider, prompt, profile, model call, vector or telemetry implementation changed. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 111/111 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
+| Database / runtime effect | NOT RUN / PASS | 0F-1 is a freeze record only. No Prisma, migration, repository, Surface, model, index, deployment, activation or traffic effect exists. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

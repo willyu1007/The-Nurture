@@ -530,3 +530,23 @@
 - **Prevention:** every cross-owner branch must pin the exact public consumer
   surface, not a nearby domain directory or prose digest. Similar table names
   are never reuse evidence; ownership and product lifecycle must match first.
+
+## 2026-08-10 — Knowledge authoring must fit the protected atomic boundary
+
+- **Symptom:** the first 0F-1 draft allowed a structured body far larger than
+  the existing protected-content port and allowed a requested authority link
+  to disappear while still saving the revision.
+- **Root cause:** product-level field maxima were chosen before checking the
+  concrete 8 KiB sealed-plaintext invariant, and draft availability was valued
+  over the caller's atomic revision intent.
+- **What was tried:** the architecture review traced the planned sealed body to
+  `ProtectedContentWritePort` before any schema or implementation was authored.
+  The mismatch and silent partial-success branch were therefore found at
+  freeze time.
+- **Fix/workaround:** cap canonical serialized UTF-8 body JSON at 8,192 bytes,
+  bound sections to 16 and require every requested authority link to resolve
+  or fail the whole revision command. Larger material uses multiple items, not
+  a second storage path.
+- **Prevention:** freeze records that reuse a security/storage port must cite
+  its concrete size and atomicity constraints. Optional enrichment may be
+  omitted only when the caller did not request it.
