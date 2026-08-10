@@ -319,6 +319,11 @@ enum NurtureEnrollmentStatus {
   deleted
 }
 
+enum NurtureEnrollmentParticipationPhase {
+  trial
+  formal
+}
+
 enum NurtureCareRole {
   guardian
   caregiver
@@ -2385,19 +2390,20 @@ model NurtureCareGroup {
 }
 
 model NurtureEnrollment {
-  id                   String                  @id @default(uuid())
-  workspaceId          String                  @map("workspace_id")
-  childCareProcessId   String                  @map("child_care_process_id")
-  institutionId        String                  @map("institution_id")
-  careGroupId          String                  @map("care_group_id")
+  id                   String                               @id @default(uuid())
+  workspaceId          String                               @map("workspace_id")
+  childCareProcessId   String                               @map("child_care_process_id")
+  institutionId        String                               @map("institution_id")
+  careGroupId          String                               @map("care_group_id")
   status               NurtureEnrollmentStatus
-  joinedAt             DateTime?               @map("joined_at")
-  leftAt               DateTime?               @map("left_at")
-  enrollmentRefPayload Json?                   @map("enrollment_ref_payload")
-  aggregateVersion     Int                     @default(0) @map("aggregate_version")
-  createdAt            DateTime                @default(now()) @map("created_at")
-  updatedAt            DateTime                @updatedAt @map("updated_at")
-  deletedAt            DateTime?               @map("deleted_at")
+  participationPhase   NurtureEnrollmentParticipationPhase? @map("participation_phase")
+  joinedAt             DateTime?                            @map("joined_at")
+  leftAt               DateTime?                            @map("left_at")
+  enrollmentRefPayload Json?                                @map("enrollment_ref_payload")
+  aggregateVersion     Int                                  @default(0) @map("aggregate_version")
+  createdAt            DateTime                             @default(now()) @map("created_at")
+  updatedAt            DateTime                             @updatedAt @map("updated_at")
+  deletedAt            DateTime?                            @map("deleted_at")
 
   childCareProcess NurtureChildCareProcess       @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
   institution      NurtureCareInstitution        @relation(fields: [institutionId], references: [id], onDelete: Restrict)
@@ -2411,7 +2417,7 @@ model NurtureEnrollment {
   publishTargets   NurturePublishProcessTarget[]
 
   @@index([workspaceId, childCareProcessId, status], map: "ix_nurture_enrollment_process")
-  @@index([workspaceId, careGroupId, status], map: "ix_nurture_enrollment_group")
+  @@index([workspaceId, careGroupId, status, participationPhase], map: "ix_nurture_enrollment_group_phase")
   @@map("nurture_enrollment")
 }
 

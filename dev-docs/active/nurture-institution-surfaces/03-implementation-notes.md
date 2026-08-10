@@ -704,3 +704,33 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   affected local profiles were re-frozen at exact revision `e7604ec` and
   aggregate hash `57e4759f…`; unchanged Base/Host fields were retained. My-Chat
   remains unadopted at observed `fd2a213c` versus expected `567b96c`.
+
+## 2026-08-10 — G4-D increment 4 trial lifecycle
+
+- Added one nullable Enrollment phase and no new business table. Existing
+  active rows backfill formal; active new/current rows must declare trial or
+  formal.
+- Added six private command specs and one repository owner inside the existing
+  serializable command transaction. Preparation/start revalidate current C30
+  binding owners and exact local association heads; end uses local authority
+  only so My-Chat outage cannot preserve future access.
+- Reused the accepted offer/reservation, Enrollment, Grant, CareGroup and
+  workflow transition chain. Review time does not write; one explicit extension
+  retains the same seat and cannot exceed the Grant policy snapshot.
+- Database replay found and repaired narrow pre-0E-3 workflow identity,
+  due/stage-loop and converted-release constraints. Full DB regression then
+  caught an implicit dynamic formal fixture and an over-broad active-Grant
+  uniqueness rule; both were corrected without a compatibility path.
+- Final architecture review restricted the Guardian canonical ref to the
+  current My-Chat `actor`, bound trial start to the pending Grant's exact
+  granting participant and stored terms, required active local Child/Family/
+  CareProcess plus a currently effective Guardian role, and made the deferred
+  reservation invariant reject unaudited date drift. The phase-aware indexes
+  replace the two indexes they subsume instead of creating parallel
+  enforcement/read paths. The unused aggregate payload export was removed.
+- Final qualification passed targeted 6/6, full production DB 386/386, full
+  unit 876/876, typecheck, structure gates, current migration status and zero
+  drift. DB context checksum is `30086d74…`; both exact disposable targets were
+  destroyed and confirmed absent.
+- No caller, capability, module/manifest registration, deployment, activation
+  or traffic was added. 0E-4 remains the next dependent unit.

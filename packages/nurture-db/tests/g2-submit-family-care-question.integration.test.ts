@@ -76,6 +76,7 @@ const seedScope = async (options: { grantStatus?: "active" | "revoked" } = {}) =
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const guardianRole = await prisma.nurtureCareRoleAssignment.create({
@@ -280,6 +281,7 @@ describe("G2-A submit_family_care_question vertical", () => {
         institutionId: otherInstitution.id,
         careGroupId: otherGroup.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     await prisma.nurtureChildLinkGrant.create({

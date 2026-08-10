@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-09T22:46:14.926Z",
+  "updatedAt": "2026-08-10T00:38:06.422Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -388,6 +388,13 @@
         "trial_ended",
         "formal_enrollment_committed",
         "journey_completed"
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentParticipationPhase",
+      "values": [
+        "trial",
+        "formal"
       ]
     },
     {
@@ -11099,6 +11106,17 @@
           "unique": false
         },
         {
+          "name": "participationPhase",
+          "type": "NurtureEnrollmentParticipationPhase",
+          "nullable": true,
+          "list": false,
+          "dbName": "participation_phase",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "status",
           "type": "NurtureEnrollmentStatus",
           "nullable": false,
@@ -11242,10 +11260,11 @@
           "fields": [
             "workspaceId",
             "careGroupId",
-            "status"
+            "status",
+            "participationPhase"
           ],
           "name": null,
-          "map": "ix_nurture_enrollment_group"
+          "map": "ix_nurture_enrollment_group_phase"
         },
         {
           "type": "index",

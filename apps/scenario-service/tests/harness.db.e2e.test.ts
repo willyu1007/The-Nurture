@@ -178,6 +178,7 @@ const seedScope = async () => {
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const guardianRole = await prisma.nurtureCareRoleAssignment.create({
@@ -2835,6 +2836,7 @@ describe("T-006 attribution lane through the formal Harness ingress", () => {
         institutionId: scope.institution.id,
         careGroupId: scope.group.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     const superseded = await prepareAndExecute({

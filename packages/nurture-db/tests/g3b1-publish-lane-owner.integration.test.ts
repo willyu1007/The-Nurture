@@ -215,6 +215,7 @@ describe("G3-B1 owner reads: teacher publish queue", () => {
         institutionId: world.institution.id,
         careGroupId: world.group.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     const grant = await prisma.nurtureChildLinkGrant.create({
@@ -1047,6 +1048,7 @@ describe("T-006 owner write: pre-release publish-process cancel", () => {
         institutionId: world.institution.id,
         careGroupId: world.group.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     const grant = await prisma.nurtureChildLinkGrant.create({

@@ -62,6 +62,7 @@ const seedWorld = async (policyConfig: unknown = SAFETY_POLICY) => {
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   // A child of the sibling class: visible in the building, never an
@@ -79,6 +80,7 @@ const seedWorld = async (policyConfig: unknown = SAFETY_POLICY) => {
       institutionId: institution.id,
       careGroupId: otherGroup.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   return {
@@ -693,6 +695,7 @@ describe("T-006 owner write: child-media attribution decisions", () => {
         institutionId: world.institution.id,
         careGroupId: world.group.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     // Child A is confirmed at revision 2 (via a candidate), child B has nothing.

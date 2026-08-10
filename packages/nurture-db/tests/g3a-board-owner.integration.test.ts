@@ -87,6 +87,7 @@ const seedWorld = async () => {
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const guardianRole = await prisma.nurtureCareRoleAssignment.create({
@@ -200,6 +201,7 @@ describe("G3-A owner reads: guardian lane", () => {
         institutionId: world.institution.id,
         careGroupId: world.group.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
 

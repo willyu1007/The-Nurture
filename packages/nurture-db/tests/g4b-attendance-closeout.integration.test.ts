@@ -98,6 +98,7 @@ const seed = async () => {
       institutionId: institution.id,
       careGroupId: careGroup.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
 
@@ -462,6 +463,7 @@ describe("T-007 G4-B attendance closeout (production DB lane)", () => {
         institutionId: scope.institution.id,
         careGroupId: scope.careGroup.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     const both = [

@@ -76,6 +76,7 @@ const seedEnrollment = (
       institutionId: scope.home.id,
       careGroupId,
       status,
+      ...(status === "active" ? { participationPhase: "formal" as const } : {}),
     },
   });
 

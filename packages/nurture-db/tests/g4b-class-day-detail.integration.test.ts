@@ -112,6 +112,7 @@ const seedScope = async () => {
       institutionId: institution.id,
       careGroupId: careGroup.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const [adminRole, caregiverRole, guardianRole] = await Promise.all([

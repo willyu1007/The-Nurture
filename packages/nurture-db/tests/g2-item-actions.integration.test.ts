@@ -93,6 +93,7 @@ const seedScope = async () => {
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   await prisma.nurtureCareRoleAssignment.create({

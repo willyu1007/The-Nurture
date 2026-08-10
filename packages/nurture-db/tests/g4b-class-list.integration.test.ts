@@ -87,6 +87,7 @@ const addChild = async (scope: Scope, careGroupId: string, label: string) => {
       institutionId: scope.institution.id,
       careGroupId,
       status: "active",
+      participationPhase: "formal",
     },
   });
   return { process, enrollment };

@@ -31,6 +31,7 @@ import { PrismaCareCaptureTransaction } from "./care-capture.transaction.js";
 import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transaction.js";
 import { PrismaEnrollmentJourneyRepository } from "./enrollment-journey.repository.js";
 import { PrismaEnrollmentWaitlistRepository } from "./enrollment-waitlist.repository.js";
+import { PrismaEnrollmentTrialLifecycleRepository } from "./enrollment-trial-lifecycle.repository.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -127,6 +128,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   /** G4-D private workflow/inquiry writes, in the one command-ledger tx. */
   readonly enrollmentJourney: PrismaEnrollmentJourneyRepository;
   readonly enrollmentWaitlist: PrismaEnrollmentWaitlistRepository;
+  readonly enrollmentTrialLifecycle: PrismaEnrollmentTrialLifecycleRepository;
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
   /**
@@ -177,6 +179,10 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   ) {
     this.enrollmentJourney = new PrismaEnrollmentJourneyRepository(transaction);
     this.enrollmentWaitlist = new PrismaEnrollmentWaitlistRepository(transaction, now);
+    this.enrollmentTrialLifecycle = new PrismaEnrollmentTrialLifecycleRepository(
+      transaction,
+      now,
+    );
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);

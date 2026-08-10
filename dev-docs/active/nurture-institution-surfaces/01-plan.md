@@ -55,8 +55,8 @@
   ([`47`](./47-g4-c-increment-1-record.md)). **G4-C increment 2** wires the
   automatic pass to capture intake and implements 0D-4's sourced,
   non-canonical correction candidate without adding lifecycle/deadline state
-  ([`48`](./48-g4-c-increment-2-record.md)). 0E and 0F have not reached the
-  freeze stage.
+  ([`48`](./48-g4-c-increment-2-record.md)). 0E is frozen and implemented
+  through 0E-3 at I1; 0F has not reached the freeze stage.
 - All of it is **I1**: exact implementation plus migration authoring. All
   implemented daily-operations persistence paths are qualified on disposable PostgreSQL. No
   shared or persistent apply, no capability
@@ -65,7 +65,7 @@
 - Live gaps and the ordered next steps are
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
 
-## Execution checkpoint — 2026-08-10 G4-D increments 2–3 qualified at I1
+## Execution checkpoint — 2026-08-10 G4-D increments 2–4 qualified at I1
 
 - The private inquiry/touchpoint owner and the capacity waitlist/policy/offer/
   reservation/preparation owner are implemented and qualified through all 31
@@ -76,8 +76,13 @@
   fences direct class capacity/status downscope, and family/Admin projections
   remain separate and bounded. No automatic deadline, blocker lifecycle,
   Enrollment/Grant mutation, public caller or activation was added.
-- The next dependent unit is G4-D increment 4 / frozen 0E-3 trial lifecycle;
-  0E-4 follows only after 0E-3 DB qualification. The independent 0F freeze may
+- Increment 4 reuses those owners for the canonical phase, exact current pair
+  and pending Grant preparation, atomic trial start, explicit review/extension/
+  proposal and local end. The clean 32-migration qualification passed targeted
+  6/6 and full 386/386 DB lanes with zero drift; both disposable targets were
+  destroyed.
+- The next dependent unit is G4-D increment 5 / frozen 0E-4 formalization and
+  completion. The independent 0F freeze may
   proceed in parallel. The live order remains in
   [`41`](./41-t007-gap-and-next-register.md).
 

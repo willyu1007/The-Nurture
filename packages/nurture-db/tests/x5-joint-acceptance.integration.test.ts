@@ -633,6 +633,7 @@ async function seedNurtureFixture(
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
       joinedAt: new Date(),
     },
   });

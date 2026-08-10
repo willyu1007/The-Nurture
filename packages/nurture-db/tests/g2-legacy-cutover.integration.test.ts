@@ -58,6 +58,7 @@ const seedG2Item = async (options: { writerContract?: "harness_g2_v1" | "legacy_
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const guardianRole = await prisma.nurtureCareRoleAssignment.create({

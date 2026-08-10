@@ -404,6 +404,7 @@ const seedNurtureWorld = async (children: ChildSpec[]) => {
         institutionId: institution.id,
         careGroupId: group.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     const grant = await prisma.nurtureChildLinkGrant.create({

@@ -41,6 +41,12 @@ export const NURTURE_ENROLLMENT_JOURNEY_COMMAND_KEYS = [
   "decline_or_expire_trial_offer",
   "withdraw_from_waitlist",
   "cancel_trial_preparation",
+  "prepare_trial_relationship",
+  "start_trial",
+  "mark_trial_review_reached",
+  "extend_trial",
+  "propose_formal_enrollment",
+  "end_trial",
 ] as const;
 
 export type NurtureEnrollmentJourneyCommandKey =

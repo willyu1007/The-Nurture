@@ -65,6 +65,7 @@ const seedScope = async () => {
       institutionId: institution.id,
       careGroupId: group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const guardianRole = await prisma.nurtureCareRoleAssignment.create({
@@ -326,6 +327,7 @@ describe("G2 query lane guards", () => {
         institutionId: otherInstitution.id,
         careGroupId: otherGroup.id,
         status: "active",
+        participationPhase: "formal",
       },
     });
     const otherThread = await prisma.nurtureFamilyCareThread.create({

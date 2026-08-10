@@ -130,6 +130,7 @@ const seedChild = async (world: Institution, label: string) => {
       institutionId: world.institution.id,
       careGroupId: world.group.id,
       status: "active",
+      participationPhase: "formal",
     },
   });
   const grant = await prisma.nurtureChildLinkGrant.create({

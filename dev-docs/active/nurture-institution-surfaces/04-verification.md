@@ -498,6 +498,27 @@ Falsification evidence is per-increment and lives in each record's
 | External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `fd2a213c`; no external adoption performed. |
 | Cleanup / effect boundary | PASS | Diff shadow and all exact qualification/simplification/release DBs, including `nurture_t007_g4d_i3_release_20260810_05`, were destroyed with zero sessions and confirmed absent. No shared apply, caller, capability, deployment, activation or traffic. |
 
+## 2026-08-10 — G4-D increment 4 trial lifecycle
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Phase migration | PASS | Active legacy backfill formal; pending/null, active/trial-or-formal and ended trial invariants replayed from empty. |
+| Exact owner preparation/start | PASS | Current Child/Family anchor, authorization, association, active local Child/Family/CareProcess, My-Chat actor, effective Guardian role, matching Grant signer/terms and expected heads required; stale/inactive facts wrote no Grant. |
+| Atomic lifecycle | PASS | Enrollment, Grant, reservation and workflow heads move in one serializable command transaction; full rollback on conflict. |
+| Explicit time behavior | PASS | Advancing through review time left workflow at head 8 until `mark_trial_review_reached`. |
+| Extension | PASS | Same converted seat, one explicit extension, valid review/end order and Grant-policy expiry bound; direct reservation/Grant date drift is rolled back. |
+| Local end | PASS | No owner snapshot input; Enrollment ended, Grant revoked, reservation released, workflow closed, accepted waitlist/offer retained. |
+| Formal population semantics | PASS | Active trial counted as class occupancy while active/formal count remained zero. |
+| Replay | PASS | Prepare and end exact command identities returned frozen replay results. |
+| Targeted / full unit | PASS | 5/5; 876/876. |
+| Targeted / full PostgreSQL | PASS | 6/6; 386/386 across 42 files. |
+| TypeScript / Prisma / structure | PASS | Root typecheck, format/validate/generate, routing 148, persistence, port topology and G3 freeze. |
+| Migration / drift / context | PASS | 32 current, empty diff, context checksum `30086d74…`; superseded active-only uniqueness and group lookup indexes are absent. |
+| Cleanup / effect boundary | PASS | Exact diff and qualification DBs destroyed and absent; no durable apply, caller, capability or traffic. |
+
+Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and
+[`artifacts/db/0e3-trial-lifecycle`](./artifacts/db/0e3-trial-lifecycle/00-connection-check.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
