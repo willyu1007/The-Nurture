@@ -533,6 +533,8 @@ Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and
 | Targeted / full PostgreSQL | PASS | 7/7; 387/387 across 42 files. |
 | TypeScript / Prisma / structure | PASS | Root typecheck, format/validate/generate, routing 148, persistence, port topology and G3 freeze. |
 | Migration / drift / context | PASS | 33 current from empty; no datasource diff; DB context checksum `3cc9d48c…`. |
+| Local qualification locks | PASS after commit boundary | C30 profiles re-frozen at `c4ac700`, aggregate `9a88a32a…`; Nurture exact runtime `6b8edb81…` over 249 files; Base/Host fields unchanged. |
+| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `a19ac96`; verifier tests pass 5/5 and no external adoption was performed. |
 | Effect boundary | PASS | Approved disposable target destroyed with zero sessions and confirmed absent; no shared apply, public caller/capability, deployment, activation or traffic. |
 
 Detailed evidence: [`61`](./61-g4-d-increment-5-record.md).

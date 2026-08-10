@@ -150,7 +150,7 @@ authorized.
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. The simplification rerun observed `fd2a213c`; C30's independent
+`x5_joint_api` divergence. Increment 5 observed `a19ac96`; C30's independent
 upstream lock still expects `51ad97f`
 ([`46`](./46-g4-b-increment-12-record.md), [`48`](./48-g4-c-increment-2-record.md)).
 Neither external head is treated as a Nurture pin.
@@ -190,7 +190,7 @@ accepts only the exact My-Chat-owned canonical ref and the private workflow ref
 is never projected.
 
 The revision-bearing local C30 adoption lock is current at implementation
-revision `e7604ec`, aggregate source hash `57e4759f…`; this closes the local
+revision `c4ac700`, aggregate source hash `9a88a32a…`; this closes the local
 commit-boundary maintenance step without adopting the divergent My-Chat head.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`61`](./61-g4-d-increment-5-record.md).

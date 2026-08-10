@@ -758,3 +758,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - This closes frozen 0E-4 at private I1. No caller, capability, module/manifest
   registration, durable apply, deployment, activation or traffic was added;
   I2 is next and I3 remains blocked by G-09.
+- The implementation commit is `c4ac700`. Its affected local C30 profiles are
+  re-frozen at aggregate `9a88a32a…`; the Nurture exact-runtime self-pin is
+  `6b8edb81…` over 249 files. Base/Host and the divergent My-Chat pin were not
+  advanced.

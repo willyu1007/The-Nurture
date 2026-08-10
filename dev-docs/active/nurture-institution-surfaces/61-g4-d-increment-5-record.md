@@ -77,6 +77,8 @@
 | Migration status / drift | PASS — current / no datasource-to-SSOT difference |
 | Storage census | PASS — no duplicate proposal index; hash + allowlisted metadata only |
 | DB context | PASS — checksum `3cc9d48c…` |
+| Local qualification locks | PASS — C30 `9a88a32a…` at `c4ac700`; exact runtime `6b8edb81…` over 249 files |
+| External My-Chat pin | KNOWN RED — expected `567b96c`, observed `a19ac96`; no adoption performed |
 | Disposable cleanup | PASS — zero sessions; exact target destroyed and absent |
 
 Re-run the main qualification with an explicitly disposable database URL:
