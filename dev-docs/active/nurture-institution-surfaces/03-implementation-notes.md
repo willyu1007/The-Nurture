@@ -909,7 +909,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   retrieval and Nurture final-currentness ports. Host owns cursors/index/retry;
   Nurture owns source truth and never imports Host ORM/RAG/provider code.
 - Added current-source reconciliation because lifecycle events alone cannot
-  rediscover time-window, authority-source or safety-hold changes. Index/cache
+  rediscover time-window, authority-source or safety-hold creation. Index/cache
   presence remains non-authoritative, and used citations require a later 0F-3
   revalidation after generation.
 - Admin preview is all-or-nothing, same-Institution, exact-revision and
@@ -919,3 +919,32 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   conflict-review/safety fact. No source, model, index or DB operation was
   executed. The Institution-specific My-Chat delta remains defined but
   unqualified.
+
+## 2026-08-10 — G4-0F-3 cited answer and safety freeze
+
+- Froze `nurture.institution-knowledge-answer-safety@1.0.0`: strict replayable
+  Host claim drafts, Nurture-built source-identity citations, pre/post owner
+  currentness, deterministic request/source/draft safety and bounded answer
+  dispositions.
+- Every positive claim is cited; medical facts/actions/danger signals require
+  a current authority-source citation. Model prose, URLs, citation refs, trust
+  upgrades and safety self-ratings remain untrusted and cannot enter results.
+- Kept the authority-currentness bridge unqualified: the pinned generic
+  `sourceVersion` and excerpt fingerprint cannot be renamed into the exact
+  authority content hash required by the scenario citation contract.
+- Kept all online generation unavailable until one exact deterministic safety
+  provider qualifies. Field-level child-ref exclusion is not treated as enough:
+  child/private facts in free-text questions or drafts produce a safety
+  abstention and are never persisted in Nurture candidate/command facts.
+- Defined one immutable, protected conflict-review candidate deduplicated by
+  exact rule/finding/source/revision identity. It has no status/deadline/
+  blocker or dismiss path; remediation uses the existing immutable
+  revision/review/publish/revoke lifecycle instead of a second knowledge state
+  machine.
+- Copy/export is an Admin-only portable presenter that must preserve every
+  citation, AI provenance and applicable fixed safety notice. It creates no
+  delivery, family visibility or canonical answer row.
+- Planned one Nurture conflict-candidate table and reused the command ledger
+  plus protected-content port. No schema, DB, model, source, export or runtime
+  operation was executed; all scenario generation/safety bridges remain
+  defined but unqualified.

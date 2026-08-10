@@ -613,6 +613,21 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Docs / context / governance | PASS | Strict task-doc lint passes 112/112 after removing an ambiguous pronoun warning; Context, project-state, governance lint and `git diff --check` pass. |
 | Database / runtime effect | NOT RUN / PASS | 0F-2 adds only frozen ports/policies and no table beyond the 0F-1 plan. No Prisma, migration, DB, source ingestion, index, model, owner adoption, activation or traffic effect exists. |
 
+## 2026-08-10 — G4-0F-3 cited answer and safety freeze
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Claim/citation boundary | PASS | [`67`](./67-g4-0f-3-citation-answer-safety-freeze.md) permits only 1..8 bounded claims and 1..16 current citations; model prose/URLs/refs are untrusted, and medical claims require an authority-source citation. |
+| Free-text privacy / safety | PASS after repair | Closed DTO keys were not treated as content safety. Child-private text, diagnostic/prescriptive requests and unsafe drafts route to fixed abstention with no generated text or candidate persistence. |
+| Unqualified safety provider | PASS after repair | All online generation remains unavailable until one deterministic request/source/draft answer-safety owner and exact rule-set pin qualify; no keyword/model-self-rating compatibility path remains. |
+| Authority content identity | PASS after repair | Generic `sourceVersion`/excerpt fingerprint cannot be renamed into authority content hash. The exact authority citation currentness bridge remains `DEFINED_UNQUALIFIED`. |
+| Conflict candidate identity | PASS after repair | Stable identity includes rule, conflict class, finding fingerprint and sorted source/revision tuples, preventing distinct findings on the same sources from merging. Protected optional excerpts use all-or-none inclusion under the 8,192-byte aggregate cap. |
+| Single lifecycle | PASS | One immutable candidate table is planned. No status/deadline/blocker/dismiss/event track exists; exact revision remediation reuses 0F-1 revision/review/publish/revoke. |
+| Replay / drift | PASS statically | Host generation replay and Nurture candidate replay remain separate owner ledgers; final currentness reruns after generation and stale replay cannot return citations. |
+| Generic owner pin / LLM config | PASS | Eight-file pin remains exact at `567b96c` / `554e79d4…`; zero LLM env/config keys, prompts, profiles, providers or runtime implementations were added. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 113/113 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
+| Database / runtime effect | NOT RUN / PASS | Freeze/docs only. No Prisma, migration, DB, candidate, model, source, copy/export route, owner adoption, activation or traffic effect exists. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

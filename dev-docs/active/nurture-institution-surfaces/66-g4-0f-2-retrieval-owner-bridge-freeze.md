@@ -121,9 +121,9 @@ the authenticated My-Chat consumer:
   snapshot or fail `unavailable`. Each row carries the exact source ref/version,
   content hash and `indexable | ineligible` decision. The terminal page is
   explicit, so the Host may compare its inventory only after one complete
-  snapshot. This recovers changes that are not lifecycle writes, including
-  time-window passage, authority-source currentness and a 0F-3 safety-hold
-  resolution;
+  snapshot. This recovers changes that are not 0F-1 lifecycle writes,
+  including time-window passage, authority-source currentness and a newly
+  appended 0F-3 exact-revision safety hold;
 - source snapshot contains canonical source ref/version/content hash,
   `sourceKind=nurture_institution_revision`,
   `provenanceKind=institution_authored`, title/summary/sections, category,

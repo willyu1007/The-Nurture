@@ -5,8 +5,8 @@
 - Task: T-007
 - Stage: G4-0A Freeze Protocol & Fact Inventory
 - State: `G4_0A_INVENTORY_PASS` on 2026-08-01. 0B～0E have since frozen and
-  exited; 0F scope, 0F-1 lifecycle/provenance and 0F-2 retrieval/owner bridge
-  are accepted, while 0F-3 remains open. Live branch state is
+  exited; 0F scope and all three unit contracts are accepted, while the 0G
+  cross-contract audit and 0F Exit remain open. Live branch state is
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
 - **Exact pin values are not recorded here.** Workflow/contact pins live in
   `docs/project/integrations/my-chat-workflow-contract.json`; the 0F generic
@@ -46,14 +46,14 @@ Documentation acceptance alone cannot produce `PRESENT_PINNED`.
 | Care interaction | T-005 | exact `CareInteraction`/owner-read/direct-interaction contracts used by Institution consumers | `DEFINED_UNQUALIFIED` | 0C/0D, G4-C/F | provider/version/source lifecycle drift invalidates affected consumer qualification |
 | Care/media/publication | T-006 | exact care facts, activity attribution, Board and `PublishProcess` contracts | `DEFINED_UNQUALIFIED` | 0B/0D, G4-B/C/F | fact/schema/policy/source-head drift invalidates affected projections and release evidence |
 | Generic Workflow runtime | My-Workflow-Base / My-Chat | pinned Run/Step/worker/ledger/private-carrier contract | `DEFINED_UNQUALIFIED` | 0E, G4-D/F | carrier/runtime/interface drift invalidates Workflow integration evidence |
-| Host identity/contact/RAG | My-Chat | Workflow/contact source is governed by the workflow pin; the exact generic Knowledge/PBR/RAG source artifact is governed by the 0F pin and [`64`](./64-g4-0f-scope-freeze.md). The required Institution source/currentness bridge is frozen in [`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md) but not adopted by My-Chat | `PRESENT_PINNED` generic source; `DEFINED_UNQUALIFIED` scenario bridge | 0C/0E/0F, G4-A/D/E/F | identity/contact/RAG owner drift invalidates affected owner and joint evidence |
-| Institution capability set | T-007 | 0B～0E are frozen and exited; 0C/0D are implemented at I1 and G4-D has I1 plus default-off I2. 0F scope and 0F-1/2 are accepted in [`64`](./64-g4-0f-scope-freeze.md)–[`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md); 0F-3 remains missing | `DEFINED_UNQUALIFIED` for accepted freeze units; `GAP` for the remaining 0F unit contract | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
+| Host identity/contact/RAG | My-Chat | Workflow/contact source is governed by the workflow pin; the exact generic Knowledge/PBR/RAG source artifact is governed by the 0F pin and [`64`](./64-g4-0f-scope-freeze.md). The required Institution source/currentness, replayable generation and authority-citation bridges are frozen in [`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md)–[`67`](./67-g4-0f-3-citation-answer-safety-freeze.md) but not adopted by My-Chat | `PRESENT_PINNED` generic source; `DEFINED_UNQUALIFIED` scenario bridges | 0C/0E/0F, G4-A/D/E/F | identity/contact/RAG owner drift invalidates affected owner and joint evidence |
+| Institution capability set | T-007 | 0B～0E are frozen and exited; 0C/0D are implemented at I1 and G4-D has I1 plus default-off I2. 0F scope and all three unit contracts are accepted in [`64`](./64-g4-0f-scope-freeze.md)–[`67`](./67-g4-0f-3-citation-answer-safety-freeze.md); 0G audit/Exit remains | `DEFINED_UNQUALIFIED`; unit contract gap closed, branch release still open | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
 
 0A may cite only exact artifacts already qualified by their owner. T-005/T-006 and
 the T-007 branch set remain non-pinned until their own implementation/qualification.
-0F now has an exact generic My-Chat source artifact and a frozen
-Institution-specific bridge; that bridge remains unqualified until later owner
-adoption/integration passes.
+0F now has an exact generic My-Chat source artifact plus frozen scenario and
+medical-safety bridges; those bridges remain unqualified until later exact
+owner adoption/integration passes.
 
 ## 0A-2 Fact Ownership Matrix
 

@@ -555,8 +555,8 @@
 
 - **Symptom:** the first 0F-2 draft used one predicate for indexing and online
   answer, then relied only on publish/supersede/revoke events. A future
-  `validFrom`, review change or cleared safety hold could remain undiscovered
-  forever after an initial ineligible read.
+  `validFrom`, authority-source currentness change or newly appended exact-
+  revision safety hold could remain undiscovered after an initial read.
 - **Root cause:** index admission, request-time authorization and source-change
   discovery were conflated. Not every eligibility change is or should be a
   lifecycle write.
@@ -564,10 +564,31 @@
   safety-held sources through publish, pull, index, retrieval and final
   validation without inventing timer-authored business states.
 - **Fix/workaround:** separate index admission from online eligibility, include
-  review changes in the event feed and add bounded current-indexable-source
-  reconciliation. Future sources may be indexed, but cannot enter model context
-  until request-time currentness passes.
+  review changes in the event feed and add bounded current-source-state
+  reconciliation. Future sources may be indexed, but cannot enter model
+  context until request-time currentness passes; an exact-revision hold is
+  monotone and remediation uses a later ordinary revision/publication.
 - **Prevention:** every derived index fed by canonical owner facts needs both
   incremental changes and full reconciliation. Cache/index presence never
   replaces owner validation, and time passage must not require a fake
   lifecycle transition.
+
+## 2026-08-10 — Closed DTO fields do not make free text non-sensitive
+
+- **Symptom:** the first 0F-3 draft excluded `child_id` and family fields but
+  would still have allowed a user to paste child-specific/private care facts
+  into the question and reach generation.
+- **Root cause:** structural input minimization was mistaken for semantic
+  content classification. The same draft also proposed leaving general
+  generation available before a medical-safety provider could distinguish a
+  general question from a medical one.
+- **What was tried:** traced raw question text, retrieved excerpts, model draft,
+  candidate persistence, copy/export and Host replay independently from the
+  typed request keys.
+- **Fix/workaround:** require one deterministic request/source/draft safety
+  owner for every online generation. Child-private input receives a fixed
+  safety abstention; the question is excluded from candidate identity/evidence
+  and all generation remains unavailable until that owner is qualified.
+- **Prevention:** free-text contracts need semantic privacy/safety gates in
+  addition to closed object schemas. If a required classifier is unqualified,
+  the caller cannot safely infer the request belongs to an allowed subset.
