@@ -87,7 +87,10 @@ const manifest = JSON.parse(
   capabilities: Array<{
     capabilityKey: string;
     capabilityVersion: string;
-    descriptor: { resultSchemaRef: string };
+    descriptor: {
+      resultSchemaRef: string;
+      dependencyGates: Array<{ dependencyKey: string }>;
+    };
   }>;
 };
 const schemaRegistry = JSON.parse(
@@ -709,9 +712,29 @@ const POST_G3_FREEZE_ONLY_KEYS = new Map([
   ],
 ]);
 
+/**
+ * G4-D I2-B has its own exact adapter/presenter suite. Absorbing those keys
+ * into this historical T-006 producer census would create a second runtime
+ * inventory with the wrong dependency boundary.
+ */
+const enrollmentJourneyI2BSeparateRuntimeKeys = new Set(
+  manifest.capabilities
+    .filter((entry) =>
+      entry.descriptor.dependencyGates.some(
+        (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+      ),
+    )
+    .map((entry) => entry.capabilityKey),
+);
+
 const t006Keys = manifest.capabilities
   .map((entry) => entry.capabilityKey)
-  .filter((key) => !PRE_G3_KEYS.has(key) && !POST_G3_FREEZE_ONLY_KEYS.has(key));
+  .filter(
+    (key) =>
+      !PRE_G3_KEYS.has(key) &&
+      !POST_G3_FREEZE_ONLY_KEYS.has(key) &&
+      !enrollmentJourneyI2BSeparateRuntimeKeys.has(key),
+  );
 
 /**
  * Every runtime module declares its own `{key, version}` identity constant.

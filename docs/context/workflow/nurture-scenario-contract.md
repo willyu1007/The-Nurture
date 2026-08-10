@@ -644,12 +644,41 @@ completion gate exists. Later formal offboarding is ordinary Enrollment/Grant/
 CareGroup lifecycle maintenance and does not reopen this Workflow or create a
 second Workflow by default.
 
-The current scenario manifest/module/source declare none of this Workflow,
-projection, or command surface. Activation remains default-off until the
-status/phase migration, waitlist/offer/reservation/preparation-cancel contracts,
-My-Chat owner evidence, formalization/exit transactions, projection schema,
-event/replay behavior, fixtures, and joint positive/negative qualification are
-immutable and pinned.
+The Nurture surface-contract source publishes the I2-A public wire boundary for
+this Workflow as three queries and 21 independently described commands at
+`nurture.surface-contract@1.19.0` / `sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e`.
+Public inputs contain business decisions and owner-issued option refs only;
+Workspace/role assignments, private Workflow refs, owner snapshots/evidence,
+expected heads and derived lifecycle state remain private prepared bindings.
+Guardian output keeps waitlist rank, category and local entry identity absent;
+Institution mobile remains action-free.
+
+I2-B binds those DTOs to the existing private I1 query/command ports through a
+server-only prepared-binding interface. Validation happens before binding
+resolution; exact Workspace/active role, private refs, owner snapshots and
+evidence, protected carriers and expected heads never come from public input.
+Actions require and queries prohibit the opaque confirmation ref. The action
+adapter forwards it to the command executor; a real I3 executor must verify and
+consume the exact input/target/head binding inside the business transaction.
+Institution/Guardian role and surface matrices are enforced before execution,
+query/command lanes are separate, and presenters omit private Nurture refs,
+reseal Admin targets and retain the family no-rank/no-category boundary. Exact
+canonical Workflow Run or local scope drift fails unavailable.
+
+Trusted Workspace/actor/request identity is validated before binding
+resolution. Canonical unavailable dependencies and their nested ports are
+immutable. An Admin waitlist journey option seals the private Workflow target
+plus exact waitlist-entry ref/head; those private fields never enter the public
+result.
+
+The scenario module declares only fail-closed internal query/command adapter
+keys and the manifest marks their chat/mobile/Web composition disabled. Every
+descriptor still depends on the unqualified
+`t007_enrollment_journey_runtime` owner-integration gate. I2-B supplies no
+scenario-service formal ingress, real owner adapter, database operation,
+activation or traffic. Authenticated My-Chat prospective-contact/native-source/
+current-owner integration and joint positive/negative qualification remain
+I3/I4 work; I3 remains blocked by the unresolved G-09 external pin adoption.
 
 ## Handoffs
 

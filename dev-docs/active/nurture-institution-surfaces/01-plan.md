@@ -87,11 +87,58 @@
   atomically. After the timing, single-proposal and serialization repair, the
   clean 33-migration qualification passes targeted 9/9 and full 389/389 DB
   lanes with no datasource drift.
-- G4-D's frozen I1 chain is now complete. I2 contract/capability rotation is
-  the next local delivery gate; authenticated My-Chat owner integration at I3
-  remains blocked by G-09. The independent 0F freeze may proceed in parallel.
+- G4-D's frozen I1 chain is complete. The following I2-A/I2-B checkpoints
+  complete the local public contract and default-off surface composition;
+  authenticated My-Chat owner integration at I3 remains blocked by G-09. The
+  independent 0F freeze may proceed in parallel.
   The live order remains in
   [`41`](./41-t007-gap-and-next-register.md).
+
+## Execution checkpoint — 2026-08-10 G4-D I2-A public wire artifact
+
+- Rotated the additive Surface Contract from `1.18.0` to `1.19.0` and
+  materialized three Enrollment Journey query descriptors plus the complete
+  21-command I1 inventory. Three aggregate schema files carry the shared
+  vocabulary, public business inputs and role-safe results; the descriptors
+  remain individually reviewable for roles, confirmation and concurrency.
+- Institution mobile receives queries only. Institution actions bind only to
+  Workbench. Guardian chat/board receive the family-safe waitlist query and
+  only waitlist/offer/preparation/formalization operations they can own;
+  caregiver surfaces receive none.
+- All trusted Workspace/role/owner evidence, private Workflow/local heads and
+  derived lifecycle state stay outside public inputs and are expected to be
+  bound server-side during prepare/confirm. No deadline or blocker state was
+  added.
+- Every new capability depends on the unqualified
+  `t007_enrollment_journey_runtime` owner-integration gate. I2-A therefore
+  adds no public handler, presenter runtime, manifest/module registration,
+  database operation, activation or traffic.
+- The following I2-B checkpoint supplies the handler/presenter/default-off
+  module composition. I3 real owner integration remains blocked by G-09; 0F
+  may still proceed independently.
+
+## Execution checkpoint — 2026-08-10 G4-D I2-B surface adapters
+
+- Added strict adapters for the three I2-A queries and all 21 action DTOs.
+  Validation precedes trusted binding resolution; exact Workspace, role,
+  private target refs, owner evidence, protected carriers and confirmation
+  heads can come only from the injected server-side binding port. The opaque
+  confirmation ref continues to the command executor so I3 can verify and
+  consume it inside the business transaction.
+- Mapped every action to its existing I1 `NurtureCommandSpec` and all queries
+  to the existing I1 query repositories. Institution/Guardian role and surface
+  rules are enforced before execution; query and command internal lanes reject
+  cross-lane payloads.
+- Added role-safe presenters: Workflow Run identity is projected as an opaque
+  ref, Admin waitlist targets are resealed and Guardian waitlist output remains
+  rank/category/policy-free. Exact canonical Workflow Run and local scope drift
+  fail unavailable.
+- Registered only two fail-closed internal adapter keys. Manifest composition
+  is explicitly disabled on chat, mobile and Web, while the Surface Contract
+  runtime dependency gate remains unqualified. No route, real owner adapter,
+  Prisma/DB operation, activation or traffic was added.
+- I3 authenticated owner/formal-ingress binding remains blocked by G-09. 0F
+  remains the independent local implementation option.
 
 ## Stage G4 Delivery Structure — Accepted
 

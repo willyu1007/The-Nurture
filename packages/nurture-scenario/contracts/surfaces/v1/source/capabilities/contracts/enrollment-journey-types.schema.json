@@ -1,0 +1,388 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/enrollment-journey-types.schema.json",
+  "title": "EnrollmentJourneyContractTypesV1",
+  "$defs": {
+    "stage": {
+      "enum": [
+        "inquiry",
+        "intent_conversation",
+        "visit_or_consultation",
+        "capacity_waitlist",
+        "trial_preparation",
+        "trial_in_progress",
+        "trial_review",
+        "formal_enrollment_confirmation",
+        "completed",
+        "closed"
+      ]
+    },
+    "waitingState": {
+      "enum": [
+        "ready",
+        "waiting_on_guardian",
+        "waiting_on_caregiver",
+        "waiting_on_system",
+        "scheduled_future",
+        "blocked"
+      ]
+    },
+    "pendingTransition": {
+      "enum": [
+        "none",
+        "trial_start_pending",
+        "formalization_pending",
+        "exit_pending"
+      ]
+    },
+    "lifecycle": {
+      "enum": [
+        "active",
+        "completed",
+        "closed_without_formalization"
+      ]
+    },
+    "milestone": {
+      "enum": [
+        "inquiry_started",
+        "intent_confirmed",
+        "visit_recorded",
+        "waitlist_qualified",
+        "trial_offer_accepted",
+        "trial_started",
+        "trial_review_reached",
+        "trial_extended",
+        "formal_proposed",
+        "guardian_formal_acceptance_recorded",
+        "preparation_cancelled",
+        "trial_ended",
+        "formal_enrollment_committed",
+        "journey_completed"
+      ]
+    },
+    "projectionState": {
+      "enum": [
+        "active",
+        "waiting",
+        "blocked",
+        "completed",
+        "closed"
+      ]
+    },
+    "responsibleRole": {
+      "enum": [
+        "institution_admin",
+        "guardian",
+        "caregiver",
+        "system_owner",
+        "none"
+      ]
+    },
+    "actionEffect": {
+      "enum": [
+        "start_enrollment_inquiry",
+        "record_external_touchpoint",
+        "confirm_native_touchpoint_note",
+        "confirm_intent_conversation",
+        "record_or_skip_visit",
+        "close_inquiry",
+        "qualify_capacity_waitlist",
+        "review_waitlist_interest",
+        "override_waitlist_category",
+        "issue_trial_offer",
+        "accept_trial_offer",
+        "decline_or_expire_trial_offer",
+        "withdraw_from_waitlist",
+        "cancel_trial_preparation",
+        "prepare_trial_relationship",
+        "start_trial",
+        "mark_trial_review_reached",
+        "extend_trial",
+        "propose_formal_enrollment",
+        "formalize_enrollment",
+        "end_trial"
+      ]
+    },
+    "workflowProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "workflowRunRef",
+        "workflowType",
+        "safeTitle",
+        "safeSummary",
+        "state",
+        "lifecycle",
+        "currentStage",
+        "waitingState",
+        "pendingTransition",
+        "completedMilestones",
+        "nextAction",
+        "responsibleRole",
+        "workflowHead",
+        "projectionVersion",
+        "startedAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "contractVersion": {
+          "const": "1.0.0"
+        },
+        "workflowRunRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "workflowType": {
+          "const": "EnrollmentJourneyWorkflowV1"
+        },
+        "safeTitle": {
+          "const": "Enrollment journey"
+        },
+        "safeSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "state": {
+          "$ref": "#/$defs/projectionState"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/lifecycle"
+        },
+        "currentStage": {
+          "$ref": "#/$defs/stage"
+        },
+        "waitingState": {
+          "$ref": "#/$defs/waitingState"
+        },
+        "pendingTransition": {
+          "$ref": "#/$defs/pendingTransition"
+        },
+        "completedMilestones": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/milestone"
+          }
+        },
+        "safeBlocker": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "nextAction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "responsibleRole": {
+          "$ref": "#/$defs/responsibleRole"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "workflowHead": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "projectionVersion": {
+          "const": 1
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "adminWaitlistEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "journeyTargetOptionRef",
+        "targetClassSafeLabel",
+        "lifecycle",
+        "continuedInterest",
+        "categoryKey",
+        "categoryBasisKey",
+        "policyRef",
+        "policyRevision",
+        "waitlistQualifiedAt",
+        "nextReviewAt",
+        "lastConfirmedAt",
+        "hasOpenOffer"
+      ],
+      "properties": {
+        "journeyTargetOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "targetClassSafeLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "lifecycle": {
+          "enum": [
+            "active",
+            "offer_open"
+          ]
+        },
+        "continuedInterest": {
+          "enum": [
+            "confirmed",
+            "waiting_on_guardian"
+          ]
+        },
+        "categoryKey": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "categoryBasisKey": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/stableKey"
+        },
+        "policyRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "policyRevision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "waitlistQualifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastConfirmedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hasOpenOffer": {
+          "type": "boolean"
+        }
+      }
+    },
+    "adminWaitlist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "targetCareGroupRef",
+        "targetClassSafeLabel",
+        "orderedEntries"
+      ],
+      "properties": {
+        "contractVersion": {
+          "const": "1.0.0"
+        },
+        "targetCareGroupRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "targetClassSafeLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "orderedEntries": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "$ref": "#/$defs/adminWaitlistEntry"
+          }
+        }
+      }
+    },
+    "familyWaitlist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion",
+        "status",
+        "targetClassSafeLabel",
+        "lastReviewAt",
+        "nextExpectedContactAt"
+      ],
+      "properties": {
+        "contractVersion": {
+          "const": "1.0.0"
+        },
+        "status": {
+          "enum": [
+            "waitlisted",
+            "waiting_on_guardian",
+            "offer_open",
+            "trial_preparation"
+          ]
+        },
+        "targetClassSafeLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "lastReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextExpectedContactAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "actionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect",
+        "workflowRunRef",
+        "workflowHead",
+        "lifecycle",
+        "currentStage",
+        "waitingState",
+        "pendingTransition",
+        "completedMilestones",
+        "updatedAt"
+      ],
+      "properties": {
+        "effect": {
+          "$ref": "#/$defs/actionEffect"
+        },
+        "workflowRunRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "workflowHead": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/lifecycle"
+        },
+        "currentStage": {
+          "$ref": "#/$defs/stage"
+        },
+        "waitingState": {
+          "$ref": "#/$defs/waitingState"
+        },
+        "pendingTransition": {
+          "$ref": "#/$defs/pendingTransition"
+        },
+        "completedMilestones": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/milestone"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

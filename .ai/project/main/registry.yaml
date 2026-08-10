@@ -103,7 +103,7 @@ tasks:
     milestone_id: M-002
     feature_id: F-003
     dev_docs_path: dev-docs/active/nurture-institution-surfaces
-    updated: 2026-08-08
+    updated: 2026-08-10
   - id: T-008
     slug: nurture-store-beta-readiness
     status: planned

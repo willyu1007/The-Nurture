@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": {
     "key": "nurture.surface-contract",
-    "version": "1.18.0"
+    "version": "1.19.0"
   },
   "capabilities": [
     {
@@ -2588,6 +2588,2078 @@
       ],
       "supportedRoles": [
         "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "query_institution_enrollment_journey",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "query_institution_enrollment_journey"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.query-institution-enrollment-journey-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "workflow_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_journey_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_institution_enrollment_journey_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_institution_enrollment_journey",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_board",
+          "presenterKey": "present_institution_board"
+        },
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "query_institution_capacity_waitlist",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "query_institution_capacity_waitlist"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.query-institution-capacity-waitlist-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "capacity_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_capacity_waitlist_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_institution_capacity_waitlist_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_institution_capacity_waitlist",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_board",
+          "presenterKey": "present_institution_board"
+        },
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "query_guardian_enrollment_waitlist",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "read_model",
+      "executionClass": "query",
+      "deliveryClass": "none",
+      "intentKeys": [
+        "query_guardian_enrollment_waitlist"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.query-guardian-enrollment-waitlist-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "none",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "guardian_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_guardian_enrollment_journey",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "workflow_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_journey_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "query_guardian_enrollment_waitlist_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "query_guardian_enrollment_waitlist",
+        "bindingKind": "query"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "start_enrollment_inquiry",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "start_enrollment_inquiry"
+      ],
+      "inputSchemaRef": "schema:nurture.start-enrollment-inquiry-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "lifecycle_authority",
+        "headBindings": [
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "prospective_contact_authority",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_prospective_contact_authority",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "workflow_uniqueness",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "no_current_enrollment_journey",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "start_enrollment_inquiry",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "record_external_touchpoint",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "record_external_touchpoint"
+      ],
+      "inputSchemaRef": "schema:nurture.external-enrollment-touchpoint-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "record_external_touchpoint",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "confirm_native_touchpoint_note",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "confirm_native_touchpoint_note"
+      ],
+      "inputSchemaRef": "schema:nurture.native-enrollment-touchpoint-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "source_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_business_message_visibility",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "native_enrollment_touchpoint_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "confirm_native_touchpoint_note",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t005_admin_business_read",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "confirm_intent_conversation",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "confirm_intent_conversation"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "touchpoint_visibility",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_touchpoint",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "confirm_intent_conversation",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "record_or_skip_visit",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "record_or_skip_visit"
+      ],
+      "inputSchemaRef": "schema:nurture.visit-enrollment-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "record_or_skip_visit",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "close_inquiry",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "close_inquiry"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "close_inquiry",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "qualify_capacity_waitlist",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "qualify_capacity_waitlist"
+      ],
+      "inputSchemaRef": "schema:nurture.qualify-enrollment-waitlist-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "capacity_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "guardian_acceptance",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_guardian_waitlist_acceptance",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "qualify_capacity_waitlist",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "review_waitlist_interest",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "review_waitlist_interest"
+      ],
+      "inputSchemaRef": "schema:nurture.review-enrollment-waitlist-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "actor_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_journey_actor",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "shared_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "review_waitlist_interest",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        },
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian",
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "override_waitlist_category",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "override_waitlist_category"
+      ],
+      "inputSchemaRef": "schema:nurture.override-enrollment-waitlist-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "override_waitlist_category",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "issue_trial_offer",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "issue_trial_offer"
+      ],
+      "inputSchemaRef": "schema:nurture.issue-enrollment-trial-offer-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "capacity_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "issue_trial_offer",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "accept_trial_offer",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "accept_trial_offer"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "trial_offer_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "guardian_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_guardian_enrollment_journey",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "guardian_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "accept_trial_offer",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "decline_or_expire_trial_offer",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "decline_or_expire_trial_offer"
+      ],
+      "inputSchemaRef": "schema:nurture.decline-or-expire-enrollment-offer-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "trial_offer_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "actor_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_journey_actor",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "shared_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "decline_or_expire_trial_offer",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        },
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian",
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "withdraw_from_waitlist",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "withdraw_from_waitlist"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "guardian_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_guardian_enrollment_journey",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "guardian_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "withdraw_from_waitlist",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "cancel_trial_preparation",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "cancel_trial_preparation"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "waitlist_entry_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "trial_offer_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "actor_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_enrollment_journey_actor",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "shared_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "cancel_trial_preparation",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        },
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian",
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "prepare_trial_relationship",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "prepare_trial_relationship"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "capacity_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "owner_pair",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_child_family_owner_pair",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "prepare_trial_relationship",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "start_trial",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "start_trial"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "enrollment_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "grant_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "capacity_revision",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "owner_pair",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_child_family_owner_pair",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "start_trial",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "mark_trial_review_reached",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "mark_trial_review_reached"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "direct_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "enrollment_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "grant_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "mark_trial_review_reached",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "extend_trial",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "extend_trial"
+      ],
+      "inputSchemaRef": "schema:nurture.extend-enrollment-trial-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "reviewable_commit",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "enrollment_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "grant_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "extend_trial",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "propose_formal_enrollment",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "propose_formal_enrollment"
+      ],
+      "inputSchemaRef": "schema:nurture.propose-formal-enrollment-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "enrollment_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "grant_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "capacity_revision",
+            "mode": "must_equal"
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "propose_formal_enrollment",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
+      ]
+    },
+    {
+      "capabilityKey": "formalize_enrollment",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "formalize_enrollment"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "formal_proposal_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "enrollment_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "grant_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "owner_pair",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_child_family_owner_pair",
+              "version": "1.0.0"
+            }
+          },
+          {
+            "headKey": "guardian_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_guardian_enrollment_journey",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "guardian_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "formalize_enrollment",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "guardian_nurture_chat",
+          "presenterKey": "present_guardian_nurture_chat"
+        },
+        {
+          "surfaceKey": "guardian_family_board",
+          "presenterKey": "present_guardian_family_board"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "guardian"
+      ]
+    },
+    {
+      "capabilityKey": "end_trial",
+      "capabilityVersion": "1.0.0",
+      "domainClass": "institution_management",
+      "executionClass": "institution_workflow_action",
+      "deliveryClass": "action_delivery_candidate",
+      "intentKeys": [
+        "end_trial"
+      ],
+      "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+      "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+      "targetPolicy": {
+        "kind": "owner_option_required",
+        "optionSchemaRef": "schema:nurture.owner-target-option@1"
+      },
+      "confirmationPolicy": "strong_confirmation",
+      "concurrencyPolicy": {
+        "class": "exact_state",
+        "headBindings": [
+          {
+            "headKey": "workflow_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "enrollment_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "grant_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "reservation_head",
+            "mode": "must_equal"
+          },
+          {
+            "headKey": "institution_scope",
+            "mode": "must_satisfy",
+            "predicateRef": {
+              "key": "current_institution_admin",
+              "version": "1.0.0"
+            }
+          }
+        ]
+      },
+      "eligibilityPolicyRef": {
+        "key": "institution_enrollment_journey_action_eligibility",
+        "version": "1.0.0"
+      },
+      "handlerBinding": {
+        "bindingKey": "end_trial",
+        "bindingKind": "institution_workflow"
+      },
+      "presenterBindings": [
+        {
+          "surfaceKey": "institution_workbench",
+          "presenterKey": "present_institution_workbench"
+        }
+      ],
+      "invalidationScopeKinds": [
+        "surface",
+        "target",
+        "institution",
+        "enrollment"
+      ],
+      "dependencyGates": [
+        {
+          "dependencyKey": "t002_owner_integration",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_i1",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "contract_boundary"
+        },
+        {
+          "dependencyKey": "t007_enrollment_journey_runtime",
+          "minimumVersion": "1.0.0",
+          "requiredGate": "owner_integration"
+        }
+      ],
+      "supportedRoles": [
+        "institution_admin"
       ]
     }
   ]

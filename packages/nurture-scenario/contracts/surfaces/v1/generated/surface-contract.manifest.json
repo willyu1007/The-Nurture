@@ -16,6 +16,103 @@
   },
   "capabilities": [
     {
+      "capabilityKey": "accept_trial_offer",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "accept_trial_offer",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "trial_offer_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "guardian_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_guardian_enrollment_journey",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "guardian_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "accept_trial_offer",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "accept_trial_offer"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:b4672470e2b26ccd77f24c713cdd3ac8f656372573fd2da2e6fe31b600911de7"
+    },
+    {
       "capabilityKey": "acknowledge_family_care_item",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -52,9 +149,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -138,9 +235,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -216,9 +313,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -268,6 +365,197 @@
       "sliceHash": "sha256:01e651c6e36e5e247379a88ad3fd0bb2bacb988bba398c47249aa7ec8c6d90b5"
     },
     {
+      "capabilityKey": "cancel_trial_preparation",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "cancel_trial_preparation",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "trial_offer_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "actor_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_enrollment_journey_actor",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "shared_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "cancel_trial_preparation",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+        "intentKeys": [
+          "cancel_trial_preparation"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          },
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "guardian",
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:3697d87fb1b544e7203ac844ed7bdee65052fbef56aa561b567f271468a46636"
+    },
+    {
+      "capabilityKey": "close_inquiry",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "close_inquiry",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "close_inquiry",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+        "intentKeys": [
+          "close_inquiry"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:79e0827d92cb9e1ea354d5742d856b9fe5b7d4ef54bc24a0734c33dd96b2ac50"
+    },
+    {
       "capabilityKey": "confirm_child_media_attribution",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -296,9 +584,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -348,6 +636,197 @@
       "sliceHash": "sha256:d160735c5b03fadd6d738e8026faa9784772dfd035d3a0553d97b0d5077e2a06"
     },
     {
+      "capabilityKey": "confirm_intent_conversation",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "confirm_intent_conversation",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "touchpoint_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_enrollment_touchpoint",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "confirm_intent_conversation",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "confirm_intent_conversation"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:c99087b6ede8f5ea4a6a6e3620d2dfc1f8bba122d893fc0e79d725679c589b1b"
+    },
+    {
+      "capabilityKey": "confirm_native_touchpoint_note",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "confirm_native_touchpoint_note",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "source_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_business_message_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t005_admin_business_read",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "native_enrollment_touchpoint_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "confirm_native_touchpoint_note",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.native-enrollment-touchpoint-input@1",
+        "intentKeys": [
+          "confirm_native_touchpoint_note"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:328068385546ade229a044ba1297ca113f015ae8a99047dd0e9a72281b7b3123"
+    },
+    {
       "capabilityKey": "correct_family_care_message",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -380,9 +859,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -476,9 +955,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -528,6 +1007,108 @@
       "sliceHash": "sha256:a3f07378714ac822156568d52e30792fd7835f49692a28d6594d033f1b61ba35"
     },
     {
+      "capabilityKey": "decline_or_expire_trial_offer",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "decline_or_expire_trial_offer",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "trial_offer_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "actor_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_enrollment_journey_actor",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "shared_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "decline_or_expire_trial_offer",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.decline-or-expire-enrollment-offer-input@1",
+        "intentKeys": [
+          "decline_or_expire_trial_offer"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          },
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "guardian",
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:b4c394519265cfcd26fe51e947b7da45861daee8b600ebb5c2ee984432b5885a"
+    },
+    {
       "capabilityKey": "detach_publish_process_media",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -552,9 +1133,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -639,9 +1220,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -691,6 +1272,313 @@
       "sliceHash": "sha256:88f554db8b702612f7a997685a6731df4ac6dbac72a7f408cca41b645df4f460"
     },
     {
+      "capabilityKey": "end_trial",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "end_trial",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "enrollment_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "grant_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "end_trial",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+        "intentKeys": [
+          "end_trial"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:06e6aa842ba7a8f1560b1bdc0c237dfe2733faded0909c71de85f26b118e0cdd"
+    },
+    {
+      "capabilityKey": "extend_trial",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "extend_trial",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "enrollment_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "grant_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "extend_trial",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.extend-enrollment-trial-input@1",
+        "intentKeys": [
+          "extend_trial"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:943a9d41ce0aba183e6485c6146f3b532da5020389bfa7280b7ed803b54a3451"
+    },
+    {
+      "capabilityKey": "formalize_enrollment",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "formalize_enrollment",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "formal_proposal_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "enrollment_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "grant_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "owner_pair",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_child_family_owner_pair",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "guardian_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_guardian_enrollment_journey",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "guardian_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "formalize_enrollment",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "formalize_enrollment"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:aa86c0c115c7e725f25541da17927f1c40992ac89a686d41023e067479a85834"
+    },
+    {
       "capabilityKey": "initiate_caregiver_direct_message",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -735,9 +1623,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -800,6 +1688,196 @@
       "sliceHash": "sha256:d88aec58676ddc83c5a1e7e437a12aec97e056f351f386d1017ec4bf6349ac05"
     },
     {
+      "capabilityKey": "issue_trial_offer",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "issue_trial_offer",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "capacity_revision",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "issue_trial_offer",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.issue-enrollment-trial-offer-input@1",
+        "intentKeys": [
+          "issue_trial_offer"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:e68b2b3dff097e5614a2540ee82b1fa38424924a2f26a2ff3269197a58cf6f83"
+    },
+    {
+      "capabilityKey": "mark_trial_review_reached",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "mark_trial_review_reached",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "enrollment_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "grant_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "direct_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "mark_trial_review_reached",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "mark_trial_review_reached"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:092c0adeeebac1ef238f3a22bd0c20da46a467200ff49e7b5d25d5bf031dcf63"
+    },
+    {
       "capabilityKey": "organize_care_capture_batch",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -832,9 +1910,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -884,6 +1962,95 @@
       "sliceHash": "sha256:f9d2f060d323f4d4f7fd6d3e978d5e2ec2be3854d218ad2b1f92bee185049adb"
     },
     {
+      "capabilityKey": "override_waitlist_category",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "override_waitlist_category",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "override_waitlist_category",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.override-enrollment-waitlist-input@1",
+        "intentKeys": [
+          "override_waitlist_category"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:482a80acb343cb412fd945db68ed0b32d5c1e66909ff320113d2250c3040d44d"
+    },
+    {
       "capabilityKey": "policy_redact_family_care_message",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -908,9 +2075,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -961,6 +2128,305 @@
       "sliceHash": "sha256:6ea83260c0ce7141ffdcc4b781ea28613feeb9f2be123131c0a3711f00612371"
     },
     {
+      "capabilityKey": "prepare_trial_relationship",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "prepare_trial_relationship",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "capacity_revision",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "owner_pair",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_child_family_owner_pair",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "prepare_trial_relationship",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "prepare_trial_relationship"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:9ba2fdbf61cba0922e1d4fd9183bbd531d1d94399a4d272be854d92b6aaa5b38"
+    },
+    {
+      "capabilityKey": "propose_formal_enrollment",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "propose_formal_enrollment",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "enrollment_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "grant_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "capacity_revision",
+              "mode": "must_equal"
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "propose_formal_enrollment",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.propose-formal-enrollment-input@1",
+        "intentKeys": [
+          "propose_formal_enrollment"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:a7cb54876a2e904070ef246872f975d6efd614fee2d60514ee667d9e5b0002d8"
+    },
+    {
+      "capabilityKey": "qualify_capacity_waitlist",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "qualify_capacity_waitlist",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "capacity_revision",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "guardian_acceptance",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_guardian_waitlist_acceptance",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "qualify_capacity_waitlist",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.qualify-enrollment-waitlist-input@1",
+        "intentKeys": [
+          "qualify_capacity_waitlist"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:983bb9f9d221a5e1826a8dcce2e71b65a69cb95c717bb3fef8f145bdbf1ab3d1"
+    },
+    {
       "capabilityKey": "query_caregiver_child_today",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -989,9 +2455,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1069,9 +2535,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1158,9 +2624,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1243,9 +2709,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1351,9 +2817,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1402,6 +2868,99 @@
       "sliceHash": "sha256:bad468244dd328c8efdccade21d9ade6bd7c2342bc777227547fcd1928156516"
     },
     {
+      "capabilityKey": "query_guardian_enrollment_waitlist",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "query_guardian_enrollment_waitlist",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "guardian_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_guardian_enrollment_journey",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "workflow_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_enrollment_journey_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "none",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "none",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "read_model",
+        "eligibilityPolicyRef": {
+          "key": "query_guardian_enrollment_waitlist_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "query",
+        "handlerBinding": {
+          "bindingKey": "query_guardian_enrollment_waitlist",
+          "bindingKind": "query"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "query_guardian_enrollment_waitlist"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.query-guardian-enrollment-waitlist-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:c555d44b6d202687567e0d1f2516e2eb0a893f99d8959b530ee4990de189f0e7"
+    },
+    {
       "capabilityKey": "query_guardian_family_board",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -1438,9 +2997,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1522,9 +3081,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1582,6 +3141,99 @@
       "sliceHash": "sha256:4834eb685080ad38befdcf157af3ddc392763a77331251c2722c4b2253b08793"
     },
     {
+      "capabilityKey": "query_institution_capacity_waitlist",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "query_institution_capacity_waitlist",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "capacity_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_capacity_waitlist_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "none",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "none",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "read_model",
+        "eligibilityPolicyRef": {
+          "key": "query_institution_capacity_waitlist_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "query",
+        "handlerBinding": {
+          "bindingKey": "query_institution_capacity_waitlist",
+          "bindingKind": "query"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "query_institution_capacity_waitlist"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_board",
+            "surfaceKey": "institution_board"
+          },
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.query-institution-capacity-waitlist-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:c2a497511b0cf1f2a915452fb8526afa842e576ce7f685db4981261d1a75cfae"
+    },
+    {
       "capabilityKey": "query_institution_communication_review",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -1610,9 +3262,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1666,6 +3318,99 @@
       "sliceHash": "sha256:b88fa7e9b7fdab6e67c1e0666976561ad7eed21bdd99fb5018dd27fa4f7d8891"
     },
     {
+      "capabilityKey": "query_institution_enrollment_journey",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "query_institution_enrollment_journey",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "workflow_visibility",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_enrollment_journey_visibility",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "none",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "none",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "read_model",
+        "eligibilityPolicyRef": {
+          "key": "query_institution_enrollment_journey_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "query",
+        "handlerBinding": {
+          "bindingKey": "query_institution_enrollment_journey",
+          "bindingKind": "query"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "query_institution_enrollment_journey"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_board",
+            "surfaceKey": "institution_board"
+          },
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.query-institution-enrollment-journey-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:f361be0b29e0d274ddf03505a4c3411740cd8f5dc27618f658b51aae793d0c05"
+    },
+    {
       "capabilityKey": "query_teacher_publish_queue",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -1694,9 +3439,9 @@
         },
         "confirmationPolicy": "none",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1774,9 +3519,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -1826,6 +3571,176 @@
       "sliceHash": "sha256:e49064ae5691abfaae62ddb278ec31c8188f5bf30bde51d8b5b3c0825e0a02c8"
     },
     {
+      "capabilityKey": "record_external_touchpoint",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "record_external_touchpoint",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "record_external_touchpoint",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.external-enrollment-touchpoint-input@1",
+        "intentKeys": [
+          "record_external_touchpoint"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:c1910d9875299de0801753b148adafea8f9dcdc8a0049f7a153e1daeedaf358a"
+    },
+    {
+      "capabilityKey": "record_or_skip_visit",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "record_or_skip_visit",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "direct_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "record_or_skip_visit",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.visit-enrollment-input@1",
+        "intentKeys": [
+          "record_or_skip_visit"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:0f6fc8c2d34f3ab6bcb2d14b9085a9ff1d960bd8e553e9e253f9f07ed881b8be"
+    },
+    {
       "capabilityKey": "redact_family_care_message",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -1858,9 +3773,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -1954,9 +3869,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2035,9 +3950,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2111,9 +4026,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2201,9 +4116,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2283,9 +4198,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2359,9 +4274,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2441,9 +4356,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2535,9 +4450,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2592,6 +4507,104 @@
       "sliceHash": "sha256:25c532267e03e1e74a8d7507f014e84b6d69b47b32d19cd67ce8f4f691374ac2"
     },
     {
+      "capabilityKey": "review_waitlist_interest",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "review_waitlist_interest",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "actor_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_enrollment_journey_actor",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "direct_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "shared_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "review_waitlist_interest",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.review-enrollment-waitlist-input@1",
+        "intentKeys": [
+          "review_waitlist_interest"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          },
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "guardian",
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:af2211195ce2934a89469e86cb112c4c7a7ecab21751c0ee67b95bdc727a76c2"
+    },
+    {
       "capabilityKey": "save_publish_process_draft",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -2624,9 +4637,9 @@
         },
         "confirmationPolicy": "direct_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2676,6 +4689,212 @@
       "sliceHash": "sha256:9381bd57cf88cc5bc49db7669b7b4df81691da899f023e0382350eccc0248c5d"
     },
     {
+      "capabilityKey": "start_enrollment_inquiry",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "start_enrollment_inquiry",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "lifecycle_authority",
+          "headBindings": [
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "prospective_contact_authority",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_prospective_contact_authority",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "workflow_uniqueness",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "no_current_enrollment_journey",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "reviewable_commit",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "start_enrollment_inquiry",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.start-enrollment-inquiry-input@1",
+        "intentKeys": [
+          "start_enrollment_inquiry"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:e389baa0460264fafea11385095c728d756982da0bb23a0d209e9f1f73499afa"
+    },
+    {
+      "capabilityKey": "start_trial",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "start_trial",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "enrollment_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "grant_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "reservation_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "institution_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_institution_admin",
+                "version": "1.0.0"
+              }
+            },
+            {
+              "headKey": "capacity_revision",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "owner_pair",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_child_family_owner_pair",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "institution_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "start_trial",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+        "intentKeys": [
+          "start_trial"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_institution_workbench",
+            "surfaceKey": "institution_workbench"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "institution_admin"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:b56b6dda96e7b1345a6c304745521a776c4af93fa23cb51154a2d362c40ba36d"
+    },
+    {
       "capabilityKey": "submit_family_care_question",
       "capabilityVersion": "1.0.0",
       "descriptor": {
@@ -2712,9 +4931,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2803,9 +5022,9 @@
         },
         "confirmationPolicy": "reviewable_commit",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "none",
         "dependencyGates": [
@@ -2879,9 +5098,9 @@
         },
         "confirmationPolicy": "strong_confirmation",
         "contract": {
-          "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
           "key": "nurture.surface-contract",
-          "version": "1.18.0"
+          "version": "1.19.0"
         },
         "deliveryClass": "action_delivery_candidate",
         "dependencyGates": [
@@ -2939,6 +5158,99 @@
         }
       },
       "sliceHash": "sha256:9f76604c4ad892d8d5b9740390e6493b5026f5ced678e42c1ff3fd3d5988612b"
+    },
+    {
+      "capabilityKey": "withdraw_from_waitlist",
+      "capabilityVersion": "1.0.0",
+      "descriptor": {
+        "capabilityKey": "withdraw_from_waitlist",
+        "capabilityVersion": "1.0.0",
+        "concurrencyPolicy": {
+          "class": "exact_state",
+          "headBindings": [
+            {
+              "headKey": "workflow_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "waitlist_entry_head",
+              "mode": "must_equal"
+            },
+            {
+              "headKey": "guardian_scope",
+              "mode": "must_satisfy",
+              "predicateRef": {
+                "key": "current_guardian_enrollment_journey",
+                "version": "1.0.0"
+              }
+            }
+          ]
+        },
+        "confirmationPolicy": "strong_confirmation",
+        "contract": {
+          "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
+          "key": "nurture.surface-contract",
+          "version": "1.19.0"
+        },
+        "deliveryClass": "action_delivery_candidate",
+        "dependencyGates": [
+          {
+            "dependencyKey": "t002_owner_integration",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_i1",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "contract_boundary"
+          },
+          {
+            "dependencyKey": "t007_enrollment_journey_runtime",
+            "minimumVersion": "1.0.0",
+            "requiredGate": "owner_integration"
+          }
+        ],
+        "domainClass": "institution_management",
+        "eligibilityPolicyRef": {
+          "key": "guardian_enrollment_journey_action_eligibility",
+          "version": "1.0.0"
+        },
+        "errorSchemaRef": "schema:nurture.surface-operation-error@1",
+        "executionClass": "institution_workflow_action",
+        "handlerBinding": {
+          "bindingKey": "withdraw_from_waitlist",
+          "bindingKind": "institution_workflow"
+        },
+        "inputSchemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+        "intentKeys": [
+          "withdraw_from_waitlist"
+        ],
+        "invalidationScopeKinds": [
+          "surface",
+          "target",
+          "institution",
+          "enrollment"
+        ],
+        "presenterBindings": [
+          {
+            "presenterKey": "present_guardian_nurture_chat",
+            "surfaceKey": "guardian_nurture_chat"
+          },
+          {
+            "presenterKey": "present_guardian_family_board",
+            "surfaceKey": "guardian_family_board"
+          }
+        ],
+        "resultSchemaRef": "schema:nurture.enrollment-journey-action-result@1",
+        "supportedRoles": [
+          "guardian"
+        ],
+        "targetPolicy": {
+          "kind": "owner_option_required",
+          "optionSchemaRef": "schema:nurture.owner-target-option@1"
+        }
+      },
+      "sliceHash": "sha256:776558a95d0f810ea6df5886aae6f0cd5f8a0ee8481ee6272a40076137a3e71a"
     }
   ],
   "fixtures": [
@@ -2984,9 +5296,9 @@
     }
   ],
   "interfaceContract": {
-    "digest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0",
+    "digest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e",
     "key": "nurture.surface-contract",
-    "version": "1.18.0"
+    "version": "1.19.0"
   },
   "schemaVersion": 1,
   "sharedCoreHash": "sha256:7bd8a82d4ad6e2ee6a5cdf02f50792049fe7bdfa546992058cb860c1baac4c6d",
@@ -2997,7 +5309,7 @@
         "path": "capabilities/capability-descriptor.schema.json"
       },
       {
-        "artifactHash": "sha256:907416bba556827884d6f5ca5ed9f617131a370f28885dd7122effc2518a84cd",
+        "artifactHash": "sha256:a86d269e02f081e5e176f707927bca44861ddb0f11c915c698b369d313e9fa97",
         "path": "capabilities/capability-registry.json"
       },
       {
@@ -3019,6 +5331,14 @@
       {
         "artifactHash": "sha256:48600cec82779320587c5cdd94347983dd88fd2ea6eee4cca3abe4043d4699a7",
         "path": "capabilities/contracts/correct-family-care-message.schema.json"
+      },
+      {
+        "artifactHash": "sha256:766b18e68434a17ebd2b72c7508be2a0628d79484cea8a266f2674fbc7047a76",
+        "path": "capabilities/contracts/enrollment-journey-actions.schema.json"
+      },
+      {
+        "artifactHash": "sha256:96eacd433110b4d22ac1f051fde30bd5219c23bdc8ad6cfb70dfe3ce06eee552",
+        "path": "capabilities/contracts/enrollment-journey-types.schema.json"
       },
       {
         "artifactHash": "sha256:e1537d151d7830a0df85cdbe9f48baeafcae94dfbff625a0b48553b3d7efa5f8",
@@ -3069,6 +5389,10 @@
         "path": "capabilities/contracts/query-caregiver-teacher-board.schema.json"
       },
       {
+        "artifactHash": "sha256:2441f343b116a8ae094cf01d8aaeed8a06b86811834747689f1164f34b206d98",
+        "path": "capabilities/contracts/query-enrollment-journey.schema.json"
+      },
+      {
         "artifactHash": "sha256:252b8610c8b3c36f6f389bad8338d1d0395b536abe81cbb4b8a2ffaea00caa77",
         "path": "capabilities/contracts/query-family-care-item.schema.json"
       },
@@ -3117,7 +5441,7 @@
         "path": "capabilities/contracts/withdraw-family-care-request.schema.json"
       },
       {
-        "artifactHash": "sha256:af74ae256b463178c662b83bd81abf360b3686a2a6a378349d27d487cf6e3e24",
+        "artifactHash": "sha256:273fdfa84516c0b80f294dabb3ad0db28120094fa55b8a8cbcbf3beb6ab79c0b",
         "path": "conformance/conformance-cases.json"
       },
       {
@@ -3297,11 +5621,11 @@
         "path": "interface/interface-contract-ref.schema.json"
       },
       {
-        "artifactHash": "sha256:b207885f87f4f3693fa648479b2e02d427fa064f4f72bc5d5ac41f22a8529e07",
+        "artifactHash": "sha256:2a61f041fcb991ea404416895625c5a7bcae72de7e9348491f8f823d69490bf1",
         "path": "interface/port-registry.json"
       },
       {
-        "artifactHash": "sha256:8a68b99341a12c04b96013d3e5c2e316361cbcf8f84263c17bebeb59218d06fd",
+        "artifactHash": "sha256:ea1c7a7a0f30734ae71963ac0fae4fcefbbb30d2203ce9305ed008e39b4ff9df",
         "path": "interface/schema-registry.json"
       },
       {
@@ -3317,7 +5641,7 @@
         "path": "interface/surface-rules.json"
       },
       {
-        "artifactHash": "sha256:dc0a3a18d9127eade26b21db7eb5f40bf2458ae95aba0aeffa2f3e2a23e9d0e4",
+        "artifactHash": "sha256:3d5b132970cab2c6f597c1103cf89d9de6b89eb40d62db040660470b34baec16",
         "path": "interface/visibility-matrix.json"
       },
       {
@@ -3389,7 +5713,7 @@
         "path": "surfaces/surface-registry.json"
       }
     ],
-    "sourceDigest": "sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0"
+    "sourceDigest": "sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e"
   },
   "surfaces": [
     {
@@ -3406,13 +5730,13 @@
     },
     {
       "presenterKey": "present_guardian_family_board",
-      "sliceHash": "sha256:774ef0b8989b9aa758bbb7a514ffd2fea47881aac08876e617047eaec40c200a",
+      "sliceHash": "sha256:7e3e00913ba6c458bb3b1b08dd457aac8acb13de225f5bbdadad1a408fc5ef1b",
       "surfaceKey": "guardian_family_board",
       "surfaceVersion": "1.0.0"
     },
     {
       "presenterKey": "present_guardian_nurture_chat",
-      "sliceHash": "sha256:9350a5ae228f3844ce5d03e11722012480ee8e2b6813ae676c6ead00a5248256",
+      "sliceHash": "sha256:81279eacece59437ee8bc763b619f420699be07756d37a4c4857a1d6966a1115",
       "surfaceKey": "guardian_nurture_chat",
       "surfaceVersion": "1.0.0"
     },

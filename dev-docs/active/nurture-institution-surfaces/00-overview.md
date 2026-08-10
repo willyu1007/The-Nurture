@@ -6,28 +6,37 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **choose the completed default-off G4-D I2 contract/capability
-  rotation or independently freeze 0F Knowledge/RAG**. Increment 5 now
-  DB-qualifies the complete frozen 0E-4 Guardian acceptance, formalization and
-  completion slice after its timing, single-proposal and concurrency repair
-  ([`61`](./61-g4-d-increment-5-record.md)). Full unit 878/878 and
-  production-DB 389/389 pass on disposable PostgreSQL. Real contact/native-
+- Next step: **after G-09 adoption, implement G4-D I3 authenticated owner and
+  formal-ingress bindings; 0F Knowledge/RAG may proceed independently**. I2-A
+  rotated the exact public wire artifact to
+  `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
+  commands map the completed private I1 domain without exposing trusted scope,
+  owner evidence, private Workflow refs or caller-supplied heads
+  ([`62`](./62-g4-d-i2-a-contract-artifact-record.md)). I2-B now supplies the
+  exact public validators, role-safe presenters, I1 command/query adapters and
+  fail-closed module/manifest composition
+  ([`63`](./63-g4-d-i2-b-surface-adapter-record.md)). Every descriptor remains
+  behind the unqualified Enrollment Journey runtime gate. Real contact/native-
   source and authenticated My-Chat owner adapters remain I3 work blocked by
-  G-09; no manifest/module registration, caller, capability, activation or
-  traffic exists, and 0F remains unstarted.
+  G-09; no formal ingress, database operation, activation or traffic exists,
+  and 0F remains unstarted.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
   records are history and are not edited to stay current.
-- Everything built sits at **I1** — implementation and migration authoring.
-  All implemented daily-operations persistence paths, including 0D-3
+- Domain and persistence owners remain qualified at **I1**; G4-D now also has
+  an **I2-A wire-contract artifact and I2-B synthetic/default-off surface
+  composition**. All implemented
+  daily-operations persistence paths, including 0D-3
   revision/downscope, 0D-4 correction reports, 0D-5 policy, the 0D-1
   checkpoint policy and all four G4-D inquiry/waitlist/preparation/trial/
   formalization persistence slices are qualified on
   disposable PostgreSQL. Nothing has a
-  production caller, no capability is registered, and no schema is applied
+  production caller, no runtime capability is registered, and no schema is applied
   anywhere durable. 0C, 0D and all four 0E persistence slices are therefore
-  validated as *buildable as frozen*, not as running.
+  validated as *buildable as frozen*, not as running. The 24 descriptors and
+  two fail-closed internal adapter lanes are default-off and do not change that
+  runtime posture.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.

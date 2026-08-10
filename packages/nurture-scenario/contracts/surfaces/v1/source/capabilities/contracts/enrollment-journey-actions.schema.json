@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/enrollment-journey-actions.schema.json",
+  "title": "EnrollmentJourneyActionsV1",
+  "$defs": {
+    "token": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_:-]{0,99}$"
+    },
+    "tokenList": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/token"
+      }
+    },
+    "emptyInput": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "reasonInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reasonKey"
+      ],
+      "properties": {
+        "reasonKey": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "startInquiryInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferredLabel",
+        "expectedEntryStartDate",
+        "expectedEntryEndDate",
+        "targetClassTypeKey",
+        "targetAgeBandKey",
+        "careScheduleNeedKeys",
+        "sourceChannel",
+        "safetyLabelKeys",
+        "initialContactAt",
+        "nextTouchpointAt"
+      ],
+      "properties": {
+        "preferredLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "birthYearMonth": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+        },
+        "ageBandKey": {
+          "$ref": "#/$defs/token"
+        },
+        "expectedEntryStartDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "expectedEntryEndDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "targetClassTypeKey": {
+          "$ref": "#/$defs/token"
+        },
+        "targetAgeBandKey": {
+          "$ref": "#/$defs/token"
+        },
+        "targetCareGroupOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "careScheduleNeedKeys": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/tokenList"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "sourceChannel": {
+          "$ref": "#/$defs/token"
+        },
+        "safetyLabelKeys": {
+          "$ref": "#/$defs/tokenList"
+        },
+        "initialContactAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextTouchpointAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "birthYearMonth"
+          ],
+          "not": {
+            "required": [
+              "ageBandKey"
+            ]
+          }
+        },
+        {
+          "required": [
+            "ageBandKey"
+          ],
+          "not": {
+            "required": [
+              "birthYearMonth"
+            ]
+          }
+        }
+      ]
+    },
+    "externalTouchpointInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceChannel",
+        "confirmedNeedKeys",
+        "safetyLabelKeys",
+        "nextActionKey",
+        "responsibleRole",
+        "dueAt",
+        "nextTouchpointAt",
+        "occurredAt",
+        "summary"
+      ],
+      "properties": {
+        "sourceChannel": {
+          "$ref": "#/$defs/token"
+        },
+        "confirmedNeedKeys": {
+          "$ref": "#/$defs/tokenList"
+        },
+        "safetyLabelKeys": {
+          "$ref": "#/$defs/tokenList"
+        },
+        "nextActionKey": {
+          "$ref": "#/$defs/token"
+        },
+        "responsibleRole": {
+          "$ref": "enrollment-journey-types.schema.json#/$defs/responsibleRole"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextTouchpointAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "supersededTouchpointOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "correctionReason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "dependentRequired": {
+        "supersededTouchpointOptionRef": [
+          "correctionReason"
+        ],
+        "correctionReason": [
+          "supersededTouchpointOptionRef"
+        ]
+      }
+    },
+    "nativeTouchpointInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceMessageOptionRef",
+        "sourceChannel",
+        "confirmedNeedKeys",
+        "safetyLabelKeys",
+        "nextActionKey",
+        "responsibleRole",
+        "dueAt",
+        "nextTouchpointAt"
+      ],
+      "properties": {
+        "sourceMessageOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "sourceChannel": {
+          "$ref": "#/$defs/token"
+        },
+        "confirmedNeedKeys": {
+          "$ref": "#/$defs/tokenList"
+        },
+        "safetyLabelKeys": {
+          "$ref": "#/$defs/tokenList"
+        },
+        "nextActionKey": {
+          "$ref": "#/$defs/token"
+        },
+        "responsibleRole": {
+          "$ref": "enrollment-journey-types.schema.json#/$defs/responsibleRole"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextTouchpointAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "visitInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "disposition"
+      ],
+      "properties": {
+        "disposition": {
+          "enum": [
+            "recorded",
+            "skipped"
+          ]
+        }
+      }
+    },
+    "qualifyWaitlistInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetCareGroupOptionRef",
+        "categoryKey",
+        "categoryBasisKey",
+        "nextReviewAt"
+      ],
+      "properties": {
+        "targetCareGroupOptionRef": {
+          "$ref": "../../interface/contract-primitives.schema.json#/$defs/opaqueRef"
+        },
+        "categoryKey": {
+          "$ref": "#/$defs/token"
+        },
+        "categoryBasisKey": {
+          "$ref": "#/$defs/token"
+        },
+        "nextReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "reviewWaitlistInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interestState",
+        "nextReviewAt"
+      ],
+      "properties": {
+        "interestState": {
+          "enum": [
+            "confirmed",
+            "unanswered"
+          ]
+        },
+        "nextReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "overrideWaitlistInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "categoryKey",
+        "categoryBasisKey",
+        "reasonKey"
+      ],
+      "properties": {
+        "categoryKey": {
+          "$ref": "#/$defs/token"
+        },
+        "categoryBasisKey": {
+          "$ref": "#/$defs/token"
+        },
+        "reasonKey": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "issueTrialOfferInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expiresAt",
+        "trialStartsAt",
+        "trialEndsAt",
+        "reviewAt",
+        "reasonKey"
+      ],
+      "properties": {
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trialStartsAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trialEndsAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reasonKey": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "declineOrExpireOfferInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "disposition",
+        "nextReviewAt",
+        "reasonKey"
+      ],
+      "properties": {
+        "disposition": {
+          "enum": [
+            "declined",
+            "expired"
+          ]
+        },
+        "nextReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reasonKey": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "extendTrialInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trialEndsAt",
+        "reviewAt",
+        "reasonKey"
+      ],
+      "properties": {
+        "trialEndsAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reasonKey": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "proposeFormalEnrollmentInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposedFormalStartAt",
+        "proposedGrantPurposes",
+        "proposedGrantExpiresAt",
+        "safeFamilySummary",
+        "proposalExpiresAt",
+        "reasonKey"
+      ],
+      "properties": {
+        "proposedFormalStartAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "proposedGrantPurposes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/token"
+          }
+        },
+        "proposedGrantExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "safeFamilySummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "proposalExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reasonKey": {
+          "$ref": "#/$defs/token"
+        }
+      }
+    },
+    "result": {
+      "$ref": "enrollment-journey-types.schema.json#/$defs/actionResult"
+    }
+  }
+}

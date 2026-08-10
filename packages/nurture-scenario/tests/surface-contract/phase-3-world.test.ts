@@ -268,25 +268,40 @@ describe("Phase 3 synthetic world", () => {
   it("pins the deliberate G2-C contract and slice rotation", () => {
     const contract = record(manifest.interfaceContract);
     expect(contract.key).toBe("nurture.surface-contract");
-    expect(contract.version).toBe("1.18.0");
+    expect(contract.version).toBe("1.19.0");
     expect(contract.digest).not.toBe(
       "sha256:b7691a814c2e3cc1f6cc0a906d1ea18bdb2104c1f8ee2adcd1db57336f03b641",
     );
     expect(manifest.sharedCoreHash).toBe(frozenSharedCoreHash);
-    const capabilityHashes = records(manifest.capabilities).map((entry) => [
-      text(entry.capabilityKey),
-      text(entry.sliceHash),
-    ]);
-    expect(capabilityHashes).toEqual(
-      frozenCapabilitySliceHashes.map((entry) => [...entry]),
+    const capabilityHashes = new Map(
+      records(manifest.capabilities).map((entry) => [
+        text(entry.capabilityKey),
+        text(entry.sliceHash),
+      ]),
     );
-    const surfaceHashes = records(manifest.surfaces).map((entry) => [
-      text(entry.surfaceKey),
-      text(entry.sliceHash),
+    for (const [key, hash] of frozenCapabilitySliceHashes) {
+      expect(capabilityHashes.get(key), key).toBe(hash);
+    }
+    expect(capabilityHashes.size).toBe(frozenCapabilitySliceHashes.length + 24);
+
+    // I2-A intentionally rotates the two Guardian slices to admit their exact
+    // Workflow write class. Caregiver and Institution slice evidence remains
+    // byte-exact; query/action bindings rotate capability slices instead.
+    const intentionallyRotatedSurfaces = new Set([
+      "guardian_family_board",
+      "guardian_nurture_chat",
     ]);
-    expect(surfaceHashes).toEqual(
-      frozenSurfaceSliceHashes.map((entry) => [...entry]),
+    const surfaceHashes = new Map(
+      records(manifest.surfaces).map((entry) => [
+        text(entry.surfaceKey),
+        text(entry.sliceHash),
+      ]),
     );
+    for (const [key, hash] of frozenSurfaceSliceHashes) {
+      if (intentionallyRotatedSurfaces.has(key)) continue;
+      expect(surfaceHashes.get(key), key).toBe(hash);
+    }
+    expect(surfaceHashes.size).toBe(frozenSurfaceSliceHashes.length);
     const inventoryPaths = records(record(manifest.sourceSet).inventory).map(
       (entry) => text(entry.path),
     );

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.the-nurture.local/surfaces/v1/source/capabilities/contracts/query-enrollment-journey.schema.json",
+  "title": "QueryEnrollmentJourneyV1",
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "workflowResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflow"
+      ],
+      "properties": {
+        "workflow": {
+          "$ref": "enrollment-journey-types.schema.json#/$defs/workflowProjection"
+        }
+      }
+    },
+    "adminWaitlistResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "waitlist"
+      ],
+      "properties": {
+        "waitlist": {
+          "$ref": "enrollment-journey-types.schema.json#/$defs/adminWaitlist"
+        }
+      }
+    },
+    "familyWaitlistResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "waitlist"
+      ],
+      "properties": {
+        "waitlist": {
+          "$ref": "enrollment-journey-types.schema.json#/$defs/familyWaitlist"
+        }
+      }
+    }
+  }
+}

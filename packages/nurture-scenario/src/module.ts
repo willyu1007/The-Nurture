@@ -17,6 +17,11 @@ import {
   nurtureScenarioManifest,
 } from "./registry.js";
 import { createInstitutionInternalApiHandlers } from "./institution-surfaces.js";
+import {
+  createNurtureEnrollmentJourneyInternalApiHandlers,
+  defaultNurtureEnrollmentJourneySurfaceDeps,
+  type NurtureEnrollmentJourneySurfaceDeps,
+} from "./enrollment-journey-surfaces.js";
 
 /**
  * Canonical default-off production module. The manifest contains no activation
@@ -32,6 +37,9 @@ export const nurtureScenarioModule: WorkflowScenarioModule = {
   internal_api_handlers: {
     ...nurtureInternalApiHandlers,
     ...createInstitutionInternalApiHandlers(defaultNurtureDeps),
+    ...createNurtureEnrollmentJourneyInternalApiHandlers(
+      defaultNurtureEnrollmentJourneySurfaceDeps,
+    ),
   },
 };
 
@@ -39,6 +47,8 @@ export type NurtureScenarioModuleDeps = {
   handlerDeps: NurtureHandlerDeps;
   presenterDeps: NurturePresenterDeps;
   workerRuntime: WorkflowRuntimePort;
+  /** I2-B is fail-closed unless an explicit synthetic or future I3 owner set is supplied. */
+  enrollmentJourneySurfaceDeps?: NurtureEnrollmentJourneySurfaceDeps;
 };
 
 /**
@@ -60,5 +70,9 @@ export const createNurtureScenarioModule = (
   internal_api_handlers: {
     ...nurtureInternalApiHandlers,
     ...createInstitutionInternalApiHandlers(deps.handlerDeps),
+    ...createNurtureEnrollmentJourneyInternalApiHandlers(
+      deps.enrollmentJourneySurfaceDeps ??
+        defaultNurtureEnrollmentJourneySurfaceDeps,
+    ),
   },
 });

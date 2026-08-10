@@ -168,6 +168,40 @@
       }
     },
     {
+      "caseKey": "enrollment-journey-i2-a-wire-contract",
+      "kind": "visibility",
+      "covers": [
+        "capability:accept_trial_offer",
+        "capability:cancel_trial_preparation",
+        "capability:close_inquiry",
+        "capability:confirm_intent_conversation",
+        "capability:confirm_native_touchpoint_note",
+        "capability:decline_or_expire_trial_offer",
+        "capability:end_trial",
+        "capability:extend_trial",
+        "capability:formalize_enrollment",
+        "capability:issue_trial_offer",
+        "capability:mark_trial_review_reached",
+        "capability:override_waitlist_category",
+        "capability:prepare_trial_relationship",
+        "capability:propose_formal_enrollment",
+        "capability:qualify_capacity_waitlist",
+        "capability:query_guardian_enrollment_waitlist",
+        "capability:query_institution_capacity_waitlist",
+        "capability:query_institution_enrollment_journey",
+        "capability:record_external_touchpoint",
+        "capability:record_or_skip_visit",
+        "capability:review_waitlist_interest",
+        "capability:start_enrollment_inquiry",
+        "capability:start_trial",
+        "capability:withdraw_from_waitlist"
+      ],
+      "suiteRef": {
+        "runner": "vitest",
+        "target": "packages/nurture-scenario/tests/surface-contract/phase-5-enrollment-journey-contract.test.ts"
+      }
+    },
+    {
       "caseKey": "manual-content-and-media-safety-path",
       "kind": "deterministic_fixtures",
       "covers": [

@@ -720,7 +720,14 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
   "surface_mapping": {
     "chat_workflow_control": {
       "adapter_key": "nurture.chat_workflow",
-      "recommendation_policy": "user_message_intent_and_context_refs"
+      "recommendation_policy": "user_message_intent_and_context_refs",
+      "enrollment_journey": {
+        "workflow_type": "EnrollmentJourneyWorkflowV1",
+        "contract_version": "1.0.0",
+        "query_handler_key": "nurture.internal.query_enrollment_journey",
+        "command_handler_key": "nurture.internal.execute_enrollment_journey",
+        "enablement_policy": "disabled"
+      }
     },
     "chat_dashboard_summary": {
       "presenter_key": "nurture.chat_dashboard_summary"
@@ -734,10 +741,24 @@ export const nurtureScenarioManifest: ScenarioManifestV2 = {
     },
     "web_run_workbench": {
       "adapter_key": "nurture.web_run_workbench",
-      "supports_step_interventions": true
+      "supports_step_interventions": true,
+      "enrollment_journey": {
+        "workflow_type": "EnrollmentJourneyWorkflowV1",
+        "contract_version": "1.0.0",
+        "query_handler_key": "nurture.internal.query_enrollment_journey",
+        "command_handler_key": "nurture.internal.execute_enrollment_journey",
+        "enablement_policy": "disabled"
+      }
     },
     "mobile_dashboard": {
-      "adapter_key": "nurture.mobile_dashboard"
+      "adapter_key": "nurture.mobile_dashboard",
+      "enrollment_journey": {
+        "workflow_type": "EnrollmentJourneyWorkflowV1",
+        "contract_version": "1.0.0",
+        "query_handler_key": "nurture.internal.query_enrollment_journey",
+        "command_handler_key": "nurture.internal.execute_enrollment_journey",
+        "enablement_policy": "disabled"
+      }
     },
     "forum_publication": {
       "handoff_type": "public_draft",

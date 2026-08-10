@@ -347,6 +347,91 @@
       "jsonPointer": ""
     },
     {
+      "schemaRef": "schema:nurture.decline-or-expire-enrollment-offer-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/declineOrExpireOfferInput"
+    },
+    {
+      "schemaRef": "schema:nurture.enrollment-journey-action-result@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/result"
+    },
+    {
+      "schemaRef": "schema:nurture.enrollment-journey-empty-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/emptyInput"
+    },
+    {
+      "schemaRef": "schema:nurture.enrollment-journey-reason-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/reasonInput"
+    },
+    {
+      "schemaRef": "schema:nurture.extend-enrollment-trial-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/extendTrialInput"
+    },
+    {
+      "schemaRef": "schema:nurture.external-enrollment-touchpoint-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/externalTouchpointInput"
+    },
+    {
+      "schemaRef": "schema:nurture.issue-enrollment-trial-offer-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/issueTrialOfferInput"
+    },
+    {
+      "schemaRef": "schema:nurture.native-enrollment-touchpoint-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/nativeTouchpointInput"
+    },
+    {
+      "schemaRef": "schema:nurture.override-enrollment-waitlist-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/overrideWaitlistInput"
+    },
+    {
+      "schemaRef": "schema:nurture.propose-formal-enrollment-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/proposeFormalEnrollmentInput"
+    },
+    {
+      "schemaRef": "schema:nurture.qualify-enrollment-waitlist-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/qualifyWaitlistInput"
+    },
+    {
+      "schemaRef": "schema:nurture.query-guardian-enrollment-waitlist-result@1",
+      "artifactPath": "capabilities/contracts/query-enrollment-journey.schema.json",
+      "jsonPointer": "/$defs/familyWaitlistResult"
+    },
+    {
+      "schemaRef": "schema:nurture.query-institution-capacity-waitlist-result@1",
+      "artifactPath": "capabilities/contracts/query-enrollment-journey.schema.json",
+      "jsonPointer": "/$defs/adminWaitlistResult"
+    },
+    {
+      "schemaRef": "schema:nurture.query-institution-enrollment-journey-result@1",
+      "artifactPath": "capabilities/contracts/query-enrollment-journey.schema.json",
+      "jsonPointer": "/$defs/workflowResult"
+    },
+    {
+      "schemaRef": "schema:nurture.review-enrollment-waitlist-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/reviewWaitlistInput"
+    },
+    {
+      "schemaRef": "schema:nurture.start-enrollment-inquiry-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/startInquiryInput"
+    },
+    {
+      "schemaRef": "schema:nurture.visit-enrollment-input@1",
+      "artifactPath": "capabilities/contracts/enrollment-journey-actions.schema.json",
+      "jsonPointer": "/$defs/visitInput"
+    },
+    {
       "schemaRef": "schema:nurture.withdraw-family-care-request-input@1",
       "artifactPath": "capabilities/contracts/withdraw-family-care-request.schema.json",
       "jsonPointer": "/$defs/input"

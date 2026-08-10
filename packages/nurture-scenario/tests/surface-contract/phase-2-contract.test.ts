@@ -64,6 +64,30 @@ const expectedCapabilityVersions: Record<string, string> = {
   submit_family_care_question: "1.0.0",
   supersede_child_media_attribution: "1.0.0",
   withdraw_family_care_request: "1.0.0",
+  query_institution_enrollment_journey: "1.0.0",
+  query_institution_capacity_waitlist: "1.0.0",
+  query_guardian_enrollment_waitlist: "1.0.0",
+  start_enrollment_inquiry: "1.0.0",
+  record_external_touchpoint: "1.0.0",
+  confirm_native_touchpoint_note: "1.0.0",
+  confirm_intent_conversation: "1.0.0",
+  record_or_skip_visit: "1.0.0",
+  close_inquiry: "1.0.0",
+  qualify_capacity_waitlist: "1.0.0",
+  review_waitlist_interest: "1.0.0",
+  override_waitlist_category: "1.0.0",
+  issue_trial_offer: "1.0.0",
+  accept_trial_offer: "1.0.0",
+  decline_or_expire_trial_offer: "1.0.0",
+  withdraw_from_waitlist: "1.0.0",
+  cancel_trial_preparation: "1.0.0",
+  prepare_trial_relationship: "1.0.0",
+  start_trial: "1.0.0",
+  mark_trial_review_reached: "1.0.0",
+  extend_trial: "1.0.0",
+  propose_formal_enrollment: "1.0.0",
+  formalize_enrollment: "1.0.0",
+  end_trial: "1.0.0",
 };
 
 const expectedCapabilityKeys = Object.keys(expectedCapabilityVersions).sort();
@@ -84,10 +108,10 @@ const manifest = loadSurfaceContractManifest(
 );
 
 describe("Phase 2 exact surface contract", () => {
-  it("loads one exact, closed manifest with thirty-four capabilities and six surfaces", () => {
+  it("loads one exact, closed manifest with fifty-eight capabilities and six surfaces", () => {
     expect(manifest.interfaceContract).toEqual({
       key: "nurture.surface-contract",
-      version: "1.18.0",
+      version: "1.19.0",
       digest: expect.stringMatching(/^sha256:[0-9a-f]{64}$/),
     });
     expect(artifactPin).toEqual({
@@ -328,7 +352,7 @@ describe("Phase 2 exact surface contract", () => {
     const queries = manifest.capabilities
       .map((entry) => entry.descriptor)
       .filter((descriptor) => descriptor.executionClass === "query");
-    expect(queries).toHaveLength(9);
+    expect(queries).toHaveLength(12);
     for (const descriptor of queries) {
       expect(descriptor.confirmationPolicy).toBe("none");
       expect(descriptor.deliveryClass).toBe("none");
@@ -833,6 +857,22 @@ describe("board write commands conform to the registry's concurrency policy", ()
     "policy_redact_family_care_message",
   ];
 
+  // Enrollment Journey specs predate this board-write factory census and are
+  // bound one-for-one by the dedicated I2-B adapter suite. Derive that exact
+  // group from its unique gate instead of copying its inventory here.
+  const I2_B_BOUND_SPECS = manifest.capabilities
+    .filter(
+      (entry) =>
+        entry.descriptor.executionClass !== "query" &&
+        entry.descriptor.dependencyGates.some(
+          (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+        ) &&
+        entry.descriptor.concurrencyPolicy.headBindings.some(
+          (binding) => binding.mode === "must_equal",
+        ),
+    )
+    .map((entry) => entry.capabilityKey);
+
   const MUST_EQUAL_WITHOUT_SPEC = [
     // release IS routed — as a transport fan-out attempt whose revision head
     // is enforced by the attempt itself (stale_confirmation), not by a spec.
@@ -909,7 +949,11 @@ describe("board write commands conform to the registry's concurrency policy", ()
       )
       .map((entry) => entry.capabilityKey);
     for (const key of mustEqualKeys) {
-      if (specKeys.has(key) || HAND_BUILT_SPECS.includes(key)) continue;
+      if (
+        specKeys.has(key) ||
+        HAND_BUILT_SPECS.includes(key) ||
+        I2_B_BOUND_SPECS.includes(key)
+      ) continue;
       expect(
         MUST_EQUAL_WITHOUT_SPEC,
         `${key} declares a must_equal head, has no spec and is not carried as a named debt`,
@@ -921,6 +965,10 @@ describe("board write commands conform to the registry's concurrency policy", ()
       expect(specKeys.has(key), `${key} is listed as hand-built but the factory now builds it`).toBe(
         false,
       );
+    }
+    for (const key of I2_B_BOUND_SPECS) {
+      expect(specKeys.has(key), `${key} must stay outside the T-006 factory census`).toBe(false);
+      expect(mustEqualKeys, `${key} must retain its registered equality head`).toContain(key);
     }
     // A debt that has been paid must leave the list, or the next real gap
     // hides behind it. And a debt no registry entry backs is fiction.

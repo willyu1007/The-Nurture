@@ -462,3 +462,47 @@
   exact-class row lock serializes both sides.
 - Prevention: capacity invariants need forward and reverse write guards on
   every canonical source that can invalidate them.
+
+## 2026-08-10 — Wire-only capabilities are not runtime fixture modules
+
+- **Symptom:** the first full I2-A Surface Contract conformance run failed four
+  historical G2/G3 suites after the new descriptors were valid and generated.
+- **Root cause:** the draft added new surface module-kind names even though the
+  existing Workflow projection/queue families already carried the data, while
+  three bidirectional runtime censuses assumed every newly registered
+  capability already had a G2/G3 handler or fixture.
+- **What was tried:** the initial source added `family_waitlist_status`,
+  `institution_capacity_waitlist` and Workbench-specific module kinds. That
+  widened the closed content-family union and forced unrelated historical
+  fixtures to pretend I2-A had a presenter runtime.
+- **Fix/workaround:** removed the redundant module kinds and reused the existing
+  `institution_workflow_projection` / `institution_workflow_queue` families.
+  The dedicated I2-A suite owns the exact 24-key inventory. I2-B cleanup makes
+  historical selection, adoption and ingress censuses derive that group from
+  its unique runtime gate rather than copying the list into each suite.
+- **Prevention:** a wire-only rotation must reuse an existing presentation
+  family unless it actually introduces a new rendered module. Every
+  bidirectional runtime census must classify new default-off descriptors
+  explicitly, and that classification must fail once a handler is routed.
+
+## 2026-08-10 — A default-off adapter still needs exact lane and identity fences
+
+- **Symptom:** the first I2-B draft shared one invocation helper between query
+  and command handler keys without checking which lane the parsed capability
+  belonged to. Its committed-result check compared only the Workflow Run
+  `object_id`.
+- **Root cause:** default-off composition was mistaken for sufficient runtime
+  isolation, an opaque ID was treated as the complete canonical identity, and
+  the confirmation ref stopped at the surface adapter instead of reaching the
+  transactional command executor.
+- **Fix:** both internal keys now reject the opposite capability lane before
+  binding resolution. Query and committed command results compare the full
+  canonical Workflow Run tuple and fail unavailable on target/scope drift.
+  Action/query request types enforce confirmation presence/absence, and the
+  executor port carries the opaque ref for future in-transaction verification
+  and consumption.
+- **Prevention:** every adapter key must enforce its declared execution class
+  even while disabled. Cross-owner canonical identities are compared as exact
+  typed tuples, never by opaque object ID alone. A confirmation token must
+  reach the transaction that applies the effect; a pre-transaction read or
+  consume is not qualification evidence.

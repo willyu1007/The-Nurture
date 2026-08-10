@@ -10,10 +10,13 @@ six-surface interface contract.
   six-surface registry, atomic surface envelope, visibility matrix and shared
   readiness/snapshot rules.
 - Phase 2 defines typed query/prepare/execute/read-result, error, pagination,
-  private confirmation/cursor bindings and the closed registry. G2-C rotates
-  that registry to eleven capabilities; all three query capabilities use
-  `1.1.0`, while the action capabilities remain independently versioned.
-  stable presenter contracts and versioned policy/repository ports.
+  private confirmation/cursor bindings, stable presenter contracts and
+  versioned policy/repository ports. The current closed registry contains 58
+  independently versioned capabilities. G4-D I2-A contributes three
+  Enrollment Journey queries and 21 commands behind an unqualified,
+  default-off runtime owner gate. I2-B binds them to fail-closed scenario
+  module adapters while leaving formal ingress, real owners and activation
+  absent.
 - Phase 3 adds `source/fixtures/` — the versioned PII-free synthetic world
   (`fixtures/world/`) plus one independent, repeatable initial state per
   journey (`fixtures/journeys/<gj-1…gj-5|rj-1>/initial-state.json`), each
@@ -24,8 +27,8 @@ six-surface interface contract.
   files join the canonical inventory and root digest without entering the
   shared core or any existing capability/surface slice.
 - `generated/surface-contract.manifest.json` is deterministic output. It
-  records the exact `nurture.surface-contract@1.13.0` /
-  `sha256:1919a289cabdd9018db83100867dd1985caf6510a7a900e8a1fc654521e26aef`,
+  records the exact `nurture.surface-contract@1.19.0` /
+  `sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e`,
   shared-core hash,
   canonical source inventory and per-capability/per-surface/per-fixture slice
   hashes (fixture slices: `world`, `journey:<key>`, `selection`).

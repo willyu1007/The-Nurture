@@ -541,6 +541,38 @@ Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and
 Detailed evidence: [`61`](./61-g4-d-increment-5-record.md) and
 [`artifacts/db/0e4-quality-repair`](./artifacts/db/0e4-quality-repair/00-connection-check.md).
 
+## 2026-08-10 — G4-D I2-A public wire artifact
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact artifact | PASS | `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`; manifest digest `sha256:2acbeb95…`; 58 capabilities / 6 surfaces; shared core remains `sha256:7bd8a82d…`. |
+| Synthetic Surface Contract | PASS | `pnpm verify:surface-conformance`: tooling 5/5; Vitest 130/130 across 13 files; 18 conformance cases cover 73/73 slices; schema negatives 7/7. Owner Integration remains NO-GO and Joint Conformance was not run. |
+| I2-A boundary suite | PASS | 9/9: exact 24-key inventory, unique runtime NO-GO, role/surface separation, trusted-input exclusion, rank-free family result, exact private heads/effects and manifest/module absence. |
+| Full unit lane | PASS | `pnpm test:unit`: 887/887 across 80 files. |
+| TypeScript | PASS | `pnpm typecheck`; pinned workflow-contract package compilation and root `tsc --noEmit` pass. |
+| Structural gates | PASS | Test routing 149 files (80 unit / 42 DB / 11 dev-host / 14 scenario-service / 2 X5); persistence, port topology, formal ingress and G3-0 freeze pass. Formal ingress reports 58 registered and the exact 25 unrouted descriptors (I2-A 24 plus 0C-4 one). |
+| Contract hygiene | PASS after repair | Removed redundant new presentation module kinds; exact contract-only keys are named in selection, adoption, typed-result and ingress censuses. See [`05-pitfalls.md`](./05-pitfalls.md). |
+| Docs / context / governance | PASS | 108/108 strict task docs with anchors, zero errors/warnings; context strict verification, project-state, governance sync/lint and `git diff --check` pass. |
+| External My-Chat pin | KNOWN RED GATE | Existing expected `567b96c` versus observed `66720cd`; workflow-contract source was unchanged at preflight. I2-A did not rerun or adopt the external checkout. |
+| Database / effect boundary | NOT RUN / PASS | I2-A changes no Prisma, migration or persistence code and requires no DB operation. No public handler/presenter runtime, real owner binding, module/manifest registration, deployment, activation or traffic was added. |
+
+Detailed evidence: [`62`](./62-g4-d-i2-a-contract-artifact-record.md).
+
+## 2026-08-10 — G4-D I2-B surface adapters
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact adapter mapping | PASS | Dedicated suite 14/14 covers all 21 command-to-I1 spec mappings, three query presenters, trusted-input/context rejection, six mixed-role branches, exact role/surface denial, protected owner/head carriers, full query/command canonical Workflow Run drift, cross-lane denial and immutable default-off composition. |
+| Full unit lane | PASS | `pnpm test:unit`: 901/901 across 81 files. |
+| TypeScript | PASS | `pnpm typecheck`; pinned workflow-contract package compilation and root `tsc --noEmit` pass. |
+| Synthetic Surface Contract | PASS | Tooling 5/5 and Vitest 130/130 across 13 files; 18 cases cover 73/73 slices with seven schema negatives. Owner Integration remains NO-GO and Joint Conformance was not run. |
+| Structural gates | PASS | Test routing 150 files (81 unit / 42 DB / 11 dev-host / 14 scenario-service / 2 X5); persistence, port topology, formal ingress, G2 exit/census and G3-0 freeze pass. Formal ingress intentionally retains the exact 25 unrouted descriptors until I3. |
+| Cleanup | PASS | Internal adapter barrel export removed; four copied Enrollment key censuses derive from the unique runtime gate; source-string assertions replaced by behavior; no temporary/compatibility/duplicate runtime file remains. |
+| Context / docs / governance | PASS | Workflow context checksum `ca639b89…`; strict context, project-state, task-doc and governance sync/lint checks pass; `git diff --check` is clean. |
+| Database / effect boundary | NOT RUN / PASS | I2-B changes no Prisma, migration or repository implementation and adds no real owner provider or formal ingress. No DB operation, deployment, activation or traffic occurred. |
+
+Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

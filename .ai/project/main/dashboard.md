@@ -17,14 +17,12 @@ Project: `main`
   `REQUAL_PASS`; T-006/G3 is `done` at `0374087…` (merged `447e646`); T-003 is
   `done` after handing its presenter/action contracts to My-Chat T-036
   (D-T009-06). All three await separately approved archival.
-- Current exact identity: `nurture.surface-contract@1.18.0` /
-  `sha256:be84bb23…` (shared core `sha256:7bd8a82d…` unchanged, 34 capabilities
-  / 6 surfaces), at My-Chat `51ad97f…` / Base `4350086…`, contract parity
-  `98f6c241…` (21 files, both sides). The Nurture self-pin is re-frozen
-  whenever pinned source changes; its current value lives in
-  `docs/project/integrations/my-chat-workflow-contract.json`. G4-0C-4 rotated
-  `1.17.0` → `1.18.0` additively, so T-005 and T-006 slice evidence is
-  preserved; no contract batch is open.
+- Current Nurture surface identity: `nurture.surface-contract@1.19.0` /
+  `sha256:6f67d49c…` (shared core `sha256:7bd8a82d…` unchanged, 58 capabilities
+  / 6 surfaces). I2-A added the default-off Enrollment Journey wire boundary;
+  I2-B adds fail-closed adapters without changing that artifact. The external
+  My-Chat pin remains a stated G-09 adoption gate; it was not floated or copied
+  into this repo.
 - Cross-repo posture: `family_growth_transport@1.0.0` is frozen and the N8
   fixtures pass jointly against the real My-Chat consumer. My-Chat T-031 owns
   the remaining consumer half; the guardian planning surface is ceded to
@@ -36,8 +34,9 @@ Project: `main`
   T-002's G1 record, which stays history at its own topology.
 - Planned chain: T-007 0C/0D and the full frozen 0E chain are implemented at
   private I1; G4-D increments 2–5 have disposable-only DB qualification through
-  33 migrations. I2 contract/capability rotation or the independent 0F freeze
-  is next. T-008 still waits for the complete T-007 Exit.
+  33 migrations. I2-A/I2-B are complete and remain default-off. Independent 0F
+  may start now; I3 waits for G-09. T-008 still waits for the complete T-007
+  Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
   default-off.
@@ -45,9 +44,9 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **G4-D I2 or 0F freeze.** I2 may publish only the completed default-off 0E
-   surface. 0F may proceed independently but cannot replace any G4-D gate.
-2. **Keep I3/I4 closed on G-09.** The local formalization path is qualified;
+1. **0F freeze may proceed independently.** It cannot replace any remaining
+   G4-D owner-integration or conformance gate.
+2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.
 3. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
@@ -70,8 +69,8 @@ Project: `main`
 
 | Task | Status | Feature | Dev Docs |
 | --- | --- | --- | --- |
-| T-003 nurture-uiux-pitch | done | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-007 nurture-institution-surfaces | in-progress | F-003 | dev-docs/active/nurture-institution-surfaces |
+| T-003 nurture-uiux-pitch | done | F-002 | dev-docs/active/nurture-uiux-pitch |
 | T-009 nurture-family-growth-provider | done | F-004 | dev-docs/active/nurture-family-growth-provider |
 | T-002 nurture-institution-mode | in-progress | F-002 | dev-docs/active/nurture-institution-mode |
 | T-006 nurture-child-care-boards | done | F-003 | dev-docs/active/nurture-child-care-boards |

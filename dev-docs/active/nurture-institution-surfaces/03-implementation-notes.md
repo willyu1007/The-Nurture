@@ -783,3 +783,76 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   implementation commit `1a79e13`, the C30 lock was re-frozen at aggregate
   `ef33c0bd…` and the Nurture exact-runtime pin at `25b7ad2f…` over 250 files.
   Base/Host fields and the divergent My-Chat revision were not advanced.
+
+## 2026-08-10 — G4-D I2-A public wire artifact
+
+- Rotated `nurture.surface-contract` once from `1.18.0` to `1.19.0`, exact
+  digest `6f67d49c…`, with 58 capabilities and six unchanged surface identities.
+- Added three query descriptors and one descriptor for each of the 21 completed
+  Enrollment Journey commands. Three aggregate schema files replace a
+  per-command input/result file pair; identical empty/reason/result shapes and
+  five actor-level eligibility policies are shared without hiding individual
+  command roles, confirmation or head bindings.
+- The first review rejected a wider token constraint and an open-ended action
+  result. Public tokens now match the private I1 vocabulary, and action effects
+  are closed to the exact 21-command enum.
+- Institution mobile remains action-free. Guardian surfaces receive only their
+  family-safe waitlist result and Guardian/mixed actions; caregiver surfaces
+  receive none. Guardian visibility now names the explicit
+  `enrollment_journey_guardian_actions_only` rule.
+- Public inputs exclude trusted Workspace/role, owner snapshots/evidence,
+  private Workflow refs, expected local heads and derived state. Exact heads
+  remain confirmation bindings; the family result remains rank/category/ref-
+  free.
+- All new descriptors require the unique unqualified
+  `t007_enrollment_journey_runtime` gate. Manifest/module, runtime handlers,
+  owner adapters and persistence are unchanged, so I2-A is not activation or
+  owner-integration evidence.
+
+## 2026-08-10 — G4-D I2-B surface adapters
+
+- Added one cohesive Enrollment Journey surface adapter. It validates the
+  exact I2-A request shell and operation family before resolving a server-only
+  prepared binding; caller-supplied Workspace, active role, owner evidence,
+  protected bodies, private refs and expected heads are rejected as extra
+  fields.
+- Action request types require a confirmation ref while query types prohibit
+  one. The ref is forwarded unchanged to the command executor; the future I3
+  implementation must verify its input/target/head binding and consume it in
+  the same transaction as the I1 effect, never in the surface adapter.
+- The adapter uses an explicit 21-case command map to the existing I1 specs.
+  This is deliberate closed-world dispatch, not a generic transition endpoint
+  or a duplicate lifecycle engine. The three reads reuse the existing Journey
+  and waitlist query services.
+- Institution and Guardian surfaces have separate role matrices. The internal
+  query and command keys also enforce separate lanes, so a valid query cannot
+  be submitted through the command key or vice versa.
+- Presenters omit private Workflow/entity refs, seal Admin targets, keep the
+  family waitlist free of rank/category/policy facts, and verify the full
+  canonical Workflow Run tuple before projecting committed/query results.
+- `nurtureScenarioModule` remains fail-closed through unavailable default
+  dependencies. The generated manifest records disabled surface composition;
+  no scenario-service ingress, owner provider, database code or activation was
+  introduced.
+- Adapter request/response names are intentionally internal. They compose the
+  public business DTO with opaque prepare/confirmation refs but do not fork the
+  generic Surface invocation/error contracts; I3 will provide their only
+  formal-ingress mapping.
+
+## 2026-08-10 — G4-D I2-A/I2-B quality and cleanup
+
+- Fixed the trusted-boundary order: malformed trusted Workspace/actor/request
+  identity now fails before the injected binding resolver is called.
+- Froze the canonical unavailable dependency graph, removed its package-root
+  export surface, and made Admin waitlist option issuance carry the exact
+  private entry ref/head instead of an ambiguously named target head.
+- Reduced four copied 24-key exception inventories to derivation from the one
+  `t007_enrollment_journey_runtime` gate. The dedicated I2-A suite remains the
+  sole exact inventory owner, so adding a capability still requires one
+  deliberate contract edit without duplicating runtime lists.
+- Replaced source-text assertions with actual manifest/module behavior checks
+  and expanded the adapter suite from 7 to 14 cases for trusted-context,
+  mixed-role and query-result drift coverage.
+- Full qualification passes 901/901 unit tests, root typecheck, Surface
+  Contract 130/130 plus tooling 5/5, and all structural gates. No DB path or
+  database operation was introduced.

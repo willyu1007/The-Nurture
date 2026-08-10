@@ -91,10 +91,19 @@ describe("EnrollmentJourneyWorkflowV1 registry", () => {
     );
   });
 
-  it("remains absent from the canonical scenario manifest", () => {
-    expect(JSON.stringify(nurtureScenarioManifest)).not.toContain(
-      "EnrollmentJourneyWorkflowV1",
-    );
+  it("is composed only as a disabled surface adapter, not a second legacy Workflow capability", () => {
+    expect(
+      nurtureScenarioManifest.capabilities.some((capability) =>
+        JSON.stringify(capability).includes("EnrollmentJourneyWorkflowV1"),
+      ),
+    ).toBe(false);
+    expect(
+      nurtureScenarioManifest.surface_mapping.web_run_workbench?.enrollment_journey,
+    ).toMatchObject({
+      workflow_type: "EnrollmentJourneyWorkflowV1",
+      contract_version: "1.0.0",
+      enablement_policy: "disabled",
+    });
   });
 });
 

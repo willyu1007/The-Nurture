@@ -20,15 +20,16 @@ places drifts in one of them.
 | 0B publication policy | frozen `@1.0.0` | provider qualified through T-006's G3 | [`08`](./08-g4-0b-publication-policy-freeze.md) |
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
-| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 — registry/state/projection plus qualified inquiry, waitlist/preparation, trial lifecycle and formalization/completion** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`61`](./61-g4-d-increment-5-record.md) |
+| 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
 | 0F knowledge & RAG | **not started** | none | — |
 
-All implementation work remains at **I1**. Persistence increments carry exact
-schema, policy, repository/service code and migration authoring, and all
-implemented daily-operations and G4-D persistence
-paths are qualified on disposable PostgreSQL. No I2
-contract release, no I3 owner integration, no I4 joint conformance, no
-capability registration, no activation, no traffic.
+Domain/persistence implementation remains at **I1** and all implemented daily-
+operations and G4-D persistence paths are qualified on disposable PostgreSQL.
+G4-D additionally has the exact I2-A wire artifact and synthetic I2-B
+handler/presenter composition. The scenario module and manifest expose only
+fail-closed, explicitly disabled internal adapter keys. No scenario-service
+formal ingress, I3 owner integration, I4 joint conformance, runtime capability
+activation or traffic exists.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
 adds explicit policy/FIFO/override/offer/reservation/cancellation semantics and
@@ -38,7 +39,8 @@ parallel trial-care path. Increment 4 adds the canonical phase, current pair
 and Grant preparation, explicit trial/review/extension/proposal lifecycle and
 local outage-safe end. Increment 5 adds one immutable formal proposal, current
 Guardian acceptance, same-relationship formalization and atomic workflow
-completion. The whole branch remains private I1 code.
+completion. I2-A describes those existing facts publicly; I2-B maps them to
+the private I1 ports without adding a real owner or database execution path.
 
 ## Gap register
 
@@ -164,7 +166,7 @@ Cited by: [`40`](./40-g4-b-increment-7-record.md),
 [`42`](./42-g4-b-increment-8-record.md),
 [`44`](./44-g4-b-increment-10-record.md).
 
-### G-10 — Enrollment Journey I1 is complete; I2–I4 remain
+### G-10 — Enrollment Journey I2-A/I2-B are complete; I3–I4 remain
 
 G4-D increments 2–5 now supply DB-qualified private inquiry and capacity
 waitlist/preparation owners. The latter provides standard-only FIFO by default,
@@ -183,19 +185,40 @@ old waitlist. 0E-4 adds the immutable formal proposal, current Guardian
 acceptance, exact-head trial-to-formal transaction and completed workflow
 outcome without releasing/reacquiring the seat or persisting owner evidence.
 
-Real prospective-contact and native business-message source adapters remain
-I3 gates. The authenticated My-Chat formalization evidence adapter/private
-ingress is also an I3 gate and remains blocked by G-09. No Host bridge, public
-caller, capability registration or traffic exists; `workflowRunRef` still
-accepts only the exact My-Chat-owned canonical ref and the private workflow ref
-is never projected.
+I2-A now publishes three queries and the complete 21-command inventory through
+the exact `nurture.surface-contract@1.19.0` /
+`sha256:6f67d49ca303ad627b6644857a16dde7626cc944bf8c065f09629039025f738e`
+artifact. Institution mobile remains query-only; Institution actions appear
+only in Workbench; Guardian surfaces receive a rank-free family waitlist result
+and only Guardian/mixed waitlist, offer, preparation and formalization actions.
+Public inputs carry no trusted Workspace/role, owner snapshot/evidence, private
+Workflow ref, expected local head or derived lifecycle field. All 24 descriptors
+depend on the unqualified `t007_enrollment_journey_runtime` owner-integration
+gate.
+
+I2-B now validates the exact public DTOs before trusted resolution, binds every
+action to its existing I1 command spec, reuses the three I1 query paths and
+applies the exact Institution/Guardian surface matrix. Its presenters project
+only the opaque Workflow Run identity, seal Admin action targets and preserve
+the family no-rank/no-category boundary. Query and command internal keys reject
+cross-lane payloads; canonical Workflow Run or local scope drift fails
+unavailable.
+
+Real prospective-contact and native business-message source adapters remain I3
+gates. The authenticated My-Chat formalization evidence adapter and formal
+scenario-service ingress are also I3 gates and remain blocked by G-09. The
+module's two adapter keys fail closed by default and the manifest marks their
+chat/mobile/Web composition disabled. No Host bridge, real owner binding,
+database operation, activation or traffic exists; `workflowRunRef` accepts only
+the exact My-Chat-owned canonical ref, and the private workflow ref is never
+projected.
 
 The revision-bearing local C30 adoption lock is current at quality-repair
 revision `1a79e13`, aggregate source hash `ef33c0bd…`; the Nurture exact-runtime
 pin is `25b7ad2f…` over 250 files. This closes the local commit-boundary
 maintenance step without adopting the divergent My-Chat head.
 
-Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`61`](./61-g4-d-increment-5-record.md).
+Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
 ## Closed since the 0D Exit
 
@@ -226,19 +249,19 @@ Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`61`](./61-g4-d-increment-5
 
 ## Next steps, in dependency order
 
-1. **G4-D I2 contract/capability rotation** — publish only the completed 0E
-   private contract surface and keep every capability default-off. This does
-   not qualify a real My-Chat owner path.
-2. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
+1. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
    any required G4-D path.
-3. **G4-D I3/I4** — after G-09 adoption, bind the authenticated My-Chat
-   current-owner/private-ingress adapter and run joint negative/replay/
-   mobile-Web head conformance.
+2. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
+   prospective-contact/native-source/current-owner providers and formal
+   scenario-service ingress. Retain exact option/confirmation heads and the
+   default-off runtime gate while qualifying on an approved disposable DB.
+3. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
+   after the I3 owner and ingress paths qualify.
 
 G-03's remaining authority/source fact is an external owner gate, not an
 actionable implementation step in the current schema. Resume it only when a
 business owner exposes a currently readable canonical blocker; do not hold the
 independent 0E/0F work behind a signal-local invention.
 
-G-09 sits outside this order: it is a cross-repository decision, not T-007 work,
-and it blocks the pin gate rather than any of the steps above.
+G-09 is a cross-repository adoption decision, not a hash refresh inside T-007.
+It blocks G4-D I3/I4 but does not block the independent 0F freeze.

@@ -30,6 +30,7 @@ const manifest = JSON.parse(
       supportedRoles?: string[];
       targetPolicy: { kind: string; optionSchemaRef: string | null };
       concurrencyPolicy: { class: string; headBindings: Array<{ headKey: string }> };
+      dependencyGates: Array<{ dependencyKey: string }>;
       inputSchemaRef: string;
     };
   }>;
@@ -208,15 +209,25 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
       "submit_family_care_question",
       "withdraw_family_care_request",
     ]);
-    // T-007 identities are reserved by their own G4-0C freeze records, not by
-    // the T-006 G3-0 adoption set. Listing them here keeps this guard exact:
-    // it still fails on an unreserved key, and adding one costs a deliberate
-    // edit naming the record that froze it.
+    // T-007 identities are reserved by their own freeze/runtime gates, not by
+    // the T-006 G3-0 adoption set. The dedicated G4-D suite keeps the gated
+    // inventory exact; this historical guard only routes each group to its
+    // owning evidence record.
     const postG3Keys = new Map([
       [
         "query_institution_communication_review",
         "dev-docs/active/nurture-institution-surfaces/14-g4-0c-4-surface-envelope-freeze.md",
-      ],
+      ] as const,
+      ...manifest.capabilities
+        .filter((entry) =>
+          entry.descriptor.dependencyGates.some(
+            (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+          ),
+        )
+        .map((entry) => [
+          entry.capabilityKey,
+          "dev-docs/active/nurture-institution-surfaces/63-g4-d-i2-b-surface-adapter-record.md",
+        ] as const),
     ]);
     for (const entry of manifest.capabilities) {
       if (preG3Keys.has(entry.capabilityKey)) continue;

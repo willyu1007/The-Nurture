@@ -366,13 +366,16 @@ Project: `main`
   T-007 (`in-progress`); T-008 (`planned`).
 - Current posture: T-007 completed 0C, 0D and the full frozen 0E chain at
   private I1. G4-D increments 2–5 are qualified through 33 migrations on
-  disposable PostgreSQL; no public caller, capability activation or durable
-  database apply exists. 0F is not started.
-- Next Checkpoint: rotate the completed G4-D contract/capability at I2 while
-  default-off, or freeze independent 0F. Authenticated My-Chat owner integration
-  at I3/I4 waits for the explicit G-09 adoption decision. T-008 remains planned
-  until the complete T-007 G4 Exit; Candidate Freeze, deployment, activation and
-  external traffic remain closed.
+  disposable PostgreSQL. I2-A publishes the exact three-query/21-action
+  Surface Contract at `1.19.0`; I2-B maps it to the existing I1 ports through
+  fail-closed, explicitly disabled module/manifest adapters. No formal ingress,
+  real owner provider, capability activation or durable database apply exists.
+  0F is not started.
+- Next Checkpoint: freeze independent 0F, or after explicit G-09 adoption enter
+  G4-D I3 authenticated prospective-contact/native-source/current-owner and
+  formal-ingress binding. I4 joint conformance follows only after I3 qualifies.
+  T-008 remains planned until the complete T-007 G4 Exit; Candidate Freeze,
+  deployment, activation and external traffic remain closed.
 
 ### F-004 Family growth material provider
 

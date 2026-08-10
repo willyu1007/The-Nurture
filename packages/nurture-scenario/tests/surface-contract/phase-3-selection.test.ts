@@ -47,10 +47,23 @@ const capabilityRegistry = record(
 );
 
 const capabilities = records(capabilityRegistry.capabilities);
+// The dedicated I2-B suite owns this gate's exact inventory. Deriving the
+// exclusion from the registry avoids copying 24 keys into historical fixtures.
+const separatelyQualifiedI2BKeys = new Set(
+  capabilities
+    .filter((capability) =>
+      records(capability.dependencyGates).some(
+        (gate) => text(gate.dependencyKey) === "t007_enrollment_journey_runtime",
+      ),
+    )
+    .map((capability) => text(capability.capabilityKey)),
+);
 const capabilityByKey = new Map(
   capabilities.map((capability) => [text(capability.capabilityKey), capability]),
 );
-const allCapabilityKeys = [...capabilityByKey.keys()].sort();
+const allCapabilityKeys = [...capabilityByKey.keys()]
+  .filter((key) => !separatelyQualifiedI2BKeys.has(key))
+  .sort();
 const intentUnion = new Set(
   capabilities.flatMap((capability) => strings(capability.intentKeys)),
 );

@@ -57,11 +57,11 @@ const expectedHarnessActionKeys = [
 
 /**
  * Capabilities that are registered in the surface contract but deliberately not
- * routed yet. Enumerating them is the point: a registered capability that is
- * neither routed nor listed here fails this guard, so coverage can never shrink
- * silently, and a key listed here after it is routed fails too.
+ * routed yet. One-off freezes stay explicit; cohesive default-off increments
+ * are derived from their unique registry gate and qualified by their dedicated
+ * exact-inventory suite. A capability in neither group fails this guard.
  */
-const expectedUnroutedCapabilityKeys = [
+const explicitlyUnroutedCapabilityKeys = [
   // Frozen by G4-0C-4 but not implemented: 0C is a freeze stage and I1 has not
   // opened, so this capability has a descriptor and no handler. It leaves this
   // list the moment it is routed, and this guard fails if it does not.
@@ -280,6 +280,19 @@ const registeredQueryKeys = new Set(
     .filter((capability) => capability.executionClass === "query")
     .map((capability) => capability.capabilityKey),
 );
+// I2-B's exact inventory is owned by the dedicated contract suite. Formal
+// ingress derives the still-unrouted set from its unique default-off gate so a
+// second hand-maintained 24-key list cannot drift.
+const expectedUnroutedCapabilityKeys = [
+  ...explicitlyUnroutedCapabilityKeys,
+  ...capabilityRegistry.capabilities
+    .filter((capability) =>
+      capability.dependencyGates?.some(
+        (gate) => gate.dependencyKey === "t007_enrollment_journey_runtime",
+      ),
+    )
+    .map((capability) => capability.capabilityKey),
+];
 
 const parseRoutedVersions = (constName) => {
   const block = harnessTransportSource.match(

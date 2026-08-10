@@ -39,6 +39,12 @@
       "requiredGate": "owner_integration"
     },
     {
+      "key": "enrollment_journey_repository",
+      "version": "1.0.0",
+      "owner": "nurture",
+      "requiredGate": "contract_boundary"
+    },
+    {
       "key": "media_attribution_repository",
       "version": "1.0.0",
       "owner": "nurture",
@@ -530,6 +536,108 @@
         },
         {
           "key": "family_care_command_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "guardian_enrollment_journey_action_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "institution_enrollment_journey_action_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "native_enrollment_touchpoint_action_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "institution_communication_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_guardian_enrollment_waitlist_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_institution_capacity_waitlist_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "query_institution_enrollment_journey_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
+          "version": "1.0.0"
+        }
+      ]
+    },
+    {
+      "key": "shared_enrollment_journey_action_eligibility",
+      "version": "1.0.0",
+      "repositoryRefs": [
+        {
+          "key": "binding_owner_repository",
+          "version": "1.0.0"
+        },
+        {
+          "key": "enrollment_journey_repository",
           "version": "1.0.0"
         }
       ]
