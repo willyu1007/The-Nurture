@@ -573,6 +573,18 @@ Detailed evidence: [`62`](./62-g4-d-i2-a-contract-artifact-record.md).
 
 Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
+## 2026-08-10 — G4-0F scope and generic owner source pin
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Exact generic owner source | PASS | `node scripts/verify-knowledge-rag-contract-pin.mjs` validates eight committed My-Chat Knowledge/PBR/RAG source and package-export files at revision `567b96c`, digest `554e79d4…`. Any observed checkout drift is reported live and is not copied into this record or adopted. |
+| Pin verifier regression | PASS | `node --test scripts/verify-knowledge-rag-contract-pin.test.mjs`: 3/3 for immutable revision hashing, checkout-drift reporting and hash-drift rejection. |
+| Scope ownership review | PASS | [`64`](./64-g4-0f-scope-freeze.md) separates Nurture canonical knowledge/revision/safety facts from My-Chat generic search/vector/model/RAG runtime and excludes the family-scoped 5h/5i corpus models. |
+| LLM governance | PASS with existing warning | Registry is structurally valid and all in-scope config keys are registered; the repository's pre-existing example registry remains in template mode. 0F adds no provider, profile, prompt or config key. |
+| Task docs | PASS | Strict task-doc lint with anchors passes 110/110, zero errors/warnings. |
+| Project state / governance | PASS | Project-state verification and governance lint pass before sync. |
+| Database / runtime effect | NOT RUN / PASS | Scope freeze changes no Prisma, migration, repository, Surface, model or index implementation. No DB operation, owner adoption, activation, deployment or traffic occurred. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

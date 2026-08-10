@@ -4,12 +4,15 @@
 
 - Task: T-007
 - Stage: G4-0A Freeze Protocol & Fact Inventory
-- State: `G4_0A_INVENTORY_PASS` on 2026-08-01. 0B, 0C and 0D have since frozen
-  and exited; 0E and 0F are unstarted. Live branch state is
+- State: `G4_0A_INVENTORY_PASS` on 2026-08-01. 0B～0E have since frozen and
+  exited; 0F scope is accepted and its three unit freezes remain open. Live
+  branch state is
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
-- **Exact pin values are not recorded here.** The SSOT is
-  `docs/project/integrations/my-chat-workflow-contract.json`, enforced by
-  `verify:workflow-contract-pin`. This ledger carried two different and both
+- **Exact pin values are not recorded here.** Workflow/contact pins live in
+  `docs/project/integrations/my-chat-workflow-contract.json`; the 0F generic
+  Knowledge/PBR/RAG source pin lives in
+  `docs/project/integrations/my-chat-knowledge-rag-contract.json`. They are
+  enforced by their respective verifier scripts. This ledger carried two different and both
   stale sets of hashes until 2026-08-09; a hash copied into prose has no gate
   behind it and silently becomes a second, wrong answer. Pin *history* stays in
   the records that made each rebind —
@@ -38,17 +41,18 @@ Documentation acceptance alone cannot produce `PRESENT_PINNED`.
 | Input | Owner | Required artifact/ref | Current state | Consumer | Drift/invalidation |
 | --- | --- | --- | --- | --- | --- |
 | Owner/source path | T-002 | Re-established at current pins by `21-c30-landing-requalification-record.md` (`C30_LANDING_REQUAL_PASS`): `verify:owner-integration` green at `1.17.0` / `sha256:d22851d9…` with 25 ingress actions, 8 queries, **0 unexercised**, over formal scenario-service HTTP against real PostgreSQL, both joint journeys PASS. The original M5/G1 records at My-Chat `a019566` / Base `06303e9` / self-pin `b2c53eb7…` remain exact history at their own topology. | `PRESENT_PINNED` (restored 2026-08-08; was `DEFINED_UNQUALIFIED` between the T-009 rotation and this requalification) | 0C～0E, G4-F | owner/source/ingress/pin drift invalidates owner and joint evidence |
-| Public Surface baseline | T-004 | `nurture.surface-contract@1.18.0` / `sha256:be84bb23a4842083f7832389b4eb27a47fadd6169729aecd34b6f5daf939e3c0`; shared core `sha256:7bd8a82d…` (unchanged); 34 capabilities / 6 surfaces; rotated additively by G4-0C-4 | `PRESENT_PINNED` | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
+| Public Surface baseline | T-004 | Current generated Surface artifact pin and conformance evidence under `packages/nurture-scenario/contracts/surfaces/v1/generated/`; never copy its changing digest into this ledger | `PRESENT_PINNED` when Surface conformance is green | 0C～0F, G4-F | public contract/schema/fixture drift invalidates affected synthetic and joint evidence |
 | Owner revisions | My-Chat / My-Workflow-Base | The exact revisions, source pins and parity hash in `docs/project/integrations/my-chat-workflow-contract.json`, whatever they currently are; `verify:workflow-contract-pin` is what makes that row true or false | `PRESENT_PINNED` when the gate is green | 0C～0F, G4-F | any revision/source-pin/parity drift invalidates the affected branch evidence |
 | Care interaction | T-005 | exact `CareInteraction`/owner-read/direct-interaction contracts used by Institution consumers | `DEFINED_UNQUALIFIED` | 0C/0D, G4-C/F | provider/version/source lifecycle drift invalidates affected consumer qualification |
 | Care/media/publication | T-006 | exact care facts, activity attribution, Board and `PublishProcess` contracts | `DEFINED_UNQUALIFIED` | 0B/0D, G4-B/C/F | fact/schema/policy/source-head drift invalidates affected projections and release evidence |
 | Generic Workflow runtime | My-Workflow-Base / My-Chat | pinned Run/Step/worker/ledger/private-carrier contract | `DEFINED_UNQUALIFIED` | 0E, G4-D/F | carrier/runtime/interface drift invalidates Workflow integration evidence |
-| Host identity/contact/RAG | My-Chat | pinned auth/session/active-role, Child/Family/contact and generic RAG owner contracts | `DEFINED_UNQUALIFIED` | 0C/0E/0F, G4-A/D/E/F | identity/contact/RAG owner drift invalidates affected owner and joint evidence |
-| Institution capability set | T-007 | 0A inventory current; 0B policy contract frozen; 0C and 0D frozen and exited ([`19`](./19-g4-0c-exit-record.md), [`32`](./32-g4-0d-exit-record.md)) with G4-A and G4-B implemented at I1; 0E and 0F records missing | `DEFINED_UNQUALIFIED` for 0C/0D, `GAP` for 0E/0F | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
+| Host identity/contact/RAG | My-Chat | Workflow/contact source is governed by the workflow pin; the exact generic Knowledge/PBR/RAG source artifact is governed by the 0F pin and [`64`](./64-g4-0f-scope-freeze.md). The Institution-specific source/currentness bridge remains a 0F-2 contract gap | `PRESENT_PINNED` generic source; `DEFINED_UNQUALIFIED` scenario bridge | 0C/0E/0F, G4-A/D/E/F | identity/contact/RAG owner drift invalidates affected owner and joint evidence |
+| Institution capability set | T-007 | 0B～0E are frozen and exited; 0C/0D are implemented at I1 and G4-D has I1 plus default-off I2. 0F scope is accepted in [`64`](./64-g4-0f-scope-freeze.md), with three unit records still missing | `DEFINED_UNQUALIFIED` for completed freeze branches; `GAP` for the 0F unit contracts | G4-A～F | any accepted freeze-record drift reopens the affected branch only |
 
 0A may cite only exact artifacts already qualified by their owner. T-005/T-006 and
-the T-007 branch set remain non-pinned until their own implementation/qualification;
-My-Chat Workflow/contact/RAG inputs require branch-specific source pins in 0E/0F.
+the T-007 branch set remain non-pinned until their own implementation/qualification.
+0F now has an exact generic My-Chat source artifact; its Institution-specific
+owner bridge remains unqualified until 0F-2 and later owner integration pass.
 
 ## 0A-2 Fact Ownership Matrix
 

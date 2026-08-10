@@ -531,6 +531,10 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
 
 ## Phase 4 — Institution Knowledge and RAG
 
+- 0F scope and the exact generic My-Chat Knowledge/PBR/RAG source pin are
+  accepted in [`64-g4-0f-scope-freeze.md`](./64-g4-0f-scope-freeze.md); the
+  lifecycle/provenance, retrieval/owner bridge and citation/safety unit freezes
+  remain the next contract work before G4-E I1.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料

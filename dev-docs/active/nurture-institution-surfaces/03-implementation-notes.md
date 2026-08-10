@@ -856,3 +856,22 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Full qualification passes 901/901 unit tests, root typecheck, Surface
   Contract 130/130 plus tooling 5/5, and all structural gates. No DB path or
   database operation was introduced.
+
+## 2026-08-10 — G4-0F scope and generic owner source pin
+
+- Added a dedicated SSOT pin for the exact My-Chat Knowledge domain, PBR and
+  generic RAG public boundary, including their package export manifests. Its
+  verifier reads committed Git objects at the pinned revision, so the
+  divergent sibling checkout cannot silently change the freeze input or be
+  mistaken for owner adoption.
+- The generic owner boundary is reusable for search, PBR, current citation
+  validation and citation packaging. It does not supply Institution revision,
+  audience/applicability, Admin draft preview, authority-linked medical
+  provenance, conflict review or a scenario source/currentness bridge.
+- Accepted three non-overlapping 0F units: lifecycle/provenance,
+  retrieval/owner bridge, and citation/answer safety. Publication, retrieval
+  eligibility and read authority remain distinct gates.
+- Explicitly excluded the family-scoped legacy `NurtureContextMaterial` and
+  `NurtureRuntimeContextPack` models, child-specific/private facts and all
+  local provider/vector/prompt/model runtime work. Scope freeze creates no
+  knowledge fact, database change, model call, index, capability or traffic.

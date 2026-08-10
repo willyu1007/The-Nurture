@@ -180,9 +180,10 @@ Project: `main`
   inputs; it is not Owner Readiness, Joint Conformance, Beta Handoff or activation.
   G4-0A exact dependency/fact/schema/census inventory is PASS. G4-0B's
   `nurture.institution-publication-policy@1.0.0` bounded provider/consumer path is
-  qualified through the T-006 handoff and remains default-off. This does not start or
-  complete T-007; G4-0C authority and surface freeze is the next G4 unit if separately
-  selected.
+  qualified through the T-006 handoff and remains default-off. 0C～0E are now frozen
+  and exited; the G4-D branch has private I1 plus default-off I2. 0F has accepted its
+  exact generic owner source pin and three-unit scope, while the unit freezes and G4-E
+  implementation remain open. None of these checkpoints completes T-007.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
   has its own DoD; overall acceptance covers contract/ownership, required product
@@ -370,10 +371,12 @@ Project: `main`
   Surface Contract at `1.19.0`; I2-B maps it to the existing I1 ports through
   fail-closed, explicitly disabled module/manifest adapters. No formal ingress,
   real owner provider, capability activation or durable database apply exists.
-  0F is not started.
-- Next Checkpoint: freeze independent 0F, or after explicit G-09 adoption enter
-  G4-D I3 authenticated prospective-contact/native-source/current-owner and
-  formal-ingress binding. I4 joint conformance follows only after I3 qualifies.
+  0F has an exact generic Knowledge/PBR/RAG source pin and accepted three-unit
+  scope; its lifecycle, retrieval and citation/safety unit freezes remain open.
+- Next Checkpoint: complete 0F-1～0F-3 and its audit/Exit, then enter G4-E I1;
+  independently, explicit G-09 adoption may open G4-D I3 authenticated
+  prospective-contact/native-source/current-owner and formal-ingress binding.
+  I4 joint conformance follows only after I3 qualifies.
   T-008 remains planned until the complete T-007 G4 Exit; Candidate Freeze,
   deployment, activation and external traffic remain closed.
 

@@ -506,3 +506,27 @@
   typed tuples, never by opaque object ID alone. A confirmation token must
   reach the transaction that applies the effect; a pre-transaction read or
   consume is not qualification evidence.
+
+## 2026-08-10 — A broad host pin did not freeze the generic RAG boundary
+
+- **Symptom:** 0A described the My-Chat RAG owner as pinned, but the existing
+  broad source set covered the Knowledge domain and PBR code without the
+  `packages/rag` public service. At the same time, the old family-scoped
+  `NurtureContextMaterial` tables looked superficially reusable for Institution
+  knowledge.
+- **Root cause:** the inventory grouped host Knowledge, permission and RAG
+  ownership into one prose row before 0F had selected an exact consumer
+  boundary. The legacy 5h/5i names described corpus/runtime mechanics, not the
+  Institution Admin revision/publish product.
+- **What was tried:** inspected the pinned My-Chat revision and the current
+  Nurture DB context before selecting files or schemas. The generic service
+  proved reusable for retrieval/citation mechanics but lacked Institution
+  lifecycle, audience, preview and medical-conflict semantics.
+- **Fix/workaround:** added a dedicated Git-revision source pin covering the
+  Knowledge types/repository, PBR entrypoint, RAG service and their package
+  export manifests, plus a verifier that hashes committed objects despite
+  checkout drift. The 0F scope record explicitly excludes both legacy Nurture
+  corpus models.
+- **Prevention:** every cross-owner branch must pin the exact public consumer
+  surface, not a nearby domain directory or prose digest. Similar table names
+  are never reuse evidence; ownership and product lifecycle must match first.

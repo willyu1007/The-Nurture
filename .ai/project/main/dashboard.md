@@ -35,8 +35,9 @@ Project: `main`
 - Planned chain: T-007 0C/0D and the full frozen 0E chain are implemented at
   private I1; G4-D increments 2–5 have disposable-only DB qualification through
   33 migrations. I2-A/I2-B are complete and remain default-off. Independent 0F
-  may start now; I3 waits for G-09. T-008 still waits for the complete T-007
-  Exit.
+  now has an exact generic My-Chat source pin and accepted three-unit scope;
+  its unit freezes and G4-E implementation remain open. I3 waits for G-09.
+  T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
   default-off.
@@ -44,8 +45,8 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **0F freeze may proceed independently.** It cannot replace any remaining
-   G4-D owner-integration or conformance gate.
+1. **Complete 0F-1～0F-3 and its branch audit/Exit.** The accepted scope does
+   not itself authorize G4-E implementation or replace any G4-D gate.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.

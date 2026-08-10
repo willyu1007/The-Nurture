@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **not started** | none | — |
+| 0F knowledge & RAG | **scope accepted; three unit freezes open** | none | [`64`](./64-g4-0f-scope-freeze.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -29,7 +29,9 @@ G4-D additionally has the exact I2-A wire artifact and synthetic I2-B
 handler/presenter composition. The scenario module and manifest expose only
 fail-closed, explicitly disabled internal adapter keys. No scenario-service
 formal ingress, I3 owner integration, I4 joint conformance, runtime capability
-activation or traffic exists.
+activation or traffic exists. 0F now has a mechanically verified generic
+My-Chat Knowledge/PBR/RAG source pin and an accepted three-unit decomposition;
+it has no domain, persistence, Surface, model or indexing implementation.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
 adds explicit policy/FIFO/override/offer/reservation/cancellation semantics and
@@ -249,13 +251,15 @@ Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surfac
 
 ## Next steps, in dependency order
 
-1. **0F Knowledge/RAG freeze** may proceed independently, but it cannot replace
-   any required G4-D path.
-2. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
+1. **Complete 0F-1～0F-3 and the rolling 0G audit/Exit.** The units freeze
+   lifecycle/provenance, retrieval/owner bridge and citation/safety respectively.
+2. **G4-E I1** — after 0F Exit, implement the frozen Nurture facts and pure
+   policy incrementally; keep the My-Chat model/vector/RAG runtime absent.
+3. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the
    default-off runtime gate while qualifying on an approved disposable DB.
-3. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
+4. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
    after the I3 owner and ingress paths qualify.
 
 G-03's remaining authority/source fact is an external owner gate, not an

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "hashAlgorithm": "sha256-path-content-v1",
+  "repository": "willyu1007/My-Chat",
+  "revision": "567b96cd5ddf2a0534fee21dd87f677439f40b78",
+  "paths": [
+    "packages/domain/knowledge/index.ts",
+    "packages/domain/knowledge/repositories.ts",
+    "packages/domain/knowledge/types.ts",
+    "packages/domain/package.json",
+    "packages/permissions/package.json",
+    "packages/permissions/src/index.ts",
+    "packages/rag/package.json",
+    "packages/rag/src/index.ts"
+  ],
+  "sha256": "554e79d4e12b5aa2ef1794e46638b2705a606fc7e035e35d0d5167a8bf23ad66"
+}
