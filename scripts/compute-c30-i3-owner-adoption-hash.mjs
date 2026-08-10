@@ -109,6 +109,13 @@ const profileDefinitions = [
     ],
   },
   {
+    source_identity: "nurture_c30_family_sharing_eligibility_provider_v1",
+    files: [
+      "packages/nurture-scenario/src/harness/family-sharing-eligibility.ts",
+      "packages/nurture-scenario/tests/harness/family-sharing-eligibility.test.ts",
+    ],
+  },
+  {
     source_identity: "nurture_c30_cumulative_convergence_v1",
     files: [
       "package.json",
