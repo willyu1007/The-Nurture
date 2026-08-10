@@ -3,9 +3,9 @@
 ## Status
 
 - State: in-progress
-- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（quality-repaired and reaccepted, default-off）
+- **Phase:** IA/IA.1（已完成）/ IB schema SPEC（已锁定）/ IIA-0 contract preflight（已锁定）/ G0（complete）/ N1 explicit-empty core（complete）/ X4/N2 development activation（complete）/ X5（complete）/ Wave 4 P7 Nurture owner endpoint（merged, default-disabled）/ NestJS ingress M0-M5（complete）/ G1 Joint Conformance（**PASS**, `18-g1-joint-conformance-record.md`）/ C30-I0 baseline isolation（complete）/ C30-I1 neutral Base contracts（I1-F reaccepted）/ C30-I2 generic Host adoption（accepted, default-off）/ C30-I3 scenario-owner adoption（quality-repaired and reaccepted, default-off）/ C30-I4 family-sharing provider A/B（accepted, default-off）
 - **Milestone:** M-002 Institution ecology / Feature F-002 Institution ecology（小孩成长外部环境与组织化照护生态）
-- **Updated:** 2026-08-08
+- **Updated:** 2026-08-11
 - **Owner:** willyu1007
 - **Landing status (2026-08-08):** C30 landed as one coordinated
   three-repository sequence per
@@ -17,11 +17,13 @@
   original topology, not current-pin evidence. The `Current gate` block further
   down still cites the superseded `a019566` / `06303e9` pins for the same
   reason.
-- Next step: C30-I3 is quality-repaired and reaccepted default-off. Only a
-  separately authorized C30-I4 scope review is eligible; begin that review by
-  resuming T-002 and reading artifacts 53 and 61 plus the exact Base/My-Chat
-  successor locks. I4 implementation, C31-C35, T-008, persistent database
-  apply, deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
+- Next step: C30-I4-A/B is accepted default-off by artifacts 62 and 63. My-Chat
+  T-039 may independently implement its canonical consent/withdrawal, receipt,
+  outbox and public API boundary against the exact provider pin. On Nurture,
+  separately review the current authority adapter/persistence semantics before
+  implementing them; the existing Grant enum cannot be stretched to represent
+  media or focus sharing. C31-C35, T-008, persistent database apply,
+  deployment, activation, Pilot and traffic remain closed. G1, T-005 G2
   Exit, T-006 G3 Exit, all `C30-I0` gates and `C30-I1-A` are PASS. `C30-I1`
   remains decomposed into ordered I1-A through I1-F
   slices. I1-B is accepted at Base source `edbcd74…` plus exact source lock

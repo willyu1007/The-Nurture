@@ -30,7 +30,7 @@
   },
   "myChat": {
     "repository": "willyu1007/My-Chat",
-    "revision": "567b96cd5ddf2a0534fee21dd87f677439f40b78",
+    "revision": "6295b4fbba776f37edf2f447fa1eebe8b7d2054b",
     "contractRoot": "packages/workflow-contracts",
     "contractPaths": [
       "src"
@@ -59,7 +59,6 @@
           "packages/domain/domain-capabilities",
           "packages/domain/family-growth",
           "packages/domain/forum",
-          "packages/domain/growth-record",
           "packages/domain/identity",
           "packages/domain/knowledge",
           "packages/domain/media",
@@ -77,7 +76,7 @@
           "packages/workflow-runtime/package.json",
           "packages/workflow-runtime/src"
         ],
-        "sha256": "84e3db7854366e5293b33d5278320228ff3e39cd722957577bf3b5eaf3fa5010"
+        "sha256": "97e90caeaecc63c08b033b0fe7b0aaf490cc0cd5fa67e90be32db3af9f9f0de8"
       },
       {
         "key": "wave4_binding_host",
@@ -100,7 +99,7 @@
           "prisma/migrations/20260728210000_scenario_binding_command_ledger/migration.sql",
           "prisma/schema.prisma"
         ],
-        "sha256": "604796160dd58230e022585006d0f9fcf608e4428e785ae51be2ca875f758e62"
+        "sha256": "3e64e0269b26a92dbc05300ce61d5c2de42d30972c11b683aaf6ca91fc1c7276"
       }
     ]
   },
@@ -132,6 +131,6 @@
       "prisma/migrations",
       "prisma/schema.prisma"
     ],
-    "contractSha256": "25b7ad2f27046d59711f96cf6b3f9c2cf2e167c8feed0c253c386c2ce287e8e1"
+    "contractSha256": "03195a3c545ea1bec73d4c0355f50f7eaa362888e30f39583e23dd9040baafa3"
   }
 }

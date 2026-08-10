@@ -3,29 +3,33 @@
 ## Status
 
 - Current status: `in-progress`
-- Last updated: 2026-08-06
+- Last updated: 2026-08-11
 
 ## Next concrete actions
 
-1. Await separate authorization for C30-I4 scope review only. After authorization,
-   run `node .ai/scripts/ctl-project-governance.mjs resume --task T-002 --json`,
-   then review `artifacts/53-c30-i3-scope-freeze.md`,
-   `artifacts/61-c30-i3-successor-quality-repair-qualification-record.md` and
-   `docs/project/integrations/c30-i3-owner-adoption-lock.json` before drafting
-   any I4 scope.
-2. At I4 review entry, rerun `pnpm verify:c30-i3-owner-adoption` and
-   `pnpm verify:c30-i3-default-off`; any source-lock or positive-population drift
-   blocks scope freeze until it is explained and requalified.
-3. Keep I4 implementation, C31-C35, T-008, persistent database apply,
-   capability/Workspace activation, deployment, Pilot and traffic closed. The
-   scope review may produce planning/governance artifacts only unless the user
-   separately authorizes implementation.
+1. Let My-Chat T-039 independently implement its canonical family-side
+   authorization/write/outbox and public API boundary against the accepted exact
+   eligibility pin.
+2. Before Nurture adds a concrete current-authority adapter, separately review
+   role/Grant/release/receiving/lifecycle persistence semantics. Media and focus
+   sharing require an honest authority model; do not alias existing data classes.
+3. Keep C30-I4-C, schema/database work, C31-C35, T-008, capability/Workspace
+   activation, deployment, Pilot and traffic closed until separately authorized.
 
-The current handoff chain is repair source `48530be…`, successor lock
-`7db3129…` and reacceptance documentation `cc57b13…`. The worktree was clean at
-that checkpoint; this progress sync is documentation-only.
+The current family-sharing handoff is Nurture source `be3d58d…`, My-Chat
+adoption `6295b4f…`, cumulative source hash `752bc3d6…ddc8a` and unchanged
+default-off census `448d37e1…3c3e`.
 
 ## What changed
+
+- 2026-08-11: Published
+  `nurture.family-sharing-eligibility@1.0.0` at digest
+  `sha256:0cc3ccc8df55b1c6060c5b39af02fb1026c260dae53727f5fdeff72f2b08f5d8`.
+  The HTTP-free provider derives eligibility only from a complete current owner
+  snapshot and collapses malformed input, incomplete facts and owner failures
+  to unavailable. My-Chat T-039 adopted the exact pin with no cache or fallback.
+  Cross-repository pins and the cumulative source lock were re-sealed; no DB,
+  manifest, route, capability or activation changed.
 
 - 2026-08-06: Reaccepted cumulative C30-I3 after the successor quality repair in
   artifact 61. Source `48530be…`, lock `7db3129…` and aggregate

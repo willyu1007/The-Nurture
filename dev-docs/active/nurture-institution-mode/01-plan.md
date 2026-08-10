@@ -799,6 +799,23 @@ qualification claims. Only a separately authorized I4 scope review is eligible.
 I4 implementation, C31-C35, T-008,
 deployment, activation, Pilot and traffic remain closed.
 
+## C30-I4 — Family-sharing eligibility adoption（A/B 已验收，default-off）
+
+[`Artifact 62`](./artifacts/62-c30-i4-family-sharing-provider-scope-freeze.md)
+freezes the first bounded cross-owner unit; artifact 63 records its exact
+handoff.
+
+| Unit | State | Boundary |
+| --- | --- | --- |
+| `C30-I4-A` Nurture owner contract/provider seam | Accepted | Exact `nurture.family-sharing-eligibility@1.0.0`, closed three-category result, current-owner fact intersection, no route/DB/manifest wiring. |
+| `C30-I4-B` My-Chat exact pin/admission | Accepted | T-039 pins one digest and validates every no-cache private result; no raw Child/Family id or fallback. |
+| `C30-I4-C` current authority adapter/persistence and joint runtime conformance | Pending separate review | Must define honest media/focus authority semantics, projection impact and transport wiring before source changes. |
+
+The A/B acceptance does not make any category live. Missing provider wiring or
+owner facts still returns unavailable/ineligible, and My-Chat still lacks the
+canonical write/outbox/public API implementation. C31-C35 and every operational
+gate remain separate decisions.
+
 ---
 
 ## Phase IA — 设计 & 治理登记（本仓，已完成）

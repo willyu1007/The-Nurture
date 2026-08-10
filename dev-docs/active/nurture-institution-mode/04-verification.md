@@ -10,7 +10,7 @@
 
 ## Current Verification Status
 
-- Last updated: 2026-08-06
+- Last updated: 2026-08-11
 - Current phase: NestJS ingress M0-M5, G1 Joint Conformance and all
   `C30-I0-A/B/C/D` gates remain complete. Artifact 50 reaccepts C30-I1-F after
   the successor repair closes all four artifact-49 findings. Artifact 48 remains
@@ -43,6 +43,20 @@
   secret/KMS/environment value,
   capability, deployment or traffic state changed.
 - Evidence convention: this file is an append-only chronological ledger.
+
+## C30-I4-A/B provider adoption — 2026-08-11
+
+| Check | Result |
+| --- | --- |
+| Nurture focused provider | PASS — 1 file / 15 tests. |
+| Nurture scenario typecheck/manifest parity | PASS. |
+| Nurture complete Vitest population | PASS — 87 files / 966 tests. |
+| My-Chat focused frozen-contract/adoption | PASS — 2 files / 13 tests. |
+| My-Chat complete typecheck/unit/ESLint | PASS — 145 files / 1003 tests; 21 files / 127 environment-gated tests skipped. |
+| Exact cross-repository pin | PASS — My-Chat `6295b4f…`; workflow-contract parity unchanged; `x5_joint_api=97e90cae…f0de8`, `wave4_binding_host=3e64e026…c7276`, Nurture scenario `03195a3c…afa3`. |
+| Cumulative owner source lock | PASS — source `be3d58d…`; 8 named profiles; aggregate `752bc3d6…ddc8a`. |
+| Default-off census | PASS — `448d37e1…3c3e`; all positive populations remain zero. |
+| Effect boundary | PASS — no schema/migration, DB apply, route, manifest capability/action, Workspace activation, deployment, Pilot or traffic change. |
 
 ## Current handoff verification commands — 2026-08-06
 

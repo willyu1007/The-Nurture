@@ -88,4 +88,3 @@ revision; the lock must not be weakened or silently ignored.
   every response without caching.
 - Default-off census remains unchanged; no DB, manifest, activation or traffic
   effect occurs.
-
