@@ -32,6 +32,7 @@ import { PrismaFamilyCareCommandTransaction } from "./family-care-command.transa
 import { PrismaEnrollmentJourneyRepository } from "./enrollment-journey.repository.js";
 import { PrismaEnrollmentWaitlistRepository } from "./enrollment-waitlist.repository.js";
 import { PrismaEnrollmentTrialLifecycleRepository } from "./enrollment-trial-lifecycle.repository.js";
+import { PrismaEnrollmentFormalizationRepository } from "./enrollment-formalization.repository.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -129,6 +130,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly enrollmentJourney: PrismaEnrollmentJourneyRepository;
   readonly enrollmentWaitlist: PrismaEnrollmentWaitlistRepository;
   readonly enrollmentTrialLifecycle: PrismaEnrollmentTrialLifecycleRepository;
+  readonly enrollmentFormalization: PrismaEnrollmentFormalizationRepository;
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
   /**
@@ -180,6 +182,10 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
     this.enrollmentJourney = new PrismaEnrollmentJourneyRepository(transaction);
     this.enrollmentWaitlist = new PrismaEnrollmentWaitlistRepository(transaction, now);
     this.enrollmentTrialLifecycle = new PrismaEnrollmentTrialLifecycleRepository(
+      transaction,
+      now,
+    );
+    this.enrollmentFormalization = new PrismaEnrollmentFormalizationRepository(
       transaction,
       now,
     );

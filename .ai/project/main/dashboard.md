@@ -34,9 +34,10 @@ Project: `main`
   25 ingress actions, 8 queries, 0 unexercised and both joint journeys
   passing. 0C work must cite the C30 requalification record for that, never
   T-002's G1 record, which stays history at its own topology.
-- Planned chain: T-007 G4-0C is **complete** (`G4_0C_EXIT_PASS`), G4-A is under
-  way at increment 1, and 0D/0E/0F plus G4-B～F remain. T-008 still waits for
-  the complete T-007 Exit.
+- Planned chain: T-007 0C/0D and the full frozen 0E chain are implemented at
+  private I1; G4-D increments 2–5 have disposable-only DB qualification through
+  33 migrations. I2 contract/capability rotation or the independent 0F freeze
+  is next. T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
   default-off.
@@ -44,21 +45,13 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Continue G4-A, or freeze 0D.** `G4_0C_EXIT_PASS` is issued and G4-A
-   increment 1 has executed the first slice of the authority chain
-   (`nurture.institution_admin_scope`, 34 tests). Remaining G4-A increments:
-   the context types as a passed chain, purpose evaluation across the 0C-3 /
-   0C-5 split, and the full-coverage aggregate rule. 0D is the alternative and
-   unblocks G4-B/C; 0E and 0F remain unstarted.
-2. **Read `21-g4-a-increment-1-audit-record.md` before extending the
-   predicate.** Auditing increment 1 found three fail-open defects that 31
-   passing tests could not see, because the tests hand-supplied facts and never
-   exercised the Prisma computation. The same gap applies to every later
-   increment until repository-level tests exist for these facts — that is the
-   highest-value next piece of test work.
-3. `NurtureInstitutionPolicyService` has **no production caller**. 0C is
-   validated as buildable as frozen, not as running; real requests wait for
-   I2/I3/I4.
+1. **G4-D I2 or 0F freeze.** I2 may publish only the completed default-off 0E
+   surface. 0F may proceed independently but cannot replace any G4-D gate.
+2. **Keep I3/I4 closed on G-09.** The local formalization path is qualified;
+   authenticated My-Chat evidence/private ingress and joint replay/negative
+   conformance require an explicit upstream adoption decision.
+3. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
+   production caller**; I1 evidence is not activation evidence.
 4. Only a separately authorized `C30-I4` scope review is eligible for T-002.
 5. Preserve T-006, T-009 and T-003 as done and archive them only after
    explicit approval.

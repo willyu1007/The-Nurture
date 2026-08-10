@@ -10,6 +10,7 @@ import {
   issueTrialOfferSpec,
   endTrialSpec,
   extendTrialSpec,
+  formalizeEnrollmentSpec,
   formatNurtureBindingOwnerRef,
   markTrialReviewReachedSpec,
   overrideWaitlistCategorySpec,
@@ -21,7 +22,9 @@ import {
   startEnrollmentInquirySpec,
   startTrialSpec,
   type NurtureCommandSpec,
+  type NurtureEnrollmentFormalizationOwnerEvidenceV1,
   type NurtureEnrollmentGuardianActionOwnerSnapshotV1,
+  type NurtureFormalizeEnrollmentPayload,
   type NurtureTrialPairOwnerSnapshotV1,
 } from "@the-nurture/scenario";
 import { createPrismaClient } from "../src/client.js";
@@ -515,7 +518,325 @@ const seedCurrentPair = async (
   };
 };
 
+const reachFormalProposal = async (world: World) => {
+  const preparation = await acceptPreparation(world);
+  const pair = await seedCurrentPair(world);
+  await execute({
+    world,
+    actorRef: world.admin.id,
+    payload: {
+      ...adminWorkflowPayload(world, preparation.journey.workflowRef, 6),
+      reservation_ref: preparation.reservation.id,
+      expected_reservation_head: 1,
+      expected_capacity_revision: world.careGroup.aggregateVersion,
+      pair_owner_snapshot: pair.snapshot,
+      grant_terms_snapshot: pair.grantTerms,
+    },
+    spec: prepareTrialRelationshipSpec,
+  });
+  const enrollment = await prisma.nurtureEnrollment.findFirstOrThrow({
+    where: {
+      workspaceId: world.workspaceId,
+      childCareProcessId: pair.snapshot.child_care_process_ref,
+    },
+  });
+  const grant = await prisma.nurtureChildLinkGrant.findFirstOrThrow({
+    where: { workspaceId: world.workspaceId, enrollmentId: enrollment.id },
+  });
+  world.setClock(preparation.offer.trialStartsAt);
+  await execute({
+    world,
+    actorRef: world.admin.id,
+    payload: {
+      ...adminWorkflowPayload(world, preparation.journey.workflowRef, 7),
+      enrollment_ref: enrollment.id,
+      expected_enrollment_head: 0,
+      grant_ref: grant.id,
+      expected_grant_head: 0,
+      reservation_ref: preparation.reservation.id,
+      expected_reservation_head: 1,
+      expected_capacity_revision: world.careGroup.aggregateVersion,
+      pair_owner_snapshot: pair.snapshot,
+    },
+    spec: startTrialSpec,
+  });
+  world.setClock(new Date(preparation.reservation.reviewAt.getTime() + 1_000));
+  const entities = {
+    ...adminWorkflowPayload(world, preparation.journey.workflowRef, 8),
+    enrollment_ref: enrollment.id,
+    expected_enrollment_head: 1,
+    grant_ref: grant.id,
+    expected_grant_head: 1,
+    reservation_ref: preparation.reservation.id,
+    expected_reservation_head: 2,
+  };
+  await execute({
+    world,
+    actorRef: world.admin.id,
+    payload: entities,
+    spec: markTrialReviewReachedSpec,
+  });
+  const proposed = await execute({
+    world,
+    actorRef: world.admin.id,
+    payload: {
+      ...entities,
+      expected_workflow_head: 9,
+      expected_capacity_revision: world.careGroup.aggregateVersion,
+      proposed_formal_start_at: world.now().toISOString(),
+      proposed_grant_purposes: ["trial_care"],
+      proposed_grant_expires_at: iso(world.now(), 5 * 24 * 60 * 60_000),
+      safe_family_summary: "Guardian reviewed the formal care continuation.",
+      proposal_expires_at: iso(world.now(), 12 * 60 * 60_000),
+      reason_key: "admin_proposed_formal_continuation",
+    },
+    spec: proposeFormalEnrollmentSpec,
+  });
+  expect(proposed).toMatchObject({ status: "ok", disposition: "executed" });
+  const proposal = await prisma.nurtureEnrollmentFormalProposal.findFirstOrThrow({
+    where: { workspaceId: world.workspaceId, workflowId: preparation.journey.workflowRef },
+  });
+  return { preparation, pair, enrollment, grant, proposal };
+};
+
 describe("T-007 G4-D waitlist and trial preparation (production DB lane)", () => {
+  it("formalizes only the current Guardian acceptance and exact proposal heads", async () => {
+    const world = await seed();
+    const state = await reachFormalProposal(world);
+    const ownerEvidence: NurtureEnrollmentFormalizationOwnerEvidenceV1 = {
+      contract_version: "1.0.0",
+      actor_ref: state.pair.snapshot.actor_ref,
+      audience: "nurture",
+      current_owner_evidence: {
+        binding_evidence_version: 1,
+        purpose_key: "formalize_enrollment",
+        owner_bindings: [
+          {
+            owner_binding_ref_version: 1,
+            binding_slot: "child",
+            owner_ref: {
+              schema_version: 1 as const,
+              namespace: "scenario-owner",
+              object_type: "child_binding_owner",
+              object_id: state.pair.snapshot.child_owner_ref,
+              version: state.pair.snapshot.child_owner_version,
+            },
+          },
+          {
+            owner_binding_ref_version: 1,
+            binding_slot: "family",
+            owner_ref: {
+              schema_version: 1 as const,
+              namespace: "scenario-owner",
+              object_type: "family_binding_owner",
+              object_id: state.pair.snapshot.family_owner_ref,
+              version: state.pair.snapshot.family_owner_version,
+            },
+          },
+        ],
+        pair_relation_evidence_hash: digest(`pair:${world.workspaceId}`),
+        current_owner_evidence_hash: digest(`current:${world.workspaceId}`),
+      },
+      request_nonce_hash: digest(`nonce:${world.workspaceId}`),
+      verified_at: world.now().toISOString(),
+      expires_at: iso(world.now(), 60_000),
+    };
+    const acceptanceRef = {
+      schema_version: 1 as const,
+      namespace: "my_chat",
+      object_type: "enrollment_action",
+      object_id: `formal-acceptance:${randomUUID()}`,
+      version: 1,
+    };
+    const payload: NurtureFormalizeEnrollmentPayload = {
+      workflow_ref: state.preparation.journey.workflowRef,
+      proposal_ref: state.proposal.id,
+      acceptance_ref: acceptanceRef,
+      accepted_at: world.now().toISOString(),
+      expected_workflow_head: 10,
+      expected_proposal_head: 1,
+      expected_enrollment_head: 1,
+      expected_grant_head: 1,
+      expected_reservation_head: 2,
+      owner_evidence: ownerEvidence,
+    };
+
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        payload: {
+          ...payload,
+          owner_evidence: {
+            ...ownerEvidence,
+            verified_at: iso(world.now(), -120_000),
+            expires_at: iso(world.now(), -60_000),
+          },
+        },
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      decision: "blocked",
+      reason_code: "formalization_owner_not_current",
+    });
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        payload: {
+          ...payload,
+          owner_evidence: {
+            ...ownerEvidence,
+            current_owner_evidence: {
+              ...ownerEvidence.current_owner_evidence,
+              owner_bindings: [
+                {
+                  ...ownerEvidence.current_owner_evidence.owner_bindings[0],
+                  owner_ref: {
+                    ...ownerEvidence.current_owner_evidence.owner_bindings[0].owner_ref,
+                    version: 2,
+                  },
+                },
+                ownerEvidence.current_owner_evidence.owner_bindings[1],
+              ],
+            },
+          },
+        },
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      decision: "blocked",
+      reason_code: "formalization_owner_not_current",
+    });
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        payload: { ...payload, expected_proposal_head: 2 },
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      decision: "conflict",
+      reason_code: "formal_proposal_head_conflict",
+    });
+    expect(
+      await prisma.nurtureEnrollment.findUniqueOrThrow({
+        where: { id: state.enrollment.id },
+      }),
+    ).toMatchObject({ participationPhase: "trial", aggregateVersion: 1 });
+
+    const commandId = `formalize:${randomUUID()}`;
+    const formalized = await execute({
+      world,
+      actorRef: state.pair.snapshot.actor_ref.object_id,
+      commandId,
+      payload,
+      spec: formalizeEnrollmentSpec,
+    });
+    expect(formalized).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      committed_result: {
+        workflow_head: 11,
+        lifecycle: "completed",
+        terminal_outcome: "formalized",
+        proposal_ref: state.proposal.id,
+        enrollment_head: 2,
+        participation_phase: "formal",
+        grant_head: 2,
+        reservation_head: 2,
+      },
+    });
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        commandId,
+        payload: {
+          ...payload,
+          owner_evidence: {
+            ...ownerEvidence,
+            current_owner_evidence: {
+              ...ownerEvidence.current_owner_evidence,
+              current_owner_evidence_hash: digest(`retry-current:${world.workspaceId}`),
+            },
+            request_nonce_hash: digest(`retry-nonce:${world.workspaceId}`),
+            verified_at: iso(world.now(), 1_000),
+            expires_at: iso(world.now(), 61_000),
+          },
+        },
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({ status: "ok", disposition: "replayed" });
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        commandId,
+        payload: { ...payload, accepted_at: iso(world.now(), -1_000) },
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({ status: "not_committed", decision: "idempotency_conflict" });
+
+    const [workflow, enrollment, grant, reservation, transition] = await Promise.all([
+      prisma.nurtureInstitutionWorkflow.findUniqueOrThrow({
+        where: { id: state.preparation.journey.workflowRef },
+      }),
+      prisma.nurtureEnrollment.findUniqueOrThrow({ where: { id: state.enrollment.id } }),
+      prisma.nurtureChildLinkGrant.findUniqueOrThrow({ where: { id: state.grant.id } }),
+      prisma.nurtureEnrollmentTrialReservation.findUniqueOrThrow({
+        where: { id: state.preparation.reservation.id },
+      }),
+      prisma.nurtureInstitutionWorkflowTransition.findFirstOrThrow({
+        where: {
+          workflowId: state.preparation.journey.workflowRef,
+          commandKey: "formalize_enrollment",
+        },
+      }),
+    ]);
+    expect(workflow).toMatchObject({
+      lifecycle: "completed",
+      currentStage: "completed",
+      waitingState: "ready",
+      terminalOutcome: "formalized",
+      workflowHead: 11,
+      dueAt: null,
+    });
+    expect(workflow.completedMilestones).toEqual(expect.arrayContaining([
+      "guardian_formal_acceptance_recorded",
+      "formal_enrollment_committed",
+      "journey_completed",
+    ]));
+    expect(enrollment).toMatchObject({ status: "active", participationPhase: "formal" });
+    expect(grant).toMatchObject({
+      status: "active",
+      purposes: state.proposal.proposedGrantPurposes,
+      expiresAt: state.proposal.proposedGrantExpiresAt,
+    });
+    expect(reservation).toMatchObject({
+      state: "converted_to_occupancy",
+      reservationHead: 2,
+    });
+    expect(transition).toMatchObject({
+      formalProposalId: state.proposal.id,
+      ownerEvidenceHash: ownerEvidence.current_owner_evidence.current_owner_evidence_hash,
+      actorRef: ownerEvidence.actor_ref,
+      ownerActionRef: acceptanceRef,
+    });
+    expect(JSON.stringify(transition.ownerEvidenceMetadata)).not.toContain(
+      "current_owner_evidence",
+    );
+    await expect(
+      prisma.nurtureEnrollmentFormalProposal.update({
+        where: { id: state.proposal.id },
+        data: { safeFamilySummary: "Changed" },
+      }),
+    ).rejects.toThrow();
+  });
+
   it("runs the explicit trial lifecycle without a timer, second child owner, or waitlist restore", async () => {
     const world = await seed();
     const preparation = await acceptPreparation(world);
@@ -800,14 +1121,23 @@ describe("T-007 G4-D waitlist and trial preparation (production DB lane)", () =>
       payload: extendedEntities,
       spec: markTrialReviewReachedSpec,
     });
-    await expect(
-      execute({
-        world,
-        actorRef: world.admin.id,
-        payload: { ...extendedEntities, expected_workflow_head: 11 },
-        spec: proposeFormalEnrollmentSpec,
-      }),
-    ).resolves.toMatchObject({
+    const proposed = await execute({
+      world,
+      actorRef: world.admin.id,
+      payload: {
+        ...extendedEntities,
+        expected_workflow_head: 11,
+        expected_capacity_revision: world.careGroup.aggregateVersion,
+        proposed_formal_start_at: world.now().toISOString(),
+        proposed_grant_purposes: ["trial_care"],
+        proposed_grant_expires_at: iso(world.now(), 5 * 24 * 60 * 60_000),
+        safe_family_summary: "Guardian reviewed the formal care continuation.",
+        proposal_expires_at: iso(world.now(), 2 * 24 * 60 * 60_000),
+        reason_key: "admin_proposed_formal_continuation",
+      },
+      spec: proposeFormalEnrollmentSpec,
+    });
+    expect(proposed).toMatchObject({
       status: "ok",
       committed_result: {
         workflow_head: 12,

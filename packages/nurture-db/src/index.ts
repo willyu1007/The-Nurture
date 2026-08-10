@@ -18,6 +18,7 @@ export * from "./repositories/attribution-correction-candidate.repository.js";
 export * from "./repositories/enrollment-journey.repository.js";
 export * from "./repositories/enrollment-waitlist.repository.js";
 export * from "./repositories/enrollment-trial-lifecycle.repository.js";
+export * from "./repositories/enrollment-formalization.repository.js";
 export * from "./repositories/family-care-query.repository.js";
 export * from "./repositories/user-attention.repository.js";
 export * from "./repositories/family-care-command.transaction.js";

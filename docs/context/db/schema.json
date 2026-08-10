@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-10T00:38:06.422Z",
+  "updatedAt": "2026-08-10T01:25:50.403Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -5500,6 +5500,15 @@
           "references": []
         },
         {
+          "field": "enrollmentFormalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "enrollments",
           "to": "NurtureEnrollment",
           "optional": false,
@@ -5805,6 +5814,15 @@
         {
           "field": "careGroups",
           "to": "NurtureCareGroup",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentFormalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -6200,6 +6218,15 @@
         {
           "field": "dailyCareLogs",
           "to": "NurtureDailyCareLog",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "enrollmentFormalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -7527,6 +7554,15 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "formalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         },
         {
           "field": "items",
@@ -11187,6 +11223,15 @@
           "references": []
         },
         {
+          "field": "formalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "grants",
           "to": "NurtureChildLinkGrant",
           "optional": false,
@@ -11275,6 +11320,336 @@
           ],
           "name": null,
           "map": "ix_nurture_enrollment_process"
+        }
+      ]
+    },
+    {
+      "name": "NurtureEnrollmentFormalProposal",
+      "dbName": "nurture_enrollment_formal_proposal",
+      "schema": null,
+      "columns": [
+        {
+          "name": "careGroupHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "careGroupId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "care_group_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "enrollment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "grantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "grant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "issuedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "issued_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "issuedByRoleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "issued_by_role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "issueReasonKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "issue_reason_key",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "proposalHead",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "proposal_head",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "proposedFormalStartAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "proposed_formal_start_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "proposedGrantExpiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "proposed_grant_expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "proposedGrantPurposes",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "proposed_grant_purposes",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "reservationId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "reservation_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "safeFamilySummary",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "safe_family_summary",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workflowId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workflow_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "careGroup",
+          "to": "NurtureCareGroup",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "careGroupId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "enrollment",
+          "to": "NurtureEnrollment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "enrollmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "grant",
+          "to": "NurtureChildLinkGrant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "grantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "issuedByRoleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "issuedByRoleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "reservation",
+          "to": "NurtureEnrollmentTrialReservation",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "reservationId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "transitions",
+          "to": "NurtureInstitutionWorkflowTransition",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "workflow",
+          "to": "NurtureInstitutionWorkflow",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "workflowId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "workflowId",
+            "proposalHead"
+          ],
+          "name": null,
+          "map": "uq_nurture_formal_proposal_workflow_head"
         }
       ]
     },
@@ -12459,6 +12834,15 @@
           "references": [
             "id"
           ]
+        },
+        {
+          "field": "formalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
         },
         {
           "field": "institution",
@@ -19589,6 +19973,15 @@
           ]
         },
         {
+          "field": "formalProposals",
+          "to": "NurtureEnrollmentFormalProposal",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "inquiry",
           "to": "NurtureEnrollmentInquiry",
           "optional": true,
@@ -19759,6 +20152,17 @@
           "unique": false
         },
         {
+          "name": "formalProposalId",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "formal_proposal_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
           "name": "id",
           "type": "String",
           "nullable": false,
@@ -19819,6 +20223,28 @@
           "nullable": true,
           "list": false,
           "dbName": "owner_action_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ownerEvidenceHash",
+          "type": "String",
+          "nullable": true,
+          "list": false,
+          "dbName": "owner_evidence_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ownerEvidenceMetadata",
+          "type": "Json",
+          "nullable": true,
+          "list": false,
+          "dbName": "owner_evidence_metadata",
           "dbType": null,
           "default": null,
           "primaryKey": false,
@@ -19996,6 +20422,19 @@
           ]
         },
         {
+          "field": "formalProposal",
+          "to": "NurtureEnrollmentFormalProposal",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "formalProposalId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
           "field": "workflow",
           "to": "NurtureInstitutionWorkflow",
           "optional": false,
@@ -20010,6 +20449,14 @@
         }
       ],
       "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "formalProposalId"
+          ],
+          "name": null,
+          "map": "ix_nurture_workflow_transition_formal_proposal"
+        },
         {
           "type": "index",
           "fields": [

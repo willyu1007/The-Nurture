@@ -3,6 +3,7 @@ import {
   Prisma,
   type NurtureChildLinkGrant,
   type NurtureEnrollment,
+  type NurtureEnrollmentFormalProposal,
   type NurtureEnrollmentTrialReservation,
   type NurtureInstitutionWorkflow,
   type PrismaClient,
@@ -11,18 +12,17 @@ import {
   NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_CONTRACT_VERSION,
   NURTURE_ENROLLMENT_JOURNEY_WORKFLOW_TYPE,
   NurtureInstitutionAuthorityChain,
-  parseNurtureBindingOwnerRef,
   validateTrialGrantTermsSnapshotV1,
-  validateTrialPairOwnerSnapshotV1,
   type NurtureEnrollmentJourneyMilestone,
   type NurtureEnrollmentJourneyWorkflowSnapshotV1,
   type NurtureEnrollmentTrialLifecycleFailure,
   type NurtureEnrollmentTrialLifecycleMutation,
   type NurtureEnrollmentTrialLifecycleResult,
   type NurtureEnrollmentTrialLifecycleTransaction,
-  type NurtureTrialPairOwnerSnapshotV1,
+  type NurtureEnrollmentFormalProposalRecordV1,
 } from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import { PrismaEnrollmentPairOwnerRepository } from "./enrollment-pair-owner.repository.js";
 
 type TrialPrisma = PrismaClient | Prisma.TransactionClient;
 
@@ -71,6 +71,26 @@ const prismaErrorCode = (error: unknown): string | undefined =>
     : undefined;
 const sameValues = (left: readonly string[], right: readonly string[]): boolean =>
   left.length === right.length && left.every((value, index) => value === right[index]);
+const toFormalProposal = (
+  row: NurtureEnrollmentFormalProposal,
+): NurtureEnrollmentFormalProposalRecordV1 => ({
+  proposal_ref: row.id,
+  proposal_head: row.proposalHead,
+  workflow_ref: row.workflowId,
+  enrollment_ref: row.enrollmentId,
+  grant_ref: row.grantId,
+  reservation_ref: row.reservationId,
+  care_group_ref: row.careGroupId,
+  care_group_head: row.careGroupHead,
+  proposed_formal_start_at: row.proposedFormalStartAt.toISOString(),
+  proposed_grant_purposes: row.proposedGrantPurposes,
+  proposed_grant_expires_at: row.proposedGrantExpiresAt.toISOString(),
+  safe_family_summary: row.safeFamilySummary,
+  issued_by_role_assignment_ref: row.issuedByRoleAssignmentId,
+  issue_reason_key: row.issueReasonKey,
+  issued_at: row.issuedAt.toISOString(),
+  expires_at: row.expiresAt.toISOString(),
+});
 
 /**
  * G4-D increment 4 owner. It mutates the existing Enrollment, Grant,
@@ -80,10 +100,14 @@ const sameValues = (left: readonly string[], right: readonly string[]): boolean 
 export class PrismaEnrollmentTrialLifecycleRepository
   implements NurtureEnrollmentTrialLifecycleTransaction
 {
+  private readonly pairOwner: PrismaEnrollmentPairOwnerRepository;
+
   constructor(
     private readonly prisma: TrialPrisma,
     private readonly now: () => Date = () => new Date(),
-  ) {}
+  ) {
+    this.pairOwner = new PrismaEnrollmentPairOwnerRepository(prisma, now);
+  }
 
   private async resolveAdmin(
     mutation: NurtureEnrollmentTrialLifecycleMutation,
@@ -106,141 +130,6 @@ export class PrismaEnrollmentTrialLifecycleRepository
       authority.active_role.role_assignment_ref === mutation.role_assignment_ref
       ? { status: "resolved" }
       : denied();
-  }
-
-  private async pairIsCurrent(
-    mutation: NurtureEnrollmentTrialLifecycleMutation,
-    snapshot: NurtureTrialPairOwnerSnapshotV1,
-  ): Promise<boolean> {
-    if (!validateTrialPairOwnerSnapshotV1(snapshot)) return false;
-    const now = this.now();
-    if (
-      new Date(snapshot.verified_at) > now ||
-      new Date(snapshot.expires_at) <= now
-    ) return false;
-
-    let childOwner: ReturnType<typeof parseNurtureBindingOwnerRef>;
-    let familyOwner: ReturnType<typeof parseNurtureBindingOwnerRef>;
-    try {
-      childOwner = parseNurtureBindingOwnerRef(snapshot.child_owner_ref);
-      familyOwner = parseNurtureBindingOwnerRef(snapshot.family_owner_ref);
-    } catch {
-      return false;
-    }
-    if (childOwner.subjectType !== "child" || familyOwner.subjectType !== "family") {
-      return false;
-    }
-
-    const [childAssociation, familyAssociation, participant, childAuthorization, familyAuthorization] =
-      await Promise.all([
-        this.prisma.nurtureChildAnchorAssociation.findFirst({
-          where: {
-            id: snapshot.child_association_ref,
-            workspaceId: mutation.workspace_id,
-            childAnchorId: childOwner.anchorId,
-            status: "active",
-            currentKey: "current",
-            aggregateVersion: snapshot.child_association_head,
-          },
-          include: { childAnchor: true, child: true },
-        }),
-        this.prisma.nurtureFamilyAnchorAssociation.findFirst({
-          where: {
-            id: snapshot.family_association_ref,
-            workspaceId: mutation.workspace_id,
-            familyAnchorId: familyOwner.anchorId,
-            childAnchorId: childOwner.anchorId,
-            childCareProcessId: snapshot.child_care_process_ref,
-            status: "active",
-            currentKey: "current",
-            aggregateVersion: snapshot.family_association_head,
-          },
-          include: {
-            familyAnchor: true,
-            family: true,
-            childCareProcess: true,
-          },
-        }),
-        this.prisma.nurtureParticipant.findFirst({
-          where: {
-            id: snapshot.guardian_participant_ref,
-            workspaceId: mutation.workspace_id,
-            status: "active",
-            deletedAt: null,
-          },
-          include: {
-            principalBindings: {
-              where: { status: "active", currentKey: "current" },
-              take: 1,
-            },
-            roleAssignments: {
-              where: {
-                id: snapshot.guardian_role_assignment_ref,
-                role: "guardian",
-                status: "active",
-                deletedAt: null,
-                AND: [
-                  { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
-                  { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
-                ],
-              },
-              take: 1,
-            },
-          },
-        }),
-        this.prisma.nurtureScenarioBindingAuthorization.findFirst({
-          where: {
-            workspaceId: mutation.workspace_id,
-            subjectType: "child",
-            childAnchorId: childOwner.anchorId,
-            status: "active",
-            verifiedAt: { lte: now },
-            expiresAt: { gt: now },
-          },
-          orderBy: [{ ownerVersion: "desc" }, { verifiedAt: "desc" }],
-        }),
-        this.prisma.nurtureScenarioBindingAuthorization.findFirst({
-          where: {
-            workspaceId: mutation.workspace_id,
-            subjectType: "family",
-            familyAnchorId: familyOwner.anchorId,
-            status: "active",
-            verifiedAt: { lte: now },
-            expiresAt: { gt: now },
-          },
-          orderBy: [{ ownerVersion: "desc" }, { verifiedAt: "desc" }],
-        }),
-      ]);
-
-    const role = participant?.roleAssignments[0];
-    return Boolean(
-      childAssociation &&
-      familyAssociation &&
-      childAssociation.childAnchor.status === "associated" &&
-      childAssociation.childAnchor.aggregateVersion === snapshot.child_owner_version &&
-      childAssociation.child.status === "active" &&
-      childAssociation.child.deletedAt === null &&
-      familyAssociation.familyAnchor.status === "associated" &&
-      familyAssociation.familyAnchor.aggregateVersion === snapshot.family_owner_version &&
-      familyAssociation.childAssociationId === childAssociation.id &&
-      familyAssociation.currentChildAssociationId === childAssociation.id &&
-      familyAssociation.childId === childAssociation.childId &&
-      familyAssociation.family.status === "active" &&
-      familyAssociation.family.deletedAt === null &&
-      familyAssociation.childCareProcess.status === "active" &&
-      familyAssociation.childCareProcess.deletedAt === null &&
-      participant?.principalBindings[0]?.actorObjectId === snapshot.actor_ref.object_id &&
-      role &&
-      ((role.scopeType === "child_care_process" &&
-        role.scopeId === snapshot.child_care_process_ref) ||
-        (role.scopeType === "family" && role.scopeId === familyAssociation.familyId)) &&
-      childAuthorization &&
-      childAuthorization.ownerRef === snapshot.child_owner_ref &&
-      childAuthorization.ownerVersion === snapshot.child_owner_version &&
-      familyAuthorization &&
-      familyAuthorization.ownerRef === snapshot.family_owner_ref &&
-      familyAuthorization.ownerVersion === snapshot.family_owner_version
-    );
   }
 
   private async lockCareGroup(input: {
@@ -374,7 +263,10 @@ export class PrismaEnrollmentTrialLifecycleRepository
         new Date(mutation.grant_terms_snapshot.verified_at) > now ||
         new Date(mutation.grant_terms_snapshot.expires_at) <= now ||
         new Date(mutation.grant_terms_snapshot.expires_at) < reservation.trialEndsAt ||
-        !(await this.pairIsCurrent(mutation, mutation.pair_owner_snapshot))
+        !(await this.pairOwner.isTrialSnapshotCurrent(
+          mutation.workspace_id,
+          mutation.pair_owner_snapshot,
+        ))
       ) return conflict("trial_relationship_preparation_predicate_failed");
       const group = await this.lockCareGroup({
         workspace_id: mutation.workspace_id,
@@ -412,7 +304,10 @@ export class PrismaEnrollmentTrialLifecycleRepository
           mutation.pair_owner_snapshot.guardian_participant_ref ||
         !this.grantMatchesStoredTerms(grant, reservation) ||
         mutation.pair_owner_snapshot.child_care_process_ref !== enrollment.childCareProcessId ||
-        !(await this.pairIsCurrent(mutation, mutation.pair_owner_snapshot))
+        !(await this.pairOwner.isTrialSnapshotCurrent(
+          mutation.workspace_id,
+          mutation.pair_owner_snapshot,
+        ))
       ) return conflict("trial_start_predicate_failed");
       const group = await this.lockCareGroup({
         workspace_id: mutation.workspace_id,
@@ -453,9 +348,43 @@ export class PrismaEnrollmentTrialLifecycleRepository
           : conflict("trial_extension_predicate_failed");
       }
       case "propose_formal_enrollment":
-        return workflow.currentStage === "trial_review"
-          ? null
-          : conflict("formal_proposal_predicate_failed");
+        if (workflow.currentStage !== "trial_review") {
+          return conflict("formal_proposal_predicate_failed");
+        }
+        {
+          const terms = grant.policySnapshotPayload;
+          const proposedStart = new Date(mutation.proposal.proposed_formal_start_at);
+          const proposedGrantExpiry = new Date(mutation.proposal.proposed_grant_expires_at);
+          const proposalExpiry = new Date(mutation.proposal.proposal_expires_at);
+          if (
+            !validateTrialGrantTermsSnapshotV1(terms) ||
+            proposedStart < now ||
+            proposedStart >= proposalExpiry ||
+            proposalExpiry > reservation.trialEndsAt ||
+            proposedGrantExpiry <= proposedStart ||
+            proposedGrantExpiry > new Date(terms.expires_at) ||
+            !mutation.proposal.proposed_grant_purposes.every((purpose) =>
+              terms.purposes.includes(purpose)
+            )
+          ) return conflict("formal_proposal_predicate_failed");
+          const group = await this.lockCareGroup({
+            workspace_id: mutation.workspace_id,
+            institution_ref: mutation.institution_ref,
+            care_group_ref: reservation.targetCareGroupId,
+          });
+          if (group?.aggregate_version !== mutation.proposal.expected_capacity_revision) {
+            return conflict("capacity_source_conflict");
+          }
+          const proposalCount = await this.prisma.nurtureEnrollmentFormalProposal.count({
+            where: {
+              workspaceId: mutation.workspace_id,
+              workflowId: workflow.id,
+            },
+          });
+          return proposalCount === 0
+            ? null
+            : conflict("formal_proposal_head_conflict");
+        }
       case "end_trial":
         return [
           "trial_in_progress",
@@ -485,7 +414,7 @@ export class PrismaEnrollmentTrialLifecycleRepository
         case "extend_trial":
           return this.extendTrial(mutation, loaded);
         case "propose_formal_enrollment":
-          return this.proposeFormal(loaded);
+          return this.proposeFormal(mutation, loaded);
         case "end_trial":
           return this.endTrial(mutation, loaded);
       }
@@ -524,6 +453,7 @@ export class PrismaEnrollmentTrialLifecycleRepository
     enrollment: NurtureEnrollment;
     grant: NurtureChildLinkGrant;
     reservation: NurtureEnrollmentTrialReservation;
+    formalProposal?: NurtureEnrollmentFormalProposal;
     added?: readonly NurtureEnrollmentJourneyMilestone[];
   }): NurtureEnrollmentTrialLifecycleResult {
     return {
@@ -543,6 +473,9 @@ export class PrismaEnrollmentTrialLifecycleRepository
       reservation_ref: input.reservation.id,
       reservation_head: input.reservation.reservationHead,
       reservation_state: input.reservation.state,
+      ...(input.formalProposal
+        ? { formal_proposal: toFormalProposal(input.formalProposal) }
+        : {}),
     };
   }
 
@@ -744,6 +677,7 @@ export class PrismaEnrollmentTrialLifecycleRepository
   }
 
   private async proposeFormal(
+    mutation: Extract<NurtureEnrollmentTrialLifecycleMutation, { kind: "propose_formal_enrollment" }>,
     loaded: Loaded,
   ): Promise<NurtureEnrollmentTrialLifecycleResult> {
     const after = await this.updateWorkflow({
@@ -755,9 +689,38 @@ export class PrismaEnrollmentTrialLifecycleRepository
         completedMilestones: { push: "formal_proposed" },
       },
     });
-    return after
-      ? this.reloadCommitted(loaded.workflow, after, loaded, ["formal_proposed"])
-      : conflict("workflow_head_conflict");
+    if (!after) return conflict("workflow_head_conflict");
+    const issuedAt = this.now();
+    const formalProposal = await this.prisma.nurtureEnrollmentFormalProposal.create({
+      data: {
+        id: randomUUID(),
+        workspaceId: mutation.workspace_id,
+        institutionId: mutation.institution_ref,
+        workflowId: loaded.workflow.id,
+        enrollmentId: loaded.enrollment!.id,
+        grantId: loaded.grant!.id,
+        reservationId: loaded.reservation.id,
+        careGroupId: loaded.reservation.targetCareGroupId,
+        careGroupHead: mutation.proposal.expected_capacity_revision,
+        proposalHead: 1,
+        proposedFormalStartAt: new Date(mutation.proposal.proposed_formal_start_at),
+        proposedGrantPurposes: [...mutation.proposal.proposed_grant_purposes],
+        proposedGrantExpiresAt: new Date(mutation.proposal.proposed_grant_expires_at),
+        safeFamilySummary: mutation.proposal.safe_family_summary,
+        issuedByRoleAssignmentId: mutation.role_assignment_ref,
+        issueReasonKey: mutation.proposal.reason_key,
+        issuedAt,
+        expiresAt: new Date(mutation.proposal.proposal_expires_at),
+        createdAt: issuedAt,
+      },
+    });
+    return this.reloadCommitted(
+      loaded.workflow,
+      after,
+      loaded,
+      ["formal_proposed"],
+      formalProposal,
+    );
   }
 
   private async endTrial(
@@ -838,6 +801,7 @@ export class PrismaEnrollmentTrialLifecycleRepository
     after: NurtureInstitutionWorkflow,
     loaded: Loaded,
     added: readonly NurtureEnrollmentJourneyMilestone[],
+    formalProposal?: NurtureEnrollmentFormalProposal,
   ): Promise<NurtureEnrollmentTrialLifecycleResult> {
     const [enrollment, grant, reservation] = await Promise.all([
       this.prisma.nurtureEnrollment.findUnique({ where: { id: loaded.enrollment!.id } }),
@@ -847,7 +811,15 @@ export class PrismaEnrollmentTrialLifecycleRepository
       }),
     ]);
     return enrollment && grant && reservation
-      ? this.committed({ before, after, enrollment, grant, reservation, added })
+      ? this.committed({
+          before,
+          after,
+          enrollment,
+          grant,
+          reservation,
+          added,
+          ...(formalProposal ? { formalProposal } : {}),
+        })
       : unavailable("trial_lifecycle_reload_unavailable");
   }
 }

@@ -24,7 +24,10 @@ type CommandTransactionOverrides = Partial<
 > &
   Pick<
     NurtureCommandTransaction,
-    "enrollmentJourney" | "enrollmentWaitlist" | "enrollmentTrialLifecycle"
+    | "enrollmentJourney"
+    | "enrollmentWaitlist"
+    | "enrollmentTrialLifecycle"
+    | "enrollmentFormalization"
   > & {
     familyCare?: NurtureFamilyCareCommandTransaction;
   };
@@ -79,6 +82,9 @@ export const createInMemoryNurtureCommandRepository = (
             : {}),
           ...(overrides.enrollmentTrialLifecycle
             ? { enrollmentTrialLifecycle: overrides.enrollmentTrialLifecycle }
+            : {}),
+          ...(overrides.enrollmentFormalization
+            ? { enrollmentFormalization: overrides.enrollmentFormalization }
             : {}),
           findCommitted: transactionalFind,
           createExecution: transactionalCreate,

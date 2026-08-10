@@ -1,5 +1,21 @@
 # Pitfalls — 机构端双 Surface
 
+## 2026-08-10 — Extending a shared transition table requires disjoint validators
+
+- **Symptom:** the first 0E-4 migration either required formal evidence on older
+  Guardian actions or sent `formalize_enrollment` through both the generic
+  journey validator and its exact formalization validator.
+- **Root cause:** adding nullable audit fields changed a shared row shape, while
+  SQL `CHECK` branches and trigger `WHEN` routing were updated independently.
+- **What was tried:** clean migration replay exposed the old-row rejection;
+  the targeted formalization test then exposed the second generic validator.
+- **Fix:** preserve the old Admin/Guardian branches verbatim, add one exact
+  formalization branch, exclude formalization from the generic trigger, and
+  require proposal refs only on propose/formalize transitions.
+- **Prevention:** every new command shape on a shared audit table MUST have a
+  storage truth table covering old rows, the new row and unrelated rows; clean
+  migration replay and the full DB lane are both required.
+
 ## 2026-08-10 — SQL three-valued checks and derived identity admitted drift
 
 - **Symptom:** an empty JSON carrier could make the exact-key helper return SQL

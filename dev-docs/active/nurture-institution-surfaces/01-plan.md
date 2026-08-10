@@ -65,7 +65,7 @@
 - Live gaps and the ordered next steps are
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
 
-## Execution checkpoint — 2026-08-10 G4-D increments 2–4 qualified at I1
+## Execution checkpoint — 2026-08-10 G4-D increments 2–5 qualified at I1
 
 - The private inquiry/touchpoint owner and the capacity waitlist/policy/offer/
   reservation/preparation owner are implemented and qualified through all 31
@@ -81,9 +81,15 @@
   proposal and local end. The clean 32-migration qualification passed targeted
   6/6 and full 386/386 DB lanes with zero drift; both disposable targets were
   destroyed.
-- The next dependent unit is G4-D increment 5 / frozen 0E-4 formalization and
-  completion. The independent 0F freeze may
-  proceed in parallel. The live order remains in
+- Increment 5 adds the immutable formal proposal and current Guardian
+  acceptance transaction. It changes the same Enrollment from trial to formal,
+  narrows the same Grant, retains the occupied seat and completes the workflow
+  atomically. The clean 33-migration qualification passed targeted 7/7 and
+  full 387/387 DB lanes with no datasource drift.
+- G4-D's frozen I1 chain is now complete. I2 contract/capability rotation is
+  the next local delivery gate; authenticated My-Chat owner integration at I3
+  remains blocked by G-09. The independent 0F freeze may proceed in parallel.
+  The live order remains in
   [`41`](./41-t007-gap-and-next-register.md).
 
 ## Stage G4 Delivery Structure — Accepted

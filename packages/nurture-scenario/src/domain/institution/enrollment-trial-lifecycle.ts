@@ -16,6 +16,11 @@ import type {
   NurtureEnrollmentJourneyMilestone,
   NurtureEnrollmentJourneyWorkflowSnapshotV1,
 } from "./enrollment-journey-workflow.js";
+import {
+  validateEnrollmentFormalProposalInputV1,
+  type NurtureEnrollmentFormalProposalInputV1,
+  type NurtureEnrollmentFormalProposalRecordV1,
+} from "./enrollment-formalization.js";
 
 export const NURTURE_ENROLLMENT_TRIAL_LIFECYCLE_CONTRACT_VERSION =
   "1.0.0" as const;
@@ -104,7 +109,8 @@ export type NurtureExtendTrialPayload = TrialEntitiesPayload & {
   reason_key: string;
 };
 
-export type NurtureProposeFormalEnrollmentPayload = TrialEntitiesPayload;
+export type NurtureProposeFormalEnrollmentPayload =
+  TrialEntitiesPayload & NurtureEnrollmentFormalProposalInputV1;
 
 export type NurtureEndTrialPayload = TrialEntitiesPayload & {
   reason_key: string;
@@ -140,7 +146,10 @@ export type NurtureEnrollmentTrialLifecycleMutation =
       review_at: string;
       reason_key: string;
     })
-  | (MutationEntities & { kind: "propose_formal_enrollment" })
+  | (MutationEntities & {
+      kind: "propose_formal_enrollment";
+      proposal: NurtureEnrollmentFormalProposalInputV1;
+    })
   | (MutationEntities & { kind: "end_trial"; reason_key: string });
 
 export type NurtureEnrollmentTrialLifecycleFailure = {
@@ -164,6 +173,7 @@ export type NurtureEnrollmentTrialLifecycleResult =
       reservation_ref: string;
       reservation_head: number;
       reservation_state: "held" | "converted_to_occupancy" | "released";
+      formal_proposal?: NurtureEnrollmentFormalProposalRecordV1;
     }
   | NurtureEnrollmentTrialLifecycleFailure;
 
@@ -337,6 +347,30 @@ export const validateEndTrialPayload = (
   validEntities(value) &&
   validToken(value.reason_key);
 
+export const validateProposeFormalEnrollmentPayload = (
+  value: unknown,
+): value is NurtureProposeFormalEnrollmentPayload => {
+  if (!onlyKeys(value, [
+    ...ENTITY_KEYS,
+    "expected_capacity_revision",
+    "proposed_formal_start_at",
+    "proposed_grant_purposes",
+    "proposed_grant_expires_at",
+    "safe_family_summary",
+    "proposal_expires_at",
+    "reason_key",
+  ]) || !validEntities(value)) return false;
+  return validateEnrollmentFormalProposalInputV1({
+    expected_capacity_revision: value.expected_capacity_revision,
+    proposed_formal_start_at: value.proposed_formal_start_at,
+    proposed_grant_purposes: value.proposed_grant_purposes,
+    proposed_grant_expires_at: value.proposed_grant_expires_at,
+    safe_family_summary: value.safe_family_summary,
+    proposal_expires_at: value.proposal_expires_at,
+    reason_key: value.reason_key,
+  });
+};
+
 const canonicalOwnerFacts = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(canonicalOwnerFacts);
   if (!isRecord(value)) return value;
@@ -451,6 +485,9 @@ const trialSpec = <Payload>(input: {
       role_assignment_ref: input.role(payload),
       result,
     });
+    if (result.formal_proposal) {
+      transition.formal_proposal_ref = result.formal_proposal.proposal_ref;
+    }
     return {
       output_refs: [
         localRef("institution_workflow", result.workflow.workflow_ref, result.workflow.workflow_head),
@@ -458,6 +495,13 @@ const trialSpec = <Payload>(input: {
         localRef("enrollment", result.enrollment_ref, result.enrollment_head),
         localRef("child_link_grant", result.grant_ref, result.grant_head),
         localRef("enrollment_trial_reservation", result.reservation_ref, result.reservation_head),
+        ...(result.formal_proposal
+          ? [localRef(
+              "enrollment_formal_proposal",
+              result.formal_proposal.proposal_ref,
+              result.formal_proposal.proposal_head,
+            )]
+          : []),
       ],
       result_schema_version: 1,
       committed_result: {
@@ -477,6 +521,12 @@ const trialSpec = <Payload>(input: {
         reservation_ref: result.reservation_ref,
         reservation_head: result.reservation_head,
         reservation_state: result.reservation_state,
+        ...(result.formal_proposal
+          ? {
+              proposal_ref: result.formal_proposal.proposal_ref,
+              proposal_head: result.formal_proposal.proposal_head,
+            }
+          : {}),
       },
       finalization_payload: { transition } satisfies TrialFinalization,
     };
@@ -563,9 +613,19 @@ export const extendTrialSpec = trialSpec<NurtureExtendTrialPayload>({
 export const proposeFormalEnrollmentSpec =
   trialSpec<NurtureProposeFormalEnrollmentPayload>({
     command_key: "propose_formal_enrollment",
-    validate: validateEntityPayload,
-    mutation: (payload, context) =>
-      entityMutation("propose_formal_enrollment", payload, context),
+    validate: validateProposeFormalEnrollmentPayload,
+    mutation: (payload, context) => ({
+      ...entityMutation("propose_formal_enrollment", payload, context),
+      proposal: {
+        expected_capacity_revision: payload.expected_capacity_revision,
+        proposed_formal_start_at: payload.proposed_formal_start_at,
+        proposed_grant_purposes: payload.proposed_grant_purposes,
+        proposed_grant_expires_at: payload.proposed_grant_expires_at,
+        safe_family_summary: payload.safe_family_summary,
+        proposal_expires_at: payload.proposal_expires_at,
+        reason_key: payload.reason_key,
+      },
+    }),
     role: (payload) => payload.role_assignment_ref,
     reason: () => "formal_enrollment_proposed",
   });

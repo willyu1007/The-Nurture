@@ -321,8 +321,9 @@ Project: `main`
     without requiring Enrollment/Grant/CareGroup or mutating My-Chat identity/binding.
     Formal activation requires Guardian acceptance and fresh My-Chat Child/Family
     membership/binding evidence, then one Nurture local transaction keeps Enrollment active,
-    changes `participationPhase: trial -> formal`, and converts reservation, Grant and CareGroup
-    together. Failure remains `active trial + reserved` and surfaces only a Workflow wait state.
+    changes `participationPhase: trial -> formal`, narrows the existing Grant and retains the
+    same occupied reservation/CareGroup. Failure remains `active trial + occupied seat`; no
+    partial formal state is published.
     Trial exit is a local downscope transaction that closes care access
     and releases capacity without deleting My-Chat identity/bindings, Nurture associations or
     historical care facts. Trial itself is the adaptation period: when more observation is needed,
@@ -362,11 +363,16 @@ Project: `main`
   institution-authored medical material as an authoritative source.
 - Success Signal: one immutable Nurture Service Candidate passes the six-surface black-box and negative conformance suite; a composite binding links its exact interface digest and test deployment to the My-Chat builds that pass TestFlight Internal plus Google Play Internal real-device validation.
 - Related Tasks: T-004 (`done`); T-005 (`archived`); T-006 (`done`);
-  T-007～T-008 (`planned`).
-- Next Checkpoint: T-006/G3 is closed at exact handoff `0374087…`, merged to
-  `main`. Per D-T009-05 the family-growth provider (F-004/T-009) precedes
-  T-007 G4-0C; T-008 remains planned until the complete T-007 G4 Exit.
-  Candidate Freeze, deployment, activation and external traffic remain closed.
+  T-007 (`in-progress`); T-008 (`planned`).
+- Current posture: T-007 completed 0C, 0D and the full frozen 0E chain at
+  private I1. G4-D increments 2–5 are qualified through 33 migrations on
+  disposable PostgreSQL; no public caller, capability activation or durable
+  database apply exists. 0F is not started.
+- Next Checkpoint: rotate the completed G4-D contract/capability at I2 while
+  default-off, or freeze independent 0F. Authenticated My-Chat owner integration
+  at I3/I4 waits for the explicit G-09 adoption decision. T-008 remains planned
+  until the complete T-007 G4 Exit; Candidate Freeze, deployment, activation and
+  external traffic remain closed.
 
 ### F-004 Family growth material provider
 

@@ -737,3 +737,24 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   runtime pin is `7c3b1564…` over 245 files. Base/Host pins were not advanced.
 - No caller, capability, module/manifest registration, deployment, activation
   or traffic was added. 0E-4 remains the next dependent unit.
+
+## 2026-08-10 — G4-D increment 5 formalization and completion
+
+- Added one append-only formal-proposal owner and one private formalization
+  command inside the existing serializable command-ledger transaction.
+- The same Enrollment changes `trial -> formal`; the existing Grant is narrowed
+  to accepted terms; the converted reservation remains occupied; and the
+  workflow reaches `completed/formalized` with one immutable acceptance audit.
+- Extracted the exact Child/Family/current-Guardian checks from the trial
+  repository into one shared local verifier. No second current-owner adapter,
+  alternate formalization state or Host outbox was introduced.
+- Empty-database replay repaired old Guardian transition compatibility,
+  disjoint formalization trigger routing, proposal time boundaries and exact
+  proposal-link storage. Expired evidence now returns an owner denial instead
+  of a business conflict.
+- Qualification passed 33 migrations, targeted 7/7, full DB 387/387, full unit
+  878/878, root typecheck and structural gates with zero schema drift. Only an
+  evidence digest and detached metadata allowlist are persisted.
+- This closes frozen 0E-4 at private I1. No caller, capability, module/manifest
+  registration, durable apply, deployment, activation or traffic was added;
+  I2 is next and I3 remains blocked by G-09.

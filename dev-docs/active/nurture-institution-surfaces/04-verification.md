@@ -520,6 +520,23 @@ Falsification evidence is per-increment and lives in each record's
 Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and
 [`artifacts/db/0e3-trial-lifecycle`](./artifacts/db/0e3-trial-lifecycle/00-connection-check.md).
 
+## 2026-08-10 — G4-D increment 5 formalization and completion
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Proposal / input contract | PASS | Exact keys and heads; formal start precedes both Grant and proposal expiry; caller cannot supply derived lifecycle/evidence/result fields. |
+| Current owner | PASS | Expired evidence and stale Child head deny; exact active local pair, authorization, principal and one effective Guardian role are reasserted. |
+| Atomic formalization | PASS | Same Enrollment/Grant/reservation/CareGroup and exact heads; one serializable transaction commits phase, terms, workflow and audit together. |
+| Replay | PASS | Refreshed volatile owner evidence replays one frozen result; changed acceptance time conflicts. |
+| Storage boundary | PASS | Immutable proposal revisions; proposal ref only on propose/formalize; evidence body absent; no duplicate proposal index. |
+| Targeted / full unit | PASS | 7/7; 878/878 across 79 files. |
+| Targeted / full PostgreSQL | PASS | 7/7; 387/387 across 42 files. |
+| TypeScript / Prisma / structure | PASS | Root typecheck, format/validate/generate, routing 148, persistence, port topology and G3 freeze. |
+| Migration / drift / context | PASS | 33 current from empty; no datasource diff; DB context checksum `3cc9d48c…`. |
+| Effect boundary | PASS | Approved disposable target destroyed with zero sessions and confirmed absent; no shared apply, public caller/capability, deployment, activation or traffic. |
+
+Detailed evidence: [`61`](./61-g4-d-increment-5-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

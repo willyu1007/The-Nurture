@@ -46,6 +46,7 @@ export const NURTURE_ENROLLMENT_JOURNEY_COMMAND_KEYS = [
   "mark_trial_review_reached",
   "extend_trial",
   "propose_formal_enrollment",
+  "formalize_enrollment",
   "end_trial",
 ] as const;
 
@@ -129,6 +130,16 @@ export type NurtureEnrollmentJourneyTransitionDraftV1 = {
   actor_role_assignment_ref?: string;
   actor_ref?: CanonicalRef;
   owner_action_ref?: CanonicalRef;
+  formal_proposal_ref?: string;
+  owner_evidence_hash?: string;
+  owner_evidence_metadata?: {
+    contract_version: "1.0.0";
+    purpose_key: "formalize_enrollment";
+    audience: "nurture";
+    request_nonce_hash: string;
+    verified_at: string;
+    expires_at: string;
+  };
   reason_key: string;
 };
 

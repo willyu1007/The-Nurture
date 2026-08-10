@@ -595,6 +595,15 @@ export class PrismaEnrollmentJourneyRepository
         ...(input.transition.owner_action_ref
           ? { ownerActionRef: asJson(input.transition.owner_action_ref) }
           : {}),
+        ...(input.transition.formal_proposal_ref
+          ? { formalProposalId: input.transition.formal_proposal_ref }
+          : {}),
+        ...(input.transition.owner_evidence_hash
+          ? { ownerEvidenceHash: input.transition.owner_evidence_hash }
+          : {}),
+        ...(input.transition.owner_evidence_metadata
+          ? { ownerEvidenceMetadata: asJson(input.transition.owner_evidence_metadata) }
+          : {}),
         reasonKey: input.transition.reason_key,
         occurredAt: execution.committedAt,
       },
