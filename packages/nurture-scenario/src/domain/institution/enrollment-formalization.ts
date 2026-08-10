@@ -30,7 +30,7 @@ export type NurtureEnrollmentFormalProposalInputV1 = {
 
 export type NurtureEnrollmentFormalProposalRecordV1 = {
   proposal_ref: string;
-  proposal_head: number;
+  proposal_head: 1;
   workflow_ref: string;
   enrollment_ref: string;
   grant_ref: string;
@@ -63,7 +63,7 @@ export type NurtureFormalizeEnrollmentPayload = {
   acceptance_ref: CanonicalRef;
   accepted_at: string;
   expected_workflow_head: number;
-  expected_proposal_head: number;
+  expected_proposal_head: 1;
   expected_enrollment_head: number;
   expected_grant_head: number;
   expected_reservation_head: number;
@@ -87,7 +87,7 @@ export type NurtureEnrollmentFormalizationResult =
       workflow: NurtureEnrollmentJourneyWorkflowSnapshotV1;
       added_milestones: readonly NurtureEnrollmentJourneyMilestone[];
       proposal_ref: string;
-      proposal_head: number;
+      proposal_head: 1;
       enrollment_ref: string;
       enrollment_head: number;
       grant_ref: string;
@@ -236,7 +236,7 @@ export const validateFormalizeEnrollmentPayload = (
   validCanonicalRef(value.acceptance_ref, "my_chat", "enrollment_action") &&
   validInstant(value.accepted_at) &&
   validHead(value.expected_workflow_head) &&
-  validHead(value.expected_proposal_head) &&
+  value.expected_proposal_head === 1 &&
   validHead(value.expected_enrollment_head, 0) &&
   validHead(value.expected_grant_head, 0) &&
   validHead(value.expected_reservation_head) &&

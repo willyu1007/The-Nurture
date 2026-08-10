@@ -1,5 +1,24 @@
 # Pitfalls — 机构端双 Surface
 
+## 2026-08-10 — Formalization coupled acceptance time to activation time
+
+- **Symptom:** a Guardian could not accept a future-start formal proposal before
+  its start time, and concurrent formalization surfaced a serialization abort as
+  owner unavailable.
+- **Root cause:** the repository compared `proposedFormalStartAt` with
+  `acceptedAt` instead of the commit clock, and inspected only Prisma's top-level
+  error code even though raw-query PostgreSQL `40001` is nested under `P2010`.
+- **What was tried:** the first concurrent test exposed a blocked owner result;
+  propagating only top-level `P2034|40001` still missed the nested database code.
+- **Fix/workaround:** acceptance is checked only against issue/expiry, commit is
+  checked against formal start, timely acceptance survives proposal expiry, and
+  both top-level and nested serialization codes reach the shared
+  `command_write_conflict` classifier. The schema now permits one immutable
+  proposal per workflow instead of an unreachable revision chain.
+- **Prevention:** every future-effective owner action needs separate decision-
+  time and effect-time predicates, plus a true competing-command DB test that
+  asserts one execution, one transition and retry convergence.
+
 ## 2026-08-10 — Extending a shared transition table requires disjoint validators
 
 - **Symptom:** the first 0E-4 migration either required formal evidence on older

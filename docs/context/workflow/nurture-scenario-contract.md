@@ -621,12 +621,20 @@ Formalization is a two-owner sequence, not a distributed transaction. After
 the Guardian accepts the current formal proposal, My-Chat rereads current
 Child/Family membership and both scenario-binding heads and issues short-lived,
 purpose-bound evidence. Nurture then validates current expected versions and
-atomically changes participation phase, converts the reservation to active
-occupancy, updates Grant/CareGroup, and records idempotency/audit evidence.
+atomically changes participation phase, retains the active occupancy already
+created by trial start, updates the existing Grant, and records idempotency/audit evidence.
 Owner outage, binding drift, evidence expiry, version conflict, or local
 failure leaves the canonical relationship
-`status=active, participationPhase=trial, reserved` and may expose only a
+`status=active, participationPhase=trial` with the same occupied seat and may expose only a
 technical `waiting_on_system` state.
+
+V1 stores exactly one immutable formal proposal per workflow and keeps
+`proposalHead=1` only as an optimistic-concurrency field. Guardian acceptance
+must occur no earlier than proposal issue and before proposal expiry. The local
+commit must occur at or after the proposed formal start, but a timely accepted
+proposal remains eligible after its acceptance window closes when fresh current-
+owner evidence and every local expected head still pass. There is no proposal
+revision command, greatest-revision query, or parallel mutable proposal state.
 
 Trial is the adaptation period. If more observation is needed, Admin extends
 trial before formalization. A confirmed Nurture formalization commit is the

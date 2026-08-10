@@ -36,7 +36,7 @@ keeps rank/category facts out of the family projection. It introduces no
 automatic timer, deadline/blocker lifecycle, Enrollment/Grant side effect or
 parallel trial-care path. Increment 4 adds the canonical phase, current pair
 and Grant preparation, explicit trial/review/extension/proposal lifecycle and
-local outage-safe end. Increment 5 adds immutable proposal revisions, current
+local outage-safe end. Increment 5 adds one immutable formal proposal, current
 Guardian acceptance, same-relationship formalization and atomic workflow
 completion. The whole branch remains private I1 code.
 
@@ -141,16 +141,17 @@ targeted 6/6 and complete 386/386 DB lanes, current status and zero drift on
 `nurture_g4d_i4_trial_20260810`. The separate diff target and qualification
 target were destroyed and confirmed absent. Shared or persistent apply remains
 unauthorized at I1. `20260810170000_g4d_formalization_completion` passed a
-clean 33-migration deploy, targeted 7/7 and full 387/387 DB lanes with current
-status and no datasource drift on the approved disposable target. That target
-is destroyed after final commit-boundary checks; no durable target is
-authorized.
+clean 33-migration quality replay after the single-proposal/timing repair,
+targeted 9/9 and full 389/389 DB lanes with current status and no datasource
+drift on the approved disposable target. The exact target was destroyed and
+confirmed absent; no durable target is authorized.
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. Increment 5 observed `a19ac96`; C30's independent
+`x5_joint_api` divergence. The quality rerun observed `876b045` with no
+`packages/workflow-contracts` diff from the pin; C30's independent
 upstream lock still expects `51ad97f`
 ([`46`](./46-g4-b-increment-12-record.md), [`48`](./48-g4-c-increment-2-record.md)).
 Neither external head is treated as a Nurture pin.

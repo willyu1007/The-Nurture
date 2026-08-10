@@ -12,7 +12,7 @@ CREATE TABLE "nurture_enrollment_formal_proposal" (
   "reservation_id" TEXT NOT NULL,
   "care_group_id" TEXT NOT NULL,
   "care_group_head" INTEGER NOT NULL,
-  "proposal_head" INTEGER NOT NULL,
+  "proposal_head" INTEGER NOT NULL DEFAULT 1,
   "proposed_formal_start_at" TIMESTAMP(3) NOT NULL,
   "proposed_grant_purposes" TEXT[] NOT NULL,
   "proposed_grant_expires_at" TIMESTAMP(3) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE "nurture_enrollment_formal_proposal" (
   CONSTRAINT "nurture_enrollment_formal_proposal_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "ck_nurture_formal_proposal_contract" CHECK (
     "care_group_head" >= 0
-    AND "proposal_head" >= 1
+    AND "proposal_head" = 1
     AND "proposed_formal_start_at" < "proposed_grant_expires_at"
     AND "proposed_formal_start_at" < "expires_at"
     AND "issued_at" < "expires_at"
@@ -40,9 +40,9 @@ CREATE TABLE "nurture_enrollment_formal_proposal" (
   )
 );
 
-CREATE UNIQUE INDEX "uq_nurture_formal_proposal_workflow_head"
+CREATE UNIQUE INDEX "uq_nurture_formal_proposal_workflow"
   ON "nurture_enrollment_formal_proposal"
-  ("workspace_id", "workflow_id", "proposal_head");
+  ("workspace_id", "workflow_id");
 ALTER TABLE "nurture_enrollment_formal_proposal"
   ADD CONSTRAINT "nurture_formal_proposal_institution_id_fkey"
   FOREIGN KEY ("institution_id") REFERENCES "nurture_care_institution"("id")
@@ -131,32 +131,12 @@ BEGIN
       USING ERRCODE = '23514';
   END IF;
 
-  IF NEW."proposal_head" = 1 THEN
-    IF EXISTS (
-      SELECT 1 FROM "nurture_enrollment_formal_proposal"
-      WHERE "workspace_id" = NEW."workspace_id"
-        AND "workflow_id" = NEW."workflow_id"
-    ) THEN
-      RAISE EXCEPTION 'nurture formal proposal head mismatch'
-        USING ERRCODE = '23514';
-    END IF;
-  ELSIF NOT EXISTS (
-    SELECT 1 FROM "nurture_enrollment_formal_proposal" previous
-    WHERE previous."workspace_id" = NEW."workspace_id"
-      AND previous."workflow_id" = NEW."workflow_id"
-      AND previous."proposal_head" = NEW."proposal_head" - 1
-      AND previous."enrollment_id" = NEW."enrollment_id"
-      AND previous."grant_id" = NEW."grant_id"
-      AND previous."reservation_id" = NEW."reservation_id"
-      AND previous."care_group_id" = NEW."care_group_id"
-      AND previous."issued_at" <= NEW."issued_at"
-  ) OR EXISTS (
-    SELECT 1 FROM "nurture_enrollment_formal_proposal" later
-    WHERE later."workspace_id" = NEW."workspace_id"
-      AND later."workflow_id" = NEW."workflow_id"
-      AND later."proposal_head" >= NEW."proposal_head"
+  IF NEW."proposal_head" <> 1 OR EXISTS (
+    SELECT 1 FROM "nurture_enrollment_formal_proposal"
+    WHERE "workspace_id" = NEW."workspace_id"
+      AND "workflow_id" = NEW."workflow_id"
   ) THEN
-    RAISE EXCEPTION 'nurture formal proposal revision chain mismatch'
+    RAISE EXCEPTION 'nurture formal proposal identity mismatch'
       USING ERRCODE = '23514';
   END IF;
   RETURN NEW;
@@ -173,7 +153,7 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  RAISE EXCEPTION 'nurture formal proposal revisions are immutable'
+  RAISE EXCEPTION 'nurture formal proposal is immutable'
     USING ERRCODE = '23514';
 END;
 $$;
@@ -508,12 +488,6 @@ BEGIN
       AND proposal."institution_id" = NEW."institution_id"
       AND proposal."workflow_id" = NEW."workflow_id"
       AND proposal."issued_by_role_assignment_id" = NEW."actor_role_assignment_id"
-      AND NOT EXISTS (
-        SELECT 1 FROM "nurture_enrollment_formal_proposal" later
-        WHERE later."workspace_id" = proposal."workspace_id"
-          AND later."workflow_id" = proposal."workflow_id"
-          AND later."proposal_head" > proposal."proposal_head"
-      )
   ) THEN
     RAISE EXCEPTION 'nurture formal proposal transition link mismatch'
       USING ERRCODE = '23514';
@@ -652,12 +626,6 @@ BEGIN
         AND care_group."workspace_id" = NEW."workspace_id"
         AND care_group."institution_id" = NEW."institution_id"
         AND care_group."aggregate_version" = proposal."care_group_head"
-        AND NOT EXISTS (
-          SELECT 1 FROM "nurture_enrollment_formal_proposal" later
-          WHERE later."workspace_id" = proposal."workspace_id"
-            AND later."workflow_id" = proposal."workflow_id"
-            AND later."proposal_head" > proposal."proposal_head"
-        )
     )
     OR NOT EXISTS (
       SELECT 1 FROM "nurture_institution_workflow_transition" proposed

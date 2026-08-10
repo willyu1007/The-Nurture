@@ -84,8 +84,9 @@
 - Increment 5 adds the immutable formal proposal and current Guardian
   acceptance transaction. It changes the same Enrollment from trial to formal,
   narrows the same Grant, retains the occupied seat and completes the workflow
-  atomically. The clean 33-migration qualification passed targeted 7/7 and
-  full 387/387 DB lanes with no datasource drift.
+  atomically. After the timing, single-proposal and serialization repair, the
+  clean 33-migration qualification passes targeted 9/9 and full 389/389 DB
+  lanes with no datasource drift.
 - G4-D's frozen I1 chain is now complete. I2 contract/capability rotation is
   the next local delivery gate; authenticated My-Chat owner integration at I3
   remains blocked by G-09. The independent 0F freeze may proceed in parallel.
@@ -462,9 +463,9 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   Child/Family membership、scenario binding 并签发当前 evidence，Nurture 不缓存
   evidence 填补 outage。
 - Nurture 以一个 expected-version/idempotent local transaction 保持 Enrollment
-  `status=active`、将 `participationPhase: trial → formal`、reservation 转 active
-  occupancy，并更新正式 Grant/CareGroup。任一步失败时 canonical lifecycle 保持
-  `active trial + reserved`，Workflow 显示
+  `status=active`、将 `participationPhase: trial → formal`、保留 trial-start 已转换的
+  active occupancy，并更新正式 Grant。任一步失败时 canonical lifecycle 保持
+  `active trial + occupied seat`，Workflow 显示
   `formalization_pending | waiting_on_system`。
 - end trial 是 Nurture 本地降权事务，不依赖 My-Chat owner 可用性：Enrollment
   `status: active → ended`（历史 phase=`trial`）、CareGroup assignment 结束、
@@ -590,10 +591,10 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   membership/binding evidence are reread before the Nurture transaction; stale/cached/
   unavailable evidence never activates.
 - Local-atomicity tests proving Enrollment remains `status=active` while
-  `participationPhase: trial→formal`, reservation→active occupancy and formal Grant/CareGroup
-  updates commit together under expected version/idempotency.
+  `participationPhase: trial→formal`, the same occupied reservation and formal Grant
+  update commit together under expected version/idempotency.
 - Activation-failure tests proving owner outage, binding drift, conflict or local failure keeps
-  canonical `active trial + reserved`, exposes only Workflow waiting state and exact-replays safely.
+  canonical `active trial + occupied seat`, exposes only Workflow waiting state and exact-replays safely.
 - Projection tests proving mobile/Web cannot display active/ended before the Nurture commit and
   cannot diverge across surfaces after retry.
 - Exit tests proving one local downscope transaction marks ended, closes CareGroup/trial Grant,

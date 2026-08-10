@@ -740,7 +740,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 
 ## 2026-08-10 — G4-D increment 5 formalization and completion
 
-- Added one append-only formal-proposal owner and one private formalization
+- Added one immutable formal-proposal owner and one private formalization
   command inside the existing serializable command-ledger transaction.
 - The same Enrollment changes `trial -> formal`; the existing Grant is narrowed
   to accepted terms; the converted reservation remains occupied; and the
@@ -762,3 +762,24 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   re-frozen at aggregate `9a88a32a…`; the Nurture exact-runtime self-pin is
   `6b8edb81…` over 249 files. Base/Host and the divergent My-Chat pin were not
   advanced.
+
+## 2026-08-10 — G4-D increment 5 quality repair
+
+- Replaced the coupled `formalStart <= acceptedAt` predicate with separate
+  acceptance-window and effect-time checks. Guardian acceptance may precede a
+  future formal start, and timely acceptance remains valid after proposal
+  expiry when fresh owner evidence and unchanged local heads pass.
+- Removed the unreachable proposal revision lane. V1 now has one immutable
+  proposal per workflow, `proposal_head=1`, one workflow unique index and no
+  greatest-revision queries or revision-chain trigger branches.
+- Added true competing-command coverage. It exposed raw-query serialization as
+  Prisma `P2010` with nested PostgreSQL `40001`; both nested and top-level codes
+  now reach the shared retryable `command_write_conflict` classifier.
+- Qualification passes targeted PostgreSQL 9/9, complete PostgreSQL 389/389,
+  unit 878/878, root typecheck, 33 migrations from empty, current migration
+  status and zero datasource drift. The manifest/module and default-off posture
+  remain unchanged.
+- Registered the proposal table in the G3 persisted-table census. The C30
+  source lock and Nurture exact-runtime pin intentionally remain pending until
+  these changed bytes have an exact implementation commit; the C30 verifier
+  rejects dirty-worktree bytes and must not be bypassed with the prior revision.

@@ -18,6 +18,10 @@ import {
   type NurtureEnrollmentJourneyWorkflowSnapshotV1,
 } from "@the-nurture/scenario";
 import { PrismaEnrollmentPairOwnerRepository } from "./enrollment-pair-owner.repository.js";
+import {
+  hasPrismaErrorCode,
+  isPrismaSerializationAbort,
+} from "./prisma-error.js";
 
 type FormalizationPrisma = PrismaClient | Prisma.TransactionClient;
 
@@ -59,10 +63,6 @@ const failure = (
 const denied = (reason = "not_authorized") => failure("denied", reason);
 const conflict = (reason: string) => failure("conflict", reason);
 const unavailable = (reason: string) => failure("unavailable", reason);
-const prismaErrorCode = (error: unknown): string | undefined =>
-  typeof error === "object" && error !== null && "code" in error
-    ? String((error as { code?: unknown }).code)
-    : undefined;
 const sameValues = (left: readonly string[], right: readonly string[]): boolean =>
   left.length === right.length && left.every((value, index) => value === right[index]);
 
@@ -88,7 +88,8 @@ export class PrismaEnrollmentFormalizationRepository
       if (!("proposal" in loaded)) return loaded;
       const invalid = await this.validateCurrent(mutation, loaded);
       return invalid ?? { status: "ready" };
-    } catch {
+    } catch (error) {
+      if (isPrismaSerializationAbort(error)) throw error;
       return unavailable("formalization_owner_unavailable");
     }
   }
@@ -183,7 +184,7 @@ export class PrismaEnrollmentFormalizationRepository
         workflow: toSnapshot(workflow),
         added_milestones: addedMilestones,
         proposal_ref: loaded.proposal.id,
-        proposal_head: loaded.proposal.proposalHead,
+        proposal_head: 1,
         enrollment_ref: enrollment.id,
         enrollment_head: enrollment.aggregateVersion,
         grant_ref: grant.id,
@@ -199,8 +200,8 @@ export class PrismaEnrollmentFormalizationRepository
           mutation.owner_evidence.current_owner_evidence.current_owner_evidence_hash,
       };
     } catch (error) {
-      const code = prismaErrorCode(error);
-      return code === "P2002" || code === "P2034" || code === "40001" || code === "23514"
+      if (isPrismaSerializationAbort(error)) throw error;
+      return hasPrismaErrorCode(error, "P2002", "23514")
         ? conflict("formalization_write_conflict")
         : unavailable("formalization_write_unavailable");
     }
@@ -223,7 +224,7 @@ export class PrismaEnrollmentFormalizationRepository
     }
     if (lock) await this.lockExact(proposal);
 
-    const [workflow, enrollment, grant, reservation, careGroup, currentProposal] =
+    const [workflow, enrollment, grant, reservation, careGroup] =
       await Promise.all([
         this.prisma.nurtureInstitutionWorkflow.findFirst({
           where: {
@@ -266,18 +267,8 @@ export class PrismaEnrollmentFormalizationRepository
           },
           select: { id: true, aggregateVersion: true },
         }),
-        this.prisma.nurtureEnrollmentFormalProposal.findFirst({
-          where: {
-            workspaceId: mutation.workspace_id,
-            workflowId: proposal.workflowId,
-          },
-          orderBy: { proposalHead: "desc" },
-        }),
       ]);
     if (!workflow || !enrollment || !grant || !reservation || !careGroup) return denied();
-    if (currentProposal?.id !== proposal.id) {
-      return conflict("formal_proposal_head_conflict");
-    }
     if (
       workflow.workflowHead !== mutation.expected_workflow_head ||
       enrollment.aggregateVersion !== mutation.expected_enrollment_head ||
@@ -348,11 +339,10 @@ export class PrismaEnrollmentFormalizationRepository
       proposal.proposedGrantExpiresAt > new Date(terms.expires_at) ||
       proposal.proposedGrantExpiresAt <= proposal.proposedFormalStartAt ||
       proposal.proposedFormalStartAt < reservation.trialStartsAt ||
-      proposal.proposedFormalStartAt > acceptedAt ||
+      proposal.proposedFormalStartAt > now ||
       proposal.issuedAt > acceptedAt ||
       acceptedAt >= proposal.expiresAt ||
-      acceptedAt > now ||
-      proposal.expiresAt <= now
+      acceptedAt > now
     ) return conflict("formalization_predicate_failed");
 
     if (new Date(mutation.owner_evidence.verified_at) < acceptedAt) {

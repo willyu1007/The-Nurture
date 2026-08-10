@@ -12,11 +12,11 @@
 
 ## Implemented slice
 
-- `propose_formal_enrollment` now appends an immutable proposal revision that
+- `propose_formal_enrollment` now creates exactly one immutable proposal that
   binds the current workflow, trial Enrollment/Grant/reservation, exact
   CareGroup head, Admin role, safe summary, formal start, bounded Grant terms
-  and proposal expiry. The current proposal is the greatest revision; there is
-  no mutable current-status carrier.
+  and proposal expiry. V1 fixes `proposal_head=1`; there is no revision command,
+  greatest-revision query or mutable current-status carrier.
 - Added the private `formalize_enrollment` command. Its caller supplies only the
   workflow/proposal/acceptance refs, accepted time, expected local heads and
   purpose-bound current-owner evidence. Caller-created role/scope, lifecycle,
@@ -29,6 +29,9 @@
 - Exact replay returns the frozen result. A retry MAY refresh volatile evidence
   hash/nonce/timestamps when the acceptance and all business identities remain
   identical; changed acceptance time or expected business state conflicts.
+- Acceptance must satisfy `issued <= accepted < proposal expiry`; commit waits
+  until the proposed formal start. A timely acceptance survives proposal expiry
+  when the retry carries fresh current-owner evidence and unchanged local heads.
 
 ## Ownership and storage boundary
 
@@ -54,7 +57,7 @@
 - Proposal timing now requires `formal start < proposal expiry` in both the
   domain and PostgreSQL. Expired or acceptance-stale owner evidence is reported
   as an owner denial, not a business-state conflict.
-- Proposal storage has only its primary key and one workflow/revision unique
+- Proposal storage has only its primary key and one workflow unique
   index. The transition has one proposal lookup index and one acceptance-action
   uniqueness fence; a proposal ref is mandatory only for propose/formalize and
   forbidden on every unrelated transition.
@@ -69,17 +72,18 @@
 | --- | --- |
 | Targeted unit | PASS — 7/7 |
 | Full unit lane | PASS — 878/878, 79 files |
-| Targeted PostgreSQL | PASS — 7/7 |
-| Full PostgreSQL lane | PASS — 387/387, 42 files |
+| Targeted PostgreSQL | PASS — 9/9 |
+| Full PostgreSQL lane | PASS — 389/389, 42 files |
 | TypeScript / Prisma | PASS — root typecheck; format, validate and generate |
 | Structural gates | PASS — routing 148; persistence, port topology and G3 freeze |
 | Migration replay | PASS — 33 migrations from empty on the approved disposable target |
 | Migration status / drift | PASS — current / no datasource-to-SSOT difference |
 | Storage census | PASS — no duplicate proposal index; hash + allowlisted metadata only |
-| DB context | PASS — checksum `3cc9d48c…` |
-| Local qualification locks | PASS — C30 `9a88a32a…` at `c4ac700`; exact runtime `6b8edb81…` over 249 files |
-| External My-Chat pin | KNOWN RED — expected `567b96c`, observed `a19ac96`; no adoption performed |
-| Disposable cleanup | PASS — zero sessions; exact target destroyed and absent |
+| DB context | PASS — checksum `0afb587c…` after quality repair |
+| Local qualification locks | COMMIT-BOUNDARY PENDING — the original increment is frozen at `c4ac700`; this repair changes bytes covered by C30 and the Nurture exact-runtime pin, so both must be re-frozen against its own implementation commit |
+| External My-Chat pin | KNOWN RED — expected `567b96c`, observed `876b045`; workflow-contract sources unchanged and no adoption performed |
+| Docs / context / governance | PASS — 107/107 task docs, zero errors/warnings; strict context, project-state and governance checks pass |
+| Disposable cleanup | PASS — all three exact targets destroyed and absent |
 
 Re-run the main qualification with an explicitly disposable database URL:
 
@@ -93,7 +97,7 @@ pnpm verify:port-topology
 ```
 
 The DB command MUST receive a URL whose database pathname has been replaced
-with the approved disposable target. Expected results are 878 unit tests, 387
+with the approved disposable target. Expected results are 878 unit tests, 389
 DB tests and no migration drift. Never run this qualification against the
 configured shared/default database.
 

@@ -6,16 +6,15 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **start G4-D increment 5, the frozen 0E-4 Guardian acceptance,
-  formalization and completion slice**. Increment 4 now DB-qualifies the 0E-3
-  phase migration plus exact-owner preparation, atomic trial start, explicit
-  review/one extension/formal proposal and outage-safe local end
-  ([`60`](./60-g4-d-increment-4-record.md)). Full unit 876/876 and production-DB
-  386/386 pass on destroyed disposable targets. No clock mutates state, trial
-  end does not restore waitlist rank, and formal counts require active/formal.
-  Real contact/native-source and My-Chat owner adapters, 0E-4 Guardian
-  acceptance, manifest/module registration, caller, capability and activation
-  remain absent; 0F Knowledge/RAG remains unstarted.
+- Next step: **choose the completed default-off G4-D I2 contract/capability
+  rotation or independently freeze 0F Knowledge/RAG**. Increment 5 now
+  DB-qualifies the complete frozen 0E-4 Guardian acceptance, formalization and
+  completion slice after its timing, single-proposal and concurrency repair
+  ([`61`](./61-g4-d-increment-5-record.md)). Full unit 878/878 and
+  production-DB 389/389 pass on disposable PostgreSQL. Real contact/native-
+  source and authenticated My-Chat owner adapters remain I3 work blocked by
+  G-09; no manifest/module registration, caller, capability, activation or
+  traffic exists, and 0F remains unstarted.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
@@ -23,10 +22,11 @@
 - Everything built sits at **I1** — implementation and migration authoring.
   All implemented daily-operations persistence paths, including 0D-3
   revision/downscope, 0D-4 correction reports, 0D-5 policy, the 0D-1
-  checkpoint policy and G4-D inquiry/waitlist/preparation/trial lifecycle, are qualified on
+  checkpoint policy and all four G4-D inquiry/waitlist/preparation/trial/
+  formalization persistence slices are qualified on
   disposable PostgreSQL. Nothing has a
   production caller, no capability is registered, and no schema is applied
-  anywhere durable. 0C, 0D and the first three 0E persistence slices are therefore
+  anywhere durable. 0C, 0D and all four 0E persistence slices are therefore
   validated as *buildable as frozen*, not as running.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
@@ -108,8 +108,8 @@ Enrollment/Grant/CareGroup 先执行 end-trial。原候补 entry
 转正式不使用跨 owner 分布式事务：Guardian 接受正式方案后，先由 My-Chat 重验
 current Child/Family membership 与 scenario binding，再由 Nurture 在一个本地事务中
 保持同一 Enrollment `status=active`、把 `participationPhase` 从 `trial` 改为
-`formal`、将 reservation 转为 active occupancy，并更新 Grant/CareGroup。owner 不可用、
-binding 失效或事务失败时保持 `active trial + reserved`，Workflow 进入
+`formal`、保留 trial-start 已转换的 active occupancy，并更新 Grant。owner 不可用、
+binding 失效或事务失败时保持 `active trial + occupied seat`，Workflow 进入
 `waiting_on_system`，幂等重试后才能显示正式在园。结束 trial 则由 Nurture 一个本地
 事务把 `status` 改为 `ended`、结束 CareGroup、关闭 trial-purpose Grant 并释放名额；
 My-Chat Child/Family/binding 与已有照护历史不删除。Workflow 完成后的正式离园属于
@@ -371,8 +371,8 @@ T-006 依赖；0C 是 G4 自身公共基础，0D/0E/0F 按域并行，0G 滚动�
   前重验 current My-Chat Child/Family membership、scenario binding 和 signed owner
   evidence；cached/stale/unavailable evidence 均不能激活。
 - [ ] Nurture formalization 在一个本地事务中保持 `status=active`、完成
-  `participationPhase: trial → formal`、reservation→active occupancy 和
-  Grant/CareGroup 更新；失败或重试期间保持 `active trial + reserved`。
+  `participationPhase: trial → formal`、保留同一 occupied reservation 并更新
+  Grant；失败或重试期间保持 `active trial + occupied seat`。
 - [ ] `trial_start_pending | formalization_pending | exit_pending | waiting_on_system`
   只属于 Workflow，不增加 Enrollment 主状态；mobile/Web 只在 canonical local commit
   后显示 trial/formal/ended。

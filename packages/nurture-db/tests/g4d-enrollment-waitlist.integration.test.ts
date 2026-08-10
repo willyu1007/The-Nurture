@@ -518,7 +518,13 @@ const seedCurrentPair = async (
   };
 };
 
-const reachFormalProposal = async (world: World) => {
+const reachFormalProposal = async (
+  world: World,
+  timing: {
+    formalStartOffsetMs?: number;
+    proposalExpiryOffsetMs?: number;
+  } = {},
+) => {
   const preparation = await acceptPreparation(world);
   const pair = await seedCurrentPair(world);
   await execute({
@@ -583,11 +589,14 @@ const reachFormalProposal = async (world: World) => {
       ...entities,
       expected_workflow_head: 9,
       expected_capacity_revision: world.careGroup.aggregateVersion,
-      proposed_formal_start_at: world.now().toISOString(),
+      proposed_formal_start_at: iso(world.now(), timing.formalStartOffsetMs ?? 0),
       proposed_grant_purposes: ["trial_care"],
       proposed_grant_expires_at: iso(world.now(), 5 * 24 * 60 * 60_000),
       safe_family_summary: "Guardian reviewed the formal care continuation.",
-      proposal_expires_at: iso(world.now(), 12 * 60 * 60_000),
+      proposal_expires_at: iso(
+        world.now(),
+        timing.proposalExpiryOffsetMs ?? 12 * 60 * 60_000,
+      ),
       reason_key: "admin_proposed_formal_continuation",
     },
     spec: proposeFormalEnrollmentSpec,
@@ -599,67 +608,80 @@ const reachFormalProposal = async (world: World) => {
   return { preparation, pair, enrollment, grant, proposal };
 };
 
+type FormalProposalState = Awaited<ReturnType<typeof reachFormalProposal>>;
+
+const formalizationOwnerEvidence = (
+  world: World,
+  state: FormalProposalState,
+): NurtureEnrollmentFormalizationOwnerEvidenceV1 => ({
+  contract_version: "1.0.0",
+  actor_ref: state.pair.snapshot.actor_ref,
+  audience: "nurture",
+  current_owner_evidence: {
+    binding_evidence_version: 1,
+    purpose_key: "formalize_enrollment",
+    owner_bindings: [
+      {
+        owner_binding_ref_version: 1,
+        binding_slot: "child",
+        owner_ref: {
+          schema_version: 1,
+          namespace: "scenario-owner",
+          object_type: "child_binding_owner",
+          object_id: state.pair.snapshot.child_owner_ref,
+          version: state.pair.snapshot.child_owner_version,
+        },
+      },
+      {
+        owner_binding_ref_version: 1,
+        binding_slot: "family",
+        owner_ref: {
+          schema_version: 1,
+          namespace: "scenario-owner",
+          object_type: "family_binding_owner",
+          object_id: state.pair.snapshot.family_owner_ref,
+          version: state.pair.snapshot.family_owner_version,
+        },
+      },
+    ],
+    pair_relation_evidence_hash: digest(`pair:${world.workspaceId}`),
+    current_owner_evidence_hash: digest(`current:${world.workspaceId}`),
+  },
+  request_nonce_hash: digest(`nonce:${world.workspaceId}`),
+  verified_at: world.now().toISOString(),
+  expires_at: iso(world.now(), 60_000),
+});
+
+const formalizationPayload = (
+  world: World,
+  state: FormalProposalState,
+  acceptedAt = world.now().toISOString(),
+): NurtureFormalizeEnrollmentPayload => ({
+  workflow_ref: state.preparation.journey.workflowRef,
+  proposal_ref: state.proposal.id,
+  acceptance_ref: {
+    schema_version: 1,
+    namespace: "my_chat",
+    object_type: "enrollment_action",
+    object_id: `formal-acceptance:${randomUUID()}`,
+    version: 1,
+  },
+  accepted_at: acceptedAt,
+  expected_workflow_head: 10,
+  expected_proposal_head: 1,
+  expected_enrollment_head: 1,
+  expected_grant_head: 1,
+  expected_reservation_head: 2,
+  owner_evidence: formalizationOwnerEvidence(world, state),
+});
+
 describe("T-007 G4-D waitlist and trial preparation (production DB lane)", () => {
   it("formalizes only the current Guardian acceptance and exact proposal heads", async () => {
     const world = await seed();
     const state = await reachFormalProposal(world);
-    const ownerEvidence: NurtureEnrollmentFormalizationOwnerEvidenceV1 = {
-      contract_version: "1.0.0",
-      actor_ref: state.pair.snapshot.actor_ref,
-      audience: "nurture",
-      current_owner_evidence: {
-        binding_evidence_version: 1,
-        purpose_key: "formalize_enrollment",
-        owner_bindings: [
-          {
-            owner_binding_ref_version: 1,
-            binding_slot: "child",
-            owner_ref: {
-              schema_version: 1 as const,
-              namespace: "scenario-owner",
-              object_type: "child_binding_owner",
-              object_id: state.pair.snapshot.child_owner_ref,
-              version: state.pair.snapshot.child_owner_version,
-            },
-          },
-          {
-            owner_binding_ref_version: 1,
-            binding_slot: "family",
-            owner_ref: {
-              schema_version: 1 as const,
-              namespace: "scenario-owner",
-              object_type: "family_binding_owner",
-              object_id: state.pair.snapshot.family_owner_ref,
-              version: state.pair.snapshot.family_owner_version,
-            },
-          },
-        ],
-        pair_relation_evidence_hash: digest(`pair:${world.workspaceId}`),
-        current_owner_evidence_hash: digest(`current:${world.workspaceId}`),
-      },
-      request_nonce_hash: digest(`nonce:${world.workspaceId}`),
-      verified_at: world.now().toISOString(),
-      expires_at: iso(world.now(), 60_000),
-    };
-    const acceptanceRef = {
-      schema_version: 1 as const,
-      namespace: "my_chat",
-      object_type: "enrollment_action",
-      object_id: `formal-acceptance:${randomUUID()}`,
-      version: 1,
-    };
-    const payload: NurtureFormalizeEnrollmentPayload = {
-      workflow_ref: state.preparation.journey.workflowRef,
-      proposal_ref: state.proposal.id,
-      acceptance_ref: acceptanceRef,
-      accepted_at: world.now().toISOString(),
-      expected_workflow_head: 10,
-      expected_proposal_head: 1,
-      expected_enrollment_head: 1,
-      expected_grant_head: 1,
-      expected_reservation_head: 2,
-      owner_evidence: ownerEvidence,
-    };
+    const payload = formalizationPayload(world, state);
+    const ownerEvidence = payload.owner_evidence;
+    const acceptanceRef = payload.acceptance_ref;
 
     await expect(
       execute({
@@ -709,18 +731,6 @@ describe("T-007 G4-D waitlist and trial preparation (production DB lane)", () =>
       status: "not_committed",
       decision: "blocked",
       reason_code: "formalization_owner_not_current",
-    });
-    await expect(
-      execute({
-        world,
-        actorRef: state.pair.snapshot.actor_ref.object_id,
-        payload: { ...payload, expected_proposal_head: 2 },
-        spec: formalizeEnrollmentSpec,
-      }),
-    ).resolves.toMatchObject({
-      status: "not_committed",
-      decision: "conflict",
-      reason_code: "formal_proposal_head_conflict",
     });
     expect(
       await prisma.nurtureEnrollment.findUniqueOrThrow({
@@ -835,6 +845,118 @@ describe("T-007 G4-D waitlist and trial preparation (production DB lane)", () =>
         data: { safeFamilySummary: "Changed" },
       }),
     ).rejects.toThrow();
+  });
+
+  it("waits for a future formal start and preserves a timely acceptance after proposal expiry", async () => {
+    const world = await seed();
+    const state = await reachFormalProposal(world, {
+      formalStartOffsetMs: 60 * 60_000,
+      proposalExpiryOffsetMs: 2 * 60 * 60_000,
+    });
+    const acceptedAt = world.now().toISOString();
+    const payload = formalizationPayload(world, state, acceptedAt);
+    const commandId = `formalize-future:${randomUUID()}`;
+
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        commandId,
+        payload,
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      decision: "conflict",
+      reason_code: "formalization_predicate_failed",
+    });
+    expect(
+      await prisma.nurtureEnrollment.findUniqueOrThrow({ where: { id: state.enrollment.id } }),
+    ).toMatchObject({ participationPhase: "trial", aggregateVersion: 1 });
+
+    world.setClock(new Date(state.proposal.expiresAt.getTime() + 1_000));
+    const committed = await execute({
+      world,
+      actorRef: state.pair.snapshot.actor_ref.object_id,
+      commandId,
+      payload: {
+        ...payload,
+        owner_evidence: formalizationOwnerEvidence(world, state),
+      },
+      spec: formalizeEnrollmentSpec,
+    });
+    expect(committed).toMatchObject({
+      status: "ok",
+      disposition: "executed",
+      committed_result: { participation_phase: "formal" },
+    });
+  });
+
+  it("serializes competing formalization commands to one acceptance commit", async () => {
+    const world = await seed();
+    const state = await reachFormalProposal(world);
+    const payload = formalizationPayload(world, state);
+    const commandIds = [
+      `formalize-concurrent-a:${randomUUID()}`,
+      `formalize-concurrent-b:${randomUUID()}`,
+    ] as const;
+    const results = await Promise.all(
+      commandIds.map((commandId) =>
+        execute({
+          world,
+          actorRef: state.pair.snapshot.actor_ref.object_id,
+          commandId,
+          payload,
+          spec: formalizeEnrollmentSpec,
+        })
+      ),
+    );
+    expect(results.filter((result) => result.status === "ok")).toHaveLength(1);
+    const loserIndex = results.findIndex((result) => result.status !== "ok");
+    expect(loserIndex).toBeGreaterThanOrEqual(0);
+    expect(results[loserIndex]).toMatchObject({
+      status: "not_committed",
+      decision: "conflict",
+    });
+    if (results[loserIndex]?.status === "not_committed") {
+      expect([
+        "command_write_conflict",
+        "formalization_entity_head_conflict",
+      ]).toContain(results[loserIndex].reason_code);
+    }
+
+    await expect(
+      execute({
+        world,
+        actorRef: state.pair.snapshot.actor_ref.object_id,
+        commandId: commandIds[loserIndex]!,
+        payload,
+        spec: formalizeEnrollmentSpec,
+      }),
+    ).resolves.toMatchObject({
+      status: "not_committed",
+      decision: "conflict",
+      reason_code: "formalization_entity_head_conflict",
+    });
+    const [executionCount, transitionCount] = await Promise.all([
+      prisma.nurtureCommandExecution.count({
+        where: {
+          workspaceId: world.workspaceId,
+          commandKey: "nurture.formalize_enrollment",
+        },
+      }),
+      prisma.nurtureInstitutionWorkflowTransition.count({
+        where: {
+          workspaceId: world.workspaceId,
+          workflowId: state.preparation.journey.workflowRef,
+          commandKey: "formalize_enrollment",
+        },
+      }),
+    ]);
+    expect({ executionCount, transitionCount }).toEqual({
+      executionCount: 1,
+      transitionCount: 1,
+    });
   });
 
   it("runs the explicit trial lifecycle without a timer, second child owner, or waitlist restore", async () => {

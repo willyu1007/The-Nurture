@@ -175,10 +175,10 @@
 - D-07E human/owner-gate tests proving current Guardian proposal acceptance plus fresh My-Chat
   Child/Family membership/binding evidence are required; Admin review/date/cached evidence fail.
 - Local transaction tests proving Enrollment remains `status=active`,
-  `participationPhase: trial→formal`, reservation→active occupancy, formal Grant/CareGroup and
+  `participationPhase: trial→formal`, the same occupied reservation, formal Grant and
   audit/idempotency commit together under expected versions.
 - Failure/replay tests for owner outage, binding drift, evidence expiry, version conflict and
-  local error, proving canonical `active trial + reserved`, waiting_on_system and exact replay.
+  local error, proving canonical `active trial + occupied seat`, waiting_on_system and exact replay.
 - Cross-surface tests proving mobile/Web/notification cannot show active before local commit and
   delivery retry cannot roll back or fabricate Enrollment state.
 - Exit-downscope tests proving `status: active→ended` for phase=trial, CareGroup/trial-Grant close
@@ -528,16 +528,18 @@ Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and
 | Current owner | PASS | Expired evidence and stale Child head deny; exact active local pair, authorization, principal and one effective Guardian role are reasserted. |
 | Atomic formalization | PASS | Same Enrollment/Grant/reservation/CareGroup and exact heads; one serializable transaction commits phase, terms, workflow and audit together. |
 | Replay | PASS | Refreshed volatile owner evidence replays one frozen result; changed acceptance time conflicts. |
-| Storage boundary | PASS | Immutable proposal revisions; proposal ref only on propose/formalize; evidence body absent; no duplicate proposal index. |
+| Storage boundary | PASS | One immutable proposal per workflow at fixed head 1; proposal ref only on propose/formalize; evidence body absent; no duplicate proposal index. |
 | Targeted / full unit | PASS | 7/7; 878/878 across 79 files. |
-| Targeted / full PostgreSQL | PASS | 7/7; 387/387 across 42 files. |
+| Targeted / full PostgreSQL | PASS | Quality rerun 9/9; 389/389 across 42 files, including future-start/post-expiry acceptance and true competing formalization commands. |
 | TypeScript / Prisma / structure | PASS | Root typecheck, format/validate/generate, routing 148, persistence, port topology and G3 freeze. |
-| Migration / drift / context | PASS | 33 current from empty; no datasource diff; DB context checksum `3cc9d48c…`. |
-| Local qualification locks | PASS after commit boundary | C30 profiles re-frozen at `c4ac700`, aggregate `9a88a32a…`; Nurture exact runtime `6b8edb81…` over 249 files; Base/Host fields unchanged. |
-| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `a19ac96`; verifier tests pass 5/5 and no external adoption was performed. |
-| Effect boundary | PASS | Approved disposable target destroyed with zero sessions and confirmed absent; no shared apply, public caller/capability, deployment, activation or traffic. |
+| Migration / drift / context | PASS | 33 current from empty; no datasource diff; DB context checksum `0afb587c…`. |
+| Local qualification locks | COMMIT-BOUNDARY PENDING | The original increment is frozen at `c4ac700`, but this quality repair changes bytes covered by both the C30 profiles and Nurture exact-runtime pin. Re-freeze both against the future implementation commit; do not advance Base/Host fields. |
+| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `876b045`; workflow-contract sources are unchanged and no external adoption was performed. |
+| Docs / context / governance | PASS | Task docs 107/107 with zero errors/warnings; strict context, project-state and governance checks pass. One obsolete root-level `ctl-context.mjs` invocation failed before the repository-documented skill path passed; it made no change. |
+| Effect boundary | PASS | All approved disposable targets were destroyed and confirmed absent; no shared apply, public caller/capability, deployment, activation or traffic. |
 
-Detailed evidence: [`61`](./61-g4-d-increment-5-record.md).
+Detailed evidence: [`61`](./61-g4-d-increment-5-record.md) and
+[`artifacts/db/0e4-quality-repair`](./artifacts/db/0e4-quality-repair/00-connection-check.md).
 
 ## Required Evidence
 

@@ -23,6 +23,10 @@ import {
 } from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
 import { PrismaEnrollmentPairOwnerRepository } from "./enrollment-pair-owner.repository.js";
+import {
+  hasPrismaErrorCode,
+  isPrismaSerializationAbort,
+} from "./prisma-error.js";
 
 type TrialPrisma = PrismaClient | Prisma.TransactionClient;
 
@@ -65,32 +69,31 @@ const failure = (
 const denied = (reason = "not_authorized") => failure("denied", reason);
 const conflict = (reason: string) => failure("conflict", reason);
 const unavailable = (reason: string) => failure("unavailable", reason);
-const prismaErrorCode = (error: unknown): string | undefined =>
-  typeof error === "object" && error !== null && "code" in error
-    ? String((error as { code?: unknown }).code)
-    : undefined;
 const sameValues = (left: readonly string[], right: readonly string[]): boolean =>
   left.length === right.length && left.every((value, index) => value === right[index]);
 const toFormalProposal = (
   row: NurtureEnrollmentFormalProposal,
-): NurtureEnrollmentFormalProposalRecordV1 => ({
-  proposal_ref: row.id,
-  proposal_head: row.proposalHead,
-  workflow_ref: row.workflowId,
-  enrollment_ref: row.enrollmentId,
-  grant_ref: row.grantId,
-  reservation_ref: row.reservationId,
-  care_group_ref: row.careGroupId,
-  care_group_head: row.careGroupHead,
-  proposed_formal_start_at: row.proposedFormalStartAt.toISOString(),
-  proposed_grant_purposes: row.proposedGrantPurposes,
-  proposed_grant_expires_at: row.proposedGrantExpiresAt.toISOString(),
-  safe_family_summary: row.safeFamilySummary,
-  issued_by_role_assignment_ref: row.issuedByRoleAssignmentId,
-  issue_reason_key: row.issueReasonKey,
-  issued_at: row.issuedAt.toISOString(),
-  expires_at: row.expiresAt.toISOString(),
-});
+): NurtureEnrollmentFormalProposalRecordV1 => {
+  if (row.proposalHead !== 1) throw new Error("invalid formal proposal head");
+  return {
+    proposal_ref: row.id,
+    proposal_head: 1,
+    workflow_ref: row.workflowId,
+    enrollment_ref: row.enrollmentId,
+    grant_ref: row.grantId,
+    reservation_ref: row.reservationId,
+    care_group_ref: row.careGroupId,
+    care_group_head: row.careGroupHead,
+    proposed_formal_start_at: row.proposedFormalStartAt.toISOString(),
+    proposed_grant_purposes: row.proposedGrantPurposes,
+    proposed_grant_expires_at: row.proposedGrantExpiresAt.toISOString(),
+    safe_family_summary: row.safeFamilySummary,
+    issued_by_role_assignment_ref: row.issuedByRoleAssignmentId,
+    issue_reason_key: row.issueReasonKey,
+    issued_at: row.issuedAt.toISOString(),
+    expires_at: row.expiresAt.toISOString(),
+  };
+};
 
 /**
  * G4-D increment 4 owner. It mutates the existing Enrollment, Grant,
@@ -240,7 +243,8 @@ export class PrismaEnrollmentTrialLifecycleRepository
       if (!("workflow" in loaded)) return loaded;
       const valid = await this.validForMutation(mutation, loaded);
       return valid ?? { status: "ready" };
-    } catch {
+    } catch (error) {
+      if (isPrismaSerializationAbort(error)) throw error;
       return unavailable("trial_lifecycle_owner_unavailable");
     }
   }
@@ -419,8 +423,8 @@ export class PrismaEnrollmentTrialLifecycleRepository
           return this.endTrial(mutation, loaded);
       }
     } catch (error) {
-      const code = prismaErrorCode(error);
-      return code === "P2002" || code === "P2034" || code === "40001" || code === "23514"
+      if (isPrismaSerializationAbort(error)) throw error;
+      return hasPrismaErrorCode(error, "P2002", "23514")
         ? conflict("trial_lifecycle_write_conflict")
         : unavailable("trial_lifecycle_write_unavailable");
     }

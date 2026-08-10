@@ -20,6 +20,7 @@ import {
   type NurtureEnrollmentJourneyWorkflowSnapshotV1,
 } from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import { hasPrismaErrorCode } from "./prisma-error.js";
 
 type EnrollmentJourneyPrisma = PrismaClient | Prisma.TransactionClient;
 type ResolvedAuthority = Extract<
@@ -64,11 +65,6 @@ const duplicateConflict = (
           ? "touchpoint_already_corrected"
           : "enrollment_journey_write_conflict",
 });
-
-const prismaErrorCode = (error: unknown): string | undefined =>
-  typeof error === "object" && error !== null && "code" in error
-    ? String((error as { code?: unknown }).code)
-    : undefined;
 
 const toSnapshot = (
   row: NurtureInstitutionWorkflow,
@@ -271,7 +267,7 @@ export class PrismaEnrollmentJourneyRepository
         ? await this.startInquiry(mutation, authority.authority)
         : await this.advanceExisting(mutation, authority.authority);
     } catch (error) {
-      if (prismaErrorCode(error) === "P2002") {
+      if (hasPrismaErrorCode(error, "P2002")) {
         return duplicateConflict(mutation);
       }
       return {

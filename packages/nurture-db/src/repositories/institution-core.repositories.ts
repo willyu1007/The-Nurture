@@ -33,6 +33,7 @@ import { PrismaEnrollmentJourneyRepository } from "./enrollment-journey.reposito
 import { PrismaEnrollmentWaitlistRepository } from "./enrollment-waitlist.repository.js";
 import { PrismaEnrollmentTrialLifecycleRepository } from "./enrollment-trial-lifecycle.repository.js";
 import { PrismaEnrollmentFormalizationRepository } from "./enrollment-formalization.repository.js";
+import { isPrismaSerializationAbort } from "./prisma-error.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 const jsonOrUndefined = (value: Prisma.JsonValue | null): unknown => (value === null ? undefined : value);
@@ -358,8 +359,7 @@ export class PrismaNurtureCommandRepository implements NurtureCommandRepository 
     decision: "conflict";
     reason_code: "command_write_conflict";
   } | null {
-    const code = (error as { code?: string } | null)?.code;
-    return code === "P2034" || code === "40001"
+    return isPrismaSerializationAbort(error)
       ? { decision: "conflict", reason_code: "command_write_conflict" }
       : null;
   }

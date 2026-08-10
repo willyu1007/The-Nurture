@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-10T01:25:50.403Z",
+  "updatedAt": "2026-08-10T04:27:42.126Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -11456,7 +11456,7 @@
           "list": false,
           "dbName": "proposal_head",
           "dbType": null,
-          "default": null,
+          "default": "1",
           "primaryKey": false,
           "unique": false
         },
@@ -11645,11 +11645,10 @@
           "type": "unique",
           "fields": [
             "workspaceId",
-            "workflowId",
-            "proposalHead"
+            "workflowId"
           ],
           "name": null,
-          "map": "uq_nurture_formal_proposal_workflow_head"
+          "map": "uq_nurture_formal_proposal_workflow"
         }
       ]
     },

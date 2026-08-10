@@ -3337,9 +3337,9 @@ model NurtureEnrollmentTrialReservation {
   @@map("nurture_enrollment_trial_reservation")
 }
 
-// G4-D increment 5: immutable formal proposal revisions. The greatest
-// proposal_head for one workflow is its current proposal; no mutable current
-// marker or second proposal state machine is persisted.
+// G4-D increment 5: one immutable formal proposal per workflow. V1 keeps a
+// fixed proposal_head=1 as an optimistic-concurrency field; there is no
+// revision command, mutable current marker, or second proposal state machine.
 model NurtureEnrollmentFormalProposal {
   id                       String   @id @default(uuid())
   workspaceId              String   @map("workspace_id")
@@ -3350,7 +3350,7 @@ model NurtureEnrollmentFormalProposal {
   reservationId            String   @map("reservation_id")
   careGroupId              String   @map("care_group_id")
   careGroupHead            Int      @map("care_group_head")
-  proposalHead             Int      @map("proposal_head")
+  proposalHead             Int      @default(1) @map("proposal_head")
   proposedFormalStartAt    DateTime @map("proposed_formal_start_at")
   proposedGrantPurposes    String[] @map("proposed_grant_purposes")
   proposedGrantExpiresAt   DateTime @map("proposed_grant_expires_at")
@@ -3370,7 +3370,7 @@ model NurtureEnrollmentFormalProposal {
   issuedByRoleAssignment NurtureCareRoleAssignment              @relation(fields: [issuedByRoleAssignmentId], references: [id], onDelete: Restrict, map: "nurture_formal_proposal_actor_role_id_fkey")
   transitions            NurtureInstitutionWorkflowTransition[]
 
-  @@unique([workspaceId, workflowId, proposalHead], map: "uq_nurture_formal_proposal_workflow_head")
+  @@unique([workspaceId, workflowId], map: "uq_nurture_formal_proposal_workflow")
   @@map("nurture_enrollment_formal_proposal")
 }
 

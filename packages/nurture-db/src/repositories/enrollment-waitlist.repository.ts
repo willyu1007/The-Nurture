@@ -26,6 +26,10 @@ import {
 } from "@the-nurture/scenario";
 import { NurtureInstitutionAuthorityChain } from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
+import {
+  hasPrismaErrorCode,
+  isPrismaSerializationAbort,
+} from "./prisma-error.js";
 
 type WaitlistPrisma = PrismaClient | Prisma.TransactionClient;
 
@@ -130,11 +134,6 @@ const unavailable = (
   status: "unavailable",
   reason_code: reasonCode,
 });
-
-const prismaErrorCode = (error: unknown): string | undefined =>
-  typeof error === "object" && error !== null && "code" in error
-    ? String((error as { code?: unknown }).code)
-    : undefined;
 
 const guardianActionAt = (
   actor: Extract<NurtureEnrollmentWaitlistActor, { kind: "guardian" }>,
@@ -307,7 +306,8 @@ export class PrismaEnrollmentWaitlistRepository
     try {
       const loaded = await this.loadMutation(mutation);
       return "workflow" in loaded ? { status: "ready" } : loaded;
-    } catch {
+    } catch (error) {
+      if (isPrismaSerializationAbort(error)) throw error;
       return unavailable("waitlist_owner_unavailable");
     }
   }
@@ -454,8 +454,8 @@ export class PrismaEnrollmentWaitlistRepository
           return this.cancelPreparation(mutation, loaded);
       }
     } catch (error) {
-      const code = prismaErrorCode(error);
-      return code === "P2002" || code === "P2034" || code === "40001"
+      if (isPrismaSerializationAbort(error)) throw error;
+      return hasPrismaErrorCode(error, "P2002")
         ? conflict("waitlist_write_conflict")
         : unavailable("waitlist_write_unavailable");
     }

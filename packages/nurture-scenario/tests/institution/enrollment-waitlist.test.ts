@@ -286,6 +286,12 @@ describe("G4-D increment 5 formalization command contracts", () => {
       owner_evidence: currentOwnerEvidence(),
     };
     expect(validateFormalizeEnrollmentPayload(payload)).toBe(true);
+    expect(
+      validateFormalizeEnrollmentPayload({
+        ...payload,
+        expected_proposal_head: 2,
+      }),
+    ).toBe(false);
     for (const forbidden of [
       "workspace_id",
       "institution_ref",
