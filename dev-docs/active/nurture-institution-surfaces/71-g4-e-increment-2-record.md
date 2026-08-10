@@ -20,6 +20,8 @@ without adding a Host runtime or a second knowledge store:
   index;
 - a bounded authenticated source-change/read/reconciliation provider contract;
 - an exact My-Chat candidate consumer port and pre/post-retrieval orchestration;
+- a strict candidate union that keeps Nurture Institution material and My-Chat
+  authority sources independently typed and owner-revalidated;
 - a bounded Nurture final-currentness provider for 1..32 exact
   source/version/hash tuples;
 - an exact Admin editor-preview provider using 1..8 actor-bound opaque option
@@ -69,6 +71,7 @@ makes the whole preview unavailable. Preview has no write or reusable output.
 | Must | The first draft let online retrieval reach the Host owner before rechecking current Admin authority. | Added an explicit pre-retrieval Admin check and retained the post-retrieval currentness check. |
 | Must | Initial source/event refs were derivable from internal item/event IDs. | Made opaque source/publication refs owner facts and removed internal item/revision IDs from preview requests/results. |
 | Must | Preview initially accepted raw revision refs without proving they were issued to the same editor. | Replaced them with actor/invocation-bound opaque option refs resolved through one exact owner port. |
+| Must | The first committed candidate shape allowed only Nurture material, so a linked authority source could not become an independently current medical citation. | Reopened E2 before E3, added the exact Institution/authority candidate union and required separate pre-generation currentness for both owner classes. |
 | Must | Raw source-change objects could carry undeclared runtime fields. | Validate then rebuild every public change field; protected body and extra owner payload cannot cross the provider. |
 | Must | A missing/stale version read could collapse source drift into `not_published`. | Read the current publication by stable source ref, then compare the requested immutable version/hash and return `content_drift`. |
 | Should | E2 duplicated part of E1's history-chain validation. | Export and reuse the E1 SSOT validator; E2 adds only source/ref/provenance coherence. |
@@ -82,9 +85,9 @@ maintained unit suite; the exact routing gate now records 83 unit files.
 
 | Check | Result |
 | --- | --- |
-| Targeted E1/E2 suites | PASS, 22/22 |
-| E2 retrieval/currentness suite | PASS, 12/12 |
-| Full unit lane | PASS, 923/923 across 83 files |
+| Targeted E1/E2 suites | PASS, 23/23 |
+| E2 retrieval/currentness suite | PASS, 13/13 |
+| Full unit lane | PASS, 924/924 across 83 files |
 | Root and scenario TypeScript | PASS |
 | Test routing | PASS, 152 files: 83 unit / 42 DB / 11 dev-host / 14 scenario-service / 2 joint |
 | Persistence / port topology / formal ingress | PASS; exact 25 descriptors remain unrouted |

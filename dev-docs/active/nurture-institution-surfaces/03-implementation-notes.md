@@ -1036,7 +1036,12 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   E2 history validator with the E1 SSOT, distinguished source drift from
   missing publication, and enforced ordered currentness plus complete stable
   reconciliation pages.
-- Targeted 12/12 and full 923/923 unit tests, root typecheck, structural gates
+- E3 input review reopened one cross-owner flaw before answer implementation:
+  authority material was only linked metadata on a Nurture candidate and could
+  not become an independently current citation. The candidate contract is now
+  a strict Institution/authority union, and both owner classes are separately
+  revalidated before model context.
+- Targeted 13/13 and full 924/924 unit tests, root typecheck, structural gates
   and the exact eight-file generic source pin pass. Live My-Chat workflow-pin
   drift remains an attributed owner gate. No DB or external owner was touched.
 - Detailed evidence: [`71`](./71-g4-e-increment-2-record.md). E3 structured

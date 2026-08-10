@@ -12,12 +12,14 @@ import {
   retrieveCurrentInstitutionKnowledgeCandidates,
   validateInstitutionKnowledgeOnlineQuery,
   type NurtureAuthoritySourceCurrentnessOwnerV1,
+  type NurtureAuthorityKnowledgeSourceCurrentnessProviderV1,
   type NurtureInstitutionAdminKnowledgeAuthorityV1,
   type NurtureInstitutionKnowledgeBodyV1,
   type NurtureInstitutionKnowledgeReadFactsV1,
   type NurtureInstitutionKnowledgeReadOwnerV1,
   type NurtureInstitutionKnowledgeRetrievalCandidateV1,
   type NurtureInstitutionKnowledgeSourceChangeV1,
+  type NurtureInstitutionKnowledgeSourceCurrentnessProviderV1,
 } from "../../src/index.js";
 
 const body: NurtureInstitutionKnowledgeBodyV1 = {
@@ -332,6 +334,16 @@ const authorityOwner = (decision: "eligible" | "denied" = "eligible") => ({
   })),
 }) satisfies NurtureAuthoritySourceCurrentnessOwnerV1;
 const protectedContent = { unseal: vi.fn(() => plaintext) };
+const authorityCandidateCurrentness = (
+  decision: "eligible" | "denied" = "eligible",
+): NurtureAuthorityKnowledgeSourceCurrentnessProviderV1 => ({
+  validateSources: vi.fn(async (
+    input: Parameters<NurtureAuthorityKnowledgeSourceCurrentnessProviderV1["validateSources"]>[0],
+  ) => ({
+    status: "resolved" as const,
+    decisions: input.sources.map((source) => ({ ...source, decision })),
+  })),
+});
 
 describe("G4-E source and currentness providers", () => {
   it("denies the generic ingestion purpose before any owner or protected-body read", async () => {
@@ -491,6 +503,29 @@ const candidate = (): NurtureInstitutionKnowledgeRetrievalCandidateV1 => ({
   authority_sources: [],
 });
 
+const authorityCandidate = (): NurtureInstitutionKnowledgeRetrievalCandidateV1 => ({
+  candidate_ref: "authority-candidate-1",
+  source_ref: {
+    schema_version: 1,
+    namespace: "my_chat",
+    object_type: "knowledge_source",
+    object_id: "opaque-authority-source-1",
+  },
+  source_version: "2026.08.10",
+  content_hash: "b".repeat(64),
+  source_owner: "my_chat",
+  source_kind: "authority_source",
+  provenance_kind: "authority_source",
+  rank: 2,
+  match_reason: "linked_authority_source",
+  excerpt: "Seek qualified help when warning signs are present.",
+  host_current_source_decision: "current",
+  publisher: "Public health authority",
+  title: "Warning signs",
+  source_date: "2026-08-01",
+  open_ref: "opaque-open-ref-1",
+});
+
 describe("G4-E online retrieval and preview", () => {
   it("rejects caller authority/source fields and checks Admin authority before retrieval", async () => {
     expect(validateInstitutionKnowledgeOnlineQuery({ question: "What helps?", child_id: "forbidden" })).toBe(false);
@@ -501,6 +536,7 @@ describe("G4-E online retrieval and preview", () => {
         trusted_context: onlineContext,
         retrieval_owner: retrievalOwner,
         currentness_provider: { validateSources: vi.fn() },
+        authority_currentness_provider: authorityCandidateCurrentness(),
         admin_authority: adminAuthority("denied"),
       }),
     ).resolves.toEqual({ status: "denied" });
@@ -513,6 +549,7 @@ describe("G4-E online retrieval and preview", () => {
       trusted_context: onlineContext,
       retrieval_owner: { retrieveCandidates: vi.fn(async () => ({ status: "resolved" as const, candidates: [] })) },
       currentness_provider: { validateSources: vi.fn() },
+      authority_currentness_provider: authorityCandidateCurrentness(),
       admin_authority: adminAuthority(),
     });
     expect(empty).toEqual({ status: "resolved", candidates: [] });
@@ -526,9 +563,48 @@ describe("G4-E online retrieval and preview", () => {
           decisions: [{ ...facts().source, decision: "denied" as const, reason_code: "content_drift" as const }],
         })),
       },
+      authority_currentness_provider: authorityCandidateCurrentness(),
       admin_authority: adminAuthority(),
     });
     expect(stale).toEqual({ status: "resolved", candidates: [] });
+  });
+
+  it("keeps authority sources distinct and validates them before model context", async () => {
+    const authorityCurrentness = authorityCandidateCurrentness("denied");
+    const result = await retrieveCurrentInstitutionKnowledgeCandidates({
+      public_query: { question: "What warning signs matter?" },
+      trusted_context: onlineContext,
+      retrieval_owner: {
+        retrieveCandidates: vi.fn(async () => ({
+          status: "resolved" as const,
+          candidates: [candidate(), authorityCandidate()],
+        })),
+      },
+      currentness_provider: {
+        validateSources: vi.fn(async (
+          input: Parameters<NurtureInstitutionKnowledgeSourceCurrentnessProviderV1["validateSources"]>[0],
+        ) => ({
+          status: "resolved" as const,
+          decisions: input.sources.map((source) => ({
+            ...source,
+            decision: "eligible" as const,
+          })),
+        })),
+      },
+      authority_currentness_provider: authorityCurrentness,
+      admin_authority: adminAuthority(),
+    });
+    expect(result).toEqual({ status: "resolved", candidates: [candidate()] });
+    expect(authorityCurrentness.validateSources).toHaveBeenCalledWith({
+      context: { ...onlineContext, age_band_keys: [], scenario_keys: [] },
+      sources: [
+        {
+          source_ref: authorityCandidate().source_ref,
+          source_version: "2026.08.10",
+          content_hash: "b".repeat(64),
+        },
+      ],
+    });
   });
 
   it("allows an unreviewed draft only in exact editor preview and fails all-or-nothing", async () => {
@@ -635,6 +711,7 @@ describe("G4-E online retrieval and preview", () => {
           })),
         },
         currentness_provider: { validateSources: vi.fn() },
+        authority_currentness_provider: authorityCandidateCurrentness(),
         admin_authority: adminAuthority(),
       }),
     ).resolves.toEqual({ status: "unavailable" });

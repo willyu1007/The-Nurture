@@ -945,21 +945,51 @@ export class NurtureInstitutionKnowledgeCurrentnessProvider
   }
 }
 
-export type NurtureInstitutionKnowledgeRetrievalCandidateV1 =
+type InstitutionKnowledgeRetrievalCandidateBase =
   NurtureInstitutionKnowledgeSourceIdentityV1 & {
     candidate_ref: string;
-    source_owner: "nurture";
-    source_kind: "nurture_institution_revision";
-    provenance_kind: "institution_authored";
     rank: number;
     match_reason: string;
     excerpt: string;
     host_current_source_decision: "current";
+  };
+
+export type NurtureInstitutionKnowledgeRetrievalCandidateV1 =
+  | (InstitutionKnowledgeRetrievalCandidateBase & {
+      source_owner: "nurture";
+      source_kind: "nurture_institution_revision";
+      provenance_kind: "institution_authored";
     authority_sources: Array<{
       authority_source_ref: CanonicalRef;
       source_version: string;
     }>;
-  };
+    })
+  | (InstitutionKnowledgeRetrievalCandidateBase & {
+      source_owner: "my_chat";
+      source_kind: "authority_source";
+      provenance_kind: "authority_source";
+      publisher: string;
+      title: string;
+      source_date: string;
+      open_ref?: string;
+    });
+
+export type NurtureAuthorityKnowledgeSourceCurrentnessProviderV1 = {
+  validateSources(input: {
+    context: NurtureInstitutionKnowledgeOnlineContextV1;
+    sources: NurtureInstitutionKnowledgeSourceIdentityV1[];
+  }): Promise<
+    | {
+        status: "resolved";
+        decisions: Array<
+          NurtureInstitutionKnowledgeSourceIdentityV1 & {
+            decision: "eligible" | "denied";
+          }
+        >;
+      }
+    | { status: "unavailable" }
+  >;
+};
 
 export type InstitutionKnowledgeRetrievalOwnerPortV1 = {
   retrieveCandidates(input: {
@@ -1002,16 +1032,8 @@ export const validateInstitutionKnowledgeOnlineQuery = (
 const validCandidate = (candidate: NurtureInstitutionKnowledgeRetrievalCandidateV1): boolean => {
   try {
     assertCanonicalRef(candidate.source_ref);
-    const authorityKeys = candidate.authority_sources.map((source) => {
-      assertCanonicalRef(source.authority_source_ref);
-      return canonicalJsonV1([source.authority_source_ref, source.source_version]);
-    });
-    return (
-      validSourceIdentity(candidate) &&
+    const common =
       REF_TOKEN_PATTERN.test(candidate.candidate_ref) &&
-      candidate.source_owner === "nurture" &&
-      candidate.source_kind === "nurture_institution_revision" &&
-      candidate.provenance_kind === "institution_authored" &&
       candidate.excerpt.trim().length > 0 &&
       candidate.excerpt.length <= 1_200 &&
       Buffer.byteLength(candidate.excerpt, "utf8") <= 4_096 &&
@@ -1019,12 +1041,35 @@ const validCandidate = (candidate: NurtureInstitutionKnowledgeRetrievalCandidate
       candidate.rank >= 0 &&
       candidate.match_reason.trim().length > 0 &&
       candidate.match_reason.length <= 200 &&
-      candidate.authority_sources.length <= 16 &&
-      candidate.authority_sources.every((source) =>
-        /^[A-Za-z0-9][A-Za-z0-9._:+-]{0,199}$/.test(source.source_version),
-      ) &&
-      new Set(authorityKeys).size === authorityKeys.length &&
-      candidate.host_current_source_decision === "current"
+      candidate.host_current_source_decision === "current";
+    if (!common) return false;
+    if (candidate.source_owner === "nurture") {
+      const authorityKeys = candidate.authority_sources.map((source) => {
+        assertCanonicalRef(source.authority_source_ref);
+        return canonicalJsonV1([source.authority_source_ref, source.source_version]);
+      });
+      return (
+        candidate.source_kind === "nurture_institution_revision" &&
+        candidate.provenance_kind === "institution_authored" &&
+        validSourceIdentity(candidate) &&
+        candidate.authority_sources.length <= 16 &&
+        candidate.authority_sources.every((source) =>
+          /^[A-Za-z0-9][A-Za-z0-9._:+-]{0,199}$/.test(source.source_version),
+        ) &&
+        new Set(authorityKeys).size === authorityKeys.length
+      );
+    }
+    return (
+      candidate.source_kind === "authority_source" &&
+      candidate.provenance_kind === "authority_source" &&
+      /^[A-Za-z0-9][A-Za-z0-9._:+-]{0,199}$/.test(candidate.source_version) &&
+      HASH_PATTERN.test(candidate.content_hash) &&
+      candidate.publisher.trim().length > 0 &&
+      candidate.publisher.length <= 200 &&
+      candidate.title.trim().length > 0 &&
+      candidate.title.length <= 300 &&
+      /^\d{4}-\d{2}-\d{2}$/.test(candidate.source_date) &&
+      (candidate.open_ref === undefined || REF_TOKEN_PATTERN.test(candidate.open_ref))
     );
   } catch {
     return false;
@@ -1036,6 +1081,7 @@ export const retrieveCurrentInstitutionKnowledgeCandidates = async (input: {
   trusted_context: Omit<NurtureInstitutionKnowledgeOnlineContextV1, "age_band_keys" | "scenario_keys">;
   retrieval_owner: InstitutionKnowledgeRetrievalOwnerPortV1;
   currentness_provider: NurtureInstitutionKnowledgeSourceCurrentnessProviderV1;
+  authority_currentness_provider: NurtureAuthorityKnowledgeSourceCurrentnessProviderV1;
   admin_authority: NurtureInstitutionAdminKnowledgeAuthorityV1;
 }): Promise<
   | { status: "resolved"; candidates: NurtureInstitutionKnowledgeRetrievalCandidateV1[] }
@@ -1069,29 +1115,72 @@ export const retrieveCurrentInstitutionKnowledgeCandidates = async (input: {
   if (
     retrieved.candidates.length > 16 ||
     retrieved.candidates.some((candidate) => !validCandidate(candidate)) ||
-    new Set(retrieved.candidates.map((candidate) => candidate.candidate_ref)).size !== retrieved.candidates.length
+    new Set(retrieved.candidates.map((candidate) => candidate.candidate_ref)).size !== retrieved.candidates.length ||
+    new Set(
+      retrieved.candidates.map((candidate) =>
+        canonicalJsonV1([
+          candidate.source_ref,
+          candidate.source_version,
+          candidate.content_hash,
+        ]),
+      ),
+    ).size !== retrieved.candidates.length
   ) return { status: "unavailable" };
   if (retrieved.candidates.length === 0) return { status: "resolved", candidates: [] };
+  const nurtureCandidates = retrieved.candidates.filter(
+    (candidate) => candidate.source_owner === "nurture",
+  );
+  const authorityCandidates = retrieved.candidates.filter(
+    (candidate) => candidate.source_owner === "my_chat",
+  );
   let currentness: Awaited<
     ReturnType<NurtureInstitutionKnowledgeSourceCurrentnessProviderV1["validateSources"]>
-  >;
+  > = { status: "resolved", decisions: [] };
+  let authorityCurrentness: Awaited<
+    ReturnType<NurtureAuthorityKnowledgeSourceCurrentnessProviderV1["validateSources"]>
+  > = { status: "resolved", decisions: [] };
   try {
-    currentness = await input.currentness_provider.validateSources({
-      context,
-      sources: retrieved.candidates.map(({ source_ref, source_version, content_hash }) => ({
-        source_ref,
-        source_version,
-        content_hash,
-      })),
-    });
+    if (nurtureCandidates.length > 0) {
+      currentness = await input.currentness_provider.validateSources({
+        context,
+        sources: nurtureCandidates.map(({ source_ref, source_version, content_hash }) => ({
+          source_ref,
+          source_version,
+          content_hash,
+        })),
+      });
+    }
+    if (authorityCandidates.length > 0) {
+      authorityCurrentness = await input.authority_currentness_provider.validateSources({
+        context,
+        sources: authorityCandidates.map(({ source_ref, source_version, content_hash }) => ({
+          source_ref,
+          source_version,
+          content_hash,
+        })),
+      });
+    }
   } catch {
     return { status: "unavailable" };
   }
-  if (currentness.status !== "resolved") return currentness;
+  if (currentness.status === "denied") return { status: "denied" };
+  if (currentness.status === "unavailable" || authorityCurrentness.status !== "resolved") {
+    return { status: "unavailable" };
+  }
   if (
-    currentness.decisions.length !== retrieved.candidates.length ||
+    currentness.decisions.length !== nurtureCandidates.length ||
+    authorityCurrentness.decisions.length !== authorityCandidates.length ||
     currentness.decisions.some((decision, index) => {
-      const candidate = retrieved.candidates[index];
+      const candidate = nurtureCandidates[index];
+      return (
+        candidate === undefined ||
+        decision.source_version !== candidate.source_version ||
+        decision.content_hash !== candidate.content_hash ||
+        refJson(decision.source_ref) !== refJson(candidate.source_ref)
+      );
+    }) ||
+    authorityCurrentness.decisions.some((decision, index) => {
+      const candidate = authorityCandidates[index];
       return (
         candidate === undefined ||
         decision.source_version !== candidate.source_version ||
@@ -1100,10 +1189,18 @@ export const retrieveCurrentInstitutionKnowledgeCandidates = async (input: {
       );
     })
   ) return { status: "unavailable" };
+  const sourceKey = (source: NurtureInstitutionKnowledgeSourceIdentityV1) =>
+    canonicalJsonV1([source.source_ref, source.source_version, source.content_hash]);
+  const eligible = new Set(
+    [...currentness.decisions, ...authorityCurrentness.decisions]
+      .filter((decision) => decision.decision === "eligible")
+      .map(sourceKey),
+  );
   return {
     status: "resolved",
     candidates: retrieved.candidates.filter(
-      (_candidate, index) => currentness.decisions[index]?.decision === "eligible",
+      ({ source_ref, source_version, content_hash }) =>
+        eligible.has(sourceKey({ source_ref, source_version, content_hash })),
     ),
   };
 };

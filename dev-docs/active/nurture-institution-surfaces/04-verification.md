@@ -688,9 +688,9 @@ Detailed evidence: [`70`](./70-g4-e-increment-1-record.md).
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Architecture review | PASS after repair | [`71`](./71-g4-e-increment-2-record.md) records closed authorization-order, opaque-ref, preview-option, body-free mapping, drift classification, SSOT and reconciliation findings. |
-| Targeted E2 suite | PASS | 12/12 covers index/online split, closed eligibility, medical authority, service purpose, stable body-free changes/reconciliation, denial/unavailable, online authorization/currentness, preview and all four limits. |
-| Full unit lane | PASS | `pnpm test:unit`: 923/923 across 83 files. |
+| Architecture review | PASS after repair | [`71`](./71-g4-e-increment-2-record.md) records closed authorization-order, opaque-ref, preview-option, body-free mapping, drift classification, SSOT, reconciliation and independent authority-candidate findings. |
+| Targeted E2 suite | PASS | 13/13 covers index/online split, closed eligibility, independent medical authority candidates, service purpose, stable body-free changes/reconciliation, denial/unavailable, online authorization/currentness, preview and all four limits. |
+| Full unit lane | PASS | `pnpm test:unit`: 924/924 across 83 files. |
 | TypeScript | PASS | Root `pnpm typecheck` and scenario package typecheck. |
 | Structural gates | PASS | Test routing 152 files; persistence, port topology, formal ingress, G2 contract/census and G3 freeze pass. |
 | Generic owner pin | PASS | Eight committed My-Chat Knowledge/RAG files remain exact at `567b96c` / `554e79d4…`; verifier tests pass 3/3. |
