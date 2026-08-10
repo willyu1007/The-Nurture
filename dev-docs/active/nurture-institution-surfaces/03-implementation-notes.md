@@ -732,5 +732,8 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   unit 876/876, typecheck, structure gates, current migration status and zero
   drift. DB context checksum is `30086d74…`; both exact disposable targets were
   destroyed and confirmed absent.
+- After the implementation commit, affected C30 profiles were re-frozen at
+  exact revision `407cb97` with aggregate `49793dc5…`; the Nurture exact
+  runtime pin is `7c3b1564…` over 245 files. Base/Host pins were not advanced.
 - No caller, capability, module/manifest registration, deployment, activation
   or traffic was added. 0E-4 remains the next dependent unit.

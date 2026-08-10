@@ -514,6 +514,7 @@ Falsification evidence is per-increment and lives in each record's
 | Targeted / full PostgreSQL | PASS | 6/6; 386/386 across 42 files. |
 | TypeScript / Prisma / structure | PASS | Root typecheck, format/validate/generate, routing 148, persistence, port topology and G3 freeze. |
 | Migration / drift / context | PASS | 32 current, empty diff, context checksum `30086d74…`; superseded active-only uniqueness and group lookup indexes are absent. |
+| Local qualification locks | PASS after commit boundary | C30 profiles are re-frozen at implementation revision `407cb97`, aggregate `49793dc5…`; Nurture exact runtime is `7c3b1564…` over 245 files. Base/Host fields are unchanged. |
 | Cleanup / effect boundary | PASS | Exact diff and qualification DBs destroyed and absent; no durable apply, caller, capability or traffic. |
 
 Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and

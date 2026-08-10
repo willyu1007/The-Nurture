@@ -103,6 +103,7 @@
 | Migration apply | PASS — 32 migrations from empty |
 | Migration status / drift | PASS — current / empty diff |
 | DB context | PASS — checksum `30086d74…` |
+| Local qualification locks | PASS — C30 `49793dc5…` at `407cb97`; exact runtime `7c3b1564…` over 245 files |
 | Disposable cleanup | PASS — exact targets destroyed and absent |
 
 Detailed database evidence is under
