@@ -462,6 +462,9 @@ export type NurtureInstitutionKnowledgeSourceSnapshotV1 =
     source_kind: "nurture_institution_revision";
     provenance_kind: "institution_authored";
     institution_ref: string;
+    item_ref: string;
+    revision_ref: string;
+    revision_number: number;
     item_head: number;
     category: NurtureInstitutionKnowledgeItemV1["category"];
     body: NurtureInstitutionKnowledgeBodyV1;
@@ -472,6 +475,7 @@ export type NurtureInstitutionKnowledgeSourceSnapshotV1 =
     valid_from?: string;
     valid_until?: string;
     publication_event_ref: CanonicalRef;
+    published_at: string;
     authority_sources: Array<{
       authority_source_ref: CanonicalRef;
       source_version: string;
@@ -481,13 +485,24 @@ export type NurtureInstitutionKnowledgeSourceSnapshotV1 =
 const snapshotOf = (
   facts: NurtureInstitutionKnowledgeReadFactsV1,
   body: NurtureInstitutionKnowledgeBodyV1,
-): NurtureInstitutionKnowledgeSourceSnapshotV1 | null =>
-  facts.publication_event_ref
+): NurtureInstitutionKnowledgeSourceSnapshotV1 | null => {
+  const publication = [...facts.events]
+    .filter(
+      (event) =>
+        event.revision_ref === facts.revision.revision_ref &&
+        event.event_type === "published",
+    )
+    .sort(byEventOrder)
+    .at(-1);
+  return facts.publication_event_ref && publication
     ? ({
         ...institutionKnowledgeSourceIdentity(facts),
         source_kind: "nurture_institution_revision",
         provenance_kind: "institution_authored",
         institution_ref: facts.item.institution_ref,
+        item_ref: facts.item.item_ref,
+        revision_ref: facts.revision.revision_ref,
+        revision_number: facts.revision.revision_number,
         item_head: facts.item.item_head,
         category: facts.item.category,
         body,
@@ -498,12 +513,14 @@ const snapshotOf = (
         ...(facts.revision.valid_from ? { valid_from: facts.revision.valid_from } : {}),
         ...(facts.revision.valid_until ? { valid_until: facts.revision.valid_until } : {}),
         publication_event_ref: facts.publication_event_ref,
+        published_at: publication.occurred_at,
         authority_sources: facts.authority_links.map((link) => ({
           authority_source_ref: link.authority_source_ref,
           source_version: link.source_version,
         })),
       } satisfies NurtureInstitutionKnowledgeSourceSnapshotV1)
     : null;
+};
 
 export type InstitutionKnowledgeSourceChangeProviderV1 = {
   listSourceChanges(input: {

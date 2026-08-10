@@ -783,6 +783,17 @@ Detailed evidence: [`75`](./75-g4-e-i2-b-surface-adapter-record.md).
 
 Verdict: `G4_E_I3_NOT_READY_EXTERNAL_GATES`. Detailed evidence: [`76`](./76-g4-e-i3-owner-gate-audit.md).
 
+## 2026-08-10 — G4-E Q2 source snapshot owner delta
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Owner boundary review | PASS after repair | Opaque source identity is no longer interpreted to invent item/revision/publication facts. |
+| Scenario typecheck / manifest | PASS | `pnpm --filter @the-nurture/scenario typecheck`; generated manifest current. |
+| Targeted retrieval suite | PASS | 13/13, including the complete exact index snapshot. |
+| Database / runtime effect | NOT RUN / PASS | No schema, DB, provider call, index write, activation or traffic. |
+
+Detailed evidence: [`77`](./77-g4-e-q2-source-snapshot-owner-delta.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

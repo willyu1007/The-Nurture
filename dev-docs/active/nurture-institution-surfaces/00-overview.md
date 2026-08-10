@@ -6,9 +6,10 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **resolve G4-E Q2–Q4 exact owner/safety adoption gates
-  ([`76`](./76-g4-e-i3-owner-gate-audit.md)); after G-09
-  and Q2–Q4 close, G4-D/G4-E I3 may proceed independently**. The exact generic
+- Next step: **complete the remaining G4-E Q2 durable source ingestion and Q3
+  generation/safety adoption gates; Q4 sibling-mutation authority is closed
+  ([`77`](./77-g4-e-q2-source-snapshot-owner-delta.md)); then bind E7 and run
+  E8 Joint Conformance while capabilities remain default-off**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
   ([`64`](./64-g4-0f-scope-freeze.md)); 0F-1 freezes the Nurture-owned item,

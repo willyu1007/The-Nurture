@@ -395,6 +395,10 @@ describe("G4-E source and currentness providers", () => {
       source: {
         source_kind: "nurture_institution_revision",
         provenance_kind: "institution_authored",
+        item_ref: "knowledge-item-1",
+        revision_ref: "knowledge-revision-1",
+        revision_number: 1,
+        published_at: "2026-08-10T03:00:00.000Z",
         body,
       },
     });

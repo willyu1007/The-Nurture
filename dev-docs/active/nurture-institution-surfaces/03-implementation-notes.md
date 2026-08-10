@@ -1142,3 +1142,16 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   package surfaces. Current authority also excludes sibling-repository writes.
 - E7 verdict is `G4_E_I3_NOT_READY_EXTERNAL_GATES`; no implementation or
   external state changed. Detailed evidence: [`76`](./76-g4-e-i3-owner-gate-audit.md).
+
+## 2026-08-10 — G4-E Q2 source snapshot owner delta
+
+- The user authorized My-Chat/Base sibling mutation, closing historical Q4.
+  My-Chat `6e6d57d` now provides the qualified exact source vocabulary,
+  scoped retrieval and live-policy currentness core; durable Q2 ingestion and
+  Q3 safety/generation remain in progress.
+- Quality review found that the Nurture indexing snapshot lacked four
+  non-derivable citation provenance facts. It now supplies the exact item,
+  revision number/ref and publication time from its canonical owner facts.
+- Scenario typecheck/manifest and the 13/13 targeted retrieval suite pass. No
+  database, provider call, indexing, activation or traffic occurred.
+- Detailed evidence: [`77`](./77-g4-e-q2-source-snapshot-owner-delta.md).
