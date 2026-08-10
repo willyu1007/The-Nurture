@@ -779,7 +779,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   unit 878/878, root typecheck, 33 migrations from empty, current migration
   status and zero datasource drift. The manifest/module and default-off posture
   remain unchanged.
-- Registered the proposal table in the G3 persisted-table census. The C30
-  source lock and Nurture exact-runtime pin intentionally remain pending until
-  these changed bytes have an exact implementation commit; the C30 verifier
-  rejects dirty-worktree bytes and must not be bypassed with the prior revision.
+- Registered the proposal table in the G3 persisted-table census. After exact
+  implementation commit `1a79e13`, the C30 lock was re-frozen at aggregate
+  `ef33c0bd…` and the Nurture exact-runtime pin at `25b7ad2f…` over 250 files.
+  Base/Host fields and the divergent My-Chat revision were not advanced.

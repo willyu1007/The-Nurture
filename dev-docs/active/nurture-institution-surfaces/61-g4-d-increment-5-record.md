@@ -80,8 +80,8 @@
 | Migration status / drift | PASS — current / no datasource-to-SSOT difference |
 | Storage census | PASS — no duplicate proposal index; hash + allowlisted metadata only |
 | DB context | PASS — checksum `0afb587c…` after quality repair |
-| Local qualification locks | COMMIT-BOUNDARY PENDING — the original increment is frozen at `c4ac700`; this repair changes bytes covered by C30 and the Nurture exact-runtime pin, so both must be re-frozen against its own implementation commit |
-| External My-Chat pin | KNOWN RED — expected `567b96c`, observed `876b045`; workflow-contract sources unchanged and no adoption performed |
+| Local qualification locks | PASS after commit boundary — C30 source revision `1a79e13`, aggregate `ef33c0bd…`; Nurture exact runtime `25b7ad2f…` over 250 files; Base/Host fields unchanged |
+| External My-Chat pin | KNOWN RED — expected `567b96c`, observed `66720cd`; workflow-contract sources unchanged and no adoption performed |
 | Docs / context / governance | PASS — 107/107 task docs, zero errors/warnings; strict context, project-state and governance checks pass |
 | Disposable cleanup | PASS — all three exact targets destroyed and absent |
 

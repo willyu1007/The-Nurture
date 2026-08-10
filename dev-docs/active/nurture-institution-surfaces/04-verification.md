@@ -533,8 +533,8 @@ Detailed evidence: [`60`](./60-g4-d-increment-4-record.md) and
 | Targeted / full PostgreSQL | PASS | Quality rerun 9/9; 389/389 across 42 files, including future-start/post-expiry acceptance and true competing formalization commands. |
 | TypeScript / Prisma / structure | PASS | Root typecheck, format/validate/generate, routing 148, persistence, port topology and G3 freeze. |
 | Migration / drift / context | PASS | 33 current from empty; no datasource diff; DB context checksum `0afb587c…`. |
-| Local qualification locks | COMMIT-BOUNDARY PENDING | The original increment is frozen at `c4ac700`, but this quality repair changes bytes covered by both the C30 profiles and Nurture exact-runtime pin. Re-freeze both against the future implementation commit; do not advance Base/Host fields. |
-| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `876b045`; workflow-contract sources are unchanged and no external adoption was performed. |
+| Local qualification locks | PASS after commit boundary | C30 profiles re-frozen at quality-repair revision `1a79e13`, aggregate `ef33c0bd…`; Nurture exact runtime `25b7ad2f…` over 250 files. Base/Host fields remain unchanged. |
+| External My-Chat pin | KNOWN RED GATE | Expected `567b96c`, observed `66720cd`; workflow-contract sources are unchanged and no external adoption was performed. |
 | Docs / context / governance | PASS | Task docs 107/107 with zero errors/warnings; strict context, project-state and governance checks pass. One obsolete root-level `ctl-context.mjs` invocation failed before the repository-documented skill path passed; it made no change. |
 | Effect boundary | PASS | All approved disposable targets were destroyed and confirmed absent; no shared apply, public caller/capability, deployment, activation or traffic. |
 

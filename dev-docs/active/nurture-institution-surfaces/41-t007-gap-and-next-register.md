@@ -150,7 +150,7 @@ confirmed absent; no durable target is authorized.
 
 `verify:workflow-contract-pin` is red. My-Chat no longer sits at the pinned
 `567b96c`; its active checkout has continued moving since the earlier recorded
-`x5_joint_api` divergence. The quality rerun observed `876b045` with no
+`x5_joint_api` divergence. The lock rerun observed `66720cd` with no
 `packages/workflow-contracts` diff from the pin; C30's independent
 upstream lock still expects `51ad97f`
 ([`46`](./46-g4-b-increment-12-record.md), [`48`](./48-g4-c-increment-2-record.md)).
@@ -190,9 +190,10 @@ caller, capability registration or traffic exists; `workflowRunRef` still
 accepts only the exact My-Chat-owned canonical ref and the private workflow ref
 is never projected.
 
-The revision-bearing local C30 adoption lock is current at implementation
-revision `c4ac700`, aggregate source hash `9a88a32a…`; this closes the local
-commit-boundary maintenance step without adopting the divergent My-Chat head.
+The revision-bearing local C30 adoption lock is current at quality-repair
+revision `1a79e13`, aggregate source hash `ef33c0bd…`; the Nurture exact-runtime
+pin is `25b7ad2f…` over 250 files. This closes the local commit-boundary
+maintenance step without adopting the divergent My-Chat head.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`61`](./61-g4-d-increment-5-record.md).
 
