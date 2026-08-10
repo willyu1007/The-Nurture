@@ -185,8 +185,9 @@ Project: `main`
   exact generic owner source pin, three-unit scope, lifecycle/provenance contract and
   retrieval/owner bridge plus cited-answer/safety contract. Its 0G audit passes;
   `G4_0F_EXIT_PASS` is issued; G4-E E1 lifecycle/provenance, E2 retrieval/
-  currentness and E3 answer safety/conflict candidate pass statically, while
-  E4–E8 remain open. None of these
+  currentness and E3 answer safety/conflict candidate pass statically. E4
+  closes the private I1 audit with all 35 migrations and 391/391 DB tests on a
+  destroyed disposable target; E5–E8 remain open. None of these
   checkpoints completes T-007.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
@@ -382,10 +383,10 @@ Project: `main`
   E2 passes statically with pure retrieval/currentness/preview providers and no
   schema or runtime effect. E3 passes statically with strict structured answer,
   deterministic safety/currentness and one immutable fifth-table conflict
-  candidate; both G4-E migrations remain unapplied.
-- Next Checkpoint: execute the G4-E E4 cross-increment audit; DB qualification
-  starts only after Q1 names and approves one exact disposable target;
-  independently, explicit G-09 adoption may open G4-D I3 authenticated
+  candidate. Both G4-E migrations are disposable-qualified and remain
+  unapplied anywhere durable.
+- Next Checkpoint: execute G4-E E5 I2-A public Surface artifact, then E6
+  default-off adapters; independently, explicit G-09 adoption may open G4-D I3 authenticated
   prospective-contact/native-source/current-owner and formal-ingress binding.
   I4 joint conformance follows only after I3 qualifies.
   T-008 remains planned until the complete T-007 G4 Exit; Candidate Freeze,

@@ -10,7 +10,7 @@ import {
   type NurtureInstitutionKnowledgeConflictCandidateTransaction,
   type NurtureInstitutionKnowledgeConflictReviewCandidateV1,
   type NurtureInstitutionKnowledgeExactSourceTupleV1,
-} from "@the-nurture/scenario/harness";
+} from "@the-nurture/scenario";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
 

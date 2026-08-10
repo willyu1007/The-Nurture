@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E I1.1–I1.3 pass statically; E4 DB qualification pending** | [`64`](./64-g4-0f-scope-freeze.md)–[`72`](./72-g4-e-increment-3-record.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A Surface artifact next** | [`64`](./64-g4-0f-scope-freeze.md)–[`73`](./73-g4-e-i1-audit-qualification-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -36,7 +36,8 @@ currentness bridge and cited-answer/safety/conflict-candidate contract. The 0G
 audit removes candidate-as-hold and lifecycle-command ambiguity, and 0F exits
 with `G4_0F_EXIT_PASS`. G4-E now has private lifecycle/provenance,
 retrieval/currentness/preview and answer-safety/conflict-candidate domain plus
-five unapplied table artifacts. It still has no public Surface, real model/
+five tables qualified on a destroyed disposable PostgreSQL target. It still
+has no public Surface, real model/
 safety owner binding, Host index runtime, formal ingress, activation or traffic.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
@@ -157,9 +158,10 @@ drift on the approved disposable target. The exact target was destroyed and
 confirmed absent; no durable target is authorized.
 `20260810210000_g4e_institution_knowledge_lifecycle` and
 `20260810230000_g4e_institution_knowledge_answer_safety` are newer and have
-only static schema/migration qualification. Neither has run on any database;
-roadmap E4/Q1 requires a newly resolved and explicitly approved disposable
-target.
+now passed all 35 migrations, targeted 2/2 and full 391/391 DB lanes, current
+status and zero datasource drift on the exact approved disposable target. The
+target was destroyed and confirmed absent with zero sessions; no shared or
+persistent database received either migration ([`73`](./73-g4-e-i1-audit-qualification-record.md)).
 
 ### G-09 — The My-Chat pin needs an adoption decision
 
@@ -233,13 +235,13 @@ maintenance step without adopting the divergent My-Chat head.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
-### G-11 — G4-E I1.1–I1.3 are complete statically; DB qualification remains
+### G-11 — G4-E private I1 is qualified; I2–I4 remain
 
 [`70`](./70-g4-e-increment-1-record.md) implements the frozen 0F-1 private
 item, sealed immutable revision, atomic authority links, append-only events and
 five exact-replay lifecycle commands. Current explicit Admin/Institution scope,
 complete bounded history, row-locked revision allocation and expected-item-head
-CAS form one write path. The four-table migration remains unapplied; no public
+CAS form one write path. The four-table migration is disposable-qualified; no public
 Surface, retrieval, model/index runtime or second knowledge lifecycle exists.
 
 [`71`](./71-g4-e-increment-2-record.md) now implements 0F-2's pure
@@ -250,12 +252,17 @@ It adds no table and binds no real Host owner/runtime.
 [`72`](./72-g4-e-increment-3-record.md) implements strict cited claims,
 deterministic request/source/draft safety ports, final owner currentness,
 medical authority precedence, fixed abstentions/portable provenance and the
-one immutable conflict candidate. Its fifth-table migration is unapplied; no
-model, safety provider, Surface or candidate lifecycle is bound. E4 may execute
-migrations and the DB lane only after Q1 names and approves one exact
-disposable target. I3/I4 additionally
-remain closed on the adopted My-Chat scenario deltas and deterministic answer-
-safety owner/rule pin; synthetic compatibility mappings cannot close them.
+one immutable conflict candidate. Its fifth-table migration is disposable-
+qualified but not durably applied; no
+model, safety provider, Surface or candidate lifecycle is bound.
+
+[`73`](./73-g4-e-i1-audit-qualification-record.md) closes E4/Q1 after real
+PostgreSQL repaired the first-publication nullable CAS and stale conditional
+export path. All 35 migrations, the 43-file DB lane, current status, zero drift
+and destroyed-target evidence pass. E5/E6 must now add the exact public
+contract and default-off adapters. I3/I4 remain closed on the adopted My-Chat
+scenario deltas and deterministic answer-safety owner/rule pin; synthetic
+compatibility mappings cannot close them.
 
 ## Closed since the 0D Exit
 
@@ -286,15 +293,17 @@ safety owner/rule pin; synthetic compatibility mappings cannot close them.
 
 ## Next steps, in dependency order
 
-1. **G4-E I1 audit/qualification** — audit E1–E3 composition; after Q1 names
-   and explicitly approves one exact disposable PostgreSQL target, deploy all
-   authored migrations, run constraint/replay/drift/full-DB checks and destroy
-   that target with evidence.
-2. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
+1. **G4-E I2-A/I2-B** — rotate the exact additive Knowledge Surface artifact,
+   then map every descriptor to the qualified private I1 behavior behind one
+   explicit default-off gate. Do not add a caller or compatibility owner.
+2. **G4-E I3/I4** — only after Q2–Q4 adopt the exact My-Chat scenario deltas,
+   deterministic safety owner/rule pin and sibling-repository authority, bind
+   real owners/formal ingress and run joint conformance/Exit.
+3. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the
    default-off runtime gate while qualifying on an approved disposable DB.
-3. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
+4. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
    after the I3 owner and ingress paths qualify.
 
 G-03's remaining authority/source fact is an external owner gate, not an

@@ -1071,3 +1071,24 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   typecheck, Prisma/static/structural gates and the exact generic source pin.
   No database or external owner was touched; E4/Q1 is next.
 - Detailed evidence: [`72`](./72-g4-e-increment-3-record.md).
+
+## 2026-08-10 — G4-E I1 audit and disposable qualification
+
+- Closed Q1 on the exact approved local disposable target and replayed all 35
+  migrations from empty. Targeted G4-E passed 2/2, the complete production DB
+  lane passed 391/391 across 43 files, status was current and datasource drift
+  was empty.
+- Real PostgreSQL exposed two composition defects that static checks could not:
+  nullable `NOT` rejected the first publication from a null pointer, and the
+  two new repositories used a stale conditional `/harness` runtime export.
+  The CAS now handles null explicitly and both imports use the source-backed
+  scenario root.
+- Added a maintained DB test for lifecycle/replay/append-only and deterministic
+  conflict-candidate convergence. Root TypeScript also tightened its committed-
+  result guard; the final test form was replayed after all 35 migrations.
+- Full unit 935/935, root/scenario/DB TypeScript, test routing, Context and the
+  database feature suite pass. The exact target was destroyed after both
+  qualification cycles with final database/session counts `0/0`; no durable
+  database or public runtime was touched.
+- Detailed evidence: [`73`](./73-g4-e-i1-audit-qualification-record.md). E5
+  I2-A public Surface artifact is next; Q2–Q4 still block E7/E8.

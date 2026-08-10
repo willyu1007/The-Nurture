@@ -11,7 +11,7 @@ import {
   type NurtureInstitutionKnowledgeRevisionEventV1,
   type NurtureInstitutionKnowledgeRevisionSummaryV1,
   type NurtureInstitutionKnowledgeTransaction,
-} from "@the-nurture/scenario/harness";
+} from "@the-nurture/scenario";
 import { PrismaInstitutionContextRepository } from "./institution-context.repository.js";
 
 const MAX_REVISIONS = 1_000;
@@ -481,7 +481,10 @@ export class PrismaInstitutionKnowledgeRepository
           id: item.id,
           itemHead: mutation.expected_item_head,
           latestRevisionId: revision.id,
-          NOT: { currentPublishedRevisionId: revision.id },
+          OR: [
+            { currentPublishedRevisionId: null },
+            { NOT: { currentPublishedRevisionId: revision.id } },
+          ],
         },
         data: {
           currentPublishedRevisionId: revision.id,

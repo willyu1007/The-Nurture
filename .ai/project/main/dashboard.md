@@ -38,13 +38,14 @@ Project: `main`
   now has an exact generic My-Chat source pin, accepted three-unit scope and a
   frozen lifecycle/provenance, retrieval/owner bridge and cited-answer/safety
   contract. Its repaired 0G audit and `G4_0F_EXIT_PASS` are complete. G4-E I1.1
-  now passes statically with the private lifecycle/provenance owner and an
-  unapplied four-table migration. I1.2 retrieval/currentness also passes
+  provides the private lifecycle/provenance owner and four-table migration.
+  I1.2 retrieval/currentness also passes
   statically with pure source/currentness/preview providers and no schema or
   runtime effect. I1.3 answer safety/candidate also passes statically with
   strict claims/citations, deterministic safety/final-currentness and one
-  immutable fifth-table candidate; E4 audit/DB qualification is next. I3 waits
-  for exact external owner/safety adoption.
+  immutable fifth-table candidate. E4 now qualifies the combined private I1
+  through all 35 migrations and 391/391 DB tests on a destroyed disposable
+  target. E5 I2-A is next; I3 waits for exact external owner/safety adoption.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -53,9 +54,9 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Execute G4-E roadmap E4.** Audit the three I1 increments; run migrations,
-   constraint probes, DB regression, drift and destruction evidence only after
-   Q1 names and approves one exact disposable PostgreSQL target.
+1. **Execute G4-E roadmap E5.** Publish the exact additive Knowledge Surface
+   artifact and fixtures without adding a caller; E6 default-off adapters
+   follow only after the E5 quality/commit boundary.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.

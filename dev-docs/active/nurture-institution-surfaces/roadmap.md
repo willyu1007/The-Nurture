@@ -16,10 +16,15 @@
   [`71`](./71-g4-e-increment-2-record.md). It adds no schema, database or
   runtime effect.
 - E3 answer safety/candidate I1.3: `G4_E_I1_3_PASS_STATIC`; see
-  [`72`](./72-g4-e-increment-3-record.md). Its one-table migration is authored
-  and unapplied; no model/provider/runtime is bound.
-- Current node: E4 I1 audit and disposable persistence qualification.
-- I3/I4 gates Q1–Q4 remain unresolved; no compatibility fallback is allowed.
+  [`72`](./72-g4-e-increment-3-record.md). Its one-table migration is authored,
+  disposable-qualified by E4 and unapplied anywhere durable; no model/provider/
+  runtime is bound.
+- E4 I1 audit/qualification: `G4_E_I1_PASS_QUALIFIED`; see
+  [`73`](./73-g4-e-i1-audit-qualification-record.md). All 35 migrations,
+  targeted/full PostgreSQL lanes, status/drift and destroyed-target evidence
+  pass on the exact approved disposable target.
+- Current node: E5 I2-A public Surface Contract.
+- I3/I4 gates Q2–Q4 remain unresolved; no compatibility fallback is allowed.
 
 ## Planning-mode context and merge policy
 
@@ -66,8 +71,10 @@
 
 ### Open questions (must close before the named phase)
 
-- Q1 — Before disposable PostgreSQL qualification: what exact disposable
-  target is approved for G4-E migration execution and destruction evidence?
+- Q1 — **Resolved for E4.** The user approved
+  `localhost:5433/nurture_t007_g4e_i1_qualification_20260810_01`; the exact
+  target passed qualification and was destroyed with final database/session
+  counts `0/0` ([`73`](./73-g4-e-i1-audit-qualification-record.md)).
 - Q2 — Before I3: which exact My-Chat revision adopts the Institution source,
   retrieval, currentness and replayable generation deltas?
 - Q3 — Before I3: which exact deterministic answer-safety provider and
@@ -81,9 +88,9 @@
   connecting to a database (risk: low).
 - A2: I2 may publish an exact default-off Surface artifact and synthetic
   adapters without claiming owner readiness (risk: low).
-- A3: Unresolved Q1 blocks DB execution only; unresolved Q2–Q4 block I3/I4 but
-  do not justify compatibility adapters or local Host-runtime substitutes
-  (risk: high if ignored).
+- A3: Q1 is closed for E4. Unresolved Q2–Q4 block I3/I4 but do not justify
+  compatibility adapters or local Host-runtime substitutes (risk: high if
+  ignored).
 - A4: Each numbered implementation node is a revertible commit boundary with
   one `Task: T-007` trailer; the next node starts only from a clean worktree
   after verification and project sync (risk: low).
@@ -196,7 +203,7 @@ expected project-structure impact.
 8. **E7 — G4-E I3 Owner Integration Readiness**
    - Deliverable: exact adopted My-Chat/safety owner pins/adapters, formal
      scenario-service ingress and disposable PostgreSQL qualification.
-   - Acceptance criteria: Q1–Q4 resolved, real owner positive/negative/replay/
+   - Acceptance criteria: Q2–Q4 resolved, real owner positive/negative/replay/
      drift paths pass; no synthetic-only readiness claim.
 9. **E8 — G4-E I4 Joint Conformance and Exit**
    - Deliverable: formal ingress end-to-end conformance, branch audit, G4-E

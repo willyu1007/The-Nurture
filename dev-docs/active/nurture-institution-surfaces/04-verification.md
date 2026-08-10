@@ -716,6 +716,24 @@ Detailed evidence: [`71`](./71-g4-e-increment-2-record.md).
 
 Detailed evidence: [`72`](./72-g4-e-increment-3-record.md).
 
+## 2026-08-10 — G4-E I1 audit and disposable qualification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | [`73`](./73-g4-e-i1-audit-qualification-record.md) closes stale conditional export, nullable first-publication CAS and exact test-result narrowing findings. |
+| Empty migration deploy | PASS | All 35 migrations applied from empty to the exact approved disposable target. |
+| Targeted G4-E DB | PASS | Final integration test form passes 2/2 for lifecycle/replay/append-only and conflict-candidate replay/immutability. |
+| Full production DB | PASS | 391/391 across 43 files after both production repairs. |
+| Related / full unit | PASS | E1–E3 34/34; full unit 935/935 across 84 files. |
+| TypeScript | PASS | Root direct `tsc --noEmit`, scenario package and DB package. |
+| Test routing | PASS | 154 files: 84 unit / 43 DB / 11 dev-host / 14 scenario-service / 2 joint. |
+| Migration status / drift | PASS | 35/current; datasource-to-datamodel reports no difference. |
+| DB context / feature suite | PASS | Context checksum `edc0f9ef…`, strict verification; SQLite pass and optional Convex lanes skipped. |
+| Cleanup / effect | PASS | Exact disposable target destroyed, final DB/session counts `0/0`; no shared/persistent DB, public capability, deployment, activation or traffic effect. |
+
+Detailed evidence: [`73`](./73-g4-e-i1-audit-qualification-record.md) and
+[`artifacts/db/g4e-i1-qualification`](./artifacts/db/g4e-i1-qualification/).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

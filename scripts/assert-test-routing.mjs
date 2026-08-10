@@ -34,13 +34,13 @@ for (const file of files.sort()) {
 if (routes.unclassified.length > 0) throw new Error(`Unclassified tests: ${routes.unclassified.join(', ')}`);
 if (
   routes.unit.length !== 84 ||
-  routes.productionDb.length !== 42 ||
+  routes.productionDb.length !== 43 ||
   routes.devHost.length !== 11 ||
   routes.scenarioService.length !== 14 ||
   routes.x5Joint.length !== 2
 ) {
   throw new Error(
-    `Test file census changed: unit=${routes.unit.length}/84 productionDb=${routes.productionDb.length}/42 devHost=${routes.devHost.length}/11 scenarioService=${routes.scenarioService.length}/14 x5Joint=${routes.x5Joint.length}/2`,
+    `Test file census changed: unit=${routes.unit.length}/84 productionDb=${routes.productionDb.length}/43 devHost=${routes.devHost.length}/11 scenarioService=${routes.scenarioService.length}/14 x5Joint=${routes.x5Joint.length}/2`,
   );
 }
 process.stdout.write(

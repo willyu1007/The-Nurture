@@ -6,10 +6,9 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **execute roadmap E4, the G4-E I1 cross-increment audit and,
-  only after Q1 names an exact approved disposable target, persistence
-  qualification;
-  after G-09 adoption, G4-D I3 may proceed independently**. The exact generic
+- Next step: **execute roadmap E5, the G4-E I2-A public Surface artifact;
+  after G-09 and exact Q2–Q4 owner/safety adoption, G4-D/G4-E I3 may proceed
+  independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
   ([`64`](./64-g4-0f-scope-freeze.md)); 0F-1 freezes the Nurture-owned item,
@@ -29,7 +28,7 @@
   gates and I3 external/DB prerequisites are fixed in
   [`roadmap.md`](./roadmap.md). E1 now implements the strict private lifecycle,
   sealed revision/provenance facts, exact-replay commands and four-table
-  unapplied migration artifact with `G4_E_I1_1_PASS_STATIC`
+  migration artifact with `G4_E_I1_1_PASS_STATIC`
   ([`70`](./70-g4-e-increment-1-record.md)). E2 now implements the pure
   index/online/preview eligibility, body-free source pull/reconciliation,
   exact candidate/currentness ports and actor-bound opaque preview options
@@ -39,7 +38,10 @@
   citations, fixed abstention/portable presenters and the one immutable
   conflict candidate with `G4_E_I1_3_PASS_STATIC`
   ([`72`](./72-g4-e-increment-3-record.md)); its fifth-table migration is
-  authored but unapplied, and no model/provider runtime is bound. I2-A
+  authored and no model/provider runtime is bound. E4 now closes the I1 audit
+  with `G4_E_I1_PASS_QUALIFIED`: all 35 migrations, targeted/full PostgreSQL,
+  status/drift and exact destroyed-target checks pass
+  ([`73`](./73-g4-e-i1-audit-qualification-record.md)). I2-A
   rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,
@@ -51,8 +53,9 @@
   behind the unqualified Enrollment Journey runtime gate. Real contact/native-
   source and authenticated My-Chat owner adapters remain I3 work blocked by
   G-09. All three 0F unit contracts, their 0G audit and branch Exit pass. E1
-  through E3 create private source/schema/port artifacts only: no model call,
-  indexing, database operation, public capability, activation or traffic.
+  through E4 remain private/default-off: no model call, indexing, public
+  capability, activation or traffic, and the only G4-E DB operation was the
+  destroyed disposable qualification.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
@@ -67,8 +70,8 @@
   disposable PostgreSQL. Nothing has a
   production caller, no runtime capability is registered, and no schema is applied
   anywhere durable. G4-E's four-table lifecycle and one-table conflict-
-  candidate migrations are statically qualified but have not run even on a
-  disposable target. 0C, 0D and all four
+  candidate migrations are now qualified only on a destroyed disposable
+  target; no persistent target has received them. 0C, 0D and all four
   0E persistence slices are therefore
   validated as *buildable as frozen*, not as running. The 24 descriptors and
   two fail-closed internal adapter lanes are default-off and do not change that

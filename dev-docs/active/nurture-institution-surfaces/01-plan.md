@@ -554,9 +554,11 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   conflict candidate now pass statically
   ([`70`](./70-g4-e-increment-1-record.md),
   [`71`](./71-g4-e-increment-2-record.md),
-  [`72`](./72-g4-e-increment-3-record.md)). E4 cross-increment audit is next;
-  DB execution remains gated on one exact approved disposable target, and real
-  owner/runtime binding remains gated.
+  [`72`](./72-g4-e-increment-3-record.md)). E4 cross-increment audit and exact
+  disposable qualification now pass all 35 migrations, 391/391 DB tests,
+  current status, zero drift and destroyed-target checks
+  ([`73`](./73-g4-e-i1-audit-qualification-record.md)). E5 I2-A public Surface
+  artifact is next; real owner/runtime binding remains gated on Q2–Q4.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料
