@@ -959,10 +959,17 @@ export type NurtureInstitutionKnowledgeRetrievalCandidateV1 =
       source_owner: "nurture";
       source_kind: "nurture_institution_revision";
       provenance_kind: "institution_authored";
-    authority_sources: Array<{
-      authority_source_ref: CanonicalRef;
-      source_version: string;
-    }>;
+      title: string;
+      item_ref: string;
+      revision_ref: string;
+      revision_number: number;
+      publication_event_ref: CanonicalRef;
+      published_at: string;
+      open_ref?: string;
+      authority_sources: Array<{
+        authority_source_ref: CanonicalRef;
+        source_version: string;
+      }>;
     })
   | (InstitutionKnowledgeRetrievalCandidateBase & {
       source_owner: "my_chat";
@@ -1029,7 +1036,15 @@ export const validateInstitutionKnowledgeOnlineQuery = (
   );
 };
 
-const validCandidate = (candidate: NurtureInstitutionKnowledgeRetrievalCandidateV1): boolean => {
+const hasExactKeys = (value: object, required: readonly string[], optional: readonly string[] = []): boolean => {
+  const keys = Object.keys(value);
+  return required.every((key) => keys.includes(key)) &&
+    keys.every((key) => required.includes(key) || optional.includes(key));
+};
+
+export const validateInstitutionKnowledgeRetrievalCandidate = (
+  candidate: NurtureInstitutionKnowledgeRetrievalCandidateV1,
+): boolean => {
   try {
     assertCanonicalRef(candidate.source_ref);
     const common =
@@ -1044,14 +1059,36 @@ const validCandidate = (candidate: NurtureInstitutionKnowledgeRetrievalCandidate
       candidate.host_current_source_decision === "current";
     if (!common) return false;
     if (candidate.source_owner === "nurture") {
+      assertCanonicalRef(candidate.publication_event_ref);
       const authorityKeys = candidate.authority_sources.map((source) => {
         assertCanonicalRef(source.authority_source_ref);
         return canonicalJsonV1([source.authority_source_ref, source.source_version]);
       });
       return (
+        hasExactKeys(
+          candidate,
+          [
+            "candidate_ref", "source_ref", "source_version", "content_hash",
+            "source_owner", "source_kind", "provenance_kind", "rank",
+            "match_reason", "excerpt", "host_current_source_decision", "title",
+            "item_ref", "revision_ref", "revision_number", "publication_event_ref",
+            "published_at", "authority_sources",
+          ],
+          ["open_ref"],
+        ) &&
         candidate.source_kind === "nurture_institution_revision" &&
         candidate.provenance_kind === "institution_authored" &&
         validSourceIdentity(candidate) &&
+        candidate.title.trim().length > 0 &&
+        candidate.title.length <= 200 &&
+        REF_TOKEN_PATTERN.test(candidate.item_ref) &&
+        REF_TOKEN_PATTERN.test(candidate.revision_ref) &&
+        Number.isInteger(candidate.revision_number) &&
+        candidate.revision_number >= 1 &&
+        candidate.publication_event_ref.namespace === "nurture" &&
+        candidate.publication_event_ref.object_type === "institution_knowledge_revision_event" &&
+        validInstant(candidate.published_at) &&
+        (candidate.open_ref === undefined || REF_TOKEN_PATTERN.test(candidate.open_ref)) &&
         candidate.authority_sources.length <= 16 &&
         candidate.authority_sources.every((source) =>
           /^[A-Za-z0-9][A-Za-z0-9._:+-]{0,199}$/.test(source.source_version),
@@ -1060,8 +1097,20 @@ const validCandidate = (candidate: NurtureInstitutionKnowledgeRetrievalCandidate
       );
     }
     return (
+      hasExactKeys(
+        candidate,
+        [
+          "candidate_ref", "source_ref", "source_version", "content_hash",
+          "source_owner", "source_kind", "provenance_kind", "rank",
+          "match_reason", "excerpt", "host_current_source_decision", "publisher",
+          "title", "source_date",
+        ],
+        ["open_ref"],
+      ) &&
       candidate.source_kind === "authority_source" &&
       candidate.provenance_kind === "authority_source" &&
+      candidate.source_ref.namespace === "my_chat" &&
+      candidate.source_ref.object_type === "knowledge_source" &&
       /^[A-Za-z0-9][A-Za-z0-9._:+-]{0,199}$/.test(candidate.source_version) &&
       HASH_PATTERN.test(candidate.content_hash) &&
       candidate.publisher.trim().length > 0 &&
@@ -1114,7 +1163,9 @@ export const retrieveCurrentInstitutionKnowledgeCandidates = async (input: {
   if (retrieved.status === "unavailable") return retrieved;
   if (
     retrieved.candidates.length > 16 ||
-    retrieved.candidates.some((candidate) => !validCandidate(candidate)) ||
+    retrieved.candidates.some(
+      (candidate) => !validateInstitutionKnowledgeRetrievalCandidate(candidate),
+    ) ||
     new Set(retrieved.candidates.map((candidate) => candidate.candidate_ref)).size !== retrieved.candidates.length ||
     new Set(
       retrieved.candidates.map((candidate) =>

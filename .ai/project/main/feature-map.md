@@ -184,8 +184,9 @@ Project: `main`
   and exited; the G4-D branch has private I1 plus default-off I2. 0F has accepted its
   exact generic owner source pin, three-unit scope, lifecycle/provenance contract and
   retrieval/owner bridge plus cited-answer/safety contract. Its 0G audit passes;
-  `G4_0F_EXIT_PASS` is issued; G4-E E1 lifecycle/provenance and E2 retrieval/
-  currentness pass statically, while E3–E8 remain open. None of these
+  `G4_0F_EXIT_PASS` is issued; G4-E E1 lifecycle/provenance, E2 retrieval/
+  currentness and E3 answer safety/conflict candidate pass statically, while
+  E4–E8 remain open. None of these
   checkpoints completes T-007.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
@@ -379,8 +380,11 @@ Project: `main`
   `G4_0F_EXIT_PASS`; its E1–E8 roadmap is fixed. E1 passes statically with the
   private lifecycle/provenance owner plus an unapplied four-table migration;
   E2 passes statically with pure retrieval/currentness/preview providers and no
-  schema or runtime effect.
-- Next Checkpoint: execute G4-E roadmap E3 for 0F-3 answer safety/candidate;
+  schema or runtime effect. E3 passes statically with strict structured answer,
+  deterministic safety/currentness and one immutable fifth-table conflict
+  candidate; both G4-E migrations remain unapplied.
+- Next Checkpoint: execute the G4-E E4 cross-increment audit; DB qualification
+  starts only after Q1 names and approves one exact disposable target;
   independently, explicit G-09 adoption may open G4-D I3 authenticated
   prospective-contact/native-source/current-owner and formal-ingress binding.
   I4 joint conformance follows only after I3 qualifies.

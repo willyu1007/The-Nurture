@@ -550,10 +550,13 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   qualification, E5/E6 I2 Contract/adapter boundaries, E7 I3 real owner
   readiness and E8 I4 joint conformance/Exit. Every node must be reviewed,
   repaired, synchronized and committed before the next begins.
-- E1 lifecycle/provenance and E2 retrieval/currentness now pass statically
+- E1 lifecycle/provenance, E2 retrieval/currentness and E3 answer safety/
+  conflict candidate now pass statically
   ([`70`](./70-g4-e-increment-1-record.md),
-  [`71`](./71-g4-e-increment-2-record.md)). E3 answer safety/candidate is the
-  next executable private node; real owner/runtime binding remains gated.
+  [`71`](./71-g4-e-increment-2-record.md),
+  [`72`](./72-g4-e-increment-3-record.md)). E4 cross-increment audit is next;
+  DB execution remains gated on one exact approved disposable target, and real
+  owner/runtime binding remains gated.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料

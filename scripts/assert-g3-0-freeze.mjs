@@ -367,6 +367,7 @@ const expectedTableCensus = [
   "NurtureFocusGoalChildScope",
   "NurtureHealthStateSummary",
   "NurtureInstitutionKnowledgeAuthorityLink",
+  "NurtureInstitutionKnowledgeConflictReviewCandidate",
   "NurtureInstitutionKnowledgeItem",
   "NurtureInstitutionKnowledgeRevision",
   "NurtureInstitutionKnowledgeRevisionEvent",

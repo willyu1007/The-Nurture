@@ -34,6 +34,7 @@ import { PrismaEnrollmentWaitlistRepository } from "./enrollment-waitlist.reposi
 import { PrismaEnrollmentTrialLifecycleRepository } from "./enrollment-trial-lifecycle.repository.js";
 import { PrismaEnrollmentFormalizationRepository } from "./enrollment-formalization.repository.js";
 import { PrismaInstitutionKnowledgeRepository } from "./institution-knowledge.repository.js";
+import { PrismaInstitutionKnowledgeConflictCandidateRepository } from "./institution-knowledge-conflict-candidate.repository.js";
 import { isPrismaSerializationAbort } from "./prisma-error.js";
 
 const asJson = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -135,6 +136,7 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
   readonly enrollmentFormalization: PrismaEnrollmentFormalizationRepository;
   /** G4-E private Institution Knowledge lifecycle/provenance writes. */
   readonly institutionKnowledge: PrismaInstitutionKnowledgeRepository;
+  readonly institutionKnowledgeConflicts: PrismaInstitutionKnowledgeConflictCandidateRepository;
   readonly familyCare: PrismaFamilyCareCommandTransaction;
   readonly interactionContexts: NurtureInteractionContextTransactionPort;
   /**
@@ -194,6 +196,8 @@ class PrismaNurtureCommandTransaction implements NurtureCommandTransaction {
       now,
     );
     this.institutionKnowledge = new PrismaInstitutionKnowledgeRepository(transaction, now);
+    this.institutionKnowledgeConflicts =
+      new PrismaInstitutionKnowledgeConflictCandidateRepository(transaction);
     this.familyCare = new PrismaFamilyCareCommandTransaction(transaction);
     this.interactionContexts = new PrismaInteractionContextRepository(transaction);
     this.boardMutations = new PrismaBoardMutationTransaction(transaction);

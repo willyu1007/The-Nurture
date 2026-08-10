@@ -699,6 +699,23 @@ Detailed evidence: [`70`](./70-g4-e-increment-1-record.md).
 
 Detailed evidence: [`71`](./71-g4-e-increment-2-record.md).
 
+## 2026-08-10 — G4-E increment 3 answer safety/conflict candidate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | [`72`](./72-g4-e-increment-3-record.md) records global citation uniqueness, exact authority namespace, candidate replay identity, malformed currentness, internal service command and SQL guard repairs. |
+| Targeted E3 suite | PASS | 11/11 covers general/medical answers, no-source, unsafe request/draft, model/safety extra fields, separate owner drift, conflict write/currentness, replay/dedup, sealed evidence and no-lifecycle schema. |
+| Targeted E2/E3 suites | PASS | 24/24; strict candidate union/currentness composes with answer safety. |
+| Full unit lane | PASS | `pnpm test:unit`: 935/935 across 84 files. |
+| TypeScript | PASS | Root plus scenario and DB package typechecks. |
+| Prisma SSOT | PASS statically | Format/validate/generate and context sync; checksum `edc0f9ef…`; fifth table migration remains unapplied. |
+| Structural gates | PASS | Test routing 153 files; persistence, formal ingress and G3 exact model census pass; exact 25 descriptors remain unrouted. |
+| Generic owner pin | PASS | Eight committed My-Chat Knowledge/RAG files remain exact at `567b96c` / `554e79d4…`; live `2dc365e` is informational drift and no adoption claim. |
+| Runtime boundary | PASS | No provider SDK, model/prompt/vector/index/cache, Host route, public capability, second ledger or candidate state machine. |
+| PostgreSQL / effect | NOT RUN / PASS | No exact disposable target was approved for E3; no DB connection/write, owner/model/source call, deployment, activation or traffic. |
+
+Detailed evidence: [`72`](./72-g4-e-increment-3-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

@@ -41,7 +41,9 @@ Project: `main`
   now passes statically with the private lifecycle/provenance owner and an
   unapplied four-table migration. I1.2 retrieval/currentness also passes
   statically with pure source/currentness/preview providers and no schema or
-  runtime effect; I1.3 answer safety/candidate is next. I3 waits
+  runtime effect. I1.3 answer safety/candidate also passes statically with
+  strict claims/citations, deterministic safety/final-currentness and one
+  immutable fifth-table candidate; E4 audit/DB qualification is next. I3 waits
   for exact external owner/safety adoption.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
@@ -51,9 +53,9 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Execute G4-E roadmap E3.** Implement only 0F-3 structured answer/citation
-   safety and the one immutable conflict candidate; do not bind a model runtime
-   or invent an answer-safety provider.
+1. **Execute G4-E roadmap E4.** Audit the three I1 increments; run migrations,
+   constraint probes, DB regression, drift and destruction evidence only after
+   Q1 names and approves one exact disposable PostgreSQL target.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.

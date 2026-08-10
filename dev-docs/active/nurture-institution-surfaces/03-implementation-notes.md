@@ -1046,3 +1046,28 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   drift remains an attributed owner gate. No DB or external owner was touched.
 - Detailed evidence: [`71`](./71-g4-e-increment-2-record.md). E3 structured
   answer/citation safety and the one immutable candidate are next.
+
+## 2026-08-10 — G4-E increment 3 answer safety/conflict candidate
+
+- Implemented the strict 0F-3 operation order: E2 authorization/retrieval,
+  deterministic request/source safety, one structured Host generation, strict
+  draft safety, final exact-owner currentness and Nurture citation assembly.
+- Model output is limited to bounded cited claims. Citation identity, source
+  label, currentness, fixed safety notices and medical authority precedence
+  remain Nurture/owner decisions; malformed or extra model/safety fields fail
+  unavailable without compatibility parsing.
+- Added the immutable conflict candidate as an internal service command over
+  the existing command ledger. Exact evidence across actors/invocations
+  converges by one stable identity; sealed evidence uses the complete `none`
+  excerpt mode and contains no question, child/family or model/provider data.
+- Added the fifth planned Prisma model and unapplied migration with exact
+  command/scope checks, source/evidence validation, uniqueness and append-only
+  enforcement. No status/deadline/blocker/resolution or eligibility link was
+  introduced.
+- Quality review repaired globally unique conflict citations, strict My-Chat
+  authority-source identity, malformed currentness handling, replayed
+  candidate identity verification and SQL JSON/identifier safety.
+- Targeted E2/E3 24/24 and full unit 935/935 pass with root/scenario/DB
+  typecheck, Prisma/static/structural gates and the exact generic source pin.
+  No database or external owner was touched; E4/Q1 is next.
+- Detailed evidence: [`72`](./72-g4-e-increment-3-record.md).

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-10T09:48:44.431Z",
+  "updatedAt": "2026-08-10T10:38:43.981Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -5924,6 +5924,15 @@
           "references": []
         },
         {
+          "field": "institutionKnowledgeConflictCandidates",
+          "to": "NurtureInstitutionKnowledgeConflictReviewCandidate",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "institutionKnowledgeEvents",
           "to": "NurtureInstitutionKnowledgeRevisionEvent",
           "optional": false,
@@ -9339,6 +9348,15 @@
         {
           "field": "enrollmentWaitlistOverride",
           "to": "NurtureEnrollmentWaitlistOverride",
+          "optional": true,
+          "list": false,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgeConflictCandidate",
+          "to": "NurtureInstitutionKnowledgeConflictReviewCandidate",
           "optional": true,
           "list": false,
           "relationName": null,
@@ -19563,6 +19581,228 @@
           ],
           "name": null,
           "map": "uq_nurture_knowledge_link_source"
+        }
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgeConflictReviewCandidate",
+      "dbName": "nurture_institution_knowledge_conflict_review_candidate",
+      "schema": null,
+      "columns": [
+        {
+          "name": "candidateIdentityHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "candidate_identity_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "candidateRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "candidate_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandExecutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_execution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "conflictClass",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "conflict_class",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceEnvelope",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_envelope",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "evidenceMode",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "evidence_mode",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "findingFingerprint",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "finding_fingerprint",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "id",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": "uuid()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ruleSetRef",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "rule_set_ref",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "ruleVersion",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "rule_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "sourceTuples",
+          "type": "Json",
+          "nullable": false,
+          "list": false,
+          "dbName": "source_tuples",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "targetedNurtureRevisionRefs",
+          "type": "String",
+          "nullable": false,
+          "list": true,
+          "dbName": "targeted_nurture_revision_refs",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "commandExecution",
+          "to": "NurtureCommandExecution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "commandExecutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "createdAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_conflict_created"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "candidateIdentityHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_conflict_identity"
         }
       ]
     },

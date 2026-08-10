@@ -500,6 +500,19 @@ const candidate = (): NurtureInstitutionKnowledgeRetrievalCandidateV1 => ({
   match_reason: "semantic_match",
   excerpt: "Keep transitions observable.",
   host_current_source_decision: "current",
+  title: "Calm transitions",
+  item_ref: "knowledge-item-1",
+  revision_ref: "knowledge-revision-1",
+  revision_number: 1,
+  publication_event_ref: {
+    schema_version: 1,
+    namespace: "nurture",
+    object_type: "institution_knowledge_revision_event",
+    object_id: "opaque-publication-event-1",
+    version: 3,
+  },
+  published_at: "2026-08-10T03:00:00.000Z",
+  open_ref: "opaque-institution-open-ref-1",
   authority_sources: [],
 });
 
@@ -605,6 +618,23 @@ describe("G4-E online retrieval and preview", () => {
         },
       ],
     });
+
+    await expect(retrieveCurrentInstitutionKnowledgeCandidates({
+      public_query: { question: "What warning signs matter?" },
+      trusted_context: onlineContext,
+      retrieval_owner: {
+        retrieveCandidates: vi.fn(async () => ({
+          status: "resolved" as const,
+          candidates: [{
+            ...authorityCandidate(),
+            source_ref: { ...authorityCandidate().source_ref, namespace: "nurture" },
+          }],
+        })),
+      },
+      currentness_provider: { validateSources: vi.fn() },
+      authority_currentness_provider: authorityCandidateCurrentness(),
+      admin_authority: adminAuthority(),
+    })).resolves.toEqual({ status: "unavailable" });
   });
 
   it("allows an unreviewed draft only in exact editor preview and fails all-or-nothing", async () => {

@@ -2269,24 +2269,25 @@ model NurtureCareInstitution {
   updatedAt              DateTime                     @updatedAt @map("updated_at")
   deletedAt              DateTime?                    @map("deleted_at")
 
-  careGroups                         NurtureCareGroup[]
-  enrollments                        NurtureEnrollment[]
-  scheduleTemplates                  NurtureClassScheduleTemplate[]
-  mediaAssets                        NurtureMediaAssetRef[]
-  publicationPolicies                NurtureInstitutionPublicationPolicy[]
-  attendanceCloseoutPolicies         NurtureAttendanceCloseoutPolicy[]
-  supportSignalPolicies              NurtureInstitutionSupportSignalPolicy[]
-  institutionWorkflows               NurtureInstitutionWorkflow[]
-  enrollmentWaitlistPolicies         NurtureEnrollmentWaitlistPolicy[]
-  enrollmentWaitlistEntries          NurtureEnrollmentWaitlistEntry[]
-  enrollmentWaitlistOverrides        NurtureEnrollmentWaitlistOverride[]
-  enrollmentTrialOffers              NurtureEnrollmentTrialOffer[]
-  enrollmentTrialReservations        NurtureEnrollmentTrialReservation[]
-  enrollmentFormalProposals          NurtureEnrollmentFormalProposal[]
-  institutionKnowledgeItems          NurtureInstitutionKnowledgeItem[]
-  institutionKnowledgeRevisions      NurtureInstitutionKnowledgeRevision[]
-  institutionKnowledgeAuthorityLinks NurtureInstitutionKnowledgeAuthorityLink[]
-  institutionKnowledgeEvents         NurtureInstitutionKnowledgeRevisionEvent[]
+  careGroups                             NurtureCareGroup[]
+  enrollments                            NurtureEnrollment[]
+  scheduleTemplates                      NurtureClassScheduleTemplate[]
+  mediaAssets                            NurtureMediaAssetRef[]
+  publicationPolicies                    NurtureInstitutionPublicationPolicy[]
+  attendanceCloseoutPolicies             NurtureAttendanceCloseoutPolicy[]
+  supportSignalPolicies                  NurtureInstitutionSupportSignalPolicy[]
+  institutionWorkflows                   NurtureInstitutionWorkflow[]
+  enrollmentWaitlistPolicies             NurtureEnrollmentWaitlistPolicy[]
+  enrollmentWaitlistEntries              NurtureEnrollmentWaitlistEntry[]
+  enrollmentWaitlistOverrides            NurtureEnrollmentWaitlistOverride[]
+  enrollmentTrialOffers                  NurtureEnrollmentTrialOffer[]
+  enrollmentTrialReservations            NurtureEnrollmentTrialReservation[]
+  enrollmentFormalProposals              NurtureEnrollmentFormalProposal[]
+  institutionKnowledgeItems              NurtureInstitutionKnowledgeItem[]
+  institutionKnowledgeRevisions          NurtureInstitutionKnowledgeRevision[]
+  institutionKnowledgeAuthorityLinks     NurtureInstitutionKnowledgeAuthorityLink[]
+  institutionKnowledgeEvents             NurtureInstitutionKnowledgeRevisionEvent[]
+  institutionKnowledgeConflictCandidates NurtureInstitutionKnowledgeConflictReviewCandidate[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -3031,16 +3032,17 @@ model NurtureCommandExecution {
   committedResultPayload          Json?                         @map("committed_result_payload")
   committedAt                     DateTime                      @default(now()) @map("committed_at")
 
-  childCareProcess              NurtureChildCareProcess?                   @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
-  corrections                   NurtureFamilyCareMessageCorrection[]
-  cascadeAudits                 NurtureFamilyCareCascadeAudit[]
-  visibilityEvents              NurturePublicationVisibilityEvent[]
-  actorPrincipalBinding         NurtureParticipantPrincipalBinding?        @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
-  c30PairOperation              NurtureC30PairOperation?                   @relation("NurtureC30PairExecution")
-  c30ActionOperation            NurtureC30ActionOperation?                 @relation("NurtureC30ActionExecution")
-  institutionWorkflowTransition NurtureInstitutionWorkflowTransition?
-  enrollmentWaitlistOverride    NurtureEnrollmentWaitlistOverride?
-  institutionKnowledgeEvents    NurtureInstitutionKnowledgeRevisionEvent[]
+  childCareProcess                      NurtureChildCareProcess?                            @relation(fields: [childCareProcessId], references: [id], onDelete: Restrict)
+  corrections                           NurtureFamilyCareMessageCorrection[]
+  cascadeAudits                         NurtureFamilyCareCascadeAudit[]
+  visibilityEvents                      NurturePublicationVisibilityEvent[]
+  actorPrincipalBinding                 NurtureParticipantPrincipalBinding?                 @relation(fields: [actorPrincipalBindingId], references: [id], onDelete: Restrict)
+  c30PairOperation                      NurtureC30PairOperation?                            @relation("NurtureC30PairExecution")
+  c30ActionOperation                    NurtureC30ActionOperation?                          @relation("NurtureC30ActionExecution")
+  institutionWorkflowTransition         NurtureInstitutionWorkflowTransition?
+  enrollmentWaitlistOverride            NurtureEnrollmentWaitlistOverride?
+  institutionKnowledgeEvents            NurtureInstitutionKnowledgeRevisionEvent[]
+  institutionKnowledgeConflictCandidate NurtureInstitutionKnowledgeConflictReviewCandidate?
 
   @@unique([workspaceId, commandRequestIdHash], map: "uq_nurture_command_execution_identity")
   @@index([workspaceId, commandKey, committedAt], map: "ix_nurture_command_execution_key")
@@ -3159,6 +3161,33 @@ model NurtureInstitutionKnowledgeRevisionEvent {
   @@index([workspaceId, institutionId, occurredAt], map: "ix_nurture_knowledge_event_occurred")
   @@index([revisionId, itemHead, eventOrdinal], map: "ix_nurture_knowledge_event_revision")
   @@map("nurture_institution_knowledge_revision_event")
+}
+
+// G4-E increment 3: immutable, non-authoritative conflict-review input.
+// It carries no status/deadline/resolution and cannot affect source eligibility.
+model NurtureInstitutionKnowledgeConflictReviewCandidate {
+  id                          String   @id(map: "nurture_knowledge_conflict_candidate_pkey") @default(uuid())
+  candidateRef                String   @unique(map: "uq_nurture_knowledge_conflict_candidate_ref") @map("candidate_ref")
+  workspaceId                 String   @map("workspace_id")
+  institutionId               String   @map("institution_id")
+  candidateIdentityHash       String   @map("candidate_identity_hash") @db.Char(64)
+  ruleSetRef                  String   @map("rule_set_ref")
+  ruleVersion                 String   @map("rule_version")
+  conflictClass               String   @map("conflict_class")
+  findingFingerprint          String   @map("finding_fingerprint") @db.Char(64)
+  sourceTuples                Json     @map("source_tuples")
+  targetedNurtureRevisionRefs String[] @map("targeted_nurture_revision_refs")
+  evidenceMode                String   @map("evidence_mode")
+  evidenceEnvelope            Json     @map("evidence_envelope")
+  commandExecutionId          String   @unique(map: "uq_nurture_knowledge_conflict_execution") @map("command_execution_id")
+  createdAt                   DateTime @default(now()) @map("created_at")
+
+  institution      NurtureCareInstitution  @relation(fields: [institutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_conflict_institution_id_fkey")
+  commandExecution NurtureCommandExecution @relation(fields: [commandExecutionId], references: [id], onDelete: Restrict, map: "nurture_knowledge_conflict_execution_id_fkey")
+
+  @@unique([workspaceId, institutionId, candidateIdentityHash], map: "uq_nurture_knowledge_conflict_identity")
+  @@index([workspaceId, institutionId, createdAt], map: "ix_nurture_knowledge_conflict_created")
+  @@map("nurture_institution_knowledge_conflict_review_candidate")
 }
 
 // G4-D increment 2: private inquiry carrier for EnrollmentJourneyWorkflowV1.

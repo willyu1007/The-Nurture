@@ -15,7 +15,10 @@
 - E2 retrieval/currentness I1.2: `G4_E_I1_2_PASS_STATIC`; see
   [`71`](./71-g4-e-increment-2-record.md). It adds no schema, database or
   runtime effect.
-- Current node: E3 answer safety/candidate I1.3.
+- E3 answer safety/candidate I1.3: `G4_E_I1_3_PASS_STATIC`; see
+  [`72`](./72-g4-e-increment-3-record.md). Its one-table migration is authored
+  and unapplied; no model/provider/runtime is bound.
+- Current node: E4 I1 audit and disposable persistence qualification.
 - I3/I4 gates Q1–Q4 remain unresolved; no compatibility fallback is allowed.
 
 ## Planning-mode context and merge policy
