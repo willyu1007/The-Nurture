@@ -12,7 +12,10 @@
 - E1 lifecycle/provenance I1.1: `G4_E_I1_1_PASS_STATIC`; see
   [`70`](./70-g4-e-increment-1-record.md). Migration execution remains reserved
   for approved disposable qualification in E4.
-- Current node: E2 retrieval/currentness I1.2.
+- E2 retrieval/currentness I1.2: `G4_E_I1_2_PASS_STATIC`; see
+  [`71`](./71-g4-e-increment-2-record.md). It adds no schema, database or
+  runtime effect.
+- Current node: E3 answer safety/candidate I1.3.
 - I3/I4 gates Q1–Q4 remain unresolved; no compatibility fallback is allowed.
 
 ## Planning-mode context and merge policy

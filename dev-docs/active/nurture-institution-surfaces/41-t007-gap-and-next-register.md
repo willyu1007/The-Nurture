@@ -229,7 +229,7 @@ maintenance step without adopting the divergent My-Chat head.
 
 Cited by: [`58`](./58-g4-d-increment-2-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
-### G-11 — G4-E I1.1 is complete statically; I1.2/I1.3 and DB qualification remain
+### G-11 — G4-E I1.1/I1.2 are complete statically; I1.3 and DB qualification remain
 
 [`70`](./70-g4-e-increment-1-record.md) implements the frozen 0F-1 private
 item, sealed immutable revision, atomic authority links, append-only events and
@@ -238,9 +238,11 @@ complete bounded history, row-locked revision allocation and expected-item-head
 CAS form one write path. The four-table migration remains unapplied; no public
 Surface, retrieval, model/index runtime or second knowledge lifecycle exists.
 
-Roadmap E2 must now implement 0F-2 retrieval/currentness as pure policies and
-bounded ports/providers with no new table. E3 then owns cited-answer safety and
-the one immutable conflict candidate. E4 may execute migrations and the DB lane
+[`71`](./71-g4-e-increment-2-record.md) now implements 0F-2's pure
+index/online/preview eligibility, body-free change/reconciliation provider,
+bounded retrieval/currentness ports and actor-bound opaque preview options.
+It adds no table and binds no real Host owner/runtime. E3 now owns cited-answer
+safety and the one immutable conflict candidate. E4 may execute migrations and the DB lane
 only after Q1 names and approves one exact disposable target. I3/I4 additionally
 remain closed on the adopted My-Chat scenario deltas and deterministic answer-
 safety owner/rule pin; synthetic compatibility mappings cannot close them.
@@ -274,9 +276,9 @@ safety owner/rule pin; synthetic compatibility mappings cannot close them.
 
 ## Next steps, in dependency order
 
-1. **G4-E I1 increment 2** — implement frozen 0F-2 index/online/preview
-   eligibility, source discovery/reconciliation and final-currentness ports;
-   consume E1 facts, add no table, model runtime, Surface or DB operation.
+1. **G4-E I1 increment 3** — implement frozen 0F-3 claim/citation/abstention,
+   deterministic safety orchestration and the one immutable conflict-review
+   candidate; do not bind a model runtime or invent an answer-safety owner.
 2. **G4-D I3** — after G-09 adoption, bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the

@@ -1017,3 +1017,27 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   disposable migration/DB qualification remains E4/Q1.
 - Detailed evidence: [`70`](./70-g4-e-increment-1-record.md). E2 retrieval and
   currentness is next; it must add no table or local Host RAG runtime.
+
+## 2026-08-10 — G4-E increment 2 retrieval/currentness
+
+- Implemented one shared 0F-2 eligibility kernel for index admission and
+  online currentness. Future-effective reviewed content may enter the Host
+  index, while online use still requires current time, exact applicability and
+  current Admin Workbench authority.
+- Added bounded source-change/read/reconciliation, retrieval-consumer,
+  authority-source-currentness and final-currentness contracts plus a private
+  editor-preview provider. There is no table, cursor store, local index/vector/
+  cache or Host SDK/runtime.
+- Made all public source/event/cursor/reconciliation/preview option identities
+  owner-issued and opaque. Preview options are actor/invocation-bound and
+  return no internal item/revision ID; source changes are reconstructed as
+  body-free closed objects.
+- Quality review moved authority ahead of retrieval/body access, replaced an
+  E2 history validator with the E1 SSOT, distinguished source drift from
+  missing publication, and enforced ordered currentness plus complete stable
+  reconciliation pages.
+- Targeted 12/12 and full 923/923 unit tests, root typecheck, structural gates
+  and the exact eight-file generic source pin pass. Live My-Chat workflow-pin
+  drift remains an attributed owner gate. No DB or external owner was touched.
+- Detailed evidence: [`71`](./71-g4-e-increment-2-record.md). E3 structured
+  answer/citation safety and the one immutable candidate are next.

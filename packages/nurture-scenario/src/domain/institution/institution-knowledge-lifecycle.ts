@@ -541,7 +541,9 @@ export const canonicalizeInstitutionKnowledgeCommand = (
   };
 };
 
-const validRevisionChain = (facts: NurtureInstitutionKnowledgeCommandFacts): boolean => {
+export const validateInstitutionKnowledgeCommandFacts = (
+  facts: NurtureInstitutionKnowledgeCommandFacts,
+): boolean => {
   if (!facts.item) return facts.revisions.length === 0 && facts.events.length === 0;
   if (facts.revisions.length === 0) return false;
   if (!facts.revisions.every(
@@ -638,7 +640,7 @@ export const decideInstitutionKnowledgeCommand = (input: {
   ) {
     return { status: "denied", layer: "authority", reason_code: "not_authorized" };
   }
-  if (!validRevisionChain(input.facts)) {
+  if (!validateInstitutionKnowledgeCommandFacts(input.facts)) {
     return { status: "unavailable", reason_code: "knowledge_revision_chain_unavailable" };
   }
   if (input.command.action === "create_institution_knowledge_item") {

@@ -39,7 +39,9 @@ Project: `main`
   frozen lifecycle/provenance, retrieval/owner bridge and cited-answer/safety
   contract. Its repaired 0G audit and `G4_0F_EXIT_PASS` are complete. G4-E I1.1
   now passes statically with the private lifecycle/provenance owner and an
-  unapplied four-table migration; I1.2 retrieval/currentness is next. I3 waits
+  unapplied four-table migration. I1.2 retrieval/currentness also passes
+  statically with pure source/currentness/preview providers and no schema or
+  runtime effect; I1.3 answer safety/candidate is next. I3 waits
   for exact external owner/safety adoption.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
@@ -49,9 +51,9 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Execute G4-E roadmap E2.** Implement only 0F-2 pure retrieval/currentness
-   policy and bounded ports/providers; add no table, model runtime, Surface or
-   DB operation.
+1. **Execute G4-E roadmap E3.** Implement only 0F-3 structured answer/citation
+   safety and the one immutable conflict candidate; do not bind a model runtime
+   or invent an answer-safety provider.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.

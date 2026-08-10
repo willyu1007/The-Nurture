@@ -6,8 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **execute roadmap E2, the G4-E I1.2 0F-2 pure
-  retrieval/currentness increment;
+- Next step: **execute roadmap E3, the G4-E I1.3 0F-3 structured
+  answer-safety/conflict-candidate increment;
   after G-09 adoption, G4-D I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
@@ -29,7 +29,11 @@
   [`roadmap.md`](./roadmap.md). E1 now implements the strict private lifecycle,
   sealed revision/provenance facts, exact-replay commands and four-table
   unapplied migration artifact with `G4_E_I1_1_PASS_STATIC`
-  ([`70`](./70-g4-e-increment-1-record.md)); no database was touched. I2-A
+  ([`70`](./70-g4-e-increment-1-record.md)). E2 now implements the pure
+  index/online/preview eligibility, body-free source pull/reconciliation,
+  exact candidate/currentness ports and actor-bound opaque preview options
+  with `G4_E_I1_2_PASS_STATIC` ([`71`](./71-g4-e-increment-2-record.md)); no
+  schema or database was touched. I2-A
   rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,
@@ -41,7 +45,7 @@
   behind the unqualified Enrollment Journey runtime gate. Real contact/native-
   source and authenticated My-Chat owner adapters remain I3 work blocked by
   G-09. All three 0F unit contracts, their 0G audit and branch Exit pass. E1
-  creates private source/schema/migration artifacts only: no model call,
+  and E2 create private source/schema/port artifacts only: no model call,
   indexing, database operation, public capability, activation or traffic.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).

@@ -684,6 +684,21 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 
 Detailed evidence: [`70`](./70-g4-e-increment-1-record.md).
 
+## 2026-08-10 — G4-E increment 2 retrieval/currentness
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Architecture review | PASS after repair | [`71`](./71-g4-e-increment-2-record.md) records closed authorization-order, opaque-ref, preview-option, body-free mapping, drift classification, SSOT and reconciliation findings. |
+| Targeted E2 suite | PASS | 12/12 covers index/online split, closed eligibility, medical authority, service purpose, stable body-free changes/reconciliation, denial/unavailable, online authorization/currentness, preview and all four limits. |
+| Full unit lane | PASS | `pnpm test:unit`: 923/923 across 83 files. |
+| TypeScript | PASS | Root `pnpm typecheck` and scenario package typecheck. |
+| Structural gates | PASS | Test routing 152 files; persistence, port topology, formal ingress, G2 contract/census and G3 freeze pass. |
+| Generic owner pin | PASS | Eight committed My-Chat Knowledge/RAG files remain exact at `567b96c` / `554e79d4…`; verifier tests pass 3/3. |
+| Live workflow pin | EXPECTED OWNER GATE | Exact workflow verifier rejects live My-Chat `2dc365e` against `567b96c`; no sibling checkout or pin was changed. |
+| Runtime/DB effect | NOT RUN / PASS | No Prisma/schema/migration delta, DB connection, source ingestion, model/index, Surface, deployment, activation or traffic. |
+
+Detailed evidence: [`71`](./71-g4-e-increment-2-record.md).
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、
