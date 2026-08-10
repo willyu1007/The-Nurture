@@ -6,7 +6,8 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-10
-- Next step: **enter G4-E I1 with the 0F-1 pure domain/persistence increment;
+- Next step: **execute roadmap E1, the G4-E I1.1 0F-1 pure
+  domain/persistence increment;
   after G-09 adoption, G4-D I3 may proceed independently**. The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
   without adopting the divergent checkout
@@ -23,7 +24,9 @@
   append from the five knowledge-lifecycle commands
   ([`68`](./68-g4-0g-0f-audit-record.md)); 0F is released by
   `G4_0F_EXIT_PASS`, opening G4-E I1 only
-  ([`69`](./69-g4-0f-exit-record.md)). I2-A
+  ([`69`](./69-g4-0f-exit-record.md)). The macro sequence, per-node quality
+  gates and I3 external/DB prerequisites are fixed in
+  [`roadmap.md`](./roadmap.md). I2-A
   rotated the exact public wire artifact to
   `nurture.surface-contract@1.19.0` / `sha256:6f67d49c…`: three queries and 21
   commands map the completed private I1 domain without exposing trusted scope,

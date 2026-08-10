@@ -982,3 +982,18 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   public Surface rotation and copy/export delivery.
 - No implementation, Prisma, migration, DB, source, model, owner, capability,
   deployment, activation or traffic operation occurred in the Exit node.
+
+## 2026-08-10 — G4-E implementation roadmap
+
+- Reused T-007 / M-002 / F-003 and added the first task-level macro roadmap.
+  No new task or documentation bundle was created.
+- Sequenced G4-E into eight reversible nodes: roadmap/preflight; three private
+  I1 increments; I1 audit/disposable DB qualification; I2-A artifact; I2-B
+  default-off adapters; I3 exact owner readiness; I4 joint conformance/Exit.
+- Fixed the first code node to 0F-1 domain/persistence only. Retrieval, answer
+  safety, public Surface and owner integration cannot leak into E1.
+- Recorded three hard later gates: exact disposable PostgreSQL target, adopted
+  My-Chat scenario deltas and a deterministic answer-safety provider/rule pin.
+  Missing gates stop their phase rather than creating compatibility fallbacks.
+- Each node requires architecture review, full repair, task/project sync and a
+  dedicated `Task: T-007` commit from a clean worktree.

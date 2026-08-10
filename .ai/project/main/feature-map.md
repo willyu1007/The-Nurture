@@ -375,8 +375,8 @@ Project: `main`
   real owner provider, capability activation or durable database apply exists.
   0F has an exact generic Knowledge/PBR/RAG source pin, accepted three-unit
   scope, all three unit freezes, a repaired cross-contract audit and
-  `G4_0F_EXIT_PASS`; it has no implementation yet.
-- Next Checkpoint: enter G4-E I1 increment 1 for 0F-1 pure domain/persistence;
+  `G4_0F_EXIT_PASS`; its E1–E8 roadmap is fixed and it has no implementation yet.
+- Next Checkpoint: execute G4-E roadmap E1 for 0F-1 pure domain/persistence;
   independently, explicit G-09 adoption may open G4-D I3 authenticated
   prospective-contact/native-source/current-owner and formal-ingress binding.
   I4 joint conformance follows only after I3 qualifies.

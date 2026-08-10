@@ -38,7 +38,8 @@ Project: `main`
   now has an exact generic My-Chat source pin, accepted three-unit scope and a
   frozen lifecycle/provenance, retrieval/owner bridge and cited-answer/safety
   contract. Its repaired 0G audit and `G4_0F_EXIT_PASS` are complete; G4-E
-  implementation remains open. I3 waits for G-09.
+  implementation is sequenced by the task roadmap and begins at I1.1. I3 waits
+  for exact external owner/safety adoption.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -47,7 +48,7 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Enter G4-E I1 increment 1.** Implement only 0F-1 pure domain/persistence
+1. **Execute G4-E roadmap E1.** Implement only 0F-1 pure domain/persistence
    artifacts; retain default-off/runtime/DB-apply boundaries.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative

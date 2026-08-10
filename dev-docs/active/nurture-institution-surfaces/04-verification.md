@@ -655,6 +655,18 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Docs / context / governance | PASS | Strict task-doc lint passes 115/115 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
 | Database / runtime effect | NOT RUN / PASS | Exit/docs only. No Prisma/schema/migration authoring, DB connection/apply, source, model, owner, capability, deployment, activation or traffic effect exists. |
 
+## 2026-08-10 — G4-E implementation roadmap
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Governance triage | `REUSE_TASK` | Existing T-007 remains mapped to M-002/F-003; no duplicate task or dev-docs bundle was created. |
+| Roadmap completeness | PASS | [`roadmap.md`](./roadmap.md) records Default-mode fallback, input precedence, non-goals, four gated questions, eight phases, per-phase DoD/rollback, structure preview, verification and risk matrix. |
+| Release-boundary parity | PASS | E1 starts with 0F-1 private domain/persistence only; I2 remains default-off and I3/I4 require exact DB/upstream/safety-owner gates. No compatibility owner or local Host runtime is planned. |
+| Per-node delivery rule | PASS | Every node requires review, full repair, task/project sync, clean worktree and a dedicated `Task: T-007` commit before the next node. |
+| Pin / LLM config | PASS | Exact eight-file generic source pin remains green; zero in-scope LLM env/config references and no provider/profile/prompt implementation. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 116/116 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
+| Runtime / DB effect | NOT RUN / PASS | Planning/docs only. No application source, config, Prisma, migration, DB, owner, model, capability, activation or traffic effect. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

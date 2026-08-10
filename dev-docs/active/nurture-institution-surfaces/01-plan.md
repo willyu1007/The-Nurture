@@ -545,6 +545,11 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   [`69-g4-0f-exit-record.md`](./69-g4-0f-exit-record.md) issues
   `G4_0F_EXIT_PASS` and opens G4-E I1 only, beginning with 0F-1 pure
   domain/persistence and migration authoring.
+- [`roadmap.md`](./roadmap.md) sequences G4-E as E1 lifecycle/provenance, E2
+  retrieval/currentness, E3 answer safety/candidate, E4 I1 audit/DB
+  qualification, E5/E6 I2 Contract/adapter boundaries, E7 I3 real owner
+  readiness and E8 I4 joint conformance/Exit. Every node must be reviewed,
+  repaired, synchronized and committed before the next begins.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料
