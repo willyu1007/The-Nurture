@@ -642,6 +642,19 @@ Detailed evidence: [`63`](./63-g4-d-i2-b-surface-adapter-record.md).
 | Docs / context / governance | PASS | Strict task-doc lint passes 114/114 with zero warnings; LLM config, Context, project-state, governance lint and `git diff --check` pass. |
 | Database / runtime effect | NOT RUN / PASS | Audit/docs only. No Prisma, migration, DB, model, candidate, source, owner adoption, capability, activation or traffic effect exists. |
 
+## 2026-08-10 — G4-0F Exit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Branch verdict | `G4_0F_EXIT_PASS` | [`69`](./69-g4-0f-exit-record.md) releases 0F after scope/pin, three unit freezes and `G4_0G_0F_AUDIT_PASS_AFTER_REPAIR`; no audit finding is deferred. |
+| Release boundary | PASS | Opens G4-E I1 only. First node is 0F-1 strict domain/pure policy/repository ports/Prisma migration authoring plus synthetic/static gates; manifest/module and DB apply stay absent. |
+| Owner readiness truth | PASS | Generic Knowledge/PBR/RAG remains exact/pinned; Institution source/currentness/generation and deterministic answer-safety bridges remain `DEFINED_UNQUALIFIED`, so online generation stays unavailable. |
+| Persistence plan | PASS statically | Exactly five non-overlapping planned tables; existing command ledger/protected-content port reused. No answer/citation/index/model/outbox or candidate status/event table. |
+| Deferred capability safety | PASS | No child/family retrieval, caregiver/Guardian/family share, public Surface, copy/export route, provider SDK, local model/vector/index/cache or source ingestion was opened. |
+| Pin / LLM config | PASS | Eight-file source pin validates at `567b96c` / `554e79d4…`; zero in-scope LLM env/config references and no provider/profile/prompt implementation. |
+| Docs / context / governance | PASS | Strict task-doc lint passes 115/115 with zero warnings; Context, project-state, governance lint and `git diff --check` pass. |
+| Database / runtime effect | NOT RUN / PASS | Exit/docs only. No Prisma/schema/migration authoring, DB connection/apply, source, model, owner, capability, deployment, activation or traffic effect exists. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

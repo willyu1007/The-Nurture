@@ -965,3 +965,20 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Recomputed nested bounds and verified that 16 final citations fit both owner
   currentness paths without truncation. Generic owner pin remains exact; all
   Institution generation/currentness/safety bridges remain unqualified.
+
+## 2026-08-10 — G4-0F Exit
+
+- Issued `G4_0F_EXIT_PASS` after the scope/pin, three unit freezes and repaired
+  0G audit. The release opens G4-E I1 only and does not complete T-007.
+- Fixed the first implementation node to 0F-1 strict domain types, pure
+  lifecycle policy, repository/transaction ports, Prisma SSOT/migration
+  authoring and synthetic/static gates. Manifest/module and DB apply remain
+  absent.
+- Preserved the exact readiness split: generic My-Chat Knowledge/PBR/RAG is
+  pinned, while Institution source/currentness/generation plus deterministic
+  answer-safety bridges remain unqualified and fail closed.
+- Carried forward five non-overlapping planned tables and prohibited local
+  model/vector/index/cache/outbox, candidate lifecycle, child/family retrieval,
+  public Surface rotation and copy/export delivery.
+- No implementation, Prisma, migration, DB, source, model, owner, capability,
+  deployment, activation or traffic operation occurred in the Exit node.

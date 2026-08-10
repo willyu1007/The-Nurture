@@ -541,8 +541,10 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   in [`67-g4-0f-3-citation-answer-safety-freeze.md`](./67-g4-0f-3-citation-answer-safety-freeze.md).
   The cross-contract audit passes after removing candidate-as-eligibility-hold
   and lifecycle-command ambiguity
-  ([`68-g4-0g-0f-audit-record.md`](./68-g4-0g-0f-audit-record.md)). Only the
-  branch Exit remains before G4-E I1 release.
+  ([`68-g4-0g-0f-audit-record.md`](./68-g4-0g-0f-audit-record.md)).
+  [`69-g4-0f-exit-record.md`](./69-g4-0f-exit-record.md) issues
+  `G4_0F_EXIT_PASS` and opens G4-E I1 only, beginning with 0F-1 pure
+  domain/persistence and migration authoring.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料

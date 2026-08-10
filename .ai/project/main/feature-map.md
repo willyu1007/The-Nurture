@@ -184,7 +184,8 @@ Project: `main`
   and exited; the G4-D branch has private I1 plus default-off I2. 0F has accepted its
   exact generic owner source pin, three-unit scope, lifecycle/provenance contract and
   retrieval/owner bridge plus cited-answer/safety contract. Its 0G audit passes;
-  Exit and G4-E implementation remain open. None of these checkpoints completes T-007.
+  `G4_0F_EXIT_PASS` is issued and G4-E implementation remains open. None of these
+  checkpoints completes T-007.
   Implementation advances through I0 Design/Synthetic, I1 Branch Freeze, I2 Contract
   Boundary, I3 Owner Integration Readiness and I4 Joint Conformance. Each G4 package
   has its own DoD; overall acceptance covers contract/ownership, required product
@@ -373,8 +374,9 @@ Project: `main`
   fail-closed, explicitly disabled module/manifest adapters. No formal ingress,
   real owner provider, capability activation or durable database apply exists.
   0F has an exact generic Knowledge/PBR/RAG source pin, accepted three-unit
-  scope, all three unit freezes and a passing cross-contract audit; Exit remains open.
-- Next Checkpoint: sign the 0F Exit, then enter G4-E I1;
+  scope, all three unit freezes, a repaired cross-contract audit and
+  `G4_0F_EXIT_PASS`; it has no implementation yet.
+- Next Checkpoint: enter G4-E I1 increment 1 for 0F-1 pure domain/persistence;
   independently, explicit G-09 adoption may open G4-D I3 authenticated
   prospective-contact/native-source/current-owner and formal-ingress binding.
   I4 joint conformance follows only after I3 qualifies.

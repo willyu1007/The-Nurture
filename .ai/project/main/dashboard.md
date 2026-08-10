@@ -37,8 +37,8 @@ Project: `main`
   33 migrations. I2-A/I2-B are complete and remain default-off. Independent 0F
   now has an exact generic My-Chat source pin, accepted three-unit scope and a
   frozen lifecycle/provenance, retrieval/owner bridge and cited-answer/safety
-  contract. Its 0G audit passes; Exit and G4-E implementation remain open. I3
-  waits for G-09.
+  contract. Its repaired 0G audit and `G4_0F_EXIT_PASS` are complete; G4-E
+  implementation remains open. I3 waits for G-09.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -47,8 +47,8 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Sign the 0F branch Exit.** The accepted unit freezes and audit do
-   not authorize G4-E implementation or replace any G4-D gate.
+1. **Enter G4-E I1 increment 1.** Implement only 0F-1 pure domain/persistence
+   artifacts; retain default-off/runtime/DB-apply boundaries.
 2. **Keep I3/I4 closed on G-09.** I2-A/I2-B are complete and default-off;
    authenticated My-Chat evidence/private ingress and joint replay/negative
    conformance require an explicit upstream adoption decision.
