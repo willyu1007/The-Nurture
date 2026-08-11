@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-10T10:38:43.981Z",
+  "updatedAt": "2026-08-11T09:51:00.957Z",
   "ssot": {
     "mode": "repo-prisma",
     "source": {
@@ -746,6 +746,14 @@
         "activity_resource",
         "guardian_communication",
         "basic_health_first_aid"
+      ]
+    },
+    {
+      "name": "NurtureInstitutionKnowledgePreparedCommandStatus",
+      "values": [
+        "prepared",
+        "consumed",
+        "expired"
       ]
     },
     {
@@ -5951,6 +5959,15 @@
           "references": []
         },
         {
+          "field": "institutionKnowledgePreparedCommands",
+          "to": "NurtureInstitutionKnowledgePreparedCommand",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
           "field": "institutionKnowledgeRevisions",
           "to": "NurtureInstitutionKnowledgeRevision",
           "optional": false,
@@ -6348,6 +6365,15 @@
         {
           "field": "institutionKnowledgeEvents",
           "to": "NurtureInstitutionKnowledgeRevisionEvent",
+          "optional": false,
+          "list": true,
+          "relationName": null,
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgePreparedCommands",
+          "to": "NurtureInstitutionKnowledgePreparedCommand",
           "optional": false,
           "list": true,
           "relationName": null,
@@ -19995,6 +20021,309 @@
       ]
     },
     {
+      "name": "NurtureInstitutionKnowledgePreparedCommand",
+      "dbName": "nurture_institution_knowledge_prepared_command",
+      "schema": null,
+      "columns": [
+        {
+          "name": "aggregateVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "aggregate_version",
+          "dbType": null,
+          "default": "1",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "capabilityKey",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "capability_key",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "clientCommandIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "client_command_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "clientSurface",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "client_surface",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "commandRequestId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "command_request_id",
+          "dbType": "VarChar",
+          "default": null,
+          "primaryKey": true,
+          "unique": false
+        },
+        {
+          "name": "confirmationRefHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "confirmation_ref_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "consumedAt",
+          "type": "DateTime",
+          "nullable": true,
+          "list": false,
+          "dbName": "consumed_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "created_at",
+          "dbType": null,
+          "default": "now()",
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "expires_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "frozenSnapshotCiphertext",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "frozen_snapshot_ciphertext",
+          "dbType": "Text",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "institutionId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "institution_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "originInvocationRequestIdHash",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "origin_invocation_request_id_hash",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "participantId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "participant_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "preparedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "prepared_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "prepareFingerprint",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "prepare_fingerprint",
+          "dbType": "Char",
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "roleAssignmentId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "role_assignment_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "snapshotCodecVersion",
+          "type": "Int",
+          "nullable": false,
+          "list": false,
+          "dbName": "snapshot_codec_version",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "status",
+          "type": "NurtureInstitutionKnowledgePreparedCommandStatus",
+          "nullable": false,
+          "list": false,
+          "dbName": null,
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "nullable": false,
+          "list": false,
+          "dbName": "updated_at",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        },
+        {
+          "name": "workspaceId",
+          "type": "String",
+          "nullable": false,
+          "list": false,
+          "dbName": "workspace_id",
+          "dbType": null,
+          "default": null,
+          "primaryKey": false,
+          "unique": false
+        }
+      ],
+      "relations": [
+        {
+          "field": "institution",
+          "to": "NurtureCareInstitution",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "institutionId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "participant",
+          "to": "NurtureParticipant",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "participantId"
+          ],
+          "references": [
+            "id"
+          ]
+        },
+        {
+          "field": "roleAssignment",
+          "to": "NurtureCareRoleAssignment",
+          "optional": false,
+          "list": false,
+          "relationName": null,
+          "fields": [
+            "roleAssignmentId"
+          ],
+          "references": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "institutionId",
+            "status",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_prepared_institution"
+        },
+        {
+          "type": "index",
+          "fields": [
+            "workspaceId",
+            "participantId",
+            "status",
+            "expiresAt"
+          ],
+          "name": null,
+          "map": "ix_nurture_knowledge_prepared_participant"
+        },
+        {
+          "type": "unique",
+          "fields": [
+            "workspaceId",
+            "participantId",
+            "clientSurface",
+            "clientCommandIdHash"
+          ],
+          "name": null,
+          "map": "uq_nurture_knowledge_prepared_client_command"
+        }
+      ]
+    },
+    {
       "name": "NurtureInstitutionKnowledgeRevision",
       "dbName": "nurture_institution_knowledge_revision",
       "schema": null,
@@ -23130,6 +23459,15 @@
           "optional": false,
           "list": true,
           "relationName": "NurtureKnowledgeEventActor",
+          "fields": [],
+          "references": []
+        },
+        {
+          "field": "institutionKnowledgePreparedCommands",
+          "to": "NurtureInstitutionKnowledgePreparedCommand",
+          "optional": false,
+          "list": true,
+          "relationName": null,
           "fields": [],
           "references": []
         },

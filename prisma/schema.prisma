@@ -824,6 +824,12 @@ enum NurtureInteractionContextStatus {
   revoked
 }
 
+enum NurtureInstitutionKnowledgePreparedCommandStatus {
+  prepared
+  consumed
+  expired
+}
+
 enum NurtureCommandBusinessOutcome {
   applied
   already_satisfied
@@ -1856,6 +1862,7 @@ model NurtureParticipant {
   c30ProtectedContentTransitioned NurtureC30ProtectedContent[]               @relation("NurtureC30ProtectedContentTransitionActor")
   institutionKnowledgeRevisions   NurtureInstitutionKnowledgeRevision[]      @relation("NurtureKnowledgeRevisionAuthor")
   institutionKnowledgeEvents      NurtureInstitutionKnowledgeRevisionEvent[] @relation("NurtureKnowledgeEventActor")
+  institutionKnowledgePreparedCommands NurtureInstitutionKnowledgePreparedCommand[]
 
   @@index([workspaceId, myChatUserId, status], map: "ix_nurture_participant_auth")
   @@map("nurture_participant")
@@ -2288,6 +2295,7 @@ model NurtureCareInstitution {
   institutionKnowledgeAuthorityLinks     NurtureInstitutionKnowledgeAuthorityLink[]
   institutionKnowledgeEvents             NurtureInstitutionKnowledgeRevisionEvent[]
   institutionKnowledgeConflictCandidates NurtureInstitutionKnowledgeConflictReviewCandidate[]
+  institutionKnowledgePreparedCommands   NurtureInstitutionKnowledgePreparedCommand[]
 
   @@index([workspaceId, status, updatedAt], map: "ix_nurture_institution_status")
   @@map("nurture_care_institution")
@@ -2500,6 +2508,7 @@ model NurtureCareRoleAssignment {
   enrollmentFormalProposals       NurtureEnrollmentFormalProposal[]
   institutionKnowledgeRevisions   NurtureInstitutionKnowledgeRevision[]
   institutionKnowledgeEvents      NurtureInstitutionKnowledgeRevisionEvent[]
+  institutionKnowledgePreparedCommands NurtureInstitutionKnowledgePreparedCommand[]
 
   @@index([workspaceId, participantId, status], map: "ix_nurture_role_participant")
   @@index([workspaceId, role, scopeType, scopeId, status], map: "ix_nurture_role_scope")
@@ -2993,6 +3002,40 @@ model NurtureInteractionContext {
   @@index([workspaceId, participantId, status, expiresAt], map: "ix_nurture_interaction_participant")
   @@index([workspaceId, hostConversationRefHash, status, expiresAt], map: "ix_nurture_interaction_conversation")
   @@map("nurture_interaction_context")
+}
+
+// T-007 formal Institution Knowledge prepare/confirm ledger. The encrypted
+// snapshot is owner-held; command execution accepts only its opaque ids.
+model NurtureInstitutionKnowledgePreparedCommand {
+  commandRequestId              String                                           @id @map("command_request_id") @db.VarChar(200)
+  workspaceId                   String                                           @map("workspace_id")
+  participantId                 String                                           @map("participant_id")
+  institutionId                 String                                           @map("institution_id")
+  roleAssignmentId              String                                           @map("role_assignment_id")
+  clientSurface                 String                                           @map("client_surface")
+  clientCommandIdHash           String                                           @map("client_command_id_hash") @db.Char(64)
+  prepareFingerprint            String                                           @map("prepare_fingerprint") @db.Char(64)
+  originInvocationRequestIdHash String                                           @map("origin_invocation_request_id_hash") @db.Char(64)
+  confirmationRefHash           String                                           @map("confirmation_ref_hash") @db.Char(64)
+  capabilityKey                 String                                           @map("capability_key") @db.VarChar(100)
+  snapshotCodecVersion          Int                                              @map("snapshot_codec_version")
+  frozenSnapshotCiphertext      String                                           @map("frozen_snapshot_ciphertext") @db.Text
+  status                        NurtureInstitutionKnowledgePreparedCommandStatus
+  preparedAt                    DateTime                                         @map("prepared_at")
+  expiresAt                     DateTime                                         @map("expires_at")
+  consumedAt                    DateTime?                                        @map("consumed_at")
+  aggregateVersion              Int                                              @default(1) @map("aggregate_version")
+  createdAt                     DateTime                                         @default(now()) @map("created_at")
+  updatedAt                     DateTime                                         @updatedAt @map("updated_at")
+
+  participant    NurtureParticipant        @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  institution    NurtureCareInstitution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  roleAssignment NurtureCareRoleAssignment @relation(fields: [roleAssignmentId], references: [id], onDelete: Restrict)
+
+  @@unique([workspaceId, participantId, clientSurface, clientCommandIdHash], map: "uq_nurture_knowledge_prepared_client_command")
+  @@index([workspaceId, participantId, status, expiresAt], map: "ix_nurture_knowledge_prepared_participant")
+  @@index([workspaceId, institutionId, status, expiresAt], map: "ix_nurture_knowledge_prepared_institution")
+  @@map("nurture_institution_knowledge_prepared_command")
 }
 
 model NurtureCommandExecution {
