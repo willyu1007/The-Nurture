@@ -189,7 +189,7 @@ const computeLock = () => {
     host: {
       // 2a2bb3c seals the trusted registry adoption. Later default-off owner
       // commits are content-inert for the C30 Host adoption source profiles.
-      head_revision: "d585ada320fddfc3c3347eb3b1528dad12afd2b1",
+      head_revision: "caa367e7f344675322ceec2390e57f5421cf9220",
       runtime_revision: "a57e1aedf960e008f34f06c3f898e5cfc35fc522",
       aggregate_source_hash: "cfd2f1d1c4e060aa468b20e71120a1e9e73abb7e4809f01faa0802cba2e1edb7",
     },
