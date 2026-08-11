@@ -879,37 +879,3 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
     };
   }
 }
-
-export const createNurtureInstitutionKnowledgeInternalApiHandlers = (
-  deps: NurtureInstitutionKnowledgeSurfaceDeps,
-) => {
-  const handler = new NurtureInstitutionKnowledgeSurfaceHandler(deps);
-  const invoke = (
-    payload: unknown,
-    meta: WorkflowCommandMeta,
-    expectedLane: "query" | "command",
-  ) => {
-    const parsed = parseNurtureInstitutionKnowledgeAdapterRequest(payload);
-    if (!parsed || isQueryKey(parsed.capabilityKey) !== (expectedLane === "query")) {
-      return Promise.resolve({
-        status: "invalid" as const,
-        reason_code: "invalid_institution_knowledge_request",
-      });
-    }
-    return handler.handle(parsed, {
-      workspace_id: meta.workspace_id,
-      actor_participant_ref: meta.actor_id ?? "",
-      invocation_request_id: meta.correlation_id,
-      command_request_id: meta.idempotency_key,
-      client_surface: meta.client_surface,
-    });
-  };
-  return {
-    "nurture.internal.query_institution_knowledge": (
-      input: { payload: unknown; meta: WorkflowCommandMeta },
-    ) => invoke(input.payload, input.meta, "query"),
-    "nurture.internal.execute_institution_knowledge": (
-      input: { payload: unknown; meta: WorkflowCommandMeta },
-    ) => invoke(input.payload, input.meta, "command"),
-  };
-};

@@ -790,6 +790,39 @@ scenario_contracts:
             ingress_key: nurture.child_care_process_overview_v1
             principal_origins:
               - interactive_session
+      - endpoint_key: nurture.institution_knowledge.query
+        method: POST
+        operation_key: query_institution_knowledge
+        input_schema_key: nurture.institution_knowledge.query.input
+        input_schema_version: 1
+        handler_key: nurture.institution_knowledge.query.formal.v1
+        ingress:
+          - ingress_category: host_transition
+            ingress_key: nurture.institution_knowledge.query
+            principal_origins:
+              - interactive_session
+      - endpoint_key: nurture.institution_knowledge.command.prepare
+        method: POST
+        operation_key: prepare_institution_knowledge_command
+        input_schema_key: nurture.institution_knowledge.command.prepare.input
+        input_schema_version: 1
+        handler_key: nurture.institution_knowledge.command.prepare.formal.v1
+        ingress:
+          - ingress_category: host_transition
+            ingress_key: nurture.institution_knowledge.command.prepare
+            principal_origins:
+              - interactive_session
+      - endpoint_key: nurture.institution_knowledge.command.execute
+        method: POST
+        operation_key: execute_prepared_institution_knowledge_command
+        input_schema_key: nurture.institution_knowledge.command.execute.input
+        input_schema_version: 1
+        handler_key: nurture.institution_knowledge.command.execute.formal.v1
+        ingress:
+          - ingress_category: host_transition
+            ingress_key: nurture.institution_knowledge.command.execute
+            principal_origins:
+              - interactive_session
   subject_context_providers:
     - provider_key: nurture.child_care_process_v1
       provider_version: 1
