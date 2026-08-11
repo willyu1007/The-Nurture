@@ -109,6 +109,22 @@ export type NurtureInstitutionKnowledgeAdapterRequest<
       : { confirmationRef: string })
   : never;
 
+/**
+ * Unconfirmed command intent accepted only by the formal prepare owner. It
+ * deliberately has no confirmation field; execute accepts no typed payload.
+ */
+export type NurtureInstitutionKnowledgeCommandIntentV1<
+  Key extends NurtureInstitutionKnowledgeActionKey =
+    NurtureInstitutionKnowledgeActionKey,
+> = Key extends NurtureInstitutionKnowledgeActionKey
+  ? {
+      capabilityKey: Key;
+      capabilityVersion: "1.0.0";
+      targetOptionRef: string;
+      operationInput: OperationInputByCapability[Key];
+    }
+  : never;
+
 export type NurtureInstitutionKnowledgeTrustedContextV1 = {
   workspace_id: string;
   actor_participant_ref: string;
@@ -319,6 +335,23 @@ export const parseNurtureInstitutionKnowledgeAdapterRequest = (
     if (value.confirmationRef !== undefined) return null;
   } else if (!opaqueRef(value.confirmationRef)) return null;
   return value as NurtureInstitutionKnowledgeAdapterRequest;
+};
+
+export const parseNurtureInstitutionKnowledgeCommandIntent = (
+  value: unknown,
+): NurtureInstitutionKnowledgeCommandIntentV1 | null => {
+  if (!exact(
+    value,
+    ["capabilityKey", "capabilityVersion", "targetOptionRef", "operationInput"],
+  ) || typeof value.capabilityKey !== "string") return null;
+  const capability = value.capabilityKey;
+  if (
+    !isActionKey(capability) ||
+    value.capabilityVersion !== "1.0.0" ||
+    !opaqueRef(value.targetOptionRef) ||
+    !validOperationInput(capability, value.operationInput)
+  ) return null;
+  return value as NurtureInstitutionKnowledgeCommandIntentV1;
 };
 
 const validTrustedContext = (
