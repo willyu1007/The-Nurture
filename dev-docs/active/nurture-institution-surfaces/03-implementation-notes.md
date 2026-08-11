@@ -1393,3 +1393,27 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   (`DR-E7-01` CHECK/expiry-scrub, `DR-E7-02` FK `map:` names); see record
   [`83`](./83-g4-e-e7-db-qualification-record.md). Durable apply remains
   approval-gated.
+
+## 2026-08-11 G4-E E8 joint conformance and Exit
+
+- The x5-lane joint suite
+  (`packages/nurture-db/tests/t007-institution-knowledge-e8-joint.integration.test.ts`)
+  drives the Base-committed / My-Chat-adopted `dispatchTrustedScenarioInvocation`
+  through the real Nurture formal owners and the real My-Chat principal-bound
+  retrieval/final-access, generation-ledger and answer-safety owners over two
+  fresh disposable databases. Twelve matrix cases pass, plus the full x5 lane
+  at 24/24 with the T-009 and T-002 joint files on the same targets.
+- The production `PrismaInstitutionKnowledgeReadOwner` closes record 82's
+  read-owner blocker: published-facts reads with an opaque keyed source object
+  id, `publication_event_ref.version = item_head` coherence and an
+  intentionally unavailable preview lane (Workbench-owned).
+- Findings: `DR-E8-02` — the production composer owes the flattening adapter
+  between the surface `finalAuthorityCurrentness` port (`{context, sources}`)
+  and the flat My-Chat authority citation owner request; `DR-E8-03` — owner
+  source ref comparisons must use the `encodeOwnerSourceRefV1` field order
+  because `jsonb` does not preserve key order; the x5 lane now serializes
+  files (`8d41be1`).
+- Records [`84`](./84-g4-e-e8-joint-conformance-record.md) and
+  [`85`](./85-g4-e-exit-record.md) close G4-E as
+  `G4_E_EXIT_PASS_ADAPTER_QUALIFIED`. Recorded transport only;
+  `live_qualified=false` and the durable-apply approval remain separate gates.

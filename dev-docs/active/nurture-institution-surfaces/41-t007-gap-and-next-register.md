@@ -21,7 +21,7 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal ingress and complete owner source bound default-off; E7 DB qualification `PASS` at `223daa7`; E8 next** | [`64`](./64-g4-0f-scope-freeze.md)–[`83`](./83-g4-e-e7-db-qualification-record.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal ingress and complete owner source bound default-off; E7 DB qualification `PASS` at `223daa7`; E8 joint conformance `PASS` at `8d41be1`; **G4-E Exit issued (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`, record 85)**; `live_qualified=false` stays the activation gate** | [`64`](./64-g4-0f-scope-freeze.md)–[`85`](./85-g4-e-exit-record.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
@@ -296,8 +296,13 @@ registry, Nurture freezes owner-held prepare/execute confirmation, and the
 scenario module exposes only the exact formal trusted handlers. The concrete
 owner source is now implemented as one indivisible binding.
 [`83`](./83-g4-e-e7-db-qualification-record.md) closes the disposable-DB
-qualification with two pre-apply repairs; the remaining gate is E8, not
-another transport envelope.
+qualification with two pre-apply repairs.
+[`84`](./84-g4-e-e8-joint-conformance-record.md) closes E8 joint conformance
+through the real Base dispatcher at `adapter_qualified` (12/12 matrix plus a
+24/24 full x5 lane on fresh disposable targets), and
+[`85`](./85-g4-e-exit-record.md) issues the G4-E Exit. Remaining G4-E-adjacent
+gates are activation-only (`live_qualified`) and the durable-apply approval;
+the open implementation work is G4-D I3/I4 and G4-F.
 Model-weight verification and live secrets are not required for that default-
 off slice.
 
@@ -336,10 +341,15 @@ off slice.
    4/4 targeted authority/dedup/expiry-scrub/conflict/consume-replay checks,
    full DB lane 395/395, drift none, destroy census `0/0`, two pre-apply
    repairs recorded.
-2. **G4-E E8** — run the real Base dispatcher → Nurture authority → My-Chat
-   retrieval joint cited-positive, no-source, medical-conflict,
-   post-generation currentness, provider-outage, drift and replay conformance,
-   then issue the G4-E Exit record without activating traffic.
+2. ~~G4-E E8~~ — done 2026-08-11 as `G4_E_E8_JOINT_CONFORMANCE_PASS` at
+   `8d41be1` ([`84`](./84-g4-e-e8-joint-conformance-record.md)): the real Base
+   dispatcher drove cited-positive general/medical, no-source,
+   medical-conflict with one idempotent review candidate, unsafe text,
+   provider outage, post-generation currentness, prepare/execute drift,
+   ledger replay, privacy negatives and the default-off census, 12/12 plus a
+   24/24 full x5 lane on fresh disposable targets. The G4-E Exit is issued as
+   [`85`](./85-g4-e-exit-record.md) (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`)
+   without activating anything.
 3. **Activation gate, later** — before enabling any Q3 flag or traffic, run a
    real secret-backed request through the same gateway and record
    `live_qualified`. Never label recorded/synthetic transport as live evidence.

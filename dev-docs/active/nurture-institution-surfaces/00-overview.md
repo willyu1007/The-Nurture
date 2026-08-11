@@ -6,9 +6,14 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-11
-- Next step: **qualify the additive prepared-command migration on an approved
-  disposable PostgreSQL target, then run E8 joint conformance without
-  traffic**. The dedicated verified-invocation
+- Next step: **implement and qualify G4-D I3 (authenticated My-Chat
+  prospective-contact/native-source/current-owner adapters plus formal
+  ingress), then I4 joint conformance, then G4-F**. E7 disposable
+  qualification (`223daa7`, record 83) and E8 joint conformance (`8d41be1`,
+  record 84) are closed and the G4-E Exit is issued
+  (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`, record 85); `live_qualified=false`
+  remains the separate activation gate and no durable apply is authorized.
+  The dedicated verified-invocation
   registry is committed and pinned across Base, My-Chat and Nurture. Nurture
   now exposes one exact query/prepare/execute formal ingress, removes the old
   Institution Knowledge internal-handler track, and binds one complete owner

@@ -971,6 +971,22 @@ DB_QUALIFICATION_PENDING / E8_PENDING`.
 
 Current verdict: `G4_E_E7_DB_QUALIFICATION_PASS / E8_PENDING`.
 
+## 2026-08-11 G4-E E8 joint conformance and G4-E Exit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Joint matrix through the real Base dispatcher | PASS | 12/12 — cited-positive general/medical, no-source, medical-conflict + one idempotent immutable review candidate, unsafe text, provider outage without fallback, post-generation currentness, prepare/execute authority drift, canonical generation-ledger replay, caregiver privacy negative, provenance/leakage, default-off census. |
+| Full x5 joint lane | PASS | 3 files / 24 tests on the same fresh disposable targets (E8 + T-009 family-growth 8/8 + T-002 x5 acceptance 4/4, serialized files). |
+| Topology | EXACT | My-Chat detached `ae563988` (clean), Base `536638a` (clean), Nurture `8d41be1`; `link:../My-Chat` resolves to the frozen tree; recorded transport on both model profiles. |
+| Disposable targets | DESTROYED | `nurture_e8` 36/36, `nurture_e8_dev_host`, `mychat_e8` (pgvector) created from absence on tmpfs, destroyed; ports 55442/55443/55444 free; boundary census `tables=99 enums=121` on its own destroyed disposable. |
+| New production read owner | LANDED | `PrismaInstitutionKnowledgeReadOwner` (record 82 blocker closure); opaque keyed source object ids; preview lane intentionally unavailable. |
+| Supporting gates | PASS | unit 94/1014; routing `x5Joint=3`; persistence/port/formal-ingress/g3-0-freeze; scenario self-pin rotated to `89b43ca7…` (279 files). |
+| Findings | RECORDED | `DR-E8-01` read-owner implementation, `DR-E8-02` final-authority port-shape adapter owed to the production composer, `DR-E8-03` `encodeOwnerSourceRefV1` canonical ordering, x5 lane serialization (`8d41be1`). |
+| Records | ISSUED | [`84`](./84-g4-e-e8-joint-conformance-record.md) joint conformance; [`85`](./85-g4-e-exit-record.md) G4-E Exit. |
+| Runtime effects | NONE / DEFAULT-OFF | No durable apply, route, flag, credential, live call, deployment or traffic; `live_qualified=false` stays the activation gate. |
+
+Current verdict: `G4_E_EXIT_PASS_ADAPTER_QUALIFIED / G4_D_I3_NEXT`.
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

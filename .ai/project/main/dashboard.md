@@ -19,12 +19,15 @@ Project: `main`
 - Current surface identity: `nurture.surface-contract@1.20.0` /
   `sha256:35d6340f…` (shared core `sha256:7bd8a82d…`, 65 capabilities /
   6 surfaces).
-- T-007 critical path (in dependency order): E7 disposable qualification is
-  **done** — `G4_E_E7_DB_QUALIFICATION_PASS` at `223daa7` (record 83; 36/36
-  empty deploy, targeted 4/4, full DB lane 395/395, destroy census `0/0`, two
-  pre-apply repairs `DR-E7-01`/`DR-E7-02`). Next: G4-E E8 joint conformance
-  with My-Chat T-040, no traffic → G4-D I3 authenticated owner adapters +
-  formal ingress → I4 joint conformance → G4-F Exit. Durable apply remains
+- T-007 critical path: **G4-E is closed** —
+  `G4_E_EXIT_PASS_ADAPTER_QUALIFIED` at `8d41be1` (records 83/84/85). E7
+  disposable qualification passed at `223daa7`; E8 joint conformance drove
+  the real Base dispatcher through the real Nurture owners and the real
+  My-Chat retrieval/generation/safety owners on fresh disposable targets —
+  12/12 matrix plus the full x5 lane 24/24 (T-009 8/8 and T-002 x5 4/4
+  included). The new production `PrismaInstitutionKnowledgeReadOwner` closed
+  record 82's read-owner blocker. Next: G4-D I3 authenticated owner adapters
+  + formal ingress → I4 joint conformance → G4-F Exit. Durable apply remains
   approval-gated; `live_qualified=false` stays a separate activation gate —
   recorded/synthetic transport is never live evidence.
 - T-010: I4-C0 qualified. Next is I4-C1 — produce and review an additive
@@ -45,8 +48,9 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Run G4-E E8 joint conformance without traffic**, then issue the G4-E Exit
-   (E7 closed 2026-08-11 as record 83).
+1. **Implement G4-D I3** (authenticated My-Chat owner adapters + formal
+   ingress, disposable-DB qualification), then I4 joint conformance
+   (G4-E closed 2026-08-11 as records 83/84/85).
 2. **Begin T-010 I4-C1**: additive Prisma diff, review-only, no apply.
 3. **Execute C30 requalification Step 5** for T-002.
 4. `NurtureInstitutionPolicyService` and the G4-D commands still have no
