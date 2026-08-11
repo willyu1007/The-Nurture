@@ -1,12 +1,18 @@
 # G4-E Increment 3 — Institution Knowledge Answer Safety
 
+> **NON-NORMATIVE / SUPERSEDED FOR CURRENT Q3 QUALIFICATION.** This record
+> remains historical evidence for the Nurture I1 domain/candidate implementation.
+> Its answer-safety `1.0.0` provider posture is not executable guidance. Current
+> SSOT is the `/v2` qualification `2.1.0` and
+> [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
 ## Status
 
 - Date: 2026-08-10
 - Task: T-007
 - Roadmap node: E3 / G4-E I1.3
-- Contract: `nurture.institution-knowledge-answer-safety@1.0.0`
-- Verdict: `G4_E_I1_3_PASS_STATIC`
+- Historical contract: `nurture.institution-knowledge-answer-safety@1.0.0`
+- Historical verdict: `G4_E_I1_3_PASS_STATIC`
 - Schema/database: **one immutable candidate table and unapplied migration;
   no database connection or operation**
 - Runtime: private/default-off; no model, provider, manifest, module or formal
@@ -34,10 +40,11 @@ scenario boundary:
   `NurtureCommandExecution` and the protected-content port;
 - the fifth and final 0F table plus an unapplied additive migration artifact.
 
-No local model, prompt, vector, index, cache, generation ledger, answer row,
+At this historical checkpoint, no local model, prompt, vector, index, cache, generation ledger, answer row,
 candidate status or public Surface was added. Until exact My-Chat generation/
-authority-currentness and deterministic safety providers qualify, no caller
-can compose the required ports and online generation remains unavailable.
+authority-currentness and the then-required deterministic safety providers
+qualified, no caller could compose the ports. That provider condition is
+superseded by the current service-backed V2 qualification in [`80`](./80-g4-e-q3-provider-qualification-contract.md).
 
 ## Safety, provenance and replay behavior
 

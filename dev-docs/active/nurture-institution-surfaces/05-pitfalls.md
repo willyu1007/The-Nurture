@@ -584,12 +584,12 @@
 - **What was tried:** traced raw question text, retrieved excerpts, model draft,
   candidate persistence, copy/export and Host replay independently from the
   typed request keys.
-- **Fix/workaround:** require one deterministic request/source/draft safety
-  owner for every online generation. Child-private input receives a fixed
+- **Fix/workaround:** require one structured request/source/draft safety owner
+  for every online generation. Child-private input receives a fixed
   safety abstention; the question is excluded from candidate identity/evidence
   and all generation remains unavailable until that owner is qualified.
 - **Prevention:** free-text contracts need semantic privacy/safety gates in
-  addition to closed object schemas. If a required classifier is unqualified,
+  addition to closed object schemas. If the required service adapter is unqualified,
   the caller cannot safely infer the request belongs to an allowed subset.
 
 ## 2026-08-10 — A review candidate is not an eligibility decision
@@ -599,7 +599,7 @@
   conflict, lose its response, then replay as no-source because its own side
   effect filtered the source.
 - **Root cause:** “fail closed” was applied by adding another persistent policy
-  input instead of preserving the one deterministic answer-safety owner.
+  input instead of preserving the one structured answer-safety owner.
   Candidate review evidence and online adjudication were conflated.
 - **What was tried:** replayed the exact source set through retrieve, safety,
   candidate commit, response loss and currentness. Actor/invocation exemptions
@@ -657,3 +657,64 @@
   derived outputs.
 - **Prevention:** generated examples must round-trip through the runtime parser;
   every scalar type has an explicit fixture and canonical textual form.
+
+## 2026-08-11 — Do not make model-weight attestation the only path to Q3
+
+- **Symptom:** Q3 remained blocked while the team searched for a fixed-weight,
+  locally verifiable non-generative classifier that covered every medical,
+  privacy and source-conflict class.
+- **Root cause:** required safety behavior was coupled to one implementation and
+  assurance strategy: bitwise determinism plus semantic-model artifact hashes.
+- **What was tried:** policy engines, PII recognizers, generic moderation,
+  custom categories and keyword libraries were compared with the full decision
+  taxonomy. None satisfied that stronger artifact-attestation standard alone.
+- **Fix/workaround:** accept a service-backed structured safety adapter through
+  the single My-Chat gateway. Pin an explicit model/deployment version and
+  immutable prompt id/version, validate closed structured output, fail closed
+  and retain all 15 regression fixtures. Qwen/Bailian is an acceptable service
+  implementation; local model weights are not required.
+- **Prevention:** treat the former artifact-attestation posture as historical
+  and superseded, not an optional current harness. Bind all current
+  evidence to the sole `/v2` `2.1.0` service qualification contract. Never claim
+  bitwise determinism or model-weight verification when the provider does not
+  expose those properties.
+
+## 2026-08-11 — Synthetic transport qualification is not a live provider smoke
+
+- **Symptom:** rejecting all synthetic evidence would block default-off
+  integration, while accepting a mock response as “real provider evidence”
+  would overstate runtime readiness.
+- **Root cause:** adapter correctness and live credential/provider readiness
+  were represented as one qualification state.
+- **What was tried:** one all-or-nothing provider gate required real artifact
+  resolution, invocation receipts and attestation before E7 could begin.
+- **Fix/workaround:** split the gate. `adapter_qualified` requires the real
+  adapter, no-secret synthetic transport tests and all 15 fixtures; it closes
+  Q3 and permits default-off E7/E8. `live_qualified` requires an actual request
+  through the configured My-Chat gateway and is deferred until feature-flag or
+  traffic activation.
+- **Prevention:** every evidence record MUST name its level. Mock/stub transport
+  is never labelled live, and no capability or traffic is enabled until the
+  separate `live_qualified` smoke passes.
+
+## 2026-08-11 — A declared trusted handler is not yet a safe formal ingress
+
+- **Symptom:** the first formal binding passed focused tests while direct
+  registry calls omitted method/scenario checks, execute trusted an authority
+  snapshot without an explicit current reread, the manifest retained stale
+  internal handler names, and the adoption lock still pointed to older bytes.
+- **Root cause:** manifest declaration, direct-handler defense, business
+  authority currentness and source locking were treated as one mechanical
+  registration step.
+- **What was tried:** the initial query/prepare/execute registration was kept
+  default-off, but focused happy-path tests and the old default-off census did
+  not detect the dangling surface mapping or source-lock drift.
+- **Fix/workaround:** remove the old internal track, freeze the full declaration
+  tuple, validate both declaration and invocation, resolve current authority at
+  prepare and execute, compare the prepared authority version, expand the
+  default-off allowlist, run the full 996-test suite, then rotate the locks from
+  the final source revision.
+- **Prevention:** future trusted operations land in four ordered units:
+  contract, fail-closed handler, full conformance/default-off verification, and
+  metadata-only lock. A port-only owner is reported as pending and never as an
+  activated transport.

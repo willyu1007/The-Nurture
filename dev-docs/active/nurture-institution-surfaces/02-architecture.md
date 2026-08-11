@@ -940,6 +940,58 @@ eligibility、citation presenter 和 safety routing。My-Chat owns generic knowl
 vector/RAG runtime、model gateway、prompt/model registry、host route 和 telemetry plumbing。
 双方通过 pinned owner contract 集成，不复制 provider SDK、向量库或 host runtime。
 
+### Q3 answer-safety provider qualification boundary
+
+Nurture owns the closed answer-safety decision vocabulary, the 15 request/
+source/draft regression fixtures and the admission mapping. My-Chat owns the
+service adapter, unified model gateway, prompt/model registry, transport
+telemetry and canonical safety ledger. The adapter MAY use Qwen, Bailian or
+another approved service through that gateway; it MUST NOT introduce a direct
+provider SDK or a second prompt/model registry in Nurture.
+
+The sole normative machine gate is
+`nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
+`sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`
+at `packages/nurture-scenario/contracts/institution-knowledge-answer-safety/v2/`.
+It binds `nurture.institution-knowledge-answer-safety@2.0.0` and requires one
+13-field tuple: gateway/provider/model/deployment/prompt plus exact My-Chat owner
+contract and answer-safety contract identities.
+Its verifier ceiling is `adapter_qualified`; real gateway-call evidence remains
+the later `live_qualified` activation gate.
+
+The accepted service contract pins an explicit model or deployment version and
+an immutable prompt id/version, requests a strict structured result, validates
+closed keys/status/reason/conflict values and converts timeout, malformed
+output, provider refusal, unsupported input or transport failure to
+`unavailable`. The 15 fixtures remain the behavioral regression boundary.
+This qualification does not claim bitwise-repeatable model output, access to or
+verification of provider model weights, or a local fixed-weight classifier.
+Stable contract decisions are enforced by structured validation, bounded
+normalization, replay tests and fail-closed handling rather than by claiming
+the remote model is mathematically deterministic.
+
+Qualification has two explicit levels:
+
+1. `adapter_qualified`: the real service adapter serialization, parser and
+   fail-closed branches pass no-secret synthetic transport tests plus all 15
+   fixtures. This closes the current Q3 implementation gate and permits E7/E8
+   to continue while every capability remains default-off.
+2. `live_qualified`: the same pinned adapter completes a secret-backed request
+   through the real My-Chat gateway and passes the activation smoke. This is a
+   feature-flag/traffic prerequisite, not an E7/E8 prerequisite when no traffic
+   is enabled.
+
+A mock response is never live evidence. Raw generic moderation labels,
+unvalidated prose, moving model aliases, direct provider calls and any `/v1`
+qualification fallback remain inadmissible. Current qualification MUST use the
+`2.1.0` contract, exact digest and full tuple above. Pre-V2 evidence does not
+bind answer-safety/owner V2 and is therefore superseded. New V2
+evidence binds both contracts, covers all 15 fixtures in 30 unique invocations
+and passes with `adapter_qualified=true`, `live_qualified=false` and
+`default_off`. Q3 no longer blocks default-off E7. The current decision is
+recorded in
+[`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
 未成年人信息和医疗健康信息属于敏感个人信息；关联具体孩子的检索必须满足特定目的、
 充分必要、严格保护和现有 authority/grant。设计与资格验证参考：
 
@@ -1021,3 +1073,26 @@ actor-bound snapshot and confirm revalidates its fact digest before effects.
 The My-Chat public Dashboard DTO remains `contract_version: 2`, a separate
 owner/version identity. Private v1/v2 routes and decoders are removed rather
 than maintained as a compatibility lane.
+
+## Institution Knowledge formal trusted ingress
+
+Institution Knowledge now uses only the Base dedicated
+`trusted_invocation_handlers` registry. Its exact disabled Workbench mapping
+names three endpoint keys: read-only query, owner-held prepare and
+confirmation-only execute. The ordinary internal-handler compatibility path is
+removed rather than retained as an alias.
+
+The transport verifier supplies only the sanitized verified principal,
+declaration and invocation. Nurture independently resolves current
+Participant, Institution and exact Admin role using the declared operation,
+capability and opaque target option. Prepare persists a frozen command under a
+business idempotency key; execute receives no target or payload, consumes only
+the owner-issued command/confirmation pair, then re-resolves local authority.
+My-Chat creates canonical `PermissionContext` only inside its retrieval owner;
+that object never crosses into Nurture.
+
+The module ports for local authority, prepared-command persistence and My-Chat
+retrieval composition remain optional. Missing ports return `unavailable`, and
+there is no application route or activation model. Concrete owners and joint
+conformance are the remaining E7/E8 work; a live provider smoke remains an
+activation-only Q3 gate.

@@ -922,7 +922,7 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 
 ## 2026-08-10 — G4-0F-3 cited answer and safety freeze
 
-- Froze `nurture.institution-knowledge-answer-safety@1.0.0`: strict replayable
+- Froze the then-current answer-safety contract: strict replayable
   Host claim drafts, Nurture-built source-identity citations, pre/post owner
   currentness, deterministic request/source/draft safety and bounded answer
   dispositions.
@@ -992,9 +992,11 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   default-off adapters; I3 exact owner readiness; I4 joint conformance/Exit.
 - Fixed the first code node to 0F-1 domain/persistence only. Retrieval, answer
   safety, public Surface and owner integration cannot leak into E1.
-- Recorded three hard later gates: exact disposable PostgreSQL target, adopted
-  My-Chat scenario deltas and a deterministic answer-safety provider/rule pin.
-  Missing gates stop their phase rather than creating compatibility fallbacks.
+- Recorded three hard later gates at that checkpoint: exact disposable
+  PostgreSQL target, adopted My-Chat scenario deltas and a deterministic answer-
+  safety provider/rule pin. Record [`80`](./80-g4-e-q3-provider-qualification-contract.md)
+  later supersedes the Q3 implementation-specific pin with the service-backed
+  `adapter_qualified` policy; the database and owner-adoption gates are unchanged.
 - Each node requires architecture review, full repair, task/project sync and a
   dedicated `Task: T-007` commit from a clean worktree.
 
@@ -1160,18 +1162,20 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 
 - Adopted the four-commit My-Chat T-040 owner sequence ending at `942bd00`:
   exact source admission/invalidation, durable cursor/reconciliation, canonical
-  structured-generation replay and the provider-neutral deterministic safety
+  structured-generation replay and the provider-neutral structured safety
   owner/write contract. All four commits are ancestors of inspected My-Chat
   `main`.
 - Q2 is closed and Q4 sibling mutation authority has been exercised. Q3 is
-  narrowed to one explicit gate: a concrete non-generative provider plus
-  immutable rule-set identity/hash and replay fixtures.
-- Preserved one safety SSOT. The existing Aliyun Bailian generative profile is
-  not reclassified as deterministic safety, and a generic content-risk API is
-  not treated as the closed Nurture medical/private/source-conflict rule owner.
+  narrowed to one explicit gate: a service-backed My-Chat adapter with explicit
+  model/deployment and immutable prompt pins, strict structured output,
+  fail-closed behavior and the 15 regression fixtures.
+- Preserved one safety SSOT. An approved Qwen/Bailian profile MAY back the
+  adapter through the unified gateway, but the existing profile alone is not
+  qualification evidence and raw generic risk labels are not the closed
+  Nurture medical/private/source-conflict decision.
 - No Nurture adapter, ingress, database, deployment, activation or traffic
-  change occurred in this sync. E7 remains default-off until the exact Q3 pin
-  exists; E8 remains the formal joint-conformance gate.
+  change occurred in this sync. E7 remains default-off until the adapter is
+  `adapter_qualified`; E8 remains the formal joint-conformance gate.
 - Detailed evidence: [`78`](./78-g4-e-q2-q3-owner-progress.md).
 
 ## 2026-08-11 — teacher-release owner v3 migration and quality convergence
@@ -1204,3 +1208,145 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
   My-Chat Workflow/source revision was adopted, closing G-09 without activating
   any traffic.
 - Detailed evidence: [`79`](./79-teacher-release-owner-v3-migration.md).
+
+## 2026-08-11 — G4-E Q3 service-backed qualification policy
+
+> **NON-NORMATIVE HISTORICAL CHECKPOINT.** The service-backed policy was adopted
+> here, but its former machine identity and evidence are invalid/non-current;
+> their audit trail remains in Git history.
+
+- Q3 adopted a service-backed structured safety decision through the single
+  My-Chat gateway while retaining strict structured output, explicit immutable
+  service pins, all 15 fixtures, fail-closed behavior and default-off rollout.
+- Qualification was split into `adapter_qualified` for default-off
+  implementation and `live_qualified` as a later activation gate.
+- Current authority and evidence are recorded in
+  [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
+## 2026-08-11 — G4-E Q3 adapter qualification evidence
+
+> **NON-NORMATIVE / SUPERSEDED.** Prior adapter evidence is invalid/non-current;
+> its audit trail remains in Git history and is not a runnable qualification
+> path. Current evidence is recorded in
+> [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
+## 2026-08-11 — G4-E Q3 single-track v2 qualification cleanup
+
+- Removed the four old-layout qualification files by moving their sole
+  canonical contents to `/v2`:
+  - `v1/README.md` → `v2/README.md`;
+  - `v1/source/qualification-contract.json` →
+    `v2/source/qualification-contract.json`;
+  - `v1/source/qualification-fixtures.json` →
+    `v2/source/qualification-fixtures.json`;
+  - `v1/generated/qualification.manifest.json` →
+    `v2/generated/qualification.manifest.json`.
+- Deleted the now-empty `/v1/source`, `/v1/generated` and `/v1` directories.
+  No compatibility file, fallback verifier or second runnable layout remains.
+- The sole current `answerSafetyContract` is `2.0.0`; the sole current
+  `qualificationContract` is `2.1.0`. The generated canonical digest is
+  `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`.
+- Expanded `requiredServicePins` from nine to thirteen fields by adding exact
+  `owner_contract_key`, `owner_contract_version`,
+  `answer_safety_contract_key` and `answer_safety_contract_version`. This makes
+  adapter evidence bind the runtime owner V2 instead of a side-channel tuple.
+- Updated the qualification script to read `/v2` only. Added tests that assert
+  the canonical paths, absence of `/v1`, full tuple validation and fail-closed
+  rejection of moving owner/answer-safety identities.
+- Prior evidence was invalidated by the single-track rotation and remains only
+  in Git history. Fresh V2 evidence was required before default-off E7.
+- Records [`67`](./67-g4-0f-3-citation-answer-safety-freeze.md),
+  [`69`](./69-g4-0f-exit-record.md),
+  [`72`](./72-g4-e-increment-3-record.md) and
+  [`78`](./78-g4-e-q2-q3-owner-progress.md) are retained only as explicitly
+  non-normative historical evidence. Record
+  [`80`](./80-g4-e-q3-provider-qualification-contract.md) and the `/v2` machine
+  files are the current SSOT.
+
+## 2026-08-11 — G4-E Q3 v2 requalification PASS
+
+- My-Chat's V2 owner/runner generated fresh gitignored `adapter_recorded`
+  evidence against qualification `2.1.0` /
+  `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`.
+  The candidate remained under My-Chat `.ai/.tmp/tests/` and was not copied into
+  Nurture.
+- The 13-pin tuple includes `my-chat-llm-gateway@1.0.0`, Aliyun Bailian/Qwen,
+  immutable deployment/prompt pins,
+  `my-chat.nurture-institution-knowledge-answer-safety-owner@2.0.0` and
+  `nurture.institution-knowledge-answer-safety@2.0.0`.
+- Nurture accepted all 15 fixtures with two attempts each and 30 unique
+  invocation ids. The result is `adapter_qualified=true`,
+  `live_qualified=false`, `default_off` and `bitwise_determinism=false`.
+- Q3's implementation gate is closed at the sole V2 contract. Prior evidence
+  remains invalid/non-current. Default-off E7 exact owner/adapter pin and
+  the trusted-authorization contract slice are now the next node;
+  E8 follows, while live qualification remains activation-only.
+- Detailed evidence: [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
+## 2026-08-11 G4-E E7 owner-composition slice
+
+- Added one Nurture admission boundary that accepts surface dependencies only
+  when the adopted Q2 tuple, qualification `2.1.0` digest, 13-field service pin,
+  injected owner pin and sole decision-rule pin match exactly.
+- Rotated the runtime safety port to V2 with no V1 alias. Missing, extra or
+  drifted identities restore the immutable unavailable dependency set.
+- My-Chat now supplies a default-off E7 host composition over the adopted Q2
+  owners and V2 service-backed safety owner. Composition performs no gateway
+  call and registers no route, flag, product binding or traffic.
+- Current evidence passes 15 fixtures with 30 unique attempts. The subsequent
+  audit proved E7 is blocked before transport binding by the missing typed
+  verified-invocation/authorization-context boundary and command confirmation
+  model; see [`81`](./81-g4-e-e7-owner-composition-record.md) and
+  [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md).
+
+## 2026-08-11 G4-E E7 historical pre-adoption formal-ingress audit
+
+- Reused the existing `ScenarioPrivateInvocationV1`, detached Ed25519,
+  credential binding and nonce-replay primitives as the only intended auth
+  spine; no replacement bearer/generic route was added.
+- Confirmed that the current `internal_api_handlers` input cannot receive a
+  verified transport context and that payload fields cannot substitute for
+  transport authentication.
+- Confirmed that My-Chat retrieval requires canonical `PermissionContext`,
+  while Nurture must independently resolve its current Participant/Institution/
+  role. Signed routing identity alone grants neither authority.
+- Confirmed that the existing prepare and execute envelopes do not individually
+  carry the complete typed input/target/confirmation tuple required by the
+  Institution Knowledge command handler.
+- Historical verdict, superseded by the landing below:
+  `G4_E_E7_FORMAL_INGRESS_CONTRACT_BLOCKED /
+  TRUSTED_AUTHORIZATION_CONTEXT_REQUIRED`. No source, manifest, route, secret,
+  deployment, provider call or traffic change was made in this audit.
+- A sibling Base checkout was then created at `D:\Else\My-Workflow-Base` under
+  the previously authorized Base mutation scope. Its local candidate adds the
+  dedicated typed registry, exact dispatcher and WF-MAN-124/125 validation;
+  typecheck, runtime 40/40, scenario 10/10 and unlocked conformance 441/441
+  pass. It is deliberately uncommitted, so no commit-pinned source lock was
+  rewritten and neither My-Chat nor Nurture was half-adopted.
+
+## 2026-08-11 G4-E E7 trusted-registry and formal-ingress landing
+
+- Landed the Base dedicated trusted-invocation registry and committed source
+  lock, mirrored and locked it in My-Chat, then adopted it in Nurture. No dirty
+  sibling revision was used as evidence.
+- Froze one Institution Knowledge formal contract: read-only query, owner-held
+  prepare and confirmation-only execute. The fixed Workbench surface is not a
+  request field.
+- Removed the two legacy `nurture.internal.*institution_knowledge` handlers and
+  replaced their stale surface mapping with the three formal endpoint keys.
+- Hardened direct handler checks for scenario, method, endpoint, operation,
+  schema version, ingress and principal origin. Drift returns safe
+  `unavailable` before any owner call.
+- Prepare now resolves current local authority. Execute consumes only the
+  owner-issued command/confirmation pair, re-resolves authority and rejects
+  workspace, participant, Institution, role, surface or authority-version
+  drift before business binding.
+- The canonical preview lane does not require My-Chat retrieval. The effectful
+  answer action obtains the My-Chat retrieval owner only after confirmed
+  command consumption.
+- Production authority, prepared-command and Host retrieval adapters remain
+  optional; the canonical module returns `unavailable` without them. No route,
+  flag, provider call or traffic was introduced.
+- Final source `4e61335c274969615ccceb7ee1f6e64a42794573` is sealed by
+  metadata `306fe16`; scenario hash `b56cb3f17a20fd67f1798a0fc64b677a1f1f5656daecf402828137d317d88017`
+  and adoption hash `b02a27c03bddcebc2d0aee14e5fc121f672d50db2c2f986f3a17d67299c236be`.

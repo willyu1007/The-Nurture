@@ -21,15 +21,15 @@ places drifts in one of them.
 | 0C authority & surface | `G4_0C_EXIT_PASS`, six units | **G4-A, four increments** | [`19`](./19-g4-0c-exit-record.md), [`21`](./21-g4-a-increment-1-audit-record.md)–[`24`](./24-g4-a-increment-4-record.md) |
 | 0D daily operations | `G4_0D_EXIT_PASS`, five units | **G4-B, twelve increments — 0D-1/checkpoint, 0D-2, class-day detail and 0D-5; G4-C increments 1–2 — 0D-3 revision/downscope, capture intake and 0D-4 correction candidate** | [`32`](./32-g4-0d-exit-record.md), [`34`](./34-g4-b-increment-1-record.md)–[`48`](./48-g4-c-increment-2-record.md) |
 | 0E Workflow & Enrollment Journey | `G4_0E_EXIT_PASS`, four units | **G4-D increments 1–5 private I1; I2-A exact public wire artifact; I2-B default-off surface adapters** | [`55`](./55-g4-0e-exit-record.md), [`57`](./57-g4-d-increment-1-record.md)–[`63`](./63-g4-d-i2-b-surface-adapter-record.md) |
-| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; My-Chat Q2/Q3 owner boundary adopted; I3/I4 gated on the concrete safety provider** | [`64`](./64-g4-0f-scope-freeze.md)–[`78`](./78-g4-e-q2-q3-owner-progress.md) |
+| 0F knowledge & RAG | **`G4_0F_EXIT_PASS`, three units + audit** | **G4-E private I1 qualified through E4; I2-A/I2-B exact and default-off; Q2/generation owners adopted; sole `/v2` Q3 adapter qualified; formal trusted ingress bound default-off; production owners next, then E8** | [`64`](./64-g4-0f-scope-freeze.md)–[`82`](./82-g4-e-e7-formal-ingress-contract-audit.md) |
 
 Domain/persistence implementation remains at **I1** and all implemented daily-
 operations and G4-D persistence paths are qualified on disposable PostgreSQL.
 G4-D additionally has the exact I2-A wire artifact and synthetic I2-B
-handler/presenter composition. The scenario module and manifest expose only
-fail-closed, explicitly disabled internal adapter keys. No scenario-service
-formal ingress, I3 owner integration, I4 joint conformance, runtime capability
-activation or traffic exists. 0F now has a mechanically verified generic
+handler/presenter composition. Institution Knowledge now exposes only three
+fail-closed, explicitly disabled formal trusted handlers; its old internal
+adapter keys are removed. No production owner composition, I4 joint
+conformance, runtime capability activation or traffic exists. 0F now has a mechanically verified generic
 My-Chat Knowledge/PBR/RAG source pin, an accepted three-unit decomposition,
 the exact Nurture-owned lifecycle/provenance contract, retrieval/source/
 currentness bridge and cited-answer/safety/conflict-candidate contract. The 0G
@@ -40,8 +40,13 @@ five tables qualified on a destroyed disposable PostgreSQL target. E5 adds the
 exact source-only `1.20.0` public wire artifact. The My-Chat T-040 sequence
 through `942bd00` now supplies durable Q2 ingestion/currentness, canonical Q3
 generation replay and the provider-neutral safety owner/write boundary. Nurture
-still has no caller, concrete deterministic safety provider/rule pin, formal
-ingress, activation or traffic.
+still has no production caller, Host route, activation or traffic. The My-Chat
+service-backed structured safety adapter and V2 owner/runner produced accepted
+`2.1.0` `adapter_recorded` evidence: 15 fixtures, two attempts each and 30
+unique invocation ids at the complete 13-pin tuple in
+[`80`](./80-g4-e-q3-provider-qualification-contract.md). Q3 is
+`adapter_qualified`; pre-V2 evidence is invalid/non-current, and
+recorded transport is not live evidence.
 
 G4-D increments 2–5 have clean disposable-only DB qualification. Increment 3
 adds explicit policy/FIFO/override/offer/reservation/cancellation semantics and
@@ -252,7 +257,7 @@ bounded retrieval/currentness ports and actor-bound opaque preview options.
 It adds no table and binds no real Host owner/runtime.
 
 [`72`](./72-g4-e-increment-3-record.md) implements strict cited claims,
-deterministic request/source/draft safety ports, final owner currentness,
+structured request/source/draft safety ports, final owner currentness,
 medical authority precedence, fixed abstentions/portable provenance and the
 one immutable conflict candidate. Its fifth-table migration is disposable-
 qualified but not durably applied; no
@@ -264,15 +269,28 @@ export path. All 35 migrations, the 43-file DB lane, current status, zero drift
 and destroyed-target evidence pass. [`74`](./74-g4-e-i2-a-contract-artifact-record.md)
 adds the exact seven-capability I2-A artifact without a caller: one read-only
 preview, one effectful answer action and five lifecycle actions. [`75`](./75-g4-e-i2-b-surface-adapter-record.md)
-maps all seven to existing I1 behavior through exact validators/presenters and
-two disabled internal Workbench handlers. The historical E7 audit
+maps all seven to existing I1 behavior through exact validators/presenters.
+The later formal landing removes its two internal Workbench handlers rather
+than retaining a compatibility lane. The historical E7 audit
 [`76`](./76-g4-e-i3-owner-gate-audit.md) found no scenario owner delta at
 `4d22aab`. That external-state finding is superseded by the authorized T-040
 sequence adopted in [`78`](./78-g4-e-q2-q3-owner-progress.md): Q2 is closed,
 Q3 generation replay and the provider-neutral safety boundary are implemented
-and Q4 is closed. I3/I4 remain closed only because no concrete non-generative
-safety provider/rule artifact and replay pin exists; synthetic, keyword or
-model-self-rating compatibility mappings cannot close that gate.
+and Q4 is closed. The latest user decision in
+[`80`](./80-g4-e-q3-provider-qualification-contract.md) accepts a service-
+backed structured safety decision through the unified My-Chat gateway. The V2
+adapter has passed
+`nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
+`sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`
+as `adapter_qualified`, closing Q3's I3/I4 prerequisite. [`81`](./81-g4-e-e7-owner-composition-record.md)
+qualifies exact owner/adapter admission plus the My-Chat default-off owner
+composition. [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md) now records
+the resolved contract gap: Base/My-Chat provide the committed verified handler
+registry, Nurture freezes owner-held prepare/execute confirmation, and the
+scenario module exposes only the exact formal trusted handlers. The remaining
+work is concrete production owner binding, not another transport envelope.
+Model-weight verification and live secrets are not required for that default-
+off slice.
 
 ## Closed since the 0D Exit
 
@@ -303,20 +321,26 @@ model-self-rating compatibility mappings cannot close that gate.
 
 ## Next steps, in dependency order
 
-1. **Close the remaining G4-E Q3 provider gate** — select and qualify one
-   concrete non-generative deterministic provider plus immutable rule-set
-   ref/version/hash and positive/denial/unavailable/drift replay fixtures. Q2
-   and Q4 are closed; do not reopen them or add a compatibility classifier.
-2. **G4-E E7** — after that exact pin exists, bind the adopted My-Chat Q2/Q3
-   owners and formal scenario-service ingress as one default-off composition.
-3. **G4-E E8** — run joint cited-positive, no-source, medical-conflict,
+1. **Implement the minimal G4-E E7 production owners** — add the Nurture
+   current-authority resolver, durable prepared-command/confirmation ledger,
+   and My-Chat adapter that creates the already committed canonical retrieval
+   owner from the verified principal. Multi-role ambiguity, expiry, reuse and
+   authority loss must fail closed.
+2. **Bind the Host composition without activation** — connect the existing
+   signed private transport and exact Workbench endpoint mapping to those
+   owners. Preserve the Q2/Q3 pins; add no public route, flag or traffic.
+3. **G4-E E8** — run the real Base dispatcher → Nurture authority → My-Chat
+   retrieval joint cited-positive, no-source, medical-conflict,
    post-generation currentness, provider-outage, drift and replay conformance,
    then issue the G4-E Exit record without activating traffic.
-4. **G4-D I3** — bind the authenticated My-Chat
+4. **Activation gate, later** — before enabling any Q3 flag or traffic, run a
+   real secret-backed request through the same gateway and record
+   `live_qualified`. Never label recorded/synthetic transport as live evidence.
+5. **G4-D I3** — bind the authenticated My-Chat
    prospective-contact/native-source/current-owner providers and formal
    scenario-service ingress. Retain exact option/confirmation heads and the
    default-off runtime gate while qualifying on an approved disposable DB.
-5. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
+6. **G4-D I4** — run joint negative/replay/mobile-Web head conformance only
    after the I3 owner and ingress paths qualify.
 
 G-03's remaining authority/source fact is an external owner gate, not an

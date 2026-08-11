@@ -1,5 +1,11 @@
 # G4-0F Exit Record
 
+> **NON-NORMATIVE FOR CURRENT ANSWER SAFETY.** This historical branch exit
+> remains evidence for the 0F decomposition, but its answer-safety `1.0.0`
+> row/provider gate is superseded. Current Q3 authority is the sole `/v2`
+> qualification `2.1.0` and
+> [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
 ## Verdict
 
 - Date: 2026-08-10
@@ -18,7 +24,7 @@
 | Scope, ownership and exact generic source pin | [`64`](./64-g4-0f-scope-freeze.md) | branch decomposition + `my-chat-knowledge-rag-contract.json` | none |
 | Knowledge lifecycle and provenance | [`65`](./65-g4-0f-1-knowledge-lifecycle-provenance-freeze.md) | `nurture.institution-knowledge-lifecycle@1.0.0` | four tables planned, not applied |
 | Retrieval eligibility and owner bridge | [`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md) | `nurture.institution-knowledge-retrieval@1.0.0` | no new table |
-| Citation, answer safety and conflict review | [`67`](./67-g4-0f-3-citation-answer-safety-freeze.md) | `nurture.institution-knowledge-answer-safety@1.0.0` | one table planned, not applied |
+| Citation, answer safety and conflict review | [`67`](./67-g4-0f-3-citation-answer-safety-freeze.md) | historical `nurture.institution-knowledge-answer-safety@1.0.0`, superseded by current V2 SSOT | one table planned, not applied |
 
 The 0G audit [`68`](./68-g4-0g-0f-audit-record.md) passes after repairing two
 collisions: conflict candidate versus eligibility/replay, and candidate append
@@ -51,15 +57,16 @@ or second knowledge lifecycle.
 | Generic My-Chat Knowledge/PBR/RAG source | `PRESENT_PINNED` at `567b96cd5ddf2a0534fee21dd87f677439f40b78` / `554e79d4e12b5aa2ef1794e46638b2705a606fc7e035e35d0d5167a8bf23ad66` |
 | Institution source/retrieval/currentness bridge | `DEFINED_UNQUALIFIED` |
 | Replayable structured generation/authority-content currentness | `DEFINED_UNQUALIFIED` |
-| Deterministic answer-safety provider and rule-set pin | `DEFINED_UNQUALIFIED` |
+| Historical V1 answer-safety provider/rule-set gate | `SUPERSEDED`; not a current qualification input |
 | Public Knowledge Surface artifact/caller | absent; later I2 work |
 | Persistent/shared DB apply | unauthorized |
 
-No adapter may map `institution_admin_online_answer` to
+At this historical exit, no adapter could map `institution_admin_online_answer` to
 `public_rag_answer`, activate reserved `external`, relabel a generic excerpt
 fingerprint as authority content hash, or use a model self-rating as the
-deterministic safety owner. Until exact owner adapters qualify, all online
-generation stays unavailable.
+deterministic safety owner. That provider-gate wording is not current; use
+[`80`](./80-g4-e-q3-provider-qualification-contract.md) for the V2 adapter and
+qualification state.
 
 ## Invariants handed to G4-E
 

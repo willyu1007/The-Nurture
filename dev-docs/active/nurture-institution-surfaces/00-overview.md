@@ -6,13 +6,31 @@
 - Task: T-007
 - Milestone / Feature: M-002 / F-003
 - Updated: 2026-08-11
-- Next step: **qualify one concrete non-generative deterministic safety
-  provider and immutable rule artifact, then bind the adopted My-Chat Q2/Q3
-  owners in E7 and run E8 Joint Conformance while capabilities remain
-  default-off**. Q2 durable ingestion/currentness and Q3 structured-generation/
+- Next step: **implement the three production owner bindings, then run E8
+  joint conformance without traffic**. The dedicated verified-invocation
+  registry is committed and pinned across Base, My-Chat and Nurture. Nurture
+  now exposes one exact query/prepare/execute formal ingress, removes the old
+  Institution Knowledge internal-handler track, re-resolves current local
+  authority, and remains fail-closed when production owners are absent. No
+  HTTP route, authenticated Host composition, credential, activation or
+  traffic is bound ([`81`](./81-g4-e-e7-owner-composition-record.md),
+  [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md)). The next bounded
+  slice is a Nurture current-authority owner, a durable owner-held prepared-
+  command/confirmation ledger, and a My-Chat host adapter for the already
+  committed canonical retrieval owner.
+  The canonical machine contract is
+  `nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
+  `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`
+  under `packages/nurture-scenario/contracts/institution-knowledge-answer-safety/v2/`.
+  It binds `nurture.institution-knowledge-answer-safety@2.0.0` plus the exact
+  My-Chat owner-contract and service tuple. New V2 evidence passed all 15
+  fixtures with 30 unique invocation ids, so Q3 is `ADAPTER_QUALIFIED`
+  ([`80`](./80-g4-e-q3-provider-qualification-contract.md)).
+  `live_qualified=false` remains the separate activation gate.
+  Q2 durable ingestion/currentness and Q3 structured-generation/
   provider-neutral safety owners are landed through `My-Chat@942bd00`; Q4
-  sibling-mutation authority is closed, while Q3's positive provider/rule pin
-  remains the single Knowledge owner gate
+  sibling-mutation authority is closed. Pre-V2 qualification evidence is
+  invalid/non-current after the single-track `/v2` contract rotation
   ([`77`](./77-g4-e-q2-source-snapshot-owner-delta.md),
   [`78`](./78-g4-e-q2-q3-owner-progress.md)). The exact generic
   My-Chat Knowledge/PBR/RAG source boundary and 0F decomposition are now pinned
@@ -40,7 +58,7 @@
   exact candidate/currentness ports and actor-bound opaque preview options
   with `G4_E_I1_2_PASS_STATIC` ([`71`](./71-g4-e-increment-2-record.md)); no
   schema or database was touched. E3 now implements strict generated-claim
-  validation, deterministic safety/currentness orchestration, owner-typed
+  validation, structured safety/currentness orchestration, owner-typed
   citations, fixed abstention/portable presenters and the one immutable
   conflict candidate with `G4_E_I1_3_PASS_STATIC`
   ([`72`](./72-g4-e-increment-3-record.md)); its fifth-table migration is
@@ -68,16 +86,26 @@
   Institution Knowledge wire artifact to `nurture.surface-contract@1.20.0` /
   `sha256:35d6340f…` with one read-only preview, one effectful answer action and
   five lifecycle actions ([`74`](./74-g4-e-i2-a-contract-artifact-record.md)).
-  E6 now maps all seven through exact public validation, trusted target/
-  confirmation/scope binding, existing I1 services/specs and role-safe presenters.
-  Exactly two internal Workbench handlers are declared disabled; no formal
-  caller exists ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)).
+  E6 maps all seven through exact public validation, trusted target/
+  confirmation/scope binding, existing I1 services/specs and role-safe
+  presenters. Its former two internal Workbench handlers are superseded and
+  removed; the only current Institution Knowledge entrypoints are the three
+  dedicated trusted handlers, mapped to the disabled Web Workbench surface
+  with no Host route ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)).
   The historical E7 audit correctly found no owner delta at My-Chat
   `4d22aab` ([`76`](./76-g4-e-i3-owner-gate-audit.md)); the later authorized
   T-040 sequence supersedes that external-state finding. Q2 and the
-  provider-neutral Q3 boundary are now adopted at `942bd00`, but no concrete
-  deterministic provider/rule artifact is qualified, so I3/I4 remain closed
-  ([`78`](./78-g4-e-q2-q3-owner-progress.md)).
+  provider-neutral Q3 boundary are now adopted at `942bd00`. The My-Chat
+  service-backed adapter/prompt/profile/test implementation has now passed the
+  current `2.1.0` verifier with answer-safety `2.0.0` and owner contract `2.0.0`.
+  Q3 no longer blocks E7. Exact owner/adapter admission, the scenario-neutral
+  verified-invocation registry, the two-stage command contract and the
+  Nurture formal handler binding now pass default-off. The remaining E7 work is
+  the concrete local authority/prepared-command owners plus My-Chat Host
+  composition. Prior
+  qualification evidence remains invalid/non-current. Record
+  [`80`](./80-g4-e-q3-provider-qualification-contract.md) is the current SSOT
+  and preserves the separate `live_qualified` activation boundary.
 - **Live branch state, gaps and next steps:**
   [`41-t007-gap-and-next-register.md`](./41-t007-gap-and-next-register.md).
   That register is the single answer to "where is T-007 now"; the numbered
@@ -95,9 +123,9 @@
   candidate migrations are now qualified only on a destroyed disposable
   target; no persistent target has received them. 0C, 0D and all four
   0E persistence slices are therefore
-  validated as *buildable as frozen*, not as running. The 24 descriptors and
-  two fail-closed internal adapter lanes are default-off and do not change that
-  runtime posture.
+  validated as *buildable as frozen*, not as running. The 24 earlier
+  descriptors and the three fail-closed formal Institution Knowledge lanes are
+  default-off and do not change that runtime posture.
 - Exit is not Owner Readiness, Joint Conformance, a Beta Profile Handoff,
   Candidate Freeze, activation or traffic; T-008 continues to wait for the
   complete T-007 Exit.

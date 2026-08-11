@@ -1,14 +1,22 @@
 # G4-0F-3 Citation, Answer Safety & Conflict Review — Freeze Record
 
+> **NON-NORMATIVE / SUPERSEDED.** This is historical design evidence for the
+> original answer-safety `1.0.0` freeze. It MUST NOT be used as the current Q3
+> provider/qualification specification. The sole current SSOT is qualification
+> `2.1.0` under
+> `packages/nurture-scenario/contracts/institution-knowledge-answer-safety/v2/`
+> plus [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
 ## Status
 
 - Date: 2026-08-10
 - Task: T-007
-- Contract identity: `nurture.institution-knowledge-answer-safety@1.0.0`
+- Historical contract identity: `nurture.institution-knowledge-answer-safety@1.0.0`
+- Record posture: `NON_NORMATIVE_SUPERSEDED`
 - Consumes: 0F scope/source pin ([`64`](./64-g4-0f-scope-freeze.md)),
   lifecycle/provenance ([`65`](./65-g4-0f-1-knowledge-lifecycle-provenance-freeze.md))
   and retrieval/currentness ([`66`](./66-g4-0f-2-retrieval-owner-bridge-freeze.md))
-- Verdict: `G4_0F_3_FREEZE_PASS`
+- Historical verdict: `G4_0F_3_FREEZE_PASS`
 - Schema delta: **one immutable conflict-review candidate table planned, not applied**
 - Non-effects: no candidate row, model call, export, schema apply, owner adoption,
   Surface, activation or traffic.
@@ -20,7 +28,7 @@
 | Answer request authority, eligible Nurture sources and final Nurture currentness | 0C + 0F-2 Nurture policies/providers |
 | Generic retrieval, generation replay, authority-source currentness and model telemetry | My-Chat owner through exact scenario adapters; generic source baseline remains the [`64`](./64-g4-0f-scope-freeze.md) pin |
 | Claim/citation schema, source precedence, abstention and conflict-candidate policy | Nurture 0F-3 |
-| Deterministic request/source/draft safety decision | Exact answer-safety owner through `InstitutionKnowledgeAnswerSafetyOwnerPortV1`; no generative model may implement this decision |
+| Historical V1 request/source/draft safety decision | `InstitutionKnowledgeAnswerSafetyOwnerPortV1`; its fixed-rule provider restriction is superseded and is not the current qualification gate |
 | Immutable conflict-review candidate | Nurture 0F-3 repository; Admin Workbench is a consumer only |
 
 `answerInstitutionKnowledgeV1` is an effectful operation, not a read-only
@@ -33,12 +41,12 @@ Workspace, Institution, Workbench surface and
 safety decisions, model/provider fields, conflict findings, child/family facts,
 heads or command identities.
 
-The exact execution order is:
+The historical V1 execution order was:
 
 1. authorize and validate the 0F-2 query;
 2. retrieve at most 16 candidates and validate every Nurture and authority
    source before any model context is built;
-3. run deterministic request/source safety; conflict or unsafe-request results
+3. run the then-frozen request/source safety decision; conflict or unsafe-request results
    abstain before generation;
 4. invoke one replayable Host generation over only the validated candidates;
 5. reject extra fields, unsupported citation refs and invalid claim shapes;
@@ -98,7 +106,7 @@ unqualified until the owner supplies that exact content identity; an adapter
 must not relabel an excerpt fingerprint or snapshot hash as source content
 currentness.
 
-### Deterministic answer safety
+### Historical V1 answer-safety posture — superseded
 
 `InstitutionKnowledgeAnswerSafetyOwnerPortV1` exposes two bounded decisions
 under one exact `ruleSetRef` and rule version:
@@ -109,12 +117,13 @@ under one exact `ruleSetRef` and rule version:
 2. `validateDraft` receives the exact generation ref, ordered draft claims and
    referenced source packages and returns `safe | unsafe | unavailable`.
 
-The same normalized input and rule version must produce the same ordered
-decision and evidence fingerprints. This owner is a deterministic policy
-service, not the generation model, prompt instruction or model self-rating.
-Until an exact provider and replay fixtures are qualified, all online
-generation is unavailable: Nurture cannot safely infer that a free-text
-question is non-medical. No keyword or compatibility classifier is allowed.
+At this historical freeze, the same normalized input and rule version was
+required to produce the same ordered decision and evidence fingerprints. That
+fixed-rule provider restriction is superseded. Current Q3 permits a
+service-backed structured decision through the My-Chat gateway and qualifies
+it only through the `/v2` 13-pin contract and full fixture regression in
+[`80`](./80-g4-e-q3-provider-qualification-contract.md). This section does not
+define a runnable provider gate.
 
 `material_source_conflict` contains 1..8 findings. Each finding names 2..8
 unique exact current source tuples from the supplied candidate set and one
@@ -339,12 +348,11 @@ Required fixtures:
 12. static boundaries find no provider SDK, local model/prompt/vector runtime,
     My-Chat ORM/ledger, host route or duplicate knowledge review state.
 
-The My-Chat scenario delta now includes the 0F-2 source/retrieval/currentness
+At this historical checkpoint, the My-Chat scenario delta included the 0F-2 source/retrieval/currentness
 bridge plus replayable structured generation and authority-citation
-currentness. The deterministic answer-safety owner also requires an exact
-provider and rule-set pin. These contracts are frozen but remain
-`DEFINED_UNQUALIFIED`; the generic Knowledge/RAG source baseline alone does not
-qualify them.
+currentness. Its exact provider/rule-set gate and `DEFINED_UNQUALIFIED` posture
+are superseded. Current owner/answer-safety V2 qualification state lives only
+in [`80`](./80-g4-e-q3-provider-qualification-contract.md).
 
 Planned table, not applied:
 

@@ -138,8 +138,9 @@
   is explicitly disabled on chat, mobile and Web, while the Surface Contract
   runtime dependency gate remains unqualified. No route, real owner adapter,
   Prisma/DB operation, activation or traffic was added.
-- I3 authenticated owner/formal-ingress binding remains unimplemented and
-  default-off; G-09 adoption is closed. 0F remains the independent local
+- I3 formal trusted ingress is structurally bound and default-off; concrete
+  local-authority, durable confirmation and My-Chat Host adapters remain
+  unimplemented. G-09 adoption is closed. 0F remains the independent local
   implementation option.
 
 ## Execution checkpoint — 2026-08-11 teacher-release owner v3 migration
@@ -583,13 +584,23 @@ authority；T-008 消费它完成后续 Candidate 与 composite qualification。
   disabled internal Workbench composition
   ([`75`](./75-g4-e-i2-b-surface-adapter-record.md)). The authorized My-Chat
   T-040 owner sequence closes Q2 durable source ingestion/currentness and
-  implements Q3 replay plus the provider-neutral deterministic safety boundary
+  implements Q3 replay plus the provider-neutral structured safety boundary
   at `942bd00`; Q4 sibling authority is also closed
-  ([`78`](./78-g4-e-q2-q3-owner-progress.md)). E7 remains gated only on a
-  concrete non-generative provider/rule artifact and its exact replay
-  qualification. After that pin exists, bind the Q2/Q3 owners and formal
-  ingress as one default-off E7 unit; E8 then runs joint positive/negative/
-  drift/replay/currentness conformance before any activation decision.
+  ([`78`](./78-g4-e-q2-q3-owner-progress.md), now retained only as a historical
+  owner checkpoint). The sole current Q3 machine contract is
+  `nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
+  `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`
+  in the canonical `/v2` layout. It requires the existing nine service pins plus
+  the exact owner-contract key/version and answer-safety-contract key/version.
+  Pre-V2 evidence is superseded and MUST NOT close Q3. My-Chat must
+  regenerate all 15 fixtures with two independent attempts against the new
+  tuple. That `2.1.0` result now passes: 30 unique invocations restore
+  `adapter_qualified` and permit default-off E7/E8. The registry, exact owner/
+  adapter pin and formal-ingress contract are now bound default-off. The next
+  node is the concrete authority/prepared-command/Host owner composition,
+  followed by E8 joint conformance. One real secret-backed gateway
+  smoke remains separately required only before feature-flag or traffic
+  activation.
 - 提供园区 Admin 使用的结构化知识编辑、来源关联、版本、发布、撤回与可视化能力。
 - 覆盖儿童沟通/发展、照护/安全、活动资源、家长沟通、园区制度和基础医疗/急救知识。
 - 为材料保留 `institution-authored`、`authority-linked` 等 provenance；园区材料

@@ -47,7 +47,7 @@ Project: `main`
   I1.2 retrieval/currentness also passes
   statically with pure source/currentness/preview providers and no schema or
   runtime effect. I1.3 answer safety/candidate also passes statically with
-  strict claims/citations, deterministic safety/final-currentness and one
+  strict claims/citations, structured safety/final-currentness and one
   immutable fifth-table candidate. E4 now qualifies the combined private I1
   through all 35 migrations and 391/391 DB tests on a destroyed disposable
   target. E5 now adds the source-only seven-capability Knowledge wire artifact;
@@ -55,9 +55,20 @@ Project: `main`
   presenters and disabled internal Workbench handlers. The later authorized
   My-Chat T-040 sequence through `942bd00` closes Q2 durable ingestion/
   currentness, adds Q3 canonical generation replay and qualifies the
-  provider-neutral safety boundary; Q4 sibling authority is closed. I3 now
-  waits only for a concrete non-generative deterministic safety provider and
-  immutable rule artifact before the exact owners/formal ingress can be bound.
+  provider-neutral safety boundary; Q4 sibling authority is closed. The My-Chat
+  V2 service-backed adapter is `ADAPTER_QUALIFIED` against the sole `/v2`
+  qualification `2.1.0` /
+  `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`;
+  its complete 13-pin tuple binds answer-safety and owner contract `2.0.0`, and
+  all 15 fixtures ran twice with 30 unique invocation ids. Pre-V2
+  evidence is invalid/non-current. Exact E7 owner admission, the committed
+  Base/My-Chat trusted registry, the two-stage confirmation contract and the
+  Nurture formal handler binding now pass default-off. The old Institution
+  Knowledge internal-handler track is removed. Concrete Nurture authority/
+  prepared-command owners and the My-Chat Host adapter remain pending; E8
+  follows after those bindings qualify.
+  `live_qualified=false` remains a separate activation gate requiring a real
+  gateway smoke; recorded/synthetic transport is never live evidence.
   T-008 still waits for the complete T-007 Exit.
 - Boundaries: Candidate Freeze, persistent deployment, activation and external
   traffic remain unauthorized; every C30 and T-009 capability stays
@@ -66,19 +77,22 @@ Project: `main`
 
 ### Next Governance Checkpoint
 
-1. **Qualify T-010 I4-C0.** Verify the independent mapping and frozen authority
-   design, then produce an additive Prisma diff without database apply.
-2. **Close the remaining G4-E Q3 provider gate.** Qualify one concrete
-   non-generative provider plus immutable rule-set ref/version/hash and exact
-   replay fixtures; do not reopen closed Q2/Q4 or add a compatibility
-   classifier.
-3. **Keep G4-E I3/I4 default-off until the Q3 pin exists.** Then bind the
-   adopted My-Chat owners/formal ingress and run joint positive, negative,
-   currentness, outage, drift and replay conformance.
-4. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
+1. **Begin T-010 I4-C1.** I4-C0 mapping and authority design are qualified;
+   produce and review an additive Prisma diff without database apply.
+2. **Implement the G4-E E7 production owners.** Add the Nurture current-
+   authority resolver, durable prepared-command ledger and My-Chat adapter for
+   the pinned canonical retrieval owner.
+3. **Finish G4-E E7 Host composition.** Bind the existing signed transport only
+   after those owners qualify; keep application routes and traffic default-off.
+4. **Run G4-E E8 without traffic.** Execute joint positive, negative,
+   currentness, outage, drift and replay conformance, then issue the G4-E Exit.
+5. **Require `live_qualified` before activation.** Run a real secret-backed
+   gateway smoke before enabling any flag or traffic; never describe mock
+   transport as live.
+6. `NurtureInstitutionPolicyService` and the G4-D commands still have **no
    production caller**; I1 evidence is not activation evidence.
-5. Only a separately authorized `C30-I4` scope review is eligible for T-002.
-6. Preserve T-006, T-009 and T-003 as done and archive them only after
+7. Only a separately authorized `C30-I4` scope review is eligible for T-002.
+8. Preserve T-006, T-009 and T-003 as done and archive them only after
    explicit approval.
 
 ## Notes (manual)

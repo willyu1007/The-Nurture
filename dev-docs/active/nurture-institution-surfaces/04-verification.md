@@ -836,6 +836,86 @@ G_09_ADOPTION_CLOSED / DEFAULT_OFF / NO_DUAL_TRACK`.
 
 Detailed evidence: [`79`](./79-teacher-release-owner-v3-migration.md).
 
+## 2026-08-11 — G4-E Q3 service-backed qualification and adapter evidence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Qualification policy | PASS | The current Q3 target is a service-backed structured safety adapter through the My-Chat gateway; Qwen/Bailian or another approved service is acceptable. |
+| Normative machine contract | PASS | Sole canonical layout `packages/nurture-scenario/contracts/institution-knowledge-answer-safety/v2/`; qualification `2.1.0` / `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`; answer-safety contract `2.0.0`; 15 fixtures. |
+| Single-track layout | PASS | `/v1` does not exist. The script and generated-manifest path resolve only to `/v2`; the layout test rejects any `/v1` fallback. |
+| Required service tuple | PASS / EVIDENCE | The evidence binds all 13 fields: the nine gateway/provider/model/deployment/prompt pins plus `my-chat.nurture-institution-knowledge-answer-safety-owner@2.0.0` and `nurture.institution-knowledge-answer-safety@2.0.0`. |
+| Current V2 regression evidence | PASS | My-Chat emitted `adapter_recorded` evidence for 15 fixtures × 2 attempts = 30 unique invocation ids against the exact `2.1.0` digest. The gitignored candidate was not copied into Nurture. |
+| `adapter_qualified` | PASS / Q3 IMPLEMENTATION GATE CLOSED | The Nurture verifier returned `adapter_qualified=true`, `live_qualified=false`, `capability=default-off` and `bitwise-determinism=false`. Default-off E7/E8 may proceed. |
+| `live_qualified` | DEFERRED ACTIVATION GATE | A real secret-backed request through the configured My-Chat gateway is required before enabling the feature flag or traffic, but is not required to complete default-off E7/E8. Recorded/synthetic transport MUST NOT be reported as live evidence. |
+| Determinism claim | EXPLICITLY NOT CLAIMED | Qualification does not claim bitwise-repeatable remote model output or verification of provider model weights. Behavioral confidence comes from strict parsing, normalization, fixtures and fail-closed handling. |
+| Runtime/config/database effect | DEFAULT-OFF ONLY | Contract/layout cleanup did not modify E7 source, enable a feature flag or traffic, apply a database migration, expose credentials or produce `live_qualified`. |
+| Docs/governance | PASS | Strict task-doc lint passes 137/137 with zero warnings; project-governance lint and `git diff --check` pass. |
+
+Verdict: `G4_E_Q3_SINGLE_TRACK_V2_CONTRACT_PASS /
+ADAPTER_QUALIFIED / LIVE_QUALIFICATION_ACTIVATION_GATE /
+DEFAULT_OFF`.
+Detailed evidence: [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+
+## 2026-08-11 G4-E E7 owner-composition verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Nurture owner/surface/admission | PASS | 4 files / 32 tests; exact external tuple, injected owner-pin drift and decision-rule drift fail closed. |
+| Nurture type/manifest | PASS | `@the-nurture/scenario` typecheck and generated manifest check pass. |
+| My-Chat V2 owner/provider/runner/composition | PASS | 9 files / 53 tests; LLM and scenario-integration typechecks; changed-file ESLint pass. |
+| V2 qualification | PASS | 7/7 contract tests; 15 fixtures / 30 unique attempts; `adapter_qualified=true`, `live_qualified=false`, `default_off`. |
+| Old-track census | PASS | `/v1` absent; current SSOT and active My-Chat implementation have zero old qualification tuple/digest/alias matches. |
+| Activation boundary | PASS | No live call, secret, database apply, route registration, feature flag or traffic. Authenticated private transport remains pending. |
+
+## 2026-08-11 G4-E E7 historical pre-adoption formal-ingress audit
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Signed transport reuse | PASS | My-Chat already supplies `ScenarioPrivateInvocationV1`, detached Ed25519 request/response verification, transport credential binding and nonce replay protection; Nurture has the matching verifier/signer. |
+| Trusted handler context | BLOCKED | `WorkflowScenarioModule.internal_api_handlers` has no typed verified-transport context. Credential/signature fields MUST NOT be moved into untrusted payload. |
+| Cross-owner authorization | BLOCKED | My-Chat retrieval requires canonical `PermissionContext`; Nurture separately requires current local Participant/Institution/role resolution. No current contract bridges both without inference. |
+| Command envelope | BLOCKED | Prepare lacks confirmation; execute lacks typed input/target. A two-stage contract or owner-held confirmed-payload resolver must be frozen before command ingress. |
+| Runtime effect | NONE / DEFAULT-OFF | No source, manifest, route, credential, deployment, provider call, database operation or traffic change. |
+
+Historical verdict, superseded by the landing section below:
+`G4_E_E7_FORMAL_INGRESS_CONTRACT_BLOCKED /
+TRUSTED_AUTHORIZATION_CONTEXT_REQUIRED`. Reproduction and the bounded next
+contract slice are recorded in
+[`82`](./82-g4-e-e7-formal-ingress-contract-audit.md).
+
+### Local Base contract candidate
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Typecheck | PASS | Base workflow contracts, runtime, scenario template and conformance packages. |
+| Runtime/scenario | PASS | Runtime 40/40; scenario template 10/10; focused registry/dispatcher 38/38. |
+| Unlocked conformance | PASS | Contract-doc alignment, consumer boundary, 66 schemas, release contract, semantic/canonical lint and 441 Node tests. |
+| Legacy hash | PASS | Frozen legacy manifest contract hash remains `9f568ff772d3dafc02dd96f284f7cedb85aff18839b8f26f4691a8b2dc0d0ca6`. |
+| Candidate source hash | RECORDED, NOT ADOPTED | `dd888b89f89d4137fb717bba60a400f9f68bb127b4485121270f1c8eb9ea51e7`. No dirty revision is treated as evidence. |
+| Portability/source lock | EXPECTED LANDING GATE | The committed lock rejects the uncommitted candidate. A source-bearing Base commit must exist before the revision and hashes can be refreshed. |
+
+## 2026-08-11 G4-E E7 formal-ingress landing and hardening
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Cross-repository trusted registry | PASS | Base source `6740871` / lock `536638a`; My-Chat source `4960f47`, runtime lock `a57e1ae`, adoption lock `2a2bb3c`; Nurture C30 adoption `42d0858`. |
+| Formal ingress contract | PASS / DEFAULT-OFF | Nurture freezes one query, prepare and execute tuple; no ordinary Institution Knowledge internal handler remains. |
+| Direct declaration defense | PASS | Scenario, method, endpoint, operation, schema, ingress and origin drift fail closed before owner invocation. |
+| Current authority | PASS AT PORT BOUNDARY | Prepare resolves current authority; execute re-resolves it and rejects exact authority snapshot drift before business binding. Concrete production owner remains pending. |
+| Full unit | PASS | 92 files / 996 tests. |
+| Focused formal/conformance | PASS | 6 files / 35 tests; owner admission follow-up 2 files / 12 tests. |
+| Type/manifest | PASS | `@the-nurture/scenario` typecheck and generated manifest check. |
+| Test routing | PASS | 164 files: 92 unit / 43 production DB / 11 dev-host / 16 Scenario Service / 2 X5 joint. |
+| Default-off | PASS | Exactly 6 trusted handlers, 0 enabled capabilities, 0 positive application route registrations and 0 activation models; census `722ee276…35c3`. |
+| Q3 machine regression | PASS | 7/7 qualification tests; sole `/v2` layout retained. |
+| Workflow pin | PASS | Base/My-Chat parity and source pins pass; Nurture scenario hash `b56cb3f1…8017`. |
+| Adoption lock | PASS | Source revision `4e61335c…4573`; adoption hash `b02a27c0…36be`. |
+| Sibling aggregate cleanliness | EXTERNAL DIRTY ONLY | `verify:c30-i3-upstream` stops because My-Chat has unrelated cloud-deployment documentation changes. Exact committed revision/source hashes pass; those files were not changed. |
+| Runtime effects | NONE | No DB apply, secret read, live gateway call, HTTP/AppModule route, deployment, flag or traffic. |
+
+Verdict: `G4_E_E7_FORMAL_INGRESS_BOUND_DEFAULT_OFF /
+PRODUCTION_OWNER_BINDING_PENDING`.
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

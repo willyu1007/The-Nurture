@@ -29,16 +29,41 @@
   five lifecycle actions without a caller.
 - E6 I2-B Surface adapters: `G4_E_I2_B_SURFACE_ADAPTER_QUALIFIED`; see
   [`75`](./75-g4-e-i2-b-surface-adapter-record.md). Exact validators,
-  presenters and I1 adapters are composed only through disabled internal
-  Workbench handlers.
+  presenters and I1 adapters are reachable only through the disabled formal
+  trusted Workbench mapping; the old internal handler track is removed.
 - E7 I3 gate audit: historical `G4_E_I3_NOT_READY_EXTERNAL_GATES`; see
   [`76`](./76-g4-e-i3-owner-gate-audit.md). The later authorized My-Chat T-040
   sequence supersedes its external-state finding: Q2, Q3 replay and the
   provider-neutral safety boundary are adopted at `942bd00`, and Q4 is closed
   ([`78`](./78-g4-e-q2-q3-owner-progress.md)).
-- Current node: pre-E7 Q3 gate, waiting only on a concrete non-generative
-  deterministic provider/rule artifact and replay qualification.
-- I3/I4 cannot start from synthetic compatibility owners or the moving checkout.
+- Pre-E7 Q3 qualification policy:
+  `G4_E_Q3_SINGLE_TRACK_V2_CONTRACT_PASS / ADAPTER_QUALIFIED`; see
+  [`80`](./80-g4-e-q3-provider-qualification-contract.md). A service-backed
+  structured decision through the My-Chat gateway is accepted with explicit
+  model/deployment and immutable prompt pins, strict parsing, fail-closed
+  behavior and the existing 15-case regression suite.
+- Current machine contract:
+  `nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
+  `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`
+  in the sole `/v2` layout, binding answer-safety and owner contract `2.0.0`.
+- Qualification evidence: the My-Chat V2 runner produced `adapter_recorded`
+  evidence for 15 fixtures × 2 attempts = 30 unique invocation ids. The Nurture
+  verifier returned `adapter_qualified=true`, `live_qualified=false`,
+  `default_off` and no bitwise-determinism claim for the complete 13-pin tuple.
+  Pre-V2 qualification evidence is invalid/non-current.
+- E7 contract/adoption slice:
+  `G4_E_E7_FORMAL_INGRESS_BOUND_DEFAULT_OFF /
+  PRODUCTION_OWNER_BINDING_PENDING`; see [`81`](./81-g4-e-e7-owner-composition-record.md)
+  and [`82`](./82-g4-e-e7-formal-ingress-contract-audit.md). Base and My-Chat
+  adopted the dedicated verified registry; Nurture declares one exact
+  query/prepare/execute handler set, removes the old internal track, binds a
+  fixed Workbench surface, and fails closed without production owners.
+- Current node: implement the Nurture current-authority owner, durable prepared-
+  command ledger and My-Chat host adapter, then run E8 Joint Conformance. A real gateway
+  smoke produces
+  `live_qualified` and is required only before feature-flag/traffic activation.
+- I3/I4 cannot start from a hand-written fixture answer, raw generic moderation
+  mapping or moving model alias. Mock transport must never be called live.
 
 ## Planning-mode context and merge policy
 
@@ -78,8 +103,9 @@
 - Do not let a conflict candidate become a status, hold, eligibility decision,
   deadline/blocker or second review lifecycle.
 - Do not apply migrations to shared/persistent/staging/production databases.
-- Do not claim I3/I4 closure from synthetic adapters, the moving My-Chat
-  checkout, or an unqualified answer-safety provider.
+- Do not claim `adapter_qualified` from hand-written fixture answers or
+  `live_qualified` from mock transport, the moving My-Chat checkout or an
+  unpinned answer-safety service.
 
 ## Open questions and assumptions
 
@@ -93,10 +119,14 @@
   exact source admission/invalidation, durable reconciliation and replayable
   generation; all are ancestors of inspected My-Chat `main`
   ([`78`](./78-g4-e-q2-q3-owner-progress.md)).
-- Q3 — Before I3: which exact deterministic answer-safety provider and
-  rule-set/version/hash and replay fixtures are owner-qualified? The
-  provider-neutral adapter is implemented; this concrete positive provider is
-  still open.
+- Q3 — **Resolved for default-off E7/E8 at `adapter_qualified`.** The
+  accepted owner is a My-Chat service adapter through the unified gateway with
+  an explicit model/deployment version, immutable prompt id/version, strict
+  structured output, fail-closed behavior and all 15 fixtures. Qwen/Bailian is
+  accepted at the exact pins in [`80`](./80-g4-e-q3-provider-qualification-contract.md).
+  The sole `/v2` `2.1.0` verifier accepted 30 unique invocations, including the
+  owner/answer-safety V2 tuple, and closed Q3.
+  `live_qualified` remains deferred to activation.
 - Q4 — **Resolved.** The user explicitly authorized My-Chat/Base sibling
   mutation and the My-Chat T-040 owner sequence was implemented.
 
@@ -106,9 +136,10 @@
   connecting to a database (risk: low).
 - A2: I2 may publish an exact default-off Surface artifact and synthetic
   adapters without claiming owner readiness (risk: low).
-- A3: Q1, Q2 and Q4 are closed. The remaining Q3 provider/rule pin blocks
-  E7/E8 and does not justify compatibility adapters, a keyword classifier or
-  local Host-runtime substitute (risk: high if ignored).
+- A3: Q1–Q4 are closed for default-off E7/E8. Q3 is
+  `adapter_qualified` at qualification `2.1.0`; live secrets are not a
+  prerequisite while the capability stays default-off. Activation remains
+  blocked until `live_qualified` (risk: high if levels are conflated).
 - A4: Each numbered implementation node is a revertible commit boundary with
   one `Task: T-007` trailer; the next node starts only from a clean worktree
   after verification and project sync (risk: low).
@@ -128,7 +159,8 @@
   integration, Surface Contract artifact/adapters, scenario module/manifest,
   verification scripts/tests and task/project docs.
 - External interfaces/APIs: exact My-Chat Knowledge/RAG source/retrieval/
-  currentness/generation adapters and one deterministic answer-safety owner;
+  currentness/generation adapters and one service-backed structured answer-
+  safety owner through the unified gateway;
   no generic-purpose remapping.
 - Data/storage impact: five planned Nurture tables total — four lifecycle/
   provenance tables and one immutable conflict candidate; existing
@@ -176,7 +208,7 @@ expected project-structure impact.
   - Knowledge repositories under the existing DB repository layer
 - New interface(s)/API(s) (when relevant):
   - Nurture source-change/currentness providers, Host retrieval/generation/
-    authority-currentness consumers and deterministic answer-safety port
+    authority-currentness consumers and structured answer-safety port
 - New file(s) (optional):
   - two additive Prisma migration directories, subject to implementation review
   - phase-specific implementation/audit records in the existing task bundle
@@ -199,7 +231,7 @@ expected project-structure impact.
      denial/unavailable and no-child/no-fallback fixtures pass.
 4. **E3 — G4-E I1.3 answer safety/candidate**
    - Deliverable: strict claim/citation/abstention/portable presenter,
-     deterministic safety orchestration, immutable candidate policy and fifth
+     structured safety orchestration, immutable candidate policy and fifth
      table/migration artifact.
    - Acceptance criteria: cited positive synthetic paths, privacy/medical
      negatives, replay/drift and candidate-no-hold regressions pass.
@@ -219,17 +251,22 @@ expected project-structure impact.
    - Acceptance criteria: behavior tests cover each descriptor; formal ingress
      remains unrouted and disabled until I3.
 8. **E7 — G4-E I3 Owner Integration Readiness**
-   - Deliverable: exact adopted My-Chat/safety owner pins/adapters, formal
-     scenario-service ingress and disposable PostgreSQL qualification.
-   - Acceptance criteria: resolved Q2/Q4 pins plus the qualified Q3 provider/
-     rule artifact are composed; real owner positive/negative/replay/drift
-     paths pass with no synthetic-only readiness claim.
+   - Deliverable: exact adopted My-Chat owner pins, an `adapter_qualified`
+     service-backed safety adapter, formal scenario-service ingress and
+     disposable PostgreSQL qualification.
+   - Acceptance criteria: the Q3 adapter prerequisite is satisfied by
+     [`80`](./80-g4-e-q3-provider-qualification-contract.md); compose it with
+     resolved Q2/Q4 pins and formal ingress, then qualify the whole default-off
+     owner path on disposable PostgreSQL. Live secrets/provider calls are not
+     required while the capability remains default-off.
 9. **E8 — G4-E I4 Joint Conformance and Exit**
    - Deliverable: formal ingress end-to-end conformance, branch audit, G4-E
      Exit record and updated T-007 gap register.
    - Acceptance criteria: positive cited general/medical paths, no-source,
      conflict, unsafe text, source drift, owner outage, copy/export provenance,
-     privacy negatives and final default-off census pass.
+     privacy negatives and final default-off census pass. E8 may exit at
+     `adapter_qualified`; activation remains separately gated by
+     `live_qualified`.
 
 ## Step-by-step plan (phased)
 
@@ -321,10 +358,16 @@ expected project-structure impact.
 
 - Objective: bind only exact adopted owner providers and formal ingress.
 - Deliverables:
-  - adopted pins, adapters, real service composition and disposable evidence.
+  - adopted pins, service adapter, immutable prompt/model selection, formal
+    composition and disposable evidence.
+- Current: exact pins, service adapter, recorded evidence, host default-off
+  composition and Nurture admission pass. The remaining gate is the typed
+  verified-invocation/authorization-context contract and command confirmation
+  model, followed by authenticated private transport binding.
 - Verification:
-  - real owner positive/denial/unavailable/drift/replay, authenticated formal
-    HTTP, PostgreSQL and source-pin/adoption hashes.
+  - adapter transport serialization/parser, all 15 positive/unsafe/conflict/
+    unavailable fixtures, authenticated formal HTTP, PostgreSQL and source-pin/
+    adoption hashes. This establishes `adapter_qualified` without secrets.
 - Rollback:
   - disable the single runtime gate, remove formal routing and destroy the
     disposable target; never fall back to generic public RAG.
@@ -336,7 +379,8 @@ expected project-structure impact.
   - joint evidence, cross-contract audit, G4-E Exit and next T-007 checkpoint.
 - Verification:
   - full required positive/negative/replay/privacy/safety matrix, all repository
-    gates, final false/empty census, docs/context/governance and clean worktree.
+    gates, final false/empty census, docs/context/governance and clean worktree;
+  - no live-provider claim is required or made while the capability is disabled.
 - Rollback:
   - retain runtime gate disabled; no activation occurs in G4-E.
 
@@ -361,7 +405,8 @@ expected project-structure impact.
   - no question/child/family/private facts in candidate/answer persistence
 - Acceptance criteria:
   - every required G4-E DoD path passes on its correct gate;
-  - no required owner/DB/formal-ingress evidence is replaced by synthetic proof;
+  - synthetic transport may prove `adapter_qualified` only when it executes the
+    real adapter; it never proves `live_qualified`;
   - every critical node is reviewed, repaired, synchronized and committed before
     the next node;
   - G4-E Exit does not activate capability or traffic and T-007 remains honest.
@@ -370,7 +415,8 @@ expected project-structure impact.
 
 | Risk | Likelihood | Impact | Mitigation | Detection | Rollback |
 | --- | ---: | ---: | --- | --- | --- |
-| External scenario/safety owner contracts remain absent | high | high | stop at exact I3 gate; no compatibility mapping | pin/adoption and real-owner suites | keep gate false; revert I3 only |
+| Service adapter remains absent or returns unvalidated prose | high | high | stop at exact I3 gate; require gateway-only structured adapter | pins, transport tests and 15 fixtures | keep gate false; revert I3 only |
+| Mock transport is mistaken for live readiness | medium | high | record `adapter_qualified` and `live_qualified` separately | evidence-level assertion and activation smoke | keep activation false |
 | Migration violates existing command/protected-content invariants | medium | high | use repo Prisma SSOT, additive FKs/checks and disposable qualification | schema diff, DB tests, drift | destroy target; revert migration commit |
 | Candidate becomes a second review/eligibility lifecycle | medium | high | immutable fact, no status/hold/event; dedicated regression | architecture review + replay tests | revert E3 |
 | Model/owner output leaks trusted/private fields | medium | high | strict DTO parsers, closed refs, safety and presenter reconstruction | negative/schema tests | gate unavailable; revert adapter |
