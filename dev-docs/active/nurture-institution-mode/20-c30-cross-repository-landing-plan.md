@@ -247,7 +247,16 @@ For reference, the conflict resolution this step restored:
 Re-verify the census after restoring — if any repository gained test files in
 the interim, the numbers move.
 
-### Step 5 — One three-repository requalification ✅ DONE 2026-08-08
+### Step 5 — One three-repository requalification ✅ DONE 2026-08-08 · ⚠️ since invalidated by pin drift
+
+> 2026-08-12 note: the 2026-08-08 pass bound My-Chat `51ad97f7` and surface
+> contract `1.17.0` under record 21's own invalidation clause ("live checkouts
+> … any sibling commit invalidates the revision binding"). Sibling pins have
+> since rotated repeatedly, so Step 5 must be re-executed at current pins (or
+> with a detached topology) before its acceptance counts as current-pin
+> evidence — `00-overview.md` and the dashboard carry the authoritative
+> "outstanding" status. The `c30-i3-owner-adoption-lock.json` host-head
+> refresh belongs to that re-execution.
 
 `C30_LANDING_REQUAL_PASS` — full record in
 [`21-c30-landing-requalification-record.md`](./21-c30-landing-requalification-record.md).

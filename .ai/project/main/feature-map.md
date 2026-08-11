@@ -390,14 +390,17 @@ Project: `main`
   artifact and disabled Workbench adapters. The adopted My-Chat T-040 sequence
   through `942bd00` closes Q2 ingestion/currentness and implements Q3 replay
   plus its provider-neutral safety boundary; Q4 sibling authority is closed.
-- Next Checkpoint: qualify the G4-E E7 additive migration on an approved
-  disposable PostgreSQL target, then run E8 Joint Conformance without traffic.
-  The trusted registry, single formal query/prepare/execute track, exact signed-
-  role current-authority owner, bounded encrypted prepared-command ledger and
-  principal-bound My-Chat retrieval/final-access adapter are implemented as one
-  default-off binding. The V2
-  owner/adapter admission and default-off composition already pass; Q3 is
-  `ADAPTER_QUALIFIED` against
+- Next Checkpoint: G4-D I3 — one coherent change that lands the enrollment
+  prepared-command ledger with its consumer, composes the adopted My-Chat
+  prospective-contact owner with the Nurture native-source and current-owner
+  ports, binds the formal trusted ingress (three operations, internal bridge
+  removed, no compatibility alias) and qualifies on an approved disposable
+  target (design frozen in record 86). G4-E is closed: record 83 (E7
+  disposable-database qualification), record 84 (E8 joint conformance, 12/12
+  matrix + x5 24/24 through the real Base dispatcher) and record 85
+  (`G4_E_EXIT_PASS_ADAPTER_QUALIFIED`) close the chain, and the 2026-08-12
+  post-review hardening re-qualified after nine independent-review fixes.
+  Q3 remains `ADAPTER_QUALIFIED` against
   the sole `/v2`
   `nurture.institution-knowledge-answer-safety-provider-qualification@2.1.0` /
   `sha256:b2e39994e712877277b2efa49300a3cf9a8b313db0f03a64fd3ffc59fb9b5741`:
