@@ -2,9 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import {
   defaultNurtureInstitutionKnowledgeSurfaceDeps,
   NurtureInstitutionKnowledgeSurfaceHandler,
-  parseNurtureInstitutionKnowledgeAdapterRequest,
+  parseNurtureInstitutionKnowledgeSurfaceRequest,
   presentInstitutionKnowledgeAnswer,
-  type NurtureInstitutionKnowledgeAdapterRequest,
+  type NurtureInstitutionKnowledgeSurfaceRequest,
   type NurtureInstitutionKnowledgePreparedBindingV1,
   type NurtureInstitutionKnowledgeSurfaceCapabilityKey,
   type NurtureInstitutionKnowledgeSurfaceDeps,
@@ -106,13 +106,13 @@ const operationInputs = {
 
 const request = <
   Key extends keyof typeof operationInputs,
->(capabilityKey: Key): NurtureInstitutionKnowledgeAdapterRequest<Key> => ({
+>(capabilityKey: Key): NurtureInstitutionKnowledgeSurfaceRequest<Key> => ({
   capabilityKey,
   capabilityVersion: "1.0.0",
   targetOptionRef: "option-institution",
   confirmationRef: "confirmation-01",
   operationInput: operationInputs[capabilityKey],
-}) as NurtureInstitutionKnowledgeAdapterRequest<Key>;
+}) as NurtureInstitutionKnowledgeSurfaceRequest<Key>;
 
 const deps = (
   overrides: Partial<NurtureInstitutionKnowledgeSurfaceDeps> = {},
@@ -239,7 +239,7 @@ describe("G4-E I2-B Institution Knowledge Surface adapters", () => {
       });
     }
     expect(resolve).not.toHaveBeenCalled();
-    expect(() => parseNurtureInstitutionKnowledgeAdapterRequest({
+    expect(() => parseNurtureInstitutionKnowledgeSurfaceRequest({
       ...request("create_institution_knowledge_revision"),
       operationInput: {
         ...operationInputs.create_institution_knowledge_revision,

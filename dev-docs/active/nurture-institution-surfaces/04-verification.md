@@ -916,6 +916,27 @@ contract slice are recorded in
 Verdict: `G4_E_E7_FORMAL_INGRESS_BOUND_DEFAULT_OFF /
 PRODUCTION_OWNER_BINDING_PENDING`.
 
+## 2026-08-11 G4-E E7 post-landing quality verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Scenario typecheck | PASS | `pnpm --filter @the-nurture/scenario exec tsc --noEmit -p tsconfig.json`. |
+| Focused formal/runtime regression | PASS | 7 files / 45 tests, including 10 formal-ingress tests. |
+| Owner response hardening | PASS | Effect mismatch, malformed frozen payload and unsafe reason-code cases fail closed before authority/business calls. |
+| Single-track census | PASS | No `AdapterRequest`, legacy Institution Knowledge internal handler or compatibility alias remains. |
+| Diff hygiene | PASS | `git diff --check`. |
+| Runtime effects | NONE | No database apply, provider call, route, feature activation or traffic. |
+
+### Final workspace verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Full workspace typecheck | PASS | Both repo-prisma clients generated locally, pinned workflow contracts built and root `tsc --noEmit` passed. Generated clients are ignored build artifacts. |
+| Full unit population | PASS | 92 files / 999 tests. |
+| Focused formal/runtime regression | PASS | 7 files / 45 tests. |
+| Manifest/test routing/default-off census | PASS | Generated manifest, lane routing and activation absence checks passed. |
+| Governance/diff hygiene | PASS | Project-governance lint and `git diff --check` passed. |
+
 ## Required Evidence
 
 测试必须说明 active role、actor、grant、child/group scope、attendance assignment/date、

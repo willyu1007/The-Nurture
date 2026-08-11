@@ -33,7 +33,7 @@ import {
 } from "./c30/trusted-handler-registry.js";
 import {
   createNurtureInstitutionKnowledgeFormalInvocationHandlers,
-  type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryV1,
+  type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1,
 } from "./institution-knowledge-formal-ingress.js";
 import type {
   NurtureInstitutionKnowledgeFormalAuthorityResolverV1,
@@ -76,7 +76,7 @@ export type NurtureScenarioModuleDeps = {
   institutionKnowledgeOwnerIntegration?: NurtureInstitutionKnowledgeOwnerIntegration;
   institutionKnowledgeAuthorityResolver?: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
   institutionKnowledgePreparedCommandOwner?: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
-  institutionKnowledgeAuthorizedRetrievalOwnerFactory?: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryV1;
+  institutionKnowledgeAuthorizedRetrievalOwnerFactory?: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1;
   /** Exact C30 owner; omitted production composition remains fail-closed. */
   c30SubjectPresentationOwner?: NurtureC30TrustedInvocationOwner;
 };

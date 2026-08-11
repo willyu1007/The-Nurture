@@ -59,6 +59,35 @@ describe("Institution Knowledge formal trusted handlers", () => {
     }));
   });
 
+  it("rejects a prepared result whose effect does not match the frozen intent", async () => {
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+      authorityResolver: {
+        resolveCurrent: async () => ({ status: "resolved", authority }),
+      },
+      preparedCommandOwner: {
+        prepare: async () => ({
+          status: "ready_to_confirm",
+          command_request_id: "command-request-01",
+          confirmation_ref: "owner-confirmation-ref-01",
+          expires_at: "2026-08-11T00:01:00.000Z",
+          effect: "revoke_institution_knowledge_revision",
+        }),
+        consumeConfirmed: async () => ({ status: "unavailable", reason_code: "unused" }),
+      },
+    });
+    await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.prepare]?.(
+      verified("prepare", {
+        contractVersion: 1,
+        clientCommandId: "client-command-01",
+        request: commandIntent(),
+      }),
+    )).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "institution_knowledge_owner_response_invalid",
+    });
+  });
+
   it("consumes an owner-held payload and rechecks the exact local authority", async () => {
     const resolve = vi.fn(async () => ({
       status: "denied" as const,
@@ -139,6 +168,39 @@ describe("Institution Knowledge formal trusted handlers", () => {
     });
     expect(resolve).not.toHaveBeenCalled();
     expect(resolveCurrent).not.toHaveBeenCalled();
+  });
+
+  it("reparses owner-held commands before current-authority lookup", async () => {
+    const resolve = vi.fn();
+    const resolveCurrent = vi.fn();
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: {
+        ...defaultNurtureInstitutionKnowledgeSurfaceDeps,
+        bindings: { resolve },
+      },
+      authorityResolver: { resolveCurrent },
+      preparedCommandOwner: {
+        prepare: async () => ({ status: "unavailable", reason_code: "unused" }),
+        consumeConfirmed: async () => ({
+          status: "resolved",
+          command_request_id: "command-request-01",
+          frozen_request: {
+            ...commandIntent(),
+            confirmationRef: "owner-confirmation-ref-01",
+            participantRef: "participant-injected-01",
+          } as never,
+          authority,
+        }),
+      },
+    });
+    await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.execute]?.(
+      verified("execute", executeInput()),
+    )).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "institution_knowledge_owner_response_invalid",
+    });
+    expect(resolveCurrent).not.toHaveBeenCalled();
+    expect(resolve).not.toHaveBeenCalled();
   });
 
   it("serves preview without requiring the My-Chat retrieval owner", async () => {
@@ -276,6 +338,32 @@ describe("Institution Knowledge formal trusted handlers", () => {
         reason_code: "institution_knowledge_formal_ingress_unavailable",
       });
     }
+  });
+
+  it("does not forward malformed authority-owner reason codes", async () => {
+    const handlers = createNurtureInstitutionKnowledgeFormalInvocationHandlers({
+      surfaceDeps: defaultNurtureInstitutionKnowledgeSurfaceDeps,
+      authorityResolver: {
+        resolveCurrent: async () => ({
+          status: "denied",
+          reason_code: "raw internal authority/id",
+        }),
+      },
+    });
+    await expect(handlers[NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS.query]?.(
+      verified("query", {
+        contractVersion: 1,
+        request: {
+          capabilityKey: "query_institution_knowledge_preview",
+          capabilityVersion: "1.0.0",
+          targetOptionRef: "institution-option-01",
+          operationInput: { revisionOptionRefs: ["revision-option-01"] },
+        },
+      }),
+    )).resolves.toEqual({
+      status: "unavailable",
+      reason_code: "institution_knowledge_owner_response_invalid",
+    });
   });
 });
 

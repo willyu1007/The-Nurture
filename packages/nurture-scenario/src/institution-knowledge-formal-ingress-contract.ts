@@ -1,9 +1,9 @@
 import type { ScenarioHumanPrincipalV1 } from "@my-chat/workflow-contracts";
 import {
-  parseNurtureInstitutionKnowledgeAdapterRequest,
+  parseNurtureInstitutionKnowledgeSurfaceRequest,
   parseNurtureInstitutionKnowledgeCommandIntent,
   type NurtureInstitutionKnowledgeActionKey,
-  type NurtureInstitutionKnowledgeAdapterRequest,
+  type NurtureInstitutionKnowledgeSurfaceRequest,
   type NurtureInstitutionKnowledgeCommandIntentV1,
   type NurtureInstitutionKnowledgeQueryKey,
 } from "./institution-knowledge-surfaces.js";
@@ -46,7 +46,7 @@ export const NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_INGRESS_V1 = Object.freeze({
 
 export type NurtureInstitutionKnowledgeFormalQueryInputV1 = {
   contractVersion: 1;
-  request: NurtureInstitutionKnowledgeAdapterRequest<NurtureInstitutionKnowledgeQueryKey>;
+  request: NurtureInstitutionKnowledgeSurfaceRequest<NurtureInstitutionKnowledgeQueryKey>;
 };
 
 export type NurtureInstitutionKnowledgeFormalPrepareInputV1 = {
@@ -115,7 +115,7 @@ export type NurtureInstitutionKnowledgePreparedCommandOwnerV1 = {
     | {
         status: "resolved";
         command_request_id: string;
-        frozen_request: NurtureInstitutionKnowledgeAdapterRequest<NurtureInstitutionKnowledgeActionKey>;
+        frozen_request: NurtureInstitutionKnowledgeSurfaceRequest<NurtureInstitutionKnowledgeActionKey>;
         authority: NurtureInstitutionKnowledgeLocalAuthorityV1;
       }
     | { status: "denied" | "conflict" | "unavailable"; reason_code: string }
@@ -128,7 +128,7 @@ export function parseNurtureInstitutionKnowledgeFormalQueryInputV1(
   if (!exactRecord(value, ["contractVersion", "request"]) || value.contractVersion !== 1) {
     return null;
   }
-  const request = parseNurtureInstitutionKnowledgeAdapterRequest(value.request);
+  const request = parseNurtureInstitutionKnowledgeSurfaceRequest(value.request);
   return request?.capabilityKey === "query_institution_knowledge_preview"
     ? { contractVersion: 1, request }
     : null;
@@ -168,8 +168,12 @@ function exactRecord(
   value: unknown,
   expectedKeys: readonly string[],
 ): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value) &&
-    Object.keys(value).sort().join("|") === [...expectedKeys].sort().join("|");
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  const keys = Object.keys(value);
+  return keys.length === expectedKeys.length &&
+    expectedKeys.every((key) => Object.prototype.hasOwnProperty.call(value, key));
 }
 
 function opaqueId(value: unknown): value is string {

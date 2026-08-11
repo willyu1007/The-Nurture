@@ -1350,3 +1350,19 @@ G4-0A～0G 的 rolling branch release 顺序取代。权威 owner/gate/default �
 - Final source `4e61335c274969615ccceb7ee1f6e64a42794573` is sealed by
   metadata `306fe16`; scenario hash `b56cb3f17a20fd67f1798a0fc64b677a1f1f5656daecf402828137d317d88017`
   and adoption hash `b02a27c03bddcebc2d0aee14e5fc121f672d50db2c2f986f3a17d67299c236be`.
+
+## 2026-08-11 G4-E E7 post-landing quality and single-track hardening
+
+- Reparsed every owner-held frozen request before current-authority lookup or
+  business binding. Extra fields, a query masquerading as a command or an
+  invalid confirmation now fail closed.
+- Validated prepared owner results at runtime. The returned effect must equal
+  the frozen command intent, ids/confirmation/expiry must be canonical and
+  malformed owner reason codes are not forwarded.
+- Validated resolved Nurture authority snapshots as exact closed records before
+  they can supply workspace, Participant, Institution, role or surface values.
+- Replaced the obsolete `AdapterRequest`/internal-bridge vocabulary with one
+  `SurfaceRequest` contract and renamed the retrieval dependency as an owner
+  factory port. No compatibility type alias or ordinary internal route remains.
+- Replaced delimiter-joined exact-key comparison with length plus own-property
+  checks, removing an ambiguous structural-validation idiom.

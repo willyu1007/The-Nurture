@@ -14,7 +14,8 @@ import {
 } from "./institution-knowledge-formal-ingress-contract.js";
 import {
   NurtureInstitutionKnowledgeSurfaceHandler,
-  type NurtureInstitutionKnowledgeAdapterRequest,
+  parseNurtureInstitutionKnowledgeSurfaceRequest,
+  type NurtureInstitutionKnowledgeSurfaceRequest,
   type NurtureInstitutionKnowledgeBindingPort,
   type NurtureInstitutionKnowledgeSurfaceDeps,
   type NurtureInstitutionKnowledgeTrustedContextV1,
@@ -26,7 +27,7 @@ export const NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_HANDLER_KEYS = Object.freeze({
   execute: NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_INGRESS_V1.execute.handler_key,
 } as const);
 
-export type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryV1 = {
+export type NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1 = {
   createForPrincipal(
     principal: WorkflowVerifiedScenarioInvocationV1["invocation"]["principal"],
   ): InstitutionKnowledgeRetrievalOwnerPortV1;
@@ -36,7 +37,7 @@ export type NurtureInstitutionKnowledgeFormalIngressDeps = {
   surfaceDeps: NurtureInstitutionKnowledgeSurfaceDeps;
   authorityResolver?: NurtureInstitutionKnowledgeFormalAuthorityResolverV1;
   preparedCommandOwner?: NurtureInstitutionKnowledgePreparedCommandOwnerV1;
-  authorizedRetrievalOwnerFactory?: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryV1;
+  authorizedRetrievalOwnerFactory?: NurtureInstitutionKnowledgeAuthorizedRetrievalOwnerFactoryPortV1;
 };
 
 export function createNurtureInstitutionKnowledgeFormalInvocationHandlers(
@@ -90,13 +91,14 @@ async function prepare(
   try {
     const resolution = await resolveCurrentAuthority(verified, deps, input.request);
     if (resolution.status !== "resolved") return resolution;
-    return await deps.preparedCommandOwner.prepare({
+    const prepared = await deps.preparedCommandOwner.prepare({
       principal: verified.invocation.principal,
       invocation_request_id: verified.invocation.request.request_id,
       client_surface: NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_INGRESS_V1.client_surface,
       authority: resolution.authority,
       command: input,
     });
+    return normalizePreparedResult(prepared, input.request.capabilityKey);
   } catch {
     return unavailable();
   }
@@ -113,12 +115,14 @@ async function execute(
   if (!input) return invalid();
   if (!deps.preparedCommandOwner || !deps.authorityResolver) return unavailable();
   try {
-    const consumed = await deps.preparedCommandOwner.consumeConfirmed({
+    const consumed = normalizeConsumedResult(
+      await deps.preparedCommandOwner.consumeConfirmed({
       principal: verified.invocation.principal,
       invocation_request_id: verified.invocation.request.request_id,
       client_surface: NURTURE_INSTITUTION_KNOWLEDGE_FORMAL_INGRESS_V1.client_surface,
       command: input,
-    });
+      }),
+    );
     if (consumed.status !== "resolved") return consumed;
     if (
       consumed.command_request_id !== input.commandRequestId ||
@@ -145,7 +149,7 @@ async function invokeSurface(
   verified: WorkflowVerifiedScenarioInvocationV1,
   deps: NurtureInstitutionKnowledgeFormalIngressDeps,
   authority: NurtureInstitutionKnowledgeLocalAuthorityV1,
-  request: NurtureInstitutionKnowledgeAdapterRequest,
+  request: NurtureInstitutionKnowledgeSurfaceRequest,
   commandRequestId: string,
 ): Promise<unknown> {
   const workspaceId = verified.invocation.principal.workspace_ref.object_id;
@@ -199,18 +203,139 @@ async function resolveCurrentAuthority(
   verified: WorkflowVerifiedScenarioInvocationV1,
   deps: NurtureInstitutionKnowledgeFormalIngressDeps,
   request: {
-    capabilityKey: NurtureInstitutionKnowledgeAdapterRequest["capabilityKey"];
+    capabilityKey: NurtureInstitutionKnowledgeSurfaceRequest["capabilityKey"];
     targetOptionRef: string;
   },
 ) {
   if (!deps.authorityResolver) return unavailable();
-  return deps.authorityResolver.resolveCurrent({
-    principal: verified.invocation.principal,
-    invocation_request_id: verified.invocation.request.request_id,
-    declared_operation_key: verified.declaration.operation_key,
-    capability_key: request.capabilityKey,
-    target_option_ref: request.targetOptionRef,
-  });
+  return normalizeAuthorityResolution(
+    await deps.authorityResolver.resolveCurrent({
+      principal: verified.invocation.principal,
+      invocation_request_id: verified.invocation.request.request_id,
+      declared_operation_key: verified.declaration.operation_key,
+      capability_key: request.capabilityKey,
+      target_option_ref: request.targetOptionRef,
+    }),
+  );
+}
+
+function normalizeAuthorityResolution(
+  value: Awaited<ReturnType<NurtureInstitutionKnowledgeFormalAuthorityResolverV1["resolveCurrent"]>>,
+) {
+  if (value.status === "resolved") {
+    return validAuthority(value.authority)
+      ? { status: "resolved" as const, authority: { ...value.authority } }
+      : unavailable("institution_knowledge_owner_response_invalid");
+  }
+  return validReasonCode(value.reason_code)
+    ? { status: value.status, reason_code: value.reason_code }
+    : unavailable("institution_knowledge_owner_response_invalid");
+}
+
+function normalizePreparedResult(
+  value: Awaited<ReturnType<NurtureInstitutionKnowledgePreparedCommandOwnerV1["prepare"]>>,
+  expectedEffect: NurtureInstitutionKnowledgeSurfaceRequest["capabilityKey"],
+) {
+  if (value.status === "ready_to_confirm") {
+    if (
+      !opaqueId(value.command_request_id) ||
+      !opaqueRef(value.confirmation_ref) ||
+      !canonicalInstant(value.expires_at) ||
+      value.effect !== expectedEffect
+    ) {
+      return unavailable("institution_knowledge_owner_response_invalid");
+    }
+    return {
+      status: "ready_to_confirm" as const,
+      command_request_id: value.command_request_id,
+      confirmation_ref: value.confirmation_ref,
+      expires_at: value.expires_at,
+      effect: value.effect,
+    };
+  }
+  return validReasonCode(value.reason_code)
+    ? { status: value.status, reason_code: value.reason_code }
+    : unavailable("institution_knowledge_owner_response_invalid");
+}
+
+function normalizeConsumedResult(
+  value: Awaited<ReturnType<NurtureInstitutionKnowledgePreparedCommandOwnerV1["consumeConfirmed"]>>,
+) {
+  if (value.status !== "resolved") {
+    return validReasonCode(value.reason_code)
+      ? { status: value.status, reason_code: value.reason_code }
+      : unavailable("institution_knowledge_owner_response_invalid");
+  }
+  const frozenRequest = parseNurtureInstitutionKnowledgeSurfaceRequest(
+    value.frozen_request,
+  );
+  if (
+    !opaqueId(value.command_request_id) ||
+    !frozenRequest ||
+    frozenRequest.capabilityKey === "query_institution_knowledge_preview" ||
+    !validAuthority(value.authority)
+  ) {
+    return unavailable("institution_knowledge_owner_response_invalid");
+  }
+  return {
+    status: "resolved" as const,
+    command_request_id: value.command_request_id,
+    frozen_request: frozenRequest,
+    authority: { ...value.authority },
+  };
+}
+
+function validAuthority(
+  value: unknown,
+): value is NurtureInstitutionKnowledgeLocalAuthorityV1 {
+  return isRecord(value) && exactKeys(value, [
+    "active_role",
+    "authority_version",
+    "evaluated_at",
+    "institution_ref",
+    "participant_ref",
+    "role_assignment_ref",
+    "surface_key",
+    "workspace_id",
+  ]) &&
+    opaqueId(value.workspace_id) &&
+    opaqueId(value.participant_ref) &&
+    opaqueId(value.institution_ref) &&
+    opaqueId(value.role_assignment_ref) &&
+    value.active_role === "institution_admin" &&
+    value.surface_key === "institution_workbench" &&
+    opaqueId(value.authority_version) &&
+    canonicalInstant(value.evaluated_at);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function exactKeys(value: object, expected: readonly string[]): boolean {
+  const keys = Object.keys(value);
+  return keys.length === expected.length &&
+    expected.every((key) => Object.prototype.hasOwnProperty.call(value, key));
+}
+
+function opaqueId(value: unknown): value is string {
+  return typeof value === "string" &&
+    /^[A-Za-z0-9][A-Za-z0-9._:~-]{0,190}$/u.test(value);
+}
+
+function opaqueRef(value: unknown): value is string {
+  return typeof value === "string" &&
+    /^[A-Za-z0-9][A-Za-z0-9._:~=-]{15,511}$/u.test(value);
+}
+
+function validReasonCode(value: unknown): value is string {
+  return typeof value === "string" && /^[a-z][a-z0-9_]{0,119}$/u.test(value);
+}
+
+function canonicalInstant(value: unknown): value is string {
+  return typeof value === "string" &&
+    !Number.isNaN(Date.parse(value)) &&
+    new Date(value).toISOString() === value;
 }
 
 function sameAuthority(
@@ -256,8 +381,10 @@ function invalid() {
   return { status: "invalid" as const, reason_code: "invalid_institution_knowledge_formal_input" };
 }
 
-function unavailable() {
-  return { status: "unavailable" as const, reason_code: "institution_knowledge_formal_ingress_unavailable" };
+function unavailable(
+  reasonCode = "institution_knowledge_formal_ingress_unavailable",
+) {
+  return { status: "unavailable" as const, reason_code: reasonCode };
 }
 
 function declarationDrift() {

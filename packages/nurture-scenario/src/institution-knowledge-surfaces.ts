@@ -94,8 +94,8 @@ type OperationInputByCapability = {
   revoke_institution_knowledge_revision: { reasonKey: string };
 };
 
-/** Internal default-off bridge. I3 alone may map the formal Surface envelope. */
-export type NurtureInstitutionKnowledgeAdapterRequest<
+/** Exact request consumed by the Institution Knowledge surface handler. */
+export type NurtureInstitutionKnowledgeSurfaceRequest<
   Key extends NurtureInstitutionKnowledgeSurfaceCapabilityKey =
     NurtureInstitutionKnowledgeSurfaceCapabilityKey,
 > = Key extends NurtureInstitutionKnowledgeSurfaceCapabilityKey
@@ -159,7 +159,7 @@ export type NurtureInstitutionKnowledgeBindingDecision =
 
 export type NurtureInstitutionKnowledgeBindingPort = {
   resolve(input: {
-    request: NurtureInstitutionKnowledgeAdapterRequest;
+    request: NurtureInstitutionKnowledgeSurfaceRequest;
     trusted: NurtureInstitutionKnowledgeTrustedContextV1;
   }): Promise<NurtureInstitutionKnowledgeBindingDecision>;
 };
@@ -319,9 +319,9 @@ const isQueryKey = (value: string): value is NurtureInstitutionKnowledgeQueryKey
   (NURTURE_INSTITUTION_KNOWLEDGE_QUERY_KEYS as readonly string[]).includes(value);
 const isActionKey = (value: string): value is NurtureInstitutionKnowledgeActionKey =>
   (NURTURE_INSTITUTION_KNOWLEDGE_ACTION_KEYS as readonly string[]).includes(value);
-export const parseNurtureInstitutionKnowledgeAdapterRequest = (
+export const parseNurtureInstitutionKnowledgeSurfaceRequest = (
   value: unknown,
-): NurtureInstitutionKnowledgeAdapterRequest | null => {
+): NurtureInstitutionKnowledgeSurfaceRequest | null => {
   if (!exact(
     value,
     ["capabilityKey", "capabilityVersion", "targetOptionRef", "operationInput"],
@@ -334,7 +334,7 @@ export const parseNurtureInstitutionKnowledgeAdapterRequest = (
   if (isQueryKey(capability)) {
     if (value.confirmationRef !== undefined) return null;
   } else if (!opaqueRef(value.confirmationRef)) return null;
-  return value as NurtureInstitutionKnowledgeAdapterRequest;
+  return value as NurtureInstitutionKnowledgeSurfaceRequest;
 };
 
 export const parseNurtureInstitutionKnowledgeCommandIntent = (
@@ -366,7 +366,7 @@ const validTrustedContext = (
   value.client_surface === "web_run_workbench";
 
 const requestedAuthorityRefs = (
-  request: NurtureInstitutionKnowledgeAdapterRequest,
+  request: NurtureInstitutionKnowledgeSurfaceRequest,
 ): string[] => {
   if (request.capabilityKey !== "create_institution_knowledge_item" &&
     request.capabilityKey !== "create_institution_knowledge_revision") return [];
@@ -374,7 +374,7 @@ const requestedAuthorityRefs = (
 };
 
 const validBinding = (input: {
-  request: NurtureInstitutionKnowledgeAdapterRequest;
+  request: NurtureInstitutionKnowledgeSurfaceRequest;
   trusted: NurtureInstitutionKnowledgeTrustedContextV1;
   binding: NurtureInstitutionKnowledgePreparedBindingV1;
 }): boolean => {
@@ -648,7 +648,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
     requestValue: unknown,
     trusted: NurtureInstitutionKnowledgeTrustedContextV1,
   ): Promise<NurtureInstitutionKnowledgeAdapterResponse> {
-    const request = parseNurtureInstitutionKnowledgeAdapterRequest(requestValue);
+    const request = parseNurtureInstitutionKnowledgeSurfaceRequest(requestValue);
     if (!request) return { status: "invalid", reason_code: "invalid_institution_knowledge_request" };
     if (!validTrustedContext(trusted)) {
       return { status: "unavailable", reason_code: "invalid_trusted_institution_knowledge_context" };
@@ -679,7 +679,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
   }
 
   private async preview(
-    request: NurtureInstitutionKnowledgeAdapterRequest<"query_institution_knowledge_preview">,
+    request: NurtureInstitutionKnowledgeSurfaceRequest<"query_institution_knowledge_preview">,
     trusted: NurtureInstitutionKnowledgeTrustedContextV1,
     binding: NurtureInstitutionKnowledgePreparedBindingV1,
   ): Promise<NurtureInstitutionKnowledgeAdapterResponse> {
@@ -702,7 +702,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
   }
 
   private async answer(
-    request: NurtureInstitutionKnowledgeAdapterRequest<"answer_institution_knowledge">,
+    request: NurtureInstitutionKnowledgeSurfaceRequest<"answer_institution_knowledge">,
     trusted: NurtureInstitutionKnowledgeTrustedContextV1,
     binding: NurtureInstitutionKnowledgePreparedBindingV1,
   ): Promise<NurtureInstitutionKnowledgeAdapterResponse> {
@@ -754,7 +754,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
   }
 
   private execute(
-    request: NurtureInstitutionKnowledgeAdapterRequest<NurtureInstitutionKnowledgeLifecycleActionKey>,
+    request: NurtureInstitutionKnowledgeSurfaceRequest<NurtureInstitutionKnowledgeLifecycleActionKey>,
     trusted: NurtureInstitutionKnowledgeTrustedContextV1,
     binding: NurtureInstitutionKnowledgePreparedBindingV1,
   ): Promise<NurtureInstitutionKnowledgeAdapterResponse> {
@@ -821,7 +821,7 @@ export class NurtureInstitutionKnowledgeSurfaceHandler {
   }
 
   private async run<Input>(
-    request: NurtureInstitutionKnowledgeAdapterRequest<NurtureInstitutionKnowledgeLifecycleActionKey>,
+    request: NurtureInstitutionKnowledgeSurfaceRequest<NurtureInstitutionKnowledgeLifecycleActionKey>,
     trusted: NurtureInstitutionKnowledgeTrustedContextV1,
     binding: NurtureInstitutionKnowledgePreparedBindingV1,
     spec: NurtureCommandSpec<Input>,
