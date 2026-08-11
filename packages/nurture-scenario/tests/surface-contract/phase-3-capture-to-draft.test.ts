@@ -173,7 +173,7 @@ describe("Phase 3 capture-to-draft deterministic main path", () => {
     const freeze = readFileSync(
       path.join(
         packageRoot,
-        "../../dev-docs/active/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md",
+        "../../dev-docs/archive/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md",
       ),
       "utf8",
     );

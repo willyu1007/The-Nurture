@@ -5,7 +5,7 @@
 // TODO(clinical-sign-off): these keyword lists are a provisional engineering
 // starting point. The vetted lexicon must be owned + signed off by product /
 // clinical before production use. Gate + review packet + sign-off record:
-// dev-docs/active/nurture-mvp/safety-lexicon-signoff.md (status: PENDING).
+// dev-docs/archive/nurture-mvp/safety-lexicon-signoff.md (status: PENDING).
 
 export type SafetyLevel = "none" | "low" | "restricted";
 export type SafetyIntentClass = "emergency" | "medication_decision" | "prescription" | "diagnosis";

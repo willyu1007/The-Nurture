@@ -249,7 +249,341 @@ describe("T-007 Prisma formal Institution Knowledge owners", () => {
       await prisma.nurtureParticipant.deleteMany({ where: { workspaceId } });
     }
   });
+
+  it("deduplicates an exact prepare and rejects client-command reuse with another payload", async () => {
+    const scope = await seedInstitutionAdminScope("dedup");
+    const clock = { ms: Date.parse("2026-08-11T10:00:00.000Z") };
+    const owners = createOwners(() => new Date(clock.ms));
+    try {
+      const principal = humanPrincipal(scope);
+      const targetOptionRef = issueTarget(owners, scope);
+      const authority = await resolvePreparedAuthority(
+        owners,
+        principal,
+        targetOptionRef,
+        `dedup-authority-${scope.suffix}`,
+      );
+      const command = knowledgeItemCommand(`client-command-${scope.suffix}`, targetOptionRef);
+      const prepareInput = {
+        principal,
+        invocation_request_id: `prepare-${scope.suffix}`,
+        client_surface: "web_run_workbench" as const,
+        authority,
+        command,
+      };
+      const first = await owners.institutionKnowledgePreparedCommandOwner.prepare(prepareInput);
+      expect(first).toMatchObject({ status: "ready_to_confirm" });
+      clock.ms += 1_000;
+      const replay = await owners.institutionKnowledgePreparedCommandOwner.prepare(prepareInput);
+      expect(replay).toEqual(first);
+      await expect(prisma.nurtureInstitutionKnowledgePreparedCommand.count({
+        where: { workspaceId: scope.workspaceId },
+      })).resolves.toBe(1);
+
+      await expect(owners.institutionKnowledgePreparedCommandOwner.prepare({
+        ...prepareInput,
+        invocation_request_id: `prepare-reuse-${scope.suffix}`,
+        command: knowledgeItemCommand(
+          `client-command-${scope.suffix}`,
+          targetOptionRef,
+          "Changed pickup title",
+        ),
+      })).resolves.toEqual({
+        status: "not_prepared",
+        reason_code: "prepared_client_command_reuse_conflict",
+      });
+      await expect(prisma.nurtureInstitutionKnowledgePreparedCommand.count({
+        where: { workspaceId: scope.workspaceId },
+      })).resolves.toBe(1);
+    } finally {
+      await cleanupScope(scope.workspaceId);
+    }
+  });
+
+  it("expires an unconsumed prepare, scrubs the snapshot and never revives the client command id", async () => {
+    const scope = await seedInstitutionAdminScope("expiry");
+    const clock = { ms: Date.parse("2026-08-11T10:00:00.000Z") };
+    const owners = createOwners(() => new Date(clock.ms));
+    try {
+      const principal = humanPrincipal(scope);
+      const targetOptionRef = issueTarget(owners, scope);
+      const authority = await resolvePreparedAuthority(
+        owners,
+        principal,
+        targetOptionRef,
+        `expiry-authority-${scope.suffix}`,
+      );
+      const command = knowledgeItemCommand(`client-command-${scope.suffix}`, targetOptionRef);
+      const prepared = await owners.institutionKnowledgePreparedCommandOwner.prepare({
+        principal,
+        invocation_request_id: `prepare-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        authority,
+        command,
+      });
+      expect(prepared).toMatchObject({ status: "ready_to_confirm" });
+      if (prepared.status !== "ready_to_confirm") throw new Error("prepare failed");
+      const before = await prisma.nurtureInstitutionKnowledgePreparedCommand.findUniqueOrThrow({
+        where: { commandRequestId: prepared.command_request_id },
+      });
+      expect(before.status).toBe("prepared");
+      expect(before.snapshotCodecVersion).toBeGreaterThan(0);
+      expect(before.frozenSnapshotCiphertext).not.toBe("");
+
+      clock.ms += 10 * 60_000;
+      await expect(owners.institutionKnowledgePreparedCommandOwner.consumeConfirmed({
+        principal,
+        invocation_request_id: `execute-expired-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        command: {
+          contractVersion: 1,
+          commandRequestId: prepared.command_request_id,
+          confirmationRef: prepared.confirmation_ref,
+        },
+      })).resolves.toEqual({
+        status: "denied",
+        reason_code: "prepared_command_expired",
+      });
+      const after = await prisma.nurtureInstitutionKnowledgePreparedCommand.findUniqueOrThrow({
+        where: { commandRequestId: prepared.command_request_id },
+      });
+      expect(after).toMatchObject({
+        status: "expired",
+        snapshotCodecVersion: 0,
+        frozenSnapshotCiphertext: "",
+      });
+      expect(after.aggregateVersion).toBe(before.aggregateVersion + 1);
+
+      const freshAuthority = await resolvePreparedAuthority(
+        owners,
+        principal,
+        targetOptionRef,
+        `expiry-fresh-authority-${scope.suffix}`,
+      );
+      await expect(owners.institutionKnowledgePreparedCommandOwner.prepare({
+        principal,
+        invocation_request_id: `prepare-revive-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        authority: freshAuthority,
+        command,
+      })).resolves.toEqual({
+        status: "not_prepared",
+        reason_code: "prepared_command_expired",
+      });
+      await expect(prisma.nurtureInstitutionKnowledgePreparedCommand.count({
+        where: { workspaceId: scope.workspaceId },
+      })).resolves.toBe(1);
+    } finally {
+      await cleanupScope(scope.workspaceId);
+    }
+  });
+
+  it("rejects a mismatched confirmation and keeps the prepared command consumable", async () => {
+    const scope = await seedInstitutionAdminScope("conflict");
+    const clock = { ms: Date.parse("2026-08-11T10:00:00.000Z") };
+    const owners = createOwners(() => new Date(clock.ms));
+    try {
+      const principal = humanPrincipal(scope);
+      const targetOptionRef = issueTarget(owners, scope);
+      const authority = await resolvePreparedAuthority(
+        owners,
+        principal,
+        targetOptionRef,
+        `conflict-authority-${scope.suffix}`,
+      );
+      const prepared = await owners.institutionKnowledgePreparedCommandOwner.prepare({
+        principal,
+        invocation_request_id: `prepare-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        authority,
+        command: knowledgeItemCommand(`client-command-${scope.suffix}`, targetOptionRef),
+      });
+      expect(prepared).toMatchObject({ status: "ready_to_confirm" });
+      if (prepared.status !== "ready_to_confirm") throw new Error("prepare failed");
+
+      await expect(owners.institutionKnowledgePreparedCommandOwner.consumeConfirmed({
+        principal,
+        invocation_request_id: `execute-mismatch-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        command: {
+          contractVersion: 1,
+          commandRequestId: prepared.command_request_id,
+          confirmationRef: "ikc1.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        },
+      })).resolves.toEqual({
+        status: "conflict",
+        reason_code: "prepared_command_reuse_conflict",
+      });
+      await expect(prisma.nurtureInstitutionKnowledgePreparedCommand.findUniqueOrThrow({
+        where: { commandRequestId: prepared.command_request_id },
+      })).resolves.toMatchObject({ status: "prepared" });
+
+      await expect(owners.institutionKnowledgePreparedCommandOwner.consumeConfirmed({
+        principal,
+        invocation_request_id: `execute-exact-${scope.suffix}`,
+        client_surface: "web_run_workbench",
+        command: {
+          contractVersion: 1,
+          commandRequestId: prepared.command_request_id,
+          confirmationRef: prepared.confirmation_ref,
+        },
+      })).resolves.toMatchObject({
+        status: "resolved",
+        command_request_id: prepared.command_request_id,
+      });
+      await expect(prisma.nurtureInstitutionKnowledgePreparedCommand.findUniqueOrThrow({
+        where: { commandRequestId: prepared.command_request_id },
+      })).resolves.toMatchObject({ status: "consumed" });
+    } finally {
+      await cleanupScope(scope.workspaceId);
+    }
+  });
 });
+
+type SeededScope = {
+  suffix: string;
+  workspaceId: string;
+  participantId: string;
+  institutionId: string;
+  roleAssignmentId: string;
+  accountId: string;
+  actorId: string;
+};
+
+async function seedInstitutionAdminScope(label: string): Promise<SeededScope> {
+  const suffix = `${label}-${randomUUID()}`;
+  const scope: SeededScope = {
+    suffix,
+    workspaceId: `workspace-${suffix}`,
+    participantId: `participant-${suffix}`,
+    institutionId: `institution-${suffix}`,
+    roleAssignmentId: `role-${suffix}`,
+    accountId: `account-${suffix}`,
+    actorId: `actor-${suffix}`,
+  };
+  await prisma.nurtureParticipant.create({
+    data: {
+      id: scope.participantId,
+      workspaceId: scope.workspaceId,
+      myChatUserId: scope.accountId,
+      status: "active",
+      aggregateVersion: 7,
+    },
+  });
+  await prisma.nurtureParticipantPrincipalBinding.create({
+    data: {
+      participantId: scope.participantId,
+      workspaceId: scope.workspaceId,
+      accountObjectId: scope.accountId,
+      actorObjectId: scope.actorId,
+      status: "active",
+      currentKey: "current",
+      aggregateVersion: 9,
+    },
+  });
+  await prisma.nurtureCareInstitution.create({
+    data: {
+      id: scope.institutionId,
+      workspaceId: scope.workspaceId,
+      displayName: "T-007 disposable institution",
+      status: "active",
+      aggregateVersion: 3,
+    },
+  });
+  await prisma.nurtureCareRoleAssignment.create({
+    data: {
+      id: scope.roleAssignmentId,
+      workspaceId: scope.workspaceId,
+      participantId: scope.participantId,
+      role: "institution_admin",
+      scopeType: "institution",
+      scopeId: scope.institutionId,
+      status: "active",
+      aggregateVersion: 5,
+    },
+  });
+  return scope;
+}
+
+function createOwners(now: () => Date) {
+  return createPrismaNurtureInstitutionKnowledgeFormalOwners({
+    prisma,
+    targetOptionIntegrityKey: "t007-target-option-integrity-key-00000001",
+    preparedCommandIntegrityKey: "t007-prepared-integrity-key-0000000001",
+    preparedCommandEncryptionSecret: "t007-prepared-encryption-key-000000001",
+    now,
+  });
+}
+
+function issueTarget(
+  owners: ReturnType<typeof createPrismaNurtureInstitutionKnowledgeFormalOwners>,
+  scope: SeededScope,
+): string {
+  const targetOptionRef = owners.institutionKnowledgeOptionIssuer.issueInstitution({
+    workspace_id: scope.workspaceId,
+    participant_ref: scope.participantId,
+    institution_ref: scope.institutionId,
+    role_assignment_ref: scope.roleAssignmentId,
+    version: 3,
+  });
+  if (!targetOptionRef) throw new Error("target option issuance failed");
+  return targetOptionRef;
+}
+
+async function resolvePreparedAuthority(
+  owners: ReturnType<typeof createPrismaNurtureInstitutionKnowledgeFormalOwners>,
+  principal: ScenarioHumanPrincipalV1,
+  targetOptionRef: string,
+  invocationRequestId: string,
+) {
+  const authority = await owners.institutionKnowledgeAuthorityResolver.resolveCurrent({
+    principal,
+    invocation_request_id: invocationRequestId,
+    declared_operation_key: "prepare_institution_knowledge_command",
+    capability_key: "create_institution_knowledge_item",
+    target_option_ref: targetOptionRef,
+  });
+  if (authority.status !== "resolved") throw new Error("authority resolution failed");
+  return authority.authority;
+}
+
+function knowledgeItemCommand(
+  clientCommandId: string,
+  targetOptionRef: string,
+  title = "Safe pickup",
+) {
+  return {
+    contractVersion: 1 as const,
+    clientCommandId,
+    request: {
+      capabilityKey: "create_institution_knowledge_item",
+      capabilityVersion: "1.0.0" as const,
+      targetOptionRef,
+      operationInput: {
+        category: "institution_policy",
+        body: {
+          title,
+          summary: "How the institution handles pickup.",
+          sections: [{
+            sectionKey: "pickup",
+            heading: "Pickup",
+            body: "Verify the authorized pickup contact.",
+          }],
+        },
+        intendedAudiences: ["institution_admin"],
+        safetyClass: "general_guidance",
+      },
+    },
+  };
+}
+
+async function cleanupScope(workspaceId: string) {
+  await prisma.nurtureInstitutionKnowledgePreparedCommand.deleteMany({ where: { workspaceId } });
+  await prisma.nurtureCareRoleAssignment.deleteMany({ where: { workspaceId } });
+  await prisma.nurtureCareInstitution.deleteMany({ where: { workspaceId } });
+  await prisma.nurtureParticipantPrincipalBinding.deleteMany({ where: { workspaceId } });
+  await prisma.nurtureParticipant.deleteMany({ where: { workspaceId } });
+}
 
 function humanPrincipal(input: {
   workspaceId: string;

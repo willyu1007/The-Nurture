@@ -22,7 +22,7 @@ const frozenInputInterface = {
     "sha256:4fe91e1314c89d09c4081001a61b93ff68392000f7725e8e21a8e7209341d47a",
 };
 const freezePath =
-  "dev-docs/active/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md";
+  "dev-docs/archive/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md";
 const t007FreezePath =
   "dev-docs/active/nurture-institution-surfaces/08-g4-0b-publication-policy-freeze.md";
 
@@ -369,6 +369,7 @@ const expectedTableCensus = [
   "NurtureInstitutionKnowledgeAuthorityLink",
   "NurtureInstitutionKnowledgeConflictReviewCandidate",
   "NurtureInstitutionKnowledgeItem",
+  "NurtureInstitutionKnowledgePreparedCommand",
   "NurtureInstitutionKnowledgeRevision",
   "NurtureInstitutionKnowledgeRevisionEvent",
   "NurtureInstitutionPublicationPolicy",

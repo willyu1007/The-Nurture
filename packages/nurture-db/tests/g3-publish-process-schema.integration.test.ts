@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createPrismaClient } from "../src/client.js";
 
 // DB-level proof of the G3-0 SSOT delta
-// (dev-docs/active/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md,
+// (dev-docs/archive/nurture-child-care-boards/06-g3-0-fact-contract-schema-freeze.md,
 // including the 2026-08-02 media lifecycle identities amendment): the retired
 // legacy enums are gone from the live database, the new publish-process
 // identities carry exactly the frozen labels, and the invariants the domain
